@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2026 Zagdrath
+ * SPDX-License-Identifier: MIT
+ */
+
 package net.zagdrath.arcforge.client.gui.tab;
 
 import java.util.ArrayList;

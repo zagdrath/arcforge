@@ -1,48 +1,58 @@
-# Arcforge
+<p align="center">
+  <img src=".github/assets/banner.png" alt="Arcforge" width="1005">
+</p>
 
-A technology mod for Minecraft 26.3 (NeoForge) by Zagdrath.
+<p align="center">
+  A Forge Energy technology mod for Minecraft 26.3 on NeoForge.
+</p>
 
-Arcforge machines use Forge Energy (FE) through NeoForge's standard capabilities
-(`Capabilities.Energy`, `Capabilities.Fluid`, `Capabilities.Item`), so they interoperate
-with any other NeoForge mod's cables, pipes and machines.
+## About
+
+Arcforge adds machines that generate and use Forge Energy (FE). All machines expose energy, fluids
+and items through NeoForge's standard capabilities, so they connect to cables, pipes and machines
+from any other NeoForge mod that uses FE.
+
+Every Arcforge machine appears in the **Arcforge: Machines** creative tab.
 
 ## Machines
 
 ### Geothermal Plant
-Converts heat (HU) into FE. Output is `heat × fePerHeat` FE/t (default 2 FE/t per HU).
 
-| Heat source | Heat | FE/t | Consumption | FE per unit |
-|---|---|---|---|---|
-| Lava (internal tank) | 40 HU | 80 | 50 mB per 100 ticks | 160,000 per bucket |
-| Coal | 20 HU | 40 | 1 per 1600 ticks | 64,000 |
-| Charcoal | 15 HU | 30 | 1 per 1600 ticks | 48,000 |
-| Adjacent lava source block (each side) | 5 HU | 10 | never consumed | — |
+Turns heat into FE. Output is **heat × 2 FE/t**, and the heat level rises and falls gradually as
+heat sources are added or run out.
 
-- The combustion chamber burns one fuel at a time: lava from the tank first, then coal/charcoal.
-- Passive heat from lava source blocks on any of the 6 sides stacks with combustion.
-- Maximum heat is 40 + 6 × 5 = 70 HU (140 FE/t); the GUI heat gauge scales to this.
-- Heat ramps toward its target, so the plant warms up and cools down gradually.
-- The input slot accepts lava buckets (drained into the 8,000 mB tank) and coal/charcoal.
-  Lava can also be piped in, or added by right-clicking the block with a lava bucket.
-- Fuel is not consumed while the internal FE buffer is full.
-- Pushes up to 1,000 FE/t into neighbours on faces configured for energy output.
+| Heat source | Heat | Output | Energy per unit |
+|---|---|---|---|
+| Lava (internal tank) | 40 HU | 80 FE/t | 160,000 FE per bucket |
+| Coal | 20 HU | 40 FE/t | 64,000 FE |
+| Charcoal | 15 HU | 30 FE/t | 48,000 FE |
+| Adjacent lava source block | 5 HU each | 10 FE/t each | Free, never consumed |
 
-### Machine GUI tabs
+- Burns one fuel at a time, lava first and then coal or charcoal.
+- Lava source blocks touching any of its six sides add passive heat on top. The plant can sit on
+  or beside a lava pool.
+- Peaks at 70 HU (140 FE/t) with lava burning and lava on all six sides.
+- Fill the 8,000 mB lava tank by piping lava in, placing lava buckets in the input slot, or
+  right-clicking the plant with a lava bucket. Coal and charcoal also go in the input slot.
+- Stores 100,000 FE and pushes up to 1,000 FE/t into neighbouring machines and cables.
+- Stops taking new fuel while its energy buffer is full.
+
+## Machine settings
+
+Tabs on the right of each machine's screen:
+
 - **Energy**: stored FE and current output.
-- **Redstone**: ignore redstone, run with signal, or run without signal.
-- **Sides**: per-face IO relative to the front (left click cycles none → input → output →
-  energy, right click reverses, shift-click clears). The front is locked. Defaults: top input,
-  bottom output, left/right/back energy output.
-- **Upgrades**: two slots accepting items tagged `#arcforge:upgrades` (empty for now).
+- **Redstone**: ignore redstone, run only with a signal, or run only without one.
+- **Sides**: choose what each face does: none, input, output or energy output. Left-click to
+  cycle, right-click to cycle back, shift-click to clear. The front face is locked.
+  - Defaults: top is input, bottom is output, left, right and back are energy output.
+- **Upgrades**: upgrade slots, reserved for future upgrade items.
 
-All values are configurable in `config/arcforge-common.toml`.
+## Configuration
 
-## Development
+All balance values (heat per fuel, FE per heat, burn times, tank and buffer sizes, output rate)
+can be changed in `config/arcforge-common.toml`.
 
-- `gradlew runClient` / `gradlew runServer` to launch.
-- `gradlew build` to produce the jar in `build/libs`.
-- `gradlew --refresh-dependencies` if your IDE is missing libraries.
+## License
 
-Minecraft uses the official Mojang mappings; see the
-[license](https://github.com/NeoForged/NeoForm/blob/main/Mojang.md).
-NeoForge docs: https://docs.neoforged.net/
+Arcforge is released under the [MIT License](LICENSE). Copyright (c) 2026 Zagdrath.
