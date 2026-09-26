@@ -1,0 +1,35 @@
+package net.zagdrath.arcforge.machine;
+
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.zagdrath.arcforge.Arcforge;
+
+// Status shown on a machine's GUI screen, with its matching LED sprite.
+public enum MachineStatus {
+    RUNNING("running", "led_running"),
+    FULL("full", "led_idle"),
+    NO_FUEL("no_fuel", "led_blocked"),
+    DISABLED("disabled", "led_off");
+
+    private final String name;
+    private final String led;
+
+    MachineStatus(String name, String led) {
+        this.name = name;
+        this.led = led;
+    }
+
+    public Component getDescription() {
+        return Component.translatable("gui.arcforge.status." + name);
+    }
+
+    // LED sprite inside the given machine's sprite folder, e.g. container/geothermal_plant/led_running.
+    public Identifier getLedSprite(String machine) {
+        return Identifier.fromNamespaceAndPath(Arcforge.MODID, "container/" + machine + "/" + led);
+    }
+
+    public static MachineStatus byId(int id) {
+        MachineStatus[] values = values();
+        return id >= 0 && id < values.length ? values[id] : NO_FUEL;
+    }
+}

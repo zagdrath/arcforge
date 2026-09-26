@@ -1,0 +1,68 @@
+package net.zagdrath.arcforge.client.gui.tab;
+
+import java.util.List;
+
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Mth;
+
+// One expandable tab on the right edge of a machine GUI. Subclasses draw the panel content.
+// All content coordinates are relative to the tab's top-left corner.
+public abstract class SideTab {
+    public static final int COLLAPSED_WIDTH = 26;
+    public static final int SELECTED_WIDTH = 28;
+    public static final int COLLAPSED_HEIGHT = 24;
+
+    private final Identifier icon;
+    private final Component title;
+    private final int expandedWidth;
+    private final int expandedHeight;
+
+    // 0 = collapsed, 1 = fully open. Animated by SideTabPanel.
+    float progress;
+    boolean open;
+    int x;
+    int y;
+
+    protected SideTab(Identifier icon, Component title, int expandedWidth, int expandedHeight) {
+        this.icon = icon;
+        this.title = title;
+        this.expandedWidth = expandedWidth;
+        this.expandedHeight = expandedHeight;
+    }
+
+    public Identifier getIcon() {
+        return icon;
+    }
+
+    public Component getTitle() {
+        return title;
+    }
+
+    public int getWidth() {
+        return progress <= 0 ? COLLAPSED_WIDTH : Math.round(Mth.lerp(progress, SELECTED_WIDTH, expandedWidth));
+    }
+
+    public int getHeight() {
+        return Math.round(Mth.lerp(progress, COLLAPSED_HEIGHT, expandedHeight));
+    }
+
+    public boolean isFullyOpen() {
+        return progress >= 1.0F;
+    }
+
+    // Called whenever the tab becomes fully open or starts closing.
+    protected void onFullyOpenChanged(boolean fullyOpen) {}
+
+    protected abstract void renderContent(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY);
+
+    // Returns true if the click was handled. localX/localY are relative to the tab origin.
+    protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
+        return false;
+    }
+
+    protected void addTooltip(List<Component> lines, int localX, int localY) {}
+}

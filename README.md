@@ -1,25 +1,48 @@
+# Arcforge
 
-Installation information
-=======
+A technology mod for Minecraft 26.3 (NeoForge) by Zagdrath.
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+Arcforge machines use Forge Energy (FE) through NeoForge's standard capabilities
+(`Capabilities.Energy`, `Capabilities.Fluid`, `Capabilities.Item`), so they interoperate
+with any other NeoForge mod's cables, pipes and machines.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+## Machines
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+### Geothermal Plant
+Converts heat (HU) into FE. Output is `heat × fePerHeat` FE/t (default 2 FE/t per HU).
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+| Heat source | Heat | FE/t | Consumption | FE per unit |
+|---|---|---|---|---|
+| Lava (internal tank) | 40 HU | 80 | 50 mB per 100 ticks | 160,000 per bucket |
+| Coal | 20 HU | 40 | 1 per 1600 ticks | 64,000 |
+| Charcoal | 15 HU | 30 | 1 per 1600 ticks | 48,000 |
+| Adjacent lava source block (each side) | 5 HU | 10 | never consumed | — |
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+- The combustion chamber burns one fuel at a time: lava from the tank first, then coal/charcoal.
+- Passive heat from lava source blocks on any of the 6 sides stacks with combustion.
+- Maximum heat is 40 + 6 × 5 = 70 HU (140 FE/t); the GUI heat gauge scales to this.
+- Heat ramps toward its target, so the plant warms up and cools down gradually.
+- The input slot accepts lava buckets (drained into the 8,000 mB tank) and coal/charcoal.
+  Lava can also be piped in, or added by right-clicking the block with a lava bucket.
+- Fuel is not consumed while the internal FE buffer is full.
+- Pushes up to 1,000 FE/t into neighbours on faces configured for energy output.
+
+### Machine GUI tabs
+- **Energy**: stored FE and current output.
+- **Redstone**: ignore redstone, run with signal, or run without signal.
+- **Sides**: per-face IO relative to the front (left click cycles none → input → output →
+  energy, right click reverses, shift-click clears). The front is locked. Defaults: top input,
+  bottom output, left/right/back energy output.
+- **Upgrades**: two slots accepting items tagged `#arcforge:upgrades` (empty for now).
+
+All values are configurable in `config/arcforge-common.toml`.
+
+## Development
+
+- `gradlew runClient` / `gradlew runServer` to launch.
+- `gradlew build` to produce the jar in `build/libs`.
+- `gradlew --refresh-dependencies` if your IDE is missing libraries.
+
+Minecraft uses the official Mojang mappings; see the
+[license](https://github.com/NeoForged/NeoForm/blob/main/Mojang.md).
+NeoForge docs: https://docs.neoforged.net/
