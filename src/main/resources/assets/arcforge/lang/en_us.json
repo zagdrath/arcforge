@@ -1,0 +1,13 @@
+{
+  "itemGroup.arcforge": "Example Mod Tab",
+  "block.arcforge.example_block": "Example Block",
+  "item.arcforge.example_item": "Example Item",
+
+  "arcforge.configuration.title": "Arcforge Configs",
+  "arcforge.configuration.section.arcforge.common.toml": "Arcforge Configs",
+  "arcforge.configuration.section.arcforge.common.toml.title": "Arcforge Configs",
+  "arcforge.configuration.items": "Item List",
+  "arcforge.configuration.logDirtBlock": "Log Dirt Block",
+  "arcforge.configuration.magicNumberIntroduction": "Magic Number Text",
+  "arcforge.configuration.magicNumber": "Magic Number"
+}
