@@ -34,7 +34,7 @@ public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu>
     private final Identifier ghostCoke = sprite("ghost_coke");
 
     public ArcforgeFurnaceScreen(ArcforgeFurnaceMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "arcforge_furnace", menu::getRedstoneMode, menu::getSideMode);
+        super(menu, inventory, title, "arcforge_furnace", menu::getRedstoneMode, menu::getPorts);
         enableAutoEject(menu::isAutoEject);
     }
 

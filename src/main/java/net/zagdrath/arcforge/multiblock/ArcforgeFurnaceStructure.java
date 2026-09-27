@@ -12,8 +12,6 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.UseOnContext;
@@ -144,21 +142,16 @@ public final class ArcforgeFurnaceStructure {
         return InteractionResult.SUCCESS;
     }
 
-    // Wrench on a brick or wall: sneak picks it up, otherwise nearby furnaces recheck and report.
+    // Wrench (Configure mode) on a brick or wall: nearby furnaces recheck and report.
     public static InteractionResult wrenchPart(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Player player = context.getPlayer();
-        if (player != null && player.isSecondaryUseActive()) {
-            level.destroyBlock(pos, true, player);
-            return InteractionResult.SUCCESS;
-        }
         forEachNearbyPort(level, pos, ArcforgeFurnaceBlockEntity::checkNow);
         if (player != null) {
             player.sendOverlayMessage(Component.translatable(findFormedPort(level, pos) != null
                     ? "message.arcforge.arcforge_furnace.formed" : "message.arcforge.arcforge_furnace.incomplete"));
         }
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
         return InteractionResult.SUCCESS;
     }
 }

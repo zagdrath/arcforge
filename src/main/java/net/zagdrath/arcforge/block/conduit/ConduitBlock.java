@@ -15,8 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -64,9 +62,6 @@ public class ConduitBlock extends BaseEntityBlock {
     private static final Map<Direction, EnumProperty<ConnectionMode>> PROPERTIES = new EnumMap<>(Map.of(
             Direction.NORTH, NORTH, Direction.SOUTH, SOUTH, Direction.EAST, EAST,
             Direction.WEST, WEST, Direction.UP, UP, Direction.DOWN, DOWN));
-
-    // Core half-width in blocks; hits closer to the centre than this count as "on the core".
-    private static final double CORE_HALF_SIZE = 3.0 / 16.0 + 1.0E-4;
 
     private static final VoxelShape CORE = Block.box(5, 5, 5, 11, 11, 11);
     private static final Map<Direction, VoxelShape> PIPE_ARMS = Shapes.rotateAll(Block.box(5, 5, 0, 11, 11, 5));
@@ -253,7 +248,7 @@ public class ConduitBlock extends BaseEntityBlock {
         }
     }
 
-    // --- Wrench (server side; see WrenchItem) ---
+    // --- Wrench (server side; see WrenchItem): the clicked side cycles its setting (sneaking: backward) ---
 
     public InteractionResult useWrench(UseOnContext context) {
         Level level = context.getLevel();
@@ -263,11 +258,6 @@ public class ConduitBlock extends BaseEntityBlock {
         boolean sneaking = player != null && player.isSecondaryUseActive();
 
         Vec3 offset = context.getClickLocation().subtract(Vec3.atCenterOf(pos));
-        boolean onCore = Math.abs(offset.x) <= CORE_HALF_SIZE && Math.abs(offset.y) <= CORE_HALF_SIZE && Math.abs(offset.z) <= CORE_HALF_SIZE;
-        if (sneaking && onCore) {
-            level.destroyBlock(pos, true, player);
-            return InteractionResult.SUCCESS;
-        }
 
         Direction side = Direction.getApproximateNearest(offset);
         BlockPos neighbourPos = pos.relative(side);
@@ -300,7 +290,6 @@ public class ConduitBlock extends BaseEntityBlock {
             result = Component.translatable("message.arcforge.conduit.nothing");
         }
 
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.8F);
         if (player != null) {
             player.sendOverlayMessage(Component.translatable("message.arcforge.conduit.side",
                     Component.translatable("conduit_side.arcforge." + side.getSerializedName()), result));

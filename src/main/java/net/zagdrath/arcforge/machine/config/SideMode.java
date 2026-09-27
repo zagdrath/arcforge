@@ -6,9 +6,11 @@
 package net.zagdrath.arcforge.machine.config;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.StringRepresentable;
 
-// What a machine face exposes to pipes, cables and other mods.
-public enum SideMode {
+// What a machine face exposes to pipes, cables and other mods (and, as a block state, what a multiblock's
+// port block does; see MultiblockPorts).
+public enum SideMode implements StringRepresentable {
     NONE("none"),
     INPUT("input"),
     OUTPUT("output"),
@@ -48,6 +50,7 @@ public enum SideMode {
         return values()[(ordinal() + values().length - 1) % values().length];
     }
 
+    @Override
     public String getSerializedName() {
         return name;
     }

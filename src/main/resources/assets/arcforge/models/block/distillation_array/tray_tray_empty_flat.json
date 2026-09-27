@@ -1,8 +1,0 @@
-{
-  "parent": "minecraft:block/cube_bottom_top",
-  "textures": {
-    "side": "arcforge:block/distillation_array/tray_empty",
-    "top": "arcforge:block/distillation_array/casing",
-    "bottom": "arcforge:block/distillation_array/casing"
-  }
-}

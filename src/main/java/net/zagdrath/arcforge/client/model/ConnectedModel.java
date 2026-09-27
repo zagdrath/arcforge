@@ -49,8 +49,10 @@ import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 
 // Connected textures for the steam arrays and Pressure Glass: a formed structure reads as one surface.
+// Formed casings that are ports (see MultiblockPorts) show their port plate on their outer faces.
 //
 // Model JSON (loader "arcforge:connected"): "connect" is "structure" (a casing) or "glass", "textures"
 // names base / beam / lip / window (and end_generator / end_bearing for the turbine), and "fallback" is a
@@ -72,6 +74,7 @@ import net.zagdrath.arcforge.multiblock.DistillationStructure;
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
     private static final String COLUMN = "column_2x2", TRAY = "tray_window";
+    private static final Identifier TRAY_FRAME = Identifier.fromNamespaceAndPath("arcforge", "block/ctm/tray_window_frame");
 
     // Overlays sit just outside the face they decorate, so they never z-fight with it.
     private static final float WINDOW_OFFSET = 0.0F, LIP_OFFSET = 0.02F, BEAM_OFFSET = 0.04F;
@@ -189,7 +192,7 @@ public final class ConnectedModel {
         }
     }
 
-    private static final class Baked implements DynamicBlockStateModel {
+    static final class Baked implements DynamicBlockStateModel {
         private final boolean glass;
         private final Material.Baked particle;
         private final Map<Direction, List<BakedQuad>[]> base = new EnumMap<>(Direction.class);
@@ -201,6 +204,7 @@ public final class ConnectedModel {
         private final Map<Direction, List<BakedQuad>[]> edgeLip = new EnumMap<>(Direction.class);
         private final Map<Direction, List<BakedQuad>> endGenerator = new EnumMap<>(Direction.class);
         private final Map<Direction, List<BakedQuad>> endBearing = new EnumMap<>(Direction.class);
+        private final PortOverlays ports;
         private final int materialFlags;
 
         @SuppressWarnings("unchecked")
@@ -214,7 +218,8 @@ public final class ConnectedModel {
             Material.Baked windowTexture = glass ? baseTexture : material(baker, unbaked.textures().get("window"), name);
             Identifier generatorId = unbaked.textures().get("end_generator");
             Identifier bearingId = unbaked.textures().get("end_bearing");
-            int flags = 0;
+            this.ports = new PortOverlays(baker, name);
+            int flags = ports.materialFlags();
             for (Direction face : Direction.values()) {
                 List<BakedQuad>[] baseQuads = new List[4];
                 List<BakedQuad>[] windowQuads = new List[4];
@@ -260,13 +265,13 @@ public final class ConnectedModel {
             this.materialFlags = flags;
         }
 
-        private static Material.Baked material(ModelBaker baker, Identifier id, Identifier name) {
+        static Material.Baked material(ModelBaker baker, Identifier id, Identifier name) {
             return baker.materials().get(new Material(id), () -> name.toString());
         }
 
         // A zero-thickness quad on one face: the face-local rectangle (u right, v down, in pixels) offset
         // outwards, showing the texture region (tu0, tv0)-(tu1, tv1) turned by rotation.
-        private static BakedQuad bake(ModelBaker baker, Direction face, float u0, float v0, float u1, float v1, float offset,
+        static BakedQuad bake(ModelBaker baker, Direction face, float u0, float v0, float u1, float v1, float offset,
                 Material.Baked texture, float tu0, float tv0, float tu1, float tv1, Quadrant rotation) {
             Vector3f from = new Vector3f();
             Vector3f to = new Vector3f();
@@ -304,30 +309,12 @@ public final class ConnectedModel {
             return enclosed >= 2;
         }
 
-        // The face's texture-up and texture-right directions in the world.
-        private static Direction up(Direction face) {
-            return switch (face) {
-                case UP -> Direction.NORTH;
-                case DOWN -> Direction.SOUTH;
-                default -> Direction.UP;
-            };
-        }
-
-        private static Direction right(Direction face) {
-            return switch (face) {
-                case NORTH -> Direction.WEST;
-                case SOUTH, UP, DOWN -> Direction.EAST;
-                case WEST -> Direction.SOUTH;
-                case EAST -> Direction.NORTH;
-            };
-        }
-
         private static Direction sideDirection(Direction face, Side side) {
             return switch (side) {
-                case TOP -> up(face);
-                case BOTTOM -> up(face).getOpposite();
-                case RIGHT -> right(face);
-                case LEFT -> right(face).getOpposite();
+                case TOP -> WindowQuadrants.up(face);
+                case BOTTOM -> WindowQuadrants.up(face).getOpposite();
+                case RIGHT -> WindowQuadrants.right(face);
+                case LEFT -> WindowQuadrants.right(face).getOpposite();
             };
         }
 
@@ -352,6 +339,10 @@ public final class ConnectedModel {
                 }
                 List<BakedQuad> faceQuads = new ArrayList<>();
                 pickFace(level, pos, state, face, faceQuads);
+                BakedQuad port = ports.get(MultiblockPorts.get(state), face);
+                if (port != null) {
+                    faceQuads.add(port);
+                }
                 faceQuads.forEach(quads::addUnculledFace);
             }
             parts.add(new SimpleModelWrapper(quads.build(), true, particle));
@@ -379,10 +370,7 @@ public final class ConnectedModel {
             } else {
                 boolean[] windowed = new boolean[4];
                 for (Quad quad : Quad.values()) {
-                    Direction vertical = quad.top ? up(face) : up(face).getOpposite();
-                    Direction horizontal = quad.right ? right(face) : right(face).getOpposite();
-                    windowed[quad.ordinal()] = isGlass(level, pos.relative(vertical)) || isGlass(level, pos.relative(horizontal))
-                            || isGlass(level, pos.relative(vertical).relative(horizontal));
+                    windowed[quad.ordinal()] = WindowQuadrants.windowed(level, pos, face, quad.top, quad.right);
                 }
                 for (Quad quad : Quad.values()) {
                     int i = quad.ordinal();
@@ -402,10 +390,6 @@ public final class ConnectedModel {
             }
         }
 
-        private static boolean isGlass(BlockAndTintGetter level, BlockPos pos) {
-            return PressureGlassBlock.isFormed(level.getBlockState(pos));
-        }
-
         @Override
         public @Nullable Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
             return null;
@@ -423,12 +407,14 @@ public final class ConnectedModel {
         }
     }
 
-    // The Distillation Array's column: solid, so a formed block draws each face that isn't against
-    // another block of the column (culled like any block). Casings show the plate, with a 2px beam along
-    // every edge of the face whose neighbour in that direction isn't part of the column (so beams only run
-    // up the four vertical edges and round the top and bottom); the top shows its quarter of the roof hatch,
-    // and the controller its display on the side it faces. Tray level casings show their window, with a
-    // frame wherever the neighbour on that side isn't a tray, so the windows of one layer merge.
+    // The Distillation Array's column: a formed block draws each face that isn't against another block of
+    // the column (culled like any block). Casings show the plate, with a 2px beam along every edge of the
+    // face whose neighbour in that direction isn't part of the column (so beams only run up the four
+    // vertical edges and round the top and bottom); the top shows its quarter of the roof hatch. Tray level
+    // casings show their glass, with a frame wherever the neighbour on that side isn't a tray, so the
+    // windows of one layer merge. The controller's display is set into the tray band the same way: its face
+    // (no beams) has the frame wherever its neighbour isn't a tray, and trays leave out their frame toward
+    // it on that face; in a plain layer it reads as a framed screen. Its other faces are plate.
     private static final class ColumnBaked implements DynamicBlockStateModel {
         private final boolean tray;
         private final Material.Baked particle;
@@ -436,8 +422,11 @@ public final class ConnectedModel {
         private final Map<Direction, List<BakedQuad>> front = new EnumMap<>(Direction.class);
         // Beams (casings) or the window frame (trays), by side of the face.
         private final Map<Direction, List<BakedQuad>[]> edges = new EnumMap<>(Direction.class);
+        // The controller's display: the window frame round it, by side.
+        private final Map<Direction, List<BakedQuad>[]> frontFrame = new EnumMap<>(Direction.class);
         // The roof quarters, by [east][south].
         private final List<BakedQuad>[][] roof;
+        private final PortOverlays ports;
         private final int materialFlags;
 
         @SuppressWarnings("unchecked")
@@ -448,7 +437,9 @@ public final class ConnectedModel {
             Material.Baked baseTexture = Baked.material(baker, textures.get("base"), name);
             Material.Baked edgeTexture = Baked.material(baker, textures.get(tray ? "frame" : "beam"), name);
             Material.Baked frontTexture = textures.containsKey("front") ? Baked.material(baker, textures.get("front"), name) : null;
-            int flags = 0;
+            Material.Baked frameTexture = frontTexture != null ? Baked.material(baker, textures.getOrDefault("frame", TRAY_FRAME), name) : null;
+            this.ports = new PortOverlays(baker, name);
+            int flags = ports.materialFlags();
             for (Direction face : Direction.values()) {
                 Material.Baked texture = baseTexture;
                 if (tray && face.getAxis().isVertical()) {
@@ -463,6 +454,13 @@ public final class ConnectedModel {
                     sides[side.ordinal()] = List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, edgeTexture, 0, 0, 16, 16, side.rotation));
                 }
                 edges.put(face, sides);
+                if (frameTexture != null) {
+                    List<BakedQuad>[] frames = new List[4];
+                    for (Side side : Side.values()) {
+                        frames[side.ordinal()] = List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, frameTexture, 0, 0, 16, 16, side.rotation));
+                    }
+                    frontFrame.put(face, frames);
+                }
             }
             this.roof = new List[2][2];
             if (!tray) {
@@ -476,6 +474,13 @@ public final class ConnectedModel {
             }
             for (Map<Direction, List<BakedQuad>> set : List.of(base, front)) {
                 for (List<BakedQuad> quads : set.values()) {
+                    for (BakedQuad quad : quads) {
+                        flags |= quad.materialInfo().flags();
+                    }
+                }
+            }
+            for (List<BakedQuad>[] sides : frontFrame.values()) {
+                for (List<BakedQuad> quads : sides) {
                     for (BakedQuad quad : quads) {
                         flags |= quad.materialInfo().flags();
                     }
@@ -495,8 +500,22 @@ public final class ConnectedModel {
             return DistillationStructure.isFormedPart(state);
         }
 
-        private static boolean isTray(BlockState state) {
-            return state.getBlock() instanceof TrayLevelCasingBlock && isPart(state);
+        // A formed port shows its plate on each outer face (the faces drawn at all).
+        private void addPort(BlockState state, boolean formed, Direction face, List<BakedQuad> out) {
+            BakedQuad port = formed ? ports.get(MultiblockPorts.get(state), face) : null;
+            if (port != null) {
+                out.add(port);
+            }
+        }
+
+        // Whether a neighbour's face on this side of the column is glass-banded: a tray, or the controller's
+        // display.
+        private static boolean isTray(BlockState state, Direction face) {
+            if (!isPart(state)) {
+                return false;
+            }
+            return state.getBlock() instanceof TrayLevelCasingBlock
+                    || state.getBlock() instanceof DistillationArrayControllerBlock && state.getValue(DistillationArrayControllerBlock.FACING) == face;
         }
 
         @Override
@@ -511,6 +530,15 @@ public final class ConnectedModel {
                 List<BakedQuad> faceQuads = new ArrayList<>();
                 if (face == facing && front.containsKey(face)) {
                     faceQuads.addAll(front.get(face));
+                    for (Side side : Side.values()) {
+                        BlockState neighbour = level.getBlockState(pos.relative(Baked.sideDirection(face, side)));
+                        if (formed && !isTray(neighbour, face)) {
+                            faceQuads.addAll(frontFrame.get(face)[side.ordinal()]);
+                        }
+                    }
+                    addPort(state, formed, face, faceQuads);
+                    faceQuads.forEach(quad -> quads.addCulledFace(face, quad));
+                    continue;
                 } else if (face == Direction.UP && !tray && formed) {
                     int east = isPart(level.getBlockState(pos.west())) ? 1 : 0;
                     int south = isPart(level.getBlockState(pos.north())) ? 1 : 0;
@@ -520,10 +548,11 @@ public final class ConnectedModel {
                 }
                 for (Side side : Side.values()) {
                     BlockState neighbour = level.getBlockState(pos.relative(Baked.sideDirection(face, side)));
-                    if (formed && (tray ? !isTray(neighbour) : !isPart(neighbour))) {
+                    if (formed && (tray ? !isTray(neighbour, face) : !isPart(neighbour))) {
                         faceQuads.addAll(edges.get(face)[side.ordinal()]);
                     }
                 }
+                addPort(state, formed, face, faceQuads);
                 faceQuads.forEach(quad -> quads.addCulledFace(face, quad));
             }
             parts.add(new SimpleModelWrapper(quads.build(), true, particle));

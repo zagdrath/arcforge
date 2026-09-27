@@ -22,6 +22,7 @@ import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
@@ -52,6 +53,7 @@ import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.multiblock.SolarThermalStructure;
 
 // Exposes machine storage through NeoForge's standard capabilities, so any mod using
 // Capabilities.Energy (FE), Capabilities.Fluid or Capabilities.Item can interact with Arcforge machines.
@@ -210,6 +212,12 @@ public final class ModCapabilities {
             MultiblockController furnace = ArcforgeFurnaceStructure.findFormedPort(level, pos);
             return furnace != null ? furnace.itemHandlerAt(pos, side) : null;
         }, furnaceParts);
+        Block[] solarParts = {
+                ModBlocks.SOLAR_THERMAL_ARRAY_CONTROLLER.get(), ModBlocks.SOLAR_THERMAL_ARRAY_CASING.get(), ModBlocks.SOLAR_COLLECTOR.get() };
+        event.registerBlock(HEAT, (level, pos, state, blockEntity, side) -> {
+            SolarThermalArrayBlockEntity solar = SolarThermalStructure.findController(level, pos);
+            return solar != null ? solar.heatHandlerAt(pos, side) : null;
+        }, solarParts);
         Block[] columnParts = {
                 ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {

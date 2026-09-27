@@ -11,6 +11,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -20,6 +21,7 @@ import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcforgeFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModFluids;
@@ -80,23 +82,32 @@ public final class MultiblockGameTests {
                 .thenSucceed();
     }
 
-    // Coal goes in through the top (input), coke comes out of the bottom (output) and creosote out of
-    // the back (by-product). The working slice lights up while its chamber runs.
+    // Coal goes in through the top (input port), coke comes out of the bottom (output port) and creosote
+    // out of the back (by-product port). The working slice lights up while its chamber runs.
     public static void carbonizerProcesses(GameTestHelper helper) {
         buildCarbonizer(helper, 1);
+        BlockPos[] ports = new BlockPos[3];
         helper.startSequence()
                 .thenIdle(3)
                 .thenExecute(() -> {
-                    BlockPos top = helper.absolutePos(new BlockPos(0, 2, 1));
-                    ResourceHandler<ItemResource> input = helper.getLevel().getCapability(Capabilities.Item.BLOCK, top, Direction.UP);
-                    helper.assertTrue(input != null, "Top face does not accept items");
+                    CarbonizerBlockEntity master = helper.getBlockEntity(new BlockPos(0, 1, 0), CarbonizerBlockEntity.class);
+                    ports[0] = PortGameTests.port(helper, master, SideMode.INPUT);
+                    ports[1] = PortGameTests.port(helper, master, SideMode.OUTPUT);
+                    ports[2] = PortGameTests.port(helper, master, SideMode.BYPRODUCT);
+                    helper.assertTrue(ports[0] != null && ports[1] != null && ports[2] != null, "Missing a default port");
+                    ResourceHandler<ItemResource> input = helper.getLevel().getCapability(Capabilities.Item.BLOCK, ports[0], Direction.UP);
+                    helper.assertTrue(input != null, "Top port does not accept items");
                     try (Transaction tx = Transaction.openRoot()) {
-                        helper.assertTrue(input.insert(ItemResource.of(Items.COAL), 2, tx) == 2, "Top face refused coal");
+                        helper.assertTrue(input.insert(ItemResource.of(Items.COAL), 2, tx) == 2, "Top port refused coal");
                         tx.commit();
                     }
-                    BlockPos side = helper.absolutePos(new BlockPos(0, 1, 0));
-                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, side, Direction.WEST) == null,
-                            "Left face (none) exposes items");
+                    // The one block that isn't a port exposes nothing.
+                    for (BlockPos pos : BlockPos.betweenClosed(helper.absolutePos(new BlockPos(0, 1, 0)), helper.absolutePos(new BlockPos(0, 2, 1)))) {
+                        if (!pos.equals(ports[0]) && !pos.equals(ports[1]) && !pos.equals(ports[2])) {
+                            helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, pos, Direction.WEST) == null,
+                                    "A block that isn't a port exposes items");
+                        }
+                    }
                 })
                 .thenIdle(20)
                 .thenExecute(() -> {
@@ -104,16 +115,14 @@ public final class MultiblockGameTests {
                 })
                 .thenIdle(600)
                 .thenExecute(() -> {
-                    BlockPos bottom = helper.absolutePos(new BlockPos(0, 1, 0));
-                    ResourceHandler<ItemResource> output = helper.getLevel().getCapability(Capabilities.Item.BLOCK, bottom, Direction.DOWN);
-                    helper.assertTrue(output != null, "Bottom face does not give items");
+                    ResourceHandler<ItemResource> output = helper.getLevel().getCapability(Capabilities.Item.BLOCK, ports[1], Direction.DOWN);
+                    helper.assertTrue(output != null, "Bottom port does not give items");
                     try (Transaction tx = Transaction.openRoot()) {
                         int coke = output.extract(ItemResource.of(ModItems.COAL_COKE.get()), 64, tx);
                         helper.assertTrue(coke >= 1, "No coal coke came out of the bottom face");
                     }
-                    BlockPos back = helper.absolutePos(new BlockPos(0, 1, 1));
-                    ResourceHandler<FluidResource> creosote = helper.getLevel().getCapability(Capabilities.Fluid.BLOCK, back, Direction.SOUTH);
-                    helper.assertTrue(creosote != null, "Back face does not give creosote");
+                    ResourceHandler<FluidResource> creosote = helper.getLevel().getCapability(Capabilities.Fluid.BLOCK, ports[2], Direction.SOUTH);
+                    helper.assertTrue(creosote != null, "Back port does not give creosote");
                     try (Transaction tx = Transaction.openRoot()) {
                         int drained = creosote.extract(FluidResource.of(ModFluids.CREOSOTE.get()), 1_000, tx);
                         helper.assertTrue(drained >= 250, "Only " + drained + " mB of creosote came out of the back face");
@@ -220,10 +229,14 @@ public final class MultiblockGameTests {
                     BlockPos wrong = ArcforgeFurnaceStructure.firstMismatch(helper.getLevel(), furnace.getBlockPos(), furnace.getFacing());
                     helper.assertTrue(furnace.isFormed(), "Furnace did not form; first mismatch at "
                             + (wrong == null ? "none" : helper.relativePos(wrong) + " = " + helper.getLevel().getBlockState(wrong)));
-                    BlockPos topBrick = helper.absolutePos(new BlockPos(0, 6, 1));
+                    // The input port is one of the top layer's bricks; its face into the stack isn't outer.
+                    BlockPos topBrick = PortGameTests.port(helper, furnace, SideMode.INPUT);
+                    helper.assertTrue(topBrick != null && helper.relativePos(topBrick).getY() == 6, "Input port is not on the top layer: " + topBrick);
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, topBrick, Direction.UP) != null,
                             "Top brick does not accept items");
-                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, topBrick, Direction.EAST) == null,
+                    BlockPos stack = helper.absolutePos(new BlockPos(1, 6, 1));
+                    Direction inward = Direction.getApproximateNearest(Vec3.atLowerCornerOf(stack.subtract(topBrick)));
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, topBrick, inward) == null,
                             "Inner face of a brick exposes items");
                 })
                 .thenExecute(() -> helper.setBlock(new BlockPos(2, 4, 2), Blocks.AIR))

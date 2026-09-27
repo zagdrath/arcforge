@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.List;
+
 // Common config for Arcforge. Values are read when machines tick, so most changes apply without a restart.
 public class ArcforgeConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
@@ -449,6 +451,70 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue DISTILLATION_OUTPUT_CAPACITY = BUILDER
             .comment("Size of each product tank (Naphtha, Light Oil, Heavy Oil) in mB.")
             .defineInRange("outputCapacity", 8_000, 1_000, 100_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Solar Thermal Array: a 2x2 tower, 4 tall, whose trough mirror tracks the sun and heats a receiver.",
+                "Heat per tick = peakHeat x sun x weather x axis x biome x (collectors in sunlight / 4); the temperature",
+                "climbs from 20°C to maxTemperature with the same factors (capped at the peak).").push("solarThermalArray");
+    }
+
+    public static final ModConfigSpec.IntValue SOLAR_PEAK_HEAT = BUILDER
+            .comment("HU/t at clear noon, all four collectors in sunlight, on the north-south axis, in a temperate biome.")
+            .defineInRange("peakHeat", 200, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue SOLAR_MAX_TEMPERATURE = BUILDER
+            .comment("Receiver temperature at full sun, in °C (High-Pressure Steam needs 500).")
+            .defineInRange("maxTemperature", 550, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue SOLAR_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 16_000, 100, 100_000_000);
+
+    public static final ModConfigSpec.DoubleValue SOLAR_RAIN_MULTIPLIER = BUILDER
+            .comment("Output in rain or snow, as a share of clear weather.")
+            .defineInRange("rainMultiplier", 0.3, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue SOLAR_THUNDER_MULTIPLIER = BUILDER
+            .comment("Output in a thunderstorm (the trough stows face down; the receiver still takes diffuse light).")
+            .defineInRange("thunderMultiplier", 0.1, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue SOLAR_HOT_BIOME_MULTIPLIER = BUILDER
+            .comment("Output in hot biomes (hotBiomeTags). The temperature is still capped at maxTemperature.")
+            .defineInRange("hotBiomeMultiplier", 1.2, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SOLAR_COLD_BIOME_MULTIPLIER = BUILDER
+            .comment("Output and temperature in cold biomes (coldBiomeTags, or anywhere cold enough to snow).")
+            .defineInRange("coldBiomeMultiplier", 0.85, 0.0, 10.0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> SOLAR_HOT_BIOME_TAGS = BUILDER
+            .comment("Biome tags counted as hot.")
+            .defineListAllowEmpty("hotBiomeTags", List.of("c:is_desert", "minecraft:is_badlands", "minecraft:is_savanna"), () -> "c:is_desert",
+                    value -> value instanceof String);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> SOLAR_COLD_BIOME_TAGS = BUILDER
+            .comment("Biome tags counted as cold.")
+            .defineListAllowEmpty("coldBiomeTags", List.of("c:is_cold"), () -> "c:is_cold", value -> value instanceof String);
+
+    public static final ModConfigSpec.DoubleValue SOLAR_NORTH_SOUTH_MULTIPLIER = BUILDER
+            .comment("Output with the tracking axis north-south (controller facing north or south).")
+            .defineInRange("northSouthMultiplier", 1.0, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SOLAR_EAST_WEST_MULTIPLIER = BUILDER
+            .comment("Output with the tracking axis east-west (controller facing east or west).")
+            .defineInRange("eastWestMultiplier", 0.7, 0.0, 10.0);
+
+    public static final ModConfigSpec.IntValue SOLAR_TRACKING_LIMIT = BUILDER
+            .comment("How far the trough tilts from level toward the sun, in degrees.")
+            .defineInRange("trackingLimitDegrees", 75, 0, 90);
+
+    public static final ModConfigSpec.DoubleValue SOLAR_PANEL_SPEED = BUILDER
+            .comment("How fast the trough turns, in degrees per tick.")
+            .defineInRange("panelSpeedDegreesPerTick", 2.0, 0.1, 180.0);
+
+    public static final ModConfigSpec.IntValue SOLAR_GLOW_FULLBRIGHT = BUILDER
+            .comment("Receiver temperature from which it glows full-bright, in °C.")
+            .defineInRange("glowFullbrightTemperature", 300, 20, 10_000);
 
     static {
         BUILDER.pop();

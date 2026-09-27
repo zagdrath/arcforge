@@ -39,7 +39,7 @@ public class CarbonizerScreen extends MultiblockScreen<CarbonizerMenu> {
     private final Identifier ghostBucket = sprite("ghost_bucket");
 
     public CarbonizerScreen(CarbonizerMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "carbonizer", menu::getRedstoneMode, menu::getSideMode);
+        super(menu, inventory, title, "carbonizer", menu::getRedstoneMode, menu::getPorts);
         enableAutoEject(menu::isAutoEject);
     }
 

@@ -25,10 +25,14 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
+import net.zagdrath.arcforge.menu.common.PortSync;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
+import net.zagdrath.arcforge.network.PortsPayload;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+
+import java.util.List;
 
 // Served by the master block of a Carbonizer; opened from any of its blocks.
 public class CarbonizerMenu extends AbstractContainerMenu {
@@ -60,6 +64,7 @@ public class CarbonizerMenu extends AbstractContainerMenu {
     private static final int PLAYER_HOTBAR_END = PLAYER_INV_END + 9;
 
     private final ContainerLevelAccess access;
+    private final PortSync ports;
     private final ContainerData data;
 
     // Client constructor, called with the master's position written by the server.
@@ -73,6 +78,7 @@ public class CarbonizerMenu extends AbstractContainerMenu {
         super(ModMenuTypes.CARBONIZER.get(), containerId);
         checkContainerDataCount(data, DATA_VALUES * 2);
         this.access = ContainerLevelAccess.create(inventory.player.level(), pos);
+        this.ports = new PortSync(inventory, pos);
         this.data = data;
 
         addSlot(new ResourceHandlerSlot(items, items::set, CarbonizerBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y));
@@ -87,6 +93,17 @@ public class CarbonizerMenu extends AbstractContainerMenu {
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
         return MachineMenuButtons.handle(access, buttonId);
+    }
+
+    // Multiblocks: their ports, for the Ports tab (see PortSync).
+    public List<PortsPayload.Entry> getPorts() {
+        return PortsPayload.forMenu(containerId);
+    }
+
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        ports.update(containerId);
     }
 
     @Override

@@ -93,16 +93,12 @@ public class ArcforgeFurnacePortBlock extends BaseEntityBlock implements Multibl
         return level.getBlockEntity(pos) instanceof ArcforgeFurnaceBlockEntity furnace && furnace.isFormed() ? furnace : null;
     }
 
-    // Sneak: pick it up. Otherwise rotate the port while the furnace is incomplete, then recheck.
+    // Wrench (Configure mode): rotate the port while the furnace is incomplete, then recheck.
     @Override
     public InteractionResult useWrench(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Player player = context.getPlayer();
-        if (player != null && player.isSecondaryUseActive()) {
-            level.destroyBlock(pos, true, player);
-            return InteractionResult.SUCCESS;
-        }
         if (!(level.getBlockEntity(pos) instanceof ArcforgeFurnaceBlockEntity furnace)) {
             return InteractionResult.PASS;
         }
@@ -116,7 +112,6 @@ public class ArcforgeFurnacePortBlock extends BaseEntityBlock implements Multibl
             player.sendOverlayMessage(Component.translatable(furnace.isFormed()
                     ? "message.arcforge.arcforge_furnace.formed" : "message.arcforge.arcforge_furnace.incomplete"));
         }
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
         return InteractionResult.SUCCESS;
     }
 

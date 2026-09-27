@@ -52,6 +52,9 @@ import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
+import net.zagdrath.arcforge.block.multiblock.SolarCollectorBlock;
+import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.machine.FiberizerBlock;
@@ -282,11 +285,28 @@ public final class ModBlocks {
     public static final DeferredBlock<DistillationArrayCasingBlock> DISTILLATION_ARRAY_CASING = BLOCKS.registerBlock("distillation_array_casing",
             DistillationArrayCasingBlock::new, ModBlocks::columnProperties);
 
+    // Glass round a tray: see-through, so it neither hides its neighbours' faces nor blocks light or view.
     public static final DeferredBlock<TrayLevelCasingBlock> TRAY_LEVEL_CASING = BLOCKS.registerBlock("tray_level_casing",
-            TrayLevelCasingBlock::new, ModBlocks::columnProperties);
+            TrayLevelCasingBlock::new, p -> columnProperties(p)
+                    .noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false)
+                    .isRedstoneConductor((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos, box) -> false));
 
     public static final DeferredBlock<DistillationArrayControllerBlock> DISTILLATION_ARRAY_CONTROLLER = BLOCKS.registerBlock("distillation_array_controller",
             DistillationArrayControllerBlock::new, ModBlocks::columnProperties);
+
+    // --- Solar Thermal Array ---
+
+    public static final DeferredBlock<SolarThermalArrayCasingBlock> SOLAR_THERMAL_ARRAY_CASING = BLOCKS.registerBlock("solar_thermal_array_casing",
+            SolarThermalArrayCasingBlock::new, ModBlocks::columnProperties);
+
+    public static final DeferredBlock<SolarThermalArrayControllerBlock> SOLAR_THERMAL_ARRAY_CONTROLLER = BLOCKS.registerBlock("solar_thermal_array_controller",
+            SolarThermalArrayControllerBlock::new, ModBlocks::columnProperties);
+
+    public static final DeferredBlock<SolarCollectorBlock> SOLAR_COLLECTOR = BLOCKS.registerBlock("solar_collector",
+            SolarCollectorBlock::new, p -> columnProperties(p).sound(SoundType.GLASS));
 
     // Asphalt: made with pitch; walking, running and riding on it are about 30% faster.
     public static final DeferredBlock<Block> ASPHALT = BLOCKS.registerSimpleBlock("asphalt", ModBlocks::asphaltProperties);

@@ -6,7 +6,9 @@
 package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 
 import org.jspecify.annotations.Nullable;
 
@@ -31,6 +33,7 @@ import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
@@ -43,12 +46,20 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity implements MultiblockController {
     // How often the master rechecks the redstone signal across its blocks.
     private static final int REDSTONE_CHECK_INTERVAL = 10;
+    private static final int WINDOW_REFRESH_INTERVAL = 20;
 
     private ShellStructure.@Nullable Shell shell;
     private Direction facing = Direction.NORTH;
     // Whether this master has formed a structure before; a rebuilt one keeps its facing.
     private boolean formedBefore;
     private boolean powered;
+    // Gives the structure its first ports (see MultiblockPorts.Defaults).
+    private final MultiblockPorts.Defaults portDefaults = new MultiblockPorts.Defaults();
+    // Client: the lining tiles left out behind windows (see SteamBoilerArrayRenderer.findWindowQuads),
+    // kept until the shell changes. Also refreshed now and then, as the glass's own block updates can
+    // reach the client after this block entity's.
+    private @Nullable Set<Long> windowQuads;
+    private long windowQuadsTime;
 
     protected ShellMultiblockBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots,
             FilteredItemHandler.SlotFilter filter, Set<UpgradeType> upgrades, SideConfig sideConfig, List<SideMode> allowedSideModes) {
@@ -66,6 +77,7 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
 
     public void setShell(ShellStructure.@Nullable Shell shell) {
         this.shell = shell;
+        windowQuads = null;
         setChanged();
         sync();
     }
@@ -113,6 +125,7 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, ShellMultiblockBlockEntity part) {
         if (part.isMaster()) {
+            part.portDefaults.tick(level, part);
             if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
                 part.powered = part.checkPowered(level);
             }
@@ -193,6 +206,19 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
         return master != null ? master.conduitConnectionAt(worldPosition, side, type) : ConnectionMode.NONE;
     }
 
+    // The renderers' window tiles for this shell, worked out by find when needed.
+    public Set<Long> windowQuads(Function<ShellStructure.Shell, Set<Long>> find) {
+        long time = level != null ? level.getGameTime() : 0L;
+        if (shell == null) {
+            return Set.of();
+        }
+        if (windowQuads == null || Math.abs(time - windowQuadsTime) >= WINDOW_REFRESH_INTERVAL) {
+            windowQuads = find.apply(shell);
+            windowQuadsTime = time;
+        }
+        return windowQuads;
+    }
+
     // Renderers draw the whole structure from the master.
     public AABB getRenderBox() {
         return shell != null ? AABB.encapsulatingFullBlocks(shell.min(), shell.max()) : new AABB(worldPosition);
@@ -203,13 +229,18 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        ShellStructure.@Nullable Shell previous = shell;
         shell = input.getInt("shell_length").map(length -> new ShellStructure.Shell(
                 BlockPos.of(input.getLongOr("shell_min", 0L)),
                 Direction.Axis.byName(input.getStringOr("shell_axis", "y")),
                 length)).orElse(null);
         facing = Direction.from2DDataValue(input.getIntOr("facing", Direction.NORTH.get2DDataValue()));
+        if (!Objects.equals(previous, shell)) {
+            windowQuads = null;
+        }
         // Saves from before this was recorded: a master holding a shell has formed.
         formedBefore = input.getBooleanOr("formed_before", shell != null);
+        portDefaults.load(input);
     }
 
     @Override
@@ -222,6 +253,7 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
         }
         output.putInt("facing", facing.get2DDataValue());
         output.putBoolean("formed_before", formedBefore);
+        portDefaults.save(output);
     }
 
     @Override

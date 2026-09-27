@@ -163,8 +163,11 @@ public final class CrushingGameTests {
                     helper.assertTrue(part(helper, 1, 2, 1) == ArcCrushingArrayCasingBlock.Part.CENTER, "Centre is " + part(helper, 1, 2, 1));
                     helper.assertTrue(part(helper, 0, 1, 0) == ArcCrushingArrayCasingBlock.Part.OTHER, "Corner is " + part(helper, 0, 1, 0));
                     helper.assertTrue(helper.getBlockState(new BlockPos(1, 2, 1)).getLightDampening() == 0, "Formed casings block light");
-                    BlockPos top = helper.absolutePos(new BlockPos(0, 3, 2));
-                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, top, Direction.UP) != null, "Top face does not accept items");
+                    // Only the default input port in the middle of the top takes items, not the rest of the top.
+                    BlockPos top = helper.absolutePos(new BlockPos(1, 3, 1));
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, top, Direction.UP) != null, "Top port does not accept items");
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(new BlockPos(0, 3, 2)), Direction.UP) == null,
+                            "A top casing that isn't a port accepts items");
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, top, Direction.DOWN) == null, "Inner face exposes items");
                 })
                 .thenExecute(() -> helper.setBlock(new BlockPos(2, 3, 2), Blocks.AIR))

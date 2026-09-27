@@ -36,9 +36,11 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.SideSetting;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
+import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.registry.ModBlocks;
+import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 
@@ -97,9 +99,14 @@ final class ConduitGameTests {
     }
 
     private static void useWrench(GameTestHelper helper, Player player, BlockPos pos, Vec3 offsetFromCentre) {
+        useWrench(helper, player, pos, offsetFromCentre, WrenchMode.CONFIGURE);
+    }
+
+    static void useWrench(GameTestHelper helper, Player player, BlockPos pos, Vec3 offsetFromCentre, WrenchMode mode) {
         BlockPos absolute = helper.absolutePos(pos);
         Vec3 hit = Vec3.atCenterOf(absolute).add(offsetFromCentre);
         ItemStack wrench = new ItemStack(ModItems.WRENCH.get());
+        wrench.set(ModDataComponents.WRENCH_MODE.get(), mode);
         player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
         var context = new UseOnContext(player, InteractionHand.MAIN_HAND, new BlockHitResult(hit, Direction.UP, absolute, false));
         wrench.getItem().onItemUseFirst(wrench, context);
@@ -380,7 +387,8 @@ final class ConduitGameTests {
         return total;
     }
 
-    // The wrench rotates machines and dismantles them into an item that keeps their contents.
+    // The wrench rotates machines (Rotate mode) and dismantles them (Dismantle mode) into an item that keeps
+    // their contents.
     static void wrenchMachine(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, ModBlocks.GEOTHERMAL_PLANT.get());
@@ -392,11 +400,17 @@ final class ConduitGameTests {
         }
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
 
-        useWrench(helper, player, pos, new Vec3(0, 0.5, 0));
+        useWrench(helper, player, pos, new Vec3(0, 0.5, 0), WrenchMode.ROTATE);
         helper.assertTrue(helper.getBlockState(pos).getValue(HorizontalDirectionalBlock.FACING) == Direction.EAST, "Plant did not rotate clockwise");
 
+        // Sneaking in Rotate mode turns it back; in Configure mode it does nothing to a machine.
         player.setShiftKeyDown(true);
-        useWrench(helper, player, pos, new Vec3(0, 0.5, 0));
+        useWrench(helper, player, pos, new Vec3(0, 0.5, 0), WrenchMode.ROTATE);
+        helper.assertTrue(helper.getBlockState(pos).getValue(HorizontalDirectionalBlock.FACING) == Direction.NORTH, "Plant did not rotate back");
+        useWrench(helper, player, pos, new Vec3(0, 0.5, 0), WrenchMode.CONFIGURE);
+        helper.assertBlockPresent(ModBlocks.GEOTHERMAL_PLANT.get(), pos);
+
+        useWrench(helper, player, pos, new Vec3(0, 0.5, 0), WrenchMode.DISMANTLE);
         helper.assertBlockNotPresent(ModBlocks.GEOTHERMAL_PLANT.get(), pos);
         // The plant drops as an item carrying its lava, and the lava bucket in its slot drops beside it.
         var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);

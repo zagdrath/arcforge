@@ -43,6 +43,9 @@ public final class ArcforgeGameTests {
     private static final java.util.Map<String, Consumer<GameTestHelper>> TESTS = new java.util.LinkedHashMap<>();
     // Tests that wait on full machine cycles (a Carbonizer chamber, heating the Arcforge Furnace) get longer to finish.
     private static final java.util.Map<String, Consumer<GameTestHelper>> LONG_TESTS = new java.util.LinkedHashMap<>();
+    // Solar Thermal Array tests set the time of day and the weather, which are the whole level's: each runs
+    // in its own batch (its own environment), one after another, under open sky.
+    private static final java.util.Map<String, Consumer<GameTestHelper>> SOLAR_TESTS = new java.util.LinkedHashMap<>();
 
     static {
         TESTS.put(REDSTONE_BUTTONS, ArcforgeGameTests::redstoneButtons);
@@ -57,6 +60,10 @@ public final class ArcforgeGameTests {
         TESTS.put("conduit_item_storage", ConduitGameTests::itemStorage);
         TESTS.put("wrench_conduit", ConduitGameTests::wrenchConduit);
         TESTS.put("wrench_machine", ConduitGameTests::wrenchMachine);
+        TESTS.put("ports_defaults", PortGameTests::defaultPorts);
+        TESTS.put("ports_wrench_sets_port", PortGameTests::wrenchSetsPort);
+        TESTS.put("ports_wrench_modes_on_multiblock", PortGameTests::wrenchModesOnMultiblock);
+        TESTS.put("ports_turbine_ends", PortGameTests::turbinePorts);
         TESTS.put("tank_buckets", StorageGameTests::tankBuckets);
         TESTS.put("tank_spills", StorageGameTests::tankSpills);
         TESTS.put("tank_wrench_keeps_fluid", StorageGameTests::tankWrenchKeepsFluid);
@@ -139,7 +146,17 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("infuser_treats_planks", InfusionGameTests::infuserTreatsPlanks);
         LONG_TESTS.put("press_presses", PressingGameTests::pressPresses);
         LONG_TESTS.put("pressing_array_lanes", PressingGameTests::arrayPressesLanes);
+        TESTS.put("solar_model_worked_values", SolarGameTests::modelWorkedValues);
+        SOLAR_TESTS.put("solar_zero_at_night", SolarGameTests::zeroAtNight);
+        SOLAR_TESTS.put("solar_peak_at_noon", SolarGameTests::peakAtNoon);
+        SOLAR_TESTS.put("solar_rain_reduces_output", SolarGameTests::rainReducesOutput);
+        SOLAR_TESTS.put("solar_thunder_stows_panel", SolarGameTests::thunderStowsPanel);
+        SOLAR_TESTS.put("solar_shading_one_collector", SolarGameTests::shadingOneCollector);
+        SOLAR_TESTS.put("solar_north_south_beats_east_west", SolarGameTests::northSouthBeatsEastWest);
+        SOLAR_TESTS.put("solar_boiler_grades", SolarGameTests::boilerGrades);
+        SOLAR_TESTS.put("solar_no_sky", SolarGameTests::noSky);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
+        SOLAR_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }
 
@@ -158,6 +175,11 @@ public final class ArcforgeGameTests {
         TestData<Holder<TestEnvironmentDefinition<?>>> longData = new TestData<>(environment, Level.OVERWORLD, Identifier.withDefaultNamespace("empty"),
                 1_500, 0, true, Rotation.NONE, false, 1, 1, false, 8);
         LONG_TESTS.keySet().forEach(name -> event.registerTest(id(name), new FunctionGameTestInstance(function(name), longData)));
+        SOLAR_TESTS.keySet().forEach(name -> {
+            Holder<TestEnvironmentDefinition<?>> own = event.registerEnvironment(id(name));
+            event.registerTest(id(name), new FunctionGameTestInstance(function(name), new TestData<>(own, Level.OVERWORLD,
+                    Identifier.withDefaultNamespace("empty"), 1_500, 0, true, Rotation.NONE, false, 1, 1, true, 8)));
+        });
     }
 
     private static Identifier id(String path) {

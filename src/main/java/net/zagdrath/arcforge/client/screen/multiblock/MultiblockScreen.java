@@ -8,7 +8,6 @@ package net.zagdrath.arcforge.client.screen.multiblock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BooleanSupplier;
-import java.util.function.Function;
 import java.util.function.Supplier;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,38 +21,35 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.PortsTab;
 import net.zagdrath.arcforge.client.gui.tab.RedstoneTab;
-import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
-import net.zagdrath.arcforge.machine.config.RelativeSide;
-import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
+import net.zagdrath.arcforge.network.PortsPayload;
 
 // Shared frame of the multiblock GUIs: background, a title that changes with the structure,
-// and the Redstone and Side config tabs (the sides are faces of the whole structure).
+// and the Redstone and Ports tabs.
 public abstract class MultiblockScreen<M extends AbstractContainerMenu> extends AbstractContainerScreen<M> {
     private final Identifier background;
     private final String machine;
     protected final SideTabPanel tabs;
-    private final SideConfigTab sides;
+    private final PortsTab ports;
 
     protected MultiblockScreen(M menu, Inventory inventory, Component title, String machine,
-            Supplier<RedstoneMode> redstone, Function<RelativeSide, SideMode> sides) {
+            Supplier<RedstoneMode> redstone, Supplier<List<PortsPayload.Entry>> ports) {
         super(menu, inventory, title);
         this.machine = machine;
         this.background = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/" + machine + ".png");
-        this.sides = new SideConfigTab(sides,
-                (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
-                () -> sendButton(MachineMenuButtons.CLEAR_SIDES));
+        this.ports = new PortsTab(ports);
         this.tabs = new SideTabPanel()
                 .add(new RedstoneTab(redstone, mode -> sendButton(MachineMenuButtons.redstoneButtonId(mode))))
-                .add(this.sides);
+                .add(this.ports);
     }
 
-    // Shows the auto-eject button on the Sides tab.
+    // Shows the auto-eject button on the Ports tab.
     protected void enableAutoEject(BooleanSupplier state) {
-        sides.withAutoEject(state, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT));
+        ports.withAutoEject(state, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT));
     }
 
     protected Identifier sprite(String name) {

@@ -34,6 +34,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.CubeMultiblockStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
@@ -154,6 +155,14 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
         onStructureChanged();
     }
 
+    // Gives the structure its first ports (see MultiblockPorts.Defaults).
+    private final MultiblockPorts.Defaults portDefaults = new MultiblockPorts.Defaults();
+
+    // Called first thing each tick by the arrays.
+    protected void tickPorts(ServerLevel level) {
+        portDefaults.tick(level, this);
+    }
+
     // --- Structure (MultiblockController) ---
 
     @Override
@@ -227,11 +236,13 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         energy.deserialize(input.childOrEmpty("energy"));
+        portDefaults.load(input);
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         energy.serialize(output.child("energy"));
+        portDefaults.save(output);
     }
 }

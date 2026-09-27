@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ATA",
+    "TCT",
+    "AKA"
+  ],
+  "key": {
+    "A": "arcforge:tempered_alloy",
+    "T": "arcforge:receiver_tube",
+    "C": "arcforge:solar_thermal_array_casing",
+    "K": "minecraft:comparator"
+  },
+  "result": {
+    "id": "arcforge:solar_thermal_array_controller",
+    "count": 1
+  }
+}

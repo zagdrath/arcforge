@@ -28,6 +28,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
@@ -135,6 +136,9 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<DistillationArrayBlockEntity>> DISTILLATION_ARRAY = BLOCK_ENTITY_TYPES.register("distillation_array",
             () -> new BlockEntityType<>(DistillationArrayBlockEntity::new, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get()));
+
+    public static final Supplier<BlockEntityType<SolarThermalArrayBlockEntity>> SOLAR_THERMAL_ARRAY = BLOCK_ENTITY_TYPES.register("solar_thermal_array",
+            () -> new BlockEntityType<>(SolarThermalArrayBlockEntity::new, ModBlocks.SOLAR_THERMAL_ARRAY_CONTROLLER.get()));
 
     private ModBlockEntityTypes() {}
 

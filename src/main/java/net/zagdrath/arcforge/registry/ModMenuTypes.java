@@ -26,6 +26,7 @@ import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.DistillationArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.InductionFurnaceArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.MetalPressingArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.SolarThermalArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
 import net.zagdrath.arcforge.menu.machine.InfuserMenu;
@@ -114,6 +115,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<DistillationArrayMenu>> DISTILLATION_ARRAY = MENU_TYPES.register("distillation_array",
             () -> IMenuTypeExtension.create(DistillationArrayMenu::new));
+
+    public static final Supplier<MenuType<SolarThermalArrayMenu>> SOLAR_THERMAL_ARRAY = MENU_TYPES.register("solar_thermal_array",
+            () -> IMenuTypeExtension.create(SolarThermalArrayMenu::new));
 
     private ModMenuTypes() {}
 

@@ -36,6 +36,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -56,6 +58,7 @@ import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -111,6 +114,13 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
     private double pendingHeat;
     private int heatPerTick;
     private boolean running;
+    // What the clients last saw of the products and the column's state (see syncKey), so they're sent
+    // again only when a tank crosses a 1% step or the state changes.
+    private int lastSyncKey = -1;
+    // Gives the structure its first ports (see MultiblockPorts.Defaults).
+    private final MultiblockPorts.Defaults portDefaults = new MultiblockPorts.Defaults();
+    // Client side: the pools' fill (naphtha, light oil, heavy oil) as last drawn, easing toward the synced.
+    private final float[] shownFill = { -1.0F, -1.0F, -1.0F };
 
     public DistillationArrayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> false, UPGRADES,
@@ -271,6 +281,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
             setRunning(level, false);
             return;
         }
+        portDefaults.tick(level, this);
         if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
             powered = isPowered(level);
         }
@@ -284,6 +295,54 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
             MultiblockAutomation.pushOutputs(level, this);
         }
+        int key = syncKey();
+        if (key != lastSyncKey) {
+            lastSyncKey = key;
+            sync();
+        }
+    }
+
+    // The renderer shows each product's pool (to the nearest percent), and vapour while running, tinted
+    // by the steam when the batch is being stripped.
+    private int syncKey() {
+        int key = 0;
+        for (FilteredFluidTank tank : List.of(naphtha, lightOil, heavyOil)) {
+            key = key * 101 + tank.getAmount() * 100 / Math.max(1, tank.getCapacity());
+        }
+        return key * 4 + (running ? 2 : 0) + (batchBonus > 0 ? 1 : 0);
+    }
+
+    // Client side: a product's pool fill (0..1; index 0 naphtha, 1 light oil, 2 heavy oil) to draw this
+    // frame, closing share of the gap to the synced amount.
+    public float easeFill(int index, float share) {
+        FilteredFluidTank tank = List.of(naphtha, lightOil, heavyOil).get(index);
+        float target = Math.min(1.0F, tank.getAmount() / (float) Math.max(1, tank.getCapacity()));
+        float shown = shownFill[index];
+        shownFill[index] = shown < 0 ? target : shown + (target - shown) * share;
+        return shownFill[index];
+    }
+
+    // Client side: whether the batch now running gets steam stripping.
+    public boolean isStripping() {
+        return batchBonus > 0;
+    }
+
+    // A column's sides are two blocks wide: its default ports go on the left one (seen from outside) of the
+    // second layer up. Top and bottom ones go in the middle as usual.
+    @Override
+    public @Nullable BlockPos defaultPortPos(Level level, Direction side) {
+        if (column == null || side.getAxis().isVertical()) {
+            return MultiblockController.super.defaultPortPos(level, side);
+        }
+        Vec3 layer = Vec3.atLowerCornerOf(column.min()).add(1.0, 1.5, 1.0);
+        Vec3 target = layer.add(side.getStepX() * 0.5, 0.0, side.getStepZ() * 0.5)
+                .add(side.getClockWise().getStepX() * 0.5, 0.0, side.getClockWise().getStepZ() * 0.5);
+        return MultiblockPorts.nearest(level, this, side, target);
+    }
+
+    // The whole column, so the renderer isn't culled when the controller is off screen.
+    public AABB getRenderBox() {
+        return column != null ? AABB.encapsulatingFullBlocks(column.min(), column.max()) : new AABB(worldPosition);
     }
 
     private boolean isPowered(ServerLevel level) {
@@ -551,6 +610,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         progress = input.getDoubleOr("progress", 0.0);
         pendingHeat = input.getDoubleOr("pending_heat", 0.0);
         running = input.getBooleanOr("running", false);
+        portDefaults.load(input);
     }
 
     @Override
@@ -573,6 +633,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         output.putDouble("progress", progress);
         output.putDouble("pending_heat", pendingHeat);
         output.putBoolean("running", running);
+        portDefaults.save(output);
     }
 
     @Override

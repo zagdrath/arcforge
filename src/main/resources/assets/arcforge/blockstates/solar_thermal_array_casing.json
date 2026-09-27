@@ -1,0 +1,57 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/solar_thermal_array/casing"
+    },
+    "formed=true,part=none": {
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/solar_thermal_array/hidden",
+      "kind": "solar",
+      "shapes": {
+        "base": "arcforge:block/solar_thermal_array/formed_base",
+        "upper_ns": "arcforge:block/solar_thermal_array/formed_upper_ns",
+        "upper_ew": "arcforge:block/solar_thermal_array/formed_upper_ew"
+      }
+    },
+    "formed=true,part=base": {
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/solar_thermal_array/formed_base",
+      "kind": "solar",
+      "shapes": {
+        "base": "arcforge:block/solar_thermal_array/formed_base",
+        "upper_ns": "arcforge:block/solar_thermal_array/formed_upper_ns",
+        "upper_ew": "arcforge:block/solar_thermal_array/formed_upper_ew"
+      }
+    },
+    "formed=true,part=upper_ns": {
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/solar_thermal_array/formed_upper_ns",
+      "kind": "solar",
+      "shapes": {
+        "base": "arcforge:block/solar_thermal_array/formed_base",
+        "upper_ns": "arcforge:block/solar_thermal_array/formed_upper_ns",
+        "upper_ew": "arcforge:block/solar_thermal_array/formed_upper_ew"
+      }
+    },
+    "formed=true,part=upper_ew": {
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/solar_thermal_array/formed_upper_ew",
+      "kind": "solar",
+      "shapes": {
+        "base": "arcforge:block/solar_thermal_array/formed_base",
+        "upper_ns": "arcforge:block/solar_thermal_array/formed_upper_ns",
+        "upper_ew": "arcforge:block/solar_thermal_array/formed_upper_ew"
+      }
+    },
+    "formed=true,part=other": {
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/solar_thermal_array/hidden",
+      "kind": "solar",
+      "shapes": {
+        "base": "arcforge:block/solar_thermal_array/formed_base",
+        "upper_ns": "arcforge:block/solar_thermal_array/formed_upper_ns",
+        "upper_ew": "arcforge:block/solar_thermal_array/formed_upper_ew"
+      }
+    }
+  }
+}

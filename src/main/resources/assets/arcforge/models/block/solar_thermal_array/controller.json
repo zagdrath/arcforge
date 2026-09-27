@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "arcforge:block/solar_thermal_array/controller",
+    "side": "arcforge:block/solar_thermal_array/casing",
+    "top": "arcforge:block/solar_thermal_array/casing"
+  }
+}

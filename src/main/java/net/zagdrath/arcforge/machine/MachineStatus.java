@@ -41,7 +41,12 @@ public enum MachineStatus {
     SPINNING_UP("spinning_up", "led_running"),
     COASTING("coasting", "led_idle"),
     NO_FEED("no_feed", "led_blocked"),
-    NOT_FORMED("not_formed", "led_off");
+    NOT_FORMED("not_formed", "led_off"),
+    // The Solar Thermal Array.
+    TRACKING("tracking", "led_running"),
+    STOWED("stowed", "led_blocked"),
+    NIGHT("night", "led_idle"),
+    NO_SKY("no_sky", "led_blocked");
 
     private final String name;
     private final String led;

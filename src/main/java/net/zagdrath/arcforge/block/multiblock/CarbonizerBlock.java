@@ -38,10 +38,12 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.MachineInteractions;
 import net.zagdrath.arcforge.multiblock.CarbonizerStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // One block of a Carbonizer. Slices (1 wide x 2 or 3 tall x 2 or 3 deep) placed side by side form one
@@ -119,7 +121,8 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
                 .setValue(HALF, Half.BOTTOM)
                 .setValue(DEPTH, Depth.FRONT)
                 .setValue(TALL, false)
-                .setValue(LIT, false));
+                .setValue(LIT, false)
+                .setValue(MultiblockPorts.PORT, SideMode.NONE));
     }
 
     public static boolean isFormed(BlockState state) {
@@ -170,24 +173,19 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
         return level.getBlockEntity(pos) instanceof CarbonizerBlockEntity carbonizer ? carbonizer.getFormedMaster() : null;
     }
 
-    // Sneak: pick the block up. Otherwise rotate a loose block, then recheck the structure.
+    // Wrench (Configure mode): rotate a loose block, then recheck the structure.
     @Override
     public InteractionResult useWrench(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
         Player player = context.getPlayer();
-        if (player != null && player.isSecondaryUseActive()) {
-            level.destroyBlock(pos, true, player);
-            return InteractionResult.SUCCESS;
-        }
         if (!isFormed(state)) {
             level.setBlock(pos, state.setValue(FACING, state.getValue(FACING).getClockWise()), Block.UPDATE_ALL);
         }
         if (level instanceof ServerLevel serverLevel) {
             CarbonizerStructure.rebuild(serverLevel, pos);
         }
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
         return InteractionResult.SUCCESS;
     }
 
@@ -226,7 +224,7 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, ROW, HALF, DEPTH, TALL, LIT);
+        builder.add(FACING, ROW, HALF, DEPTH, TALL, LIT, MultiblockPorts.PORT);
     }
 
     // Smoke curls out of the open doors of working slices.

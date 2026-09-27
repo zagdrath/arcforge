@@ -50,6 +50,7 @@ import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -244,6 +245,9 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         return ArcforgeFurnaceStructure.isPart(worldPosition, getFacing(), pos);
     }
 
+    // Gives the structure its first ports (see MultiblockPorts.Defaults).
+    private final MultiblockPorts.Defaults portDefaults = new MultiblockPorts.Defaults();
+
     // --- Ticking ---
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, ArcforgeFurnaceBlockEntity furnace) {
@@ -255,6 +259,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
             checkRequested = false;
             updateFormed(level);
         }
+        portDefaults.tick(level, this);
         if (formed && level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
             powered = isPowered(level);
         }
@@ -464,6 +469,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        portDefaults.load(input);
         if (input.getIntOr("slot_layout", 1) >= SLOT_LAYOUT) {
             items.deserialize(input.childOrEmpty("items"));
         } else {
@@ -492,6 +498,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        portDefaults.save(output);
         items.serialize(output.child("items"));
         output.putInt("slot_layout", SLOT_LAYOUT);
         sideConfig.serialize(output);

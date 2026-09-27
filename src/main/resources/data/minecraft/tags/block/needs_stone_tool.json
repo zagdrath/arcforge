@@ -19,6 +19,9 @@
     "arcforge:steam_turbine_array_casing",
     "arcforge:distillation_array_casing",
     "arcforge:distillation_array_controller",
-    "arcforge:tray_level_casing"
+    "arcforge:tray_level_casing",
+    "arcforge:solar_thermal_array_casing",
+    "arcforge:solar_thermal_array_controller",
+    "arcforge:solar_collector"
   ]
 }

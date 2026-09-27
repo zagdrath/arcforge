@@ -24,6 +24,7 @@
         "firebox",
         "geothermal_plant",
         "fuel_burner",
+        "solar_thermal_array",
         "thermoelectric_plant",
         "heat_cells"
       ]

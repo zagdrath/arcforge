@@ -27,6 +27,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.HeatScale;
+import net.zagdrath.arcforge.client.gui.tab.PortsTab;
 import net.zagdrath.arcforge.client.gui.tab.RedstoneTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTab;
@@ -38,8 +39,11 @@ import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.machine.MachineMenu;
 import net.zagdrath.arcforge.registry.ModFluids;
 
-// Shared frame of the single-block machine GUIs: background, the machine's own tabs followed by
-// Redstone, Sides and Upgrades, and helpers for the common gauges. Positions are relative to leftPos/topPos.
+import org.jspecify.annotations.Nullable;
+
+// Shared frame of the machine GUIs: background, the machine's own tabs followed by Redstone, Sides (Ports
+// on a multiblock, see PortsTab) and Upgrades, and helpers for the common gauges. Positions are relative to
+// leftPos/topPos.
 public abstract class MachineScreen<M extends MachineMenu> extends AbstractContainerScreen<M> {
     // The status line: LED then text.
     protected static final int LED_SIZE = 6;
@@ -50,7 +54,8 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     private final Identifier background;
     private final String machine;
     protected final SideTabPanel tabs = new SideTabPanel();
-    private final SideConfigTab sides;
+    private final @Nullable SideConfigTab sides;
+    private final @Nullable PortsTab ports;
 
     protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs) {
         this(menu, inventory, title, machine, machineTabs, true);
@@ -62,12 +67,19 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         this.machine = machine;
         this.background = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/" + machine + ".png");
         machineTabs.forEach(tabs::add);
-        this.sides = new SideConfigTab(menu::getSideMode,
-                (side, action) -> sendButton(MachineMenu.sideButtonId(side, action)),
-                () -> sendButton(MachineMenu.BUTTON_CLEAR_SIDES),
-                this::sideModeName);
-        tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenu.redstoneButtonId(mode))))
-                .add(sides);
+        tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenu.redstoneButtonId(mode))));
+        if (menu.isMultiblock()) {
+            this.sides = null;
+            this.ports = new PortsTab(menu::getPorts);
+            tabs.add(ports);
+        } else {
+            this.ports = null;
+            this.sides = new SideConfigTab(menu::getSideMode,
+                    (side, action) -> sendButton(MachineMenu.sideButtonId(side, action)),
+                    () -> sendButton(MachineMenu.BUTTON_CLEAR_SIDES),
+                    this::sideModeName);
+            tabs.add(sides);
+        }
         if (upgrades) {
             tabs.add(new UpgradesTab(menu.getUpgradeSlots()));
         } else {
@@ -75,9 +87,14 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         }
     }
 
-    // For machines with item outputs: shows the auto-eject button on the Sides tab.
+    // For machines with item outputs: shows the auto-eject button on the Sides (or Ports) tab.
     protected void enableAutoEject() {
-        sides.withAutoEject(menu::isAutoEject, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT));
+        if (sides != null) {
+            sides.withAutoEject(menu::isAutoEject, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT));
+        }
+        if (ports != null) {
+            ports.withAutoEject(menu::isAutoEject, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT));
+        }
     }
 
     // What a side mode is called on this machine (shown in the Sides tab). Machines that take energy

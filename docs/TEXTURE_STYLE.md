@@ -178,6 +178,80 @@ texture-unification drop.
 - Dark panels: `#313131` face with a `#505050` highlight and a `#1A1A1A` shadow bevel. Use vanilla-style slots and dark machine screens.
 - Keep text on screens short so it never overlaps.
 
+### Glass (see-through multiblock windows)
+
+- Glass is clear like vanilla glass: the pane is fully transparent (alpha 0) with two opaque 1 px
+  diagonal glint streaks (`#DCE8EE`, `#A9BCC6`), so it stays cutout-safe.
+- Whatever is behind the glass (fluids, vapour, rotors) is drawn by a renderer, not painted into the
+  texture.
+
+### Distillation column band grammar
+
+Every face in the 2-wide column shares the same row layout, so lines run unbroken all the way round:
+
+| Rows | Content |
+|---|---|
+| 0–9 | Content: glass, a screen or plain face |
+| 10–12 | Tray sill: `#727982` on row 10, then face |
+| 13–15 | The riveted strap |
+
+The controller is a screen pane inside that band, not a boxed bezel.
+
+### Interior skins
+
+- Inside skins (`ctm/shell_liner`) are one step darker than the outside, with one riveted rib per block.
+- Window openings get a 1/16 reveal (`ctm/shell_jamb`).
+- Never put an interior plane in the same plane as an outer face.
+
+### Multiblock port overlays (`block/port/<mode>`)
+
+- A 10×10 steel collar, 1 px bevel, sitting at x3..12.
+- A coloured ring inside it:
+  - blue = in;
+  - orange = out;
+  - red = FE;
+  - hot orange = heat.
+- A dark bore with a 4×4 resource-colour chip.
+- The overlay is transparent outside the collar.
+
+### Tool modes
+
+- A mode is shown by recolouring the item's grip with three tones:
+  - Configure: cyan;
+  - Rotate: green;
+  - Port: orange;
+  - Dismantle: red.
+- The head stays unchanged.
+
+### Natural blocks (asphalt, stone-like)
+
+- 3 close dark tones in flat blotches 2–4 px across, plus a few 1–2 px lighter chips.
+- No single-pixel noise, and the texture tiles seamlessly.
+
+### 3D models (formed multiblocks, renderer models)
+
+- **UV-unwrap every model** like Mekanism and Blockbench: one texture sheet per model, with every element
+  face pointing at its own painted rectangle at 1 texel per px.
+- **Never tile a 16 px block texture across model faces.** The seams, straps and bands then land at random
+  on each part and read as stripes and noise.
+- **Paint each face flat, sized to that face:**
+  - a 1 px lit top/left edge and a dark bottom/right edge;
+  - rivets only on faces 9 px or larger;
+  - tiny faces (1–2 px) get one or two flat tones.
+- **Let geometry carry the detail:** legs, girders, recessed cores, stepped footings, collars. The
+  game's face shading does the rest. Don't make a base one plain box.
+- **Solar and mirror facets:** a solar panel face is deep blue cells (`#3E6A92`). Each cell has:
+  - a lit top/left edge (`#6F9CC2`);
+  - a shaded bottom/right edge (`#2F5478`);
+  - dark grid lines (`#1C2E44`) on a fixed pitch, so the lines stay straight across neighbouring
+    facets;
+  - at most one glint per facet.
+
+  Curvature comes from the facets' angles, never from painted gradients. Facet joints are sealed (they
+  overlap under the neighbour) and draw no edge faces.
+- **Parts tinted in code** (for example glowing receivers) use neutral greys so the tint multiplies
+  cleanly.
+
 ---
 
 ## 6. Workflow checklist for any new texture

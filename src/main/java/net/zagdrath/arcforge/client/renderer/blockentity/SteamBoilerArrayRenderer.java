@@ -24,6 +24,7 @@ import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
@@ -31,6 +32,9 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
+import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
+import net.zagdrath.arcforge.client.model.WindowQuadrants;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.SteamGrade;
@@ -39,11 +43,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 // Draws the inside of a formed Steam Boiler Array, seen through its windows (the casings draw only the
-// outside of the structure, so the inside of that skin is drawn here too, except behind glass): an opaque dark drum just inside the walls, then water rising from the floor
+// outside of the structure, so the inside of that skin is drawn here too, just inside it and cut away
+// behind the windows; see TiledBoxes.lining): an opaque dark drum just inside the walls, then water rising from the floor
 // (a full tank fills the lower 65%), and steam gathering under the roof and filling the space above the
 // water as it builds up, thicker the more there is. Levels ease toward the synced ones.
 public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoilerArrayBlockEntity, SteamBoilerArrayRenderer.State> {
-    private static final float VOLUME_INSET = 1.0F / 16.0F, DRUM_INSET = 2.0F / 16.0F;
+    // Lining, then the water and steam, then the drum: each a little further in, so no two share a plane.
+    static final float LINER_INSET = 1.0F / 16.0F;
+    private static final float VOLUME_INSET = 1.5F / 16.0F, DRUM_INSET = 2.0F / 16.0F;
     private static final int DRUM_COLOR = 0xFF1C1F22;
     // Share of the gap to the synced level closed each frame.
     private static final float EASE = 0.08F;
@@ -53,14 +60,16 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
     // (a little thicker again while it boils).
     private static final float STEAM_MIN_ALPHA = 0.2F, STEAM_FULL_ALPHA = 0.75F, BOILING_ALPHA = 0.1F;
     private static final Identifier DRUM = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_boiler_array/formed_base");
+    static final Identifier LINER = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/ctm/shell_liner");
+    static final Identifier JAMB = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/ctm/shell_jamb");
 
     public static class State extends BlockEntityRenderState {
         public boolean formed;
-        // Offsets (from the minimum corner) of the Pressure Glass panes: no inner skin behind them.
-        public final Set<BlockPos> windows = new HashSet<>();
+        // The lining tiles behind windows (see TiledBoxes.windowKey), which are left out.
+        public Set<Long> windows = Set.of();
         public float sizeX, sizeY, sizeZ;
         public float water, steam;
-        public @Nullable TextureAtlasSprite waterSprite, steamSprite, drumSprite;
+        public @Nullable TextureAtlasSprite waterSprite, steamSprite, drumSprite, liner, jamb;
         public int waterColor, steamColor;
         public int light;
     }
@@ -87,7 +96,9 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
         state.water = boiler.easeWater(fill(boiler.getWater().getAmount(), boiler.getWater().getCapacity()), EASE);
         state.steam = boiler.easeSteam(fill(boiler.getSteam().getAmount(), boiler.getSteam().getCapacity()), EASE);
         state.drumSprite = sprite(DRUM);
-        findWindows(boiler.getLevel(), shell, state.windows);
+        state.liner = sprite(LINER);
+        state.jamb = sprite(JAMB);
+        state.windows = boiler.windowQuads(found -> findWindowQuads(boiler.getLevel(), found));
 
         Fluid waterFluid = boiler.getWater().getAmount() > 0 ? boiler.getWater().getResource(0).getFluid() : Fluids.WATER;
         var waterModel = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(waterFluid.defaultFluidState());
@@ -112,16 +123,52 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
         return capacity > 0 ? Math.min(1.0F, amount / (float) capacity) : 0.0F;
     }
 
-    // The Pressure Glass panes of a shell, as offsets from its minimum corner.
-    static void findWindows(@Nullable Level level, ShellStructure.Shell shell, Set<BlockPos> windows) {
-        windows.clear();
-        if (level != null) {
-            for (BlockPos pos : shell.positions()) {
-                if (level.getBlockState(pos).getBlock() instanceof PressureGlassBlock) {
-                    windows.add(pos.subtract(shell.min()));
+    // The half-block lining tiles of a shell's walls that lie behind window (TiledBoxes.windowKey): those
+    // behind a Pressure Glass pane, and those behind a casing quadrant that shows window because glass
+    // touches that corner (the same rule ConnectedModel draws the casings by, so there's never lining in
+    // the plane of a half-block window). The turbine's end caps never show window.
+    static Set<Long> findWindowQuads(@Nullable Level level, ShellStructure.Shell shell) {
+        Set<Long> windows = new HashSet<>();
+        if (level == null) {
+            return windows;
+        }
+        int[] size = { shell.size(Direction.Axis.X), shell.size(Direction.Axis.Y), shell.size(Direction.Axis.Z) };
+        for (Direction face : Direction.values()) {
+            int a = face.getAxis().ordinal();
+            int u = (a + 1) % 3;
+            int v = (a + 2) % 3;
+            Direction up = WindowQuadrants.up(face);
+            Direction right = WindowQuadrants.right(face);
+            for (int hu = 0; hu < size[u] * 2; hu++) {
+                for (int hv = 0; hv < size[v] * 2; hv++) {
+                    int[] offset = new int[3];
+                    offset[a] = face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? size[a] - 1 : 0;
+                    offset[u] = hu / 2;
+                    offset[v] = hv / 2;
+                    BlockPos pos = shell.min().offset(offset[0], offset[1], offset[2]);
+                    BlockState state = level.getBlockState(pos);
+                    boolean window;
+                    if (PressureGlassBlock.isFormed(state)) {
+                        window = true;
+                    } else if (!ShellCasingBlock.isFormed(state) || state.hasProperty(SteamTurbineArrayCasingBlock.END)
+                            && state.getValue(SteamTurbineArrayCasingBlock.END) != SteamTurbineArrayCasingBlock.End.NONE) {
+                        window = false;
+                    } else {
+                        // Which quadrant of the casing's face the tile lies behind, from its centre.
+                        float[] centre = new float[3];
+                        centre[u] = hu % 2 == 0 ? -1.0F : 1.0F;
+                        centre[v] = hv % 2 == 0 ? -1.0F : 1.0F;
+                        boolean top = centre[up.getAxis().ordinal()] * up.getAxisDirection().getStep() > 0;
+                        boolean isRight = centre[right.getAxis().ordinal()] * right.getAxisDirection().getStep() > 0;
+                        window = WindowQuadrants.windowed(level, pos, face, top, isRight);
+                    }
+                    if (window) {
+                        windows.add(TiledBoxes.windowKey(face, hu, hv));
+                    }
                 }
             }
         }
+        return windows;
     }
 
     static TextureAtlasSprite sprite(Identifier id) {
@@ -130,12 +177,15 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        if (!state.formed || state.drumSprite == null || state.waterSprite == null || state.steamSprite == null) {
+        if (!state.formed || state.drumSprite == null || state.waterSprite == null || state.steamSprite == null
+                || state.liner == null || state.jamb == null) {
             return;
         }
         TextureAtlasSprite drum = state.drumSprite;
         TextureAtlasSprite water = state.waterSprite;
         TextureAtlasSprite steam = state.steamSprite;
+        TextureAtlasSprite liner = state.liner;
+        TextureAtlasSprite jamb = state.jamb;
         float x0 = VOLUME_INSET, y0 = VOLUME_INSET, z0 = VOLUME_INSET;
         float x1 = state.sizeX - VOLUME_INSET, y1 = state.sizeY - VOLUME_INSET, z1 = state.sizeZ - VOLUME_INSET;
         float waterTop = y0 + (y1 - y0) * WATER_SHARE * state.water;
@@ -154,7 +204,7 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
                 (pose, buffer) -> {
                     TiledBoxes.box(pose, buffer, drum, DRUM_COLOR, state.light,
                             DRUM_INSET, DRUM_INSET, DRUM_INSET, state.sizeX - DRUM_INSET, state.sizeY - DRUM_INSET, state.sizeZ - DRUM_INSET, false);
-                    TiledBoxes.lining(pose, buffer, drum, DRUM_COLOR, state.light, 0.0F, state.sizeX, state.sizeY, state.sizeZ, state.windows::contains);
+                    TiledBoxes.lining(pose, buffer, liner, jamb, -1, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows);
                 });
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(water.atlasLocation()), (pose, buffer) -> {
             TiledBoxes.box(pose, buffer, water, state.waterColor, state.light, x0, y0, z0, x1, waterTop, z1, false);

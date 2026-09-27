@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "MMM",
+    "RTR"
+  ],
+  "key": {
+    "M": "arcforge:trough_mirror",
+    "T": "arcforge:receiver_tube",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:solar_collector",
+    "count": 2
+  }
+}

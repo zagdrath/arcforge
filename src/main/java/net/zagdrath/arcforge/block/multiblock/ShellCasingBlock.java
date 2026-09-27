@@ -10,8 +10,6 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -34,8 +32,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
 // A casing of a steam array (see ShellStructure). Loose casings are ordinary solid blocks; formed ones
@@ -47,7 +47,7 @@ public abstract class ShellCasingBlock extends BaseEntityBlock implements Multib
 
     protected ShellCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FORMED, false));
+        registerDefaultState(stateDefinition.any().setValue(FORMED, false).setValue(MultiblockPorts.PORT, SideMode.NONE));
     }
 
     public abstract ShellStructure structure();
@@ -69,7 +69,7 @@ public abstract class ShellCasingBlock extends BaseEntityBlock implements Multib
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FORMED);
+        builder.add(FORMED, MultiblockPorts.PORT);
     }
 
     // Only the master of a formed structure runs.
@@ -177,20 +177,15 @@ public abstract class ShellCasingBlock extends BaseEntityBlock implements Multib
         return structure().findMaster(level, pos);
     }
 
-    // Sneak: pick the casing up. Otherwise recheck the structure.
+    // Wrench (Configure mode): recheck the structure.
     @Override
     public InteractionResult useWrench(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Player player = context.getPlayer();
-        if (player != null && player.isSecondaryUseActive()) {
-            level.destroyBlock(pos, true, player);
-            return InteractionResult.SUCCESS;
-        }
         if (level instanceof ServerLevel serverLevel && !level.getBlockState(pos).getValue(FORMED)) {
             rebuild(serverLevel, pos, player);
         }
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
         return InteractionResult.SUCCESS;
     }
 

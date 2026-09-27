@@ -28,8 +28,10 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
+import net.zagdrath.arcforge.menu.common.PortSync;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.slot.ToggleableSlot;
+import net.zagdrath.arcforge.network.PortsPayload;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
 // Shared menu for single-block machines: the machine's own slots, then its upgrade slots (which live in
@@ -42,6 +44,8 @@ public abstract class MachineMenu extends AbstractContainerMenu {
 
     protected final MachineItemHandler items;
     private final ContainerLevelAccess access;
+    private final PortSync ports;
+    private final boolean multiblock;
     private final ContainerData data;
     private final Block block;
     private final List<ToggleableSlot> upgradeSlots = new ArrayList<>();
@@ -52,9 +56,27 @@ public abstract class MachineMenu extends AbstractContainerMenu {
         super(type, containerId);
         checkContainerDataCount(data, dataValues * 2);
         this.access = ContainerLevelAccess.create(inventory.player.level(), pos);
+        this.ports = new PortSync(inventory, pos);
+        this.multiblock = PortSync.isMultiblock(inventory, pos);
         this.items = items;
         this.data = data;
         this.block = block;
+    }
+
+    // Whether this is a multiblock's menu: its screen shows its ports instead of the Sides tab.
+    public boolean isMultiblock() {
+        return multiblock;
+    }
+
+    // Multiblocks: their ports, for the Ports tab (see PortSync).
+    public List<PortsPayload.Entry> getPorts() {
+        return PortsPayload.forMenu(containerId);
+    }
+
+    @Override
+    public void broadcastChanges() {
+        super.broadcastChanges();
+        ports.update(containerId);
     }
 
     protected void addMachineSlot(int index, int x, int y) {

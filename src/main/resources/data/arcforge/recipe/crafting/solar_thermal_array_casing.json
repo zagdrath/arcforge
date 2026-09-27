@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RWR",
+    "WAW",
+    "RWR"
+  ],
+  "key": {
+    "R": "#c:rods/steel",
+    "W": "arcforge:treated_planks",
+    "A": "arcforge:tempered_alloy"
+  },
+  "result": {
+    "id": "arcforge:solar_thermal_array_casing",
+    "count": 4
+  }
+}

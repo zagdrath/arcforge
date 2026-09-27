@@ -1,6 +1,41 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "arcforge:item/wrench"
+    "type": "minecraft:select",
+    "property": "minecraft:component",
+    "component": "arcforge:wrench_mode",
+    "cases": [
+      {
+        "when": "configure",
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/wrench_configure"
+        }
+      },
+      {
+        "when": "rotate",
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/wrench_rotate"
+        }
+      },
+      {
+        "when": "port",
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/wrench_port"
+        }
+      },
+      {
+        "when": "dismantle",
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/wrench_dismantle"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "arcforge:item/wrench_configure"
+    }
   }
 }

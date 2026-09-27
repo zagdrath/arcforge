@@ -55,6 +55,7 @@ import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
 import net.zagdrath.arcforge.multiblock.CarbonizerStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -358,10 +359,14 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         return 1.0F - inverse * inverse * inverse;
     }
 
+    // Gives the structure its first ports (see MultiblockPorts.Defaults).
+    private final MultiblockPorts.Defaults portDefaults = new MultiblockPorts.Defaults();
+
     // --- Ticking (the master of a formed structure only) ---
 
     public static void serverTick(ServerLevel level, CarbonizerBlockEntity carbonizer) {
         if (carbonizer.isFormed()) {
+            carbonizer.portDefaults.tick(level, carbonizer);
             carbonizer.tick(level);
         }
     }
@@ -644,6 +649,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        portDefaults.load(input);
         masterPos = input.read("master", BlockPos.CODEC).orElse(null);
         formation = input.read("formation", CarbonizerStructure.Formation.CODEC).orElse(null);
         holdsContents = input.getBooleanOr("holds_contents", false);
@@ -670,6 +676,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        portDefaults.save(output);
         output.storeNullable("master", BlockPos.CODEC, masterPos);
         output.storeNullable("formation", CarbonizerStructure.Formation.CODEC, formation);
         output.putBoolean("holds_contents", holdsContents);

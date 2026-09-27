@@ -11,8 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -32,8 +30,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Distillation Array's controller: its display faces the column's front (the structure's facing),
@@ -43,7 +43,8 @@ public class DistillationArrayControllerBlock extends BaseEntityBlock implements
 
     public DistillationArrayControllerBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FORMED, false).setValue(LIT, false));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FORMED, false).setValue(LIT, false)
+                .setValue(MultiblockPorts.PORT, SideMode.NONE));
     }
 
     @Override
@@ -87,17 +88,13 @@ public class DistillationArrayControllerBlock extends BaseEntityBlock implements
         return level.getBlockEntity(pos) instanceof DistillationArrayBlockEntity column && column.isFormed() ? column : null;
     }
 
-    // Sneak: pick it up. Otherwise turn it: a formed column's controller to its other outward side (which
+    // Wrench (Configure mode): turn it: a formed column's controller to its other outward side (which
     // turns the side configuration with it), a loose one clockwise. Then recheck.
     @Override
     public InteractionResult useWrench(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Player player = context.getPlayer();
-        if (player != null && player.isSecondaryUseActive()) {
-            level.destroyBlock(pos, true, player);
-            return InteractionResult.SUCCESS;
-        }
         if (!(level.getBlockEntity(pos) instanceof DistillationArrayBlockEntity column)) {
             return InteractionResult.PASS;
         }
@@ -114,7 +111,6 @@ public class DistillationArrayControllerBlock extends BaseEntityBlock implements
             player.sendOverlayMessage(Component.translatable(column.isFormed()
                     ? "message.arcforge.distillation_array.formed" : "message.arcforge.distillation_array.incomplete"));
         }
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
         return InteractionResult.SUCCESS;
     }
 
@@ -135,6 +131,6 @@ public class DistillationArrayControllerBlock extends BaseEntityBlock implements
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, FORMED, LIT);
+        builder.add(FACING, FORMED, LIT, MultiblockPorts.PORT);
     }
 }

@@ -10,8 +10,6 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionResult;
@@ -36,9 +34,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.CubeMultiblockBlockEntity;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.CubeMultiblockStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 
 // A casing of a 3x3x3 cube multiblock (the Arc Crushing Array, the Induction Furnace Array). 27 of the
 // same casing form the machine: the centre block (part=center) draws the whole 48px machine model and
@@ -67,7 +67,8 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
 
     protected CubeCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(PART, Part.NONE).setValue(FACING, Direction.NORTH).setValue(LIT, false));
+        registerDefaultState(stateDefinition.any().setValue(PART, Part.NONE).setValue(FACING, Direction.NORTH).setValue(LIT, false)
+                .setValue(MultiblockPorts.PORT, SideMode.NONE));
     }
 
     public static boolean isFormed(BlockState state) {
@@ -81,7 +82,7 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(PART, FACING, LIT);
+        builder.add(PART, FACING, LIT, MultiblockPorts.PORT);
     }
 
     // Only the centre of a formed cube runs.
@@ -150,16 +151,12 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
         return structure().findController(level, pos);
     }
 
-    // Sneak: pick the casing up. On a formed cube, turn it clockwise; otherwise recheck the structure.
+    // Wrench (Configure mode): on a formed cube, turn it clockwise; otherwise recheck the structure.
     @Override
     public InteractionResult useWrench(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Player player = context.getPlayer();
-        if (player != null && player.isSecondaryUseActive()) {
-            level.destroyBlock(pos, true, player);
-            return InteractionResult.SUCCESS;
-        }
         if (!(level instanceof ServerLevel serverLevel)) {
             return InteractionResult.SUCCESS;
         }
@@ -173,7 +170,6 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
         } else {
             structure().rebuild(serverLevel, pos, player != null ? player.position() : null);
         }
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
         return InteractionResult.SUCCESS;
     }
 

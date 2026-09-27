@@ -66,6 +66,9 @@
     "arcforge:tray_level_casing",
     "arcforge:asphalt",
     "arcforge:asphalt_slab",
-    "arcforge:asphalt_stairs"
+    "arcforge:asphalt_stairs",
+    "arcforge:solar_thermal_array_casing",
+    "arcforge:solar_thermal_array_controller",
+    "arcforge:solar_collector"
   ]
 }

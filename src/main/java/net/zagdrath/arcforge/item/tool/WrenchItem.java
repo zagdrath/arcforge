@@ -5,7 +5,10 @@
 
 package net.zagdrath.arcforge.item.tool;
 
+import java.util.List;
 import java.util.function.Consumer;
+
+import org.jspecify.annotations.Nullable;
 
 import com.mojang.logging.LogUtils;
 
@@ -31,59 +34,200 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
+import net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
+import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.conduit.ConnectionMode;
+import net.zagdrath.arcforge.machine.config.ConfigurableMachine;
+import net.zagdrath.arcforge.machine.config.RelativeSide;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.Dismantleable;
 import net.zagdrath.arcforge.machine.interaction.WrenchableMachine;
+import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.registry.ModDataComponents;
 
-// Configures conduit sides, rotates machines, and picks up conduits and machines.
-// Runs from onItemUseFirst so it acts before the block's own interaction (such as opening a GUI).
+// The Wrench. Its mode (Shift + mouse wheel, see WrenchMode) decides what right-clicking does:
+//   Configure: a conduit side cycles through its settings (sneaking: backward); a multiblock rechecks its
+//              structure (sneaking does nothing, so it can't be broken by accident).
+//   Rotate:    a machine turns clockwise (sneaking: counter-clockwise).
+//   Port:      a multiblock block on the outside of its structure says what port it is, and sneaking
+//              cycles it through the modes the structure allows (see MultiblockPorts); a machine face
+//              likewise; conduits as in Configure.
+//   Dismantle: sneaking picks up a machine (keeping its contents), a conduit, or a block of a multiblock.
+// Runs from onItemUseFirst so it acts before the block's own interaction (such as opening a GUI); where the
+// mode does nothing with a block, the click goes through to it.
 public class WrenchItem extends Item {
+    private enum Target { CONDUIT, MULTIBLOCK, GLASS, MACHINE, OTHER }
+
     public WrenchItem(Item.Properties properties) {
         super(properties);
+    }
+
+    public static WrenchMode mode(ItemStack stack) {
+        return stack.getOrDefault(ModDataComponents.WRENCH_MODE.get(), WrenchMode.CONFIGURE);
     }
 
     @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Level level = context.getLevel();
-        BlockState state = level.getBlockState(context.getClickedPos());
-        // Multiblock parts: recheck the structure (the part decides whether to rotate or dismantle too).
-        if (state.getBlock() instanceof MultiblockPart part) {
-            return level.isClientSide() ? InteractionResult.SUCCESS : part.useWrench(context);
-        }
-        boolean conduit = state.getBlock() instanceof ConduitBlock;
-        boolean machine = state.getBlock() instanceof WrenchableMachine;
-        if (!conduit && !machine) {
+        BlockPos pos = context.getClickedPos();
+        BlockState state = level.getBlockState(pos);
+        Player player = context.getPlayer();
+        boolean sneaking = player != null && player.isSecondaryUseActive();
+        Target target = targetOf(state);
+        WrenchMode mode = mode(stack);
+        if (!acts(mode, target, sneaking, level.getBlockEntity(pos))) {
             return InteractionResult.PASS;
         }
         // The server does the work; the client only swings.
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
-        if (conduit) {
-            return ((ConduitBlock) state.getBlock()).useWrench(context);
-        }
-        Player player = context.getPlayer();
-        return player != null && player.isSecondaryUseActive()
-                ? dismantle(level, context.getClickedPos(), state, player)
-                : rotate(level, context.getClickedPos(), state);
+        InteractionResult result = switch (mode) {
+            case CONFIGURE -> target == Target.CONDUIT ? ((ConduitBlock) state.getBlock()).useWrench(context)
+                    : ((MultiblockPart) state.getBlock()).useWrench(context);
+            case ROTATE -> rotate(level, pos, state, sneaking);
+            case PORT -> switch (target) {
+                case CONDUIT -> ((ConduitBlock) state.getBlock()).useWrench(context);
+                case MACHINE -> machineSide(context, state, sneaking);
+                default -> port(context, state, sneaking);
+            };
+            case DISMANTLE -> target == Target.MACHINE ? dismantle(level, pos, state, player) : breakBlock(level, pos, player);
+        };
+        level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 0.3F, 1.4F);
+        return result;
     }
 
-    private static InteractionResult rotate(Level level, BlockPos pos, BlockState state) {
+    private static Target targetOf(BlockState state) {
+        Block block = state.getBlock();
+        if (block instanceof ConduitBlock) {
+            return Target.CONDUIT;
+        }
+        if (block instanceof MultiblockPart) {
+            return Target.MULTIBLOCK;
+        }
+        if (block instanceof PressureGlassBlock) {
+            return Target.GLASS;
+        }
+        return block instanceof WrenchableMachine ? Target.MACHINE : Target.OTHER;
+    }
+
+    // Whether this mode does something with the block (otherwise the click passes to it).
+    private static boolean acts(WrenchMode mode, Target target, boolean sneaking, @Nullable BlockEntity blockEntity) {
+        return switch (mode) {
+            case CONFIGURE -> target == Target.CONDUIT || target == Target.MULTIBLOCK && !sneaking;
+            case ROTATE -> target == Target.MACHINE;
+            case PORT -> target == Target.CONDUIT || target == Target.MULTIBLOCK || target == Target.GLASS
+                    || target == Target.MACHINE && blockEntity instanceof ConfigurableMachine;
+            case DISMANTLE -> sneaking && target != Target.OTHER;
+        };
+    }
+
+    // --- Rotate ---
+
+    private static InteractionResult rotate(Level level, BlockPos pos, BlockState state, boolean backward) {
         if (!state.hasProperty(HorizontalDirectionalBlock.FACING)) {
             return InteractionResult.PASS;
         }
         Direction facing = state.getValue(HorizontalDirectionalBlock.FACING);
-        level.setBlock(pos, state.setValue(HorizontalDirectionalBlock.FACING, facing.getClockWise()), Block.UPDATE_ALL);
+        level.setBlock(pos, state.setValue(HorizontalDirectionalBlock.FACING, backward ? facing.getCounterClockWise() : facing.getClockWise()), Block.UPDATE_ALL);
         // Side configuration is relative to the front, so every face's capabilities just changed.
         level.invalidateCapabilities(pos);
         ConduitBlock.refreshAround(level, pos);
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
+        return InteractionResult.SUCCESS;
+    }
+
+    // --- Port ---
+
+    // A multiblock's port: says what it is, or (sneaking) sets it to the next mode.
+    private static InteractionResult port(UseOnContext context, BlockState state, boolean change) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        MultiblockController controller = state.getBlock() instanceof MultiblockPart part ? part.findController(level, pos) : null;
+        if (controller == null || !controller.isFormed() || !MultiblockPorts.canHold(level, controller, pos)
+                || controller.isInside(pos.relative(context.getClickedFace()))) {
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.not_port"));
+            return InteractionResult.SUCCESS;
+        }
+        SideMode current = MultiblockPorts.get(state);
+        if (change) {
+            SideMode next = MultiblockPorts.next(controller, current, false);
+            MultiblockPorts.set(level, controller, pos, next);
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.port_set", portName(controller, next)));
+        } else {
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.port", portName(controller, current)));
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    // A port's mode, with which way things go through it on this structure, e.g. "Naphtha (output)".
+    private static Component portName(MultiblockController controller, SideMode mode) {
+        boolean in = false, out = false;
+        for (ConduitType type : ConduitType.values()) {
+            ConnectionMode connection = controller.getConduitConnection(mode, type);
+            in |= connection == ConnectionMode.INPUT;
+            out |= connection == ConnectionMode.OUTPUT;
+        }
+        if (mode == SideMode.NONE || in == out) {
+            return mode.getDescription();
+        }
+        return Component.translatable(out ? "message.arcforge.wrench.port_out" : "message.arcforge.wrench.port_in", mode.getDescription());
+    }
+
+    // A machine face (the clicked one): says its side mode, or (sneaking) sets the next allowed one.
+    private static InteractionResult machineSide(UseOnContext context, BlockState state, boolean change) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (!(blockEntity instanceof ConfigurableMachine machine)) {
+            return InteractionResult.PASS;
+        }
+        RelativeSide side = RelativeSide.fromDirection(facingOf(blockEntity, state), context.getClickedFace());
+        SideMode mode = machine.getSideMode(side);
+        if (change) {
+            List<SideMode> allowed = machine.getAllowedSideModes();
+            int index = allowed.indexOf(mode);
+            mode = allowed.get(index < 0 ? 0 : (index + 1) % allowed.size());
+            machine.setSideMode(side, mode);
+            blockEntity.setChanged();
+            level.sendBlockUpdated(pos, state, state, Block.UPDATE_ALL);
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.side_set", side.getDescription(), mode.getDescription()));
+        } else {
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.side", side.getDescription(), mode.getDescription()));
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    private static Direction facingOf(BlockEntity blockEntity, BlockState state) {
+        if (blockEntity instanceof MachineBlockEntity machine) {
+            return machine.getFacing();
+        }
+        if (blockEntity instanceof StorageBlockEntity storage) {
+            return storage.getFacing();
+        }
+        return state.hasProperty(HorizontalDirectionalBlock.FACING) ? state.getValue(HorizontalDirectionalBlock.FACING) : Direction.NORTH;
+    }
+
+    private static void tell(@Nullable Player player, Component message) {
+        if (player != null) {
+            player.sendOverlayMessage(message);
+        }
+    }
+
+    // --- Dismantle ---
+
+    // A conduit, or a block of a multiblock (which breaks the structure): broken with its drops.
+    private static InteractionResult breakBlock(Level level, BlockPos pos, @Nullable Player player) {
+        level.destroyBlock(pos, true, player);
         return InteractionResult.SUCCESS;
     }
 
     // Drops the machine as an item carrying its block entity data (fluid, energy, settings), so it can be
     // placed back unchanged. The items in its slots drop separately.
-    private static InteractionResult dismantle(Level level, BlockPos pos, BlockState state, Player player) {
+    private static InteractionResult dismantle(Level level, BlockPos pos, BlockState state, @Nullable Player player) {
         ItemStack drop = new ItemStack(state.getBlock());
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null) {
@@ -108,9 +252,9 @@ public class WrenchItem extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
-        builder.accept(Component.translatable("tooltip.arcforge.wrench.conduit").withStyle(ChatFormatting.GRAY));
-        builder.accept(Component.translatable("tooltip.arcforge.wrench.pick_up").withStyle(ChatFormatting.GRAY));
-        builder.accept(Component.translatable("tooltip.arcforge.wrench.machine").withStyle(ChatFormatting.GRAY));
-        builder.accept(Component.translatable("tooltip.arcforge.wrench.multiblock").withStyle(ChatFormatting.GRAY));
+        WrenchMode mode = mode(stack);
+        builder.accept(Component.translatable("tooltip.arcforge.wrench.mode", mode.displayName()));
+        builder.accept(Component.translatable("tooltip.arcforge.wrench." + mode.getSerializedName()).withStyle(ChatFormatting.GRAY));
+        builder.accept(Component.translatable("tooltip.arcforge.wrench.scroll").withStyle(ChatFormatting.DARK_GRAY));
     }
 }

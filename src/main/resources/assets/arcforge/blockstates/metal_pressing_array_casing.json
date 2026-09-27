@@ -13,10 +13,20 @@
       "model": "arcforge:block/metal_pressing_array/formed_active"
     },
     "facing=north,lit=false,part=other": {
-      "model": "arcforge:block/metal_pressing_array/hidden"
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/metal_pressing_array/hidden",
+      "kind": "cube",
+      "shapes": {
+        "formed": "arcforge:block/metal_pressing_array/formed"
+      }
     },
     "facing=north,lit=true,part=other": {
-      "model": "arcforge:block/metal_pressing_array/hidden"
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/metal_pressing_array/hidden",
+      "kind": "cube",
+      "shapes": {
+        "formed": "arcforge:block/metal_pressing_array/formed"
+      }
     },
     "facing=east,lit=false,part=none": {
       "model": "arcforge:block/metal_pressing_array/casing"
@@ -33,10 +43,20 @@
       "y": 90
     },
     "facing=east,lit=false,part=other": {
-      "model": "arcforge:block/metal_pressing_array/hidden"
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/metal_pressing_array/hidden",
+      "kind": "cube",
+      "shapes": {
+        "formed": "arcforge:block/metal_pressing_array/formed"
+      }
     },
     "facing=east,lit=true,part=other": {
-      "model": "arcforge:block/metal_pressing_array/hidden"
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/metal_pressing_array/hidden",
+      "kind": "cube",
+      "shapes": {
+        "formed": "arcforge:block/metal_pressing_array/formed"
+      }
     },
     "facing=south,lit=false,part=none": {
       "model": "arcforge:block/metal_pressing_array/casing"
@@ -53,10 +73,20 @@
       "y": 180
     },
     "facing=south,lit=false,part=other": {
-      "model": "arcforge:block/metal_pressing_array/hidden"
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/metal_pressing_array/hidden",
+      "kind": "cube",
+      "shapes": {
+        "formed": "arcforge:block/metal_pressing_array/formed"
+      }
     },
     "facing=south,lit=true,part=other": {
-      "model": "arcforge:block/metal_pressing_array/hidden"
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/metal_pressing_array/hidden",
+      "kind": "cube",
+      "shapes": {
+        "formed": "arcforge:block/metal_pressing_array/formed"
+      }
     },
     "facing=west,lit=false,part=none": {
       "model": "arcforge:block/metal_pressing_array/casing"
@@ -73,10 +103,20 @@
       "y": 270
     },
     "facing=west,lit=false,part=other": {
-      "model": "arcforge:block/metal_pressing_array/hidden"
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/metal_pressing_array/hidden",
+      "kind": "cube",
+      "shapes": {
+        "formed": "arcforge:block/metal_pressing_array/formed"
+      }
     },
     "facing=west,lit=true,part=other": {
-      "model": "arcforge:block/metal_pressing_array/hidden"
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/metal_pressing_array/hidden",
+      "kind": "cube",
+      "shapes": {
+        "formed": "arcforge:block/metal_pressing_array/formed"
+      }
     }
   }
 }

@@ -141,6 +141,7 @@ public class MetalPressingArrayBlockEntity extends CubeMultiblockBlockEntity {
 
     @Override
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
+        tickPorts(level);
         if (!isFormed()) {
             return;
         }

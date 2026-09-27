@@ -5,7 +5,6 @@
 
 package net.zagdrath.arcforge.client.renderer.blockentity;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -26,7 +25,6 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
@@ -38,9 +36,10 @@ import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
-// Draws the inside of a formed Steam Turbine Array, seen through its windows: a ribbed lining on the inside
-// of the walls' outer skin (only its inward faces, so the near wall never hides the far one; none behind
-// glass, so opposite windows see through), then the rotor: the shaft
+// Draws the inside of a formed Steam Turbine Array, seen through its windows: a ribbed lining just inside
+// the walls' outer skin (only its inward faces, so the near wall never hides the far one; cut away behind
+// the windows, with a reveal round each opening, so opposite windows see through; see TiledBoxes.lining),
+// then the rotor: the shaft
 // through every block from bearing to generator (stopping just short of the end caps' faces), and a set of blades in each block between them, each
 // set turned 22.5° further so they look staggered; and the steam around it, thicker the faster it flows. The rotor turns at up to one turn a second.
 public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
@@ -48,9 +47,8 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
     public static final StandaloneModelKey<QuadCollection> ROTOR_BLADES = new StandaloneModelKey<>(() -> Arcforge.MODID + ":rotor_blades");
     public static final Identifier ROTOR_SHAFT_MODEL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/rotor_shaft");
     public static final Identifier ROTOR_BLADES_MODEL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/rotor_blades");
-    private static final Identifier LINER = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/liner");
-    // The lining is the inside of the structure's outer skin (see TiledBoxes.lining).
-    private static final float LINER_INSET = 0.0F;
+    // The lining sits just inside the structure's outer skin (see TiledBoxes.lining).
+    private static final float LINER_INSET = SteamBoilerArrayRenderer.LINER_INSET;
     // The steam fills the chamber just inside the lining, around the rotor.
     private static final float STEAM_INSET = 2.5F / 16.0F;
     // Steam is this see-through with steam in the tank but none flowing, and this thick at full flow.
@@ -58,18 +56,18 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
     // Share of the gap to the synced flow closed each frame.
     private static final float EASE = 0.05F;
     private static final float STAGGER = 22.5F;
-    // In the end blocks the shaft stops this far inside the outer face, so it never lies on the end caps.
-    private static final float SHAFT_END_INSET = 1.0F / 16.0F;
+    // In the end blocks the shaft stops this far inside the outer face, clear of the end lining.
+    private static final float SHAFT_END_INSET = 1.5F / 16.0F;
 
     public static class State extends BlockEntityRenderState {
         public boolean formed;
         public Direction.Axis axis = Direction.Axis.Z;
         public int length;
         public float sizeX, sizeY, sizeZ;
-        // Offsets (from the minimum corner) of the Pressure Glass panes: no lining behind them.
-        public final Set<BlockPos> windows = new HashSet<>();
+        // The lining tiles behind windows (see TiledBoxes.windowKey), which are left out.
+        public Set<Long> windows = Set.of();
         public float angle;
-        public @Nullable TextureAtlasSprite liner;
+        public @Nullable TextureAtlasSprite liner, jamb;
         public @Nullable TextureAtlasSprite steamSprite;
         public int steamColor;
         public int light;
@@ -96,8 +94,9 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         state.sizeX = shell.size(Direction.Axis.X);
         state.sizeY = shell.size(Direction.Axis.Y);
         state.sizeZ = shell.size(Direction.Axis.Z);
-        state.liner = SteamBoilerArrayRenderer.sprite(LINER);
-        SteamBoilerArrayRenderer.findWindows(turbine.getLevel(), shell, state.windows);
+        state.liner = SteamBoilerArrayRenderer.sprite(SteamBoilerArrayRenderer.LINER);
+        state.jamb = SteamBoilerArrayRenderer.sprite(SteamBoilerArrayRenderer.JAMB);
+        state.windows = turbine.windowQuads(found -> SteamBoilerArrayRenderer.findWindowQuads(turbine.getLevel(), found));
         // The faster steam goes through, the thicker it looks.
         float flow = turbine.easeSteamDensity(EASE);
         SteamGrade grade = SteamGrade.of(turbine.getSteam().getResource(0));
@@ -118,12 +117,13 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        if (!state.formed || state.liner == null) {
+        if (!state.formed || state.liner == null || state.jamb == null) {
             return;
         }
         TextureAtlasSprite liner = state.liner;
+        TextureAtlasSprite jamb = state.jamb;
         collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(liner.atlasLocation()),
-                (pose, buffer) -> TiledBoxes.lining(pose, buffer, liner, -1, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows::contains));
+                (pose, buffer) -> TiledBoxes.lining(pose, buffer, liner, jamb, -1, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows));
 
         var models = Minecraft.getInstance().getModelManager();
         QuadCollection shaft = models.getStandaloneModel(ROTOR_SHAFT);

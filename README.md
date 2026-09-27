@@ -49,6 +49,26 @@ It only ever flows from a hotter machine into a colder one.
   It takes a few minutes to warm up.
 - The Combustion and Thermoelectric Plants push up to 200 FE/t out of their energy faces.
 
+**Solar Thermal Array** (Tempered tier). A 2x2 tower exactly 4 tall: three layers of Solar Thermal Array
+Casings with one controller in the bottom layer, facing out of the tower, and four Solar Collectors on
+top. Formed, it becomes one model: a tower base, a mast and a parabolic trough mirror whose receiver tube
+glows from grey through dull red to orange as it heats. The trough follows the sun (and stows face down at
+night and in thunderstorms), and the receiver takes in heat by it:
+
+| Condition | Effect |
+|---|---|
+| Sun | sin(time of day): nothing at night, about 70% at 9:00, 100% at noon |
+| Weather | rain or snow ×0.3, thunderstorm ×0.1 (stowed) |
+| Tracking axis | the controller's facing: north or south ×1.0, east or west ×0.7 |
+| Biome | hot (desert, badlands, savanna) ×1.2, cold ×0.85 |
+| Collectors | each one that can't see the sky loses a quarter |
+
+At clear noon on the north-south axis it makes 200 HU/t at 550°C (High-Pressure Steam from a boiler needs
+500°C, so about 10:00 to 14:00 in clear weather). The temperature follows the same factors, up to 550°C.
+It holds 16,000 HU and gives heat out of its heat ports (a new tower has one on the bottom block behind
+the controller); a buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
+it does nothing in the Nether or the End. Everything is configurable (`solarThermalArray`).
+
 ### Steelmaking and alloys
 
 ```
@@ -60,7 +80,7 @@ metal + additive + coal coke --[Arcforge Furnace]--> result + slag
 **Arcforge Furnace.** Three inputs: the metal, an optional additive and coal coke, which is both its fuel
 and its reagent (it keeps back what each smelt uses; a coke block counts as nine). Burning coke heats it
 towards 1,600°C, and a smelt only progresses above its recipe's minimum. A recipe without an additive only
-runs with the additive slot empty. Input faces route each item to its own slot. Recipes are data-driven
+runs with the additive slot empty. Input ports route each item to its own slot. Recipes are data-driven
 (`arcforge:arcforge_smelting`: `metal`, optional `additive`, `coke`, `result`, `byproduct`, `time`, `min_temp`).
 
 | Makes | Metal | Additive | Coke | Time | From |
@@ -91,8 +111,9 @@ machine facing the player who completed it (turn it with the wrench), and any ca
 Three lanes crush in parallel, twice as fast as the Arc Crusher and for 60% less FE an operation
 (16 FE/t per working lane), and ore recipes give **double** the main output (raw iron gives 2 dust, iron
 ore 4); ingots, gems and blocks are not doubled. It stores 100,000 FE and takes up to 1,000 FE/t.
-Side configuration covers the faces of the whole cube; input faces feed the lane holding the fewest
-items. Breaking any casing reverts it to loose casings; the contents stay in the centre casing.
+It does IO through its ports (see Multiblock ports): a new one has an input in the middle of the top,
+an output in the middle of the bottom and energy in the middle of the back; input ports feed the lane
+holding the fewest items. Breaking any casing reverts it to loose casings; the contents stay in the centre casing.
 
 ### Pressing
 
@@ -146,8 +167,8 @@ costs 80% of a Steam Boiler's heat.
 **Steam Turbine Array.** A 3x3 tube 3 to 9 long along either horizontal axis, built the same way. It
 takes up to 40 mB/t per block of length at 10 / 18 / 28 FE per mB (a 9-long array on Superheated makes
 10,080 FE/t). Its rotor spins up over a few seconds when steam flows, and output rises with it; it
-coasts down when the steam stops. The generator end (the back) is its energy face. Heavy Oil in its
-4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
+coasts down when the steam stops. A new one has an energy port on its generator end and a steam port on
+its bearing end. Heavy Oil in its 4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
 blocks of length.
 
 ### Distillation
@@ -161,7 +182,8 @@ pitch --[Fiberizer, 1,000°C]--> Carbon Fiber --> Arcforged Alloy
 **Distillation Array.** A solid 2x2 column exactly 4, 6 or 8 tall of Distillation Array Casings and Tray
 Level Casings with one Distillation Array Controller (Hardened tier). The controller and the trays can't
 be in the top or bottom layer; the controller's display is the front. Formed, the column reads as one
-block, and its tray windows show the fractions it makes, with vapour rising while it runs. It distils
+block, and its tray levels are glass: each shows its steel tray, the fraction pooled on it (as deep as its
+tank is full) and vapour rising while it runs. It distils
 1,000 mB batches of creosote with heat, at 4,000 HU a batch and only at 350°C or hotter:
 
 | Height | Per 1,000 mB of creosote | Feed | Heat |
@@ -173,8 +195,9 @@ block, and its tray windows show the fractions it makes, with vapour rising whil
 It holds 40,000 HU per 4 blocks of height (up to 1,400°C), 16,000 mB of creosote, 8,000 mB of steam and
 8,000 mB of each product, and stops when a product it makes is full. **Steam stripping:** steam in its
 steam tank raises each batch's Naphtha by the grade (Steam +15%, High-Pressure +30%, Superheated +50%), out
-of the Heavy Oil (a straight bonus at 4 high), using 100 mB a batch. Its faces take the modes None, Input
-(creosote), Steam, Heat, Naphtha, Light Oil, Heavy Oil and Pitch, with auto-eject. Recipes are data-driven
+of the Heavy Oil (a straight bonus at 4 high), using 100 mB a batch. Its ports take the modes Input
+(creosote), Steam, Heat, Naphtha, Light Oil, Heavy Oil and Pitch, with auto-eject; a new column has heat
+underneath, feed on the left, Naphtha on top, Heavy Oil on the right and Pitch at the back. Recipes are data-driven
 (`arcforge:distilling`: `input`, `heat`, `min_temp`, `by_height`, `item_output`, `steam_stripping`).
 
 **Fuel Burner.** Burns liquid fuels into heat, but never hotter than the fuel's burn temperature (the
@@ -243,7 +266,7 @@ A slim glass tank that shows the liquid inside, and glows with lava or any other
   empty container drops into the slot below. An empty bucket there is filled from the tank instead.
 - A Canister in the top slot empties into the tank, and one in the bottom slot fills from it, at the
   canister's rate; either way it stays in its slot.
-- Pick the tank up with the wrench (sneak-use) to keep its fluid on the item; the item shows the
+- Pick the tank up with the wrench (Dismantle mode, sneak-use) to keep its fluid on the item; the item shows the
   fluid inside. Breaking it any other way spills a source block of the fluid (if it held at least
   a bucket) and drops the tank empty. A comparator reads how full it is.
 - Sides: fill from every side and drain from the bottom by default. Output faces push fluid into
@@ -310,11 +333,27 @@ heat to something colder, and leak like that Heat Cell while carried.
 
 ### Wrench
 
-- Use on a conduit side facing a machine: cycle Auto, Input, Output, Disabled (sneak to cycle
-  backwards). On a joint between two conduits it disconnects or reconnects them.
-- Sneak-use on a conduit's centre: pick it up.
-- Use on a machine: rotate it. Sneak-use: pick it up with its fluid, energy and settings kept; items
-  in its slots drop beside it.
+Shift + mouse wheel with the wrench in hand changes its mode (shown in the action bar, on its tooltip and
+by the colour of its grip). Where a mode does nothing with a block, the click goes through to it.
+
+- **Configure**: use on a conduit side facing a machine to cycle Auto, Input, Output, Disabled (sneak to
+  cycle backwards); on a joint between two conduits it disconnects or reconnects them. Use on a
+  multiblock to check its structure (sneaking does nothing).
+- **Rotate**: use on a machine to turn it clockwise, sneak-use to turn it back.
+- **Port**: use on a multiblock's block or a machine's face to see its port or side mode, sneak-use to
+  cycle it. Conduits work as in Configure.
+- **Dismantle**: sneak-use to pick up a machine (its fluid, energy and settings kept; items in its
+  slots drop beside it), a conduit, or a block of a multiblock.
+
+### Multiblock ports
+
+Multiblocks do IO only through their **ports**: blocks on the outside of the structure set to a mode,
+marked with a plate (a blue ring takes in, an orange one gives out, red is energy, hot orange is heat).
+A port works on every outer face of its block. On the cube arrays and the Solar Thermal Array, whose
+formed model isn't a cube, a port is a steel nozzle from the model out to the block face. Set them with
+the wrench in Port mode; each structure cycles only through its own modes. A new structure gets a few in
+the middle of its sides (as listed with each machine), and ports stay on their blocks when the structure
+breaks and forms again. Worlds from before ports get ports where their side configuration had faces.
 
 ## Machine settings
 
@@ -328,9 +367,11 @@ Tabs on the right of each machine's screen:
   - Combustion Plant: none, input, energy. Top is input, back is energy.
   - Firebox and Geothermal Plant: none, input, heat. Top is input, back is heat.
   - Thermoelectric Plant: none, heat, energy. Top and bottom are heat, back is energy.
-  - Arc Crusher, Arc Crushing Array, Metal Press and Metal Pressing Array: none, input, output,
-    energy. Top is input, bottom is output, back is energy.
+  - Arc Crusher and Metal Press: none, input, output, energy. Top is input, bottom is output, back is
+    energy.
   - Tanks and cells: none, input or output.
+- **Ports** (multiblocks, in place of Sides): the structure's ports, with where each one is, and the
+  auto-eject toggle. Set ports with the wrench in Port mode.
 - **Upgrades**: four slots. Each holds up to 8 of one upgrade type, so a machine takes at most 8 of
   each (see Upgrades below).
 

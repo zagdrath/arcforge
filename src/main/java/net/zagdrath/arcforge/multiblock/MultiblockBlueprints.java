@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
+import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
 // An example build of every Arcforge multiblock, for the JEI build viewer and the Engineer's Handbook: which block
@@ -62,7 +63,8 @@ public final class MultiblockBlueprints {
                 arcforgeFurnace(),
                 steamBoilerArray(),
                 steamTurbineArray(),
-                distillationArray());
+                distillationArray(),
+                solarThermalArray());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -144,6 +146,25 @@ public final class MultiblockBlueprints {
             }
         }
         return placements;
+    }
+
+    // 2x2, 4 tall: three layers of casings with the controller at the front of the bottom one (facing south,
+    // so its axis is north-south), and four collectors on top.
+    private static Blueprint solarThermalArray() {
+        BlockState casing = ModBlocks.SOLAR_THERMAL_ARRAY_CASING.get().defaultBlockState();
+        BlockState collector = ModBlocks.SOLAR_COLLECTOR.get().defaultBlockState();
+        BlockState controller = ModBlocks.SOLAR_THERMAL_ARRAY_CONTROLLER.get().defaultBlockState()
+                .setValue(SolarThermalArrayControllerBlock.FACING, Direction.SOUTH);
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < SolarThermalStructure.HEIGHT; y++) {
+            for (int z = 0; z < 2; z++) {
+                for (int x = 0; x < 2; x++) {
+                    BlockState state = y == SolarThermalStructure.HEIGHT - 1 ? collector : y == 0 && x == 0 && z == 1 ? controller : casing;
+                    placements.add(new Placement(new BlockPos(x, y, z), state));
+                }
+            }
+        }
+        return new Blueprint("solar_thermal_array", placements, new BlockPos(2, SolarThermalStructure.HEIGHT, 2));
     }
 
     // 2x2, 8 tall (4 and 6 work too): casings top and bottom, the controller at the front of the second

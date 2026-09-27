@@ -13,8 +13,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.UseOnContext;
@@ -246,21 +244,16 @@ public final class DistillationStructure {
         return InteractionResult.SUCCESS;
     }
 
-    // Wrench on a casing or tray: sneak picks it up, otherwise nearby controllers recheck and report.
+    // Wrench (Configure mode) on a casing or tray: nearby controllers recheck and report.
     public static InteractionResult wrenchPart(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         Player player = context.getPlayer();
-        if (player != null && player.isSecondaryUseActive()) {
-            level.destroyBlock(pos, true, player);
-            return InteractionResult.SUCCESS;
-        }
         forEachNearbyController(level, pos, DistillationArrayBlockEntity::checkNow);
         if (player != null) {
             player.sendOverlayMessage(Component.translatable(findController(level, pos) != null
                     ? "message.arcforge.distillation_array.formed" : "message.arcforge.distillation_array.incomplete"));
         }
-        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
         return InteractionResult.SUCCESS;
     }
 }

@@ -14,8 +14,9 @@ import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.item.tool.WrenchMode;
 
-// Item components carrying a storage block's contents while it is an item.
+// Item components carrying a storage block's contents while it is an item, and the Wrench's mode.
 public final class ModDataComponents {
     public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Arcforge.MODID);
 
@@ -30,6 +31,10 @@ public final class ModDataComponents {
     // HU held by a heat cell.
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> HEAT =
             DATA_COMPONENTS.registerComponentType("heat", b -> b.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    // What the Wrench does (absent: Configure).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<WrenchMode>> WRENCH_MODE =
+            DATA_COMPONENTS.registerComponentType("wrench_mode", b -> b.persistent(WrenchMode.CODEC).networkSynchronized(WrenchMode.STREAM_CODEC));
 
     private ModDataComponents() {}
 

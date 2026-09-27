@@ -145,8 +145,9 @@ final class AlloyGameTests {
                 smelting += id.getPath().startsWith("arcforge_smelting/") ? 1 : 0;
             }
         }
-        // 72 from the alloy drop, and the distillation drop's casing, tray, controller and asphalt, slab and stairs.
-        helper.assertTrue(crafting == 78, crafting + " crafting/ recipes, not 78");
+        // 72 from the alloy drop, the distillation drop's casing, tray, controller and asphalt, slab and stairs,
+        // and the Solar Thermal Array's casing, controller, collector, trough mirror and receiver tube.
+        helper.assertTrue(crafting == 83, crafting + " crafting/ recipes, not 83");
         helper.assertTrue(smelting == 5, smelting + " arcforge_smelting/ recipes, not 5");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
             helper.assertTrue(recipe(helper, old) == null, "Old recipe " + old + " is still there");

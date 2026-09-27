@@ -12,7 +12,11 @@
   "pages": [
     {
       "type": "text",
-      "text": "Conduits move things between machines: FE, items, liquids, gases and heat. Conduits of the same kind join into one network; mixed tiers run at the slowest tier's speed.\nNext to a machine, a conduit connects on its own, following the machine's side settings.\n# The Wrench\n- Right-click a conduit side: cycle Auto, Input (forced), Output (forced) and Disabled.\n- Right-click the joint between two conduits to split or join them.\n- Sneak-right-click a machine to pick it up with its contents."
+      "text": "Conduits move things between machines: FE, items, liquids, gases and heat. Conduits of the same kind join into one network; mixed tiers run at the slowest tier's speed.\nNext to a machine, a conduit connects on its own, following the machine's side settings.\n# The Wrench\nShift + mouse wheel changes its mode (the colour of its grip):\n- Configure: right-click a conduit side to cycle Auto, Input, Output and Disabled (sneak: backward), or the joint between two conduits to split or join them. Right-click a multiblock to check it.\n- Rotate: right-click a machine to turn it (sneak: the other way).\n- Port: multiblock ports and machine faces (next page).\n- Dismantle: sneak-right-click a machine to pick it up with its contents, or a conduit or a block of a multiblock."
+    },
+    {
+      "type": "text",
+      "text": "# Multiblock ports\nMultiblocks do IO only through their ports: blocks on the outside of the structure set to a mode, marked with a plate (a blue ring takes in, an orange one gives out). A new structure gets a few in the middle of its sides.\nWith the Wrench in Port mode, right-click a block to see its port, and sneak-right-click to cycle it through the modes that structure allows. A port works on every outer face of its block. The Ports tab in the structure's GUI lists them.\nOn a single machine, Port mode shows and cycles the clicked face instead."
     }
   ]
 }

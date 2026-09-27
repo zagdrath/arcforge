@@ -43,16 +43,21 @@ import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.client.model.PortNozzleModel;
+import net.zagdrath.arcforge.client.model.PortedModel;
 import net.zagdrath.arcforge.client.renderer.blockentity.ArcforgeFurnaceRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.CarbonizerDoorRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.DistillationArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.SolarThermalArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamBoilerArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamTurbineArrayRenderer;
 import net.zagdrath.arcforge.client.model.ConnectedModel;
 import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.DistillationArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.SolarThermalArrayScreen;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
@@ -131,6 +136,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.CARBONIZER.get(), CarbonizerScreen::new);
         event.register(ModMenuTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceScreen::new);
         event.register(ModMenuTypes.DISTILLATION_ARRAY.get(), DistillationArrayScreen::new);
+        event.register(ModMenuTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayScreen::new);
     }
 
     // Lit Pressurized and Thermodynamic Conduits glow in the colour of what they hold.
@@ -232,16 +238,24 @@ public class ArcforgeClient {
         event.register(ConnectedModel.ID, ConnectedModel.Loader.INSTANCE);
     }
 
+    // Connected textures, and the port plates and nozzles of multiblocks (see PortedModel, PortNozzleModel).
     @SubscribeEvent
     static void registerBlockStateModels(RegisterBlockStateModels event) {
         event.registerModel(ConnectedModel.ID, ConnectedModel.BlockStateUnbaked.MAP_CODEC);
+        event.registerModel(PortedModel.ID, PortedModel.Unbaked.MAP_CODEC);
+        event.registerModel(PortNozzleModel.ID, PortNozzleModel.Unbaked.MAP_CODEC);
     }
 
-    // The Steam Turbine Array's rotor pieces, drawn by its renderer.
+    // The Steam Turbine Array's rotor pieces and the Solar Thermal Array's trough, receiver and control panel,
+    // drawn by their renderers.
     @SubscribeEvent
     static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
         event.register(SteamTurbineArrayRenderer.ROTOR_SHAFT, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_SHAFT_MODEL));
         event.register(SteamTurbineArrayRenderer.ROTOR_BLADES, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_BLADES_MODEL));
+        event.register(SolarThermalArrayRenderer.MIRROR, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.MIRROR_MODEL));
+        event.register(SolarThermalArrayRenderer.RECEIVER, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.RECEIVER_MODEL));
+        event.register(SolarThermalArrayRenderer.PANEL, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.PANEL_MODEL));
+        event.register(SolarThermalArrayRenderer.PANEL_ON, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.PANEL_ON_MODEL));
     }
 
     // Glass conduits (item and fluid) and fluid tanks draw their contents; everything else is pure block models.
@@ -253,5 +267,7 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CARBONIZER.get(), CarbonizerDoorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayRenderer::new);
     }
 }

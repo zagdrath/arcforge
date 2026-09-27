@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "RRR",
+    "GGG"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "R": "#c:rods/copper"
+  },
+  "result": {
+    "id": "arcforge:receiver_tube",
+    "count": 2
+  }
+}

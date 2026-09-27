@@ -12,8 +12,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
-// A casing with a window onto a tray of the column. Formed, it shows the fraction that pools at its height
-// (FRACTION, set when the column forms), and vapour rising while the column runs (LIT).
+// A casing with a window onto a tray of the column: glass above a steel sill. Formed, the column's renderer
+// draws the tray inside, the fraction that pools at its height (FRACTION, set when the column forms) and
+// vapour rising while the column runs (LIT). See-through, so light gets in (sunlight too, once formed).
 public class TrayLevelCasingBlock extends DistillationArrayCasingBlock {
     // Bottom to top.
     public enum Fraction implements StringRepresentable {
@@ -50,6 +51,11 @@ public class TrayLevelCasingBlock extends DistillationArrayCasingBlock {
     public TrayLevelCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(FORMED, false).setValue(FRACTION, Fraction.VAPOR).setValue(LIT, false));
+    }
+
+    @Override
+    protected boolean propagatesSkylightDown(BlockState state) {
+        return state.getValue(FORMED);
     }
 
     @Override

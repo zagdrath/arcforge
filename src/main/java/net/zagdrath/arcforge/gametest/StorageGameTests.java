@@ -30,6 +30,7 @@ import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
+import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -94,6 +95,7 @@ final class StorageGameTests {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setShiftKeyDown(true);
         ItemStack wrench = new ItemStack(ModItems.WRENCH.get());
+        wrench.set(ModDataComponents.WRENCH_MODE.get(), WrenchMode.DISMANTLE);
         player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
         BlockPos absolute = helper.absolutePos(pos);
         wrench.getItem().onItemUseFirst(wrench, new UseOnContext(player, InteractionHand.MAIN_HAND,

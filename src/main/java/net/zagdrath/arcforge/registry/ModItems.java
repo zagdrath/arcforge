@@ -140,6 +140,15 @@ public final class ModItems {
     public static final DeferredItem<Item> PITCH = ITEMS.registerSimpleItem("pitch", p -> p.cookingFuel(PITCH_BURN_TIME));
     public static final DeferredItem<Item> CARBON_FIBER = ITEMS.registerSimpleItem("carbon_fiber");
     public static final DeferredItem<BlockItem> ASPHALT = ITEMS.registerSimpleBlockItem(ModBlocks.ASPHALT);
+
+    // --- Solar Thermal Array ---
+
+    public static final DeferredItem<BlockItem> SOLAR_THERMAL_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.SOLAR_THERMAL_ARRAY_CASING);
+    public static final DeferredItem<BlockItem> SOLAR_THERMAL_ARRAY_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.SOLAR_THERMAL_ARRAY_CONTROLLER);
+    public static final DeferredItem<BlockItem> SOLAR_COLLECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.SOLAR_COLLECTOR);
+    public static final DeferredItem<Item> TROUGH_MIRROR = ITEMS.registerSimpleItem("trough_mirror");
+    public static final DeferredItem<Item> RECEIVER_TUBE = ITEMS.registerSimpleItem("receiver_tube");
+
     public static final DeferredItem<BlockItem> ASPHALT_STAIRS = ITEMS.registerSimpleBlockItem(ModBlocks.ASPHALT_STAIRS);
     public static final DeferredItem<BlockItem> ASPHALT_SLAB = ITEMS.registerSimpleBlockItem(ModBlocks.ASPHALT_SLAB);
 

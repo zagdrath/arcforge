@@ -7,7 +7,9 @@ package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
@@ -22,6 +24,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -41,7 +44,6 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
-import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -61,9 +63,9 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // by the flow (about 5 s to get there) and coasts down (about 10 s) when the steam stops; the output is
 // scaled by how close the rotor is to that speed, so opening the valve gives a rising output over a few
 // seconds. Steam is used either way. Its front is a long side (the window, see chooseFront), so the
-// generator end (positive along the axis, with the FE port) is on its left or right: that end is the
-// default energy face, and the bearing end and the top take steam. Heavy Oil in its lubricant tank (fed
-// through lubricant faces) adds 8% to its output and doubles how fast the rotor spins up while it
+// generator end (positive along the axis) is on its left or right. A new turbine's ports are an energy port
+// on the generator end's cap and a steam port on the bearing end's. Heavy Oil in its lubricant tank (fed
+// through lubricant ports) adds 8% to its output and doubles how fast the rotor spins up while it
 // generates, using 1 mB every 20 ticks for every 3 blocks of length.
 public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
@@ -173,7 +175,24 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         // A rebuilt turbine breaks a tie the way it faced before.
         setStructureFacing(chooseFront(shell, wasFormedBefore() ? getFacing() : facing));
         super.onFormed(null);
-        matchSidesToGenerator(shell);
+    }
+
+    // Energy out of the generator end, steam into the bearing end.
+    @Override
+    public Map<BlockPos, SideMode> defaultPorts(Level level) {
+        ShellStructure.Shell shell = getShell();
+        if (shell == null) {
+            return super.defaultPorts(level);
+        }
+        Map<BlockPos, SideMode> ports = new LinkedHashMap<>();
+        ports.put(shell.endCenter(Direction.AxisDirection.POSITIVE), SideMode.ENERGY);
+        ports.put(shell.endCenter(Direction.AxisDirection.NEGATIVE), SideMode.INPUT);
+        return ports;
+    }
+
+    @Override
+    public void onPortsChanged() {
+        targetsDirty = true;
     }
 
     // The front is one of the two long horizontal sides: the one with more Pressure Glass, else the one
@@ -199,20 +218,6 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
             }
         }
         return count;
-    }
-
-    // The side modes follow the generator: if it ended up on the other side from the energy face (the
-    // defaults assume the right), left and right swap.
-    private void matchSidesToGenerator(ShellStructure.Shell shell) {
-        Direction generatorEnd = Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.POSITIVE);
-        RelativeSide generator = RelativeSide.fromDirection(getFacing(), generatorEnd);
-        RelativeSide bearing = generator == RelativeSide.LEFT ? RelativeSide.RIGHT : RelativeSide.LEFT;
-        if (sideConfig.get(generator) != SideMode.ENERGY && sideConfig.get(bearing) == SideMode.ENERGY) {
-            SideMode generatorMode = sideConfig.get(generator);
-            sideConfig.set(generator, SideMode.ENERGY);
-            sideConfig.set(bearing, generatorMode);
-            onSideConfigChanged();
-        }
     }
 
     @Override

@@ -1,0 +1,39 @@
+{
+  "variants": {
+    "facing=north,formed=false": {
+      "model": "arcforge:block/solar_thermal_array/controller"
+    },
+    "facing=east,formed=false": {
+      "model": "arcforge:block/solar_thermal_array/controller",
+      "y": 90
+    },
+    "facing=south,formed=false": {
+      "model": "arcforge:block/solar_thermal_array/controller",
+      "y": 180
+    },
+    "facing=west,formed=false": {
+      "model": "arcforge:block/solar_thermal_array/controller",
+      "y": 270
+    },
+    "base=false,formed=true": {
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/solar_thermal_array/hidden",
+      "kind": "solar",
+      "shapes": {
+        "base": "arcforge:block/solar_thermal_array/formed_base",
+        "upper_ns": "arcforge:block/solar_thermal_array/formed_upper_ns",
+        "upper_ew": "arcforge:block/solar_thermal_array/formed_upper_ew"
+      }
+    },
+    "base=true,formed=true": {
+      "type": "arcforge:port_nozzle",
+      "model": "arcforge:block/solar_thermal_array/formed_base",
+      "kind": "solar",
+      "shapes": {
+        "base": "arcforge:block/solar_thermal_array/formed_base",
+        "upper_ns": "arcforge:block/solar_thermal_array/formed_upper_ns",
+        "upper_ew": "arcforge:block/solar_thermal_array/formed_upper_ew"
+      }
+    }
+  }
+}

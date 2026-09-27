@@ -1,6 +1,7 @@
 {
   "variants": {
     "": {
+      "type": "arcforge:ported",
       "model": "arcforge:block/arcforge_furnace_bricks"
     }
   }

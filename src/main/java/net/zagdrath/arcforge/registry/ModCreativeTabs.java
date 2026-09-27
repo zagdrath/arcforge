@@ -51,6 +51,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.DISTILLATION_ARRAY_CONTROLLER.get());
                 output.accept(ModItems.DISTILLATION_ARRAY_CASING.get());
                 output.accept(ModItems.TRAY_LEVEL_CASING.get());
+                output.accept(ModItems.SOLAR_THERMAL_ARRAY_CONTROLLER.get());
+                output.accept(ModItems.SOLAR_THERMAL_ARRAY_CASING.get());
+                output.accept(ModItems.SOLAR_COLLECTOR.get());
                 ModItems.allStorage().forEach(item -> output.accept(item.get()));
             }).build());
 
@@ -82,6 +85,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.SLAG_WOOL.get());
                 output.accept(ModItems.ROCK_WOOL.get());
                 output.accept(ModItems.CARBON_FIBER.get());
+                output.accept(ModItems.TROUGH_MIRROR.get());
+                output.accept(ModItems.RECEIVER_TUBE.get());
                 output.accept(ModItems.PLATE_DIE.get());
                 output.accept(ModItems.GEAR_DIE.get());
                 output.accept(ModItems.ROD_DIE.get());

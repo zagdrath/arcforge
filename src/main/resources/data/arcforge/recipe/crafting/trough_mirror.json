@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "CSC"
+  ],
+  "key": {
+    "G": "minecraft:glass",
+    "C": "#c:plates/copper",
+    "S": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:trough_mirror",
+    "count": 2
+  }
+}
