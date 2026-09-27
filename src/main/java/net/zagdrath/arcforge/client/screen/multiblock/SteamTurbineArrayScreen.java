@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
 
@@ -24,11 +25,11 @@ import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
 public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu> {
     private static final int STEAM_X = 9, STEAM_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int ENERGY_X = 157, ENERGY_Y = 19;
-    private static final int DIAL_X = 31, DIAL_Y = 22, DIAL_W = 44, DIAL_H = 26;
-    private static final float PIVOT_X = 53.0F, PIVOT_Y = 45.5F, NEEDLE_LENGTH = 13.0F;
-    private static final int RPM_CENTER_X = 53, RPM_Y = 52;
-    private static final int LABEL_X = 82, VALUE_RIGHT = 145, FLOW_LABEL_Y = 22, FLOW_Y = 31, OUTPUT_LABEL_Y = 42, OUTPUT_Y = 51;
-    private static final int LED_X = 82, LED_Y = 61, STATUS_X = 90, STATUS_Y = 61;
+    private static final int DIAL_X = 38, DIAL_Y = 22, DIAL_W = 44, DIAL_H = 26;
+    private static final float PIVOT_X = 60.0F, PIVOT_Y = 45.5F, NEEDLE_LENGTH = 13.0F;
+    private static final int RPM_CENTER_X = 60, RPM_Y = 52;
+    private static final int LABEL_X = 88, VALUE_RIGHT = 145, FLOW_LABEL_Y = 22, FLOW_Y = 31, OUTPUT_LABEL_Y = 42, OUTPUT_Y = 51;
+    private static final int LED_X = 88, LED_Y = 61, STATUS_X = 96, STATUS_Y = 61;
     private static final int NEEDLE_COLOR = 0xFFFF5A4A;
     // Share of the gap to the synced speed the needle closes each frame.
     private static final float NEEDLE_EASE = 0.15F;
@@ -47,6 +48,7 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
         return switch (mode) {
             case INPUT -> sideModeName("steam_input");
             case ENERGY -> sideModeName("energy_output");
+            case LUBRICANT -> sideModeName("lubricant_input");
             default -> super.sideModeName(mode);
         };
     }
@@ -55,6 +57,7 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         drawFluidTank(graphics, menu.getSteam(), menu.getSteamAmount(), menu.getSteamCapacity(), steamFill, tankGauge,
                 x, y, STEAM_X, STEAM_Y, TANK_W, TANK_H);
+        drawLubricant(graphics, x, y, menu.getLubricant(), menu.getLubricantCapacity());
         drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.getEnergy(), menu.getCapacity());
         drawNeedle(graphics, x, y);
         drawLed(graphics, x, y, LED_X, LED_Y);
@@ -93,6 +96,8 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
         if (isHovering(STEAM_X - 1, STEAM_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getSteam(), Component.translatable("gui.arcforge.steam"), menu.getSteamAmount(), menu.getSteamCapacity());
+        } else if (isHovering(LUBE_X - 1, LUBE_Y - 1, LUBE_W + 2, LUBE_H + 2, mouseX, mouseY)) {
+            addLubricantTooltip(lines, menu.getLubricant(), menu.getLubricantCapacity(), ArcforgeConfig.LUBRICANT_SPIN_UP.getAsDouble());
         } else if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getCapacity())).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(DIAL_X, DIAL_Y, DIAL_W, DIAL_H, mouseX, mouseY)) {

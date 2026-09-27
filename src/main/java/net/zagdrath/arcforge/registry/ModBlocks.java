@@ -10,7 +10,10 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.DoorBlock;
@@ -24,6 +27,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.StairBlock;
 import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.block.state.properties.WoodType;
@@ -43,6 +47,8 @@ import net.zagdrath.arcforge.block.machine.SteamBoilerBlock;
 import net.zagdrath.arcforge.block.machine.SteamTurbineBlock;
 import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
@@ -59,6 +65,7 @@ import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
+import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
 import net.zagdrath.arcforge.block.storage.HeatCellBlock;
 import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
@@ -247,6 +254,47 @@ public final class ModBlocks {
                     .liquid()
                     .sound(SoundType.EMPTY));
 
+    // The Distillation Array's products. Naphtha burns where it lies, like a flammable block.
+    public static final DeferredBlock<LiquidBlock> NAPHTHA = BLOCKS.registerBlock("naphtha",
+            p -> new LiquidBlock(ModFluids.NAPHTHA.get(), p) {
+                @Override
+                public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 300;
+                }
+
+                @Override
+                public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 60;
+                }
+            },
+            p -> liquidProperties(p, MapColor.SAND));
+
+    public static final DeferredBlock<LiquidBlock> LIGHT_OIL = BLOCKS.registerBlock("light_oil",
+            p -> new LiquidBlock(ModFluids.LIGHT_OIL.get(), p) {},
+            p -> liquidProperties(p, MapColor.GOLD));
+
+    public static final DeferredBlock<LiquidBlock> HEAVY_OIL = BLOCKS.registerBlock("heavy_oil",
+            p -> new LiquidBlock(ModFluids.HEAVY_OIL.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_BROWN));
+
+    // --- Distillation ---
+
+    public static final DeferredBlock<DistillationArrayCasingBlock> DISTILLATION_ARRAY_CASING = BLOCKS.registerBlock("distillation_array_casing",
+            DistillationArrayCasingBlock::new, ModBlocks::columnProperties);
+
+    public static final DeferredBlock<TrayLevelCasingBlock> TRAY_LEVEL_CASING = BLOCKS.registerBlock("tray_level_casing",
+            TrayLevelCasingBlock::new, ModBlocks::columnProperties);
+
+    public static final DeferredBlock<DistillationArrayControllerBlock> DISTILLATION_ARRAY_CONTROLLER = BLOCKS.registerBlock("distillation_array_controller",
+            DistillationArrayControllerBlock::new, ModBlocks::columnProperties);
+
+    // Asphalt: made with pitch; walking, running and riding on it are about 30% faster.
+    public static final DeferredBlock<Block> ASPHALT = BLOCKS.registerSimpleBlock("asphalt", ModBlocks::asphaltProperties);
+    public static final DeferredBlock<StairBlock> ASPHALT_STAIRS = BLOCKS.registerBlock("asphalt_stairs",
+            p -> new StairBlock(ASPHALT.get().defaultBlockState(), p), ModBlocks::asphaltProperties);
+    public static final DeferredBlock<SlabBlock> ASPHALT_SLAB = BLOCKS.registerBlock("asphalt_slab",
+            SlabBlock::new, ModBlocks::asphaltProperties);
+
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);
 
@@ -335,6 +383,34 @@ public final class ModBlocks {
     public static List<DeferredBlock<? extends Block>> treatedWoodSet() {
         return List.of(TREATED_LOG, TREATED_WOOD, STRIPPED_TREATED_LOG, STRIPPED_TREATED_WOOD, TREATED_PLANKS, TREATED_STAIRS, TREATED_SLAB,
                 TREATED_FENCE, TREATED_FENCE_GATE, TREATED_DOOR, TREATED_TRAPDOOR, TREATED_PRESSURE_PLATE, TREATED_BUTTON);
+    }
+
+    private static BlockBehaviour.Properties liquidProperties(BlockBehaviour.Properties p, MapColor color) {
+        return p.mapColor(color)
+                .replaceable()
+                .noCollision()
+                .strength(100.0F)
+                .pushReaction(PushReaction.POPPED)
+                .noLootTable()
+                .liquid()
+                .sound(SoundType.EMPTY);
+    }
+
+    private static BlockBehaviour.Properties columnProperties(BlockBehaviour.Properties p) {
+        return p.mapColor(MapColor.METAL)
+                .strength(3.5F, 6.0F)
+                .requiresCorrectToolForDrops()
+                .sound(SoundType.METAL);
+    }
+
+    // The game multiplies an entity's speed by the speed factor every tick, so 1.2 makes it about 30%
+    // faster in the end (soul sand's 0.4 about 40% slower).
+    private static BlockBehaviour.Properties asphaltProperties(BlockBehaviour.Properties p) {
+        return p.mapColor(MapColor.COLOR_BLACK)
+                .instrument(NoteBlockInstrument.BASEDRUM)
+                .strength(1.5F, 6.0F)
+                .requiresCorrectToolForDrops()
+                .speedFactor(1.2F);
     }
 
     private static BlockBehaviour.Properties furnaceBrickProperties(BlockBehaviour.Properties p) {

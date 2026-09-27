@@ -48,6 +48,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ARCFORGE_FURNACE_PORT.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_BRICKS.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_BRICK_WALL.get());
+                output.accept(ModItems.DISTILLATION_ARRAY_CONTROLLER.get());
+                output.accept(ModItems.DISTILLATION_ARRAY_CASING.get());
+                output.accept(ModItems.TRAY_LEVEL_CASING.get());
                 ModItems.allStorage().forEach(item -> output.accept(item.get()));
             }).build());
 
@@ -62,6 +65,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COAL_COKE.get());
                 output.accept(ModItems.COAL_COKE_BLOCK.get());
                 output.accept(ModItems.SLAG.get());
+                output.accept(ModItems.PITCH.get());
                 output.accept(ModItems.IRON_DUST.get());
                 output.accept(ModItems.COPPER_DUST.get());
                 output.accept(ModItems.GOLD_DUST.get());
@@ -77,6 +81,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.SLAG_WOOL.get());
                 output.accept(ModItems.ROCK_WOOL.get());
+                output.accept(ModItems.CARBON_FIBER.get());
                 output.accept(ModItems.PLATE_DIE.get());
                 output.accept(ModItems.GEAR_DIE.get());
                 output.accept(ModItems.ROD_DIE.get());
@@ -95,6 +100,9 @@ public final class ModCreativeTabs {
             .icon(() -> ModBlocks.TREATED_PLANKS.get().asItem().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 ModItems.treatedWood().forEach(item -> output.accept(item.get()));
+                output.accept(ModItems.ASPHALT.get());
+                output.accept(ModItems.ASPHALT_STAIRS.get());
+                output.accept(ModItems.ASPHALT_SLAB.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FLUIDS = CREATIVE_MODE_TABS.register("fluids", () -> CreativeModeTab.builder()
@@ -103,6 +111,9 @@ public final class ModCreativeTabs {
             .icon(() -> ModItems.CREOSOTE_BUCKET.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.CREOSOTE_BUCKET.get());
+                output.accept(ModItems.NAPHTHA_BUCKET.get());
+                output.accept(ModItems.LIGHT_OIL_BUCKET.get());
+                output.accept(ModItems.HEAVY_OIL_BUCKET.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> LOGISTICS = CREATIVE_MODE_TABS.register("logistics", () -> CreativeModeTab.builder()

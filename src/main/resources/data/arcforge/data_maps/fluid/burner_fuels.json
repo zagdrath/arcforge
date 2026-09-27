@@ -2,7 +2,23 @@
   "values": {
     "arcforge:creosote": {
       "hu_per_mb": 120,
-      "mb_per_tick": 0.75
+      "mb_per_tick": 0.5,
+      "burn_temperature": 850
+    },
+    "arcforge:naphtha": {
+      "hu_per_mb": 400,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1200
+    },
+    "arcforge:light_oil": {
+      "hu_per_mb": 250,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1000
+    },
+    "arcforge:heavy_oil": {
+      "hu_per_mb": 200,
+      "mb_per_tick": 0.25,
+      "burn_temperature": 750
     }
   }
 }

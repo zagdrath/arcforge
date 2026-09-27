@@ -210,7 +210,7 @@ public final class SteamGameTests {
     }
 
     // A 3x3 tube of casings along an axis, with glass at the given (non-corner) positions.
-    private static void buildShell(GameTestHelper helper, BlockPos min, Direction.Axis axis, int length,
+    static void buildShell(GameTestHelper helper, BlockPos min, Direction.Axis axis, int length,
             net.minecraft.world.level.block.Block casing, BlockPos... glass) {
         java.util.Set<BlockPos> panes = java.util.Set.of(glass);
         for (int along = 0; along < length; along++) {

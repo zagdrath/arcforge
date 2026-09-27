@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PgP",
+    "RCR",
+    "PBP"
+  ],
+  "key": {
+    "R": "#c:rods/steel",
+    "B": "#c:storage_blocks/redstone",
+    "C": "arcforge:distillation_array_casing",
+    "g": "#c:gears/copper",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:distillation_array_controller",
+    "count": 1
+  }
+}

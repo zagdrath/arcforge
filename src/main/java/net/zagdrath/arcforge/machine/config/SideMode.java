@@ -16,12 +16,28 @@ public enum SideMode {
     // Multiblocks: exposes only the by-product (e.g. the Carbonizer's creosote, the Arcforge Furnace's slag).
     BYPRODUCT("byproduct"),
     // Heat machines: exposes the heat buffer (producers give heat out of it, consumers take heat in).
-    HEAT("heat");
+    HEAT("heat"),
+    // The Distillation Array: steam for stripping goes in, and each product has its own face mode out.
+    STEAM("steam"),
+    NAPHTHA("naphtha"),
+    LIGHT_OIL("light_oil"),
+    HEAVY_OIL("heavy_oil"),
+    PITCH("pitch"),
+    // Steam turbines: Heavy Oil goes into the lubricant tank.
+    LUBRICANT("lubricant");
 
     private final String name;
 
     SideMode(String name) {
         this.name = name;
+    }
+
+    // Whether faces in this mode give things out (and push them out with auto-eject).
+    public boolean isOutput() {
+        return switch (this) {
+            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH -> true;
+            default -> false;
+        };
     }
 
     public SideMode next() {

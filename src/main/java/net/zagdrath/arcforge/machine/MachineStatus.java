@@ -39,7 +39,9 @@ public enum MachineStatus {
     GENERATING("generating", "led_running"),
     NO_STEAM("no_steam", "led_blocked"),
     SPINNING_UP("spinning_up", "led_running"),
-    COASTING("coasting", "led_idle");
+    COASTING("coasting", "led_idle"),
+    NO_FEED("no_feed", "led_blocked"),
+    NOT_FORMED("not_formed", "led_off");
 
     private final String name;
     private final String led;

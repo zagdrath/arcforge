@@ -146,15 +146,19 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         return sideConfig.get(side);
     }
 
-    // Only machines with item outputs have auto-eject.
+    // Only machines with output faces have auto-eject.
     @Override
     public boolean isAutoEject() {
-        return sideConfig.isAutoEject() && allowedSideModes.contains(SideMode.OUTPUT);
+        return sideConfig.isAutoEject() && hasOutputs();
+    }
+
+    private boolean hasOutputs() {
+        return allowedSideModes.stream().anyMatch(SideMode::isOutput);
     }
 
     @Override
     public void setAutoEject(boolean autoEject) {
-        if (allowedSideModes.contains(SideMode.OUTPUT)) {
+        if (hasOutputs()) {
             sideConfig.setAutoEject(autoEject);
             setChanged();
         }

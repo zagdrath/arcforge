@@ -3,12 +3,15 @@
   "icon": "arcforge:fuel_burner",
   "items": [
     "arcforge:fuel_burner",
-    "arcforge:creosote_bucket"
+    "arcforge:creosote_bucket",
+    "arcforge:naphtha_bucket",
+    "arcforge:light_oil_bucket",
+    "arcforge:heavy_oil_bucket"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Burns liquid fuel into heat, up to 1,200°C. Creosote from the Carbonizer burns at 0.75 mB/t into 90 HU/t.\nA good use for all the creosote a big Carbonizer makes."
+      "text": "Burns liquid fuel into heat, but never hotter than the fuel burns:\n- Creosote: 60 HU/t, up to 850°C.\n- Naphtha: 200 HU/t, up to 1,200°C.\n- Light Oil: 125 HU/t, up to 1,000°C.\n- Heavy Oil: 50 HU/t, up to 750°C.\nSuperheated Steam needs a 900°C boiler, so a creosote burner only reaches High-Pressure: distil the creosote into Naphtha for that. Switching to a cooler fuel lets it cool down to that fuel's temperature."
     }
   ]
 }

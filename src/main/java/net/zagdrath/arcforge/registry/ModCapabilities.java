@@ -20,6 +20,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
+import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
@@ -49,6 +50,7 @@ import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.item.storage.PortableFluidHandler;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
+import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 
 // Exposes machine storage through NeoForge's standard capabilities, so any mod using
@@ -208,5 +210,19 @@ public final class ModCapabilities {
             MultiblockController furnace = ArcforgeFurnaceStructure.findFormedPort(level, pos);
             return furnace != null ? furnace.itemHandlerAt(pos, side) : null;
         }, furnaceParts);
+        Block[] columnParts = {
+                ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            DistillationArrayBlockEntity column = DistillationStructure.findController(level, pos);
+            return column != null ? column.itemHandlerAt(pos, side) : null;
+        }, columnParts);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            DistillationArrayBlockEntity column = DistillationStructure.findController(level, pos);
+            return column != null ? column.fluidHandlerAt(pos, side) : null;
+        }, columnParts);
+        event.registerBlock(HEAT, (level, pos, state, blockEntity, side) -> {
+            DistillationArrayBlockEntity column = DistillationStructure.findController(level, pos);
+            return column != null ? column.heatHandlerAt(pos, side) : null;
+        }, columnParts);
     }
 }

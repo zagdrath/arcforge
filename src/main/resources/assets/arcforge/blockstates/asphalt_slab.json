@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/asphalt_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/asphalt"
+    },
+    "type=top": {
+      "model": "arcforge:block/asphalt_slab_top"
+    }
+  }
+}

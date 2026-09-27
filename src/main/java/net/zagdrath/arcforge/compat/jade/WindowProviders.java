@@ -17,10 +17,13 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
+import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
+import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import snownee.jade.api.Accessor;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.view.ClientViewGroup;
@@ -32,8 +35,9 @@ import snownee.jade.api.view.ViewGroup;
 import snownee.jade.util.JadeForgeUtils;
 
 // Pressure Glass has no block entity or capabilities of its own, so Jade would show nothing for a window.
-// These show the fluids and FE of the array it belongs to, read from the master, as a casing does.
-// (Heat is in HeatProvider, which follows glass to the master too.)
+// These show the fluids and FE of the array it belongs to, read from the master, as a casing does. The
+// Distillation Array's casings and trays have no block entity either: the fluid view reads its controller.
+// (Heat is in HeatProvider, which follows glass and casings to the machine too.)
 public final class WindowProviders {
     private WindowProviders() {}
 
@@ -54,21 +58,41 @@ public final class WindowProviders {
         return accessor instanceof BlockAccessor block ? master(block.getLevel(), block.getPosition()) : null;
     }
 
+    // Where the machine the block-entity-less part at pos belongs to keeps its contents: an array's master
+    // for a pane of glass, the controller for a column casing. Null for anything else.
+    static @Nullable BlockPos machinePos(BlockGetter level, BlockPos pos) {
+        ShellMultiblockBlockEntity master = master(level, pos);
+        if (master != null) {
+            return master.getBlockPos();
+        }
+        if (level.getBlockState(pos).getBlock() instanceof DistillationArrayCasingBlock) {
+            DistillationArrayBlockEntity column = DistillationStructure.findController(level, pos);
+            return column != null ? column.getBlockPos() : null;
+        }
+        return null;
+    }
+
+    private static boolean isFormedPart(Accessor<?> accessor) {
+        return isFormedGlass(accessor) || accessor instanceof BlockAccessor block && block.getBlock() instanceof DistillationArrayCasingBlock
+                && DistillationStructure.isFormedPart(block.getBlockState());
+    }
+
     public enum Fluid implements IServerExtensionProvider<FluidView.Data>, IClientExtensionProvider<FluidView.Data, FluidView> {
         INSTANCE;
 
         @Override
         public @Nullable List<ViewGroup<FluidView.Data>> getGroups(Accessor<?> accessor) {
-            ShellMultiblockBlockEntity master = master(accessor);
-            ResourceHandler<FluidResource> fluids = master != null && master.getLevel() != null
-                    ? master.getLevel().getCapability(Capabilities.Fluid.BLOCK, master.getBlockPos(), null)
-                    : null;
+            if (!(accessor instanceof BlockAccessor block)) {
+                return null;
+            }
+            BlockPos pos = machinePos(block.getLevel(), block.getPosition());
+            ResourceHandler<FluidResource> fluids = pos != null ? block.getLevel().getCapability(Capabilities.Fluid.BLOCK, pos, null) : null;
             return fluids != null ? JadeForgeUtils.fromFluidHandler(fluids) : null;
         }
 
         @Override
         public boolean shouldRequestData(Accessor<?> accessor) {
-            return isFormedGlass(accessor);
+            return isFormedPart(accessor);
         }
 
         @Override

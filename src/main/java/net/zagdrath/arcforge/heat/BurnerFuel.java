@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.heat;
 
+import java.util.Optional;
+
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.serialization.Codec;
@@ -16,14 +18,22 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.registry.ModDataMaps;
 
-// What a liquid fuel is worth in the Fuel Burner: the heat each mB gives, and how fast it burns. Set per
-// fluid in the arcforge:burner_fuels data map (data/<namespace>/data_maps/fluid/burner_fuels.json), so
-// fuels can be added without code. Fluids not in the map aren't fuel.
-public record BurnerFuel(int huPerMb, float mbPerTick) {
+// What a liquid fuel is worth in the Fuel Burner: the heat each mB gives, how fast it burns, and
+// optionally how hot it burns (°C; the burner can't get hotter than that, and without it the burner's own
+// maximum). Set per fluid in the arcforge:burner_fuels data map
+// (data/<namespace>/data_maps/fluid/burner_fuels.json), so fuels can be added without code. Fluids not in
+// the map aren't fuel.
+public record BurnerFuel(int huPerMb, float mbPerTick, Optional<Integer> burnTemperature) {
     public static final Codec<BurnerFuel> CODEC = RecordCodecBuilder.create(i -> i.group(
             ExtraCodecs.POSITIVE_INT.fieldOf("hu_per_mb").forGetter(BurnerFuel::huPerMb),
-            ExtraCodecs.POSITIVE_FLOAT.fieldOf("mb_per_tick").forGetter(BurnerFuel::mbPerTick))
+            ExtraCodecs.POSITIVE_FLOAT.fieldOf("mb_per_tick").forGetter(BurnerFuel::mbPerTick),
+            ExtraCodecs.POSITIVE_INT.optionalFieldOf("burn_temperature").forGetter(BurnerFuel::burnTemperature))
             .apply(i, BurnerFuel::new));
+
+    // How hot a burner burning this gets, capped at the burner's own maximum.
+    public int burnTemperature(int maxCelsius) {
+        return Math.min(maxCelsius, burnTemperature.orElse(maxCelsius));
+    }
 
     public static @Nullable BurnerFuel of(Fluid fluid) {
         return BuiltInRegistries.FLUID.wrapAsHolder(fluid).getData(ModDataMaps.BURNER_FUELS);

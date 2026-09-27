@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "HLH",
+    "PHP"
+  ],
+  "key": {
+    "H": "arcforge:hardened_alloy",
+    "P": "#c:plates/steel",
+    "L": "arcforge:hardened_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:distillation_array_casing",
+    "count": 4
+  }
+}

@@ -91,7 +91,7 @@ public final class InfusionGameTests {
                 .thenSucceed();
     }
 
-    // Creosote burns at 0.75 mB/t into +90 HU/t, up to 1,200°C; a full buffer pauses it without using fuel.
+    // Creosote burns at 0.5 mB/t into +60 HU/t (up to 850°C); a full buffer pauses it without using fuel.
     static void fuelBurnerBurnsCreosote(GameTestHelper helper) {
         BlockPos pos = new BlockPos(0, 1, 0);
         BlockPos fullPos = new BlockPos(3, 1, 0);
@@ -111,11 +111,11 @@ public final class InfusionGameTests {
                 .thenIdle(21)
                 .thenExecute(() -> {
                     helper.assertTrue(burner.getStatus() == MachineStatus.BURNING, "Burner is " + burner.getStatus());
-                    helper.assertTrue(burner.getHeatPerTick() == 90, "Burner makes " + burner.getHeatPerTick() + " HU/t");
+                    helper.assertTrue(burner.getHeatPerTick() == 60, "Burner makes " + burner.getHeatPerTick() + " HU/t");
                     helper.assertTrue(helper.getBlockState(pos).getValue(MachineBlock.LIT), "Burner is not lit while burning");
-                    // 20 ticks at 0.75 mB/t, give or take the tick the test runs on.
+                    // 20 ticks at 0.5 mB/t, give or take the tick the test runs on.
                     int used = 1_000 - burner.getTank().getAmount();
-                    helper.assertTrue(used >= 14 && used <= 17, "Burner used " + used + " mB in ~20 ticks");
+                    helper.assertTrue(used >= 9 && used <= 12, "Burner used " + used + " mB in ~20 ticks");
                     helper.assertTrue(full.getStatus() == MachineStatus.FULL, "Full burner is " + full.getStatus());
                     helper.assertTrue(full.getTank().getAmount() == 1_000, "Full burner burned fuel anyway");
                 })

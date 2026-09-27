@@ -16,6 +16,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.FuelBurnerMenu;
 import net.zagdrath.arcforge.registry.ModFluids;
@@ -83,6 +85,11 @@ public class FuelBurnerScreen extends MachineScreen<FuelBurnerMenu> {
             lines.add(Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getHeatPerTick()).withStyle(ChatFormatting.GOLD));
         } else if (isHovering(TANK_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getFluid(), ModFluids.CREOSOTE_TYPE.get().getDescription(), menu.getFluidAmount(), menu.getFluidCapacity());
+            BurnerFuel fuel = BurnerFuel.of(menu.getFluid());
+            if (fuel != null) {
+                lines.add(Component.translatable("gui.arcforge.burns_at", ArcforgeGui.grouped(fuel.burnTemperature(ArcforgeConfig.FUEL_BURNER_MAX_TEMPERATURE.getAsInt())))
+                        .withStyle(ChatFormatting.GOLD));
+            }
         } else if (isHovering(HEAT_X, HEAT_Y - 2, HEAT_W, 8, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())));
         }

@@ -69,12 +69,13 @@ runs with the additive slot empty. Input faces route each item to its own slot. 
 | 2 Wrought Alloy | 2 iron | 1 gold | 1 | 400 | 1,200°C |
 | 2 Tempered Alloy | 2 steel | 2 copper | 1 | 500 | 1,300°C |
 | 2 Hardened Alloy | 2 steel | 2 amethyst shards | 2 | 600 | 1,400°C |
-| 2 Arcforged Alloy | 2 Hardened Alloy | 1 ancient debris dust | 2 | 800 | 1,500°C |
+| 2 Arcforged Alloy | 2 Hardened Alloy | 2 Carbon Fiber | 2 | 800 | 1,500°C |
 
 Each also gives 1 slag. **Tier alloys** are the material of every tiered block and item: conduits, cells,
 tanks, cylinders and the portables are crafted from their tier's alloy, and each tier upgrades into the next
 (the `arcforge:tier_upgrade` recipe keeps what it holds). The machine array casings need Tempered Alloy.
 Crushing coal ore (2 carbon dust + a chance of a third) and carbonizing the dust is the high-yield coke route.
+Carbon Fiber comes from the Distillation Array's pitch, so the top tier needs distillation.
 
 ### Crushing
 
@@ -134,7 +135,8 @@ temperature; underfed, it sits near 100°C making plain Steam. Cooling into a lo
 steam it holds into that grade.
 
 **Steam Turbine.** Turns up to 10 mB/t of steam into FE: 8 / 14 / 22 FE per mB by grade (80 to
-220 FE/t). The used steam vents.
+220 FE/t). The used steam vents. Heavy Oil in its 1,000 mB lubricant tank (through a **Lubricant**
+face) adds 8% to its output, using 1 mB every 100 ticks while it generates.
 
 **Steam Boiler Array.** A 3x3 tower 3 to 7 tall of Steam Boiler Array Casings and Pressure Glass,
 hollow in the middle. Only the 8 corners must be casings, so whole walls can be windows, and the water
@@ -144,7 +146,50 @@ costs 80% of a Steam Boiler's heat.
 **Steam Turbine Array.** A 3x3 tube 3 to 9 long along either horizontal axis, built the same way. It
 takes up to 40 mB/t per block of length at 10 / 18 / 28 FE per mB (a 9-long array on Superheated makes
 10,080 FE/t). Its rotor spins up over a few seconds when steam flows, and output rises with it; it
-coasts down when the steam stops. The generator end (the back) is its energy face.
+coasts down when the steam stops. The generator end (the back) is its energy face. Heavy Oil in its
+4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
+blocks of length.
+
+### Distillation
+
+```
+creosote + heat (+ steam) --[Distillation Array]--> Naphtha, Light Oil, Heavy Oil, Pitch
+pitch --[Fiberizer, 1,000°C]--> Carbon Fiber --> Arcforged Alloy
+8 gravel + 1 pitch --> 8 Asphalt
+```
+
+**Distillation Array.** A solid 2x2 column exactly 4, 6 or 8 tall of Distillation Array Casings and Tray
+Level Casings with one Distillation Array Controller (Hardened tier). The controller and the trays can't
+be in the top or bottom layer; the controller's display is the front. Formed, the column reads as one
+block, and its tray windows show the fractions it makes, with vapour rising while it runs. It distils
+1,000 mB batches of creosote with heat, at 4,000 HU a batch and only at 350°C or hotter:
+
+| Height | Per 1,000 mB of creosote | Feed | Heat |
+|---|---|---|---|
+| 4 | 250 Naphtha, 2 Pitch | 10 mB/t | 40 HU/t |
+| 6 | 250 Naphtha, 450 Heavy Oil, 1 Pitch | 15 mB/t | 60 HU/t |
+| 8 | 250 Naphtha, 300 Light Oil, 300 Heavy Oil, 1 Pitch | 20 mB/t | 80 HU/t |
+
+It holds 40,000 HU per 4 blocks of height (up to 1,400°C), 16,000 mB of creosote, 8,000 mB of steam and
+8,000 mB of each product, and stops when a product it makes is full. **Steam stripping:** steam in its
+steam tank raises each batch's Naphtha by the grade (Steam +15%, High-Pressure +30%, Superheated +50%), out
+of the Heavy Oil (a straight bonus at 4 high), using 100 mB a batch. Its faces take the modes None, Input
+(creosote), Steam, Heat, Naphtha, Light Oil, Heavy Oil and Pitch, with auto-eject. Recipes are data-driven
+(`arcforge:distilling`: `input`, `heat`, `min_temp`, `by_height`, `item_output`, `steam_stripping`).
+
+**Fuel Burner.** Burns liquid fuels into heat, but never hotter than the fuel's burn temperature (the
+optional `burn_temperature` of the `arcforge:burner_fuels` data map; without it, the burner's 1,200°C):
+
+| Fuel | HU/mB | mB/t | HU/t | Burns at |
+|---|---|---|---|---|
+| Creosote | 120 | 0.5 | 60 | 850°C |
+| Naphtha | 400 | 0.5 | 200 | 1,200°C |
+| Light Oil | 250 | 0.5 | 125 | 1,000°C |
+| Heavy Oil | 200 | 0.25 | 50 | 750°C |
+
+Superheated Steam needs a 900°C boiler, so Naphtha is the fuel that makes it without a Geothermal Plant.
+Naphtha also catches fire in the world. **Pitch** is a long-burning furnace fuel (12 items) and spins into
+Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running and riding by about 30%.
 
 ### Upgrades
 

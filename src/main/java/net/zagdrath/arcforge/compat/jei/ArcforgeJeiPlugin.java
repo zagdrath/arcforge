@@ -61,6 +61,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Pressing(gui),
                 new MachineCategories.Carbonizing(gui),
                 new MachineCategories.ArcforgeSmelting(gui),
+                new MachineCategories.Distilling(gui),
                 new MachineCategories.Steam(gui),
                 new MachineCategories.BurnerFuels(gui),
                 new MultiblockCategory(gui));
@@ -74,6 +75,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Pressing.TYPE, recipes(ModRecipes.PRESSING.get()));
         registration.addRecipes(MachineCategories.Carbonizing.TYPE, recipes(ModRecipes.CARBONIZING.get()));
         registration.addRecipes(MachineCategories.ArcforgeSmelting.TYPE, recipes(ModRecipes.ARCFORGE_SMELTING.get()));
+        registration.addRecipes(MachineCategories.Distilling.TYPE, recipes(ModRecipes.DISTILLING.get()).stream()
+                .flatMap(holder -> MachineCategories.DistillingPage.of(holder).stream()).toList());
         registration.addRecipes(MachineCategories.Steam.TYPE, List.of(SteamGrade.values()).stream().map(MachineCategories.SteamRecipe::new).toList());
 
         List<MachineCategories.BurnerFuelRecipe> fuels = new ArrayList<>();
@@ -126,6 +129,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Steam.TYPE, ModBlocks.STEAM_BOILER.get(), ModBlocks.STEAM_BOILER_ARRAY_CASING.get(),
                 ModBlocks.STEAM_TURBINE.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.BurnerFuels.TYPE, ModBlocks.FUEL_BURNER.get());
+        registration.addCraftingStation(MachineCategories.Distilling.TYPE, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(),
+                ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get());
         registration.addCraftingStation(RecipeTypes.SMELTING, ModBlocks.INDUCTION_FURNACE.get(), ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get());
         List<ItemLike> multiblockBlocks = new ArrayList<>();
         for (MultiblockBlueprints.Blueprint blueprint : MultiblockBlueprints.all()) {

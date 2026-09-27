@@ -8,6 +8,7 @@ package net.zagdrath.arcforge.compat.jade;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import snownee.jade.api.IWailaClientRegistration;
@@ -30,6 +31,9 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, PressureGlassBlock.class);
         registration.registerEnergyStorage(WindowProviders.Energy.INSTANCE, PressureGlassBlock.class);
+        // Nor do the Distillation Array's casings and trays: these read its controller.
+        registration.registerBlockDataProvider(HeatProvider.INSTANCE, DistillationArrayCasingBlock.class);
+        registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, DistillationArrayCasingBlock.class);
     }
 
     @Override

@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/distillation_array/casing"
+    },
+    "formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/casing_formed"
+    }
+  }
+}

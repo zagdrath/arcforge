@@ -25,6 +25,7 @@ import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
@@ -131,6 +132,9 @@ public final class ModBlockEntityTypes {
     // On the furnace port only; bricks and walls are plain blocks that find the port.
     public static final Supplier<BlockEntityType<ArcforgeFurnaceBlockEntity>> ARCFORGE_FURNACE = BLOCK_ENTITY_TYPES.register("arcforge_furnace",
             () -> new BlockEntityType<>(ArcforgeFurnaceBlockEntity::new, ModBlocks.ARCFORGE_FURNACE_PORT.get()));
+
+    public static final Supplier<BlockEntityType<DistillationArrayBlockEntity>> DISTILLATION_ARRAY = BLOCK_ENTITY_TYPES.register("distillation_array",
+            () -> new BlockEntityType<>(DistillationArrayBlockEntity::new, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get()));
 
     private ModBlockEntityTypes() {}
 

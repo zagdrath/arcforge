@@ -60,6 +60,12 @@
     "arcforge:wrought_pressurized_cylinder",
     "arcforge:tempered_pressurized_cylinder",
     "arcforge:hardened_pressurized_cylinder",
-    "arcforge:arcforged_pressurized_cylinder"
+    "arcforge:arcforged_pressurized_cylinder",
+    "arcforge:distillation_array_casing",
+    "arcforge:distillation_array_controller",
+    "arcforge:tray_level_casing",
+    "arcforge:asphalt",
+    "arcforge:asphalt_slab",
+    "arcforge:asphalt_stairs"
   ]
 }

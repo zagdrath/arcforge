@@ -13,12 +13,14 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 // Per-face IO modes for a machine, relative to its front, and whether its output faces push (auto-eject).
 public class SideConfig {
-    private static final int BITS_PER_SIDE = 3;
+    private static final int BITS_PER_SIDE = 4;
     private static final int SIDE_MASK = (1 << BITS_PER_SIDE) - 1;
     // Packed after the six faces.
     private static final int AUTO_EJECT_BIT = 1 << (6 * BITS_PER_SIDE);
-    // Saves from before BYPRODUCT existed packed each face into 2 bits under "sides".
+    // Older saves packed each face into fewer bits: 2 under "sides" (before BYPRODUCT), then 3 under
+    // "side_modes" (before the distillation modes).
     private static final int LEGACY_BITS_PER_SIDE = 2;
+    private static final int OLD_BITS_PER_SIDE = 3;
 
     // Player actions on a face, sent from the side-config tab.
     public static final int ACTION_NEXT = 0;
@@ -91,20 +93,30 @@ public class SideConfig {
     }
 
     private void loadLegacy(int packed) {
-        int mask = (1 << LEGACY_BITS_PER_SIDE) - 1;
-        for (RelativeSide side : RelativeSide.values()) {
-            modes[side.ordinal()] = SideMode.byId((packed >>> (side.ordinal() * LEGACY_BITS_PER_SIDE)) & mask);
-        }
+        loadNarrow(packed, LEGACY_BITS_PER_SIDE);
         autoEject = false;
     }
 
+    private void loadOld(int packed) {
+        loadNarrow(packed, OLD_BITS_PER_SIDE);
+        autoEject = (packed & 1 << (6 * OLD_BITS_PER_SIDE)) != 0;
+    }
+
+    private void loadNarrow(int packed, int bits) {
+        int mask = (1 << bits) - 1;
+        for (RelativeSide side : RelativeSide.values()) {
+            modes[side.ordinal()] = SideMode.byId((packed >>> (side.ordinal() * bits)) & mask);
+        }
+    }
+
     public void serialize(ValueOutput output) {
-        output.putInt("side_modes", pack());
+        output.putInt("side_config", pack());
     }
 
     public void deserialize(ValueInput input) {
-        input.getInt("side_modes").ifPresentOrElse(this::load,
-                () -> input.getInt("sides").ifPresentOrElse(this::loadLegacy, this::reset));
+        input.getInt("side_config").ifPresentOrElse(this::load,
+                () -> input.getInt("side_modes").ifPresentOrElse(this::loadOld,
+                        () -> input.getInt("sides").ifPresentOrElse(this::loadLegacy, this::reset)));
     }
 
     @Override

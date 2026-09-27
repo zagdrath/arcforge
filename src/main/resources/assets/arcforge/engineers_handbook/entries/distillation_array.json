@@ -1,0 +1,23 @@
+{
+  "title": "Distillation Array",
+  "icon": "arcforge:distillation_array_controller",
+  "items": [
+    "arcforge:distillation_array_controller",
+    "arcforge:distillation_array_casing",
+    "arcforge:tray_level_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Splits creosote into fractions with heat. The taller the column, the more it makes, and the faster.\n# Building\nA solid 2x2 column exactly 4, 6 or 8 tall, of casings and Tray Level Casings with one controller. The controller and the trays can't be in the top or bottom layer. The controller's display is the front.\n# Per 1,000 mB of creosote\n- 4 high: 250 Naphtha, 2 Pitch.\n- 6 high: 250 Naphtha, 450 Heavy Oil, 1 Pitch.\n- 8 high: 250 Naphtha, 300 Light Oil, 300 Heavy Oil, 1 Pitch.\nEvery batch takes 4,000 HU, and the column must be at 350°C or hotter. It feeds 10, 15 or 20 mB/t by height and holds 40,000 HU per 4 blocks. A Fuel Burner under it heats it through the bottom face."
+    },
+    {
+      "type": "text",
+      "text": "# Steam stripping\nSteam in its steam tank (fed through steam faces) raises the Naphtha yield of every batch, out of the Heavy Oil: Steam +15%, High-Pressure +30%, Superheated +50%. Each batch uses 100 mB.\nIt stops when a product it makes is full, so pipe them away or turn on auto-eject. Each product has its own face mode."
+    },
+    {
+      "type": "multiblock",
+      "structure": "distillation_array"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "A  ",
+    "AA ",
+    "AAA"
+  ],
+  "key": {
+    "A": "arcforge:asphalt"
+  },
+  "result": {
+    "id": "arcforge:asphalt_stairs",
+    "count": 4
+  }
+}

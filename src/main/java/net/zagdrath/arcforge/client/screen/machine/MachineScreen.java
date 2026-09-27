@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.client.screen.machine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -31,9 +32,11 @@ import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.client.gui.tab.UpgradesTab;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.machine.MachineMenu;
+import net.zagdrath.arcforge.registry.ModFluids;
 
 // Shared frame of the single-block machine GUIs: background, the machine's own tabs followed by
 // Redstone, Sides and Upgrades, and helpers for the common gauges. Positions are relative to leftPos/topPos.
@@ -189,6 +192,24 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     protected static void addFluidTooltip(List<Component> lines, Fluid fluid, Component emptyName, int amount, int capacity) {
         lines.add(fluid != Fluids.EMPTY ? fluid.getFluidType().getDescription() : emptyName);
         lines.add(Component.translatable("gui.arcforge.mb_stored", ArcforgeGui.grouped(amount), ArcforgeGui.grouped(capacity)).withStyle(ChatFormatting.GRAY));
+    }
+
+    // The thin Heavy Oil gauge of the steam turbines.
+    protected static final int LUBE_X = 25, LUBE_Y = 19, LUBE_W = 6, LUBE_H = 50;
+
+    protected void drawLubricant(GuiGraphicsExtractor graphics, int x, int y, int amount, int capacity) {
+        drawFluidTank(graphics, ModFluids.HEAVY_OIL.get(), amount, capacity, sprite("lube_fill"), sprite("lube_gauge"),
+                x, y, LUBE_X, LUBE_Y, LUBE_W, LUBE_H);
+    }
+
+    // spinUp: the spin-up multiplier, or 0 for a turbine without a rotor to spin up.
+    protected static void addLubricantTooltip(List<Component> lines, int amount, int capacity, double spinUp) {
+        lines.add(Component.translatable("gui.arcforge.lubricant"));
+        lines.add(Component.translatable("gui.arcforge.mb_stored", ArcforgeGui.grouped(amount), ArcforgeGui.grouped(capacity)).withStyle(ChatFormatting.GRAY));
+        int bonus = (int) Math.round(ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble() * 100);
+        String spin = String.format(Locale.ROOT, "%.1f", spinUp).replaceAll("\\.0$", "");
+        lines.add((spinUp > 0 ? Component.translatable("gui.arcforge.lubricant.effect_spin_up", bonus, spin)
+                : Component.translatable("gui.arcforge.lubricant.effect", bonus)).withStyle(amount > 0 ? ChatFormatting.GOLD : ChatFormatting.DARK_GRAY));
     }
 
     protected void drawLed(GuiGraphicsExtractor graphics, int x, int y, int ledX, int ledY) {

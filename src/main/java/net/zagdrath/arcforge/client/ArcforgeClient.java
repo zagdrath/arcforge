@@ -52,6 +52,7 @@ import net.zagdrath.arcforge.client.renderer.blockentity.SteamTurbineArrayRender
 import net.zagdrath.arcforge.client.model.ConnectedModel;
 import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.DistillationArrayScreen;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
@@ -129,6 +130,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.HEAT_CELL.get(), HeatCellScreen::new);
         event.register(ModMenuTypes.CARBONIZER.get(), CarbonizerScreen::new);
         event.register(ModMenuTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceScreen::new);
+        event.register(ModMenuTypes.DISTILLATION_ARRAY.get(), DistillationArrayScreen::new);
     }
 
     // Lit Pressurized and Thermodynamic Conduits glow in the colour of what they hold.
@@ -145,18 +147,25 @@ public class ArcforgeClient {
         event.addListener(Identifier.fromNamespaceAndPath(Arcforge.MODID, "structure_renderer"), (ResourceManagerReloadListener) resources -> StructureRenderer.clearCache());
     }
 
-    // Creosote's textures are already coloured, so it renders untinted.
+    // Creosote's and the distillation products' textures are already coloured, so they render untinted.
     @SubscribeEvent
     static void registerFluidModels(RegisterFluidModelsEvent event) {
-        event.register(new FluidModel.Unbaked(
-                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/creosote_still")),
-                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/creosote_flow")),
-                null,
-                null), ModFluids.CREOSOTE, ModFluids.FLOWING_CREOSOTE);
+        event.register(liquidModel("creosote"), ModFluids.CREOSOTE, ModFluids.FLOWING_CREOSOTE);
+        event.register(liquidModel("naphtha"), ModFluids.NAPHTHA, ModFluids.FLOWING_NAPHTHA);
+        event.register(liquidModel("light_oil"), ModFluids.LIGHT_OIL, ModFluids.FLOWING_LIGHT_OIL);
+        event.register(liquidModel("heavy_oil"), ModFluids.HEAVY_OIL, ModFluids.FLOWING_HEAVY_OIL);
         // The steam grades share one greyscale texture, tinted per grade.
         event.register(steamModel(SteamGrade.STEAM), ModFluids.STEAM, ModFluids.FLOWING_STEAM);
         event.register(steamModel(SteamGrade.HIGH_PRESSURE), ModFluids.HIGH_PRESSURE_STEAM, ModFluids.FLOWING_HIGH_PRESSURE_STEAM);
         event.register(steamModel(SteamGrade.SUPERHEATED), ModFluids.SUPERHEATED_STEAM, ModFluids.FLOWING_SUPERHEATED_STEAM);
+    }
+
+    private static FluidModel.Unbaked liquidModel(String name) {
+        return new FluidModel.Unbaked(
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/" + name + "_still")),
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/" + name + "_flow")),
+                null,
+                null);
     }
 
     private static FluidModel.Unbaked steamModel(SteamGrade grade) {
@@ -167,23 +176,31 @@ public class ArcforgeClient {
                 FluidTintSources.constant(grade.tint()));
     }
 
-    // Dark, murky fog when the camera is inside creosote.
+    // Fog in the colour of the liquid when the camera is inside one: dark and murky in creosote and Heavy
+    // Oil, a little clearer in the lighter oils.
     @SubscribeEvent
     static void registerClientExtensions(RegisterClientExtensionsEvent event) {
-        event.registerFluidType(new IClientFluidTypeExtensions() {
+        event.registerFluidType(liquidFog(0x1A1109, 3.0F), ModFluids.CREOSOTE_TYPE.get());
+        event.registerFluidType(liquidFog(0xE0C080, 8.0F), ModFluids.NAPHTHA_TYPE.get());
+        event.registerFluidType(liquidFog(0xC89A20, 5.0F), ModFluids.LIGHT_OIL_TYPE.get());
+        event.registerFluidType(liquidFog(0x2A1A0C, 2.0F), ModFluids.HEAVY_OIL_TYPE.get());
+    }
+
+    private static IClientFluidTypeExtensions liquidFog(int color, float distance) {
+        return new IClientFluidTypeExtensions() {
             @Override
             public void modifyFogColor(Camera camera, float partialTick, ClientLevel level, int renderDistance, float darkenWorldAmount, Vector4f fluidFogColor) {
-                fluidFogColor.set(0x1A / 255.0F, 0x11 / 255.0F, 0x09 / 255.0F, 1.0F);
+                fluidFogColor.set((color >> 16 & 0xFF) / 255.0F, (color >> 8 & 0xFF) / 255.0F, (color & 0xFF) / 255.0F, 1.0F);
             }
 
             @Override
             public void modifyFogRender(Camera camera, @Nullable FogEnvironment environment, float renderDistance, float partialTick, FogData fogData) {
                 fogData.environmentalStart = 0.0F;
-                fogData.environmentalEnd = 3.0F;
+                fogData.environmentalEnd = distance;
                 fogData.skyEnd = fogData.environmentalEnd;
                 fogData.cloudEnd = fogData.environmentalEnd;
             }
-        }, ModFluids.CREOSOTE_TYPE.get());
+        };
     }
 
     // Machine GUIs check their slots against these recipes (see MachineRecipes).

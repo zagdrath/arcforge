@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "AAA"
+  ],
+  "key": {
+    "A": "arcforge:asphalt"
+  },
+  "result": {
+    "id": "arcforge:asphalt_slab",
+    "count": 6
+  }
+}

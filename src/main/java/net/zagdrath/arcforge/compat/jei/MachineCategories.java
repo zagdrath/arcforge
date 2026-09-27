@@ -16,10 +16,12 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.CrushingRecipe;
+import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
@@ -272,6 +274,58 @@ final class MachineCategories {
 
     // --- Fuel Burner fuels (the arcforge:burner_fuels data map) ---
 
+    // --- Distillation Array: one page per column height ---
+
+    record DistillingPage(DistillingRecipe recipe, int height) {
+        static List<DistillingPage> of(RecipeHolder<DistillingRecipe> holder) {
+            return holder.value().byHeight().keySet().stream().sorted().map(height -> new DistillingPage(holder.value(), height)).toList();
+        }
+    }
+
+    static final class Distilling extends ArcforgeCategory<DistillingPage> {
+        static final IRecipeType<DistillingPage> TYPE = IRecipeType.create(Arcforge.MODID, "distilling", DistillingPage.class);
+
+        Distilling(IGuiHelper gui) {
+            super(TYPE, "distilling", ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), gui, 150, 52);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, DistillingPage page, IFocusGroup focuses) {
+            DistillingRecipe recipe = page.recipe();
+            fluid(builder, true, 1, 5, recipe.input(), recipe.amount());
+            int x = 56;
+            for (var output : recipe.outputs(page.height(), 0.0F).entrySet()) {
+                fluid(builder, false, x, 5, output.getKey(), output.getValue());
+                x += 20;
+            }
+            int items = recipe.items(page.height());
+            if (items > 0) {
+                builder.addOutputSlot(x, 5).setStandardSlotBackground().add(new ItemStack(recipe.itemOutput(), items));
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, DistillingPage page, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(ticks(page)).setPosition(24, 5);
+        }
+
+        private static int ticks(DistillingPage page) {
+            int feed = ArcforgeConfig.DISTILLATION_FEED_RATE.getAsInt() * page.height() / 4;
+            return (int) Math.ceil((double) page.recipe().amount() / Math.max(1, feed));
+        }
+
+        @Override
+        public void draw(DistillingPage page, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            DistillingRecipe recipe = page.recipe();
+            text(graphics, Component.translatable("jei.arcforge.distilling.column", page.height(), seconds(ticks(page))), 0, 26);
+            text(graphics, Component.translatable("jei.arcforge.distilling.heat", recipe.heat(), recipe.minTemp()), 0, 36);
+            if (recipe.steamStripping().isPresent()) {
+                int best = Math.round(recipe.bonusFor(SteamGrade.SUPERHEATED) * 100);
+                textRight(graphics, Component.translatable("jei.arcforge.distilling.steam", best), 150, 26);
+            }
+        }
+    }
+
     record BurnerFuelRecipe(Fluid fluid, BurnerFuel fuel) {}
 
     static final class BurnerFuels extends ArcforgeCategory<BurnerFuelRecipe> {
@@ -293,6 +347,8 @@ final class MachineCategories {
             text(graphics, Component.translatable("jei.arcforge.burner_fuel.rate",
                     String.format(Locale.ROOT, "%.2f", fuel.mbPerTick()).replaceAll("0+$", "").replaceAll("\\.$", ""),
                     Math.round(fuel.huPerMb() * fuel.mbPerTick())), 24, 16);
+            textRight(graphics, Component.translatable("gui.arcforge.burns_at",
+                    fuel.burnTemperature(ArcforgeConfig.FUEL_BURNER_MAX_TEMPERATURE.getAsInt())), 140, 5);
         }
     }
 }

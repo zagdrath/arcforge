@@ -10,7 +10,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Every tiered block and item (conduits, cells, tanks, cylinders and the portables) is made from its tier's alloy. All four are smelted in the Arcforge Furnace, from a metal, an additive and coal coke.\n# Recipes (each also gives slag)\n- Wrought: 2 iron + 1 gold + 1 coke, from 1,200°C.\n- Tempered: 2 steel + 2 copper + 1 coke, from 1,300°C.\n- Hardened: 2 steel + 2 amethyst shards + 2 coke, from 1,400°C.\n- Arcforged: 2 Hardened Alloy + 1 ancient debris dust + 2 coke, from 1,500°C.\nEach smelt makes two ingots. The higher tiers need the furnace hotter; it keeps heating while it burns coke, up to 1,600°C.\nTempered Alloy also goes into the machine array casings."
+      "text": "Every tiered block and item (conduits, cells, tanks, cylinders and the portables) is made from its tier's alloy. All four are smelted in the Arcforge Furnace, from a metal, an additive and coal coke.\n# Recipes (each also gives slag)\n- Wrought: 2 iron + 1 gold + 1 coke, from 1,200°C.\n- Tempered: 2 steel + 2 copper + 1 coke, from 1,300°C.\n- Hardened: 2 steel + 2 amethyst shards + 2 coke, from 1,400°C.\n- Arcforged: 2 Hardened Alloy + 2 Carbon Fiber + 2 coke, from 1,500°C. Carbon Fiber comes from the Distillation Array's pitch.\nEach smelt makes two ingots. The higher tiers need the furnace hotter; it keeps heating while it burns coke, up to 1,600°C.\nTempered Alloy also goes into the machine array casings."
     }
   ]
 }

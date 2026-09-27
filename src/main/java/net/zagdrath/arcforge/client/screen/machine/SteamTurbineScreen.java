@@ -22,8 +22,8 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 public class SteamTurbineScreen extends MachineScreen<SteamTurbineMenu> {
     private static final int STEAM_X = 9, STEAM_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int ENERGY_X = 157, ENERGY_Y = 19;
-    private static final int LABEL_X = 31, VALUE_RIGHT = 145, STEAM_TEXT_Y = 23, FLOW_Y = 34, OUTPUT_Y = 45;
-    private static final int LED_X = 31, LED_Y = 57, STATUS_X = 39, STATUS_Y = 57;
+    private static final int LABEL_X = 39, VALUE_RIGHT = 145, STEAM_TEXT_Y = 23, FLOW_Y = 34, OUTPUT_Y = 45;
+    private static final int LED_X = 39, LED_Y = 57, STATUS_X = 47, STATUS_Y = 57;
     static final int NONE_COLOR = 0xFF707070;
 
     private final Identifier energyBar = sprite("energy_bar");
@@ -39,6 +39,7 @@ public class SteamTurbineScreen extends MachineScreen<SteamTurbineMenu> {
         return switch (mode) {
             case INPUT -> sideModeName("steam_input");
             case ENERGY -> sideModeName("energy_output");
+            case LUBRICANT -> sideModeName("lubricant_input");
             default -> super.sideModeName(mode);
         };
     }
@@ -47,6 +48,7 @@ public class SteamTurbineScreen extends MachineScreen<SteamTurbineMenu> {
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         drawFluidTank(graphics, menu.getSteam(), menu.getSteamAmount(), menu.getSteamCapacity(), steamFill, tankGauge,
                 x, y, STEAM_X, STEAM_Y, TANK_W, TANK_H);
+        drawLubricant(graphics, x, y, menu.getLubricant(), menu.getLubricantCapacity());
         drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.getEnergy(), menu.getCapacity());
         drawLed(graphics, x, y, LED_X, LED_Y);
     }
@@ -71,6 +73,8 @@ public class SteamTurbineScreen extends MachineScreen<SteamTurbineMenu> {
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
         if (isHovering(STEAM_X - 1, STEAM_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getSteam(), Component.translatable("gui.arcforge.steam"), menu.getSteamAmount(), menu.getSteamCapacity());
+        } else if (isHovering(LUBE_X - 1, LUBE_Y - 1, LUBE_W + 2, LUBE_H + 2, mouseX, mouseY)) {
+            addLubricantTooltip(lines, menu.getLubricant(), menu.getLubricantCapacity(), 0);
         } else if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getCapacity())).withStyle(ChatFormatting.GRAY));
         }

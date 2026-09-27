@@ -1,0 +1,16 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "column_2x2",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "arcforge:block/distillation_array/plate",
+    "base": "arcforge:block/distillation_array/plate",
+    "beam": "arcforge:block/ctm/column_beam",
+    "roof_nw": "arcforge:block/distillation_array/roof_nw",
+    "roof_ne": "arcforge:block/distillation_array/roof_ne",
+    "roof_sw": "arcforge:block/distillation_array/roof_sw",
+    "roof_se": "arcforge:block/distillation_array/roof_se",
+    "front": "arcforge:block/distillation_array/controller_on"
+  },
+  "fallback": "arcforge:block/distillation_array/casing"
+}

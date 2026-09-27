@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/distillation_array/controller_unformed",
+    "particle": "arcforge:block/distillation_array/casing",
+    "south": "arcforge:block/distillation_array/casing",
+    "east": "arcforge:block/distillation_array/casing",
+    "west": "arcforge:block/distillation_array/casing",
+    "up": "arcforge:block/distillation_array/casing",
+    "down": "arcforge:block/distillation_array/casing"
+  }
+}

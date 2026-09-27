@@ -58,6 +58,19 @@ public class HeatBuffer {
         sourceCelsius = producing ? maxCelsius : AMBIENT_CELSIUS;
     }
 
+    // The machine is making heat this tick at this temperature (capped at the maximum).
+    public void setProducingAt(int celsius) {
+        sourceCelsius = Math.min(celsius, maxCelsius);
+    }
+
+    // How much heat the buffer holds at this temperature.
+    public int storedAt(int celsius) {
+        if (celsius >= maxCelsius) {
+            return capacity;
+        }
+        return (int) ((long) capacity * Math.max(0, celsius - AMBIENT_CELSIUS) / (maxCelsius - AMBIENT_CELSIUS));
+    }
+
     public int getRoom() {
         return capacity - stored;
     }

@@ -26,8 +26,8 @@ public final class MultiblockAutomation {
 
     private MultiblockAutomation() {}
 
-    // With auto-eject on, pushes items and fluids out of every outward face configured as output or
-    // by-product, into whatever inventory or tank is next to it.
+    // With auto-eject on, pushes items and fluids out of every outward face in an output mode (output,
+    // by-product, a distillation product), into whatever inventory or tank is next to it.
     public static void pushOutputs(ServerLevel level, MultiblockController controller) {
         if (!controller.isAutoEject()) {
             return;
@@ -38,7 +38,7 @@ public final class MultiblockAutomation {
             }
             for (Direction side : Direction.values()) {
                 SideMode mode = controller.faceMode(pos, side);
-                if (mode != SideMode.OUTPUT && mode != SideMode.BYPRODUCT) {
+                if (mode == null || !mode.isOutput()) {
                     continue;
                 }
                 BlockPos target = pos.relative(side);

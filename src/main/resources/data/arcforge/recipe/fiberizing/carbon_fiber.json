@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:fiberizing",
+  "ingredient": "arcforge:pitch",
+  "result": {
+    "id": "arcforge:carbon_fiber",
+    "count": 1
+  },
+  "time": 200,
+  "fe_per_tick": 40,
+  "hu_per_tick": 30,
+  "min_temp": 1000
+}

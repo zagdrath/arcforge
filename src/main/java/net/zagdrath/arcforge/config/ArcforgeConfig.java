@@ -343,6 +343,14 @@ public class ArcforgeConfig {
             .comment("Most FE/t pushed out of its energy faces.")
             .defineInRange("maxEnergyOutput", 400, 1, 1_000_000_000);
 
+    public static final ModConfigSpec.IntValue TURBINE_LUBRICANT_CAPACITY = BUILDER
+            .comment("Lubricant (Heavy Oil) tank size in mB.")
+            .defineInRange("lubricantCapacity", 1_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_LUBRICANT_INTERVAL = BUILDER
+            .comment("Ticks of generating per mB of lubricant used.")
+            .defineInRange("lubricantInterval", 100, 1, 100_000);
+
     static {
         BUILDER.pop();
         BUILDER.comment("Steam Boiler Array: a 3x3 boiler 3 to 7 blocks tall. Values are per block of height.").push("steamBoilerArray");
@@ -389,6 +397,58 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_RPM = BUILDER
             .comment("Rotor speed at full steam flow.")
             .defineInRange("maxRpm", 3_600, 100, 100_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_CAPACITY = BUILDER
+            .comment("Lubricant (Heavy Oil) tank size in mB.")
+            .defineInRange("lubricantCapacity", 4_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_INTERVAL = BUILDER
+            .comment("Ticks of generating per mB of lubricant used, for every 3 blocks of length.")
+            .defineInRange("lubricantInterval", 20, 1, 100_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Heavy Oil in a steam turbine's lubricant tank, while it isn't empty and the turbine generates.").push("lubricant");
+    }
+
+    public static final ModConfigSpec.DoubleValue LUBRICANT_OUTPUT_BONUS = BUILDER
+            .comment("Extra FE per mB of steam (0.08 = +8%).")
+            .defineInRange("outputBonus", 0.08, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue LUBRICANT_SPIN_UP = BUILDER
+            .comment("Multiplier on how fast a Steam Turbine Array's rotor spins up.")
+            .defineInRange("arraySpinUpMultiplier", 2.0, 1.0, 100.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Distillation Array: a 2x2 column 4, 6 or 8 tall that splits creosote into fractions with heat.",
+                "Recipes are data-driven (arcforge:distilling). Values scale with the height (a 4-high column gets them as given).")
+                .push("distillationArray");
+    }
+
+    public static final ModConfigSpec.IntValue DISTILLATION_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU for a 4-high column.")
+            .defineInRange("heatCapacity", 40_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_400, 400, 10_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_FEED_RATE = BUILDER
+            .comment("Feed distilled per tick in mB, for a 4-high column (6 high: x1.5, 8 high: x2).")
+            .defineInRange("feedPerTick", 10, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_FEED_CAPACITY = BUILDER
+            .comment("Feed (creosote) tank size in mB.")
+            .defineInRange("feedCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_STEAM_CAPACITY = BUILDER
+            .comment("Steam tank size in mB.")
+            .defineInRange("steamCapacity", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_OUTPUT_CAPACITY = BUILDER
+            .comment("Size of each product tank (Naphtha, Light Oil, Heavy Oil) in mB.")
+            .defineInRange("outputCapacity", 8_000, 1_000, 100_000_000);
 
     static {
         BUILDER.pop();

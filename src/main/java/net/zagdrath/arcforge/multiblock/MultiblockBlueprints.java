@@ -18,6 +18,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
+import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
 // An example build of every Arcforge multiblock, for the JEI build viewer and the Engineer's Handbook: which block
@@ -60,7 +61,8 @@ public final class MultiblockBlueprints {
                 carbonizer(),
                 arcforgeFurnace(),
                 steamBoilerArray(),
-                steamTurbineArray());
+                steamTurbineArray(),
+                distillationArray());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -142,6 +144,25 @@ public final class MultiblockBlueprints {
             }
         }
         return placements;
+    }
+
+    // 2x2, 8 tall (4 and 6 work too): casings top and bottom, the controller at the front of the second
+    // layer, tray level casings everywhere else.
+    private static Blueprint distillationArray() {
+        BlockState casing = ModBlocks.DISTILLATION_ARRAY_CASING.get().defaultBlockState();
+        BlockState tray = ModBlocks.TRAY_LEVEL_CASING.get().defaultBlockState();
+        BlockState controller = ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get().defaultBlockState()
+                .setValue(DistillationArrayControllerBlock.FACING, Direction.SOUTH);
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < 8; y++) {
+            for (int z = 0; z < 2; z++) {
+                for (int x = 0; x < 2; x++) {
+                    BlockState state = y == 0 || y == 7 ? casing : y == 1 && x == 0 && z == 1 ? controller : tray;
+                    placements.add(new Placement(new BlockPos(x, y, z), state));
+                }
+            }
+        }
+        return new Blueprint("distillation_array", placements, new BlockPos(2, 8, 2));
     }
 
     // 3x3, 5 tall (3 to 7 work), with a window up the front.

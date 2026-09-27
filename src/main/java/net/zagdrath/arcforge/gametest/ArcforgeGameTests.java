@@ -108,6 +108,14 @@ public final class ArcforgeGameTests {
         TESTS.put("portable_battery_in_energy_cell", AlloyGameTests::batteryInEnergyCell);
         TESTS.put("portable_canister_in_tank", AlloyGameTests::canisterInTank);
         TESTS.put("portable_cartridge_in_cylinder", AlloyGameTests::cartridgeInCylinder);
+        TESTS.put("distillation_column_forms", DistillationGameTests::columnForms);
+        TESTS.put("distillation_makes_fractions", DistillationGameTests::columnMakesFractions);
+        TESTS.put("distillation_steam_stripping", DistillationGameTests::steamStripping);
+        TESTS.put("distillation_steam_tank_mixes_down", DistillationGameTests::steamTankMixesDown);
+        TESTS.put("distillation_burn_temperature", DistillationGameTests::burnTemperature);
+        TESTS.put("distillation_turbine_lubricant", DistillationGameTests::turbineLubricant);
+        TESTS.put("distillation_turbine_array_lubricant", DistillationGameTests::turbineArrayLubricant);
+        TESTS.put("distillation_pitch_products", DistillationGameTests::pitchProducts);
         TESTS.put("portable_capsule_heat_flows_hot_to_cold", AlloyGameTests::capsuleHeatFlowsHotToCold);
         TESTS.put("steam_copper_parts_and_upgrades", SteamGameTests::copperPartsAndUpgrades);
         TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);

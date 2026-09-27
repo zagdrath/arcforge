@@ -23,6 +23,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -36,6 +37,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.SteamTurbineMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.steam.BoilerCore;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
@@ -45,17 +47,23 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Turns steam into FE: up to 10 mB/t of any grade, at the grade's FE per mB (Steam 8, High-Pressure 14,
 // Superheated 22), so 80 to 220 FE/t. The used steam vents as exhaust. It stops while its FE buffer is
-// full, and pushes up to 400 FE/t out of its energy faces.
+// full, and pushes up to 400 FE/t out of its energy faces. Heavy Oil in its lubricant tank (fed through
+// lubricant faces) adds 8% to its output while it generates, using 1 mB every 100 ticks.
 public class SteamTurbineBlockEntity extends MachineBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.LUBRICANT);
 
     private final GeneratorEnergyHandler energy;
     private final FilteredFluidTank steam;
     private final ResourceHandler<FluidResource> steamInput;
+    private final FilteredFluidTank lubricant;
+    private final ResourceHandler<FluidResource> lubricantInput;
+    private final ResourceHandler<FluidResource> fluidAutomation;
     private final ContainerData data;
     private int flow;
     private int fePerTick;
+    // Ticks generated since the lubricant last lost a mB.
+    private int lubricatedTicks;
 
     public SteamTurbineBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.STEAM_TURBINE.get(), pos, state, 0, (slot, resource) -> false, UPGRADES,
@@ -67,6 +75,9 @@ public class SteamTurbineBlockEntity extends MachineBlockEntity {
                 this::setChanged);
         this.steam = new FilteredFluidTank(ArcforgeConfig.TURBINE_TANK_CAPACITY.getAsInt(), BoilerCore::isSteam, this::setChanged);
         this.steamInput = new AutomationResourceHandler<>(steam, index -> true, index -> false);
+        this.lubricant = new FilteredFluidTank(ArcforgeConfig.TURBINE_LUBRICANT_CAPACITY.getAsInt(), SteamTurbineBlockEntity::isLubricant, this::setChanged);
+        this.lubricantInput = new AutomationResourceHandler<>(lubricant, index -> true, index -> false);
+        this.fluidAutomation = new CombinedResourceHandler<>(steamInput, lubricantInput);
         this.data = new WideIntContainerData(SteamTurbineMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -82,10 +93,22 @@ public class SteamTurbineBlockEntity extends MachineBlockEntity {
                     case SteamTurbineMenu.DATA_STATUS -> status.ordinal();
                     case SteamTurbineMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case SteamTurbineMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case SteamTurbineMenu.DATA_LUBRICANT -> lubricant.getAmount();
+                    case SteamTurbineMenu.DATA_LUBRICANT_CAPACITY -> lubricant.getCapacity();
                     default -> 0;
                 };
             }
         };
+    }
+
+    // Only Heavy Oil lubricates a turbine.
+    public static boolean isLubricant(FluidResource resource) {
+        return resource.is(ModFluids.HEAVY_OIL.get());
+    }
+
+    // The output multiplier while lubricated.
+    public static double lubricantBonus() {
+        return 1.0 + ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble();
     }
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
@@ -106,7 +129,15 @@ public class SteamTurbineBlockEntity extends MachineBlockEntity {
                 flow = steam.extract(0, steam.getResource(0), flow, tx);
                 tx.commit();
             }
-            fePerTick = energy.generate(flow * grade.fePerMb());
+            boolean lubricated = lubricant.getAmount() > 0;
+            fePerTick = energy.generate((int) Math.round(flow * grade.fePerMb() * (lubricated ? lubricantBonus() : 1.0)));
+            if (lubricated && ++lubricatedTicks >= ArcforgeConfig.TURBINE_LUBRICANT_INTERVAL.getAsInt()) {
+                lubricatedTicks = 0;
+                try (Transaction tx = Transaction.openRoot()) {
+                    lubricant.extract(0, lubricant.getResource(0), 1, tx);
+                    tx.commit();
+                }
+            }
             status = MachineStatus.GENERATING;
             setChanged();
         }
@@ -128,10 +159,17 @@ public class SteamTurbineBlockEntity extends MachineBlockEntity {
 
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---
 
-    // Steam goes in on input faces.
+    public FilteredFluidTank getLubricant() {
+        return lubricant;
+    }
+
+    // Steam goes in on input faces, Heavy Oil on lubricant faces.
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
-        return mode == null || mode == SideMode.INPUT ? steamInput : null;
+        if (mode == null) {
+            return fluidAutomation;
+        }
+        return mode == SideMode.INPUT ? steamInput : mode == SideMode.LUBRICANT ? lubricantInput : null;
     }
 
     // FE can be drawn out of energy faces.
@@ -145,8 +183,9 @@ public class SteamTurbineBlockEntity extends MachineBlockEntity {
         SideMode mode = modeFor(side);
         return switch (type) {
             case GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case FLUID -> mode == SideMode.LUBRICANT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case ITEM, FLUID, THERMAL -> ConnectionMode.NONE;
+            case ITEM, THERMAL -> ConnectionMode.NONE;
         };
     }
 
@@ -155,6 +194,8 @@ public class SteamTurbineBlockEntity extends MachineBlockEntity {
         super.loadAdditional(input);
         energy.deserialize(input.childOrEmpty("energy"));
         steam.deserialize(input.childOrEmpty("steam"));
+        lubricant.deserialize(input.childOrEmpty("lubricant"));
+        lubricatedTicks = input.getIntOr("lubricated_ticks", 0);
     }
 
     @Override
@@ -162,6 +203,8 @@ public class SteamTurbineBlockEntity extends MachineBlockEntity {
         super.saveAdditional(output);
         energy.serialize(output.child("energy"));
         steam.serialize(output.child("steam"));
+        lubricant.serialize(output.child("lubricant"));
+        output.putInt("lubricated_ticks", lubricatedTicks);
     }
 
     @Override

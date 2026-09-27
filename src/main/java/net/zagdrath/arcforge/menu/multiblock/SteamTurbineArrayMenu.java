@@ -34,7 +34,9 @@ public class SteamTurbineArrayMenu extends MachineMenu {
     public static final int DATA_STATUS = 11;
     public static final int DATA_REDSTONE_MODE = 12;
     public static final int DATA_SIDE_CONFIG = 13;
-    public static final int DATA_VALUES = 14;
+    public static final int DATA_LUBRICANT = 14;
+    public static final int DATA_LUBRICANT_CAPACITY = 15;
+    public static final int DATA_VALUES = 16;
 
     // Tabs: Energy, Redstone, Sides; the (hidden) upgrade slots would sit under a fourth.
     private static final int UPGRADES_TAB = 3;
@@ -96,6 +98,14 @@ public class SteamTurbineArrayMenu extends MachineMenu {
 
     public int getFePerTick() {
         return value(DATA_FE_PER_TICK);
+    }
+
+    public int getLubricant() {
+        return value(DATA_LUBRICANT);
+    }
+
+    public int getLubricantCapacity() {
+        return value(DATA_LUBRICANT_CAPACITY);
     }
 
     public int getRpm() {

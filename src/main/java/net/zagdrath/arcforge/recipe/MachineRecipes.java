@@ -116,6 +116,18 @@ public final class MachineRecipes {
                 .anyMatch(holder -> holder.value().usesFluid(fluid));
     }
 
+    // The distilling recipe for this feed, if any.
+    public static Optional<RecipeHolder<DistillingRecipe>> distilling(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.DISTILLING.get()).stream()
+                .filter(holder -> holder.value().usesFluid(fluid))
+                .findFirst();
+    }
+
+    // Fluids some distilling recipe takes: the only ones the Distillation Array's feed tank takes.
+    public static boolean isDistillingFeed(@Nullable Level level, FluidResource fluid) {
+        return distilling(level, fluid).isPresent();
+    }
+
     public static boolean isCarbonizerInput(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(ModRecipes.CARBONIZING.get()).stream()
                 .anyMatch(holder -> holder.value().ingredient().test(stack));

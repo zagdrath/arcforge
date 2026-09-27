@@ -1,0 +1,43 @@
+{
+  "type": "arcforge:distilling",
+  "input": {
+    "fluid": "arcforge:creosote",
+    "amount": 1000
+  },
+  "heat": 4000,
+  "min_temp": 350,
+  "by_height": {
+    "4": {
+      "fluids": {
+        "arcforge:naphtha": 250
+      },
+      "pitch": 2
+    },
+    "6": {
+      "fluids": {
+        "arcforge:naphtha": 250,
+        "arcforge:heavy_oil": 450
+      },
+      "pitch": 1
+    },
+    "8": {
+      "fluids": {
+        "arcforge:naphtha": 250,
+        "arcforge:light_oil": 300,
+        "arcforge:heavy_oil": 300
+      },
+      "pitch": 1
+    }
+  },
+  "item_output": "arcforge:pitch",
+  "steam_stripping": {
+    "steam_per_batch": 100,
+    "boosts": "arcforge:naphtha",
+    "taken_from": "arcforge:heavy_oil",
+    "bonus": {
+      "arcforge:steam": 0.15,
+      "arcforge:high_pressure_steam": 0.3,
+      "arcforge:superheated_steam": 0.5
+    }
+  }
+}

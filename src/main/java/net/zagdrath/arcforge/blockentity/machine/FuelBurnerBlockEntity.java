@@ -46,10 +46,12 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// Burns liquid fuel from its tank into heat (HU). What burns, and how well, comes from the
-// arcforge:burner_fuels data map: creosote burns at 0.75 mB/t for 120 HU per mB, so 90 HU/t up to
-// 1,200°C, between the Firebox and the Geothermal Plant. It pauses while its heat buffer is full. Speed
-// upgrades burn fuel (and make heat) faster, Heat upgrades get more heat from each mB.
+// Burns liquid fuel from its tank into heat (HU). What burns, how well and how hot comes from the
+// arcforge:burner_fuels data map: creosote burns at 0.5 mB/t for 120 HU per mB, so 60 HU/t, and only
+// up to 850°C; Naphtha makes 200 HU/t up to 1,200°C (the burner's maximum). It pauses while its heat
+// buffer is full, or as hot as the fuel burns (after switching to a cooler fuel it cools down to it as
+// its heat is drawn off). Speed upgrades burn fuel (and make heat) faster, Heat upgrades get more heat
+// from each mB.
 public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int SLOT_BUCKET_IN = 0;
     public static final int SLOT_BUCKET_OUT = 1;
@@ -125,16 +127,22 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         heatPerTick = 0;
         burnedPerTick = 0;
         BurnerFuel fuel = BurnerFuel.of(tank.getResource(0));
-        if (enabled && !heat.isFull() && fuel != null) {
-            burn(fuel);
+        int burnCelsius = fuel != null ? fuel.burnTemperature(heat.getMaxCelsius()) : heat.getMaxCelsius();
+        boolean hotEnough = heat.getStored() >= heat.storedAt(burnCelsius);
+        if (enabled && !heat.isFull() && !hotEnough && fuel != null) {
+            burn(fuel, heat.storedAt(burnCelsius) - heat.getStored());
         }
-        // While it's burning it is at full temperature, so the heat moves on straight away.
-        heat.setProducing(heatPerTick > 0);
+        // While it's burning it is at the fuel's temperature, so the heat moves on straight away.
+        if (heatPerTick > 0) {
+            heat.setProducingAt(burnCelsius);
+        } else {
+            heat.setProducing(false);
+        }
         outputs.pushHeat(level, pos, getFacing(), sideConfig, heat, ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt());
 
         if (!enabled) {
             status = MachineStatus.DISABLED;
-        } else if (heat.isFull()) {
+        } else if (heat.isFull() || hotEnough && fuel != null) {
             status = MachineStatus.FULL;
         } else if (heatPerTick > 0) {
             status = MachineStatus.BURNING;
@@ -145,7 +153,8 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
     }
 
     // Burns one tick's fuel (faster with Speed upgrades), taking whole mB from the tank as it needs them.
-    private void burn(BurnerFuel fuel) {
+    // room: the most heat the buffer takes before it's as hot as the fuel burns.
+    private void burn(BurnerFuel fuel, int room) {
         double wanted = fuel.mbPerTick() * speedMultiplier();
         if (fuelTaken < wanted) {
             int take = Math.min(tank.getAmount(), (int) Math.ceil(wanted - fuelTaken));
@@ -156,7 +165,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         }
         burnedPerTick = Math.min(wanted, fuelTaken);
         fuelTaken -= burnedPerTick;
-        heatPerTick = heat.add((int) Math.round(burnedPerTick * fuel.huPerMb() * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT))));
+        heatPerTick = heat.add(Math.min(room, (int) Math.round(burnedPerTick * fuel.huPerMb() * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT)))));
         setChanged();
     }
 

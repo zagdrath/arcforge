@@ -4,6 +4,10 @@
     "ingredient": "arcforge:hardened_alloy",
     "count": 2
   },
+  "additive": {
+    "ingredient": "arcforge:carbon_fiber",
+    "count": 2
+  },
   "coke": 2,
   "result": {
     "id": "arcforge:arcforged_alloy",
@@ -14,9 +18,5 @@
     "count": 1
   },
   "time": 800,
-  "min_temp": 1500,
-  "additive": {
-    "ingredient": "arcforge:ancient_debris_dust",
-    "count": 1
-  }
+  "min_temp": 1500
 }

@@ -123,6 +123,25 @@ public final class ModItems {
 
     public static final DeferredItem<BucketItem> CREOSOTE_BUCKET = ITEMS.registerItem("creosote_bucket",
             p -> new BucketItem(ModFluids.CREOSOTE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> NAPHTHA_BUCKET = ITEMS.registerItem("naphtha_bucket",
+            p -> new BucketItem(ModFluids.NAPHTHA.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> LIGHT_OIL_BUCKET = ITEMS.registerItem("light_oil_bucket",
+            p -> new BucketItem(ModFluids.LIGHT_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> HEAVY_OIL_BUCKET = ITEMS.registerItem("heavy_oil_bucket",
+            p -> new BucketItem(ModFluids.HEAVY_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+
+    // --- Distillation ---
+
+    private static final ResourceKey<ContextIntProvider> PITCH_BURN_TIME = cookingTime("time_pitch");
+
+    public static final DeferredItem<BlockItem> DISTILLATION_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.DISTILLATION_ARRAY_CASING);
+    public static final DeferredItem<BlockItem> TRAY_LEVEL_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.TRAY_LEVEL_CASING);
+    public static final DeferredItem<BlockItem> DISTILLATION_ARRAY_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.DISTILLATION_ARRAY_CONTROLLER);
+    public static final DeferredItem<Item> PITCH = ITEMS.registerSimpleItem("pitch", p -> p.cookingFuel(PITCH_BURN_TIME));
+    public static final DeferredItem<Item> CARBON_FIBER = ITEMS.registerSimpleItem("carbon_fiber");
+    public static final DeferredItem<BlockItem> ASPHALT = ITEMS.registerSimpleBlockItem(ModBlocks.ASPHALT);
+    public static final DeferredItem<BlockItem> ASPHALT_STAIRS = ITEMS.registerSimpleBlockItem(ModBlocks.ASPHALT_STAIRS);
+    public static final DeferredItem<BlockItem> ASPHALT_SLAB = ITEMS.registerSimpleBlockItem(ModBlocks.ASPHALT_SLAB);
 
     // Treated wood, like crimson and warped: not furnace fuel. The door places both halves.
     private static final List<DeferredItem<BlockItem>> TREATED_WOOD = new ArrayList<>();

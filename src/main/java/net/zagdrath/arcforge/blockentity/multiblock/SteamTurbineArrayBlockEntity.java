@@ -27,6 +27,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
@@ -35,6 +36,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
+import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -60,10 +62,12 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // scaled by how close the rotor is to that speed, so opening the valve gives a rising output over a few
 // seconds. Steam is used either way. Its front is a long side (the window, see chooseFront), so the
 // generator end (positive along the axis, with the FE port) is on its left or right: that end is the
-// default energy face, and the bearing end and the top take steam.
+// default energy face, and the bearing end and the top take steam. Heavy Oil in its lubricant tank (fed
+// through lubricant faces) adds 8% to its output and doubles how fast the rotor spins up while it
+// generates, using 1 mB every 20 ticks for every 3 blocks of length.
 public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.LUBRICANT);
     private static final double SPIN_UP = 0.01;
     private static final double SPIN_DOWN = 0.005;
     // The rotor speed is sent to clients at most this often (and when it changes noticeably).
@@ -72,6 +76,11 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     private final GeneratorEnergyHandler energy;
     private final FilteredFluidTank steam;
     private final ResourceHandler<FluidResource> steamInput;
+    private final FilteredFluidTank lubricant;
+    private final ResourceHandler<FluidResource> lubricantInput;
+    private final ResourceHandler<FluidResource> fluidAutomation;
+    // Lubricant used but not yet taken from the tank (mB).
+    private double lubricantUsed;
     private final ContainerData data;
     private final List<BlockCapabilityCache<EnergyHandler, @Nullable Direction>> energyTargets = new ArrayList<>();
     private boolean targetsDirty = true;
@@ -98,6 +107,9 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
                 this::setChanged);
         this.steam = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_LENGTH.getAsInt() * 3, BoilerCore::isSteam, this::setChanged);
         this.steamInput = new AutomationResourceHandler<>(steam, index -> true, index -> false);
+        this.lubricant = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_LUBRICANT_CAPACITY.getAsInt(), SteamTurbineBlockEntity::isLubricant, this::setChanged);
+        this.lubricantInput = new AutomationResourceHandler<>(lubricant, index -> true, index -> false);
+        this.fluidAutomation = new CombinedResourceHandler<>(steamInput, lubricantInput);
         this.data = new WideIntContainerData(SteamTurbineArrayMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -116,6 +128,8 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
                     case SteamTurbineArrayMenu.DATA_STATUS -> status.ordinal();
                     case SteamTurbineArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case SteamTurbineArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case SteamTurbineArrayMenu.DATA_LUBRICANT -> lubricant.getAmount();
+                    case SteamTurbineArrayMenu.DATA_LUBRICANT_CAPACITY -> lubricant.getCapacity();
                     default -> 0;
                 };
             }
@@ -228,14 +242,20 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
                 tx.commit();
             }
         }
+        boolean lubricated = lubricant.getAmount() > 0;
         double target = (double) maxRpm() * flow / maxFlow;
-        rpm += (target - rpm) * (target > rpm ? SPIN_UP : SPIN_DOWN);
+        double spinUp = SPIN_UP * (lubricated && flow > 0 ? ArcforgeConfig.LUBRICANT_SPIN_UP.getAsDouble() : 1.0);
+        rpm += (target - rpm) * (target > rpm ? spinUp : SPIN_DOWN);
         if (rpm < 0.5 && target == 0) {
             rpm = 0;
         }
         if (flow > 0 && grade != null) {
             double spun = Mth.clamp(rpm / Math.max(target, 1.0), 0.0, 1.0);
-            fePerTick = energy.generate((int) Math.round(flow * grade.arrayFePerMb() * spun));
+            double bonus = lubricated ? SteamTurbineBlockEntity.lubricantBonus() : 1.0;
+            fePerTick = energy.generate((int) Math.round(flow * grade.arrayFePerMb() * spun * bonus));
+            if (lubricated) {
+                useLubricant();
+            }
             setChanged();
         }
 
@@ -256,6 +276,19 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
             syncedFlow = flow;
             lastSync = level.getGameTime();
             sync();
+        }
+    }
+
+    // 1 mB every lubricantInterval ticks for every 3 blocks of length.
+    private void useLubricant() {
+        lubricantUsed += getLength() / 3.0 / ArcforgeConfig.TURBINE_ARRAY_LUBRICANT_INTERVAL.getAsInt();
+        int whole = (int) Math.min(Math.floor(lubricantUsed), lubricant.getAmount());
+        if (whole > 0) {
+            lubricantUsed -= whole;
+            try (Transaction tx = Transaction.openRoot()) {
+                lubricant.extract(0, lubricant.getResource(0), whole, tx);
+                tx.commit();
+            }
         }
     }
 
@@ -295,6 +328,10 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         return steam;
     }
 
+    public FilteredFluidTank getLubricant() {
+        return lubricant;
+    }
+
     public double getRpm() {
         return rpm;
     }
@@ -329,7 +366,10 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     @Override
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable SideMode mode) {
-        return mode == null || mode == SideMode.INPUT ? steamInput : null;
+        if (mode == null) {
+            return fluidAutomation;
+        }
+        return mode == SideMode.INPUT ? steamInput : mode == SideMode.LUBRICANT ? lubricantInput : null;
     }
 
     public @Nullable EnergyHandler energyHandlerAt(BlockPos pos, @Nullable Direction side) {
@@ -343,8 +383,9 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
         return switch (type) {
             case GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case FLUID -> mode == SideMode.LUBRICANT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case ITEM, FLUID, THERMAL -> ConnectionMode.NONE;
+            case ITEM, THERMAL -> ConnectionMode.NONE;
         };
     }
 
@@ -356,6 +397,8 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         steam.setCapacity(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_LENGTH.getAsInt() * getLength());
         energy.deserialize(input.childOrEmpty("energy"));
         steam.deserialize(input.childOrEmpty("steam"));
+        lubricant.deserialize(input.childOrEmpty("lubricant"));
+        lubricantUsed = input.getDoubleOr("lubricant_used", 0.0);
         rpm = input.getDoubleOr("rpm", 0.0);
         syncedRpm = (float) rpm;
         flow = input.getIntOr("flow", 0);
@@ -368,6 +411,8 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         super.saveAdditional(output);
         energy.serialize(output.child("energy"));
         steam.serialize(output.child("steam"));
+        lubricant.serialize(output.child("lubricant"));
+        output.putDouble("lubricant_used", lubricantUsed);
         output.putDouble("rpm", rpm);
         output.putInt("flow", flow);
     }

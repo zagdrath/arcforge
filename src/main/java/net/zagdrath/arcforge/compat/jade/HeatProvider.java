@@ -17,7 +17,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
-import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.conduit.network.ThermalConduitNetwork;
@@ -64,9 +63,9 @@ public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, Heat
             }
             return new Data(network.getStored(), network.getCapacity(), network.getTemperature());
         }
-        // A pane of Pressure Glass shows its array's heat.
-        ShellMultiblockBlockEntity window = WindowProviders.master(level, accessor.getPosition());
-        BlockPos pos = window != null ? window.getBlockPos() : accessor.getPosition();
+        // A pane of Pressure Glass shows its array's heat, a column casing its column's.
+        BlockPos machine = WindowProviders.machinePos(level, accessor.getPosition());
+        BlockPos pos = machine != null ? machine : accessor.getPosition();
         HeatHandler heat = level.getCapability(ModCapabilities.HEAT, pos, null);
         return heat != null && heat.getMaxHeat() > 0 ? new Data(heat.getHeat(), heat.getMaxHeat(), heat.getTemperature()) : null;
     }

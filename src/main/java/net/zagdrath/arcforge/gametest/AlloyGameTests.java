@@ -91,9 +91,11 @@ final class AlloyGameTests {
         ArcforgeSmeltingRecipe tempered = smelt(helper, new ItemStack(ModItems.STEEL_INGOT.get(), 2), new ItemStack(Items.COPPER_INGOT, 2));
         helper.assertTrue(tempered != null && tempered.result().create().is(ModItems.TEMPERED_ALLOY.get()) && tempered.minHeat() == 1_300,
                 "Steel and copper don't make Tempered Alloy at 1,300°C");
-        ArcforgeSmeltingRecipe arcforged = smelt(helper, new ItemStack(ModItems.HARDENED_ALLOY.get(), 2), new ItemStack(ModItems.ANCIENT_DEBRIS_DUST.get()));
+        ArcforgeSmeltingRecipe arcforged = smelt(helper, new ItemStack(ModItems.HARDENED_ALLOY.get(), 2), new ItemStack(ModItems.CARBON_FIBER.get(), 2));
         helper.assertTrue(arcforged != null && arcforged.result().create().is(ModItems.ARCFORGED_ALLOY.get()) && arcforged.coke() == 2 && arcforged.minHeat() == 1_500,
-                "Hardened Alloy and ancient debris dust don't make Arcforged Alloy");
+                "Hardened Alloy and Carbon Fiber don't make Arcforged Alloy");
+        helper.assertTrue(smelt(helper, new ItemStack(ModItems.HARDENED_ALLOY.get(), 2), new ItemStack(ModItems.ANCIENT_DEBRIS_DUST.get())) == null,
+                "Ancient debris dust still makes Arcforged Alloy");
 
         helper.assertTrue(ArcforgeFurnaceBlockEntity.isItemValid(helper.getLevel(), ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE, ItemResource.of(Items.AMETHYST_SHARD)),
                 "The additive slot doesn't take amethyst");
@@ -143,7 +145,8 @@ final class AlloyGameTests {
                 smelting += id.getPath().startsWith("arcforge_smelting/") ? 1 : 0;
             }
         }
-        helper.assertTrue(crafting == 72, crafting + " crafting/ recipes, not 72");
+        // 72 from the alloy drop, and the distillation drop's casing, tray, controller and asphalt, slab and stairs.
+        helper.assertTrue(crafting == 78, crafting + " crafting/ recipes, not 78");
         helper.assertTrue(smelting == 5, smelting + " arcforge_smelting/ recipes, not 5");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
             helper.assertTrue(recipe(helper, old) == null, "Old recipe " + old + " is still there");

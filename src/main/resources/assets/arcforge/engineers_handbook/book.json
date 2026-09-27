@@ -51,6 +51,7 @@
         "metal_press",
         "fiberizer",
         "infuser",
+        "distillation_array",
         "electric_pump"
       ]
     },
@@ -100,7 +101,8 @@
         "dusts",
         "parts",
         "mineral_wool",
-        "treated_wood"
+        "treated_wood",
+        "fractions_and_pitch"
       ]
     }
   ]

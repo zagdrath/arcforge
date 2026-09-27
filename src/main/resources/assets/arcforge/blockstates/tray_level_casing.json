@@ -1,0 +1,60 @@
+{
+  "variants": {
+    "formed=true,fraction=heavy,lit=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/tray_heavy"
+    },
+    "formed=false,fraction=heavy,lit=false": {
+      "model": "arcforge:block/distillation_array/tray_tray_empty_flat"
+    },
+    "formed=true,fraction=heavy,lit=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/tray_heavy_on"
+    },
+    "formed=false,fraction=heavy,lit=true": {
+      "model": "arcforge:block/distillation_array/tray_tray_empty_flat"
+    },
+    "formed=true,fraction=light,lit=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/tray_light"
+    },
+    "formed=false,fraction=light,lit=false": {
+      "model": "arcforge:block/distillation_array/tray_tray_empty_flat"
+    },
+    "formed=true,fraction=light,lit=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/tray_light_on"
+    },
+    "formed=false,fraction=light,lit=true": {
+      "model": "arcforge:block/distillation_array/tray_tray_empty_flat"
+    },
+    "formed=true,fraction=naphtha,lit=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/tray_naphtha"
+    },
+    "formed=false,fraction=naphtha,lit=false": {
+      "model": "arcforge:block/distillation_array/tray_tray_empty_flat"
+    },
+    "formed=true,fraction=naphtha,lit=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/tray_naphtha_on"
+    },
+    "formed=false,fraction=naphtha,lit=true": {
+      "model": "arcforge:block/distillation_array/tray_tray_empty_flat"
+    },
+    "formed=true,fraction=vapor,lit=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/tray_vapor"
+    },
+    "formed=false,fraction=vapor,lit=false": {
+      "model": "arcforge:block/distillation_array/tray_tray_empty_flat"
+    },
+    "formed=true,fraction=vapor,lit=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/distillation_array/tray_vapor_on"
+    },
+    "formed=false,fraction=vapor,lit=true": {
+      "model": "arcforge:block/distillation_array/tray_tray_empty_flat"
+    }
+  }
+}

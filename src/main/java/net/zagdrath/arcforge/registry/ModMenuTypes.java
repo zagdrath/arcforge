@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.menu.machine.FiberizerMenu;
 import net.zagdrath.arcforge.menu.machine.FuelBurnerMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.DistillationArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.InductionFurnaceArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.MetalPressingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
@@ -110,6 +111,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<ArcforgeFurnaceMenu>> ARCFORGE_FURNACE = MENU_TYPES.register("arcforge_furnace",
             () -> IMenuTypeExtension.create(ArcforgeFurnaceMenu::new));
+
+    public static final Supplier<MenuType<DistillationArrayMenu>> DISTILLATION_ARRAY = MENU_TYPES.register("distillation_array",
+            () -> IMenuTypeExtension.create(DistillationArrayMenu::new));
 
     private ModMenuTypes() {}
 

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "vvv",
+    "vpv",
+    "vvv"
+  ],
+  "key": {
+    "v": "minecraft:gravel",
+    "p": "arcforge:pitch"
+  },
+  "result": {
+    "id": "arcforge:asphalt",
+    "count": 8
+  }
+}

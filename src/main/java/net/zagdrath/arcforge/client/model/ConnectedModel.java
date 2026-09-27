@@ -43,9 +43,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.DynamicBlockStateModel;
 import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
+import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
+import net.zagdrath.arcforge.multiblock.DistillationStructure;
 
 // Connected textures for the steam arrays and Pressure Glass: a formed structure reads as one surface.
 //
@@ -62,8 +65,13 @@ import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 // outside of the structure (not toward other parts, nor into the hollow core), so the whole thing is a
 // thin skin the machine's renderer can be seen through. Loose casings use their plain model; a loose pane
 // shows its base with a lip on all four sides.
+//
+// The Distillation Array's solid column uses two more modes (see ColumnBaked): "column_2x2" for its casings
+// and controller (base / beam / roof_nw / roof_ne / roof_sw / roof_se, and front for the controller) and
+// "tray_window" for its tray level casings (base / frame / top / bottom).
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
+    private static final String COLUMN = "column_2x2", TRAY = "tray_window";
 
     // Overlays sit just outside the face they decorate, so they never z-fight with it.
     private static final float WINDOW_OFFSET = 0.0F, LIP_OFFSET = 0.02F, BEAM_OFFSET = 0.04F;
@@ -72,7 +80,15 @@ public final class ConnectedModel {
 
     // --- The model JSON ---
 
-    public record JsonModel(boolean glass, Map<String, Identifier> textures, Identifier fallback) implements UnbakedModel {
+    public record JsonModel(String connect, Map<String, Identifier> textures, Identifier fallback) implements UnbakedModel {
+        public boolean glass() {
+            return connect.equals("glass");
+        }
+
+        public boolean column() {
+            return connect.equals(COLUMN) || connect.equals(TRAY);
+        }
+
         // Anything that bakes this as an ordinary model gets the plain fallback cube.
         @Override
         public Identifier parent() {
@@ -85,18 +101,24 @@ public final class ConnectedModel {
 
         @Override
         public JsonModel read(JsonObject json, JsonDeserializationContext context) throws JsonParseException {
-            boolean glass = GsonHelper.getAsString(json, "connect", "structure").equals("glass");
+            String connect = GsonHelper.getAsString(json, "connect", "structure");
             Map<String, Identifier> textures = new HashMap<>();
             JsonObject textureJson = GsonHelper.getAsJsonObject(json, "textures");
             for (var entry : textureJson.entrySet()) {
                 textures.put(entry.getKey(), Identifier.parse(entry.getValue().getAsString()));
             }
-            for (String required : glass ? new String[] { "base", "beam", "lip" } : new String[] { "base", "beam", "lip", "window" }) {
+            String[] needed = switch (connect) {
+                case "glass" -> new String[] { "base", "beam", "lip" };
+                case COLUMN -> new String[] { "base", "beam", "roof_nw", "roof_ne", "roof_sw", "roof_se" };
+                case TRAY -> new String[] { "base", "frame", "top", "bottom" };
+                default -> new String[] { "base", "beam", "lip", "window" };
+            };
+            for (String required : needed) {
                 if (!textures.containsKey(required)) {
                     throw new JsonParseException("Connected model is missing texture '" + required + "'");
                 }
             }
-            return new JsonModel(glass, textures, Identifier.parse(GsonHelper.getAsString(json, "fallback")));
+            return new JsonModel(connect, textures, Identifier.parse(GsonHelper.getAsString(json, "fallback")));
         }
     }
 
@@ -123,7 +145,7 @@ public final class ConnectedModel {
             if (!(resolved.wrapped() instanceof JsonModel unbaked)) {
                 throw new IllegalStateException("Model " + model + " is not an arcforge:connected model");
             }
-            return new Baked(baker, unbaked, model);
+            return unbaked.column() ? new ColumnBaked(baker, unbaked, model) : new Baked(baker, unbaked, model);
         }
     }
 
@@ -382,6 +404,129 @@ public final class ConnectedModel {
 
         private static boolean isGlass(BlockAndTintGetter level, BlockPos pos) {
             return PressureGlassBlock.isFormed(level.getBlockState(pos));
+        }
+
+        @Override
+        public @Nullable Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
+            return null;
+        }
+
+        @Override
+        public Material.Baked particleMaterial() {
+            return particle;
+        }
+
+        @Override
+        @BakedQuad.MaterialFlags
+        public int materialFlags() {
+            return materialFlags;
+        }
+    }
+
+    // The Distillation Array's column: solid, so a formed block draws each face that isn't against
+    // another block of the column (culled like any block). Casings show the plate, with a 2px beam along
+    // every edge of the face whose neighbour in that direction isn't part of the column (so beams only run
+    // up the four vertical edges and round the top and bottom); the top shows its quarter of the roof hatch,
+    // and the controller its display on the side it faces. Tray level casings show their window, with a
+    // frame wherever the neighbour on that side isn't a tray, so the windows of one layer merge.
+    private static final class ColumnBaked implements DynamicBlockStateModel {
+        private final boolean tray;
+        private final Material.Baked particle;
+        private final Map<Direction, List<BakedQuad>> base = new EnumMap<>(Direction.class);
+        private final Map<Direction, List<BakedQuad>> front = new EnumMap<>(Direction.class);
+        // Beams (casings) or the window frame (trays), by side of the face.
+        private final Map<Direction, List<BakedQuad>[]> edges = new EnumMap<>(Direction.class);
+        // The roof quarters, by [east][south].
+        private final List<BakedQuad>[][] roof;
+        private final int materialFlags;
+
+        @SuppressWarnings("unchecked")
+        ColumnBaked(ModelBaker baker, JsonModel unbaked, Identifier name) {
+            this.tray = unbaked.connect().equals(TRAY);
+            Map<String, Identifier> textures = unbaked.textures();
+            this.particle = Baked.material(baker, textures.getOrDefault("particle", textures.get("base")), name);
+            Material.Baked baseTexture = Baked.material(baker, textures.get("base"), name);
+            Material.Baked edgeTexture = Baked.material(baker, textures.get(tray ? "frame" : "beam"), name);
+            Material.Baked frontTexture = textures.containsKey("front") ? Baked.material(baker, textures.get("front"), name) : null;
+            int flags = 0;
+            for (Direction face : Direction.values()) {
+                Material.Baked texture = baseTexture;
+                if (tray && face.getAxis().isVertical()) {
+                    texture = Baked.material(baker, textures.get(face == Direction.UP ? "top" : "bottom"), name);
+                }
+                base.put(face, List.of(Baked.bake(baker, face, 0, 0, 16, 16, 0, texture, 0, 0, 16, 16, Quadrant.R0)));
+                if (frontTexture != null) {
+                    front.put(face, List.of(Baked.bake(baker, face, 0, 0, 16, 16, 0, frontTexture, 0, 0, 16, 16, Quadrant.R0)));
+                }
+                List<BakedQuad>[] sides = new List[4];
+                for (Side side : Side.values()) {
+                    sides[side.ordinal()] = List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, edgeTexture, 0, 0, 16, 16, side.rotation));
+                }
+                edges.put(face, sides);
+            }
+            this.roof = new List[2][2];
+            if (!tray) {
+                String[][] names = { { "roof_nw", "roof_sw" }, { "roof_ne", "roof_se" } };
+                for (int east = 0; east < 2; east++) {
+                    for (int south = 0; south < 2; south++) {
+                        roof[east][south] = List.of(Baked.bake(baker, Direction.UP, 0, 0, 16, 16, 0,
+                                Baked.material(baker, textures.get(names[east][south]), name), 0, 0, 16, 16, Quadrant.R0));
+                    }
+                }
+            }
+            for (Map<Direction, List<BakedQuad>> set : List.of(base, front)) {
+                for (List<BakedQuad> quads : set.values()) {
+                    for (BakedQuad quad : quads) {
+                        flags |= quad.materialInfo().flags();
+                    }
+                }
+            }
+            for (List<BakedQuad>[] sides : edges.values()) {
+                for (List<BakedQuad> quads : sides) {
+                    for (BakedQuad quad : quads) {
+                        flags |= quad.materialInfo().flags();
+                    }
+                }
+            }
+            this.materialFlags = flags;
+        }
+
+        private static boolean isPart(BlockState state) {
+            return DistillationStructure.isFormedPart(state);
+        }
+
+        private static boolean isTray(BlockState state) {
+            return state.getBlock() instanceof TrayLevelCasingBlock && isPart(state);
+        }
+
+        @Override
+        public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+            QuadCollection.Builder quads = new QuadCollection.Builder();
+            boolean formed = isPart(state);
+            Direction facing = state.hasProperty(DistillationArrayControllerBlock.FACING) ? state.getValue(DistillationArrayControllerBlock.FACING) : null;
+            for (Direction face : Direction.values()) {
+                if (formed && isPart(level.getBlockState(pos.relative(face)))) {
+                    continue;
+                }
+                List<BakedQuad> faceQuads = new ArrayList<>();
+                if (face == facing && front.containsKey(face)) {
+                    faceQuads.addAll(front.get(face));
+                } else if (face == Direction.UP && !tray && formed) {
+                    int east = isPart(level.getBlockState(pos.west())) ? 1 : 0;
+                    int south = isPart(level.getBlockState(pos.north())) ? 1 : 0;
+                    faceQuads.addAll(roof[east][south]);
+                } else {
+                    faceQuads.addAll(base.get(face));
+                }
+                for (Side side : Side.values()) {
+                    BlockState neighbour = level.getBlockState(pos.relative(Baked.sideDirection(face, side)));
+                    if (formed && (tray ? !isTray(neighbour) : !isPart(neighbour))) {
+                        faceQuads.addAll(edges.get(face)[side.ordinal()]);
+                    }
+                }
+                faceQuads.forEach(quad -> quads.addCulledFace(face, quad));
+            }
+            parts.add(new SimpleModelWrapper(quads.build(), true, particle));
         }
 
         @Override
