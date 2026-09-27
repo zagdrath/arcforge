@@ -32,10 +32,11 @@
       "id": "steelmaking",
       "title": "Steelmaking",
       "icon": "arcforge:steel_ingot",
-      "description": "Coal coke from the Carbonizer, steel from the Arcforge Furnace.",
+      "description": "Coal coke from the Carbonizer; steel and the tier alloys from the Arcforge Furnace.",
       "entries": [
         "carbonizer",
         "arcforge_furnace",
+        "alloys",
         "coal_coke_and_creosote"
       ]
     },
@@ -86,7 +87,8 @@
       "entries": [
         "conduits",
         "fluid_tanks",
-        "energy_cells"
+        "energy_cells",
+        "portable_storage"
       ]
     },
     {

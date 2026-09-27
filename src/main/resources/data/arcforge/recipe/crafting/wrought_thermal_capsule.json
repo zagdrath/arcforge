@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " p ",
+    "wWw",
+    "wcw"
+  ],
+  "key": {
+    "c": "#c:ingots/copper",
+    "W": "arcforge:wrought_alloy",
+    "p": "#c:plates/copper",
+    "w": "arcforge:slag_wool"
+  },
+  "result": {
+    "id": "arcforge:wrought_thermal_capsule",
+    "count": 1
+  }
+}

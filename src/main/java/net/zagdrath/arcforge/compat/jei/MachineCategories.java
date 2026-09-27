@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.compat.jei;
 
+import java.util.List;
 import java.util.Locale;
 
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -23,6 +24,7 @@ import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
 import net.zagdrath.arcforge.registry.ModBlocks;
+import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModRecipes;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
@@ -206,27 +208,34 @@ final class MachineCategories {
         static final IRecipeHolderType<ArcforgeSmeltingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.ARCFORGE_SMELTING.get());
 
         ArcforgeSmelting(IGuiHelper gui) {
-            super(TYPE, "arcforge_smelting", ModBlocks.ARCFORGE_FURNACE_PORT.get(), gui, 124, 40);
+            super(TYPE, "arcforge_smelting", ModBlocks.ARCFORGE_FURNACE_PORT.get(), gui, 138, 40);
         }
 
+        // Metal, additive (empty for steel) and coke, as in the furnace.
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ArcforgeSmeltingRecipe> holder, IFocusGroup focuses) {
             ArcforgeSmeltingRecipe recipe = holder.value();
-            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.input());
-            builder.addInputSlot(21, 5).setStandardSlotBackground().add(recipe.reagent());
-            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(recipe.result());
-            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(103, 5).setStandardSlotBackground().add(byproduct));
+            builder.addInputSlot(1, 5).setStandardSlotBackground().addItemStacks(counted(recipe.metal()));
+            var additive = builder.addInputSlot(21, 5).setStandardSlotBackground();
+            recipe.additive().ifPresent(needed -> additive.addItemStacks(counted(needed)));
+            builder.addInputSlot(41, 5).setStandardSlotBackground().add(new ItemStack(ModItems.COAL_COKE.get(), Math.max(1, recipe.coke())));
+            builder.addOutputSlot(97, 5).setStandardSlotBackground().add(recipe.result());
+            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(119, 5).setStandardSlotBackground().add(byproduct));
+        }
+
+        private static List<ItemStack> counted(ArcforgeSmeltingRecipe.Counted ingredient) {
+            return ingredient.ingredient().items().map(item -> new ItemStack(item, ingredient.count())).toList();
         }
 
         @Override
         public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<ArcforgeSmeltingRecipe> holder, IFocusGroup focuses) {
-            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(64, 5);
         }
 
         @Override
         public void draw(RecipeHolder<ArcforgeSmeltingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             text(graphics, Component.translatable("jei.arcforge.arcforge_smelting.heat", holder.value().minHeat()), 0, 30);
-            textRight(graphics, seconds(holder.value().time()), 124, 30);
+            textRight(graphics, seconds(holder.value().time()), 138, 30);
         }
     }
 

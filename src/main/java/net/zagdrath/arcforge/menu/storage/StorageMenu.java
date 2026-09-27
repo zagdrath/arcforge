@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
 import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -26,11 +27,12 @@ import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
-// Storage block menus: an input slot above an output slot (none for heat cells), the player inventory,
-// and synced data including the side configuration. One menu type serves every tier of a block.
+// Storage block menus: a drain slot above a fill slot, the player inventory, and synced data including
+// the side configuration. One menu type serves every tier of a block.
 public abstract class StorageMenu extends AbstractContainerMenu {
-    public static final int SLOT_IN_X = 27, SLOT_IN_Y = 19;
-    public static final int SLOT_OUT_X = 27, SLOT_OUT_Y = 53;
+    // Energy Cells and Fluid Tanks put their slots here; Heat Cells and Pressurized Cylinders at SLOT_X_LEFT.
+    public static final int SLOT_X = 27, SLOT_X_LEFT = 9;
+    public static final int SLOT_IN_Y = 19, SLOT_OUT_Y = 53;
 
     protected static final int MACHINE_SLOTS = StorageBlockEntity.SLOT_COUNT;
 
@@ -45,11 +47,11 @@ public abstract class StorageMenu extends AbstractContainerMenu {
 
     protected StorageMenu(MenuType<?> type, int containerId, Inventory inventory, BlockPos pos, FilteredItemHandler items,
             ContainerData data, int dataValues, int sideConfigIndex, Predicate<Block> validBlock) {
-        this(type, containerId, inventory, pos, items, data, dataValues, sideConfigIndex, validBlock, true);
+        this(type, containerId, inventory, pos, items, data, dataValues, sideConfigIndex, validBlock, SLOT_X);
     }
 
     protected StorageMenu(MenuType<?> type, int containerId, Inventory inventory, BlockPos pos, FilteredItemHandler items,
-            ContainerData data, int dataValues, int sideConfigIndex, Predicate<Block> validBlock, boolean itemSlots) {
+            ContainerData data, int dataValues, int sideConfigIndex, Predicate<Block> validBlock, int slotX) {
         super(type, containerId);
         checkContainerDataCount(data, dataValues * 2);
         this.access = ContainerLevelAccess.create(inventory.player.level(), pos);
@@ -57,11 +59,9 @@ public abstract class StorageMenu extends AbstractContainerMenu {
         this.validBlock = validBlock;
         this.sideConfigIndex = sideConfigIndex;
 
-        if (itemSlots) {
-            addSlot(new ResourceHandlerSlot(items, items::set, StorageBlockEntity.SLOT_IN, SLOT_IN_X, SLOT_IN_Y));
-            addSlot(new ResourceHandlerSlot(items, items::set, StorageBlockEntity.SLOT_OUT, SLOT_OUT_X, SLOT_OUT_Y));
-        }
-        this.machineSlots = itemSlots ? MACHINE_SLOTS : 0;
+        addSlot(new ResourceHandlerSlot(items, items::set, StorageBlockEntity.SLOT_IN, slotX, SLOT_IN_Y));
+        addSlot(new ResourceHandlerSlot(items, items::set, StorageBlockEntity.SLOT_OUT, slotX, SLOT_OUT_Y));
+        this.machineSlots = MACHINE_SLOTS;
         this.playerInventoryEnd = machineSlots + 27;
         this.playerHotbarEnd = playerInventoryEnd + 9;
         addStandardInventorySlots(inventory, 8, 84);
@@ -70,6 +70,12 @@ public abstract class StorageMenu extends AbstractContainerMenu {
 
     // Where shift-clicking an item from the player inventory sends it: a machine slot index, or -1.
     protected abstract int quickMoveTarget(ItemStack stack);
+
+    // For portable storage: one holding something goes to the drain slot, an empty one to the fill slot.
+    protected static int portableTarget(ItemStack stack) {
+        return stack.getItem() instanceof PortableStorageItem portable && portable.amount(stack) > 0
+                ? StorageBlockEntity.SLOT_IN : StorageBlockEntity.SLOT_OUT;
+    }
 
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
@@ -121,10 +127,6 @@ public abstract class StorageMenu extends AbstractContainerMenu {
     public boolean stillValid(Player player) {
         return access.evaluate((level, pos) -> validBlock.test(level.getBlockState(pos).getBlock())
                 && player.isWithinBlockInteractionRange(pos, 4.0), true);
-    }
-
-    public boolean hasItemSlots() {
-        return machineSlots > 0;
     }
 
     public Slot getInputSlot() {

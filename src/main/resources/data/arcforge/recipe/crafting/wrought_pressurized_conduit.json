@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "PPP",
+    "WWW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:wrought_pressurized_conduit",
+    "count": 8
+  }
+}

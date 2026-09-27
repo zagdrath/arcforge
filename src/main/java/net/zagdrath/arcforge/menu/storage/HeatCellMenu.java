@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.zagdrath.arcforge.block.storage.HeatCellBlock;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.slot.ToggleableSlot;
@@ -21,8 +22,8 @@ import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
-// No item slots of its own (heat has no item form), but one upgrade slot for Insulation Upgrades, which
-// lives in the Upgrades side tab after the player inventory.
+// Thermal Capsule slots on the left (drain above, fill below), and one upgrade slot for Insulation
+// Upgrades, which lives in the Upgrades side tab after the player inventory.
 public class HeatCellMenu extends StorageMenu {
     // Logical data indices (each is a full int, see WideIntContainerData).
     public static final int DATA_HEAT = 0;
@@ -47,22 +48,25 @@ public class HeatCellMenu extends StorageMenu {
     // Client constructor, called with the block position written by the server.
     public HeatCellMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(),
-                new FilteredItemHandler(MACHINE_SLOTS, (slot, resource) -> false, () -> {}),
+                new FilteredItemHandler(MACHINE_SLOTS, (slot, resource) -> HeatCellBlockEntity.accepts(resource), () -> {}),
                 HeatCellBlockEntity.upgradeSlots(() -> {}),
                 WideIntContainerData.client(DATA_VALUES));
     }
 
     public HeatCellMenu(int containerId, Inventory inventory, BlockPos pos, FilteredItemHandler items, MachineItemHandler upgrades, ContainerData data) {
         super(ModMenuTypes.HEAT_CELL.get(), containerId, inventory, pos, items, data, DATA_VALUES, DATA_SIDE_CONFIG,
-                block -> block instanceof HeatCellBlock, false);
+                block -> block instanceof HeatCellBlock, SLOT_X_LEFT);
         this.upgradeSlotIndex = slots.size();
         this.upgradeSlot = new ToggleableSlot(upgrades, upgrades::set, upgrades.getFirstUpgradeSlot(), UPGRADE_SLOT_X, UPGRADE_SLOT_Y);
         addSlot(upgradeSlot);
     }
 
-    // Insulation Upgrades shift-click into the upgrade slot.
+    // Capsules shift-click into the slot that fits, Insulation Upgrades into the upgrade slot.
     @Override
     protected int quickMoveTarget(ItemStack stack) {
+        if (PortableStorageItem.is(stack, PortableStorageItem.Kind.THERMAL_CAPSULE)) {
+            return portableTarget(stack);
+        }
         return upgradeSlot.mayPlace(stack) ? upgradeSlotIndex : -1;
     }
 

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PXP",
+    "gYg",
+    "PEP"
+  ],
+  "key": {
+    "Y": "minecraft:piston",
+    "g": "#c:gears/copper",
+    "P": "#c:plates/steel",
+    "E": "arcforge:wrought_energy_conduit",
+    "X": "minecraft:bucket"
+  },
+  "result": {
+    "id": "arcforge:electric_pump",
+    "count": 1
+  }
+}

@@ -14,6 +14,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.registries.DeferredItem;
+import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
@@ -42,7 +44,10 @@ import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
 import net.zagdrath.arcforge.heat.HeatHandler;
+import net.zagdrath.arcforge.item.storage.PortableFluidHandler;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 
@@ -171,6 +176,26 @@ public final class ModCapabilities {
                 EnergyCellBlockEntity::getEnergyHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.HEAT_CELL.get(),
                 HeatCellBlockEntity::getHeatHandler);
+
+        // The storage blocks' item slots: input faces take items into the drain slot, output faces give filled items from the fill slot.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FLUID_TANK.get(), StorageBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(), StorageBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(), StorageBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.HEAT_CELL.get(), StorageBlockEntity::getItemHandler);
+
+        // Portable storage: Batteries hold FE, Canisters liquids and Gas Cartridges gases. (Thermal Capsules hold
+        // heat, which has no item capability; the Heat Cell reads them through PortableStorageItem.)
+        for (DeferredItem<PortableStorageItem> holder : ModItems.allPortables()) {
+            PortableStorageItem item = holder.get();
+            switch (item.kind()) {
+                case BATTERY -> event.registerItem(Capabilities.Energy.ITEM,
+                        (stack, access) -> new ItemAccessEnergyHandler(access, ModDataComponents.ENERGY.get(), item.capacity(), item.rate()), item);
+                case CANISTER, GAS_CARTRIDGE -> event.registerItem(Capabilities.Fluid.ITEM,
+                        (stack, access) -> new PortableFluidHandler(access, item), item);
+                case THERMAL_CAPSULE -> {
+                }
+            }
+        }
 
         // Multiblocks: every block of a formed structure exposes the structure face it lies on (served by the controller).
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CARBONIZER.get(),

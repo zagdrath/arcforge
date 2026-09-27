@@ -13,11 +13,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.conduit.ConduitConnectable;
@@ -30,12 +32,16 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.Dismantleable;
+import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
-// Shared by fluid tanks and energy cells: a tier, per-face input/output/none configuration relative to
-// the direction the block was placed facing (the model looks the same from every side), a redstone
-// mode, and two GUI item slots that drop when the block is broken. The stored fluid or energy travels
-// on the dropped item instead (see the loot tables).
+// Shared by fluid tanks, energy cells, heat cells and pressurized cylinders: a tier, per-face
+// input/output/none configuration relative to the direction the block was placed facing (the model looks
+// the same from every side), a redstone mode, and two GUI item slots that drop when the block is broken:
+// a drain slot (SLOT_IN) whose item is emptied into the block and a fill slot (SLOT_OUT) whose item is
+// filled from it. The stored contents travel on the dropped item instead (see the loot tables).
+// Automation puts items into the drain slot through input faces and takes them out of the fill slot
+// through output faces once they can take no more.
 public abstract class StorageBlockEntity extends BlockEntity implements MenuProvider, ConfigurableMachine, ConduitConnectable, Dismantleable {
     public static final int SLOT_IN = 0;
     public static final int SLOT_OUT = 1;
@@ -46,6 +52,9 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
     protected final ConduitTier tier;
     protected final SideConfig sideConfig;
     protected final FilteredItemHandler items;
+    private final ResourceHandler<ItemResource> itemInput;
+    private final ResourceHandler<ItemResource> itemOutput;
+    private final ResourceHandler<ItemResource> itemAutomation;
     protected RedstoneMode redstoneMode = RedstoneMode.IGNORE;
     private Direction facing = Direction.NORTH;
     private boolean dismantled;
@@ -55,13 +64,25 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
         this.tier = tier;
         this.sideConfig = sideConfig;
         this.items = new FilteredItemHandler(SLOT_COUNT, this::isItemValid, this::setChanged);
+        this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_IN, slot -> false);
+        this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUT && isFillSlotDone());
+        this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_IN, slot -> slot == SLOT_OUT && isFillSlotDone());
     }
 
     // Whether players may put this item in a GUI slot. The block itself bypasses this (e.g. to fill an output slot).
     protected abstract boolean isItemValid(int slot, ItemResource resource);
 
-    // The conduit type whose auto connections follow this block's side configuration.
+    // The conduit type whose auto connections follow this block's side configuration. Item conduits do too,
+    // for the item slots.
     protected abstract ConduitType conduitType();
+
+    // Whether the item in the fill slot can take more of what this block stores.
+    protected abstract boolean canFill(ItemStack stack);
+
+    private boolean isFillSlotDone() {
+        ItemStack stack = items.getStack(SLOT_OUT);
+        return !stack.isEmpty() && !canFill(stack);
+    }
 
     // Comparator output, 0-15 by how full the block is.
     public abstract int getComparatorSignal();
@@ -142,13 +163,25 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
 
     @Override
     public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
-        if (type != conduitType()) {
+        if (type != conduitType() && type != ConduitType.ITEM) {
             return ConnectionMode.NONE;
         }
         return switch (sideConfig.get(facing, side)) {
             case INPUT -> ConnectionMode.INPUT;
             case OUTPUT -> ConnectionMode.OUTPUT;
             default -> ConnectionMode.NONE;
+        };
+    }
+
+    public @Nullable ResourceHandler<ItemResource> getItemHandler(@Nullable Direction side) {
+        SideMode mode = modeFor(side);
+        if (mode == null) {
+            return itemAutomation;
+        }
+        return switch (mode) {
+            case INPUT -> itemInput;
+            case OUTPUT -> itemOutput;
+            default -> null;
         };
     }
 

@@ -46,8 +46,8 @@ public final class MachineRecipes {
         return level.recipeAccess().getRecipeFor(ModRecipes.CARBONIZING.get(), new SingleRecipeInput(input), level);
     }
 
-    public static Optional<RecipeHolder<ArcforgeSmeltingRecipe>> arcforgeSmelting(ServerLevel level, ItemStack input, ItemStack reagent) {
-        return level.recipeAccess().getRecipeFor(ModRecipes.ARCFORGE_SMELTING.get(), new ArcforgeSmeltingRecipe.Input(input, reagent), level);
+    public static Optional<RecipeHolder<ArcforgeSmeltingRecipe>> arcforgeSmelting(ServerLevel level, ItemStack metal, ItemStack additive) {
+        return level.recipeAccess().getRecipeFor(ModRecipes.ARCFORGE_SMELTING.get(), new ArcforgeSmeltingRecipe.Input(metal, additive), level);
     }
 
     public static Optional<RecipeHolder<CrushingRecipe>> crushing(ServerLevel level, ItemStack input) {
@@ -121,13 +121,15 @@ public final class MachineRecipes {
                 .anyMatch(holder -> holder.value().ingredient().test(stack));
     }
 
-    public static boolean isArcforgeInput(@Nullable Level level, ItemStack stack) {
+    // The metal of some Arcforge Furnace recipe: what its metal slot takes.
+    public static boolean isArcforgeMetal(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(ModRecipes.ARCFORGE_SMELTING.get()).stream()
-                .anyMatch(holder -> holder.value().input().test(stack));
+                .anyMatch(holder -> holder.value().metal().is(stack));
     }
 
-    public static boolean isArcforgeReagent(@Nullable Level level, ItemStack stack) {
+    // The additive of some Arcforge Furnace recipe: what its additive slot takes.
+    public static boolean isArcforgeAdditive(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(ModRecipes.ARCFORGE_SMELTING.get()).stream()
-                .anyMatch(holder -> holder.value().reagent().test(stack));
+                .anyMatch(holder -> holder.value().additive().map(additive -> additive.is(stack)).orElse(false));
     }
 }

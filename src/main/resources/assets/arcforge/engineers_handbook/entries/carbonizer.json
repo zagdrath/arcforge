@@ -5,12 +5,13 @@
     "arcforge:carbonizer",
     "arcforge:coal_coke",
     "arcforge:coal_coke_block",
-    "arcforge:creosote_bucket"
+    "arcforge:creosote_bucket",
+    "arcforge:carbon_dust"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Bakes coal into coal coke, collecting creosote as it goes. It needs no fuel.\nBuild it from Carbonizer blocks all facing the same way, as slices side by side: each slice 2 or 3 tall and 2 or 3 deep, up to 8 slices. Every slice bakes in parallel, and bigger slices bake more at once.\nPipe the creosote out, or it will fill up and stop."
+      "text": "Bakes coal into coal coke, collecting creosote as it goes. It needs no fuel.\nCarbon dust bakes into coal coke too, in half the time and with no creosote: crushing coal ore into dust first is the high-yield way to make coke.\nBuild it from Carbonizer blocks all facing the same way, as slices side by side: each slice 2 or 3 tall and 2 or 3 deep, up to 8 slices. Every slice bakes in parallel, and bigger slices bake more at once.\nPipe the creosote out, or it will fill up and stop the coal."
     },
     {
       "type": "multiblock",

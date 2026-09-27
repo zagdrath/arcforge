@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.recipe.CrushingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
+import net.zagdrath.arcforge.recipe.TierUpgradeRecipe;
 
 // Data-driven machine recipes: data/<namespace>/recipe/*.json with type arcforge:carbonizing,
 // arcforge:arcforge_smelting, arcforge:crushing, arcforge:fiberizing, arcforge:infusing or arcforge:pressing. All are synced to clients so GUI slots know what they accept,
@@ -57,6 +58,9 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(InfusingRecipe.MAP_CODEC, InfusingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<PressingRecipe>> PRESSING_SERIALIZER = RECIPE_SERIALIZERS.register("pressing",
             () -> new RecipeSerializer<>(PressingRecipe.MAP_CODEC, PressingRecipe.STREAM_CODEC));
+    // A crafting recipe (vanilla's crafting type) that keeps the contents of what it upgrades.
+    public static final Supplier<RecipeSerializer<TierUpgradeRecipe>> TIER_UPGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("tier_upgrade",
+            () -> new RecipeSerializer<>(TierUpgradeRecipe.MAP_CODEC, TierUpgradeRecipe.STREAM_CODEC));
 
     // Machine recipes never show in the recipe book, but every recipe must name a category.
     public static final Supplier<RecipeBookCategory> MACHINE_CATEGORY = RECIPE_BOOK_CATEGORIES.register("machine", RecipeBookCategory::new);

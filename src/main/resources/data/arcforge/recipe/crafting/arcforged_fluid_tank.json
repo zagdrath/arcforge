@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "ALA",
+    "LXL",
+    "ALA"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "X": "arcforge:hardened_fluid_tank",
+    "L": "#c:glass_blocks"
+  },
+  "result": {
+    "id": "arcforge:arcforged_fluid_tank",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

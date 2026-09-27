@@ -21,7 +21,7 @@ import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 
 // Layout follows arcforge_furnace_gui_layout.json. All positions are relative to leftPos/topPos.
 public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu> {
-    private static final int PROGRESS_X = 52, PROGRESS_Y = 24, PROGRESS_W = 21, PROGRESS_H = 15;
+    private static final int PROGRESS_X = 72, PROGRESS_Y = 24, PROGRESS_W = 21, PROGRESS_H = 15;
     private static final int HEAT_X = 12, HEAT_Y = 61, HEAT_W = 152, HEAT_H = 4;
     private static final int HEAT_LABEL_X = 13, HEAT_TEXT_Y = 51, HEAT_TEXT_RIGHT = 163;
     private static final int SCREEN_X = 8, SCREEN_Y = 46, SCREEN_W = 160, SCREEN_H = 24;
@@ -30,6 +30,7 @@ public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu>
     private final Identifier heatBar = sprite("heat_bar");
     private final Identifier heatMarker = sprite("heat_marker");
     private final Identifier ghostIron = sprite("ghost_iron");
+    private final Identifier ghostAdditive = sprite("ghost_additive");
     private final Identifier ghostCoke = sprite("ghost_coke");
 
     public ArcforgeFurnaceScreen(ArcforgeFurnaceMenu menu, Inventory inventory, Component title) {
@@ -56,8 +57,9 @@ public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu>
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, heatMarker, x + HEAT_X + heat - 1, y + HEAT_Y - 1, 2, 6);
         }
 
-        ghost(graphics, ghostIron, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_INPUT).hasItem(), ArcforgeFurnaceMenu.INPUT_X, ArcforgeFurnaceMenu.INPUT_Y);
-        ghost(graphics, ghostCoke, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_FUEL).hasItem(), ArcforgeFurnaceMenu.FUEL_X, ArcforgeFurnaceMenu.FUEL_Y);
+        ghost(graphics, ghostIron, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_METAL).hasItem(), ArcforgeFurnaceMenu.METAL_X, ArcforgeFurnaceMenu.METAL_Y);
+        ghost(graphics, ghostAdditive, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE).hasItem(), ArcforgeFurnaceMenu.ADDITIVE_X, ArcforgeFurnaceMenu.ADDITIVE_Y);
+        ghost(graphics, ghostCoke, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_COKE).hasItem(), ArcforgeFurnaceMenu.COKE_X, ArcforgeFurnaceMenu.COKE_Y);
     }
 
     @Override

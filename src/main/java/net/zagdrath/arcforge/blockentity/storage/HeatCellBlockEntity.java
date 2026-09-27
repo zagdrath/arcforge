@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -36,6 +37,7 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.machine.MachineOutputs;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -51,7 +53,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // each tick, both capped at the tier's rate. Heat always leaks away: once a second the cell loses a
 // share of what it holds (less for better-insulated tiers, and 0.8x less per Insulation Upgrade in its
 // one upgrade slot), so an idle cell drifts back to 20°C. The tier also sets how hot a full cell is.
-// Redstone control pauses pushing; leaking never stops.
+// Redstone control pauses pushing; leaking never stops. Thermal Capsules in the item slots are emptied
+// into the cell (top) or filled from it (bottom), at the capsule's rate and only from hotter to colder.
 public class HeatCellBlockEntity extends StorageBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.INSULATION);
     public static final int UPGRADE_SLOTS = 1;
@@ -108,10 +111,18 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
         };
     }
 
-    // Heat cells have no item slots.
     @Override
     protected boolean isItemValid(int slot, ItemResource resource) {
-        return false;
+        return accepts(resource);
+    }
+
+    public static boolean accepts(ItemResource resource) {
+        return PortableStorageItem.is(resource.toStack(1), PortableStorageItem.Kind.THERMAL_CAPSULE);
+    }
+
+    @Override
+    protected boolean canFill(ItemStack stack) {
+        return stack.getItem() instanceof PortableStorageItem capsule && capsule.amount(stack) < capsule.capacity();
     }
 
     @Override
@@ -171,7 +182,9 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
         if (level.getGameTime() % LEAK_INTERVAL == 0) {
             leak();
         }
+        drainCapsule();
         if (isRedstoneEnabled()) {
+            fillCapsule();
             pushHeat(level, pos);
         }
 
@@ -220,6 +233,45 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
             if (target != null) {
                 countExtracted(MachineOutputs.moveHeat(heat, target, budget));
             }
+        }
+    }
+
+    // The cell's temperature with this much more (or, negative, less) heat in it.
+    private int temperatureWith(int change) {
+        return HeatBuffer.temperature(heat.getStored() + change, heat.getCapacity(), heat.getMaxCelsius());
+    }
+
+    // A hotter capsule in the top slot gives its heat to the cell.
+    private void drainCapsule() {
+        ItemStack stack = items.getStack(SLOT_IN);
+        if (!(stack.getItem() instanceof PortableStorageItem capsule)) {
+            return;
+        }
+        int held = capsule.amount(stack);
+        int max = inputView.receiveHeat(Math.min(capsule.rate(), held), true);
+        int amount = PortableStorageItem.heatFlow(max, moved -> capsule.temperatureAt(held - moved), this::temperatureWith);
+        if (amount > 0) {
+            inputView.receiveHeat(amount, false);
+            ItemStack drained = stack.copy();
+            PortableStorageItem.setHeat(drained, held - amount);
+            items.setStack(SLOT_IN, drained);
+        }
+    }
+
+    // A colder capsule in the bottom slot takes heat from the cell.
+    private void fillCapsule() {
+        ItemStack stack = items.getStack(SLOT_OUT);
+        if (!(stack.getItem() instanceof PortableStorageItem capsule)) {
+            return;
+        }
+        int held = capsule.amount(stack);
+        int max = outputView.extractHeat(Math.min(capsule.rate(), capsule.capacity() - held), true);
+        int amount = PortableStorageItem.heatFlow(max, moved -> temperatureWith(-moved), moved -> capsule.temperatureAt(held + moved));
+        if (amount > 0) {
+            outputView.extractHeat(amount, false);
+            ItemStack filled = stack.copy();
+            PortableStorageItem.setHeat(filled, held + amount);
+            items.setStack(SLOT_OUT, filled);
         }
     }
 

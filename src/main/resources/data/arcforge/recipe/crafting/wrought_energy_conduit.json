@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "ccc",
+    "WWW"
+  ],
+  "key": {
+    "c": "#c:ingots/copper",
+    "W": "arcforge:wrought_alloy"
+  },
+  "result": {
+    "id": "arcforge:wrought_energy_conduit",
+    "count": 8
+  }
+}

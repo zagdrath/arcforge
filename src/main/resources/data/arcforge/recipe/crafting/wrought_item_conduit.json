@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "LhL",
+    "WWW"
+  ],
+  "key": {
+    "L": "#c:glass_blocks",
+    "W": "arcforge:wrought_alloy",
+    "h": "minecraft:hopper"
+  },
+  "result": {
+    "id": "arcforge:wrought_item_conduit",
+    "count": 8
+  }
+}

@@ -21,8 +21,7 @@ import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.menu.storage.StorageMenu;
 
-// Storage block screens: a 176x166 background, the side tabs, and a ghost icon in the empty input
-// slot (heat cells have no slots). Subclasses draw the gauge and the info screen. Positions are relative to leftPos/topPos.
+// Storage block screens: a 176x166 background, the side tabs, and a ghost icon in the empty drain slot. Subclasses draw the gauge and the info screen. Positions are relative to leftPos/topPos.
 public abstract class StorageScreen<M extends StorageMenu> extends AbstractContainerScreen<M> {
     protected final String name;
     private final Identifier background;
@@ -33,7 +32,12 @@ public abstract class StorageScreen<M extends StorageMenu> extends AbstractConta
         super(menu, inventory, title);
         this.name = name;
         this.background = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/" + name + ".png");
-        this.ghostInput = sprite(name.equals("fluid_tank") ? "ghost_bucket" : "ghost_battery");
+        this.ghostInput = sprite(switch (name) {
+            case "fluid_tank" -> "ghost_bucket";
+            case "heat_cell" -> "ghost_capsule";
+            case "pressurized_cylinder" -> "ghost_cartridge";
+            default -> "ghost_battery";
+        });
     }
 
     protected Identifier sprite(String sprite) {
@@ -68,8 +72,8 @@ public abstract class StorageScreen<M extends StorageMenu> extends AbstractConta
         int y = topPos;
         graphics.blit(RenderPipelines.GUI_TEXTURED, background, x, y, 0.0F, 0.0F, imageWidth, imageHeight, 256, 256);
         drawContents(graphics, x, y);
-        if (menu.hasItemSlots() && !menu.getInputSlot().hasItem()) {
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ghostInput, x + StorageMenu.SLOT_IN_X, y + StorageMenu.SLOT_IN_Y, 16, 16);
+        if (!menu.getInputSlot().hasItem()) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ghostInput, x + menu.getInputSlot().x, y + menu.getInputSlot().y, 16, 16);
         }
         // Tabs overlap the panel edge, so they are drawn after the background.
         tabs.render(graphics, font, x, y, mouseX, mouseY);

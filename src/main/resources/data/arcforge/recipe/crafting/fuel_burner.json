@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PpP",
+    "pFp",
+    "PXP"
+  ],
+  "key": {
+    "F": "arcforge:firebox",
+    "p": "#c:plates/copper",
+    "X": "arcforge:wrought_fluid_tank",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:fuel_burner",
+    "count": 1
+  }
+}

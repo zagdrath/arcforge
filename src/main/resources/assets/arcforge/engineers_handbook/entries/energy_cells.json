@@ -10,7 +10,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Store FE, from 500,000 to 256,000,000 by tier, and keep it when broken. The lights on top show how full they are."
+      "text": "Store FE, from 500,000 to 256,000,000 by tier, and keep it when broken. The lights on top show how full they are.\nIts top slot drains a Battery into the cell, the bottom one charges it."
     }
   ]
 }

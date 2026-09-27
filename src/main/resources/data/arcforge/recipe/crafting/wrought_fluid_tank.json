@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WLW",
+    "LbL",
+    "WLW"
+  ],
+  "key": {
+    "b": "minecraft:bucket",
+    "W": "arcforge:wrought_alloy",
+    "L": "#c:glass_blocks"
+  },
+  "result": {
+    "id": "arcforge:wrought_fluid_tank",
+    "count": 1
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "arcforge:hardened_alloy",
+    "count": 2
+  },
+  "coke": 2,
+  "result": {
+    "id": "arcforge:arcforged_alloy",
+    "count": 2
+  },
+  "byproduct": {
+    "id": "arcforge:slag",
+    "count": 1
+  },
+  "time": 800,
+  "min_temp": 1500,
+  "additive": {
+    "ingredient": "arcforge:ancient_debris_dust",
+    "count": 1
+  }
+}

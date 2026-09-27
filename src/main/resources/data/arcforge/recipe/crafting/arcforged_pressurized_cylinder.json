@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "PAP",
+    "AXA",
+    "PAP"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "X": "arcforge:hardened_pressurized_cylinder",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:arcforged_pressurized_cylinder",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

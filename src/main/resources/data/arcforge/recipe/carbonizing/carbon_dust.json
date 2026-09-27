@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:carbonizing",
+  "ingredient": "arcforge:carbon_dust",
+  "result": {
+    "id": "arcforge:coal_coke",
+    "count": 1
+  },
+  "time": 300
+}

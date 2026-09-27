@@ -1,5 +1,9 @@
 {
   "values": [
-    "#c:ingots/steel"
+    "#c:ingots/steel",
+    "#c:ingots/wrought_alloy",
+    "#c:ingots/tempered_alloy",
+    "#c:ingots/hardened_alloy",
+    "#c:ingots/arcforged_alloy"
   ]
 }

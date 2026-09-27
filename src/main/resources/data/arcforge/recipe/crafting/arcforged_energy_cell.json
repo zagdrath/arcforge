@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "ApA",
+    "pXp",
+    "ApA"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "p": "#c:plates/copper",
+    "X": "arcforge:hardened_energy_cell"
+  },
+  "result": {
+    "id": "arcforge:arcforged_energy_cell",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "wAw",
+    "AXA",
+    "wAw"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "X": "arcforge:hardened_heat_cell",
+    "w": "arcforge:rock_wool"
+  },
+  "result": {
+    "id": "arcforge:arcforged_heat_cell",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

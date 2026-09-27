@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "XXX",
+    "XTX",
+    "XXX"
+  ],
+  "key": {
+    "X": "arcforge:wrought_thermal_conduit",
+    "T": "arcforge:tempered_alloy"
+  },
+  "result": {
+    "id": "arcforge:tempered_thermal_conduit",
+    "count": 8
+  }
+}

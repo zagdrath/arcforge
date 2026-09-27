@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PrP",
+    "rXr",
+    "PBP"
+  ],
+  "key": {
+    "r": "#c:rods/copper",
+    "B": "#c:storage_blocks/redstone",
+    "X": "minecraft:blast_furnace",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:induction_furnace",
+    "count": 1
+  }
+}

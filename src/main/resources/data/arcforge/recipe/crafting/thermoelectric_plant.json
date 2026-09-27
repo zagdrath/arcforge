@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PpP",
+    "gFg",
+    "PBP"
+  ],
+  "key": {
+    "F": "arcforge:firebox",
+    "B": "#c:storage_blocks/redstone",
+    "g": "#c:gears/copper",
+    "P": "#c:plates/steel",
+    "p": "#c:plates/copper"
+  },
+  "result": {
+    "id": "arcforge:thermoelectric_plant",
+    "count": 1
+  }
+}

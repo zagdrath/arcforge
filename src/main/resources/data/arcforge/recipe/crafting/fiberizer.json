@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "RXR",
+    "PFP"
+  ],
+  "key": {
+    "F": "arcforge:firebox",
+    "R": "#c:rods/steel",
+    "P": "#c:plates/steel",
+    "G": "#c:gears/steel",
+    "X": "arcforge:induction_furnace"
+  },
+  "result": {
+    "id": "arcforge:fiberizer",
+    "count": 1
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "TLT",
+    "LXL",
+    "TLT"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "L": "#c:glass_blocks",
+    "X": "arcforge:wrought_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:tempered_fluid_tank",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

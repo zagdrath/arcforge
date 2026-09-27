@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "#c:ingots/iron",
+    "count": 2
+  },
+  "coke": 1,
+  "result": {
+    "id": "arcforge:wrought_alloy",
+    "count": 2
+  },
+  "byproduct": {
+    "id": "arcforge:slag",
+    "count": 1
+  },
+  "time": 400,
+  "min_temp": 1200,
+  "additive": {
+    "ingredient": "#c:ingots/gold",
+    "count": 1
+  }
+}

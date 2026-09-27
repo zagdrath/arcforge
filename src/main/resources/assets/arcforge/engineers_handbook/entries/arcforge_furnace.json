@@ -9,7 +9,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Smelts iron and coal coke into steel, with slag as a by-product.\nCoal coke is both its fuel and its reagent: burning it heats the furnace toward 1,600°C, and a smelt only works at 1,200°C or hotter. Coal coke blocks work as nine coal coke.\nOpen it from the port."
+      "text": "Smelts steel and the tier alloys, with slag as a by-product.\nIt has three inputs: the metal (iron for steel), an additive for the alloys (leave it empty for steel), and coal coke. Coal coke is both its fuel and its reagent: burning it heats the furnace toward 1,600°C, and it keeps back what each smelt uses. Coal coke blocks work as nine coal coke.\nEach recipe needs the furnace hot enough: steel from 1,200°C, the alloys from 1,200 to 1,500°C.\nOpen it from the port."
     },
     {
       "type": "multiblock",

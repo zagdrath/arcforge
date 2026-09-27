@@ -17,7 +17,9 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
+import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
@@ -33,7 +35,7 @@ public class FluidTankMenu extends StorageMenu {
     // Client constructor, called with the block position written by the server.
     public FluidTankMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(),
-                new FilteredItemHandler(MACHINE_SLOTS, (slot, resource) -> slot == StorageBlockEntity.SLOT_IN, () -> {}),
+                new FilteredItemHandler(MACHINE_SLOTS, FluidTankBlockEntity::accepts, () -> {}),
                 WideIntContainerData.client(DATA_VALUES));
     }
 
@@ -45,6 +47,9 @@ public class FluidTankMenu extends StorageMenu {
     // Anything holding or able to hold fluid goes to the bucket slot.
     @Override
     protected int quickMoveTarget(ItemStack stack) {
+        if (PortableStorageItem.is(stack, PortableStorageItem.Kind.CANISTER)) {
+            return portableTarget(stack);
+        }
         return ItemAccess.forStack(stack.copyWithCount(1)).getCapability(Capabilities.Fluid.ITEM) != null ? StorageBlockEntity.SLOT_IN : -1;
     }
 

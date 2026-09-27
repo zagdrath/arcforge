@@ -378,7 +378,7 @@ public final class SteamGameTests {
         var rod = MachineRecipes.pressing(level, new ItemStack(ModItems.ROD_DIE.get()), new ItemStack(Items.COPPER_INGOT)).orElse(null);
         helper.assertTrue(rod != null && rod.value().result().create().getCount() == 2, "Rod die doesn't make 2 copper rods");
         for (var holder : level.recipeAccess().recipeMap().byType(RecipeType.CRAFTING)) {
-            String id = holder.id().identifier().getPath();
+            String id = holder.id().identifier().getPath().replaceFirst("^crafting/", "");
             if (id.equals("speed_upgrade") || id.equals("energy_upgrade") || id.equals("heat_upgrade")) {
                 boolean usesPlate = holder.value().placementInfo().ingredients().stream().anyMatch(ingredient -> ingredient.test(new ItemStack(ModItems.STEEL_PLATE.get())));
                 boolean usesIngot = holder.value().placementInfo().ingredients().stream().anyMatch(ingredient -> ingredient.test(new ItemStack(ModItems.STEEL_INGOT.get())));

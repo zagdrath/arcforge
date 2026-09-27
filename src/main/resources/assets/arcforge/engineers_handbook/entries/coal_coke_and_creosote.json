@@ -10,7 +10,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "- Coal coke: fuel and reagent for the Arcforge Furnace, and a long-burning furnace fuel.\n- Creosote: burns in the Fuel Burner and treats wood in the Infuser.\n- Slag: left over from steel. Spin it into Slag Wool in a Fiberizer."
+      "text": "- Coal coke: fuel and reagent for the Arcforge Furnace, and a long-burning furnace fuel.\n- Carbon dust: crushed coal. Bakes into coal coke with no creosote.\n- Creosote: burns in the Fuel Burner and treats wood in the Infuser. Only coal makes it.\n- Slag: left over from the Arcforge Furnace. Spin it into Slag Wool in a Fiberizer."
     }
   ]
 }

@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "#c:ingots/steel",
+    "count": 2
+  },
+  "coke": 2,
+  "result": {
+    "id": "arcforge:hardened_alloy",
+    "count": 2
+  },
+  "byproduct": {
+    "id": "arcforge:slag",
+    "count": 1
+  },
+  "time": 600,
+  "min_temp": 1400,
+  "additive": {
+    "ingredient": "minecraft:amethyst_shard",
+    "count": 2
+  }
+}

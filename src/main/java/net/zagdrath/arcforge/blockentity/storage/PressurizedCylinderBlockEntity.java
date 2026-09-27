@@ -22,6 +22,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -32,10 +33,12 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -46,8 +49,9 @@ import net.zagdrath.arcforge.steam.Gases;
 import net.zagdrath.arcforge.transfer.SidedResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
-// One tank of one gas (see Gases), filled and drained by Pressurized Conduits and gas machines. It has no
-// bucket slots, since a gas can't go in a bucket, and it keeps its gas when broken (on the dropped item).
+// One tank of one gas (see Gases), filled and drained by Pressurized Conduits and gas machines. A gas can't
+// go in a bucket, so its item slots take Gas Cartridges: the top one is emptied into the cylinder, the
+// bottom one filled from it. It keeps its gas when broken (on the dropped item).
 // The gauge on the model follows the fill level; auto-eject pushes gas out of output faces while the
 // redstone mode allows it.
 public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
@@ -82,10 +86,18 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
         };
     }
 
-    // No GUI slots.
     @Override
     protected boolean isItemValid(int slot, ItemResource resource) {
-        return false;
+        return accepts(resource);
+    }
+
+    public static boolean accepts(ItemResource resource) {
+        return PortableStorageItem.is(resource.toStack(1), PortableStorageItem.Kind.GAS_CARTRIDGE);
+    }
+
+    @Override
+    protected boolean canFill(ItemStack stack) {
+        return stack.getItem() instanceof PortableStorageItem cartridge && cartridge.amount(stack) < cartridge.capacity();
     }
 
     @Override
@@ -109,10 +121,28 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
     // --- Ticking ---
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, PressurizedCylinderBlockEntity cylinder) {
+        cylinder.moveGas(SLOT_IN, true);
+        cylinder.moveGas(SLOT_OUT, false);
         if (cylinder.isAutoEject() && cylinder.isRedstoneEnabled()) {
             cylinder.pushGas(level, pos);
         }
         cylinder.updateState(level, pos, state);
+    }
+
+    // Empties the cartridge in a slot into the cylinder (drain) or fills it from the cylinder, in place; the
+    // cartridge's own handler limits the rate.
+    private void moveGas(int slot, boolean drain) {
+        if (items.getStack(slot).isEmpty()) {
+            return;
+        }
+        ResourceHandler<FluidResource> cartridge = ItemAccess.forHandlerIndexStrict(items, slot).getCapability(Capabilities.Fluid.ITEM);
+        if (cartridge != null) {
+            if (drain) {
+                ResourceHandlerUtil.move(cartridge, tank, resource -> true, Integer.MAX_VALUE, null);
+            } else {
+                ResourceHandlerUtil.move(tank, cartridge, resource -> true, Integer.MAX_VALUE, null);
+            }
+        }
     }
 
     @Override

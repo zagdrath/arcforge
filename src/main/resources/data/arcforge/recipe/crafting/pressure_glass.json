@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LRL",
+    "RPR",
+    "LRL"
+  ],
+  "key": {
+    "R": "#c:rods/steel",
+    "L": "#c:glass_blocks",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:pressure_glass",
+    "count": 4
+  }
+}

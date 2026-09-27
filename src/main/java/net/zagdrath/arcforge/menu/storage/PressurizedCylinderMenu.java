@@ -15,12 +15,15 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
+import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
+import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
-// A Pressurized Cylinder has no item slots: just the gas gauge and the tabs.
+// Gas Cartridge slots on the left (drain above, fill below), the gas gauge and the tabs.
 public class PressurizedCylinderMenu extends StorageMenu {
     // Logical data indices (each is a full int, see WideIntContainerData).
     public static final int DATA_FLUID = 0;
@@ -33,18 +36,28 @@ public class PressurizedCylinderMenu extends StorageMenu {
     // Client constructor, called with the block position written by the server.
     public PressurizedCylinderMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(),
-                new FilteredItemHandler(MACHINE_SLOTS, (slot, resource) -> false, () -> {}),
+                new FilteredItemHandler(MACHINE_SLOTS, (slot, resource) -> PressurizedCylinderBlockEntity.accepts(resource), () -> {}),
                 WideIntContainerData.client(DATA_VALUES));
     }
 
+    private final ConduitTier tier;
+
     public PressurizedCylinderMenu(int containerId, Inventory inventory, BlockPos pos, FilteredItemHandler items, ContainerData data) {
         super(ModMenuTypes.PRESSURIZED_CYLINDER.get(), containerId, inventory, pos, items, data, DATA_VALUES, DATA_SIDE_CONFIG,
-                block -> block instanceof PressurizedCylinderBlock, false);
+                block -> block instanceof PressurizedCylinderBlock, SLOT_X_LEFT);
+        // Read from the block rather than synced, since the screen's title needs it straight away.
+        this.tier = inventory.player.level().getBlockState(pos).getBlock() instanceof PressurizedCylinderBlock cylinder
+                ? cylinder.getTier()
+                : ConduitTier.WROUGHT;
+    }
+
+    public ConduitTier getTier() {
+        return tier;
     }
 
     @Override
     protected int quickMoveTarget(ItemStack stack) {
-        return -1;
+        return PortableStorageItem.is(stack, PortableStorageItem.Kind.GAS_CARTRIDGE) ? portableTarget(stack) : -1;
     }
 
     // The stored gas, rebuilt from its registry id.

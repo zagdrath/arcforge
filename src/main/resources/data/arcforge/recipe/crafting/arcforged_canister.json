@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    " A ",
+    "AXA",
+    " A "
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "X": "arcforge:hardened_canister"
+  },
+  "result": {
+    "id": "arcforge:arcforged_canister",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

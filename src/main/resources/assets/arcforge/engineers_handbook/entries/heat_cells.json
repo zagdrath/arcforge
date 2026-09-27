@@ -11,7 +11,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Store heat for later. Better tiers hold more, move it faster, and can hold hotter heat.\nHeat Cells slowly leak. Better tiers leak less, and an Insulation Upgrade slows it further.\nThey keep their heat when broken."
+      "text": "Store heat for later. Better tiers hold more, move it faster, and can hold hotter heat.\nHeat Cells slowly leak. Better tiers leak less, and an Insulation Upgrade slows it further.\nThey keep their heat when broken.\nIts top slot empties a Thermal Capsule into the cell, the bottom one fills it, only ever from hotter to colder."
     }
   ]
 }

@@ -1,0 +1,28 @@
+{
+  "title": "Portable Storage",
+  "icon": "arcforge:wrought_battery",
+  "items": [
+    "arcforge:wrought_battery",
+    "arcforge:tempered_battery",
+    "arcforge:hardened_battery",
+    "arcforge:arcforged_battery",
+    "arcforge:wrought_canister",
+    "arcforge:tempered_canister",
+    "arcforge:hardened_canister",
+    "arcforge:arcforged_canister",
+    "arcforge:wrought_gas_cartridge",
+    "arcforge:tempered_gas_cartridge",
+    "arcforge:hardened_gas_cartridge",
+    "arcforge:arcforged_gas_cartridge",
+    "arcforge:wrought_thermal_capsule",
+    "arcforge:tempered_thermal_capsule",
+    "arcforge:hardened_thermal_capsule",
+    "arcforge:arcforged_thermal_capsule"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Carry power, liquids, gases and heat in your inventory. Each comes in four tiers; better tiers hold four times as much and move it four times as fast.\n- Battery: FE. Drain it in an Energy Cell's top slot, charge it in the bottom one.\n- Canister: one liquid. Empty it in a Fluid Tank's top slot, fill it in the bottom one. It won't take gases.\n- Gas Cartridge: one gas. Use a Pressurized Cylinder's slots.\n- Thermal Capsule: heat. Use a Heat Cell's slots. Heat only flows from hotter to colder, and a capsule leaks while you carry it.\nThe bar under the item shows how full it is. Upgrading one to the next tier keeps what it holds."
+    }
+  ]
+}

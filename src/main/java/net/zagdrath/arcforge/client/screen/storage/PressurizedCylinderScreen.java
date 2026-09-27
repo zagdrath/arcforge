@@ -23,17 +23,18 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 
 // Layout follows pressurized_cylinder_gui_layout.json.
 public class PressurizedCylinderScreen extends StorageScreen<PressurizedCylinderMenu> {
-    private static final int GAUGE_X = 8, GAUGE_Y = 16, GAUGE_W = 38, GAUGE_H = 56;
-    private static final int FILL_X = 9, FILL_Y = 17, FILL_W = 36, FILL_H = 54;
-    private static final int TEXT_X = 57, TEXT_MAX_WIDTH = 108;
+    private static final int GAUGE_X = 30, GAUGE_Y = 16, GAUGE_W = 22, GAUGE_H = 56;
+    private static final int FILL_X = 31, FILL_Y = 17, FILL_W = 20, FILL_H = 54;
+    private static final int TEXT_X = 58, TEXT_MAX_WIDTH = 106;
     private static final int GAS_Y = 21, STORED_LABEL_Y = 35, AMOUNT_Y = 45, CAPACITY_Y = 57;
     private static final int EMPTY_COLOR = 0xFF707070;
 
     private final Identifier gauge = sprite("gauge");
     private final Identifier fallback = sprite("gas_fill");
 
+    // "Hardened Cylinder": the full block name doesn't fit the panel.
     public PressurizedCylinderScreen(PressurizedCylinderMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "pressurized_cylinder");
+        super(menu, inventory, Component.translatable("container.arcforge.cylinder_short", menu.getTier().getDisplayName()), "pressurized_cylinder");
         tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenuButtons.redstoneButtonId(mode))))
                 .add(new SideConfigTab(menu::getSideMode,
                         (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
@@ -46,7 +47,7 @@ public class PressurizedCylinderScreen extends StorageScreen<PressurizedCylinder
         FluidStack gas = menu.getGas();
         int fill = scaledRound(menu.getAmount(), menu.getCapacity(), FILL_H);
         ArcforgeGui.drawFluid(graphics, gas.getFluid(), gas.isEmpty() ? 0 : fill, fallback, x + FILL_X, y + FILL_Y + FILL_H, FILL_W, FILL_H);
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, gauge, x + GAUGE_X, y + GAUGE_Y, GAUGE_W, GAUGE_H);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, gauge, x + FILL_X, y + FILL_Y, FILL_W, FILL_H);
     }
 
     @Override

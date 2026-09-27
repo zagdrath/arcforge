@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "wdw",
+    "dPd",
+    "wdw"
+  ],
+  "key": {
+    "w": "arcforge:rock_wool",
+    "P": "#c:plates/steel",
+    "d": "#c:dusts/redstone"
+  },
+  "result": {
+    "id": "arcforge:insulation_upgrade",
+    "count": 1
+  }
+}

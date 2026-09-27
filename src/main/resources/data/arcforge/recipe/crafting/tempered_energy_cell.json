@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "TpT",
+    "pXp",
+    "TpT"
+  ],
+  "key": {
+    "X": "arcforge:wrought_energy_cell",
+    "T": "arcforge:tempered_alloy",
+    "p": "#c:plates/copper"
+  },
+  "result": {
+    "id": "arcforge:tempered_energy_cell",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

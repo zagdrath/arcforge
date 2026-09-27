@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PWP",
+    "pFp",
+    "PXP"
+  ],
+  "key": {
+    "F": "arcforge:firebox",
+    "P": "#c:plates/steel",
+    "p": "#c:plates/copper",
+    "W": "arcforge:wrought_alloy",
+    "X": "arcforge:wrought_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:geothermal_plant",
+    "count": 1
+  }
+}

@@ -11,6 +11,7 @@ import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.Camera;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.fog.FogData;
@@ -51,6 +52,7 @@ import net.zagdrath.arcforge.client.renderer.blockentity.SteamTurbineArrayRender
 import net.zagdrath.arcforge.client.model.ConnectedModel;
 import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
@@ -94,6 +96,11 @@ public class ArcforgeClient {
         // Mods screen > Arcforge > Config
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         EngineersHandbookItem.opener = EngineersHandbookScreen::open;
+        // Canister and cartridge fill bars take the fluid's colour from its model.
+        PortableStorageItem.fluidTint = stack -> {
+            var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(stack.getFluid().defaultFluidState());
+            return model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(stack) | 0xFF000000 : -1;
+        };
     }
 
     @SubscribeEvent

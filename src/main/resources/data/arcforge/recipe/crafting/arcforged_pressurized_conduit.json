@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "XXX",
+    "XAX",
+    "XXX"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "X": "arcforge:hardened_pressurized_conduit"
+  },
+  "result": {
+    "id": "arcforge:arcforged_pressurized_conduit",
+    "count": 8
+  }
+}

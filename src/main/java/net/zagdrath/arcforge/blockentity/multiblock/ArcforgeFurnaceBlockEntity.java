@@ -35,6 +35,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -58,16 +59,20 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // The Arcforge Furnace, run from its port. Burning fuel (coal coke) heats the furnace towards its
-// maximum; with no fuel burning it cools. A smelt (iron + coal coke -> steel + slag) only progresses
-// while the furnace is at least as hot as the recipe needs. Coal coke is both the fuel and the reagent.
-// A coal coke block in the fuel slot is broken open into nine loose coal coke when needed, which are
-// burned and used as reagent before anything else in the slot.
+// maximum; with no fuel burning it cools. A smelt (metal, an optional additive and coal coke -> a result
+// and slag, e.g. iron + coke -> steel, iron + gold + coke -> Wrought Alloy) only progresses while the
+// furnace is at least as hot as the recipe needs. Coal coke is both the fuel and the reagent: the furnace
+// keeps back what the smelt needs. A coal coke block in the coke slot is broken open into nine loose coal
+// coke when needed, which are burned and used before anything else in the slot.
 public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController {
-    public static final int SLOT_INPUT = 0;
-    public static final int SLOT_FUEL = 1;
-    public static final int SLOT_OUTPUT = 2;
-    public static final int SLOT_BYPRODUCT = 3;
-    public static final int SLOT_COUNT = 4;
+    public static final int SLOT_METAL = 0;
+    public static final int SLOT_ADDITIVE = 1;
+    public static final int SLOT_COKE = 2;
+    public static final int SLOT_OUTPUT = 3;
+    public static final int SLOT_BYPRODUCT = 4;
+    public static final int SLOT_COUNT = 5;
+    // Saves from before the additive slot (layout 1) had iron, coke, output and by-product in slots 0-3.
+    private static final int SLOT_LAYOUT = 2;
 
     public static final int AMBIENT_HEAT = 20;
     // Coal coke in a coal coke block.
@@ -101,10 +106,10 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     public ArcforgeFurnaceBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), pos, state);
         this.items = new FilteredItemHandler(SLOT_COUNT, (slot, resource) -> isItemValid(level, slot, resource), this::setChanged);
-        this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT || slot == SLOT_FUEL, slot -> false);
+        this.itemInput = new AutomationResourceHandler<>(items, ArcforgeFurnaceBlockEntity::isInputSlot, slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT);
         this.itemByproduct = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_BYPRODUCT);
-        this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT || slot == SLOT_FUEL,
+        this.itemAutomation = new AutomationResourceHandler<>(items, ArcforgeFurnaceBlockEntity::isInputSlot,
                 slot -> slot == SLOT_OUTPUT || slot == SLOT_BYPRODUCT);
         this.data = new WideIntContainerData(ArcforgeFurnaceMenu.DATA_VALUES) {
             @Override
@@ -126,15 +131,21 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         };
     }
 
-    // Iron goes in the input slot; coal coke (fuel and reagent) in the fuel slot. The client passes a
-    // null level and checks against the recipes the server synced.
+    // Each slot takes its part of some recipe: a metal, an additive, or coal coke (fuel and reagent), so
+    // input faces route each item to its own slot. The client passes a null level and checks against
+    // the recipes the server synced.
     public static boolean isItemValid(@Nullable Level level, int slot, ItemResource resource) {
         ItemStack stack = resource.toStack(1);
         return switch (slot) {
-            case SLOT_INPUT -> MachineRecipes.isArcforgeInput(level, stack);
-            case SLOT_FUEL -> isFuel(stack) || MachineRecipes.isArcforgeReagent(level, stack);
+            case SLOT_METAL -> MachineRecipes.isArcforgeMetal(level, stack);
+            case SLOT_ADDITIVE -> MachineRecipes.isArcforgeAdditive(level, stack);
+            case SLOT_COKE -> isFuel(stack);
             default -> false;
         };
+    }
+
+    private static boolean isInputSlot(int slot) {
+        return slot == SLOT_METAL || slot == SLOT_ADDITIVE || slot == SLOT_COKE;
     }
 
     public static boolean isFuel(ItemStack stack) {
@@ -145,31 +156,35 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         return stack.is(ModItemTags.COAL_COKE_BLOCKS);
     }
 
-    // What the fuel slot offers as fuel and reagent: loose coke first, and a coke block counts as coal coke.
+    // What the coke slot offers as fuel and reagent: loose coke first, and a coke block counts as coal coke.
     private ItemStack fuelAndReagent() {
-        ItemStack slot = items.getStack(SLOT_FUEL);
+        ItemStack slot = items.getStack(SLOT_COKE);
         return looseCoke > 0 || isCokeBlock(slot) ? new ItemStack(ModItems.COAL_COKE.get()) : slot;
     }
 
     // How many fuel or reagent items are available, counting nine per coke block.
     private int fuelAndReagentCount() {
-        ItemStack slot = items.getStack(SLOT_FUEL);
+        ItemStack slot = items.getStack(SLOT_COKE);
         return looseCoke + (isCokeBlock(slot) ? slot.getCount() * BLOCK_COKE : slot.getCount());
     }
 
     // Uses up one fuel or reagent item: loose coke first, breaking open a coke block if that's what the slot holds.
     private void takeFuelOrReagent() {
-        ItemStack slot = items.getStack(SLOT_FUEL);
+        ItemStack slot = items.getStack(SLOT_COKE);
         if (looseCoke == 0 && isCokeBlock(slot)) {
-            items.setStack(SLOT_FUEL, slot.copyWithCount(slot.getCount() - 1));
+            items.setStack(SLOT_COKE, slot.copyWithCount(slot.getCount() - 1));
             looseCoke = BLOCK_COKE;
         }
         if (looseCoke > 0) {
             looseCoke--;
             setChanged();
         } else {
-            items.setStack(SLOT_FUEL, slot.copyWithCount(slot.getCount() - 1));
+            items.setStack(SLOT_COKE, slot.copyWithCount(slot.getCount() - 1));
         }
+    }
+
+    public FilteredItemHandler getItems() {
+        return items;
     }
 
     public Direction getFacing() {
@@ -246,7 +261,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
 
         boolean enabled = formed && redstoneMode.canRun(powered);
         ArcforgeSmeltingRecipe recipe = enabled ? currentRecipe(level) : null;
-        boolean canSmelt = recipe != null && productsFit(recipe);
+        boolean canSmelt = recipe != null && productsFit(recipe) && fuelAndReagentCount() >= recipe.coke();
         if (recipe != null) {
             progressTotal = recipe.time();
             minHeat = recipe.minHeat();
@@ -295,12 +310,11 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     }
 
     private @Nullable ArcforgeSmeltingRecipe currentRecipe(ServerLevel level) {
-        ItemStack input = items.getStack(SLOT_INPUT);
-        ItemStack reagent = fuelAndReagent();
-        if (input.isEmpty() || reagent.isEmpty()) {
+        ItemStack metal = items.getStack(SLOT_METAL);
+        if (metal.isEmpty()) {
             return null;
         }
-        return MachineRecipes.arcforgeSmelting(level, input, reagent).map(RecipeHolder::value).orElse(null);
+        return MachineRecipes.arcforgeSmelting(level, metal, items.getStack(SLOT_ADDITIVE)).map(RecipeHolder::value).orElse(null);
     }
 
     private boolean productsFit(ArcforgeSmeltingRecipe recipe) {
@@ -314,10 +328,10 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
                 || (ItemStack.isSameItemSameComponents(current, stack) && current.getCount() + stack.getCount() <= current.getMaxStackSize());
     }
 
-    // Burns one fuel item, keeping the last one back if the smelt still needs it as its reagent.
+    // Burns one coke, keeping back what the smelt still needs as its reagent.
     private void burnFuel(ArcforgeSmeltingRecipe recipe) {
         ItemStack fuel = fuelAndReagent();
-        if (!isFuel(fuel) || (fuelAndReagentCount() < 2 && recipe.reagent().test(fuel))) {
+        if (!isFuel(fuel) || fuelAndReagentCount() <= recipe.coke()) {
             return;
         }
         takeFuelOrReagent();
@@ -326,9 +340,15 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     }
 
     private void smelt(ArcforgeSmeltingRecipe recipe) {
-        ItemStack input = items.getStack(SLOT_INPUT);
-        items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
-        takeFuelOrReagent();
+        ItemStack metal = items.getStack(SLOT_METAL);
+        items.setStack(SLOT_METAL, metal.copyWithCount(metal.getCount() - recipe.metal().count()));
+        recipe.additive().ifPresent(additive -> {
+            ItemStack stack = items.getStack(SLOT_ADDITIVE);
+            items.setStack(SLOT_ADDITIVE, stack.copyWithCount(stack.getCount() - additive.count()));
+        });
+        for (int i = 0; i < recipe.coke(); i++) {
+            takeFuelOrReagent();
+        }
         addTo(SLOT_OUTPUT, recipe.result().create());
         recipe.byproduct().ifPresent(byproduct -> addTo(SLOT_BYPRODUCT, byproduct.create()));
     }
@@ -390,7 +410,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
 
     // --- Capabilities, served for every brick, wall and the port (see ModCapabilities) ---
 
-    // Input faces route iron and coke to their own slots; output gives steel, by-product gives slag.
+    // Input faces route metal, additive and coke to their own slots; output gives the result, by-product gives slag.
     @Override
     public @Nullable ResourceHandler<ItemResource> getItemHandler(@Nullable SideMode mode) {
         if (mode == null) {
@@ -444,7 +464,21 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        items.deserialize(input.childOrEmpty("items"));
+        if (input.getIntOr("slot_layout", 1) >= SLOT_LAYOUT) {
+            items.deserialize(input.childOrEmpty("items"));
+        } else {
+            // Old saves hold iron, coke, output and by-product in four slots: read them aside (loading
+            // replaces the whole list) and move them to their slots, past the new additive slot.
+            ItemStacksResourceHandler old = new ItemStacksResourceHandler(4);
+            old.deserialize(input.childOrEmpty("items"));
+            int[] moveTo = { SLOT_METAL, SLOT_COKE, SLOT_OUTPUT, SLOT_BYPRODUCT };
+            for (int slot = 0; slot < SLOT_COUNT; slot++) {
+                items.setStack(slot, ItemStack.EMPTY);
+            }
+            for (int i = 0; i < Math.min(old.size(), moveTo.length); i++) {
+                items.setStack(moveTo[i], old.getResource(i).toStack(old.getAmountAsInt(i)));
+            }
+        }
         sideConfig.deserialize(input);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", 0));
         formed = input.getBooleanOr("formed", false);
@@ -459,6 +493,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         items.serialize(output.child("items"));
+        output.putInt("slot_layout", SLOT_LAYOUT);
         sideConfig.serialize(output);
         output.putInt("redstone_mode", redstoneMode.ordinal());
         output.putBoolean("formed", formed);

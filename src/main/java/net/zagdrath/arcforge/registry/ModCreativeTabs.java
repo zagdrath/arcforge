@@ -9,12 +9,15 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 
 // Arcforge tabs, in order: Machines, Materials, Components, Building Blocks, Fluids, Logistics, Tools & Upgrades.
 public final class ModCreativeTabs {
@@ -58,6 +61,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.STEEL_INGOT.get());
                 output.accept(ModItems.STEEL_BLOCK.get());
+                ModItems.alloys().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.COAL_COKE.get());
                 output.accept(ModItems.COAL_COKE_BLOCK.get());
                 output.accept(ModItems.SLAG.get());
@@ -85,6 +89,15 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COPPER_PLATE.get());
                 output.accept(ModItems.COPPER_GEAR.get());
                 output.accept(ModItems.COPPER_ROD.get());
+                // Portable storage, empty; then full Batteries and Thermal Capsules and a Canister of water.
+                ModItems.allPortables().forEach(item -> output.accept(item.get()));
+                for (ConduitTier tier : ConduitTier.values()) {
+                    output.accept(ModItems.portable(PortableStorageItem.Kind.BATTERY, tier).filled(null));
+                }
+                for (ConduitTier tier : ConduitTier.values()) {
+                    output.accept(ModItems.portable(PortableStorageItem.Kind.THERMAL_CAPSULE, tier).filled(null));
+                }
+                output.accept(ModItems.portable(PortableStorageItem.Kind.CANISTER, ConduitTier.WROUGHT).filled(new FluidStack(Fluids.WATER, 1)));
             }).build());
 
     // Ordered like vanilla's Building Blocks: logs and wood, planks, then the shapes.

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WWW",
+    "ppp",
+    "WWW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "p": "#c:plates/copper"
+  },
+  "result": {
+    "id": "arcforge:wrought_thermal_conduit",
+    "count": 8
+  }
+}

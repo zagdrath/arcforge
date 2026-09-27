@@ -49,6 +49,33 @@ It only ever flows from a hotter machine into a colder one.
   It takes a few minutes to warm up.
 - The Combustion and Thermoelectric Plants push up to 200 FE/t out of their energy faces.
 
+### Steelmaking and alloys
+
+```
+coal        --[Carbonizer]--> coal coke + 250 mB creosote   (600 ticks)
+carbon dust --[Carbonizer]--> coal coke                     (300 ticks, no creosote)
+metal + additive + coal coke --[Arcforge Furnace]--> result + slag
+```
+
+**Arcforge Furnace.** Three inputs: the metal, an optional additive and coal coke, which is both its fuel
+and its reagent (it keeps back what each smelt uses; a coke block counts as nine). Burning coke heats it
+towards 1,600°C, and a smelt only progresses above its recipe's minimum. A recipe without an additive only
+runs with the additive slot empty. Input faces route each item to its own slot. Recipes are data-driven
+(`arcforge:arcforge_smelting`: `metal`, optional `additive`, `coke`, `result`, `byproduct`, `time`, `min_temp`).
+
+| Makes | Metal | Additive | Coke | Time | From |
+|---|---|---|---|---|---|
+| 1 Steel Ingot | 1 iron | — | 1 | 400 | 1,200°C |
+| 2 Wrought Alloy | 2 iron | 1 gold | 1 | 400 | 1,200°C |
+| 2 Tempered Alloy | 2 steel | 2 copper | 1 | 500 | 1,300°C |
+| 2 Hardened Alloy | 2 steel | 2 amethyst shards | 2 | 600 | 1,400°C |
+| 2 Arcforged Alloy | 2 Hardened Alloy | 1 ancient debris dust | 2 | 800 | 1,500°C |
+
+Each also gives 1 slag. **Tier alloys** are the material of every tiered block and item: conduits, cells,
+tanks, cylinders and the portables are crafted from their tier's alloy, and each tier upgrades into the next
+(the `arcforge:tier_upgrade` recipe keeps what it holds). The machine array casings need Tempered Alloy.
+Crushing coal ore (2 carbon dust + a chance of a third) and carbonizing the dust is the high-yield coke route.
+
 ### Crushing
 
 **Arc Crusher.** Crushes ores and materials into dusts with FE: 20 FE/t for 200 ticks (4,000 FE an
@@ -93,7 +120,8 @@ them. A tank or network holds one gas at a time.
 
 **Pressurized Conduits** move 400 / 1,600 / 6,400 / 25,600 mB/t (twice a fluid conduit) and hold
 2,000 mB each; they glow in the colour of the gas while they hold or move it. **Pressurized Cylinders** hold 64,000 / 256,000 / 1,024,000 /
-4,096,000 mB, keep their gas when broken, and show their fill on a gauge (and to comparators).
+4,096,000 mB, keep their gas when broken, and show their fill on a gauge (and to comparators). Their GUI's
+top slot empties a Gas Cartridge into the cylinder and the bottom one fills it.
 
 **Electric Pump.** Pumps the fluid source directly below it: a bucket every 20 ticks for 10 FE/t. The
 source is removed, except water with two or more water sources beside it, which is infinite. It
@@ -168,6 +196,8 @@ A slim glass tank that shows the liquid inside, and glows with lava or any other
 - Right-click with a filled bucket to pour it in, or with an empty bucket to take a bucket out.
 - In the GUI, a filled bucket (or any fluid container) in the top slot empties into the tank and the
   empty container drops into the slot below. An empty bucket there is filled from the tank instead.
+- A Canister in the top slot empties into the tank, and one in the bottom slot fills from it, at the
+  canister's rate; either way it stays in its slot.
 - Pick the tank up with the wrench (sneak-use) to keep its fluid on the item; the item shows the
   fluid inside. Breaking it any other way spills a source block of the fluid (if it held at least
   a bucket) and drops the tank empty. A comparator reads how full it is.
@@ -186,8 +216,8 @@ off more light the fuller it is.
 
 - Output faces push FE into neighbouring machines every tick. By default the front (the side
   facing you when you placed it) is the output and every other face is an input.
-- GUI: the top slot drains a battery or any FE item into the cell; the bottom slot charges one from
-  the cell. The screen shows live input and output rates.
+- GUI: the top slot drains a Battery (or any FE item) into the cell; the bottom slot charges one from
+  the cell, at up to the item's rate. The screen shows live input and output rates.
 - Redstone control pauses pushing and charging.
 
 ### Heat Cells
@@ -210,11 +240,28 @@ better insulated.
 - Output faces push heat into colder neighbours every tick; thermodynamic conduits can also pull
   from them. Redstone control pauses pushing, but not leaking.
 - Breaking a cell keeps its heat on the item (it doesn't leak while it's an item).
-- GUI: stored heat, temperature, live in/out rates, the current leak, and insulation pips for the tier.
-- Recipes upgrade one tier into the next: bricks and a copper block, then Arcforge furnace bricks,
-  then steel and wool, then obsidian and steel blocks, with copper at the corners of each.
+- GUI: Thermal Capsule slots (the top one empties a capsule into the cell, the bottom one fills one, only
+  ever from hotter to colder), stored heat, temperature, live in/out rates, the current leak, and
+  insulation pips for the tier.
 - Breaking the cell keeps its energy on the item, which lights up to show its charge. A comparator
   reads how full it is.
+
+### Portable storage
+
+Carry FE, liquids, gases and heat. Each is filled and emptied in the item slots of its storage block
+(top slot: emptied into the block; bottom slot: filled from it), shows a fill bar, and keeps its contents
+when upgraded to the next tier. Automation can put them in through input faces and take full ones out
+through output faces.
+
+| | Wrought | Tempered | Hardened | Arcforged | Rate per tick | Filled at |
+|---|---|---|---|---|---|---|
+| Battery (FE) | 250,000 | 1,000,000 | 4,000,000 | 16,000,000 | 1k / 4k / 16k / 64k | Energy Cell |
+| Canister (mB, liquids) | 16,000 | 64,000 | 256,000 | 1,024,000 | 1k / 4k / 16k / 64k | Fluid Tank |
+| Gas Cartridge (mB, gases) | 32,000 | 128,000 | 512,000 | 2,048,000 | 2k / 8k / 32k / 128k | Pressurized Cylinder |
+| Thermal Capsule (HU) | 50,000 | 200,000 | 800,000 | 3,200,000 | 50 / 200 / 800 / 3,200 | Heat Cell |
+
+Thermal Capsules get as hot as the Heat Cell of their tier (1,100 / 1,100 / 1,300 / 1,400°C), only give
+heat to something colder, and leak like that Heat Cell while carried.
 
 ### Wrench
 

@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.registry;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
@@ -25,7 +26,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
+import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.storage.StorageBlockItem;
 import net.zagdrath.arcforge.item.tool.DieItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
@@ -104,6 +107,13 @@ public final class ModItems {
     public static final DeferredItem<Item> COPPER_GEAR = ITEMS.registerSimpleItem("copper_gear");
     public static final DeferredItem<Item> COPPER_ROD = ITEMS.registerSimpleItem("copper_rod");
 
+    // --- Alloys: the tier material of every tiered block and item, made in the Arcforge Furnace ---
+
+    public static final DeferredItem<Item> WROUGHT_ALLOY = ITEMS.registerSimpleItem("wrought_alloy");
+    public static final DeferredItem<Item> TEMPERED_ALLOY = ITEMS.registerSimpleItem("tempered_alloy");
+    public static final DeferredItem<Item> HARDENED_ALLOY = ITEMS.registerSimpleItem("hardened_alloy");
+    public static final DeferredItem<Item> ARCFORGED_ALLOY = ITEMS.registerSimpleItem("arcforged_alloy");
+
     // --- Upgrades ---
 
     public static final DeferredItem<UpgradeItem> SPEED_UPGRADE = ITEMS.registerItem("speed_upgrade", p -> new UpgradeItem(UpgradeType.SPEED, p));
@@ -145,7 +155,31 @@ public final class ModItems {
         }
     }
 
+    // Batteries, Canisters, Gas Cartridges and Thermal Capsules, ordered by kind then tier.
+    private static final List<DeferredItem<PortableStorageItem>> PORTABLES = new ArrayList<>();
+
+    static {
+        for (PortableStorageItem.Kind kind : PortableStorageItem.Kind.values()) {
+            for (ConduitTier tier : ConduitTier.values()) {
+                String name = tier.getSerializedName() + "_" + kind.name().toLowerCase(Locale.ROOT);
+                PORTABLES.add(ITEMS.registerItem(name, p -> new PortableStorageItem(kind, tier, p)));
+            }
+        }
+    }
+
     private ModItems() {}
+
+    public static List<DeferredItem<Item>> alloys() {
+        return List.of(WROUGHT_ALLOY, TEMPERED_ALLOY, HARDENED_ALLOY, ARCFORGED_ALLOY);
+    }
+
+    public static List<DeferredItem<PortableStorageItem>> allPortables() {
+        return PORTABLES;
+    }
+
+    public static PortableStorageItem portable(PortableStorageItem.Kind kind, ConduitTier tier) {
+        return PORTABLES.get(kind.ordinal() * ConduitTier.values().length + tier.ordinal()).get();
+    }
 
     private static ResourceKey<ContextIntProvider> cookingTime(String name) {
         return ResourceKey.create(Registries.CONTEXT_INT_PROVIDER, Identifier.fromNamespaceAndPath(Arcforge.MODID, "cooking/" + name));

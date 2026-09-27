@@ -46,6 +46,7 @@ import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.FluidInteractable;
@@ -58,7 +59,8 @@ import net.zagdrath.arcforge.transfer.SidedResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
 // One tank of any fluid but a gas (those go in Pressurized Cylinders). The GUI's bucket slot empties filled containers into the tank (or fills empty
-// ones from it) and moves the result to the slot below. The fluid is synced to clients for the block
+// ones from it) and moves the result to the slot below. A Canister is different: in the top slot it's
+// emptied into the tank and in the bottom slot filled from it, at the canister's rate, and stays put. The fluid is synced to clients for the block
 // entity renderer, and the tank lights up with the fluid's light level. Breaking the tank spills its
 // fluid as a source block; picking it up with the wrench keeps the fluid on the item.
 public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInteractable {
@@ -99,7 +101,22 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
 
     @Override
     protected boolean isItemValid(int slot, ItemResource resource) {
-        return slot == SLOT_IN && ItemAccess.forStack(resource.toStack(1)).getCapability(Capabilities.Fluid.ITEM) != null;
+        return accepts(slot, resource);
+    }
+
+    // Any fluid container in the top slot; only a Canister in the bottom one. The client menu uses this too.
+    public static boolean accepts(int slot, ItemResource resource) {
+        ItemStack stack = resource.toStack(1);
+        return slot == SLOT_IN
+                ? ItemAccess.forStack(stack).getCapability(Capabilities.Fluid.ITEM) != null
+                : PortableStorageItem.is(stack, PortableStorageItem.Kind.CANISTER);
+    }
+
+    // Only a canister is filled in place; anything else in the bottom slot is a finished bucket.
+    @Override
+    protected boolean canFill(ItemStack stack) {
+        return stack.getItem() instanceof PortableStorageItem canister && PortableStorageItem.is(stack, PortableStorageItem.Kind.CANISTER)
+                && canister.amount(stack) < canister.capacity();
     }
 
     @Override
@@ -138,7 +155,14 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
     // output slot. Filled containers are emptied into the tank; empty ones are filled from it.
     private void processContainer() {
         ItemStack input = items.getStack(SLOT_IN);
+        if (PortableStorageItem.is(items.getStack(SLOT_OUT), PortableStorageItem.Kind.CANISTER)) {
+            moveFluid(tank, SLOT_OUT, false);
+        }
         if (input.isEmpty()) {
+            return;
+        }
+        if (PortableStorageItem.is(input, PortableStorageItem.Kind.CANISTER)) {
+            moveFluid(tank, SLOT_IN, true);
             return;
         }
         ItemStacksResourceHandler scratch = new ItemStacksResourceHandler(1);
@@ -168,6 +192,19 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
             items.setStack(SLOT_IN, input.copyWithCount(input.getCount() - 1));
             if (!result.isEmpty()) {
                 items.setStack(SLOT_OUT, output.isEmpty() ? result : output.copyWithCount(output.getCount() + result.getCount()));
+            }
+        }
+    }
+
+    // Empties the canister in a slot into the tank (drain) or fills it from the tank, in place; the
+    // canister's own handler limits the rate.
+    private void moveFluid(ResourceHandler<FluidResource> tank, int slot, boolean drain) {
+        ResourceHandler<FluidResource> canister = ItemAccess.forHandlerIndexStrict(items, slot).getCapability(Capabilities.Fluid.ITEM);
+        if (canister != null) {
+            if (drain) {
+                ResourceHandlerUtil.move(canister, tank, resource -> true, Integer.MAX_VALUE, null);
+            } else {
+                ResourceHandlerUtil.move(tank, canister, resource -> true, Integer.MAX_VALUE, null);
             }
         }
     }

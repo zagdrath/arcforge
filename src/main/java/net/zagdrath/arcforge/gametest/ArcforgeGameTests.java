@@ -99,6 +99,16 @@ public final class ArcforgeGameTests {
         TESTS.put("steam_turbine_array_spins", SteamGameTests::turbineArraySpins);
         TESTS.put("steam_turbine_array_conduits", SteamGameTests::turbineArrayConduits);
         TESTS.put("steam_boiler_array_rebuild_keeps_sides", SteamGameTests::boilerArrayRebuildKeepsSides);
+        TESTS.put("alloy_carbon_dust_carbonizes", AlloyGameTests::carbonDustCarbonizes);
+        TESTS.put("alloy_furnace_recipes", AlloyGameTests::furnaceRecipes);
+        TESTS.put("alloy_furnace_old_save_migrates", AlloyGameTests::furnaceOldSaveMigrates);
+        TESTS.put("alloy_recipes_loaded", AlloyGameTests::recipesLoaded);
+        TESTS.put("alloy_tier_upgrade_keeps_contents", AlloyGameTests::tierUpgradeKeepsContents);
+        TESTS.put("portable_fluid_rules", AlloyGameTests::portableFluidRules);
+        TESTS.put("portable_battery_in_energy_cell", AlloyGameTests::batteryInEnergyCell);
+        TESTS.put("portable_canister_in_tank", AlloyGameTests::canisterInTank);
+        TESTS.put("portable_cartridge_in_cylinder", AlloyGameTests::cartridgeInCylinder);
+        TESTS.put("portable_capsule_heat_flows_hot_to_cold", AlloyGameTests::capsuleHeatFlowsHotToCold);
         TESTS.put("steam_copper_parts_and_upgrades", SteamGameTests::copperPartsAndUpgrades);
         TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);
         TESTS.put("auto_eject", InductionGameTests::autoEject);

@@ -43,10 +43,11 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
     public static final int DATA_VALUES = 10;
 
     // Slot positions from arcforge_furnace_gui_layout.json.
-    public static final int INPUT_X = 9, INPUT_Y = 23;
-    public static final int FUEL_X = 29, FUEL_Y = 23;
-    public static final int OUTPUT_X = 85, OUTPUT_Y = 23;
-    public static final int BYPRODUCT_X = 115, BYPRODUCT_Y = 23;
+    public static final int METAL_X = 9, METAL_Y = 23;
+    public static final int ADDITIVE_X = 29, ADDITIVE_Y = 23;
+    public static final int COKE_X = 49, COKE_Y = 23;
+    public static final int OUTPUT_X = 105, OUTPUT_Y = 23;
+    public static final int BYPRODUCT_X = 135, BYPRODUCT_Y = 23;
 
     private static final int MACHINE_SLOTS = ArcforgeFurnaceBlockEntity.SLOT_COUNT;
     private static final int PLAYER_INV_END = MACHINE_SLOTS + 27;
@@ -68,8 +69,9 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
         this.access = ContainerLevelAccess.create(inventory.player.level(), pos);
         this.data = data;
 
-        addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y));
-        addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_FUEL, FUEL_X, FUEL_Y));
+        addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_METAL, METAL_X, METAL_Y));
+        addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE, ADDITIVE_X, ADDITIVE_Y));
+        addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_COKE, COKE_X, COKE_Y));
         addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y));
         addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_BYPRODUCT, BYPRODUCT_X, BYPRODUCT_Y));
         addStandardInventorySlots(inventory, 8, 84);
@@ -97,12 +99,9 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
             if (!moveItemStackTo(stack, MACHINE_SLOTS, PLAYER_HOTBAR_END, true)) {
                 return ItemStack.EMPTY;
             }
-        } else if (ArcforgeFurnaceBlockEntity.isItemValid(player.level(), ArcforgeFurnaceBlockEntity.SLOT_INPUT, resource)) {
-            if (!moveItemStackTo(stack, ArcforgeFurnaceBlockEntity.SLOT_INPUT, ArcforgeFurnaceBlockEntity.SLOT_INPUT + 1, false)) {
-                return ItemStack.EMPTY;
-            }
-        } else if (ArcforgeFurnaceBlockEntity.isItemValid(player.level(), ArcforgeFurnaceBlockEntity.SLOT_FUEL, resource)) {
-            if (!moveItemStackTo(stack, ArcforgeFurnaceBlockEntity.SLOT_FUEL, ArcforgeFurnaceBlockEntity.SLOT_FUEL + 1, false)) {
+        } else if (inputSlotFor(player, resource) >= 0) {
+            int target = inputSlotFor(player, resource);
+            if (!moveItemStackTo(stack, target, target + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (slotIndex < PLAYER_INV_END) {
@@ -125,6 +124,16 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
 
         slot.onTake(player, stack);
         return original;
+    }
+
+    // The metal, additive or coke slot this item belongs in, or -1.
+    private static int inputSlotFor(Player player, ItemResource resource) {
+        for (int slot : new int[] { ArcforgeFurnaceBlockEntity.SLOT_METAL, ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE, ArcforgeFurnaceBlockEntity.SLOT_COKE }) {
+            if (ArcforgeFurnaceBlockEntity.isItemValid(player.level(), slot, resource)) {
+                return slot;
+            }
+        }
+        return -1;
     }
 
     @Override

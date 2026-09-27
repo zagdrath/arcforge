@@ -27,11 +27,11 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Layout follows heat_cell_gui_layout.json. All positions are relative to leftPos/topPos.
 public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
-    private static final int RECESS_X = 12, RECESS_Y = 16, RECESS_W = 16, RECESS_H = 56;
-    private static final int FILL_X = 13, FILL_Y = 17, FILL_W = 14, FILL_H = 54;
-    private static final int TEXT_LEFT = 39, TEXT_RIGHT = 163;
+    private static final int RECESS_X = 30, RECESS_Y = 16, RECESS_W = 16, RECESS_H = 56;
+    private static final int FILL_X = 31, FILL_Y = 17, FILL_W = 14, FILL_H = 54;
+    private static final int TEXT_LEFT = 55, TEXT_RIGHT = 163;
     private static final int STORED_Y = 21, TEMP_Y = 31, IN_OUT_Y = 50, LEAK_Y = 61;
-    private static final int BAR_X = 39, BAR_Y = 41, BAR_W = 124, BAR_H = 4;
+    private static final int BAR_X = 55, BAR_Y = 41, BAR_W = 108, BAR_H = 4;
     private static final int PIPS_X = 140, PIPS_Y = 62, PIP_PITCH = 6, PIP_SIZE = 5;
     private static final int OUT_COLOR = 0xFFFF5555, LEAK_COLOR = 0xFFB0A090;
 
@@ -77,7 +77,7 @@ public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
     @Override
     protected void drawInfo(GuiGraphicsExtractor graphics) {
         graphics.text(font, Component.translatable("gui.arcforge.stored"), TEXT_LEFT, STORED_Y, ArcforgeGui.LABEL, false);
-        textRight(graphics, Component.translatable("gui.arcforge.hu_stored", compact(menu.getHeat()), compact(menu.getCapacity())), STORED_Y, ArcforgeGui.WHITE);
+        textRight(graphics, Component.translatable("gui.arcforge.hu_stored_compact", compact(menu.getHeat()), compact(menu.getCapacity())), STORED_Y, ArcforgeGui.WHITE);
         graphics.text(font, Component.translatable("gui.arcforge.temp"), TEXT_LEFT, TEMP_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.translatable("gui.arcforge.celsius", menu.getTemperature()), TEMP_Y, ArcforgeGui.TEXT);
         graphics.text(font, Component.translatable("gui.arcforge.heat_cell.in", menu.getReceivedPerTick()), TEXT_LEFT, IN_OUT_Y, ArcforgeGui.HEAT, false);

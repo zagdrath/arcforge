@@ -163,6 +163,56 @@ public enum ConduitTier implements StringRepresentable {
         };
     }
 
+    // --- Portable storage items (Batteries, Canisters, Gas Cartridges, Thermal Capsules) ---
+
+    // How much the next tier holds or moves: four times as much.
+    private int quadrupled(int wrought) {
+        return wrought << (2 * ordinal());
+    }
+
+    // Battery capacity in FE: half an energy cell of the first tier, four times more per tier.
+    public int batteryCapacity() {
+        return quadrupled(250_000);
+    }
+
+    // Most FE a battery takes in or gives out per tick.
+    public int batteryRate() {
+        return quadrupled(1_000);
+    }
+
+    // Canister capacity in mB: a fluid tank of the same tier.
+    public int canisterCapacity() {
+        return tankCapacity();
+    }
+
+    // Most mB a canister takes in or gives out per tick.
+    public int canisterRate() {
+        return quadrupled(1_000);
+    }
+
+    // Gas cartridge capacity in mB: twice a canister, like the cylinders.
+    public int gasCartridgeCapacity() {
+        return quadrupled(32_000);
+    }
+
+    // Most mB a gas cartridge takes in or gives out per tick.
+    public int gasCartridgeRate() {
+        return quadrupled(2_000);
+    }
+
+    // A thermal capsule holds, moves, leaks and gets as hot as the heat cell of the same tier.
+    public int thermalCapsuleCapacity() {
+        return heatCellCapacity();
+    }
+
+    public int thermalCapsuleRate() {
+        return heatCellRate();
+    }
+
+    public int thermalCapsuleMaxTemperature() {
+        return heatCellMaxTemperature();
+    }
+
     public static ConduitTier lowest(ConduitTier a, ConduitTier b) {
         return a.ordinal() <= b.ordinal() ? a : b;
     }

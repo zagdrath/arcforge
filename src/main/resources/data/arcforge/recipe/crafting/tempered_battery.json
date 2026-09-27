@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    " T ",
+    "TXT",
+    " T "
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "X": "arcforge:wrought_battery"
+  },
+  "result": {
+    "id": "arcforge:tempered_battery",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

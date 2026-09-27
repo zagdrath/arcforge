@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PpP",
+    "RXR",
+    "PBP"
+  ],
+  "key": {
+    "B": "#c:storage_blocks/redstone",
+    "R": "#c:rods/steel",
+    "P": "#c:plates/steel",
+    "p": "#c:plates/copper",
+    "X": "arcforge:wrought_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:infuser",
+    "count": 1
+  }
+}

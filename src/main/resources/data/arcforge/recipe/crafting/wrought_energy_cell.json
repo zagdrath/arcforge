@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WpW",
+    "pBp",
+    "WpW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "p": "#c:plates/copper",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:wrought_energy_cell",
+    "count": 1
+  }
+}
