@@ -120,6 +120,7 @@ public final class ModItems {
     public static final DeferredItem<UpgradeItem> ENERGY_UPGRADE = ITEMS.registerItem("energy_upgrade", p -> new UpgradeItem(UpgradeType.ENERGY, p));
     public static final DeferredItem<UpgradeItem> HEAT_UPGRADE = ITEMS.registerItem("heat_upgrade", p -> new UpgradeItem(UpgradeType.HEAT, p));
     public static final DeferredItem<UpgradeItem> INSULATION_UPGRADE = ITEMS.registerItem("insulation_upgrade", p -> new UpgradeItem(UpgradeType.INSULATION, p));
+    public static final DeferredItem<UpgradeItem> THERMOELECTRIC_UPGRADE = ITEMS.registerItem("thermoelectric_upgrade", p -> new UpgradeItem(UpgradeType.THERMOELECTRIC, p));
 
     public static final DeferredItem<BucketItem> CREOSOTE_BUCKET = ITEMS.registerItem("creosote_bucket",
             p -> new BucketItem(ModFluids.CREOSOTE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
@@ -129,6 +130,66 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.LIGHT_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> HEAVY_OIL_BUCKET = ITEMS.registerItem("heavy_oil_bucket",
             p -> new BucketItem(ModFluids.HEAVY_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+
+    // --- Ores (see ModBlocks), their dusts, and what they make ---
+
+    public static final DeferredItem<BlockItem> SILVER_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.SILVER_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_SILVER_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_SILVER_ORE);
+    public static final DeferredItem<Item> RAW_SILVER = ITEMS.registerSimpleItem("raw_silver");
+    public static final DeferredItem<BlockItem> RAW_SILVER_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_SILVER_BLOCK);
+    public static final DeferredItem<Item> SILVER_DUST = ITEMS.registerSimpleItem("silver_dust");
+    public static final DeferredItem<Item> SILVER_INGOT = ITEMS.registerSimpleItem("silver_ingot");
+    public static final DeferredItem<BlockItem> SILVER_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.SILVER_BLOCK);
+    public static final DeferredItem<BlockItem> NICKEL_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.NICKEL_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_NICKEL_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_NICKEL_ORE);
+    public static final DeferredItem<Item> RAW_NICKEL = ITEMS.registerSimpleItem("raw_nickel");
+    public static final DeferredItem<BlockItem> RAW_NICKEL_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_NICKEL_BLOCK);
+    public static final DeferredItem<Item> NICKEL_DUST = ITEMS.registerSimpleItem("nickel_dust");
+    public static final DeferredItem<Item> NICKEL_INGOT = ITEMS.registerSimpleItem("nickel_ingot");
+    public static final DeferredItem<BlockItem> NICKEL_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.NICKEL_BLOCK);
+    public static final DeferredItem<BlockItem> WOLFRAMITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.WOLFRAMITE_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_WOLFRAMITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_WOLFRAMITE_ORE);
+    public static final DeferredItem<Item> RAW_WOLFRAMITE = ITEMS.registerSimpleItem("raw_wolframite");
+    public static final DeferredItem<BlockItem> RAW_WOLFRAMITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_WOLFRAMITE_BLOCK);
+    public static final DeferredItem<Item> TUNGSTEN_DUST = ITEMS.registerSimpleItem("tungsten_dust");
+    public static final DeferredItem<Item> TUNGSTEN_INGOT = ITEMS.registerSimpleItem("tungsten_ingot");
+    public static final DeferredItem<BlockItem> TUNGSTEN_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.TUNGSTEN_BLOCK);
+    public static final DeferredItem<BlockItem> FLUORITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.FLUORITE_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_FLUORITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_FLUORITE_ORE);
+    public static final DeferredItem<Item> RAW_FLUORITE = ITEMS.registerSimpleItem("raw_fluorite");
+    public static final DeferredItem<BlockItem> RAW_FLUORITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_FLUORITE_BLOCK);
+    public static final DeferredItem<Item> FLUORITE_DUST = ITEMS.registerSimpleItem("fluorite_dust");
+    public static final DeferredItem<Item> FLUORITE_CRYSTAL = ITEMS.registerSimpleItem("fluorite_crystal");
+    public static final DeferredItem<BlockItem> FLUORITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.FLUORITE_BLOCK);
+    public static final DeferredItem<BlockItem> BISMUTH_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.BISMUTH_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_BISMUTH_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_BISMUTH_ORE);
+    public static final DeferredItem<Item> RAW_BISMUTH = ITEMS.registerSimpleItem("raw_bismuth");
+    public static final DeferredItem<BlockItem> RAW_BISMUTH_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_BISMUTH_BLOCK);
+    public static final DeferredItem<Item> BISMUTH_DUST = ITEMS.registerSimpleItem("bismuth_dust");
+    public static final DeferredItem<Item> BISMUTH_INGOT = ITEMS.registerSimpleItem("bismuth_ingot");
+    public static final DeferredItem<BlockItem> BISMUTH_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.BISMUTH_BLOCK);
+    public static final DeferredItem<BlockItem> ARCITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.ARCITE_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_ARCITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_ARCITE_ORE);
+    public static final DeferredItem<Item> RAW_ARCITE = ITEMS.registerSimpleItem("raw_arcite");
+    public static final DeferredItem<BlockItem> RAW_ARCITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_ARCITE_BLOCK);
+    public static final DeferredItem<Item> ARCITE_DUST = ITEMS.registerSimpleItem("arcite_dust");
+    public static final DeferredItem<Item> ARCITE_CRYSTAL = ITEMS.registerSimpleItem("arcite_crystal");
+    public static final DeferredItem<BlockItem> ARCITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.ARCITE_BLOCK);
+    public static final DeferredItem<Item> SILVER_PLATE = ITEMS.registerSimpleItem("silver_plate");
+    public static final DeferredItem<Item> NICKEL_PLATE = ITEMS.registerSimpleItem("nickel_plate");
+    public static final DeferredItem<Item> TUNGSTEN_PLATE = ITEMS.registerSimpleItem("tungsten_plate");
+    public static final DeferredItem<Item> INVAR_PLATE = ITEMS.registerSimpleItem("invar_plate");
+    public static final DeferredItem<Item> INVAR_DUST = ITEMS.registerSimpleItem("invar_dust");
+    public static final DeferredItem<Item> INVAR_INGOT = ITEMS.registerSimpleItem("invar_ingot");
+    public static final DeferredItem<Item> TUNGSTEN_HEATING_COIL = ITEMS.registerSimpleItem("tungsten_heating_coil");
+    public static final DeferredItem<Item> THERMOCOUPLE = ITEMS.registerSimpleItem("thermocouple");
+    public static final DeferredItem<Item> ARCITE_TUNGSTEN_COMPOSITE = ITEMS.registerSimpleItem("arcite_tungsten_composite");
+
+    // The ore items in creative tab order: per ore its ore, deepslate ore, raw item, raw block, dust,
+    // ingot or crystal and block; then the plates, the Invar set and the components.
+    public static List<DeferredItem<? extends Item>> ores() {
+        return List.of(SILVER_ORE, DEEPSLATE_SILVER_ORE, RAW_SILVER, RAW_SILVER_BLOCK, SILVER_DUST, SILVER_INGOT, SILVER_BLOCK, NICKEL_ORE, DEEPSLATE_NICKEL_ORE, RAW_NICKEL, RAW_NICKEL_BLOCK, NICKEL_DUST, NICKEL_INGOT, NICKEL_BLOCK, WOLFRAMITE_ORE, DEEPSLATE_WOLFRAMITE_ORE, RAW_WOLFRAMITE, RAW_WOLFRAMITE_BLOCK, TUNGSTEN_DUST, TUNGSTEN_INGOT, TUNGSTEN_BLOCK, FLUORITE_ORE, DEEPSLATE_FLUORITE_ORE, RAW_FLUORITE, RAW_FLUORITE_BLOCK, FLUORITE_DUST, FLUORITE_CRYSTAL, FLUORITE_BLOCK, BISMUTH_ORE, DEEPSLATE_BISMUTH_ORE, RAW_BISMUTH, RAW_BISMUTH_BLOCK, BISMUTH_DUST, BISMUTH_INGOT, BISMUTH_BLOCK, ARCITE_ORE, DEEPSLATE_ARCITE_ORE, RAW_ARCITE, RAW_ARCITE_BLOCK, ARCITE_DUST, ARCITE_CRYSTAL, ARCITE_BLOCK, SILVER_PLATE, NICKEL_PLATE, TUNGSTEN_PLATE, INVAR_DUST, INVAR_INGOT, INVAR_PLATE, TUNGSTEN_HEATING_COIL, THERMOCOUPLE, ARCITE_TUNGSTEN_COMPOSITE);
+    }
 
     // --- Distillation ---
 

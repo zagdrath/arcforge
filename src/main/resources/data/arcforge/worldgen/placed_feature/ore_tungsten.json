@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_tungsten",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "tungsten",
+      "default": 2
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "tungsten",
+      "shape": "uniform",
+      "default_min": -64,
+      "default_max": -16
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

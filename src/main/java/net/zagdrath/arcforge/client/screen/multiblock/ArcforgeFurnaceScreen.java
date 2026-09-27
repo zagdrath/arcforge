@@ -21,7 +21,7 @@ import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 
 // Layout follows arcforge_furnace_gui_layout.json. All positions are relative to leftPos/topPos.
 public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu> {
-    private static final int PROGRESS_X = 72, PROGRESS_Y = 24, PROGRESS_W = 21, PROGRESS_H = 15;
+    private static final int PROGRESS_X = 84, PROGRESS_Y = 24, PROGRESS_W = 21, PROGRESS_H = 15;
     private static final int HEAT_X = 12, HEAT_Y = 61, HEAT_W = 152, HEAT_H = 4;
     private static final int HEAT_LABEL_X = 13, HEAT_TEXT_Y = 51, HEAT_TEXT_RIGHT = 163;
     private static final int SCREEN_X = 8, SCREEN_Y = 46, SCREEN_W = 160, SCREEN_H = 24;
@@ -59,6 +59,7 @@ public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu>
 
         ghost(graphics, ghostIron, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_METAL).hasItem(), ArcforgeFurnaceMenu.METAL_X, ArcforgeFurnaceMenu.METAL_Y);
         ghost(graphics, ghostAdditive, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE).hasItem(), ArcforgeFurnaceMenu.ADDITIVE_X, ArcforgeFurnaceMenu.ADDITIVE_Y);
+        ghost(graphics, ghostAdditive, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE_2).hasItem(), ArcforgeFurnaceMenu.ADDITIVE_2_X, ArcforgeFurnaceMenu.ADDITIVE_2_Y);
         ghost(graphics, ghostCoke, !menu.getSlotFor(ArcforgeFurnaceBlockEntity.SLOT_COKE).hasItem(), ArcforgeFurnaceMenu.COKE_X, ArcforgeFurnaceMenu.COKE_Y);
     }
 

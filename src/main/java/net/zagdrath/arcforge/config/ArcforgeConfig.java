@@ -7,7 +7,11 @@ package net.zagdrath.arcforge.config;
 
 import net.neoforged.neoforge.common.ModConfigSpec;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.jspecify.annotations.Nullable;
 
 // Common config for Arcforge. Values are read when machines tick, so most changes apply without a restart.
 public class ArcforgeConfig {
@@ -133,6 +137,10 @@ public class ArcforgeConfig {
             .comment("Efficiency reached at the bonus temperature (1.15 = 115%). It rises linearly from 100% at the",
                     "100% efficiency temperature, and goes no higher.")
             .defineInRange("bonusEfficiency", 1.15, 1.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue THERMOELECTRIC_UPGRADE_EFFICIENCY = BUILDER
+            .comment("Extra FE per HU each Thermoelectric Efficiency Upgrade adds (0.0625: 8 cards give +50%).")
+            .defineInRange("upgradeEfficiencyPerCard", 0.0625, 0.0, 1.0);
 
     public static final ModConfigSpec.IntValue THERMOELECTRIC_BONUS_TEMPERATURE = BUILDER
             .comment("Temperature at which the bonus efficiency is reached, in °C.")
@@ -628,6 +636,42 @@ public class ArcforgeConfig {
             .defineInRange("autoPushInterval", 10, 1, 1_200);
 
     static {
+        BUILDER.pop();
+        BUILDER.comment("Ore generation, per ore. Read when a world loads; changes apply to chunks generated after a restart.",
+                "Turning an ore off only stops it generating: its items and recipes stay (other mods' ores tagged",
+                "the same still work). Arcite can't be turned off.").push("ores");
+    }
+
+    // One ore's generation settings (enabled is null for arcite, which is always on).
+    public record OreSettings(ModConfigSpec.@Nullable BooleanValue enabled, ModConfigSpec.IntValue veinsPerChunk,
+            ModConfigSpec.IntValue veinSize, ModConfigSpec.IntValue minY, ModConfigSpec.IntValue maxY,
+            ModConfigSpec.DoubleValue airExposureDiscard) {
+        public boolean isEnabled() {
+            return enabled == null || enabled.getAsBoolean();
+        }
+    }
+
+    public static final Map<String, OreSettings> ORES = new LinkedHashMap<>();
+
+    private static void ore(String key, String description, boolean toggle, int veins, int size, int minY, int maxY, double discard) {
+        BUILDER.comment(description).push(key);
+        ModConfigSpec.BooleanValue enabled = toggle ? BUILDER.comment("Whether it generates.").define("enabled", true) : null;
+        ORES.put(key, new OreSettings(enabled,
+                BUILDER.comment("Veins per chunk.").defineInRange("veinsPerChunk", veins, 0, 256),
+                BUILDER.comment("Blocks per vein, at most.").defineInRange("veinSize", size, 1, 64),
+                BUILDER.comment("Lowest Y it generates at.").defineInRange("minY", minY, -2_032, 2_031),
+                BUILDER.comment("Highest Y it generates at.").defineInRange("maxY", maxY, -2_032, 2_031),
+                BUILDER.comment("Chance an ore block touching air is left out (0 to 1).").defineInRange("airExposureDiscard", discard, 0.0, 1.0)));
+        BUILDER.pop();
+    }
+
+    static {
+        ore("silver", "Silver: common, mid-depth.", true, 8, 9, -32, 64, 0.0);
+        ore("nickel", "Nickel: deep, near iron's lower band.", true, 6, 8, -64, 16, 0.0);
+        ore("fluorite", "Fluorite: uncommon, mid-depth.", true, 4, 7, -16, 48, 0.0);
+        ore("bismuth", "Bismuth: uncommon, mid-depth.", true, 4, 6, 0, 56, 0.0);
+        ore("tungsten", "Tungsten (wolframite ore): rare and deep.", true, 2, 5, -64, -16, 0.5);
+        ore("arcite", "Arcite: rare, the deepest; needs a diamond pickaxe.", false, 1, 4, -64, -40, 0.7);
         BUILDER.pop();
     }
 

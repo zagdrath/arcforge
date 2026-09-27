@@ -46,8 +46,13 @@ public final class MachineRecipes {
         return level.recipeAccess().getRecipeFor(ModRecipes.CARBONIZING.get(), new SingleRecipeInput(input), level);
     }
 
+    public static Optional<RecipeHolder<ArcforgeSmeltingRecipe>> arcforgeSmelting(ServerLevel level, ItemStack metal, ItemStack additive, ItemStack additive2) {
+        return level.recipeAccess().getRecipeFor(ModRecipes.ARCFORGE_SMELTING.get(), new ArcforgeSmeltingRecipe.Input(metal, additive, additive2), level);
+    }
+
+    // With the second additive slot empty.
     public static Optional<RecipeHolder<ArcforgeSmeltingRecipe>> arcforgeSmelting(ServerLevel level, ItemStack metal, ItemStack additive) {
-        return level.recipeAccess().getRecipeFor(ModRecipes.ARCFORGE_SMELTING.get(), new ArcforgeSmeltingRecipe.Input(metal, additive), level);
+        return arcforgeSmelting(level, metal, additive, ItemStack.EMPTY);
     }
 
     public static Optional<RecipeHolder<CrushingRecipe>> crushing(ServerLevel level, ItemStack input) {
@@ -139,9 +144,9 @@ public final class MachineRecipes {
                 .anyMatch(holder -> holder.value().metal().is(stack));
     }
 
-    // The additive of some Arcforge Furnace recipe: what its additive slot takes.
+    // An additive (either one) of some Arcforge Furnace recipe: what its additive slots take.
     public static boolean isArcforgeAdditive(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(ModRecipes.ARCFORGE_SMELTING.get()).stream()
-                .anyMatch(holder -> holder.value().additive().map(additive -> additive.is(stack)).orElse(false));
+                .anyMatch(holder -> holder.value().isAdditive(stack));
     }
 }

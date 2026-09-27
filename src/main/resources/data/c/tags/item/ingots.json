@@ -4,6 +4,11 @@
     "#c:ingots/wrought_alloy",
     "#c:ingots/tempered_alloy",
     "#c:ingots/hardened_alloy",
-    "#c:ingots/arcforged_alloy"
+    "#c:ingots/arcforged_alloy",
+    "#c:ingots/silver",
+    "#c:ingots/nickel",
+    "#c:ingots/tungsten",
+    "#c:ingots/bismuth",
+    "#c:ingots/invar"
   ]
 }

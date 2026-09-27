@@ -2,11 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PTP",
+    "PcP",
     "TXT",
-    "PTP"
+    "PcP"
   ],
   "key": {
+    "c": "arcforge:tungsten_heating_coil",
     "T": "arcforge:tempered_alloy",
     "X": "arcforge:induction_furnace",
     "P": "#c:plates/steel"

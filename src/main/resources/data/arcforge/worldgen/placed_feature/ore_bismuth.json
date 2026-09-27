@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_bismuth",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "bismuth",
+      "default": 4
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "bismuth",
+      "shape": "uniform",
+      "default_min": 0,
+      "default_max": 56
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

@@ -2,14 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PTP",
+    "NTN",
     "TXT",
-    "PTP"
+    "NTN"
   ],
   "key": {
     "T": "arcforge:tempered_alloy",
     "X": "arcforge:steam_turbine",
-    "P": "#c:plates/steel"
+    "N": "#c:plates/nickel"
   },
   "result": {
     "id": "arcforge:steam_turbine_array_casing",

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:gems/fluorite"
+  },
+  "result": {
+    "id": "arcforge:fluorite_block",
+    "count": 1
+  }
+}

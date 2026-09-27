@@ -2,16 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "XXX",
+    "XCX",
     "XAX",
-    "XXX"
+    "XCX"
   ],
   "key": {
+    "X": "arcforge:hardened_item_conduit",
     "A": "arcforge:arcforged_alloy",
-    "X": "arcforge:hardened_item_conduit"
+    "C": "#c:gems/arcite"
   },
   "result": {
     "id": "arcforge:arcforged_item_conduit",
-    "count": 8
+    "count": 6
   }
 }

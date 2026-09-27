@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:gems/arcite"
+  },
+  "result": {
+    "id": "arcforge:arcite_block",
+    "count": 1
+  }
+}

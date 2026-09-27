@@ -197,7 +197,7 @@ public final class MultiblockGameTests {
     }
 
     // Arcforge Furnace centred on (1, y, 1), front facing north (port at (1, 1, 0)), 6 layers from y=1.
-    private static void buildFurnace(GameTestHelper helper) {
+    static void buildFurnace(GameTestHelper helper) {
         for (int y = 1; y <= 6; y++) {
             for (int x = 0; x <= 2; x++) {
                 for (int z = 0; z <= 2; z++) {

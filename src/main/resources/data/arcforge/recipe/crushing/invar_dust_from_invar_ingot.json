@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:ingots/invar",
+  "result": {
+    "count": 1,
+    "id": "arcforge:invar_dust"
+  },
+  "time": 200,
+  "ore": false
+}

@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "#c:ingots/iron",
+    "count": 4
+  },
+  "additive": {
+    "ingredient": "#c:gems/fluorite",
+    "count": 1
+  },
+  "coke": 4,
+  "result": {
+    "id": "arcforge:steel_ingot",
+    "count": 4
+  },
+  "byproduct": {
+    "id": "arcforge:slag",
+    "count": 6
+  },
+  "time": 1000,
+  "min_temp": 1200
+}

@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_overworld",
+  "features": "arcforge:ore_arcite",
+  "step": "underground_ores"
+}

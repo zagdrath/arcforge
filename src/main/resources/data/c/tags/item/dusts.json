@@ -6,6 +6,13 @@
     "#c:dusts/netherite_scrap",
     "#c:dusts/coal",
     "#c:dusts/carbon",
-    "#c:dusts/quartz"
+    "#c:dusts/quartz",
+    "#c:dusts/silver",
+    "#c:dusts/nickel",
+    "#c:dusts/tungsten",
+    "#c:dusts/fluorite",
+    "#c:dusts/bismuth",
+    "#c:dusts/arcite",
+    "#c:dusts/invar"
   ]
 }

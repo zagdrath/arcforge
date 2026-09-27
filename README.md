@@ -74,28 +74,56 @@ it does nothing in the Nether or the End. Everything is configurable (`solarTher
 ```
 coal        --[Carbonizer]--> coal coke + 250 mB creosote   (600 ticks)
 carbon dust --[Carbonizer]--> coal coke                     (300 ticks, no creosote)
-metal + additive + coal coke --[Arcforge Furnace]--> result + slag
+metal + additive(s) + coal coke --[Arcforge Furnace]--> result + slag
 ```
 
-**Arcforge Furnace.** Three inputs: the metal, an optional additive and coal coke, which is both its fuel
-and its reagent (it keeps back what each smelt uses; a coke block counts as nine). Burning coke heats it
-towards 1,600°C, and a smelt only progresses above its recipe's minimum. A recipe without an additive only
-runs with the additive slot empty. Input ports route each item to its own slot. Recipes are data-driven
-(`arcforge:arcforge_smelting`: `metal`, optional `additive`, `coke`, `result`, `byproduct`, `time`, `min_temp`).
+**Arcforge Furnace.** Four inputs: the metal, two additive slots and coal coke, which is both its fuel and
+its reagent (it keeps back what each smelt uses; a coke block counts as nine). Burning coke heats it towards
+1,600°C, and a smelt only progresses above its recipe's minimum. A recipe's two additives can sit in either
+additive slot, and an additive a recipe doesn't have needs its slot empty, so an alloy's metal never makes
+steel by accident. Input ports send metals to the metal slot, coke to the coke slot and additives to the
+additive slot already holding them (else the first empty one). Recipes are data-driven
+(`arcforge:arcforge_smelting`: `metal`, optional `additive` and `additive_2`, `coke`, `result`, `byproduct`,
+`time`, `min_temp`).
 
-| Makes | Metal | Additive | Coke | Time | From |
+| Makes | Metal | Additives | Coke | Time | From |
 |---|---|---|---|---|---|
 | 1 Steel Ingot | 1 iron | — | 1 | 400 | 1,200°C |
+| 4 Steel Ingot (+6 slag) | 4 iron | 1 fluorite crystal | 4 | 1,000 | 1,200°C |
 | 2 Wrought Alloy | 2 iron | 1 gold | 1 | 400 | 1,200°C |
 | 2 Tempered Alloy | 2 steel | 2 copper | 1 | 500 | 1,300°C |
-| 2 Hardened Alloy | 2 steel | 2 amethyst shards | 2 | 600 | 1,400°C |
-| 2 Arcforged Alloy | 2 Hardened Alloy | 2 Carbon Fiber | 2 | 800 | 1,500°C |
+| 2 Hardened Alloy | 2 steel | 2 amethyst shards + 1 nickel plate | 2 | 600 | 1,400°C |
+| 2 Arcforged Alloy | 2 Hardened Alloy | 2 Carbon Fiber + 1 Arcite-Tungsten Composite | 2 | 800 | 1,500°C |
 
-Each also gives 1 slag. **Tier alloys** are the material of every tiered block and item: conduits, cells,
+Each also gives 1 slag unless noted. **Tier alloys** are the material of every tiered block and item: conduits, cells,
 tanks, cylinders and the portables are crafted from their tier's alloy, and each tier upgrades into the next
 (the `arcforge:tier_upgrade` recipe keeps what it holds). The machine array casings need Tempered Alloy.
 Crushing coal ore (2 carbon dust + a chance of a third) and carbonizing the dust is the high-yield coke route.
 Carbon Fiber comes from the Distillation Array's pitch, so the top tier needs distillation.
+
+### Ores
+
+Six ores generate in stone and deepslate (Silver, Nickel, Tungsten as wolframite ore, Fluorite, Bismuth and
+Arcite). Each drops its raw item (Fortune works; Silk Touch drops the ore), and has a raw block and a storage
+block. Raw items, ores and dusts smelt into the ingot or crystal (twice as fast in a blast furnace, and in the
+Induction Furnace), and the Arc Crusher gives 2 dust per ore (+25%), 1 per raw item (+25%), 9 per raw block
+and 1 per ingot. Arcite needs a diamond pickaxe and glows (ores 5, raw block 9, block 12). Every recipe
+takes the common tags (`c:ingots/silver`, `c:gems/arcite`, ...), so other mods' silver works too.
+
+| Ore | Veins / chunk | Vein size | Height | Used for |
+|---|---|---|---|---|
+| Silver | 8 | 9 | -32 to 64 (peaks mid) | batteries, trough mirrors |
+| Nickel | 6 | 8 | -64 to 16 (peaks mid) | Invar, Hardened Alloy, turbine casings |
+| Fluorite | 4 | 7 | -16 to 48 | Pressure Glass, steel flux |
+| Bismuth | 4 | 6 | 0 to 56 | thermocouples |
+| Tungsten | 2 | 5 | -64 to -16 | heating coils, the Arcforged composite |
+| Arcite | 1 | 4 | -64 to -40 | Arcforged conduits and upgrades |
+
+**Invar**: 2 iron dust + 1 nickel dust make 3 invar dust, which smelts into invar ingots. **Plates** (silver,
+nickel, tungsten, invar) come from the Metal Press. **Components**: the Tungsten Heating Coil (Induction
+Furnace and its array), the Thermocouple (Thermoelectric Plant and its upgrade) and the Arcite-Tungsten
+Composite (1 tungsten plate + 2 arcite crystals, for Arcforged Alloy). Each ore's generation is set in the
+`ores` config (and all but arcite can be turned off); turning one off keeps its items and recipes.
 
 ### Crushing
 
@@ -216,13 +244,14 @@ Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running a
 
 ### Upgrades
 
-Speed, Energy and Heat upgrade cards go in a machine's Upgrades tab, up to 8 of each.
+Speed, Energy, Heat and Thermoelectric Efficiency upgrade cards go in a machine's Upgrades tab, up to 8 of each.
 
 | Upgrade | Effect (n installed) | Machines |
 |---|---|---|
 | Speed | Works 2^(n/2) times as fast (16x at 8), using power or fuel just as fast, so the cost per operation doesn't change | All with an Upgrades tab |
 | Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Metal Press, Metal Pressing Array, Electric Pump, Combustion Plant |
 | Heat | Heat per fuel or lava (and from nearby lava and magma) x (1 + n/8); Thermoelectric Plant: efficiency / 0.8^n, up to 100% | Firebox, Geothermal Plant, Thermoelectric Plant |
+| Thermoelectric Efficiency | FE per HU x (1 + 0.0625 n) (+50% at 8), on top of Heat upgrades | Thermoelectric Plant |
 
 ## Logistics
 

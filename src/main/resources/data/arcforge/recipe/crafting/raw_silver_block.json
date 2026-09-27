@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:raw_materials/silver"
+  },
+  "result": {
+    "id": "arcforge:raw_silver_block",
+    "count": 1
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:ingots/nickel"
+  },
+  "result": {
+    "id": "arcforge:nickel_block",
+    "count": 1
+  }
+}

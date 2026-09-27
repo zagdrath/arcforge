@@ -3,13 +3,14 @@
   "category": "misc",
   "pattern": [
     "LRL",
-    "RPR",
+    "FPF",
     "LRL"
   ],
   "key": {
     "R": "#c:rods/steel",
     "L": "#c:glass_blocks",
-    "P": "#c:plates/steel"
+    "P": "#c:plates/steel",
+    "F": "#c:gems/fluorite"
   },
   "result": {
     "id": "arcforge:pressure_glass",

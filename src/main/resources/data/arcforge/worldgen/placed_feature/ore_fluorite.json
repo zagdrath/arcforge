@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_fluorite",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "fluorite",
+      "default": 4
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "fluorite",
+      "shape": "uniform",
+      "default_min": -16,
+      "default_max": 48
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

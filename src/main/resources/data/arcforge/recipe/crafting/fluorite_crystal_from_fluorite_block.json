@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:storage_blocks/fluorite"
+  ],
+  "result": {
+    "id": "arcforge:fluorite_crystal",
+    "count": 9
+  }
+}

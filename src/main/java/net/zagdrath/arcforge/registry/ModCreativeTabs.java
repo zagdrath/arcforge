@@ -64,6 +64,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.STEEL_INGOT.get());
                 output.accept(ModItems.STEEL_BLOCK.get());
+                ModItems.ores().forEach(item -> output.accept(item.get()));
                 ModItems.alloys().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.COAL_COKE.get());
                 output.accept(ModItems.COAL_COKE_BLOCK.get());
@@ -140,6 +141,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ENERGY_UPGRADE.get());
                 output.accept(ModItems.HEAT_UPGRADE.get());
                 output.accept(ModItems.INSULATION_UPGRADE.get());
+                output.accept(ModItems.THERMOELECTRIC_UPGRADE.get());
                 // Portable storage: Batteries, Canisters, Gas Cartridges and Thermal Capsules, empty.
                 ModItems.allPortables().forEach(item -> output.accept(item.get()));
             }).build());

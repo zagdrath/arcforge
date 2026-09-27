@@ -210,19 +210,21 @@ final class MachineCategories {
         static final IRecipeHolderType<ArcforgeSmeltingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.ARCFORGE_SMELTING.get());
 
         ArcforgeSmelting(IGuiHelper gui) {
-            super(TYPE, "arcforge_smelting", ModBlocks.ARCFORGE_FURNACE_PORT.get(), gui, 138, 40);
+            super(TYPE, "arcforge_smelting", ModBlocks.ARCFORGE_FURNACE_PORT.get(), gui, 158, 40);
         }
 
-        // Metal, additive (empty for steel) and coke, as in the furnace.
+        // Metal, the two additives (empty for steel) and coke, as in the furnace.
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ArcforgeSmeltingRecipe> holder, IFocusGroup focuses) {
             ArcforgeSmeltingRecipe recipe = holder.value();
             builder.addInputSlot(1, 5).setStandardSlotBackground().addItemStacks(counted(recipe.metal()));
-            var additive = builder.addInputSlot(21, 5).setStandardSlotBackground();
+            var additive = builder.addInputSlot(19, 5).setStandardSlotBackground();
             recipe.additive().ifPresent(needed -> additive.addItemStacks(counted(needed)));
-            builder.addInputSlot(41, 5).setStandardSlotBackground().add(new ItemStack(ModItems.COAL_COKE.get(), Math.max(1, recipe.coke())));
-            builder.addOutputSlot(97, 5).setStandardSlotBackground().add(recipe.result());
-            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(119, 5).setStandardSlotBackground().add(byproduct));
+            var additive2 = builder.addInputSlot(37, 5).setStandardSlotBackground();
+            recipe.additive2().ifPresent(needed -> additive2.addItemStacks(counted(needed)));
+            builder.addInputSlot(55, 5).setStandardSlotBackground().add(new ItemStack(ModItems.COAL_COKE.get(), Math.max(1, recipe.coke())));
+            builder.addOutputSlot(113, 5).setStandardSlotBackground().add(recipe.result());
+            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(137, 5).setStandardSlotBackground().add(byproduct));
         }
 
         private static List<ItemStack> counted(ArcforgeSmeltingRecipe.Counted ingredient) {
@@ -231,13 +233,13 @@ final class MachineCategories {
 
         @Override
         public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<ArcforgeSmeltingRecipe> holder, IFocusGroup focuses) {
-            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(64, 5);
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(80, 5);
         }
 
         @Override
         public void draw(RecipeHolder<ArcforgeSmeltingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             text(graphics, Component.translatable("jei.arcforge.arcforge_smelting.heat", holder.value().minHeat()), 0, 30);
-            textRight(graphics, seconds(holder.value().time()), 138, 30);
+            textRight(graphics, seconds(holder.value().time()), 158, 30);
         }
     }
 

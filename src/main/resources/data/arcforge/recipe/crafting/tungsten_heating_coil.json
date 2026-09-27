@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " T ",
+    "TRT",
+    " T "
+  ],
+  "key": {
+    "T": "#c:plates/tungsten",
+    "R": "#c:rods/copper"
+  },
+  "result": {
+    "id": "arcforge:tungsten_heating_coil",
+    "count": 2
+  }
+}

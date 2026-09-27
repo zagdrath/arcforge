@@ -27,6 +27,7 @@ import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.registry.ModRecipes;
+import net.zagdrath.arcforge.worldgen.ModWorldgen;
 
 // Arcforge by Zagdrath. Must match the modId in META-INF/neoforge.mods.toml.
 @Mod(Arcforge.MODID)
@@ -46,6 +47,7 @@ public class Arcforge {
         ModCapabilities.register(modEventBus);
         ModDataMaps.register(modEventBus);
         ArcforgeNetwork.register(modEventBus);
+        ModWorldgen.register(modEventBus);
         ArcforgeGameTests.register(modEventBus);
         TestFixtures.register(modEventBus);
 

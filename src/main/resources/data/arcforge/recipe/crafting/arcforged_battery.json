@@ -2,11 +2,13 @@
   "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
-    " A ",
+    " C ",
     "AXA",
-    " A "
+    " S "
   ],
   "key": {
+    "C": "#c:gems/arcite",
+    "S": "#c:plates/silver",
     "A": "arcforge:arcforged_alloy",
     "X": "arcforge:hardened_battery"
   },

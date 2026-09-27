@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_arcite",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "arcite",
+      "default": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "arcite",
+      "shape": "uniform",
+      "default_min": -64,
+      "default_max": -40
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

@@ -3,12 +3,13 @@
   "category": "misc",
   "pattern": [
     " r ",
-    "WdW",
+    "WSW",
     "WdW"
   ],
   "key": {
     "r": "#c:rods/copper",
     "W": "arcforge:wrought_alloy",
+    "S": "#c:plates/silver",
     "d": "#c:dusts/redstone"
   },
   "result": {

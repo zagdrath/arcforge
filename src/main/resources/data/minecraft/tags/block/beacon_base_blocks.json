@@ -1,5 +1,9 @@
 {
   "values": [
-    "arcforge:steel_block"
+    "arcforge:steel_block",
+    "arcforge:silver_block",
+    "arcforge:nickel_block",
+    "arcforge:tungsten_block",
+    "arcforge:bismuth_block"
   ]
 }

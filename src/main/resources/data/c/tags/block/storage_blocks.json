@@ -1,6 +1,18 @@
 {
   "values": [
     "#c:storage_blocks/coal_coke",
-    "#c:storage_blocks/steel"
+    "#c:storage_blocks/steel",
+    "#c:storage_blocks/silver",
+    "#c:storage_blocks/raw_silver",
+    "#c:storage_blocks/nickel",
+    "#c:storage_blocks/raw_nickel",
+    "#c:storage_blocks/tungsten",
+    "#c:storage_blocks/raw_tungsten",
+    "#c:storage_blocks/fluorite",
+    "#c:storage_blocks/raw_fluorite",
+    "#c:storage_blocks/bismuth",
+    "#c:storage_blocks/raw_bismuth",
+    "#c:storage_blocks/arcite",
+    "#c:storage_blocks/raw_arcite"
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:gems/arcite",
+  "result": {
+    "count": 1,
+    "id": "arcforge:arcite_dust"
+  },
+  "time": 200,
+  "ore": false
+}

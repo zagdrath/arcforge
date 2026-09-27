@@ -13,11 +13,14 @@ package net.zagdrath.arcforge.upgrade;
 //  - Heat: heat producers make 1 + n/8 times the heat per unit of fuel or lava (and from nearby lava and
 //    magma); the Thermoelectric Plant converts heat as if its efficiency were divided by 0.8^n (up to 100%).
 //  - Insulation: Heat Cells only. Each cuts the cell's heat leak to 0.8x.
+//  - Thermoelectric: the Thermoelectric Plant only. Each adds 6.25% (configurable) to the FE it makes per HU,
+//    so 8 give +50%; it stacks with Heat upgrades.
 public enum UpgradeType {
     SPEED("speed"),
     ENERGY("energy"),
     HEAT("heat"),
-    INSULATION("insulation");
+    INSULATION("insulation"),
+    THERMOELECTRIC("thermoelectric");
 
     public static final int MAX_PER_MACHINE = 8;
 

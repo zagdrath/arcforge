@@ -1,0 +1,26 @@
+{
+  "values": [
+    "arcforge:silver_ore",
+    "arcforge:deepslate_silver_ore",
+    "arcforge:raw_silver_block",
+    "arcforge:silver_block",
+    "arcforge:nickel_ore",
+    "arcforge:deepslate_nickel_ore",
+    "arcforge:raw_nickel_block",
+    "arcforge:nickel_block",
+    "arcforge:wolframite_ore",
+    "arcforge:deepslate_wolframite_ore",
+    "arcforge:raw_wolframite_block",
+    "arcforge:tungsten_block",
+    "arcforge:fluorite_ore",
+    "arcforge:deepslate_fluorite_ore",
+    "arcforge:raw_fluorite_block",
+    "arcforge:fluorite_block",
+    "arcforge:bismuth_ore",
+    "arcforge:deepslate_bismuth_ore",
+    "arcforge:raw_bismuth_block",
+    "arcforge:bismuth_block",
+    "arcforge:raw_arcite_block",
+    "arcforge:arcite_block"
+  ]
+}

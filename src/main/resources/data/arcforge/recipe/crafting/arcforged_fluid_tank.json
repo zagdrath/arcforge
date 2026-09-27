@@ -2,14 +2,15 @@
   "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
-    "ALA",
+    "ACA",
     "LXL",
     "ALA"
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
-    "X": "arcforge:hardened_fluid_tank",
-    "L": "#c:glass_blocks"
+    "C": "#c:gems/arcite",
+    "L": "#c:glass_blocks",
+    "X": "arcforge:hardened_fluid_tank"
   },
   "result": {
     "id": "arcforge:arcforged_fluid_tank",

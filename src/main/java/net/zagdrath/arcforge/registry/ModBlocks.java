@@ -13,10 +13,14 @@ import java.util.Map;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.valueproviders.ConstantInt;
+import net.minecraft.util.valueproviders.IntProvider;
+import net.minecraft.util.valueproviders.UniformInt;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.DropExperienceBlock;
 import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.LiquidBlock;
@@ -76,6 +80,8 @@ import net.zagdrath.arcforge.block.storage.FluidTankBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
+
+import org.jspecify.annotations.Nullable;
 
 public final class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Arcforge.MODID);
@@ -245,6 +251,60 @@ public final class ModBlocks {
                     .strength(5.0F, 6.0F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL));
+
+    // --- Ores: silver, nickel, tungsten (its ore is wolframite), fluorite, bismuth and arcite ---
+    // Each has an ore and a deepslate ore (dropping the raw item; see the loot tables), a raw block and a
+    // storage block. Arcite glows (ores 5, raw block 9, block 12) and needs a diamond pickaxe.
+
+    public static final DeferredBlock<DropExperienceBlock> SILVER_ORE = ore("silver_ore", ConstantInt.ZERO, false, 0, null);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_SILVER_ORE = ore("deepslate_silver_ore", ConstantInt.ZERO, true, 0, null);
+    public static final DeferredBlock<Block> RAW_SILVER_BLOCK = BLOCKS.registerSimpleBlock("raw_silver_block", p -> storageProperties(p, SoundType.STONE, MapColor.RAW_IRON, 0));
+    public static final DeferredBlock<Block> SILVER_BLOCK = BLOCKS.registerSimpleBlock("silver_block", p -> storageProperties(p, SoundType.METAL, MapColor.METAL, 0));
+
+    public static final DeferredBlock<DropExperienceBlock> NICKEL_ORE = ore("nickel_ore", ConstantInt.ZERO, false, 0, null);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_NICKEL_ORE = ore("deepslate_nickel_ore", ConstantInt.ZERO, true, 0, null);
+    public static final DeferredBlock<Block> RAW_NICKEL_BLOCK = BLOCKS.registerSimpleBlock("raw_nickel_block", p -> storageProperties(p, SoundType.STONE, MapColor.RAW_IRON, 0));
+    public static final DeferredBlock<Block> NICKEL_BLOCK = BLOCKS.registerSimpleBlock("nickel_block", p -> storageProperties(p, SoundType.METAL, MapColor.METAL, 0));
+
+    public static final DeferredBlock<DropExperienceBlock> WOLFRAMITE_ORE = ore("wolframite_ore", ConstantInt.ZERO, false, 0, null);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_WOLFRAMITE_ORE = ore("deepslate_wolframite_ore", ConstantInt.ZERO, true, 0, null);
+    public static final DeferredBlock<Block> RAW_WOLFRAMITE_BLOCK = BLOCKS.registerSimpleBlock("raw_wolframite_block", p -> storageProperties(p, SoundType.STONE, MapColor.RAW_IRON, 0));
+    public static final DeferredBlock<Block> TUNGSTEN_BLOCK = BLOCKS.registerSimpleBlock("tungsten_block", p -> storageProperties(p, SoundType.METAL, MapColor.METAL, 0));
+
+    public static final DeferredBlock<DropExperienceBlock> FLUORITE_ORE = ore("fluorite_ore", UniformInt.of(2, 5), false, 0, null);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_FLUORITE_ORE = ore("deepslate_fluorite_ore", UniformInt.of(2, 5), true, 0, null);
+    public static final DeferredBlock<Block> RAW_FLUORITE_BLOCK = BLOCKS.registerSimpleBlock("raw_fluorite_block", p -> storageProperties(p, SoundType.STONE, MapColor.RAW_IRON, 0));
+    public static final DeferredBlock<Block> FLUORITE_BLOCK = BLOCKS.registerSimpleBlock("fluorite_block", p -> storageProperties(p, SoundType.AMETHYST, MapColor.COLOR_PURPLE, 0));
+
+    public static final DeferredBlock<DropExperienceBlock> BISMUTH_ORE = ore("bismuth_ore", UniformInt.of(2, 5), false, 0, null);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_BISMUTH_ORE = ore("deepslate_bismuth_ore", UniformInt.of(2, 5), true, 0, null);
+    public static final DeferredBlock<Block> RAW_BISMUTH_BLOCK = BLOCKS.registerSimpleBlock("raw_bismuth_block", p -> storageProperties(p, SoundType.STONE, MapColor.RAW_IRON, 0));
+    public static final DeferredBlock<Block> BISMUTH_BLOCK = BLOCKS.registerSimpleBlock("bismuth_block", p -> storageProperties(p, SoundType.METAL, MapColor.METAL, 0));
+
+    public static final DeferredBlock<DropExperienceBlock> ARCITE_ORE = ore("arcite_ore", UniformInt.of(3, 7), false, 5, MapColor.DIAMOND);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_ARCITE_ORE = ore("deepslate_arcite_ore", UniformInt.of(3, 7), true, 5, MapColor.DIAMOND);
+    public static final DeferredBlock<Block> RAW_ARCITE_BLOCK = BLOCKS.registerSimpleBlock("raw_arcite_block", p -> storageProperties(p, SoundType.STONE, MapColor.DIAMOND, 9));
+    public static final DeferredBlock<Block> ARCITE_BLOCK = BLOCKS.registerSimpleBlock("arcite_block", p -> storageProperties(p, SoundType.AMETHYST, MapColor.DIAMOND, 12));
+
+    // Ores: stone 3.0 or deepslate 4.5 hardness, the right tool to drop anything; xp as given.
+    private static DeferredBlock<DropExperienceBlock> ore(String name, IntProvider xp, boolean deepslate, int light, @Nullable MapColor color) {
+        return BLOCKS.registerBlock(name, p -> new DropExperienceBlock(xp, p), p -> p
+                .mapColor(color != null ? color : deepslate ? MapColor.DEEPSLATE : MapColor.STONE)
+                .instrument(NoteBlockInstrument.BASEDRUM)
+                .strength(deepslate ? 4.5F : 3.0F, 3.0F)
+                .sound(deepslate ? SoundType.DEEPSLATE : SoundType.STONE)
+                .requiresCorrectToolForDrops()
+                .lightLevel(state -> light));
+    }
+
+    // Raw and storage blocks: 5.0 hardness, 6.0 blast resistance.
+    private static BlockBehaviour.Properties storageProperties(BlockBehaviour.Properties p, SoundType sound, MapColor color, int light) {
+        return p.mapColor(color)
+                .strength(5.0F, 6.0F)
+                .requiresCorrectToolForDrops()
+                .sound(sound)
+                .lightLevel(state -> light);
+    }
 
     public static final DeferredBlock<LiquidBlock> CREOSOTE = BLOCKS.registerBlock("creosote",
             p -> new LiquidBlock(ModFluids.CREOSOTE.get(), p) {},

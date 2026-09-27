@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_nickel",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "nickel",
+      "default": 6
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "nickel",
+      "shape": "trapezoid",
+      "default_min": -64,
+      "default_max": 16
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

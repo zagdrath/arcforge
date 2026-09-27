@@ -36,6 +36,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -60,20 +61,27 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // The Arcforge Furnace, run from its port. Burning fuel (coal coke) heats the furnace towards its
-// maximum; with no fuel burning it cools. A smelt (metal, an optional additive and coal coke -> a result
-// and slag, e.g. iron + coke -> steel, iron + gold + coke -> Wrought Alloy) only progresses while the
+// maximum; with no fuel burning it cools. A smelt (metal, up to two additives and coal coke -> a result
+// and slag, e.g. iron + coke -> steel, iron + gold + coke -> Wrought Alloy, steel + amethyst + nickel plate
+// + coke -> Hardened Alloy; the two additives go in either additive slot) only progresses while the
 // furnace is at least as hot as the recipe needs. Coal coke is both the fuel and the reagent: the furnace
 // keeps back what the smelt needs. A coal coke block in the coke slot is broken open into nine loose coal
 // coke when needed, which are burned and used before anything else in the slot.
 public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController {
     public static final int SLOT_METAL = 0;
     public static final int SLOT_ADDITIVE = 1;
-    public static final int SLOT_COKE = 2;
-    public static final int SLOT_OUTPUT = 3;
-    public static final int SLOT_BYPRODUCT = 4;
-    public static final int SLOT_COUNT = 5;
-    // Saves from before the additive slot (layout 1) had iron, coke, output and by-product in slots 0-3.
-    private static final int SLOT_LAYOUT = 2;
+    public static final int SLOT_ADDITIVE_2 = 2;
+    public static final int SLOT_COKE = 3;
+    public static final int SLOT_OUTPUT = 4;
+    public static final int SLOT_BYPRODUCT = 5;
+    public static final int SLOT_COUNT = 6;
+    // Older saves had fewer slots: layout 1 (before the additive slot) iron, coke, output and by-product in
+    // slots 0-3; layout 2 (one additive) metal, additive, coke, output and by-product in slots 0-4.
+    private static final int SLOT_LAYOUT = 3;
+    private static final int[][] OLD_LAYOUTS = {
+            {},
+            { SLOT_METAL, SLOT_COKE, SLOT_OUTPUT, SLOT_BYPRODUCT },
+            { SLOT_METAL, SLOT_ADDITIVE, SLOT_COKE, SLOT_OUTPUT, SLOT_BYPRODUCT } };
 
     public static final int AMBIENT_HEAT = 20;
     // Coal coke in a coal coke block.
@@ -107,11 +115,10 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     public ArcforgeFurnaceBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), pos, state);
         this.items = new FilteredItemHandler(SLOT_COUNT, (slot, resource) -> isItemValid(level, slot, resource), this::setChanged);
-        this.itemInput = new AutomationResourceHandler<>(items, ArcforgeFurnaceBlockEntity::isInputSlot, slot -> false);
+        this.itemInput = new RoutedInput(items, slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT);
         this.itemByproduct = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_BYPRODUCT);
-        this.itemAutomation = new AutomationResourceHandler<>(items, ArcforgeFurnaceBlockEntity::isInputSlot,
-                slot -> slot == SLOT_OUTPUT || slot == SLOT_BYPRODUCT);
+        this.itemAutomation = new RoutedInput(items, slot -> slot == SLOT_OUTPUT || slot == SLOT_BYPRODUCT);
         this.data = new WideIntContainerData(ArcforgeFurnaceMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -139,14 +146,53 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         ItemStack stack = resource.toStack(1);
         return switch (slot) {
             case SLOT_METAL -> MachineRecipes.isArcforgeMetal(level, stack);
-            case SLOT_ADDITIVE -> MachineRecipes.isArcforgeAdditive(level, stack);
+            case SLOT_ADDITIVE, SLOT_ADDITIVE_2 -> MachineRecipes.isArcforgeAdditive(level, stack);
             case SLOT_COKE -> isFuel(stack);
             default -> false;
         };
     }
 
     private static boolean isInputSlot(int slot) {
-        return slot == SLOT_METAL || slot == SLOT_ADDITIVE || slot == SLOT_COKE;
+        return slot == SLOT_METAL || slot == SLOT_ADDITIVE || slot == SLOT_ADDITIVE_2 || slot == SLOT_COKE;
+    }
+
+    // Where an item put in through an input port goes: a recipe metal to the metal slot, coal coke to the coke
+    // slot, and an additive to the additive slot already holding it, else the first empty one. -1: nowhere.
+    private int routeSlot(ItemResource resource) {
+        ItemStack stack = resource.toStack(1);
+        if (MachineRecipes.isArcforgeMetal(level, stack)) {
+            return SLOT_METAL;
+        }
+        if (isFuel(stack)) {
+            return SLOT_COKE;
+        }
+        if (!MachineRecipes.isArcforgeAdditive(level, stack)) {
+            return -1;
+        }
+        for (int slot : new int[] { SLOT_ADDITIVE, SLOT_ADDITIVE_2 }) {
+            if (ItemStack.isSameItemSameComponents(items.getStack(slot), stack)) {
+                return slot;
+            }
+        }
+        for (int slot : new int[] { SLOT_ADDITIVE, SLOT_ADDITIVE_2 }) {
+            if (items.getStack(slot).isEmpty()) {
+                return slot;
+            }
+        }
+        return -1;
+    }
+
+    // Input ports: an insert without a slot goes where routeSlot says; inserts into a slot as the slot allows.
+    private final class RoutedInput extends AutomationResourceHandler<ItemResource> {
+        RoutedInput(ResourceHandler<ItemResource> delegate, java.util.function.IntPredicate canExtract) {
+            super(delegate, ArcforgeFurnaceBlockEntity::isInputSlot, canExtract);
+        }
+
+        @Override
+        public int insert(ItemResource resource, int amount, TransactionContext transaction) {
+            int slot = routeSlot(resource);
+            return slot < 0 ? 0 : insert(slot, resource, amount, transaction);
+        }
     }
 
     public static boolean isFuel(ItemStack stack) {
@@ -319,7 +365,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         if (metal.isEmpty()) {
             return null;
         }
-        return MachineRecipes.arcforgeSmelting(level, metal, items.getStack(SLOT_ADDITIVE)).map(RecipeHolder::value).orElse(null);
+        return MachineRecipes.arcforgeSmelting(level, metal, items.getStack(SLOT_ADDITIVE), items.getStack(SLOT_ADDITIVE_2))
+                .map(RecipeHolder::value).orElse(null);
     }
 
     private boolean productsFit(ArcforgeSmeltingRecipe recipe) {
@@ -347,15 +394,20 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     private void smelt(ArcforgeSmeltingRecipe recipe) {
         ItemStack metal = items.getStack(SLOT_METAL);
         items.setStack(SLOT_METAL, metal.copyWithCount(metal.getCount() - recipe.metal().count()));
-        recipe.additive().ifPresent(additive -> {
-            ItemStack stack = items.getStack(SLOT_ADDITIVE);
-            items.setStack(SLOT_ADDITIVE, stack.copyWithCount(stack.getCount() - additive.count()));
-        });
+        // Each additive comes out of the slot it matched.
+        boolean swapped = recipe.swapped(new ArcforgeSmeltingRecipe.Input(metal, items.getStack(SLOT_ADDITIVE), items.getStack(SLOT_ADDITIVE_2)));
+        recipe.additive().ifPresent(additive -> take(swapped ? SLOT_ADDITIVE_2 : SLOT_ADDITIVE, additive.count()));
+        recipe.additive2().ifPresent(additive -> take(swapped ? SLOT_ADDITIVE : SLOT_ADDITIVE_2, additive.count()));
         for (int i = 0; i < recipe.coke(); i++) {
             takeFuelOrReagent();
         }
         addTo(SLOT_OUTPUT, recipe.result().create());
         recipe.byproduct().ifPresent(byproduct -> addTo(SLOT_BYPRODUCT, byproduct.create()));
+    }
+
+    private void take(int slot, int count) {
+        ItemStack stack = items.getStack(slot);
+        items.setStack(slot, stack.copyWithCount(stack.getCount() - count));
     }
 
     private void addTo(int slot, ItemStack stack) {
@@ -470,14 +522,15 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         portDefaults.load(input);
-        if (input.getIntOr("slot_layout", 1) >= SLOT_LAYOUT) {
+        int layout = input.getIntOr("slot_layout", 1);
+        if (layout >= SLOT_LAYOUT) {
             items.deserialize(input.childOrEmpty("items"));
         } else {
-            // Old saves hold iron, coke, output and by-product in four slots: read them aside (loading
-            // replaces the whole list) and move them to their slots, past the new additive slot.
-            ItemStacksResourceHandler old = new ItemStacksResourceHandler(4);
+            // Older saves have fewer slots (see OLD_LAYOUTS): read them aside (loading replaces the whole
+            // list) and move each to its slot now.
+            int[] moveTo = OLD_LAYOUTS[Math.max(1, layout)];
+            ItemStacksResourceHandler old = new ItemStacksResourceHandler(moveTo.length);
             old.deserialize(input.childOrEmpty("items"));
-            int[] moveTo = { SLOT_METAL, SLOT_COKE, SLOT_OUTPUT, SLOT_BYPRODUCT };
             for (int slot = 0; slot < SLOT_COUNT; slot++) {
                 items.setStack(slot, ItemStack.EMPTY);
             }

@@ -2,14 +2,15 @@
   "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
-    "wAw",
+    "wCw",
     "AXA",
     "wAw"
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
-    "X": "arcforge:hardened_heat_cell",
-    "w": "arcforge:rock_wool"
+    "C": "#c:gems/arcite",
+    "w": "arcforge:rock_wool",
+    "X": "arcforge:hardened_heat_cell"
   },
   "result": {
     "id": "arcforge:arcforged_heat_cell",

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "arcforge:block/raw_wolframite_block"
+    }
+  }
+}

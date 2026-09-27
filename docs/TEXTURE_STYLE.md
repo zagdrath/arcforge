@@ -252,6 +252,53 @@ The controller is a screen pane inside that band, not a boxed bezel.
 - **Parts tinted in code** (for example glowing receivers) use neutral greys so the tint multiplies
   cleanly.
 
+### Natural materials: ores, raw items, raw blocks, crystals (VANILLA texture language)
+
+Cody wants these to look like Minecraft's own textures, not like our machine style. The flat, no-noise
+rules above are for machines, casings and GUIs. Natural materials follow vanilla's technique instead
+(learned from the vanilla textures, never traced or copied).
+
+- **Ore blocks:** Cody's own ore textures, recoloured per ore and used as overlays on the real vanilla
+  stone / deepslate.
+  - The overlay is every pixel where his texture differs from the stone base: the mineral pixels plus his
+    dark stone bevels.
+  - Mineral pixels are recoloured by brightness onto the ore's ramp. Bevels are kept on stone and
+    darkened for deepslate.
+  - Sources: silverish → silver and arcite; cream → nickel and tungsten (wolframite); green → fluorite
+    (alternate clusters purple and green); iridescent → bismuth (rainbow ramp).
+  - Use the same method for any future ore.
+- **Raw items:** Cody's own raw item textures, recoloured per ore by brightness onto the ore's 7-tone ramp,
+  keeping every pixel and his outline shading.
+  - Sources: blue → silver and arcite; light → nickel and bismuth (rainbow ramp); dark → tungsten
+    (wolframite); green → fluorite (purple, with the lower-right lobe green).
+  - Use the same method for any future raw item.
+- **Raw blocks:** Cody's own raw-block textures, recoloured per ore by brightness onto the ore's 7-tone ramp,
+  keeping every pixel, lump and crease of his art. Sources: bluegrey → silver, grey → nickel and tungsten,
+  green → fluorite, teal → bismuth (rainbow ramp) and arcite (dimmed cyan). Use the same method for any
+  future raw block.
+- **Crystals and crystal blocks:** Cody's own crystal item and crystal block textures, recoloured per ore by
+  brightness onto the ore's 7-tone ramp. Fluorite is purple with a green crystal / green patches; arcite is
+  cyan. Use the same method for any future crystal.
+- **Metal storage blocks:** Cody's own block textures, recoloured per metal, then SMOOTHED.
+  - Smoothing: blur the interior brightness (3×3, or horizontal-only for the banded texture), then flatten
+    it to 4 tones. The 2 px frame and the corner rivets are kept from the source.
+  - Sources: banded → silver, riveted copper-tone → nickel, riveted dark → tungsten and bismuth
+    (pink-silver).
+- **Dusts (every dust in the mod):** Cody's greyscale dust texture, recoloured by brightness.
+  - New dusts use their ore ramp.
+  - Existing dusts (iron, copper, gold, carbon, ancient debris, nether quartz) use their current tones,
+    so their colours stay the same.
+- **Palettes are brighter and more saturated than the machine steel.**
+  - Silver `#5E6C7C → #FFFFFF`; nickel `#6E6236 → #FFF9DC`; tungsten metal `#2E3338 → #B4BBC2`.
+  - Wolframite (ore/raw) `#16100C → #A09080`.
+  - Fluorite purple `#4A2275 → #F0E0FF` with green `#1F6B3A → #DCFFE6`.
+  - Bismuth rainbow (blue, magenta, gold, cyan) on the ore/raw; bismuth metal pink-silver
+    `#6E5E70 → #FFF4FA`.
+  - Arcite `#1B6E8C → #E8FCFF`.
+- **Ingots:** Cody's reference ingot shape (exact 16×16, 8 light levels, tonal outline) for every ingot,
+  including steel.
+- **Coal Coke:** his reference lump shape, in its light grey.
+
 ---
 
 ## 6. Workflow checklist for any new texture

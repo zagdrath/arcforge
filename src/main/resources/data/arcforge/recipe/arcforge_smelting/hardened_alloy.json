@@ -4,6 +4,14 @@
     "ingredient": "#c:ingots/steel",
     "count": 2
   },
+  "additive": {
+    "ingredient": "minecraft:amethyst_shard",
+    "count": 2
+  },
+  "additive_2": {
+    "ingredient": "#c:plates/nickel",
+    "count": 1
+  },
   "coke": 2,
   "result": {
     "id": "arcforge:hardened_alloy",
@@ -14,9 +22,5 @@
     "count": 1
   },
   "time": 600,
-  "min_temp": 1400,
-  "additive": {
-    "ingredient": "minecraft:amethyst_shard",
-    "count": 2
-  }
+  "min_temp": 1400
 }

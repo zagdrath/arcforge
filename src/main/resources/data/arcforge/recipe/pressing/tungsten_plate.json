@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:plate_die",
+  "ingredient": "#c:ingots/tungsten",
+  "count": 1,
+  "result": {
+    "id": "arcforge:tungsten_plate",
+    "count": 1
+  },
+  "time": 100
+}

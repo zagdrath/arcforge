@@ -2,14 +2,15 @@
   "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
-    "PAP",
+    "PCP",
     "AXA",
     "PAP"
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
-    "X": "arcforge:hardened_pressurized_cylinder",
-    "P": "#c:plates/steel"
+    "C": "#c:gems/arcite",
+    "P": "#c:plates/steel",
+    "X": "arcforge:hardened_pressurized_cylinder"
   },
   "result": {
     "id": "arcforge:arcforged_pressurized_cylinder",

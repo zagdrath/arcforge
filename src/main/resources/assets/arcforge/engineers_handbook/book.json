@@ -99,6 +99,7 @@
       "icon": "arcforge:steel_plate",
       "description": "What the machines make, and what it's for.",
       "entries": [
+        "ores",
         "dusts",
         "parts",
         "mineral_wool",

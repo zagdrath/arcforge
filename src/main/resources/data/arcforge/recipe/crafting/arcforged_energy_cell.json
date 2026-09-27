@@ -2,12 +2,13 @@
   "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
-    "ApA",
+    "ACA",
     "pXp",
     "ApA"
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
+    "C": "#c:gems/arcite",
     "p": "#c:plates/copper",
     "X": "arcforge:hardened_energy_cell"
   },

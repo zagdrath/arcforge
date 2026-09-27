@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_silver",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "silver",
+      "default": 8
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "silver",
+      "shape": "trapezoid",
+      "default_min": -32,
+      "default_max": 64
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

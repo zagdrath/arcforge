@@ -1,0 +1,27 @@
+{
+  "title": "Ores",
+  "icon": "arcforge:raw_silver",
+  "items": [
+    "arcforge:silver_ore",
+    "arcforge:nickel_ore",
+    "arcforge:wolframite_ore",
+    "arcforge:fluorite_ore",
+    "arcforge:bismuth_ore",
+    "arcforge:arcite_ore",
+    "arcforge:invar_ingot",
+    "arcforge:tungsten_heating_coil",
+    "arcforge:thermocouple",
+    "arcforge:arcite_tungsten_composite",
+    "arcforge:thermoelectric_upgrade"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Six ores, in stone and deepslate:\n- Silver: common, Y -32 to 64.\n- Nickel: deep, Y -64 to 16.\n- Fluorite: Y -16 to 48 (crystals, drops experience).\n- Bismuth: Y 0 to 56 (drops experience).\n- Tungsten, as wolframite ore: rare, Y -64 to -16.\n- Arcite: the rarest and deepest, Y -64 to -40, and only a diamond pickaxe breaks it. It glows.\nEach drops its raw item (more with Fortune). Smelt the raw item, the ore or its dust into an ingot or crystal; crushing gives two dust per ore, so crush first."
+    },
+    {
+      "type": "text",
+      "text": "# What they're for\n- Silver plates: batteries and trough mirrors.\n- Nickel plates: Hardened Alloy and Steam Turbine Array casings.\n- Invar (2 iron dust + 1 nickel dust make 3): Hardened heat cells and thermal conduits.\n- Tungsten: the heating coil (Induction Furnaces) and, with arcite, the composite for Arcforged Alloy.\n- Fluorite: Pressure Glass, and flux for steel in the Arcforge Furnace.\n- Bismuth: thermocouples, for the Thermoelectric Plant and its Efficiency Upgrade (+6.25% FE per HU each, up to 8).\n- Arcite: the Arcforged tier."
+    }
+  ]
+}

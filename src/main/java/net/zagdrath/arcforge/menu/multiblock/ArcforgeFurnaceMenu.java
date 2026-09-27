@@ -48,10 +48,11 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
 
     // Slot positions from arcforge_furnace_gui_layout.json.
     public static final int METAL_X = 9, METAL_Y = 23;
-    public static final int ADDITIVE_X = 29, ADDITIVE_Y = 23;
-    public static final int COKE_X = 49, COKE_Y = 23;
-    public static final int OUTPUT_X = 105, OUTPUT_Y = 23;
-    public static final int BYPRODUCT_X = 135, BYPRODUCT_Y = 23;
+    public static final int ADDITIVE_X = 27, ADDITIVE_Y = 23;
+    public static final int ADDITIVE_2_X = 45, ADDITIVE_2_Y = 23;
+    public static final int COKE_X = 63, COKE_Y = 23;
+    public static final int OUTPUT_X = 115, OUTPUT_Y = 23;
+    public static final int BYPRODUCT_X = 145, BYPRODUCT_Y = 23;
 
     private static final int MACHINE_SLOTS = ArcforgeFurnaceBlockEntity.SLOT_COUNT;
     private static final int PLAYER_INV_END = MACHINE_SLOTS + 27;
@@ -77,6 +78,7 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
 
         addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_METAL, METAL_X, METAL_Y));
         addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE, ADDITIVE_X, ADDITIVE_Y));
+        addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE_2, ADDITIVE_2_X, ADDITIVE_2_Y));
         addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_COKE, COKE_X, COKE_Y));
         addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y));
         addSlot(new ResourceHandlerSlot(items, items::set, ArcforgeFurnaceBlockEntity.SLOT_BYPRODUCT, BYPRODUCT_X, BYPRODUCT_Y));
@@ -143,10 +145,25 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
         return original;
     }
 
-    // The metal, additive or coke slot this item belongs in, or -1.
-    private static int inputSlotFor(Player player, ItemResource resource) {
-        for (int slot : new int[] { ArcforgeFurnaceBlockEntity.SLOT_METAL, ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE, ArcforgeFurnaceBlockEntity.SLOT_COKE }) {
+    // The metal, additive or coke slot this item belongs in, or -1. An additive goes to the additive slot
+    // already holding it, else the first empty one (as through an input port).
+    private int inputSlotFor(Player player, ItemResource resource) {
+        for (int slot : new int[] { ArcforgeFurnaceBlockEntity.SLOT_METAL, ArcforgeFurnaceBlockEntity.SLOT_COKE }) {
             if (ArcforgeFurnaceBlockEntity.isItemValid(player.level(), slot, resource)) {
+                return slot;
+            }
+        }
+        if (!ArcforgeFurnaceBlockEntity.isItemValid(player.level(), ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE, resource)) {
+            return -1;
+        }
+        int[] additives = { ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE, ArcforgeFurnaceBlockEntity.SLOT_ADDITIVE_2 };
+        for (int slot : additives) {
+            if (resource.matches(slots.get(slot).getItem())) {
+                return slot;
+            }
+        }
+        for (int slot : additives) {
+            if (!slots.get(slot).hasItem()) {
                 return slot;
             }
         }

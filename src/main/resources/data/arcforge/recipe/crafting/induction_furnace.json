@@ -2,11 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PrP",
+    "PcP",
     "rXr",
     "PBP"
   ],
   "key": {
+    "c": "arcforge:tungsten_heating_coil",
     "r": "#c:rods/copper",
     "B": "#c:storage_blocks/redstone",
     "X": "minecraft:blast_furnace",

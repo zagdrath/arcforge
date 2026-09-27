@@ -74,7 +74,11 @@ final class AlloyGameTests {
     }
 
     private static ArcforgeSmeltingRecipe smelt(GameTestHelper helper, ItemStack metal, ItemStack additive) {
-        return MachineRecipes.arcforgeSmelting(helper.getLevel(), metal, additive).map(RecipeHolder::value).orElse(null);
+        return smelt(helper, metal, additive, ItemStack.EMPTY);
+    }
+
+    static ArcforgeSmeltingRecipe smelt(GameTestHelper helper, ItemStack metal, ItemStack additive, ItemStack additive2) {
+        return MachineRecipes.arcforgeSmelting(helper.getLevel(), metal, additive, additive2).map(RecipeHolder::value).orElse(null);
     }
 
     // Iron alone makes steel; iron with gold makes Wrought Alloy and never steel; each alloy needs its metal,
@@ -91,9 +95,13 @@ final class AlloyGameTests {
         ArcforgeSmeltingRecipe tempered = smelt(helper, new ItemStack(ModItems.STEEL_INGOT.get(), 2), new ItemStack(Items.COPPER_INGOT, 2));
         helper.assertTrue(tempered != null && tempered.result().create().is(ModItems.TEMPERED_ALLOY.get()) && tempered.minHeat() == 1_300,
                 "Steel and copper don't make Tempered Alloy at 1,300°C");
-        ArcforgeSmeltingRecipe arcforged = smelt(helper, new ItemStack(ModItems.HARDENED_ALLOY.get(), 2), new ItemStack(ModItems.CARBON_FIBER.get(), 2));
+        // Arcforged Alloy takes a second additive, the Arcite-Tungsten Composite; without it nothing matches.
+        ArcforgeSmeltingRecipe arcforged = smelt(helper, new ItemStack(ModItems.HARDENED_ALLOY.get(), 2), new ItemStack(ModItems.CARBON_FIBER.get(), 2),
+                new ItemStack(ModItems.ARCITE_TUNGSTEN_COMPOSITE.get()));
         helper.assertTrue(arcforged != null && arcforged.result().create().is(ModItems.ARCFORGED_ALLOY.get()) && arcforged.coke() == 2 && arcforged.minHeat() == 1_500,
-                "Hardened Alloy and Carbon Fiber don't make Arcforged Alloy");
+                "Hardened Alloy, Carbon Fiber and the composite don't make Arcforged Alloy");
+        helper.assertTrue(smelt(helper, new ItemStack(ModItems.HARDENED_ALLOY.get(), 2), new ItemStack(ModItems.CARBON_FIBER.get(), 2)) == null,
+                "Arcforged Alloy still forms without the composite");
         helper.assertTrue(smelt(helper, new ItemStack(ModItems.HARDENED_ALLOY.get(), 2), new ItemStack(ModItems.ANCIENT_DEBRIS_DUST.get())) == null,
                 "Ancient debris dust still makes Arcforged Alloy");
 
@@ -146,9 +154,11 @@ final class AlloyGameTests {
             }
         }
         // 72 from the alloy drop, the distillation drop's casing, tray, controller and asphalt, slab and stairs,
-        // and the Solar Thermal Array's casing, controller, collector, trough mirror and receiver tube.
-        helper.assertTrue(crafting == 83, crafting + " crafting/ recipes, not 83");
-        helper.assertTrue(smelting == 5, smelting + " arcforge_smelting/ recipes, not 5");
+        // the Solar Thermal Array's casing, controller, collector, trough mirror and receiver tube, and the ores
+        // drop's 29 (storage and raw blocks both ways, invar dust, the components and the upgrade).
+        helper.assertTrue(crafting == 112, crafting + " crafting/ recipes, not 112");
+        // Plus the fluorite-fluxed steel.
+        helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
             helper.assertTrue(recipe(helper, old) == null, "Old recipe " + old + " is still there");
         }
@@ -188,8 +198,8 @@ final class AlloyGameTests {
 
         ItemStack battery = new ItemStack(portable(PortableStorageItem.Kind.BATTERY, ConduitTier.WROUGHT));
         battery.set(ModDataComponents.ENERGY.get(), 5_000);
-        ItemStack better = craft(helper, "crafting/tempered_battery", new String[] { " T ", "TXT", " T " }, java.util.Map.of(
-                'T', new ItemStack(ModItems.TEMPERED_ALLOY.get()), 'X', battery));
+        ItemStack better = craft(helper, "crafting/tempered_battery", new String[] { " S ", "TXT", " T " }, java.util.Map.of(
+                'S', new ItemStack(ModItems.SILVER_PLATE.get()), 'T', new ItemStack(ModItems.TEMPERED_ALLOY.get()), 'X', battery));
         helper.assertTrue(better.is(portable(PortableStorageItem.Kind.BATTERY, ConduitTier.TEMPERED)) && better.getOrDefault(ModDataComponents.ENERGY.get(), 0) == 5_000,
                 "Battery upgrade lost its charge");
         helper.succeed();

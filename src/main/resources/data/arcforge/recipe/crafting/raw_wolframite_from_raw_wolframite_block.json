@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:storage_blocks/raw_tungsten"
+  ],
+  "result": {
+    "id": "arcforge:raw_wolframite",
+    "count": 9
+  }
+}

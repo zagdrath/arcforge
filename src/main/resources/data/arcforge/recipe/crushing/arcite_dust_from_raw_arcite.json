@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:raw_materials/arcite",
+  "result": {
+    "count": 1,
+    "id": "arcforge:arcite_dust"
+  },
+  "bonus": {
+    "count": 1,
+    "id": "arcforge:arcite_dust"
+  },
+  "bonus_chance": 0.25,
+  "time": 200,
+  "ore": true
+}

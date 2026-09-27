@@ -47,7 +47,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // runs it at full efficiency, and only a Geothermal Plant's hotter heat (1,400°C) earns the bonus.
 public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
     public static final int MACHINE_SLOTS = 0;
-    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT, UpgradeType.THERMOELECTRIC);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.HEAT, SideMode.ENERGY);
 
     private final HeatBuffer heat;
@@ -164,10 +164,12 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
         return (int) Math.round(ArcforgeConfig.THERMOELECTRIC_HEAT_THROUGHPUT.getAsInt() * hotter * speedMultiplier());
     }
 
-    // Heat upgrades lift the efficiency of cooler heat up to 100%, and never lower the bonus above it.
+    // Heat upgrades lift the efficiency of cooler heat up to 100%, and never lower the bonus above it;
+    // Thermoelectric upgrades then add their share on top (FE per HU x (1 + perCard x n)).
     public float upgradedEfficiency() {
         float base = efficiency(heat.getTemperature());
-        return (float) Math.max(base, Math.min(1.0, base / UpgradeType.energyCostMultiplier(upgrades(UpgradeType.HEAT))));
+        double heated = Math.max(base, Math.min(1.0, base / UpgradeType.energyCostMultiplier(upgrades(UpgradeType.HEAT))));
+        return (float) (heated * (1.0 + ArcforgeConfig.THERMOELECTRIC_UPGRADE_EFFICIENCY.getAsDouble() * upgrades(UpgradeType.THERMOELECTRIC)));
     }
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {

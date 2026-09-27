@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:plates/tungsten",
+    "#c:gems/arcite",
+    "#c:gems/arcite"
+  ],
+  "result": {
+    "id": "arcforge:arcite_tungsten_composite",
+    "count": 1
+  }
+}

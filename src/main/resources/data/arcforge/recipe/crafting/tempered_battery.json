@@ -2,11 +2,12 @@
   "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
-    " T ",
+    " S ",
     "TXT",
     " T "
   ],
   "key": {
+    "S": "#c:plates/silver",
     "T": "arcforge:tempered_alloy",
     "X": "arcforge:wrought_battery"
   },

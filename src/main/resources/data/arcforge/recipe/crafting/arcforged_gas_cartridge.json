@@ -2,11 +2,12 @@
   "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
-    " A ",
+    " C ",
     "AXA",
     " A "
   ],
   "key": {
+    "C": "#c:gems/arcite",
     "A": "arcforge:arcforged_alloy",
     "X": "arcforge:hardened_gas_cartridge"
   },

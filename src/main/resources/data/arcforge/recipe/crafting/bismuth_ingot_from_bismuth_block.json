@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:storage_blocks/bismuth"
+  ],
+  "result": {
+    "id": "arcforge:bismuth_ingot",
+    "count": 9
+  }
+}

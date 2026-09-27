@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PpP",
+    "PtP",
     "gFg",
     "PBP"
   ],
@@ -11,7 +11,7 @@
     "B": "#c:storage_blocks/redstone",
     "g": "#c:gears/copper",
     "P": "#c:plates/steel",
-    "p": "#c:plates/copper"
+    "t": "arcforge:thermocouple"
   },
   "result": {
     "id": "arcforge:thermoelectric_plant",

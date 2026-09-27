@@ -1,6 +1,10 @@
 {
   "values": [
     "#c:plates/steel",
-    "#c:plates/copper"
+    "#c:plates/copper",
+    "#c:plates/silver",
+    "#c:plates/nickel",
+    "#c:plates/tungsten",
+    "#c:plates/invar"
   ]
 }
