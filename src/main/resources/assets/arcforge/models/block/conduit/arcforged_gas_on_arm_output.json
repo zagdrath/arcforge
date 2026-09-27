@@ -3,6 +3,7 @@
   "textures": {
     "conduit": "arcforge:block/conduit/arcforged_gas_on",
     "port_in": "arcforge:block/conduit/port_input",
-    "port_out": "arcforge:block/conduit/port_output"
+    "port_out": "arcforge:block/conduit/port_output",
+    "glow": "arcforge:block/conduit/arcforged_gas_glow"
   }
 }

@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -22,6 +23,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -43,6 +45,8 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 public class ConduitBlockEntity extends BlockEntity {
     // Fluid and item conduits sync their contents to clients at most this often.
     private static final int CONTENTS_SYNC_INTERVAL = 5;
+    // Thermal conduits tint their glow by temperature in steps this big.
+    private static final int HEAT_TINT_STEP = 50;
 
     private final SideSetting[] settings = new SideSetting[Direction.values().length];
     private final List<ItemPacket> packets = new ArrayList<>();
@@ -57,6 +61,8 @@ public class ConduitBlockEntity extends BlockEntity {
     private boolean syncPending;
     // Game time is never negative, so the first sync is always allowed. (Long.MIN_VALUE would overflow the subtraction.)
     private long lastSyncTick = -CONTENTS_SYNC_INTERVAL;
+    // The glow tint last sent to clients (server) or last drawn (client); see glowKey.
+    private int syncedGlow = Integer.MIN_VALUE;
 
     public ConduitBlockEntity(BlockPos pos, BlockState state) {
         super(typeFor(state), pos, state);
@@ -111,6 +117,33 @@ public class ConduitBlockEntity extends BlockEntity {
         if (celsius != heatTemperature) {
             heatTemperature = celsius;
             setChanged();
+            syncGlow();
+        }
+    }
+
+    // What a gas or thermal conduit's glow is tinted by (see ConduitTints): which gas it holds, or how hot
+    // its heat is. Clients are sent it when it changes, and redraw the conduit.
+    public int glowKey() {
+        return switch (getConduitType()) {
+            case GAS -> fluid.isEmpty() ? -1 : BuiltInRegistries.FLUID.getId(fluid.getFluid());
+            case THERMAL -> heatTemperature / HEAT_TINT_STEP;
+            default -> 0;
+        };
+    }
+
+    private static boolean hasGlowTint(ConduitType type) {
+        return type == ConduitType.GAS || type == ConduitType.THERMAL;
+    }
+
+    private void syncGlow() {
+        if (level == null || !hasGlowTint(getConduitType())) {
+            return;
+        }
+        int key = glowKey();
+        if (key != syncedGlow) {
+            syncedGlow = key;
+            // On the server this sends the update; on a client it redraws the conduit's section.
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         }
     }
 
@@ -187,6 +220,7 @@ public class ConduitBlockEntity extends BlockEntity {
         if (!FluidStack.matches(stack, fluid)) {
             fluid = stack.copy();
             markContentsChanged(false);
+            syncGlow();
         }
     }
 
@@ -300,6 +334,9 @@ public class ConduitBlockEntity extends BlockEntity {
         heatTemperature = input.getIntOr("heat_temperature", HeatBuffer.AMBIENT_CELSIUS);
         fluid = input.read("fluid", FluidStack.OPTIONAL_CODEC).orElse(FluidStack.EMPTY);
         itemSpeed = input.getFloatOr("item_speed", 0.0F);
+        if (level != null && level.isClientSide()) {
+            syncGlow();
+        }
     }
 
     @Override
@@ -365,6 +402,6 @@ public class ConduitBlockEntity extends BlockEntity {
 
     @Override
     public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
-        return getConduitType().isTransparent() ? ClientboundBlockEntityDataPacket.create(this) : null;
+        return getConduitType().isTransparent() || hasGlowTint(getConduitType()) ? ClientboundBlockEntityDataPacket.create(this) : null;
     }
 }

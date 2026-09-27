@@ -92,7 +92,7 @@ Conduits and Pressurized Cylinders, which carry nothing else; Fluid Conduits and
 them. A tank or network holds one gas at a time.
 
 **Pressurized Conduits** move 400 / 1,600 / 6,400 / 25,600 mB/t (twice a fluid conduit) and hold
-2,000 mB each; they glow while gas moves. **Pressurized Cylinders** hold 64,000 / 256,000 / 1,024,000 /
+2,000 mB each; they glow in the colour of the gas while they hold or move it. **Pressurized Cylinders** hold 64,000 / 256,000 / 1,024,000 /
 4,096,000 mB, keep their gas when broken, and show their fill on a gauge (and to comparators).
 
 **Electric Pump.** Pumps the fluid source directly below it: a bucket every 20 ticks for 10 FE/t. The
@@ -149,7 +149,7 @@ to force a side to **Input** (push into the machine) or **Output** (pull from it
 Conduits store what they pull, so they keep pulling from machines even when nothing will take it yet:
 
 - **Energy** and **Thermodynamic** conduits each hold one tick's worth of their tier's rate
-  (e.g. 256 FE per wrought energy conduit), and glow while they are moving energy or heat.
+  (e.g. 256 FE per wrought energy conduit), and glow while they hold or move energy or heat (thermodynamic conduits from dull red to white-hot with the temperature).
 - **Fluid** conduits are glass and show the fluid inside. Each holds 1,000 mB, and a network
   carries one fluid at a time.
 - **Item** conduits are glass and show items travelling through. Each stores up to 4 stacks,

@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.client;
 
+import java.util.List;
+
 import org.joml.Vector4f;
 import org.jspecify.annotations.Nullable;
 
@@ -24,6 +26,7 @@ import net.neoforged.fml.common.Mod;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.event.RegisterBlockStateModels;
@@ -75,7 +78,10 @@ import net.zagdrath.arcforge.client.screen.storage.FluidTankScreen;
 import net.zagdrath.arcforge.client.screen.storage.HeatCellScreen;
 import net.zagdrath.arcforge.client.screen.storage.PressurizedCylinderScreen;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
+import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.steam.SteamGrade;
@@ -116,6 +122,14 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.HEAT_CELL.get(), HeatCellScreen::new);
         event.register(ModMenuTypes.CARBONIZER.get(), CarbonizerScreen::new);
         event.register(ModMenuTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceScreen::new);
+    }
+
+    // Lit Pressurized and Thermodynamic Conduits glow in the colour of what they hold.
+    @SubscribeEvent
+    static void registerBlockTints(RegisterColorHandlersEvent.BlockTintSources event) {
+        for (ConduitTier tier : ConduitTier.values()) {
+            event.register(List.of(ConduitTints.INSTANCE), ModBlocks.conduit(ConduitType.GAS, tier).get(), ModBlocks.conduit(ConduitType.THERMAL, tier).get());
+        }
     }
 
     // The structure viewer caches block sprites, which a resource reload replaces.

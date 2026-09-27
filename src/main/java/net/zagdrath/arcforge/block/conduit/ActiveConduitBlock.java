@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 
-// Energy and thermal conduits: glow (swap to the "_on" textures and emit light) while their network is moving resource.
+// Energy and thermal conduits: glow (swap to the "_on" textures and emit light) while their network holds or moves anything.
 public class ActiveConduitBlock extends ConduitBlock {
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
     public static final int ACTIVE_LIGHT = 4;

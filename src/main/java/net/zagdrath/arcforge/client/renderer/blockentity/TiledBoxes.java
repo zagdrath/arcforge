@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.client.renderer.blockentity;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
@@ -25,13 +27,22 @@ public final class TiledBoxes {
 
     public static void box(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
             float x0, float y0, float z0, float x1, float y1, float z1, boolean inward) {
+        box(pose, buffer, sprite, color, light, x0, y0, z0, x1, y1, z1, inward, null);
+    }
+
+    // As above, leaving out one face (skip), e.g. where the box sits on another and the two faces
+    // would share a plane and flicker.
+    public static void box(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
+            float x0, float y0, float z0, float x1, float y1, float z1, boolean inward, @Nullable Direction skip) {
         if (x1 <= x0 || y1 <= y0 || z1 <= z0) {
             return;
         }
         float[] min = { x0, y0, z0 };
         float[] max = { x1, y1, z1 };
         for (Direction face : Direction.values()) {
-            face(pose, buffer, sprite, color, light, min, max, face, inward);
+            if (face != skip) {
+                face(pose, buffer, sprite, color, light, min, max, face, inward);
+            }
         }
     }
 

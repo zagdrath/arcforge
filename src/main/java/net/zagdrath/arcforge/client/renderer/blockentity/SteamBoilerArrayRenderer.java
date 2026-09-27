@@ -120,13 +120,21 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
         float waterTop = y0 + (y1 - y0) * WATER_SHARE * state.water;
         // Steam gathers under the roof and fills the headspace down toward the water as it builds up.
         float steamBottom = y1 - (y1 - waterTop) * state.steam;
+        // Once the steam reaches the water it sits on it: its bottom would share the water's surface and
+        // flicker, so only the water's top is drawn there.
+        boolean touching = state.water > 0 && steamBottom - waterTop < 1.0F / 64.0F;
+        if (touching) {
+            steamBottom = waterTop;
+        }
+        float steamFloor = steamBottom;
+        Direction steamSkip = touching ? Direction.DOWN : null;
 
         collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(drum.atlasLocation()),
                 (pose, buffer) -> TiledBoxes.box(pose, buffer, drum, DRUM_COLOR, state.light,
                         DRUM_INSET, DRUM_INSET, DRUM_INSET, state.sizeX - DRUM_INSET, state.sizeY - DRUM_INSET, state.sizeZ - DRUM_INSET, false));
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(water.atlasLocation()), (pose, buffer) -> {
             TiledBoxes.box(pose, buffer, water, state.waterColor, state.light, x0, y0, z0, x1, waterTop, z1, false);
-            TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light, x0, steamBottom, z0, x1, y1, z1, false);
+            TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light, x0, steamFloor, z0, x1, y1, z1, false, steamSkip);
         });
     }
 

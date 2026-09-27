@@ -20,7 +20,7 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 
 // Energy and thermal networks. Each conduit holds up to one tick's worth of its tier's rate, pooled
 // across the network: output sides are pulled into the pool even when nothing wants it yet, and the
-// pool is pushed into input sides. Conduits light up while anything is moving.
+// pool is pushed into input sides. Conduits light up while the network holds anything or it is moving.
 public abstract class ActiveConduitNetwork<H> extends ConduitNetwork<H> {
     // Ticks without movement before the conduits go dark (prevents flicker).
     private static final int IDLE_TICKS = 10;
@@ -83,7 +83,7 @@ public abstract class ActiveConduitNetwork<H> extends ConduitNetwork<H> {
         if (stored != before) {
             distribute();
         }
-        if (moved > 0) {
+        if (moved > 0 || stored > 0) {
             lastMovedTick = gameTime;
             setActive(true);
         } else if (active && gameTime - lastMovedTick >= IDLE_TICKS) {

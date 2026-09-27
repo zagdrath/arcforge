@@ -15,7 +15,7 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.steam.Gases;
 
 // Pressurized conduits: a fluid network for gases only (one gas at a time), holding 2,000 mB per conduit
-// and moving twice a fluid conduit's rate. The conduits glow while gas is moving, like energy conduits.
+// and moving twice a fluid conduit's rate. The conduits glow while they hold or move gas, like energy conduits.
 public class GasConduitNetwork extends FluidConduitNetwork {
     // Ticks without movement before the conduits go dark (prevents flicker).
     private static final int IDLE_TICKS = 10;
@@ -43,7 +43,7 @@ public class GasConduitNetwork extends FluidConduitNetwork {
 
     @Override
     protected void onMoved(int moved, long gameTime) {
-        if (moved > 0) {
+        if (moved > 0 || getAmount() > 0) {
             lastMovedTick = gameTime;
             setActive(true);
         } else if (active && gameTime - lastMovedTick >= IDLE_TICKS) {

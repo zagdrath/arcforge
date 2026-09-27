@@ -48,9 +48,8 @@ public enum MultiblockNameProvider implements IBlockComponentProvider {
         MultiblockController controller = null;
         if (block instanceof MultiblockPart part) {
             controller = part.findController(level, pos);
-        } else if (block instanceof PressureGlassBlock && PressureGlassBlock.isFormed(level.getBlockState(pos))) {
-            ShellMultiblockBlockEntity master = SteamBoilerArrayCasingBlock.STRUCTURE.findMaster(level, pos);
-            controller = master != null ? master : SteamTurbineArrayCasingBlock.STRUCTURE.findMaster(level, pos);
+        } else if (block instanceof PressureGlassBlock) {
+            controller = WindowProviders.master(level, pos);
         }
         return controller != null && controller.isFormed() && controller instanceof MenuProvider menu ? menu.getDisplayName() : null;
     }

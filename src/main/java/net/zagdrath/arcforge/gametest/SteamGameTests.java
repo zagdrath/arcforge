@@ -301,35 +301,30 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
-    // Pressurized Conduits connect to a turbine array's casings on its steam input face, and only there.
+    // The turbine's front is its window, so its ends are its left and right: with glass on the north side it
+    // faces north, and by default the generator (east) end takes FE out and the bearing (west) end takes steam.
     static void turbineArrayConduits(GameTestHelper helper) {
-        BlockPos min = new BlockPos(0, 1, 1);
-        buildShell(helper, min, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
-        BlockPos north = new BlockPos(1, 1, 0);
-        BlockPos south = new BlockPos(1, 1, 4);
+        BlockPos min = new BlockPos(1, 1, 1);
+        buildShell(helper, min, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get(), new BlockPos(2, 2, 1));
+        BlockPos west = new BlockPos(0, 2, 2);
+        BlockPos east = new BlockPos(4, 2, 2);
         helper.startSequence()
                 .thenIdle(3)
                 .thenExecute(() -> {
                     SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
                     helper.assertTrue(turbine.isMaster(), "Turbine did not form");
-                    // Conduits first, then the side changed in the GUI, as a player would.
-                    helper.setBlock(north, ModBlocks.conduit(ConduitType.GAS, ConduitTier.WROUGHT).get());
-                    helper.setBlock(south, ModBlocks.conduit(ConduitType.GAS, ConduitTier.WROUGHT).get());
-                    net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(north));
-                    net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(south));
-                    for (var side : net.zagdrath.arcforge.machine.config.RelativeSide.values()) {
-                        turbine.setSideMode(side, side == net.zagdrath.arcforge.machine.config.RelativeSide.LEFT
-                                ? net.zagdrath.arcforge.machine.config.SideMode.INPUT : net.zagdrath.arcforge.machine.config.SideMode.NONE);
-                    }
+                    helper.assertTrue(turbine.getStructureFacing() == Direction.NORTH, "Facing " + turbine.getStructureFacing());
+                    helper.setBlock(west, ModBlocks.conduit(ConduitType.GAS, ConduitTier.WROUGHT).get());
+                    helper.setBlock(east, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
+                    net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(west));
+                    net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(east));
                 })
                 .thenIdle(2)
                 .thenExecute(() -> {
-                    SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
-                    var northMode = net.zagdrath.arcforge.block.conduit.ConduitBlock.mode(helper.getBlockState(north), Direction.SOUTH);
-                    var southMode = net.zagdrath.arcforge.block.conduit.ConduitBlock.mode(helper.getBlockState(south), Direction.NORTH);
-                    helper.assertTrue(turbine.getStructureFacing() == Direction.WEST, "Facing " + turbine.getStructureFacing());
-                    helper.assertTrue(northMode == net.zagdrath.arcforge.conduit.ConnectionMode.INPUT, "Conduit on the left (north) face is " + northMode);
-                    helper.assertTrue(southMode == net.zagdrath.arcforge.conduit.ConnectionMode.NONE, "Conduit on the right (south) face is " + southMode);
+                    var westMode = net.zagdrath.arcforge.block.conduit.ConduitBlock.mode(helper.getBlockState(west), Direction.EAST);
+                    var eastMode = net.zagdrath.arcforge.block.conduit.ConduitBlock.mode(helper.getBlockState(east), Direction.WEST);
+                    helper.assertTrue(westMode == net.zagdrath.arcforge.conduit.ConnectionMode.INPUT, "Steam conduit on the bearing end is " + westMode);
+                    helper.assertTrue(eastMode != net.zagdrath.arcforge.conduit.ConnectionMode.NONE, "Energy conduit on the generator end is not connected");
                 })
                 .thenSucceed();
     }

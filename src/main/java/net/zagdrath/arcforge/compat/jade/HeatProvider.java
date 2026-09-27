@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.compat.jade;
 
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -16,6 +17,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.conduit.network.ThermalConduitNetwork;
@@ -62,7 +64,10 @@ public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, Heat
             }
             return new Data(network.getStored(), network.getCapacity(), network.getTemperature());
         }
-        HeatHandler heat = level.getCapability(ModCapabilities.HEAT, accessor.getPosition(), null);
+        // A pane of Pressure Glass shows its array's heat.
+        ShellMultiblockBlockEntity window = WindowProviders.master(level, accessor.getPosition());
+        BlockPos pos = window != null ? window.getBlockPos() : accessor.getPosition();
+        HeatHandler heat = level.getCapability(ModCapabilities.HEAT, pos, null);
         return heat != null && heat.getMaxHeat() > 0 ? new Data(heat.getHeat(), heat.getMaxHeat(), heat.getTemperature()) : null;
     }
 

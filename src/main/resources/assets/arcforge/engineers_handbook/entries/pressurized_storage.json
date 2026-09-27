@@ -14,7 +14,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Pressurized Conduits carry gases, twice as fast as fluid conduits, and glow while gas moves. Pressurized Cylinders store one gas each and keep it when broken; the gauge on top shows how full they are.\nNeither mixes gases: each network or cylinder holds one kind at a time."
+      "text": "Pressurized Conduits carry gases, twice as fast as fluid conduits, and glow in the colour of the gas inside. Pressurized Cylinders store one gas each and keep it when broken; the gauge on top shows how full they are.\nNeither mixes gases: each network or cylinder holds one kind at a time."
     }
   ]
 }

@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "A huge turbine: up to 40 mB/t of steam per block of length, at 10, 18 or 28 FE per mB. A 9-long array on Superheated Steam makes over 10,000 FE/t.\nIts rotor spins up over a few seconds when steam flows, and the output rises with it.\nBuild a hollow 3x3 tube, 3 to 9 long on either horizontal axis. The generator end (the back) is its energy face."
+      "text": "A huge turbine: up to 40 mB/t of steam per block of length, at 10, 18 or 28 FE per mB. A 9-long array on Superheated Steam makes over 10,000 FE/t.\nIts rotor spins up over a few seconds when steam flows, and the output rises with it.\nBuild a hollow 3x3 tube, 3 to 9 long on either horizontal axis. Its front is the side with the window (or the side you finish it from). The generator end is its energy face; steam goes in the other end or the top."
     },
     {
       "type": "multiblock",

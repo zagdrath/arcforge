@@ -33,11 +33,13 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -56,8 +58,9 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // Superheated 28; a 9-long array on Superheated makes 10,080 FE/t). The rotor spins up toward a speed set
 // by the flow (about 5 s to get there) and coasts down (about 10 s) when the steam stops; the output is
 // scaled by how close the rotor is to that speed, so opening the valve gives a rising output over a few
-// seconds. Steam is used either way. It faces along its axis: the generator end (with the FE port) is
-// the back, the default energy face.
+// seconds. Steam is used either way. Its front is a long side (the window, see chooseFront), so the
+// generator end (positive along the axis, with the FE port) is on its left or right: that end is the
+// default energy face, and the bearing end and the top take steam.
 public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY);
@@ -87,7 +90,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     public SteamTurbineArrayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), pos, state, 0, (slot, resource) -> false, UPGRADES,
-                new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.ENERGY, SideMode.NONE),
+                new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.NONE, SideMode.NONE),
                 SIDE_MODES);
         this.energy = new GeneratorEnergyHandler(
                 ArcforgeConfig.TURBINE_ARRAY_ENERGY_CAPACITY.getAsInt(),
@@ -146,11 +149,54 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         targetsDirty = true;
     }
 
-    // A turbine faces along its axis, so the generator end (positive along the axis) is the back.
     @Override
     public void onFormed(@Nullable Direction facing) {
         ShellStructure.Shell shell = getShell();
-        super.onFormed(shell != null ? Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.NEGATIVE) : facing);
+        if (shell == null) {
+            super.onFormed(facing);
+            return;
+        }
+        super.onFormed(chooseFront(shell, facing));
+        matchSidesToGenerator(shell);
+    }
+
+    // The front is one of the two long horizontal sides: the one with more Pressure Glass, else the one
+    // toward the player who completed it (facing), else the one that puts the generator on the right.
+    private Direction chooseFront(ShellStructure.Shell shell, @Nullable Direction facing) {
+        Direction generatorEnd = Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.POSITIVE);
+        Direction preferred = generatorEnd.getClockWise();
+        Direction other = preferred.getOpposite();
+        int preferredGlass = glassOn(shell, preferred);
+        int otherGlass = glassOn(shell, other);
+        return otherGlass > preferredGlass || otherGlass == preferredGlass && facing == other ? other : preferred;
+    }
+
+    private int glassOn(ShellStructure.Shell shell, Direction side) {
+        if (level == null) {
+            return 0;
+        }
+        int face = side.getAxisDirection() == Direction.AxisDirection.POSITIVE ? ShellStructure.WIDTH - 1 : 0;
+        int count = 0;
+        for (BlockPos pos : shell.positions()) {
+            if (shell.offset(pos, side.getAxis()) == face && level.getBlockState(pos).getBlock() instanceof PressureGlassBlock) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // The side modes follow the generator: if it ended up on the other side from the energy face (the
+    // defaults assume the right), left and right swap.
+    private void matchSidesToGenerator(ShellStructure.Shell shell) {
+        Direction generatorEnd = Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.POSITIVE);
+        RelativeSide generator = RelativeSide.fromDirection(getFacing(), generatorEnd);
+        RelativeSide bearing = generator == RelativeSide.LEFT ? RelativeSide.RIGHT : RelativeSide.LEFT;
+        if (sideConfig.get(generator) != SideMode.ENERGY && sideConfig.get(bearing) == SideMode.ENERGY) {
+            SideMode generatorMode = sideConfig.get(generator);
+            sideConfig.set(generator, SideMode.ENERGY);
+            sideConfig.set(bearing, generatorMode);
+            onSideConfigChanged();
+        }
     }
 
     @Override
@@ -161,6 +207,14 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     @Override
     protected void tickMaster(ServerLevel level) {
+        // Arrays formed before the front moved to the window faced along the axis: turn them and reset
+        // their side modes, which were relative to that facing.
+        ShellStructure.Shell shell = getShell();
+        if (shell != null && getFacing().getAxis() == shell.axis()) {
+            sideConfig.reset();
+            onFormed(null);
+            onSideConfigChanged();
+        }
         flow = 0;
         fePerTick = 0;
         SteamGrade grade = SteamGrade.of(steam.getResource(0));

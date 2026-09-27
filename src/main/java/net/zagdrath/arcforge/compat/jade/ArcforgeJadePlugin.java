@@ -8,6 +8,7 @@ package net.zagdrath.arcforge.compat.jade;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
@@ -15,7 +16,8 @@ import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
 
 // Jade support (only loaded when Jade is installed): formed multiblocks are named as the machine, heat is
-// shown for everything that holds it, and conduits show what their network carries.
+// shown for everything that holds it, and conduits show what their network carries. Looking through a
+// Pressure Glass window shows the same as looking at its array's casings.
 @WailaPlugin
 public class ArcforgeJadePlugin implements IWailaPlugin {
     @Override
@@ -24,6 +26,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerEnergyStorage(ConduitProviders.Energy.INSTANCE, ConduitBlockEntity.class);
         registration.registerFluidStorage(ConduitProviders.Fluid.INSTANCE, ConduitBlockEntity.class);
         registration.registerItemStorage(ConduitProviders.Items.INSTANCE, ConduitBlockEntity.class);
+        // Pressure Glass has no block entity: these read the array it belongs to.
+        registration.registerBlockDataProvider(HeatProvider.INSTANCE, PressureGlassBlock.class);
+        registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, PressureGlassBlock.class);
+        registration.registerEnergyStorage(WindowProviders.Energy.INSTANCE, PressureGlassBlock.class);
     }
 
     @Override
@@ -34,5 +40,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);
+        registration.registerFluidStorageClient(WindowProviders.Fluid.INSTANCE);
+        registration.registerEnergyStorageClient(WindowProviders.Energy.INSTANCE);
     }
 }

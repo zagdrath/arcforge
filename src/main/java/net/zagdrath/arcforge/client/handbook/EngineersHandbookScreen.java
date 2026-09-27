@@ -14,6 +14,8 @@ import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -27,7 +29,6 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.StructureRenderer;
-import org.lwjgl.glfw.GLFW;
 
 // The Engineer's Handbook: a two-page book. The first spread lists the chapters; a chapter lists its
 // entries; an entry's pages flow across spreads. An entry shows the items it covers at the top (click one
@@ -394,7 +395,7 @@ public class EngineersHandbookScreen extends Screen {
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         double mouseX = event.x(), mouseY = event.y();
-        if (event.button() == GLFW.GLFW_MOUSE_BUTTON_RIGHT) {
+        if (event.button() == InputConstants.MOUSE_BUTTON_RIGHT) {
             back();
             return true;
         }
@@ -538,15 +539,15 @@ public class EngineersHandbookScreen extends Screen {
     @Override
     public boolean keyPressed(KeyEvent event) {
         switch (event.key()) {
-            case GLFW.GLFW_KEY_BACKSPACE -> {
+            case InputConstants.KEY_BACKSPACE -> {
                 back();
                 return true;
             }
-            case GLFW.GLFW_KEY_LEFT, GLFW.GLFW_KEY_PAGE_UP -> {
+            case InputConstants.KEY_LEFT, InputConstants.KEY_PAGEUP -> {
                 turn(-1);
                 return true;
             }
-            case GLFW.GLFW_KEY_RIGHT, GLFW.GLFW_KEY_PAGE_DOWN -> {
+            case InputConstants.KEY_RIGHT, InputConstants.KEY_PAGEDOWN -> {
                 turn(1);
                 return true;
             }

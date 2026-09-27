@@ -1,7 +1,8 @@
 {
-  "render_type": "minecraft:solid",
+  "render_type": "minecraft:cutout",
   "textures": {
-    "particle": "#conduit"
+    "particle": "#conduit",
+    "glow": "#conduit"
   },
   "elements": [
     {
@@ -62,6 +63,72 @@
             12
           ],
           "texture": "#conduit"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        5,
+        0
+      ],
+      "to": [
+        11,
+        11,
+        5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            6,
+            6,
+            11,
+            12
+          ],
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "west": {
+          "uv": [
+            6,
+            6,
+            11,
+            12
+          ],
+          "texture": "#glow",
+          "tintindex": 0
+        },
+        "up": {
+          "uv": [
+            6,
+            6,
+            11,
+            12
+          ],
+          "texture": "#glow",
+          "rotation": 90,
+          "tintindex": 0
+        },
+        "down": {
+          "uv": [
+            6,
+            6,
+            11,
+            12
+          ],
+          "texture": "#glow",
+          "rotation": 90,
+          "tintindex": 0
+        },
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#glow",
+          "tintindex": 0
         }
       }
     }
