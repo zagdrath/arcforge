@@ -28,8 +28,8 @@ public final class ModMenuTypes {
     public static final Supplier<MenuType<GeothermalPlantMenu>> GEOTHERMAL_PLANT = MENU_TYPES.register("geothermal_plant",
             () -> IMenuTypeExtension.create(GeothermalPlantMenu::new));
 
-    public static final Supplier<MenuType<BurnerMenu>> COMBUSTION_GENERATOR = MENU_TYPES.register("combustion_generator",
-            () -> IMenuTypeExtension.create(BurnerMenu::combustionGenerator));
+    public static final Supplier<MenuType<BurnerMenu>> COMBUSTION_PLANT = MENU_TYPES.register("combustion_plant",
+            () -> IMenuTypeExtension.create(BurnerMenu::combustionPlant));
 
     public static final Supplier<MenuType<BurnerMenu>> FIREBOX = MENU_TYPES.register("firebox",
             () -> IMenuTypeExtension.create(BurnerMenu::firebox));

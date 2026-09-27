@@ -1,6 +1,6 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "arcforge:block/combustion_generator"
+    "model": "arcforge:block/combustion_plant"
   }
 }

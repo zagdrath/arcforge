@@ -29,6 +29,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.SideSetting;
@@ -49,6 +50,8 @@ public class ConduitBlockEntity extends BlockEntity {
     private final List<ItemStack> storedItems = new ArrayList<>();
     // Energy (FE) or heat (HU) held by this conduit, for energy and thermal conduits.
     private int stored;
+    // Thermal conduits: the temperature (°C) of the heat held, so a rebuilt network remembers it.
+    private int heatTemperature = HeatBuffer.AMBIENT_CELSIUS;
     private FluidStack fluid = FluidStack.EMPTY;
     private float itemSpeed;
     private boolean syncPending;
@@ -96,6 +99,17 @@ public class ConduitBlockEntity extends BlockEntity {
     public void setStored(int amount) {
         if (amount != stored) {
             stored = amount;
+            setChanged();
+        }
+    }
+
+    public int getHeatTemperature() {
+        return heatTemperature;
+    }
+
+    public void setHeatTemperature(int celsius) {
+        if (celsius != heatTemperature) {
+            heatTemperature = celsius;
             setChanged();
         }
     }
@@ -283,6 +297,7 @@ public class ConduitBlockEntity extends BlockEntity {
             }
         });
         stored = input.getIntOr("stored", 0);
+        heatTemperature = input.getIntOr("heat_temperature", HeatBuffer.AMBIENT_CELSIUS);
         fluid = input.read("fluid", FluidStack.OPTIONAL_CODEC).orElse(FluidStack.EMPTY);
         itemSpeed = input.getFloatOr("item_speed", 0.0F);
     }
@@ -298,6 +313,9 @@ public class ConduitBlockEntity extends BlockEntity {
         if (!storedItems.isEmpty()) {
             var list = output.list("stored_items", ItemStack.OPTIONAL_CODEC);
             storedItems.forEach(list::add);
+        }
+        if (heatTemperature != HeatBuffer.AMBIENT_CELSIUS) {
+            output.putInt("heat_temperature", heatTemperature);
         }
         if (stored > 0) {
             output.putInt("stored", stored);

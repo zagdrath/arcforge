@@ -22,7 +22,7 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
-// The Combustion Generator's and the Firebox's menu: one fuel slot, and a buffer of FE or heat.
+// The Combustion Plant's and the Firebox's menu: one fuel slot, and a buffer of FE or heat.
 public class BurnerMenu extends MachineMenu {
     public static final int DATA_STORED = 0;
     public static final int DATA_CAPACITY = 1;
@@ -41,8 +41,8 @@ public class BurnerMenu extends MachineMenu {
     private static final int UPGRADES_TAB = 3;
 
     // Client constructors, called with the block position written by the server.
-    public static BurnerMenu combustionGenerator(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
-        return client(ModMenuTypes.COMBUSTION_GENERATOR.get(), containerId, inventory, extraData);
+    public static BurnerMenu combustionPlant(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
+        return client(ModMenuTypes.COMBUSTION_PLANT.get(), containerId, inventory, extraData);
     }
 
     public static BurnerMenu firebox(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -62,7 +62,7 @@ public class BurnerMenu extends MachineMenu {
     }
 
     private static Block blockFor(MenuType<BurnerMenu> type) {
-        return type == ModMenuTypes.FIREBOX.get() ? ModBlocks.FIREBOX.get() : ModBlocks.COMBUSTION_GENERATOR.get();
+        return type == ModMenuTypes.FIREBOX.get() ? ModBlocks.FIREBOX.get() : ModBlocks.COMBUSTION_PLANT.get();
     }
 
     @Override

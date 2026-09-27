@@ -29,12 +29,16 @@ import net.zagdrath.arcforge.registry.ModItems;
 public final class MultiblockGameTests {
     private MultiblockGameTests() {}
 
-    // Carbonizer N slices wide along +X, facing north (front row at z=0, back row at z=1), bottom at y=1.
+    // Carbonizer N slices wide along +X, facing north (front row at z=0, back rows behind it), bottom at y=1.
     private static void buildCarbonizer(GameTestHelper helper, int slices) {
+        buildCarbonizer(helper, 0, slices, 2, 2);
+    }
+
+    private static void buildCarbonizer(GameTestHelper helper, int firstX, int slices, int height, int depth) {
         BlockState state = ModBlocks.CARBONIZER.get().defaultBlockState().setValue(CarbonizerBlock.FACING, Direction.NORTH);
-        for (int x = 0; x < slices; x++) {
-            for (int y = 1; y <= 2; y++) {
-                for (int z = 0; z <= 1; z++) {
+        for (int x = firstX; x < firstX + slices; x++) {
+            for (int y = 1; y <= height; y++) {
+                for (int z = 0; z < depth; z++) {
                     helper.setBlock(new BlockPos(x, y, z), state);
                 }
             }
@@ -113,6 +117,71 @@ public final class MultiblockGameTests {
                     try (Transaction tx = Transaction.openRoot()) {
                         int drained = creosote.extract(FluidResource.of(ModFluids.CREOSOTE.get()), 1_000, tx);
                         helper.assertTrue(drained >= 250, "Only " + drained + " mB of creosote came out of the back face");
+                    }
+                })
+                .thenSucceed();
+    }
+
+    // Three 3-tall, 3-deep slices form one structure; the middle layer and row are marked middle, and
+    // the fronts use the tall door.
+    public static void carbonizerBigForms(GameTestHelper helper) {
+        buildCarbonizer(helper, 0, 3, 3, 3);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    CarbonizerBlockEntity master = helper.getBlockEntity(new BlockPos(0, 1, 0), CarbonizerBlockEntity.class);
+                    helper.assertTrue(master.isFormed() && master.getSlices() == 3, "Master is not formed with 3 slices");
+                    helper.assertTrue(master.getSliceHeight() == 3 && master.getSliceDepth() == 3,
+                            "Slices are " + master.getSliceHeight() + "x" + master.getSliceDepth() + ", expected 3x3");
+                    BlockState centre = helper.getBlockState(new BlockPos(1, 2, 1));
+                    helper.assertTrue(centre.getValue(CarbonizerBlock.HALF) == CarbonizerBlock.Half.MIDDLE, "Centre is not the middle layer");
+                    helper.assertTrue(centre.getValue(CarbonizerBlock.DEPTH) == CarbonizerBlock.Depth.MIDDLE, "Centre is not the middle row");
+                    BlockState frontTop = helper.getBlockState(new BlockPos(2, 3, 0));
+                    helper.assertTrue(frontTop.getValue(CarbonizerBlock.HALF) == CarbonizerBlock.Half.TOP
+                            && frontTop.getValue(CarbonizerBlock.DEPTH) == CarbonizerBlock.Depth.FRONT
+                            && frontTop.getValue(CarbonizerBlock.TALL), "Front top block is " + frontTop);
+                    helper.assertTrue(helper.getBlockState(new BlockPos(0, 1, 2)).getValue(CarbonizerBlock.DEPTH) == CarbonizerBlock.Depth.BACK, "z=2 is not the back row");
+                })
+                .thenSucceed();
+    }
+
+    // A 3-tall slice next to a 2-tall one isn't a box, so nothing forms.
+    public static void carbonizerMixedSizes(GameTestHelper helper) {
+        buildCarbonizer(helper, 0, 1, 3, 2);
+        buildCarbonizer(helper, 1, 1, 2, 2);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.assertTrue(row(helper, 0, 1, 0) == CarbonizerBlock.Row.NONE, "Mixed heights formed");
+                    helper.assertTrue(row(helper, 1, 1, 0) == CarbonizerBlock.Row.NONE, "Mixed heights formed");
+                })
+                .thenSucceed();
+    }
+
+    // A 3x3 slice bakes 3 coal at once: 3 coke and 750 mB of creosote per cycle.
+    public static void carbonizerBigBatch(GameTestHelper helper) {
+        buildCarbonizer(helper, 0, 1, 3, 3);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    CarbonizerBlockEntity master = helper.getBlockEntity(new BlockPos(0, 1, 0), CarbonizerBlockEntity.class);
+                    try (Transaction tx = Transaction.openRoot()) {
+                        helper.assertTrue(master.getItemHandler(null).insert(ItemResource.of(Items.COAL), 5, tx) == 5, "Carbonizer refused coal");
+                        tx.commit();
+                    }
+                })
+                .thenIdle(605)
+                .thenExecute(() -> {
+                    CarbonizerBlockEntity master = helper.getBlockEntity(new BlockPos(0, 1, 0), CarbonizerBlockEntity.class);
+                    ResourceHandler<ItemResource> items = master.getItemHandler(null);
+                    try (Transaction tx = Transaction.openRoot()) {
+                        int coke = items.extract(ItemResource.of(ModItems.COAL_COKE.get()), 64, tx);
+                        helper.assertTrue(coke == 3, "One cycle made " + coke + " coke, expected 3");
+                    }
+                    ResourceHandler<FluidResource> creosote = master.getFluidHandler(null);
+                    try (Transaction tx = Transaction.openRoot()) {
+                        int drained = creosote.extract(FluidResource.of(ModFluids.CREOSOTE.get()), 10_000, tx);
+                        helper.assertTrue(drained == 750, "One cycle made " + drained + " mB of creosote, expected 750");
                     }
                 })
                 .thenSucceed();

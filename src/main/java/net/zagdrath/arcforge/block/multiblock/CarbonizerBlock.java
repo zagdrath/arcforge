@@ -44,9 +44,9 @@ import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-// One block of a Carbonizer. Slices (1 wide x 2 tall x 2 deep) placed side by side form one structure;
-// ROW/HALF/DEPTH record where each block sits so the models can draw one continuous casing with a door
-// per slice. See CarbonizerStructure for formation and CarbonizerBlockEntity for processing.
+// One block of a Carbonizer. Slices (1 wide x 2 or 3 tall x 2 or 3 deep) placed side by side form one
+// structure; ROW/HALF/DEPTH record where each block sits so the models can draw one continuous casing
+// with a door per slice, and TALL picks the 3-tall front and door art. See CarbonizerStructure for formation and CarbonizerBlockEntity for processing.
 public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
     // Position along the row of slices. NONE = not part of a formed structure.
     public enum Row implements StringRepresentable {
@@ -71,7 +71,8 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
     }
 
     public enum Half implements StringRepresentable {
-        TOP("top"), BOTTOM("bottom");
+        // MIDDLE only in 3-tall slices.
+        TOP("top"), MIDDLE("middle"), BOTTOM("bottom");
 
         private final String name;
 
@@ -85,9 +86,9 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
         }
     }
 
-    // FRONT = the row carrying the slice doors, on the facing side.
+    // FRONT = the row carrying the slice doors, on the facing side. MIDDLE only in 3-deep slices.
     public enum Depth implements StringRepresentable {
-        FRONT("front"), BACK("back");
+        FRONT("front"), MIDDLE("middle"), BACK("back");
 
         private final String name;
 
@@ -105,6 +106,8 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
     public static final EnumProperty<Row> ROW = EnumProperty.create("h", Row.class);
     public static final EnumProperty<Half> HALF = EnumProperty.create("v", Half.class);
     public static final EnumProperty<Depth> DEPTH = EnumProperty.create("d", Depth.class);
+    // The slice is 3 tall (the front blocks show the tall door).
+    public static final BooleanProperty TALL = BooleanProperty.create("tall");
     // The block's slice is processing: front blocks open their door and show the fire.
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
@@ -115,6 +118,7 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
                 .setValue(ROW, Row.NONE)
                 .setValue(HALF, Half.BOTTOM)
                 .setValue(DEPTH, Depth.FRONT)
+                .setValue(TALL, false)
                 .setValue(LIT, false));
     }
 
@@ -222,7 +226,7 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, ROW, HALF, DEPTH, LIT);
+        builder.add(FACING, ROW, HALF, DEPTH, TALL, LIT);
     }
 
     // Smoke curls out of the open doors of working slices.

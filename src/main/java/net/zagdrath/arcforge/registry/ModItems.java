@@ -31,7 +31,7 @@ public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Arcforge.MODID);
 
     public static final DeferredItem<BlockItem> GEOTHERMAL_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.GEOTHERMAL_PLANT);
-    public static final DeferredItem<BlockItem> COMBUSTION_GENERATOR = ITEMS.registerSimpleBlockItem(ModBlocks.COMBUSTION_GENERATOR);
+    public static final DeferredItem<BlockItem> COMBUSTION_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.COMBUSTION_PLANT);
     public static final DeferredItem<BlockItem> FIREBOX = ITEMS.registerSimpleBlockItem(ModBlocks.FIREBOX);
     public static final DeferredItem<BlockItem> THERMOELECTRIC_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.THERMOELECTRIC_PLANT);
 

@@ -33,24 +33,40 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 
-// The steel door on each Carbonizer slice front. It stands 1px proud of the front face and swings
-// 90 degrees outwards about its hinge (the viewer's left) while the slice works. The block models
-// leave the door out; the geometry and UVs below match the leaf they used to carry.
+// The steel door on each Carbonizer slice front, one leaf the full height of the slice (24px for a
+// 2-tall slice, 40px for a 3-tall one), drawn a block-sized piece at a time. It stands 1px proud of the
+// front face and swings 90 degrees outwards about its hinge (the viewer's left) while the slice works.
+// The block models leave the door out. Leaf texture u = 0 is the hinge edge.
 // Coordinates are model pixels for a north-facing block, rotated to the block's facing.
 public class CarbonizerDoorRenderer implements BlockEntityRenderer<CarbonizerBlockEntity, CarbonizerDoorRenderer.State> {
-    private static final Identifier DOOR_TOP = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/carbonizer/door_top");
-    private static final Identifier DOOR_BOTTOM = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/carbonizer/door_bottom");
 
     // The closed leaf, and the hinge edge it swings about.
     private static final float X0 = 4, X1 = 12, Z0 = -1, Z1 = 0;
     private static final float HINGE_X = 12, HINGE_Z = 0;
-    // The bottom leaf fills y 4..16 of the lower block, the top leaf y 0..12 of the upper one.
-    private static final float BOTTOM_Y0 = 4, BOTTOM_Y1 = 16, TOP_Y0 = 0, TOP_Y1 = 12;
+    // Each block's piece of the leaf: y 4..16 of the bottom block, all of a middle block, y 0..12 of the top.
+    private enum Piece {
+        BOTTOM("bottom", 4, 16),
+        MIDDLE("middle", 0, 16),
+        TOP("top", 0, 12);
+
+        final String name;
+        final float y0, y1;
+
+        Piece(String name, float y0, float y1) {
+            this.name = name;
+            this.y0 = y0;
+            this.y1 = y1;
+        }
+
+        Identifier texture(boolean tall) {
+            return Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/carbonizer/" + (tall ? "door3_" : "door_") + name);
+        }
+    }
 
     public static class State extends BlockEntityRenderState {
         public @Nullable TextureAtlasSprite sprite;
         public Direction facing = Direction.NORTH;
-        public boolean top;
+        public Piece piece = Piece.BOTTOM;
         public float open;
         public int doorLight;
     }
@@ -72,9 +88,14 @@ public class CarbonizerDoorRenderer implements BlockEntityRenderer<CarbonizerBlo
             return;
         }
         state.facing = blockState.getValue(CarbonizerBlock.FACING);
-        state.top = blockState.getValue(CarbonizerBlock.HALF) == CarbonizerBlock.Half.TOP;
+        state.piece = switch (blockState.getValue(CarbonizerBlock.HALF)) {
+            case TOP -> Piece.TOP;
+            case MIDDLE -> Piece.MIDDLE;
+            case BOTTOM -> Piece.BOTTOM;
+        };
         state.open = carbonizer.getDoorOpen(partialTicks);
-        state.sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).getSprite(state.top ? DOOR_TOP : DOOR_BOTTOM);
+        state.sprite = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS)
+                .getSprite(state.piece.texture(blockState.getValue(CarbonizerBlock.TALL)));
         // The door hangs in front of the (opaque) block, so it takes the light of the space it sits in.
         BlockPos front = carbonizer.getBlockPos().relative(state.facing);
         state.doorLight = carbonizer.getLevel() != null ? LightCoordsUtil.getLightCoords(carbonizer.getLevel(), front) : state.lightCoords;
@@ -92,27 +113,26 @@ public class CarbonizerDoorRenderer implements BlockEntityRenderer<CarbonizerBlo
         // Swing outwards about the hinge.
         poseStack.rotateAround(Axis.YP.rotationDegrees(-90.0F * state.open), HINGE_X / 16.0F, 0.0F, HINGE_Z / 16.0F);
 
-        float y0 = state.top ? TOP_Y0 : BOTTOM_Y0;
-        float y1 = state.top ? TOP_Y1 : BOTTOM_Y1;
-        boolean top = state.top;
+        Piece piece = state.piece;
         int light = state.doorLight;
         collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sprite.atlasLocation()),
-                (pose, buffer) -> leaf(pose, buffer, sprite, light, y0, y1, top));
+                (pose, buffer) -> leaf(pose, buffer, sprite, light, piece));
         poseStack.popPose();
     }
 
-    // The leaf: face and back 8x12 from the door texture, edges from its 1px strip at u 8..9.
-    private static void leaf(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int light, float y0, float y1, boolean top) {
+    // A piece of the leaf: face and back 8 wide from the door texture, edges from its 1px strip at u 8..9.
+    private static void leaf(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int light, Piece piece) {
+        float y0 = piece.y0, y1 = piece.y1, v = y1 - y0;
         // Front (north) and back (south, mirrored).
-        quad(pose, buffer, sprite, light, 0, 0, -1, X1, y1, Z0, X1, y0, Z0, X0, y0, Z0, X0, y1, Z0, 0, 0, 8, 12);
-        quad(pose, buffer, sprite, light, 0, 0, 1, X0, y1, Z1, X0, y0, Z1, X1, y0, Z1, X1, y1, Z1, 8, 0, 0, 12);
+        quad(pose, buffer, sprite, light, 0, 0, -1, X1, y1, Z0, X1, y0, Z0, X0, y0, Z0, X0, y1, Z0, 0, 0, 8, v);
+        quad(pose, buffer, sprite, light, 0, 0, 1, X0, y1, Z1, X0, y0, Z1, X1, y0, Z1, X1, y1, Z1, 8, 0, 0, v);
         // Hinge side (east) and free side (west).
-        quad(pose, buffer, sprite, light, 1, 0, 0, X1, y1, Z1, X1, y0, Z1, X1, y0, Z0, X1, y1, Z0, 8, 0, 9, 12);
-        quad(pose, buffer, sprite, light, -1, 0, 0, X0, y1, Z0, X0, y0, Z0, X0, y0, Z1, X0, y1, Z1, 8, 0, 9, 12);
-        // The exposed end: the top of the upper leaf, the bottom of the lower one.
-        if (top) {
+        quad(pose, buffer, sprite, light, 1, 0, 0, X1, y1, Z1, X1, y0, Z1, X1, y0, Z0, X1, y1, Z0, 8, 0, 9, v);
+        quad(pose, buffer, sprite, light, -1, 0, 0, X0, y1, Z0, X0, y0, Z0, X0, y0, Z1, X0, y1, Z1, 8, 0, 9, v);
+        // The exposed ends: the top of the top piece, the bottom of the bottom one. Middle pieces have none.
+        if (piece == Piece.TOP) {
             quad(pose, buffer, sprite, light, 0, 1, 0, X0, y1, Z0, X0, y1, Z1, X1, y1, Z1, X1, y1, Z0, 0, 0, 8, 1);
-        } else {
+        } else if (piece == Piece.BOTTOM) {
             quad(pose, buffer, sprite, light, 0, -1, 0, X0, y0, Z1, X0, y0, Z0, X1, y0, Z0, X1, y0, Z1, 0, 1, 8, 0);
         }
     }

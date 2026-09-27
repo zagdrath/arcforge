@@ -18,7 +18,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
-import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
@@ -53,19 +53,19 @@ public final class HeatGameTests {
         heat.add((int) ((long) heat.getCapacity() * (celsius - HeatBuffer.AMBIENT_CELSIUS) / (heat.getMaxCelsius() - HeatBuffer.AMBIENT_CELSIUS)));
     }
 
-    // Coal through the top face burns at twice furnace speed (800 ticks) into FE, lighting the generator.
-    static void generatorBurns(GameTestHelper helper) {
+    // Coal through the top face burns at twice furnace speed (800 ticks) into FE, lighting the plant.
+    static void combustionPlantBurns(GameTestHelper helper) {
         BlockPos pos = new BlockPos(0, 1, 0);
-        helper.setBlock(pos, ModBlocks.COMBUSTION_GENERATOR.get());
+        helper.setBlock(pos, ModBlocks.COMBUSTION_PLANT.get());
         insertThroughTop(helper, pos, Items.COAL, 2);
         helper.startSequence()
                 .thenIdle(20)
                 .thenExecute(() -> {
-                    CombustionGeneratorBlockEntity generator = helper.getBlockEntity(pos, CombustionGeneratorBlockEntity.class);
-                    helper.assertTrue(generator.getStored() >= 40 * 15, "Generator made only " + generator.getStored() + " FE");
-                    helper.assertTrue(generator.getBurnTime() > 700 && generator.getBurnTime() <= 800, "Coal burns for " + generator.getBurnTime() + " more ticks, expected ~800 in all");
-                    helper.assertTrue(generator.getItems().getStack(0).getCount() == 1, "Generator burned more than one coal");
-                    helper.assertTrue(helper.getBlockState(pos).getValue(MachineBlock.LIT), "Generator is not lit while burning");
+                    CombustionPlantBlockEntity plant = helper.getBlockEntity(pos, CombustionPlantBlockEntity.class);
+                    helper.assertTrue(plant.getStored() >= 40 * 15, "Plant made only " + plant.getStored() + " FE");
+                    helper.assertTrue(plant.getBurnTime() > 700 && plant.getBurnTime() <= 800, "Coal burns for " + plant.getBurnTime() + " more ticks, expected ~800 in all");
+                    helper.assertTrue(plant.getItems().getStack(0).getCount() == 1, "Plant burned more than one coal");
+                    helper.assertTrue(helper.getBlockState(pos).getValue(MachineBlock.LIT), "Plant is not lit while burning");
                     BlockPos back = helper.absolutePos(pos).south();
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Energy.BLOCK, helper.absolutePos(pos), Direction.SOUTH) != null,
                             "Back face does not give FE " + back);
@@ -166,6 +166,33 @@ public final class HeatGameTests {
                 .thenWaitUntil(() -> helper.assertTrue(plant.getHeat().getStored() > 0, "No heat reached the plant"))
                 .thenExecute(() -> helper.assertTrue(helper.getBlockState(new BlockPos(2, 1, 0)).getValue(ActiveConduitBlock.ACTIVE),
                         "Conduit is not glowing while heat moves"))
+                .thenSucceed();
+    }
+
+    // A conduit run filled with heat before anything takes it (so it's full), then a thermoelectric
+    // plant is connected: the rebuilt network must pass on the heat it holds. It used to forget the
+    // heat's temperature and stall until a conduit was broken and replaced.
+    static void thermalConduitKeepsTemperature(GameTestHelper helper) {
+        BlockPos fireboxPos = new BlockPos(0, 1, 0);
+        BlockPos plantPos = new BlockPos(4, 1, 0);
+        helper.setBlock(fireboxPos, ModBlocks.FIREBOX.get());
+        FireboxBlockEntity firebox = helper.getBlockEntity(fireboxPos, FireboxBlockEntity.class);
+        firebox.setSideMode(RelativeSide.LEFT, SideMode.HEAT);
+        firebox.getHeat().add(firebox.getHeat().getCapacity());
+        for (int x = 1; x <= 3; x++) {
+            helper.setBlock(new BlockPos(x, 1, 0), ModBlocks.conduit(ConduitType.THERMAL, ConduitTier.WROUGHT).get());
+        }
+        for (int x = 1; x <= 3; x++) {
+            ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(new BlockPos(x, 1, 0)));
+        }
+        helper.startSequence()
+                .thenIdle(20)
+                .thenExecute(() -> {
+                    helper.setBlock(plantPos, ModBlocks.THERMOELECTRIC_PLANT.get());
+                    helper.getBlockEntity(plantPos, ThermoelectricPlantBlockEntity.class).setSideMode(RelativeSide.RIGHT, SideMode.HEAT);
+                })
+                .thenWaitUntil(() -> helper.assertTrue(helper.getBlockEntity(plantPos, ThermoelectricPlantBlockEntity.class).getHeat().getStored() > 0,
+                        "Heat held in a full conduit run never reached the plant"))
                 .thenSucceed();
     }
 

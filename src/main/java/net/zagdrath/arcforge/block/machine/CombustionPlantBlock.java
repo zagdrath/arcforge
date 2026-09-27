@@ -20,24 +20,24 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-public class CombustionGeneratorBlock extends MachineBlock {
-    public CombustionGeneratorBlock(BlockBehaviour.Properties properties) {
+public class CombustionPlantBlock extends MachineBlock {
+    public CombustionPlantBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new CombustionGeneratorBlockEntity(pos, state);
+        return new CombustionPlantBlockEntity(pos, state);
     }
 
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         return level instanceof ServerLevel serverLevel
-                ? createTickerHelper(type, ModBlockEntityTypes.COMBUSTION_GENERATOR.get(),
-                        (innerLevel, pos, blockState, generator) -> generator.serverTick(serverLevel, pos, blockState))
+                ? createTickerHelper(type, ModBlockEntityTypes.COMBUSTION_PLANT.get(),
+                        (innerLevel, pos, blockState, plant) -> plant.serverTick(serverLevel, pos, blockState))
                 : null;
     }
 

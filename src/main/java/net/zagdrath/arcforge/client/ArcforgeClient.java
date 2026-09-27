@@ -39,7 +39,7 @@ import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
-import net.zagdrath.arcforge.client.screen.machine.CombustionGeneratorScreen;
+import net.zagdrath.arcforge.client.screen.machine.CombustionPlantScreen;
 import net.zagdrath.arcforge.client.screen.machine.FireboxScreen;
 import net.zagdrath.arcforge.client.screen.machine.GeothermalPlantScreen;
 import net.zagdrath.arcforge.client.screen.machine.ThermoelectricPlantScreen;
@@ -65,7 +65,7 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.GEOTHERMAL_PLANT.get(), GeothermalPlantScreen::new);
-        event.register(ModMenuTypes.COMBUSTION_GENERATOR.get(), CombustionGeneratorScreen::new);
+        event.register(ModMenuTypes.COMBUSTION_PLANT.get(), CombustionPlantScreen::new);
         event.register(ModMenuTypes.FIREBOX.get(), FireboxScreen::new);
         event.register(ModMenuTypes.THERMOELECTRIC_PLANT.get(), ThermoelectricPlantScreen::new);
         event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);

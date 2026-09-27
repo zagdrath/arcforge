@@ -32,29 +32,29 @@ import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 
 // Burns coal, charcoal and coal blocks straight into FE: quick and simple, but only half the FE per
 // coal that a Firebox feeding a hot Thermoelectric Plant gets. Fuel burns at twice furnace speed.
-public class CombustionGeneratorBlockEntity extends BurnerBlockEntity {
+public class CombustionPlantBlockEntity extends BurnerBlockEntity {
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY);
 
     private final GeneratorEnergyHandler energy;
 
-    public CombustionGeneratorBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntityTypes.COMBUSTION_GENERATOR.get(), pos, state,
+    public CombustionPlantBlockEntity(BlockPos pos, BlockState state) {
+        super(ModBlockEntityTypes.COMBUSTION_PLANT.get(), pos, state,
                 new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.ENERGY, SideMode.NONE),
                 SIDE_MODES);
         this.energy = new GeneratorEnergyHandler(
-                ArcforgeConfig.GENERATOR_ENERGY_CAPACITY.getAsInt(),
-                ArcforgeConfig.GENERATOR_MAX_OUTPUT.getAsInt(),
+                ArcforgeConfig.COMBUSTION_PLANT_ENERGY_CAPACITY.getAsInt(),
+                ArcforgeConfig.COMBUSTION_PLANT_MAX_OUTPUT.getAsInt(),
                 this::setChanged);
     }
 
     @Override
     protected double burnSpeed() {
-        return ArcforgeConfig.GENERATOR_BURN_SPEED.getAsDouble();
+        return ArcforgeConfig.COMBUSTION_PLANT_BURN_SPEED.getAsDouble();
     }
 
     @Override
     protected int produce() {
-        return energy.generate(ArcforgeConfig.GENERATOR_ENERGY_PER_TICK.getAsInt());
+        return energy.generate(ArcforgeConfig.COMBUSTION_PLANT_ENERGY_PER_TICK.getAsInt());
     }
 
     @Override
@@ -64,7 +64,7 @@ public class CombustionGeneratorBlockEntity extends BurnerBlockEntity {
 
     @Override
     protected void pushOutput(ServerLevel level, BlockPos pos, Direction facing) {
-        outputs.pushEnergy(level, pos, facing, sideConfig, energy, ArcforgeConfig.GENERATOR_MAX_OUTPUT.getAsInt());
+        outputs.pushEnergy(level, pos, facing, sideConfig, energy, ArcforgeConfig.COMBUSTION_PLANT_MAX_OUTPUT.getAsInt());
     }
 
     @Override
@@ -107,11 +107,11 @@ public class CombustionGeneratorBlockEntity extends BurnerBlockEntity {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("container.arcforge.combustion_generator");
+        return Component.translatable("container.arcforge.combustion_plant");
     }
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        return new BurnerMenu(ModMenuTypes.COMBUSTION_GENERATOR.get(), containerId, inventory, worldPosition, items, getData());
+        return new BurnerMenu(ModMenuTypes.COMBUSTION_PLANT.get(), containerId, inventory, worldPosition, items, getData());
     }
 }

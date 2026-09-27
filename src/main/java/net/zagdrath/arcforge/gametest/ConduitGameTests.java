@@ -29,7 +29,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
@@ -236,9 +236,9 @@ final class ConduitGameTests {
     // The wrench then cycles that side auto -> input -> output -> disabled (backwards when sneaking),
     // and a conduit-to-conduit joint stays disconnected after neighbour updates.
     static void wrenchConduit(GameTestHelper helper) {
-        BlockPos generator = new BlockPos(0, 1, 0);
-        helper.setBlock(generator, ModBlocks.COMBUSTION_GENERATOR.get());
-        helper.getBlockEntity(generator, CombustionGeneratorBlockEntity.class).setSideMode(RelativeSide.LEFT, SideMode.ENERGY);
+        BlockPos combustionPlant = new BlockPos(0, 1, 0);
+        helper.setBlock(combustionPlant, ModBlocks.COMBUSTION_PLANT.get());
+        helper.getBlockEntity(combustionPlant, CombustionPlantBlockEntity.class).setSideMode(RelativeSide.LEFT, SideMode.ENERGY);
         placeRun(helper, ConduitType.ENERGY, ConduitTier.WROUGHT, 2);
         BlockPos first = new BlockPos(1, 1, 0);
         BlockPos second = new BlockPos(2, 1, 0);
@@ -246,7 +246,7 @@ final class ConduitGameTests {
         Vec3 westArm = new Vec3(-0.4, 0, 0);
         Vec3 eastArm = new Vec3(0.4, 0, 0);
 
-        // The generator faces north, so its east face is its left side, set to energy output.
+        // The plant faces north, so its east face is its left side, set to energy output.
         helper.assertTrue(sideOf(helper, first, Direction.WEST) == ConnectionMode.OUTPUT,
                 "Auto side is " + sideOf(helper, first, Direction.WEST) + ", expected OUTPUT");
         ConnectionMode[] expected = { ConnectionMode.INPUT, ConnectionMode.OUTPUT, ConnectionMode.NONE, ConnectionMode.OUTPUT };
@@ -276,21 +276,21 @@ final class ConduitGameTests {
         helper.succeed();
     }
 
-    // With no wrench configuration, a generator's energy side feeds a buffer at the other end, and changing
-    // the generator's side configuration disconnects the conduit.
+    // With no wrench configuration, a combustion plant's energy side feeds a buffer at the other end, and changing
+    // the plant's side configuration disconnects the conduit.
     static void autoConnect(GameTestHelper helper) {
         BlockPos plantPos = new BlockPos(0, 1, 0);
         BlockPos sink = new BlockPos(4, 1, 0);
         TestFixtures.reset(helper.absolutePos(sink));
-        helper.setBlock(plantPos, ModBlocks.COMBUSTION_GENERATOR.get());
+        helper.setBlock(plantPos, ModBlocks.COMBUSTION_PLANT.get());
         helper.setBlock(sink, Blocks.LODESTONE);
-        CombustionGeneratorBlockEntity plant = helper.getBlockEntity(plantPos, CombustionGeneratorBlockEntity.class);
+        CombustionPlantBlockEntity plant = helper.getBlockEntity(plantPos, CombustionPlantBlockEntity.class);
         plant.setSideMode(RelativeSide.LEFT, SideMode.ENERGY);
         placeRun(helper, ConduitType.ENERGY, ConduitTier.WROUGHT, 3);
         ((GeneratorEnergyHandler) plant.getEnergyHandler(null)).generate(5_000);
         var to = TestFixtures.energy(helper.absolutePos(sink));
 
-        helper.assertTrue(sideOf(helper, new BlockPos(1, 1, 0), Direction.WEST) == ConnectionMode.OUTPUT, "Conduit does not pull from the generator");
+        helper.assertTrue(sideOf(helper, new BlockPos(1, 1, 0), Direction.WEST) == ConnectionMode.OUTPUT, "Conduit does not pull from the plant");
         helper.assertTrue(sideOf(helper, new BlockPos(3, 1, 0), Direction.EAST) == ConnectionMode.INPUT, "Conduit does not push into the buffer");
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(to.getAmountAsInt() == 5_000, "Sink has " + to.getAmountAsInt()))

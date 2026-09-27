@@ -30,7 +30,7 @@ import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 
-// Burns coal, charcoal and coal blocks into heat (HU) at furnace speed. It runs up to 1,100°C, hot
+// Burns coal, charcoal and coal blocks into heat (HU) at twice furnace speed. It runs up to 1,100°C, hot
 // enough to drive a Thermoelectric Plant at full efficiency.
 public class FireboxBlockEntity extends BurnerBlockEntity {
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT);

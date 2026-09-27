@@ -41,7 +41,13 @@ public class CarbonizerMenu extends AbstractContainerMenu {
     public static final int DATA_FLUID_CAPACITY = DATA_FLUID + 2;
     public static final int DATA_REDSTONE_MODE = DATA_FLUID + 3;
     public static final int DATA_SIDE_CONFIG = DATA_FLUID + 4;
-    public static final int DATA_VALUES = DATA_FLUID + 5;
+    // Slice height and depth (0 while unformed).
+    public static final int DATA_SLICE_HEIGHT = DATA_FLUID + 5;
+    public static final int DATA_SLICE_DEPTH = DATA_FLUID + 6;
+    // One per chamber: how many inputs it is baking, and which item (-1 when empty).
+    public static final int DATA_BATCH_FIRST = DATA_FLUID + 7;
+    public static final int DATA_BATCH_ITEM_FIRST = DATA_BATCH_FIRST + CarbonizerBlockEntity.MAX_CHAMBERS;
+    public static final int DATA_VALUES = DATA_BATCH_ITEM_FIRST + CarbonizerBlockEntity.MAX_CHAMBERS;
 
     // Slot positions from carbonizer_gui_layout.json.
     public static final int INPUT_X = 27, INPUT_Y = 23;
@@ -150,6 +156,24 @@ public class CarbonizerMenu extends AbstractContainerMenu {
     public float getChamberProgress(int chamber) {
         int permille = value(DATA_CHAMBER_FIRST + chamber);
         return permille < 0 ? -1.0F : permille / 1000.0F;
+    }
+
+    public int getSliceHeight() {
+        return value(DATA_SLICE_HEIGHT);
+    }
+
+    public int getSliceDepth() {
+        return value(DATA_SLICE_DEPTH);
+    }
+
+    public int getChamberBatch(int chamber) {
+        return value(DATA_BATCH_FIRST + chamber);
+    }
+
+    // The item a chamber is baking, or null when it's empty.
+    public net.minecraft.world.item.@org.jspecify.annotations.Nullable Item getChamberItem(int chamber) {
+        int id = value(DATA_BATCH_ITEM_FIRST + chamber);
+        return id < 0 ? null : net.minecraft.core.registries.BuiltInRegistries.ITEM.byId(id);
     }
 
     public Fluid getFluid() {

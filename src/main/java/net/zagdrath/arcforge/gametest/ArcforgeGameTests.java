@@ -64,19 +64,23 @@ public final class ArcforgeGameTests {
         TESTS.put("machines_drop_items", StorageGameTests::machinesDropItems);
         TESTS.put("cell_charge", StorageGameTests::cellCharge);
         TESTS.put("cell_output_and_conduit", StorageGameTests::cellOutputAndConduit);
-        TESTS.put("generator_burns", HeatGameTests::generatorBurns);
+        TESTS.put("combustion_plant_burns", HeatGameTests::combustionPlantBurns);
         TESTS.put("geothermal_makes_heat", HeatGameTests::geothermalMakesHeat);
         TESTS.put("firebox_drives_thermoelectric", HeatGameTests::fireboxDrivesThermoelectric);
         TESTS.put("heat_flows_hot_to_cold", HeatGameTests::heatFlowsHotToCold);
         TESTS.put("thermal_conduit_carries_heat", HeatGameTests::thermalConduitCarriesHeat);
+        TESTS.put("thermal_conduit_keeps_temperature", HeatGameTests::thermalConduitKeepsTemperature);
         TESTS.put("heat_cell_fills", HeatGameTests::heatCellFills);
         TESTS.put("heat_cell_leaks", HeatGameTests::heatCellLeaks);
         TESTS.put("heat_cell_outputs", HeatGameTests::heatCellOutputs);
         TESTS.put("heat_cell_keeps_heat", HeatGameTests::heatCellKeepsHeat);
         TESTS.put("carbonizer_forms", MultiblockGameTests::carbonizerForms);
         TESTS.put("furnace_forms", MultiblockGameTests::furnaceForms);
+        TESTS.put("carbonizer_big_forms", MultiblockGameTests::carbonizerBigForms);
+        TESTS.put("carbonizer_mixed_sizes", MultiblockGameTests::carbonizerMixedSizes);
         LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);
         LONG_TESTS.put("furnace_smelts", MultiblockGameTests::furnaceSmelts);
+        LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }

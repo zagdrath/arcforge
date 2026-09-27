@@ -25,32 +25,47 @@ import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 
 // Carbonizer formation. Connected carbonizer blocks form a structure when they fill exactly a box N wide
-// (1..maxSlices) x 2 tall x 2 deep, all facing the same way, with the depth running along the facing.
+// (1..maxSlices) x H tall x D deep (H and D each 2 or 3, the same for every slice), all facing the same
+// way, with the depth running along the facing.
 // Slice i is row column i, counted from the left end (facing.getCounterClockWise(), model -X). The
 // master is the left, bottom, front block; it runs the structure and holds its inventory.
 public final class CarbonizerStructure {
-    // Stop flood-filling past this; anything this big is invalid anyway.
-    private static final int SEARCH_LIMIT = 256;
+    public static final int MIN_SIZE = 2;
+    public static final int MAX_SIZE = 3;
 
-    public record Formation(Direction facing, BlockPos min, BlockPos max, int slices, BlockPos master) {
+    // Formations saved before slices could vary were all 2 tall and 2 deep.
+    public record Formation(Direction facing, BlockPos min, BlockPos max, int slices, BlockPos master, int height, int depth) {
         public static final Codec<Formation> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Direction.CODEC.fieldOf("facing").forGetter(Formation::facing),
                 BlockPos.CODEC.fieldOf("min").forGetter(Formation::min),
                 BlockPos.CODEC.fieldOf("max").forGetter(Formation::max),
                 Codec.INT.fieldOf("slices").forGetter(Formation::slices),
-                BlockPos.CODEC.fieldOf("master").forGetter(Formation::master))
+                BlockPos.CODEC.fieldOf("master").forGetter(Formation::master),
+                Codec.INT.optionalFieldOf("height", MIN_SIZE).forGetter(Formation::height),
+                Codec.INT.optionalFieldOf("depth", MIN_SIZE).forGetter(Formation::depth))
                 .apply(i, Formation::new));
+
+        // Blocks in one slice: its height times its depth (4, 6 or 9).
+        public int sliceVolume() {
+            return height * depth;
+        }
 
         // Blocks along the row run from the master towards the facing's clockwise side.
         public Direction rowDirection() {
             return facing.getClockWise();
         }
 
-        // The four blocks of slice i: front and back, bottom and top.
+        // The blocks of slice i, front row first, each column bottom up; [0] is its front bottom block.
         public BlockPos[] slice(int index) {
             BlockPos frontBottom = master.relative(rowDirection(), index);
-            BlockPos backBottom = frontBottom.relative(facing.getOpposite());
-            return new BlockPos[] { frontBottom, frontBottom.above(), backBottom, backBottom.above() };
+            BlockPos[] blocks = new BlockPos[sliceVolume()];
+            int i = 0;
+            for (int back = 0; back < depth; back++) {
+                for (int up = 0; up < height; up++) {
+                    blocks[i++] = frontBottom.relative(facing.getOpposite(), back).above(up);
+                }
+            }
+            return blocks;
         }
     }
 
@@ -81,7 +96,9 @@ public final class CarbonizerStructure {
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
         found.add(origin);
         queue.add(origin);
-        while (!queue.isEmpty() && found.size() < SEARCH_LIMIT) {
+        // Stop flood-filling past the biggest valid structure; anything bigger is invalid anyway.
+        int searchLimit = ArcforgeConfig.CARBONIZER_MAX_SLICES.getAsInt() * MAX_SIZE * MAX_SIZE + 1;
+        while (!queue.isEmpty() && found.size() < searchLimit) {
             BlockPos pos = queue.poll();
             for (Direction direction : Direction.values()) {
                 BlockPos next = pos.relative(direction);
@@ -105,7 +122,7 @@ public final class CarbonizerStructure {
 
     public static @Nullable Formation validate(ServerLevel level, Set<BlockPos> blocks) {
         int maxSlices = ArcforgeConfig.CARBONIZER_MAX_SLICES.getAsInt();
-        if (blocks.isEmpty() || blocks.size() % 4 != 0 || blocks.size() > maxSlices * 4) {
+        if (blocks.size() < MIN_SIZE * MIN_SIZE || blocks.size() > maxSlices * MAX_SIZE * MAX_SIZE) {
             return null;
         }
 
@@ -129,10 +146,13 @@ public final class CarbonizerStructure {
 
         int sizeX = maxX - minX + 1;
         int sizeZ = maxZ - minZ + 1;
+        int height = maxY - minY + 1;
         int depth = facing.getAxis() == Direction.Axis.X ? sizeX : sizeZ;
         int width = facing.getAxis() == Direction.Axis.X ? sizeZ : sizeX;
-        // Distinct positions filling the whole box's volume means the box is solid.
-        if (maxY - minY + 1 != 2 || depth != 2 || width < 1 || width > maxSlices || width * 4 != blocks.size()) {
+        // Distinct positions filling the whole box's volume means the box is solid, so every slice has
+        // the same height and depth.
+        if (height < MIN_SIZE || height > MAX_SIZE || depth < MIN_SIZE || depth > MAX_SIZE
+                || width < 1 || width > maxSlices || width * height * depth != blocks.size()) {
             return null;
         }
 
@@ -142,7 +162,7 @@ public final class CarbonizerStructure {
         Direction row = facing.getClockWise();
         int masterX = row.getStepX() > 0 ? minX : row.getStepX() < 0 ? maxX : facing.getStepX() > 0 ? maxX : minX;
         int masterZ = row.getStepZ() > 0 ? minZ : row.getStepZ() < 0 ? maxZ : facing.getStepZ() > 0 ? maxZ : minZ;
-        return new Formation(facing, min, max, width, new BlockPos(masterX, minY, masterZ));
+        return new Formation(facing, min, max, width, new BlockPos(masterX, minY, masterZ), height, depth);
     }
 
     private static void form(ServerLevel level, Set<BlockPos> blocks, Formation formation) {
@@ -151,15 +171,21 @@ public final class CarbonizerStructure {
         BlockPos master = formation.master();
         // Rechecking a structure that's already built this way (e.g. after a wrench click) isn't news.
         boolean unchanged = level.getBlockEntity(master) instanceof CarbonizerBlockEntity current
-                && current.isFormed() && current.getSlices() == formation.slices();
+                && current.isFormed() && current.getSlices() == formation.slices()
+                && current.getSliceHeight() == formation.height() && current.getSliceDepth() == formation.depth();
         for (BlockPos pos : blocks) {
             int index = (pos.getX() - master.getX()) * row.getStepX() + (pos.getZ() - master.getZ()) * row.getStepZ();
-            boolean front = (pos.getX() - master.getX()) * facing.getStepX() + (pos.getZ() - master.getZ()) * facing.getStepZ() == 0;
+            // How many rows back from the front this block is.
+            int back = -((pos.getX() - master.getX()) * facing.getStepX() + (pos.getZ() - master.getZ()) * facing.getStepZ());
+            int up = pos.getY() - master.getY();
             BlockState state = level.getBlockState(pos);
             BlockState formed = state
                     .setValue(CarbonizerBlock.ROW, CarbonizerBlock.Row.of(index, formation.slices()))
-                    .setValue(CarbonizerBlock.HALF, pos.getY() == formation.max().getY() ? CarbonizerBlock.Half.TOP : CarbonizerBlock.Half.BOTTOM)
-                    .setValue(CarbonizerBlock.DEPTH, front ? CarbonizerBlock.Depth.FRONT : CarbonizerBlock.Depth.BACK);
+                    .setValue(CarbonizerBlock.HALF, up == 0 ? CarbonizerBlock.Half.BOTTOM
+                            : up == formation.height() - 1 ? CarbonizerBlock.Half.TOP : CarbonizerBlock.Half.MIDDLE)
+                    .setValue(CarbonizerBlock.DEPTH, back == 0 ? CarbonizerBlock.Depth.FRONT
+                            : back == formation.depth() - 1 ? CarbonizerBlock.Depth.BACK : CarbonizerBlock.Depth.MIDDLE)
+                    .setValue(CarbonizerBlock.TALL, formation.height() == MAX_SIZE);
             if (formed != state) {
                 level.setBlock(pos, formed, Block.UPDATE_ALL);
             }

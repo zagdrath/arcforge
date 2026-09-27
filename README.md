@@ -19,7 +19,7 @@ Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Ma
 ### Power and heat
 
 ```
-coal / charcoal / coal block --[Combustion Generator]--> FE      (simple, least FE per coal)
+coal / charcoal / coal block --[Combustion Plant]--> FE      (simple, least FE per coal)
 coal / charcoal / coal block --[Firebox]--> heat (HU)            (up to 1,100°C)
 lava (tank, pipes, nearby blocks) --[Geothermal Plant]--> heat   (up to 600°C)
 heat --[Thermoelectric Plant]--> FE                              (hotter heat = more FE)
@@ -32,22 +32,22 @@ It only ever flows from a hotter machine into a colder one.
 
 | Machine | Makes | Buffer | Max temp | Notes |
 |---|---|---|---|---|
-| Combustion Generator | 40 FE/t | 50,000 FE | — | Fuel burns at 2× furnace speed: 32,000 FE per coal |
-| Firebox | 40 HU/t | 40,000 HU | 1,100°C | Fuel burns at furnace speed: 64,000 HU per coal |
-| Geothermal Plant | 20 HU/t from lava, plus passive | 20,000 HU | 600°C | 1 mB/t of lava: 20,000 HU per bucket |
-| Thermoelectric Plant | FE from heat | 20,000 HU + 50,000 FE | 1,100°C | Takes up to 40 HU/t |
+| Combustion Plant | 40 FE/t | 50,000 FE | — | Fuel burns at 2× furnace speed: 32,000 FE per coal |
+| Firebox | 80 HU/t | 40,000 HU | 1,100°C | Fuel burns at 2× furnace speed: 64,000 HU per coal |
+| Geothermal Plant | 40 HU/t from lava, plus passive | 20,000 HU | 600°C | 1 mB/t of lava: 40,000 HU per bucket |
+| Thermoelectric Plant | FE from heat | 20,000 HU + 50,000 FE | 1,100°C | Takes up to 80 HU/t |
 
-- **Fuel** for the Combustion Generator and Firebox is `#arcforge:combustion_fuel` (coal,
+- **Fuel** for the Combustion Plant and Firebox is `#arcforge:combustion_fuel` (coal,
   charcoal, blocks of coal). Both pause while their buffer is full, keeping the rest of the burning item.
 - **Geothermal Plant:** fill its 8,000 mB lava tank with lava buckets in the slot, by right-clicking
   with a bucket, or by piping lava into an input face. Touching lava source blocks add 3 HU/t each and
   magma blocks 1 HU/t each, even with an empty tank; they're never used up. It makes no FE itself.
 - **Thermoelectric Plant:** heat passes through it in proportion to how full its buffer is (up to
-  40 HU/t when full), and becomes FE at an efficiency set by its temperature: 0% at 100°C,
+  80 HU/t when full), and becomes FE at an efficiency set by its temperature: 0% at 100°C,
   50% at 600°C and 100% at 1,100°C. It can't get hotter than what feeds it, so a Geothermal Plant
   drives it to about 50% at best, while a Firebox gets it close to 100% (about 64,000 FE per coal).
   It takes a few minutes to warm up.
-- Generators push up to 200 FE/t out of their energy faces.
+- The Combustion and Thermoelectric Plants push up to 200 FE/t out of their energy faces.
 
 ## Logistics
 
@@ -154,7 +154,7 @@ Tabs on the right of each machine's screen:
 - **Redstone**: ignore redstone, run only with a signal, or run only without one.
 - **Sides**: choose what each face does, including the front. Left-click to cycle, right-click to
   cycle back, shift-click to clear one face, or use the clear button to reset every face to none.
-  - Combustion Generator: none, input, energy. Top is input, back is energy.
+  - Combustion Plant: none, input, energy. Top is input, back is energy.
   - Firebox and Geothermal Plant: none, input, heat. Top is input, back is heat.
   - Thermoelectric Plant: none, heat, energy. Top and bottom are heat, back is energy.
   - Tanks and cells: none, input or output.

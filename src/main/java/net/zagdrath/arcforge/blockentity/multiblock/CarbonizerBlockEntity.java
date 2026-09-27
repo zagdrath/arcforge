@@ -64,7 +64,8 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // Every Carbonizer block has one of these. In a formed structure each points at the master (the left,
 // bottom, front block), which runs one chamber per slice in parallel, holds the shared slots and the
-// creosote buffer tank, and serves the GUI and capabilities for every block.
+// creosote buffer tank, and serves the GUI and capabilities for every block. Bigger slices bake a
+// bigger batch in the same time: one input per 3 blocks of slice volume (2x2: 1, 2x3: 2, 3x3: 3).
 //
 // The master's contents stay with that block when the structure breaks and come back when it re-forms.
 // If a different block becomes master, the old one hands everything over (see absorb).
@@ -88,7 +89,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     private final SideConfig sideConfig = new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.NONE, SideMode.NONE, SideMode.BYPRODUCT, SideMode.NONE);
     private final ContainerData data;
 
-    // Each chamber holds the one input item it is baking.
+    // Each chamber holds the batch of input items it is baking.
     private final ItemStack[] chamberInput = new ItemStack[MAX_CHAMBERS];
     private final int[] chamberProgress = new int[MAX_CHAMBERS];
     private final int[] chamberTime = new int[MAX_CHAMBERS];
@@ -122,8 +123,17 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
                 if (index >= CarbonizerMenu.DATA_CHAMBER_FIRST && index < CarbonizerMenu.DATA_CHAMBER_FIRST + MAX_CHAMBERS) {
                     return chamberDisplay(index - CarbonizerMenu.DATA_CHAMBER_FIRST);
                 }
+                if (index >= CarbonizerMenu.DATA_BATCH_FIRST && index < CarbonizerMenu.DATA_BATCH_FIRST + MAX_CHAMBERS) {
+                    return chamberInput[index - CarbonizerMenu.DATA_BATCH_FIRST].getCount();
+                }
+                if (index >= CarbonizerMenu.DATA_BATCH_ITEM_FIRST && index < CarbonizerMenu.DATA_BATCH_ITEM_FIRST + MAX_CHAMBERS) {
+                    ItemStack batch = chamberInput[index - CarbonizerMenu.DATA_BATCH_ITEM_FIRST];
+                    return batch.isEmpty() ? -1 : BuiltInRegistries.ITEM.getId(batch.getItem());
+                }
                 return switch (index) {
                     case CarbonizerMenu.DATA_CHAMBERS -> formation != null ? formation.slices() : 0;
+                    case CarbonizerMenu.DATA_SLICE_HEIGHT -> getSliceHeight();
+                    case CarbonizerMenu.DATA_SLICE_DEPTH -> getSliceDepth();
                     case CarbonizerMenu.DATA_FLUID -> tank.getAmount() > 0 ? BuiltInRegistries.FLUID.getId(tank.getResource(0).getFluid()) : -1;
                     case CarbonizerMenu.DATA_FLUID_AMOUNT -> tank.getAmount();
                     case CarbonizerMenu.DATA_FLUID_CAPACITY -> tank.getCapacity();
@@ -149,8 +159,14 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         return ArcforgeConfig.CARBONIZER_MIN_CREOSOTE_CAPACITY.getAsInt();
     }
 
-    private static int capacityFor(int slices) {
-        return Math.max(minCapacity(), slices * ArcforgeConfig.CARBONIZER_CREOSOTE_PER_SLICE.getAsInt());
+    // The creosote tank grows with the chambers' total volume.
+    private static int capacityFor(CarbonizerStructure.Formation formation) {
+        return Math.max(minCapacity(), formation.slices() * formation.sliceVolume() * ArcforgeConfig.CARBONIZER_CREOSOTE_PER_VOLUME.getAsInt());
+    }
+
+    // Inputs baked at once in each chamber of this structure.
+    private static int batchSize(CarbonizerStructure.Formation formation) {
+        return Math.max(1, formation.sliceVolume() / 3);
     }
 
     // Permille progress of a working chamber, or -1 while it is idle or stalled.
@@ -187,7 +203,13 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         masterPos = worldPosition;
         formation = newFormation;
         holdsContents = true;
-        tank.setCapacity(capacityFor(newFormation.slices()));
+        tank.setCapacity(capacityFor(newFormation));
+        // Chambers holding more than the new slice size bakes give their items back, as do chambers past the end.
+        for (int chamber = 0; chamber < newFormation.slices(); chamber++) {
+            if (chamberInput[chamber].getCount() > batchSize(newFormation)) {
+                releaseChamber(chamber);
+            }
+        }
         releaseChambers(newFormation.slices());
         setChanged();
     }
@@ -275,6 +297,14 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         return formation != null ? formation.slices() : 0;
     }
 
+    public int getSliceHeight() {
+        return formation != null ? formation.height() : 0;
+    }
+
+    public int getSliceDepth() {
+        return formation != null ? formation.depth() : 0;
+    }
+
     @Override
     public Direction getStructureFacing() {
         return formation != null ? formation.facing() : getBlockState().getValue(CarbonizerBlock.FACING);
@@ -341,13 +371,13 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
             powered = isPowered(level, formed);
         }
-        tank.setCapacity(capacityFor(formed.slices()));
+        tank.setCapacity(capacityFor(formed));
         fillContainer();
 
         boolean enabled = redstoneMode.canRun(powered);
         for (int chamber = 0; chamber < formed.slices(); chamber++) {
             if (enabled && chamberInput[chamber].isEmpty()) {
-                startChamber(level, chamber);
+                startChamber(level, chamber, batchSize(formed));
             }
             boolean working = false;
             if (!chamberInput[chamber].isEmpty()) {
@@ -378,20 +408,28 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         return false;
     }
 
-    // Loads one input item into an idle chamber, if its products would currently fit.
-    private void startChamber(ServerLevel level, int chamber) {
+    // Loads up to a batch of input into an idle chamber: as many as there are (a partial batch never waits
+    // for more) and as many as the products would currently fit for.
+    private void startChamber(ServerLevel level, int chamber, int batch) {
         ItemStack input = items.getStack(SLOT_INPUT);
         if (input.isEmpty()) {
             return;
         }
         RecipeHolder<CarbonizingRecipe> recipe = MachineRecipes.carbonizing(level, input).orElse(null);
-        if (recipe == null || !productsFit(recipe.value())) {
+        if (recipe == null) {
             return;
         }
-        chamberInput[chamber] = input.copyWithCount(1);
+        int count = Math.min(batch, input.getCount());
+        while (count > 0 && !productsFit(recipe.value(), count)) {
+            count--;
+        }
+        if (count <= 0) {
+            return;
+        }
+        chamberInput[chamber] = input.copyWithCount(count);
         chamberProgress[chamber] = 0;
         chamberTime[chamber] = recipe.value().time();
-        items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
+        items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - count));
     }
 
     // Moves a finished chamber's products out. Returns false if they don't fit yet (the chamber stalls).
@@ -403,15 +441,17 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
             return false;
         }
         CarbonizingRecipe value = recipe.value();
-        if (!productsFit(value)) {
+        int count = chamberInput[chamber].getCount();
+        if (!productsFit(value, count)) {
             return false;
         }
         ItemStack result = value.result().create();
+        result.setCount(result.getCount() * count);
         ItemStack output = items.getStack(SLOT_OUTPUT);
         items.setStack(SLOT_OUTPUT, output.isEmpty() ? result : output.copyWithCount(output.getCount() + result.getCount()));
         value.byproduct().ifPresent(fluid -> {
             try (Transaction tx = Transaction.openRoot()) {
-                tank.insert(0, FluidResource.of(fluid.create()), fluid.amount(), tx);
+                tank.insert(0, FluidResource.of(fluid.create()), fluid.amount() * count, tx);
                 tx.commit();
             }
         });
@@ -422,11 +462,14 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         return true;
     }
 
-    private boolean productsFit(CarbonizingRecipe recipe) {
+    // Whether the products of baking `count` inputs fit in the output slot and the tank right now.
+    private boolean productsFit(CarbonizingRecipe recipe, int count) {
         ItemStack result = recipe.result().create();
+        int resultCount = result.getCount() * count;
         ItemStack output = items.getStack(SLOT_OUTPUT);
         boolean itemFits = output.isEmpty()
-                || (ItemStack.isSameItemSameComponents(output, result) && output.getCount() + result.getCount() <= output.getMaxStackSize());
+                ? resultCount <= result.getMaxStackSize()
+                : ItemStack.isSameItemSameComponents(output, result) && output.getCount() + resultCount <= output.getMaxStackSize();
         if (!itemFits) {
             return false;
         }
@@ -434,12 +477,13 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
             return true;
         }
         FluidStack fluid = recipe.byproduct().get().create();
+        int amount = fluid.getAmount() * count;
         try (Transaction tx = Transaction.openRoot()) {
-            return tank.insert(0, FluidResource.of(fluid), fluid.getAmount(), tx) == fluid.getAmount();
+            return tank.insert(0, FluidResource.of(fluid), amount, tx) == amount;
         }
     }
 
-    // Only the two front blocks look different while lit (their doors swing open), but the whole slice
+    // Only the front blocks look different while lit (their door swings open), but the whole slice
     // carries the state. The slice's door clanks once as it opens or shuts.
     private static void setSliceLit(ServerLevel level, CarbonizerStructure.Formation formed, int chamber, boolean lit) {
         BlockPos[] slice = formed.slice(chamber);
@@ -608,7 +652,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
             chamber++;
         }
         if (formation != null) {
-            tank.setCapacity(capacityFor(formation.slices()));
+            tank.setCapacity(capacityFor(formation));
         }
     }
 

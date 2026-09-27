@@ -17,7 +17,7 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
@@ -34,8 +34,8 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<GeothermalPlantBlockEntity>> GEOTHERMAL_PLANT = BLOCK_ENTITY_TYPES.register("geothermal_plant",
             () -> new BlockEntityType<>(GeothermalPlantBlockEntity::new, ModBlocks.GEOTHERMAL_PLANT.get()));
 
-    public static final Supplier<BlockEntityType<CombustionGeneratorBlockEntity>> COMBUSTION_GENERATOR = BLOCK_ENTITY_TYPES.register("combustion_generator",
-            () -> new BlockEntityType<>(CombustionGeneratorBlockEntity::new, ModBlocks.COMBUSTION_GENERATOR.get()));
+    public static final Supplier<BlockEntityType<CombustionPlantBlockEntity>> COMBUSTION_PLANT = BLOCK_ENTITY_TYPES.register("combustion_plant",
+            () -> new BlockEntityType<>(CombustionPlantBlockEntity::new, ModBlocks.COMBUSTION_PLANT.get()));
 
     public static final Supplier<BlockEntityType<FireboxBlockEntity>> FIREBOX = BLOCK_ENTITY_TYPES.register("firebox",
             () -> new BlockEntityType<>(FireboxBlockEntity::new, ModBlocks.FIREBOX.get()));

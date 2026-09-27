@@ -24,7 +24,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
-import net.zagdrath.arcforge.block.machine.CombustionGeneratorBlock;
+import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
 import net.zagdrath.arcforge.block.machine.FireboxBlock;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
@@ -51,8 +51,8 @@ public final class ModBlocks {
                     .sound(SoundType.METAL)
                     .lightLevel(state -> state.getValue(MachineBlock.LIT) ? 7 : 0));
 
-    public static final DeferredBlock<CombustionGeneratorBlock> COMBUSTION_GENERATOR = BLOCKS.registerBlock("combustion_generator",
-            CombustionGeneratorBlock::new, p -> machineProperties(p, 13));
+    public static final DeferredBlock<CombustionPlantBlock> COMBUSTION_PLANT = BLOCKS.registerBlock("combustion_plant",
+            CombustionPlantBlock::new, p -> machineProperties(p, 13));
 
     public static final DeferredBlock<FireboxBlock> FIREBOX = BLOCKS.registerBlock("firebox",
             FireboxBlock::new, p -> machineProperties(p, 13));

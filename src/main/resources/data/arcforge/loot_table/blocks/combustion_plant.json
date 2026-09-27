@@ -15,11 +15,11 @@
             ],
             "source": "block_entity"
           },
-          "name": "arcforge:combustion_generator"
+          "name": "arcforge:combustion_plant"
         }
       ],
       "rolls": 1
     }
   ],
-  "random_sequence": "arcforge:blocks/combustion_generator"
+  "random_sequence": "arcforge:blocks/combustion_plant"
 }

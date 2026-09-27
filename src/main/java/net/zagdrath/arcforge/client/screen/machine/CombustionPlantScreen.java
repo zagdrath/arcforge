@@ -17,8 +17,8 @@ import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 
-// Layout follows combustion_generator_gui_layout.json. All positions are relative to leftPos/topPos.
-public class CombustionGeneratorScreen extends MachineScreen<BurnerMenu> {
+// Layout follows combustion_plant_gui_layout.json. All positions are relative to leftPos/topPos.
+public class CombustionPlantScreen extends MachineScreen<BurnerMenu> {
     private static final int ENERGY_X = 157, ENERGY_Y = 19;
     private static final int FLAME_X = 21, FLAME_Y = 46;
     private static final int BURN_X = 57, BURN_Y = 34, BURN_W = 84, BURN_H = 4;
@@ -32,8 +32,8 @@ public class CombustionGeneratorScreen extends MachineScreen<BurnerMenu> {
     private final Identifier marker = sprite("heat_marker");
     private final Identifier ghostCoal = sprite("ghost_coal");
 
-    public CombustionGeneratorScreen(BurnerMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "combustion_generator", List.of(new EnergyTab(menu::getStored, menu::getOutputPerTick)));
+    public CombustionPlantScreen(BurnerMenu menu, Inventory inventory, Component title) {
+        super(menu, inventory, title, "combustion_plant", List.of(new EnergyTab(menu::getStored, menu::getOutputPerTick)));
     }
 
     @Override

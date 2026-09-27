@@ -15,7 +15,7 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.zagdrath.arcforge.Arcforge;
-import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
@@ -48,10 +48,10 @@ public final class ModCapabilities {
                 GeothermalPlantBlockEntity::getItemHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.GEOTHERMAL_PLANT.get(),
                 GeothermalPlantBlockEntity::getHeatHandler);
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.COMBUSTION_GENERATOR.get(),
-                CombustionGeneratorBlockEntity::getEnergyHandler);
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.COMBUSTION_GENERATOR.get(),
-                CombustionGeneratorBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.COMBUSTION_PLANT.get(),
+                CombustionPlantBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.COMBUSTION_PLANT.get(),
+                CombustionPlantBlockEntity::getItemHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.FIREBOX.get(),
                 FireboxBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FIREBOX.get(),

@@ -22,7 +22,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.loot.NeoForgeLootContextParams;
 import net.zagdrath.arcforge.tag.ModItemTags;
 
-// Fuel for the Combustion Generator and the Firebox: #arcforge:combustion_fuel, burning for its
+// Fuel for the Combustion Plant and the Firebox: #arcforge:combustion_fuel, burning for its
 // vanilla furnace time (coal and charcoal 1,600 ticks, a coal block 16,000).
 public final class CombustionFuel {
     private CombustionFuel() {}

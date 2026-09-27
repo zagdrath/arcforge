@@ -48,9 +48,10 @@ public class CarbonizerScreen extends MultiblockScreen<CarbonizerMenu> {
         if (chambers <= 0) {
             return Component.translatable("gui.arcforge.carbonizer.incomplete");
         }
+        Component size = Component.translatable("gui.arcforge.carbonizer.size", menu.getSliceHeight(), menu.getSliceDepth());
         return chambers == 1
-                ? Component.translatable("gui.arcforge.carbonizer.chamber")
-                : Component.translatable("gui.arcforge.carbonizer.chambers", chambers);
+                ? Component.translatable("gui.arcforge.carbonizer.chamber", size)
+                : Component.translatable("gui.arcforge.carbonizer.chambers", chambers, size);
     }
 
     @Override
@@ -123,9 +124,16 @@ public class CarbonizerScreen extends MultiblockScreen<CarbonizerMenu> {
                 float chamberProgress = menu.getChamberProgress(chamber);
                 lines.add(chamberProgress < 0
                         ? Component.translatable("gui.arcforge.carbonizer.chamber_idle", chamber + 1)
-                        : Component.translatable("gui.arcforge.carbonizer.chamber_progress", chamber + 1, (int) (chamberProgress * 100)));
+                        : Component.translatable("gui.arcforge.carbonizer.chamber_progress", chamber + 1, (int) (chamberProgress * 100), batchName(chamber)));
                 return;
             }
         }
+    }
+
+    // "3 coal": how many of which item the chamber is baking.
+    private Component batchName(int chamber) {
+        net.minecraft.world.item.Item item = menu.getChamberItem(chamber);
+        Component name = item != null ? item.getName(item.getDefaultInstance()) : Component.empty();
+        return Component.translatable("gui.arcforge.carbonizer.batch", menu.getChamberBatch(chamber), name);
     }
 }

@@ -40,7 +40,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_HEAT = BUILDER
             .comment("HU/t made while lava drains from the tank (at 1 mB/t).")
-            .defineInRange("lavaHeat", 20, 0, 10_000);
+            .defineInRange("lavaHeat", 40, 0, 10_000);
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_PER_BURN = BUILDER
             .comment("mB of lava taken from the tank at a time; it then drains at 1 mB/t (the GUI flame shows what's left).")
@@ -56,23 +56,23 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
-        BUILDER.comment("Combustion Generator: burns coal, charcoal and coal blocks (#arcforge:combustion_fuel) straight into FE.")
-                .push("combustionGenerator");
+        BUILDER.comment("Combustion Plant: burns coal, charcoal and coal blocks (#arcforge:combustion_fuel) straight into FE.")
+                .push("combustionPlant");
     }
 
-    public static final ModConfigSpec.IntValue GENERATOR_ENERGY_CAPACITY = BUILDER
+    public static final ModConfigSpec.IntValue COMBUSTION_PLANT_ENERGY_CAPACITY = BUILDER
             .comment("Internal FE buffer size.")
             .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
 
-    public static final ModConfigSpec.IntValue GENERATOR_ENERGY_PER_TICK = BUILDER
+    public static final ModConfigSpec.IntValue COMBUSTION_PLANT_ENERGY_PER_TICK = BUILDER
             .comment("FE/t made while burning.")
             .defineInRange("energyPerTick", 40, 1, 1_000_000);
 
-    public static final ModConfigSpec.IntValue GENERATOR_MAX_OUTPUT = BUILDER
+    public static final ModConfigSpec.IntValue COMBUSTION_PLANT_MAX_OUTPUT = BUILDER
             .comment("Most FE/t pushed out of energy faces (shared across them).")
             .defineInRange("maxEnergyOutput", 200, 1, 1_000_000_000);
 
-    public static final ModConfigSpec.DoubleValue GENERATOR_BURN_SPEED = BUILDER
+    public static final ModConfigSpec.DoubleValue COMBUSTION_PLANT_BURN_SPEED = BUILDER
             .comment("How much faster than a vanilla furnace fuel burns (2 = coal lasts 800 ticks instead of 1,600).")
             .defineInRange("burnSpeed", 2.0, 0.1, 100.0);
 
@@ -92,11 +92,11 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue FIREBOX_HEAT_PER_TICK = BUILDER
             .comment("HU/t made while burning.")
-            .defineInRange("heatPerTick", 40, 1, 1_000_000);
+            .defineInRange("heatPerTick", 80, 1, 1_000_000);
 
     public static final ModConfigSpec.DoubleValue FIREBOX_BURN_SPEED = BUILDER
-            .comment("How much faster than a vanilla furnace fuel burns (1 = coal lasts 1,600 ticks).")
-            .defineInRange("burnSpeed", 1.0, 0.1, 100.0);
+            .comment("How much faster than a vanilla furnace fuel burns (2 = coal lasts 800 ticks instead of 1,600).")
+            .defineInRange("burnSpeed", 2.0, 0.1, 100.0);
 
     static {
         BUILDER.pop();
@@ -115,7 +115,7 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue THERMOELECTRIC_HEAT_THROUGHPUT = BUILDER
             .comment("Most HU/t it takes in, and the HU/t it converts when its buffer is full (it converts",
                     "in proportion to how full the buffer is, so it has to warm up).")
-            .defineInRange("heatThroughput", 40, 1, 1_000_000);
+            .defineInRange("heatThroughput", 80, 1, 1_000_000);
 
     public static final ModConfigSpec.IntValue THERMOELECTRIC_MIN_TEMPERATURE = BUILDER
             .comment("Temperature at which efficiency is 0%, in °C.")
@@ -143,9 +143,9 @@ public class ArcforgeConfig {
             .comment("Most slices (chambers) one Carbonizer can have. Each slice is 1 wide x 2 tall x 2 deep.")
             .defineInRange("maxSlices", 8, 1, 8);
 
-    public static final ModConfigSpec.IntValue CARBONIZER_CREOSOTE_PER_SLICE = BUILDER
-            .comment("Creosote buffer capacity per slice, in mB.")
-            .defineInRange("creosotePerSlice", 4_000, 250, 1_000_000);
+    public static final ModConfigSpec.IntValue CARBONIZER_CREOSOTE_PER_VOLUME = BUILDER
+            .comment("Creosote buffer capacity per block of slice volume, in mB (a 2x2 slice gets 4x this, a 3x3 slice 9x).")
+            .defineInRange("creosotePerSliceBlock", 1_000, 100, 1_000_000);
 
     public static final ModConfigSpec.IntValue CARBONIZER_MIN_CREOSOTE_CAPACITY = BUILDER
             .comment("Smallest creosote buffer, in mB, whatever the slice count.")

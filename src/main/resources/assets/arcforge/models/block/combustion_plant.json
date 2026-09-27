@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/combustion_plant_front",
+    "south": "arcforge:block/combustion_plant_back",
+    "east": "arcforge:block/combustion_plant_side",
+    "west": "arcforge:block/combustion_plant_side",
+    "up": "arcforge:block/combustion_plant_top",
+    "down": "arcforge:block/combustion_plant_bottom",
+    "particle": "arcforge:block/combustion_plant_side"
+  }
+}
