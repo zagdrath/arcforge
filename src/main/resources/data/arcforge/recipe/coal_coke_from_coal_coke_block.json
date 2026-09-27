@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "group": "coal_coke",
+  "ingredients": [
+    "arcforge:coal_coke_block"
+  ],
+  "result": {
+    "count": 9,
+    "id": "arcforge:coal_coke"
+  }
+}

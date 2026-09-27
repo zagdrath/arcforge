@@ -41,6 +41,8 @@ public final class ArcforgeGameTests {
 
     // Every test, by name. All run in the same batch on an empty structure with room around it.
     private static final java.util.Map<String, Consumer<GameTestHelper>> TESTS = new java.util.LinkedHashMap<>();
+    // Tests that wait on full machine cycles (a Carbonizer chamber, heating the Arcforge Furnace) get longer to finish.
+    private static final java.util.Map<String, Consumer<GameTestHelper>> LONG_TESTS = new java.util.LinkedHashMap<>();
 
     static {
         TESTS.put(REDSTONE_BUTTONS, ArcforgeGameTests::redstoneButtons);
@@ -62,7 +64,12 @@ public final class ArcforgeGameTests {
         TESTS.put("machines_drop_items", StorageGameTests::machinesDropItems);
         TESTS.put("cell_charge", StorageGameTests::cellCharge);
         TESTS.put("cell_output_and_conduit", StorageGameTests::cellOutputAndConduit);
+        TESTS.put("carbonizer_forms", MultiblockGameTests::carbonizerForms);
+        TESTS.put("furnace_forms", MultiblockGameTests::furnaceForms);
+        LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);
+        LONG_TESTS.put("furnace_smelts", MultiblockGameTests::furnaceSmelts);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
+        LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }
 
     private ArcforgeGameTests() {}
@@ -77,6 +84,9 @@ public final class ArcforgeGameTests {
         TestData<Holder<TestEnvironmentDefinition<?>>> data = new TestData<>(environment, Level.OVERWORLD, Identifier.withDefaultNamespace("empty"),
                 600, 0, true, Rotation.NONE, false, 1, 1, false, 8);
         TESTS.keySet().forEach(name -> event.registerTest(id(name), new FunctionGameTestInstance(function(name), data)));
+        TestData<Holder<TestEnvironmentDefinition<?>>> longData = new TestData<>(environment, Level.OVERWORLD, Identifier.withDefaultNamespace("empty"),
+                1_500, 0, true, Rotation.NONE, false, 1, 1, false, 8);
+        LONG_TESTS.keySet().forEach(name -> event.registerTest(id(name), new FunctionGameTestInstance(function(name), longData)));
     }
 
     private static Identifier id(String path) {

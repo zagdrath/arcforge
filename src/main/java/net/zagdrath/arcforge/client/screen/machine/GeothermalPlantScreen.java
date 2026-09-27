@@ -23,6 +23,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.HeatScale;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.gui.tab.RedstoneTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
@@ -101,7 +102,7 @@ public class GeothermalPlantScreen extends AbstractContainerScreen<GeothermalPla
                     x + ENERGY_X, y + ENERGY_Y + ENERGY_H - energyHeight, ENERGY_W, energyHeight);
         }
 
-        int heatWidth = scaledRound(menu.getHeat(), menu.getMaxHeat(), HEAT_W);
+        int heatWidth = HeatScale.fillWidth(HEAT_W, GeothermalHeat.toCelsius(menu.getHeat()));
         if (heatWidth > 0) {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, HEAT_BAR, HEAT_W, HEAT_H, 0, 0, x + HEAT_X, y + HEAT_Y, heatWidth, HEAT_H);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, HEAT_MARKER, x + HEAT_X + heatWidth - 1, y + HEAT_Y - 1, 2, 6);

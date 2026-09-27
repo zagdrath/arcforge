@@ -13,8 +13,10 @@ import net.minecraft.world.level.storage.ValueOutput;
 
 // Per-face IO modes for a machine, relative to its front.
 public class SideConfig {
-    private static final int BITS_PER_SIDE = 2;
+    private static final int BITS_PER_SIDE = 3;
     private static final int SIDE_MASK = (1 << BITS_PER_SIDE) - 1;
+    // Saves from before BYPRODUCT existed packed each face into 2 bits under "sides".
+    private static final int LEGACY_BITS_PER_SIDE = 2;
 
     // Player actions on a face, sent from the side-config tab.
     public static final int ACTION_NEXT = 0;
@@ -69,12 +71,20 @@ public class SideConfig {
         }
     }
 
+    private void loadLegacy(int packed) {
+        int mask = (1 << LEGACY_BITS_PER_SIDE) - 1;
+        for (RelativeSide side : RelativeSide.values()) {
+            modes[side.ordinal()] = SideMode.byId((packed >>> (side.ordinal() * LEGACY_BITS_PER_SIDE)) & mask);
+        }
+    }
+
     public void serialize(ValueOutput output) {
-        output.putInt("sides", pack());
+        output.putInt("side_modes", pack());
     }
 
     public void deserialize(ValueInput input) {
-        input.getInt("sides").ifPresentOrElse(this::load, this::reset);
+        input.getInt("side_modes").ifPresentOrElse(this::load,
+                () -> input.getInt("sides").ifPresentOrElse(this::loadLegacy, this::reset));
     }
 
     @Override

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,lit=false": {
+      "model": "arcforge:block/arcforge_furnace_port"
+    },
+    "facing=north,lit=true": {
+      "model": "arcforge:block/arcforge_furnace_port_lit"
+    },
+    "facing=east,lit=false": {
+      "model": "arcforge:block/arcforge_furnace_port",
+      "y": 90
+    },
+    "facing=east,lit=true": {
+      "model": "arcforge:block/arcforge_furnace_port_lit",
+      "y": 90
+    },
+    "facing=south,lit=false": {
+      "model": "arcforge:block/arcforge_furnace_port",
+      "y": 180
+    },
+    "facing=south,lit=true": {
+      "model": "arcforge:block/arcforge_furnace_port_lit",
+      "y": 180
+    },
+    "facing=west,lit=false": {
+      "model": "arcforge:block/arcforge_furnace_port",
+      "y": 270
+    },
+    "facing=west,lit=true": {
+      "model": "arcforge:block/arcforge_furnace_port_lit",
+      "y": 270
+    }
+  }
+}

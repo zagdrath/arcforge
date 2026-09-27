@@ -1,0 +1,580 @@
+{
+  "variants": {
+    "d=front,facing=north,h=none,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=north,h=none,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=north,h=none,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=north,h=none,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=north,h=none,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=north,h=none,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=north,h=none,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=north,h=none,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=east,h=none,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=east,h=none,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=east,h=none,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=east,h=none,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=east,h=none,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=east,h=none,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=east,h=none,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=east,h=none,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=south,h=none,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=south,h=none,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=south,h=none,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=south,h=none,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=south,h=none,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=south,h=none,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=south,h=none,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=south,h=none,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=west,h=none,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=west,h=none,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=west,h=none,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=west,h=none,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=west,h=none,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=west,h=none,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=west,h=none,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=back,facing=west,h=none,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/unformed"
+    },
+    "d=front,facing=north,h=single,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_front"
+    },
+    "d=front,facing=east,h=single,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_front",
+      "y": 90
+    },
+    "d=front,facing=south,h=single,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_front",
+      "y": 180
+    },
+    "d=front,facing=west,h=single,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_front",
+      "y": 270
+    },
+    "d=front,facing=north,h=single,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_front_lit"
+    },
+    "d=front,facing=east,h=single,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_front_lit",
+      "y": 90
+    },
+    "d=front,facing=south,h=single,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_front_lit",
+      "y": 180
+    },
+    "d=front,facing=west,h=single,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_front_lit",
+      "y": 270
+    },
+    "d=back,facing=north,h=single,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_back"
+    },
+    "d=back,facing=north,h=single,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_back"
+    },
+    "d=back,facing=east,h=single,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_back",
+      "y": 90
+    },
+    "d=back,facing=east,h=single,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_back",
+      "y": 90
+    },
+    "d=back,facing=south,h=single,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_back",
+      "y": 180
+    },
+    "d=back,facing=south,h=single,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_back",
+      "y": 180
+    },
+    "d=back,facing=west,h=single,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_back",
+      "y": 270
+    },
+    "d=back,facing=west,h=single,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/single_top_back",
+      "y": 270
+    },
+    "d=front,facing=north,h=single,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_front"
+    },
+    "d=front,facing=east,h=single,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_front",
+      "y": 90
+    },
+    "d=front,facing=south,h=single,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_front",
+      "y": 180
+    },
+    "d=front,facing=west,h=single,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_front",
+      "y": 270
+    },
+    "d=front,facing=north,h=single,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_front_lit"
+    },
+    "d=front,facing=east,h=single,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_front_lit",
+      "y": 90
+    },
+    "d=front,facing=south,h=single,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_front_lit",
+      "y": 180
+    },
+    "d=front,facing=west,h=single,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_front_lit",
+      "y": 270
+    },
+    "d=back,facing=north,h=single,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_back"
+    },
+    "d=back,facing=north,h=single,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_back"
+    },
+    "d=back,facing=east,h=single,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_back",
+      "y": 90
+    },
+    "d=back,facing=east,h=single,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_back",
+      "y": 90
+    },
+    "d=back,facing=south,h=single,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_back",
+      "y": 180
+    },
+    "d=back,facing=south,h=single,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_back",
+      "y": 180
+    },
+    "d=back,facing=west,h=single,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_back",
+      "y": 270
+    },
+    "d=back,facing=west,h=single,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/single_bottom_back",
+      "y": 270
+    },
+    "d=front,facing=north,h=left,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_front"
+    },
+    "d=front,facing=east,h=left,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_front",
+      "y": 90
+    },
+    "d=front,facing=south,h=left,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_front",
+      "y": 180
+    },
+    "d=front,facing=west,h=left,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_front",
+      "y": 270
+    },
+    "d=front,facing=north,h=left,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_front_lit"
+    },
+    "d=front,facing=east,h=left,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_front_lit",
+      "y": 90
+    },
+    "d=front,facing=south,h=left,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_front_lit",
+      "y": 180
+    },
+    "d=front,facing=west,h=left,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_front_lit",
+      "y": 270
+    },
+    "d=back,facing=north,h=left,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_back"
+    },
+    "d=back,facing=north,h=left,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_back"
+    },
+    "d=back,facing=east,h=left,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_back",
+      "y": 90
+    },
+    "d=back,facing=east,h=left,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_back",
+      "y": 90
+    },
+    "d=back,facing=south,h=left,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_back",
+      "y": 180
+    },
+    "d=back,facing=south,h=left,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_back",
+      "y": 180
+    },
+    "d=back,facing=west,h=left,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_back",
+      "y": 270
+    },
+    "d=back,facing=west,h=left,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/left_top_back",
+      "y": 270
+    },
+    "d=front,facing=north,h=left,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_front"
+    },
+    "d=front,facing=east,h=left,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_front",
+      "y": 90
+    },
+    "d=front,facing=south,h=left,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_front",
+      "y": 180
+    },
+    "d=front,facing=west,h=left,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_front",
+      "y": 270
+    },
+    "d=front,facing=north,h=left,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_front_lit"
+    },
+    "d=front,facing=east,h=left,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_front_lit",
+      "y": 90
+    },
+    "d=front,facing=south,h=left,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_front_lit",
+      "y": 180
+    },
+    "d=front,facing=west,h=left,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_front_lit",
+      "y": 270
+    },
+    "d=back,facing=north,h=left,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_back"
+    },
+    "d=back,facing=north,h=left,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_back"
+    },
+    "d=back,facing=east,h=left,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_back",
+      "y": 90
+    },
+    "d=back,facing=east,h=left,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_back",
+      "y": 90
+    },
+    "d=back,facing=south,h=left,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_back",
+      "y": 180
+    },
+    "d=back,facing=south,h=left,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_back",
+      "y": 180
+    },
+    "d=back,facing=west,h=left,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_back",
+      "y": 270
+    },
+    "d=back,facing=west,h=left,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/left_bottom_back",
+      "y": 270
+    },
+    "d=front,facing=north,h=middle,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_front"
+    },
+    "d=front,facing=east,h=middle,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_front",
+      "y": 90
+    },
+    "d=front,facing=south,h=middle,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_front",
+      "y": 180
+    },
+    "d=front,facing=west,h=middle,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_front",
+      "y": 270
+    },
+    "d=front,facing=north,h=middle,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_front_lit"
+    },
+    "d=front,facing=east,h=middle,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_front_lit",
+      "y": 90
+    },
+    "d=front,facing=south,h=middle,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_front_lit",
+      "y": 180
+    },
+    "d=front,facing=west,h=middle,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_front_lit",
+      "y": 270
+    },
+    "d=back,facing=north,h=middle,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_back"
+    },
+    "d=back,facing=north,h=middle,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_back"
+    },
+    "d=back,facing=east,h=middle,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_back",
+      "y": 90
+    },
+    "d=back,facing=east,h=middle,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_back",
+      "y": 90
+    },
+    "d=back,facing=south,h=middle,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_back",
+      "y": 180
+    },
+    "d=back,facing=south,h=middle,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_back",
+      "y": 180
+    },
+    "d=back,facing=west,h=middle,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_back",
+      "y": 270
+    },
+    "d=back,facing=west,h=middle,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/middle_top_back",
+      "y": 270
+    },
+    "d=front,facing=north,h=middle,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_front"
+    },
+    "d=front,facing=east,h=middle,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_front",
+      "y": 90
+    },
+    "d=front,facing=south,h=middle,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_front",
+      "y": 180
+    },
+    "d=front,facing=west,h=middle,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_front",
+      "y": 270
+    },
+    "d=front,facing=north,h=middle,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_front_lit"
+    },
+    "d=front,facing=east,h=middle,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_front_lit",
+      "y": 90
+    },
+    "d=front,facing=south,h=middle,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_front_lit",
+      "y": 180
+    },
+    "d=front,facing=west,h=middle,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_front_lit",
+      "y": 270
+    },
+    "d=back,facing=north,h=middle,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_back"
+    },
+    "d=back,facing=north,h=middle,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_back"
+    },
+    "d=back,facing=east,h=middle,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_back",
+      "y": 90
+    },
+    "d=back,facing=east,h=middle,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_back",
+      "y": 90
+    },
+    "d=back,facing=south,h=middle,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_back",
+      "y": 180
+    },
+    "d=back,facing=south,h=middle,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_back",
+      "y": 180
+    },
+    "d=back,facing=west,h=middle,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_back",
+      "y": 270
+    },
+    "d=back,facing=west,h=middle,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/middle_bottom_back",
+      "y": 270
+    },
+    "d=front,facing=north,h=right,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_front"
+    },
+    "d=front,facing=east,h=right,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_front",
+      "y": 90
+    },
+    "d=front,facing=south,h=right,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_front",
+      "y": 180
+    },
+    "d=front,facing=west,h=right,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_front",
+      "y": 270
+    },
+    "d=front,facing=north,h=right,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_front_lit"
+    },
+    "d=front,facing=east,h=right,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_front_lit",
+      "y": 90
+    },
+    "d=front,facing=south,h=right,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_front_lit",
+      "y": 180
+    },
+    "d=front,facing=west,h=right,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_front_lit",
+      "y": 270
+    },
+    "d=back,facing=north,h=right,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_back"
+    },
+    "d=back,facing=north,h=right,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_back"
+    },
+    "d=back,facing=east,h=right,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_back",
+      "y": 90
+    },
+    "d=back,facing=east,h=right,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_back",
+      "y": 90
+    },
+    "d=back,facing=south,h=right,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_back",
+      "y": 180
+    },
+    "d=back,facing=south,h=right,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_back",
+      "y": 180
+    },
+    "d=back,facing=west,h=right,lit=false,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_back",
+      "y": 270
+    },
+    "d=back,facing=west,h=right,lit=true,v=top": {
+      "model": "arcforge:block/carbonizer/right_top_back",
+      "y": 270
+    },
+    "d=front,facing=north,h=right,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_front"
+    },
+    "d=front,facing=east,h=right,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_front",
+      "y": 90
+    },
+    "d=front,facing=south,h=right,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_front",
+      "y": 180
+    },
+    "d=front,facing=west,h=right,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_front",
+      "y": 270
+    },
+    "d=front,facing=north,h=right,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_front_lit"
+    },
+    "d=front,facing=east,h=right,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_front_lit",
+      "y": 90
+    },
+    "d=front,facing=south,h=right,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_front_lit",
+      "y": 180
+    },
+    "d=front,facing=west,h=right,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_front_lit",
+      "y": 270
+    },
+    "d=back,facing=north,h=right,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_back"
+    },
+    "d=back,facing=north,h=right,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_back"
+    },
+    "d=back,facing=east,h=right,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_back",
+      "y": 90
+    },
+    "d=back,facing=east,h=right,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_back",
+      "y": 90
+    },
+    "d=back,facing=south,h=right,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_back",
+      "y": 180
+    },
+    "d=back,facing=south,h=right,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_back",
+      "y": 180
+    },
+    "d=back,facing=west,h=right,lit=false,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_back",
+      "y": 270
+    },
+    "d=back,facing=west,h=right,lit=true,v=bottom": {
+      "model": "arcforge:block/carbonizer/right_bottom_back",
+      "y": 270
+    }
+  }
+}

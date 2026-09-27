@@ -12,7 +12,9 @@ public enum SideMode {
     NONE("none"),
     INPUT("input"),
     OUTPUT("output"),
-    ENERGY("energy");
+    ENERGY("energy"),
+    // Multiblocks: exposes only the by-product (e.g. the Carbonizer's creosote, the Arcforge Furnace's slag).
+    BYPRODUCT("byproduct");
 
     private final String name;
 

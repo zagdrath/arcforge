@@ -41,6 +41,11 @@ public class FilteredFluidTank extends FluidStacksResourceHandler {
         return capacity;
     }
 
+    // For tanks that grow and shrink with their machine. Fluid already above a lowered capacity stays until drained.
+    public void setCapacity(int capacity) {
+        this.capacity = capacity;
+    }
+
     public int getSpace() {
         return Math.max(0, capacity - getAmount());
     }

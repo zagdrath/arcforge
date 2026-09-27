@@ -15,6 +15,8 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.heat.HeatHandler;
+import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 
 // The block capability each conduit type connects to.
@@ -48,6 +50,10 @@ public final class ConduitCapabilities {
         Direction face = side.getOpposite();
         if (level.getBlockEntity(target) instanceof ConduitConnectable connectable) {
             return connectable.getConduitConnection(face, type);
+        }
+        if (level.getBlockState(target).getBlock() instanceof MultiblockPart part) {
+            MultiblockController controller = part.findController(level, target);
+            return controller != null ? controller.conduitConnectionAt(target, face, type) : ConnectionMode.NONE;
         }
         return switch (type) {
             case ENERGY -> energyMode(level.getCapability(Capabilities.Energy.BLOCK, target, face));

@@ -9,15 +9,19 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.heat.HeatHandler;
+import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
+import net.zagdrath.arcforge.multiblock.MultiblockController;
 
 // Exposes machine storage through NeoForge's standard capabilities, so any mod using
 // Capabilities.Energy (FE), Capabilities.Fluid or Capabilities.Item can interact with Arcforge machines.
@@ -46,5 +50,17 @@ public final class ModCapabilities {
                 FluidTankBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(),
                 EnergyCellBlockEntity::getEnergyHandler);
+
+        // Multiblocks: every block of a formed structure exposes the structure face it lies on (served by the controller).
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CARBONIZER.get(),
+                CarbonizerBlockEntity::getItemCapability);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CARBONIZER.get(),
+                CarbonizerBlockEntity::getFluidCapability);
+        Block[] furnaceParts = {
+                ModBlocks.ARCFORGE_FURNACE_PORT.get(), ModBlocks.ARCFORGE_FURNACE_BRICKS.get(), ModBlocks.ARCFORGE_FURNACE_BRICK_WALL.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            MultiblockController furnace = ArcforgeFurnaceStructure.findFormedPort(level, pos);
+            return furnace != null ? furnace.itemHandlerAt(pos, side) : null;
+        }, furnaceParts);
     }
 }

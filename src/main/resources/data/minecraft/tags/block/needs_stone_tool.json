@@ -1,5 +1,7 @@
 {
   "values": [
-    "arcforge:geothermal_plant"
+    "arcforge:geothermal_plant",
+    "arcforge:carbonizer",
+    "arcforge:steel_block"
   ]
 }

@@ -69,6 +69,55 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+        BUILDER.comment("Carbonizer: multiblock that bakes coal into coal coke, collecting creosote. Recipes are data-driven (arcforge:carbonizing).")
+                .push("carbonizer");
+    }
+
+    public static final ModConfigSpec.IntValue CARBONIZER_MAX_SLICES = BUILDER
+            .comment("Most slices (chambers) one Carbonizer can have. Each slice is 1 wide x 2 tall x 2 deep.")
+            .defineInRange("maxSlices", 8, 1, 8);
+
+    public static final ModConfigSpec.IntValue CARBONIZER_CREOSOTE_PER_SLICE = BUILDER
+            .comment("Creosote buffer capacity per slice, in mB.")
+            .defineInRange("creosotePerSlice", 4_000, 250, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CARBONIZER_MIN_CREOSOTE_CAPACITY = BUILDER
+            .comment("Smallest creosote buffer, in mB, whatever the slice count.")
+            .defineInRange("minCreosoteCapacity", 8_000, 250, 1_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Arcforge Furnace: 3x3x6 brick multiblock that smelts steel. Recipes are data-driven (arcforge:arcforge_smelting).")
+                .push("arcforgeFurnace");
+    }
+
+    public static final ModConfigSpec.IntValue FURNACE_MAX_HEAT = BUILDER
+            .comment("Hottest the furnace can get, in °C.")
+            .defineInRange("maxHeat", 1_600, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue FURNACE_HEAT_GAIN = BUILDER
+            .comment("°C gained per tick while fuel burns.")
+            .defineInRange("heatGainPerTick", 2, 1, 1_000);
+
+    public static final ModConfigSpec.IntValue FURNACE_HEAT_LOSS = BUILDER
+            .comment("°C lost per tick while no fuel burns.")
+            .defineInRange("heatLossPerTick", 1, 1, 1_000);
+
+    public static final ModConfigSpec.IntValue FURNACE_FUEL_BURN_TICKS = BUILDER
+            .comment("Ticks one fuel item (#arcforge:arcforge_furnace_fuels, e.g. coal coke) keeps the furnace heating.")
+            .defineInRange("fuelBurnTicks", 800, 1, 32_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Shared multiblock settings.").push("multiblock");
+    }
+
+    public static final ModConfigSpec.IntValue MULTIBLOCK_PUSH_INTERVAL = BUILDER
+            .comment("Ticks between pushes out of output and by-product faces into neighbouring inventories and tanks.")
+            .defineInRange("autoPushInterval", 10, 1, 1_200);
+
+    static {
+        BUILDER.pop();
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

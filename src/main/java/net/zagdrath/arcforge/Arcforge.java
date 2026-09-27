@@ -21,8 +21,10 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 import net.zagdrath.arcforge.registry.ModCreativeTabs;
 import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Arcforge by Zagdrath. Must match the modId in META-INF/neoforge.mods.toml.
 @Mod(Arcforge.MODID)
@@ -31,8 +33,10 @@ public class Arcforge {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public Arcforge(IEventBus modEventBus, ModContainer modContainer) {
+        ModFluids.register(modEventBus);
         ModBlocks.register(modEventBus);
         ModItems.register(modEventBus);
+        ModRecipes.register(modEventBus);
         ModBlockEntityTypes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);

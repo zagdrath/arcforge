@@ -16,7 +16,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 
-// Arcforge tabs, in order: Machines, Logistics, Tools & Upgrades.
+// Arcforge tabs, in order: Machines, Materials, Fluids, Logistics, Tools & Upgrades.
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Arcforge.MODID);
 
@@ -26,12 +26,36 @@ public final class ModCreativeTabs {
             .icon(() -> ModItems.GEOTHERMAL_PLANT.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.GEOTHERMAL_PLANT.get());
+                output.accept(ModItems.CARBONIZER.get());
+                output.accept(ModItems.ARCFORGE_FURNACE_PORT.get());
+                output.accept(ModItems.ARCFORGE_FURNACE_BRICKS.get());
+                output.accept(ModItems.ARCFORGE_FURNACE_BRICK_WALL.get());
                 ModItems.allStorage().forEach(item -> output.accept(item.get()));
+            }).build());
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS = CREATIVE_MODE_TABS.register("materials", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.arcforge.materials"))
+            .withTabsBefore(MACHINES.getKey())
+            .icon(() -> ModItems.STEEL_INGOT.get().getDefaultInstance())
+            .displayItems((parameters, output) -> {
+                output.accept(ModItems.STEEL_INGOT.get());
+                output.accept(ModItems.STEEL_BLOCK.get());
+                output.accept(ModItems.COAL_COKE.get());
+                output.accept(ModItems.COAL_COKE_BLOCK.get());
+                output.accept(ModItems.SLAG.get());
+            }).build());
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FLUIDS = CREATIVE_MODE_TABS.register("fluids", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.arcforge.fluids"))
+            .withTabsBefore(MATERIALS.getKey())
+            .icon(() -> ModItems.CREOSOTE_BUCKET.get().getDefaultInstance())
+            .displayItems((parameters, output) -> {
+                output.accept(ModItems.CREOSOTE_BUCKET.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> LOGISTICS = CREATIVE_MODE_TABS.register("logistics", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.arcforge.logistics"))
-            .withTabsBefore(MACHINES.getKey())
+            .withTabsBefore(FLUIDS.getKey())
             .icon(() -> ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.ARCFORGED).get().asItem().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 ModItems.allConduits().forEach(item -> output.accept(item.get()));

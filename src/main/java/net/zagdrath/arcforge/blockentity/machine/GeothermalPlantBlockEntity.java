@@ -6,6 +6,7 @@
 package net.zagdrath.arcforge.blockentity.machine;
 
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
@@ -73,6 +74,7 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
 
     private static final int LAVA_SCAN_INTERVAL = 20;
     private static final FluidResource LAVA = FluidResource.of(Fluids.LAVA);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY);
 
     private final GeneratorEnergyHandler energy;
     private final FilteredFluidTank lavaTank;
@@ -305,6 +307,11 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
     @Override
     public SideMode getSideMode(RelativeSide side) {
         return sideConfig.get(side);
+    }
+
+    @Override
+    public List<SideMode> getAllowedSideModes() {
+        return SIDE_MODES;
     }
 
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---

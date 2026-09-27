@@ -33,6 +33,7 @@ import net.minecraft.world.level.storage.TagValueOutput;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.machine.interaction.Dismantleable;
 import net.zagdrath.arcforge.machine.interaction.WrenchableMachine;
+import net.zagdrath.arcforge.multiblock.MultiblockPart;
 
 // Configures conduit sides, rotates machines, and picks up conduits and machines.
 // Runs from onItemUseFirst so it acts before the block's own interaction (such as opening a GUI).
@@ -45,6 +46,10 @@ public class WrenchItem extends Item {
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Level level = context.getLevel();
         BlockState state = level.getBlockState(context.getClickedPos());
+        // Multiblock parts: recheck the structure (the part decides whether to rotate or dismantle too).
+        if (state.getBlock() instanceof MultiblockPart part) {
+            return level.isClientSide() ? InteractionResult.SUCCESS : part.useWrench(context);
+        }
         boolean conduit = state.getBlock() instanceof ConduitBlock;
         boolean machine = state.getBlock() instanceof WrenchableMachine;
         if (!conduit && !machine) {
@@ -106,5 +111,6 @@ public class WrenchItem extends Item {
         builder.accept(Component.translatable("tooltip.arcforge.wrench.conduit").withStyle(ChatFormatting.GRAY));
         builder.accept(Component.translatable("tooltip.arcforge.wrench.pick_up").withStyle(ChatFormatting.GRAY));
         builder.accept(Component.translatable("tooltip.arcforge.wrench.machine").withStyle(ChatFormatting.GRAY));
+        builder.accept(Component.translatable("tooltip.arcforge.wrench.multiblock").withStyle(ChatFormatting.GRAY));
     }
 }

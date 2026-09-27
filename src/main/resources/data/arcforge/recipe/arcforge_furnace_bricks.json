@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "B": "minecraft:bricks",
+    "N": "minecraft:nether_bricks"
+  },
+  "pattern": [
+    "BN",
+    "NB"
+  ],
+  "result": {
+    "count": 4,
+    "id": "arcforge:arcforge_furnace_bricks"
+  }
+}

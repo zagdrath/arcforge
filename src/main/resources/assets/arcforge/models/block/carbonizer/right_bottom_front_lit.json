@@ -1,0 +1,138 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "south": "arcforge:block/carbonizer/casing_6",
+    "east": "arcforge:block/carbonizer/casing_6",
+    "west": "arcforge:block/carbonizer/casing_12",
+    "up": "arcforge:block/carbonizer/top_3",
+    "down": "arcforge:block/carbonizer/top_6",
+    "north": "arcforge:block/carbonizer/front_bottom_lit",
+    "door": "arcforge:block/carbonizer/door_bottom",
+    "particle": "arcforge:block/carbonizer/casing"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#north"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#south",
+          "cullface": "south"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#east",
+          "cullface": "east"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#west",
+          "cullface": "west"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#up",
+          "cullface": "up"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ],
+          "texture": "#down",
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        12,
+        4,
+        -8
+      ],
+      "to": [
+        13,
+        16,
+        0
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            8,
+            12
+          ],
+          "texture": "#door"
+        },
+        "west": {
+          "uv": [
+            8,
+            0,
+            0,
+            12
+          ],
+          "texture": "#door"
+        },
+        "north": {
+          "uv": [
+            8,
+            0,
+            9,
+            12
+          ],
+          "texture": "#door"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            8,
+            1
+          ],
+          "texture": "#door"
+        }
+      }
+    }
+  ]
+}

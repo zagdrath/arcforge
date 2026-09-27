@@ -15,5 +15,8 @@ public final class ModItemTags {
     // Items accepted in machine upgrade slots. Empty until upgrade items exist.
     public static final TagKey<Item> UPGRADES = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "upgrades"));
 
+    // Items the Arcforge Furnace burns for heat (coal coke by default).
+    public static final TagKey<Item> ARCFORGE_FURNACE_FUELS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "arcforge_furnace_fuels"));
+
     private ModItemTags() {}
 }

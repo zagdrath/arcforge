@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": "arcforge:arcforge_furnace_bricks",
+    "F": "minecraft:blast_furnace",
+    "I": "minecraft:iron_bars"
+  },
+  "pattern": [
+    "###",
+    "#F#",
+    "#I#"
+  ],
+  "result": {
+    "id": "arcforge:arcforge_furnace_port"
+  }
+}

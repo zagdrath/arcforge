@@ -24,6 +24,12 @@
     "arcforge:wrought_energy_cell",
     "arcforge:tempered_energy_cell",
     "arcforge:hardened_energy_cell",
-    "arcforge:arcforged_energy_cell"
+    "arcforge:arcforged_energy_cell",
+    "arcforge:carbonizer",
+    "arcforge:arcforge_furnace_port",
+    "arcforge:arcforge_furnace_bricks",
+    "arcforge:arcforge_furnace_brick_wall",
+    "arcforge:coal_coke_block",
+    "arcforge:steel_block"
   ]
 }

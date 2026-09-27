@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "minecraft:bricks",
+    "F": "minecraft:furnace",
+    "I": "#c:ingots/iron"
+  },
+  "pattern": [
+    "III",
+    "IFI",
+    "BBB"
+  ],
+  "result": {
+    "count": 4,
+    "id": "arcforge:carbonizer"
+  }
+}

@@ -11,9 +11,13 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -21,6 +25,10 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
+import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock;
+import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
+import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
+import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
@@ -37,6 +45,50 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL)
                     .lightLevel(state -> state.getValue(GeothermalPlantBlock.LIT) ? 7 : 0));
+
+    // --- Steelmaking ---
+
+    public static final DeferredBlock<CarbonizerBlock> CARBONIZER = BLOCKS.registerBlock("carbonizer",
+            CarbonizerBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)
+                    .lightLevel(state -> state.getValue(CarbonizerBlock.LIT) && state.getValue(CarbonizerBlock.DEPTH) == CarbonizerBlock.Depth.FRONT ? 7 : 0));
+
+    public static final DeferredBlock<ArcforgeFurnaceBricksBlock> ARCFORGE_FURNACE_BRICKS = BLOCKS.registerBlock("arcforge_furnace_bricks",
+            ArcforgeFurnaceBricksBlock::new, ModBlocks::furnaceBrickProperties);
+
+    public static final DeferredBlock<ArcforgeFurnaceBrickWallBlock> ARCFORGE_FURNACE_BRICK_WALL = BLOCKS.registerBlock("arcforge_furnace_brick_wall",
+            ArcforgeFurnaceBrickWallBlock::new, p -> furnaceBrickProperties(p).forceSolidOn());
+
+    public static final DeferredBlock<ArcforgeFurnacePortBlock> ARCFORGE_FURNACE_PORT = BLOCKS.registerBlock("arcforge_furnace_port",
+            ArcforgeFurnacePortBlock::new,
+            p -> furnaceBrickProperties(p).lightLevel(state -> state.getValue(ArcforgeFurnacePortBlock.LIT) ? 9 : 0));
+
+    public static final DeferredBlock<Block> COAL_COKE_BLOCK = BLOCKS.registerSimpleBlock("coal_coke_block",
+            p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY)
+                    .instrument(NoteBlockInstrument.BASEDRUM)
+                    .strength(5.0F, 6.0F)
+                    .requiresCorrectToolForDrops());
+
+    public static final DeferredBlock<Block> STEEL_BLOCK = BLOCKS.registerSimpleBlock("steel_block",
+            p -> p.mapColor(MapColor.METAL)
+                    .instrument(NoteBlockInstrument.IRON_XYLOPHONE)
+                    .strength(5.0F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
+
+    public static final DeferredBlock<LiquidBlock> CREOSOTE = BLOCKS.registerBlock("creosote",
+            p -> new LiquidBlock(ModFluids.CREOSOTE.get(), p) {},
+            p -> p.mapColor(MapColor.COLOR_BROWN)
+                    .replaceable()
+                    .noCollision()
+                    .strength(100.0F)
+                    .pushReaction(PushReaction.POPPED)
+                    .noLootTable()
+                    .liquid()
+                    .sound(SoundType.EMPTY));
 
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);
@@ -84,6 +136,14 @@ public final class ModBlocks {
 
     public static String conduitName(ConduitType type, ConduitTier tier) {
         return tier.getSerializedName() + "_" + type.getSerializedName() + "_conduit";
+    }
+
+    private static BlockBehaviour.Properties furnaceBrickProperties(BlockBehaviour.Properties p) {
+        return p.mapColor(MapColor.TERRACOTTA_BROWN)
+                .instrument(NoteBlockInstrument.BASEDRUM)
+                .strength(2.0F, 6.0F)
+                .requiresCorrectToolForDrops()
+                .sound(SoundType.MUD_BRICKS);
     }
 
     private static BlockBehaviour.Properties conduitProperties(BlockBehaviour.Properties p) {

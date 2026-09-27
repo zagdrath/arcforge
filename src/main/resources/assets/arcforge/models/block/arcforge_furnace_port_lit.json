@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "top": "arcforge:block/arcforge_furnace_bricks",
+    "side": "arcforge:block/arcforge_furnace_bricks",
+    "front": "arcforge:block/arcforge_furnace_port_lit"
+  }
+}

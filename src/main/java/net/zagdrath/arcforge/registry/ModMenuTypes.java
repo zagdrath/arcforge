@@ -14,6 +14,8 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
+import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
+import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
 import net.zagdrath.arcforge.menu.storage.EnergyCellMenu;
 import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
 
@@ -28,6 +30,12 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<EnergyCellMenu>> ENERGY_CELL = MENU_TYPES.register("energy_cell",
             () -> IMenuTypeExtension.create(EnergyCellMenu::new));
+
+    public static final Supplier<MenuType<CarbonizerMenu>> CARBONIZER = MENU_TYPES.register("carbonizer",
+            () -> IMenuTypeExtension.create(CarbonizerMenu::new));
+
+    public static final Supplier<MenuType<ArcforgeFurnaceMenu>> ARCFORGE_FURNACE = MENU_TYPES.register("arcforge_furnace",
+            () -> IMenuTypeExtension.create(ArcforgeFurnaceMenu::new));
 
     private ModMenuTypes() {}
 
