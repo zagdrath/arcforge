@@ -69,6 +69,10 @@ public final class ArcforgeGameTests {
         TESTS.put("firebox_drives_thermoelectric", HeatGameTests::fireboxDrivesThermoelectric);
         TESTS.put("heat_flows_hot_to_cold", HeatGameTests::heatFlowsHotToCold);
         TESTS.put("thermal_conduit_carries_heat", HeatGameTests::thermalConduitCarriesHeat);
+        TESTS.put("heat_cell_fills", HeatGameTests::heatCellFills);
+        TESTS.put("heat_cell_leaks", HeatGameTests::heatCellLeaks);
+        TESTS.put("heat_cell_outputs", HeatGameTests::heatCellOutputs);
+        TESTS.put("heat_cell_keeps_heat", HeatGameTests::heatCellKeepsHeat);
         TESTS.put("carbonizer_forms", MultiblockGameTests::carbonizerForms);
         TESTS.put("furnace_forms", MultiblockGameTests::furnaceForms);
         LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);

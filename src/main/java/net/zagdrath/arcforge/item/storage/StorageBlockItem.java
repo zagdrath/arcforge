@@ -18,11 +18,12 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
+import net.zagdrath.arcforge.block.storage.HeatCellBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 
-// Fluid tank / energy cell item. Shows what it holds, which is kept when the block is broken.
+// Fluid tank / energy cell / heat cell item. Shows what it holds, which is kept when the block is broken.
 public class StorageBlockItem extends BlockItem {
     public StorageBlockItem(StorageBlock block, Item.Properties properties) {
         super(block, properties);
@@ -39,6 +40,12 @@ public class StorageBlockItem extends BlockItem {
         } else if (getBlock() instanceof EnergyCellBlock) {
             int energy = stack.getOrDefault(ModDataComponents.ENERGY.get(), 0);
             builder.accept(Component.translatable("gui.arcforge.fe_stored", format(energy), format(tier.cellCapacity()))
+                    .withStyle(ChatFormatting.GRAY));
+        } else if (getBlock() instanceof HeatCellBlock) {
+            int heat = stack.getOrDefault(ModDataComponents.HEAT.get(), 0);
+            builder.accept(Component.translatable("gui.arcforge.hu_stored", format(heat), format(tier.heatCellCapacity()))
+                    .withStyle(ChatFormatting.GRAY));
+            builder.accept(Component.translatable("tooltip.arcforge.heat_cell.insulation", tier.getDisplayName())
                     .withStyle(ChatFormatting.GRAY));
         }
     }

@@ -20,6 +20,7 @@ import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
 import net.zagdrath.arcforge.menu.storage.EnergyCellMenu;
 import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
+import net.zagdrath.arcforge.menu.storage.HeatCellMenu;
 
 public final class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, Arcforge.MODID);
@@ -41,6 +42,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<EnergyCellMenu>> ENERGY_CELL = MENU_TYPES.register("energy_cell",
             () -> IMenuTypeExtension.create(EnergyCellMenu::new));
+
+    public static final Supplier<MenuType<HeatCellMenu>> HEAT_CELL = MENU_TYPES.register("heat_cell",
+            () -> IMenuTypeExtension.create(HeatCellMenu::new));
 
     public static final Supplier<MenuType<CarbonizerMenu>> CARBONIZER = MENU_TYPES.register("carbonizer",
             () -> IMenuTypeExtension.create(CarbonizerMenu::new));

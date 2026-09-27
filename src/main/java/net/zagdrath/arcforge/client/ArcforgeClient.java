@@ -47,6 +47,7 @@ import net.zagdrath.arcforge.client.screen.multiblock.ArcforgeFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.CarbonizerScreen;
 import net.zagdrath.arcforge.client.screen.storage.EnergyCellScreen;
 import net.zagdrath.arcforge.client.screen.storage.FluidTankScreen;
+import net.zagdrath.arcforge.client.screen.storage.HeatCellScreen;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModFluids;
@@ -69,6 +70,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.THERMOELECTRIC_PLANT.get(), ThermoelectricPlantScreen::new);
         event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);
         event.register(ModMenuTypes.ENERGY_CELL.get(), EnergyCellScreen::new);
+        event.register(ModMenuTypes.HEAT_CELL.get(), HeatCellScreen::new);
         event.register(ModMenuTypes.CARBONIZER.get(), CarbonizerScreen::new);
         event.register(ModMenuTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceScreen::new);
     }

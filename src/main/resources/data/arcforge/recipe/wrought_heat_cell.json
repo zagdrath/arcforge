@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "minecraft:bricks",
+    "C": "#c:ingots/copper",
+    "M": "#c:storage_blocks/copper"
+  },
+  "pattern": [
+    "CBC",
+    "BMB",
+    "CBC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:wrought_heat_cell"
+  }
+}

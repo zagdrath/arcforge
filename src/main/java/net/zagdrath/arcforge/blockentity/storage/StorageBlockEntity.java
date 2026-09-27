@@ -74,6 +74,10 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
         return items;
     }
 
+    public Direction getFacing() {
+        return facing;
+    }
+
     public void setFacing(Direction facing) {
         this.facing = facing;
         onSideConfigChanged();

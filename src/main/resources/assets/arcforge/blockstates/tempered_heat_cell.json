@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "heat=0": {
+      "model": "arcforge:block/heat_cell/tempered_0"
+    },
+    "heat=1": {
+      "model": "arcforge:block/heat_cell/tempered_1"
+    },
+    "heat=2": {
+      "model": "arcforge:block/heat_cell/tempered_2"
+    },
+    "heat=3": {
+      "model": "arcforge:block/heat_cell/tempered_3"
+    },
+    "heat=4": {
+      "model": "arcforge:block/heat_cell/tempered_4"
+    }
+  }
+}

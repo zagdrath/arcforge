@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "arcforge:arcforge_furnace_bricks",
+    "C": "#c:ingots/copper",
+    "H": "arcforge:wrought_heat_cell"
+  },
+  "pattern": [
+    "CBC",
+    "BHB",
+    "CBC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:tempered_heat_cell"
+  }
+}

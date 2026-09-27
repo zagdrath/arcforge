@@ -106,6 +106,31 @@ public enum ConduitTier implements StringRepresentable {
         };
     }
 
+    // Heat cell capacity in HU.
+    public int heatCellCapacity() {
+        return switch (this) {
+            case WROUGHT -> 50_000;
+            case TEMPERED -> 200_000;
+            case HARDENED -> 800_000;
+            case ARCFORGED -> 3_200_000;
+        };
+    }
+
+    // Most HU a heat cell takes in or gives out per tick: the thermodynamic conduit rate of the same tier.
+    public int heatCellRate() {
+        return heatPerTick;
+    }
+
+    // Share of its stored heat a heat cell leaks away per minute, in percent. Better tiers are better insulated.
+    public double heatCellLeakPercentPerMinute() {
+        return switch (this) {
+            case WROUGHT -> 10.0;
+            case TEMPERED -> 4.0;
+            case HARDENED -> 1.5;
+            case ARCFORGED -> 0.5;
+        };
+    }
+
     public static ConduitTier lowest(ConduitTier a, ConduitTier b) {
         return a.ordinal() <= b.ordinal() ? a : b;
     }

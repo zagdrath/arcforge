@@ -34,6 +34,7 @@ import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
+import net.zagdrath.arcforge.block.storage.HeatCellBlock;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -118,9 +119,10 @@ public final class ModBlocks {
         }
     }
 
-    // arcforge:<tier>_fluid_tank and arcforge:<tier>_energy_cell.
+    // arcforge:<tier>_fluid_tank, arcforge:<tier>_energy_cell and arcforge:<tier>_heat_cell.
     private static final Map<ConduitTier, DeferredBlock<FluidTankBlock>> FLUID_TANKS = new EnumMap<>(ConduitTier.class);
     private static final Map<ConduitTier, DeferredBlock<EnergyCellBlock>> ENERGY_CELLS = new EnumMap<>(ConduitTier.class);
+    private static final Map<ConduitTier, DeferredBlock<HeatCellBlock>> HEAT_CELLS = new EnumMap<>(ConduitTier.class);
 
     // Glass body on a metal frame: breaks like glass, otherwise sounds like metal.
     private static final SoundType TANK_SOUND = new SoundType(1.0F, 1.0F, SoundEvents.GLASS_BREAK, SoundEvents.METAL_STEP,
@@ -139,6 +141,13 @@ public final class ModBlocks {
                             .isRedstoneConductor((state, level, pos) -> false)));
             ENERGY_CELLS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_energy_cell",
                     p -> new EnergyCellBlock(p, tier),
+                    p -> p.mapColor(MapColor.METAL)
+                            .strength(3.0F)
+                            .sound(SoundType.METAL)));
+        }
+        for (ConduitTier tier : ConduitTier.values()) {
+            HEAT_CELLS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_heat_cell",
+                    p -> new HeatCellBlock(p, tier),
                     p -> p.mapColor(MapColor.METAL)
                             .strength(3.0F)
                             .sound(SoundType.METAL)));
@@ -202,11 +211,16 @@ public final class ModBlocks {
         return ENERGY_CELLS.get(tier);
     }
 
-    // Every fluid tank then every energy cell, each ordered by tier.
+    public static DeferredBlock<HeatCellBlock> heatCell(ConduitTier tier) {
+        return HEAT_CELLS.get(tier);
+    }
+
+    // Every fluid tank, then every energy cell, then every heat cell, each ordered by tier.
     public static List<DeferredBlock<? extends StorageBlock>> allStorage() {
         List<DeferredBlock<? extends StorageBlock>> all = new ArrayList<>();
         all.addAll(FLUID_TANKS.values());
         all.addAll(ENERGY_CELLS.values());
+        all.addAll(HEAT_CELLS.values());
         return all;
     }
 

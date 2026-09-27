@@ -27,6 +27,10 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ENERGY =
             DATA_COMPONENTS.registerComponentType("energy", b -> b.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    // HU held by a heat cell.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> HEAT =
+            DATA_COMPONENTS.registerComponentType("heat", b -> b.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));
+
     private ModDataComponents() {}
 
     public static void register(IEventBus modEventBus) {

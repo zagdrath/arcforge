@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "heat=0": {
+      "model": "arcforge:block/heat_cell/wrought_0"
+    },
+    "heat=1": {
+      "model": "arcforge:block/heat_cell/wrought_1"
+    },
+    "heat=2": {
+      "model": "arcforge:block/heat_cell/wrought_2"
+    },
+    "heat=3": {
+      "model": "arcforge:block/heat_cell/wrought_3"
+    },
+    "heat=4": {
+      "model": "arcforge:block/heat_cell/wrought_4"
+    }
+  }
+}

@@ -22,6 +22,10 @@ import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
+import net.zagdrath.arcforge.block.storage.HeatCellBlock;
+import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.minecraft.world.item.ItemStack;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.heat.HeatBuffer;
@@ -163,5 +167,89 @@ public final class HeatGameTests {
                 .thenExecute(() -> helper.assertTrue(helper.getBlockState(new BlockPos(2, 1, 0)).getValue(ActiveConduitBlock.ACTIVE),
                         "Conduit is not glowing while heat moves"))
                 .thenSucceed();
+    }
+
+    // --- Heat cells (placed without a player, so they face north: the front, their output, is the north face) ---
+
+    // A hot firebox fills a cell's input face, no faster than the cell's tier allows.
+    static void heatCellFills(GameTestHelper helper) {
+        BlockPos fireboxPos = new BlockPos(0, 1, 0);
+        BlockPos cellPos = new BlockPos(0, 1, 1);
+        helper.setBlock(fireboxPos, ModBlocks.FIREBOX.get());
+        helper.setBlock(cellPos, ModBlocks.heatCell(ConduitTier.WROUGHT).get());
+        FireboxBlockEntity firebox = helper.getBlockEntity(fireboxPos, FireboxBlockEntity.class);
+        HeatCellBlockEntity cell = helper.getBlockEntity(cellPos, HeatCellBlockEntity.class);
+        // The firebox's back (south) touches the cell's front, which is normally its output.
+        cell.setSideMode(RelativeSide.FRONT, SideMode.INPUT);
+        firebox.getHeat().add(firebox.getHeat().getCapacity());
+        helper.startSequence()
+                .thenIdle(20)
+                .thenExecute(() -> {
+                    int stored = cell.getHeat().getStored();
+                    helper.assertTrue(stored > 0, "Cell took no heat from the firebox");
+                    helper.assertTrue(stored <= ConduitTier.WROUGHT.heatCellRate() * 21, "Cell took " + stored + " HU in 20 ticks, over its rate");
+                })
+                .thenSucceed();
+    }
+
+    // Heat leaks away every second, a larger share from a worse-insulated tier.
+    static void heatCellLeaks(GameTestHelper helper) {
+        BlockPos wroughtPos = new BlockPos(0, 1, 0);
+        BlockPos arcforgedPos = new BlockPos(2, 1, 0);
+        helper.setBlock(wroughtPos, ModBlocks.heatCell(ConduitTier.WROUGHT).get());
+        helper.setBlock(arcforgedPos, ModBlocks.heatCell(ConduitTier.ARCFORGED).get());
+        HeatCellBlockEntity wrought = helper.getBlockEntity(wroughtPos, HeatCellBlockEntity.class);
+        HeatCellBlockEntity arcforged = helper.getBlockEntity(arcforgedPos, HeatCellBlockEntity.class);
+        for (HeatCellBlockEntity cell : new HeatCellBlockEntity[] { wrought, arcforged }) {
+            cell.clearSideModes();
+            cell.getHeat().add(cell.getHeat().getCapacity());
+        }
+        helper.startSequence()
+                .thenIdle(61)
+                .thenExecute(() -> {
+                    double wroughtLost = 1.0 - (double) wrought.getHeat().getStored() / wrought.getHeat().getCapacity();
+                    double arcforgedLost = 1.0 - (double) arcforged.getHeat().getStored() / arcforged.getHeat().getCapacity();
+                    // 3 leaks of 10%/min: about 0.5%.
+                    helper.assertTrue(wroughtLost > 0.004 && wroughtLost < 0.006, "Wrought cell lost " + wroughtLost * 100 + "% in 3 s");
+                    helper.assertTrue(arcforgedLost > 0 && arcforgedLost < wroughtLost / 10, "Arcforged cell lost " + arcforgedLost * 100 + "% in 3 s");
+                    helper.assertTrue(wrought.getLeakPerTick() > 0, "Wrought cell shows no leak");
+                    helper.assertTrue(helper.getBlockState(wroughtPos).getValue(HeatCellBlock.HEAT) == 4, "Full cell is at heat level "
+                            + helper.getBlockState(wroughtPos).getValue(HeatCellBlock.HEAT));
+                })
+                .thenSucceed();
+    }
+
+    // A hot cell's output face pushes heat into a colder thermoelectric plant.
+    static void heatCellOutputs(GameTestHelper helper) {
+        BlockPos plantPos = new BlockPos(0, 1, 0);
+        BlockPos cellPos = new BlockPos(0, 1, 1);
+        helper.setBlock(plantPos, ModBlocks.THERMOELECTRIC_PLANT.get());
+        helper.setBlock(cellPos, ModBlocks.heatCell(ConduitTier.TEMPERED).get());
+        ThermoelectricPlantBlockEntity plant = helper.getBlockEntity(plantPos, ThermoelectricPlantBlockEntity.class);
+        HeatCellBlockEntity cell = helper.getBlockEntity(cellPos, HeatCellBlockEntity.class);
+        plant.setSideMode(RelativeSide.BACK, SideMode.HEAT);
+        cell.getHeat().add(cell.getHeat().getCapacity());
+        helper.startSequence()
+                .thenIdle(10)
+                .thenExecute(() -> helper.assertTrue(plant.getHeat().getStored() > 0, "No heat reached the plant from the cell"))
+                .thenSucceed();
+    }
+
+    // A cell's heat travels on its item and comes back when it's placed again.
+    static void heatCellKeepsHeat(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(0, 1, 0);
+        helper.setBlock(pos, ModBlocks.heatCell(ConduitTier.HARDENED).get());
+        HeatCellBlockEntity cell = helper.getBlockEntity(pos, HeatCellBlockEntity.class);
+        cell.getHeat().add(123_456);
+        ItemStack item = new ItemStack(ModBlocks.heatCell(ConduitTier.HARDENED).get());
+        item.applyComponents(cell.collectComponents());
+        helper.assertTrue(item.getOrDefault(ModDataComponents.HEAT.get(), 0) == 123_456, "Item carries " + item.get(ModDataComponents.HEAT.get()) + " HU");
+
+        helper.setBlock(pos, Blocks.AIR);
+        helper.setBlock(pos, ModBlocks.heatCell(ConduitTier.HARDENED).get());
+        HeatCellBlockEntity placed = helper.getBlockEntity(pos, HeatCellBlockEntity.class);
+        placed.applyComponentsFromItemStack(item);
+        helper.assertTrue(placed.getHeat().getStored() == 123_456, "Placed cell has " + placed.getHeat().getStored() + " HU");
+        helper.succeed();
     }
 }

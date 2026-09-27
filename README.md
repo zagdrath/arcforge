@@ -110,6 +110,30 @@ off more light the fuller it is.
 - GUI: the top slot drains a battery or any FE item into the cell; the bottom slot charges one from
   the cell. The screen shows live input and output rates.
 - Redstone control pauses pushing and charging.
+
+### Heat Cells
+
+A full-block heat (HU) store, built like the Energy Cell in orange. Its window segments, glowing
+core and light level rise with its temperature (20°C empty, 1,100°C full). Heat always leaks away,
+a share of what it holds every second, so an idle cell cools back towards 20°C; better tiers are
+better insulated.
+
+| | Wrought | Tempered | Hardened | Arcforged |
+|---|---|---|---|---|
+| Capacity (HU) | 50,000 | 200,000 | 800,000 | 3,200,000 |
+| I/O (HU/t) | 50 | 200 | 800 | 3,200 |
+| Leak | 10% / min | 4% / min | 1.5% / min | 0.5% / min |
+| Idle half-life | ~7 min | ~17 min | ~46 min | ~2.3 h |
+
+- Faces work like the Energy Cell's: the front outputs, every other face is an input. Heat only
+  flows from hotter to colder, so a Geothermal Plant (600°C) fills a cell to about half; a Firebox
+  fills it completely.
+- Output faces push heat into colder neighbours every tick; thermodynamic conduits can also pull
+  from them. Redstone control pauses pushing, but not leaking.
+- Breaking a cell keeps its heat on the item (it doesn't leak while it's an item).
+- GUI: stored heat, temperature, live in/out rates, the current leak, and insulation pips for the tier.
+- Recipes upgrade one tier into the next: bricks and a copper block, then Arcforge furnace bricks,
+  then steel and wool, then obsidian and steel blocks, with copper at the corners of each.
 - Breaking the cell keeps its energy on the item, which lights up to show its charge. A comparator
   reads how full it is.
 

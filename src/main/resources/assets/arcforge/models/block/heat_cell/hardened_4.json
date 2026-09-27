@@ -1,0 +1,9 @@
+{
+  "parent": "arcforge:block/energy_cell/base",
+  "textures": {
+    "particle": "arcforge:block/heat_cell/side_4",
+    "frame": "arcforge:block/heat_cell/frame_hardened",
+    "side": "arcforge:block/heat_cell/side_4",
+    "top": "arcforge:block/heat_cell/top_4"
+  }
+}

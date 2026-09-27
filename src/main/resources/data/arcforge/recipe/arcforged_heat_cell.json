@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "#c:ingots/copper",
+    "H": "arcforge:hardened_heat_cell",
+    "O": "minecraft:obsidian",
+    "S": "#c:storage_blocks/steel"
+  },
+  "pattern": [
+    "CSC",
+    "OHO",
+    "CSC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:arcforged_heat_cell"
+  }
+}

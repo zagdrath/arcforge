@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "#c:ingots/copper",
+    "H": "arcforge:tempered_heat_cell",
+    "S": "#c:ingots/steel",
+    "W": "#minecraft:wool"
+  },
+  "pattern": [
+    "CSC",
+    "WHW",
+    "CSC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:hardened_heat_cell"
+  }
+}
