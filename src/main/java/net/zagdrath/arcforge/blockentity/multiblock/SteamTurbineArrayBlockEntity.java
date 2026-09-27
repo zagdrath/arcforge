@@ -156,7 +156,9 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
             super.onFormed(facing);
             return;
         }
-        super.onFormed(chooseFront(shell, facing));
+        // A rebuilt turbine breaks a tie the way it faced before.
+        setStructureFacing(chooseFront(shell, wasFormedBefore() ? getFacing() : facing));
+        super.onFormed(null);
         matchSidesToGenerator(shell);
     }
 

@@ -329,6 +329,45 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
+    // Breaking a boiler array and finishing it again from another side keeps its facing, so its side
+    // configuration stays on the same faces and the conduits there reconnect.
+    static void boilerArrayRebuildKeepsSides(GameTestHelper helper) {
+        BlockPos min = new BlockPos(1, 1, 1);
+        buildShell(helper, min, Direction.Axis.Y, 3, ModBlocks.STEAM_BOILER_ARRAY_CASING.get());
+        BlockPos east = new BlockPos(4, 2, 2);
+        BlockPos broken = new BlockPos(2, 2, 1);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(min, SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.isMaster() && boiler.getStructureFacing() == Direction.NORTH, "Boiler did not form facing north");
+                    helper.setBlock(east, ModBlocks.conduit(ConduitType.FLUID, ConduitTier.WROUGHT).get());
+                    net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(east));
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    var mode = net.zagdrath.arcforge.block.conduit.ConduitBlock.mode(helper.getBlockState(east), Direction.WEST);
+                    helper.assertTrue(mode == net.zagdrath.arcforge.conduit.ConnectionMode.INPUT, "Conduit on the left (east) face is " + mode);
+                    helper.setBlock(broken, net.minecraft.world.level.block.Blocks.AIR);
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    helper.assertFalse(helper.getBlockEntity(min, SteamBoilerArrayBlockEntity.class).isMaster(), "Boiler did not break");
+                    helper.setBlock(broken, ModBlocks.STEAM_BOILER_ARRAY_CASING.get());
+                    // Finished by a player standing on the south side.
+                    net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock.STRUCTURE.rebuild(helper.getLevel(), helper.absolutePos(broken), null, Direction.SOUTH);
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(min, SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.isMaster(), "Boiler did not re-form");
+                    helper.assertTrue(boiler.getStructureFacing() == Direction.NORTH, "Rebuilt boiler faces " + boiler.getStructureFacing());
+                    var mode = net.zagdrath.arcforge.block.conduit.ConduitBlock.mode(helper.getBlockState(east), Direction.WEST);
+                    helper.assertTrue(mode == net.zagdrath.arcforge.conduit.ConnectionMode.INPUT, "Conduit did not reconnect: " + mode);
+                })
+                .thenSucceed();
+    }
+
     // Copper presses like steel; the upgrades are made from plates now.
     static void copperPartsAndUpgrades(GameTestHelper helper) {
         var level = helper.getLevel();

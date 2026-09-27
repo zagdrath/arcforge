@@ -46,6 +46,8 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
 
     private ShellStructure.@Nullable Shell shell;
     private Direction facing = Direction.NORTH;
+    // Whether this master has formed a structure before; a rebuilt one keeps its facing.
+    private boolean formedBefore;
     private boolean powered;
 
     protected ShellMultiblockBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots,
@@ -81,12 +83,27 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
     }
 
     // The structure has just formed around this master. facing: toward the player who completed it, if known.
+    // Only the first build takes it: a structure broken and rebuilt keeps its facing, so its side
+    // configuration stays on the same faces (and the conduits there reconnect) whichever side it's
+    // finished from.
     public void onFormed(@Nullable Direction facing) {
-        if (facing != null && facing.getAxis().isHorizontal()) {
+        if (!formedBefore && facing != null && facing.getAxis().isHorizontal()) {
             this.facing = facing;
         }
+        formedBefore = true;
         setChanged();
         sync();
+    }
+
+    protected boolean wasFormedBefore() {
+        return formedBefore;
+    }
+
+    // For structures that choose their own facing (see SteamTurbineArrayBlockEntity).
+    protected void setStructureFacing(Direction facing) {
+        if (facing.getAxis().isHorizontal()) {
+            this.facing = facing;
+        }
     }
 
     // The structure is about to break apart.
@@ -191,6 +208,8 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
                 Direction.Axis.byName(input.getStringOr("shell_axis", "y")),
                 length)).orElse(null);
         facing = Direction.from2DDataValue(input.getIntOr("facing", Direction.NORTH.get2DDataValue()));
+        // Saves from before this was recorded: a master holding a shell has formed.
+        formedBefore = input.getBooleanOr("formed_before", shell != null);
     }
 
     @Override
@@ -202,6 +221,7 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
             output.putInt("shell_length", shell.length());
         }
         output.putInt("facing", facing.get2DDataValue());
+        output.putBoolean("formed_before", formedBefore);
     }
 
     @Override

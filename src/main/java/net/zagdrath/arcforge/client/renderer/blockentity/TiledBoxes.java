@@ -6,6 +6,7 @@
 package net.zagdrath.arcforge.client.renderer.blockentity;
 
 import java.util.List;
+import java.util.function.Predicate;
 
 import org.jspecify.annotations.Nullable;
 
@@ -16,6 +17,7 @@ import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.joml.Vector3fc;
 
@@ -46,11 +48,49 @@ public final class TiledBoxes {
         }
     }
 
+    // The inward faces of a box inset from a structure's walls (sizes in blocks), each face stretched to
+    // the structure's outer edges rather than stopping at the box's corners. Seen through a window at a
+    // steep angle, the strip between the box and the outside of the walls then shows lining, not the
+    // world behind (the walls' own blocks draw only their outer faces). No lining is drawn behind a wall
+    // block that window says is a window (given its offset from the structure's minimum corner), so the
+    // structure can be seen through from one window to another.
+    public static void lining(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
+            float inset, float sizeX, float sizeY, float sizeZ, Predicate<BlockPos> window) {
+        float[] size = { sizeX, sizeY, sizeZ };
+        for (Direction face : Direction.values()) {
+            int a = face.getAxis().ordinal();
+            int u = (a + 1) % 3;
+            int v = (a + 2) % 3;
+            int wall = face.getAxisDirection() == Direction.AxisDirection.POSITIVE ? (int) size[a] - 1 : 0;
+            float[] min = { 0.0F, 0.0F, 0.0F };
+            float[] max = size.clone();
+            min[a] = inset;
+            max[a] = size[a] - inset;
+            face(pose, buffer, sprite, color, light, min, max, face, true, (tu, tv) -> {
+                int[] offset = new int[3];
+                offset[a] = wall;
+                offset[u] = tu;
+                offset[v] = tv;
+                return window.test(new BlockPos(offset[0], offset[1], offset[2]));
+            });
+        }
+    }
+
+    private interface TileSkip {
+        boolean skip(int tu, int tv);
+    }
+
     // One face of the box, tiled. For a face along axis a, the in-plane axes u and v are chosen so that
     // u x v points along +a; corners (u0,v0) (u1,v0) (u1,v1) (u0,v1) then wind counter-clockwise seen
     // from +a, and are reversed for faces that should point the other way.
     private static void face(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
             float[] min, float[] max, Direction face, boolean inward) {
+        face(pose, buffer, sprite, color, light, min, max, face, inward, null);
+    }
+
+    // As above, leaving out the one-block tiles skip names.
+    private static void face(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
+            float[] min, float[] max, Direction face, boolean inward, @Nullable TileSkip skip) {
         int a = face.getAxis().ordinal();
         int u = (a + 1) % 3;
         int v = (a + 2) % 3;
@@ -63,7 +103,7 @@ public final class TiledBoxes {
             for (float tv = (float) Math.floor(min[v]); tv < max[v]; tv++) {
                 float u0 = Math.max(min[u], tu), u1 = Math.min(max[u], tu + 1);
                 float v0 = Math.max(min[v], tv), v1 = Math.min(max[v], tv + 1);
-                if (u1 <= u0 || v1 <= v0) {
+                if (u1 <= u0 || v1 <= v0 || skip != null && skip.skip((int) tu, (int) tv)) {
                     continue;
                 }
                 float[][] corners = { { u0, v0 }, { u1, v0 }, { u1, v1 }, { u0, v1 } };

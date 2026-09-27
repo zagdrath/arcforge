@@ -5,7 +5,9 @@
 
 package net.zagdrath.arcforge.client.renderer.blockentity;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -24,6 +26,7 @@ import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
@@ -31,12 +34,14 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
 // Draws the inside of a formed Steam Turbine Array, seen through its windows: a ribbed lining just inside
-// the walls (only its inward faces, so the near wall never hides the far one), then the rotor: the shaft
+// the walls (only its inward faces, so the near wall never hides the far one, each reaching out to the
+// structure's edges so no gap shows at the rims), then the rotor: the shaft
 // through every block from bearing to generator (stopping just short of the end caps' faces), and a set of blades in each block between them, each
 // set turned 22.5° further so they look staggered; and the steam around it, thicker the faster it flows. The rotor turns at up to one turn a second.
 public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
@@ -61,6 +66,8 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         public Direction.Axis axis = Direction.Axis.Z;
         public int length;
         public float sizeX, sizeY, sizeZ;
+        // Offsets (from the minimum corner) of the Pressure Glass panes: no lining behind them.
+        public final Set<BlockPos> windows = new HashSet<>();
         public float angle;
         public @Nullable TextureAtlasSprite liner;
         public @Nullable TextureAtlasSprite steamSprite;
@@ -90,6 +97,14 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         state.sizeY = shell.size(Direction.Axis.Y);
         state.sizeZ = shell.size(Direction.Axis.Z);
         state.liner = SteamBoilerArrayRenderer.sprite(LINER);
+        state.windows.clear();
+        if (turbine.getLevel() != null) {
+            for (BlockPos pos : shell.positions()) {
+                if (turbine.getLevel().getBlockState(pos).getBlock() instanceof PressureGlassBlock) {
+                    state.windows.add(pos.subtract(shell.min()));
+                }
+            }
+        }
         // The faster steam goes through, the thicker it looks.
         float flow = turbine.easeSteamDensity(EASE);
         SteamGrade grade = SteamGrade.of(turbine.getSteam().getResource(0));
@@ -115,8 +130,7 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         }
         TextureAtlasSprite liner = state.liner;
         collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(liner.atlasLocation()),
-                (pose, buffer) -> TiledBoxes.box(pose, buffer, liner, -1, state.light,
-                        LINER_INSET, LINER_INSET, LINER_INSET, state.sizeX - LINER_INSET, state.sizeY - LINER_INSET, state.sizeZ - LINER_INSET, true));
+                (pose, buffer) -> TiledBoxes.lining(pose, buffer, liner, -1, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows::contains));
 
         var models = Minecraft.getInstance().getModelManager();
         QuadCollection shaft = models.getStandaloneModel(ROTOR_SHAFT);
