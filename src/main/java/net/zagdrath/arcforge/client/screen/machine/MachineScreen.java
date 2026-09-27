@@ -50,6 +50,11 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     private final SideConfigTab sides;
 
     protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs) {
+        this(menu, inventory, title, machine, machineTabs, true);
+    }
+
+    // upgrades: false for machines without an Upgrades tab; their upgrade slots stay hidden.
+    protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs, boolean upgrades) {
         super(menu, inventory, title);
         this.machine = machine;
         this.background = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/" + machine + ".png");
@@ -59,8 +64,12 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
                 () -> sendButton(MachineMenu.BUTTON_CLEAR_SIDES),
                 this::sideModeName);
         tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenu.redstoneButtonId(mode))))
-                .add(sides)
-                .add(new UpgradesTab(menu.getUpgradeSlots()));
+                .add(sides);
+        if (upgrades) {
+            tabs.add(new UpgradesTab(menu.getUpgradeSlots()));
+        } else {
+            menu.getUpgradeSlots().forEach(slot -> slot.setActive(false));
+        }
     }
 
     // For machines with item outputs: shows the auto-eject button on the Sides tab.
@@ -172,20 +181,7 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         int fill = scaled(amount, capacity, tankH);
         int left = x + tankX;
         int bottom = y + tankY + tankH;
-        if (fill > 0 && fluid != Fluids.EMPTY) {
-            try {
-                var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState());
-                TextureAtlasSprite still = model.stillMaterial().sprite();
-                int tint = (model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(new FluidStack(fluid, 1)) : -1) | 0xFF000000;
-                graphics.enableScissor(left, bottom - fill, left + tankW, bottom);
-                for (int tileY = bottom - 16; tileY > bottom - fill - 16; tileY -= 16) {
-                    graphics.blitSprite(RenderPipelines.GUI_TEXTURED, still, left, tileY, 16, 16, tint);
-                }
-                graphics.disableScissor();
-            } catch (RuntimeException e) {
-                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, fallback, tankW, tankH, 0, tankH - fill, left, bottom - fill, tankW, fill);
-            }
-        }
+        ArcforgeGui.drawFluid(graphics, fluid, fill, fallback, left, bottom, tankW, tankH);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, gauge, left, y + tankY, tankW, tankH);
     }
 

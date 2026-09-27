@@ -46,6 +46,20 @@
     "arcforge:fuel_burner",
     "arcforge:infuser",
     "arcforge:metal_press",
-    "arcforge:metal_pressing_array_casing"
+    "arcforge:metal_pressing_array_casing",
+    "arcforge:steam_boiler",
+    "arcforge:steam_turbine",
+    "arcforge:electric_pump",
+    "arcforge:steam_boiler_array_casing",
+    "arcforge:steam_turbine_array_casing",
+    "arcforge:pressure_glass",
+    "arcforge:wrought_pressurized_conduit",
+    "arcforge:tempered_pressurized_conduit",
+    "arcforge:hardened_pressurized_conduit",
+    "arcforge:arcforged_pressurized_conduit",
+    "arcforge:wrought_pressurized_cylinder",
+    "arcforge:tempered_pressurized_cylinder",
+    "arcforge:hardened_pressurized_cylinder",
+    "arcforge:arcforged_pressurized_cylinder"
   ]
 }

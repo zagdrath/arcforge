@@ -89,6 +89,15 @@ public final class ArcforgeGameTests {
         TESTS.put("press_slots_and_recipes", PressingGameTests::pressSlotsAndRecipes);
         TESTS.put("press_upgrades", PressingGameTests::pressUpgrades);
         TESTS.put("pressing_array_routes_input", PressingGameTests::arrayRoutesInput);
+        TESTS.put("steam_gas_rules", SteamGameTests::gasRules);
+        TESTS.put("steam_gas_conduit_carries_steam", SteamGameTests::gasConduitCarriesSteam);
+        TESTS.put("steam_pump_drains_source", SteamGameTests::pumpDrainsSource);
+        TESTS.put("steam_pump_leaves_infinite_water", SteamGameTests::pumpLeavesInfiniteWater);
+        TESTS.put("steam_boiler_grades", SteamGameTests::boilerGrades);
+        TESTS.put("steam_turbine_output", SteamGameTests::turbineOutput);
+        TESTS.put("steam_boiler_array_forms", SteamGameTests::boilerArrayForms);
+        TESTS.put("steam_turbine_array_spins", SteamGameTests::turbineArraySpins);
+        TESTS.put("steam_copper_parts_and_upgrades", SteamGameTests::copperPartsAndUpgrades);
         TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);
         TESTS.put("auto_eject", InductionGameTests::autoEject);
         TESTS.put("creosote_moves", InductionGameTests::creosoteMoves);

@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "formed=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/pressure_glass_ctm"
+    },
+    "formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/pressure_glass_ctm"
+    }
+  }
+}

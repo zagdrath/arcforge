@@ -47,7 +47,47 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CREOSOTE = FLUIDS.register("flowing_creosote",
             () -> new BaseFlowingFluid.Flowing(creosoteProperties()));
 
+    // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
+    // so they only exist in tanks, machines and Pressurized Conduits.
+    public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = gasType("steam", 373);
+    public static final DeferredHolder<FluidType, FluidType> HIGH_PRESSURE_STEAM_TYPE = gasType("high_pressure_steam", 773);
+    public static final DeferredHolder<FluidType, FluidType> SUPERHEATED_STEAM_TYPE = gasType("superheated_steam", 1_173);
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> STEAM = FLUIDS.register("steam",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.STEAM_TYPE, ModFluids.STEAM, ModFluids.FLOWING_STEAM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_STEAM = FLUIDS.register("flowing_steam",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.STEAM_TYPE, ModFluids.STEAM, ModFluids.FLOWING_STEAM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HIGH_PRESSURE_STEAM = FLUIDS.register("high_pressure_steam",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HIGH_PRESSURE_STEAM_TYPE, ModFluids.HIGH_PRESSURE_STEAM, ModFluids.FLOWING_HIGH_PRESSURE_STEAM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HIGH_PRESSURE_STEAM = FLUIDS.register("flowing_high_pressure_steam",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HIGH_PRESSURE_STEAM_TYPE, ModFluids.HIGH_PRESSURE_STEAM, ModFluids.FLOWING_HIGH_PRESSURE_STEAM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SUPERHEATED_STEAM = FLUIDS.register("superheated_steam",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.SUPERHEATED_STEAM_TYPE, ModFluids.SUPERHEATED_STEAM, ModFluids.FLOWING_SUPERHEATED_STEAM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SUPERHEATED_STEAM = FLUIDS.register("flowing_superheated_steam",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.SUPERHEATED_STEAM_TYPE, ModFluids.SUPERHEATED_STEAM, ModFluids.FLOWING_SUPERHEATED_STEAM)));
+
     private ModFluids() {}
+
+    // Negative density marks a gas (see Gases); temperature in kelvin.
+    private static DeferredHolder<FluidType, FluidType> gasType(String name, int kelvin) {
+        return FLUID_TYPES.register(name, () -> new FluidType(FluidType.Properties.create()
+                .descriptionId("fluid_type.arcforge." + name)
+                .density(-500)
+                .viscosity(200)
+                .temperature(kelvin)
+                .canSwim(false)
+                .canDrown(false)
+                .canPushEntity(false)
+                .canExtinguish(false)
+                .canConvertToSource(false)
+                .supportsBoating(false)));
+    }
+
+    // No block and no bucket: a gas can't be placed or carried.
+    private static BaseFlowingFluid.Properties gasProperties(DeferredHolder<FluidType, FluidType> type,
+            DeferredHolder<Fluid, ? extends Fluid> source, DeferredHolder<Fluid, ? extends Fluid> flowing) {
+        return new BaseFlowingFluid.Properties(type, source, flowing);
+    }
 
     // Slow like lava: spreads 2 blocks, every 30 ticks.
     private static BaseFlowingFluid.Properties creosoteProperties() {

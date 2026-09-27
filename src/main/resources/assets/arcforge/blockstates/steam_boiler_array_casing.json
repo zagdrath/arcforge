@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/steam_boiler_array/casing"
+    },
+    "formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/steam_boiler_array/casing_formed"
+    }
+  }
+}

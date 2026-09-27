@@ -20,10 +20,15 @@ import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FiberizerBlockEntity;
@@ -35,6 +40,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 
 public final class ModBlockEntityTypes {
@@ -66,6 +72,22 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<MetalPressBlockEntity>> METAL_PRESS = BLOCK_ENTITY_TYPES.register("metal_press",
             () -> new BlockEntityType<>(MetalPressBlockEntity::new, ModBlocks.METAL_PRESS.get()));
 
+    public static final Supplier<BlockEntityType<SteamBoilerBlockEntity>> STEAM_BOILER = BLOCK_ENTITY_TYPES.register("steam_boiler",
+            () -> new BlockEntityType<>(SteamBoilerBlockEntity::new, ModBlocks.STEAM_BOILER.get()));
+
+    public static final Supplier<BlockEntityType<SteamTurbineBlockEntity>> STEAM_TURBINE = BLOCK_ENTITY_TYPES.register("steam_turbine",
+            () -> new BlockEntityType<>(SteamTurbineBlockEntity::new, ModBlocks.STEAM_TURBINE.get()));
+
+    public static final Supplier<BlockEntityType<ElectricPumpBlockEntity>> ELECTRIC_PUMP = BLOCK_ENTITY_TYPES.register("electric_pump",
+            () -> new BlockEntityType<>(ElectricPumpBlockEntity::new, ModBlocks.ELECTRIC_PUMP.get()));
+
+    // Every casing has one; only the master (the minimum corner) runs.
+    public static final Supplier<BlockEntityType<SteamBoilerArrayBlockEntity>> STEAM_BOILER_ARRAY = BLOCK_ENTITY_TYPES.register("steam_boiler_array",
+            () -> new BlockEntityType<>(SteamBoilerArrayBlockEntity::new, ModBlocks.STEAM_BOILER_ARRAY_CASING.get()));
+
+    public static final Supplier<BlockEntityType<SteamTurbineArrayBlockEntity>> STEAM_TURBINE_ARRAY = BLOCK_ENTITY_TYPES.register("steam_turbine_array",
+            () -> new BlockEntityType<>(SteamTurbineArrayBlockEntity::new, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get()));
+
     // Every casing has one; only the centre's runs.
     public static final Supplier<BlockEntityType<MetalPressingArrayBlockEntity>> METAL_PRESSING_ARRAY = BLOCK_ENTITY_TYPES.register("metal_pressing_array",
             () -> new BlockEntityType<>(MetalPressingArrayBlockEntity::new, ModBlocks.METAL_PRESSING_ARRAY_CASING.get()));
@@ -92,6 +114,9 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<FluidTankBlockEntity>> FLUID_TANK = BLOCK_ENTITY_TYPES.register("fluid_tank",
             () -> new BlockEntityType<>(FluidTankBlockEntity::new, tierBlocks(ModBlocks::fluidTank)));
+
+    public static final Supplier<BlockEntityType<PressurizedCylinderBlockEntity>> PRESSURIZED_CYLINDER = BLOCK_ENTITY_TYPES.register("pressurized_cylinder",
+            () -> new BlockEntityType<>(PressurizedCylinderBlockEntity::new, tierBlocks(ModBlocks::pressurizedCylinder)));
 
     public static final Supplier<BlockEntityType<EnergyCellBlockEntity>> ENERGY_CELL = BLOCK_ENTITY_TYPES.register("energy_cell",
             () -> new BlockEntityType<>(EnergyCellBlockEntity::new, tierBlocks(ModBlocks::energyCell)));

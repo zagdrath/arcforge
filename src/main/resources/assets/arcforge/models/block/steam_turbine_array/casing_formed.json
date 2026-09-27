@@ -1,0 +1,17 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "structure",
+  "render_type": "minecraft:translucent",
+  "window_fill": "see_through",
+  "faces": "exterior_only",
+  "textures": {
+    "particle": "arcforge:block/steam_turbine_array/formed_base",
+    "base": "arcforge:block/steam_turbine_array/formed_base",
+    "beam": "arcforge:block/ctm/frame_beam",
+    "lip": "arcforge:block/ctm/window_lip",
+    "window": "arcforge:block/ctm/pressure_glass_base",
+    "end_generator": "arcforge:block/steam_turbine_array/end_generator",
+    "end_bearing": "arcforge:block/steam_turbine_array/end_bearing"
+  },
+  "fallback": "arcforge:block/steam_turbine_array/casing_formed_flat"
+}

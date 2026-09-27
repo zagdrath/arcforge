@@ -1,0 +1,131 @@
+{
+  "render_type": "minecraft:solid",
+  "textures": {
+    "particle": "#conduit"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        5,
+        2
+      ],
+      "to": [
+        11,
+        11,
+        5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            11,
+            6,
+            14,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "west": {
+          "uv": [
+            11,
+            6,
+            14,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "up": {
+          "uv": [
+            11,
+            6,
+            14,
+            12
+          ],
+          "texture": "#conduit",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            11,
+            6,
+            14,
+            12
+          ],
+          "texture": "#conduit",
+          "rotation": 90
+        },
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        }
+      }
+    },
+    {
+      "from": [
+        6,
+        6,
+        0
+      ],
+      "to": [
+        10,
+        10,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            4,
+            4
+          ],
+          "texture": "#port_in",
+          "cullface": "north"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            2,
+            4
+          ],
+          "texture": "#port_in"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            2,
+            4
+          ],
+          "texture": "#port_in"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            2,
+            4
+          ],
+          "texture": "#port_in",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            2,
+            4
+          ],
+          "texture": "#port_in",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

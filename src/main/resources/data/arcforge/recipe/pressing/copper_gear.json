@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:gear_die",
+  "ingredient": "#c:ingots/copper",
+  "count": 4,
+  "result": {
+    "id": "arcforge:copper_gear",
+    "count": 1
+  },
+  "time": 100
+}

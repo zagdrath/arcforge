@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#c:plates/steel",
+    "M": "#c:storage_blocks/steel",
+    "C": "arcforge:tempered_pressurized_cylinder"
+  },
+  "pattern": [
+    "PMP",
+    "PCP",
+    "PMP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:hardened_pressurized_cylinder"
+  }
+}

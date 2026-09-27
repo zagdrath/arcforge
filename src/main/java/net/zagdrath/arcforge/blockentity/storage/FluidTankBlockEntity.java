@@ -53,10 +53,11 @@ import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.zagdrath.arcforge.steam.Gases;
 import net.zagdrath.arcforge.transfer.SidedResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
-// One tank of any fluid. The GUI's bucket slot empties filled containers into the tank (or fills empty
+// One tank of any fluid but a gas (those go in Pressurized Cylinders). The GUI's bucket slot empties filled containers into the tank (or fills empty
 // ones from it) and moves the result to the slot below. The fluid is synced to clients for the block
 // entity renderer, and the tank lights up with the fluid's light level. Breaking the tank spills its
 // fluid as a source block; picking it up with the wrench keeps the fluid on the item.
@@ -78,7 +79,7 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
         // Defaults: fill from every side, drain from the bottom.
         super(ModBlockEntityTypes.FLUID_TANK.get(), pos, state, ((FluidTankBlock) state.getBlock()).getTier(),
                 new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT));
-        this.tank = new FilteredFluidTank(tier.tankCapacity(), resource -> true, this::onTankChanged);
+        this.tank = new FilteredFluidTank(tier.tankCapacity(), resource -> !Gases.isGas(resource), this::onTankChanged);
         this.inputView = new SidedResourceHandler<>(tank, true, false, tier.tankRate());
         this.outputView = new SidedResourceHandler<>(tank, false, true, tier.tankRate());
         this.automationView = new SidedResourceHandler<>(tank, true, true, tier.tankRate());

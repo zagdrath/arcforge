@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/steam_boiler_front",
+    "south": "arcforge:block/steam_boiler_back",
+    "east": "arcforge:block/steam_boiler_side",
+    "west": "arcforge:block/steam_boiler_side",
+    "up": "arcforge:block/steam_boiler_top",
+    "down": "arcforge:block/steam_boiler_bottom",
+    "particle": "arcforge:block/steam_boiler_side"
+  }
+}

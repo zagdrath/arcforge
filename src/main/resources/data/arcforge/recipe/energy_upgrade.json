@@ -2,9 +2,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "S": "#c:ingots/steel",
+    "S": "#c:plates/steel",
     "A": "#c:dusts/redstone",
-    "B": "#c:ingots/copper"
+    "B": "#c:plates/copper"
   },
   "pattern": [
     "ABA",

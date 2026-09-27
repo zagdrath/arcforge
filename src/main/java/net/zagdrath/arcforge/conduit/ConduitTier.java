@@ -19,6 +19,8 @@ public enum ConduitTier implements StringRepresentable {
 
     // Fluid each conduit block can hold.
     public static final int FLUID_CAPACITY_PER_CONDUIT = 1_000;
+    // Gas each pressurized conduit block can hold.
+    public static final int GAS_CAPACITY_PER_CONDUIT = 2_000;
     // Item stacks each item conduit can store while nothing will take them.
     public static final int ITEM_STORAGE_SLOTS = 4;
 
@@ -54,6 +56,11 @@ public enum ConduitTier implements StringRepresentable {
 
     public int fluidPerTick() {
         return fluidPerTick;
+    }
+
+    // Pressurized conduits move gas twice as fast as fluid conduits move fluid.
+    public int gasPerTick() {
+        return fluidPerTick * 2;
     }
 
     public int heatPerTick() {
@@ -106,6 +113,21 @@ public enum ConduitTier implements StringRepresentable {
         };
     }
 
+    // Pressurized Cylinder capacity in mB.
+    public int cylinderCapacity() {
+        return switch (this) {
+            case WROUGHT -> 64_000;
+            case TEMPERED -> 256_000;
+            case HARDENED -> 1_024_000;
+            case ARCFORGED -> 4_096_000;
+        };
+    }
+
+    // Most mB a Pressurized Cylinder moves in or out per operation: twice a fluid tank, like the conduits.
+    public int cylinderRate() {
+        return tankRate() * 2;
+    }
+
     // Heat cell capacity in HU.
     public int heatCellCapacity() {
         return switch (this) {
@@ -154,6 +176,7 @@ public enum ConduitTier implements StringRepresentable {
         return switch (type) {
             case ENERGY -> Component.translatable("tooltip.arcforge.conduit.throughput.energy", format(energyPerTick));
             case FLUID -> Component.translatable("tooltip.arcforge.conduit.throughput.fluid", format(fluidPerTick));
+            case GAS -> Component.translatable("tooltip.arcforge.conduit.throughput.fluid", format(gasPerTick()));
             case THERMAL -> Component.translatable("tooltip.arcforge.conduit.throughput.thermal", format(heatPerTick));
             case ITEM -> Component.translatable("tooltip.arcforge.conduit.throughput.item", itemsPerOperation,
                     String.format("%.1f", ticksPerItemOperation / 20.0));

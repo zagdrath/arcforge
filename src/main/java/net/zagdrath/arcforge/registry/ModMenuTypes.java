@@ -16,12 +16,16 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
 import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
+import net.zagdrath.arcforge.menu.machine.ElectricPumpMenu;
+import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
+import net.zagdrath.arcforge.menu.machine.SteamTurbineMenu;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.menu.machine.FiberizerMenu;
 import net.zagdrath.arcforge.menu.machine.FuelBurnerMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.InductionFurnaceArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.MetalPressingArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
 import net.zagdrath.arcforge.menu.machine.InfuserMenu;
 import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
@@ -29,6 +33,7 @@ import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
 import net.zagdrath.arcforge.menu.storage.EnergyCellMenu;
 import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
+import net.zagdrath.arcforge.menu.storage.PressurizedCylinderMenu;
 import net.zagdrath.arcforge.menu.storage.HeatCellMenu;
 
 public final class ModMenuTypes {
@@ -61,6 +66,21 @@ public final class ModMenuTypes {
     public static final Supplier<MenuType<MetalPressMenu>> METAL_PRESS = MENU_TYPES.register("metal_press",
             () -> IMenuTypeExtension.create(MetalPressMenu::new));
 
+    public static final Supplier<MenuType<SteamBoilerMenu>> STEAM_BOILER = MENU_TYPES.register("steam_boiler",
+            () -> IMenuTypeExtension.create(SteamBoilerMenu::single));
+
+    public static final Supplier<MenuType<SteamBoilerMenu>> STEAM_BOILER_ARRAY = MENU_TYPES.register("steam_boiler_array",
+            () -> IMenuTypeExtension.create(SteamBoilerMenu::array));
+
+    public static final Supplier<MenuType<SteamTurbineMenu>> STEAM_TURBINE = MENU_TYPES.register("steam_turbine",
+            () -> IMenuTypeExtension.create(SteamTurbineMenu::new));
+
+    public static final Supplier<MenuType<ElectricPumpMenu>> ELECTRIC_PUMP = MENU_TYPES.register("electric_pump",
+            () -> IMenuTypeExtension.create(ElectricPumpMenu::new));
+
+    public static final Supplier<MenuType<SteamTurbineArrayMenu>> STEAM_TURBINE_ARRAY = MENU_TYPES.register("steam_turbine_array",
+            () -> IMenuTypeExtension.create(SteamTurbineArrayMenu::new));
+
     public static final Supplier<MenuType<MetalPressingArrayMenu>> METAL_PRESSING_ARRAY = MENU_TYPES.register("metal_pressing_array",
             () -> IMenuTypeExtension.create(MetalPressingArrayMenu::new));
 
@@ -75,6 +95,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<FluidTankMenu>> FLUID_TANK = MENU_TYPES.register("fluid_tank",
             () -> IMenuTypeExtension.create(FluidTankMenu::new));
+
+    public static final Supplier<MenuType<PressurizedCylinderMenu>> PRESSURIZED_CYLINDER = MENU_TYPES.register("pressurized_cylinder",
+            () -> IMenuTypeExtension.create(PressurizedCylinderMenu::new));
 
     public static final Supplier<MenuType<EnergyCellMenu>> ENERGY_CELL = MENU_TYPES.register("energy_cell",
             () -> IMenuTypeExtension.create(EnergyCellMenu::new));

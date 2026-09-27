@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "arcforge:block/steam_turbine_array/formed_base"
+  }
+}

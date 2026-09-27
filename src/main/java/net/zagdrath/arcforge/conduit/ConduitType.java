@@ -13,10 +13,12 @@ public enum ConduitType implements StringRepresentable {
     ENERGY("energy", true),
     ITEM("item", false),
     FLUID("fluid", false),
+    // Pressurized conduits: gases only (see Gases). Steel pipe that glows while gas moves.
+    GAS("pressurized", true),
     THERMAL("thermal", true);
 
     private final String name;
-    // Energy and thermal conduits glow while moving their resource; item and fluid conduits are glass.
+    // Energy, gas and thermal conduits glow while moving their resource; item and fluid conduits are glass.
     private final boolean hasActiveState;
 
     ConduitType(String name, boolean hasActiveState) {

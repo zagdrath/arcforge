@@ -20,6 +20,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
@@ -33,6 +34,7 @@ public class MachineOutputs {
     private final Map<Direction, BlockCapabilityCache<EnergyHandler, @Nullable Direction>> energyTargets = new EnumMap<>(Direction.class);
     private final Map<Direction, BlockCapabilityCache<HeatHandler, @Nullable Direction>> heatTargets = new EnumMap<>(Direction.class);
     private final Map<Direction, BlockCapabilityCache<ResourceHandler<ItemResource>, @Nullable Direction>> itemTargets = new EnumMap<>(Direction.class);
+    private final Map<Direction, BlockCapabilityCache<ResourceHandler<FluidResource>, @Nullable Direction>> fluidTargets = new EnumMap<>(Direction.class);
     private static final int ITEMS_PER_FACE = 16;
 
     // Moves up to max FE out of ENERGY faces (shared across them); returns how much moved.
@@ -82,6 +84,28 @@ public class MachineOutputs {
             }
         }
         return moved;
+    }
+
+    // Moves up to max mB out of OUTPUT faces (shared across them) into the tanks they touch, skipping
+    // `except` (a face the machine already pushed through). Returns how much moved.
+    public int pushFluid(ServerLevel level, BlockPos pos, Direction facing, SideConfig sides, ResourceHandler<FluidResource> source, int max,
+            @Nullable Direction except) {
+        int budget = max;
+        for (Direction direction : Direction.values()) {
+            if (budget <= 0) {
+                break;
+            }
+            if (direction != except && sides.get(facing, direction) == SideMode.OUTPUT) {
+                budget -= pushFluid(level, pos, direction, source, budget);
+            }
+        }
+        return max - budget;
+    }
+
+    // Moves up to max mB into the tank touching one face, whatever that face is set to.
+    public int pushFluid(ServerLevel level, BlockPos pos, Direction direction, ResourceHandler<FluidResource> source, int max) {
+        ResourceHandler<FluidResource> target = target(fluidTargets, Capabilities.Fluid.BLOCK, level, pos, direction);
+        return target != null ? ResourceHandlerUtil.move(source, target, resource -> true, max, null) : 0;
     }
 
     // min(rate, what the source holds, what the target can take), if the source is hotter.

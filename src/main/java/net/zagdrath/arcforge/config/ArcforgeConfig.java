@@ -270,6 +270,128 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+        BUILDER.comment("Electric Pump: pumps the fluid source block directly below it using FE.").push("electricPump");
+    }
+
+    public static final ModConfigSpec.IntValue PUMP_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while pumping, before upgrades.")
+            .defineInRange("energyPerTick", 10, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_CYCLE_TICKS = BUILDER
+            .comment("Ticks to pump one bucket (1,000 mB), before Speed upgrades.")
+            .defineInRange("cycleTicks", 20, 1, 1_200);
+
+    public static final ModConfigSpec.IntValue PUMP_TANK_CAPACITY = BUILDER
+            .comment("Internal tank size in mB.")
+            .defineInRange("tankCapacity", 16_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t it pushes up out of its top face (and out of output faces with auto-eject).")
+            .defineInRange("outputRate", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.BooleanValue PUMP_INFINITE_WATER = BUILDER
+            .comment("Leave water in place when it is an infinite source (2+ water sources beside it), like a bucket would refill.")
+            .define("pumpInfiniteWater", true);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Steam Boiler: boils water into steam with heat. Hotter boilers make higher grades of steam.").push("steamBoiler");
+    }
+
+    public static final ModConfigSpec.IntValue BOILER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU (a full buffer is at the maximum temperature).")
+            .defineInRange("heatCapacity", 40_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue BOILER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_400, 200, 10_000);
+
+    public static final ModConfigSpec.IntValue BOILER_MAX_HEAT_PER_TICK = BUILDER
+            .comment("Most HU/t it boils with.")
+            .defineInRange("maxHeatPerTick", 80, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue BOILER_TANK_CAPACITY = BUILDER
+            .comment("Water and steam tank sizes in mB.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Steam Turbine: turns steam into FE. FE per mB depends on the steam grade.").push("steamTurbine");
+    }
+
+    public static final ModConfigSpec.IntValue TURBINE_MAX_FLOW = BUILDER
+            .comment("Most steam it uses, in mB/t.")
+            .defineInRange("maxFlow", 10, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_TANK_CAPACITY = BUILDER
+            .comment("Steam tank size in mB.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_MAX_OUTPUT = BUILDER
+            .comment("Most FE/t pushed out of its energy faces.")
+            .defineInRange("maxEnergyOutput", 400, 1, 1_000_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Steam Boiler Array: a 3x3 boiler 3 to 7 blocks tall. Values are per block of height.").push("steamBoilerArray");
+    }
+
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_HEAT_PER_HEIGHT = BUILDER
+            .comment("Heat buffer size in HU, per block of height.")
+            .defineInRange("heatCapacityPerHeight", 100_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_HEAT_PER_HEIGHT = BUILDER
+            .comment("Most HU/t it boils with, per block of height.")
+            .defineInRange("maxHeatPerTickPerHeight", 200, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_TANK_PER_HEIGHT = BUILDER
+            .comment("Water and steam tank sizes in mB, per block of height.")
+            .defineInRange("tankCapacityPerHeight", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.DoubleValue BOILER_ARRAY_HEAT_COST = BUILDER
+            .comment("Multiplier on the heat per mB of steam (0.8 = the big drum loses 20% less).")
+            .defineInRange("heatCostMultiplier", 0.8, 0.1, 10.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Steam Turbine Array: a 3x3 turbine 3 to 9 blocks long, whose rotor spins up and coasts down.",
+                "Values are per block of length.").push("steamTurbineArray");
+    }
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_FLOW_PER_LENGTH = BUILDER
+            .comment("Most steam it uses in mB/t, per block of length.")
+            .defineInRange("maxFlowPerLength", 40, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_TANK_PER_LENGTH = BUILDER
+            .comment("Steam tank size in mB, per block of length.")
+            .defineInRange("tankCapacityPerLength", 32_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 1_000_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_OUTPUT = BUILDER
+            .comment("Most FE/t pushed out of its energy faces.")
+            .defineInRange("maxEnergyOutput", 16_384, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_RPM = BUILDER
+            .comment("Rotor speed at full steam flow.")
+            .defineInRange("maxRpm", 3_600, 100, 100_000);
+
+    static {
+        BUILDER.pop();
         BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
                 "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
     }

@@ -250,7 +250,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
         return switch (type) {
             case ITEM, FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case ENERGY -> ConnectionMode.NONE;
+            case ENERGY, GAS -> ConnectionMode.NONE;
         };
     }
 

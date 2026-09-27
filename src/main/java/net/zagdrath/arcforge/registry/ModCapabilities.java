@@ -18,6 +18,9 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
+import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
@@ -32,8 +35,12 @@ import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
@@ -96,6 +103,33 @@ public final class ModCapabilities {
         });
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
                 MetalPressBlockEntity::getEnergyHandler);
+        // Every casing of a formed steam array exposes the face of the box it lies on (served by the master).
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), (casing, side) ->
+                casing.getMaster() instanceof SteamBoilerArrayBlockEntity boiler ? boiler.itemHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), (casing, side) ->
+                casing.getMaster() instanceof SteamBoilerArrayBlockEntity boiler ? boiler.fluidHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), (casing, side) ->
+                casing.getMaster() instanceof SteamBoilerArrayBlockEntity boiler ? boiler.heatHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), (casing, side) ->
+                casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), (casing, side) ->
+                casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.STEAM_BOILER.get(),
+                SteamBoilerBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.STEAM_BOILER.get(),
+                SteamBoilerBlockEntity::getFluidHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.STEAM_BOILER.get(),
+                SteamBoilerBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.STEAM_TURBINE.get(),
+                SteamTurbineBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.STEAM_TURBINE.get(),
+                SteamTurbineBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ELECTRIC_PUMP.get(),
+                ElectricPumpBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ELECTRIC_PUMP.get(),
+                ElectricPumpBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ELECTRIC_PUMP.get(),
+                ElectricPumpBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
                 MetalPressBlockEntity::getItemHandler);
         // Every casing of a formed Metal Pressing Array exposes the cube face it lies on (served by the centre).
@@ -131,6 +165,8 @@ public final class ModCapabilities {
                 ThermoelectricPlantBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FLUID_TANK.get(),
                 FluidTankBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(),
+                PressurizedCylinderBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(),
                 EnergyCellBlockEntity::getEnergyHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.HEAT_CELL.get(),

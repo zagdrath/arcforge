@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#c:plates/steel",
+    "C": "#c:plates/copper",
+    "T": "arcforge:wrought_fluid_tank",
+    "W": "arcforge:wrought_thermal_conduit"
+  },
+  "pattern": [
+    "PPP",
+    "CTC",
+    "PWP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:steam_boiler"
+  }
+}

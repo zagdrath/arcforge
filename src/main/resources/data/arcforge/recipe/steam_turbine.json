@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:gears/steel",
+    "r": "#c:rods/copper",
+    "R": "#c:rods/steel",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "pattern": [
+    "PGP",
+    "rRr",
+    "PEP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:steam_turbine"
+  }
+}

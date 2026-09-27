@@ -84,14 +84,48 @@ can run side by side. Each lane is twice as fast as the Metal Press and uses 60%
 (16 FE/t per working lane). It stores 100,000 FE and takes up to 1,000 FE/t. Input faces feed a lane
 whose die presses the item (the one holding the fewest first) and refuse anything no lane can use.
 
+### Steam
+
+**Gases.** Steam comes in three grades, each its own gas: Steam, High-Pressure Steam and Superheated
+Steam. Gases are fluids lighter than air (or tagged `#arcforge:gases`). They travel only in Pressurized
+Conduits and Pressurized Cylinders, which carry nothing else; Fluid Conduits and Fluid Tanks refuse
+them. A tank or network holds one gas at a time.
+
+**Pressurized Conduits** move 400 / 1,600 / 6,400 / 25,600 mB/t (twice a fluid conduit) and hold
+2,000 mB each; they glow while gas moves. **Pressurized Cylinders** hold 64,000 / 256,000 / 1,024,000 /
+4,096,000 mB, keep their gas when broken, and show their fill on a gauge (and to comparators).
+
+**Electric Pump.** Pumps the fluid source directly below it: a bucket every 20 ticks for 10 FE/t. The
+source is removed, except water with two or more water sources beside it, which is infinite. It
+pushes up to 1,000 mB/t out of its top. Takes Speed and Energy upgrades.
+
+**Steam Boiler.** Boils water into steam with heat, using up to 80 HU/t, and only at 100°C or hotter.
+The grade depends on its temperature: Steam from 100°C (10 HU/mB), High-Pressure from 500°C (15 HU/mB),
+Superheated from 900°C (20 HU/mB). Fed more heat than it uses, it climbs toward its heat source's
+temperature; underfed, it sits near 100°C making plain Steam. Cooling into a lower grade turns the
+steam it holds into that grade.
+
+**Steam Turbine.** Turns up to 10 mB/t of steam into FE: 8 / 14 / 22 FE per mB by grade (80 to
+220 FE/t). The used steam vents.
+
+**Steam Boiler Array.** A 3x3 tower 3 to 7 tall of Steam Boiler Array Casings and Pressure Glass,
+hollow in the middle. Only the 8 corners must be casings, so whole walls can be windows, and the water
+and steam show through them. Per block of height: 100,000 HU, up to 200 HU/t, 16,000 mB tanks; each mB
+costs 80% of a Steam Boiler's heat.
+
+**Steam Turbine Array.** A 3x3 tube 3 to 9 long along either horizontal axis, built the same way. It
+takes up to 40 mB/t per block of length at 10 / 18 / 28 FE per mB (a 9-long array on Superheated makes
+10,080 FE/t). Its rotor spins up over a few seconds when steam flows, and output rises with it; it
+coasts down when the steam stops. The generator end (the back) is its energy face.
+
 ### Upgrades
 
 Speed, Energy and Heat upgrade cards go in a machine's Upgrades tab, up to 8 of each.
 
 | Upgrade | Effect (n installed) | Machines |
 |---|---|---|
-| Speed | Works 2^(n/2) times as fast (16x at 8), using power or fuel just as fast, so the cost per operation doesn't change | All |
-| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Metal Press, Metal Pressing Array, Combustion Plant |
+| Speed | Works 2^(n/2) times as fast (16x at 8), using power or fuel just as fast, so the cost per operation doesn't change | All with an Upgrades tab |
+| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Metal Press, Metal Pressing Array, Electric Pump, Combustion Plant |
 | Heat | Heat per fuel or lava (and from nearby lava and magma) x (1 + n/8); Thermoelectric Plant: efficiency / 0.8^n, up to 100% | Firebox, Geothermal Plant, Thermoelectric Plant |
 
 ## Logistics

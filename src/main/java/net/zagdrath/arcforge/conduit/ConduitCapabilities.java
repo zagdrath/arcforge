@@ -27,7 +27,7 @@ public final class ConduitCapabilities {
         return switch (type) {
             case ENERGY -> Capabilities.Energy.BLOCK;
             case ITEM -> Capabilities.Item.BLOCK;
-            case FLUID -> Capabilities.Fluid.BLOCK;
+            case FLUID, GAS -> Capabilities.Fluid.BLOCK;
             case THERMAL -> ModCapabilities.HEAT;
         };
     }
@@ -58,7 +58,7 @@ public final class ConduitCapabilities {
         return switch (type) {
             case ENERGY -> energyMode(level.getCapability(Capabilities.Energy.BLOCK, target, face));
             case THERMAL -> heatMode(level.getCapability(ModCapabilities.HEAT, target, face));
-            case ITEM, FLUID -> ConnectionMode.INPUT;
+            case ITEM, FLUID, GAS -> ConnectionMode.INPUT;
         };
     }
 

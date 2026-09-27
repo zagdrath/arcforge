@@ -28,7 +28,18 @@ public enum MachineStatus {
     NO_FLUID("no_fluid", "led_blocked"),
     BURNING("burning", "led_running"),
     PRESSING("pressing", "led_running"),
-    NO_DIE("no_die", "led_blocked");
+    NO_DIE("no_die", "led_blocked"),
+    PUMPING("pumping", "led_running"),
+    NO_SOURCE("no_source", "led_blocked"),
+    TANK_FULL("tank_full", "led_blocked"),
+    BOILING("boiling", "led_running"),
+    HEATING("heating", "led_idle"),
+    NO_WATER("no_water", "led_blocked"),
+    STEAM_FULL("steam_full", "led_blocked"),
+    GENERATING("generating", "led_running"),
+    NO_STEAM("no_steam", "led_blocked"),
+    SPINNING_UP("spinning_up", "led_running"),
+    COASTING("coasting", "led_idle");
 
     private final String name;
     private final String led;

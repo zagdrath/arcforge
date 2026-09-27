@@ -100,7 +100,7 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
         return switch (type) {
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case FLUID, THERMAL -> ConnectionMode.NONE;
+            case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
         };
     }
 

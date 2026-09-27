@@ -1,5 +1,6 @@
 {
   "values": [
-    "#c:plates/steel"
+    "#c:plates/steel",
+    "#c:plates/copper"
   ]
 }

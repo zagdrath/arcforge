@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#c:plates/steel",
+    "C": "#c:plates/copper",
+    "S": "arcforge:steam_boiler"
+  },
+  "pattern": [
+    "PCP",
+    "CSC",
+    "PCP"
+  ],
+  "result": {
+    "count": 4,
+    "id": "arcforge:steam_boiler_array_casing"
+  }
+}

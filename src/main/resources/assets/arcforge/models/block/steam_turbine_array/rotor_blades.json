@@ -1,0 +1,218 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "#blade",
+    "blade": "arcforge:block/steam_turbine_array/rotor_blade",
+    "hub": "arcforge:block/steam_turbine_array/rotor_hub"
+  },
+  "elements": [
+    {
+      "from": [
+        -12,
+        5,
+        7
+      ],
+      "to": [
+        28,
+        11,
+        9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ],
+          "texture": "#blade"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ],
+          "texture": "#blade"
+        },
+        "up": {
+          "uv": [
+            0,
+            4,
+            16,
+            6
+          ],
+          "texture": "#blade"
+        },
+        "down": {
+          "uv": [
+            0,
+            4,
+            16,
+            6
+          ],
+          "texture": "#blade"
+        },
+        "east": {
+          "uv": [
+            0,
+            4,
+            4,
+            6
+          ],
+          "texture": "#blade"
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            4,
+            6
+          ],
+          "texture": "#blade"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        -12,
+        7
+      ],
+      "to": [
+        11,
+        28,
+        9
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ],
+          "texture": "#blade",
+          "rotation": 90
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            16,
+            4
+          ],
+          "texture": "#blade",
+          "rotation": 90
+        },
+        "east": {
+          "uv": [
+            0,
+            4,
+            16,
+            6
+          ],
+          "texture": "#blade",
+          "rotation": 90
+        },
+        "west": {
+          "uv": [
+            0,
+            4,
+            16,
+            6
+          ],
+          "texture": "#blade",
+          "rotation": 90
+        },
+        "up": {
+          "uv": [
+            0,
+            4,
+            4,
+            6
+          ],
+          "texture": "#blade"
+        },
+        "down": {
+          "uv": [
+            0,
+            4,
+            4,
+            6
+          ],
+          "texture": "#blade"
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        3,
+        5
+      ],
+      "to": [
+        13,
+        13,
+        11
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#hub"
+        },
+        "south": {
+          "uv": [
+            4,
+            4,
+            12,
+            12
+          ],
+          "texture": "#hub"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            4,
+            8
+          ],
+          "texture": "#hub"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            4,
+            8
+          ],
+          "texture": "#hub"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            8,
+            4
+          ],
+          "texture": "#hub"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            8,
+            4
+          ],
+          "texture": "#hub"
+        }
+      }
+    }
+  ]
+}

@@ -171,7 +171,7 @@ public class MetalPressBlockEntity extends MachineBlockEntity {
         return switch (type) {
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case FLUID, THERMAL -> ConnectionMode.NONE;
+            case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
         };
     }
 

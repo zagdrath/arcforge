@@ -8,9 +8,15 @@ package net.zagdrath.arcforge.client.gui;
 import java.util.Locale;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.Arcforge;
 
 // Shared GUI colours and helpers for every Arcforge machine screen.
@@ -64,5 +70,28 @@ public final class ArcforgeGui {
 
     public static String grouped(long value) {
         return String.format("%,d", value);
+    }
+
+    // The bottom `fill` px of a width x height gauge whose bottom-left is (left, bottom): the fluid's still
+    // texture, tinted and tiled in 16px steps, clipped to the fill; or the fallback sprite if the fluid has
+    // no model.
+    public static void drawFluid(GuiGraphicsExtractor graphics, Fluid fluid, int fill, Identifier fallback, int left, int bottom, int width, int height) {
+        if (fill <= 0 || fluid == Fluids.EMPTY) {
+            return;
+        }
+        try {
+            var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState());
+            TextureAtlasSprite still = model.stillMaterial().sprite();
+            int tint = (model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(new FluidStack(fluid, 1)) : -1) | 0xFF000000;
+            graphics.enableScissor(left, bottom - fill, left + width, bottom);
+            for (int tileY = bottom - 16; tileY > bottom - fill - 16; tileY -= 16) {
+                for (int tileX = left; tileX < left + width; tileX += 16) {
+                    graphics.blitSprite(RenderPipelines.GUI_TEXTURED, still, tileX, tileY, 16, 16, tint);
+                }
+            }
+            graphics.disableScissor();
+        } catch (RuntimeException e) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, fallback, width, height, 0, height - fill, left, bottom - fill, width, fill);
+        }
     }
 }

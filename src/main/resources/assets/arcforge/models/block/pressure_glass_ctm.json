@@ -1,0 +1,12 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "glass",
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "particle": "arcforge:block/pressure_glass",
+    "base": "arcforge:block/ctm/pressure_glass_base",
+    "beam": "arcforge:block/ctm/frame_beam",
+    "lip": "arcforge:block/ctm/window_lip"
+  },
+  "fallback": "arcforge:block/pressure_glass_flat"
+}

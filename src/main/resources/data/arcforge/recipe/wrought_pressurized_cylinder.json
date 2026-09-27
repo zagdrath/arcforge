@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#c:plates/steel",
+    "T": "arcforge:wrought_fluid_tank"
+  },
+  "pattern": [
+    "PPP",
+    "PTP",
+    "PPP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:wrought_pressurized_cylinder"
+  }
+}

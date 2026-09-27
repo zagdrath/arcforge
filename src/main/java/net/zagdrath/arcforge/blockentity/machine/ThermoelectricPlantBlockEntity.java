@@ -231,7 +231,7 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
         return switch (type) {
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case ITEM, FLUID -> ConnectionMode.NONE;
+            case ITEM, FLUID, GAS -> ConnectionMode.NONE;
         };
     }
 

@@ -23,9 +23,13 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.event.RegisterBlockStateModels;
+import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
 import net.neoforged.neoforge.client.event.RecipesReceivedEvent;
 import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.client.fluid.FluidTintSources;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent;
@@ -37,15 +41,22 @@ import net.zagdrath.arcforge.client.renderer.blockentity.ArcforgeFurnaceRenderer
 import net.zagdrath.arcforge.client.renderer.blockentity.CarbonizerDoorRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.SteamBoilerArrayRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.SteamTurbineArrayRenderer;
+import net.zagdrath.arcforge.client.model.ConnectedModel;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
 import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
 import net.zagdrath.arcforge.client.screen.machine.InductionFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.machine.MetalPressScreen;
+import net.zagdrath.arcforge.client.screen.machine.ElectricPumpScreen;
+import net.zagdrath.arcforge.client.screen.machine.SteamBoilerScreen;
+import net.zagdrath.arcforge.client.screen.machine.SteamTurbineScreen;
 import net.zagdrath.arcforge.client.screen.machine.CombustionPlantScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.ArcCrushingArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.InductionFurnaceArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.MetalPressingArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.SteamTurbineArrayScreen;
 import net.zagdrath.arcforge.client.screen.machine.FireboxScreen;
 import net.zagdrath.arcforge.client.screen.machine.FiberizerScreen;
 import net.zagdrath.arcforge.client.screen.machine.FuelBurnerScreen;
@@ -57,10 +68,12 @@ import net.zagdrath.arcforge.client.screen.multiblock.CarbonizerScreen;
 import net.zagdrath.arcforge.client.screen.storage.EnergyCellScreen;
 import net.zagdrath.arcforge.client.screen.storage.FluidTankScreen;
 import net.zagdrath.arcforge.client.screen.storage.HeatCellScreen;
+import net.zagdrath.arcforge.client.screen.storage.PressurizedCylinderScreen;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.steam.SteamGrade;
 
 // Client-only entrypoint; never loaded on dedicated servers.
 @Mod(value = Arcforge.MODID, dist = Dist.CLIENT)
@@ -83,10 +96,16 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.INDUCTION_FURNACE_ARRAY.get(), InductionFurnaceArrayScreen::new);
         event.register(ModMenuTypes.METAL_PRESS.get(), MetalPressScreen::new);
         event.register(ModMenuTypes.METAL_PRESSING_ARRAY.get(), MetalPressingArrayScreen::new);
+        event.register(ModMenuTypes.STEAM_BOILER.get(), SteamBoilerScreen::new);
+        event.register(ModMenuTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerScreen::array);
+        event.register(ModMenuTypes.STEAM_TURBINE.get(), SteamTurbineScreen::new);
+        event.register(ModMenuTypes.ELECTRIC_PUMP.get(), ElectricPumpScreen::new);
+        event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
         event.register(ModMenuTypes.FIBERIZER.get(), FiberizerScreen::new);
         event.register(ModMenuTypes.FUEL_BURNER.get(), FuelBurnerScreen::new);
         event.register(ModMenuTypes.INFUSER.get(), InfuserScreen::new);
         event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);
+        event.register(ModMenuTypes.PRESSURIZED_CYLINDER.get(), PressurizedCylinderScreen::new);
         event.register(ModMenuTypes.ENERGY_CELL.get(), EnergyCellScreen::new);
         event.register(ModMenuTypes.HEAT_CELL.get(), HeatCellScreen::new);
         event.register(ModMenuTypes.CARBONIZER.get(), CarbonizerScreen::new);
@@ -101,6 +120,18 @@ public class ArcforgeClient {
                 new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/creosote_flow")),
                 null,
                 null), ModFluids.CREOSOTE, ModFluids.FLOWING_CREOSOTE);
+        // The steam grades share one greyscale texture, tinted per grade.
+        event.register(steamModel(SteamGrade.STEAM), ModFluids.STEAM, ModFluids.FLOWING_STEAM);
+        event.register(steamModel(SteamGrade.HIGH_PRESSURE), ModFluids.HIGH_PRESSURE_STEAM, ModFluids.FLOWING_HIGH_PRESSURE_STEAM);
+        event.register(steamModel(SteamGrade.SUPERHEATED), ModFluids.SUPERHEATED_STEAM, ModFluids.FLOWING_SUPERHEATED_STEAM);
+    }
+
+    private static FluidModel.Unbaked steamModel(SteamGrade grade) {
+        return new FluidModel.Unbaked(
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/steam_still")),
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/steam_flow")),
+                null,
+                FluidTintSources.constant(grade.tint()));
     }
 
     // Dark, murky fog when the camera is inside creosote.
@@ -145,6 +176,24 @@ public class ArcforgeClient {
         event.register(CellChargeProperty.ID, CellChargeProperty.MAP_CODEC);
     }
 
+    // Connected textures for the steam arrays and Pressure Glass (see ConnectedModel).
+    @SubscribeEvent
+    static void registerModelLoaders(ModelEvent.RegisterLoaders event) {
+        event.register(ConnectedModel.ID, ConnectedModel.Loader.INSTANCE);
+    }
+
+    @SubscribeEvent
+    static void registerBlockStateModels(RegisterBlockStateModels event) {
+        event.registerModel(ConnectedModel.ID, ConnectedModel.BlockStateUnbaked.MAP_CODEC);
+    }
+
+    // The Steam Turbine Array's rotor pieces, drawn by its renderer.
+    @SubscribeEvent
+    static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
+        event.register(SteamTurbineArrayRenderer.ROTOR_SHAFT, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_SHAFT_MODEL));
+        event.register(SteamTurbineArrayRenderer.ROTOR_BLADES, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_BLADES_MODEL));
+    }
+
     // Glass conduits (item and fluid) and fluid tanks draw their contents; everything else is pure block models.
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
@@ -152,5 +201,7 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FLUID_TANK.get(), FluidTankRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CARBONIZER.get(), CarbonizerDoorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerArrayRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayRenderer::new);
     }
 }

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "level=0": {
+      "model": "arcforge:block/pressurized_cylinder/wrought_0"
+    },
+    "level=1": {
+      "model": "arcforge:block/pressurized_cylinder/wrought_1"
+    },
+    "level=2": {
+      "model": "arcforge:block/pressurized_cylinder/wrought_2"
+    },
+    "level=3": {
+      "model": "arcforge:block/pressurized_cylinder/wrought_3"
+    },
+    "level=4": {
+      "model": "arcforge:block/pressurized_cylinder/wrought_4"
+    }
+  }
+}

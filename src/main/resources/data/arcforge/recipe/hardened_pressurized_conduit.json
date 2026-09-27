@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "arcforge:tempered_pressurized_conduit",
+    "M": "#c:storage_blocks/steel"
+  },
+  "pattern": [
+    "CCC",
+    "CMC",
+    "CCC"
+  ],
+  "result": {
+    "count": 8,
+    "id": "arcforge:hardened_pressurized_conduit"
+  }
+}

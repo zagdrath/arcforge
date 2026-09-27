@@ -38,10 +38,16 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
 import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
 import net.zagdrath.arcforge.block.machine.MetalPressBlock;
+import net.zagdrath.arcforge.block.machine.ElectricPumpBlock;
+import net.zagdrath.arcforge.block.machine.SteamBoilerBlock;
+import net.zagdrath.arcforge.block.machine.SteamTurbineBlock;
 import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
+import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.machine.FiberizerBlock;
 import net.zagdrath.arcforge.block.machine.FireboxBlock;
 import net.zagdrath.arcforge.block.machine.FuelBurnerBlock;
@@ -55,6 +61,7 @@ import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
 import net.zagdrath.arcforge.block.storage.HeatCellBlock;
+import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -117,6 +124,36 @@ public final class ModBlocks {
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL));
+
+    // --- Steam ---
+
+    public static final DeferredBlock<SteamBoilerBlock> STEAM_BOILER = BLOCKS.registerBlock("steam_boiler",
+            SteamBoilerBlock::new, p -> machineProperties(p, 6));
+
+    public static final DeferredBlock<SteamTurbineBlock> STEAM_TURBINE = BLOCKS.registerBlock("steam_turbine",
+            SteamTurbineBlock::new, p -> machineProperties(p, 4));
+
+    // Slim: light passes around it.
+    public static final DeferredBlock<ElectricPumpBlock> ELECTRIC_PUMP = BLOCKS.registerBlock("electric_pump",
+            ElectricPumpBlock::new, p -> machineProperties(p, 0).noOcclusion());
+
+    public static final DeferredBlock<SteamBoilerArrayCasingBlock> STEAM_BOILER_ARRAY_CASING = BLOCKS.registerBlock("steam_boiler_array_casing",
+            SteamBoilerArrayCasingBlock::new, ModBlocks::steamCasingProperties);
+
+    public static final DeferredBlock<SteamTurbineArrayCasingBlock> STEAM_TURBINE_ARRAY_CASING = BLOCKS.registerBlock("steam_turbine_array_casing",
+            SteamTurbineArrayCasingBlock::new, ModBlocks::steamCasingProperties);
+
+    // The steam arrays' windows; also fine as decorative glass.
+    public static final DeferredBlock<PressureGlassBlock> PRESSURE_GLASS = BLOCKS.registerBlock("pressure_glass",
+            PressureGlassBlock::new,
+            p -> p.mapColor(MapColor.NONE)
+                    .strength(1.5F, 12.0F)
+                    .sound(SoundType.GLASS)
+                    .noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false)
+                    .isRedstoneConductor((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos, box) -> false));
 
     // --- Mineral wool ---
 
@@ -229,6 +266,7 @@ public final class ModBlocks {
     private static final Map<ConduitTier, DeferredBlock<FluidTankBlock>> FLUID_TANKS = new EnumMap<>(ConduitTier.class);
     private static final Map<ConduitTier, DeferredBlock<EnergyCellBlock>> ENERGY_CELLS = new EnumMap<>(ConduitTier.class);
     private static final Map<ConduitTier, DeferredBlock<HeatCellBlock>> HEAT_CELLS = new EnumMap<>(ConduitTier.class);
+    private static final Map<ConduitTier, DeferredBlock<PressurizedCylinderBlock>> PRESSURIZED_CYLINDERS = new EnumMap<>(ConduitTier.class);
 
     // Glass body on a metal frame: breaks like glass, otherwise sounds like metal.
     private static final SoundType TANK_SOUND = new SoundType(1.0F, 1.0F, SoundEvents.GLASS_BREAK, SoundEvents.METAL_STEP,
@@ -250,6 +288,17 @@ public final class ModBlocks {
                     p -> p.mapColor(MapColor.METAL)
                             .strength(3.0F)
                             .sound(SoundType.METAL)));
+        }
+        for (ConduitTier tier : ConduitTier.values()) {
+            PRESSURIZED_CYLINDERS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_pressurized_cylinder",
+                    p -> new PressurizedCylinderBlock(p, tier),
+                    p -> p.mapColor(MapColor.METAL)
+                            .strength(3.0F)
+                            .sound(SoundType.METAL)
+                            .noOcclusion()
+                            .isSuffocating((state, level, pos) -> false)
+                            .isViewBlocking((state, level, pos, box) -> false)
+                            .isRedstoneConductor((state, level, pos) -> false)));
         }
         for (ConduitTier tier : ConduitTier.values()) {
             HEAT_CELLS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_heat_cell",
@@ -296,6 +345,15 @@ public final class ModBlocks {
                 .sound(SoundType.MUD_BRICKS);
     }
 
+    // Steam array casings: metal, need a pickaxe. Formed ones are drawn as one see-through surface.
+    private static BlockBehaviour.Properties steamCasingProperties(BlockBehaviour.Properties p) {
+        return p.mapColor(MapColor.METAL)
+                .strength(3.5F, 6.0F)
+                .requiresCorrectToolForDrops()
+                .sound(SoundType.METAL)
+                .isRedstoneConductor((state, level, pos) -> false);
+    }
+
     private static BlockBehaviour.Properties conduitProperties(BlockBehaviour.Properties p) {
         return p.mapColor(MapColor.METAL)
                 .strength(1.0F)
@@ -334,10 +392,15 @@ public final class ModBlocks {
         return HEAT_CELLS.get(tier);
     }
 
-    // Every fluid tank, then every energy cell, then every heat cell, each ordered by tier.
+    public static DeferredBlock<PressurizedCylinderBlock> pressurizedCylinder(ConduitTier tier) {
+        return PRESSURIZED_CYLINDERS.get(tier);
+    }
+
+    // Every fluid tank, then every pressurized cylinder, energy cell and heat cell, each ordered by tier.
     public static List<DeferredBlock<? extends StorageBlock>> allStorage() {
         List<DeferredBlock<? extends StorageBlock>> all = new ArrayList<>();
         all.addAll(FLUID_TANKS.values());
+        all.addAll(PRESSURIZED_CYLINDERS.values());
         all.addAll(ENERGY_CELLS.values());
         all.addAll(HEAT_CELLS.values());
         return all;

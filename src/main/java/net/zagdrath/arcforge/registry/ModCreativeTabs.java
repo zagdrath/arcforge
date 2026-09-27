@@ -36,6 +36,12 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.INDUCTION_FURNACE_ARRAY_CASING.get());
                 output.accept(ModItems.METAL_PRESS.get());
                 output.accept(ModItems.METAL_PRESSING_ARRAY_CASING.get());
+                output.accept(ModItems.STEAM_BOILER.get());
+                output.accept(ModItems.STEAM_TURBINE.get());
+                output.accept(ModItems.ELECTRIC_PUMP.get());
+                output.accept(ModItems.STEAM_BOILER_ARRAY_CASING.get());
+                output.accept(ModItems.STEAM_TURBINE_ARRAY_CASING.get());
+                output.accept(ModItems.PRESSURE_GLASS.get());
                 output.accept(ModItems.FIBERIZER.get());
                 output.accept(ModItems.INFUSER.get());
                 output.accept(ModItems.CARBONIZER.get());
@@ -76,6 +82,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.STEEL_PLATE.get());
                 output.accept(ModItems.STEEL_GEAR.get());
                 output.accept(ModItems.STEEL_ROD.get());
+                output.accept(ModItems.COPPER_PLATE.get());
+                output.accept(ModItems.COPPER_GEAR.get());
+                output.accept(ModItems.COPPER_ROD.get());
             }).build());
 
     // Ordered like vanilla's Building Blocks: logs and wood, planks, then the shapes.

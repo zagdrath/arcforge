@@ -108,7 +108,7 @@ public class FireboxBlockEntity extends BurnerBlockEntity {
         return switch (type) {
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case ENERGY, FLUID -> ConnectionMode.NONE;
+            case ENERGY, FLUID, GAS -> ConnectionMode.NONE;
         };
     }
 

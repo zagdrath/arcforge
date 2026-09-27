@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -21,18 +22,29 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.steam.Gases;
 
 // A shared tank of one fluid (1,000 mB per conduit). Pulls from output sides and pushes into input
-// sides, each capped at the tier's mB/t. The tank is split evenly back into the conduit block
+// sides, each capped at the tier's mB/t. Fluid conduits never carry gases (see GasConduitNetwork). The tank is split evenly back into the conduit block
 // entities whenever it changes, so splitting or unloading a network never creates or loses fluid.
 public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidResource>> {
     private FluidResource fluid = FluidResource.EMPTY;
     private int amount;
     private final int capacity;
+    private final int rate;
+    private final Predicate<FluidResource> accepts;
 
     public FluidConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier) {
+        this(level, members, memberSet, tier, ConduitTier.FLUID_CAPACITY_PER_CONDUIT, tier.fluidPerTick(), resource -> !Gases.isGas(resource));
+    }
+
+    // perConduit: mB each conduit holds. rate: mB/t pulled and pushed. accepts: the fluids it carries.
+    protected FluidConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier,
+            int perConduit, int rate, Predicate<FluidResource> accepts) {
         super(level, members, memberSet, tier, Capabilities.Fluid.BLOCK);
-        this.capacity = members.size() * ConduitTier.FLUID_CAPACITY_PER_CONDUIT;
+        this.capacity = members.size() * perConduit;
+        this.rate = rate;
+        this.accepts = accepts;
     }
 
     @Override
@@ -58,8 +70,8 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
     @Override
     public void tick(long gameTime) {
         int before = amount;
-        pull();
-        push();
+        int moved = pull() + push();
+        onMoved(moved, gameTime);
         if (amount == 0) {
             fluid = FluidResource.EMPTY;
         }
@@ -77,8 +89,12 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
         }
     }
 
-    private void pull() {
-        int budget = tier.fluidPerTick();
+    // Called every tick with how much was pulled in and pushed out.
+    protected void onMoved(int moved, long gameTime) {}
+
+    private int pull() {
+        int budget = rate;
+        int pulled = 0;
         for (Endpoint<ResourceHandler<FluidResource>> source : sources) {
             ResourceHandler<FluidResource> handler = source.handler();
             int space = Math.min(capacity - amount, budget);
@@ -87,7 +103,7 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
             }
             for (int index = 0; index < handler.size() && space > 0; index++) {
                 FluidResource resource = handler.getResource(index);
-                if (resource.isEmpty() || (!fluid.isEmpty() && !resource.equals(fluid))) {
+                if (resource.isEmpty() || !accepts.test(resource) || (!fluid.isEmpty() && !resource.equals(fluid))) {
                     continue;
                 }
                 try (Transaction tx = Transaction.openRoot()) {
@@ -98,17 +114,20 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
                         amount += extracted;
                         budget -= extracted;
                         space -= extracted;
+                        pulled += extracted;
                     }
                 }
             }
         }
+        return pulled;
     }
 
-    private void push() {
+    private int push() {
         if (fluid.isEmpty()) {
-            return;
+            return 0;
         }
-        int budget = tier.fluidPerTick();
+        int budget = rate;
+        int pushed = 0;
         List<Endpoint<ResourceHandler<FluidResource>>> ordered = sinksInTurn();
         for (int i = 0; i < ordered.size() && amount > 0 && budget > 0; i++) {
             ResourceHandler<FluidResource> handler = ordered.get(i).handler();
@@ -121,8 +140,10 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
                 tx.commit();
                 amount -= inserted;
                 budget -= inserted;
+                pushed += inserted;
             }
         }
+        return pushed;
     }
 
     // Splits the tank evenly across the conduits (the remainder goes to the first ones).

@@ -250,7 +250,7 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case THERMAL -> ConnectionMode.NONE;
+            case THERMAL, GAS -> ConnectionMode.NONE;
         };
     }
 

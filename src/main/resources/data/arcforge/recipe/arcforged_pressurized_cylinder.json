@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#c:plates/steel",
+    "M": "minecraft:netherite_ingot",
+    "C": "arcforge:hardened_pressurized_cylinder"
+  },
+  "pattern": [
+    "PMP",
+    "PCP",
+    "PMP"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:arcforged_pressurized_cylinder"
+  }
+}

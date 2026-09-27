@@ -128,6 +128,7 @@ public final class ConduitNetworkManager {
             case ENERGY -> new EnergyConduitNetwork(level, members, visited, tier);
             case THERMAL -> new ThermalConduitNetwork(level, members, visited, tier);
             case FLUID -> new FluidConduitNetwork(level, members, visited, tier);
+            case GAS -> new GasConduitNetwork(level, members, visited, tier);
             case ITEM -> new ItemConduitNetwork(level, members, visited, tier);
         };
     }
