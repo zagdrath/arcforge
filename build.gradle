@@ -13,7 +13,8 @@ tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-version = mod_version
+// Full version is <mod_version>+<minecraft_version>, e.g. 1.0.0+26.3 (SemVer build metadata).
+version = "${mod_version}+${minecraft_version}"
 group = mod_group_id
 
 sourceSets.main.resources {
@@ -106,7 +107,7 @@ tasks.withType(ProcessResources).configureEach {
             mod_id                 : mod_id,
             mod_name               : mod_name,
             mod_license            : mod_license,
-            mod_version            : mod_version,
+            mod_version            : project.version,
     ]
     inputs.properties replaceProperties
 
@@ -131,8 +132,9 @@ publishing {
 
 // Ship the MIT license inside the mod jar.
 tasks.named('jar', Jar).configure {
+    def licenseName = "LICENSE_${mod_id}"
     from('LICENSE') {
-        rename { "${it}_${project.base.archivesName.get()}" }
+        rename { licenseName }
     }
 }
 

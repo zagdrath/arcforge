@@ -21,21 +21,27 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 
-// Cross of block faces for configuring IO per side.
-// Left click cycles forward, right click cycles back, shift-click clears to none.
+// Cross of block faces for configuring IO per side, plus a button that clears every face.
+// Left click cycles forward, right click cycles back, shift-click clears one face.
 public class SideConfigTab extends SideTab {
-    private static final Identifier FACE_LOCKED = ArcforgeGui.widget("face_locked");
     private static final Identifier FACE_HOVER = ArcforgeGui.widget("face_hover");
+    private static final Identifier FACE_NONE = ArcforgeGui.widget("face_none");
+    private static final Identifier BUTTON = ArcforgeGui.widget("button");
+    private static final Identifier BUTTON_HOVER = ArcforgeGui.widget("button_hover");
     private static final int FACE_SIZE = 16;
+    // Clear-all button, bottom-right, level with the bottom face.
+    private static final int CLEAR_X = 66, CLEAR_Y = 58, CLEAR_SIZE = 20;
 
     private final Function<RelativeSide, SideMode> modes;
     private final BiConsumer<RelativeSide, Integer> action;
+    private final Runnable clearAll;
 
     // action receives a side and one of SideConfig.ACTION_*.
-    public SideConfigTab(Function<RelativeSide, SideMode> modes, BiConsumer<RelativeSide, Integer> action) {
-        super(ArcforgeGui.widget("icon_side_config"), Component.translatable("gui.arcforge.tab.side_config"), 100, 86);
+    public SideConfigTab(Function<RelativeSide, SideMode> modes, BiConsumer<RelativeSide, Integer> action, Runnable clearAll) {
+        super(ArcforgeGui.widget("icon_side_config"), Component.translatable("gui.arcforge.tab.side_config"), 100, 84);
         this.modes = modes;
         this.action = action;
+        this.clearAll = clearAll;
     }
 
     private static int faceX(RelativeSide side) {
@@ -64,26 +70,37 @@ public class SideConfigTab extends SideTab {
         return null;
     }
 
+    private static boolean isOverClear(int localX, int localY) {
+        return ArcforgeGui.isInside(localX, localY, CLEAR_X, CLEAR_Y, CLEAR_SIZE, CLEAR_SIZE);
+    }
+
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
         RelativeSide hovered = faceAt(mouseX - x, mouseY - y);
         for (RelativeSide side : RelativeSide.values()) {
-            Identifier sprite = SideConfig.isLocked(side)
-                    ? FACE_LOCKED
-                    : ArcforgeGui.widget("face_" + modes.apply(side).getSerializedName());
             int fx = x + faceX(side);
             int fy = y + faceY(side);
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, fx, fy, FACE_SIZE, FACE_SIZE);
-            if (side == hovered && !SideConfig.isLocked(side)) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.widget("face_" + modes.apply(side).getSerializedName()), fx, fy, FACE_SIZE, FACE_SIZE);
+            if (side == hovered) {
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FACE_HOVER, fx, fy, FACE_SIZE, FACE_SIZE);
             }
         }
+
+        boolean clearHovered = isOverClear(mouseX - x, mouseY - y);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, clearHovered ? BUTTON_HOVER : BUTTON, x + CLEAR_X, y + CLEAR_Y, CLEAR_SIZE, CLEAR_SIZE);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FACE_NONE, x + CLEAR_X + 2, y + CLEAR_Y + 2, FACE_SIZE, FACE_SIZE);
     }
 
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
+        if (isOverClear(localX, localY) && event.button() == 0) {
+            clearAll.run();
+            ArcforgeGui.playClickSound();
+            return true;
+        }
+
         RelativeSide side = faceAt(localX, localY);
-        if (side == null || SideConfig.isLocked(side) || (event.button() != 0 && event.button() != 1)) {
+        if (side == null || (event.button() != 0 && event.button() != 1)) {
             return false;
         }
         int sideAction = event.hasShiftDown() ? SideConfig.ACTION_CLEAR
@@ -96,13 +113,14 @@ public class SideConfigTab extends SideTab {
 
     @Override
     protected void addTooltip(List<Component> lines, int localX, int localY) {
-        RelativeSide side = faceAt(localX, localY);
-        if (side == null) {
+        if (isOverClear(localX, localY)) {
+            lines.add(Component.translatable("gui.arcforge.side.clear_all"));
             return;
         }
-        lines.add(side.getDescription());
-        lines.add(SideConfig.isLocked(side)
-                ? Component.translatable("gui.arcforge.side_mode.locked").withStyle(ChatFormatting.GRAY)
-                : modes.apply(side).getDescription().copy().withStyle(ChatFormatting.GRAY));
+        RelativeSide side = faceAt(localX, localY);
+        if (side != null) {
+            lines.add(side.getDescription());
+            lines.add(modes.apply(side).getDescription().copy().withStyle(ChatFormatting.GRAY));
+        }
     }
 }

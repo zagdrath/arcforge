@@ -5,8 +5,10 @@ modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
 authors="Zagdrath"
-logoFile="arcforge.png"
-logoBlur=false
+# Square icon in the mod list, banner on the mod details screen.
+iconFile="arcforge_icon.png"
+iconBlur=false
+bannerFile="arcforge_banner.png"
 description='''
 Arcforge is a technology mod built on Forge Energy (FE), compatible with any NeoForge mod that uses the standard energy, fluid and item capabilities.
 '''

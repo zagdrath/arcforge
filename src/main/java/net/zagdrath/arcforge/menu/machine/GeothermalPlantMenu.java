@@ -59,6 +59,7 @@ public class GeothermalPlantMenu extends AbstractContainerMenu {
     // Menu button ids, sent through vanilla's container button packet.
     private static final int BUTTON_REDSTONE_FIRST = 0;
     private static final int BUTTON_SIDE_FIRST = 100;
+    public static final int BUTTON_CLEAR_SIDES = 99;
 
     private static final int MACHINE_SLOTS = GeothermalPlantBlockEntity.SLOT_COUNT;
     private static final int PLAYER_INV_END = MACHINE_SLOTS + 27;
@@ -109,6 +110,15 @@ public class GeothermalPlantMenu extends AbstractContainerMenu {
             access.execute((level, pos) -> {
                 if (level.getBlockEntity(pos) instanceof GeothermalPlantBlockEntity plant) {
                     plant.setRedstoneMode(mode);
+                }
+            });
+            return true;
+        }
+
+        if (buttonId == BUTTON_CLEAR_SIDES) {
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof GeothermalPlantBlockEntity plant) {
+                    plant.clearSideModes();
                 }
             });
             return true;
@@ -243,6 +253,6 @@ public class GeothermalPlantMenu extends AbstractContainerMenu {
     }
 
     public SideMode getSideMode(RelativeSide side) {
-        return SideConfig.isLocked(side) ? SideMode.NONE : SideConfig.unpack(value(DATA_SIDE_CONFIG), side);
+        return SideConfig.unpack(value(DATA_SIDE_CONFIG), side);
     }
 }

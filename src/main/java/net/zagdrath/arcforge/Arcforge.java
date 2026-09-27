@@ -14,6 +14,8 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.gametest.ArcforgeGameTests;
+import net.zagdrath.arcforge.gametest.TestFixtures;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModCapabilities;
@@ -34,6 +36,8 @@ public class Arcforge {
         ModMenuTypes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
         ModCapabilities.register(modEventBus);
+        ArcforgeGameTests.register(modEventBus);
+        TestFixtures.register(modEventBus);
 
         modContainer.registerConfig(ModConfig.Type.COMMON, ArcforgeConfig.SPEC);
 

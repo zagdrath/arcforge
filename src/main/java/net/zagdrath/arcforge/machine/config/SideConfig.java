@@ -11,7 +11,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-// Per-face IO modes for a machine. The front face is locked to NONE.
+// Per-face IO modes for a machine, relative to its front.
 public class SideConfig {
     private static final int BITS_PER_SIDE = 2;
     private static final int SIDE_MASK = (1 << BITS_PER_SIDE) - 1;
@@ -25,8 +25,8 @@ public class SideConfig {
     private final SideMode[] modes = new SideMode[RelativeSide.values().length];
     private final SideMode[] defaults;
 
-    public SideConfig(SideMode top, SideMode bottom, SideMode left, SideMode right, SideMode back) {
-        this.defaults = new SideMode[] { top, bottom, left, right, back, SideMode.NONE };
+    public SideConfig(SideMode top, SideMode bottom, SideMode left, SideMode right, SideMode back, SideMode front) {
+        this.defaults = new SideMode[] { top, bottom, left, right, back, front };
         reset();
     }
 
@@ -38,14 +38,12 @@ public class SideConfig {
         return get(RelativeSide.fromDirection(facing, direction));
     }
 
-    public static boolean isLocked(RelativeSide side) {
-        return side == RelativeSide.FRONT;
+    public void set(RelativeSide side, SideMode mode) {
+        modes[side.ordinal()] = mode;
     }
 
-    public void set(RelativeSide side, SideMode mode) {
-        if (!isLocked(side)) {
-            modes[side.ordinal()] = mode;
-        }
+    public void clear() {
+        Arrays.fill(modes, SideMode.NONE);
     }
 
     public void reset() {
@@ -67,7 +65,7 @@ public class SideConfig {
 
     public void load(int packed) {
         for (RelativeSide side : RelativeSide.values()) {
-            modes[side.ordinal()] = isLocked(side) ? SideMode.NONE : unpack(packed, side);
+            modes[side.ordinal()] = unpack(packed, side);
         }
     }
 

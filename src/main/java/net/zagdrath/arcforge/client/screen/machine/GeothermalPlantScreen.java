@@ -60,7 +60,9 @@ public class GeothermalPlantScreen extends AbstractContainerScreen<GeothermalPla
         this.tabs = new SideTabPanel()
                 .add(new EnergyTab(menu::getEnergy, menu::getFePerTick))
                 .add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(GeothermalPlantMenu.redstoneButtonId(mode))))
-                .add(new SideConfigTab(menu::getSideMode, (side, action) -> sendButton(GeothermalPlantMenu.sideButtonId(side, action))))
+                .add(new SideConfigTab(menu::getSideMode,
+                        (side, action) -> sendButton(GeothermalPlantMenu.sideButtonId(side, action)),
+                        () -> sendButton(GeothermalPlantMenu.BUTTON_CLEAR_SIDES)))
                 .add(new UpgradesTab(menu.getUpgradeSlots()));
     }
 

@@ -1,0 +1,1174 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "pipe",
+            "south": "pipe",
+            "east": "none",
+            "west": "none",
+            "up": "none",
+            "down": "none"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_straight"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "none",
+            "south": "none",
+            "east": "pipe",
+            "west": "pipe",
+            "up": "none",
+            "down": "none"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_straight",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "none",
+            "south": "none",
+            "east": "none",
+            "west": "none",
+            "up": "pipe",
+            "down": "pipe"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_straight",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "north": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_input"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_output"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "south": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_input",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_output",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "east": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_input",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_output",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "west": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_input",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_output",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "up": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_input",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_output",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "down": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_input",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_off_arm_output",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_core"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "pipe",
+            "south": "pipe",
+            "east": "none",
+            "west": "none",
+            "up": "none",
+            "down": "none"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_straight"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "none",
+            "south": "none",
+            "east": "pipe",
+            "west": "pipe",
+            "up": "none",
+            "down": "none"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_straight",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "none",
+            "south": "none",
+            "east": "none",
+            "west": "none",
+            "up": "pipe",
+            "down": "pipe"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_straight",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "north": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_input"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_output"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "south": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_input",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_output",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "east": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_input",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_output",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "west": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_input",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_output",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "up": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_input",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_output",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "down": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_input",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/hardened_energy_on_arm_output",
+        "x": 90
+      }
+    }
+  ]
+}

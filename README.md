@@ -37,15 +37,45 @@ heat sources are added or run out.
 - Stores 100,000 FE and pushes up to 1,000 FE/t into neighbouring machines and cables.
 - Stops taking new fuel while its energy buffer is full.
 
+## Logistics
+
+### Conduits
+
+Thin pipes that connect automatically to other conduits of the same type. Use the wrench on a side
+touching a machine to set it to **Input** (the conduit pushes into the machine) or **Output**
+(the conduit pulls from it). Conduits of different tiers connect, and a network runs at the rate
+of its lowest tier.
+
+| Type | Wrought | Tempered | Hardened | Arcforged |
+|---|---|---|---|---|
+| Energy (FE/t) | 256 | 1,024 | 8,192 | 65,536 |
+| Item (items per transfer) | 8 every 1.0s | 16 every 0.5s | 32 every 0.25s | 64 every 0.1s |
+| Liquid (mB/t) | 200 | 800 | 3,200 | 12,800 |
+| Thermodynamic (HU/t) | 50 | 200 | 800 | 3,200 |
+
+- **Energy** and **Thermodynamic** conduits glow while they are moving energy or heat.
+- **Liquid** conduits are glass and show the fluid inside. Each holds 1,000 mB, and a network
+  carries one fluid at a time.
+- **Item** conduits are glass and show items travelling through. Items that can't be delivered
+  are rerouted to another destination, and are only dropped if nothing can take them.
+
+### Wrench
+
+- Use on a conduit side: cycle Input, Output, Off (sneak to cycle backwards). On a joint between
+  two conduits it disconnects or reconnects them.
+- Sneak-use on a conduit's centre: pick it up.
+- Use on a machine: rotate it. Sneak-use: pick it up with its contents, energy and settings kept.
+
 ## Machine settings
 
 Tabs on the right of each machine's screen:
 
 - **Energy**: stored FE and current output.
 - **Redstone**: ignore redstone, run only with a signal, or run only without one.
-- **Sides**: choose what each face does: none, input, output or energy output. Left-click to
-  cycle, right-click to cycle back, shift-click to clear. The front face is locked.
-  - Defaults: top is input, bottom is output, left, right and back are energy output.
+- **Sides**: choose what each face does, including the front: none, input, output or energy
+  output. Left-click to cycle, right-click to cycle back, shift-click to clear one face, or use
+  the clear button to reset every face to none.
+  - Defaults: top is input, bottom is output, left, right and back are energy output, front is none.
 - **Upgrades**: upgrade slots, reserved for future upgrade items.
 
 ## Configuration

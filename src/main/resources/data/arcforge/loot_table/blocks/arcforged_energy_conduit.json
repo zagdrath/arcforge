@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:arcforged_energy_conduit"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "arcforge:blocks/arcforged_energy_conduit"
+}

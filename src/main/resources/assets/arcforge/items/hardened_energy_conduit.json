@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "arcforge:item/hardened_energy_conduit"
+  }
+}

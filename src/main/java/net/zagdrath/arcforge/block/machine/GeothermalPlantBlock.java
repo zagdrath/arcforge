@@ -35,11 +35,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.transfer.fluid.FluidUtil;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
+import net.zagdrath.arcforge.machine.interaction.MachineInteractions;
+import net.zagdrath.arcforge.machine.interaction.WrenchableMachine;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-public class GeothermalPlantBlock extends BaseEntityBlock {
+public class GeothermalPlantBlock extends BaseEntityBlock implements WrenchableMachine {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
@@ -69,17 +70,11 @@ public class GeothermalPlantBlock extends BaseEntityBlock {
         return InteractionResult.SUCCESS;
     }
 
-    // Right-clicking any face with a fluid container (e.g. a lava bucket) fills the lava tank directly,
-    // regardless of the side configuration.
+    // Right-click (or sneak right-click) with a fluid container, e.g. a lava bucket, to fill the lava tank.
     @Override
     protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (level.getBlockEntity(pos) instanceof GeothermalPlantBlockEntity plant) {
-            var tank = plant.getFluidHandler(null);
-            if (tank != null && FluidUtil.interactWithFluidHandler(player, hand, pos, tank, null)) {
-                return InteractionResult.SUCCESS;
-            }
-        }
-        return InteractionResult.TRY_WITH_EMPTY_HAND;
+        InteractionResult result = MachineInteractions.useFluidContainer(level, pos, player, hand);
+        return result != null ? result : InteractionResult.TRY_WITH_EMPTY_HAND;
     }
 
     @Override

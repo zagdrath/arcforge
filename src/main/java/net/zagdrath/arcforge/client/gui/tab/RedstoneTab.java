@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -63,6 +64,10 @@ public class RedstoneTab extends SideTab {
             int iconOffset = pressed ? 3 : 2;
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, bx, by, BUTTON_SIZE, BUTTON_SIZE);
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, icon(mode), bx + iconOffset, by + iconOffset, 16, 16);
+            // The pressed sprite is only slightly darker, so mark the active mode with an accent outline.
+            if (pressed) {
+                graphics.outline(bx - 1, by - 1, BUTTON_SIZE + 2, BUTTON_SIZE + 2, ArcforgeGui.ACCENT);
+            }
         }
     }
 
@@ -77,6 +82,12 @@ public class RedstoneTab extends SideTab {
             ArcforgeGui.playClickSound();
         }
         return true;
+    }
+
+    @Override
+    protected void addCollapsedTooltip(List<Component> lines) {
+        super.addCollapsedTooltip(lines);
+        lines.add(current.get().getDescription().copy().withStyle(ChatFormatting.GRAY));
     }
 
     @Override

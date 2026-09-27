@@ -1,0 +1,17 @@
+{
+  "parent": "arcforge:block/conduit/wrought_item_straight",
+  "display": {
+    "gui": {
+      "rotation": [
+        30,
+        45,
+        0
+      ],
+      "scale": [
+        0.625,
+        0.625,
+        0.625
+      ]
+    }
+  }
+}

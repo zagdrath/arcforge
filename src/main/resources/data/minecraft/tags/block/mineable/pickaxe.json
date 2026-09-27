@@ -1,5 +1,21 @@
 {
   "values": [
-    "arcforge:geothermal_plant"
+    "arcforge:geothermal_plant",
+    "arcforge:wrought_energy_conduit",
+    "arcforge:tempered_energy_conduit",
+    "arcforge:hardened_energy_conduit",
+    "arcforge:arcforged_energy_conduit",
+    "arcforge:wrought_item_conduit",
+    "arcforge:tempered_item_conduit",
+    "arcforge:hardened_item_conduit",
+    "arcforge:arcforged_item_conduit",
+    "arcforge:wrought_liquid_conduit",
+    "arcforge:tempered_liquid_conduit",
+    "arcforge:hardened_liquid_conduit",
+    "arcforge:arcforged_liquid_conduit",
+    "arcforge:wrought_thermal_conduit",
+    "arcforge:tempered_thermal_conduit",
+    "arcforge:hardened_thermal_conduit",
+    "arcforge:arcforged_thermal_conduit"
   ]
 }

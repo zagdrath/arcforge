@@ -1,0 +1,8 @@
+{
+  "parent": "arcforge:block/conduit/base_item_arm_output",
+  "textures": {
+    "conduit": "arcforge:block/conduit/arcforged_item",
+    "port_in": "arcforge:block/conduit/port_input",
+    "port_out": "arcforge:block/conduit/port_output"
+  }
+}

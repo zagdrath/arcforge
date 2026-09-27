@@ -118,7 +118,7 @@ public class SideTabPanel {
         if (tab != null && tab.isFullyOpen()) {
             tab.addTooltip(lines, (int) mouseX - tab.x, (int) mouseY - tab.y);
         } else if (tab != null && tab.progress <= 0) {
-            lines.add(tab.getTitle());
+            tab.addCollapsedTooltip(lines);
         }
     }
 

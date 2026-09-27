@@ -70,4 +70,9 @@ public abstract class SideTab {
     }
 
     protected void addTooltip(List<Component> lines, int localX, int localY) {}
+
+    // Tooltip while the tab is collapsed; defaults to its title.
+    protected void addCollapsedTooltip(List<Component> lines) {
+        lines.add(title);
+    }
 }

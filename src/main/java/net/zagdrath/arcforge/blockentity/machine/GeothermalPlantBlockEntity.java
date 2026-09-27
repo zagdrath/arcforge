@@ -39,11 +39,14 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.GeothermalHeat;
+import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.interaction.Dismantleable;
+import net.zagdrath.arcforge.machine.interaction.FluidInteractable;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -55,7 +58,7 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // Turns heat into FE. Heat comes from a combustion chamber (lava from the tank first, then coal/charcoal)
 // plus passive heat from adjacent lava source blocks. Heat ramps toward its target, and FE/t = heat * fePerHeat.
-public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvider {
+public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, Dismantleable {
     // The input slot takes lava buckets (drained into the tank) and coal/charcoal (burned directly).
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
@@ -73,7 +76,7 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
     private final ResourceHandler<ItemResource> itemOutput;
     private final ResourceHandler<ItemResource> itemAutomation;
     private final ResourceHandler<FluidResource> fluidInput;
-    private final SideConfig sideConfig = new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.ENERGY, SideMode.ENERGY);
+    private final SideConfig sideConfig = new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.ENERGY, SideMode.ENERGY, SideMode.NONE);
     private final ContainerData data;
     private final Map<Direction, BlockCapabilityCache<EnergyHandler, @Nullable Direction>> energyTargets = new EnumMap<>(Direction.class);
 
@@ -260,16 +263,29 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
 
     // --- Configuration, changed by players through the menu ---
 
+    public RedstoneMode getRedstoneMode() {
+        return redstoneMode;
+    }
+
     public void setRedstoneMode(RedstoneMode mode) {
         redstoneMode = mode;
         setChanged();
     }
 
     public void setSideMode(RelativeSide side, SideMode mode) {
-        if (SideConfig.isLocked(side) || sideConfig.get(side) == mode) {
+        if (sideConfig.get(side) == mode) {
             return;
         }
         sideConfig.set(side, mode);
+        onSideConfigChanged();
+    }
+
+    public void clearSideModes() {
+        sideConfig.clear();
+        onSideConfigChanged();
+    }
+
+    private void onSideConfigChanged() {
         setChanged();
         if (level != null) {
             level.invalidateCapabilities(worldPosition);
@@ -301,15 +317,62 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
         };
     }
 
+    // Heat is available on every face so thermal conduits can draw from the plant. Drawing heat
+    // lowers the plant's temperature and therefore its FE output. The plant does not accept heat.
+    private final HeatHandler heatHandler = new HeatHandler() {
+        @Override
+        public int getHeat() {
+            return heat;
+        }
+
+        @Override
+        public int getMaxHeat() {
+            return GeothermalHeat.maxHeat();
+        }
+
+        @Override
+        public int receiveHeat(int amount, boolean simulate) {
+            return 0;
+        }
+
+        @Override
+        public int extractHeat(int amount, boolean simulate) {
+            int extracted = Math.min(Math.max(0, amount), heat);
+            if (!simulate && extracted > 0) {
+                heat -= extracted;
+                setChanged();
+            }
+            return extracted;
+        }
+    };
+
+    public HeatHandler getHeatHandler(@Nullable Direction side) {
+        return heatHandler;
+    }
+
+    // Held buckets fill the tank from any face, regardless of the side configuration.
+    @Override
+    public ResourceHandler<FluidResource> getInteractionFluidHandler() {
+        return fluidInput;
+    }
+
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
         return mode == null || mode == SideMode.INPUT ? fluidInput : null;
     }
 
+    // Set by the wrench: the contents travel on the dropped item instead of spilling.
+    private boolean dismantled;
+
+    @Override
+    public void markDismantled() {
+        dismantled = true;
+    }
+
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        if (level != null) {
+        if (level != null && !dismantled) {
             for (int slot = 0; slot < SLOT_COUNT; slot++) {
                 Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), items.getStack(slot));
             }
