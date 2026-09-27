@@ -76,7 +76,8 @@ public class WrenchItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    // Drops the machine as an item carrying its block entity data, so it can be placed back unchanged.
+    // Drops the machine as an item carrying its block entity data (fluid, energy, settings), so it can be
+    // placed back unchanged. The items in its slots drop separately.
     private static InteractionResult dismantle(Level level, BlockPos pos, BlockState state, Player player) {
         ItemStack drop = new ItemStack(state.getBlock());
         BlockEntity blockEntity = level.getBlockEntity(pos);
@@ -85,6 +86,8 @@ public class WrenchItem extends Item {
                 TagValueOutput output = TagValueOutput.createWithContext(reporter, level.registryAccess());
                 blockEntity.saveCustomOnly(output);
                 blockEntity.removeComponentsFromTag(output);
+                // Slot items drop into the world when the block is removed (see Dismantleable).
+                output.discard("items");
                 BlockItem.setBlockEntityData(drop, blockEntity.getType(), output);
             }
             drop.applyComponents(blockEntity.collectComponents());

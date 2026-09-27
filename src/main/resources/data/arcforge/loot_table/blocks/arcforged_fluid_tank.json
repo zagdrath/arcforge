@@ -11,8 +11,7 @@
           "modifier": {
             "type": "minecraft:copy_components",
             "include": [
-              "minecraft:custom_name",
-              "arcforge:fluid_contents"
+              "minecraft:custom_name"
             ],
             "source": "block_entity"
           },

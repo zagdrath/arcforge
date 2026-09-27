@@ -11,9 +11,10 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.blockentity.storage.FluidSpills;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 
-// Drives conduit networks once per server level tick.
+// Drives conduit networks once per server level tick, and places fluid spilled by broken tanks.
 @EventBusSubscriber(modid = Arcforge.MODID)
 public final class ConduitNetworkEvents {
     private ConduitNetworkEvents() {}
@@ -22,6 +23,7 @@ public final class ConduitNetworkEvents {
     static void onLevelTick(LevelTickEvent.Post event) {
         if (event.getLevel() instanceof ServerLevel level) {
             ConduitNetworkManager.get(level).tick();
+            FluidSpills.flush(level);
         }
     }
 

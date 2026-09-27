@@ -5,6 +5,9 @@
 
 package net.zagdrath.arcforge.blockentity.storage;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -29,8 +32,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
@@ -53,7 +58,8 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
 // One tank of any fluid. The GUI's bucket slot empties filled containers into the tank (or fills empty
 // ones from it) and moves the result to the slot below. The fluid is synced to clients for the block
-// entity renderer, and the tank lights up with the fluid's light level.
+// entity renderer, and the tank lights up with the fluid's light level. Breaking the tank spills its
+// fluid as a source block; picking it up with the wrench keeps the fluid on the item.
 public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInteractable {
     private static final int SYNC_INTERVAL = 5;
 
@@ -62,6 +68,7 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
     private final ResourceHandler<FluidResource> outputView;
     private final ResourceHandler<FluidResource> automationView;
     private final ContainerData data;
+    private final Map<Direction, BlockCapabilityCache<ResourceHandler<FluidResource>, @Nullable Direction>> fluidTargets = new EnumMap<>(Direction.class);
 
     private boolean syncPending;
     private long lastSyncTick = -SYNC_INTERVAL;
@@ -120,6 +127,7 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, FluidTankBlockEntity tank) {
         tank.processContainer();
+        tank.pushFluid(level, pos);
         tank.updateState(level, pos, state);
     }
 
@@ -157,6 +165,26 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
             items.setStack(SLOT_IN, input.copyWithCount(input.getCount() - 1));
             if (!result.isEmpty()) {
                 items.setStack(SLOT_OUT, output.isEmpty() ? result : output.copyWithCount(output.getCount() + result.getCount()));
+            }
+        }
+    }
+
+    // Pushes fluid out of every output face into the block beside it, up to the tier rate in total.
+    // With the default sides (output on the bottom, input on top) stacked tanks drain downwards.
+    private void pushFluid(ServerLevel level, BlockPos pos) {
+        int budget = tier.tankRate();
+        for (Direction direction : Direction.values()) {
+            if (budget <= 0 || tank.getAmount() <= 0) {
+                return;
+            }
+            if (modeFor(direction) != SideMode.OUTPUT) {
+                continue;
+            }
+            ResourceHandler<FluidResource> target = fluidTargets
+                    .computeIfAbsent(direction, dir -> BlockCapabilityCache.create(Capabilities.Fluid.BLOCK, level, pos.relative(dir), dir.getOpposite()))
+                    .getCapability();
+            if (target != null) {
+                budget -= ResourceHandlerUtil.move(tank, target, resource -> true, budget, null);
             }
         }
     }
@@ -201,7 +229,18 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
         return tank;
     }
 
-    // --- Item form: the fluid travels in a data component ---
+    // --- Removal: breaking the tank spills a source block; picking it up with the wrench keeps the fluid ---
+
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        FluidStack fluid = getFluid();
+        if (!isDismantled() && level instanceof ServerLevel serverLevel && fluid.getAmount() >= FluidType.BUCKET_VOLUME) {
+            FluidSpills.queue(serverLevel, pos, FluidResource.of(fluid));
+        }
+    }
+
+    // --- Item form: the fluid travels in a data component (only via the wrench; see the loot table) ---
 
     @Override
     protected void applyImplicitComponents(DataComponentGetter components) {

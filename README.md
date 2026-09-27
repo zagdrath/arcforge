@@ -79,8 +79,11 @@ A slim glass tank that shows the liquid inside, and glows with lava or any other
 - Right-click with a filled bucket to pour it in, or with an empty bucket to take a bucket out.
 - In the GUI, a filled bucket (or any fluid container) in the top slot empties into the tank and the
   empty container drops into the slot below. An empty bucket there is filled from the tank instead.
-- Breaking the tank keeps its fluid on the item. A comparator reads how full it is.
-- Sides: fill from every side and drain from the bottom by default.
+- Pick the tank up with the wrench (sneak-use) to keep its fluid on the item; the item shows the
+  fluid inside. Breaking it any other way spills a source block of the fluid (if it held at least
+  a bucket) and drops the tank empty. A comparator reads how full it is.
+- Sides: fill from every side and drain from the bottom by default. Output faces push fluid into
+  the block beside them, so stacked tanks drain downwards into the lowest one.
 
 ### Energy Cells
 
@@ -97,14 +100,16 @@ off more light the fuller it is.
 - GUI: the top slot drains a battery or any FE item into the cell; the bottom slot charges one from
   the cell. The screen shows live input and output rates.
 - Redstone control pauses pushing and charging.
-- Breaking the cell keeps its energy on the item. A comparator reads how full it is.
+- Breaking the cell keeps its energy on the item, which lights up to show its charge. A comparator
+  reads how full it is.
 
 ### Wrench
 
 - Use on a conduit side facing a machine: cycle Auto, Input, Output, Disabled (sneak to cycle
   backwards). On a joint between two conduits it disconnects or reconnects them.
 - Sneak-use on a conduit's centre: pick it up.
-- Use on a machine: rotate it. Sneak-use: pick it up with its contents, energy and settings kept.
+- Use on a machine: rotate it. Sneak-use: pick it up with its fluid, energy and settings kept; items
+  in its slots drop beside it.
 
 ## Machine settings
 

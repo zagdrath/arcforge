@@ -1,6 +1,19 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "arcforge:item/arcforged_fluid_tank"
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "arcforge:item/arcforged_fluid_tank"
+      },
+      {
+        "type": "minecraft:special",
+        "base": "arcforge:item/arcforged_fluid_tank",
+        "model": {
+          "type": "arcforge:fluid_tank_contents",
+          "capacity": 1024000
+        }
+      }
+    ]
   }
 }

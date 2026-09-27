@@ -43,6 +43,10 @@ public abstract class ActiveConduitNetwork<H> extends ConduitNetwork<H> {
             return state.hasProperty(ActiveConduitBlock.ACTIVE) && state.getValue(ActiveConduitBlock.ACTIVE);
         });
         lastMovedTick = level.getGameTime();
+        // A merged or extended network mixes lit and unlit conduits; make them all match.
+        for (BlockPos pos : members) {
+            ActiveConduitBlock.setActive(level, pos, active);
+        }
 
         long total = 0;
         for (BlockPos pos : members) {

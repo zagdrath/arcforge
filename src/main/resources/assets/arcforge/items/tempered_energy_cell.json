@@ -1,6 +1,40 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "arcforge:item/tempered_energy_cell"
+    "type": "minecraft:range_dispatch",
+    "property": "arcforge:cell_charge",
+    "entries": [
+      {
+        "threshold": 1,
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/tempered_energy_cell_1"
+        }
+      },
+      {
+        "threshold": 2,
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/tempered_energy_cell_2"
+        }
+      },
+      {
+        "threshold": 3,
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/tempered_energy_cell_3"
+        }
+      },
+      {
+        "threshold": 4,
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/tempered_energy_cell_4"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "arcforge:item/tempered_energy_cell"
+    }
   }
 }

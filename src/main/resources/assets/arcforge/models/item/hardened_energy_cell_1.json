@@ -1,0 +1,8 @@
+{
+  "parent": "arcforge:block/energy_cell/base_lit",
+  "textures": {
+    "frame": "arcforge:block/energy_cell/frame_hardened",
+    "side": "arcforge:block/energy_cell/side_1",
+    "top": "arcforge:block/energy_cell/top_1"
+  }
+}

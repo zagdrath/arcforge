@@ -24,6 +24,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
@@ -296,6 +297,30 @@ final class ConduitGameTests {
                 .thenSucceed();
     }
 
+    // A conduit added to a lit network lights up too (merged networks used to keep unlit members dark).
+    static void glowExtends(GameTestHelper helper) {
+        BlockPos source = new BlockPos(0, 1, 0);
+        BlockPos sink = new BlockPos(4, 1, 0);
+        TestFixtures.reset(helper.absolutePos(source));
+        TestFixtures.reset(helper.absolutePos(sink));
+        helper.setBlock(source, Blocks.LODESTONE);
+        helper.setBlock(sink, Blocks.LODESTONE);
+        placeRun(helper, ConduitType.ENERGY, ConduitTier.WROUGHT, 3);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, SideSetting.INPUT);
+        TestFixtures.energy(helper.absolutePos(source)).set(1_000_000);
+        BlockPos branch = new BlockPos(2, 1, 1);
+
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(helper.getBlockState(new BlockPos(2, 1, 0)).getValue(ActiveConduitBlock.ACTIVE), "Network not lit"))
+                .thenExecute(() -> {
+                    helper.setBlock(branch, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
+                    ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(branch));
+                })
+                .thenWaitUntil(() -> helper.assertTrue(helper.getBlockState(branch).getValue(ActiveConduitBlock.ACTIVE), "New conduit on a lit network is dark"))
+                .thenSucceed();
+    }
+
     // Energy conduits pull from a source and hold it even with nowhere to send it; the rest waits.
     static void energyStorage(GameTestHelper helper) {
         BlockPos source = new BlockPos(0, 1, 0);
@@ -359,6 +384,7 @@ final class ConduitGameTests {
         GeothermalPlantBlockEntity plant = helper.getBlockEntity(pos, GeothermalPlantBlockEntity.class);
         try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
             plant.getInteractionFluidHandler().insert(FluidResource.of(Fluids.LAVA), 3_000, tx);
+            plant.getItemHandler(null).insert(ItemResource.of(Items.COAL), 5, tx);
             tx.commit();
         }
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -369,9 +395,11 @@ final class ConduitGameTests {
         player.setShiftKeyDown(true);
         useWrench(helper, player, pos, new Vec3(0, 0.5, 0));
         helper.assertBlockNotPresent(ModBlocks.GEOTHERMAL_PLANT.get(), pos);
+        // The plant drops as an item carrying its lava, and the coal in its slot drops beside it.
         var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
-        helper.assertTrue(drops.size() == 1, "Expected exactly one drop, got " + drops.size());
-        ItemStack dropped = drops.getFirst().getItem();
+        helper.assertTrue(drops.size() == 2, "Expected the plant and its coal, got " + drops.size() + " drops");
+        helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().is(Items.COAL) && drop.getItem().getCount() == 5), "Coal in the slot did not drop");
+        ItemStack dropped = drops.stream().filter(drop -> drop.getItem().is(ModBlocks.GEOTHERMAL_PLANT.get().asItem())).findFirst().orElseThrow().getItem();
         helper.assertTrue(dropped.has(DataComponents.BLOCK_ENTITY_DATA), "Dropped machine has no saved data");
 
         // Place it back: the lava tank comes back too.
@@ -379,6 +407,7 @@ final class ConduitGameTests {
         BlockItem.updateCustomBlockEntityTag(helper.getLevel(), player, helper.absolutePos(pos), dropped);
         GeothermalPlantBlockEntity restored = helper.getBlockEntity(pos, GeothermalPlantBlockEntity.class);
         int lava = restored.getInteractionFluidHandler().getAmountAsInt(0);
+        helper.assertTrue(restored.getItemHandler(null).getAmountAsInt(GeothermalPlantBlockEntity.SLOT_INPUT) == 0, "Placed plant got its coal back (duplicated)");
         helper.assertTrue(lava == 3_000, "Restored plant has " + lava + " mB of lava");
         helper.succeed();
     }

@@ -26,9 +26,9 @@ import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 // Draws the liquid inside a fluid tank's glass, rising with the fill level (gases hang from the top).
 // Glowing fluids render full-bright.
 public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEntity, FluidTankRenderer.State> {
-    // Just inside the glass (4..12) so the faces don't z-fight, between the plates (2..14).
+    // Just inside the glass (4..12) and the plates (2..14), so no face lies on a model face and z-fights.
     private static final float MIN = 4.02F / 16.0F, MAX = 11.98F / 16.0F;
-    private static final float BOTTOM = 2.0F / 16.0F, HEIGHT = 12.0F / 16.0F;
+    private static final float BOTTOM = 2.02F / 16.0F, HEIGHT = 11.96F / 16.0F;
 
     public static class State extends BlockEntityRenderState {
         public @Nullable TextureAtlasSprite sprite;
@@ -69,9 +69,16 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
         if (sprite == null || state.fill <= 0.0F) {
             return;
         }
-        float height = HEIGHT * state.fill;
-        float y0 = state.gaseous ? BOTTOM + HEIGHT - height : BOTTOM;
+        float[] box = fluidBox(state.fill, state.gaseous);
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()),
-                (pose, buffer) -> FluidBoxes.box(pose, buffer, sprite, state.color, state.light, MIN, y0, MIN, MAX, y0 + height, MAX));
+                (pose, buffer) -> FluidBoxes.box(pose, buffer, sprite, state.color, state.light, box[0], box[1], box[2], box[3], box[4], box[5]));
+    }
+
+    // The liquid's box inside the tank as {x0, y0, z0, x1, y1, z1}: rising from the bottom, or hanging
+    // from the top for gases. Shared with the tank item renderer.
+    public static float[] fluidBox(float fill, boolean gaseous) {
+        float height = HEIGHT * fill;
+        float y0 = gaseous ? BOTTOM + HEIGHT - height : BOTTOM;
+        return new float[] { MIN, y0, MIN, MAX, y0 + height, MAX };
     }
 }

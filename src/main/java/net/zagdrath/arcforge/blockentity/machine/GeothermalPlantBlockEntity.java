@@ -385,18 +385,11 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
         return mode == null || mode == SideMode.INPUT ? fluidInput : null;
     }
 
-    // Set by the wrench: the contents travel on the dropped item instead of spilling.
-    private boolean dismantled;
-
-    @Override
-    public void markDismantled() {
-        dismantled = true;
-    }
-
+    // Slot items drop however the plant is removed, including with the wrench.
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        if (level != null && !dismantled) {
+        if (level != null) {
             for (int slot = 0; slot < SLOT_COUNT; slot++) {
                 Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), items.getStack(slot));
             }

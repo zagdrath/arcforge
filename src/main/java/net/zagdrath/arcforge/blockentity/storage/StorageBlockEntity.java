@@ -155,10 +155,16 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
         dismantled = true;
     }
 
+    // Whether the block is being picked up with the wrench rather than broken.
+    protected boolean isDismantled() {
+        return dismantled;
+    }
+
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        if (level != null && !dismantled) {
+        // Slot items drop however the block is removed, including with the wrench.
+        if (level != null) {
             for (int slot = 0; slot < SLOT_COUNT; slot++) {
                 Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), items.getStack(slot));
             }

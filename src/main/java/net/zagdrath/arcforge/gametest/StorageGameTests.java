@@ -8,11 +8,17 @@ package net.zagdrath.arcforge.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
@@ -26,6 +32,7 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.zagdrath.arcforge.registry.ModItems;
 
 // Fluid tanks and energy cells: GUI slots, block state feedback, item form, and conduits.
 final class StorageGameTests {
@@ -63,8 +70,8 @@ final class StorageGameTests {
                 .thenSucceed();
     }
 
-    // Breaking a tank drops it with its fluid, and placing it again restores the fluid.
-    static void tankKeepsFluid(GameTestHelper helper) {
+    // Breaking a tank spills a source block of its fluid and drops the tank empty.
+    static void tankSpills(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, ModBlocks.fluidTank(ConduitTier.TEMPERED).get());
         fillTank(helper.getBlockEntity(pos, FluidTankBlockEntity.class), Fluids.WATER, 12_400);
@@ -72,14 +79,92 @@ final class StorageGameTests {
 
         var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
         helper.assertTrue(drops.size() == 1, "Expected one drop, got " + drops.size());
+        helper.assertTrue(!drops.getFirst().getItem().has(ModDataComponents.FLUID_CONTENTS.get()), "Broken tank still carries its fluid");
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(helper.getLevel().getFluidState(helper.absolutePos(pos)).isSource()
+                        && helper.getLevel().getFluidState(helper.absolutePos(pos)).is(Fluids.WATER), "No water source where the tank was"))
+                .thenSucceed();
+    }
+
+    // Picking a tank up with the wrench keeps its fluid, and placing it again restores the fluid.
+    static void tankWrenchKeepsFluid(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.fluidTank(ConduitTier.TEMPERED).get());
+        fillTank(helper.getBlockEntity(pos, FluidTankBlockEntity.class), Fluids.WATER, 12_400);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setShiftKeyDown(true);
+        ItemStack wrench = new ItemStack(ModItems.WRENCH.get());
+        player.setItemInHand(InteractionHand.MAIN_HAND, wrench);
+        BlockPos absolute = helper.absolutePos(pos);
+        wrench.getItem().onItemUseFirst(wrench, new UseOnContext(player, InteractionHand.MAIN_HAND,
+                new BlockHitResult(Vec3.atCenterOf(absolute), Direction.UP, absolute, false)));
+
+        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        helper.assertTrue(drops.size() == 1, "Expected one drop, got " + drops.size());
         ItemStack dropped = drops.getFirst().getItem();
         var content = dropped.get(ModDataComponents.FLUID_CONTENTS.get());
-        helper.assertTrue(content != null && content.copy().getAmount() == 12_400, "Dropped tank does not carry its fluid");
+        helper.assertTrue(content != null && content.copy().getAmount() == 12_400, "Dismantled tank does not carry its fluid");
+        helper.assertTrue(helper.getLevel().getFluidState(absolute).isEmpty(), "Dismantled tank spilled its fluid");
 
         helper.setBlock(pos, ModBlocks.fluidTank(ConduitTier.TEMPERED).get());
         helper.getBlockEntity(pos, FluidTankBlockEntity.class).applyComponentsFromItemStack(dropped);
         int amount = helper.getBlockEntity(pos, FluidTankBlockEntity.class).getFluid().getAmount();
         helper.assertTrue(amount == 12_400, "Placed tank holds " + amount + " mB");
+        helper.succeed();
+    }
+
+    // With the default sides (input on top, output on the bottom) a tank drains into the tank below it.
+    static void tanksStack(GameTestHelper helper) {
+        BlockPos lower = new BlockPos(1, 1, 1);
+        BlockPos upper = new BlockPos(1, 2, 1);
+        helper.setBlock(lower, ModBlocks.fluidTank(ConduitTier.WROUGHT).get());
+        helper.setBlock(upper, ModBlocks.fluidTank(ConduitTier.WROUGHT).get());
+        fillTank(helper.getBlockEntity(upper, FluidTankBlockEntity.class), Fluids.WATER, 5_000);
+
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(helper.getBlockEntity(lower, FluidTankBlockEntity.class).getFluid().getAmount() == 5_000,
+                        "Lower tank has " + helper.getBlockEntity(lower, FluidTankBlockEntity.class).getFluid().getAmount() + " mB"))
+                .thenExecute(() -> helper.assertTrue(helper.getBlockEntity(upper, FluidTankBlockEntity.class).getFluid().isEmpty(), "Upper tank not drained"))
+                .thenSucceed();
+    }
+
+    // Breaking a machine (not with the wrench) drops the items in its slots as well as the block.
+    static void machinesDropItems(GameTestHelper helper) {
+        BlockPos plantPos = new BlockPos(0, 1, 0);
+        BlockPos tankPos = new BlockPos(2, 1, 0);
+        BlockPos cellPos = new BlockPos(4, 1, 0);
+        helper.setBlock(plantPos, ModBlocks.GEOTHERMAL_PLANT.get());
+        helper.setBlock(tankPos, ModBlocks.fluidTank(ConduitTier.WROUGHT).get());
+        helper.setBlock(cellPos, ModBlocks.energyCell(ConduitTier.WROUGHT).get());
+        var plant = helper.getBlockEntity(plantPos, net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity.class);
+        try (Transaction tx = Transaction.openRoot()) {
+            plant.getItemHandler(null).insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.COAL), 5, tx);
+            tx.commit();
+        }
+        helper.getBlockEntity(tankPos, FluidTankBlockEntity.class).getItems().setStack(StorageBlockEntity.SLOT_OUT, new ItemStack(Items.BUCKET, 3));
+        helper.getBlockEntity(cellPos, EnergyCellBlockEntity.class).getItems().setStack(StorageBlockEntity.SLOT_IN, new ItemStack(Items.DIAMOND, 2));
+
+        var player = helper.makeMockServerPlayerInLevel();
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_PICKAXE));
+        // Keep the mock player out of pickup range of the drops.
+        BlockPos away = helper.absolutePos(new BlockPos(2, 1, 12));
+        player.snapTo(away.getX() + 0.5, away.getY(), away.getZ() + 0.5);
+        for (BlockPos pos : new BlockPos[] { plantPos, tankPos, cellPos }) {
+            BlockPos absolute = helper.absolutePos(pos);
+            var state = helper.getLevel().getBlockState(absolute);
+            var blockEntity = helper.getLevel().getBlockEntity(absolute);
+            state.onDestroyedByPlayer(helper.getLevel(), absolute, player, player.getMainHandItem(), true, helper.getLevel().getFluidState(absolute));
+            state.getBlock().playerDestroy(helper.getLevel(), player, absolute, state, blockEntity, player.getMainHandItem());
+            helper.assertBlockNotPresent(state.getBlock(), pos);
+        }
+
+        java.util.Map<net.minecraft.world.item.Item, Integer> counts = new java.util.HashMap<>();
+        for (var entity : helper.getEntities(EntityTypes.ITEM, new BlockPos(2, 1, 0), 6.0)) {
+            counts.merge(entity.getItem().getItem(), entity.getItem().getCount(), Integer::sum);
+        }
+        helper.assertTrue(counts.getOrDefault(Items.COAL, 0) == 5, "Plant dropped " + counts.getOrDefault(Items.COAL, 0) + " coal; drops " + counts);
+        helper.assertTrue(counts.getOrDefault(Items.BUCKET, 0) == 3, "Tank dropped " + counts.getOrDefault(Items.BUCKET, 0) + " buckets; drops " + counts);
+        helper.assertTrue(counts.getOrDefault(Items.DIAMOND, 0) == 2, "Cell dropped " + counts.getOrDefault(Items.DIAMOND, 0) + " diamonds; drops " + counts);
         helper.succeed();
     }
 

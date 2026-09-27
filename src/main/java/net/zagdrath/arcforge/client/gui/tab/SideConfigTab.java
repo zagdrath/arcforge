@@ -31,8 +31,8 @@ public class SideConfigTab extends SideTab {
     private static final Identifier BUTTON = ArcforgeGui.widget("button");
     private static final Identifier BUTTON_HOVER = ArcforgeGui.widget("button_hover");
     private static final int FACE_SIZE = 16;
-    // Clear-all button, bottom-right, level with the bottom face.
-    private static final int CLEAR_X = 66, CLEAR_Y = 58, CLEAR_SIZE = 20;
+    // Clear-all button: face-sized, below the back face and level with the bottom face.
+    private static final int CLEAR_X = 68, CLEAR_Y = 60, CLEAR_SIZE = FACE_SIZE;
 
     private final Function<RelativeSide, SideMode> modes;
     private final BiConsumer<RelativeSide, Integer> action;
@@ -90,7 +90,7 @@ public class SideConfigTab extends SideTab {
 
         boolean clearHovered = isOverClear(mouseX - x, mouseY - y);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, clearHovered ? BUTTON_HOVER : BUTTON, x + CLEAR_X, y + CLEAR_Y, CLEAR_SIZE, CLEAR_SIZE);
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ICON_CLEAR, x + CLEAR_X + 2, y + CLEAR_Y + 2, 16, 16);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ICON_CLEAR, x + CLEAR_X, y + CLEAR_Y, CLEAR_SIZE, CLEAR_SIZE);
     }
 
     @Override

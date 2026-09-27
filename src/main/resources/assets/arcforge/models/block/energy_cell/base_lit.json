@@ -71,7 +71,8 @@
           ],
           "texture": "#top"
         }
-      }
+      },
+      "light_emission": 15
     },
     {
       "from": [
