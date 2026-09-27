@@ -16,6 +16,8 @@ import net.zagdrath.arcforge.Arcforge;
 // Shared GUI colours and helpers for every Arcforge machine screen.
 public final class ArcforgeGui {
     public static final int ACCENT = 0xFF5FD4C4;
+    // Heat amounts and rates (HU).
+    public static final int HEAT = 0xFFFF9A3C;
     public static final int TEXT = 0xFFE0E0E0;
     public static final int LABEL = 0xFFA0A0A0;
     public static final int TOOLTIP_GRAY = 0xFFAAAAAA;

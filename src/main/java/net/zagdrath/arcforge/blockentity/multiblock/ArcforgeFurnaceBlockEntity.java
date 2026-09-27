@@ -48,6 +48,7 @@ import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -165,6 +166,9 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         setChanged();
         level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
         MultiblockAutomation.refresh(level, getMinCorner(), getMaxCorner());
+        if (formed && level instanceof ServerLevel serverLevel) {
+            MultiblockEffects.formed(serverLevel, getMinCorner(), getMaxCorner());
+        }
     }
 
     @Override

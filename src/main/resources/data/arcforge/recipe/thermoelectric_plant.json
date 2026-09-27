@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "#c:storage_blocks/copper",
+    "F": "arcforge:firebox",
+    "R": "#c:dusts/redstone",
+    "S": "#c:ingots/steel"
+  },
+  "pattern": [
+    "SRS",
+    "CFC",
+    "SRS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:thermoelectric_plant"
+  }
+}

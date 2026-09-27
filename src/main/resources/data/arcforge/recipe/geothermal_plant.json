@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "minecraft:bucket",
+    "F": "minecraft:blast_furnace",
+    "M": "minecraft:magma_block",
+    "S": "#c:ingots/steel"
+  },
+  "pattern": [
+    "SBS",
+    "MFM",
+    "SSS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:geothermal_plant"
+  }
+}

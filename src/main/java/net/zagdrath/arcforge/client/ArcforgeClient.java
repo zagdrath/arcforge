@@ -39,7 +39,10 @@ import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
+import net.zagdrath.arcforge.client.screen.machine.CombustionGeneratorScreen;
+import net.zagdrath.arcforge.client.screen.machine.FireboxScreen;
 import net.zagdrath.arcforge.client.screen.machine.GeothermalPlantScreen;
+import net.zagdrath.arcforge.client.screen.machine.ThermoelectricPlantScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.ArcforgeFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.CarbonizerScreen;
 import net.zagdrath.arcforge.client.screen.storage.EnergyCellScreen;
@@ -61,6 +64,9 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.GEOTHERMAL_PLANT.get(), GeothermalPlantScreen::new);
+        event.register(ModMenuTypes.COMBUSTION_GENERATOR.get(), CombustionGeneratorScreen::new);
+        event.register(ModMenuTypes.FIREBOX.get(), FireboxScreen::new);
+        event.register(ModMenuTypes.THERMOELECTRIC_PLANT.get(), ThermoelectricPlantScreen::new);
         event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);
         event.register(ModMenuTypes.ENERGY_CELL.get(), EnergyCellScreen::new);
         event.register(ModMenuTypes.CARBONIZER.get(), CarbonizerScreen::new);
@@ -119,7 +125,7 @@ public class ArcforgeClient {
         event.register(CellChargeProperty.ID, CellChargeProperty.MAP_CODEC);
     }
 
-    // Glass conduits (item and liquid) and fluid tanks draw their contents; everything else is pure block models.
+    // Glass conduits (item and fluid) and fluid tanks draw their contents; everything else is pure block models.
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.TRANSPARENT_CONDUIT.get(), ConduitRenderer::new);

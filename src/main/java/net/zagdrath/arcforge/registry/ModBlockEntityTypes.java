@@ -17,7 +17,10 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcforgeFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
@@ -30,11 +33,20 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<GeothermalPlantBlockEntity>> GEOTHERMAL_PLANT = BLOCK_ENTITY_TYPES.register("geothermal_plant",
             () -> new BlockEntityType<>(GeothermalPlantBlockEntity::new, ModBlocks.GEOTHERMAL_PLANT.get()));
 
+    public static final Supplier<BlockEntityType<CombustionGeneratorBlockEntity>> COMBUSTION_GENERATOR = BLOCK_ENTITY_TYPES.register("combustion_generator",
+            () -> new BlockEntityType<>(CombustionGeneratorBlockEntity::new, ModBlocks.COMBUSTION_GENERATOR.get()));
+
+    public static final Supplier<BlockEntityType<FireboxBlockEntity>> FIREBOX = BLOCK_ENTITY_TYPES.register("firebox",
+            () -> new BlockEntityType<>(FireboxBlockEntity::new, ModBlocks.FIREBOX.get()));
+
+    public static final Supplier<BlockEntityType<ThermoelectricPlantBlockEntity>> THERMOELECTRIC_PLANT = BLOCK_ENTITY_TYPES.register("thermoelectric_plant",
+            () -> new BlockEntityType<>(ThermoelectricPlantBlockEntity::new, ModBlocks.THERMOELECTRIC_PLANT.get()));
+
     // Energy and thermal conduits: state only, rendered entirely by their block models.
     public static final Supplier<BlockEntityType<ConduitBlockEntity>> CONDUIT = BLOCK_ENTITY_TYPES.register("conduit",
             () -> new BlockEntityType<>(ConduitBlockEntity::new, conduitBlocks(false)));
 
-    // Item and liquid conduits: glass, with a block entity renderer drawing their contents.
+    // Item and fluid conduits: glass, with a block entity renderer drawing their contents.
     public static final Supplier<BlockEntityType<ConduitBlockEntity>> TRANSPARENT_CONDUIT = BLOCK_ENTITY_TYPES.register("transparent_conduit",
             () -> new BlockEntityType<>(ConduitBlockEntity::new, conduitBlocks(true)));
 

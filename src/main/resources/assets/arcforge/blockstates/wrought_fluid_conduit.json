@@ -1,0 +1,435 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "AND": [
+          {
+            "OR": [
+              {
+                "north": "!pipe"
+              },
+              {
+                "south": "!pipe"
+              },
+              {
+                "east": "!none"
+              },
+              {
+                "west": "!none"
+              },
+              {
+                "up": "!none"
+              },
+              {
+                "down": "!none"
+              }
+            ]
+          },
+          {
+            "OR": [
+              {
+                "north": "!none"
+              },
+              {
+                "south": "!none"
+              },
+              {
+                "east": "!pipe"
+              },
+              {
+                "west": "!pipe"
+              },
+              {
+                "up": "!none"
+              },
+              {
+                "down": "!none"
+              }
+            ]
+          },
+          {
+            "OR": [
+              {
+                "north": "!none"
+              },
+              {
+                "south": "!none"
+              },
+              {
+                "east": "!none"
+              },
+              {
+                "west": "!none"
+              },
+              {
+                "up": "!pipe"
+              },
+              {
+                "down": "!pipe"
+              }
+            ]
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_core"
+      }
+    },
+    {
+      "when": {
+        "north": "pipe",
+        "south": "pipe",
+        "east": "none",
+        "west": "none",
+        "up": "none",
+        "down": "none"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_straight"
+      }
+    },
+    {
+      "when": {
+        "north": "none",
+        "south": "none",
+        "east": "pipe",
+        "west": "pipe",
+        "up": "none",
+        "down": "none"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_straight",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "north": "none",
+        "south": "none",
+        "east": "none",
+        "west": "none",
+        "up": "pipe",
+        "down": "pipe"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_straight",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "pipe"
+          },
+          {
+            "OR": [
+              {
+                "north": "!pipe"
+              },
+              {
+                "south": "!pipe"
+              },
+              {
+                "east": "!none"
+              },
+              {
+                "west": "!none"
+              },
+              {
+                "up": "!none"
+              },
+              {
+                "down": "!none"
+              }
+            ]
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm"
+      }
+    },
+    {
+      "when": {
+        "north": "input"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_input"
+      }
+    },
+    {
+      "when": {
+        "north": "output"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_output"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "pipe"
+          },
+          {
+            "OR": [
+              {
+                "north": "!pipe"
+              },
+              {
+                "south": "!pipe"
+              },
+              {
+                "east": "!none"
+              },
+              {
+                "west": "!none"
+              },
+              {
+                "up": "!none"
+              },
+              {
+                "down": "!none"
+              }
+            ]
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "input"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_input",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "output"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_output",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "pipe"
+          },
+          {
+            "OR": [
+              {
+                "north": "!none"
+              },
+              {
+                "south": "!none"
+              },
+              {
+                "east": "!pipe"
+              },
+              {
+                "west": "!pipe"
+              },
+              {
+                "up": "!none"
+              },
+              {
+                "down": "!none"
+              }
+            ]
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "input"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_input",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "output"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_output",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "pipe"
+          },
+          {
+            "OR": [
+              {
+                "north": "!none"
+              },
+              {
+                "south": "!none"
+              },
+              {
+                "east": "!pipe"
+              },
+              {
+                "west": "!pipe"
+              },
+              {
+                "up": "!none"
+              },
+              {
+                "down": "!none"
+              }
+            ]
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "input"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_input",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "output"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_output",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "pipe"
+          },
+          {
+            "OR": [
+              {
+                "north": "!none"
+              },
+              {
+                "south": "!none"
+              },
+              {
+                "east": "!none"
+              },
+              {
+                "west": "!none"
+              },
+              {
+                "up": "!pipe"
+              },
+              {
+                "down": "!pipe"
+              }
+            ]
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "input"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_input",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "output"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_output",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "pipe"
+          },
+          {
+            "OR": [
+              {
+                "north": "!none"
+              },
+              {
+                "south": "!none"
+              },
+              {
+                "east": "!none"
+              },
+              {
+                "west": "!none"
+              },
+              {
+                "up": "!pipe"
+              },
+              {
+                "down": "!pipe"
+              }
+            ]
+          }
+        ]
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "input"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_input",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "output"
+      },
+      "apply": {
+        "model": "arcforge:block/conduit/wrought_fluid_arm_output",
+        "x": 90
+      }
+    }
+  ]
+}

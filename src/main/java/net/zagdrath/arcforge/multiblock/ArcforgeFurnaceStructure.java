@@ -24,12 +24,14 @@ import net.zagdrath.arcforge.blockentity.multiblock.ArcforgeFurnaceBlockEntity;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
 // The Arcforge Furnace: a 3x3 cross-shaped column, 6 tall. Every layer has bricks on the four edge
-// middles, brick walls on the four corners and an empty centre (the stack, open at the top), except
-// that the front edge of the bottom layer is the port, whose facing is the furnace's front:
+// middles and brick walls on the four corners. The bottom layer is solid, with the port on its front
+// edge (the port's facing is the furnace's front) and a brick hearth in the centre; the layers above
+// have an empty centre (the stack, open at the top):
 //
-//     W B W
-//     B . B      23 bricks + 1 port + 24 walls
-//     W P W      (P only on the bottom layer)
+//     W B W        W B W
+//     B B B        B . B      24 bricks + 1 port + 24 walls
+//     W P W        W B W
+//    bottom      layers 2-6
 //
 // The port's block entity runs the furnace; bricks and walls find it by searching around themselves.
 public final class ArcforgeFurnaceStructure {
@@ -38,7 +40,7 @@ public final class ArcforgeFurnaceStructure {
 
     private ArcforgeFurnaceStructure() {}
 
-    // The hollow column's bottom block, just behind the port.
+    // The bottom-centre hearth brick, just behind the port; the hollow stack starts above it.
     public static BlockPos center(BlockPos port, Direction facing) {
         return port.relative(facing.getOpposite());
     }
@@ -51,13 +53,13 @@ public final class ArcforgeFurnaceStructure {
         return center(port, facing).offset(1, HEIGHT - 1, 1);
     }
 
-    // Whether pos is one of the structure's blocks (inside the box, not in the hollow centre).
+    // Whether pos is one of the structure's blocks (inside the box, not in the hollow stack).
     public static boolean isPart(BlockPos port, Direction facing, BlockPos pos) {
         BlockPos center = center(port, facing);
         int dx = pos.getX() - center.getX();
         int dy = pos.getY() - center.getY();
         int dz = pos.getZ() - center.getZ();
-        return Math.abs(dx) <= 1 && Math.abs(dz) <= 1 && dy >= 0 && dy < HEIGHT && (dx != 0 || dz != 0);
+        return Math.abs(dx) <= 1 && Math.abs(dz) <= 1 && dy >= 0 && dy < HEIGHT && (dx != 0 || dz != 0 || dy == 0);
     }
 
     public static boolean isValid(Level level, BlockPos port, Direction facing) {
@@ -82,7 +84,7 @@ public final class ArcforgeFurnaceStructure {
 
     private static boolean matches(BlockState state, int dx, int dy, int dz, Direction facing) {
         if (dx == 0 && dz == 0) {
-            return state.canBeReplaced();
+            return dy == 0 ? state.is(ModBlocks.ARCFORGE_FURNACE_BRICKS.get()) : state.canBeReplaced();
         }
         if (dx != 0 && dz != 0) {
             return state.is(ModBlocks.ARCFORGE_FURNACE_BRICK_WALL.get());

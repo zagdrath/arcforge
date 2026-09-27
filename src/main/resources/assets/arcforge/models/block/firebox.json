@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/firebox_front",
+    "south": "arcforge:block/firebox_back",
+    "east": "arcforge:block/firebox_side",
+    "west": "arcforge:block/firebox_side",
+    "up": "arcforge:block/firebox_top",
+    "down": "arcforge:block/firebox_bottom",
+    "particle": "arcforge:block/firebox_side"
+  }
+}

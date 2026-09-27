@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": "arcforge:arcforge_furnace_bricks",
+    "F": "minecraft:furnace",
+    "I": "#c:ingots/iron"
+  },
+  "pattern": [
+    "BIB",
+    "IFI",
+    "BIB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:firebox"
+  }
+}

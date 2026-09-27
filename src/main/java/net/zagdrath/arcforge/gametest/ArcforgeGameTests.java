@@ -49,8 +49,8 @@ public final class ArcforgeGameTests {
         TESTS.put(SIDE_CONFIG_BUTTONS, ArcforgeGameTests::sideConfigButtons);
         TESTS.put("conduit_energy_transfer", ConduitGameTests::energyTransfer);
         TESTS.put("conduit_item_transfer", ConduitGameTests::itemTransfer);
-        TESTS.put("conduit_liquid_transfer", ConduitGameTests::liquidTransfer);
-        TESTS.put("conduit_liquid_split", ConduitGameTests::liquidSplit);
+        TESTS.put("conduit_fluid_transfer", ConduitGameTests::fluidTransfer);
+        TESTS.put("conduit_fluid_split", ConduitGameTests::fluidSplit);
         TESTS.put("conduit_auto_connect", ConduitGameTests::autoConnect);
         TESTS.put("conduit_energy_storage", ConduitGameTests::energyStorage);
         TESTS.put("conduit_glow_extends", ConduitGameTests::glowExtends);
@@ -64,6 +64,11 @@ public final class ArcforgeGameTests {
         TESTS.put("machines_drop_items", StorageGameTests::machinesDropItems);
         TESTS.put("cell_charge", StorageGameTests::cellCharge);
         TESTS.put("cell_output_and_conduit", StorageGameTests::cellOutputAndConduit);
+        TESTS.put("generator_burns", HeatGameTests::generatorBurns);
+        TESTS.put("geothermal_makes_heat", HeatGameTests::geothermalMakesHeat);
+        TESTS.put("firebox_drives_thermoelectric", HeatGameTests::fireboxDrivesThermoelectric);
+        TESTS.put("heat_flows_hot_to_cold", HeatGameTests::heatFlowsHotToCold);
+        TESTS.put("thermal_conduit_carries_heat", HeatGameTests::thermalConduitCarriesHeat);
         TESTS.put("carbonizer_forms", MultiblockGameTests::carbonizerForms);
         TESTS.put("furnace_forms", MultiblockGameTests::furnaceForms);
         LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);
@@ -154,7 +159,7 @@ public final class ArcforgeGameTests {
         for (RelativeSide side : RelativeSide.values()) {
             helper.assertTrue(plant.getSideMode(side) == SideMode.NONE, side + " is " + plant.getSideMode(side) + " after clear all");
         }
-        helper.assertTrue(plant.getEnergyHandler(facing.getOpposite()) == null, "Back still exposes energy after clear all");
+        helper.assertTrue(plant.getHeatHandler(facing.getOpposite()) == null, "Back still exposes heat after clear all");
         helper.succeed();
     }
 }

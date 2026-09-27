@@ -14,7 +14,9 @@ public enum SideMode {
     OUTPUT("output"),
     ENERGY("energy"),
     // Multiblocks: exposes only the by-product (e.g. the Carbonizer's creosote, the Arcforge Furnace's slag).
-    BYPRODUCT("byproduct");
+    BYPRODUCT("byproduct"),
+    // Heat machines: exposes the heat buffer (producers give heat out of it, consumers take heat in).
+    HEAT("heat");
 
     private final String name;
 

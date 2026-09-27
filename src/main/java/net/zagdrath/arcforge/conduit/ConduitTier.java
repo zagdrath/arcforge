@@ -17,8 +17,8 @@ public enum ConduitTier implements StringRepresentable {
     HARDENED("hardened", 8_192, 32, 5, 3_200, 800, 0.12F),
     ARCFORGED("arcforged", 65_536, 64, 2, 12_800, 3_200, 0.2F);
 
-    // Liquid each conduit block can hold.
-    public static final int LIQUID_CAPACITY_PER_CONDUIT = 1_000;
+    // Fluid each conduit block can hold.
+    public static final int FLUID_CAPACITY_PER_CONDUIT = 1_000;
     // Item stacks each item conduit can store while nothing will take them.
     public static final int ITEM_STORAGE_SLOTS = 4;
 
@@ -26,16 +26,16 @@ public enum ConduitTier implements StringRepresentable {
     private final int energyPerTick;
     private final int itemsPerOperation;
     private final int ticksPerItemOperation;
-    private final int liquidPerTick;
+    private final int fluidPerTick;
     private final int heatPerTick;
     private final float itemSpeed;
 
-    ConduitTier(String name, int energyPerTick, int itemsPerOperation, int ticksPerItemOperation, int liquidPerTick, int heatPerTick, float itemSpeed) {
+    ConduitTier(String name, int energyPerTick, int itemsPerOperation, int ticksPerItemOperation, int fluidPerTick, int heatPerTick, float itemSpeed) {
         this.name = name;
         this.energyPerTick = energyPerTick;
         this.itemsPerOperation = itemsPerOperation;
         this.ticksPerItemOperation = ticksPerItemOperation;
-        this.liquidPerTick = liquidPerTick;
+        this.fluidPerTick = fluidPerTick;
         this.heatPerTick = heatPerTick;
         this.itemSpeed = itemSpeed;
     }
@@ -52,8 +52,8 @@ public enum ConduitTier implements StringRepresentable {
         return ticksPerItemOperation;
     }
 
-    public int liquidPerTick() {
-        return liquidPerTick;
+    public int fluidPerTick() {
+        return fluidPerTick;
     }
 
     public int heatPerTick() {
@@ -118,7 +118,7 @@ public enum ConduitTier implements StringRepresentable {
     public Component describeThroughput(ConduitType type) {
         return switch (type) {
             case ENERGY -> Component.translatable("tooltip.arcforge.conduit.throughput.energy", format(energyPerTick));
-            case LIQUID -> Component.translatable("tooltip.arcforge.conduit.throughput.liquid", format(liquidPerTick));
+            case FLUID -> Component.translatable("tooltip.arcforge.conduit.throughput.fluid", format(fluidPerTick));
             case THERMAL -> Component.translatable("tooltip.arcforge.conduit.throughput.thermal", format(heatPerTick));
             case ITEM -> Component.translatable("tooltip.arcforge.conduit.throughput.item", itemsPerOperation,
                     String.format("%.1f", ticksPerItemOperation / 20.0));

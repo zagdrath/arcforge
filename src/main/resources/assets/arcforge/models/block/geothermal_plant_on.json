@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:block/cube",
   "textures": {
-    "particle": "arcforge:block/geothermal_plant_side",
     "north": "arcforge:block/geothermal_plant_front_on",
     "south": "arcforge:block/geothermal_plant_back",
     "east": "arcforge:block/geothermal_plant_side_on",
     "west": "arcforge:block/geothermal_plant_side_on",
     "up": "arcforge:block/geothermal_plant_top_on",
-    "down": "arcforge:block/geothermal_plant_bottom"
+    "down": "arcforge:block/geothermal_plant_bottom",
+    "particle": "arcforge:block/geothermal_plant_side"
   }
 }

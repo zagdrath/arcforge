@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/combustion_generator_front",
+    "south": "arcforge:block/combustion_generator_back",
+    "east": "arcforge:block/combustion_generator_side",
+    "west": "arcforge:block/combustion_generator_side",
+    "up": "arcforge:block/combustion_generator_top",
+    "down": "arcforge:block/combustion_generator_bottom",
+    "particle": "arcforge:block/combustion_generator_side"
+  }
+}

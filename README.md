@@ -16,28 +16,38 @@ Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Ma
 
 ## Machines
 
-### Geothermal Plant
+### Power and heat
 
-Turns heat into FE. Output is **heat × 2 FE/t**, and the heat level rises and falls gradually as
-heat sources are added or run out.
+```
+coal / charcoal / coal block --[Combustion Generator]--> FE      (simple, least FE per coal)
+coal / charcoal / coal block --[Firebox]--> heat (HU)            (up to 1,100°C)
+lava (tank, pipes, nearby blocks) --[Geothermal Plant]--> heat   (up to 600°C)
+heat --[Thermoelectric Plant]--> FE                              (hotter heat = more FE)
+```
 
-| Heat source | Heat | Output | Energy per unit |
-|---|---|---|---|
-| Lava (internal tank) | 40 HU | 80 FE/t | 160,000 FE per bucket |
-| Coal | 20 HU | 40 FE/t | 64,000 FE |
-| Block of coal | 20 HU | 40 FE/t | 608,000 FE (9.5× coal) |
-| Charcoal | 15 HU | 30 FE/t | 48,000 FE |
-| Adjacent lava source block | 5 HU each | 10 FE/t each | Free, never consumed |
+**Heat.** Heat machines store heat (HU) in a buffer. Their temperature rises from 20°C when the
+buffer is empty to the machine's maximum when it's full. Heat leaves through faces set to **Heat**,
+either into a touching machine's heat face (up to 100 HU/t) or through thermodynamic conduits.
+It only ever flows from a hotter machine into a colder one.
 
-- Burns one fuel at a time, lava first and then coal, blocks of coal or charcoal. A block of coal
-  burns at coal heat for 9.5× as long as one coal, so it is a little more efficient than 9 coal.
-- Lava source blocks touching any of its six sides add passive heat on top. The plant can sit on
-  or beside a lava pool.
-- Peaks at 70 HU (140 FE/t) with lava burning and lava on all six sides.
-- Fill the 8,000 mB lava tank by piping lava in, placing lava buckets in the input slot, or
-  right-clicking the plant with a lava bucket. Coal, blocks of coal and charcoal also go in the input slot.
-- Stores 100,000 FE and pushes up to 1,000 FE/t into neighbouring machines and cables.
-- Stops taking new fuel while its energy buffer is full.
+| Machine | Makes | Buffer | Max temp | Notes |
+|---|---|---|---|---|
+| Combustion Generator | 40 FE/t | 50,000 FE | — | Fuel burns at 2× furnace speed: 32,000 FE per coal |
+| Firebox | 40 HU/t | 40,000 HU | 1,100°C | Fuel burns at furnace speed: 64,000 HU per coal |
+| Geothermal Plant | 20 HU/t from lava, plus passive | 20,000 HU | 600°C | 1 mB/t of lava: 20,000 HU per bucket |
+| Thermoelectric Plant | FE from heat | 20,000 HU + 50,000 FE | 1,100°C | Takes up to 40 HU/t |
+
+- **Fuel** for the Combustion Generator and Firebox is `#arcforge:combustion_fuel` (coal,
+  charcoal, blocks of coal). Both pause while their buffer is full, keeping the rest of the burning item.
+- **Geothermal Plant:** fill its 8,000 mB lava tank with lava buckets in the slot, by right-clicking
+  with a bucket, or by piping lava into an input face. Touching lava source blocks add 3 HU/t each and
+  magma blocks 1 HU/t each, even with an empty tank; they're never used up. It makes no FE itself.
+- **Thermoelectric Plant:** heat passes through it in proportion to how full its buffer is (up to
+  40 HU/t when full), and becomes FE at an efficiency set by its temperature: 0% at 100°C,
+  50% at 600°C and 100% at 1,100°C. It can't get hotter than what feeds it, so a Geothermal Plant
+  drives it to about 50% at best, while a Firebox gets it close to 100% (about 64,000 FE per coal).
+  It takes a few minutes to warm up.
+- Generators push up to 200 FE/t out of their energy faces.
 
 ## Logistics
 
@@ -54,14 +64,14 @@ to force a side to **Input** (push into the machine) or **Output** (pull from it
 |---|---|---|---|---|
 | Energy (FE/t) | 256 | 1,024 | 8,192 | 65,536 |
 | Item (items per transfer) | 8 every 1.0s | 16 every 0.5s | 32 every 0.25s | 64 every 0.1s |
-| Liquid (mB/t) | 200 | 800 | 3,200 | 12,800 |
+| Fluid (mB/t) | 200 | 800 | 3,200 | 12,800 |
 | Thermodynamic (HU/t) | 50 | 200 | 800 | 3,200 |
 
 Conduits store what they pull, so they keep pulling from machines even when nothing will take it yet:
 
 - **Energy** and **Thermodynamic** conduits each hold one tick's worth of their tier's rate
   (e.g. 256 FE per wrought energy conduit), and glow while they are moving energy or heat.
-- **Liquid** conduits are glass and show the fluid inside. Each holds 1,000 mB, and a network
+- **Fluid** conduits are glass and show the fluid inside. Each holds 1,000 mB, and a network
   carries one fluid at a time.
 - **Item** conduits are glass and show items travelling through. Each stores up to 4 stacks,
   shown resting in its centre, and sends them on once a destination has room. Items that can't
@@ -115,17 +125,20 @@ off more light the fuller it is.
 
 Tabs on the right of each machine's screen:
 
-- **Energy**: stored FE and current output.
+- **Energy** / **Heat**: stored FE or HU and the current rate (the Geothermal Plant also shows the
+  lava and magma touching it).
 - **Redstone**: ignore redstone, run only with a signal, or run only without one.
-- **Sides**: choose what each face does, including the front: none, input, output or energy
-  output (tanks and cells: none, input or output). Left-click to cycle, right-click to cycle back, shift-click to clear one face, or use
-  the clear button to reset every face to none.
-  - Defaults: top is input, bottom is output, left, right and back are energy output, front is none.
+- **Sides**: choose what each face does, including the front. Left-click to cycle, right-click to
+  cycle back, shift-click to clear one face, or use the clear button to reset every face to none.
+  - Combustion Generator: none, input, energy. Top is input, back is energy.
+  - Firebox and Geothermal Plant: none, input, heat. Top is input, back is heat.
+  - Thermoelectric Plant: none, heat, energy. Top and bottom are heat, back is energy.
+  - Tanks and cells: none, input or output.
 - **Upgrades**: upgrade slots, reserved for future upgrade items.
 
 ## Configuration
 
-All balance values (heat per fuel, FE per heat, burn times, tank and buffer sizes, output rate)
+All balance values (heat and FE rates, buffer sizes, temperatures, burn speeds, efficiency, output rates)
 can be changed in `config/arcforge-common.toml`.
 
 ## License

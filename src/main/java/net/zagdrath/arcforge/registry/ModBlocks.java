@@ -24,7 +24,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.machine.CombustionGeneratorBlock;
+import net.zagdrath.arcforge.block.machine.FireboxBlock;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
+import net.zagdrath.arcforge.block.machine.MachineBlock;
+import net.zagdrath.arcforge.block.machine.ThermoelectricPlantBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
@@ -44,7 +48,16 @@ public final class ModBlocks {
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL)
-                    .lightLevel(state -> state.getValue(GeothermalPlantBlock.LIT) ? 7 : 0));
+                    .lightLevel(state -> state.getValue(MachineBlock.LIT) ? 7 : 0));
+
+    public static final DeferredBlock<CombustionGeneratorBlock> COMBUSTION_GENERATOR = BLOCKS.registerBlock("combustion_generator",
+            CombustionGeneratorBlock::new, p -> machineProperties(p, 13));
+
+    public static final DeferredBlock<FireboxBlock> FIREBOX = BLOCKS.registerBlock("firebox",
+            FireboxBlock::new, p -> machineProperties(p, 13));
+
+    public static final DeferredBlock<ThermoelectricPlantBlock> THERMOELECTRIC_PLANT = BLOCKS.registerBlock("thermoelectric_plant",
+            ThermoelectricPlantBlock::new, p -> machineProperties(p, 7));
 
     // --- Steelmaking ---
 
@@ -136,6 +149,15 @@ public final class ModBlocks {
 
     public static String conduitName(ConduitType type, ConduitTier tier) {
         return tier.getSerializedName() + "_" + type.getSerializedName() + "_conduit";
+    }
+
+    // Like the Geothermal Plant: metal, needs a pickaxe, glows while lit.
+    private static BlockBehaviour.Properties machineProperties(BlockBehaviour.Properties p, int litLight) {
+        return p.mapColor(MapColor.METAL)
+                .strength(3.5F, 6.0F)
+                .requiresCorrectToolForDrops()
+                .sound(SoundType.METAL)
+                .lightLevel(state -> state.getValue(MachineBlock.LIT) ? litLight : 0);
     }
 
     private static BlockBehaviour.Properties furnaceBrickProperties(BlockBehaviour.Properties p) {

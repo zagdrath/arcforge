@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": "#c:ingots/copper",
+    "F": "minecraft:furnace",
+    "I": "#c:ingots/iron",
+    "R": "#c:dusts/redstone"
+  },
+  "pattern": [
+    "III",
+    "RFR",
+    "ICI"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:combustion_generator"
+  }
+}

@@ -22,7 +22,7 @@ public class ConduitRenderState extends BlockEntityRenderState {
     public final ConnectionMode[] sides = new ConnectionMode[Direction.values().length];
     public Direction.@Nullable Axis straight;
 
-    // Liquid conduits.
+    // Fluid conduits.
     public @Nullable TextureAtlasSprite fluidSprite;
     public int fluidColor = -1;
     public int fluidLight;

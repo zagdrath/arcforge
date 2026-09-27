@@ -8,71 +8,42 @@ package net.zagdrath.arcforge.heat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.tags.FluidTags;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.FluidState;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 
-// Heat values for every Geothermal Plant heat source, and the heat -> FE conversion.
-// Ranking: lava > coal > charcoal. Passive lava source heat stacks on top of the combustion chamber.
+// The Geothermal Plant's heat sources: lava drained from its tank, plus passive heat from touching
+// lava source blocks and magma blocks (which are never consumed).
 public final class GeothermalHeat {
     private GeothermalHeat() {}
 
-    public static boolean isSolidFuel(ItemStack stack) {
-        return solidFuelHeat(stack) > 0;
-    }
+    // What touches the plant, counted every so often.
+    public record Surroundings(int lavaSources, int magmaBlocks) {
+        public static final Surroundings NONE = new Surroundings(0, 0);
 
-    // HU produced while this item burns, or 0 if it is not a valid fuel.
-    public static int solidFuelHeat(ItemStack stack) {
-        if (stack.is(Items.COAL) || stack.is(Items.COAL_BLOCK)) return ArcforgeConfig.GEOTHERMAL_COAL_HEAT.getAsInt();
-        if (stack.is(Items.CHARCOAL)) return ArcforgeConfig.GEOTHERMAL_CHARCOAL_HEAT.getAsInt();
-        return 0;
-    }
-
-    // Ticks one item of this fuel burns for. A block of coal lasts coalBlockMultiplier times as long as coal.
-    public static int solidFuelBurnTicks(ItemStack stack) {
-        int ticks = ArcforgeConfig.GEOTHERMAL_SOLID_FUEL_BURN_TICKS.getAsInt();
-        if (stack.is(Items.COAL_BLOCK)) {
-            return (int) Math.round(ticks * ArcforgeConfig.GEOTHERMAL_COAL_BLOCK_MULTIPLIER.getAsDouble());
+        public int passiveHeat() {
+            return lavaSources * ArcforgeConfig.GEOTHERMAL_LAVA_SOURCE_HEAT.getAsInt()
+                    + magmaBlocks * ArcforgeConfig.GEOTHERMAL_MAGMA_HEAT.getAsInt();
         }
-        return ticks;
     }
 
     public static int lavaHeat() {
         return ArcforgeConfig.GEOTHERMAL_LAVA_HEAT.getAsInt();
     }
 
-    public static int passiveHeat(int adjacentLavaSources) {
-        return adjacentLavaSources * ArcforgeConfig.GEOTHERMAL_LAVA_SOURCE_HEAT.getAsInt();
-    }
-
-    // Highest heat the plant can ever reach: the hottest combustion fuel plus lava sources on all 6 sides.
-    // The GUI heat gauge scales against this, so a fully-fed plant reads as full.
-    public static int maxHeat() {
-        int hottestFuel = Math.max(lavaHeat(), Math.max(
-                ArcforgeConfig.GEOTHERMAL_COAL_HEAT.getAsInt(),
-                ArcforgeConfig.GEOTHERMAL_CHARCOAL_HEAT.getAsInt()));
-        return Math.max(1, hottestFuel + passiveHeat(Direction.values().length));
-    }
-
-    public static int toFePerTick(int heat) {
-        return heat * ArcforgeConfig.GEOTHERMAL_FE_PER_HEAT.getAsInt();
-    }
-
-    // Display temperature: ambient 20°C plus 10°C per HU (lava alone reads 420°C).
-    public static int toCelsius(int heat) {
-        return 20 + heat * 10;
-    }
-
-    public static int countAdjacentLavaSources(Level level, BlockPos pos) {
-        int count = 0;
+    public static Surroundings scan(Level level, BlockPos pos) {
+        int lava = 0;
+        int magma = 0;
         for (Direction direction : Direction.values()) {
-            FluidState fluid = level.getFluidState(pos.relative(direction));
+            BlockPos neighbour = pos.relative(direction);
+            FluidState fluid = level.getFluidState(neighbour);
             if (fluid.isSource() && fluid.is(FluidTags.LAVA)) {
-                count++;
+                lava++;
+            } else if (level.getBlockState(neighbour).is(Blocks.MAGMA_BLOCK)) {
+                magma++;
             }
         }
-        return count;
+        return new Surroundings(lava, magma);
     }
 }

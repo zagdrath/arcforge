@@ -13,7 +13,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
+import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
 import net.zagdrath.arcforge.menu.storage.EnergyCellMenu;
@@ -24,6 +26,15 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<GeothermalPlantMenu>> GEOTHERMAL_PLANT = MENU_TYPES.register("geothermal_plant",
             () -> IMenuTypeExtension.create(GeothermalPlantMenu::new));
+
+    public static final Supplier<MenuType<BurnerMenu>> COMBUSTION_GENERATOR = MENU_TYPES.register("combustion_generator",
+            () -> IMenuTypeExtension.create(BurnerMenu::combustionGenerator));
+
+    public static final Supplier<MenuType<BurnerMenu>> FIREBOX = MENU_TYPES.register("firebox",
+            () -> IMenuTypeExtension.create(BurnerMenu::firebox));
+
+    public static final Supplier<MenuType<ThermoelectricPlantMenu>> THERMOELECTRIC_PLANT = MENU_TYPES.register("thermoelectric_plant",
+            () -> IMenuTypeExtension.create(ThermoelectricPlantMenu::new));
 
     public static final Supplier<MenuType<FluidTankMenu>> FLUID_TANK = MENU_TYPES.register("fluid_tank",
             () -> IMenuTypeExtension.create(FluidTankMenu::new));

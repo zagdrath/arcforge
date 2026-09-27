@@ -26,6 +26,9 @@ public final class ModCreativeTabs {
             .icon(() -> ModItems.GEOTHERMAL_PLANT.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.GEOTHERMAL_PLANT.get());
+                output.accept(ModItems.COMBUSTION_GENERATOR.get());
+                output.accept(ModItems.FIREBOX.get());
+                output.accept(ModItems.THERMOELECTRIC_PLANT.get());
                 output.accept(ModItems.CARBONIZER.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_PORT.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_BRICKS.get());

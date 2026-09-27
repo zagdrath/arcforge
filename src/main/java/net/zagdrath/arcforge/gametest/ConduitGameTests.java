@@ -29,6 +29,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidStacksResourceHandler;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
@@ -178,15 +179,15 @@ final class ConduitGameTests {
         return count;
     }
 
-    // Liquid moves from one tank to another; source + conduits + sink always add up.
-    static void liquidTransfer(GameTestHelper helper) {
+    // Fluid moves from one tank to another; source + conduits + sink always add up.
+    static void fluidTransfer(GameTestHelper helper) {
         BlockPos source = new BlockPos(0, 1, 0);
         BlockPos sink = new BlockPos(4, 1, 0);
         TestFixtures.reset(helper.absolutePos(source));
         TestFixtures.reset(helper.absolutePos(sink));
         helper.setBlock(source, Blocks.TARGET);
         helper.setBlock(sink, Blocks.TARGET);
-        placeRun(helper, ConduitType.LIQUID, ConduitTier.WROUGHT, 3);
+        placeRun(helper, ConduitType.FLUID, ConduitTier.WROUGHT, 3);
         setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
         setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, SideSetting.INPUT);
         var from = TestFixtures.tank(helper.absolutePos(source));
@@ -195,20 +196,20 @@ final class ConduitGameTests {
 
         helper.onEachTick(() -> {
             int total = fluidIn(from) + fluidIn(to) + fluidInConduits(helper, 3);
-            helper.assertTrue(total == 4_000, "Liquid not conserved: " + total + " mB");
+            helper.assertTrue(total == 4_000, "Fluid not conserved: " + total + " mB");
         });
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(fluidIn(to) == 4_000, "Sink has " + fluidIn(to) + " mB"))
-                .thenExecute(() -> helper.assertTrue(fluidInConduits(helper, 3) == 0, "Conduits still hold liquid"))
+                .thenExecute(() -> helper.assertTrue(fluidInConduits(helper, 3) == 0, "Conduits still hold fluid"))
                 .thenSucceed();
     }
 
-    // Breaking a conduit in a filled network splits it in two without creating or losing liquid.
-    static void liquidSplit(GameTestHelper helper) {
+    // Breaking a conduit in a filled network splits it in two without creating or losing fluid.
+    static void fluidSplit(GameTestHelper helper) {
         BlockPos source = new BlockPos(0, 1, 0);
         TestFixtures.reset(helper.absolutePos(source));
         helper.setBlock(source, Blocks.TARGET);
-        placeRun(helper, ConduitType.LIQUID, ConduitTier.ARCFORGED, 5);
+        placeRun(helper, ConduitType.FLUID, ConduitTier.ARCFORGED, 5);
         setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
         var from = TestFixtures.tank(helper.absolutePos(source));
         from.set(0, FluidResource.of(Fluids.LAVA), 3_000);
@@ -235,8 +236,9 @@ final class ConduitGameTests {
     // The wrench then cycles that side auto -> input -> output -> disabled (backwards when sneaking),
     // and a conduit-to-conduit joint stays disconnected after neighbour updates.
     static void wrenchConduit(GameTestHelper helper) {
-        BlockPos plant = new BlockPos(0, 1, 0);
-        helper.setBlock(plant, ModBlocks.GEOTHERMAL_PLANT.get());
+        BlockPos generator = new BlockPos(0, 1, 0);
+        helper.setBlock(generator, ModBlocks.COMBUSTION_GENERATOR.get());
+        helper.getBlockEntity(generator, CombustionGeneratorBlockEntity.class).setSideMode(RelativeSide.LEFT, SideMode.ENERGY);
         placeRun(helper, ConduitType.ENERGY, ConduitTier.WROUGHT, 2);
         BlockPos first = new BlockPos(1, 1, 0);
         BlockPos second = new BlockPos(2, 1, 0);
@@ -244,7 +246,7 @@ final class ConduitGameTests {
         Vec3 westArm = new Vec3(-0.4, 0, 0);
         Vec3 eastArm = new Vec3(0.4, 0, 0);
 
-        // The plant faces north, so its east face is its left side, which defaults to energy output.
+        // The generator faces north, so its east face is its left side, set to energy output.
         helper.assertTrue(sideOf(helper, first, Direction.WEST) == ConnectionMode.OUTPUT,
                 "Auto side is " + sideOf(helper, first, Direction.WEST) + ", expected OUTPUT");
         ConnectionMode[] expected = { ConnectionMode.INPUT, ConnectionMode.OUTPUT, ConnectionMode.NONE, ConnectionMode.OUTPUT };
@@ -274,20 +276,21 @@ final class ConduitGameTests {
         helper.succeed();
     }
 
-    // With no wrench configuration, a plant's energy side feeds a buffer at the other end, and changing
-    // the plant's side configuration disconnects the conduit.
+    // With no wrench configuration, a generator's energy side feeds a buffer at the other end, and changing
+    // the generator's side configuration disconnects the conduit.
     static void autoConnect(GameTestHelper helper) {
         BlockPos plantPos = new BlockPos(0, 1, 0);
         BlockPos sink = new BlockPos(4, 1, 0);
         TestFixtures.reset(helper.absolutePos(sink));
-        helper.setBlock(plantPos, ModBlocks.GEOTHERMAL_PLANT.get());
+        helper.setBlock(plantPos, ModBlocks.COMBUSTION_GENERATOR.get());
         helper.setBlock(sink, Blocks.LODESTONE);
+        CombustionGeneratorBlockEntity plant = helper.getBlockEntity(plantPos, CombustionGeneratorBlockEntity.class);
+        plant.setSideMode(RelativeSide.LEFT, SideMode.ENERGY);
         placeRun(helper, ConduitType.ENERGY, ConduitTier.WROUGHT, 3);
-        GeothermalPlantBlockEntity plant = helper.getBlockEntity(plantPos, GeothermalPlantBlockEntity.class);
         ((GeneratorEnergyHandler) plant.getEnergyHandler(null)).generate(5_000);
         var to = TestFixtures.energy(helper.absolutePos(sink));
 
-        helper.assertTrue(sideOf(helper, new BlockPos(1, 1, 0), Direction.WEST) == ConnectionMode.OUTPUT, "Conduit does not pull from the plant");
+        helper.assertTrue(sideOf(helper, new BlockPos(1, 1, 0), Direction.WEST) == ConnectionMode.OUTPUT, "Conduit does not pull from the generator");
         helper.assertTrue(sideOf(helper, new BlockPos(3, 1, 0), Direction.EAST) == ConnectionMode.INPUT, "Conduit does not push into the buffer");
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(to.getAmountAsInt() == 5_000, "Sink has " + to.getAmountAsInt()))
@@ -384,7 +387,7 @@ final class ConduitGameTests {
         GeothermalPlantBlockEntity plant = helper.getBlockEntity(pos, GeothermalPlantBlockEntity.class);
         try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
             plant.getInteractionFluidHandler().insert(FluidResource.of(Fluids.LAVA), 3_000, tx);
-            plant.getItemHandler(null).insert(ItemResource.of(Items.COAL), 5, tx);
+            plant.getItemHandler(null).insert(ItemResource.of(Items.LAVA_BUCKET), 1, tx);
             tx.commit();
         }
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
@@ -395,10 +398,10 @@ final class ConduitGameTests {
         player.setShiftKeyDown(true);
         useWrench(helper, player, pos, new Vec3(0, 0.5, 0));
         helper.assertBlockNotPresent(ModBlocks.GEOTHERMAL_PLANT.get(), pos);
-        // The plant drops as an item carrying its lava, and the coal in its slot drops beside it.
+        // The plant drops as an item carrying its lava, and the lava bucket in its slot drops beside it.
         var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
-        helper.assertTrue(drops.size() == 2, "Expected the plant and its coal, got " + drops.size() + " drops");
-        helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().is(Items.COAL) && drop.getItem().getCount() == 5), "Coal in the slot did not drop");
+        helper.assertTrue(drops.size() == 2, "Expected the plant and its lava bucket, got " + drops.size() + " drops");
+        helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().is(Items.LAVA_BUCKET)), "Lava bucket in the slot did not drop");
         ItemStack dropped = drops.stream().filter(drop -> drop.getItem().is(ModBlocks.GEOTHERMAL_PLANT.get().asItem())).findFirst().orElseThrow().getItem();
         helper.assertTrue(dropped.has(DataComponents.BLOCK_ENTITY_DATA), "Dropped machine has no saved data");
 
@@ -407,7 +410,7 @@ final class ConduitGameTests {
         BlockItem.updateCustomBlockEntityTag(helper.getLevel(), player, helper.absolutePos(pos), dropped);
         GeothermalPlantBlockEntity restored = helper.getBlockEntity(pos, GeothermalPlantBlockEntity.class);
         int lava = restored.getInteractionFluidHandler().getAmountAsInt(0);
-        helper.assertTrue(restored.getItemHandler(null).getAmountAsInt(GeothermalPlantBlockEntity.SLOT_INPUT) == 0, "Placed plant got its coal back (duplicated)");
+        helper.assertTrue(restored.getItemHandler(null).getAmountAsInt(GeothermalPlantBlockEntity.SLOT_INPUT) == 0, "Placed plant got its lava bucket back (duplicated)");
         helper.assertTrue(lava == 3_000, "Restored plant has " + lava + " mB of lava");
         helper.succeed();
     }

@@ -35,7 +35,7 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.item.ItemPacket;
 
-// Draws what is inside glass conduits: the liquid (filled to its level) or the items travelling through.
+// Draws what is inside glass conduits: the fluid (filled to its level) or the items travelling through.
 // The glass itself comes from the block model.
 public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, ConduitRenderState> {
     private static final float ITEM_SCALE = 0.3F;
@@ -81,7 +81,7 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
             int tint = model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(fluid) : -1;
             state.fluidColor = tint | 0xFF000000;
             state.fluidLight = LightCoordsUtil.lightCoordsWithEmission(state.lightCoords, fluid.getFluidType().getLightLevel());
-            state.fill = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.LIQUID_CAPACITY_PER_CONDUIT);
+            state.fill = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.FLUID_CAPACITY_PER_CONDUIT);
         }
 
         state.items.clear();
@@ -121,7 +121,7 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
         }
     }
 
-    // --- Liquid ---
+    // --- Fluid ---
 
     // Horizontal runs fill from the bottom; vertical runs fill their whole cross-section.
     private static void drawFluid(ConduitRenderState state, PoseStack.Pose pose, VertexConsumer buffer) {

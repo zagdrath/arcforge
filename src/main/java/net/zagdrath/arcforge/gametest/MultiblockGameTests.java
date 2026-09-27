@@ -126,8 +126,9 @@ public final class MultiblockGameTests {
                     BlockPos pos = new BlockPos(x, y, z);
                     boolean corner = x != 1 && z != 1;
                     if (x == 1 && z == 1) {
-                        // The test area's barrier walls can reach into the stack, which must be empty.
-                        helper.setBlock(pos, Blocks.AIR);
+                        // A brick hearth at the bottom; above it the stack must be empty (the test
+                        // area's barrier walls can reach into it).
+                        helper.setBlock(pos, y == 1 ? ModBlocks.ARCFORGE_FURNACE_BRICKS.get().defaultBlockState() : Blocks.AIR.defaultBlockState());
                         continue;
                     }
                     if (y == 1 && x == 1 && z == 0) {
@@ -140,7 +141,7 @@ public final class MultiblockGameTests {
         }
     }
 
-    // The cross pattern forms; a top brick then accepts items from above; losing a wall breaks it.
+    // The cross pattern forms; a top brick then accepts items from above; losing a wall or the hearth breaks it.
     public static void furnaceForms(GameTestHelper helper) {
         buildFurnace(helper);
         helper.startSequence()
@@ -160,6 +161,17 @@ public final class MultiblockGameTests {
                 .thenIdle(2)
                 .thenExecute(() -> helper.assertTrue(!helper.getBlockEntity(new BlockPos(1, 1, 0), ArcforgeFurnaceBlockEntity.class).isFormed(),
                         "Furnace still formed without a corner wall"))
+                .thenExecute(() -> {
+                    helper.setBlock(new BlockPos(2, 4, 2), ModBlocks.ARCFORGE_FURNACE_BRICK_WALL.get());
+                    helper.setBlock(new BlockPos(1, 1, 1), Blocks.AIR);
+                })
+                .thenIdle(25)
+                .thenExecute(() -> helper.assertTrue(!helper.getBlockEntity(new BlockPos(1, 1, 0), ArcforgeFurnaceBlockEntity.class).isFormed(),
+                        "Furnace formed without its hearth brick"))
+                .thenExecute(() -> helper.setBlock(new BlockPos(1, 1, 1), ModBlocks.ARCFORGE_FURNACE_BRICKS.get()))
+                .thenIdle(25)
+                .thenExecute(() -> helper.assertTrue(helper.getBlockEntity(new BlockPos(1, 1, 0), ArcforgeFurnaceBlockEntity.class).isFormed(),
+                        "Furnace did not re-form with its hearth brick back"))
                 .thenSucceed();
     }
 

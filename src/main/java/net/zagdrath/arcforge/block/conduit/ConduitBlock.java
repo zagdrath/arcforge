@@ -178,7 +178,7 @@ public class ConduitBlock extends BaseEntityBlock {
 
     // Decides a side's connection from its wrench setting:
     //  - a same-type conduit connects unless either end is disabled
-    //    (or, for liquid conduits, the two hold different liquids);
+    //    (or, for fluid conduits, the two hold different fluids);
     //  - next to anything else, auto asks the block (see ConduitCapabilities.autoMode), a forced
     //    input/output applies while the block has the capability, and disabled never connects;
     //  - once the neighbour is gone (air) the setting goes back to auto.
@@ -191,7 +191,7 @@ public class ConduitBlock extends BaseEntityBlock {
         if (neighbourState.getBlock() instanceof ConduitBlock other && other.conduitType == conduitType) {
             ConduitBlockEntity neighbour = level.getBlockEntity(neighbourPos) instanceof ConduitBlockEntity be ? be : null;
             boolean disabled = setting == SideSetting.DISABLED || (neighbour != null && neighbour.isSideDisabled(side.getOpposite()));
-            if (disabled || hasConflictingLiquids(own, neighbour)) {
+            if (disabled || hasConflictingFluids(own, neighbour)) {
                 return ConnectionMode.NONE;
             }
             return ConnectionMode.PIPE;
@@ -215,8 +215,8 @@ public class ConduitBlock extends BaseEntityBlock {
         };
     }
 
-    // A liquid network carries one fluid at a time, so conduits holding different fluids stay apart.
-    private static boolean hasConflictingLiquids(@Nullable ConduitBlockEntity a, @Nullable ConduitBlockEntity b) {
+    // A fluid network carries one fluid at a time, so conduits holding different fluids stay apart.
+    private static boolean hasConflictingFluids(@Nullable ConduitBlockEntity a, @Nullable ConduitBlockEntity b) {
         if (a == null || b == null) {
             return false;
         }
@@ -235,7 +235,7 @@ public class ConduitBlock extends BaseEntityBlock {
         }
     }
 
-    // Re-evaluates every side, e.g. after a liquid network empties and can now merge with its neighbours.
+    // Re-evaluates every side, e.g. after a fluid network empties and can now merge with its neighbours.
     public static void refreshConnections(Level level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
         if (!(state.getBlock() instanceof ConduitBlock conduit)) {

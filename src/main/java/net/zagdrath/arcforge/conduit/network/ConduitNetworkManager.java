@@ -127,7 +127,7 @@ public final class ConduitNetworkManager {
         return switch (startBlock.getConduitType()) {
             case ENERGY -> new EnergyConduitNetwork(level, members, visited, tier);
             case THERMAL -> new ThermalConduitNetwork(level, members, visited, tier);
-            case LIQUID -> new LiquidConduitNetwork(level, members, visited, tier);
+            case FLUID -> new FluidConduitNetwork(level, members, visited, tier);
             case ITEM -> new ItemConduitNetwork(level, members, visited, tier);
         };
     }

@@ -37,11 +37,11 @@ import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // Per-block conduit state: the wrench setting of each side, plus what this conduit holds (its share of
-// the network's energy/heat/liquid, items in transit and items stored). All transfer logic lives in
+// the network's energy/heat/fluid, items in transit and items stored). All transfer logic lives in
 // ConduitNetworkManager.
 public class ConduitBlockEntity extends BlockEntity {
-    // Liquid and item conduits sync their contents to clients at most this often.
-    private static final int LIQUID_SYNC_INTERVAL = 5;
+    // Fluid and item conduits sync their contents to clients at most this often.
+    private static final int CONTENTS_SYNC_INTERVAL = 5;
 
     private final SideSetting[] settings = new SideSetting[Direction.values().length];
     private final List<ItemPacket> packets = new ArrayList<>();
@@ -53,7 +53,7 @@ public class ConduitBlockEntity extends BlockEntity {
     private float itemSpeed;
     private boolean syncPending;
     // Game time is never negative, so the first sync is always allowed. (Long.MIN_VALUE would overflow the subtraction.)
-    private long lastSyncTick = -LIQUID_SYNC_INTERVAL;
+    private long lastSyncTick = -CONTENTS_SYNC_INTERVAL;
 
     public ConduitBlockEntity(BlockPos pos, BlockState state) {
         super(typeFor(state), pos, state);
@@ -163,7 +163,7 @@ public class ConduitBlockEntity extends BlockEntity {
         }
     }
 
-    // --- Liquid share of the network tank ---
+    // --- Fluid share of the network tank ---
 
     public FluidStack getFluid() {
         return fluid;
@@ -177,7 +177,7 @@ public class ConduitBlockEntity extends BlockEntity {
     }
 
     // Records a content change. Items sync right away so clients see packets enter and leave;
-    // liquid levels change every tick and are throttled.
+    // fluid levels change every tick and are throttled.
     public void markContentsChanged(boolean immediate) {
         setChanged();
         if (!getConduitType().isTransparent()) {
@@ -195,7 +195,7 @@ public class ConduitBlockEntity extends BlockEntity {
             return;
         }
         long now = level.getGameTime();
-        if (force || now - lastSyncTick >= LIQUID_SYNC_INTERVAL) {
+        if (force || now - lastSyncTick >= CONTENTS_SYNC_INTERVAL) {
             syncPending = false;
             lastSyncTick = now;
             level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
@@ -228,8 +228,8 @@ public class ConduitBlockEntity extends BlockEntity {
     }
 
     // Items in transit are dropped when the conduit is broken; they are never deleted.
-    // Liquid moves into the connected neighbours, which pool it when their network is rebuilt
-    // (only liquid beyond the remaining network's capacity is lost).
+    // Fluid moves into the connected neighbours, which pool it when their network is rebuilt
+    // (only fluid beyond the remaining network's capacity is lost).
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);

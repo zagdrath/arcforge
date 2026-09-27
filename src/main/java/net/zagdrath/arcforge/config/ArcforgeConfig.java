@@ -12,60 +12,126 @@ public class ArcforgeConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     static {
-        BUILDER.comment("Geothermal Plant: converts heat (HU) into Forge Energy (FE).").push("geothermalPlant");
+        BUILDER.comment("Heat (HU) shared by every heat machine. A machine's temperature rises from 20°C when its heat",
+                "buffer is empty to its maximum temperature when full, and heat only flows from hotter to colder.").push("heat");
     }
 
-    public static final ModConfigSpec.IntValue GEOTHERMAL_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
+    public static final ModConfigSpec.IntValue HEAT_CONTACT_RATE = BUILDER
+            .comment("Most HU/t a heat face pushes into a touching machine's heat face (without a thermodynamic conduit).")
+            .defineInRange("contactTransferRate", 100, 1, 1_000_000);
 
-    public static final ModConfigSpec.IntValue GEOTHERMAL_MAX_OUTPUT = BUILDER
-            .comment("Maximum FE/t pushed into neighbouring energy receivers (shared across all sides).")
-            .defineInRange("maxEnergyOutput", 1_000, 1, 1_000_000_000);
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Geothermal Plant: turns lava into heat (HU). It makes no FE; feed its heat to a Thermoelectric Plant.")
+                .push("geothermalPlant");
+    }
+
+    public static final ModConfigSpec.IntValue GEOTHERMAL_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 20_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue GEOTHERMAL_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 600, 21, 10_000);
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_TANK_CAPACITY = BUILDER
             .comment("Internal lava tank capacity in mB.")
             .defineInRange("lavaTankCapacity", 8_000, 1_000, 1_000_000);
 
-    public static final ModConfigSpec.IntValue GEOTHERMAL_FE_PER_HEAT = BUILDER
-            .comment("FE/t produced per heat unit (HU). This is the single heat -> FE conversion factor.")
-            .defineInRange("fePerHeat", 2, 1, 10_000);
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_HEAT_RATE = BUILDER
-            .comment("How many HU the plant heats up or cools down per tick while approaching its target heat.")
-            .defineInRange("heatChangePerTick", 1, 1, 10_000);
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_SOURCE_HEAT = BUILDER
-            .comment("Passive HU from each adjacent lava source block (all 6 sides count; blocks are never consumed).")
-            .defineInRange("lavaSourceHeat", 5, 0, 10_000);
-
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_HEAT = BUILDER
-            .comment("HU while burning lava from the internal tank.")
-            .defineInRange("lavaCombustionHeat", 40, 0, 10_000);
+            .comment("HU/t made while lava drains from the tank (at 1 mB/t).")
+            .defineInRange("lavaHeat", 20, 0, 10_000);
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_PER_BURN = BUILDER
-            .comment("mB of lava consumed per lava burn cycle.")
-            .defineInRange("lavaPerBurn", 50, 1, 1_000);
+            .comment("mB of lava taken from the tank at a time; it then drains at 1 mB/t (the GUI flame shows what's left).")
+            .defineInRange("lavaPerBurn", 100, 1, 1_000);
 
-    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_BURN_TICKS = BUILDER
-            .comment("Ticks one lava burn cycle lasts.")
-            .defineInRange("lavaBurnTicks", 100, 1, 32_000);
+    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_SOURCE_HEAT = BUILDER
+            .comment("Passive HU/t from each touching lava source block (all 6 sides count; blocks are never consumed).")
+            .defineInRange("lavaSourceHeat", 3, 0, 10_000);
 
-    public static final ModConfigSpec.IntValue GEOTHERMAL_COAL_HEAT = BUILDER
-            .comment("HU while burning coal.")
-            .defineInRange("coalHeat", 20, 0, 10_000);
+    public static final ModConfigSpec.IntValue GEOTHERMAL_MAGMA_HEAT = BUILDER
+            .comment("Passive HU/t from each touching magma block (never consumed).")
+            .defineInRange("magmaHeat", 1, 0, 10_000);
 
-    public static final ModConfigSpec.IntValue GEOTHERMAL_CHARCOAL_HEAT = BUILDER
-            .comment("HU while burning charcoal.")
-            .defineInRange("charcoalHeat", 15, 0, 10_000);
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Combustion Generator: burns coal, charcoal and coal blocks (#arcforge:combustion_fuel) straight into FE.")
+                .push("combustionGenerator");
+    }
 
-    public static final ModConfigSpec.IntValue GEOTHERMAL_SOLID_FUEL_BURN_TICKS = BUILDER
-            .comment("Ticks one piece of coal or charcoal burns for (vanilla furnace value is 1600).")
-            .defineInRange("solidFuelBurnTicks", 1_600, 1, 32_000);
+    public static final ModConfigSpec.IntValue GENERATOR_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
 
-    public static final ModConfigSpec.DoubleValue GEOTHERMAL_COAL_BLOCK_MULTIPLIER = BUILDER
-            .comment("A block of coal burns at coal heat for this many times as long as one coal (9 coal, plus a bonus).")
-            .defineInRange("coalBlockMultiplier", 9.5, 1.0, 100.0);
+    public static final ModConfigSpec.IntValue GENERATOR_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t made while burning.")
+            .defineInRange("energyPerTick", 40, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GENERATOR_MAX_OUTPUT = BUILDER
+            .comment("Most FE/t pushed out of energy faces (shared across them).")
+            .defineInRange("maxEnergyOutput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.DoubleValue GENERATOR_BURN_SPEED = BUILDER
+            .comment("How much faster than a vanilla furnace fuel burns (2 = coal lasts 800 ticks instead of 1,600).")
+            .defineInRange("burnSpeed", 2.0, 0.1, 100.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Firebox: burns coal, charcoal and coal blocks (#arcforge:combustion_fuel) into heat (HU).")
+                .push("firebox");
+    }
+
+    public static final ModConfigSpec.IntValue FIREBOX_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_100, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_HEAT_PER_TICK = BUILDER
+            .comment("HU/t made while burning.")
+            .defineInRange("heatPerTick", 40, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue FIREBOX_BURN_SPEED = BUILDER
+            .comment("How much faster than a vanilla furnace fuel burns (1 = coal lasts 1,600 ticks).")
+            .defineInRange("burnSpeed", 1.0, 0.1, 100.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Thermoelectric Plant: turns heat (HU) into FE. The hotter it runs, the more FE each HU gives.")
+                .push("thermoelectricPlant");
+    }
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 20_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_100, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_HEAT_THROUGHPUT = BUILDER
+            .comment("Most HU/t it takes in, and the HU/t it converts when its buffer is full (it converts",
+                    "in proportion to how full the buffer is, so it has to warm up).")
+            .defineInRange("heatThroughput", 40, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_MIN_TEMPERATURE = BUILDER
+            .comment("Temperature at which efficiency is 0%, in °C.")
+            .defineInRange("zeroEfficiencyTemperature", 100, 0, 10_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_FULL_TEMPERATURE = BUILDER
+            .comment("Temperature at which efficiency reaches 100% (1 FE per HU), in °C.")
+            .defineInRange("fullEfficiencyTemperature", 1_100, 1, 10_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_MAX_OUTPUT = BUILDER
+            .comment("Most FE/t pushed out of energy faces (shared across them).")
+            .defineInRange("maxEnergyOutput", 200, 1, 1_000_000_000);
 
     static {
         BUILDER.pop();

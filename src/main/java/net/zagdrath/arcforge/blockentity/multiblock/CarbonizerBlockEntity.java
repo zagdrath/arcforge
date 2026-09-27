@@ -549,7 +549,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
         return switch (type) {
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case LIQUID -> mode == SideMode.BYPRODUCT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case FLUID -> mode == SideMode.BYPRODUCT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             default -> ConnectionMode.NONE;
         };
     }

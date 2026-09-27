@@ -33,7 +33,7 @@ public class ConduitBlockItem extends BlockItem {
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
         builder.accept(tier.describeThroughput(conduitType).copy().withStyle(ChatFormatting.GRAY));
         Component buffer = switch (conduitType) {
-            case LIQUID -> Component.translatable("tooltip.arcforge.conduit.buffer", String.format("%,d", ConduitTier.LIQUID_CAPACITY_PER_CONDUIT));
+            case FLUID -> Component.translatable("tooltip.arcforge.conduit.buffer", String.format("%,d", ConduitTier.FLUID_CAPACITY_PER_CONDUIT));
             case ENERGY -> Component.translatable("tooltip.arcforge.conduit.buffer.energy", String.format("%,d", tier.energyPerTick()));
             case THERMAL -> Component.translatable("tooltip.arcforge.conduit.buffer.thermal", String.format("%,d", tier.heatPerTick()));
             case ITEM -> Component.translatable("tooltip.arcforge.conduit.buffer.item", ConduitTier.ITEM_STORAGE_SLOTS);

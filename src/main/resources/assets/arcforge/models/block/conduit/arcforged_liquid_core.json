@@ -1,8 +1,0 @@
-{
-  "parent": "arcforge:block/conduit/base_liquid_core",
-  "textures": {
-    "conduit": "arcforge:block/conduit/arcforged_liquid",
-    "port_in": "arcforge:block/conduit/port_input",
-    "port_out": "arcforge:block/conduit/port_output"
-  }
-}

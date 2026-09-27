@@ -138,7 +138,7 @@ final class StorageGameTests {
         helper.setBlock(cellPos, ModBlocks.energyCell(ConduitTier.WROUGHT).get());
         var plant = helper.getBlockEntity(plantPos, net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity.class);
         try (Transaction tx = Transaction.openRoot()) {
-            plant.getItemHandler(null).insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.COAL), 5, tx);
+            plant.getItemHandler(null).insert(net.neoforged.neoforge.transfer.item.ItemResource.of(Items.LAVA_BUCKET), 1, tx);
             tx.commit();
         }
         helper.getBlockEntity(tankPos, FluidTankBlockEntity.class).getItems().setStack(StorageBlockEntity.SLOT_OUT, new ItemStack(Items.BUCKET, 3));
@@ -162,7 +162,7 @@ final class StorageGameTests {
         for (var entity : helper.getEntities(EntityTypes.ITEM, new BlockPos(2, 1, 0), 6.0)) {
             counts.merge(entity.getItem().getItem(), entity.getItem().getCount(), Integer::sum);
         }
-        helper.assertTrue(counts.getOrDefault(Items.COAL, 0) == 5, "Plant dropped " + counts.getOrDefault(Items.COAL, 0) + " coal; drops " + counts);
+        helper.assertTrue(counts.getOrDefault(Items.LAVA_BUCKET, 0) == 1, "Plant dropped " + counts.getOrDefault(Items.LAVA_BUCKET, 0) + " lava buckets; drops " + counts);
         helper.assertTrue(counts.getOrDefault(Items.BUCKET, 0) == 3, "Tank dropped " + counts.getOrDefault(Items.BUCKET, 0) + " buckets; drops " + counts);
         helper.assertTrue(counts.getOrDefault(Items.DIAMOND, 0) == 2, "Cell dropped " + counts.getOrDefault(Items.DIAMOND, 0) + " diamonds; drops " + counts);
         helper.succeed();

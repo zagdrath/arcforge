@@ -15,7 +15,10 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.blockentity.machine.CombustionGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
@@ -38,14 +41,24 @@ public final class ModCapabilities {
     }
 
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.GEOTHERMAL_PLANT.get(),
-                GeothermalPlantBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GEOTHERMAL_PLANT.get(),
                 GeothermalPlantBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.GEOTHERMAL_PLANT.get(),
                 GeothermalPlantBlockEntity::getItemHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.GEOTHERMAL_PLANT.get(),
                 GeothermalPlantBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.COMBUSTION_GENERATOR.get(),
+                CombustionGeneratorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.COMBUSTION_GENERATOR.get(),
+                CombustionGeneratorBlockEntity::getItemHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.FIREBOX.get(),
+                FireboxBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FIREBOX.get(),
+                FireboxBlockEntity::getItemHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),
+                ThermoelectricPlantBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),
+                ThermoelectricPlantBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FLUID_TANK.get(),
                 FluidTankBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(),

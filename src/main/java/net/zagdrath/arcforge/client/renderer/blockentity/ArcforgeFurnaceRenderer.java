@@ -62,18 +62,18 @@ public class ArcforgeFurnaceRenderer implements BlockEntityRenderer<ArcforgeFurn
         if (sprite == null) {
             return;
         }
-        // The pool sits in the hollow centre, one block behind the port.
+        // The pool sits on the hearth brick at the bottom of the stack: one block behind the port and one up.
         poseStack.pushPose();
-        poseStack.translate(-state.facing.getStepX(), 0.0F, -state.facing.getStepZ());
+        poseStack.translate(-state.facing.getStepX(), 1.0F, -state.facing.getStepZ());
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()),
                 (pose, buffer) -> FluidBoxes.box(pose, buffer, sprite, 0xFFFFFFFF, LightCoordsUtil.FULL_BRIGHT,
-                        INSET, INSET, INSET, 1.0F - INSET, DEPTH, 1.0F - INSET));
+                        INSET, 0.0F, INSET, 1.0F - INSET, DEPTH, 1.0F - INSET));
         poseStack.popPose();
     }
 
     @Override
     public AABB getRenderBoundingBox(ArcforgeFurnaceBlockEntity furnace) {
         BlockPos pos = furnace.getBlockPos();
-        return new AABB(pos).inflate(1.0, 0.0, 1.0);
+        return new AABB(pos).inflate(1.0, 0.0, 1.0).expandTowards(0.0, 1.0, 0.0);
     }
 }

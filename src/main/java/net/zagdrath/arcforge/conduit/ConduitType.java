@@ -12,11 +12,11 @@ import net.minecraft.util.StringRepresentable;
 public enum ConduitType implements StringRepresentable {
     ENERGY("energy", true),
     ITEM("item", false),
-    LIQUID("liquid", false),
+    FLUID("fluid", false),
     THERMAL("thermal", true);
 
     private final String name;
-    // Energy and thermal conduits glow while moving their resource; item and liquid conduits are glass.
+    // Energy and thermal conduits glow while moving their resource; item and fluid conduits are glass.
     private final boolean hasActiveState;
 
     ConduitType(String name, boolean hasActiveState) {

@@ -149,6 +149,9 @@ public final class CarbonizerStructure {
         Direction row = formation.rowDirection();
         Direction facing = formation.facing();
         BlockPos master = formation.master();
+        // Rechecking a structure that's already built this way (e.g. after a wrench click) isn't news.
+        boolean unchanged = level.getBlockEntity(master) instanceof CarbonizerBlockEntity current
+                && current.isFormed() && current.getSlices() == formation.slices();
         for (BlockPos pos : blocks) {
             int index = (pos.getX() - master.getX()) * row.getStepX() + (pos.getZ() - master.getZ()) * row.getStepZ();
             boolean front = (pos.getX() - master.getX()) * facing.getStepX() + (pos.getZ() - master.getZ()) * facing.getStepZ() == 0;
@@ -174,6 +177,9 @@ public final class CarbonizerStructure {
         }
         controller.becomeMaster(formation);
         MultiblockAutomation.refresh(level, formation.min(), formation.max());
+        if (!unchanged) {
+            MultiblockEffects.formed(level, formation.min(), formation.max());
+        }
     }
 
     private static void unform(ServerLevel level, Set<BlockPos> blocks) {

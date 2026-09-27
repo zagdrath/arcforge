@@ -1,6 +1,9 @@
 {
   "values": [
     "arcforge:geothermal_plant",
+    "arcforge:combustion_generator",
+    "arcforge:firebox",
+    "arcforge:thermoelectric_plant",
     "arcforge:carbonizer",
     "arcforge:steel_block"
   ]

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/thermoelectric_plant_front",
+    "south": "arcforge:block/thermoelectric_plant_back",
+    "east": "arcforge:block/thermoelectric_plant_side",
+    "west": "arcforge:block/thermoelectric_plant_side",
+    "up": "arcforge:block/thermoelectric_plant_top",
+    "down": "arcforge:block/thermoelectric_plant_bottom",
+    "particle": "arcforge:block/thermoelectric_plant_side"
+  }
+}

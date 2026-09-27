@@ -103,7 +103,7 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
 
     @Override
     protected ConduitType conduitType() {
-        return ConduitType.LIQUID;
+        return ConduitType.FLUID;
     }
 
     private void onTankChanged() {
