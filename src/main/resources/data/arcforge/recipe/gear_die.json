@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": "#c:ingots/steel",
+    "X": "minecraft:clock",
+    "B": "#c:storage_blocks/steel"
+  },
+  "pattern": [
+    "SSS",
+    "SXS",
+    "BBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:gear_die"
+  }
+}

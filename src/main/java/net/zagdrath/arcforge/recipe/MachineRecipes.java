@@ -63,6 +63,23 @@ public final class MachineRecipes {
                 .or(() -> matches.stream().findFirst());
     }
 
+    // The pressing recipe this die makes from this input, if there are enough of it.
+    public static Optional<RecipeHolder<PressingRecipe>> pressing(ServerLevel level, ItemStack die, ItemStack input) {
+        return level.recipeAccess().getRecipeFor(ModRecipes.PRESSING.get(), new PressingRecipe.Input(die, input), level);
+    }
+
+    // Anything some die presses: what a Metal Press input slot takes from a player.
+    public static boolean isPressingInput(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.PRESSING.get()).stream()
+                .anyMatch(holder -> holder.value().ingredient().test(stack));
+    }
+
+    // Whether this die presses this item: what automation may put in beside it.
+    public static boolean isPressingInput(@Nullable Level level, ItemStack die, ItemStack stack) {
+        return !die.isEmpty() && recipes(level).byType(ModRecipes.PRESSING.get()).stream()
+                .anyMatch(holder -> holder.value().accepts(die, stack));
+    }
+
     // Vanilla furnace recipes (and any mod's), for the Induction Furnaces.
     public static Optional<RecipeHolder<SmeltingRecipe>> smelting(ServerLevel level, ItemStack input) {
         return level.recipeAccess().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(input), level);

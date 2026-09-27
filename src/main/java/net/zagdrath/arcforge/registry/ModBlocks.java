@@ -37,9 +37,11 @@ import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
 import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
+import net.zagdrath.arcforge.block.machine.MetalPressBlock;
 import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
 import net.zagdrath.arcforge.block.machine.FiberizerBlock;
 import net.zagdrath.arcforge.block.machine.FireboxBlock;
 import net.zagdrath.arcforge.block.machine.FuelBurnerBlock;
@@ -103,6 +105,18 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL)
                     .lightLevel(state -> state.getValue(InductionFurnaceArrayCasingBlock.LIT) ? 12 : 0));
+
+    // --- Pressing: no glow, lit only swaps the textures ---
+
+    public static final DeferredBlock<MetalPressBlock> METAL_PRESS = BLOCKS.registerBlock("metal_press",
+            MetalPressBlock::new, p -> machineProperties(p, 0));
+
+    public static final DeferredBlock<MetalPressingArrayCasingBlock> METAL_PRESSING_ARRAY_CASING = BLOCKS.registerBlock("metal_pressing_array_casing",
+            MetalPressingArrayCasingBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
 
     // --- Mineral wool ---
 

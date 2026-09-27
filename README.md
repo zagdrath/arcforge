@@ -66,6 +66,24 @@ ore 4); ingots, gems and blocks are not doubled. It stores 100,000 FE and takes 
 Side configuration covers the faces of the whole cube; input faces feed the lane holding the fewest
 items. Breaking any casing reverts it to loose casings; the contents stay in the centre casing.
 
+### Pressing
+
+**Dies.** A Plate Die, Gear Die or Rod Die goes in a press's die slot and decides what it makes. Dies
+don't stack and are never used up, and only players can put them in or take them out: hoppers and
+pipes never touch the die slot.
+
+**Metal Press.** Presses steel ingots into parts with FE: 20 FE/t for 100 ticks (2,000 FE an
+operation). A plate die makes 1 Steel Plate from 1 ingot, a gear die 1 Steel Gear from 4, a rod die 2
+Steel Rods from 1. With no die it reads "No die"; taking the die out mid-operation starts it over. It
+stores 20,000 FE and takes up to 200 FE/t. Automation only feeds it what its die presses. Recipes are
+data-driven (`arcforge:pressing`), so other metals can add their own.
+
+**Metal Pressing Array.** Place 27 Metal Pressing Array Casings as a solid 3x3x3 cube; it forms like
+the Arc Crushing Array. Three lanes press in parallel, each with its own die, so plates, gears and rods
+can run side by side. Each lane is twice as fast as the Metal Press and uses 60% less FE an operation
+(16 FE/t per working lane). It stores 100,000 FE and takes up to 1,000 FE/t. Input faces feed a lane
+whose die presses the item (the one holding the fewest first) and refuse anything no lane can use.
+
 ### Upgrades
 
 Speed, Energy and Heat upgrade cards go in a machine's Upgrades tab, up to 8 of each.
@@ -73,7 +91,7 @@ Speed, Energy and Heat upgrade cards go in a machine's Upgrades tab, up to 8 of 
 | Upgrade | Effect (n installed) | Machines |
 |---|---|---|
 | Speed | Works 2^(n/2) times as fast (16x at 8), using power or fuel just as fast, so the cost per operation doesn't change | All |
-| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Combustion Plant |
+| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Metal Press, Metal Pressing Array, Combustion Plant |
 | Heat | Heat per fuel or lava (and from nearby lava and magma) x (1 + n/8); Thermoelectric Plant: efficiency / 0.8^n, up to 100% | Firebox, Geothermal Plant, Thermoelectric Plant |
 
 ## Logistics
@@ -184,8 +202,8 @@ Tabs on the right of each machine's screen:
   - Combustion Plant: none, input, energy. Top is input, back is energy.
   - Firebox and Geothermal Plant: none, input, heat. Top is input, back is heat.
   - Thermoelectric Plant: none, heat, energy. Top and bottom are heat, back is energy.
-  - Arc Crusher and Arc Crushing Array: none, input, output, energy. Top is input, bottom is
-    output, back is energy.
+  - Arc Crusher, Arc Crushing Array, Metal Press and Metal Pressing Array: none, input, output,
+    energy. Top is input, bottom is output, back is energy.
   - Tanks and cells: none, input or output.
 - **Upgrades**: four slots. Each holds up to 8 of one upgrade type, so a machine takes at most 8 of
   each (see Upgrades below).

@@ -231,6 +231,45 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+        BUILDER.comment("Metal Press: presses ingots into plates, gears and rods with a die, using FE. Recipes are data-driven",
+                "(arcforge:pressing) and set the time.").push("metalPress");
+    }
+
+    public static final ModConfigSpec.IntValue PRESS_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PRESS_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PRESS_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while pressing, before upgrades (a 100-tick recipe costs 100x this).")
+            .defineInRange("energyPerTick", 20, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Metal Pressing Array: 3x3x3 multiblock with three pressing lanes, each with its own die.").push("metalPressingArray");
+    }
+
+    public static final ModConfigSpec.IntValue PRESSING_ARRAY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PRESSING_ARRAY_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PRESSING_ARRAY_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t per working lane, before upgrades.")
+            .defineInRange("energyPerTick", 16, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue PRESSING_ARRAY_TIME_MULTIPLIER = BUILDER
+            .comment("Recipe time multiplier (0.5 = twice as fast as the Metal Press).")
+            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
+
+    static {
+        BUILDER.pop();
         BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
                 "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
     }

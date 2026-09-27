@@ -34,6 +34,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ARC_CRUSHING_ARRAY_CASING.get());
                 output.accept(ModItems.INDUCTION_FURNACE.get());
                 output.accept(ModItems.INDUCTION_FURNACE_ARRAY_CASING.get());
+                output.accept(ModItems.METAL_PRESS.get());
+                output.accept(ModItems.METAL_PRESSING_ARRAY_CASING.get());
                 output.accept(ModItems.FIBERIZER.get());
                 output.accept(ModItems.INFUSER.get());
                 output.accept(ModItems.CARBONIZER.get());
@@ -68,6 +70,12 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.SLAG_WOOL.get());
                 output.accept(ModItems.ROCK_WOOL.get());
+                output.accept(ModItems.PLATE_DIE.get());
+                output.accept(ModItems.GEAR_DIE.get());
+                output.accept(ModItems.ROD_DIE.get());
+                output.accept(ModItems.STEEL_PLATE.get());
+                output.accept(ModItems.STEEL_GEAR.get());
+                output.accept(ModItems.STEEL_ROD.get());
             }).build());
 
     // Ordered like vanilla's Building Blocks: logs and wood, planks, then the shapes.

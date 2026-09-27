@@ -86,6 +86,9 @@ public final class ArcforgeGameTests {
         TESTS.put("crusher_upgrades", CrushingGameTests::crusherUpgrades);
         TESTS.put("firebox_heat_upgrades", CrushingGameTests::fireboxHeatUpgrades);
         TESTS.put("array_forms", CrushingGameTests::arrayForms);
+        TESTS.put("press_slots_and_recipes", PressingGameTests::pressSlotsAndRecipes);
+        TESTS.put("press_upgrades", PressingGameTests::pressUpgrades);
+        TESTS.put("pressing_array_routes_input", PressingGameTests::arrayRoutesInput);
         TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);
         TESTS.put("auto_eject", InductionGameTests::autoEject);
         TESTS.put("creosote_moves", InductionGameTests::creosoteMoves);
@@ -105,6 +108,8 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("induction_array_smelts", InductionGameTests::arraySmelts);
         LONG_TESTS.put("fiberizer_needs_heat", FiberGameTests::fiberizerNeedsHeat);
         LONG_TESTS.put("infuser_treats_planks", InfusionGameTests::infuserTreatsPlanks);
+        LONG_TESTS.put("press_presses", PressingGameTests::pressPresses);
+        LONG_TESTS.put("pressing_array_lanes", PressingGameTests::arrayPressesLanes);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }

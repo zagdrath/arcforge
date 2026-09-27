@@ -26,7 +26,9 @@ public enum MachineStatus {
     TOO_COLD("too_cold", "led_blocked"),
     INFUSING("infusing", "led_running"),
     NO_FLUID("no_fluid", "led_blocked"),
-    BURNING("burning", "led_running");
+    BURNING("burning", "led_running"),
+    PRESSING("pressing", "led_running"),
+    NO_DIE("no_die", "led_blocked");
 
     private final String name;
     private final String led;

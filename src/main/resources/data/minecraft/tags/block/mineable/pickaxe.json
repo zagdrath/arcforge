@@ -44,6 +44,8 @@
     "arcforge:induction_furnace_array_casing",
     "arcforge:fiberizer",
     "arcforge:fuel_burner",
-    "arcforge:infuser"
+    "arcforge:infuser",
+    "arcforge:metal_press",
+    "arcforge:metal_pressing_array_casing"
   ]
 }

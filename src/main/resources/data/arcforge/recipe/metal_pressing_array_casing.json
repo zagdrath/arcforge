@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "#c:ingots/steel",
+    "P": "#c:plates/steel",
+    "M": "arcforge:metal_press"
+  },
+  "pattern": [
+    "IPI",
+    "PMP",
+    "IPI"
+  ],
+  "result": {
+    "count": 4,
+    "id": "arcforge:metal_pressing_array_casing"
+  }
+}

@@ -9,6 +9,8 @@
     "arcforge:arc_crusher",
     "arcforge:arc_crushing_array_casing",
     "arcforge:induction_furnace",
-    "arcforge:induction_furnace_array_casing"
+    "arcforge:induction_furnace_array_casing",
+    "arcforge:metal_press",
+    "arcforge:metal_pressing_array_casing"
   ]
 }

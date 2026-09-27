@@ -76,8 +76,13 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
         };
     }
 
-    // Items put in through input faces go to the lane holding the fewest.
-    private static class BalancedInput extends AutomationResourceHandler<ItemResource> {
+    // Whether automation may put this item into this lane input slot (the slot filter already passed).
+    protected boolean acceptsLaneInput(int slot, ItemResource resource) {
+        return true;
+    }
+
+    // Items put in through input faces go to the lane holding the fewest, of those that take them.
+    private class BalancedInput extends AutomationResourceHandler<ItemResource> {
         private final MachineItemHandler items;
         private final int[] inputSlots;
 
@@ -85,6 +90,16 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
             super(items, slot -> Arrays.stream(inputSlots).anyMatch(input -> input == slot), slot -> false);
             this.items = items;
             this.inputSlots = inputSlots;
+        }
+
+        @Override
+        public boolean isValid(int index, ItemResource resource) {
+            return super.isValid(index, resource) && acceptsLaneInput(index, resource);
+        }
+
+        @Override
+        public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
+            return acceptsLaneInput(index, resource) ? super.insert(index, resource, amount, transaction) : 0;
         }
 
         @Override

@@ -15,11 +15,13 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
+import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.menu.machine.FiberizerMenu;
 import net.zagdrath.arcforge.menu.machine.FuelBurnerMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.InductionFurnaceArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.MetalPressingArrayMenu;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
 import net.zagdrath.arcforge.menu.machine.InfuserMenu;
 import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
@@ -55,6 +57,12 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<InductionFurnaceArrayMenu>> INDUCTION_FURNACE_ARRAY = MENU_TYPES.register("induction_furnace_array",
             () -> IMenuTypeExtension.create(InductionFurnaceArrayMenu::new));
+
+    public static final Supplier<MenuType<MetalPressMenu>> METAL_PRESS = MENU_TYPES.register("metal_press",
+            () -> IMenuTypeExtension.create(MetalPressMenu::new));
+
+    public static final Supplier<MenuType<MetalPressingArrayMenu>> METAL_PRESSING_ARRAY = MENU_TYPES.register("metal_pressing_array",
+            () -> IMenuTypeExtension.create(MetalPressingArrayMenu::new));
 
     public static final Supplier<MenuType<FiberizerMenu>> FIBERIZER = MENU_TYPES.register("fiberizer",
             () -> IMenuTypeExtension.create(FiberizerMenu::new));

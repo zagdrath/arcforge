@@ -27,6 +27,7 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
 import net.zagdrath.arcforge.item.storage.StorageBlockItem;
+import net.zagdrath.arcforge.item.tool.DieItem;
 import net.zagdrath.arcforge.item.tool.WrenchItem;
 import net.zagdrath.arcforge.item.upgrade.UpgradeItem;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
@@ -42,6 +43,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ARC_CRUSHING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHING_ARRAY_CASING);
     public static final DeferredItem<BlockItem> INDUCTION_FURNACE = ITEMS.registerSimpleBlockItem(ModBlocks.INDUCTION_FURNACE);
     public static final DeferredItem<BlockItem> INDUCTION_FURNACE_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.INDUCTION_FURNACE_ARRAY_CASING);
+    public static final DeferredItem<BlockItem> METAL_PRESS = ITEMS.registerSimpleBlockItem(ModBlocks.METAL_PRESS);
+    public static final DeferredItem<BlockItem> METAL_PRESSING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.METAL_PRESSING_ARRAY_CASING);
     public static final DeferredItem<BlockItem> FIBERIZER = ITEMS.registerSimpleBlockItem(ModBlocks.FIBERIZER);
     public static final DeferredItem<BlockItem> INFUSER = ITEMS.registerSimpleBlockItem(ModBlocks.INFUSER);
     public static final DeferredItem<BlockItem> FUEL_BURNER = ITEMS.registerSimpleBlockItem(ModBlocks.FUEL_BURNER);
@@ -81,6 +84,14 @@ public final class ModItems {
 
     public static final DeferredItem<Item> SLAG_WOOL = ITEMS.registerSimpleItem("slag_wool");
     public static final DeferredItem<Item> ROCK_WOOL = ITEMS.registerSimpleItem("rock_wool");
+
+    // Dies for the Metal Press, and what they make. Dies are never used up.
+    public static final DeferredItem<DieItem> PLATE_DIE = ITEMS.registerItem("plate_die", DieItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<DieItem> GEAR_DIE = ITEMS.registerItem("gear_die", DieItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<DieItem> ROD_DIE = ITEMS.registerItem("rod_die", DieItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<Item> STEEL_PLATE = ITEMS.registerSimpleItem("steel_plate");
+    public static final DeferredItem<Item> STEEL_GEAR = ITEMS.registerSimpleItem("steel_gear");
+    public static final DeferredItem<Item> STEEL_ROD = ITEMS.registerSimpleItem("steel_rod");
 
     // --- Upgrades ---
 

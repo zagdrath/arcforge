@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": "#c:ingots/steel",
+    "X": "minecraft:heavy_weighted_pressure_plate",
+    "B": "#c:storage_blocks/steel"
+  },
+  "pattern": [
+    "SSS",
+    "SXS",
+    "BBB"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:plate_die"
+  }
+}

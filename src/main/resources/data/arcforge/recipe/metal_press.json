@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "I": "#c:ingots/steel",
+    "P": "minecraft:piston",
+    "G": "#c:ingots/copper",
+    "R": "minecraft:anvil",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "pattern": [
+    "IPI",
+    "GRG",
+    "IBI"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:metal_press"
+  }
+}

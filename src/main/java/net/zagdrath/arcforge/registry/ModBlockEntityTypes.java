@@ -19,9 +19,11 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FiberizerBlockEntity;
@@ -60,6 +62,13 @@ public final class ModBlockEntityTypes {
     // Every casing has one; only the centre of a formed Array runs.
     public static final Supplier<BlockEntityType<InductionFurnaceArrayBlockEntity>> INDUCTION_FURNACE_ARRAY = BLOCK_ENTITY_TYPES.register("induction_furnace_array",
             () -> new BlockEntityType<>(InductionFurnaceArrayBlockEntity::new, ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get()));
+
+    public static final Supplier<BlockEntityType<MetalPressBlockEntity>> METAL_PRESS = BLOCK_ENTITY_TYPES.register("metal_press",
+            () -> new BlockEntityType<>(MetalPressBlockEntity::new, ModBlocks.METAL_PRESS.get()));
+
+    // Every casing has one; only the centre's runs.
+    public static final Supplier<BlockEntityType<MetalPressingArrayBlockEntity>> METAL_PRESSING_ARRAY = BLOCK_ENTITY_TYPES.register("metal_pressing_array",
+            () -> new BlockEntityType<>(MetalPressingArrayBlockEntity::new, ModBlocks.METAL_PRESSING_ARRAY_CASING.get()));
 
     public static final Supplier<BlockEntityType<FiberizerBlockEntity>> FIBERIZER = BLOCK_ENTITY_TYPES.register("fiberizer",
             () -> new BlockEntityType<>(FiberizerBlockEntity::new, ModBlocks.FIBERIZER.get()));

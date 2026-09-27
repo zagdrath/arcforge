@@ -17,6 +17,7 @@ import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
@@ -29,6 +30,8 @@ import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
@@ -89,6 +92,19 @@ public final class ModCapabilities {
         });
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE_ARRAY.get(), (casing, side) -> {
             InductionFurnaceArrayBlockEntity array = InductionFurnaceArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.energyHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
+                MetalPressBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
+                MetalPressBlockEntity::getItemHandler);
+        // Every casing of a formed Metal Pressing Array exposes the cube face it lies on (served by the centre).
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.METAL_PRESSING_ARRAY.get(), (casing, side) -> {
+            MetalPressingArrayBlockEntity array = MetalPressingArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.itemHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.METAL_PRESSING_ARRAY.get(), (casing, side) -> {
+            MetalPressingArrayBlockEntity array = MetalPressingArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
             return array != null ? array.energyHandlerAt(casing.getBlockPos(), side) : null;
         });
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.FIBERIZER.get(),

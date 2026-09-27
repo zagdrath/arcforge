@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/metal_press_front_on",
+    "south": "arcforge:block/metal_press_back",
+    "east": "arcforge:block/metal_press_side_on",
+    "west": "arcforge:block/metal_press_side_on",
+    "up": "arcforge:block/metal_press_top_on",
+    "down": "arcforge:block/metal_press_bottom",
+    "particle": "arcforge:block/metal_press_side"
+  }
+}

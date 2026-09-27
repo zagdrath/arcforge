@@ -24,5 +24,8 @@ public final class ModItemTags {
     // Items the Combustion Plant and Firebox burn (coal, charcoal and coal blocks by default).
     public static final TagKey<Item> COMBUSTION_FUEL = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "combustion_fuel"));
 
+    // Dies: what a Metal Press die slot takes.
+    public static final TagKey<Item> DIES = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "dies"));
+
     private ModItemTags() {}
 }
