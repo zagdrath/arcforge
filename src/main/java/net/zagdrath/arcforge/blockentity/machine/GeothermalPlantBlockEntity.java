@@ -50,7 +50,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Turns lava into heat (HU); it makes no FE itself. Lava drains from the tank at 1 mB/t for lavaHeat
 // HU/t, and touching lava source blocks and magma blocks add passive heat, tank or no tank. Production
-// pauses while the heat buffer is full. At 600°C it's a cooler source than a Firebox.
+// pauses while the heat buffer is full. At up to 1,400°C it is the hottest heat source, hot enough to
+// drive a Thermoelectric Plant past 100% efficiency and fill the rock-wool Heat Cells.
 public class GeothermalPlantBlockEntity extends MachineBlockEntity implements FluidInteractable {
     // Lava buckets go in the input slot and are poured into the tank; the empty buckets come out below.
     public static final int SLOT_INPUT = 0;

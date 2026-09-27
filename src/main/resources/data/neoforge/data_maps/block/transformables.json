@@ -1,0 +1,56 @@
+{
+  "values": {
+    "arcforge:treated_log": {
+      "transformer": "minecraft:axe",
+      "transform_data": {
+        "block_state_provider": {
+          "type": "minecraft:rule_based",
+          "rules": [
+            {
+              "if_true": {
+                "type": "minecraft:matching_blocks",
+                "blocks": "arcforge:treated_log"
+              },
+              "then": {
+                "type": "minecraft:copy_properties",
+                "source": {
+                  "id": "arcforge:stripped_treated_log",
+                  "properties": {
+                    "axis": "y"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "sound": "minecraft:item.axe.strip"
+      }
+    },
+    "arcforge:treated_wood": {
+      "transformer": "minecraft:axe",
+      "transform_data": {
+        "block_state_provider": {
+          "type": "minecraft:rule_based",
+          "rules": [
+            {
+              "if_true": {
+                "type": "minecraft:matching_blocks",
+                "blocks": "arcforge:treated_wood"
+              },
+              "then": {
+                "type": "minecraft:copy_properties",
+                "source": {
+                  "id": "arcforge:stripped_treated_wood",
+                  "properties": {
+                    "axis": "y"
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "sound": "minecraft:item.axe.strip"
+      }
+    }
+  }
+}

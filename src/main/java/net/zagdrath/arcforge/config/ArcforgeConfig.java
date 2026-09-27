@@ -28,11 +28,11 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_HEAT_CAPACITY = BUILDER
             .comment("Heat buffer size, in HU.")
-            .defineInRange("heatCapacity", 20_000, 100, 1_000_000_000);
+            .defineInRange("heatCapacity", 60_000, 100, 1_000_000_000);
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_MAX_TEMPERATURE = BUILDER
             .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 600, 21, 10_000);
+            .defineInRange("maxTemperature", 1_400, 21, 10_000);
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_TANK_CAPACITY = BUILDER
             .comment("Internal lava tank capacity in mB.")
@@ -40,7 +40,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_HEAT = BUILDER
             .comment("HU/t made while lava drains from the tank (at 1 mB/t).")
-            .defineInRange("lavaHeat", 40, 0, 10_000);
+            .defineInRange("lavaHeat", 80, 0, 10_000);
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_PER_BURN = BUILDER
             .comment("mB of lava taken from the tank at a time; it then drains at 1 mB/t (the GUI flame shows what's left).")
@@ -48,11 +48,11 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_SOURCE_HEAT = BUILDER
             .comment("Passive HU/t from each touching lava source block (all 6 sides count; blocks are never consumed).")
-            .defineInRange("lavaSourceHeat", 3, 0, 10_000);
+            .defineInRange("lavaSourceHeat", 10, 0, 10_000);
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_MAGMA_HEAT = BUILDER
             .comment("Passive HU/t from each touching magma block (never consumed).")
-            .defineInRange("magmaHeat", 1, 0, 10_000);
+            .defineInRange("magmaHeat", 4, 0, 10_000);
 
     static {
         BUILDER.pop();
@@ -109,12 +109,14 @@ public class ArcforgeConfig {
             .defineInRange("heatCapacity", 20_000, 100, 1_000_000_000);
 
     public static final ModConfigSpec.IntValue THERMOELECTRIC_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 1_100, 21, 10_000);
+            .comment("Temperature of a full heat buffer, in °C. Above the 100% efficiency temperature it runs",
+                    "no faster, but each HU gives more FE (see bonusEfficiency).")
+            .defineInRange("maxTemperature", 1_400, 21, 10_000);
 
     public static final ModConfigSpec.IntValue THERMOELECTRIC_HEAT_THROUGHPUT = BUILDER
-            .comment("Most HU/t it takes in, and the HU/t it converts when its buffer is full (it converts",
-                    "in proportion to how full the buffer is, so it has to warm up).")
+            .comment("HU/t it converts at the 100% efficiency temperature. It converts in proportion to its temperature",
+                    "above 20°C, so it has to warm up, and hotter heat passes faster: when full (at maxTemperature) it",
+                    "takes in and converts heatThroughput x (maxTemperature - 20) / (fullEfficiencyTemperature - 20).")
             .defineInRange("heatThroughput", 80, 1, 1_000_000);
 
     public static final ModConfigSpec.IntValue THERMOELECTRIC_MIN_TEMPERATURE = BUILDER
@@ -124,6 +126,15 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue THERMOELECTRIC_FULL_TEMPERATURE = BUILDER
             .comment("Temperature at which efficiency reaches 100% (1 FE per HU), in °C.")
             .defineInRange("fullEfficiencyTemperature", 1_100, 1, 10_000);
+
+    public static final ModConfigSpec.DoubleValue THERMOELECTRIC_BONUS_EFFICIENCY = BUILDER
+            .comment("Efficiency reached at the bonus temperature (1.15 = 115%). It rises linearly from 100% at the",
+                    "100% efficiency temperature, and goes no higher.")
+            .defineInRange("bonusEfficiency", 1.15, 1.0, 10.0);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_BONUS_TEMPERATURE = BUILDER
+            .comment("Temperature at which the bonus efficiency is reached, in °C.")
+            .defineInRange("bonusEfficiencyTemperature", 1_400, 1, 10_000);
 
     public static final ModConfigSpec.IntValue THERMOELECTRIC_ENERGY_CAPACITY = BUILDER
             .comment("Internal FE buffer size.")
@@ -217,6 +228,68 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.DoubleValue INDUCTION_ARRAY_TIME_MULTIPLIER = BUILDER
             .comment("Multiplier on the recipe's cooking time (0.25 = 50 ticks, twice as fast as the Induction Furnace).")
             .defineInRange("timeMultiplier", 0.25, 0.01, 10.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
+                "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
+    }
+
+    public static final ModConfigSpec.IntValue FIBERIZER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FIBERIZER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FIBERIZER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 10_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FIBERIZER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_100, 21, 10_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Infuser: soaks vanilla wood in creosote with FE, making treated wood. Recipes are data-driven",
+                "(arcforge:infusing) and set the fluid used.").push("infuser");
+    }
+
+    public static final ModConfigSpec.IntValue INFUSER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INFUSER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INFUSER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while infusing, before upgrades.")
+            .defineInRange("energyPerTick", 20, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue INFUSER_TANK_CAPACITY = BUILDER
+            .comment("Fluid tank capacity in mB.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Fuel Burner: burns liquid fuel into heat (HU). Fuels and their heat are data-driven",
+                "(data map arcforge:burner_fuels, keyed by fluid).").push("fuelBurner");
+    }
+
+    public static final ModConfigSpec.IntValue FUEL_BURNER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FUEL_BURNER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_200, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue FUEL_BURNER_TANK_CAPACITY = BUILDER
+            .comment("Fuel tank capacity in mB.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
 
     static {
         BUILDER.pop();

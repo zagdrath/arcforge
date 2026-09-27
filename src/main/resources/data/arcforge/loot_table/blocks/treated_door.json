@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "condition": {
+            "type": "minecraft:match_block",
+            "blocks": "arcforge:treated_door",
+            "state": {
+              "half": "lower"
+            }
+          },
+          "name": "arcforge:treated_door"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "arcforge:blocks/treated_door"
+}

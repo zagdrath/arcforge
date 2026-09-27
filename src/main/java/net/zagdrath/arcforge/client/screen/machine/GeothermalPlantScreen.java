@@ -96,7 +96,7 @@ public class GeothermalPlantScreen extends MachineScreen<GeothermalPlantMenu> {
     @Override
     protected void drawText(GuiGraphicsExtractor graphics) {
         graphics.text(font, Component.translatable("gui.arcforge.heat_label"), SCREEN_LEFT, HEAT_TEXT_Y, ArcforgeGui.LABEL, false);
-        textRight(graphics, Component.translatable("gui.arcforge.celsius", menu.getTemperature()), SCREEN_RIGHT, HEAT_TEXT_Y, ArcforgeGui.TEXT);
+        textRight(graphics, Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())), SCREEN_RIGHT, HEAT_TEXT_Y, ArcforgeGui.TEXT);
         graphics.text(font, Component.translatable("gui.arcforge.output"), SCREEN_LEFT, OUTPUT_TEXT_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getHeatPerTick()), SCREEN_RIGHT, OUTPUT_TEXT_Y, ArcforgeGui.HEAT);
         graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
@@ -111,7 +111,7 @@ public class GeothermalPlantScreen extends MachineScreen<GeothermalPlantMenu> {
             lines.add(Fluids.LAVA.getFluidType().getDescription());
             lines.add(Component.translatable("gui.arcforge.mb_stored", ArcforgeGui.grouped(menu.getLava()), ArcforgeGui.grouped(menu.getLavaCapacity())).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(HEAT_X, HEAT_Y - 2, HEAT_W, 8, mouseX, mouseY)) {
-            lines.add(Component.translatable("gui.arcforge.celsius", menu.getTemperature()));
+            lines.add(Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())));
             lines.add(Component.translatable("gui.arcforge.nearby_value", menu.getLavaSources(), menu.getMagmaBlocks()).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(FLAME_X, FLAME_Y, FLAME_SIZE, FLAME_SIZE, mouseX, mouseY) && menu.getBurnTime() > 0) {
             lines.add(Component.translatable("gui.arcforge.lava_draining", menu.getBurnTime()));

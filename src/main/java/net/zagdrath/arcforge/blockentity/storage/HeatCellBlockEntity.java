@@ -6,7 +6,10 @@
 package net.zagdrath.arcforge.blockentity.storage;
 
 import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -17,6 +20,7 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -40,18 +44,23 @@ import net.zagdrath.arcforge.menu.storage.HeatCellMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Stores heat (HU). Input faces accept heat, output faces give it and push it into colder neighbours
 // each tick, both capped at the tier's rate. Heat always leaks away: once a second the cell loses a
-// share of what it holds (less for better-insulated tiers), so an idle cell drifts back to 20°C.
+// share of what it holds (less for better-insulated tiers, and 0.8x less per Insulation Upgrade in its
+// one upgrade slot), so an idle cell drifts back to 20°C. The tier also sets how hot a full cell is.
 // Redstone control pauses pushing; leaking never stops.
 public class HeatCellBlockEntity extends StorageBlockEntity {
-    public static final int MAX_CELSIUS = 1_100;
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.INSULATION);
+    public static final int UPGRADE_SLOTS = 1;
     private static final int LEAK_INTERVAL = 20;
     // Temperatures at which the cell shows heat level 1, 2, 3 and 4.
     private static final int[] HEAT_LEVELS = { 300, 650, 850, 1_000 };
 
     private final HeatBuffer heat;
+    private final MachineItemHandler upgrades;
     private final HeatHandler inputView;
     private final HeatHandler outputView;
     private final ContainerData data;
@@ -75,7 +84,8 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
         // Defaults as the energy cell: take heat on every side, give it from the front.
         super(ModBlockEntityTypes.HEAT_CELL.get(), pos, state, ((HeatCellBlock) state.getBlock()).getTier(),
                 new SideConfig(SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.OUTPUT));
-        this.heat = new HeatBuffer(tier.heatCellCapacity(), MAX_CELSIUS, this::setChanged);
+        this.heat = new HeatBuffer(tier.heatCellCapacity(), tier.heatCellMaxTemperature(), this::setChanged);
+        this.upgrades = upgradeSlots(this::setChanged);
         this.inputView = new View(true);
         this.outputView = new View(false);
         this.data = new WideIntContainerData(HeatCellMenu.DATA_VALUES) {
@@ -89,6 +99,7 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
                     case HeatCellMenu.DATA_EXTRACTED -> lastExtracted;
                     case HeatCellMenu.DATA_LEAK -> leakPerTick;
                     case HeatCellMenu.DATA_TIER -> tier.ordinal();
+                    case HeatCellMenu.DATA_INSULATION -> insulation();
                     case HeatCellMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case HeatCellMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
                     default -> 0;
@@ -116,10 +127,29 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
         return leakPerTick;
     }
 
-    // The tier's leak for display: "10", "1.5".
-    public static String leakPercentText(ConduitTier tier) {
-        double percent = tier.heatCellLeakPercentPerMinute();
-        return percent == Math.floor(percent) ? Integer.toString((int) percent) : String.format(java.util.Locale.ROOT, "%.1f", percent);
+    // The one upgrade slot: Insulation Upgrades only, up to 8.
+    public static MachineItemHandler upgradeSlots(Runnable onChanged) {
+        return new MachineItemHandler(0, UPGRADE_SLOTS, (slot, resource) -> false, UPGRADES, onChanged);
+    }
+
+    public MachineItemHandler getUpgrades() {
+        return upgrades;
+    }
+
+    // Insulation Upgrades installed (0-8).
+    public int insulation() {
+        return upgrades.count(UpgradeType.INSULATION);
+    }
+
+    // Share of its heat the cell loses per minute, in percent, after its Insulation Upgrades.
+    public static double leakPercentPerMinute(ConduitTier tier, int insulation) {
+        return tier.heatCellLeakPercentPerMinute() * UpgradeType.leakMultiplier(insulation);
+    }
+
+    // A leak for display, to at most two decimal places: "10", "1.5", "1.68", "0.08".
+    public static String leakPercentText(double percent) {
+        String text = String.format(Locale.ROOT, "%.2f", percent);
+        return text.contains(".") ? text.replaceAll("0+$", "").replaceAll("\\.$", "") : text;
     }
 
     public static int heatLevel(int celsius) {
@@ -163,7 +193,7 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
 
     // Loses a share of the stored heat, keeping the fraction so small amounts still drain smoothly.
     private void leak() {
-        double perSecond = heat.getStored() * tier.heatCellLeakPercentPerMinute() / 100.0 / 60.0;
+        double perSecond = heat.getStored() * leakPercentPerMinute(tier, insulation()) / 100.0 / 60.0;
         leakPerTick = (int) Math.round(perSecond / LEAK_INTERVAL);
         double total = perSecond + leakRemainder;
         int lost = (int) Math.floor(total);
@@ -306,12 +336,24 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
         output.discard("heat");
     }
 
+    // Insulation Upgrades stay in the block and drop when it's broken or picked up; only the heat travels on the item.
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level != null) {
+            for (int slot = 0; slot < upgrades.size(); slot++) {
+                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), upgrades.getStack(slot));
+            }
+        }
+    }
+
     // --- Saving ---
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         heat.deserialize(input);
+        upgrades.deserialize(input.childOrEmpty("upgrades"));
         leakRemainder = input.getDoubleOr("leak_remainder", 0.0);
     }
 
@@ -319,6 +361,7 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         heat.serialize(output);
+        upgrades.serialize(output.child("upgrades"));
         output.putDouble("leak_remainder", leakRemainder);
     }
 
@@ -331,6 +374,6 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
-        return new HeatCellMenu(containerId, inventory, worldPosition, items, data);
+        return new HeatCellMenu(containerId, inventory, worldPosition, items, upgrades, data);
     }
 }

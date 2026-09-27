@@ -16,9 +16,12 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
+import net.zagdrath.arcforge.menu.machine.FiberizerMenu;
+import net.zagdrath.arcforge.menu.machine.FuelBurnerMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.InductionFurnaceArrayMenu;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
+import net.zagdrath.arcforge.menu.machine.InfuserMenu;
 import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
@@ -52,6 +55,15 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<InductionFurnaceArrayMenu>> INDUCTION_FURNACE_ARRAY = MENU_TYPES.register("induction_furnace_array",
             () -> IMenuTypeExtension.create(InductionFurnaceArrayMenu::new));
+
+    public static final Supplier<MenuType<FiberizerMenu>> FIBERIZER = MENU_TYPES.register("fiberizer",
+            () -> IMenuTypeExtension.create(FiberizerMenu::new));
+
+    public static final Supplier<MenuType<FuelBurnerMenu>> FUEL_BURNER = MENU_TYPES.register("fuel_burner",
+            () -> IMenuTypeExtension.create(FuelBurnerMenu::new));
+
+    public static final Supplier<MenuType<InfuserMenu>> INFUSER = MENU_TYPES.register("infuser",
+            () -> IMenuTypeExtension.create(InfuserMenu::new));
 
     public static final Supplier<MenuType<FluidTankMenu>> FLUID_TANK = MENU_TYPES.register("fluid_tank",
             () -> IMenuTypeExtension.create(FluidTankMenu::new));

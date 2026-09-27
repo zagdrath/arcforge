@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/fuel_burner_front",
+    "south": "arcforge:block/fuel_burner_back",
+    "east": "arcforge:block/fuel_burner_side",
+    "west": "arcforge:block/fuel_burner_side",
+    "up": "arcforge:block/fuel_burner_top",
+    "down": "arcforge:block/fuel_burner_bottom",
+    "particle": "arcforge:block/fuel_burner_side"
+  }
+}

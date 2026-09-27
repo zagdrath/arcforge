@@ -12,10 +12,21 @@ import java.util.Map;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ButtonBlock;
+import net.minecraft.world.level.block.DoorBlock;
+import net.minecraft.world.level.block.FenceBlock;
+import net.minecraft.world.level.block.FenceGateBlock;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.PressurePlateBlock;
+import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.SlabBlock;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.StairBlock;
+import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
+import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
@@ -29,8 +40,11 @@ import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
 import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
+import net.zagdrath.arcforge.block.machine.FiberizerBlock;
 import net.zagdrath.arcforge.block.machine.FireboxBlock;
+import net.zagdrath.arcforge.block.machine.FuelBurnerBlock;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
+import net.zagdrath.arcforge.block.machine.InfuserBlock;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
 import net.zagdrath.arcforge.block.machine.ThermoelectricPlantBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock;
@@ -89,6 +103,54 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL)
                     .lightLevel(state -> state.getValue(InductionFurnaceArrayCasingBlock.LIT) ? 12 : 0));
+
+    // --- Mineral wool ---
+
+    public static final DeferredBlock<FiberizerBlock> FIBERIZER = BLOCKS.registerBlock("fiberizer",
+            FiberizerBlock::new, p -> machineProperties(p, 10));
+
+    // --- Creosote ---
+
+    public static final DeferredBlock<FuelBurnerBlock> FUEL_BURNER = BLOCKS.registerBlock("fuel_burner",
+            FuelBurnerBlock::new, p -> machineProperties(p, 13));
+
+    public static final DeferredBlock<InfuserBlock> INFUSER = BLOCKS.registerBlock("infuser",
+            InfuserBlock::new, p -> machineProperties(p, 4));
+
+    // --- Treated wood: creosote-soaked, so like crimson and warped wood it doesn't burn ---
+
+    // Oak's sounds and behaviour. Not registered with vanilla's lists, which only matter for signs.
+    public static final BlockSetType TREATED_SET = new BlockSetType(Arcforge.MODID + ":treated");
+    public static final WoodType TREATED_WOOD_TYPE = new WoodType(Arcforge.MODID + ":treated", TREATED_SET);
+
+    public static final DeferredBlock<RotatedPillarBlock> TREATED_LOG = BLOCKS.registerBlock("treated_log",
+            RotatedPillarBlock::new, p -> treatedWood(p).strength(2.0F));
+    public static final DeferredBlock<RotatedPillarBlock> TREATED_WOOD = BLOCKS.registerBlock("treated_wood",
+            RotatedPillarBlock::new, p -> treatedWood(p).strength(2.0F));
+    public static final DeferredBlock<RotatedPillarBlock> STRIPPED_TREATED_LOG = BLOCKS.registerBlock("stripped_treated_log",
+            RotatedPillarBlock::new, p -> treatedWood(p).strength(2.0F));
+    public static final DeferredBlock<RotatedPillarBlock> STRIPPED_TREATED_WOOD = BLOCKS.registerBlock("stripped_treated_wood",
+            RotatedPillarBlock::new, p -> treatedWood(p).strength(2.0F));
+    public static final DeferredBlock<Block> TREATED_PLANKS = BLOCKS.registerSimpleBlock("treated_planks",
+            p -> treatedWood(p).strength(2.0F, 3.0F));
+    public static final DeferredBlock<StairBlock> TREATED_STAIRS = BLOCKS.registerBlock("treated_stairs",
+            p -> new StairBlock(TREATED_PLANKS.get().defaultBlockState(), p), p -> treatedWood(p).strength(2.0F, 3.0F));
+    public static final DeferredBlock<SlabBlock> TREATED_SLAB = BLOCKS.registerBlock("treated_slab",
+            SlabBlock::new, p -> treatedWood(p).strength(2.0F, 3.0F));
+    public static final DeferredBlock<FenceBlock> TREATED_FENCE = BLOCKS.registerBlock("treated_fence",
+            FenceBlock::new, p -> treatedWood(p).forceSolidOn().strength(2.0F, 3.0F));
+    public static final DeferredBlock<FenceGateBlock> TREATED_FENCE_GATE = BLOCKS.registerBlock("treated_fence_gate",
+            p -> new FenceGateBlock(TREATED_WOOD_TYPE, p), p -> treatedWood(p).forceSolidOn().strength(2.0F, 3.0F));
+    public static final DeferredBlock<DoorBlock> TREATED_DOOR = BLOCKS.registerBlock("treated_door",
+            p -> new DoorBlock(TREATED_SET, p), p -> treatedWood(p).strength(3.0F).noOcclusion().pushReaction(PushReaction.POPPED));
+    public static final DeferredBlock<TrapDoorBlock> TREATED_TRAPDOOR = BLOCKS.registerBlock("treated_trapdoor",
+            p -> new TrapDoorBlock(TREATED_SET, p),
+            p -> treatedWood(p).strength(3.0F).noOcclusion().isValidSpawn((state, level, pos, entity) -> false));
+    public static final DeferredBlock<PressurePlateBlock> TREATED_PRESSURE_PLATE = BLOCKS.registerBlock("treated_pressure_plate",
+            p -> new PressurePlateBlock(TREATED_SET, p),
+            p -> treatedWood(p).forceSolidOn().noCollision().strength(0.5F).pushReaction(PushReaction.POPPED));
+    public static final DeferredBlock<ButtonBlock> TREATED_BUTTON = BLOCKS.registerBlock("treated_button",
+            p -> new ButtonBlock(TREATED_SET, 30, p), p -> p.noCollision().strength(0.5F).pushReaction(PushReaction.POPPED));
 
     // --- Steelmaking ---
 
@@ -197,6 +259,19 @@ public final class ModBlocks {
                 .requiresCorrectToolForDrops()
                 .sound(SoundType.METAL)
                 .lightLevel(state -> state.getValue(MachineBlock.LIT) ? litLight : 0);
+    }
+
+    // Like oak (an axe breaks it), much darker, and never ignited by lava or fire.
+    private static BlockBehaviour.Properties treatedWood(BlockBehaviour.Properties p) {
+        return p.mapColor(MapColor.COLOR_BROWN)
+                .instrument(NoteBlockInstrument.BASS)
+                .sound(SoundType.WOOD);
+    }
+
+    // Every treated wood block, in the order of the Building Blocks tab.
+    public static List<DeferredBlock<? extends Block>> treatedWoodSet() {
+        return List.of(TREATED_LOG, TREATED_WOOD, STRIPPED_TREATED_LOG, STRIPPED_TREATED_WOOD, TREATED_PLANKS, TREATED_STAIRS, TREATED_SLAB,
+                TREATED_FENCE, TREATED_FENCE_GATE, TREATED_DOOR, TREATED_TRAPDOOR, TREATED_PRESSURE_PLATE, TREATED_BUTTON);
     }
 
     private static BlockBehaviour.Properties furnaceBrickProperties(BlockBehaviour.Properties p) {

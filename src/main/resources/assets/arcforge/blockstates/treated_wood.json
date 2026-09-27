@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "arcforge:block/treated_wood"
+    },
+    "axis=z": {
+      "model": "arcforge:block/treated_wood",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "arcforge:block/treated_wood",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

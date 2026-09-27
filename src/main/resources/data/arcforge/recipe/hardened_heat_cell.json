@@ -5,7 +5,7 @@
     "C": "#c:ingots/copper",
     "H": "arcforge:tempered_heat_cell",
     "S": "#c:ingots/steel",
-    "W": "#minecraft:wool"
+    "W": "arcforge:rock_wool"
   },
   "pattern": [
     "CSC",

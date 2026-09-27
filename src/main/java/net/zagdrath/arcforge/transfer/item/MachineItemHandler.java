@@ -22,7 +22,12 @@ public class MachineItemHandler extends FilteredItemHandler {
     private final Set<UpgradeType> acceptedUpgrades;
 
     public MachineItemHandler(int machineSlots, SlotFilter filter, Set<UpgradeType> acceptedUpgrades, Runnable onChanged) {
-        super(machineSlots + UPGRADE_SLOTS, filter, onChanged);
+        this(machineSlots, UPGRADE_SLOTS, filter, acceptedUpgrades, onChanged);
+    }
+
+    // For blocks with fewer upgrade slots than a machine (a Heat Cell has one).
+    public MachineItemHandler(int machineSlots, int upgradeSlots, SlotFilter filter, Set<UpgradeType> acceptedUpgrades, Runnable onChanged) {
+        super(machineSlots + upgradeSlots, filter, onChanged);
         this.firstUpgradeSlot = machineSlots;
         this.acceptedUpgrades = acceptedUpgrades;
     }

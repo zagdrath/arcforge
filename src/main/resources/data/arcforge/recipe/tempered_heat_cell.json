@@ -3,13 +3,13 @@
   "category": "misc",
   "key": {
     "B": "arcforge:arcforge_furnace_bricks",
-    "C": "#c:ingots/copper",
+    "W": "arcforge:slag_wool",
     "H": "arcforge:wrought_heat_cell"
   },
   "pattern": [
-    "CBC",
-    "BHB",
-    "CBC"
+    "BWB",
+    "WHW",
+    "BWB"
   ],
   "result": {
     "count": 1,

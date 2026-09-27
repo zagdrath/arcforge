@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "condition": {
+        "type": "minecraft:survives_explosion"
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:stripped_treated_log"
+        }
+      ],
+      "rolls": 1
+    }
+  ],
+  "random_sequence": "arcforge:blocks/stripped_treated_log"
+}

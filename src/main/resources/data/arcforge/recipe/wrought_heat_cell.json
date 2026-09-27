@@ -2,14 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "B": "minecraft:bricks",
     "C": "#c:ingots/copper",
+    "W": "arcforge:slag_wool",
     "M": "#c:storage_blocks/copper"
   },
   "pattern": [
-    "CBC",
-    "BMB",
-    "CBC"
+    "CWC",
+    "WMW",
+    "CWC"
   ],
   "result": {
     "count": 1,

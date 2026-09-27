@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": "#c:ingots/steel",
+    "I": "arcforge:induction_furnace",
+    "B": "minecraft:iron_bars",
+    "R": "#c:storage_blocks/redstone",
+    "F": "arcforge:firebox"
+  },
+  "pattern": [
+    "SIS",
+    "BRB",
+    "SFS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:fiberizer"
+  }
+}

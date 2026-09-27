@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "arcforge:block/stripped_treated_log"
+    },
+    "axis=z": {
+      "model": "arcforge:block/stripped_treated_log_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "arcforge:block/stripped_treated_log_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

@@ -41,9 +41,10 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Turns heat into FE. Heat arriving on heat faces fills its buffer, and heat passes through the
-// thermocouples in proportion to how full (how hot) the buffer is: up to heatThroughput HU/t when full.
-// The FE made from that heat depends on the temperature: 0% at 100°C, 100% at 1,100°C. So it needs a
-// hot source: a Geothermal Plant (600°C at most) can only drive it to about half efficiency.
+// thermocouples in proportion to how hot the buffer is: heatThroughput HU/t (80) at 1,100°C, and more
+// above that, up to ~102 HU/t when full at 1,400°C. The FE made from that heat depends on the temperature:
+// 0% at 100°C, 100% at 1,100°C, and up to 115% at 1,400°C. So it needs a hot source: a Firebox (1,100°C)
+// runs it at full efficiency, and only a Geothermal Plant's hotter heat (1,400°C) earns the bonus.
 public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
     public static final int MACHINE_SLOTS = 0;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
@@ -141,21 +142,32 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
         return new MachineItemHandler(MACHINE_SLOTS, ThermoelectricPlantBlockEntity::isItemValid, UPGRADES, () -> {});
     }
 
-    // Fraction of the heat passing through that becomes FE, from the temperature.
+    // Fraction of the heat passing through that becomes FE, from the temperature: 0 at 100°C rising to 1 at
+    // 1,100°C, then on to the bonus (1.15) at 1,400°C, which only a Geothermal Plant's heat reaches.
     public static float efficiency(int celsius) {
         int zero = ArcforgeConfig.THERMOELECTRIC_MIN_TEMPERATURE.getAsInt();
         int full = Math.max(zero + 1, ArcforgeConfig.THERMOELECTRIC_FULL_TEMPERATURE.getAsInt());
-        return Mth.clamp((float) (celsius - zero) / (full - zero), 0.0F, 1.0F);
+        if (celsius <= full) {
+            return Mth.clamp((float) (celsius - zero) / (full - zero), 0.0F, 1.0F);
+        }
+        float bonus = (float) ArcforgeConfig.THERMOELECTRIC_BONUS_EFFICIENCY.getAsDouble();
+        int bonusTemperature = Math.max(full + 1, ArcforgeConfig.THERMOELECTRIC_BONUS_TEMPERATURE.getAsInt());
+        return Math.min(bonus, 1.0F + (bonus - 1.0F) * (celsius - full) / (bonusTemperature - full));
     }
 
-    // HU/t it takes in and converts when full: faster with Speed upgrades.
+    // HU/t it takes in, and converts when its buffer is full. Heat moves through in proportion to its
+    // temperature above ambient, reaching heatThroughput at the 100% efficiency temperature (1,100°C), so
+    // a full buffer (hotter still) passes proportionally more. Faster with Speed upgrades.
     private int throughput() {
-        return (int) Math.round(ArcforgeConfig.THERMOELECTRIC_HEAT_THROUGHPUT.getAsInt() * speedMultiplier());
+        int full = ArcforgeConfig.THERMOELECTRIC_FULL_TEMPERATURE.getAsInt();
+        double hotter = (double) (heat.getMaxCelsius() - HeatBuffer.AMBIENT_CELSIUS) / Math.max(1, full - HeatBuffer.AMBIENT_CELSIUS);
+        return (int) Math.round(ArcforgeConfig.THERMOELECTRIC_HEAT_THROUGHPUT.getAsInt() * hotter * speedMultiplier());
     }
 
-    // Heat upgrades lift the efficiency of cooler heat (never past 100%).
+    // Heat upgrades lift the efficiency of cooler heat up to 100%, and never lower the bonus above it.
     public float upgradedEfficiency() {
-        return (float) Math.min(1.0, efficiency(heat.getTemperature()) / UpgradeType.energyCostMultiplier(upgrades(UpgradeType.HEAT)));
+        float base = efficiency(heat.getTemperature());
+        return (float) Math.max(base, Math.min(1.0, base / UpgradeType.energyCostMultiplier(upgrades(UpgradeType.HEAT))));
     }
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {

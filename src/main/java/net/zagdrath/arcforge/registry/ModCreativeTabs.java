@@ -16,7 +16,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 
-// Arcforge tabs, in order: Machines, Materials, Fluids, Logistics, Tools & Upgrades.
+// Arcforge tabs, in order: Machines, Materials, Components, Building Blocks, Fluids, Logistics, Tools & Upgrades.
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Arcforge.MODID);
 
@@ -28,11 +28,14 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.GEOTHERMAL_PLANT.get());
                 output.accept(ModItems.COMBUSTION_PLANT.get());
                 output.accept(ModItems.FIREBOX.get());
+                output.accept(ModItems.FUEL_BURNER.get());
                 output.accept(ModItems.THERMOELECTRIC_PLANT.get());
                 output.accept(ModItems.ARC_CRUSHER.get());
                 output.accept(ModItems.ARC_CRUSHING_ARRAY_CASING.get());
                 output.accept(ModItems.INDUCTION_FURNACE.get());
                 output.accept(ModItems.INDUCTION_FURNACE_ARRAY_CASING.get());
+                output.accept(ModItems.FIBERIZER.get());
+                output.accept(ModItems.INFUSER.get());
                 output.accept(ModItems.CARBONIZER.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_PORT.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_BRICKS.get());
@@ -58,9 +61,27 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.NETHER_QUARTZ_DUST.get());
             }).build());
 
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> COMPONENTS = CREATIVE_MODE_TABS.register("components", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.arcforge.components"))
+            .withTabsBefore(MATERIALS.getKey())
+            .icon(() -> ModItems.ROCK_WOOL.get().getDefaultInstance())
+            .displayItems((parameters, output) -> {
+                output.accept(ModItems.SLAG_WOOL.get());
+                output.accept(ModItems.ROCK_WOOL.get());
+            }).build());
+
+    // Ordered like vanilla's Building Blocks: logs and wood, planks, then the shapes.
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> BUILDING_BLOCKS = CREATIVE_MODE_TABS.register("building_blocks", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.arcforge.building_blocks"))
+            .withTabsBefore(COMPONENTS.getKey())
+            .icon(() -> ModBlocks.TREATED_PLANKS.get().asItem().getDefaultInstance())
+            .displayItems((parameters, output) -> {
+                ModItems.treatedWood().forEach(item -> output.accept(item.get()));
+            }).build());
+
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FLUIDS = CREATIVE_MODE_TABS.register("fluids", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.arcforge.fluids"))
-            .withTabsBefore(MATERIALS.getKey())
+            .withTabsBefore(BUILDING_BLOCKS.getKey())
             .icon(() -> ModItems.CREOSOTE_BUCKET.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.CREOSOTE_BUCKET.get());
@@ -83,6 +104,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.SPEED_UPGRADE.get());
                 output.accept(ModItems.ENERGY_UPGRADE.get());
                 output.accept(ModItems.HEAT_UPGRADE.get());
+                output.accept(ModItems.INSULATION_UPGRADE.get());
             }).build());
 
     private ModCreativeTabs() {}

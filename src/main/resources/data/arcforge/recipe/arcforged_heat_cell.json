@@ -4,12 +4,12 @@
   "key": {
     "C": "#c:ingots/copper",
     "H": "arcforge:hardened_heat_cell",
-    "O": "minecraft:obsidian",
+    "W": "arcforge:rock_wool",
     "S": "#c:storage_blocks/steel"
   },
   "pattern": [
     "CSC",
-    "OHO",
+    "WHW",
     "CSC"
   ],
   "result": {

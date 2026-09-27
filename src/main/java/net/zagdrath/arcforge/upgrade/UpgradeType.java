@@ -12,10 +12,12 @@ package net.zagdrath.arcforge.upgrade;
 //    the FE per unit of fuel.
 //  - Heat: heat producers make 1 + n/8 times the heat per unit of fuel or lava (and from nearby lava and
 //    magma); the Thermoelectric Plant converts heat as if its efficiency were divided by 0.8^n (up to 100%).
+//  - Insulation: Heat Cells only. Each cuts the cell's heat leak to 0.8x.
 public enum UpgradeType {
     SPEED("speed"),
     ENERGY("energy"),
-    HEAT("heat");
+    HEAT("heat"),
+    INSULATION("insulation");
 
     public static final int MAX_PER_MACHINE = 8;
 
@@ -41,6 +43,11 @@ public enum UpgradeType {
     // Output per unit of fuel for the Combustion Plant (Energy) or heat producers (Heat).
     public static double outputMultiplier(int count) {
         return 1.0 + 0.125 * count;
+    }
+
+    // Share of its tier's leak a Heat Cell still loses.
+    public static double leakMultiplier(int insulation) {
+        return Math.pow(0.8, insulation);
     }
 
     // Processing time after Speed upgrades, never under a tick.

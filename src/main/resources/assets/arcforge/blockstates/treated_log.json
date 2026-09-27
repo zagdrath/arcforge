@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "axis=y": {
+      "model": "arcforge:block/treated_log"
+    },
+    "axis=z": {
+      "model": "arcforge:block/treated_log_horizontal",
+      "x": 90
+    },
+    "axis=x": {
+      "model": "arcforge:block/treated_log_horizontal",
+      "x": 90,
+      "y": 90
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:fiberizing",
+  "ingredient": "arcforge:slag",
+  "result": {
+    "count": 2,
+    "id": "arcforge:slag_wool"
+  },
+  "time": 160,
+  "fe_per_tick": 30,
+  "hu_per_tick": 20,
+  "min_temp": 800
+}

@@ -41,6 +41,9 @@
     "arcforge:arc_crusher",
     "arcforge:arc_crushing_array_casing",
     "arcforge:induction_furnace",
-    "arcforge:induction_furnace_array_casing"
+    "arcforge:induction_furnace_array_casing",
+    "arcforge:fiberizer",
+    "arcforge:fuel_burner",
+    "arcforge:infuser"
   ]
 }

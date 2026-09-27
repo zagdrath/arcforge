@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.recipe;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
@@ -17,6 +18,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Recipe lookups for Arcforge machines that work on both sides: the server reads its recipe manager,
@@ -47,6 +49,20 @@ public final class MachineRecipes {
         return level.recipeAccess().getRecipeFor(ModRecipes.CRUSHING.get(), new SingleRecipeInput(input), level);
     }
 
+    public static Optional<RecipeHolder<FiberizingRecipe>> fiberizing(ServerLevel level, ItemStack input) {
+        return level.recipeAccess().getRecipeFor(ModRecipes.FIBERIZING.get(), new SingleRecipeInput(input), level);
+    }
+
+    // The infusing recipe for this item, preferring one that uses the fluid in the tank. Returns one for
+    // another fluid if that's all there is, so the Infuser can say it has no fluid.
+    public static Optional<RecipeHolder<InfusingRecipe>> infusing(ServerLevel level, ItemStack input, FluidResource fluid) {
+        List<RecipeHolder<InfusingRecipe>> matches = level.recipeAccess().recipeMap().byType(ModRecipes.INFUSING.get()).stream()
+                .filter(holder -> holder.value().ingredient().test(input))
+                .toList();
+        return matches.stream().filter(holder -> holder.value().usesFluid(fluid)).findFirst()
+                .or(() -> matches.stream().findFirst());
+    }
+
     // Vanilla furnace recipes (and any mod's), for the Induction Furnaces.
     public static Optional<RecipeHolder<SmeltingRecipe>> smelting(ServerLevel level, ItemStack input) {
         return level.recipeAccess().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(input), level);
@@ -60,6 +76,22 @@ public final class MachineRecipes {
     public static boolean isCrusherInput(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(ModRecipes.CRUSHING.get()).stream()
                 .anyMatch(holder -> holder.value().ingredient().test(stack));
+    }
+
+    public static boolean isFiberizerInput(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.FIBERIZING.get()).stream()
+                .anyMatch(holder -> holder.value().ingredient().test(stack));
+    }
+
+    public static boolean isInfuserInput(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.INFUSING.get()).stream()
+                .anyMatch(holder -> holder.value().ingredient().test(stack));
+    }
+
+    // Fluids some infusing recipe uses: the only ones the Infuser's tank takes.
+    public static boolean isInfuserFluid(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.INFUSING.get()).stream()
+                .anyMatch(holder -> holder.value().usesFluid(fluid));
     }
 
     public static boolean isCarbonizerInput(@Nullable Level level, ItemStack stack) {

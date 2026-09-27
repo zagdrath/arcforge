@@ -13,8 +13,10 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
+import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
@@ -40,6 +42,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ARC_CRUSHING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHING_ARRAY_CASING);
     public static final DeferredItem<BlockItem> INDUCTION_FURNACE = ITEMS.registerSimpleBlockItem(ModBlocks.INDUCTION_FURNACE);
     public static final DeferredItem<BlockItem> INDUCTION_FURNACE_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.INDUCTION_FURNACE_ARRAY_CASING);
+    public static final DeferredItem<BlockItem> FIBERIZER = ITEMS.registerSimpleBlockItem(ModBlocks.FIBERIZER);
+    public static final DeferredItem<BlockItem> INFUSER = ITEMS.registerSimpleBlockItem(ModBlocks.INFUSER);
+    public static final DeferredItem<BlockItem> FUEL_BURNER = ITEMS.registerSimpleBlockItem(ModBlocks.FUEL_BURNER);
 
     public static final DeferredItem<WrenchItem> WRENCH = ITEMS.registerItem("wrench", WrenchItem::new, p -> p.stacksTo(1));
 
@@ -72,14 +77,31 @@ public final class ModItems {
     public static final DeferredItem<Item> CARBON_DUST = ITEMS.registerSimpleItem("carbon_dust", p -> p.cookingFuel(CARBON_DUST_BURN_TIME));
     public static final DeferredItem<Item> NETHER_QUARTZ_DUST = ITEMS.registerSimpleItem("nether_quartz_dust");
 
+    // --- Components ---
+
+    public static final DeferredItem<Item> SLAG_WOOL = ITEMS.registerSimpleItem("slag_wool");
+    public static final DeferredItem<Item> ROCK_WOOL = ITEMS.registerSimpleItem("rock_wool");
+
     // --- Upgrades ---
 
     public static final DeferredItem<UpgradeItem> SPEED_UPGRADE = ITEMS.registerItem("speed_upgrade", p -> new UpgradeItem(UpgradeType.SPEED, p));
     public static final DeferredItem<UpgradeItem> ENERGY_UPGRADE = ITEMS.registerItem("energy_upgrade", p -> new UpgradeItem(UpgradeType.ENERGY, p));
     public static final DeferredItem<UpgradeItem> HEAT_UPGRADE = ITEMS.registerItem("heat_upgrade", p -> new UpgradeItem(UpgradeType.HEAT, p));
+    public static final DeferredItem<UpgradeItem> INSULATION_UPGRADE = ITEMS.registerItem("insulation_upgrade", p -> new UpgradeItem(UpgradeType.INSULATION, p));
 
     public static final DeferredItem<BucketItem> CREOSOTE_BUCKET = ITEMS.registerItem("creosote_bucket",
             p -> new BucketItem(ModFluids.CREOSOTE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+
+    // Treated wood, like crimson and warped: not furnace fuel. The door places both halves.
+    private static final List<DeferredItem<BlockItem>> TREATED_WOOD = new ArrayList<>();
+
+    static {
+        for (DeferredBlock<? extends Block> block : ModBlocks.treatedWoodSet()) {
+            TREATED_WOOD.add(block == ModBlocks.TREATED_DOOR
+                    ? ITEMS.registerItem(block.getId().getPath(), p -> new DoubleHighBlockItem(block.get(), p), p -> p.useBlockDescriptionPrefix())
+                    : ITEMS.registerSimpleBlockItem(block));
+        }
+    }
 
     // Conduit items, ordered by type then tier.
     private static final List<DeferredItem<ConduitBlockItem>> CONDUITS = new ArrayList<>();
@@ -105,6 +127,11 @@ public final class ModItems {
 
     private static ResourceKey<ContextIntProvider> cookingTime(String name) {
         return ResourceKey.create(Registries.CONTEXT_INT_PROVIDER, Identifier.fromNamespaceAndPath(Arcforge.MODID, "cooking/" + name));
+    }
+
+    // In the order of the Building Blocks tab.
+    public static List<DeferredItem<BlockItem>> treatedWood() {
+        return TREATED_WOOD;
     }
 
     public static List<DeferredItem<StorageBlockItem>> allStorage() {

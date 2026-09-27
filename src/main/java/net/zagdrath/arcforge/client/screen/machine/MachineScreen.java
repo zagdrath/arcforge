@@ -8,15 +8,21 @@ package net.zagdrath.arcforge.client.screen.machine;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.HeatScale;
@@ -157,6 +163,36 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("flame_on"), FLAME_SIZE, FLAME_SIZE, 0, FLAME_SIZE - height,
                     x + flameX, y + flameY + FLAME_SIZE - height, FLAME_SIZE, height);
         }
+    }
+
+    // A tank: the fluid's still texture, tinted and tiled in 16px steps, clipped to the fill (the fallback
+    // sprite if the fluid has no model), then the gauge marks over it.
+    protected void drawFluidTank(GuiGraphicsExtractor graphics, Fluid fluid, int amount, int capacity, Identifier fallback, Identifier gauge,
+            int x, int y, int tankX, int tankY, int tankW, int tankH) {
+        int fill = scaled(amount, capacity, tankH);
+        int left = x + tankX;
+        int bottom = y + tankY + tankH;
+        if (fill > 0 && fluid != Fluids.EMPTY) {
+            try {
+                var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState());
+                TextureAtlasSprite still = model.stillMaterial().sprite();
+                int tint = (model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(new FluidStack(fluid, 1)) : -1) | 0xFF000000;
+                graphics.enableScissor(left, bottom - fill, left + tankW, bottom);
+                for (int tileY = bottom - 16; tileY > bottom - fill - 16; tileY -= 16) {
+                    graphics.blitSprite(RenderPipelines.GUI_TEXTURED, still, left, tileY, 16, 16, tint);
+                }
+                graphics.disableScissor();
+            } catch (RuntimeException e) {
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, fallback, tankW, tankH, 0, tankH - fill, left, bottom - fill, tankW, fill);
+            }
+        }
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, gauge, left, y + tankY, tankW, tankH);
+    }
+
+    // A tank's tooltip: the fluid (or what it's for when empty) and how much there is.
+    protected static void addFluidTooltip(List<Component> lines, Fluid fluid, Component emptyName, int amount, int capacity) {
+        lines.add(fluid != Fluids.EMPTY ? fluid.getFluidType().getDescription() : emptyName);
+        lines.add(Component.translatable("gui.arcforge.mb_stored", ArcforgeGui.grouped(amount), ArcforgeGui.grouped(capacity)).withStyle(ChatFormatting.GRAY));
     }
 
     protected void drawLed(GuiGraphicsExtractor graphics, int x, int y, int ledX, int ledY) {

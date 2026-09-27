@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/stairs",
+  "textures": {
+    "bottom": "arcforge:block/treated_planks",
+    "side": "arcforge:block/treated_planks",
+    "top": "arcforge:block/treated_planks"
+  }
+}

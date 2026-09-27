@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/fiberizer_front",
+    "south": "arcforge:block/fiberizer_back",
+    "east": "arcforge:block/fiberizer_side",
+    "west": "arcforge:block/fiberizer_side",
+    "up": "arcforge:block/fiberizer_top",
+    "down": "arcforge:block/fiberizer_bottom",
+    "particle": "arcforge:block/fiberizer_side"
+  }
+}

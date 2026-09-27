@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:infusing",
+  "ingredient": "#arcforge:infusable/planks",
+  "fluid": {
+    "id": "arcforge:creosote",
+    "amount": 50
+  },
+  "result": {
+    "count": 1,
+    "id": "arcforge:treated_planks"
+  },
+  "time": 60
+}

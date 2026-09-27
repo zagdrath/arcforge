@@ -1,0 +1,13 @@
+{
+  "variants": {
+    "type=bottom": {
+      "model": "arcforge:block/treated_slab"
+    },
+    "type=double": {
+      "model": "arcforge:block/treated_planks"
+    },
+    "type=top": {
+      "model": "arcforge:block/treated_slab_top"
+    }
+  }
+}

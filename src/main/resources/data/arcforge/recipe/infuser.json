@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "S": "#c:ingots/steel",
+    "T": "arcforge:wrought_fluid_tank",
+    "P": "minecraft:piston",
+    "B": "minecraft:iron_bars",
+    "R": "#c:storage_blocks/redstone"
+  },
+  "pattern": [
+    "SPS",
+    "BTB",
+    "SRS"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:infuser"
+  }
+}

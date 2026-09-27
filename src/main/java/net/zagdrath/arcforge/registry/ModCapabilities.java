@@ -21,7 +21,10 @@ import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FiberizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.InfuserBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
@@ -88,6 +91,24 @@ public final class ModCapabilities {
             InductionFurnaceArrayBlockEntity array = InductionFurnaceArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
             return array != null ? array.energyHandlerAt(casing.getBlockPos(), side) : null;
         });
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.FIBERIZER.get(),
+                FiberizerBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FIBERIZER.get(),
+                FiberizerBlockEntity::getItemHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.FIBERIZER.get(),
+                FiberizerBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FUEL_BURNER.get(),
+                FuelBurnerBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FUEL_BURNER.get(),
+                FuelBurnerBlockEntity::getItemHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.FUEL_BURNER.get(),
+                FuelBurnerBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.INFUSER.get(),
+                InfuserBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.INFUSER.get(),
+                InfuserBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.INFUSER.get(),
+                InfuserBlockEntity::getFluidHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),
                 ThermoelectricPlantBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),

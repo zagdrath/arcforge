@@ -1,0 +1,8 @@
+{
+  "values": {
+    "arcforge:creosote": {
+      "hu_per_mb": 120,
+      "mb_per_tick": 0.75
+    }
+  }
+}

@@ -6,6 +6,9 @@
 package net.zagdrath.arcforge.client.gui.tab;
 
 import java.util.List;
+import java.util.function.Supplier;
+
+import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -22,11 +25,18 @@ public class UpgradesTab extends SideTab {
     private static final int SLOTS_X = 8, SLOTS_Y = 24, SLOT_PITCH = 20;
 
     private final List<ToggleableSlot> slots;
+    private @Nullable Supplier<Component> info;
 
     public UpgradesTab(List<ToggleableSlot> slots) {
         super(ArcforgeGui.widget("icon_upgrades"), Component.translatable("gui.arcforge.tab.upgrades"), 100, 50);
         this.slots = slots;
         onFullyOpenChanged(false);
+    }
+
+    // A line beside the slots saying what the upgrades do (e.g. a Heat Cell's "Leak x0.17").
+    public UpgradesTab withInfo(Supplier<Component> info) {
+        this.info = info;
+        return this;
     }
 
     @Override
@@ -38,6 +48,9 @@ public class UpgradesTab extends SideTab {
     protected void renderContent(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
         for (int i = 0; i < slots.size(); i++) {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT, x + SLOTS_X + i * SLOT_PITCH, y + SLOTS_Y, 18, 18);
+        }
+        if (info != null) {
+            graphics.text(font, info.get(), x + SLOTS_X + slots.size() * SLOT_PITCH + 2, y + SLOTS_Y + 5, ArcforgeGui.TOOLTIP_GRAY, false);
         }
     }
 }

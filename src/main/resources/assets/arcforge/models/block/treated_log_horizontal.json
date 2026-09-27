@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "arcforge:block/treated_log_top",
+    "side": "arcforge:block/treated_log"
+  }
+}

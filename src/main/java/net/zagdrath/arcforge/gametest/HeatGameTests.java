@@ -123,8 +123,8 @@ public final class HeatGameTests {
                 .thenSucceed();
     }
 
-    // Heat never flows from colder to hotter: a full Geothermal Plant (600°C) can't feed a hotter plant,
-    // and the plant runs at the efficiency of its own temperature.
+    // Heat never flows from colder to hotter: a Geothermal Plant at 600°C can't feed a hotter plant, and
+    // the plant runs at the efficiency of its own temperature.
     static void heatFlowsHotToCold(GameTestHelper helper) {
         BlockPos geoPos = new BlockPos(0, 1, 0);
         BlockPos plantPos = new BlockPos(0, 1, 1);
@@ -133,12 +133,13 @@ public final class HeatGameTests {
         GeothermalPlantBlockEntity geothermal = helper.getBlockEntity(geoPos, GeothermalPlantBlockEntity.class);
         ThermoelectricPlantBlockEntity plant = helper.getBlockEntity(plantPos, ThermoelectricPlantBlockEntity.class);
         plant.setSideMode(RelativeSide.FRONT, SideMode.HEAT);
-        geothermal.getHeat().add(geothermal.getHeat().getCapacity());
+        heatTo(geothermal.getHeat(), 600);
+        int start = geothermal.getHeat().getStored();
         heatTo(plant.getHeat(), 800);
         helper.startSequence()
                 .thenIdle(10)
                 .thenExecute(() -> {
-                    helper.assertTrue(geothermal.getHeat().isFull(), "Heat flowed from 600°C into a plant at " + plant.getHeat().getTemperature() + "°C");
+                    helper.assertTrue(geothermal.getHeat().getStored() >= start, "Heat flowed from 600°C into a plant at " + plant.getHeat().getTemperature() + "°C");
                     helper.assertTrue(ThermoelectricPlantBlockEntity.efficiency(600) == 0.5F, "Efficiency at 600°C is " + ThermoelectricPlantBlockEntity.efficiency(600));
                 })
                 .thenSucceed();

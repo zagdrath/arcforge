@@ -19,9 +19,11 @@ import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.HeatScale;
 import net.zagdrath.arcforge.client.gui.tab.RedstoneTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
+import net.zagdrath.arcforge.client.gui.tab.UpgradesTab;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.storage.HeatCellMenu;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Layout follows heat_cell_gui_layout.json. All positions are relative to leftPos/topPos.
 public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
@@ -43,7 +45,9 @@ public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
         tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenuButtons.redstoneButtonId(mode))))
                 .add(new SideConfigTab(menu::getSideMode,
                         (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
-                        () -> sendButton(MachineMenuButtons.CLEAR_SIDES)));
+                        () -> sendButton(MachineMenuButtons.CLEAR_SIDES)))
+                .add(new UpgradesTab(List.of(menu.getUpgradeSlot())).withInfo(() -> Component.translatable("gui.arcforge.heat_cell.leak_multiplier",
+                        String.format(Locale.ROOT, "%.2f", UpgradeType.leakMultiplier(menu.getInsulation())))));
     }
 
     @Override
@@ -97,7 +101,11 @@ public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
             lines.add(Component.translatable("gui.arcforge.celsius", menu.getTemperature()).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(PIPS_X, PIPS_Y, ConduitTier.values().length * PIP_PITCH, PIP_SIZE, mouseX, mouseY)) {
             ConduitTier tier = menu.getTier();
-            lines.add(Component.translatable("gui.arcforge.insulation", tier.getDisplayName(), HeatCellBlockEntity.leakPercentText(tier)));
+            int insulation = menu.getInsulation();
+            String leak = HeatCellBlockEntity.leakPercentText(HeatCellBlockEntity.leakPercentPerMinute(tier, insulation));
+            lines.add(insulation > 0
+                    ? Component.translatable("gui.arcforge.insulation_upgraded", tier.getDisplayName(), insulation, leak)
+                    : Component.translatable("gui.arcforge.insulation", tier.getDisplayName(), leak));
         }
     }
 }

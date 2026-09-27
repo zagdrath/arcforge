@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "arcforge:block/treated_pressure_plate"
+    },
+    "powered=true": {
+      "model": "arcforge:block/treated_pressure_plate_down"
+    }
+  }
+}

@@ -15,7 +15,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// A Speed, Energy or Heat upgrade card, placed in a machine's Upgrades tab.
+// A Speed, Energy, Heat or Insulation upgrade card, placed in a machine's (or Heat Cell's) Upgrades tab.
 public class UpgradeItem extends Item {
     private final UpgradeType type;
 
@@ -31,6 +31,7 @@ public class UpgradeItem extends Item {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
         builder.accept(Component.translatable("tooltip.arcforge.upgrade." + type.getSerializedName()).withStyle(ChatFormatting.GRAY));
-        builder.accept(Component.translatable("tooltip.arcforge.upgrade.max").withStyle(ChatFormatting.DARK_GRAY));
+        String max = type == UpgradeType.INSULATION ? "tooltip.arcforge.upgrade.insulation.max" : "tooltip.arcforge.upgrade.max";
+        builder.accept(Component.translatable(max).withStyle(ChatFormatting.DARK_GRAY));
     }
 }

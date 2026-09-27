@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/infuser_front",
+    "south": "arcforge:block/infuser_back",
+    "east": "arcforge:block/infuser_side",
+    "west": "arcforge:block/infuser_side",
+    "up": "arcforge:block/infuser_top",
+    "down": "arcforge:block/infuser_bottom",
+    "particle": "arcforge:block/infuser_side"
+  }
+}

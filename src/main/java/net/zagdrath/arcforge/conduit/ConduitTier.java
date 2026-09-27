@@ -116,6 +116,16 @@ public enum ConduitTier implements StringRepresentable {
         };
     }
 
+    // Temperature of a full heat cell, in °C. The rock-wool tiers hold hotter heat: a Firebox (1,100°C) can
+    // only fill them part way, a Geothermal Plant (1,400°C) all the way.
+    public int heatCellMaxTemperature() {
+        return switch (this) {
+            case WROUGHT, TEMPERED -> 1_100;
+            case HARDENED -> 1_300;
+            case ARCFORGED -> 1_400;
+        };
+    }
+
     // Most HU a heat cell takes in or gives out per tick: the thermodynamic conduit rate of the same tier.
     public int heatCellRate() {
         return heatPerTick;

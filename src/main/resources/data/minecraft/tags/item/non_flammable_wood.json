@@ -1,0 +1,17 @@
+{
+  "values": [
+    "arcforge:treated_log",
+    "arcforge:treated_wood",
+    "arcforge:stripped_treated_log",
+    "arcforge:stripped_treated_wood",
+    "arcforge:treated_planks",
+    "arcforge:treated_stairs",
+    "arcforge:treated_slab",
+    "arcforge:treated_fence",
+    "arcforge:treated_fence_gate",
+    "arcforge:treated_door",
+    "arcforge:treated_trapdoor",
+    "arcforge:treated_pressure_plate",
+    "arcforge:treated_button"
+  ]
+}

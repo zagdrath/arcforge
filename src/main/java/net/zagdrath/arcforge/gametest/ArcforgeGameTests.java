@@ -74,6 +74,14 @@ public final class ArcforgeGameTests {
         TESTS.put("heat_cell_leaks", HeatGameTests::heatCellLeaks);
         TESTS.put("heat_cell_outputs", HeatGameTests::heatCellOutputs);
         TESTS.put("heat_cell_keeps_heat", HeatGameTests::heatCellKeepsHeat);
+        TESTS.put("fiberizer_accepts_inputs", FiberGameTests::fiberizerAcceptsInputs);
+        TESTS.put("heat_cell_insulation", FiberGameTests::heatCellInsulation);
+        TESTS.put("heat_cell_tier_temperature", FiberGameTests::heatCellTierTemperature);
+        TESTS.put("geothermal_rebalance", FiberGameTests::geothermalRebalance);
+        TESTS.put("thermoelectric_bonus", FiberGameTests::thermoelectricBonus);
+        TESTS.put("infuser_accepts_vanilla_wood", InfusionGameTests::infuserAcceptsVanillaWood);
+        TESTS.put("fuel_burner_burns_creosote", InfusionGameTests::fuelBurnerBurnsCreosote);
+        TESTS.put("treated_wood_strips_and_resists_fire", InfusionGameTests::treatedWoodStripsAndResistsFire);
         TESTS.put("upgrade_slots", CrushingGameTests::upgradeSlots);
         TESTS.put("crusher_upgrades", CrushingGameTests::crusherUpgrades);
         TESTS.put("firebox_heat_upgrades", CrushingGameTests::fireboxHeatUpgrades);
@@ -95,6 +103,8 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("firebox_heats_plant_from_cold", HeatGameTests::fireboxHeatsPlantFromCold);
         LONG_TESTS.put("induction_furnace_smelts", InductionGameTests::furnaceSmelts);
         LONG_TESTS.put("induction_array_smelts", InductionGameTests::arraySmelts);
+        LONG_TESTS.put("fiberizer_needs_heat", FiberGameTests::fiberizerNeedsHeat);
+        LONG_TESTS.put("infuser_treats_planks", InfusionGameTests::infuserTreatsPlanks);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }
