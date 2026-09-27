@@ -32,9 +32,13 @@ import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
+import net.zagdrath.arcforge.conduit.SideSetting;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
+import net.zagdrath.arcforge.machine.config.RelativeSide;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 
 // Conduit behaviour: transfer for every type, conservation when networks split, and the wrench.
 // Layouts run along +X at y=1: source at x=0, conduits, sink at the end.
@@ -54,11 +58,26 @@ final class ConduitGameTests {
     }
 
     // Sets a conduit side the way the wrench would.
-    private static void setPort(GameTestHelper helper, BlockPos pos, Direction side, ConnectionMode mode) {
+    private static void setPort(GameTestHelper helper, BlockPos pos, Direction side, SideSetting setting) {
         BlockPos absolute = helper.absolutePos(pos);
-        var state = helper.getLevel().getBlockState(absolute);
-        helper.getLevel().setBlock(absolute, state.setValue(ConduitBlock.property(side), mode), 3);
+        helper.getBlockEntity(pos, ConduitBlockEntity.class).setSetting(side, setting);
+        ConduitBlock.refreshConnections(helper.getLevel(), absolute);
         ConduitNetworkManager.get(helper.getLevel()).markDirty(absolute);
+    }
+
+    private static ConnectionMode sideOf(GameTestHelper helper, BlockPos pos, Direction side) {
+        return ConduitBlock.mode(helper.getBlockState(pos), side);
+    }
+
+    // FE or HU held by the conduits of a straight run.
+    private static int storedInConduits(GameTestHelper helper, int length) {
+        int total = 0;
+        for (int x = 1; x <= length; x++) {
+            if (helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(x, 1, 0))) instanceof ConduitBlockEntity conduit) {
+                total += conduit.getStored();
+            }
+        }
+        return total;
     }
 
     private static int fluidIn(FluidStacksResourceHandler tank) {
@@ -86,8 +105,8 @@ final class ConduitGameTests {
 
     // --- Tests ---
 
-    // FE moves from source to sink at no more than the tier rate, is conserved, and the conduits
-    // light up while it flows and go dark shortly after.
+    // FE moves from source to sink at no more than the tier rate, is conserved (counting what the
+    // conduits hold), and the conduits light up while it flows and go dark shortly after.
     static void energyTransfer(GameTestHelper helper) {
         BlockPos source = new BlockPos(0, 1, 0);
         BlockPos sink = new BlockPos(4, 1, 0);
@@ -96,8 +115,8 @@ final class ConduitGameTests {
         helper.setBlock(source, Blocks.LODESTONE);
         helper.setBlock(sink, Blocks.LODESTONE);
         placeRun(helper, ConduitType.ENERGY, ConduitTier.WROUGHT, 3);
-        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, ConnectionMode.OUTPUT);
-        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, ConnectionMode.INPUT);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, SideSetting.INPUT);
         var from = TestFixtures.energy(helper.absolutePos(source));
         var to = TestFixtures.energy(helper.absolutePos(sink));
         from.set(2_000);
@@ -106,7 +125,7 @@ final class ConduitGameTests {
 
         // Checks may not land on every game tick, so compare against the ticks that actually elapsed.
         helper.onEachTick(() -> {
-            int total = from.getAmountAsInt() + to.getAmountAsInt();
+            int total = from.getAmountAsInt() + to.getAmountAsInt() + storedInConduits(helper, 3);
             helper.assertTrue(total == 2_000, "Energy not conserved: " + total);
             long now = helper.getLevel().getGameTime();
             long moved = to.getAmountAsInt() - last[1];
@@ -130,8 +149,8 @@ final class ConduitGameTests {
         helper.setBlock(source, Blocks.CHEST);
         helper.setBlock(sink, Blocks.CHEST);
         placeRun(helper, ConduitType.ITEM, ConduitTier.ARCFORGED, 3);
-        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, ConnectionMode.OUTPUT);
-        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, ConnectionMode.INPUT);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, SideSetting.INPUT);
         ChestBlockEntity from = helper.getBlockEntity(source, ChestBlockEntity.class);
         ChestBlockEntity to = helper.getBlockEntity(sink, ChestBlockEntity.class);
         from.setItem(0, new ItemStack(Items.COBBLESTONE, 64));
@@ -167,8 +186,8 @@ final class ConduitGameTests {
         helper.setBlock(source, Blocks.TARGET);
         helper.setBlock(sink, Blocks.TARGET);
         placeRun(helper, ConduitType.LIQUID, ConduitTier.WROUGHT, 3);
-        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, ConnectionMode.OUTPUT);
-        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, ConnectionMode.INPUT);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, SideSetting.INPUT);
         var from = TestFixtures.tank(helper.absolutePos(source));
         var to = TestFixtures.tank(helper.absolutePos(sink));
         from.set(0, FluidResource.of(Fluids.WATER), 4_000);
@@ -189,7 +208,7 @@ final class ConduitGameTests {
         TestFixtures.reset(helper.absolutePos(source));
         helper.setBlock(source, Blocks.TARGET);
         placeRun(helper, ConduitType.LIQUID, ConduitTier.ARCFORGED, 5);
-        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, ConnectionMode.OUTPUT);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
         var from = TestFixtures.tank(helper.absolutePos(source));
         from.set(0, FluidResource.of(Fluids.LAVA), 3_000);
 
@@ -211,7 +230,8 @@ final class ConduitGameTests {
                 ? conduit.getFluid().getAmount() : 0;
     }
 
-    // The wrench cycles a machine-facing side none -> input -> output -> none (backwards when sneaking),
+    // A conduit placed next to a machine connects by itself, following the machine's side configuration.
+    // The wrench then cycles that side auto -> input -> output -> disabled (backwards when sneaking),
     // and a conduit-to-conduit joint stays disconnected after neighbour updates.
     static void wrenchConduit(GameTestHelper helper) {
         BlockPos plant = new BlockPos(0, 1, 0);
@@ -224,28 +244,112 @@ final class ConduitGameTests {
         Vec3 eastArm = new Vec3(0.4, 0, 0);
 
         // The plant faces north, so its east face is its left side, which defaults to energy output.
-        ConnectionMode[] expected = { ConnectionMode.INPUT, ConnectionMode.OUTPUT, ConnectionMode.NONE };
+        helper.assertTrue(sideOf(helper, first, Direction.WEST) == ConnectionMode.OUTPUT,
+                "Auto side is " + sideOf(helper, first, Direction.WEST) + ", expected OUTPUT");
+        ConnectionMode[] expected = { ConnectionMode.INPUT, ConnectionMode.OUTPUT, ConnectionMode.NONE, ConnectionMode.OUTPUT };
         for (ConnectionMode mode : expected) {
             useWrench(helper, player, first, westArm);
-            helper.assertTrue(ConduitBlock.mode(helper.getBlockState(first), Direction.WEST) == mode,
-                    "West side is " + ConduitBlock.mode(helper.getBlockState(first), Direction.WEST) + ", expected " + mode);
+            helper.assertTrue(sideOf(helper, first, Direction.WEST) == mode,
+                    "West side is " + sideOf(helper, first, Direction.WEST) + ", expected " + mode);
         }
+        helper.assertTrue(helper.getBlockEntity(first, ConduitBlockEntity.class).getSetting(Direction.WEST) == SideSetting.AUTO,
+                "The wrench cycle did not return to auto");
         player.setShiftKeyDown(true);
         useWrench(helper, player, first, westArm);
-        helper.assertTrue(ConduitBlock.mode(helper.getBlockState(first), Direction.WEST) == ConnectionMode.OUTPUT, "Sneak-use did not cycle backwards");
+        helper.assertTrue(helper.getBlockEntity(first, ConduitBlockEntity.class).getSetting(Direction.WEST) == SideSetting.DISABLED,
+                "Sneak-use did not cycle backwards");
         player.setShiftKeyDown(false);
 
         useWrench(helper, player, first, eastArm);
-        helper.assertTrue(ConduitBlock.mode(helper.getBlockState(first), Direction.EAST) == ConnectionMode.NONE
-                && ConduitBlock.mode(helper.getBlockState(second), Direction.WEST) == ConnectionMode.NONE, "Joint did not disconnect on both sides");
+        helper.assertTrue(sideOf(helper, first, Direction.EAST) == ConnectionMode.NONE
+                && sideOf(helper, second, Direction.WEST) == ConnectionMode.NONE, "Joint did not disconnect on both sides");
         helper.setBlock(new BlockPos(1, 2, 0), Blocks.STONE);
         helper.setBlock(new BlockPos(2, 2, 0), Blocks.STONE);
-        helper.assertTrue(ConduitBlock.mode(helper.getBlockState(first), Direction.EAST) == ConnectionMode.NONE,
+        helper.assertTrue(sideOf(helper, first, Direction.EAST) == ConnectionMode.NONE,
                 "Joint reconnected after a neighbour update");
         useWrench(helper, player, first, eastArm);
-        helper.assertTrue(ConduitBlock.mode(helper.getBlockState(first), Direction.EAST) == ConnectionMode.PIPE
-                && ConduitBlock.mode(helper.getBlockState(second), Direction.WEST) == ConnectionMode.PIPE, "Joint did not reconnect");
+        helper.assertTrue(sideOf(helper, first, Direction.EAST) == ConnectionMode.PIPE
+                && sideOf(helper, second, Direction.WEST) == ConnectionMode.PIPE, "Joint did not reconnect");
         helper.succeed();
+    }
+
+    // With no wrench configuration, a plant's energy side feeds a buffer at the other end, and changing
+    // the plant's side configuration disconnects the conduit.
+    static void autoConnect(GameTestHelper helper) {
+        BlockPos plantPos = new BlockPos(0, 1, 0);
+        BlockPos sink = new BlockPos(4, 1, 0);
+        TestFixtures.reset(helper.absolutePos(sink));
+        helper.setBlock(plantPos, ModBlocks.GEOTHERMAL_PLANT.get());
+        helper.setBlock(sink, Blocks.LODESTONE);
+        placeRun(helper, ConduitType.ENERGY, ConduitTier.WROUGHT, 3);
+        GeothermalPlantBlockEntity plant = helper.getBlockEntity(plantPos, GeothermalPlantBlockEntity.class);
+        ((GeneratorEnergyHandler) plant.getEnergyHandler(null)).generate(5_000);
+        var to = TestFixtures.energy(helper.absolutePos(sink));
+
+        helper.assertTrue(sideOf(helper, new BlockPos(1, 1, 0), Direction.WEST) == ConnectionMode.OUTPUT, "Conduit does not pull from the plant");
+        helper.assertTrue(sideOf(helper, new BlockPos(3, 1, 0), Direction.EAST) == ConnectionMode.INPUT, "Conduit does not push into the buffer");
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(to.getAmountAsInt() == 5_000, "Sink has " + to.getAmountAsInt()))
+                .thenExecute(() -> plant.setSideMode(RelativeSide.LEFT, SideMode.NONE))
+                .thenExecute(() -> helper.assertTrue(sideOf(helper, new BlockPos(1, 1, 0), Direction.WEST) == ConnectionMode.NONE,
+                        "Conduit still connected to a face set to none"))
+                .thenSucceed();
+    }
+
+    // Energy conduits pull from a source and hold it even with nowhere to send it; the rest waits.
+    static void energyStorage(GameTestHelper helper) {
+        BlockPos source = new BlockPos(0, 1, 0);
+        TestFixtures.reset(helper.absolutePos(source));
+        helper.setBlock(source, Blocks.LODESTONE);
+        placeRun(helper, ConduitType.ENERGY, ConduitTier.WROUGHT, 3);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        var from = TestFixtures.energy(helper.absolutePos(source));
+        from.set(10_000);
+        int capacity = 3 * ConduitTier.WROUGHT.energyPerTick();
+
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(storedInConduits(helper, 3) == capacity, "Conduits hold " + storedInConduits(helper, 3)))
+                .thenIdle(5)
+                .thenExecute(() -> helper.assertTrue(from.getAmountAsInt() == 10_000 - capacity, "Source has " + from.getAmountAsInt()))
+                .thenSucceed();
+    }
+
+    // Item conduits pull items in with no destination, hold them, and deliver them once a chest is
+    // placed at the other end (which connects by itself).
+    static void itemStorage(GameTestHelper helper) {
+        BlockPos source = new BlockPos(0, 1, 0);
+        BlockPos sink = new BlockPos(4, 1, 0);
+        helper.setBlock(source, Blocks.CHEST);
+        placeRun(helper, ConduitType.ITEM, ConduitTier.ARCFORGED, 3);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        ChestBlockEntity from = helper.getBlockEntity(source, ChestBlockEntity.class);
+        from.setItem(0, new ItemStack(Items.COBBLESTONE, 64));
+        from.setItem(1, new ItemStack(Items.DIRT, 10));
+
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(from.isEmpty(), "Source chest not empty yet"))
+                .thenExecute(() -> helper.assertTrue(storedItemCount(helper, 3) == 74, "Conduits store " + storedItemCount(helper, 3) + " items"))
+                .thenExecute(() -> helper.setBlock(sink, Blocks.CHEST))
+                .thenWaitUntil(() -> {
+                    ChestBlockEntity to = helper.getBlockEntity(sink, ChestBlockEntity.class);
+                    helper.assertTrue(countItem(to, Items.COBBLESTONE) == 64 && countItem(to, Items.DIRT) == 10,
+                            "Sink has " + countItem(to, Items.COBBLESTONE) + " cobblestone, " + countItem(to, Items.DIRT) + " dirt");
+                })
+                .thenExecute(() -> helper.assertTrue(storedItemCount(helper, 3) == 0, "Conduits still store items"))
+                .thenExecute(() -> helper.assertTrue(helper.getEntities(EntityTypes.ITEM).isEmpty(), "Items were dropped into the world"))
+                .thenSucceed();
+    }
+
+    private static int storedItemCount(GameTestHelper helper, int length) {
+        int total = 0;
+        for (int x = 1; x <= length; x++) {
+            if (helper.getLevel().getBlockEntity(helper.absolutePos(new BlockPos(x, 1, 0))) instanceof ConduitBlockEntity conduit) {
+                for (ItemStack stack : conduit.getStoredItems()) {
+                    total += stack.getCount();
+                }
+            }
+        }
+        return total;
     }
 
     // The wrench rotates machines and dismantles them into an item that keeps their contents.

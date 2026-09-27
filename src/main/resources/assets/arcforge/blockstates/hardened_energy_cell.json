@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "charge=0": {
+      "model": "arcforge:block/energy_cell/hardened_0"
+    },
+    "charge=1": {
+      "model": "arcforge:block/energy_cell/hardened_1"
+    },
+    "charge=2": {
+      "model": "arcforge:block/energy_cell/hardened_2"
+    },
+    "charge=3": {
+      "model": "arcforge:block/energy_cell/hardened_3"
+    },
+    "charge=4": {
+      "model": "arcforge:block/energy_cell/hardened_4"
+    }
+  }
+}

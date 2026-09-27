@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -74,7 +76,7 @@ public class RedstoneTab extends SideTab {
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
         RedstoneMode mode = buttonAt(localX, localY);
-        if (mode == null || event.button() != 0) {
+        if (mode == null || event.button() != InputConstants.MOUSE_BUTTON_LEFT) {
             return false;
         }
         if (mode != current.get()) {

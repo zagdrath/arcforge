@@ -10,6 +10,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.MapColor;
@@ -20,6 +21,9 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
+import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
+import net.zagdrath.arcforge.block.storage.FluidTankBlock;
+import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 
@@ -46,6 +50,33 @@ public final class ModBlocks {
                         ModBlocks::conduitProperties));
             }
             CONDUITS.put(type, byTier);
+        }
+    }
+
+    // arcforge:<tier>_fluid_tank and arcforge:<tier>_energy_cell.
+    private static final Map<ConduitTier, DeferredBlock<FluidTankBlock>> FLUID_TANKS = new EnumMap<>(ConduitTier.class);
+    private static final Map<ConduitTier, DeferredBlock<EnergyCellBlock>> ENERGY_CELLS = new EnumMap<>(ConduitTier.class);
+
+    // Glass body on a metal frame: breaks like glass, otherwise sounds like metal.
+    private static final SoundType TANK_SOUND = new SoundType(1.0F, 1.0F, SoundEvents.GLASS_BREAK, SoundEvents.METAL_STEP,
+            SoundEvents.METAL_PLACE, SoundEvents.METAL_HIT, SoundEvents.METAL_FALL);
+
+    static {
+        for (ConduitTier tier : ConduitTier.values()) {
+            FLUID_TANKS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_fluid_tank",
+                    p -> new FluidTankBlock(p, tier),
+                    p -> p.mapColor(MapColor.METAL)
+                            .strength(2.0F)
+                            .sound(TANK_SOUND)
+                            .noOcclusion()
+                            .isSuffocating((state, level, pos) -> false)
+                            .isViewBlocking((state, level, pos, box) -> false)
+                            .isRedstoneConductor((state, level, pos) -> false)));
+            ENERGY_CELLS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_energy_cell",
+                    p -> new EnergyCellBlock(p, tier),
+                    p -> p.mapColor(MapColor.METAL)
+                            .strength(3.0F)
+                            .sound(SoundType.METAL)));
         }
     }
 
@@ -78,6 +109,22 @@ public final class ModBlocks {
                 all.add(conduit(type, tier));
             }
         }
+        return all;
+    }
+
+    public static DeferredBlock<FluidTankBlock> fluidTank(ConduitTier tier) {
+        return FLUID_TANKS.get(tier);
+    }
+
+    public static DeferredBlock<EnergyCellBlock> energyCell(ConduitTier tier) {
+        return ENERGY_CELLS.get(tier);
+    }
+
+    // Every fluid tank then every energy cell, each ordered by tier.
+    public static List<DeferredBlock<? extends StorageBlock>> allStorage() {
+        List<DeferredBlock<? extends StorageBlock>> all = new ArrayList<>();
+        all.addAll(FLUID_TANKS.values());
+        all.addAll(ENERGY_CELLS.values());
         return all;
     }
 

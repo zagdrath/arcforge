@@ -49,8 +49,15 @@ public final class ArcforgeGameTests {
         TESTS.put("conduit_item_transfer", ConduitGameTests::itemTransfer);
         TESTS.put("conduit_liquid_transfer", ConduitGameTests::liquidTransfer);
         TESTS.put("conduit_liquid_split", ConduitGameTests::liquidSplit);
+        TESTS.put("conduit_auto_connect", ConduitGameTests::autoConnect);
+        TESTS.put("conduit_energy_storage", ConduitGameTests::energyStorage);
+        TESTS.put("conduit_item_storage", ConduitGameTests::itemStorage);
         TESTS.put("wrench_conduit", ConduitGameTests::wrenchConduit);
         TESTS.put("wrench_machine", ConduitGameTests::wrenchMachine);
+        TESTS.put("tank_buckets", StorageGameTests::tankBuckets);
+        TESTS.put("tank_keeps_fluid", StorageGameTests::tankKeepsFluid);
+        TESTS.put("cell_charge", StorageGameTests::cellCharge);
+        TESTS.put("cell_output_and_conduit", StorageGameTests::cellOutputAndConduit);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }
 

@@ -31,13 +31,15 @@ import net.zagdrath.arcforge.conduit.item.ItemPacket;
 
 // Every few ticks (per tier) pulls one stack from an output side and sends it as a packet towards an
 // input side that will accept it. Packets travel conduit by conduit along precomputed routes.
-// A destination that refuses the items makes the packet reroute; items are only dropped into the
-// world when nothing in the network can take them.
+// When nothing will take the items they are pulled into the source conduit's storage anyway (up to
+// ConduitTier.ITEM_STORAGE_SLOTS stacks) and sent on once a destination has room. A destination that
+// refuses a packet makes it reroute, and if nothing can take it the items are stored where they are.
 public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResource>> {
     // For each sink, the direction to leave each conduit in to get one step closer to it.
     private final Map<SinkKey, Map<BlockPos, Direction>> routes = new HashMap<>();
     private final Map<SinkKey, Endpoint<ResourceHandler<ItemResource>>> sinksByKey = new HashMap<>();
     private int sourceCursor;
+    private int storageCursor;
 
     public ItemConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier) {
         super(level, members, memberSet, tier, Capabilities.Item.BLOCK);
@@ -81,8 +83,13 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
 
     @Override
     public void tick(long gameTime) {
-        if (!sources.isEmpty() && !sinks.isEmpty() && gameTime % tier.ticksPerItemOperation() == 0) {
-            extract();
+        if (gameTime % tier.ticksPerItemOperation() == 0) {
+            if (!sinks.isEmpty()) {
+                dispatchStored();
+            }
+            if (!sources.isEmpty()) {
+                extract();
+            }
         }
         movePackets();
     }
@@ -111,6 +118,11 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
             }
             Target target = findTarget(resource, available, source.conduit(), source.machine());
             if (target == null) {
+                // Nowhere to send it: keep it in the conduit until somewhere has room.
+                int space = Math.min(available, conduit.storageSpaceFor(resource.toStack(1)));
+                if (space > 0 && extractInto(handler, index, resource, space, conduit)) {
+                    return true;
+                }
                 continue;
             }
             int extracted;
@@ -127,6 +139,48 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
             }
         }
         return false;
+    }
+
+    private static boolean extractInto(ResourceHandler<ItemResource> handler, int index, ItemResource resource, int amount, ConduitBlockEntity conduit) {
+        int extracted;
+        try (Transaction tx = Transaction.openRoot()) {
+            extracted = handler.extract(index, resource, amount, tx);
+            tx.commit();
+        }
+        if (extracted > 0) {
+            conduit.storeItems(resource.toStack(extracted), true);
+        }
+        return extracted > 0;
+    }
+
+    // Sends one stored stack (conduits taken in turn) towards a destination that will accept it.
+    // The packet starts at the conduit's core, where stored items rest.
+    private void dispatchStored() {
+        int count = members.size();
+        for (int attempt = 0; attempt < count; attempt++) {
+            BlockPos pos = members.get(storageCursor++ % count);
+            if (!(level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) || conduit.getStoredItems().isEmpty()) {
+                continue;
+            }
+            var iterator = conduit.getStoredItems().iterator();
+            while (iterator.hasNext()) {
+                ItemStack stack = iterator.next();
+                int amount = Math.min(stack.getCount(), tier.itemsPerOperation());
+                Target target = findTarget(ItemResource.of(stack), amount, pos, null);
+                if (target == null) {
+                    continue;
+                }
+                Direction exit = target.route().get(pos);
+                conduit.getPackets().add(new ItemPacket(stack.copyWithCount(target.accepted()), exit.getOpposite(), exit, 0.5F,
+                        target.key().conduit(), target.key().side()));
+                stack.shrink(target.accepted());
+                if (stack.isEmpty()) {
+                    iterator.remove();
+                }
+                conduit.markContentsChanged(true);
+                return;
+            }
+        }
     }
 
     private record Target(SinkKey key, Map<BlockPos, Direction> route, int accepted) {}
@@ -229,11 +283,15 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
         return stack.copyWithCount(stack.getCount() - inserted);
     }
 
-    // Sends the packet back through this conduit towards another sink, or drops it if nothing can take it.
+    // Sends the packet back through this conduit towards another sink, or stores it here if nothing can take it.
     private boolean reroute(BlockPos pos, ItemPacket packet) {
         Target target = findTarget(ItemResource.of(packet.stack), packet.stack.getCount(), pos, null);
         if (target == null) {
-            Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, packet.stack);
+            if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
+                conduit.storeItems(packet.stack, true);
+            } else {
+                Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, packet.stack);
+            }
             return false;
         }
         packet.from = packet.to;

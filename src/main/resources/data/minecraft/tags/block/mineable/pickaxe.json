@@ -16,6 +16,14 @@
     "arcforge:wrought_thermal_conduit",
     "arcforge:tempered_thermal_conduit",
     "arcforge:hardened_thermal_conduit",
-    "arcforge:arcforged_thermal_conduit"
+    "arcforge:arcforged_thermal_conduit",
+    "arcforge:wrought_fluid_tank",
+    "arcforge:tempered_fluid_tank",
+    "arcforge:hardened_fluid_tank",
+    "arcforge:arcforged_fluid_tank",
+    "arcforge:wrought_energy_cell",
+    "arcforge:tempered_energy_cell",
+    "arcforge:hardened_energy_cell",
+    "arcforge:arcforged_energy_cell"
   ]
 }

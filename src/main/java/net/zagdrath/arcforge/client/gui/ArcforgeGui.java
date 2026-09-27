@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.client.gui;
 
+import java.util.Locale;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.resources.Identifier;
@@ -37,5 +39,28 @@ public final class ArcforgeGui {
 
     public static boolean isInside(double mouseX, double mouseY, int x, int y, int width, int height) {
         return mouseX >= x && mouseX < x + width && mouseY >= y && mouseY < y + height;
+    }
+
+    // "950", "12.4k", "2.5M", "1.2G": one decimal place, dropping a trailing ".0".
+    public static String compact(long value) {
+        if (value < 1_000) return Long.toString(value);
+        if (value < 1_000_000) return oneDecimal(value / 1_000.0) + "k";
+        if (value < 1_000_000_000) return oneDecimal(value / 1_000_000.0) + "M";
+        return oneDecimal(value / 1_000_000_000.0) + "G";
+    }
+
+    // Millibuckets as buckets, e.g. 40,200 mB -> "40.2".
+    public static String buckets(long millibuckets) {
+        return oneDecimal(millibuckets / 1_000.0);
+    }
+
+    // Rounds down so a nearly-full store never reads as full.
+    private static String oneDecimal(double value) {
+        String text = String.format(Locale.ROOT, "%,.1f", Math.floor(value * 10.0) / 10.0);
+        return text.endsWith(".0") ? text.substring(0, text.length() - 2) : text;
+    }
+
+    public static String grouped(long value) {
+        return String.format("%,d", value);
     }
 }

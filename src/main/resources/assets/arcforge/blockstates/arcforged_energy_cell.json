@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "charge=0": {
+      "model": "arcforge:block/energy_cell/arcforged_0"
+    },
+    "charge=1": {
+      "model": "arcforge:block/energy_cell/arcforged_1"
+    },
+    "charge=2": {
+      "model": "arcforge:block/energy_cell/arcforged_2"
+    },
+    "charge=3": {
+      "model": "arcforge:block/energy_cell/arcforged_3"
+    },
+    "charge=4": {
+      "model": "arcforge:block/energy_cell/arcforged_4"
+    }
+  }
+}

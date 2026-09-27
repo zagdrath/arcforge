@@ -15,6 +15,8 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.heat.HeatHandler;
 
 // Exposes machine storage through NeoForge's standard capabilities, so any mod using
@@ -40,5 +42,9 @@ public final class ModCapabilities {
                 GeothermalPlantBlockEntity::getItemHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.GEOTHERMAL_PLANT.get(),
                 GeothermalPlantBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FLUID_TANK.get(),
+                FluidTankBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(),
+                EnergyCellBlockEntity::getEnergyHandler);
     }
 }

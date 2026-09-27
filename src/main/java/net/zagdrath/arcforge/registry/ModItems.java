@@ -15,7 +15,9 @@ import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
+import net.zagdrath.arcforge.item.storage.StorageBlockItem;
 import net.zagdrath.arcforge.item.tool.WrenchItem;
 
 public final class ModItems {
@@ -35,7 +37,21 @@ public final class ModItems {
         }
     }
 
+    // Fluid tank and energy cell items, in the same order as ModBlocks.allStorage().
+    private static final List<DeferredItem<StorageBlockItem>> STORAGE = new ArrayList<>();
+
+    static {
+        for (DeferredBlock<? extends StorageBlock> block : ModBlocks.allStorage()) {
+            STORAGE.add(ITEMS.registerItem(block.getId().getPath(),
+                    p -> new StorageBlockItem(block.get(), p), p -> p.useBlockDescriptionPrefix()));
+        }
+    }
+
     private ModItems() {}
+
+    public static List<DeferredItem<StorageBlockItem>> allStorage() {
+        return STORAGE;
+    }
 
     public static List<DeferredItem<ConduitBlockItem>> allConduits() {
         return CONDUITS;

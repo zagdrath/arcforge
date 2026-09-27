@@ -26,6 +26,7 @@ import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.slot.ToggleableSlot;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -56,10 +57,7 @@ public class GeothermalPlantMenu extends AbstractContainerMenu {
     // Upgrade slots sit in the Upgrades side tab, which is the 4th tab (y = 6 + 3 * 25), with slot items at +9,+25.
     public static final int UPGRADE_SLOT_X = 181, UPGRADE_SLOT_Y = 106, UPGRADE_SLOT_PITCH = 20;
 
-    // Menu button ids, sent through vanilla's container button packet.
-    private static final int BUTTON_REDSTONE_FIRST = 0;
-    private static final int BUTTON_SIDE_FIRST = 100;
-    public static final int BUTTON_CLEAR_SIDES = 99;
+    public static final int BUTTON_CLEAR_SIDES = MachineMenuButtons.CLEAR_SIDES;
 
     private static final int MACHINE_SLOTS = GeothermalPlantBlockEntity.SLOT_COUNT;
     private static final int PLAYER_INV_END = MACHINE_SLOTS + 27;
@@ -95,52 +93,17 @@ public class GeothermalPlantMenu extends AbstractContainerMenu {
     }
 
     public static int redstoneButtonId(RedstoneMode mode) {
-        return BUTTON_REDSTONE_FIRST + mode.ordinal();
+        return MachineMenuButtons.redstoneButtonId(mode);
     }
 
     public static int sideButtonId(RelativeSide side, int action) {
-        return BUTTON_SIDE_FIRST + side.ordinal() * SideConfig.ACTION_COUNT + action;
+        return MachineMenuButtons.sideButtonId(side, action);
     }
 
     // Runs on the server when the client clicks a redstone or side-config button.
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
-        if (buttonId >= BUTTON_REDSTONE_FIRST && buttonId < BUTTON_REDSTONE_FIRST + RedstoneMode.values().length) {
-            RedstoneMode mode = RedstoneMode.byId(buttonId - BUTTON_REDSTONE_FIRST);
-            access.execute((level, pos) -> {
-                if (level.getBlockEntity(pos) instanceof GeothermalPlantBlockEntity plant) {
-                    plant.setRedstoneMode(mode);
-                }
-            });
-            return true;
-        }
-
-        if (buttonId == BUTTON_CLEAR_SIDES) {
-            access.execute((level, pos) -> {
-                if (level.getBlockEntity(pos) instanceof GeothermalPlantBlockEntity plant) {
-                    plant.clearSideModes();
-                }
-            });
-            return true;
-        }
-
-        int sideButton = buttonId - BUTTON_SIDE_FIRST;
-        if (sideButton >= 0 && sideButton < RelativeSide.values().length * SideConfig.ACTION_COUNT) {
-            RelativeSide side = RelativeSide.byId(sideButton / SideConfig.ACTION_COUNT);
-            int action = sideButton % SideConfig.ACTION_COUNT;
-            access.execute((level, pos) -> {
-                if (level.getBlockEntity(pos) instanceof GeothermalPlantBlockEntity plant) {
-                    SideMode current = plant.getSideMode(side);
-                    plant.setSideMode(side, switch (action) {
-                        case SideConfig.ACTION_NEXT -> current.next();
-                        case SideConfig.ACTION_PREVIOUS -> current.previous();
-                        default -> SideMode.NONE;
-                    });
-                }
-            });
-            return true;
-        }
-        return false;
+        return MachineMenuButtons.handle(access, buttonId);
     }
 
     @Override

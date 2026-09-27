@@ -8,8 +8,8 @@ package net.zagdrath.arcforge.conduit;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 
-// Conduit tiers in progression order. Different tiers of the same type connect,
-// and a network runs at the rate of its lowest tier.
+// Arcforge tiers in progression order, shared by conduits and storage blocks. Different tiers of the
+// same conduit type connect, and a network runs at the rate of its lowest tier.
 public enum ConduitTier implements StringRepresentable {
     //            FE/t    items/op  ticks/op  mB/t    HU/t   item speed (blocks/tick)
     WROUGHT("wrought", 256, 8, 20, 200, 50, 0.05F),
@@ -19,6 +19,8 @@ public enum ConduitTier implements StringRepresentable {
 
     // Liquid each conduit block can hold.
     public static final int LIQUID_CAPACITY_PER_CONDUIT = 1_000;
+    // Item stacks each item conduit can store while nothing will take them.
+    public static final int ITEM_STORAGE_SLOTS = 4;
 
     private final String name;
     private final int energyPerTick;
@@ -60,6 +62,48 @@ public enum ConduitTier implements StringRepresentable {
 
     public float itemSpeed() {
         return itemSpeed;
+    }
+
+    // --- Storage blocks ---
+
+    // Fluid tank capacity in mB.
+    public int tankCapacity() {
+        return switch (this) {
+            case WROUGHT -> 16_000;
+            case TEMPERED -> 64_000;
+            case HARDENED -> 256_000;
+            case ARCFORGED -> 1_024_000;
+        };
+    }
+
+    // Most mB a fluid tank moves in or out per operation.
+    public int tankRate() {
+        return switch (this) {
+            case WROUGHT -> 500;
+            case TEMPERED -> 2_000;
+            case HARDENED -> 8_000;
+            case ARCFORGED -> 32_000;
+        };
+    }
+
+    // Energy cell capacity in FE.
+    public int cellCapacity() {
+        return switch (this) {
+            case WROUGHT -> 500_000;
+            case TEMPERED -> 4_000_000;
+            case HARDENED -> 32_000_000;
+            case ARCFORGED -> 256_000_000;
+        };
+    }
+
+    // Most FE an energy cell takes in or gives out per tick.
+    public int cellRate() {
+        return switch (this) {
+            case WROUGHT -> 512;
+            case TEMPERED -> 2_048;
+            case HARDENED -> 16_384;
+            case ARCFORGED -> 131_072;
+        };
     }
 
     public static ConduitTier lowest(ConduitTier a, ConduitTier b) {

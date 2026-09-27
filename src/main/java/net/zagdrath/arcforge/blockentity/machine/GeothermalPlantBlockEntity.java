@@ -36,11 +36,16 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
+import net.zagdrath.arcforge.conduit.ConduitConnectable;
+import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.GeothermalHeat;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.config.ConfigurableMachine;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
@@ -58,7 +63,7 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // Turns heat into FE. Heat comes from a combustion chamber (lava from the tank first, then coal/charcoal)
 // plus passive heat from adjacent lava source blocks. Heat ramps toward its target, and FE/t = heat * fePerHeat.
-public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, Dismantleable {
+public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, Dismantleable, ConduitConnectable, ConfigurableMachine {
     // The input slot takes lava buckets (drained into the tank) and coal/charcoal (burned directly).
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
@@ -206,10 +211,11 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
         ItemStack fuel = items.getStack(SLOT_INPUT);
         int fuelHeat = GeothermalHeat.solidFuelHeat(fuel);
         if (fuelHeat > 0) {
+            int burnTicks = GeothermalHeat.solidFuelBurnTicks(fuel);
             ItemStack remaining = fuel.copy();
             remaining.shrink(1);
             items.setStack(SLOT_INPUT, remaining);
-            beginBurn(ArcforgeConfig.GEOTHERMAL_SOLID_FUEL_BURN_TICKS.getAsInt(), fuelHeat);
+            beginBurn(burnTicks, fuelHeat);
         }
     }
 
@@ -267,11 +273,13 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
         return redstoneMode;
     }
 
+    @Override
     public void setRedstoneMode(RedstoneMode mode) {
         redstoneMode = mode;
         setChanged();
     }
 
+    @Override
     public void setSideMode(RelativeSide side, SideMode mode) {
         if (sideConfig.get(side) == mode) {
             return;
@@ -280,6 +288,7 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
         onSideConfigChanged();
     }
 
+    @Override
     public void clearSideModes() {
         sideConfig.clear();
         onSideConfigChanged();
@@ -289,9 +298,11 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
         setChanged();
         if (level != null) {
             level.invalidateCapabilities(worldPosition);
+            ConduitBlock.refreshAround(level, worldPosition);
         }
     }
 
+    @Override
     public SideMode getSideMode(RelativeSide side) {
         return sideConfig.get(side);
     }
@@ -348,6 +359,19 @@ public class GeothermalPlantBlockEntity extends BlockEntity implements MenuProvi
 
     public HeatHandler getHeatHandler(@Nullable Direction side) {
         return heatHandler;
+    }
+
+    // Auto conduits follow the side configuration: items in on input faces and out of output faces,
+    // lava in on input faces, FE out of energy faces, and heat out of every face.
+    @Override
+    public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
+        SideMode mode = modeFor(side);
+        return switch (type) {
+            case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case LIQUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case THERMAL -> ConnectionMode.OUTPUT;
+        };
     }
 
     // Held buckets fill the tank from any face, regardless of the side configuration.

@@ -71,6 +71,7 @@ public class WrenchItem extends Item {
         level.setBlock(pos, state.setValue(HorizontalDirectionalBlock.FACING, facing.getClockWise()), Block.UPDATE_ALL);
         // Side configuration is relative to the front, so every face's capabilities just changed.
         level.invalidateCapabilities(pos);
+        ConduitBlock.refreshAround(level, pos);
         level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_CLOSE, SoundSource.BLOCKS, 0.4F, 1.6F);
         return InteractionResult.SUCCESS;
     }

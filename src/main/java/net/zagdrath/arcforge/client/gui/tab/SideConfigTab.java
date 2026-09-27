@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -25,7 +27,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 // Left click cycles forward, right click cycles back, shift-click clears one face.
 public class SideConfigTab extends SideTab {
     private static final Identifier FACE_HOVER = ArcforgeGui.widget("face_hover");
-    private static final Identifier FACE_NONE = ArcforgeGui.widget("face_none");
+    private static final Identifier ICON_CLEAR = ArcforgeGui.widget("icon_clear");
     private static final Identifier BUTTON = ArcforgeGui.widget("button");
     private static final Identifier BUTTON_HOVER = ArcforgeGui.widget("button_hover");
     private static final int FACE_SIZE = 16;
@@ -88,23 +90,23 @@ public class SideConfigTab extends SideTab {
 
         boolean clearHovered = isOverClear(mouseX - x, mouseY - y);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, clearHovered ? BUTTON_HOVER : BUTTON, x + CLEAR_X, y + CLEAR_Y, CLEAR_SIZE, CLEAR_SIZE);
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FACE_NONE, x + CLEAR_X + 2, y + CLEAR_Y + 2, FACE_SIZE, FACE_SIZE);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ICON_CLEAR, x + CLEAR_X + 2, y + CLEAR_Y + 2, 16, 16);
     }
 
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
-        if (isOverClear(localX, localY) && event.button() == 0) {
+        if (isOverClear(localX, localY) && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             clearAll.run();
             ArcforgeGui.playClickSound();
             return true;
         }
 
         RelativeSide side = faceAt(localX, localY);
-        if (side == null || (event.button() != 0 && event.button() != 1)) {
+        if (side == null || (event.button() != InputConstants.MOUSE_BUTTON_LEFT && event.button() != InputConstants.MOUSE_BUTTON_RIGHT)) {
             return false;
         }
         int sideAction = event.hasShiftDown() ? SideConfig.ACTION_CLEAR
-                : event.button() == 1 ? SideConfig.ACTION_PREVIOUS
+                : event.button() == InputConstants.MOUSE_BUTTON_RIGHT ? SideConfig.ACTION_PREVIOUS
                 : SideConfig.ACTION_NEXT;
         action.accept(side, sideAction);
         ArcforgeGui.playClickSound();

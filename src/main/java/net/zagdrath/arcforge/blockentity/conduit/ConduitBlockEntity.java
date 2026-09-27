@@ -6,6 +6,7 @@
 package net.zagdrath.arcforge.blockentity.conduit;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
@@ -19,6 +20,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,19 +28,27 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.conduit.ConnectionMode;
+import net.zagdrath.arcforge.conduit.SideSetting;
 import net.zagdrath.arcforge.conduit.item.ItemPacket;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-// Per-block conduit state: wrench-disabled sides, plus contents for rendering (items and liquid).
-// All transfer logic lives in ConduitNetworkManager.
+// Per-block conduit state: the wrench setting of each side, plus what this conduit holds (its share of
+// the network's energy/heat/liquid, items in transit and items stored). All transfer logic lives in
+// ConduitNetworkManager.
 public class ConduitBlockEntity extends BlockEntity {
     // Liquid and item conduits sync their contents to clients at most this often.
     private static final int LIQUID_SYNC_INTERVAL = 5;
 
-    private byte disabledSides;
+    private final SideSetting[] settings = new SideSetting[Direction.values().length];
     private final List<ItemPacket> packets = new ArrayList<>();
+    // Items pulled in with nowhere to go yet; shown resting in the conduit's core.
+    private final List<ItemStack> storedItems = new ArrayList<>();
+    // Energy (FE) or heat (HU) held by this conduit, for energy and thermal conduits.
+    private int stored;
     private FluidStack fluid = FluidStack.EMPTY;
     private float itemSpeed;
     private boolean syncPending;
@@ -47,6 +57,7 @@ public class ConduitBlockEntity extends BlockEntity {
 
     public ConduitBlockEntity(BlockPos pos, BlockState state) {
         super(typeFor(state), pos, state);
+        Arrays.fill(settings, SideSetting.AUTO);
     }
 
     private static net.minecraft.world.level.block.entity.BlockEntityType<ConduitBlockEntity> typeFor(BlockState state) {
@@ -59,18 +70,80 @@ public class ConduitBlockEntity extends BlockEntity {
         return ((ConduitBlock) getBlockState().getBlock()).getConduitType();
     }
 
-    // --- Wrench-disabled conduit-to-conduit sides ---
+    // --- Side settings (changed with the wrench) ---
 
-    public boolean isSideDisabled(Direction side) {
-        return (disabledSides & (1 << side.ordinal())) != 0;
+    public SideSetting getSetting(Direction side) {
+        return settings[side.ordinal()];
     }
 
-    public void setSideDisabled(Direction side, boolean disabled) {
-        byte updated = (byte) (disabled ? disabledSides | (1 << side.ordinal()) : disabledSides & ~(1 << side.ordinal()));
-        if (updated != disabledSides) {
-            disabledSides = updated;
+    public void setSetting(Direction side, SideSetting setting) {
+        if (settings[side.ordinal()] != setting) {
+            settings[side.ordinal()] = setting;
             setChanged();
         }
+    }
+
+    public boolean isSideDisabled(Direction side) {
+        return getSetting(side) == SideSetting.DISABLED;
+    }
+
+    // --- Energy / heat buffer ---
+
+    public int getStored() {
+        return stored;
+    }
+
+    public void setStored(int amount) {
+        if (amount != stored) {
+            stored = amount;
+            setChanged();
+        }
+    }
+
+    // --- Stored items ---
+
+    public List<ItemStack> getStoredItems() {
+        return storedItems;
+    }
+
+    // Adds as much of the stack as fits in the storage slots and returns how many were stored.
+    // With `overflow`, items that do not fit get a slot of their own anyway (used for items already
+    // inside the network, which must never be deleted).
+    public int storeItems(ItemStack stack, boolean overflow) {
+        int remaining = stack.getCount();
+        for (ItemStack held : storedItems) {
+            if (remaining <= 0) {
+                break;
+            }
+            if (ItemStack.isSameItemSameComponents(held, stack)) {
+                int moved = Math.min(remaining, held.getMaxStackSize() - held.getCount());
+                if (moved > 0) {
+                    held.grow(moved);
+                    remaining -= moved;
+                }
+            }
+        }
+        while (remaining > 0 && (overflow || storedItems.size() < ConduitTier.ITEM_STORAGE_SLOTS)) {
+            int moved = Math.min(remaining, stack.getMaxStackSize());
+            storedItems.add(stack.copyWithCount(moved));
+            remaining -= moved;
+        }
+        int storedCount = stack.getCount() - remaining;
+        if (storedCount > 0) {
+            markContentsChanged(true);
+        }
+        return storedCount;
+    }
+
+    // How many of this item could still be stored.
+    public int storageSpaceFor(ItemStack stack) {
+        int space = (ConduitTier.ITEM_STORAGE_SLOTS - storedItems.size()) * stack.getMaxStackSize();
+        for (ItemStack held : storedItems) {
+            if (ItemStack.isSameItemSameComponents(held, stack)) {
+                space += held.getMaxStackSize() - held.getCount();
+            }
+        }
+        return Math.max(0, space);
     }
 
     // --- Item packets ---
@@ -167,6 +240,10 @@ public class ConduitBlockEntity extends BlockEntity {
             Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, packet.stack);
         }
         packets.clear();
+        for (ItemStack stack : storedItems) {
+            Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
+        }
+        storedItems.clear();
         if (!fluid.isEmpty()) {
             handOffFluid(pos, state);
         }
@@ -175,7 +252,7 @@ public class ConduitBlockEntity extends BlockEntity {
     private void handOffFluid(BlockPos pos, BlockState state) {
         List<ConduitBlockEntity> neighbours = new ArrayList<>();
         for (Direction side : Direction.values()) {
-            if (ConduitBlock.mode(state, side) == net.zagdrath.arcforge.conduit.ConnectionMode.PIPE
+            if (ConduitBlock.mode(state, side) == ConnectionMode.PIPE
                     && level.getBlockEntity(pos.relative(side)) instanceof ConduitBlockEntity neighbour
                     && (neighbour.fluid.isEmpty() || FluidStack.isSameFluidSameComponents(neighbour.fluid, fluid))) {
                 neighbours.add(neighbour);
@@ -196,9 +273,16 @@ public class ConduitBlockEntity extends BlockEntity {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        disabledSides = (byte) input.getIntOr("disabled_sides", 0);
+        input.getInt("sides").ifPresentOrElse(this::unpackSettings, () -> migrateSettings(input.getIntOr("disabled_sides", 0)));
         packets.clear();
         input.listOrEmpty("packets", ItemPacket.CODEC).forEach(packets::add);
+        storedItems.clear();
+        input.listOrEmpty("stored_items", ItemStack.OPTIONAL_CODEC).forEach(stack -> {
+            if (!stack.isEmpty()) {
+                storedItems.add(stack);
+            }
+        });
+        stored = input.getIntOr("stored", 0);
         fluid = input.read("fluid", FluidStack.OPTIONAL_CODEC).orElse(FluidStack.EMPTY);
         itemSpeed = input.getFloatOr("item_speed", 0.0F);
     }
@@ -206,15 +290,54 @@ public class ConduitBlockEntity extends BlockEntity {
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
-        output.putInt("disabled_sides", disabledSides);
+        output.putInt("sides", packSettings());
         if (!packets.isEmpty()) {
             var list = output.list("packets", ItemPacket.CODEC);
             packets.forEach(list::add);
+        }
+        if (!storedItems.isEmpty()) {
+            var list = output.list("stored_items", ItemStack.OPTIONAL_CODEC);
+            storedItems.forEach(list::add);
+        }
+        if (stored > 0) {
+            output.putInt("stored", stored);
         }
         if (!fluid.isEmpty()) {
             output.store("fluid", FluidStack.OPTIONAL_CODEC, fluid);
         }
         output.putFloat("item_speed", itemSpeed);
+    }
+
+    // Two bits per side.
+    private int packSettings() {
+        int packed = 0;
+        for (Direction side : Direction.values()) {
+            packed |= settings[side.ordinal()].ordinal() << (side.ordinal() * 2);
+        }
+        return packed;
+    }
+
+    private void unpackSettings(int packed) {
+        for (Direction side : Direction.values()) {
+            settings[side.ordinal()] = SideSetting.byId((packed >>> (side.ordinal() * 2)) & 3);
+        }
+    }
+
+    // Saves from before side settings existed: a wrench-set input/output lived only in the block state,
+    // and disabled conduit joints in a bit mask. Keep both as forced settings.
+    private void migrateSettings(int disabledMask) {
+        BlockState state = getBlockState();
+        for (Direction side : Direction.values()) {
+            SideSetting setting = SideSetting.AUTO;
+            if ((disabledMask & (1 << side.ordinal())) != 0) {
+                setting = SideSetting.DISABLED;
+            } else if (state.getBlock() instanceof ConduitBlock) {
+                ConnectionMode mode = ConduitBlock.mode(state, side);
+                if (mode == ConnectionMode.INPUT) setting = SideSetting.INPUT;
+                if (mode == ConnectionMode.OUTPUT) setting = SideSetting.OUTPUT;
+            }
+            settings[side.ordinal()] = setting;
+        }
     }
 
     @Override

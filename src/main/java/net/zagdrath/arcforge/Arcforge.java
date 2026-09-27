@@ -20,6 +20,7 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 import net.zagdrath.arcforge.registry.ModCreativeTabs;
+import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 
@@ -35,6 +36,7 @@ public class Arcforge {
         ModBlockEntityTypes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
+        ModDataComponents.register(modEventBus);
         ModCapabilities.register(modEventBus);
         ArcforgeGameTests.register(modEventBus);
         TestFixtures.register(modEventBus);

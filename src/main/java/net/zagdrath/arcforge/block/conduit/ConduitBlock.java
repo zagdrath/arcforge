@@ -45,12 +45,15 @@ import net.zagdrath.arcforge.conduit.ConduitCapabilities;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
+import net.zagdrath.arcforge.conduit.SideSetting;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-// A 6px pipe that auto-connects to conduits of the same type (any tier). Sides facing machines are
-// set to input/output with the wrench. Whether a run is drawn as one straight tube is derived from
-// the six sides (see isStraight) rather than stored, which keeps the block state count down.
+// A 6px pipe that auto-connects to conduits of the same type (any tier) and to machines. A side facing a
+// machine follows the machine's side configuration ("auto"), unless the wrench forces it to input,
+// output or disabled. The block state holds the resulting connection; the setting lives in the block
+// entity. Whether a run is drawn as one straight tube is derived from the six sides (see straightAxis)
+// rather than stored, which keeps the block state count down.
 public class ConduitBlock extends BaseEntityBlock {
     public static final EnumProperty<ConnectionMode> NORTH = EnumProperty.create("north", ConnectionMode.class);
     public static final EnumProperty<ConnectionMode> SOUTH = EnumProperty.create("south", ConnectionMode.class);
@@ -173,32 +176,43 @@ public class ConduitBlock extends BaseEntityBlock {
         return state.setValue(property(side), updated);
     }
 
-    // Decides a side's connection:
-    //  - a same-type conduit connects unless either end was disconnected with the wrench
+    // Decides a side's connection from its wrench setting:
+    //  - a same-type conduit connects unless either end is disabled
     //    (or, for liquid conduits, the two hold different liquids);
-    //  - a wrench-configured input/output is kept while the neighbour still has the capability;
-    //  - anything else is none.
+    //  - next to anything else, auto asks the block (see ConduitCapabilities.autoMode), a forced
+    //    input/output applies while the block has the capability, and disabled never connects;
+    //  - once the neighbour is gone (air) the setting goes back to auto.
     ConnectionMode computeSide(LevelReader level, BlockPos pos, Direction side, ConnectionMode current) {
         BlockPos neighbourPos = pos.relative(side);
         ConduitBlockEntity own = level.getBlockEntity(pos) instanceof ConduitBlockEntity be ? be : null;
+        SideSetting setting = own != null ? own.getSetting(side) : SideSetting.AUTO;
+        BlockState neighbourState = level.getBlockState(neighbourPos);
 
-        if (level.getBlockState(neighbourPos).getBlock() instanceof ConduitBlock other && other.conduitType == conduitType) {
+        if (neighbourState.getBlock() instanceof ConduitBlock other && other.conduitType == conduitType) {
             ConduitBlockEntity neighbour = level.getBlockEntity(neighbourPos) instanceof ConduitBlockEntity be ? be : null;
-            boolean disabled = (own != null && own.isSideDisabled(side)) || (neighbour != null && neighbour.isSideDisabled(side.getOpposite()));
+            boolean disabled = setting == SideSetting.DISABLED || (neighbour != null && neighbour.isSideDisabled(side.getOpposite()));
             if (disabled || hasConflictingLiquids(own, neighbour)) {
                 return ConnectionMode.NONE;
             }
             return ConnectionMode.PIPE;
         }
 
-        // The wrench-disabled flag only matters between conduits; forget it once the neighbour is gone.
-        if (own != null) {
-            own.setSideDisabled(side, false);
+        // Capabilities can only be queried on a full level with the neighbour loaded; keep what we have.
+        if (!(level instanceof Level fullLevel) || !fullLevel.isLoaded(neighbourPos)) {
+            return current == ConnectionMode.PIPE ? ConnectionMode.NONE : current;
         }
-        if (current.isPort() && level instanceof Level fullLevel && ConduitCapabilities.canConnect(fullLevel, pos, side, conduitType)) {
-            return current;
+        if (neighbourState.isAir()) {
+            if (own != null) {
+                own.setSetting(side, SideSetting.AUTO);
+            }
+            return ConnectionMode.NONE;
         }
-        return ConnectionMode.NONE;
+        return switch (setting) {
+            case AUTO -> ConduitCapabilities.autoMode(fullLevel, pos, side, conduitType);
+            case INPUT -> ConduitCapabilities.canConnect(fullLevel, pos, side, conduitType) ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case OUTPUT -> ConduitCapabilities.canConnect(fullLevel, pos, side, conduitType) ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case DISABLED -> ConnectionMode.NONE;
+        };
     }
 
     // A liquid network carries one fluid at a time, so conduits holding different fluids stay apart.
@@ -209,6 +223,16 @@ public class ConduitBlock extends BaseEntityBlock {
         FluidStack fa = a.getFluid();
         FluidStack fb = b.getFluid();
         return !fa.isEmpty() && !fb.isEmpty() && !FluidStack.isSameFluidSameComponents(fa, fb);
+    }
+
+    // Re-evaluates the conduits touching a machine, e.g. after its side configuration or facing changed.
+    public static void refreshAround(Level level, BlockPos machinePos) {
+        if (level.isClientSide()) {
+            return;
+        }
+        for (Direction side : Direction.values()) {
+            refreshConnections(level, machinePos.relative(side));
+        }
     }
 
     // Re-evaluates every side, e.g. after a liquid network empties and can now merge with its neighbours.
@@ -249,23 +273,29 @@ public class ConduitBlock extends BaseEntityBlock {
         BlockPos neighbourPos = pos.relative(side);
         Component result;
 
-        if (level.getBlockState(neighbourPos).getBlock() instanceof ConduitBlock other && other.conduitType == conduitType
-                && level.getBlockEntity(pos) instanceof ConduitBlockEntity own
+        ConduitBlockEntity own = level.getBlockEntity(pos) instanceof ConduitBlockEntity be ? be : null;
+        BlockState neighbourState = level.getBlockState(neighbourPos);
+
+        if (own == null) {
+            result = Component.translatable("message.arcforge.conduit.nothing");
+        } else if (neighbourState.getBlock() instanceof ConduitBlock other && other.conduitType == conduitType
                 && level.getBlockEntity(neighbourPos) instanceof ConduitBlockEntity neighbour) {
-            boolean disconnect = mode(state, side) == ConnectionMode.PIPE;
-            own.setSideDisabled(side, disconnect);
-            neighbour.setSideDisabled(side.getOpposite(), disconnect);
+            SideSetting setting = mode(state, side) == ConnectionMode.PIPE ? SideSetting.DISABLED : SideSetting.AUTO;
+            own.setSetting(side, setting);
+            neighbour.setSetting(side.getOpposite(), setting);
             refreshConnections(level, pos);
             refreshConnections(level, neighbourPos);
             boolean connected = mode(level.getBlockState(pos), side) == ConnectionMode.PIPE;
             result = Component.translatable(connected ? "message.arcforge.conduit.connected" : "message.arcforge.conduit.disconnected");
-        } else if (ConduitCapabilities.canConnect(level, pos, side, conduitType)) {
-            ConnectionMode next = mode(state, side).nextPort(sneaking);
-            level.setBlock(pos, state.setValue(property(side), next), Block.UPDATE_ALL);
-            if (level instanceof ServerLevel serverLevel) {
-                ConduitNetworkManager.get(serverLevel).markDirty(pos);
-            }
-            result = next.getDisplayName();
+        } else if (!neighbourState.isAir()
+                && (own.getSetting(side) != SideSetting.AUTO || ConduitCapabilities.canConnect(level, pos, side, conduitType))) {
+            SideSetting next = own.getSetting(side).next(sneaking);
+            own.setSetting(side, next);
+            refreshConnections(level, pos);
+            ConnectionMode effective = mode(level.getBlockState(pos), side);
+            result = next == SideSetting.AUTO
+                    ? Component.translatable("message.arcforge.conduit.auto", effective.getDisplayName())
+                    : next.getDisplayName();
         } else {
             result = Component.translatable("message.arcforge.conduit.nothing");
         }

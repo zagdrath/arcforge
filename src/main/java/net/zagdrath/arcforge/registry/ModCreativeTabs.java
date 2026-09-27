@@ -26,6 +26,7 @@ public final class ModCreativeTabs {
             .icon(() -> ModItems.GEOTHERMAL_PLANT.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.GEOTHERMAL_PLANT.get());
+                ModItems.allStorage().forEach(item -> output.accept(item.get()));
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> LOGISTICS = CREATIVE_MODE_TABS.register("logistics", () -> CreativeModeTab.builder()

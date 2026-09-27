@@ -63,6 +63,10 @@ public class ArcforgeConfig {
             .comment("Ticks one piece of coal or charcoal burns for (vanilla furnace value is 1600).")
             .defineInRange("solidFuelBurnTicks", 1_600, 1, 32_000);
 
+    public static final ModConfigSpec.DoubleValue GEOTHERMAL_COAL_BLOCK_MULTIPLIER = BUILDER
+            .comment("A block of coal burns at coal heat for this many times as long as one coal (9 coal, plus a bonus).")
+            .defineInRange("coalBlockMultiplier", 9.5, 1.0, 100.0);
+
     static {
         BUILDER.pop();
     }

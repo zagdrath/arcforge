@@ -16,6 +16,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -35,6 +36,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.machine.interaction.MachineInteractions;
 import net.zagdrath.arcforge.machine.interaction.WrenchableMachine;
@@ -75,6 +77,14 @@ public class GeothermalPlantBlock extends BaseEntityBlock implements WrenchableM
     protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         InteractionResult result = MachineInteractions.useFluidContainer(level, pos, player, hand);
         return result != null ? result : InteractionResult.TRY_WITH_EMPTY_HAND;
+    }
+
+    // Placed from a dismantled item, the saved side configuration is only applied after the block
+    // exists, so let neighbouring conduits look again.
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        ConduitBlock.refreshAround(level, pos);
     }
 
     @Override

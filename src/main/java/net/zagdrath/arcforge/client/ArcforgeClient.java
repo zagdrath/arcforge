@@ -16,7 +16,10 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.client.screen.machine.GeothermalPlantScreen;
+import net.zagdrath.arcforge.client.screen.storage.EnergyCellScreen;
+import net.zagdrath.arcforge.client.screen.storage.FluidTankScreen;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 
@@ -32,11 +35,14 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.GEOTHERMAL_PLANT.get(), GeothermalPlantScreen::new);
+        event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);
+        event.register(ModMenuTypes.ENERGY_CELL.get(), EnergyCellScreen::new);
     }
 
-    // Only glass conduits (item and liquid) need a renderer; energy and thermal are pure block models.
+    // Glass conduits (item and liquid) and fluid tanks draw their contents; everything else is pure block models.
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.TRANSPARENT_CONDUIT.get(), ConduitRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.FLUID_TANK.get(), FluidTankRenderer::new);
     }
 }

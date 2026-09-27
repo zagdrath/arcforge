@@ -32,10 +32,13 @@ public class ConduitBlockItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
         builder.accept(tier.describeThroughput(conduitType).copy().withStyle(ChatFormatting.GRAY));
-        if (conduitType == ConduitType.LIQUID) {
-            builder.accept(Component.translatable("tooltip.arcforge.conduit.buffer", String.format("%,d", ConduitTier.LIQUID_CAPACITY_PER_CONDUIT))
-                    .withStyle(ChatFormatting.GRAY));
-        }
+        Component buffer = switch (conduitType) {
+            case LIQUID -> Component.translatable("tooltip.arcforge.conduit.buffer", String.format("%,d", ConduitTier.LIQUID_CAPACITY_PER_CONDUIT));
+            case ENERGY -> Component.translatable("tooltip.arcforge.conduit.buffer.energy", String.format("%,d", tier.energyPerTick()));
+            case THERMAL -> Component.translatable("tooltip.arcforge.conduit.buffer.thermal", String.format("%,d", tier.heatPerTick()));
+            case ITEM -> Component.translatable("tooltip.arcforge.conduit.buffer.item", ConduitTier.ITEM_STORAGE_SLOTS);
+        };
+        builder.accept(buffer.copy().withStyle(ChatFormatting.GRAY));
         builder.accept(Component.translatable("tooltip.arcforge.conduit.mixed_tiers").withStyle(ChatFormatting.DARK_GRAY));
     }
 }

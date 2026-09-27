@@ -1,0 +1,7 @@
+{
+  "parent": "arcforge:block/fluid_tank/base",
+  "textures": {
+    "frame": "arcforge:block/fluid_tank/arcforged",
+    "glass": "arcforge:block/fluid_tank/glass"
+  }
+}

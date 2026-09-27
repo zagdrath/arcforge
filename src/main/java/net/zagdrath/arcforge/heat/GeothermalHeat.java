@@ -25,9 +25,18 @@ public final class GeothermalHeat {
 
     // HU produced while this item burns, or 0 if it is not a valid fuel.
     public static int solidFuelHeat(ItemStack stack) {
-        if (stack.is(Items.COAL)) return ArcforgeConfig.GEOTHERMAL_COAL_HEAT.getAsInt();
+        if (stack.is(Items.COAL) || stack.is(Items.COAL_BLOCK)) return ArcforgeConfig.GEOTHERMAL_COAL_HEAT.getAsInt();
         if (stack.is(Items.CHARCOAL)) return ArcforgeConfig.GEOTHERMAL_CHARCOAL_HEAT.getAsInt();
         return 0;
+    }
+
+    // Ticks one item of this fuel burns for. A block of coal lasts coalBlockMultiplier times as long as coal.
+    public static int solidFuelBurnTicks(ItemStack stack) {
+        int ticks = ArcforgeConfig.GEOTHERMAL_SOLID_FUEL_BURN_TICKS.getAsInt();
+        if (stack.is(Items.COAL_BLOCK)) {
+            return (int) Math.round(ticks * ArcforgeConfig.GEOTHERMAL_COAL_BLOCK_MULTIPLIER.getAsDouble());
+        }
+        return ticks;
     }
 
     public static int lavaHeat() {
