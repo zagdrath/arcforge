@@ -301,6 +301,39 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
+    // Pressurized Conduits connect to a turbine array's casings on its steam input face, and only there.
+    static void turbineArrayConduits(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 1);
+        buildShell(helper, min, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
+        BlockPos north = new BlockPos(1, 1, 0);
+        BlockPos south = new BlockPos(1, 1, 4);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
+                    helper.assertTrue(turbine.isMaster(), "Turbine did not form");
+                    // Conduits first, then the side changed in the GUI, as a player would.
+                    helper.setBlock(north, ModBlocks.conduit(ConduitType.GAS, ConduitTier.WROUGHT).get());
+                    helper.setBlock(south, ModBlocks.conduit(ConduitType.GAS, ConduitTier.WROUGHT).get());
+                    net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(north));
+                    net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(south));
+                    for (var side : net.zagdrath.arcforge.machine.config.RelativeSide.values()) {
+                        turbine.setSideMode(side, side == net.zagdrath.arcforge.machine.config.RelativeSide.LEFT
+                                ? net.zagdrath.arcforge.machine.config.SideMode.INPUT : net.zagdrath.arcforge.machine.config.SideMode.NONE);
+                    }
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
+                    var northMode = net.zagdrath.arcforge.block.conduit.ConduitBlock.mode(helper.getBlockState(north), Direction.SOUTH);
+                    var southMode = net.zagdrath.arcforge.block.conduit.ConduitBlock.mode(helper.getBlockState(south), Direction.NORTH);
+                    helper.assertTrue(turbine.getStructureFacing() == Direction.WEST, "Facing " + turbine.getStructureFacing());
+                    helper.assertTrue(northMode == net.zagdrath.arcforge.conduit.ConnectionMode.INPUT, "Conduit on the left (north) face is " + northMode);
+                    helper.assertTrue(southMode == net.zagdrath.arcforge.conduit.ConnectionMode.NONE, "Conduit on the right (south) face is " + southMode);
+                })
+                .thenSucceed();
+    }
+
     // Copper presses like steel; the upgrades are made from plates now.
     static void copperPartsAndUpgrades(GameTestHelper helper) {
         var level = helper.getLevel();

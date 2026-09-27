@@ -25,7 +25,8 @@ public class EnergyCellScreen extends StorageScreen<EnergyCellMenu> {
     private static final int RECESS_X = 64, RECESS_Y = 16, RECESS_W = 16, RECESS_H = 56;
     private static final int FILL_X = 65, FILL_Y = 17, FILL_W = 14, FILL_H = 54;
     private static final int TEXT_X = 91;
-    private static final int STORED_LABEL_Y = 21, STORED_Y = 31, IN_Y = 47, OUT_Y = 57;
+    // The amount and the capacity get a line each, so big numbers still fit the screen.
+    private static final int STORED_LABEL_Y = 21, STORED_Y = 30, CAPACITY_Y = 39, IN_Y = 49, OUT_Y = 58;
     private static final int IN_COLOR = 0xFF55FF55, OUT_COLOR = 0xFFFF5555;
 
     private final Identifier energyFill = sprite("energy_fill");
@@ -51,8 +52,8 @@ public class EnergyCellScreen extends StorageScreen<EnergyCellMenu> {
     @Override
     protected void drawInfo(GuiGraphicsExtractor graphics) {
         graphics.text(font, Component.translatable("gui.arcforge.stored"), TEXT_X, STORED_LABEL_Y, ArcforgeGui.LABEL, false);
-        graphics.text(font, Component.translatable("gui.arcforge.fe_compact",
-                ArcforgeGui.compact(menu.getEnergy()), ArcforgeGui.compact(menu.getCapacity())), TEXT_X, STORED_Y, ArcforgeGui.WHITE, false);
+        graphics.text(font, Component.translatable("gui.arcforge.fe_amount", ArcforgeGui.compact(menu.getEnergy())), TEXT_X, STORED_Y, ArcforgeGui.WHITE, false);
+        graphics.text(font, Component.translatable("gui.arcforge.fe_capacity", ArcforgeGui.compact(menu.getCapacity())), TEXT_X, CAPACITY_Y, ArcforgeGui.LABEL, false);
         graphics.text(font, Component.translatable("gui.arcforge.fe_in", ArcforgeGui.compact(menu.getReceivedPerTick())), TEXT_X, IN_Y, IN_COLOR, false);
         graphics.text(font, Component.translatable("gui.arcforge.fe_out", ArcforgeGui.compact(menu.getExtractedPerTick())), TEXT_X, OUT_Y, OUT_COLOR, false);
     }

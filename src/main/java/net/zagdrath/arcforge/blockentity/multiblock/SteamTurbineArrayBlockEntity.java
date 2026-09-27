@@ -76,7 +76,10 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     private int flow;
     private int fePerTick;
     private float syncedRpm;
+    private int syncedFlow;
     private long lastSync;
+    // Client side: how thick the steam in the rotor chamber looks (0-1), easing toward the synced flow.
+    private float shownSteam = -1;
 
     // Client side: the rotor angle, advanced as frames are drawn.
     private float clientAngle;
@@ -191,9 +194,10 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         }
 
         pushEnergy(level);
-        if (Math.abs(rpm - syncedRpm) >= 1.0 && level.getGameTime() - lastSync >= SYNC_INTERVAL
-                || (rpm == 0 && syncedRpm != 0)) {
+        boolean changed = Math.abs(rpm - syncedRpm) >= 1.0 || flow != syncedFlow;
+        if (changed && level.getGameTime() - lastSync >= SYNC_INTERVAL || (rpm == 0 && syncedRpm != 0)) {
             syncedRpm = (float) rpm;
+            syncedFlow = flow;
             lastSync = level.getGameTime();
             sync();
         }
@@ -241,6 +245,13 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     public int getFePerTick() {
         return fePerTick;
+    }
+
+    // Client side: the steam density to draw, easing toward the share of the maximum flow going through.
+    public float easeSteamDensity(float share) {
+        float target = Math.min(1.0F, (float) syncedFlow / Math.max(1, maxFlow()));
+        shownSteam = shownSteam < 0 ? target : shownSteam + (target - shownSteam) * share;
+        return shownSteam;
     }
 
     // Client side: the rotor angle in degrees at this moment. It turns at up to 18° a tick (one turn a
@@ -291,6 +302,8 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         steam.deserialize(input.childOrEmpty("steam"));
         rpm = input.getDoubleOr("rpm", 0.0);
         syncedRpm = (float) rpm;
+        flow = input.getIntOr("flow", 0);
+        syncedFlow = flow;
         targetsDirty = true;
     }
 
@@ -300,6 +313,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         energy.serialize(output.child("energy"));
         steam.serialize(output.child("steam"));
         output.putDouble("rpm", rpm);
+        output.putInt("flow", flow);
     }
 
     @Override

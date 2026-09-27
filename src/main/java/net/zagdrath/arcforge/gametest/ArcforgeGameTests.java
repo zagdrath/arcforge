@@ -97,6 +97,7 @@ public final class ArcforgeGameTests {
         TESTS.put("steam_turbine_output", SteamGameTests::turbineOutput);
         TESTS.put("steam_boiler_array_forms", SteamGameTests::boilerArrayForms);
         TESTS.put("steam_turbine_array_spins", SteamGameTests::turbineArraySpins);
+        TESTS.put("steam_turbine_array_conduits", SteamGameTests::turbineArrayConduits);
         TESTS.put("steam_copper_parts_and_upgrades", SteamGameTests::copperPartsAndUpgrades);
         TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);
         TESTS.put("auto_eject", InductionGameTests::autoEject);

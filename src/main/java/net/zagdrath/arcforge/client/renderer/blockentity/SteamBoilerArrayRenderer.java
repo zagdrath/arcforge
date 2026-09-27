@@ -33,13 +33,19 @@ import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
 // Draws the inside of a formed Steam Boiler Array, seen through its windows (the casings draw only the
-// outside of the structure): an opaque dark drum just inside the walls, then water from the floor up to
-// its level and steam above it, thicker the more steam there is. Levels ease toward the synced ones.
+// outside of the structure): an opaque dark drum just inside the walls, then water rising from the floor
+// (a full tank fills the lower 65%), and steam gathering under the roof and filling the space above the
+// water as it builds up, thicker the more there is. Levels ease toward the synced ones.
 public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoilerArrayBlockEntity, SteamBoilerArrayRenderer.State> {
     private static final float VOLUME_INSET = 1.0F / 16.0F, DRUM_INSET = 2.0F / 16.0F;
     private static final int DRUM_COLOR = 0xFF1C1F22;
     // Share of the gap to the synced level closed each frame.
     private static final float EASE = 0.08F;
+    // A full water tank fills this share of the drum; the rest is headspace for the steam.
+    private static final float WATER_SHARE = 0.65F;
+    // Steam is this see-through when there is only a wisp of it, and this thick when the tank is full
+    // (a little thicker again while it boils).
+    private static final float STEAM_MIN_ALPHA = 0.2F, STEAM_FULL_ALPHA = 0.75F, BOILING_ALPHA = 0.1F;
     private static final Identifier DRUM = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_boiler_array/formed_base");
 
     public static class State extends BlockEntityRenderState {
@@ -83,7 +89,8 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
         Fluid steamFluid = (grade != null ? grade : SteamGrade.STEAM).fluid();
         var steamModel = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(steamFluid.defaultFluidState());
         state.steamSprite = steamModel.stillMaterial().sprite();
-        int alpha = (int) (255 * (0.35F + 0.45F * state.steam));
+        float density = STEAM_MIN_ALPHA + (STEAM_FULL_ALPHA - STEAM_MIN_ALPHA) * state.steam + (boiler.isBoilingOnClient() ? BOILING_ALPHA : 0.0F);
+        int alpha = (int) (255 * Math.min(0.9F, density));
         state.steamColor = ((grade != null ? grade : SteamGrade.STEAM).tint() & 0x00FFFFFF) | (alpha << 24);
 
         // Lit by the middle of the structure, not by the corner the master sits in.
@@ -110,14 +117,16 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
         TextureAtlasSprite steam = state.steamSprite;
         float x0 = VOLUME_INSET, y0 = VOLUME_INSET, z0 = VOLUME_INSET;
         float x1 = state.sizeX - VOLUME_INSET, y1 = state.sizeY - VOLUME_INSET, z1 = state.sizeZ - VOLUME_INSET;
-        float waterTop = y0 + (y1 - y0) * state.water;
+        float waterTop = y0 + (y1 - y0) * WATER_SHARE * state.water;
+        // Steam gathers under the roof and fills the headspace down toward the water as it builds up.
+        float steamBottom = y1 - (y1 - waterTop) * state.steam;
 
         collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(drum.atlasLocation()),
                 (pose, buffer) -> TiledBoxes.box(pose, buffer, drum, DRUM_COLOR, state.light,
                         DRUM_INSET, DRUM_INSET, DRUM_INSET, state.sizeX - DRUM_INSET, state.sizeY - DRUM_INSET, state.sizeZ - DRUM_INSET, false));
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(water.atlasLocation()), (pose, buffer) -> {
             TiledBoxes.box(pose, buffer, water, state.waterColor, state.light, x0, y0, z0, x1, waterTop, z1, false);
-            TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light, x0, waterTop, z0, x1, y1, z1, false);
+            TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light, x0, steamBottom, z0, x1, y1, z1, false);
         });
     }
 

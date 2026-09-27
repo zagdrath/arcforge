@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.HeatScale;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
+import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
 import net.zagdrath.arcforge.steam.SteamGrade;
@@ -26,6 +27,7 @@ public class SteamBoilerScreen extends MachineScreen<SteamBoilerMenu> {
     private static final int HEAT_X = 53, HEAT_Y = 34, HEAT_W = 92;
     private static final int TEXT_X = 53, VALUE_RIGHT = 145, TEMP_Y = 23, GRADE_Y = 42;
     private static final int LED_X = 53, LED_Y = 56, STATUS_X = 61, STATUS_Y = 56;
+    private static final int RATE_GAP = 4;
     private static final int TICK_COLOR = 0xFF5C5C5C, NOT_BOILING_COLOR = 0xFF707070;
 
     private final Identifier waterFill = sprite("water_fill");
@@ -87,9 +89,18 @@ public class SteamBoilerScreen extends MachineScreen<SteamBoilerMenu> {
         } else {
             graphics.text(font, Component.translatable("gui.arcforge.not_boiling"), TEXT_X, GRADE_Y, NOT_BOILING_COLOR, false);
         }
-        graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
-        textRight(graphics, Component.translatable("gui.arcforge.mb_per_tick_gain", String.format(Locale.ROOT, "%.1f", menu.getRate())),
-                VALUE_RIGHT, STATUS_Y, ArcforgeGui.ACCENT);
+        Component status = menu.getStatus().getDescription();
+        graphics.text(font, status, STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        // The rate shares the status line, so it only shows while boiling (the other statuses are longer),
+        // and only if it fits; the tooltip always has it.
+        Component rate = rateText();
+        if (menu.getStatus() == MachineStatus.BOILING && STATUS_X + font.width(status) + RATE_GAP <= VALUE_RIGHT - font.width(rate)) {
+            textRight(graphics, rate, VALUE_RIGHT, STATUS_Y, ArcforgeGui.ACCENT);
+        }
+    }
+
+    private Component rateText() {
+        return Component.translatable("gui.arcforge.mb_per_tick_gain", String.format(Locale.ROOT, "%.1f", menu.getRate()));
     }
 
     @Override
@@ -98,6 +109,9 @@ public class SteamBoilerScreen extends MachineScreen<SteamBoilerMenu> {
             addFluidTooltip(lines, menu.getWater(), Component.translatable("gui.arcforge.water"), menu.getWaterAmount(), menu.getWaterCapacity());
         } else if (isHovering(STEAM_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getSteam(), Component.translatable("gui.arcforge.steam"), menu.getSteamAmount(), menu.getSteamCapacity());
+        } else if (isHovering(LED_X, STATUS_Y - 1, VALUE_RIGHT - LED_X, 10, mouseX, mouseY)) {
+            lines.add(menu.getStatus().getDescription());
+            lines.add(rateText().copy().withColor(ArcforgeGui.ACCENT));
         } else if (isHovering(HEAT_X, HEAT_Y - 2, HEAT_W, 8, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())));
         }

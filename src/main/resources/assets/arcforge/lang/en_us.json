@@ -119,7 +119,7 @@
   "gui.arcforge.empty": "Empty",
   "gui.arcforge.buckets": "%s B",
   "gui.arcforge.buckets_capacity": "/ %s B",
-  "gui.arcforge.fe_compact": "%s / %s FE",
+  "gui.arcforge.fe_capacity": "/ %s FE",
   "gui.arcforge.fe_in": "In  +%s FE/t",
   "gui.arcforge.fe_out": "Out -%s FE/t",
   "tooltip.arcforge.tank.contents": "%s — %s / %s mB",

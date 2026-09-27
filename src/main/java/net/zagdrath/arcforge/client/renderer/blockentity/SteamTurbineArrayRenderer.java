@@ -14,6 +14,7 @@ import com.mojang.math.Axis;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
@@ -32,11 +33,12 @@ import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
+import net.zagdrath.arcforge.steam.SteamGrade;
 
 // Draws the inside of a formed Steam Turbine Array, seen through its windows: a ribbed lining just inside
 // the walls (only its inward faces, so the near wall never hides the far one), then the rotor: the shaft
-// through every block from bearing to generator, and a set of blades in each block between them, each
-// set turned 22.5° further so they look staggered. The rotor turns at up to one turn a second.
+// through every block from bearing to generator (stopping just short of the end caps' faces), and a set of blades in each block between them, each
+// set turned 22.5° further so they look staggered; and the steam around it, thicker the faster it flows. The rotor turns at up to one turn a second.
 public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
     public static final StandaloneModelKey<QuadCollection> ROTOR_SHAFT = new StandaloneModelKey<>(() -> Arcforge.MODID + ":rotor_shaft");
     public static final StandaloneModelKey<QuadCollection> ROTOR_BLADES = new StandaloneModelKey<>(() -> Arcforge.MODID + ":rotor_blades");
@@ -44,7 +46,15 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
     public static final Identifier ROTOR_BLADES_MODEL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/rotor_blades");
     private static final Identifier LINER = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/liner");
     private static final float LINER_INSET = 2.0F / 16.0F;
+    // The steam fills the chamber just inside the lining, around the rotor.
+    private static final float STEAM_INSET = 2.5F / 16.0F;
+    // Steam is this see-through with steam in the tank but none flowing, and this thick at full flow.
+    private static final float STEAM_IDLE_ALPHA = 0.1F, STEAM_FULL_ALPHA = 0.8F;
+    // Share of the gap to the synced flow closed each frame.
+    private static final float EASE = 0.05F;
     private static final float STAGGER = 22.5F;
+    // In the end blocks the shaft stops this far inside the outer face, so it never lies on the end caps.
+    private static final float SHAFT_END_INSET = 1.0F / 16.0F;
 
     public static class State extends BlockEntityRenderState {
         public boolean formed;
@@ -53,6 +63,8 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         public float sizeX, sizeY, sizeZ;
         public float angle;
         public @Nullable TextureAtlasSprite liner;
+        public @Nullable TextureAtlasSprite steamSprite;
+        public int steamColor;
         public int light;
     }
 
@@ -78,6 +90,17 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         state.sizeY = shell.size(Direction.Axis.Y);
         state.sizeZ = shell.size(Direction.Axis.Z);
         state.liner = SteamBoilerArrayRenderer.sprite(LINER);
+        // The faster steam goes through, the thicker it looks.
+        float flow = turbine.easeSteamDensity(EASE);
+        SteamGrade grade = SteamGrade.of(turbine.getSteam().getResource(0));
+        boolean hasSteam = turbine.getSteam().getAmount() > 0 && grade != null;
+        float density = hasSteam || flow > 0.01F ? STEAM_IDLE_ALPHA + (STEAM_FULL_ALPHA - STEAM_IDLE_ALPHA) * flow : 0.0F;
+        state.steamSprite = null;
+        if (density > 0.0F) {
+            SteamGrade shown = grade != null ? grade : SteamGrade.STEAM;
+            state.steamSprite = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(shown.fluid().defaultFluidState()).stillMaterial().sprite();
+            state.steamColor = (shown.tint() & 0x00FFFFFF) | ((int) (255 * density) << 24);
+        }
         double time = turbine.getLevel() != null ? turbine.getLevel().getGameTime() + partialTicks : 0.0;
         state.angle = turbine.advanceAngle(time);
         state.light = turbine.getLevel() != null
@@ -103,28 +126,55 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         }
         List<BakedQuad> shaftQuads = shaft.getAll();
         List<BakedQuad> bladeQuads = blades.getAll();
+        RenderType cutout = RenderTypes.entityCutout(liner.atlasLocation());
         for (int i = 0; i < state.length; i++) {
+            // The shaft turns as one piece, so every block's segment is at the same angle.
             poseStack.pushPose();
-            // To the middle of block i along the axis, in the centre of the cross-section.
-            poseStack.translate(
-                    state.axis == Direction.Axis.X ? i + 0.5 : 1.5,
-                    1.5,
-                    state.axis == Direction.Axis.Z ? i + 0.5 : 1.5);
-            // The models are built along Z.
-            if (state.axis == Direction.Axis.X) {
-                poseStack.rotate(Axis.YP.rotationDegrees(90.0F));
+            rotorPose(poseStack, state, i, state.angle);
+            // The model runs along its Z from the bearing end (block 0) toward the generator end.
+            if (i == 0) {
+                poseStack.translate(0.0F, 0.0F, SHAFT_END_INSET);
+                poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
+            } else if (i == state.length - 1) {
+                poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
             }
-            poseStack.rotate(Axis.ZP.rotationDegrees(state.angle + i * STAGGER));
-            poseStack.translate(-0.5, -0.5, -0.5);
-            boolean bladeSet = i > 0 && i < state.length - 1;
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(liner.atlasLocation()), (pose, buffer) -> {
-                TiledBoxes.quads(pose, buffer, shaftQuads, -1, state.light);
-                if (bladeSet) {
-                    TiledBoxes.quads(pose, buffer, bladeQuads, -1, state.light);
-                }
-            });
+            collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, shaftQuads, -1, state.light));
             poseStack.popPose();
+
+            // Each blade set is turned a little further than the last, so they look staggered.
+            if (i > 0 && i < state.length - 1) {
+                poseStack.pushPose();
+                rotorPose(poseStack, state, i, state.angle + i * STAGGER);
+                collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, bladeQuads, -1, state.light));
+                poseStack.popPose();
+            }
         }
+        submitSteam(state, poseStack, collector);
+    }
+
+    // Steam filling the chamber around the rotor, drawn after it so the rotor shows through.
+    private static void submitSteam(State state, PoseStack poseStack, SubmitNodeCollector collector) {
+        TextureAtlasSprite steam = state.steamSprite;
+        if (steam == null) {
+            return;
+        }
+        collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(steam.atlasLocation()),
+                (pose, buffer) -> TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light,
+                        STEAM_INSET, STEAM_INSET, STEAM_INSET, state.sizeX - STEAM_INSET, state.sizeY - STEAM_INSET, state.sizeZ - STEAM_INSET, false));
+    }
+
+    // Places a rotor model (built along Z, one block long) in block i along the axis, in the centre of
+    // the cross-section, turned to the given angle about the axis.
+    private static void rotorPose(PoseStack poseStack, State state, int i, float angle) {
+        poseStack.translate(
+                state.axis == Direction.Axis.X ? i + 0.5 : 1.5,
+                1.5,
+                state.axis == Direction.Axis.Z ? i + 0.5 : 1.5);
+        if (state.axis == Direction.Axis.X) {
+            poseStack.rotate(Axis.YP.rotationDegrees(90.0F));
+        }
+        poseStack.rotate(Axis.ZP.rotationDegrees(angle));
+        poseStack.translate(-0.5, -0.5, -0.5);
     }
 
     // The whole structure, so it isn't culled when the master corner is off screen.
