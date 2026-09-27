@@ -21,4 +21,12 @@ public interface ConfigurableMachine {
     }
 
     default void setRedstoneMode(RedstoneMode mode) {}
+
+    // Auto-eject: whether output faces push items and fluids into neighbours (off: they wait to be
+    // pulled). Machines without item or fluid outputs have no button and never push.
+    default boolean isAutoEject() {
+        return false;
+    }
+
+    default void setAutoEject(boolean autoEject) {}
 }

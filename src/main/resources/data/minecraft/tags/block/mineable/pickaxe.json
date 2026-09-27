@@ -39,6 +39,8 @@
     "arcforge:coal_coke_block",
     "arcforge:steel_block",
     "arcforge:arc_crusher",
-    "arcforge:arc_crushing_array_casing"
+    "arcforge:arc_crushing_array_casing",
+    "arcforge:induction_furnace",
+    "arcforge:induction_furnace_array_casing"
   ]
 }

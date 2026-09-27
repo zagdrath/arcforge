@@ -127,7 +127,9 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, FluidTankBlockEntity tank) {
         tank.processContainer();
-        tank.pushFluid(level, pos);
+        if (tank.isAutoEject()) {
+            tank.pushFluid(level, pos);
+        }
         tank.updateState(level, pos, state);
     }
 
@@ -169,7 +171,18 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
         }
     }
 
-    // Pushes fluid out of every output face into the block beside it, up to the tier rate in total.
+    @Override
+    public boolean isAutoEject() {
+        return sideConfig.isAutoEject();
+    }
+
+    @Override
+    public void setAutoEject(boolean autoEject) {
+        sideConfig.setAutoEject(autoEject);
+        setChanged();
+    }
+
+    // With auto-eject on, pushes fluid out of every output face into the block beside it, up to the tier rate in total.
     // With the default sides (output on the bottom, input on top) stacked tanks drain downwards.
     private void pushFluid(ServerLevel level, BlockPos pos) {
         int budget = tier.tankRate();

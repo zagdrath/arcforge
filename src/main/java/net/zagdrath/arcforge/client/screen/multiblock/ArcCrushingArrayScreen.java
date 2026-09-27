@@ -35,6 +35,7 @@ public class ArcCrushingArrayScreen extends MachineScreen<ArcCrushingArrayMenu> 
 
     public ArcCrushingArrayScreen(ArcCrushingArrayMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "arc_crushing_array", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)));
+        enableAutoEject();
     }
 
     @Override

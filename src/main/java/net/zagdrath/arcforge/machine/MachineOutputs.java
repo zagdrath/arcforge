@@ -16,19 +16,24 @@ import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.ResourceHandlerUtil;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 
-// Pushes a machine's FE or heat straight into the blocks touching its ENERGY or HEAT faces.
-// One instance per machine; it caches the neighbouring capabilities.
+// Pushes a machine's FE, heat or items straight into the blocks touching its ENERGY, HEAT or OUTPUT
+// faces. One instance per machine; it caches the neighbouring capabilities.
 public class MachineOutputs {
     private final Map<Direction, BlockCapabilityCache<EnergyHandler, @Nullable Direction>> energyTargets = new EnumMap<>(Direction.class);
     private final Map<Direction, BlockCapabilityCache<HeatHandler, @Nullable Direction>> heatTargets = new EnumMap<>(Direction.class);
+    private final Map<Direction, BlockCapabilityCache<ResourceHandler<ItemResource>, @Nullable Direction>> itemTargets = new EnumMap<>(Direction.class);
+    private static final int ITEMS_PER_FACE = 16;
 
     // Moves up to max FE out of ENERGY faces (shared across them); returns how much moved.
     public int pushEnergy(ServerLevel level, BlockPos pos, Direction facing, SideConfig sides, EnergyHandler source, int max) {
@@ -59,6 +64,21 @@ public class MachineOutputs {
             HeatHandler target = target(heatTargets, ModCapabilities.HEAT, level, pos, direction);
             if (target != null) {
                 moved += moveHeat(source, target, ratePerFace);
+            }
+        }
+        return moved;
+    }
+
+    // Moves up to 16 items per OUTPUT face into the inventory it touches. Returns how many moved.
+    public int pushItems(ServerLevel level, BlockPos pos, Direction facing, SideConfig sides, ResourceHandler<ItemResource> source) {
+        int moved = 0;
+        for (Direction direction : Direction.values()) {
+            if (sides.get(facing, direction) != SideMode.OUTPUT) {
+                continue;
+            }
+            ResourceHandler<ItemResource> target = target(itemTargets, Capabilities.Item.BLOCK, level, pos, direction);
+            if (target != null) {
+                moved += ResourceHandlerUtil.move(source, target, resource -> true, ITEMS_PER_FACE, null);
             }
         }
         return moved;

@@ -34,6 +34,7 @@ public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu>
 
     public ArcforgeFurnaceScreen(ArcforgeFurnaceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "arcforge_furnace", menu::getRedstoneMode, menu::getSideMode);
+        enableAutoEject(menu::isAutoEject);
     }
 
     @Override

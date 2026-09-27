@@ -15,14 +15,17 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
-import net.zagdrath.arcforge.multiblock.ArcCrushingArrayStructure;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
@@ -65,11 +68,24 @@ public final class ModCapabilities {
                 ArcCrusherBlockEntity::getItemHandler);
         // Every casing of a formed Arc Crushing Array exposes the cube face it lies on (served by the centre).
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ARC_CRUSHING_ARRAY.get(), (casing, side) -> {
-            ArcCrushingArrayBlockEntity array = ArcCrushingArrayStructure.findController(casing.getLevel(), casing.getBlockPos());
+            ArcCrushingArrayBlockEntity array = ArcCrushingArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
             return array != null ? array.itemHandlerAt(casing.getBlockPos(), side) : null;
         });
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_CRUSHING_ARRAY.get(), (casing, side) -> {
-            ArcCrushingArrayBlockEntity array = ArcCrushingArrayStructure.findController(casing.getLevel(), casing.getBlockPos());
+            ArcCrushingArrayBlockEntity array = ArcCrushingArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.energyHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE.get(),
+                InductionFurnaceBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE.get(),
+                InductionFurnaceBlockEntity::getItemHandler);
+        // Every casing of a formed Induction Furnace Array exposes the cube face it lies on (served by the centre).
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE_ARRAY.get(), (casing, side) -> {
+            InductionFurnaceArrayBlockEntity array = InductionFurnaceArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.itemHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE_ARRAY.get(), (casing, side) -> {
+            InductionFurnaceArrayBlockEntity array = InductionFurnaceArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
             return array != null ? array.energyHandlerAt(casing.getBlockPos(), side) : null;
         });
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),

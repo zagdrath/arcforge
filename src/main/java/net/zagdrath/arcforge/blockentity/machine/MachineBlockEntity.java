@@ -12,6 +12,7 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.Level;
@@ -20,10 +21,12 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
 import net.zagdrath.arcforge.conduit.ConduitConnectable;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineOutputs;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.ConfigurableMachine;
@@ -141,6 +144,27 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     @Override
     public SideMode getSideMode(RelativeSide side) {
         return sideConfig.get(side);
+    }
+
+    // Only machines with item outputs have auto-eject.
+    @Override
+    public boolean isAutoEject() {
+        return sideConfig.isAutoEject() && allowedSideModes.contains(SideMode.OUTPUT);
+    }
+
+    @Override
+    public void setAutoEject(boolean autoEject) {
+        if (allowedSideModes.contains(SideMode.OUTPUT)) {
+            sideConfig.setAutoEject(autoEject);
+            setChanged();
+        }
+    }
+
+    // With auto-eject on, pushes items out of Output faces every few ticks. output: what those faces give.
+    protected void autoEject(ServerLevel level, ResourceHandler<ItemResource> output) {
+        if (isAutoEject() && level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
+            outputs.pushItems(level, worldPosition, getFacing(), sideConfig, output);
+        }
     }
 
     @Override

@@ -557,6 +557,17 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
+    public boolean isAutoEject() {
+        return sideConfig.isAutoEject();
+    }
+
+    @Override
+    public void setAutoEject(boolean autoEject) {
+        sideConfig.setAutoEject(autoEject);
+        setChanged();
+    }
+
+    @Override
     public void setRedstoneMode(RedstoneMode mode) {
         redstoneMode = mode;
         setChanged();

@@ -7,7 +7,10 @@ package net.zagdrath.arcforge.client.gui.tab;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
+
+import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -23,8 +26,9 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 
-// Cross of block faces for configuring IO per side, plus a button that clears every face.
-// Left click cycles forward, right click cycles back, shift-click clears one face.
+// Cross of block faces for configuring IO per side, plus a button that clears every face and, on
+// machines with item or fluid outputs, the auto-eject toggle. Left click cycles forward, right click
+// cycles back, shift-click clears one face.
 public class SideConfigTab extends SideTab {
     private static final Identifier FACE_HOVER = ArcforgeGui.widget("face_hover");
     private static final Identifier ICON_CLEAR = ArcforgeGui.widget("icon_clear");
@@ -33,12 +37,18 @@ public class SideConfigTab extends SideTab {
     private static final int FACE_SIZE = 16;
     // Clear-all button: face-sized, below the back face and level with the bottom face.
     private static final int CLEAR_X = 68, CLEAR_Y = 60, CLEAR_SIZE = FACE_SIZE;
+    // Auto-eject toggle: face-sized, above the back face and level with the top face.
+    private static final int EJECT_X = 68, EJECT_Y = 24;
+    private static final Identifier EJECT_OFF = ArcforgeGui.widget("auto_eject_off");
+    private static final Identifier EJECT_ON = ArcforgeGui.widget("auto_eject_on");
 
     private final Function<RelativeSide, SideMode> modes;
     private final BiConsumer<RelativeSide, Integer> action;
     private final Runnable clearAll;
     // What each mode is called on this machine, e.g. an energy face is an input on a machine that uses power.
     private final Function<SideMode, Component> names;
+    private @Nullable BooleanSupplier autoEject;
+    private @Nullable Runnable toggleAutoEject;
 
     // action receives a side and one of SideConfig.ACTION_*.
     public SideConfigTab(Function<RelativeSide, SideMode> modes, BiConsumer<RelativeSide, Integer> action, Runnable clearAll) {
@@ -52,6 +62,13 @@ public class SideConfigTab extends SideTab {
         this.action = action;
         this.clearAll = clearAll;
         this.names = names;
+    }
+
+    // Shows the auto-eject button, reading its state from state and sending toggle when clicked.
+    public SideConfigTab withAutoEject(BooleanSupplier state, Runnable toggle) {
+        this.autoEject = state;
+        this.toggleAutoEject = toggle;
+        return this;
     }
 
     private static int faceX(RelativeSide side) {
@@ -84,6 +101,10 @@ public class SideConfigTab extends SideTab {
         return ArcforgeGui.isInside(localX, localY, CLEAR_X, CLEAR_Y, CLEAR_SIZE, CLEAR_SIZE);
     }
 
+    private boolean isOverAutoEject(int localX, int localY) {
+        return autoEject != null && ArcforgeGui.isInside(localX, localY, EJECT_X, EJECT_Y, FACE_SIZE, FACE_SIZE);
+    }
+
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
         RelativeSide hovered = faceAt(mouseX - x, mouseY - y);
@@ -99,12 +120,25 @@ public class SideConfigTab extends SideTab {
         boolean clearHovered = isOverClear(mouseX - x, mouseY - y);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, clearHovered ? BUTTON_HOVER : BUTTON, x + CLEAR_X, y + CLEAR_Y, CLEAR_SIZE, CLEAR_SIZE);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ICON_CLEAR, x + CLEAR_X, y + CLEAR_Y, CLEAR_SIZE, CLEAR_SIZE);
+
+        if (autoEject != null) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, autoEject.getAsBoolean() ? EJECT_ON : EJECT_OFF,
+                    x + EJECT_X, y + EJECT_Y, FACE_SIZE, FACE_SIZE);
+            if (isOverAutoEject(mouseX - x, mouseY - y)) {
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, FACE_HOVER, x + EJECT_X, y + EJECT_Y, FACE_SIZE, FACE_SIZE);
+            }
+        }
     }
 
     @Override
     protected boolean contentClicked(MouseButtonEvent event, int localX, int localY) {
         if (isOverClear(localX, localY) && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
             clearAll.run();
+            ArcforgeGui.playClickSound();
+            return true;
+        }
+        if (isOverAutoEject(localX, localY) && toggleAutoEject != null && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+            toggleAutoEject.run();
             ArcforgeGui.playClickSound();
             return true;
         }
@@ -125,6 +159,12 @@ public class SideConfigTab extends SideTab {
     protected void addTooltip(List<Component> lines, int localX, int localY) {
         if (isOverClear(localX, localY)) {
             lines.add(Component.translatable("gui.arcforge.side.clear_all"));
+            return;
+        }
+        if (autoEject != null && isOverAutoEject(localX, localY)) {
+            String state = autoEject.getAsBoolean() ? "on" : "off";
+            lines.add(Component.translatable("gui.arcforge.auto_eject." + state));
+            lines.add(Component.translatable("gui.arcforge.auto_eject." + state + ".description").withStyle(ChatFormatting.GRAY));
             return;
         }
         RelativeSide side = faceAt(localX, localY);

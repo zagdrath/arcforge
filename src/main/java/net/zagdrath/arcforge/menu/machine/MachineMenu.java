@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.menu.machine;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
@@ -58,6 +59,19 @@ public abstract class MachineMenu extends AbstractContainerMenu {
 
     protected void addMachineSlot(int index, int x, int y) {
         addSlot(new ResourceHandlerSlot(items, items::set, index, x, y));
+    }
+
+    // An output slot that runs onTake (on the server) whenever a player takes from it, e.g. to pay out XP.
+    protected void addOutputSlot(int index, int x, int y, Consumer<Player> onTake) {
+        addSlot(new ResourceHandlerSlot(items, items::set, index, x, y) {
+            @Override
+            public void onTake(Player player, ItemStack stack) {
+                super.onTake(player, stack);
+                if (!player.level().isClientSide()) {
+                    onTake.accept(player);
+                }
+            }
+        });
     }
 
     // Adds the upgrade slots (for the Upgrades tab at the given position in the tab stack), the player
@@ -166,5 +180,9 @@ public abstract class MachineMenu extends AbstractContainerMenu {
 
     public SideMode getSideMode(RelativeSide side) {
         return SideConfig.unpack(value(sidesIndex()), side);
+    }
+
+    public boolean isAutoEject() {
+        return SideConfig.unpackAutoEject(value(sidesIndex()));
     }
 }

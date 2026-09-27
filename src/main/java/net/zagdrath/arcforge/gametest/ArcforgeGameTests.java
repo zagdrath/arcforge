@@ -78,6 +78,9 @@ public final class ArcforgeGameTests {
         TESTS.put("crusher_upgrades", CrushingGameTests::crusherUpgrades);
         TESTS.put("firebox_heat_upgrades", CrushingGameTests::fireboxHeatUpgrades);
         TESTS.put("array_forms", CrushingGameTests::arrayForms);
+        TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);
+        TESTS.put("auto_eject", InductionGameTests::autoEject);
+        TESTS.put("creosote_moves", InductionGameTests::creosoteMoves);
         TESTS.put("carbonizer_forms", MultiblockGameTests::carbonizerForms);
         TESTS.put("furnace_forms", MultiblockGameTests::furnaceForms);
         TESTS.put("carbonizer_big_forms", MultiblockGameTests::carbonizerBigForms);
@@ -87,6 +90,8 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);
         LONG_TESTS.put("crusher_recipes", CrushingGameTests::crusherRecipes);
         LONG_TESTS.put("array_doubles_ores", CrushingGameTests::arrayDoublesOres);
+        LONG_TESTS.put("induction_furnace_smelts", InductionGameTests::furnaceSmelts);
+        LONG_TESTS.put("induction_array_smelts", InductionGameTests::arraySmelts);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }

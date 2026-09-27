@@ -181,4 +181,8 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
     public SideMode getSideMode(RelativeSide side) {
         return SideConfig.unpack(value(DATA_SIDE_CONFIG), side);
     }
+
+    public boolean isAutoEject() {
+        return SideConfig.unpackAutoEject(value(DATA_SIDE_CONFIG));
+    }
 }

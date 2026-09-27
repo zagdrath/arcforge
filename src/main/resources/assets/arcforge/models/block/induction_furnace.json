@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/induction_furnace_front",
+    "south": "arcforge:block/induction_furnace_back",
+    "east": "arcforge:block/induction_furnace_side",
+    "west": "arcforge:block/induction_furnace_side",
+    "up": "arcforge:block/induction_furnace_top",
+    "down": "arcforge:block/induction_furnace_bottom",
+    "particle": "arcforge:block/induction_furnace_side"
+  }
+}

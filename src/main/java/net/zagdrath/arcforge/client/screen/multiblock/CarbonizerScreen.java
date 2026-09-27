@@ -40,6 +40,7 @@ public class CarbonizerScreen extends MultiblockScreen<CarbonizerMenu> {
 
     public CarbonizerScreen(CarbonizerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "carbonizer", menu::getRedstoneMode, menu::getSideMode);
+        enableAutoEject(menu::isAutoEject);
     }
 
     @Override

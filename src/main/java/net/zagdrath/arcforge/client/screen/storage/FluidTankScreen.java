@@ -35,7 +35,8 @@ public class FluidTankScreen extends StorageScreen<FluidTankMenu> {
         super(menu, inventory, title, "fluid_tank");
         tabs.add(new SideConfigTab(menu::getSideMode,
                 (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
-                () -> sendButton(MachineMenuButtons.CLEAR_SIDES)));
+                () -> sendButton(MachineMenuButtons.CLEAR_SIDES))
+                .withAutoEject(menu::isAutoEject, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT)));
     }
 
     // Renders the fluid's still texture, tinted and tiled in 16px steps, clipped to the fill, then the gauge marks.

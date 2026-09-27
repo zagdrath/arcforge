@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.client.screen.multiblock;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BooleanSupplier;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -35,17 +36,24 @@ public abstract class MultiblockScreen<M extends AbstractContainerMenu> extends 
     private final Identifier background;
     private final String machine;
     protected final SideTabPanel tabs;
+    private final SideConfigTab sides;
 
     protected MultiblockScreen(M menu, Inventory inventory, Component title, String machine,
             Supplier<RedstoneMode> redstone, Function<RelativeSide, SideMode> sides) {
         super(menu, inventory, title);
         this.machine = machine;
         this.background = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/" + machine + ".png");
+        this.sides = new SideConfigTab(sides,
+                (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
+                () -> sendButton(MachineMenuButtons.CLEAR_SIDES));
         this.tabs = new SideTabPanel()
                 .add(new RedstoneTab(redstone, mode -> sendButton(MachineMenuButtons.redstoneButtonId(mode))))
-                .add(new SideConfigTab(sides,
-                        (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
-                        () -> sendButton(MachineMenuButtons.CLEAR_SIDES)));
+                .add(this.sides);
+    }
+
+    // Shows the auto-eject button on the Sides tab.
+    protected void enableAutoEject(BooleanSupplier state) {
+        sides.withAutoEject(state, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT));
     }
 
     protected Identifier sprite(String name) {

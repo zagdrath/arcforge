@@ -25,8 +25,10 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
+import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
 import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.machine.FireboxBlock;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
@@ -74,6 +76,19 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL)
                     .lightLevel(state -> state.getValue(ArcCrushingArrayCasingBlock.LIT) ? 8 : 0));
+
+    // --- Smelting ---
+
+    public static final DeferredBlock<InductionFurnaceBlock> INDUCTION_FURNACE = BLOCKS.registerBlock("induction_furnace",
+            InductionFurnaceBlock::new, p -> machineProperties(p, 10));
+
+    public static final DeferredBlock<InductionFurnaceArrayCasingBlock> INDUCTION_FURNACE_ARRAY_CASING = BLOCKS.registerBlock("induction_furnace_array_casing",
+            InductionFurnaceArrayCasingBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)
+                    .lightLevel(state -> state.getValue(InductionFurnaceArrayCasingBlock.LIT) ? 12 : 0));
 
     // --- Steelmaking ---
 

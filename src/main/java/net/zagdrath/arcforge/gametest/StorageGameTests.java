@@ -113,7 +113,8 @@ final class StorageGameTests {
         helper.succeed();
     }
 
-    // With the default sides (input on top, output on the bottom) a tank drains into the tank below it.
+    // With the default sides (input on top, output on the bottom) a tank drains into the tank below it,
+    // but only once auto-eject is on.
     static void tanksStack(GameTestHelper helper) {
         BlockPos lower = new BlockPos(1, 1, 1);
         BlockPos upper = new BlockPos(1, 2, 1);
@@ -122,6 +123,11 @@ final class StorageGameTests {
         fillTank(helper.getBlockEntity(upper, FluidTankBlockEntity.class), Fluids.WATER, 5_000);
 
         helper.startSequence()
+                .thenIdle(10)
+                .thenExecute(() -> {
+                    helper.assertTrue(helper.getBlockEntity(lower, FluidTankBlockEntity.class).getFluid().isEmpty(), "Tank drained with auto-eject off");
+                    helper.getBlockEntity(upper, FluidTankBlockEntity.class).setAutoEject(true);
+                })
                 .thenWaitUntil(() -> helper.assertTrue(helper.getBlockEntity(lower, FluidTankBlockEntity.class).getFluid().getAmount() == 5_000,
                         "Lower tank has " + helper.getBlockEntity(lower, FluidTankBlockEntity.class).getFluid().getAmount() + " mB"))
                 .thenExecute(() -> helper.assertTrue(helper.getBlockEntity(upper, FluidTankBlockEntity.class).getFluid().isEmpty(), "Upper tank not drained"))

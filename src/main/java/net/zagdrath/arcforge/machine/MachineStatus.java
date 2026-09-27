@@ -20,7 +20,8 @@ public enum MachineStatus {
     CRUSHING("crushing", "led_running"),
     IDLE("idle", "led_idle"),
     NO_POWER("no_power", "led_blocked"),
-    OUTPUT_FULL("output_full", "led_blocked");
+    OUTPUT_FULL("output_full", "led_blocked"),
+    SMELTING("smelting", "led_running");
 
     private final String name;
     private final String led;

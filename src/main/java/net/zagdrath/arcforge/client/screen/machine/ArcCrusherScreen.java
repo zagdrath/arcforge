@@ -31,6 +31,7 @@ public class ArcCrusherScreen extends MachineScreen<ArcCrusherMenu> {
 
     public ArcCrusherScreen(ArcCrusherMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "arc_crusher", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)));
+        enableAutoEject();
     }
 
     @Override

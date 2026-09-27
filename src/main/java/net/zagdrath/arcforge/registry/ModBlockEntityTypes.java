@@ -18,8 +18,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
@@ -48,6 +50,13 @@ public final class ModBlockEntityTypes {
     // Every casing has one; only the centre of a formed Array runs.
     public static final Supplier<BlockEntityType<ArcCrushingArrayBlockEntity>> ARC_CRUSHING_ARRAY = BLOCK_ENTITY_TYPES.register("arc_crushing_array",
             () -> new BlockEntityType<>(ArcCrushingArrayBlockEntity::new, ModBlocks.ARC_CRUSHING_ARRAY_CASING.get()));
+
+    public static final Supplier<BlockEntityType<InductionFurnaceBlockEntity>> INDUCTION_FURNACE = BLOCK_ENTITY_TYPES.register("induction_furnace",
+            () -> new BlockEntityType<>(InductionFurnaceBlockEntity::new, ModBlocks.INDUCTION_FURNACE.get()));
+
+    // Every casing has one; only the centre of a formed Array runs.
+    public static final Supplier<BlockEntityType<InductionFurnaceArrayBlockEntity>> INDUCTION_FURNACE_ARRAY = BLOCK_ENTITY_TYPES.register("induction_furnace_array",
+            () -> new BlockEntityType<>(InductionFurnaceArrayBlockEntity::new, ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get()));
 
     public static final Supplier<BlockEntityType<ThermoelectricPlantBlockEntity>> THERMOELECTRIC_PLANT = BLOCK_ENTITY_TYPES.register("thermoelectric_plant",
             () -> new BlockEntityType<>(ThermoelectricPlantBlockEntity::new, ModBlocks.THERMOELECTRIC_PLANT.get()));

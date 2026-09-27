@@ -22,7 +22,8 @@ import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.CrushingRecipe;
 
 // Data-driven machine recipes: data/<namespace>/recipe/*.json with type arcforge:carbonizing,
-// arcforge:arcforge_smelting or arcforge:crushing. All are synced to clients so GUI slots know what they accept.
+// arcforge:arcforge_smelting or arcforge:crushing. All are synced to clients so GUI slots know what they accept,
+// as are vanilla smelting recipes (for the Induction Furnaces).
 public final class ModRecipes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Arcforge.MODID);
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Arcforge.MODID);
@@ -59,6 +60,6 @@ public final class ModRecipes {
     }
 
     private static void syncToClients(OnDatapackSyncEvent event) {
-        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CRUSHING.get());
+        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CRUSHING.get(), RecipeType.SMELTING);
     }
 }

@@ -126,6 +126,7 @@ public class ArcCrusherBlockEntity extends MachineBlockEntity {
             }
         }
         setLit(status == MachineStatus.CRUSHING);
+        autoEject(level, itemOutput);
     }
 
     public CrushingLane getLane() {

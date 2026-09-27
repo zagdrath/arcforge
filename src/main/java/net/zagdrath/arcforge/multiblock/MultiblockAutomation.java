@@ -26,9 +26,12 @@ public final class MultiblockAutomation {
 
     private MultiblockAutomation() {}
 
-    // Pushes items and fluids out of every outward face configured as output or by-product, into
-    // whatever inventory or tank is next to it.
+    // With auto-eject on, pushes items and fluids out of every outward face configured as output or
+    // by-product, into whatever inventory or tank is next to it.
     public static void pushOutputs(ServerLevel level, MultiblockController controller) {
+        if (!controller.isAutoEject()) {
+            return;
+        }
         for (BlockPos pos : BlockPos.betweenClosed(controller.getMinCorner(), controller.getMaxCorner())) {
             if (!controller.isPart(pos)) {
                 continue;

@@ -21,6 +21,7 @@ public final class MachineMenuButtons {
     private static final int REDSTONE_FIRST = 0;
     private static final int SIDE_FIRST = 100;
     public static final int CLEAR_SIDES = 99;
+    public static final int TOGGLE_AUTO_EJECT = 98;
 
     private MachineMenuButtons() {}
 
@@ -42,6 +43,11 @@ public final class MachineMenuButtons {
 
         if (buttonId == CLEAR_SIDES) {
             apply(access, ConfigurableMachine::clearSideModes);
+            return true;
+        }
+
+        if (buttonId == TOGGLE_AUTO_EJECT) {
+            apply(access, machine -> machine.setAutoEject(!machine.isAutoEject()));
             return true;
         }
 

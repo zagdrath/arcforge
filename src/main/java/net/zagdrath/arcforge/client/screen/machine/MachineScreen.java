@@ -26,6 +26,7 @@ import net.zagdrath.arcforge.client.gui.tab.SideTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.client.gui.tab.UpgradesTab;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.machine.MachineMenu;
 
 // Shared frame of the single-block machine GUIs: background, the machine's own tabs followed by
@@ -40,18 +41,25 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     private final Identifier background;
     private final String machine;
     protected final SideTabPanel tabs = new SideTabPanel();
+    private final SideConfigTab sides;
 
     protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs) {
         super(menu, inventory, title);
         this.machine = machine;
         this.background = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/" + machine + ".png");
         machineTabs.forEach(tabs::add);
+        this.sides = new SideConfigTab(menu::getSideMode,
+                (side, action) -> sendButton(MachineMenu.sideButtonId(side, action)),
+                () -> sendButton(MachineMenu.BUTTON_CLEAR_SIDES),
+                this::sideModeName);
         tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenu.redstoneButtonId(mode))))
-                .add(new SideConfigTab(menu::getSideMode,
-                        (side, action) -> sendButton(MachineMenu.sideButtonId(side, action)),
-                        () -> sendButton(MachineMenu.BUTTON_CLEAR_SIDES),
-                        this::sideModeName))
+                .add(sides)
                 .add(new UpgradesTab(menu.getUpgradeSlots()));
+    }
+
+    // For machines with item outputs: shows the auto-eject button on the Sides tab.
+    protected void enableAutoEject() {
+        sides.withAutoEject(menu::isAutoEject, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT));
     }
 
     // What a side mode is called on this machine (shown in the Sides tab). Machines that take energy

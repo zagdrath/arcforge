@@ -18,56 +18,63 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock.Part;
-import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.block.multiblock.CubeCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.CubeCasingBlock.Part;
+import net.zagdrath.arcforge.blockentity.multiblock.CubeMultiblockBlockEntity;
 
-// The Arc Crushing Array: 27 casings as a solid 3x3x3 cube. When formed, the centre block becomes
-// part=center and draws the whole machine (and its block entity runs it); the other 26 become
-// part=other and draw nothing. The front faces the player who completed it.
-public final class ArcCrushingArrayStructure {
+// A solid 3x3x3 cube of one kind of casing (the Arc Crushing Array, the Induction Furnace Array). When
+// formed, the centre block becomes part=center and draws the whole machine (and its block entity runs
+// it); the other 26 become part=other and draw nothing. The front faces the player who completed it.
+// Casings of different machines never join.
+public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> {
     public static final int SIZE = 3;
     private static final int BLOCKS = SIZE * SIZE * SIZE;
 
-    private ArcCrushingArrayStructure() {}
+    private final Class<? extends CubeCasingBlock> casing;
+    private final Class<T> controller;
 
-    private static boolean isCasing(BlockState state) {
-        return state.getBlock() instanceof ArcCrushingArrayCasingBlock;
+    public CubeMultiblockStructure(Class<? extends CubeCasingBlock> casing, Class<T> controller) {
+        this.casing = casing;
+        this.controller = controller;
+    }
+
+    private boolean isCasing(BlockState state) {
+        return casing.isInstance(state.getBlock());
     }
 
     // The centre block of the formed structure the casing at pos belongs to, or null.
-    public static @Nullable BlockPos findCenter(BlockGetter level, BlockPos pos) {
+    public @Nullable BlockPos findCenter(BlockGetter level, BlockPos pos) {
         BlockState state = level.getBlockState(pos);
-        if (!isCasing(state) || state.getValue(ArcCrushingArrayCasingBlock.PART) == Part.NONE) {
+        if (!isCasing(state) || state.getValue(CubeCasingBlock.PART) == Part.NONE) {
             return null;
         }
-        if (state.getValue(ArcCrushingArrayCasingBlock.PART) == Part.CENTER) {
+        if (state.getValue(CubeCasingBlock.PART) == Part.CENTER) {
             return pos;
         }
         for (BlockPos candidate : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
             BlockState other = level.getBlockState(candidate);
-            if (isCasing(other) && other.getValue(ArcCrushingArrayCasingBlock.PART) == Part.CENTER) {
+            if (isCasing(other) && other.getValue(CubeCasingBlock.PART) == Part.CENTER) {
                 return candidate.immutable();
             }
         }
         return null;
     }
 
-    public static @Nullable ArcCrushingArrayBlockEntity findController(BlockGetter level, BlockPos pos) {
+    public @Nullable T findController(BlockGetter level, BlockPos pos) {
         BlockPos center = findCenter(level, pos);
-        return center != null && level.getBlockEntity(center) instanceof ArcCrushingArrayBlockEntity array ? array : null;
+        return center != null && controller.isInstance(level.getBlockEntity(center)) ? controller.cast(level.getBlockEntity(center)) : null;
     }
 
     // Re-evaluates the casings connected to origin. viewer: the player completing it, so the front faces
     // them; null keeps the current facing.
-    public static void rebuild(ServerLevel level, BlockPos origin, @Nullable Vec3 viewer) {
+    public void rebuild(ServerLevel level, BlockPos origin, @Nullable Vec3 viewer) {
         if (isCasing(level.getBlockState(origin))) {
             apply(level, flood(level, origin), viewer);
         }
     }
 
     // After a casing is removed: re-evaluates everything that touched it.
-    public static void rebuildAround(ServerLevel level, BlockPos removed) {
+    public void rebuildAround(ServerLevel level, BlockPos removed) {
         Set<BlockPos> done = new HashSet<>();
         for (BlockPos pos : BlockPos.betweenClosed(removed.offset(-1, -1, -1), removed.offset(1, 1, 1))) {
             if (!done.contains(pos) && isCasing(level.getBlockState(pos))) {
@@ -78,7 +85,7 @@ public final class ArcCrushingArrayStructure {
         }
     }
 
-    private static Set<BlockPos> flood(ServerLevel level, BlockPos origin) {
+    private Set<BlockPos> flood(ServerLevel level, BlockPos origin) {
         Set<BlockPos> found = new HashSet<>();
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
         found.add(origin);
@@ -129,10 +136,10 @@ public final class ArcCrushingArrayStructure {
 
     private static void form(ServerLevel level, Set<BlockPos> blocks, BlockPos center, @Nullable Vec3 viewer) {
         BlockState centerState = level.getBlockState(center);
-        boolean wasFormed = centerState.getValue(ArcCrushingArrayCasingBlock.PART) == Part.CENTER;
+        boolean wasFormed = centerState.getValue(CubeCasingBlock.PART) == Part.CENTER;
         Direction facing = viewer != null
                 ? Direction.getApproximateNearest(viewer.x - (center.getX() + 0.5), 0.0, viewer.z - (center.getZ() + 0.5))
-                : wasFormed ? centerState.getValue(ArcCrushingArrayCasingBlock.FACING) : Direction.NORTH;
+                : wasFormed ? centerState.getValue(CubeCasingBlock.FACING) : Direction.NORTH;
         if (facing.getAxis().isVertical()) {
             facing = Direction.NORTH;
         }
@@ -140,11 +147,11 @@ public final class ArcCrushingArrayStructure {
         for (BlockPos pos : blocks) {
             BlockState state = level.getBlockState(pos);
             BlockState formed = pos.equals(center)
-                    ? state.setValue(ArcCrushingArrayCasingBlock.PART, Part.CENTER).setValue(ArcCrushingArrayCasingBlock.FACING, facing)
-                    : state.setValue(ArcCrushingArrayCasingBlock.PART, Part.OTHER).setValue(ArcCrushingArrayCasingBlock.LIT, false);
+                    ? state.setValue(CubeCasingBlock.PART, Part.CENTER).setValue(CubeCasingBlock.FACING, facing)
+                    : state.setValue(CubeCasingBlock.PART, Part.OTHER).setValue(CubeCasingBlock.LIT, false);
             if (formed != state) {
                 level.setBlock(pos, formed, Block.UPDATE_ALL);
-                changed |= pos.equals(center) || state.getValue(ArcCrushingArrayCasingBlock.PART) == Part.NONE;
+                changed |= pos.equals(center) || state.getValue(CubeCasingBlock.PART) == Part.NONE;
             }
         }
         BlockPos min = center.offset(-1, -1, -1);
@@ -160,7 +167,7 @@ public final class ArcCrushingArrayStructure {
         BlockPos max = null;
         for (BlockPos pos : blocks) {
             BlockState state = level.getBlockState(pos);
-            BlockState loose = state.setValue(ArcCrushingArrayCasingBlock.PART, Part.NONE).setValue(ArcCrushingArrayCasingBlock.LIT, false);
+            BlockState loose = state.setValue(CubeCasingBlock.PART, Part.NONE).setValue(CubeCasingBlock.LIT, false);
             if (loose != state) {
                 level.setBlock(pos, loose, Block.UPDATE_ALL);
                 min = min == null ? pos : BlockPos.min(min, pos);

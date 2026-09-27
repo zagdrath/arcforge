@@ -142,4 +142,8 @@ public abstract class StorageMenu extends AbstractContainerMenu {
     public SideMode getSideMode(RelativeSide side) {
         return SideConfig.unpack(value(sideConfigIndex), side);
     }
+
+    public boolean isAutoEject() {
+        return SideConfig.unpackAutoEject(value(sideConfigIndex));
+    }
 }

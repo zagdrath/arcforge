@@ -178,6 +178,48 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+        BUILDER.comment("Induction Furnace: smelts anything with a furnace recipe using FE.").push("inductionFurnace");
+    }
+
+    public static final ModConfigSpec.IntValue INDUCTION_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while smelting, before upgrades.")
+            .defineInRange("energyPerTick", 20, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue INDUCTION_TIME_MULTIPLIER = BUILDER
+            .comment("Multiplier on the recipe's cooking time (0.5 = 100 ticks for a normal 200-tick furnace recipe).")
+            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Induction Furnace Array: 3x3x3 multiblock with three smelting lanes.").push("inductionFurnaceArray");
+    }
+
+    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t per working lane, before upgrades.")
+            .defineInRange("energyPerTick", 16, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue INDUCTION_ARRAY_TIME_MULTIPLIER = BUILDER
+            .comment("Multiplier on the recipe's cooking time (0.25 = 50 ticks, twice as fast as the Induction Furnace).")
+            .defineInRange("timeMultiplier", 0.25, 0.01, 10.0);
+
+    static {
+        BUILDER.pop();
         BUILDER.comment("Carbonizer: multiblock that bakes coal into coal coke, collecting creosote. Recipes are data-driven (arcforge:carbonizing).")
                 .push("carbonizer");
     }

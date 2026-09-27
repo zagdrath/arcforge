@@ -31,6 +31,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.THERMOELECTRIC_PLANT.get());
                 output.accept(ModItems.ARC_CRUSHER.get());
                 output.accept(ModItems.ARC_CRUSHING_ARRAY_CASING.get());
+                output.accept(ModItems.INDUCTION_FURNACE.get());
+                output.accept(ModItems.INDUCTION_FURNACE_ARRAY_CASING.get());
                 output.accept(ModItems.CARBONIZER.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_PORT.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_BRICKS.get());
