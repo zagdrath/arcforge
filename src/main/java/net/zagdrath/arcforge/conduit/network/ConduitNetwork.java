@@ -53,6 +53,10 @@ public abstract class ConduitNetwork<H> {
 
     public abstract void tick(long gameTime);
 
+    public ConduitTier getTier() {
+        return tier;
+    }
+
     public List<BlockPos> getMembers() {
         return members;
     }

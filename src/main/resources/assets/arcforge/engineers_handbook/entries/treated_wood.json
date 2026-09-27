@@ -1,0 +1,18 @@
+{
+  "title": "Treated Wood",
+  "icon": "arcforge:treated_planks",
+  "items": [
+    "arcforge:treated_log",
+    "arcforge:treated_planks",
+    "arcforge:treated_stairs",
+    "arcforge:treated_slab",
+    "arcforge:treated_fence",
+    "arcforge:treated_door"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Wood soaked in creosote in the Infuser. A full building set that never catches fire, like crimson and warped wood."
+    }
+  ]
+}

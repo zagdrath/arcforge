@@ -1,0 +1,105 @@
+{
+  "chapters": [
+    {
+      "id": "getting_started",
+      "title": "Getting Started",
+      "icon": "arcforge:engineers_handbook",
+      "description": "Where to begin: your first power, your first steel, and the tools that tie it together.",
+      "entries": [
+        "welcome",
+        "first_power",
+        "making_steel",
+        "conduits_and_wrench",
+        "upgrades"
+      ]
+    },
+    {
+      "id": "power_and_heat",
+      "title": "Power & Heat",
+      "icon": "arcforge:firebox",
+      "description": "Burning fuel for heat, and turning heat into FE.",
+      "entries": [
+        "heat_basics",
+        "combustion_plant",
+        "firebox",
+        "geothermal_plant",
+        "fuel_burner",
+        "thermoelectric_plant",
+        "heat_cells"
+      ]
+    },
+    {
+      "id": "steelmaking",
+      "title": "Steelmaking",
+      "icon": "arcforge:steel_ingot",
+      "description": "Coal coke from the Carbonizer, steel from the Arcforge Furnace.",
+      "entries": [
+        "carbonizer",
+        "arcforge_furnace",
+        "coal_coke_and_creosote"
+      ]
+    },
+    {
+      "id": "processing",
+      "title": "Processing",
+      "icon": "arcforge:arc_crusher",
+      "description": "FE machines that crush, smelt, press, spin and soak.",
+      "entries": [
+        "arc_crusher",
+        "induction_furnace",
+        "metal_press",
+        "fiberizer",
+        "infuser",
+        "electric_pump"
+      ]
+    },
+    {
+      "id": "arrays",
+      "title": "Machine Arrays",
+      "icon": "arcforge:arc_crushing_array_casing",
+      "description": "3x3x3 multiblocks with three lanes each: faster, and cheaper to run.",
+      "entries": [
+        "arc_crushing_array",
+        "induction_furnace_array",
+        "metal_pressing_array"
+      ]
+    },
+    {
+      "id": "steam",
+      "title": "Steam",
+      "icon": "arcforge:steam_boiler",
+      "description": "Boilers, turbines and their giant arrays.",
+      "entries": [
+        "steam_basics",
+        "steam_boiler",
+        "steam_turbine",
+        "steam_boiler_array",
+        "steam_turbine_array",
+        "pressurized_storage"
+      ]
+    },
+    {
+      "id": "logistics",
+      "title": "Logistics & Storage",
+      "icon": "arcforge:wrought_energy_conduit",
+      "description": "Moving and storing power, items, fluids, gases and heat.",
+      "entries": [
+        "conduits",
+        "fluid_tanks",
+        "energy_cells"
+      ]
+    },
+    {
+      "id": "materials",
+      "title": "Materials",
+      "icon": "arcforge:steel_plate",
+      "description": "What the machines make, and what it's for.",
+      "entries": [
+        "dusts",
+        "parts",
+        "mineral_wool",
+        "treated_wood"
+      ]
+    }
+  ]
+}

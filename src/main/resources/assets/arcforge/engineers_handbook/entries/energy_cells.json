@@ -1,0 +1,16 @@
+{
+  "title": "Energy Cells",
+  "icon": "arcforge:wrought_energy_cell",
+  "items": [
+    "arcforge:wrought_energy_cell",
+    "arcforge:tempered_energy_cell",
+    "arcforge:hardened_energy_cell",
+    "arcforge:arcforged_energy_cell"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Store FE, from 500,000 to 256,000,000 by tier, and keep it when broken. The lights on top show how full they are."
+    }
+  ]
+}

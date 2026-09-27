@@ -1,0 +1,17 @@
+{
+  "title": "Induction Furnace Array",
+  "icon": "arcforge:induction_furnace_array_casing",
+  "items": [
+    "arcforge:induction_furnace_array_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Three smelting lanes, each twice as fast as an Induction Furnace, for less FE per item.\nBuild a solid 3x3x3 cube of casings."
+    },
+    {
+      "type": "multiblock",
+      "structure": "induction_furnace_array"
+    }
+  ]
+}

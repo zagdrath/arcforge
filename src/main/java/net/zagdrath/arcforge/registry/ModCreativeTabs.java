@@ -117,6 +117,7 @@ public final class ModCreativeTabs {
             .withTabsBefore(LOGISTICS.getKey())
             .icon(() -> ModItems.WRENCH.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
+                output.accept(ModItems.ENGINEERS_HANDBOOK.get());
                 output.accept(ModItems.WRENCH.get());
                 output.accept(ModItems.SPEED_UPGRADE.get());
                 output.accept(ModItems.ENERGY_UPGRADE.get());

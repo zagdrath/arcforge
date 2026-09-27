@@ -1,0 +1,17 @@
+{
+  "title": "Heat Cells",
+  "icon": "arcforge:wrought_heat_cell",
+  "items": [
+    "arcforge:wrought_heat_cell",
+    "arcforge:tempered_heat_cell",
+    "arcforge:hardened_heat_cell",
+    "arcforge:arcforged_heat_cell",
+    "arcforge:insulation_upgrade"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Store heat for later. Better tiers hold more, move it faster, and can hold hotter heat.\nHeat Cells slowly leak. Better tiers leak less, and an Insulation Upgrade slows it further.\nThey keep their heat when broken."
+    }
+  ]
+}

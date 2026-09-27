@@ -1,0 +1,15 @@
+{
+  "title": "Steam",
+  "icon": "arcforge:steam_boiler",
+  "items": [
+    "arcforge:steam_boiler",
+    "arcforge:steam_turbine",
+    "arcforge:electric_pump"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Boil water with heat, then turn the steam into FE in a turbine. It beats the Thermoelectric Plant once you run it hot.\n# Grades\n- Steam: from 100°C. 10 HU per mB.\n- High-Pressure Steam: from 500°C. 15 HU per mB.\n- Superheated Steam: from 900°C. 20 HU per mB.\nBetter grades cost more heat but give a turbine much more FE per mB.\nSteam is a gas: it travels in Pressurized Conduits and is stored in Pressurized Cylinders, never in fluid tanks or pipes."
+    }
+  ]
+}

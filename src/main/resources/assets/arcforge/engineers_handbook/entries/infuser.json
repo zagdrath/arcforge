@@ -1,0 +1,15 @@
+{
+  "title": "Infuser",
+  "icon": "arcforge:infuser",
+  "items": [
+    "arcforge:infuser",
+    "arcforge:treated_planks",
+    "arcforge:treated_log"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Soaks wood in creosote with FE: any vanilla planks, logs or wood become the treated version, which never catches fire."
+    }
+  ]
+}

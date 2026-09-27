@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.WeakHashMap;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -42,6 +44,11 @@ public final class ConduitNetworkManager {
 
     public static void remove(ServerLevel level) {
         MANAGERS.remove(level);
+    }
+
+    // The network the conduit at pos belongs to (for displays like Jade), or null.
+    public @Nullable ConduitNetwork<?> getNetwork(BlockPos pos) {
+        return byPos.get(pos);
     }
 
     public void markDirty(BlockPos pos) {

@@ -1,0 +1,16 @@
+{
+  "title": "Fluid Tanks",
+  "icon": "arcforge:wrought_fluid_tank",
+  "items": [
+    "arcforge:wrought_fluid_tank",
+    "arcforge:tempered_fluid_tank",
+    "arcforge:hardened_fluid_tank",
+    "arcforge:arcforged_fluid_tank"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Store one liquid each, from 16,000 to 1,024,000 mB by tier. Stacked tanks drain downwards. Pick one up with the Wrench to keep its contents; broken, it spills.\nGases need Pressurized Cylinders instead."
+    }
+  ]
+}

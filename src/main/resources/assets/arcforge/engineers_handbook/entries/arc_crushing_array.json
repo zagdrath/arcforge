@@ -1,0 +1,17 @@
+{
+  "title": "Arc Crushing Array",
+  "icon": "arcforge:arc_crushing_array_casing",
+  "items": [
+    "arcforge:arc_crushing_array_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Three crushing lanes in one: twice as fast as an Arc Crusher, 60% less FE per operation, and ores give double.\nBuild a solid 3x3x3 cube of casings. Any casing opens it."
+    },
+    {
+      "type": "multiblock",
+      "structure": "arc_crushing_array"
+    }
+  ]
+}

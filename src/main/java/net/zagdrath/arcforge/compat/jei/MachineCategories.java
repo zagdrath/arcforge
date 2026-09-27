@@ -1,0 +1,289 @@
+/*
+ * Copyright (c) 2026 Zagdrath
+ * SPDX-License-Identifier: MIT
+ */
+
+package net.zagdrath.arcforge.compat.jei;
+
+import java.util.Locale;
+
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.fluids.FluidStackTemplate;
+import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.heat.BurnerFuel;
+import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
+import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
+import net.zagdrath.arcforge.recipe.CrushingRecipe;
+import net.zagdrath.arcforge.recipe.FiberizingRecipe;
+import net.zagdrath.arcforge.recipe.InfusingRecipe;
+import net.zagdrath.arcforge.recipe.PressingRecipe;
+import net.zagdrath.arcforge.registry.ModBlocks;
+import net.zagdrath.arcforge.registry.ModRecipes;
+import net.zagdrath.arcforge.steam.SteamGrade;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.gui.widgets.IRecipeExtrasBuilder;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.types.IRecipeHolderType;
+import mezz.jei.api.recipe.types.IRecipeType;
+
+// JEI categories for Arcforge's machines: what goes in, what comes out, and what it takes.
+final class MachineCategories {
+    // Fluids show in a 16x16 slot, measured against a bucket.
+    private static final int FLUID_SLOT_CAPACITY = 1_000;
+
+    private MachineCategories() {}
+
+    static void fluid(IRecipeLayoutBuilder builder, boolean input, int x, int y, FluidStackTemplate fluid) {
+        (input ? builder.addInputSlot(x, y) : builder.addOutputSlot(x, y))
+                .setStandardSlotBackground()
+                .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, fluid.amount()), false, 16, 16)
+                .add(fluid.fluid().value(), fluid.amount());
+    }
+
+    static void fluid(IRecipeLayoutBuilder builder, boolean input, int x, int y, Fluid fluid, int amount) {
+        (input ? builder.addInputSlot(x, y) : builder.addOutputSlot(x, y))
+                .setStandardSlotBackground()
+                .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, amount), false, 16, 16)
+                .add(fluid, amount);
+    }
+
+    // --- Arc Crusher / Arc Crushing Array ---
+
+    static final class Crushing extends ArcforgeCategory<RecipeHolder<CrushingRecipe>> {
+        static final IRecipeHolderType<CrushingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.CRUSHING.get());
+
+        Crushing(IGuiHelper gui) {
+            super(TYPE, "crushing", ModBlocks.ARC_CRUSHER.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CrushingRecipe> holder, IFocusGroup focuses) {
+            CrushingRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(recipe.result());
+            recipe.bonus().ifPresent(bonus -> builder.addOutputSlot(83, 5).setStandardSlotBackground().add(bonus)
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                            Math.round(recipe.bonusChance() * 100)))));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<CrushingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<CrushingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, seconds(holder.value().time()), 0, 30);
+            if (holder.value().ore()) {
+                textRight(graphics, Component.translatable("jei.arcforge.crushing.ore"), 116, 30);
+            }
+        }
+    }
+
+    // --- Fiberizer ---
+
+    static final class Fiberizing extends ArcforgeCategory<RecipeHolder<FiberizingRecipe>> {
+        static final IRecipeHolderType<FiberizingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.FIBERIZING.get());
+
+        Fiberizing(IGuiHelper gui) {
+            super(TYPE, "fiberizing", ModBlocks.FIBERIZER.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<FiberizingRecipe> holder, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(holder.value().result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<FiberizingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<FiberizingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            FiberizingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.fiberizing.cost", recipe.fePerTick(), recipe.huPerTick(), recipe.minTemp()), 0, 30);
+            textRight(graphics, seconds(recipe.time()), 116, 9);
+        }
+    }
+
+    // --- Infuser ---
+
+    static final class Infusing extends ArcforgeCategory<RecipeHolder<InfusingRecipe>> {
+        static final IRecipeHolderType<InfusingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.INFUSING.get());
+
+        Infusing(IGuiHelper gui) {
+            super(TYPE, "infusing", ModBlocks.INFUSER.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<InfusingRecipe> holder, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
+            fluid(builder, true, 21, 5, holder.value().fluid());
+            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(holder.value().result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<InfusingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<InfusingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, seconds(holder.value().time()), 0, 30);
+        }
+    }
+
+    // --- Metal Press / Metal Pressing Array ---
+
+    static final class Pressing extends ArcforgeCategory<RecipeHolder<PressingRecipe>> {
+        static final IRecipeHolderType<PressingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.PRESSING.get());
+
+        Pressing(IGuiHelper gui) {
+            super(TYPE, "pressing", ModBlocks.METAL_PRESS.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<PressingRecipe> holder, IFocusGroup focuses) {
+            PressingRecipe recipe = holder.value();
+            // The die is needed but never used up.
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(new ItemStack(recipe.die()))
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.pressing.die")));
+            builder.addInputSlot(21, 5).setStandardSlotBackground().addItemStacks(recipe.ingredient().items()
+                    .map(item -> new ItemStack(item, recipe.count())).toList());
+            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(recipe.result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<PressingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<PressingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, seconds(holder.value().time()), 0, 30);
+        }
+    }
+
+    // --- Carbonizer ---
+
+    static final class Carbonizing extends ArcforgeCategory<RecipeHolder<CarbonizingRecipe>> {
+        static final IRecipeHolderType<CarbonizingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.CARBONIZING.get());
+
+        Carbonizing(IGuiHelper gui) {
+            super(TYPE, "carbonizing", ModBlocks.CARBONIZER.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CarbonizingRecipe> holder, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(holder.value().result());
+            holder.value().byproduct().ifPresent(fluid -> fluid(builder, false, 83, 5, fluid));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<CarbonizingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<CarbonizingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, seconds(holder.value().time()), 0, 30);
+        }
+    }
+
+    // --- Arcforge Furnace ---
+
+    static final class ArcforgeSmelting extends ArcforgeCategory<RecipeHolder<ArcforgeSmeltingRecipe>> {
+        static final IRecipeHolderType<ArcforgeSmeltingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.ARCFORGE_SMELTING.get());
+
+        ArcforgeSmelting(IGuiHelper gui) {
+            super(TYPE, "arcforge_smelting", ModBlocks.ARCFORGE_FURNACE_PORT.get(), gui, 124, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ArcforgeSmeltingRecipe> holder, IFocusGroup focuses) {
+            ArcforgeSmeltingRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.input());
+            builder.addInputSlot(21, 5).setStandardSlotBackground().add(recipe.reagent());
+            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(recipe.result());
+            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(103, 5).setStandardSlotBackground().add(byproduct));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<ArcforgeSmeltingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<ArcforgeSmeltingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.arcforge_smelting.heat", holder.value().minHeat()), 0, 30);
+            textRight(graphics, seconds(holder.value().time()), 124, 30);
+        }
+    }
+
+    // --- Steam: what each grade takes to boil and gives in a turbine ---
+
+    record SteamRecipe(SteamGrade grade) {}
+
+    static final class Steam extends ArcforgeCategory<SteamRecipe> {
+        static final IRecipeType<SteamRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "steam", SteamRecipe.class);
+
+        Steam(IGuiHelper gui) {
+            super(TYPE, "steam", ModBlocks.STEAM_BOILER.get(), gui, 150, 46);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, SteamRecipe recipe, IFocusGroup focuses) {
+            fluid(builder, true, 1, 5, Fluids.WATER, 1_000);
+            fluid(builder, false, 61, 5, recipe.grade().fluid(), 1_000);
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, SteamRecipe recipe, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(SteamRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            SteamGrade grade = recipe.grade();
+            text(graphics, Component.translatable("jei.arcforge.steam.boil", grade.minCelsius(), grade.huPerMb()), 84, 5);
+            text(graphics, Component.translatable("jei.arcforge.steam.boil_array", String.format(Locale.ROOT, "%.0f", grade.huPerMb() * 0.8)), 84, 15);
+            text(graphics, Component.translatable("jei.arcforge.steam.turbine", grade.fePerMb(), grade.arrayFePerMb()), 0, 30);
+        }
+    }
+
+    // --- Fuel Burner fuels (the arcforge:burner_fuels data map) ---
+
+    record BurnerFuelRecipe(Fluid fluid, BurnerFuel fuel) {}
+
+    static final class BurnerFuels extends ArcforgeCategory<BurnerFuelRecipe> {
+        static final IRecipeType<BurnerFuelRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "burner_fuel", BurnerFuelRecipe.class);
+
+        BurnerFuels(IGuiHelper gui) {
+            super(TYPE, "burner_fuel", ModBlocks.FUEL_BURNER.get(), gui, 140, 30);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, BurnerFuelRecipe recipe, IFocusGroup focuses) {
+            fluid(builder, true, 1, 7, recipe.fluid(), 1_000);
+        }
+
+        @Override
+        public void draw(BurnerFuelRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            BurnerFuel fuel = recipe.fuel();
+            text(graphics, Component.translatable("jei.arcforge.burner_fuel.value", fuel.huPerMb()), 24, 5);
+            text(graphics, Component.translatable("jei.arcforge.burner_fuel.rate",
+                    String.format(Locale.ROOT, "%.2f", fuel.mbPerTick()).replaceAll("0+$", "").replaceAll("\\.$", ""),
+                    Math.round(fuel.huPerMb() * fuel.mbPerTick())), 24, 16);
+        }
+    }
+}

@@ -21,6 +21,8 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
+import net.neoforged.neoforge.client.event.AddClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -44,6 +46,9 @@ import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamBoilerArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamTurbineArrayRenderer;
 import net.zagdrath.arcforge.client.model.ConnectedModel;
+import net.zagdrath.arcforge.client.gui.StructureRenderer;
+import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
+import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
 import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
@@ -82,6 +87,7 @@ public class ArcforgeClient {
     public ArcforgeClient(ModContainer container) {
         // Mods screen > Arcforge > Config
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        EngineersHandbookItem.opener = EngineersHandbookScreen::open;
     }
 
     @SubscribeEvent
@@ -110,6 +116,12 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.HEAT_CELL.get(), HeatCellScreen::new);
         event.register(ModMenuTypes.CARBONIZER.get(), CarbonizerScreen::new);
         event.register(ModMenuTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceScreen::new);
+    }
+
+    // The structure viewer caches block sprites, which a resource reload replaces.
+    @SubscribeEvent
+    static void addReloadListeners(AddClientReloadListenersEvent event) {
+        event.addListener(Identifier.fromNamespaceAndPath(Arcforge.MODID, "structure_renderer"), (ResourceManagerReloadListener) resources -> StructureRenderer.clearCache());
     }
 
     // Creosote's textures are already coloured, so it renders untinted.

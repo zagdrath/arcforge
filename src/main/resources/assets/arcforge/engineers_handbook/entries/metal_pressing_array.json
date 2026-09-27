@@ -1,0 +1,17 @@
+{
+  "title": "Metal Pressing Array",
+  "icon": "arcforge:metal_pressing_array_casing",
+  "items": [
+    "arcforge:metal_pressing_array_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Three pressing lanes, each with its own die, so plates, gears and rods can run side by side. Twice as fast as a Metal Press, 60% less FE.\nBuild a solid 3x3x3 cube of casings."
+    },
+    {
+      "type": "multiblock",
+      "structure": "metal_pressing_array"
+    }
+  ]
+}

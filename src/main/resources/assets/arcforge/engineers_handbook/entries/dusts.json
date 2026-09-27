@@ -1,0 +1,18 @@
+{
+  "title": "Dusts",
+  "icon": "arcforge:iron_dust",
+  "items": [
+    "arcforge:iron_dust",
+    "arcforge:copper_dust",
+    "arcforge:gold_dust",
+    "arcforge:ancient_debris_dust",
+    "arcforge:carbon_dust",
+    "arcforge:nether_quartz_dust"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Made in the Arc Crusher. Metal dusts smelt back into ingots (faster in a blast furnace), so crushing raw ores gets you more metal. Carbon dust is a furnace fuel."
+    }
+  ]
+}

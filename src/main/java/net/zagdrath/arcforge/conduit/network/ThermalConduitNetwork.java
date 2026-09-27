@@ -26,6 +26,10 @@ public class ThermalConduitNetwork extends ActiveConduitNetwork<HeatHandler> {
     private int temperature = HeatBuffer.AMBIENT_CELSIUS;
     private boolean pulledThisTick;
 
+    public int getTemperature() {
+        return temperature;
+    }
+
     public ThermalConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier) {
         super(level, members, memberSet, tier, ModCapabilities.HEAT);
     }

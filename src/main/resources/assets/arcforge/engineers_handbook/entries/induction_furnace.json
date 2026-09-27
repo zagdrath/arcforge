@@ -1,0 +1,13 @@
+{
+  "title": "Induction Furnace",
+  "icon": "arcforge:induction_furnace",
+  "items": [
+    "arcforge:induction_furnace"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Smelts anything a furnace can, twice as fast, with FE instead of fuel."
+    }
+  ]
+}

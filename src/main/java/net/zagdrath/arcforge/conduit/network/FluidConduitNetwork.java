@@ -47,6 +47,18 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
         this.accepts = accepts;
     }
 
+    public FluidResource getFluid() {
+        return fluid;
+    }
+
+    public int getAmount() {
+        return amount;
+    }
+
+    public int getCapacity() {
+        return capacity;
+    }
+
     @Override
     protected void onCreated() {
         // Gather the conduits' shares. Connection rules keep different fluids apart, so there is

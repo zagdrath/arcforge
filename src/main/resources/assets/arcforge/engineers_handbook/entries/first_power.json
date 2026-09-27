@@ -1,0 +1,15 @@
+{
+  "title": "Your First Power",
+  "icon": "arcforge:firebox",
+  "items": [
+    "arcforge:combustion_plant",
+    "arcforge:firebox",
+    "arcforge:thermoelectric_plant"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The quickest start is a Combustion Plant: put coal or charcoal in and it makes 40 FE/t straight away.\nThe better setup is a Firebox feeding a Thermoelectric Plant. The Firebox burns the same fuel into heat, up to 1,100°C; the Thermoelectric Plant turns heat into FE, and the hotter the heat, the more FE it gets. Together they make about twice the FE per coal.\n# Setting it up\n- Place them touching, with the Firebox's heat face against the plant's heat face, or join them with Thermodynamic Conduits.\n- The plant takes a few minutes to warm up.\n- Take FE out of the plant's energy face with Energy Conduits."
+    }
+  ]
+}

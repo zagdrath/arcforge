@@ -1,0 +1,20 @@
+{
+  "title": "Gas Storage",
+  "icon": "arcforge:wrought_pressurized_cylinder",
+  "items": [
+    "arcforge:wrought_pressurized_cylinder",
+    "arcforge:tempered_pressurized_cylinder",
+    "arcforge:hardened_pressurized_cylinder",
+    "arcforge:arcforged_pressurized_cylinder",
+    "arcforge:wrought_pressurized_conduit",
+    "arcforge:tempered_pressurized_conduit",
+    "arcforge:hardened_pressurized_conduit",
+    "arcforge:arcforged_pressurized_conduit"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Pressurized Conduits carry gases, twice as fast as fluid conduits, and glow while gas moves. Pressurized Cylinders store one gas each and keep it when broken; the gauge on top shows how full they are.\nNeither mixes gases: each network or cylinder holds one kind at a time."
+    }
+  ]
+}

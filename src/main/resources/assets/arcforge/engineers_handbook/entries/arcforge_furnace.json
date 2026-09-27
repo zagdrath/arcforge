@@ -1,0 +1,19 @@
+{
+  "title": "Arcforge Furnace",
+  "icon": "arcforge:arcforge_furnace_port",
+  "items": [
+    "arcforge:arcforge_furnace_port",
+    "arcforge:arcforge_furnace_bricks",
+    "arcforge:arcforge_furnace_brick_wall"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Smelts iron and coal coke into steel, with slag as a by-product.\nCoal coke is both its fuel and its reagent: burning it heats the furnace toward 1,600°C, and a smelt only works at 1,200°C or hotter. Coal coke blocks work as nine coal coke.\nOpen it from the port."
+    },
+    {
+      "type": "multiblock",
+      "structure": "arcforge_furnace"
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "title": "Geothermal Plant",
+  "icon": "arcforge:geothermal_plant",
+  "items": [
+    "arcforge:geothermal_plant"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The hottest heat source, up to 1,400°C. It burns lava from its tank, and lava and magma blocks touching it add heat for free, without being used up.\nFill it with lava buckets in the slot, by right-clicking with a bucket, or with pipes. Pair it with an Electric Pump over a lava lake."
+    }
+  ]
+}

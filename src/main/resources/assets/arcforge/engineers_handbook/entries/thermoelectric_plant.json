@@ -1,0 +1,13 @@
+{
+  "title": "Thermoelectric Plant",
+  "icon": "arcforge:thermoelectric_plant",
+  "items": [
+    "arcforge:thermoelectric_plant"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Turns heat into FE. How much depends on its temperature: nothing at 100°C, half at 600°C, all of it at 1,100°C, and a bonus up to 1,400°C.\nIt can't get hotter than what feeds it, so feed it from the hottest source you have. It takes a few minutes to warm up."
+    }
+  ]
+}

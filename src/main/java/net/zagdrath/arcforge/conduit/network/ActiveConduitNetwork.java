@@ -67,6 +67,10 @@ public abstract class ActiveConduitNetwork<H> extends ConduitNetwork<H> {
     // Gives up to `max` to a sink and returns how much was accepted.
     protected abstract int insert(H sink, int max);
 
+    public int getCapacity() {
+        return capacity;
+    }
+
     // What the network holds right now, across all its conduits.
     public int getStored() {
         return stored;

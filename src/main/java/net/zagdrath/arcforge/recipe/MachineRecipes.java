@@ -33,6 +33,11 @@ public final class MachineRecipes {
         clientRecipes = recipes;
     }
 
+    // The recipes the server synced, for client-side displays (JEI, the Engineer's Handbook).
+    public static RecipeMap clientRecipes() {
+        return clientRecipes;
+    }
+
     private static RecipeMap recipes(@Nullable Level level) {
         return level instanceof ServerLevel serverLevel ? serverLevel.recipeAccess().recipeMap() : clientRecipes;
     }

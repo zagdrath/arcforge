@@ -1,0 +1,16 @@
+{
+  "title": "Metal Press",
+  "icon": "arcforge:metal_press",
+  "items": [
+    "arcforge:metal_press",
+    "arcforge:plate_die",
+    "arcforge:gear_die",
+    "arcforge:rod_die"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Presses ingots into plates, gears and rods with FE: 20 FE/t for 100 ticks.\nWhat it makes depends on the die in its die slot: 1 ingot makes a plate, 4 a gear, and 1 makes 2 rods. Dies are never used up, and pipes never take them out."
+    }
+  ]
+}

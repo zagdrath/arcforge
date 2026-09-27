@@ -1,0 +1,14 @@
+{
+  "title": "Fuel Burner",
+  "icon": "arcforge:fuel_burner",
+  "items": [
+    "arcforge:fuel_burner",
+    "arcforge:creosote_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Burns liquid fuel into heat, up to 1,200°C. Creosote from the Carbonizer burns at 0.75 mB/t into 90 HU/t.\nA good use for all the creosote a big Carbonizer makes."
+    }
+  ]
+}

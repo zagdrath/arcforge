@@ -1,0 +1,18 @@
+{
+  "title": "Conduits & the Wrench",
+  "icon": "arcforge:wrench",
+  "items": [
+    "arcforge:wrench",
+    "arcforge:wrought_energy_conduit",
+    "arcforge:wrought_item_conduit",
+    "arcforge:wrought_fluid_conduit",
+    "arcforge:wrought_thermal_conduit",
+    "arcforge:wrought_pressurized_conduit"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Conduits move things between machines: FE, items, liquids, gases and heat. Conduits of the same kind join into one network; mixed tiers run at the slowest tier's speed.\nNext to a machine, a conduit connects on its own, following the machine's side settings.\n# The Wrench\n- Right-click a conduit side: cycle Auto, Input (forced), Output (forced) and Disabled.\n- Right-click the joint between two conduits to split or join them.\n- Sneak-right-click a machine to pick it up with its contents."
+    }
+  ]
+}

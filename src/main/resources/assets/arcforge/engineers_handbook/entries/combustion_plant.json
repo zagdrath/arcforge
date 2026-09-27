@@ -1,0 +1,13 @@
+{
+  "title": "Combustion Plant",
+  "icon": "arcforge:combustion_plant",
+  "items": [
+    "arcforge:combustion_plant"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Burns coal, charcoal and coal blocks straight into FE: 40 FE/t, 32,000 FE per coal. It pauses while its FE buffer is full.\nSimple and cheap, but a Firebox with a Thermoelectric Plant gets about twice as much from each coal.\nEnergy upgrades raise the FE per fuel; Speed upgrades burn faster."
+    }
+  ]
+}

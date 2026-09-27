@@ -1,0 +1,20 @@
+{
+  "title": "Conduits",
+  "icon": "arcforge:wrought_energy_conduit",
+  "items": [
+    "arcforge:wrought_energy_conduit",
+    "arcforge:tempered_energy_conduit",
+    "arcforge:hardened_energy_conduit",
+    "arcforge:arcforged_energy_conduit",
+    "arcforge:wrought_item_conduit",
+    "arcforge:wrought_fluid_conduit",
+    "arcforge:wrought_thermal_conduit",
+    "arcforge:wrought_pressurized_conduit"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "- Energy: FE, from 256 to 65,536 FE/t by tier.\n- Item: items, 8 to 64 at a time.\n- Fluid: one liquid at a time, 200 to 12,800 mB/t.\n- Pressurized: one gas at a time, 400 to 25,600 mB/t.\n- Thermodynamic: heat, 50 to 3,200 HU/t.\nUse the Wrench to set sides to input or output, or to split networks."
+    }
+  ]
+}

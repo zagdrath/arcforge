@@ -1,0 +1,15 @@
+{
+  "title": "Fiberizer",
+  "icon": "arcforge:fiberizer",
+  "items": [
+    "arcforge:fiberizer",
+    "arcforge:slag_wool",
+    "arcforge:rock_wool"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Spins slag and basalt into mineral wool, using FE and heat. It only works at 800°C or hotter, so feed it from a Firebox, Fuel Burner or Geothermal Plant.\nMineral wool insulates Heat Cells and makes Insulation Upgrades."
+    }
+  ]
+}

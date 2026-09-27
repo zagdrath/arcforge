@@ -1,0 +1,16 @@
+{
+  "title": "Arc Crusher",
+  "icon": "arcforge:arc_crusher",
+  "items": [
+    "arcforge:arc_crusher",
+    "arcforge:iron_dust",
+    "arcforge:copper_dust",
+    "arcforge:gold_dust"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Crushes ores into dusts with FE: 20 FE/t for 200 ticks. Raw ores give a dust and a 25% chance of another; ore blocks give two.\nDusts smelt back into ingots. Coal and charcoal crush into carbon dust, a furnace fuel."
+    }
+  ]
+}

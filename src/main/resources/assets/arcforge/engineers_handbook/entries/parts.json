@@ -1,0 +1,21 @@
+{
+  "title": "Plates, Gears & Rods",
+  "icon": "arcforge:steel_plate",
+  "items": [
+    "arcforge:plate_die",
+    "arcforge:gear_die",
+    "arcforge:rod_die",
+    "arcforge:steel_plate",
+    "arcforge:steel_gear",
+    "arcforge:steel_rod",
+    "arcforge:copper_plate",
+    "arcforge:copper_gear",
+    "arcforge:copper_rod"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Pressed in the Metal Press from steel and copper ingots. They go into upgrades, the steam machines and the bigger arrays."
+    }
+  ]
+}

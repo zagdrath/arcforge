@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "minecraft:book",
+    "#c:ingots/copper"
+  ],
+  "result": {
+    "count": 1,
+    "id": "arcforge:engineers_handbook"
+  }
+}
