@@ -13,7 +13,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
+import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
 import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
@@ -36,6 +38,12 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<ThermoelectricPlantMenu>> THERMOELECTRIC_PLANT = MENU_TYPES.register("thermoelectric_plant",
             () -> IMenuTypeExtension.create(ThermoelectricPlantMenu::new));
+
+    public static final Supplier<MenuType<ArcCrusherMenu>> ARC_CRUSHER = MENU_TYPES.register("arc_crusher",
+            () -> IMenuTypeExtension.create(ArcCrusherMenu::new));
+
+    public static final Supplier<MenuType<ArcCrushingArrayMenu>> ARC_CRUSHING_ARRAY = MENU_TYPES.register("arc_crushing_array",
+            () -> IMenuTypeExtension.create(ArcCrushingArrayMenu::new));
 
     public static final Supplier<MenuType<FluidTankMenu>> FLUID_TANK = MENU_TYPES.register("fluid_tank",
             () -> IMenuTypeExtension.create(FluidTankMenu::new));

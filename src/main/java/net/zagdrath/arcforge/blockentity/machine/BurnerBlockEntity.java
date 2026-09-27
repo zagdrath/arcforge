@@ -6,6 +6,7 @@
 package net.zagdrath.arcforge.blockentity.machine;
 
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -30,13 +31,14 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // A machine that burns #arcforge:combustion_fuel from one slot, making something (FE or heat) into a
 // buffer each tick it burns. While the buffer is full it pauses, keeping what's left of the burning item.
 public abstract class BurnerBlockEntity extends MachineBlockEntity {
     public static final int SLOT_FUEL = 0;
-    public static final int SLOT_UPGRADE_FIRST = 1;
-    public static final int SLOT_COUNT = SLOT_UPGRADE_FIRST + UPGRADE_SLOTS;
+    public static final int MACHINE_SLOTS = 1;
 
     private final ResourceHandler<ItemResource> fuelInput;
     private final ContainerData data;
@@ -46,8 +48,9 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
     private @Nullable Item burning;
     private int outputPerTick;
 
-    protected BurnerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, SideConfig sideConfig, List<SideMode> allowedSideModes) {
-        super(type, pos, state, SLOT_COUNT, BurnerBlockEntity::isItemValid, sideConfig, allowedSideModes);
+    protected BurnerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, Set<UpgradeType> upgrades,
+            SideConfig sideConfig, List<SideMode> allowedSideModes) {
+        super(type, pos, state, MACHINE_SLOTS, BurnerBlockEntity::isItemValid, upgrades, sideConfig, allowedSideModes);
         this.fuelInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_FUEL, slot -> false);
         this.data = new WideIntContainerData(BurnerMenu.DATA_VALUES) {
             @Override
@@ -70,10 +73,12 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
     }
 
     public static boolean isItemValid(int slot, ItemResource resource) {
-        if (slot == SLOT_FUEL) {
-            return CombustionFuel.isFuel(resource.toStack(1));
-        }
-        return isUpgradeSlot(slot, SLOT_UPGRADE_FIRST, resource);
+        return slot == SLOT_FUEL && CombustionFuel.isFuel(resource.toStack(1));
+    }
+
+    // A client-side copy of the slots, for the menu.
+    public static MachineItemHandler clientItems(Set<UpgradeType> upgrades) {
+        return new MachineItemHandler(MACHINE_SLOTS, BurnerBlockEntity::isItemValid, upgrades, () -> {});
     }
 
     // --- What the burner makes ---

@@ -5,7 +5,9 @@
 
 package net.zagdrath.arcforge.blockentity.machine;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -43,6 +45,8 @@ import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Turns lava into heat (HU); it makes no FE itself. Lava drains from the tank at 1 mB/t for lavaHeat
 // HU/t, and touching lava source blocks and magma blocks add passive heat, tank or no tank. Production
@@ -51,8 +55,8 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
     // Lava buckets go in the input slot and are poured into the tank; the empty buckets come out below.
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
-    public static final int SLOT_UPGRADE_FIRST = 2;
-    public static final int SLOT_COUNT = SLOT_UPGRADE_FIRST + UPGRADE_SLOTS;
+    public static final int MACHINE_SLOTS = 2;
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
 
     private static final int SCAN_INTERVAL = 20;
     private static final FluidResource LAVA = FluidResource.of(Fluids.LAVA);
@@ -66,13 +70,13 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
     private final ContainerData data;
 
     // Lava taken from the tank and still draining (1 mB/t), out of what was taken.
-    private int lavaBurning;
+    private double lavaBurning;
     private int lavaBurnTotal;
     private GeothermalHeat.@Nullable Surroundings surroundings;
     private int heatPerTick;
 
     public GeothermalPlantBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntityTypes.GEOTHERMAL_PLANT.get(), pos, state, SLOT_COUNT, GeothermalPlantBlockEntity::isItemValid,
+        super(ModBlockEntityTypes.GEOTHERMAL_PLANT.get(), pos, state, MACHINE_SLOTS, GeothermalPlantBlockEntity::isItemValid, UPGRADES,
                 new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.HEAT, SideMode.NONE),
                 SIDE_MODES);
         this.heat = new HeatBuffer(
@@ -97,7 +101,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
                     case GeothermalPlantMenu.DATA_TEMPERATURE -> heat.getTemperature();
                     case GeothermalPlantMenu.DATA_LAVA -> lavaTank.getAmount();
                     case GeothermalPlantMenu.DATA_LAVA_CAPACITY -> lavaTank.getCapacity();
-                    case GeothermalPlantMenu.DATA_BURN_TIME -> lavaBurning;
+                    case GeothermalPlantMenu.DATA_BURN_TIME -> (int) Math.ceil(lavaBurning);
                     case GeothermalPlantMenu.DATA_BURN_TOTAL -> lavaBurnTotal;
                     case GeothermalPlantMenu.DATA_HEAT_PER_TICK -> heatPerTick;
                     case GeothermalPlantMenu.DATA_LAVA_SOURCES -> around.lavaSources();
@@ -112,10 +116,12 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
     }
 
     public static boolean isItemValid(int slot, ItemResource resource) {
-        if (slot == SLOT_INPUT) {
-            return resource.is(Items.LAVA_BUCKET);
-        }
-        return isUpgradeSlot(slot, SLOT_UPGRADE_FIRST, resource);
+        return slot == SLOT_INPUT && resource.is(Items.LAVA_BUCKET);
+    }
+
+    // A client-side copy of the slots, for the menu.
+    public static MachineItemHandler clientItems() {
+        return new MachineItemHandler(MACHINE_SLOTS, GeothermalPlantBlockEntity::isItemValid, UPGRADES, () -> {});
     }
 
     private GeothermalHeat.Surroundings surroundings() {
@@ -140,13 +146,15 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
             if (lavaBurning <= 0) {
                 takeLava();
             }
-            int made = surroundings.passiveHeat();
+            // Speed upgrades drain the lava faster; Heat upgrades get more heat from it and from the surroundings.
+            double made = surroundings.passiveHeat();
             if (lavaBurning > 0) {
-                lavaBurning--;
+                double drain = Math.min(lavaBurning, speedMultiplier());
+                lavaBurning -= drain;
                 drained = true;
-                made += GeothermalHeat.lavaHeat();
+                made += GeothermalHeat.lavaHeat() * drain;
             }
-            heatPerTick = heat.add(made);
+            heatPerTick = heat.add((int) Math.round(made * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT))));
         }
         outputs.pushHeat(level, pos, getFacing(), sideConfig, heat, ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt());
 
@@ -248,7 +256,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
         super.loadAdditional(input);
         lavaTank.deserialize(input.childOrEmpty("lava"));
         heat.deserialize(input);
-        lavaBurning = input.getIntOr("lava_burning", 0);
+        lavaBurning = input.getDoubleOr("lava_burning", 0.0);
         lavaBurnTotal = input.getIntOr("lava_burn_total", 0);
     }
 
@@ -257,7 +265,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
         super.saveAdditional(output);
         lavaTank.serialize(output.child("lava"));
         heat.serialize(output);
-        output.putInt("lava_burning", lavaBurning);
+        output.putDouble("lava_burning", lavaBurning);
         output.putInt("lava_burn_total", lavaBurnTotal);
     }
 

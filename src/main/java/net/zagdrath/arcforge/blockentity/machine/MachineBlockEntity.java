@@ -6,6 +6,7 @@
 package net.zagdrath.arcforge.blockentity.machine;
 
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -13,6 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -30,16 +32,17 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.Dismantleable;
-import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// What every single-block machine shares: its item slots (the machine's own, then two upgrade slots),
+// What every single-block machine shares: its item slots (the machine's own, then four upgrade slots),
 // the side configuration and redstone mode set from its GUI, pushing output into touching blocks,
 // and dropping its items when removed.
 public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider, Dismantleable, ConduitConnectable, ConfigurableMachine {
-    public static final int UPGRADE_SLOTS = 2;
+    public static final int UPGRADE_SLOTS = MachineItemHandler.UPGRADE_SLOTS;
 
-    protected final FilteredItemHandler items;
+    protected final MachineItemHandler items;
     protected final SideConfig sideConfig;
     protected final MachineOutputs outputs = new MachineOutputs();
     private final List<SideMode> allowedSideModes;
@@ -47,21 +50,37 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected RedstoneMode redstoneMode = RedstoneMode.IGNORE;
     protected MachineStatus status = MachineStatus.NO_FUEL;
 
-    protected MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int slotCount,
-            FilteredItemHandler.SlotFilter filter, SideConfig sideConfig, List<SideMode> allowedSideModes) {
+    // A slot filter that needs the machine's level, e.g. to look up recipes (null on the client menu's copy).
+    @FunctionalInterface
+    public interface LevelSlotFilter {
+        boolean test(@Nullable Level level, int slot, ItemResource resource);
+    }
+
+    // machineSlots: the machine's own slots; the upgrade slots follow them.
+    protected MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots,
+            FilteredItemHandler.SlotFilter filter, Set<UpgradeType> upgrades, SideConfig sideConfig, List<SideMode> allowedSideModes) {
+        this(type, pos, state, machineSlots, (level, slot, resource) -> filter.test(slot, resource), upgrades, sideConfig, allowedSideModes);
+    }
+
+    protected MachineBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots,
+            LevelSlotFilter filter, Set<UpgradeType> upgrades, SideConfig sideConfig, List<SideMode> allowedSideModes) {
         super(type, pos, state);
-        this.items = new FilteredItemHandler(slotCount, filter, this::setChanged);
+        this.items = new MachineItemHandler(machineSlots, (slot, resource) -> filter.test(level, slot, resource), upgrades, this::setChanged);
         this.sideConfig = sideConfig;
         this.allowedSideModes = allowedSideModes;
     }
 
-    // Upgrade slots come after the machine's own; they take anything tagged #arcforge:upgrades.
-    public static boolean isUpgradeSlot(int slot, int firstUpgradeSlot, ItemResource resource) {
-        return slot >= firstUpgradeSlot && slot < firstUpgradeSlot + UPGRADE_SLOTS && resource.toStack(1).is(ModItemTags.UPGRADES);
+    public MachineItemHandler getItems() {
+        return items;
     }
 
-    public FilteredItemHandler getItems() {
-        return items;
+    // How many upgrades of this type are installed (0-8).
+    public int upgrades(UpgradeType type) {
+        return items.count(type);
+    }
+
+    protected double speedMultiplier() {
+        return UpgradeType.speedMultiplier(upgrades(UpgradeType.SPEED));
     }
 
     public Direction getFacing() {
@@ -111,7 +130,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         onSideConfigChanged();
     }
 
-    private void onSideConfigChanged() {
+    protected void onSideConfigChanged() {
         setChanged();
         if (level != null) {
             level.invalidateCapabilities(worldPosition);

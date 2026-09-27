@@ -15,7 +15,10 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.multiblock.ArcCrushingArrayStructure;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
@@ -56,6 +59,19 @@ public final class ModCapabilities {
                 FireboxBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FIREBOX.get(),
                 FireboxBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_CRUSHER.get(),
+                ArcCrusherBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ARC_CRUSHER.get(),
+                ArcCrusherBlockEntity::getItemHandler);
+        // Every casing of a formed Arc Crushing Array exposes the cube face it lies on (served by the centre).
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ARC_CRUSHING_ARRAY.get(), (casing, side) -> {
+            ArcCrushingArrayBlockEntity array = ArcCrushingArrayStructure.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.itemHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_CRUSHING_ARRAY.get(), (casing, side) -> {
+            ArcCrushingArrayBlockEntity array = ArcCrushingArrayStructure.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.energyHandlerAt(casing.getBlockPos(), side) : null;
+        });
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),
                 ThermoelectricPlantBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/arc_crusher_front_on",
+    "south": "arcforge:block/arc_crusher_back",
+    "east": "arcforge:block/arc_crusher_side_on",
+    "west": "arcforge:block/arc_crusher_side_on",
+    "up": "arcforge:block/arc_crusher_top_on",
+    "down": "arcforge:block/arc_crusher_bottom",
+    "particle": "arcforge:block/arc_crusher_side"
+  }
+}

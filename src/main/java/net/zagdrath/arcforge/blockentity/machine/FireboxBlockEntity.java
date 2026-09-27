@@ -5,7 +5,9 @@
 
 package net.zagdrath.arcforge.blockentity.machine;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -29,17 +31,19 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Burns coal, charcoal and coal blocks into heat (HU) at twice furnace speed. It runs up to 1,100°C, hot
 // enough to drive a Thermoelectric Plant at full efficiency.
 public class FireboxBlockEntity extends BurnerBlockEntity {
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT);
 
     private final HeatBuffer heat;
     private final HeatHandler heatOutput;
 
     public FireboxBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntityTypes.FIREBOX.get(), pos, state,
+        super(ModBlockEntityTypes.FIREBOX.get(), pos, state, UPGRADES,
                 new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.HEAT, SideMode.NONE),
                 SIDE_MODES);
         this.heat = new HeatBuffer(
@@ -51,12 +55,14 @@ public class FireboxBlockEntity extends BurnerBlockEntity {
 
     @Override
     protected double burnSpeed() {
-        return ArcforgeConfig.FIREBOX_BURN_SPEED.getAsDouble();
+        return ArcforgeConfig.FIREBOX_BURN_SPEED.getAsDouble() * speedMultiplier();
     }
 
+    // HU/t while burning: faster with Speed upgrades, more per fuel item with Heat upgrades.
     @Override
     protected int produce() {
-        return heat.add(ArcforgeConfig.FIREBOX_HEAT_PER_TICK.getAsInt());
+        return heat.add((int) Math.round(ArcforgeConfig.FIREBOX_HEAT_PER_TICK.getAsInt() * speedMultiplier()
+                * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT))));
     }
 
     @Override

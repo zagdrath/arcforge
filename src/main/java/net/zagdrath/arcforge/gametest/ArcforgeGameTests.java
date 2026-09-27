@@ -74,6 +74,10 @@ public final class ArcforgeGameTests {
         TESTS.put("heat_cell_leaks", HeatGameTests::heatCellLeaks);
         TESTS.put("heat_cell_outputs", HeatGameTests::heatCellOutputs);
         TESTS.put("heat_cell_keeps_heat", HeatGameTests::heatCellKeepsHeat);
+        TESTS.put("upgrade_slots", CrushingGameTests::upgradeSlots);
+        TESTS.put("crusher_upgrades", CrushingGameTests::crusherUpgrades);
+        TESTS.put("firebox_heat_upgrades", CrushingGameTests::fireboxHeatUpgrades);
+        TESTS.put("array_forms", CrushingGameTests::arrayForms);
         TESTS.put("carbonizer_forms", MultiblockGameTests::carbonizerForms);
         TESTS.put("furnace_forms", MultiblockGameTests::furnaceForms);
         TESTS.put("carbonizer_big_forms", MultiblockGameTests::carbonizerBigForms);
@@ -81,6 +85,8 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);
         LONG_TESTS.put("furnace_smelts", MultiblockGameTests::furnaceSmelts);
         LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);
+        LONG_TESTS.put("crusher_recipes", CrushingGameTests::crusherRecipes);
+        LONG_TESTS.put("array_doubles_ores", CrushingGameTests::arrayDoublesOres);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }

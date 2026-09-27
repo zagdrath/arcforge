@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "minecraft:ancient_debris",
+  "result": {
+    "count": 1,
+    "id": "arcforge:ancient_debris_dust"
+  },
+  "bonus": {
+    "count": 1,
+    "id": "arcforge:ancient_debris_dust"
+  },
+  "bonus_chance": 0.1,
+  "time": 200,
+  "ore": true
+}

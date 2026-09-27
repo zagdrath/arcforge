@@ -37,6 +37,8 @@
     "arcforge:arcforge_furnace_bricks",
     "arcforge:arcforge_furnace_brick_wall",
     "arcforge:coal_coke_block",
-    "arcforge:steel_block"
+    "arcforge:steel_block",
+    "arcforge:arc_crusher",
+    "arcforge:arc_crushing_array_casing"
   ]
 }

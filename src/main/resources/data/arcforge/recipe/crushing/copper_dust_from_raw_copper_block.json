@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:storage_blocks/raw_copper",
+  "result": {
+    "count": 9,
+    "id": "arcforge:copper_dust"
+  },
+  "time": 200,
+  "ore": false
+}

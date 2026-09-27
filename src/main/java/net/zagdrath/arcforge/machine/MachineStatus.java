@@ -16,7 +16,11 @@ public enum MachineStatus {
     NO_FUEL("no_fuel", "led_blocked"),
     DISABLED("disabled", "led_off"),
     NO_LAVA("no_lava", "led_blocked"),
-    NO_HEAT("no_heat", "led_blocked");
+    NO_HEAT("no_heat", "led_blocked"),
+    CRUSHING("crushing", "led_running"),
+    IDLE("idle", "led_idle"),
+    NO_POWER("no_power", "led_blocked"),
+    OUTPUT_FULL("output_full", "led_blocked");
 
     private final String name;
     private final String led;

@@ -17,7 +17,9 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
@@ -39,6 +41,13 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<FireboxBlockEntity>> FIREBOX = BLOCK_ENTITY_TYPES.register("firebox",
             () -> new BlockEntityType<>(FireboxBlockEntity::new, ModBlocks.FIREBOX.get()));
+
+    public static final Supplier<BlockEntityType<ArcCrusherBlockEntity>> ARC_CRUSHER = BLOCK_ENTITY_TYPES.register("arc_crusher",
+            () -> new BlockEntityType<>(ArcCrusherBlockEntity::new, ModBlocks.ARC_CRUSHER.get()));
+
+    // Every casing has one; only the centre of a formed Array runs.
+    public static final Supplier<BlockEntityType<ArcCrushingArrayBlockEntity>> ARC_CRUSHING_ARRAY = BLOCK_ENTITY_TYPES.register("arc_crushing_array",
+            () -> new BlockEntityType<>(ArcCrushingArrayBlockEntity::new, ModBlocks.ARC_CRUSHING_ARRAY_CASING.get()));
 
     public static final Supplier<BlockEntityType<ThermoelectricPlantBlockEntity>> THERMOELECTRIC_PLANT = BLOCK_ENTITY_TYPES.register("thermoelectric_plant",
             () -> new BlockEntityType<>(ThermoelectricPlantBlockEntity::new, ModBlocks.THERMOELECTRIC_PLANT.get()));

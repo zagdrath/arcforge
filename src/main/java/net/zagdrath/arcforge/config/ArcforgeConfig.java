@@ -135,6 +135,49 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+        BUILDER.comment("Arc Crusher: crushes ores and materials into dusts with FE. Recipes are data-driven (arcforge:crushing).")
+                .push("arcCrusher");
+    }
+
+    public static final ModConfigSpec.IntValue CRUSHER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue CRUSHER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue CRUSHER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while crushing, before upgrades (a 200-tick recipe costs 200x this).")
+            .defineInRange("energyPerTick", 20, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Arc Crushing Array: 3x3x3 multiblock with three crushing lanes that doubles ores.").push("arcCrushingArray");
+    }
+
+    public static final ModConfigSpec.IntValue ARRAY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ARRAY_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ARRAY_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t per working lane, before upgrades.")
+            .defineInRange("energyPerTick", 16, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue ARRAY_TIME_MULTIPLIER = BUILDER
+            .comment("Recipe time multiplier (0.5 = twice as fast as the Arc Crusher).")
+            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
+
+    public static final ModConfigSpec.IntValue ARRAY_ORE_YIELD = BUILDER
+            .comment("Main output multiplier for ore recipes (\"ore\": true).")
+            .defineInRange("oreYield", 2, 1, 16);
+
+    static {
+        BUILDER.pop();
         BUILDER.comment("Carbonizer: multiblock that bakes coal into coal coke, collecting creosote. Recipes are data-driven (arcforge:carbonizing).")
                 .push("carbonizer");
     }

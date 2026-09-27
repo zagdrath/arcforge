@@ -26,6 +26,8 @@ import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
 import net.zagdrath.arcforge.item.storage.StorageBlockItem;
 import net.zagdrath.arcforge.item.tool.WrenchItem;
+import net.zagdrath.arcforge.item.upgrade.UpgradeItem;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(Arcforge.MODID);
@@ -34,6 +36,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> COMBUSTION_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.COMBUSTION_PLANT);
     public static final DeferredItem<BlockItem> FIREBOX = ITEMS.registerSimpleBlockItem(ModBlocks.FIREBOX);
     public static final DeferredItem<BlockItem> THERMOELECTRIC_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.THERMOELECTRIC_PLANT);
+    public static final DeferredItem<BlockItem> ARC_CRUSHER = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHER);
+    public static final DeferredItem<BlockItem> ARC_CRUSHING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHING_ARRAY_CASING);
 
     public static final DeferredItem<WrenchItem> WRENCH = ITEMS.registerItem("wrench", WrenchItem::new, p -> p.stacksTo(1));
 
@@ -54,6 +58,23 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> COAL_COKE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.COAL_COKE_BLOCK,
             p -> p.cookingFuel(COAL_COKE_BLOCK_BURN_TIME));
     public static final DeferredItem<Item> SLAG = ITEMS.registerSimpleItem("slag");
+
+    // --- Crushing ---
+
+    private static final ResourceKey<ContextIntProvider> CARBON_DUST_BURN_TIME = cookingTime("time_carbon_dust");
+
+    public static final DeferredItem<Item> IRON_DUST = ITEMS.registerSimpleItem("iron_dust");
+    public static final DeferredItem<Item> COPPER_DUST = ITEMS.registerSimpleItem("copper_dust");
+    public static final DeferredItem<Item> GOLD_DUST = ITEMS.registerSimpleItem("gold_dust");
+    public static final DeferredItem<Item> ANCIENT_DEBRIS_DUST = ITEMS.registerSimpleItem("ancient_debris_dust");
+    public static final DeferredItem<Item> CARBON_DUST = ITEMS.registerSimpleItem("carbon_dust", p -> p.cookingFuel(CARBON_DUST_BURN_TIME));
+    public static final DeferredItem<Item> NETHER_QUARTZ_DUST = ITEMS.registerSimpleItem("nether_quartz_dust");
+
+    // --- Upgrades ---
+
+    public static final DeferredItem<UpgradeItem> SPEED_UPGRADE = ITEMS.registerItem("speed_upgrade", p -> new UpgradeItem(UpgradeType.SPEED, p));
+    public static final DeferredItem<UpgradeItem> ENERGY_UPGRADE = ITEMS.registerItem("energy_upgrade", p -> new UpgradeItem(UpgradeType.ENERGY, p));
+    public static final DeferredItem<UpgradeItem> HEAT_UPGRADE = ITEMS.registerItem("heat_upgrade", p -> new UpgradeItem(UpgradeType.HEAT, p));
 
     public static final DeferredItem<BucketItem> CREOSOTE_BUCKET = ITEMS.registerItem("creosote_bucket",
             p -> new BucketItem(ModFluids.CREOSOTE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));

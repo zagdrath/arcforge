@@ -5,7 +5,9 @@
 
 package net.zagdrath.arcforge.blockentity.machine;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -28,17 +30,19 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 
 // Burns coal, charcoal and coal blocks straight into FE: quick and simple, but only half the FE per
 // coal that a Firebox feeding a hot Thermoelectric Plant gets. Fuel burns at twice furnace speed.
 public class CombustionPlantBlockEntity extends BurnerBlockEntity {
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY);
 
     private final GeneratorEnergyHandler energy;
 
     public CombustionPlantBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntityTypes.COMBUSTION_PLANT.get(), pos, state,
+        super(ModBlockEntityTypes.COMBUSTION_PLANT.get(), pos, state, UPGRADES,
                 new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.ENERGY, SideMode.NONE),
                 SIDE_MODES);
         this.energy = new GeneratorEnergyHandler(
@@ -47,14 +51,21 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
                 this::setChanged);
     }
 
+    // Speed upgrades burn fuel faster and make FE faster, so the FE per fuel item stays the same.
     @Override
     protected double burnSpeed() {
-        return ArcforgeConfig.COMBUSTION_PLANT_BURN_SPEED.getAsDouble();
+        return ArcforgeConfig.COMBUSTION_PLANT_BURN_SPEED.getAsDouble() * speedMultiplier();
     }
 
     @Override
     protected int produce() {
-        return energy.generate(ArcforgeConfig.COMBUSTION_PLANT_ENERGY_PER_TICK.getAsInt());
+        return energy.generate(energyPerTick());
+    }
+
+    // FE/t while burning: faster with Speed upgrades, more per fuel item with Energy upgrades.
+    private int energyPerTick() {
+        return (int) Math.round(ArcforgeConfig.COMBUSTION_PLANT_ENERGY_PER_TICK.getAsInt() * speedMultiplier()
+                * UpgradeType.outputMultiplier(upgrades(UpgradeType.ENERGY)));
     }
 
     @Override

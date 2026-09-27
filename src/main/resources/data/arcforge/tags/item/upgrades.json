@@ -1,3 +1,7 @@
 {
-  "values": []
+  "values": [
+    "arcforge:speed_upgrade",
+    "arcforge:energy_upgrade",
+    "arcforge:heat_upgrade"
+  ]
 }

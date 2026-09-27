@@ -13,7 +13,7 @@ import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
-import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
 // No item slots of its own; just the upgrade slots.
 public class ThermoelectricPlantMenu extends MachineMenu {
@@ -36,13 +36,13 @@ public class ThermoelectricPlantMenu extends MachineMenu {
     // Client constructor, called with the block position written by the server.
     public ThermoelectricPlantMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(),
-                new FilteredItemHandler(ThermoelectricPlantBlockEntity.SLOT_COUNT, ThermoelectricPlantBlockEntity::isItemValid, () -> {}),
+                ThermoelectricPlantBlockEntity.clientItems(),
                 WideIntContainerData.client(DATA_VALUES));
     }
 
-    public ThermoelectricPlantMenu(int containerId, Inventory inventory, BlockPos pos, FilteredItemHandler items, ContainerData data) {
+    public ThermoelectricPlantMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.THERMOELECTRIC_PLANT.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.THERMOELECTRIC_PLANT.get());
-        finish(inventory, ThermoelectricPlantBlockEntity.SLOT_UPGRADE_FIRST, UPGRADES_TAB);
+        finish(inventory, UPGRADES_TAB);
     }
 
     @Override

@@ -5,7 +5,9 @@
 
 package net.zagdrath.arcforge.blockentity.machine;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -35,14 +37,16 @@ import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Turns heat into FE. Heat arriving on heat faces fills its buffer, and heat passes through the
 // thermocouples in proportion to how full (how hot) the buffer is: up to heatThroughput HU/t when full.
 // The FE made from that heat depends on the temperature: 0% at 100°C, 100% at 1,100°C. So it needs a
 // hot source: a Geothermal Plant (600°C at most) can only drive it to about half efficiency.
 public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
-    public static final int SLOT_UPGRADE_FIRST = 0;
-    public static final int SLOT_COUNT = UPGRADE_SLOTS;
+    public static final int MACHINE_SLOTS = 0;
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.HEAT, SideMode.ENERGY);
 
     private final HeatBuffer heat;
@@ -57,7 +61,7 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
     private int fePerTick;
 
     public ThermoelectricPlantBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(), pos, state, SLOT_COUNT, ThermoelectricPlantBlockEntity::isItemValid,
+        super(ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(), pos, state, MACHINE_SLOTS, ThermoelectricPlantBlockEntity::isItemValid, UPGRADES,
                 new SideConfig(SideMode.HEAT, SideMode.HEAT, SideMode.NONE, SideMode.NONE, SideMode.ENERGY, SideMode.NONE),
                 SIDE_MODES);
         this.heat = new HeatBuffer(
@@ -93,7 +97,7 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
                     receiveTick = now;
                     receivedThisTick = 0;
                 }
-                int allowed = Math.max(0, ArcforgeConfig.THERMOELECTRIC_HEAT_THROUGHPUT.getAsInt() - receivedThisTick);
+                int allowed = Math.max(0, throughput() - receivedThisTick);
                 int accepted = buffered.receiveHeat(Math.min(amount, allowed), simulate);
                 if (!simulate) {
                     receivedThisTick += accepted;
@@ -113,7 +117,7 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
                     case ThermoelectricPlantMenu.DATA_HEAT -> heat.getStored();
                     case ThermoelectricPlantMenu.DATA_HEAT_CAPACITY -> heat.getCapacity();
                     case ThermoelectricPlantMenu.DATA_TEMPERATURE -> heat.getTemperature();
-                    case ThermoelectricPlantMenu.DATA_EFFICIENCY -> Math.round(efficiency(heat.getTemperature()) * 100.0F);
+                    case ThermoelectricPlantMenu.DATA_EFFICIENCY -> Math.round(upgradedEfficiency() * 100.0F);
                     case ThermoelectricPlantMenu.DATA_HEAT_PER_TICK -> heatPerTick;
                     case ThermoelectricPlantMenu.DATA_ENERGY -> energy.getAmountAsInt();
                     case ThermoelectricPlantMenu.DATA_ENERGY_CAPACITY -> energy.getCapacityAsInt();
@@ -127,8 +131,14 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
         };
     }
 
+    // No slots of its own; the upgrade slots are checked by the handler.
     public static boolean isItemValid(int slot, ItemResource resource) {
-        return isUpgradeSlot(slot, SLOT_UPGRADE_FIRST, resource);
+        return false;
+    }
+
+    // A client-side copy of the slots, for the menu.
+    public static MachineItemHandler clientItems() {
+        return new MachineItemHandler(MACHINE_SLOTS, ThermoelectricPlantBlockEntity::isItemValid, UPGRADES, () -> {});
     }
 
     // Fraction of the heat passing through that becomes FE, from the temperature.
@@ -138,13 +148,23 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
         return Mth.clamp((float) (celsius - zero) / (full - zero), 0.0F, 1.0F);
     }
 
+    // HU/t it takes in and converts when full: faster with Speed upgrades.
+    private int throughput() {
+        return (int) Math.round(ArcforgeConfig.THERMOELECTRIC_HEAT_THROUGHPUT.getAsInt() * speedMultiplier());
+    }
+
+    // Heat upgrades lift the efficiency of cooler heat (never past 100%).
+    public float upgradedEfficiency() {
+        return (float) Math.min(1.0, efficiency(heat.getTemperature()) / UpgradeType.energyCostMultiplier(upgrades(UpgradeType.HEAT)));
+    }
+
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         boolean enabled = redstoneMode.canRun(level.hasNeighborSignal(pos));
         heatPerTick = 0;
         fePerTick = 0;
         if (enabled && !energy.isFull() && heat.getStored() > 0) {
-            float efficiency = efficiency(heat.getTemperature());
-            int throughput = ArcforgeConfig.THERMOELECTRIC_HEAT_THROUGHPUT.getAsInt();
+            float efficiency = upgradedEfficiency();
+            int throughput = throughput();
             // Heat flows through in proportion to the temperature above ambient (the cold side).
             int wanted = (int) Math.ceil((double) throughput * heat.getStored() / heat.getCapacity());
             int wantedFe = (int) (wanted * efficiency);

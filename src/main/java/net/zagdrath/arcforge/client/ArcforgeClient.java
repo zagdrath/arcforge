@@ -39,7 +39,9 @@ import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
+import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
 import net.zagdrath.arcforge.client.screen.machine.CombustionPlantScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.ArcCrushingArrayScreen;
 import net.zagdrath.arcforge.client.screen.machine.FireboxScreen;
 import net.zagdrath.arcforge.client.screen.machine.GeothermalPlantScreen;
 import net.zagdrath.arcforge.client.screen.machine.ThermoelectricPlantScreen;
@@ -68,6 +70,8 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.COMBUSTION_PLANT.get(), CombustionPlantScreen::new);
         event.register(ModMenuTypes.FIREBOX.get(), FireboxScreen::new);
         event.register(ModMenuTypes.THERMOELECTRIC_PLANT.get(), ThermoelectricPlantScreen::new);
+        event.register(ModMenuTypes.ARC_CRUSHER.get(), ArcCrusherScreen::new);
+        event.register(ModMenuTypes.ARC_CRUSHING_ARRAY.get(), ArcCrushingArrayScreen::new);
         event.register(ModMenuTypes.FLUID_TANK.get(), FluidTankScreen::new);
         event.register(ModMenuTypes.ENERGY_CELL.get(), EnergyCellScreen::new);
         event.register(ModMenuTypes.HEAT_CELL.get(), HeatCellScreen::new);

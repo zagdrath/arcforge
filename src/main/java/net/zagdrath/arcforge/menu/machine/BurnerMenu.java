@@ -17,10 +17,12 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.zagdrath.arcforge.blockentity.machine.BurnerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
-import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
 // The Combustion Plant's and the Firebox's menu: one fuel slot, and a buffer of FE or heat.
 public class BurnerMenu extends MachineMenu {
@@ -51,14 +53,14 @@ public class BurnerMenu extends MachineMenu {
 
     private static BurnerMenu client(MenuType<BurnerMenu> type, int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         return new BurnerMenu(type, containerId, inventory, extraData.readBlockPos(),
-                new FilteredItemHandler(BurnerBlockEntity.SLOT_COUNT, BurnerBlockEntity::isItemValid, () -> {}),
+                BurnerBlockEntity.clientItems(type == ModMenuTypes.FIREBOX.get() ? FireboxBlockEntity.UPGRADES : CombustionPlantBlockEntity.UPGRADES),
                 WideIntContainerData.client(DATA_VALUES));
     }
 
-    public BurnerMenu(MenuType<BurnerMenu> type, int containerId, Inventory inventory, BlockPos pos, FilteredItemHandler items, ContainerData data) {
+    public BurnerMenu(MenuType<BurnerMenu> type, int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(type, containerId, inventory, pos, items, data, DATA_VALUES, blockFor(type));
         addMachineSlot(BurnerBlockEntity.SLOT_FUEL, FUEL_SLOT_X, FUEL_SLOT_Y);
-        finish(inventory, BurnerBlockEntity.SLOT_UPGRADE_FIRST, UPGRADES_TAB);
+        finish(inventory, UPGRADES_TAB);
     }
 
     private static Block blockFor(MenuType<BurnerMenu> type) {

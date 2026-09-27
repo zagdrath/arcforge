@@ -19,9 +19,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
+import net.zagdrath.arcforge.recipe.CrushingRecipe;
 
-// Data-driven machine recipes: data/<namespace>/recipe/*.json with type arcforge:carbonizing or
-// arcforge:arcforge_smelting. Both types are synced to clients so GUI slots know what they accept.
+// Data-driven machine recipes: data/<namespace>/recipe/*.json with type arcforge:carbonizing,
+// arcforge:arcforge_smelting or arcforge:crushing. All are synced to clients so GUI slots know what they accept.
 public final class ModRecipes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Arcforge.MODID);
     public static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(Registries.RECIPE_SERIALIZER, Arcforge.MODID);
@@ -31,11 +32,15 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("carbonizing")));
     public static final Supplier<RecipeType<ArcforgeSmeltingRecipe>> ARCFORGE_SMELTING = RECIPE_TYPES.register("arcforge_smelting",
             () -> RecipeType.simple(id("arcforge_smelting")));
+    public static final Supplier<RecipeType<CrushingRecipe>> CRUSHING = RECIPE_TYPES.register("crushing",
+            () -> RecipeType.simple(id("crushing")));
 
     public static final Supplier<RecipeSerializer<CarbonizingRecipe>> CARBONIZING_SERIALIZER = RECIPE_SERIALIZERS.register("carbonizing",
             () -> new RecipeSerializer<>(CarbonizingRecipe.MAP_CODEC, CarbonizingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<ArcforgeSmeltingRecipe>> ARCFORGE_SMELTING_SERIALIZER = RECIPE_SERIALIZERS.register("arcforge_smelting",
             () -> new RecipeSerializer<>(ArcforgeSmeltingRecipe.MAP_CODEC, ArcforgeSmeltingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<CrushingRecipe>> CRUSHING_SERIALIZER = RECIPE_SERIALIZERS.register("crushing",
+            () -> new RecipeSerializer<>(CrushingRecipe.MAP_CODEC, CrushingRecipe.STREAM_CODEC));
 
     // Machine recipes never show in the recipe book, but every recipe must name a category.
     public static final Supplier<RecipeBookCategory> MACHINE_CATEGORY = RECIPE_BOOK_CATEGORIES.register("machine", RecipeBookCategory::new);
@@ -54,6 +59,6 @@ public final class ModRecipes {
     }
 
     private static void syncToClients(OnDatapackSyncEvent event) {
-        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get());
+        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CRUSHING.get());
     }
 }

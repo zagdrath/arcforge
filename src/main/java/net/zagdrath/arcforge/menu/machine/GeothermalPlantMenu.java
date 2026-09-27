@@ -14,7 +14,7 @@ import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
-import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
 public class GeothermalPlantMenu extends MachineMenu {
     // Logical data indices (each is a full int, see WideIntContainerData).
@@ -42,15 +42,15 @@ public class GeothermalPlantMenu extends MachineMenu {
     // Client constructor, called with the block position written by the server.
     public GeothermalPlantMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(),
-                new FilteredItemHandler(GeothermalPlantBlockEntity.SLOT_COUNT, GeothermalPlantBlockEntity::isItemValid, () -> {}),
+                GeothermalPlantBlockEntity.clientItems(),
                 WideIntContainerData.client(DATA_VALUES));
     }
 
-    public GeothermalPlantMenu(int containerId, Inventory inventory, BlockPos pos, FilteredItemHandler items, ContainerData data) {
+    public GeothermalPlantMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.GEOTHERMAL_PLANT.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.GEOTHERMAL_PLANT.get());
         addMachineSlot(GeothermalPlantBlockEntity.SLOT_INPUT, INPUT_SLOT_X, INPUT_SLOT_Y);
         addMachineSlot(GeothermalPlantBlockEntity.SLOT_OUTPUT, OUTPUT_SLOT_X, OUTPUT_SLOT_Y);
-        finish(inventory, GeothermalPlantBlockEntity.SLOT_UPGRADE_FIRST, UPGRADES_TAB);
+        finish(inventory, UPGRADES_TAB);
     }
 
     @Override

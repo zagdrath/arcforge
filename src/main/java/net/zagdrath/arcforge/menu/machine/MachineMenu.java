@@ -29,7 +29,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.slot.ToggleableSlot;
-import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
 // Shared menu for single-block machines: the machine's own slots, then its upgrade slots (which live in
 // the Upgrades side tab), then the player's inventory. Subclasses add their slots in the constructor
@@ -39,14 +39,14 @@ public abstract class MachineMenu extends AbstractContainerMenu {
     // Upgrade slots sit in the Upgrades side tab (x 172, the Nth tab at y = 6 + N * 25), with slot items at +9,+25.
     private static final int UPGRADE_SLOT_X = 181, UPGRADE_SLOT_PITCH = 20;
 
-    protected final FilteredItemHandler items;
+    protected final MachineItemHandler items;
     private final ContainerLevelAccess access;
     private final ContainerData data;
     private final Block block;
     private final List<ToggleableSlot> upgradeSlots = new ArrayList<>();
     private int machineSlots;
 
-    protected MachineMenu(MenuType<?> type, int containerId, Inventory inventory, BlockPos pos, FilteredItemHandler items,
+    protected MachineMenu(MenuType<?> type, int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items,
             ContainerData data, int dataValues, Block block) {
         super(type, containerId);
         checkContainerDataCount(data, dataValues * 2);
@@ -62,10 +62,10 @@ public abstract class MachineMenu extends AbstractContainerMenu {
 
     // Adds the upgrade slots (for the Upgrades tab at the given position in the tab stack), the player
     // inventory and the data slots. Call once, after the machine's own slots.
-    protected void finish(Inventory inventory, int firstUpgradeSlot, int upgradesTabIndex) {
+    protected void finish(Inventory inventory, int upgradesTabIndex) {
         int y = 6 + upgradesTabIndex * 25 + 25;
         for (int i = 0; i < MachineBlockEntity.UPGRADE_SLOTS; i++) {
-            ToggleableSlot slot = new ToggleableSlot(items, items::set, firstUpgradeSlot + i, UPGRADE_SLOT_X + i * UPGRADE_SLOT_PITCH, y);
+            ToggleableSlot slot = new ToggleableSlot(items, items::set, items.getFirstUpgradeSlot() + i, UPGRADE_SLOT_X + i * UPGRADE_SLOT_PITCH, y);
             upgradeSlots.add(slot);
             addSlot(slot);
         }

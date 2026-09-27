@@ -49,6 +49,33 @@ It only ever flows from a hotter machine into a colder one.
   It takes a few minutes to warm up.
 - The Combustion and Thermoelectric Plants push up to 200 FE/t out of their energy faces.
 
+### Crushing
+
+**Arc Crusher.** Crushes ores and materials into dusts with FE: 20 FE/t for 200 ticks (4,000 FE an
+operation), with a bonus output rolled once per operation. It stores 20,000 FE and takes up to
+200 FE/t. Raw iron gives 1 iron dust (plus a 25% bonus), iron ore 2, ingots 1, and raw-ore blocks 9.
+Coal and charcoal give carbon dust, a furnace fuel (half a coal). Iron, copper, gold, ancient debris
+and quartz dust smelt back (twice as fast in a blast furnace). Recipes are data-driven
+(`arcforge:crushing`).
+
+**Arc Crushing Array.** Place 27 Arc Crushing Array Casings as a solid 3x3x3 cube. It forms into one
+machine facing the player who completed it (turn it with the wrench), and any casing opens its GUI.
+Three lanes crush in parallel, twice as fast as the Arc Crusher and for 60% less FE an operation
+(16 FE/t per working lane), and ore recipes give **double** the main output (raw iron gives 2 dust, iron
+ore 4); ingots, gems and blocks are not doubled. It stores 100,000 FE and takes up to 1,000 FE/t.
+Side configuration covers the faces of the whole cube; input faces feed the lane holding the fewest
+items. Breaking any casing reverts it to loose casings; the contents stay in the centre casing.
+
+### Upgrades
+
+Speed, Energy and Heat upgrade cards go in a machine's Upgrades tab, up to 8 of each.
+
+| Upgrade | Effect (n installed) | Machines |
+|---|---|---|
+| Speed | Works 2^(n/2) times as fast (16x at 8), using power or fuel just as fast, so the cost per operation doesn't change | All |
+| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Combustion Plant |
+| Heat | Heat per fuel or lava (and from nearby lava and magma) x (1 + n/8); Thermoelectric Plant: efficiency / 0.8^n, up to 100% | Firebox, Geothermal Plant, Thermoelectric Plant |
+
 ## Logistics
 
 ### Conduits
@@ -157,8 +184,11 @@ Tabs on the right of each machine's screen:
   - Combustion Plant: none, input, energy. Top is input, back is energy.
   - Firebox and Geothermal Plant: none, input, heat. Top is input, back is heat.
   - Thermoelectric Plant: none, heat, energy. Top and bottom are heat, back is energy.
+  - Arc Crusher and Arc Crushing Array: none, input, output, energy. Top is input, bottom is
+    output, back is energy.
   - Tanks and cells: none, input or output.
-- **Upgrades**: upgrade slots, reserved for future upgrade items.
+- **Upgrades**: four slots. Each holds up to 8 of one upgrade type, so a machine takes at most 8 of
+  each (see Upgrades below).
 
 ## Configuration
 

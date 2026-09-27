@@ -24,7 +24,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
 import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
+import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.machine.FireboxBlock;
 import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
@@ -59,6 +61,19 @@ public final class ModBlocks {
 
     public static final DeferredBlock<ThermoelectricPlantBlock> THERMOELECTRIC_PLANT = BLOCKS.registerBlock("thermoelectric_plant",
             ThermoelectricPlantBlock::new, p -> machineProperties(p, 7));
+
+    // --- Crushing ---
+
+    public static final DeferredBlock<ArcCrusherBlock> ARC_CRUSHER = BLOCKS.registerBlock("arc_crusher",
+            ArcCrusherBlock::new, p -> machineProperties(p, 8));
+
+    public static final DeferredBlock<ArcCrushingArrayCasingBlock> ARC_CRUSHING_ARRAY_CASING = BLOCKS.registerBlock("arc_crushing_array_casing",
+            ArcCrushingArrayCasingBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)
+                    .lightLevel(state -> state.getValue(ArcCrushingArrayCasingBlock.LIT) ? 8 : 0));
 
     // --- Steelmaking ---
 

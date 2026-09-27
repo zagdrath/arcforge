@@ -5,6 +5,8 @@
     "arcforge:firebox",
     "arcforge:thermoelectric_plant",
     "arcforge:carbonizer",
-    "arcforge:steel_block"
+    "arcforge:steel_block",
+    "arcforge:arc_crusher",
+    "arcforge:arc_crushing_array_casing"
   ]
 }

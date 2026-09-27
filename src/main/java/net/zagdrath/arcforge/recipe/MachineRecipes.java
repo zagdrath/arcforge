@@ -41,6 +41,15 @@ public final class MachineRecipes {
         return level.recipeAccess().getRecipeFor(ModRecipes.ARCFORGE_SMELTING.get(), new ArcforgeSmeltingRecipe.Input(input, reagent), level);
     }
 
+    public static Optional<RecipeHolder<CrushingRecipe>> crushing(ServerLevel level, ItemStack input) {
+        return level.recipeAccess().getRecipeFor(ModRecipes.CRUSHING.get(), new SingleRecipeInput(input), level);
+    }
+
+    public static boolean isCrusherInput(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.CRUSHING.get()).stream()
+                .anyMatch(holder -> holder.value().ingredient().test(stack));
+    }
+
     public static boolean isCarbonizerInput(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(ModRecipes.CARBONIZING.get()).stream()
                 .anyMatch(holder -> holder.value().ingredient().test(stack));

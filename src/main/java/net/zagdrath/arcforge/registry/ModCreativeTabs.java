@@ -29,6 +29,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COMBUSTION_PLANT.get());
                 output.accept(ModItems.FIREBOX.get());
                 output.accept(ModItems.THERMOELECTRIC_PLANT.get());
+                output.accept(ModItems.ARC_CRUSHER.get());
+                output.accept(ModItems.ARC_CRUSHING_ARRAY_CASING.get());
                 output.accept(ModItems.CARBONIZER.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_PORT.get());
                 output.accept(ModItems.ARCFORGE_FURNACE_BRICKS.get());
@@ -46,6 +48,12 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COAL_COKE.get());
                 output.accept(ModItems.COAL_COKE_BLOCK.get());
                 output.accept(ModItems.SLAG.get());
+                output.accept(ModItems.IRON_DUST.get());
+                output.accept(ModItems.COPPER_DUST.get());
+                output.accept(ModItems.GOLD_DUST.get());
+                output.accept(ModItems.ANCIENT_DEBRIS_DUST.get());
+                output.accept(ModItems.CARBON_DUST.get());
+                output.accept(ModItems.NETHER_QUARTZ_DUST.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FLUIDS = CREATIVE_MODE_TABS.register("fluids", () -> CreativeModeTab.builder()
@@ -70,6 +78,9 @@ public final class ModCreativeTabs {
             .icon(() -> ModItems.WRENCH.get().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.WRENCH.get());
+                output.accept(ModItems.SPEED_UPGRADE.get());
+                output.accept(ModItems.ENERGY_UPGRADE.get());
+                output.accept(ModItems.HEAT_UPGRADE.get());
             }).build());
 
     private ModCreativeTabs() {}
