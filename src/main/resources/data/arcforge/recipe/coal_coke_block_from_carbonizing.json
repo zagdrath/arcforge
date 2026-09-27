@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:carbonizing",
+  "ingredient": "minecraft:coal_block",
+  "result": {
+    "id": "arcforge:coal_coke_block"
+  },
+  "byproduct": {
+    "id": "arcforge:creosote",
+    "amount": 2250
+  },
+  "time": 5400
+}

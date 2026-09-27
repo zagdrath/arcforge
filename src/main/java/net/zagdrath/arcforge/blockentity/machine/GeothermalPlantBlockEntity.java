@@ -156,6 +156,8 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
             }
             heatPerTick = heat.add((int) Math.round(made * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT))));
         }
+        // While it's making heat it is at full temperature, so the heat moves on straight away.
+        heat.setProducing(heatPerTick > 0);
         outputs.pushHeat(level, pos, getFacing(), sideConfig, heat, ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt());
 
         if (!enabled) {

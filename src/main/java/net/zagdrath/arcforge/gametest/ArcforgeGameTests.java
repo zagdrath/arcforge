@@ -83,13 +83,16 @@ public final class ArcforgeGameTests {
         TESTS.put("creosote_moves", InductionGameTests::creosoteMoves);
         TESTS.put("carbonizer_forms", MultiblockGameTests::carbonizerForms);
         TESTS.put("furnace_forms", MultiblockGameTests::furnaceForms);
+        TESTS.put("carbonizer_takes_coal_blocks", MultiblockGameTests::carbonizerTakesCoalBlocks);
         TESTS.put("carbonizer_big_forms", MultiblockGameTests::carbonizerBigForms);
         TESTS.put("carbonizer_mixed_sizes", MultiblockGameTests::carbonizerMixedSizes);
         LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);
         LONG_TESTS.put("furnace_smelts", MultiblockGameTests::furnaceSmelts);
+        LONG_TESTS.put("furnace_burns_coke_blocks", MultiblockGameTests::furnaceBurnsCokeBlocks);
         LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);
         LONG_TESTS.put("crusher_recipes", CrushingGameTests::crusherRecipes);
         LONG_TESTS.put("array_doubles_ores", CrushingGameTests::arrayDoublesOres);
+        LONG_TESTS.put("firebox_heats_plant_from_cold", HeatGameTests::fireboxHeatsPlantFromCold);
         LONG_TESTS.put("induction_furnace_smelts", InductionGameTests::furnaceSmelts);
         LONG_TESTS.put("induction_array_smelts", InductionGameTests::arraySmelts);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));

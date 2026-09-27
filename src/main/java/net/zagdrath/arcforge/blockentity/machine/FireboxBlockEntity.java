@@ -72,6 +72,8 @@ public class FireboxBlockEntity extends BurnerBlockEntity {
 
     @Override
     protected void pushOutput(ServerLevel level, BlockPos pos, Direction facing) {
+        // A burning fire is at full temperature, so its heat moves on straight away.
+        heat.setProducing(producedThisTick() > 0);
         outputs.pushHeat(level, pos, facing, sideConfig, heat, ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt());
     }
 

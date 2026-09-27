@@ -165,8 +165,7 @@ public final class InductionGameTests {
         Vec3 start = stand.position();
         stand.setDeltaMovement(0.3, 0.0, 0.0);
         helper.startSequence()
-                .thenIdle(20)
-                .thenExecute(() -> {
+                .thenWaitUntil(() -> {
                     Vec3 now = stand.position();
                     helper.assertTrue(now.x - start.x > 0.1, "Armor stand did not drift through creosote: x " + start.x + " -> " + now.x);
                     helper.assertTrue(now.y < start.y - 0.1, "Armor stand did not sink in creosote: y " + start.y + " -> " + now.y);

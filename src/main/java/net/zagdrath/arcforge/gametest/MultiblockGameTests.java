@@ -244,6 +244,41 @@ public final class MultiblockGameTests {
                 .thenSucceed();
     }
 
+    // A coal coke block alone fuels the furnace and supplies the reagent: it's broken open into nine coke.
+    public static void furnaceBurnsCokeBlocks(GameTestHelper helper) {
+        buildFurnace(helper);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    ArcforgeFurnaceBlockEntity furnace = helper.getBlockEntity(new BlockPos(1, 1, 0), ArcforgeFurnaceBlockEntity.class);
+                    ResourceHandler<ItemResource> items = furnace.getItemHandler(null);
+                    try (Transaction tx = Transaction.openRoot()) {
+                        helper.assertTrue(items.insert(ItemResource.of(Items.IRON_INGOT), 1, tx) == 1, "Furnace refused iron");
+                        helper.assertTrue(items.insert(ItemResource.of(ModItems.COAL_COKE_BLOCK.get()), 1, tx) == 1, "Furnace refused a coal coke block");
+                        tx.commit();
+                    }
+                })
+                .thenExecuteAfter(1_040, () -> {
+                    ArcforgeFurnaceBlockEntity furnace = helper.getBlockEntity(new BlockPos(1, 1, 0), ArcforgeFurnaceBlockEntity.class);
+                    ResourceHandler<ItemResource> items = furnace.getItemHandler(null);
+                    try (Transaction tx = Transaction.openRoot()) {
+                        helper.assertTrue(items.extract(ItemResource.of(ModItems.STEEL_INGOT.get()), 1, tx) == 1, "No steel ingot was made from a coke block");
+                        helper.assertTrue(items.extract(ItemResource.of(ModItems.COAL_COKE_BLOCK.get()), 1, tx) == 0, "The coke block was not broken open");
+                    }
+                })
+                .thenSucceed();
+    }
+
+    // Coal blocks carbonize into coal coke blocks.
+    public static void carbonizerTakesCoalBlocks(GameTestHelper helper) {
+        var recipe = net.zagdrath.arcforge.recipe.MachineRecipes.carbonizing(helper.getLevel(), new net.minecraft.world.item.ItemStack(Items.COAL_BLOCK));
+        helper.assertTrue(recipe.isPresent() && recipe.get().value().result().create().is(ModItems.COAL_COKE_BLOCK.get()),
+                "Coal blocks don't carbonize into coal coke blocks");
+        helper.assertTrue(net.zagdrath.arcforge.recipe.MachineRecipes.isCarbonizerInput(helper.getLevel(), new net.minecraft.world.item.ItemStack(Items.COAL_BLOCK)),
+                "Carbonizer input refuses coal blocks");
+        helper.succeed();
+    }
+
     // Iron and coke go in; once hot enough the furnace makes steel and slag.
     public static void furnaceSmelts(GameTestHelper helper) {
         buildFurnace(helper);

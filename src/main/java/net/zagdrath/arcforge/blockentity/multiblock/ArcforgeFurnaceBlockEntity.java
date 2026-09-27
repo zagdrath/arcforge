@@ -52,6 +52,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
@@ -59,6 +60,8 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 // The Arcforge Furnace, run from its port. Burning fuel (coal coke) heats the furnace towards its
 // maximum; with no fuel burning it cools. A smelt (iron + coal coke -> steel + slag) only progresses
 // while the furnace is at least as hot as the recipe needs. Coal coke is both the fuel and the reagent.
+// A coal coke block in the fuel slot is broken open into nine loose coal coke when needed, which are
+// burned and used as reagent before anything else in the slot.
 public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_FUEL = 1;
@@ -67,6 +70,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     public static final int SLOT_COUNT = 4;
 
     public static final int AMBIENT_HEAT = 20;
+    // Coal coke in a coal coke block.
+    private static final int BLOCK_COKE = 9;
 
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT);
     private static final int STRUCTURE_CHECK_INTERVAL = 20;
@@ -85,6 +90,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     private boolean checkRequested = true;
     private boolean powered;
     private int heat = AMBIENT_HEAT;
+    // Coal coke left from a coke block broken open in the fuel slot (0-8).
+    private int looseCoke;
     private int burnTime;
     private int burnTotal;
     private int progress;
@@ -132,6 +139,37 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
 
     public static boolean isFuel(ItemStack stack) {
         return stack.is(ModItemTags.ARCFORGE_FURNACE_FUELS);
+    }
+
+    private static boolean isCokeBlock(ItemStack stack) {
+        return stack.is(ModItemTags.COAL_COKE_BLOCKS);
+    }
+
+    // What the fuel slot offers as fuel and reagent: loose coke first, and a coke block counts as coal coke.
+    private ItemStack fuelAndReagent() {
+        ItemStack slot = items.getStack(SLOT_FUEL);
+        return looseCoke > 0 || isCokeBlock(slot) ? new ItemStack(ModItems.COAL_COKE.get()) : slot;
+    }
+
+    // How many fuel or reagent items are available, counting nine per coke block.
+    private int fuelAndReagentCount() {
+        ItemStack slot = items.getStack(SLOT_FUEL);
+        return looseCoke + (isCokeBlock(slot) ? slot.getCount() * BLOCK_COKE : slot.getCount());
+    }
+
+    // Uses up one fuel or reagent item: loose coke first, breaking open a coke block if that's what the slot holds.
+    private void takeFuelOrReagent() {
+        ItemStack slot = items.getStack(SLOT_FUEL);
+        if (looseCoke == 0 && isCokeBlock(slot)) {
+            items.setStack(SLOT_FUEL, slot.copyWithCount(slot.getCount() - 1));
+            looseCoke = BLOCK_COKE;
+        }
+        if (looseCoke > 0) {
+            looseCoke--;
+            setChanged();
+        } else {
+            items.setStack(SLOT_FUEL, slot.copyWithCount(slot.getCount() - 1));
+        }
     }
 
     public Direction getFacing() {
@@ -258,7 +296,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
 
     private @Nullable ArcforgeSmeltingRecipe currentRecipe(ServerLevel level) {
         ItemStack input = items.getStack(SLOT_INPUT);
-        ItemStack reagent = items.getStack(SLOT_FUEL);
+        ItemStack reagent = fuelAndReagent();
         if (input.isEmpty() || reagent.isEmpty()) {
             return null;
         }
@@ -278,20 +316,19 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
 
     // Burns one fuel item, keeping the last one back if the smelt still needs it as its reagent.
     private void burnFuel(ArcforgeSmeltingRecipe recipe) {
-        ItemStack fuel = items.getStack(SLOT_FUEL);
-        if (!isFuel(fuel) || (fuel.getCount() < 2 && recipe.reagent().test(fuel))) {
+        ItemStack fuel = fuelAndReagent();
+        if (!isFuel(fuel) || (fuelAndReagentCount() < 2 && recipe.reagent().test(fuel))) {
             return;
         }
-        items.setStack(SLOT_FUEL, fuel.copyWithCount(fuel.getCount() - 1));
+        takeFuelOrReagent();
         burnTime = ArcforgeConfig.FURNACE_FUEL_BURN_TICKS.getAsInt();
         burnTotal = burnTime;
     }
 
     private void smelt(ArcforgeSmeltingRecipe recipe) {
         ItemStack input = items.getStack(SLOT_INPUT);
-        ItemStack reagent = items.getStack(SLOT_FUEL);
         items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
-        items.setStack(SLOT_FUEL, reagent.copyWithCount(reagent.getCount() - 1));
+        takeFuelOrReagent();
         addTo(SLOT_OUTPUT, recipe.result().create());
         recipe.byproduct().ifPresent(byproduct -> addTo(SLOT_BYPRODUCT, byproduct.create()));
     }
@@ -393,6 +430,9 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
             for (int slot = 0; slot < SLOT_COUNT; slot++) {
                 Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), items.getStack(slot));
             }
+            if (looseCoke > 0) {
+                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(ModItems.COAL_COKE.get(), looseCoke));
+            }
             if (formed) {
                 MultiblockAutomation.refresh(level, getMinCorner(), getMaxCorner());
             }
@@ -412,6 +452,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         burnTime = input.getIntOr("burn_time", 0);
         burnTotal = input.getIntOr("burn_total", 0);
         progress = input.getIntOr("progress", 0);
+        looseCoke = input.getIntOr("loose_coke", 0);
     }
 
     @Override
@@ -425,6 +466,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         output.putInt("burn_time", burnTime);
         output.putInt("burn_total", burnTotal);
         output.putInt("progress", progress);
+        output.putInt("loose_coke", looseCoke);
     }
 
     @Override

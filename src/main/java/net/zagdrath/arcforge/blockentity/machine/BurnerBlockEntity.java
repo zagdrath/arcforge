@@ -99,6 +99,11 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
     public abstract int getCapacity();
 
     // °C for heat, 0 for FE.
+    // What it made this tick (FE or HU).
+    protected int producedThisTick() {
+        return outputPerTick;
+    }
+
     protected int getTemperature() {
         return 0;
     }

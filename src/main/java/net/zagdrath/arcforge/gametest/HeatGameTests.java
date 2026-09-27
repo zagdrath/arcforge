@@ -144,6 +144,39 @@ public final class HeatGameTests {
                 .thenSucceed();
     }
 
+    // A cold Firebox that has just been lit sends its heat on at flame temperature: the plant heats up
+    // through the conduit straight away instead of waiting for the Firebox's own buffer to fill.
+    static void fireboxHeatsPlantFromCold(GameTestHelper helper) {
+        BlockPos fireboxPos = new BlockPos(0, 1, 0);
+        BlockPos plantPos = new BlockPos(4, 1, 0);
+        helper.setBlock(fireboxPos, ModBlocks.FIREBOX.get().defaultBlockState());
+        helper.setBlock(plantPos, ModBlocks.THERMOELECTRIC_PLANT.get());
+        FireboxBlockEntity firebox = helper.getBlockEntity(fireboxPos, FireboxBlockEntity.class);
+        ThermoelectricPlantBlockEntity plant = helper.getBlockEntity(plantPos, ThermoelectricPlantBlockEntity.class);
+        firebox.setSideMode(RelativeSide.LEFT, SideMode.HEAT);
+        plant.setSideMode(RelativeSide.RIGHT, SideMode.HEAT);
+        for (int x = 1; x <= 3; x++) {
+            helper.setBlock(new BlockPos(x, 1, 0), ModBlocks.conduit(ConduitType.THERMAL, ConduitTier.WROUGHT).get());
+        }
+        for (int x = 1; x <= 3; x++) {
+            ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(new BlockPos(x, 1, 0)));
+        }
+        try (Transaction tx = Transaction.openRoot()) {
+            firebox.getItemHandler(null).insert(ItemResource.of(Items.COAL), 4, tx);
+            tx.commit();
+        }
+        helper.startSequence()
+                .thenIdle(200)
+                .thenExecute(() -> {
+                    int fireboxHeat = firebox.getHeat().getStored();
+                    int plantTemperature = plant.getHeat().getTemperature();
+                    helper.assertTrue(plantTemperature >= 300, "Plant only reached " + plantTemperature + "°C in 200 ticks (Firebox holds "
+                            + fireboxHeat + " HU at " + firebox.getHeat().getTemperature() + "°C)");
+                    helper.assertTrue(plant.getFePerTick() > 0, "Plant makes no FE");
+                })
+                .thenSucceed();
+    }
+
     // A thermodynamic conduit carries heat from the firebox's heat face to the plant's, and glows.
     static void thermalConduitCarriesHeat(GameTestHelper helper) {
         BlockPos fireboxPos = new BlockPos(0, 1, 0);

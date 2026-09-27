@@ -10,7 +10,9 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 // A machine's store of heat (HU). Its temperature rises linearly with how full it is, from ambient
-// when empty to the machine's maximum when full. The owning machine adds and removes heat directly;
+// when empty to the machine's maximum when full. A producer that is making heat right now (a fire
+// burning, lava draining) sets a source temperature, and is at least that hot however full it is, so
+// its heat flows out at once instead of waiting for the buffer to fill. The owning machine adds and removes heat directly;
 // other blocks see one of the one-way views (output() for producers, input() for consumers).
 public class HeatBuffer {
     public static final int AMBIENT_CELSIUS = 20;
@@ -19,6 +21,8 @@ public class HeatBuffer {
     private final int maxCelsius;
     private final Runnable onChanged;
     private int stored;
+    // Not saved: the owning machine sets it every tick.
+    private int sourceCelsius = AMBIENT_CELSIUS;
 
     public HeatBuffer(int capacity, int maxCelsius, Runnable onChanged) {
         this.capacity = Math.max(1, capacity);
@@ -46,7 +50,12 @@ public class HeatBuffer {
     }
 
     public int getTemperature() {
-        return temperature(stored, capacity, maxCelsius);
+        return Math.max(sourceCelsius, temperature(stored, capacity, maxCelsius));
+    }
+
+    // Whether the machine is making heat this tick: while it is, the buffer is at its maximum temperature.
+    public void setProducing(boolean producing) {
+        sourceCelsius = producing ? maxCelsius : AMBIENT_CELSIUS;
     }
 
     public int getRoom() {
