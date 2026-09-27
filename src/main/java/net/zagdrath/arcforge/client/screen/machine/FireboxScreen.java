@@ -14,6 +14,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 
 // Layout follows firebox_gui_layout.json. All positions are relative to leftPos/topPos.
@@ -33,6 +34,11 @@ public class FireboxScreen extends MachineScreen<BurnerMenu> {
         super(menu, inventory, title, "firebox", List.of(new HeatTab(menu::getStored,
                 Component.translatable("gui.arcforge.output"),
                 () -> Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getOutputPerTick()))));
+    }
+
+    @Override
+    protected Component sideModeName(SideMode mode) {
+        return mode == SideMode.HEAT ? sideModeName("heat_output") : super.sideModeName(mode);
     }
 
     @Override

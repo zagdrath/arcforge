@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
 
 // Layout follows thermoelectric_plant_gui_layout.json. All positions are relative to leftPos/topPos.
@@ -36,6 +37,11 @@ public class ThermoelectricPlantScreen extends MachineScreen<ThermoelectricPlant
                 new HeatTab(menu::getHeat,
                         Component.translatable("gui.arcforge.input"),
                         () -> Component.translatable("gui.arcforge.hu_per_tick_loss", menu.getHeatPerTick()))));
+    }
+
+    @Override
+    protected Component sideModeName(SideMode mode) {
+        return mode == SideMode.HEAT ? sideModeName("heat_input") : super.sideModeName(mode);
     }
 
     @Override

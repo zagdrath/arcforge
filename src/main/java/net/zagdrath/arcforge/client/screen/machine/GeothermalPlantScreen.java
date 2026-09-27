@@ -20,6 +20,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
 
 // Layout follows geothermal_plant_gui_layout.json. All positions are relative to leftPos/topPos.
@@ -44,6 +45,11 @@ public class GeothermalPlantScreen extends MachineScreen<GeothermalPlantMenu> {
                 () -> Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getHeatPerTick()),
                 Component.translatable("gui.arcforge.nearby"),
                 () -> Component.translatable("gui.arcforge.nearby_value", menu.getLavaSources(), menu.getMagmaBlocks()))));
+    }
+
+    @Override
+    protected Component sideModeName(SideMode mode) {
+        return mode == SideMode.HEAT ? sideModeName("heat_output") : super.sideModeName(mode);
     }
 
     @Override

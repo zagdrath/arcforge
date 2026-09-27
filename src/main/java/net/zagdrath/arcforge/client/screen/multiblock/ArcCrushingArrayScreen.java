@@ -18,6 +18,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
 
 // Layout follows arc_crushing_array_gui_layout.json. All positions are relative to leftPos/topPos.
@@ -34,6 +35,11 @@ public class ArcCrushingArrayScreen extends MachineScreen<ArcCrushingArrayMenu> 
 
     public ArcCrushingArrayScreen(ArcCrushingArrayMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "arc_crushing_array", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)));
+    }
+
+    @Override
+    protected Component sideModeName(SideMode mode) {
+        return mode == SideMode.ENERGY ? sideModeName("energy_input") : super.sideModeName(mode);
     }
 
     @Override

@@ -16,6 +16,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
 
 // Layout follows arc_crusher_gui_layout.json. All positions are relative to leftPos/topPos.
@@ -30,6 +31,11 @@ public class ArcCrusherScreen extends MachineScreen<ArcCrusherMenu> {
 
     public ArcCrusherScreen(ArcCrusherMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "arc_crusher", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)));
+    }
+
+    @Override
+    protected Component sideModeName(SideMode mode) {
+        return mode == SideMode.ENERGY ? sideModeName("energy_input") : super.sideModeName(mode);
     }
 
     @Override

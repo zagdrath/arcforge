@@ -37,13 +37,21 @@ public class SideConfigTab extends SideTab {
     private final Function<RelativeSide, SideMode> modes;
     private final BiConsumer<RelativeSide, Integer> action;
     private final Runnable clearAll;
+    // What each mode is called on this machine, e.g. an energy face is an input on a machine that uses power.
+    private final Function<SideMode, Component> names;
 
     // action receives a side and one of SideConfig.ACTION_*.
     public SideConfigTab(Function<RelativeSide, SideMode> modes, BiConsumer<RelativeSide, Integer> action, Runnable clearAll) {
+        this(modes, action, clearAll, SideMode::getDescription);
+    }
+
+    public SideConfigTab(Function<RelativeSide, SideMode> modes, BiConsumer<RelativeSide, Integer> action, Runnable clearAll,
+            Function<SideMode, Component> names) {
         super(ArcforgeGui.widget("icon_side_config"), Component.translatable("gui.arcforge.tab.side_config"), 100, 84);
         this.modes = modes;
         this.action = action;
         this.clearAll = clearAll;
+        this.names = names;
     }
 
     private static int faceX(RelativeSide side) {
@@ -122,7 +130,7 @@ public class SideConfigTab extends SideTab {
         RelativeSide side = faceAt(localX, localY);
         if (side != null) {
             lines.add(side.getDescription());
-            lines.add(modes.apply(side).getDescription().copy().withStyle(ChatFormatting.GRAY));
+            lines.add(names.apply(modes.apply(side)).copy().withStyle(ChatFormatting.GRAY));
         }
     }
 }

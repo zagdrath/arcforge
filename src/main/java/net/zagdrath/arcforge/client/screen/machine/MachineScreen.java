@@ -25,6 +25,7 @@ import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.client.gui.tab.UpgradesTab;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.MachineMenu;
 
 // Shared frame of the single-block machine GUIs: background, the machine's own tabs followed by
@@ -48,8 +49,19 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenu.redstoneButtonId(mode))))
                 .add(new SideConfigTab(menu::getSideMode,
                         (side, action) -> sendButton(MachineMenu.sideButtonId(side, action)),
-                        () -> sendButton(MachineMenu.BUTTON_CLEAR_SIDES)))
+                        () -> sendButton(MachineMenu.BUTTON_CLEAR_SIDES),
+                        this::sideModeName))
                 .add(new UpgradesTab(menu.getUpgradeSlots()));
+    }
+
+    // What a side mode is called on this machine (shown in the Sides tab). Machines that take energy
+    // or heat in, or give heat out, say so.
+    protected Component sideModeName(SideMode mode) {
+        return mode.getDescription();
+    }
+
+    protected static Component sideModeName(String name) {
+        return Component.translatable("gui.arcforge.side_mode." + name);
     }
 
     protected Identifier sprite(String name) {
