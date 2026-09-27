@@ -131,6 +131,6 @@ public class DistillationArrayControllerBlock extends BaseEntityBlock implements
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, FORMED, LIT, MultiblockPorts.PORT);
+        builder.add(FACING, FORMED, LIT, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 }

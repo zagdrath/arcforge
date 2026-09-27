@@ -148,6 +148,6 @@ public class SolarThermalArrayControllerBlock extends BaseEntityBlock implements
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, FORMED, LIT, BASE, MultiblockPorts.PORT);
+        builder.add(FACING, FORMED, LIT, BASE, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 }

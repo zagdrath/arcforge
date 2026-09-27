@@ -22,7 +22,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 
 // The block entity that runs a formed multiblock (the Carbonizer's master block, the Arcforge Furnace's
 // port). The structure does IO only through its ports (see MultiblockPorts): each port block exposes its
-// mode's capability on every one of its outer faces. Its side configuration is kept only for auto-eject
+// mode's capability on the one outer face the port is on. Its side configuration is kept only for auto-eject
 // and for carrying ports over from saves made before ports.
 public interface MultiblockController extends ConfigurableMachine {
     // Every controller is a block entity.
@@ -58,14 +58,14 @@ public interface MultiblockController extends ConfigurableMachine {
                 && pos.getZ() >= min.getZ() && pos.getZ() <= max.getZ();
     }
 
-    // The mode of the port at pos, if `side` of it faces out of the structure; null if it isn't a port,
-    // or that side faces into the structure.
+    // The mode of the port at pos, if it's on `side` and that faces out of the structure; null if it
+    // isn't a port, the port is on another face, or that side faces into the structure.
     default @Nullable SideMode faceMode(BlockPos pos, Direction side) {
         Level level = getLevel();
         if (level == null || isInside(pos.relative(side))) {
             return null;
         }
-        SideMode mode = MultiblockPorts.get(level.getBlockState(pos));
+        SideMode mode = MultiblockPorts.get(level.getBlockState(pos), side);
         return mode == SideMode.NONE ? null : mode;
     }
 
@@ -79,7 +79,7 @@ public interface MultiblockController extends ConfigurableMachine {
 
     // The ports a structure gets the first time it forms (see MultiblockPorts.Defaults): by default, one
     // in the middle of each side its default side configuration uses.
-    default Map<BlockPos, SideMode> defaultPorts(Level level) {
+    default Map<BlockPos, MultiblockPorts.DefaultPort> defaultPorts(Level level) {
         return MultiblockPorts.fromSideConfig(level, this);
     }
 

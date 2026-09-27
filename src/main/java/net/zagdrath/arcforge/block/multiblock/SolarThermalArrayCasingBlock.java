@@ -42,6 +42,6 @@ public class SolarThermalArrayCasingBlock extends SolarBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FORMED, PART, MultiblockPorts.PORT);
+        builder.add(FORMED, PART, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 }

@@ -82,7 +82,7 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(PART, FACING, LIT, MultiblockPorts.PORT);
+        builder.add(PART, FACING, LIT, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 
     // Only the centre of a formed cube runs.

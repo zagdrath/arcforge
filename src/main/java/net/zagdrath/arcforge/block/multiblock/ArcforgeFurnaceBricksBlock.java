@@ -34,7 +34,7 @@ public class ArcforgeFurnaceBricksBlock extends Block implements MultiblockPart 
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(MultiblockPorts.PORT);
+        builder.add(MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 
     @Override

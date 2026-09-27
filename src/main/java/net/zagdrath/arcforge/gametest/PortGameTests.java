@@ -18,11 +18,19 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
+import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -103,6 +111,16 @@ public final class PortGameTests {
                     helper.assertTrue(portAt(helper, corner) == SideMode.OUTPUT, "Second port mode is " + portAt(helper, corner));
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(corner), Direction.UP) != null,
                             "New port does not give items");
+                    // The port is on the clicked face only: the corner's other outer faces do nothing.
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(corner), Direction.SOUTH) == null,
+                            "The port also works on another face of its block");
+                    // Setting it on another outer face moves it there.
+                    wrench(helper, player, corner, Direction.SOUTH, WrenchMode.PORT);
+                    helper.assertTrue(MultiblockPorts.face(helper.getBlockState(corner)) == Direction.SOUTH, "The port did not move to the south face");
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(corner), Direction.UP) == null,
+                            "The old face still works after the port moved");
+                    wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
+                    wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
                     // Clicking the side of the centre casing that faces into the array: not a port position.
                     wrench(helper, player, new BlockPos(1, 2, 1), Direction.UP, WrenchMode.PORT);
                     helper.assertTrue(portAt(helper, new BlockPos(1, 2, 1)) == SideMode.NONE, "The inside became a port");
@@ -110,6 +128,41 @@ public final class PortGameTests {
                     wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
                     wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
                     helper.assertTrue(portAt(helper, corner) == SideMode.NONE, "Did not wrap back to none: " + portAt(helper, corner));
+                })
+                .thenSucceed();
+    }
+
+    // An item conduit next to a Carbonizer port connects to it, whether the conduit or the port came first;
+    // one next to another face of the port's block doesn't.
+    static void conduitsConnectToPorts(GameTestHelper helper) {
+        BlockState carbonizer = ModBlocks.CARBONIZER.get().defaultBlockState().setValue(CarbonizerBlock.FACING, Direction.NORTH);
+        for (BlockPos pos : BlockPos.betweenClosed(new BlockPos(0, 1, 0), new BlockPos(1, 2, 1))) {
+            helper.setBlock(pos.immutable(), carbonizer);
+        }
+        Block conduit = ModBlocks.conduit(ConduitType.ITEM, ConduitTier.WROUGHT).get();
+        BlockPos corner = new BlockPos(1, 2, 1), before = new BlockPos(1, 3, 1), beside = new BlockPos(2, 2, 1);
+        BlockPos later = new BlockPos(0, 2, 0), after = new BlockPos(0, 3, 0);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.setBlock(before, conduit);
+                    helper.setBlock(beside, conduit);
+                    CarbonizerBlockEntity master = helper.getBlockEntity(new BlockPos(0, 1, 0), CarbonizerBlockEntity.class);
+                    helper.assertTrue(master.isFormed(), "Carbonizer did not form");
+                    MultiblockPorts.set(helper.getLevel(), master, helper.absolutePos(corner), SideMode.INPUT, Direction.UP);
+                    MultiblockPorts.set(helper.getLevel(), master, helper.absolutePos(later), SideMode.INPUT, Direction.UP);
+                    // Connected as a player placement would.
+                    helper.setBlock(after, conduit);
+                    ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(after));
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    ConnectionMode existing = ConduitBlock.mode(helper.getBlockState(before), Direction.DOWN);
+                    helper.assertTrue(existing == ConnectionMode.INPUT, "A conduit placed before the port connects " + existing);
+                    ConnectionMode placed = ConduitBlock.mode(helper.getBlockState(after), Direction.DOWN);
+                    helper.assertTrue(placed == ConnectionMode.INPUT, "A conduit placed after the port connects " + placed);
+                    ConnectionMode side = ConduitBlock.mode(helper.getBlockState(beside), Direction.WEST);
+                    helper.assertTrue(side == ConnectionMode.NONE, "A conduit on another face of the port's block connects " + side);
                 })
                 .thenSucceed();
     }

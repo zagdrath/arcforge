@@ -224,7 +224,7 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, ROW, HALF, DEPTH, TALL, LIT, MultiblockPorts.PORT);
+        builder.add(FACING, ROW, HALF, DEPTH, TALL, LIT, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 
     // Smoke curls out of the open doors of working slices.

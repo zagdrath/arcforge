@@ -339,7 +339,7 @@ public final class ConnectedModel {
                 }
                 List<BakedQuad> faceQuads = new ArrayList<>();
                 pickFace(level, pos, state, face, faceQuads);
-                BakedQuad port = ports.get(MultiblockPorts.get(state), face);
+                BakedQuad port = ports.get(MultiblockPorts.get(state, face), face);
                 if (port != null) {
                     faceQuads.add(port);
                 }
@@ -500,9 +500,9 @@ public final class ConnectedModel {
             return DistillationStructure.isFormedPart(state);
         }
 
-        // A formed port shows its plate on each outer face (the faces drawn at all).
+        // A formed port shows its plate on its face (if that's drawn, i.e. on the outside).
         private void addPort(BlockState state, boolean formed, Direction face, List<BakedQuad> out) {
-            BakedQuad port = formed ? ports.get(MultiblockPorts.get(state), face) : null;
+            BakedQuad port = formed ? ports.get(MultiblockPorts.get(state, face), face) : null;
             if (port != null) {
                 out.add(port);
             }

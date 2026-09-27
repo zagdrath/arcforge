@@ -378,7 +378,7 @@ by the colour of its grip). Where a mode does nothing with a block, the click go
 
 Multiblocks do IO only through their **ports**: blocks on the outside of the structure set to a mode,
 marked with a plate (a blue ring takes in, an orange one gives out, red is energy, hot orange is heat).
-A port works on every outer face of its block. On the cube arrays and the Solar Thermal Array, whose
+A port is on one outer face of its block, the one it was set on (setting another face moves it). On the cube arrays and the Solar Thermal Array, whose
 formed model isn't a cube, a port is a steel nozzle from the model out to the block face. Set them with
 the wrench in Port mode; each structure cycles only through its own modes. A new structure gets a few in
 the middle of its sides (as listed with each machine), and ports stay on their blocks when the structure

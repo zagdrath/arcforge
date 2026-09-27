@@ -207,13 +207,13 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
         return tower != null && tower.contains(pos);
     }
 
-    // A heat port on the bottom-layer block behind the controller.
+    // A heat port on the back of the bottom-layer block behind the controller.
     @Override
-    public Map<BlockPos, SideMode> defaultPorts(Level level) {
-        Map<BlockPos, SideMode> ports = new LinkedHashMap<>();
+    public Map<BlockPos, MultiblockPorts.DefaultPort> defaultPorts(Level level) {
+        Map<BlockPos, MultiblockPorts.DefaultPort> ports = new LinkedHashMap<>();
         BlockPos behind = worldPosition.relative(getFacing().getOpposite());
         if (tower != null && tower.contains(behind)) {
-            ports.put(behind, SideMode.HEAT);
+            ports.put(behind, new MultiblockPorts.DefaultPort(SideMode.HEAT, getFacing().getOpposite()));
         }
         return ports;
     }
@@ -355,7 +355,7 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
         return rain ? SolarModel.Weather.RAIN : snow ? SolarModel.Weather.SNOW : SolarModel.Weather.CLEAR;
     }
 
-    // Heat out of every outer face of every heat port, into whatever cooler heat handler it touches.
+    // Heat out of the face of every heat port, into whatever cooler heat handler it touches.
     private void pushHeat(ServerLevel level) {
         if (targetsDirty) {
             targetsDirty = false;
@@ -364,9 +364,7 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
                 if (port.mode() != SideMode.HEAT) {
                     continue;
                 }
-                for (Direction side : MultiblockPorts.outerFaces(this, port.pos())) {
-                    heatTargets.add(BlockCapabilityCache.create(ModCapabilities.HEAT, level, port.pos().relative(side), side.getOpposite()));
-                }
+                heatTargets.add(BlockCapabilityCache.create(ModCapabilities.HEAT, level, port.pos().relative(port.face()), port.face().getOpposite()));
             }
         }
         int rate = ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt();

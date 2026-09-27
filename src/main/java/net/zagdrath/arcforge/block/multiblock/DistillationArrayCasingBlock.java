@@ -30,7 +30,7 @@ public class DistillationArrayCasingBlock extends Block implements ColumnPart {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FORMED, MultiblockPorts.PORT);
+        builder.add(FORMED, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 
     @Override

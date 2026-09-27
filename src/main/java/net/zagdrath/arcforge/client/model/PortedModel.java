@@ -77,11 +77,10 @@ public final class PortedModel {
                 return;
             }
             QuadCollection.Builder quads = new QuadCollection.Builder();
-            for (Direction face : Direction.values()) {
-                BakedQuad port = ports.get(mode, face);
-                if (port != null && isOuter(level, pos.relative(face))) {
-                    quads.addCulledFace(face, port);
-                }
+            Direction face = MultiblockPorts.face(state);
+            BakedQuad port = ports.get(mode, face);
+            if (port != null && isOuter(level, pos.relative(face))) {
+                quads.addCulledFace(face, port);
             }
             parts.add(new SimpleModelWrapper(quads.build(), true, base.particleMaterial()));
         }

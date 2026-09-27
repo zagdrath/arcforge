@@ -142,20 +142,22 @@ public class WrenchItem extends Item {
 
     // --- Port ---
 
-    // A multiblock's port: says what it is, or (sneaking) sets it to the next mode.
+    // A multiblock's port on the clicked face: says what it is, or (sneaking) sets it to the next mode
+    // (moving the block's port to this face if it was on another).
     private static InteractionResult port(UseOnContext context, BlockState state, boolean change) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
+        Direction face = context.getClickedFace();
         MultiblockController controller = state.getBlock() instanceof MultiblockPart part ? part.findController(level, pos) : null;
         if (controller == null || !controller.isFormed() || !MultiblockPorts.canHold(level, controller, pos)
-                || controller.isInside(pos.relative(context.getClickedFace()))) {
+                || controller.isInside(pos.relative(face))) {
             tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.not_port"));
             return InteractionResult.SUCCESS;
         }
-        SideMode current = MultiblockPorts.get(state);
+        SideMode current = MultiblockPorts.get(state, face);
         if (change) {
             SideMode next = MultiblockPorts.next(controller, current, false);
-            MultiblockPorts.set(level, controller, pos, next);
+            MultiblockPorts.set(level, controller, pos, next, face);
             tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.port_set", portName(controller, next)));
         } else {
             tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.port", portName(controller, current)));

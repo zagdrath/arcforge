@@ -172,10 +172,8 @@ public final class PortNozzleModel {
                 return;
             }
             QuadCollection.Builder quads = new QuadCollection.Builder();
-            for (Direction face : Direction.values()) {
-                if (kind.inside(level, pos, pos.relative(face)) || !kind.shows(state, face)) {
-                    continue;
-                }
+            Direction face = MultiblockPorts.face(state);
+            if (!kind.inside(level, pos, pos.relative(face)) && kind.shows(state, face)) {
                 float depth = depth(pos, face, placed);
                 if (depth > 0) {
                     addCollar(quads, face, depth);

@@ -64,6 +64,7 @@ public final class ArcforgeGameTests {
         TESTS.put("ports_wrench_sets_port", PortGameTests::wrenchSetsPort);
         TESTS.put("ports_wrench_modes_on_multiblock", PortGameTests::wrenchModesOnMultiblock);
         TESTS.put("ports_turbine_ends", PortGameTests::turbinePorts);
+        TESTS.put("ports_conduits_connect", PortGameTests::conduitsConnectToPorts);
         TESTS.put("tank_buckets", StorageGameTests::tankBuckets);
         TESTS.put("tank_spills", StorageGameTests::tankSpills);
         TESTS.put("tank_wrench_keeps_fluid", StorageGameTests::tankWrenchKeepsFluid);

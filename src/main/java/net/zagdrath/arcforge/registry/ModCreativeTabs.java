@@ -97,6 +97,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COPPER_PLATE.get());
                 output.accept(ModItems.COPPER_GEAR.get());
                 output.accept(ModItems.COPPER_ROD.get());
+                ModItems.oreComponents().forEach(item -> output.accept(item.get()));
             }).build());
 
     // Ordered like vanilla's Building Blocks: logs and wood, planks, then the shapes.

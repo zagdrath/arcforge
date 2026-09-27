@@ -69,7 +69,7 @@ public abstract class ShellCasingBlock extends BaseEntityBlock implements Multib
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FORMED, MultiblockPorts.PORT);
+        builder.add(FORMED, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 
     // Only the master of a formed structure runs.

@@ -48,6 +48,7 @@ import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.steam.BoilerCore;
@@ -179,14 +180,16 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     // Energy out of the generator end, steam into the bearing end.
     @Override
-    public Map<BlockPos, SideMode> defaultPorts(Level level) {
+    public Map<BlockPos, MultiblockPorts.DefaultPort> defaultPorts(Level level) {
         ShellStructure.Shell shell = getShell();
         if (shell == null) {
             return super.defaultPorts(level);
         }
-        Map<BlockPos, SideMode> ports = new LinkedHashMap<>();
-        ports.put(shell.endCenter(Direction.AxisDirection.POSITIVE), SideMode.ENERGY);
-        ports.put(shell.endCenter(Direction.AxisDirection.NEGATIVE), SideMode.INPUT);
+        Map<BlockPos, MultiblockPorts.DefaultPort> ports = new LinkedHashMap<>();
+        ports.put(shell.endCenter(Direction.AxisDirection.POSITIVE), new MultiblockPorts.DefaultPort(SideMode.ENERGY,
+                Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.POSITIVE)));
+        ports.put(shell.endCenter(Direction.AxisDirection.NEGATIVE), new MultiblockPorts.DefaultPort(SideMode.INPUT,
+                Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.NEGATIVE)));
         return ports;
     }
 
