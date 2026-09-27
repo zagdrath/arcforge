@@ -18,22 +18,28 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
+import java.util.HashSet;
+import java.util.Set;
+
 // Draws the inside of a formed Steam Boiler Array, seen through its windows (the casings draw only the
-// outside of the structure): an opaque dark drum just inside the walls, then water rising from the floor
+// outside of the structure, so the inside of that skin is drawn here too, except behind glass): an opaque dark drum just inside the walls, then water rising from the floor
 // (a full tank fills the lower 65%), and steam gathering under the roof and filling the space above the
 // water as it builds up, thicker the more there is. Levels ease toward the synced ones.
 public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoilerArrayBlockEntity, SteamBoilerArrayRenderer.State> {
@@ -50,6 +56,8 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
 
     public static class State extends BlockEntityRenderState {
         public boolean formed;
+        // Offsets (from the minimum corner) of the Pressure Glass panes: no inner skin behind them.
+        public final Set<BlockPos> windows = new HashSet<>();
         public float sizeX, sizeY, sizeZ;
         public float water, steam;
         public @Nullable TextureAtlasSprite waterSprite, steamSprite, drumSprite;
@@ -79,6 +87,7 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
         state.water = boiler.easeWater(fill(boiler.getWater().getAmount(), boiler.getWater().getCapacity()), EASE);
         state.steam = boiler.easeSteam(fill(boiler.getSteam().getAmount(), boiler.getSteam().getCapacity()), EASE);
         state.drumSprite = sprite(DRUM);
+        findWindows(boiler.getLevel(), shell, state.windows);
 
         Fluid waterFluid = boiler.getWater().getAmount() > 0 ? boiler.getWater().getResource(0).getFluid() : Fluids.WATER;
         var waterModel = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(waterFluid.defaultFluidState());
@@ -101,6 +110,18 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
 
     private static float fill(int amount, int capacity) {
         return capacity > 0 ? Math.min(1.0F, amount / (float) capacity) : 0.0F;
+    }
+
+    // The Pressure Glass panes of a shell, as offsets from its minimum corner.
+    static void findWindows(@Nullable Level level, ShellStructure.Shell shell, Set<BlockPos> windows) {
+        windows.clear();
+        if (level != null) {
+            for (BlockPos pos : shell.positions()) {
+                if (level.getBlockState(pos).getBlock() instanceof PressureGlassBlock) {
+                    windows.add(pos.subtract(shell.min()));
+                }
+            }
+        }
     }
 
     static TextureAtlasSprite sprite(Identifier id) {
@@ -130,8 +151,11 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
         Direction steamSkip = touching ? Direction.DOWN : null;
 
         collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(drum.atlasLocation()),
-                (pose, buffer) -> TiledBoxes.box(pose, buffer, drum, DRUM_COLOR, state.light,
-                        DRUM_INSET, DRUM_INSET, DRUM_INSET, state.sizeX - DRUM_INSET, state.sizeY - DRUM_INSET, state.sizeZ - DRUM_INSET, false));
+                (pose, buffer) -> {
+                    TiledBoxes.box(pose, buffer, drum, DRUM_COLOR, state.light,
+                            DRUM_INSET, DRUM_INSET, DRUM_INSET, state.sizeX - DRUM_INSET, state.sizeY - DRUM_INSET, state.sizeZ - DRUM_INSET, false);
+                    TiledBoxes.lining(pose, buffer, drum, DRUM_COLOR, state.light, 0.0F, state.sizeX, state.sizeY, state.sizeZ, state.windows::contains);
+                });
         collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(water.atlasLocation()), (pose, buffer) -> {
             TiledBoxes.box(pose, buffer, water, state.waterColor, state.light, x0, y0, z0, x1, waterTop, z1, false);
             TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light, x0, steamFloor, z0, x1, y1, z1, false, steamSkip);

@@ -34,14 +34,13 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.zagdrath.arcforge.Arcforge;
-import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
-// Draws the inside of a formed Steam Turbine Array, seen through its windows: a ribbed lining just inside
-// the walls (only its inward faces, so the near wall never hides the far one, each reaching out to the
-// structure's edges so no gap shows at the rims), then the rotor: the shaft
+// Draws the inside of a formed Steam Turbine Array, seen through its windows: a ribbed lining on the inside
+// of the walls' outer skin (only its inward faces, so the near wall never hides the far one; none behind
+// glass, so opposite windows see through), then the rotor: the shaft
 // through every block from bearing to generator (stopping just short of the end caps' faces), and a set of blades in each block between them, each
 // set turned 22.5° further so they look staggered; and the steam around it, thicker the faster it flows. The rotor turns at up to one turn a second.
 public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
@@ -50,7 +49,8 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
     public static final Identifier ROTOR_SHAFT_MODEL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/rotor_shaft");
     public static final Identifier ROTOR_BLADES_MODEL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/rotor_blades");
     private static final Identifier LINER = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/liner");
-    private static final float LINER_INSET = 2.0F / 16.0F;
+    // The lining is the inside of the structure's outer skin (see TiledBoxes.lining).
+    private static final float LINER_INSET = 0.0F;
     // The steam fills the chamber just inside the lining, around the rotor.
     private static final float STEAM_INSET = 2.5F / 16.0F;
     // Steam is this see-through with steam in the tank but none flowing, and this thick at full flow.
@@ -97,14 +97,7 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         state.sizeY = shell.size(Direction.Axis.Y);
         state.sizeZ = shell.size(Direction.Axis.Z);
         state.liner = SteamBoilerArrayRenderer.sprite(LINER);
-        state.windows.clear();
-        if (turbine.getLevel() != null) {
-            for (BlockPos pos : shell.positions()) {
-                if (turbine.getLevel().getBlockState(pos).getBlock() instanceof PressureGlassBlock) {
-                    state.windows.add(pos.subtract(shell.min()));
-                }
-            }
-        }
+        SteamBoilerArrayRenderer.findWindows(turbine.getLevel(), shell, state.windows);
         // The faster steam goes through, the thicker it looks.
         float flow = turbine.easeSteamDensity(EASE);
         SteamGrade grade = SteamGrade.of(turbine.getSteam().getResource(0));

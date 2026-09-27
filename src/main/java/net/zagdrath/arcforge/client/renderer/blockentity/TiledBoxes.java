@@ -48,12 +48,12 @@ public final class TiledBoxes {
         }
     }
 
-    // The inward faces of a box inset from a structure's walls (sizes in blocks), each face stretched to
-    // the structure's outer edges rather than stopping at the box's corners. Seen through a window at a
-    // steep angle, the strip between the box and the outside of the walls then shows lining, not the
-    // world behind (the walls' own blocks draw only their outer faces). No lining is drawn behind a wall
-    // block that window says is a window (given its offset from the structure's minimum corner), so the
-    // structure can be seen through from one window to another.
+    // The inward faces of a box inset from a structure's walls (sizes in blocks; an inset of 0 is the inside
+    // of the structure's outer skin), each face stretched to the structure's outer edges. The walls' own
+    // blocks draw only their outer faces, so without this a ray in through a window at a steep angle
+    // would leave by the rim. Inward faces are culled from outside, so they never fight the blocks' own.
+    // No lining is drawn behind a wall block that window says is a window (given its offset from the
+    // structure's minimum corner), so the structure can be seen through from one window to another.
     public static void lining(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
             float inset, float sizeX, float sizeY, float sizeZ, Predicate<BlockPos> window) {
         float[] size = { sizeX, sizeY, sizeZ };
