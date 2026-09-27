@@ -34,6 +34,7 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.renderer.blockentity.ArcforgeFurnaceRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.CarbonizerDoorRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
@@ -124,5 +125,6 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.TRANSPARENT_CONDUIT.get(), ConduitRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FLUID_TANK.get(), FluidTankRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.CARBONIZER.get(), CarbonizerDoorRenderer::new);
     }
 }

@@ -129,10 +129,12 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
 
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        // The server runs the master; clients animate the slice doors.
         return level instanceof ServerLevel serverLevel
                 ? createTickerHelper(type, ModBlockEntityTypes.CARBONIZER.get(),
                         (innerLevel, pos, blockState, carbonizer) -> CarbonizerBlockEntity.serverTick(serverLevel, carbonizer))
-                : null;
+                : createTickerHelper(type, ModBlockEntityTypes.CARBONIZER.get(),
+                        (innerLevel, pos, blockState, carbonizer) -> CarbonizerBlockEntity.clientTick(carbonizer, blockState));
     }
 
     // --- Formation: placing, breaking or wrenching any block re-evaluates its structure ---

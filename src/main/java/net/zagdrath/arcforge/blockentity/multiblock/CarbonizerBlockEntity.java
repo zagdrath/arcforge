@@ -15,6 +15,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
@@ -96,6 +99,13 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     private boolean powered;
     // Whether this block holds a structure's contents (it is, or was, a master).
     private boolean holdsContents;
+
+    // Client only: how far the slice door on this block is open (0 = shut, 1 = open), animated
+    // towards the LIT state by clientTick and drawn by CarbonizerDoorRenderer.
+    private float doorOpen;
+    private float doorOpenPrevious;
+    private boolean doorOpening;
+    private boolean doorInitialized;
 
     public CarbonizerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.CARBONIZER.get(), pos, state);
@@ -285,6 +295,39 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         return isInside(pos);
     }
 
+    // --- Door animation (client) ---
+
+    public static final int DOOR_SWING_TICKS = 4;
+
+    public static boolean hasDoor(BlockState state) {
+        return CarbonizerBlock.isFormed(state) && state.getValue(CarbonizerBlock.DEPTH) == CarbonizerBlock.Depth.FRONT;
+    }
+
+    public static void clientTick(CarbonizerBlockEntity carbonizer, BlockState state) {
+        boolean open = hasDoor(state) && state.getValue(CarbonizerBlock.LIT);
+        float target = open ? 1.0F : 0.0F;
+        // A door already open when the chunk loads doesn't swing.
+        if (!carbonizer.doorInitialized) {
+            carbonizer.doorInitialized = true;
+            carbonizer.doorOpen = target;
+        }
+        carbonizer.doorOpenPrevious = carbonizer.doorOpen;
+        carbonizer.doorOpening = open;
+        float step = 1.0F / DOOR_SWING_TICKS;
+        carbonizer.doorOpen = open ? Math.min(1.0F, carbonizer.doorOpen + step) : Math.max(0.0F, carbonizer.doorOpen - step);
+    }
+
+    // How far open the door is this frame, eased so it starts quickly and settles into place either way.
+    public float getDoorOpen(float partialTick) {
+        float linear = Mth.lerp(partialTick, doorOpenPrevious, doorOpen);
+        return doorOpening ? easeOut(linear) : 1.0F - easeOut(1.0F - linear);
+    }
+
+    private static float easeOut(float t) {
+        float inverse = 1.0F - t;
+        return 1.0F - inverse * inverse * inverse;
+    }
+
     // --- Ticking (the master of a formed structure only) ---
 
     public static void serverTick(ServerLevel level, CarbonizerBlockEntity carbonizer) {
@@ -396,12 +439,18 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         }
     }
 
-    // Only the two front blocks look different while lit, but the whole slice carries the state.
+    // Only the two front blocks look different while lit (their doors swing open), but the whole slice
+    // carries the state. The slice's door clanks once as it opens or shuts.
     private static void setSliceLit(ServerLevel level, CarbonizerStructure.Formation formed, int chamber, boolean lit) {
-        for (BlockPos pos : formed.slice(chamber)) {
+        BlockPos[] slice = formed.slice(chamber);
+        for (BlockPos pos : slice) {
             BlockState state = level.getBlockState(pos);
             if (state.getBlock() instanceof CarbonizerBlock && state.getValue(CarbonizerBlock.LIT) != lit) {
                 level.setBlock(pos, state.setValue(CarbonizerBlock.LIT, lit), Block.UPDATE_CLIENTS);
+                if (pos == slice[0]) {
+                    level.playSound(null, pos.above(), lit ? SoundEvents.IRON_DOOR_OPEN : SoundEvents.IRON_DOOR_CLOSE, SoundSource.BLOCKS,
+                            0.5F, 1.1F + level.getRandom().nextFloat() * 0.2F);
+                }
             }
         }
     }

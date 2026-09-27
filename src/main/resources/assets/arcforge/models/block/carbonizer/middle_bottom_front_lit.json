@@ -7,7 +7,6 @@
     "up": "arcforge:block/carbonizer/top_1",
     "down": "arcforge:block/carbonizer/top_4",
     "north": "arcforge:block/carbonizer/front_bottom_lit",
-    "door": "arcforge:block/carbonizer/door_bottom",
     "particle": "arcforge:block/carbonizer/casing"
   },
   "elements": [
@@ -81,56 +80,6 @@
           ],
           "texture": "#down",
           "cullface": "down"
-        }
-      }
-    },
-    {
-      "from": [
-        12,
-        4,
-        -8
-      ],
-      "to": [
-        13,
-        16,
-        0
-      ],
-      "faces": {
-        "east": {
-          "uv": [
-            0,
-            0,
-            8,
-            12
-          ],
-          "texture": "#door"
-        },
-        "west": {
-          "uv": [
-            8,
-            0,
-            0,
-            12
-          ],
-          "texture": "#door"
-        },
-        "north": {
-          "uv": [
-            8,
-            0,
-            9,
-            12
-          ],
-          "texture": "#door"
-        },
-        "down": {
-          "uv": [
-            0,
-            0,
-            8,
-            1
-          ],
-          "texture": "#door"
         }
       }
     }
