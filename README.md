@@ -421,6 +421,10 @@ can be changed in `config/arcforge-common.toml`, or in game from the Mods screen
 **Ore Generation** (`ores`), each with a page per machine. **Reset All**, at the bottom of the first page, puts
 every value back to its default.
 
+## Changelog
+
+What changed in each version, and what to redo when upgrading, is in [CHANGELOG.md](CHANGELOG.md).
+
 ## License
 
 Arcforge is released under the [MIT License](LICENSE). Copyright (c) 2026 Zagdrath.
