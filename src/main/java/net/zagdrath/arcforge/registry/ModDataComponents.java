@@ -15,6 +15,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
+import net.zagdrath.arcforge.machine.quarry.QuarrySettings;
 import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.storage.VaultContents;
 
@@ -46,6 +47,10 @@ public final class ModDataComponents {
     // What a Vault holds while it's an item (absent: empty, unlocked, void off). Crates use minecraft:container.
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<VaultContents>> VAULT_CONTENTS =
             DATA_COMPONENTS.registerComponentType("vault_contents", b -> b.persistent(VaultContents.CODEC).networkSynchronized(VaultContents.STREAM_CODEC));
+
+    // An Arc Quarry's area, filter and switches, kept when it's picked up (see QuarrySettings).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<QuarrySettings>> QUARRY_SETTINGS =
+            DATA_COMPONENTS.registerComponentType("quarry_settings", b -> b.persistent(QuarrySettings.CODEC).networkSynchronized(QuarrySettings.STREAM_CODEC));
 
     private ModDataComponents() {}
 

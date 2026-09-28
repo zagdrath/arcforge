@@ -21,6 +21,8 @@
     "arcforge:raw_bismuth_block",
     "arcforge:bismuth_block",
     "arcforge:raw_arcite_block",
-    "arcforge:arcite_block"
+    "arcforge:arcite_block",
+    "arcforge:arc_quarry",
+    "arcforge:arc_quarry_bounding"
   ]
 }

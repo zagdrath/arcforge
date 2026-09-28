@@ -69,7 +69,8 @@
         "assembler",
         "block_breaker",
         "block_placer",
-        "vacuum_collector"
+        "vacuum_collector",
+        "arc_quarry"
       ]
     },
     {

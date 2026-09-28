@@ -44,6 +44,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.BLOCK_BREAKER.get());
                 output.accept(ModItems.BLOCK_PLACER.get());
                 output.accept(ModItems.VACUUM_COLLECTOR.get());
+                output.accept(ModItems.ARC_QUARRY.get());
                 output.accept(ModItems.STEAM_BOILER_ARRAY_CASING.get());
                 output.accept(ModItems.STEAM_TURBINE_ARRAY_CASING.get());
                 output.accept(ModItems.SUPERHEATER_ARRAY_CASING.get());
@@ -106,6 +107,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COPPER_GEAR.get());
                 output.accept(ModItems.COPPER_ROD.get());
                 output.accept(ModItems.PLASTIC_SHEET.get());
+                output.accept(ModItems.TUNGSTEN_DRILL_HEAD.get());
+                output.accept(ModItems.QUARRY_SCANNER.get());
                 ModItems.oreComponents().forEach(item -> output.accept(item.get()));
             }).build());
 

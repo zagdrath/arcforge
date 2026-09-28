@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "HSH",
+    "GDG",
+    "HHH"
+  ],
+  "key": {
+    "H": "arcforge:hardened_alloy",
+    "S": "arcforge:quarry_scanner",
+    "G": "#c:gears/steel",
+    "D": "arcforge:tungsten_drill_head"
+  },
+  "result": {
+    "id": "arcforge:arc_quarry",
+    "count": 1
+  }
+}

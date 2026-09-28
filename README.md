@@ -356,6 +356,25 @@ placement per redstone pulse.
 All four take Speed and Energy upgrades. Config: `machines.assembler`, `machines.blockBreaker`,
 `machines.blockPlacer` and `machines.vacuumCollector`.
 
+**Arc Quarry** (Hardened). A 3×3×3 digital miner. Its item places the whole machine in a clear 3×3 space, 3 blocks
+tall; the parts around the centre all act as the Quarry (using, breaking, the Wrench, conduits on any outer face).
+
+- **Area:** a square around the Quarry, radius 10 by default (up to `maxRadius`, 32), from Y 0 to 60 by default.
+  It mines from the top layer down.
+- **Filter:** 18 cells, like a Conduit Filter's but for blocks. Click a cell with a block, click its chip to cycle
+  the block's tags, or type a block tag (with suggestions) to add it. Allowlist or Denylist. **Scan** counts what
+  matches, with the most common blocks.
+- **Cost:** 200 FE a block at 1 block a second, with Speed and Energy upgrades. **Silk Touch** costs 5×.
+- **Replace** (on by default) fills each mined space from its replace slot (any block), and pauses when it runs out.
+- It skips air, fluids and waterlogged blocks, unbreakable blocks, anything with a block entity, multiblock parts
+  and `#arcforge:breaker_blacklist`. Each block is checked again just before it's mined, and it mines as a fake
+  player, so protection mods can refuse.
+- Drops go to a 27-slot buffer and out of the cube's Output faces. It pauses, saying why, when full, out of power,
+  out of replace blocks, or (without chunk loading) waiting for an unloaded chunk.
+- Its area shows as an outline while you hold a Quarry, while its settings are open, or always with its eye button.
+- Config `machines.arcQuarry`, including `chunkLoading` (off by default), which keeps its own chunk and the one
+  it's working in loaded.
+
 ### Upgrades
 
 Speed, Energy, Heat and Thermoelectric Efficiency upgrade cards go in a machine's Upgrades tab, up to 8 of each.

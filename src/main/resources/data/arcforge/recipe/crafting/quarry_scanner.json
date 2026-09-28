@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PSP",
+    "GRG",
+    "PCP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "S": "#c:plates/silver",
+    "G": "#c:glass_panes",
+    "R": "minecraft:redstone",
+    "C": "minecraft:comparator"
+  },
+  "result": {
+    "id": "arcforge:quarry_scanner",
+    "count": 1
+  }
+}

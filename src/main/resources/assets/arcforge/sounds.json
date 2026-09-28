@@ -142,5 +142,14 @@
         "stream": false
       }
     ]
+  },
+  "arc_quarry_run": {
+    "subtitle": "subtitles.arcforge.arc_quarry_run",
+    "sounds": [
+      {
+        "name": "arcforge:arc_quarry_run",
+        "stream": false
+      }
+    ]
   }
 }

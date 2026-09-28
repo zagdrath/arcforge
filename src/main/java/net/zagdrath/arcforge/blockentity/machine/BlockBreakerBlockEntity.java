@@ -37,14 +37,13 @@ import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.ArcforgeFakePlayer;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.MineRules;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.BlockBreakerMenu;
-import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
-import net.zagdrath.arcforge.tag.ModBlockTags;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
@@ -114,8 +113,7 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
 
     // Whether it may break this block at all.
     public static boolean canBreak(ServerLevel level, BlockPos pos, BlockState state) {
-        return !state.isAir() && !(state.getBlock() instanceof LiquidBlock) && state.getDestroySpeed(level, pos) >= 0
-                && !state.is(ModBlockTags.BREAKER_BLACKLIST) && !(state.getBlock() instanceof MultiblockPart);
+        return MineRules.canBreak(level, pos, state);
     }
 
     // The tool that suits the block (never stored or damaged), or EMPTY to break it by hand.

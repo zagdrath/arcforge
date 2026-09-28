@@ -778,6 +778,59 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Arc Quarry: a 3x3x3 digital miner that mines a square area top-down, keeping only the blocks its filter picks.")
+                .push("arcQuarry");
+    }
+
+    public static final ModConfigSpec.IntValue QUARRY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 500_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue QUARRY_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 20_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue QUARRY_ENERGY_PER_BLOCK = BUILDER
+            .comment("FE per block mined, before Energy upgrades.")
+            .defineInRange("energyPerBlock", 200, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue QUARRY_SILK_MULTIPLIER = BUILDER
+            .comment("Multiplier on the FE per block with Silk Touch on.")
+            .defineInRange("silkTouchMultiplier", 5.0, 1.0, 100.0);
+
+    public static final ModConfigSpec.IntValue QUARRY_TICKS_PER_BLOCK = BUILDER
+            .comment("Ticks per block mined, before Speed upgrades.")
+            .defineInRange("ticksPerBlock", 20, 1, 1_000);
+
+    public static final ModConfigSpec.IntValue QUARRY_DEFAULT_RADIUS = BUILDER
+            .comment("Radius a new quarry starts with (the area is 2 x radius + 1 blocks square).")
+            .defineInRange("defaultRadius", 10, 0, 64);
+
+    public static final ModConfigSpec.IntValue QUARRY_MAX_RADIUS = BUILDER
+            .comment("Largest radius it can be set to.")
+            .defineInRange("maxRadius", 32, 0, 64);
+
+    public static final ModConfigSpec.IntValue QUARRY_DEFAULT_MIN_Y = BUILDER
+            .comment("Lowest layer a new quarry mines.")
+            .defineInRange("defaultMinY", 0, -2_048, 2_048);
+
+    public static final ModConfigSpec.IntValue QUARRY_DEFAULT_MAX_Y = BUILDER
+            .comment("Highest layer a new quarry mines.")
+            .defineInRange("defaultMaxY", 60, -2_048, 2_048);
+
+    public static final ModConfigSpec.IntValue QUARRY_SCAN_PER_TICK = BUILDER
+            .comment("Positions it scans per tick.")
+            .defineInRange("scanBlocksPerTick", 4_096, 64, 65_536);
+
+    public static final ModConfigSpec.BooleanValue QUARRY_CHUNK_LOADING = BUILDER
+            .comment("Keep the quarry's chunk and the chunk it's mining (or scanning) loaded while it works.")
+            .define("chunkLoading", false);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
                 "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
     }

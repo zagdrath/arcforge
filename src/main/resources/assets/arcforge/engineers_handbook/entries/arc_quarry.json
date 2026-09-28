@@ -1,0 +1,19 @@
+{
+  "title": "Arc Quarry",
+  "icon": "arcforge:arc_quarry",
+  "items": [
+    "arcforge:arc_quarry",
+    "arcforge:tungsten_drill_head",
+    "arcforge:quarry_scanner"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A big digital miner (Hardened tier). Place it with a clear 3×3 space, 3 blocks tall; the parts it fills in all act as the Quarry.\n# Area\n- A square around the Quarry: radius 10 by default (21×21), up to 32. Min Y 0 and Max Y 60 by default; set all three in its settings.\n- It mines from the top layer down. The area shows as an outline while you hold a Quarry, while you're in its settings, or with the eye button.\n# What it mines\n- Its filter works like a Conduit Filter, but for blocks: click a cell with a block, click the chip to cycle its tags, or type a tag such as #c:ores into the box. Allowlist or Denylist.\n- Press Scan to count what matches before you start.\n- It skips air, fluids, unbreakable blocks, anything with a block entity (chests, furnaces, spawners) and Arcforge machines."
+    },
+    {
+      "type": "text",
+      "text": "# Running it\n- About 200 FE a block, 1 block a second; Speed and Energy upgrades help. It holds 500,000 FE and takes up to 20,000 FE/t.\n- Silk Touch keeps blocks whole for 5× the FE.\n- Replace fills each mined space from its replace slot (cobblestone by default); turn it off to leave air. It pauses when the slot runs out.\n- Drops go to its 27-slot buffer and out of its Output faces. It pauses when full or out of power, and says why in its GUI and in Jade.\n- Protection mods can stop it: it mines as a fake player."
+    }
+  ]
+}

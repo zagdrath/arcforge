@@ -34,6 +34,8 @@ public class MachineOutputs {
     private final Map<Direction, BlockCapabilityCache<EnergyHandler, @Nullable Direction>> energyTargets = new EnumMap<>(Direction.class);
     private final Map<Direction, BlockCapabilityCache<HeatHandler, @Nullable Direction>> heatTargets = new EnumMap<>(Direction.class);
     private final Map<Direction, BlockCapabilityCache<ResourceHandler<ItemResource>, @Nullable Direction>> itemTargets = new EnumMap<>(Direction.class);
+
+    private final Map<Direction, BlockCapabilityCache<ResourceHandler<ItemResource>, @Nullable Direction>> itemTargetsFrom = new EnumMap<>(Direction.class);
     private final Map<Direction, BlockCapabilityCache<ResourceHandler<FluidResource>, @Nullable Direction>> fluidTargets = new EnumMap<>(Direction.class);
     private static final int ITEMS_PER_FACE = 16;
 
@@ -84,6 +86,13 @@ public class MachineOutputs {
             }
         }
         return moved;
+    }
+
+    // Moves up to 16 items from `from` (another block of the same machine, such as the Arc Quarry's outer parts)
+    // into the inventory beyond it in `direction`. Returns how many moved.
+    public int pushItemsFrom(ServerLevel level, BlockPos from, Direction direction, ResourceHandler<ItemResource> source) {
+        ResourceHandler<ItemResource> target = target(itemTargetsFrom, Capabilities.Item.BLOCK, level, from, direction);
+        return target != null ? ResourceHandlerUtil.move(source, target, resource -> true, ITEMS_PER_FACE, null) : 0;
     }
 
     // Moves up to max mB out of OUTPUT faces (shared across them) into the tanks they touch, skipping

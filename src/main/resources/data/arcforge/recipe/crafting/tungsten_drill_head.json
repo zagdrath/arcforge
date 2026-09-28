@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PCP",
+    " P "
+  ],
+  "key": {
+    "P": "#c:plates/tungsten",
+    "C": "arcforge:arcite_tungsten_composite"
+  },
+  "result": {
+    "id": "arcforge:tungsten_drill_head",
+    "count": 1
+  }
+}

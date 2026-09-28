@@ -25,6 +25,8 @@ import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.BlockPlacerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.BlockBreakerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
@@ -102,6 +104,10 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(BlockPlacerBlockEntity::new, ModBlocks.BLOCK_PLACER.get()));
     public static final Supplier<BlockEntityType<VacuumCollectorBlockEntity>> VACUUM_COLLECTOR = BLOCK_ENTITY_TYPES.register("vacuum_collector",
             () -> new BlockEntityType<>(VacuumCollectorBlockEntity::new, ModBlocks.VACUUM_COLLECTOR.get()));
+    public static final Supplier<BlockEntityType<ArcQuarryBlockEntity>> ARC_QUARRY = BLOCK_ENTITY_TYPES.register("arc_quarry",
+            () -> new BlockEntityType<>(ArcQuarryBlockEntity::new, ModBlocks.ARC_QUARRY.get()));
+    public static final Supplier<BlockEntityType<ArcQuarryBoundingBlockEntity>> ARC_QUARRY_BOUNDING = BLOCK_ENTITY_TYPES.register("arc_quarry_bounding",
+            () -> new BlockEntityType<>(ArcQuarryBoundingBlockEntity::new, ModBlocks.ARC_QUARRY_BOUNDING.get()));
 
     // Every casing has one; only the master (the minimum corner) runs.
     public static final Supplier<BlockEntityType<SteamBoilerArrayBlockEntity>> STEAM_BOILER_ARRAY = BLOCK_ENTITY_TYPES.register("steam_boiler_array",

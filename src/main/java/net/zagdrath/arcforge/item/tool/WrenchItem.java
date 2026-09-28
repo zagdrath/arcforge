@@ -52,6 +52,10 @@ import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
+import net.zagdrath.arcforge.block.machine.ArcQuarryBoundingBlock;
+import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
 
 // The Wrench. Its mode (Shift + mouse wheel, see WrenchMode) decides what right-clicking does:
 //   Configure: a conduit side cycles through its settings (sneaking: backward); a multiblock rechecks its
@@ -81,6 +85,14 @@ public class WrenchItem extends Item {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
+        // An Arc Quarry's invisible parts act as its main block.
+        if (state.getBlock() instanceof ArcQuarryBoundingBlock) {
+            BlockPos main = ArcQuarryBoundingBlock.mainOf(level, pos);
+            if (main != null && level.getBlockState(main).getBlock() instanceof ArcQuarryBlock) {
+                pos = main;
+                state = level.getBlockState(main);
+            }
+        }
         Player player = context.getPlayer();
         boolean sneaking = player != null && player.isSecondaryUseActive();
         Target target = targetOf(state);
@@ -110,11 +122,11 @@ public class WrenchItem extends Item {
             case ROTATE -> rotate(level, pos, state, sneaking);
             case PORT -> switch (target) {
                 case CONDUIT -> ((ConduitBlock) state.getBlock()).useWrench(context);
-                case MACHINE -> machineSide(context, state, sneaking);
+                case MACHINE -> machineSide(context, pos, state, sneaking);
                 default -> port(context, state, sneaking);
             };
             case DISMANTLE -> switch (target) {
-                case MACHINE -> dismantle(level, pos, state, player);
+                case MACHINE -> state.getBlock() instanceof ArcQuarryBlock ? dismantleQuarry(level, pos, player) : dismantle(level, pos, state, player);
                 case CONDUIT -> removeFilterOrBreak(context);
                 default -> breakBlock(level, pos, player);
             };
@@ -212,9 +224,8 @@ public class WrenchItem extends Item {
     }
 
     // A machine face (the clicked one): says its side mode, or (sneaking) sets the next allowed one.
-    private static InteractionResult machineSide(UseOnContext context, BlockState state, boolean change) {
+    private static InteractionResult machineSide(UseOnContext context, BlockPos pos, BlockState state, boolean change) {
         Level level = context.getLevel();
-        BlockPos pos = context.getClickedPos();
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (!(blockEntity instanceof ConfigurableMachine machine)) {
             return InteractionResult.PASS;
@@ -274,6 +285,18 @@ public class WrenchItem extends Item {
 
     // Drops the machine as an item carrying its block entity data (fluid, energy, settings), so it can be
     // placed back unchanged. The items in its slots drop separately.
+    // The Arc Quarry comes up with its settings (and name) but not its energy or progress; its buffer spills.
+    private static InteractionResult dismantleQuarry(Level level, BlockPos pos, @Nullable Player player) {
+        ItemStack drop = new ItemStack(ModItems.ARC_QUARRY.get());
+        if (level.getBlockEntity(pos) instanceof ArcQuarryBlockEntity quarry) {
+            drop.applyComponents(quarry.collectComponents());
+        }
+        level.removeBlock(pos, false);
+        Block.popResource(level, pos, drop);
+        level.playSound(null, pos, SoundEvents.IRON_TRAPDOOR_OPEN, SoundSource.BLOCKS, 0.5F, 1.2F);
+        return InteractionResult.SUCCESS;
+    }
+
     private static InteractionResult dismantle(Level level, BlockPos pos, BlockState state, @Nullable Player player) {
         ItemStack drop = new ItemStack(state.getBlock());
         BlockEntity blockEntity = level.getBlockEntity(pos);

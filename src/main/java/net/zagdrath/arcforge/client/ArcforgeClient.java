@@ -58,6 +58,7 @@ import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SolarThermalArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamBoilerArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamTurbineArrayRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.ArcQuarryRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.VaultRenderer;
 import net.zagdrath.arcforge.client.model.ConnectedModel;
 import net.zagdrath.arcforge.client.gui.StructureRenderer;
@@ -79,6 +80,8 @@ import net.zagdrath.arcforge.client.screen.machine.ArcMelterScreen;
 import net.zagdrath.arcforge.client.screen.machine.ChemicalReactorScreen;
 import net.zagdrath.arcforge.client.screen.machine.ElectrolyzerScreen;
 import net.zagdrath.arcforge.client.screen.machine.VacuumCollectorScreen;
+import net.zagdrath.arcforge.client.screen.machine.ArcQuarryScreen;
+import net.zagdrath.arcforge.client.screen.machine.ArcQuarryConfigScreen;
 import net.zagdrath.arcforge.client.screen.machine.BlockPlacerScreen;
 import net.zagdrath.arcforge.client.screen.machine.BlockBreakerScreen;
 import net.zagdrath.arcforge.client.screen.machine.AssemblerScreen;
@@ -170,6 +173,8 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.BLOCK_BREAKER.get(), BlockBreakerScreen::new);
         event.register(ModMenuTypes.BLOCK_PLACER.get(), BlockPlacerScreen::new);
         event.register(ModMenuTypes.VACUUM_COLLECTOR.get(), VacuumCollectorScreen::new);
+        event.register(ModMenuTypes.ARC_QUARRY.get(), ArcQuarryScreen::new);
+        event.register(ModMenuTypes.ARC_QUARRY_CONFIG.get(), ArcQuarryConfigScreen::new);
         event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
         event.register(ModMenuTypes.SUPERHEATER_ARRAY.get(), SuperheaterArrayScreen::new);
         event.register(ModMenuTypes.CONDENSER_ARRAY.get(), CondenserArrayScreen::new);
@@ -349,6 +354,7 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
         event.register(SteamTurbineArrayRenderer.ROTOR_SHAFT, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_SHAFT_MODEL));
+        event.register(ArcQuarryRenderer.EMITTER, SimpleUnbakedStandaloneModel.quadCollection(ArcQuarryRenderer.EMITTER_MODEL));
         event.register(SteamTurbineArrayRenderer.ROTOR_BLADES, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_BLADES_MODEL));
         event.register(SolarThermalArrayRenderer.MIRROR, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.MIRROR_MODEL));
         event.register(SolarThermalArrayRenderer.RECEIVER, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.RECEIVER_MODEL));
@@ -376,5 +382,6 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.ARC_QUARRY.get(), ArcQuarryRenderer::new);
     }
 }

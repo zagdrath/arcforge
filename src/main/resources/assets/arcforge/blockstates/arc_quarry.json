@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "arcforge:block/arc_quarry/model"
+    },
+    "facing=east": {
+      "model": "arcforge:block/arc_quarry/model",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "arcforge:block/arc_quarry/model",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "arcforge:block/arc_quarry/model",
+      "y": 270
+    }
+  }
+}

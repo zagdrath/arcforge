@@ -25,5 +25,7 @@ public final class ArcforgeNetwork {
         registrar.playToServer(WrenchModePayload.TYPE, WrenchModePayload.STREAM_CODEC, WrenchModePayload::handle);
         registrar.playToClient(PortsPayload.TYPE, PortsPayload.STREAM_CODEC, PortsPayload::handle);
         registrar.playToServer(AssemblerPatternPayload.TYPE, AssemblerPatternPayload.STREAM_CODEC, AssemblerPatternPayload::handle);
+        registrar.playToServer(ArcQuarryAreaPayload.TYPE, ArcQuarryAreaPayload.STREAM_CODEC, ArcQuarryAreaPayload::handle);
+        registrar.playToServer(ArcQuarryTagPayload.TYPE, ArcQuarryTagPayload.STREAM_CODEC, ArcQuarryTagPayload::handle);
     }
 }

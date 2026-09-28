@@ -48,6 +48,8 @@ import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
 import net.zagdrath.arcforge.block.machine.ElectrolyzerBlock;
 import net.zagdrath.arcforge.block.machine.VacuumCollectorBlock;
+import net.zagdrath.arcforge.block.machine.ArcQuarryBoundingBlock;
+import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
 import net.zagdrath.arcforge.block.machine.BlockPlacerBlock;
 import net.zagdrath.arcforge.block.machine.BlockBreakerBlock;
 import net.zagdrath.arcforge.block.machine.AssemblerBlock;
@@ -182,6 +184,14 @@ public final class ModBlocks {
 
     public static final DeferredBlock<VacuumCollectorBlock> VACUUM_COLLECTOR = BLOCKS.registerBlock("vacuum_collector",
             VacuumCollectorBlock::new, p -> machineProperties(p, 4));
+
+    // The Arc Quarry: its main block (the centre of the 3x3x3, which draws it all) and the invisible parts around it.
+    // Pistons can't move either.
+    public static final DeferredBlock<ArcQuarryBlock> ARC_QUARRY = BLOCKS.registerBlock("arc_quarry",
+            ArcQuarryBlock::new, p -> machineProperties(p, 6).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
+    public static final DeferredBlock<ArcQuarryBoundingBlock> ARC_QUARRY_BOUNDING = BLOCKS.registerBlock("arc_quarry_bounding",
+            ArcQuarryBoundingBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
+                    .noOcclusion().noLootTable().pushReaction(PushReaction.IMMOVEABLE));
 
     public static final DeferredBlock<SteamBoilerArrayCasingBlock> STEAM_BOILER_ARRAY_CASING = BLOCKS.registerBlock("steam_boiler_array_casing",
             SteamBoilerArrayCasingBlock::new, ModBlocks::steamCasingProperties);

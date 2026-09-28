@@ -72,7 +72,14 @@ public enum MachineStatus {
     // The Vacuum Collector.
     COLLECTING("collecting", "led_running"),
     // Pulse redstone mode, between pulses.
-    WAITING_PULSE("waiting_pulse", "led_idle");
+    WAITING_PULSE("waiting_pulse", "led_idle"),
+    // The Arc Quarry.
+    MINING("mining", "led_running"),
+    SCANNING("scanning", "led_running"),
+    OUT_OF_REPLACE("out_of_replace", "led_blocked"),
+    WAITING_CHUNK("waiting_chunk", "led_blocked"),
+    FINISHED("finished", "led_idle"),
+    STOPPED("stopped", "led_off");
 
     private final String name;
     private final String led;

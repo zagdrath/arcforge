@@ -75,6 +75,7 @@ public class MachineLoopSound extends AbstractTickableSoundInstance {
         LOOPS.put(ModBlocks.BLOCK_BREAKER.get(), new Loop(ModSounds.BLOCK_BREAKER_RUN::get, 0.8F));
         LOOPS.put(ModBlocks.BLOCK_PLACER.get(), new Loop(ModSounds.BLOCK_PLACER_RUN::get, 0.8F));
         LOOPS.put(ModBlocks.VACUUM_COLLECTOR.get(), new Loop(ModSounds.VACUUM_COLLECTOR_RUN::get, 0.8F));
+        LOOPS.put(ModBlocks.ARC_QUARRY.get(), new Loop(ModSounds.ARC_QUARRY_RUN::get, 1.0F));
         LOOPS.put(ModBlocks.SUPERHEATER_ARRAY_CASING.get(), new Loop(ModSounds.SUPERHEATER_ARRAY_RUN::get, 1.0F));
         LOOPS.put(ModBlocks.CONDENSER_ARRAY_CASING.get(), new Loop(ModSounds.CONDENSER_ARRAY_RUN::get, 0.9F));
     }

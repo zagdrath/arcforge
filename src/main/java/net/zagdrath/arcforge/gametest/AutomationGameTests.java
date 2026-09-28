@@ -11,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -444,7 +443,10 @@ public final class AutomationGameTests {
                     helper.assertBlockPresent(Blocks.COBBLESTONE, cell);
                     int loose = count(slots(placer.getItems(), 0, 9), Items.COBBLESTONE) + count(slots(breaker.getItems(), 0, 9), Items.COBBLESTONE);
                     helper.assertTrue(loose == 0, loose + " more cobblestone in the machines: it was duplicated");
-                    helper.assertTrue(helper.getEntities(EntityTypes.ITEM).isEmpty(), "Items were dropped");
+                    // helper.getEntities only looks inside the (tiny) test structure; look around the machines.
+                    net.minecraft.world.phys.AABB around = new net.minecraft.world.phys.AABB(helper.absolutePos(cell)).inflate(4.0);
+                    helper.assertTrue(helper.getLevel().getEntitiesOfClass(net.minecraft.world.entity.item.ItemEntity.class, around).isEmpty(),
+                            "Items were dropped");
                     helper.assertTrue(placer.getPlacements() >= 10, placer.getPlacements() + " placements");
                 })
                 .thenSucceed();

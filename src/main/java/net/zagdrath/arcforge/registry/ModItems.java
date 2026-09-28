@@ -32,6 +32,7 @@ import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
 import net.zagdrath.arcforge.item.conduit.ConduitFilterItem;
+import net.zagdrath.arcforge.item.machine.ArcQuarryItem;
 import net.zagdrath.arcforge.item.storage.CrateBlockItem;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.storage.StorageBlockItem;
@@ -64,6 +65,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> BLOCK_BREAKER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_BREAKER);
     public static final DeferredItem<BlockItem> BLOCK_PLACER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_PLACER);
     public static final DeferredItem<BlockItem> VACUUM_COLLECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.VACUUM_COLLECTOR);
+    // Places a whole 3x3x3 (see ArcQuarryItem). The bounding parts have no item.
+    public static final DeferredItem<ArcQuarryItem> ARC_QUARRY = ITEMS.registerItem("arc_quarry",
+            p -> new ArcQuarryItem(ModBlocks.ARC_QUARRY.get(), p), p -> p.useBlockDescriptionPrefix());
     public static final DeferredItem<BlockItem> STEAM_BOILER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_BOILER_ARRAY_CASING);
     public static final DeferredItem<BlockItem> STEAM_TURBINE_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_TURBINE_ARRAY_CASING);
     public static final DeferredItem<BlockItem> SUPERHEATER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.SUPERHEATER_ARRAY_CASING);
@@ -124,6 +128,9 @@ public final class ModItems {
     public static final DeferredItem<Item> COPPER_ROD = ITEMS.registerSimpleItem("copper_rod");
     // Light Oil and Hydrogen, reacted in the Chemical Reactor (#c:plastics).
     public static final DeferredItem<Item> PLASTIC_SHEET = ITEMS.registerSimpleItem("plastic_sheet");
+    // Arc Quarry parts.
+    public static final DeferredItem<Item> TUNGSTEN_DRILL_HEAD = ITEMS.registerSimpleItem("tungsten_drill_head");
+    public static final DeferredItem<Item> QUARRY_SCANNER = ITEMS.registerSimpleItem("quarry_scanner");
 
     // --- Alloys: the tier material of every tiered block and item, made in the Arcforge Furnace ---
 

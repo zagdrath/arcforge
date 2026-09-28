@@ -109,6 +109,8 @@
     "arcforge:block_placer",
     "arcforge:vacuum_collector",
     "arcforge:superheater_array_casing",
-    "arcforge:condenser_array_casing"
+    "arcforge:condenser_array_casing",
+    "arcforge:arc_quarry",
+    "arcforge:arc_quarry_bounding"
   ]
 }

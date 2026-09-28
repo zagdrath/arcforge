@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 import net.zagdrath.arcforge.registry.ModCreativeTabs;
 import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.zagdrath.arcforge.registry.ModChunkLoading;
 import net.zagdrath.arcforge.registry.ModDataMaps;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -50,6 +51,7 @@ public class Arcforge {
         ModDataComponents.register(modEventBus);
         ModCapabilities.register(modEventBus);
         ModDataMaps.register(modEventBus);
+        ModChunkLoading.register(modEventBus);
         ArcforgeNetwork.register(modEventBus);
         ModWorldgen.register(modEventBus);
         ArcforgeGameTests.register(modEventBus);

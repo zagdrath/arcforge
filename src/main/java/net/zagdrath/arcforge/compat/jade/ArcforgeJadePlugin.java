@@ -11,6 +11,10 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.ArcMelterBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
 import net.zagdrath.arcforge.block.machine.ElectrolyzerBlock;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
+import net.zagdrath.arcforge.block.machine.ArcQuarryBoundingBlock;
+import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
 import net.zagdrath.arcforge.block.machine.VacuumCollectorBlock;
 import net.zagdrath.arcforge.block.machine.BlockPlacerBlock;
 import net.zagdrath.arcforge.block.machine.BlockBreakerBlock;
@@ -61,6 +65,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(AutomationProvider.INSTANCE, BlockBreakerBlockEntity.class);
         registration.registerBlockDataProvider(AutomationProvider.INSTANCE, BlockPlacerBlockEntity.class);
         registration.registerBlockDataProvider(AutomationProvider.INSTANCE, VacuumCollectorBlockEntity.class);
+        registration.registerBlockDataProvider(ArcQuarryProvider.INSTANCE, ArcQuarryBlockEntity.class);
+        registration.registerBlockDataProvider(ArcQuarryProvider.INSTANCE, ArcQuarryBoundingBlockEntity.class);
         registration.registerBlockDataProvider(ArcforgeFurnaceProvider.INSTANCE, ArcforgeFurnaceBlockEntity.class);
         // Any casing: the cube arrays' casings each have a block entity; a turbine's glass doesn't.
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SuperheaterArrayBlockEntity.class);
@@ -91,6 +97,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(AutomationProvider.Client.INSTANCE, BlockBreakerBlock.class);
         registration.registerBlockComponent(AutomationProvider.Client.INSTANCE, BlockPlacerBlock.class);
         registration.registerBlockComponent(AutomationProvider.Client.INSTANCE, VacuumCollectorBlock.class);
+        registration.registerBlockComponent(ArcQuarryProvider.Client.INSTANCE, ArcQuarryBlock.class);
+        registration.registerBlockComponent(ArcQuarryProvider.Client.INSTANCE, ArcQuarryBoundingBlock.class);
         registration.registerBlockComponent(ArcforgeFurnaceProvider.Client.INSTANCE, ArcforgeFurnacePortBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SuperheaterArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, CondenserArrayCasingBlock.class);

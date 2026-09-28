@@ -47,6 +47,8 @@ import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.BlockPlacerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.BlockBreakerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
@@ -183,6 +185,16 @@ public final class ModCapabilities {
                 VacuumCollectorBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.VACUUM_COLLECTOR.get(),
                 VacuumCollectorBlockEntity::getEnergyHandler);
+        // The Arc Quarry acts as one 3x3x3 block: only the outer faces of its parts expose it (the main block is the
+        // centre, so its own faces are all inside).
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ARC_QUARRY.get(),
+                (quarry, side) -> quarry.itemHandlerAt(quarry.getBlockPos(), side));
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_QUARRY.get(),
+                (quarry, side) -> quarry.energyHandlerAt(quarry.getBlockPos(), side));
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ARC_QUARRY_BOUNDING.get(),
+                ArcQuarryBoundingBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_QUARRY_BOUNDING.get(),
+                ArcQuarryBoundingBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
                 MetalPressBlockEntity::getItemHandler);
         // Every casing of a formed Metal Pressing Array exposes the cube face it lies on (served by the centre).

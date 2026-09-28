@@ -37,6 +37,7 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> BLOCK_BREAKER_RUN = loop("block_breaker_run", 16.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> BLOCK_PLACER_RUN = loop("block_placer_run", 16.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> VACUUM_COLLECTOR_RUN = loop("vacuum_collector_run", 16.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARC_QUARRY_RUN = loop("arc_quarry_run", 24.0F);
 
     private ModSounds() {}
 

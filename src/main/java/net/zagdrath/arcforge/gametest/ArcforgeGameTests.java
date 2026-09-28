@@ -174,6 +174,17 @@ public final class ArcforgeGameTests {
         TESTS.put("placer_places_from_inventory", AutomationGameTests::placerPlacesFromInventory);
         TESTS.put("vacuum_radius", AutomationGameTests::vacuumRadius);
         TESTS.put("vacuum_filter", AutomationGameTests::vacuumFilter);
+        TESTS.put("quarry_needs_room", ArcQuarryGameTests::needsRoom);
+        TESTS.put("quarry_tag_allowlist", ArcQuarryGameTests::tagAllowlist);
+        TESTS.put("quarry_denylist", ArcQuarryGameTests::denylist);
+        TESTS.put("quarry_replace_mode", ArcQuarryGameTests::replaceMode);
+        TESTS.put("quarry_silk_touch", ArcQuarryGameTests::silkTouch);
+        TESTS.put("quarry_skips_block_entities_and_fluids", ArcQuarryGameTests::skipsBlockEntitiesAndFluids);
+        TESTS.put("quarry_pauses_full_and_unpowered", ArcQuarryGameTests::pausesFullAndUnpowered);
+        TESTS.put("quarry_clamps", ArcQuarryGameTests::clamps);
+        TESTS.put("quarry_scan_matches_ore", ArcQuarryGameTests::scanMatchesOre);
+        TESTS.put("quarry_rechecks_before_mining", ArcQuarryGameTests::rechecksBeforeMining);
+        TESTS.put("quarry_break_event_cancel", ArcQuarryGameTests::breakEventCancel);
         TESTS.put("steam_boiler_array_forms", SteamGameTests::boilerArrayForms);
         TESTS.put("steam_turbine_array_spins", SteamGameTests::turbineArraySpins);
         TESTS.put("steam_turbine_array_grade_speed", SteamGameTests::turbineArrayGradeSpeed);

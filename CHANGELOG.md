@@ -77,6 +77,25 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Pulse redstone mode** for the Block Breaker and Block Placer: one break or placement per redstone pulse.
 - Running sounds, Jade lines, JEI (the Assembler is a crafting station) and a new **Automation** chapter in the
   Handbook for all four.
+- **Arc Quarry** (Hardened). A 3×3×3 digital miner, placed as one item in a clear 3×3 space, 3 blocks tall.
+  - It mines a square area from the top layer down: radius 10 by default (up to 32, config `maxRadius`), from Y 0
+    to 60 by default.
+  - A block filter works like a Conduit Filter's. Set blocks or block tags (click a cell's chip, or type a tag
+    with suggestions), as an allowlist or a denylist. Scan counts what matches before you start.
+  - 200 FE per block, one block a second. Speed and Energy upgrades help.
+  - **Silk Touch** mode costs 5× the FE. **Replace** mode (on by default) fills each mined space from its replace
+    slot, and pauses when the slot runs out.
+  - It skips air, fluids, unbreakable blocks, anything with a block entity, multiblock parts and
+    `#arcforge:breaker_blacklist`. It checks each block again before mining it, and mines as a fake player so
+    protection mods can refuse.
+  - Drops go to a 27-slot buffer and out of any Output face of the cube. It pauses when full, out of power or out
+    of replace blocks, and says why in its GUI and Jade.
+  - An arc beam runs from its emitter to each block it mines. Its area shows as an outline while you hold one,
+    while its settings are open, or always with its eye button.
+  - Optional chunk loading (config `chunkLoading`, off by default) keeps its own chunk and the one it's working in
+    loaded.
+  - The Wrench picks it up with its settings.
+- **Tungsten Drill Head** and **Quarry Scanner**, the Arc Quarry's parts.
 
 ### Changed
 

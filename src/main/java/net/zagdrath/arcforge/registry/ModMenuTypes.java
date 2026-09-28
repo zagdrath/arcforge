@@ -21,6 +21,8 @@ import net.zagdrath.arcforge.menu.machine.ArcMelterMenu;
 import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
 import net.zagdrath.arcforge.menu.machine.ElectrolyzerMenu;
 import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
+import net.zagdrath.arcforge.menu.machine.ArcQuarryConfigMenu;
+import net.zagdrath.arcforge.menu.machine.ArcQuarryMenu;
 import net.zagdrath.arcforge.menu.machine.BlockPlacerMenu;
 import net.zagdrath.arcforge.menu.machine.BlockBreakerMenu;
 import net.zagdrath.arcforge.menu.machine.AssemblerMenu;
@@ -100,6 +102,10 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(BlockPlacerMenu::new));
     public static final Supplier<MenuType<VacuumCollectorMenu>> VACUUM_COLLECTOR = MENU_TYPES.register("vacuum_collector",
             () -> IMenuTypeExtension.create(VacuumCollectorMenu::new));
+    public static final Supplier<MenuType<ArcQuarryMenu>> ARC_QUARRY = MENU_TYPES.register("arc_quarry",
+            () -> IMenuTypeExtension.create(ArcQuarryMenu::new));
+    public static final Supplier<MenuType<ArcQuarryConfigMenu>> ARC_QUARRY_CONFIG = MENU_TYPES.register("arc_quarry_config",
+            () -> IMenuTypeExtension.create(ArcQuarryConfigMenu::new));
 
     public static final Supplier<MenuType<SteamTurbineArrayMenu>> STEAM_TURBINE_ARRAY = MENU_TYPES.register("steam_turbine_array",
             () -> IMenuTypeExtension.create(SteamTurbineArrayMenu::new));
