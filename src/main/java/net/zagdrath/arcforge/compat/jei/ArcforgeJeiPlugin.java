@@ -61,6 +61,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Pressing(gui),
                 new MachineCategories.Carbonizing(gui),
                 new MachineCategories.Melting(gui),
+                new MachineCategories.ChemicalReacting(gui),
                 new MachineCategories.ArcforgeSmelting(gui),
                 new MachineCategories.Distilling(gui),
                 new MachineCategories.Steam(gui),
@@ -76,6 +77,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Pressing.TYPE, recipes(ModRecipes.PRESSING.get()));
         registration.addRecipes(MachineCategories.Carbonizing.TYPE, recipes(ModRecipes.CARBONIZING.get()));
         registration.addRecipes(MachineCategories.Melting.TYPE, recipes(ModRecipes.MELTING.get()));
+        registration.addRecipes(MachineCategories.ChemicalReacting.TYPE, recipes(ModRecipes.CHEMICAL_REACTING.get()));
         registration.addRecipes(MachineCategories.ArcforgeSmelting.TYPE, recipes(ModRecipes.ARCFORGE_SMELTING.get()));
         registration.addRecipes(MachineCategories.Distilling.TYPE, recipes(ModRecipes.DISTILLING.get()).stream()
                 .flatMap(holder -> MachineCategories.DistillingPage.of(holder).stream()).toList());
@@ -127,6 +129,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Pressing.TYPE, ModBlocks.METAL_PRESS.get(), ModBlocks.METAL_PRESSING_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.Carbonizing.TYPE, ModBlocks.CARBONIZER.get());
         registration.addCraftingStation(MachineCategories.Melting.TYPE, ModBlocks.ARC_MELTER.get());
+        registration.addCraftingStation(MachineCategories.ChemicalReacting.TYPE, ModBlocks.CHEMICAL_REACTOR.get());
         registration.addCraftingStation(MachineCategories.ArcforgeSmelting.TYPE, ModBlocks.ARCFORGE_FURNACE_PORT.get(),
                 ModBlocks.ARCFORGE_FURNACE_BRICKS.get());
         registration.addCraftingStation(MachineCategories.Steam.TYPE, ModBlocks.STEAM_BOILER.get(), ModBlocks.STEAM_BOILER_ARRAY_CASING.get(),

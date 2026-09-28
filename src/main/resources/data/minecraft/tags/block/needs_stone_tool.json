@@ -23,6 +23,8 @@
     "arcforge:solar_thermal_array_casing",
     "arcforge:solar_thermal_array_controller",
     "arcforge:solar_collector",
-    "arcforge:arc_melter"
+    "arcforge:arc_melter",
+    "arcforge:chemical_reactor",
+    "arcforge:nether_sulfur_ore"
   ]
 }

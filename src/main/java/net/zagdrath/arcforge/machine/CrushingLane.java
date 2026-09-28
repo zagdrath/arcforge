@@ -17,7 +17,7 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // One crushing line: an input slot feeding a main output and a bonus output. The Arc Crusher has one,
 // the Arc Crushing Array three. Each tick it draws its FE and advances; when an operation finishes it
-// makes the result (times oreYield for ore recipes) and rolls the bonus once.
+// makes the result (times oreYield for ore recipes), if the recipe has one, and rolls the bonus once.
 public class CrushingLane {
     // How a machine runs its lanes, with its upgrades applied.
     public record Settings(double timeMultiplier, int energyPerTick, int oreYield) {}
@@ -71,9 +71,11 @@ public class CrushingLane {
 
     // Whether the result (and a possible bonus) would fit in the output slots right now.
     private boolean fits(FilteredItemHandler items, CrushingRecipe recipe, int yield) {
-        ItemStack result = recipe.result().create();
-        if (!fits(items.getStack(outputSlot), result, result.getCount() * yield)) {
-            return false;
+        if (recipe.result().isPresent()) {
+            ItemStack result = recipe.result().get().create();
+            if (!fits(items.getStack(outputSlot), result, result.getCount() * yield)) {
+                return false;
+            }
         }
         return recipe.bonus().isEmpty() || fits(items.getStack(bonusSlot), recipe.bonus().get().create(), recipe.bonus().get().create().getCount());
     }
@@ -88,8 +90,10 @@ public class CrushingLane {
     private void finish(ServerLevel level, FilteredItemHandler items, CrushingRecipe recipe, int yield) {
         ItemStack input = items.getStack(inputSlot);
         items.setStack(inputSlot, input.copyWithCount(input.getCount() - 1));
-        ItemStack result = recipe.result().create();
-        add(items, outputSlot, result, result.getCount() * yield);
+        recipe.result().ifPresent(template -> {
+            ItemStack result = template.create();
+            add(items, outputSlot, result, result.getCount() * yield);
+        });
         if (recipe.bonus().isPresent() && level.getRandom().nextFloat() < recipe.bonusChance()) {
             ItemStack bonus = recipe.bonus().get().create();
             add(items, bonusSlot, bonus, bonus.getCount());

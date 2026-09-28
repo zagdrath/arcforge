@@ -116,6 +116,25 @@ public final class MachineRecipes {
         return melting(level, stack).isPresent();
     }
 
+    // The chemical reacting recipe for what the reactor holds, if any.
+    public static Optional<RecipeHolder<ChemicalReactingRecipe>> chemicalReacting(@Nullable Level level, ChemicalReactorInput input) {
+        return recipes(level).byType(ModRecipes.CHEMICAL_REACTING.get()).stream()
+                .filter(holder -> holder.value().matches(input, level))
+                .findFirst();
+    }
+
+    // Anything some chemical reacting recipe takes as its item: what the reactor's input slot takes.
+    public static boolean isReactorItem(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.CHEMICAL_REACTING.get()).stream()
+                .anyMatch(holder -> holder.value().usesItem(stack));
+    }
+
+    // Fluids some chemical reacting recipe takes: the only ones the reactor's input tanks take.
+    public static boolean isReactorFluid(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.CHEMICAL_REACTING.get()).stream()
+                .anyMatch(holder -> holder.value().usesFluid(fluid));
+    }
+
     public static boolean isFiberizerInput(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(ModRecipes.FIBERIZING.get()).stream()
                 .anyMatch(holder -> holder.value().ingredient().test(stack));

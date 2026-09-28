@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:gunpowders",
+  "result": {
+    "count": 2,
+    "id": "arcforge:sulfur_dust"
+  },
+  "time": 100,
+  "ore": false
+}

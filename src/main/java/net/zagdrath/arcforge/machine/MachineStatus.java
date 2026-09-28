@@ -48,7 +48,10 @@ public enum MachineStatus {
     NIGHT("night", "led_idle"),
     NO_SKY("no_sky", "led_blocked"),
     // The Arc Melter.
-    MELTING("melting", "led_running");
+    MELTING("melting", "led_running"),
+    // The Chemical Reactor.
+    REACTING("reacting", "led_running"),
+    MISSING_FLUID("missing_fluid", "led_blocked");
 
     private final String name;
     private final String led;

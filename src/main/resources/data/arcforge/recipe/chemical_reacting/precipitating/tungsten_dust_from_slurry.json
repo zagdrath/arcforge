@@ -1,0 +1,24 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "category": "precipitating",
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:tungsten_slurry",
+      "amount": 100
+    },
+    {
+      "tag": "minecraft:water",
+      "amount": 100
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:tungsten_dust",
+    "count": 1
+  },
+  "byproduct": {
+    "id": "arcforge:slag",
+    "count": 1
+  },
+  "byproduct_chance": 0.05,
+  "time": 40
+}

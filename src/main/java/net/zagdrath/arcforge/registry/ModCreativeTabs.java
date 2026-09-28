@@ -40,6 +40,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.STEAM_TURBINE.get());
                 output.accept(ModItems.ELECTRIC_PUMP.get());
                 output.accept(ModItems.ARC_MELTER.get());
+                output.accept(ModItems.CHEMICAL_REACTOR.get());
                 output.accept(ModItems.STEAM_BOILER_ARRAY_CASING.get());
                 output.accept(ModItems.STEAM_TURBINE_ARRAY_CASING.get());
                 output.accept(ModItems.PRESSURE_GLASS.get());
@@ -77,6 +78,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ANCIENT_DEBRIS_DUST.get());
                 output.accept(ModItems.CARBON_DUST.get());
                 output.accept(ModItems.NETHER_QUARTZ_DUST.get());
+                output.accept(ModItems.SULFUR_DUST.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> COMPONENTS = CREATIVE_MODE_TABS.register("components", () -> CreativeModeTab.builder()
@@ -122,6 +124,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.NAPHTHA_BUCKET.get());
                 output.accept(ModItems.LIGHT_OIL_BUCKET.get());
                 output.accept(ModItems.HEAVY_OIL_BUCKET.get());
+                ModItems.chemicalBuckets().forEach(item -> output.accept(item.get()));
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> LOGISTICS = CREATIVE_MODE_TABS.register("logistics", () -> CreativeModeTab.builder()

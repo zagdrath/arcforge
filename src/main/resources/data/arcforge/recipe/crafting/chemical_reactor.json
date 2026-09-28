@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "HGH",
+    "LPL",
+    "HTH"
+  ],
+  "key": {
+    "H": "arcforge:hardened_alloy",
+    "G": "#c:glass_blocks",
+    "L": "arcforge:hardened_fluid_tank",
+    "P": "#c:plates/nickel",
+    "T": "arcforge:thermocouple"
+  },
+  "result": {
+    "id": "arcforge:chemical_reactor",
+    "count": 1
+  }
+}

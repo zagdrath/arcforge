@@ -102,6 +102,8 @@
     "arcforge:tempered_vault",
     "arcforge:hardened_vault",
     "arcforge:arcforged_vault",
-    "arcforge:arc_melter"
+    "arcforge:arc_melter",
+    "arcforge:nether_sulfur_ore",
+    "arcforge:chemical_reactor"
   ]
 }

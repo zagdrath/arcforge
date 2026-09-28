@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "category": "leaching",
+  "item_input": {
+    "ingredient": "#c:storage_blocks/raw_gold",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:sulfuric_acid",
+      "amount": 2250
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:gold_slurry",
+    "amount": 2700
+  },
+  "time": 1200
+}

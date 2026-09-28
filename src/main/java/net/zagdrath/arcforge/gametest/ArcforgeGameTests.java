@@ -129,6 +129,14 @@ public final class ArcforgeGameTests {
         TESTS.put("melter_feeds_geothermal_side", MeltingGameTests::feedsGeothermalSide);
         TESTS.put("melter_upgrades", MeltingGameTests::upgrades);
         TESTS.put("melter_redstone", MeltingGameTests::redstone);
+        TESTS.put("reactor_sulfuric_acid", ChemicalGameTests::sulfuricAcid);
+        TESTS.put("crush_gunpowder_to_sulfur", ChemicalGameTests::crushGunpowder);
+        TESTS.put("crush_netherrack_no_main_output", ChemicalGameTests::crushNetherrack);
+        TESTS.put("reactor_tank_routing", ChemicalGameTests::tankRouting);
+        TESTS.put("precipitate_iron", ChemicalGameTests::precipitateIron);
+        TESTS.put("every_metal_has_a_chain", ChemicalGameTests::everyMetalHasAChain);
+        TESTS.put("reactor_upgrades", ChemicalGameTests::upgrades);
+        TESTS.put("nether_sulfur_ore_drops", ChemicalGameTests::netherSulfurOreDrops);
         TESTS.put("firebox_heat_upgrades", CrushingGameTests::fireboxHeatUpgrades);
         TESTS.put("array_forms", CrushingGameTests::arrayForms);
         TESTS.put("press_slots_and_recipes", PressingGameTests::pressSlotsAndRecipes);
@@ -177,6 +185,8 @@ public final class ArcforgeGameTests {
         TESTS.put("carbonizer_mixed_sizes", MultiblockGameTests::carbonizerMixedSizes);
         LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);
         LONG_TESTS.put("melter_magma_block", MeltingGameTests::magmaBlock);
+        LONG_TESTS.put("leach_raw_iron", ChemicalGameTests::leachRawIron);
+        LONG_TESTS.put("chain_yield_triple", ChemicalGameTests::chainYieldTriple);
         LONG_TESTS.put("furnace_smelts", MultiblockGameTests::furnaceSmelts);
         LONG_TESTS.put("furnace_burns_coke_blocks", MultiblockGameTests::furnaceBurnsCokeBlocks);
         LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);

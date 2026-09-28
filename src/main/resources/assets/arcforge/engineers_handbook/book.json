@@ -54,7 +54,8 @@
         "infuser",
         "distillation_array",
         "electric_pump",
-        "arc_melter"
+        "arc_melter",
+        "chemical_processing"
       ]
     },
     {

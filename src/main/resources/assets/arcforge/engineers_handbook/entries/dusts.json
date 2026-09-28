@@ -7,12 +7,13 @@
     "arcforge:gold_dust",
     "arcforge:ancient_debris_dust",
     "arcforge:carbon_dust",
-    "arcforge:nether_quartz_dust"
+    "arcforge:nether_quartz_dust",
+    "arcforge:sulfur_dust"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Made in the Arc Crusher. Metal dusts smelt back into ingots (faster in a blast furnace), so crushing raw ores gets you more metal. Carbon dust is a furnace fuel."
+      "text": "Made in the Arc Crusher. Metal dusts smelt back into ingots (faster in a blast furnace), so crushing raw ores gets you more metal. Carbon dust is a furnace fuel. Sulfur dust comes from crushing gunpowder, netherrack or Nether Sulfur Ore, and makes Sulfuric Acid in the Chemical Reactor."
     }
   ]
 }

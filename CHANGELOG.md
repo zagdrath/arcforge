@@ -73,6 +73,17 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
   Geothermal Plant set right under it, with no setup. Takes Speed and Energy upgrades, has a running sound,
   and shows in JEI (Melting) and Jade. Recipes are data-driven (`arcforge:melting`), and the costs are in the
   config under `machines.arcMelter`.
+- **Sulfur:** Sulfur Dust, crushed from gunpowder (2 each), netherrack (a 15% chance) or the new Nether Sulfur
+  Ore, which drops 2–4 Sulfur Dust and generates through the Nether (configurable under `ores.sulfur`).
+- **Chemical Reactor** (Hardened tier): an item and up to two fluids react into an item, a fluid or both, with a
+  byproduct slot for chance outputs. Its two input tanks sort fluids by themselves, so water and acid each keep
+  a tank. Takes Speed and Energy upgrades, has a running sound, and shows in JEI (Chemical Reacting) and Jade.
+  Recipes are data-driven (`arcforge:chemical_reacting`).
+- **Sulfuric Acid** (hurts whatever wades in) and an **Ore Slurry** for iron, copper, gold, silver, nickel,
+  tungsten and bismuth, with buckets.
+- **3x ore processing:** leach raw ore in Sulfuric Acid into slurry, then precipitate the slurry with water
+  into dust: 3 dust per raw ore and 6 per ore block, against 2 and 4 from the Arc Crushing Array.
+- Crushing recipes may now have only a chance output (no main result).
 
 ### Changed
 

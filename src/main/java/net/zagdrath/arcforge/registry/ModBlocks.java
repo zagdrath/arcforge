@@ -43,6 +43,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
+import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
+import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
 import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
 import net.zagdrath.arcforge.block.machine.MetalPressBlock;
@@ -159,6 +162,9 @@ public final class ModBlocks {
     // The molten crucible glows while it melts.
     public static final DeferredBlock<ArcMelterBlock> ARC_MELTER = BLOCKS.registerBlock("arc_melter",
             ArcMelterBlock::new, p -> machineProperties(p, 10));
+
+    public static final DeferredBlock<ChemicalReactorBlock> CHEMICAL_REACTOR = BLOCKS.registerBlock("chemical_reactor",
+            ChemicalReactorBlock::new, p -> machineProperties(p, 6));
 
     public static final DeferredBlock<SteamBoilerArrayCasingBlock> STEAM_BOILER_ARRAY_CASING = BLOCKS.registerBlock("steam_boiler_array_casing",
             SteamBoilerArrayCasingBlock::new, ModBlocks::steamCasingProperties);
@@ -293,6 +299,15 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> RAW_ARCITE_BLOCK = BLOCKS.registerSimpleBlock("raw_arcite_block", p -> storageProperties(p, SoundType.STONE, MapColor.DIAMOND, 9));
     public static final DeferredBlock<Block> ARCITE_BLOCK = BLOCKS.registerSimpleBlock("arcite_block", p -> storageProperties(p, SoundType.AMETHYST, MapColor.DIAMOND, 12));
 
+    // Sulfur, through the Nether: it drops Sulfur Dust (see its loot table) and needs a stone pickaxe.
+    public static final DeferredBlock<DropExperienceBlock> NETHER_SULFUR_ORE = BLOCKS.registerBlock("nether_sulfur_ore",
+            p -> new DropExperienceBlock(UniformInt.of(1, 3), p), p -> p
+                    .mapColor(MapColor.NETHER)
+                    .instrument(NoteBlockInstrument.BASEDRUM)
+                    .strength(3.0F, 3.0F)
+                    .sound(SoundType.NETHER_ORE)
+                    .requiresCorrectToolForDrops());
+
     // Ores: stone 3.0 or deepslate 4.5 hardness, the right tool to drop anything; xp as given.
     private static DeferredBlock<DropExperienceBlock> ore(String name, IntProvider xp, boolean deepslate, int light, @Nullable MapColor color) {
         return BLOCKS.registerBlock(name, p -> new DropExperienceBlock(xp, p), p -> p
@@ -346,6 +361,27 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> HEAVY_OIL = BLOCKS.registerBlock("heavy_oil",
             p -> new LiquidBlock(ModFluids.HEAVY_OIL.get(), p) {},
             p -> liquidProperties(p, MapColor.COLOR_BROWN));
+
+    // The Chemical Reactor's fluids. Sulfuric Acid hurts whatever wades in; the slurries are harmless.
+    public static final DeferredBlock<LiquidBlock> SULFURIC_ACID = BLOCKS.registerBlock("sulfuric_acid",
+            p -> new SulfuricAcidBlock(ModFluids.SULFURIC_ACID.get(), p),
+            p -> liquidProperties(p, MapColor.COLOR_LIGHT_GREEN));
+
+    private static final Map<OreSlurry, DeferredBlock<LiquidBlock>> SLURRY_BLOCKS = registerSlurryBlocks();
+
+    public static DeferredBlock<LiquidBlock> slurryBlock(OreSlurry slurry) {
+        return SLURRY_BLOCKS.get(slurry);
+    }
+
+    private static Map<OreSlurry, DeferredBlock<LiquidBlock>> registerSlurryBlocks() {
+        Map<OreSlurry, DeferredBlock<LiquidBlock>> blocks = new EnumMap<>(OreSlurry.class);
+        for (OreSlurry slurry : OreSlurry.values()) {
+            blocks.put(slurry, BLOCKS.registerBlock(slurry.fluidName(),
+                    p -> new LiquidBlock(ModFluids.slurry(slurry).source().get(), p) {},
+                    p -> liquidProperties(p, MapColor.TERRACOTTA_BROWN)));
+        }
+        return blocks;
+    }
 
     // --- Distillation ---
 

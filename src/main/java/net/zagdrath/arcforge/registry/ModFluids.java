@@ -5,6 +5,10 @@
 
 package net.zagdrath.arcforge.registry;
 
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.Map;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.LivingEntity;
@@ -19,10 +23,12 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.chemistry.OreSlurry;
 
 // Creosote: the Carbonizer's by-product. A slow, oily liquid; not flammable in the world (yet). The
 // Distillation Array splits it into Naphtha (thin, and flammable in the world), Light Oil and Heavy Oil
-// (thick, slow as lava). Their textures and fog colours are registered on the client in ArcforgeClient.
+// (thick, slow as lava). Sulfuric Acid and the ore slurries are the Chemical Reactor's. Their textures and
+// fog colours are registered on the client in ArcforgeClient.
 public final class ModFluids {
     public static final DeferredRegister<FluidType> FLUID_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.FLUID_TYPES, Arcforge.MODID);
     public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Registries.FLUID, Arcforge.MODID);
@@ -66,6 +72,20 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HEAVY_OIL = FLUIDS.register("flowing_heavy_oil",
             () -> new BaseFlowingFluid.Flowing(heavyOilProperties()));
 
+    // The Chemical Reactor's acid: dense and thickish, and it burns (see ModBlocks.SULFURIC_ACID).
+    public static final DeferredHolder<FluidType, FluidType> SULFURIC_ACID_TYPE = liquidType("sulfuric_acid", 1_830, 2_500, 0.02F, 0.7, 0.8);
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SULFURIC_ACID = FLUIDS.register("sulfuric_acid",
+            () -> new BaseFlowingFluid.Source(sulfuricAcidProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SULFURIC_ACID = FLUIDS.register("flowing_sulfuric_acid",
+            () -> new BaseFlowingFluid.Flowing(sulfuricAcidProperties()));
+
+    // One slurry per leached metal (see OreSlurry): thick and slow, a little freer than Heavy Oil.
+    public record Slurry(DeferredHolder<FluidType, FluidType> type, DeferredHolder<Fluid, BaseFlowingFluid.Source> source,
+            DeferredHolder<Fluid, BaseFlowingFluid.Flowing> flowing) {}
+
+    private static final Map<OreSlurry, Slurry> SLURRIES = registerSlurries();
+
     // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
     // so they only exist in tanks, machines and Pressurized Conduits.
     public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = gasType("steam", 373);
@@ -86,6 +106,21 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.SUPERHEATED_STEAM_TYPE, ModFluids.SUPERHEATED_STEAM, ModFluids.FLOWING_SUPERHEATED_STEAM)));
 
     private ModFluids() {}
+
+    public static Slurry slurry(OreSlurry slurry) {
+        return SLURRIES.get(slurry);
+    }
+
+    private static Map<OreSlurry, Slurry> registerSlurries() {
+        Map<OreSlurry, Slurry> slurries = new EnumMap<>(OreSlurry.class);
+        for (OreSlurry slurry : OreSlurry.values()) {
+            String name = slurry.fluidName();
+            slurries.put(slurry, new Slurry(liquidType(name, 1_600, 4_000, 0.015F, 0.6, 0.7),
+                    FLUIDS.register(name, () -> new BaseFlowingFluid.Source(slurryProperties(slurry))),
+                    FLUIDS.register("flowing_" + name, () -> new BaseFlowingFluid.Flowing(slurryProperties(slurry)))));
+        }
+        return Collections.unmodifiableMap(slurries);
+    }
 
     // Negative density marks a gas (see Gases); temperature in kelvin.
     private static DeferredHolder<FluidType, FluidType> gasType(String name, int kelvin) {
@@ -156,6 +191,29 @@ public final class ModFluids {
                 .slopeFindDistance(2)
                 .levelDecreasePerBlock(2)
                 .tickRate(30)
+                .explosionResistance(100.0F);
+    }
+
+    // Spreads 3 blocks, every 10 ticks.
+    private static BaseFlowingFluid.Properties sulfuricAcidProperties() {
+        return new BaseFlowingFluid.Properties(SULFURIC_ACID_TYPE, SULFURIC_ACID, FLOWING_SULFURIC_ACID)
+                .bucket(ModItems.SULFURIC_ACID_BUCKET)
+                .block(ModBlocks.SULFURIC_ACID)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
+                .explosionResistance(100.0F);
+    }
+
+    // Spreads 2 blocks, every 20 ticks.
+    private static BaseFlowingFluid.Properties slurryProperties(OreSlurry slurry) {
+        Slurry fluids = slurry(slurry);
+        return new BaseFlowingFluid.Properties(fluids.type(), fluids.source(), fluids.flowing())
+                .bucket(ModItems.slurryBucket(slurry))
+                .block(ModBlocks.slurryBlock(slurry))
+                .slopeFindDistance(2)
+                .levelDecreasePerBlock(2)
+                .tickRate(20)
                 .explosionResistance(100.0F);
     }
 

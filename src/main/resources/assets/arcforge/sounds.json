@@ -70,5 +70,14 @@
         "stream": false
       }
     ]
+  },
+  "chemical_reactor_run": {
+    "subtitle": "subtitles.arcforge.chemical_reactor_run",
+    "sounds": [
+      {
+        "name": "arcforge:chemical_reactor_run",
+        "stream": false
+      }
+    ]
   }
 }

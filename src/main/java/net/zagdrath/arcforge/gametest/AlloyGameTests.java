@@ -157,8 +157,8 @@ final class AlloyGameTests {
         // the Solar Thermal Array's casing, controller, collector, trough mirror and receiver tube, and the ores
         // drop's 29 (storage and raw blocks both ways, invar dust, the components and the upgrade), the Conduit
         // Filter, the Crates and Vaults drop's 11 (two blocks, their six tier upgrades and three Storage Upgrades),
-        // and the Arc Melter.
-        helper.assertTrue(crafting == 125, crafting + " crafting/ recipes, not 125");
+        // the Arc Melter and the Chemical Reactor.
+        helper.assertTrue(crafting == 126, crafting + " crafting/ recipes, not 126");
         // Plus the fluorite-fluxed steel.
         helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

@@ -28,16 +28,17 @@ import net.minecraft.world.level.Level;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Arc Crusher / Arc Crushing Array: one input item crushed into a result, with an optional bonus item
-// rolled once per operation. "ore" marks recipes the Arc Crushing Array doubles; never set it on
-// ingots, gems or blocks, or the Array would duplicate items.
-public record CrushingRecipe(Ingredient ingredient, ItemStackTemplate result, Optional<ItemStackTemplate> bonus, float bonusChance,
+// rolled once per operation. A recipe may have only the bonus (netherrack: a chance of sulfur). "ore"
+// marks recipes the Arc Crushing Array doubles; never set it on ingots, gems or blocks, or the Array
+// would duplicate items.
+public record CrushingRecipe(Ingredient ingredient, Optional<ItemStackTemplate> result, Optional<ItemStackTemplate> bonus, float bonusChance,
         int time, boolean ore) implements Recipe<SingleRecipeInput> {
     public static final int DEFAULT_TIME = 200;
     public static final float DEFAULT_BONUS_CHANCE = 0.25F;
 
     public static final MapCodec<CrushingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             Ingredient.CODEC.fieldOf("ingredient").forGetter(CrushingRecipe::ingredient),
-            ItemStackTemplate.CODEC.fieldOf("result").forGetter(CrushingRecipe::result),
+            ItemStackTemplate.CODEC.optionalFieldOf("result").forGetter(CrushingRecipe::result),
             ItemStackTemplate.CODEC.optionalFieldOf("bonus").forGetter(CrushingRecipe::bonus),
             Codec.floatRange(0.0F, 1.0F).optionalFieldOf("bonus_chance", DEFAULT_BONUS_CHANCE).forGetter(CrushingRecipe::bonusChance),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("time", DEFAULT_TIME).forGetter(CrushingRecipe::time),
@@ -46,7 +47,7 @@ public record CrushingRecipe(Ingredient ingredient, ItemStackTemplate result, Op
 
     public static final StreamCodec<RegistryFriendlyByteBuf, CrushingRecipe> STREAM_CODEC = StreamCodec.composite(
             Ingredient.CONTENTS_STREAM_CODEC, CrushingRecipe::ingredient,
-            ItemStackTemplate.STREAM_CODEC, CrushingRecipe::result,
+            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), CrushingRecipe::result,
             ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), CrushingRecipe::bonus,
             ByteBufCodecs.FLOAT, CrushingRecipe::bonusChance,
             ByteBufCodecs.VAR_INT, CrushingRecipe::time,
@@ -60,7 +61,7 @@ public record CrushingRecipe(Ingredient ingredient, ItemStackTemplate result, Op
 
     @Override
     public ItemStack assemble(SingleRecipeInput input) {
-        return result.create();
+        return result.map(ItemStackTemplate::create).orElse(ItemStack.EMPTY);
     }
 
     // Machine recipes stay out of the recipe book.

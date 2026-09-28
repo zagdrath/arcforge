@@ -76,6 +76,7 @@ import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
 import net.zagdrath.arcforge.client.screen.machine.InductionFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.machine.MetalPressScreen;
 import net.zagdrath.arcforge.client.screen.machine.ArcMelterScreen;
+import net.zagdrath.arcforge.client.screen.machine.ChemicalReactorScreen;
 import net.zagdrath.arcforge.client.screen.machine.ElectricPumpScreen;
 import net.zagdrath.arcforge.client.screen.machine.SteamBoilerScreen;
 import net.zagdrath.arcforge.client.screen.machine.SteamTurbineScreen;
@@ -106,6 +107,7 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModFluids;
+import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
@@ -158,6 +160,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.STEAM_TURBINE.get(), SteamTurbineScreen::new);
         event.register(ModMenuTypes.ELECTRIC_PUMP.get(), ElectricPumpScreen::new);
         event.register(ModMenuTypes.ARC_MELTER.get(), ArcMelterScreen::new);
+        event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
         event.register(ModMenuTypes.FIBERIZER.get(), FiberizerScreen::new);
         event.register(ModMenuTypes.FUEL_BURNER.get(), FuelBurnerScreen::new);
@@ -196,6 +199,12 @@ public class ArcforgeClient {
         event.register(liquidModel("naphtha"), ModFluids.NAPHTHA, ModFluids.FLOWING_NAPHTHA);
         event.register(liquidModel("light_oil"), ModFluids.LIGHT_OIL, ModFluids.FLOWING_LIGHT_OIL);
         event.register(liquidModel("heavy_oil"), ModFluids.HEAVY_OIL, ModFluids.FLOWING_HEAVY_OIL);
+        event.register(liquidModel("sulfuric_acid"), ModFluids.SULFURIC_ACID, ModFluids.FLOWING_SULFURIC_ACID);
+        // The slurries share one greyscale texture, tinted per metal.
+        for (OreSlurry slurry : OreSlurry.values()) {
+            ModFluids.Slurry fluids = ModFluids.slurry(slurry);
+            event.register(slurryModel(slurry), fluids.source(), fluids.flowing());
+        }
         // The steam grades share one greyscale texture, tinted per grade.
         event.register(steamModel(SteamGrade.STEAM), ModFluids.STEAM, ModFluids.FLOWING_STEAM);
         event.register(steamModel(SteamGrade.HIGH_PRESSURE), ModFluids.HIGH_PRESSURE_STEAM, ModFluids.FLOWING_HIGH_PRESSURE_STEAM);
@@ -218,6 +227,14 @@ public class ArcforgeClient {
                 FluidTintSources.constant(grade.tint()));
     }
 
+    private static FluidModel.Unbaked slurryModel(OreSlurry slurry) {
+        return new FluidModel.Unbaked(
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/slurry_still")),
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/slurry_flow")),
+                null,
+                FluidTintSources.constant(slurry.tint()));
+    }
+
     // Fog in the colour of the liquid when the camera is inside one: dark and murky in creosote and Heavy
     // Oil, a little clearer in the lighter oils.
     @SubscribeEvent
@@ -226,6 +243,10 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xE0C080, 8.0F), ModFluids.NAPHTHA_TYPE.get());
         event.registerFluidType(liquidFog(0xC89A20, 5.0F), ModFluids.LIGHT_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0x2A1A0C, 2.0F), ModFluids.HEAVY_OIL_TYPE.get());
+        event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
+        for (OreSlurry slurry : OreSlurry.values()) {
+            event.registerFluidType(liquidFog(slurry.tint() & 0xFFFFFF, 3.0F), ModFluids.slurry(slurry).type().get());
+        }
     }
 
     private static IClientFluidTypeExtensions liquidFog(int color, float distance) {

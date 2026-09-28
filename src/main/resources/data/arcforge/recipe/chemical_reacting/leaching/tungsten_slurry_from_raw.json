@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "category": "leaching",
+  "item_input": {
+    "ingredient": "#c:raw_materials/tungsten",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:sulfuric_acid",
+      "amount": 250
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:tungsten_slurry",
+    "amount": 300
+  },
+  "time": 160
+}

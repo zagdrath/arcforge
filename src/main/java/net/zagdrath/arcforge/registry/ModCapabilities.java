@@ -40,6 +40,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEn
 import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
@@ -146,6 +147,12 @@ public final class ModCapabilities {
                 ArcMelterBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_MELTER.get(),
                 ArcMelterBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
+                ChemicalReactorBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
+                ChemicalReactorBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
+                ChemicalReactorBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
                 MetalPressBlockEntity::getItemHandler);
         // Every casing of a formed Metal Pressing Array exposes the cube face it lies on (served by the centre).

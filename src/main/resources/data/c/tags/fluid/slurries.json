@@ -1,0 +1,11 @@
+{
+  "values": [
+    "#c:slurries/iron",
+    "#c:slurries/copper",
+    "#c:slurries/gold",
+    "#c:slurries/silver",
+    "#c:slurries/nickel",
+    "#c:slurries/tungsten",
+    "#c:slurries/bismuth"
+  ]
+}

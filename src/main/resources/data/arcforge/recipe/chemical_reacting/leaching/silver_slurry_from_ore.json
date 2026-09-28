@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "category": "leaching",
+  "item_input": {
+    "ingredient": "#c:ores/silver",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:sulfuric_acid",
+      "amount": 500
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:silver_slurry",
+    "amount": 600
+  },
+  "time": 240
+}

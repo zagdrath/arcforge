@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_nether",
+  "features": "arcforge:ore_nether_sulfur",
+  "step": "underground_decoration",
+  "neoforge:conditions": [
+    {
+      "type": "arcforge:ore_enabled",
+      "ore": "sulfur"
+    }
+  ]
+}

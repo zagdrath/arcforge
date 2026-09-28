@@ -8,6 +8,8 @@ package net.zagdrath.arcforge.compat.jei;
 import java.util.List;
 import java.util.Locale;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -15,15 +17,18 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStackTemplate;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
+import net.zagdrath.arcforge.recipe.ChemicalReactingRecipe;
 import net.zagdrath.arcforge.recipe.CrushingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
+import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.recipe.MeltingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -72,7 +77,8 @@ final class MachineCategories {
         public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CrushingRecipe> holder, IFocusGroup focuses) {
             CrushingRecipe recipe = holder.value();
             builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
-            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(recipe.result());
+            // A bonus-only recipe (netherrack) shows just the chance slot.
+            recipe.result().ifPresent(result -> builder.addOutputSlot(61, 5).setStandardSlotBackground().add(result));
             recipe.bonus().ifPresent(bonus -> builder.addOutputSlot(83, 5).setStandardSlotBackground().add(bonus)
                     .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
                             Math.round(recipe.bonusChance() * 100)))));
@@ -231,6 +237,80 @@ final class MachineCategories {
             MeltingRecipe recipe = holder.value();
             text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.baseTicks()),
                     String.format(Locale.ROOT, "%,d", recipe.totalEnergy())), 0, 30);
+        }
+    }
+
+    // --- Chemical Reactor ---
+
+    static final class ChemicalReacting extends ArcforgeCategory<RecipeHolder<ChemicalReactingRecipe>> {
+        static final IRecipeHolderType<ChemicalReactingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.CHEMICAL_REACTING.get());
+        private static final int WIDTH = 152;
+
+        ChemicalReacting(IGuiHelper gui) {
+            super(TYPE, "chemical_reacting", ModBlocks.CHEMICAL_REACTOR.get(), gui, WIDTH, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ChemicalReactingRecipe> holder, IFocusGroup focuses) {
+            ChemicalReactingRecipe recipe = holder.value();
+            recipe.itemInput().ifPresent(input -> builder.addInputSlot(1, 5).setStandardSlotBackground()
+                    .addItemStacks(input.ingredient().items().map(item -> new ItemStack(item, input.count())).toList()));
+            for (int i = 0; i < recipe.fluidInputs().size(); i++) {
+                ChemicalReactingRecipe.FluidInput input = recipe.fluidInputs().get(i);
+                var slot = builder.addInputSlot(21 + 20 * i, 5).setStandardSlotBackground()
+                        .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, input.amount()), false, 16, 16);
+                // A tag lists every fluid in it.
+                input.fluids().forEach(fluid -> slot.add(fluid, input.amount()));
+            }
+            recipe.itemOutput().ifPresent(output -> builder.addOutputSlot(91, 5).setStandardSlotBackground().add(output));
+            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(111, 5).setStandardSlotBackground().add(byproduct)
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                            Math.round(recipe.byproductChance() * 100)))));
+            recipe.fluidOutput().ifPresent(output -> fluid(builder, false, 131, 5, output));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<ChemicalReactingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(62, 5);
+        }
+
+        // Time and FE before upgrades, the category, and for leaching what a raw ore or ore block comes to.
+        @Override
+        public void draw(RecipeHolder<ChemicalReactingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            ChemicalReactingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
+                    String.format(Locale.ROOT, "%,d", recipe.time() * recipe.baseEnergyPerTick())), 0, 30);
+            if (!recipe.category().equals("general")) {
+                textRight(graphics, Component.translatable("jei.arcforge.chemical_reacting." + recipe.category()), WIDTH, 30);
+            }
+            int[] yield = leachingYield(recipe);
+            if (yield != null) {
+                text(graphics, Component.translatable("jei.arcforge.yield", yield[0], yield[1]), 0, 40);
+            }
+        }
+
+        // For a leaching recipe of an ore the Arc Crushing Array multiplies: the dust it comes to here (its
+        // slurry over the slurry one dust takes to precipitate) and in the Array. Null otherwise (raw blocks).
+        private static int @Nullable [] leachingYield(ChemicalReactingRecipe recipe) {
+            if (recipe.itemInput().isEmpty() || recipe.fluidOutput().isEmpty()) {
+                return null;
+            }
+            var recipes = MachineRecipes.clientRecipes();
+            FluidResource slurry = FluidResource.of(recipe.fluidOutput().get());
+            var precipitating = recipes.byType(ModRecipes.CHEMICAL_REACTING.get()).stream().map(RecipeHolder::value)
+                    .filter(other -> other.itemOutput().isPresent() && other.itemInput().isEmpty())
+                    .flatMap(other -> other.fluidInputs().stream().filter(input -> input.test(slurry)))
+                    .findFirst();
+            ItemStack sample = recipe.itemInput().get().ingredient().items().findFirst().map(item -> new ItemStack(item)).orElse(ItemStack.EMPTY);
+            var crushing = recipes.byType(ModRecipes.CRUSHING.get()).stream().map(RecipeHolder::value)
+                    .filter(other -> other.ore() && other.result().isPresent() && other.ingredient().test(sample))
+                    .findFirst();
+            if (precipitating.isEmpty() || crushing.isEmpty()) {
+                return null;
+            }
+            int dust = recipe.fluidOutput().get().amount() / precipitating.get().amount();
+            int array = crushing.get().result().get().count() * ArcforgeConfig.ARRAY_ORE_YIELD.getAsInt();
+            return new int[] { dust, array };
         }
     }
 

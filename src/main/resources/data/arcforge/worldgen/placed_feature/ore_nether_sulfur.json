@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_nether_sulfur",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "sulfur",
+      "default": 12
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "sulfur",
+      "shape": "uniform",
+      "default_min": 10,
+      "default_max": 117
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

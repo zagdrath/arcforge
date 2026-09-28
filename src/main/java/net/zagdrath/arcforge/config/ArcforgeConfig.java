@@ -547,6 +547,35 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Chemical Reactor: reacts an item and up to two fluids with FE. Recipes are data-driven (arcforge:chemical_reacting)",
+                "and set the time; a recipe can set its own energy_per_tick.").push("chemicalReactor");
+    }
+
+    public static final ModConfigSpec.IntValue REACTOR_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 40_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue REACTOR_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in. Keep it at 16x energyPerTick or more, so 8 Speed upgrades can run flat out.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue REACTOR_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while reacting, before upgrades, for recipes that don't set their own.")
+            .defineInRange("energyPerTick", 60, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue REACTOR_TANK_CAPACITY = BUILDER
+            .comment("Size in mB of each of its three tanks (two inputs, one output).")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue REACTOR_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t it pushes out of its output faces with auto-eject.")
+            .defineInRange("fluidOutputRate", 1_000, 1, 100_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
                 "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
     }
@@ -812,6 +841,7 @@ public class ArcforgeConfig {
         ore("bismuth", "Bismuth: fairly common, mid-depth.", true, 8, 8, 0, 56, 0.0);
         ore("tungsten", "Tungsten (wolframite ore): uncommon and deep.", true, 6, 6, -64, -16, 0.0);
         ore("arcite", "Arcite: rare, the deepest; needs a diamond pickaxe.", false, 4, 5, -64, -40, 0.2);
+        ore("sulfur", "Nether Sulfur Ore: common through the Nether's netherrack; drops Sulfur Dust.", true, 12, 10, 10, 117, 0.0);
         BUILDER.pop();
     }
 
