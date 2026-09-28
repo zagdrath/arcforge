@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WCW",
+    "WBW",
+    "WWW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "C": "#c:chests/wooden",
+    "B": "minecraft:barrel"
+  },
+  "result": {
+    "id": "arcforge:wrought_vault",
+    "count": 1
+  }
+}

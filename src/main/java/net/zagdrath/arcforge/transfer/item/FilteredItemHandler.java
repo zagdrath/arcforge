@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.transfer.item;
 
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
@@ -42,5 +43,16 @@ public class FilteredItemHandler extends ItemStacksResourceHandler {
 
     public void setStack(int index, ItemStack stack) {
         set(index, ItemResource.of(stack), stack.getCount());
+    }
+
+    // Grows the handler to at least this many slots (new ones empty), e.g. after loading a smaller saved list.
+    public void ensureSize(int size) {
+        if (stacks.size() < size) {
+            NonNullList<ItemStack> grown = NonNullList.withSize(size, ItemStack.EMPTY);
+            for (int i = 0; i < stacks.size(); i++) {
+                grown.set(i, stacks.get(i));
+            }
+            setStacks(grown);
+        }
     }
 }

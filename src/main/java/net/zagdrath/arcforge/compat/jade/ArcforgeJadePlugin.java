@@ -11,7 +11,9 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarBlock;
+import net.zagdrath.arcforge.block.storage.VaultBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.VaultBlockEntity;
 import snownee.jade.api.IWailaClientRegistration;
 import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
@@ -28,6 +30,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerEnergyStorage(ConduitProviders.Energy.INSTANCE, ConduitBlockEntity.class);
         registration.registerFluidStorage(ConduitProviders.Fluid.INSTANCE, ConduitBlockEntity.class);
         registration.registerItemStorage(ConduitProviders.Items.INSTANCE, ConduitBlockEntity.class);
+        registration.registerItemStorage(VaultProviders.HideItems.INSTANCE, VaultBlockEntity.class);
         // Pressure Glass has no block entity: these read the array it belongs to.
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, PressureGlassBlock.class);
@@ -45,9 +48,11 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(HeatProvider.Client.INSTANCE, Block.class);
         registration.registerBlockComponent(ConduitProviders.Info.INSTANCE, ConduitBlock.class);
         registration.registerBlockComponent(ConduitProviders.Filters.INSTANCE, ConduitBlock.class);
+        registration.registerBlockComponent(VaultProviders.Info.INSTANCE, VaultBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);
+        registration.registerItemStorageClient(VaultProviders.HideItems.INSTANCE);
         registration.registerFluidStorageClient(WindowProviders.Fluid.INSTANCE);
         registration.registerEnergyStorageClient(WindowProviders.Energy.INSTANCE);
     }

@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "KXK",
+    "AAA"
+  ],
+  "key": {
+    "A": "arcforge:tempered_alloy",
+    "K": "#c:chests/wooden",
+    "X": "arcforge:wrought_vault"
+  },
+  "result": {
+    "id": "arcforge:tempered_vault",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

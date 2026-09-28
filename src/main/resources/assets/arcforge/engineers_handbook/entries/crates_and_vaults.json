@@ -1,0 +1,23 @@
+{
+  "title": "Crates & Vaults",
+  "icon": "arcforge:wrought_crate",
+  "items": [
+    "arcforge:wrought_crate",
+    "arcforge:tempered_crate",
+    "arcforge:hardened_crate",
+    "arcforge:arcforged_crate",
+    "arcforge:wrought_vault",
+    "arcforge:tempered_vault",
+    "arcforge:hardened_vault",
+    "arcforge:arcforged_vault",
+    "arcforge:tempered_storage_upgrade",
+    "arcforge:hardened_storage_upgrade",
+    "arcforge:arcforged_storage_upgrade"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Two kinds of item storage, each in four tiers.\n# Crates\nChests with more room: 54, 72, 99 and 126 slots. Larger crates scroll. Set each face to Input, Output or None in the Sides tab; conduits and hoppers use it, and a comparator reads how full it is.\n- Broken, a crate spills like a chest. Pick it up with the Wrench (Dismantle) to keep its items. A filled crate can't go inside another crate or a vault.\n# Vaults\nBulk storage for one stackable item: 4,096, 16,384, 65,536 and 262,144 by tier. The front shows the item and how many.\n- Right-click the front to put in what you hold; right-click twice quickly to put in every matching item you carry.\n- Left-click the front to take a stack; Shift + Left-click takes one. Mine a vault from any other face.\n- Lock (Wrench on the front, or the GUI) keeps the item type when the vault empties. Void destroys anything that arrives when it is full.\n- A vault keeps its contents, lock and void setting when picked up; the tooltip shows what's inside. Comparators read its fill level.\n# Upgrading\nRight-click a placed Crate or Vault with the next tier's Storage Upgrade to upgrade it where it stands, contents and settings included. Or craft the old one with the next tier's alloy, like tanks and cells."
+    }
+  ]
+}

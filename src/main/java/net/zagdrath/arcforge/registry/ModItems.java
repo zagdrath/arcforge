@@ -29,8 +29,11 @@ import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
 import net.zagdrath.arcforge.item.conduit.ConduitFilterItem;
+import net.zagdrath.arcforge.item.storage.CrateBlockItem;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.storage.StorageBlockItem;
+import net.zagdrath.arcforge.item.storage.StorageUpgradeItem;
+import net.zagdrath.arcforge.item.storage.VaultBlockItem;
 import net.zagdrath.arcforge.item.tool.DieItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
 import net.zagdrath.arcforge.item.tool.WrenchItem;
@@ -251,6 +254,27 @@ public final class ModItems {
         }
     }
 
+    // Crate and Vault items (ordered like ModBlocks.allCratesAndVaults()), then the Storage Upgrades.
+    private static final List<DeferredItem<? extends BlockItem>> CRATES_AND_VAULTS = new ArrayList<>();
+    private static final List<DeferredItem<StorageUpgradeItem>> STORAGE_UPGRADES = new ArrayList<>();
+
+    static {
+        for (ConduitTier tier : ConduitTier.values()) {
+            CRATES_AND_VAULTS.add(ITEMS.registerItem(tier.getSerializedName() + "_crate",
+                    p -> new CrateBlockItem(ModBlocks.crate(tier).get(), p), p -> p.useBlockDescriptionPrefix()));
+        }
+        for (ConduitTier tier : ConduitTier.values()) {
+            CRATES_AND_VAULTS.add(ITEMS.registerItem(tier.getSerializedName() + "_vault",
+                    p -> new VaultBlockItem(ModBlocks.vault(tier).get(), p), p -> p.useBlockDescriptionPrefix()));
+        }
+        for (ConduitTier tier : ConduitTier.values()) {
+            if (tier.previous() != null) {
+                STORAGE_UPGRADES.add(ITEMS.registerItem(tier.getSerializedName() + "_storage_upgrade",
+                        p -> new StorageUpgradeItem(tier, p), p -> p.stacksTo(16)));
+            }
+        }
+    }
+
     // Batteries, Canisters, Gas Cartridges and Thermal Capsules, ordered by kind then tier.
     private static final List<DeferredItem<PortableStorageItem>> PORTABLES = new ArrayList<>();
 
@@ -292,6 +316,14 @@ public final class ModItems {
 
     public static List<DeferredItem<ConduitBlockItem>> allConduits() {
         return CONDUITS;
+    }
+
+    public static List<DeferredItem<? extends BlockItem>> allCratesAndVaults() {
+        return CRATES_AND_VAULTS;
+    }
+
+    public static List<DeferredItem<StorageUpgradeItem>> storageUpgrades() {
+        return STORAGE_UPGRADES;
     }
 
     public static void register(IEventBus modEventBus) {

@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "arcforge:block/crate/tempered_front",
+    "side": "arcforge:block/crate/tempered_side",
+    "top": "arcforge:block/crate/tempered_top",
+    "particle": "arcforge:block/crate/tempered_side"
+  }
+}

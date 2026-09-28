@@ -73,11 +73,13 @@ import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
+import net.zagdrath.arcforge.block.storage.CrateBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
 import net.zagdrath.arcforge.block.storage.HeatCellBlock;
 import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
+import net.zagdrath.arcforge.block.storage.VaultBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 
@@ -550,6 +552,39 @@ public final class ModBlocks {
 
     public static DeferredBlock<PressurizedCylinderBlock> pressurizedCylinder(ConduitTier tier) {
         return PRESSURIZED_CYLINDERS.get(tier);
+    }
+
+    // arcforge:<tier>_crate and arcforge:<tier>_vault.
+    private static final Map<ConduitTier, DeferredBlock<CrateBlock>> CRATES = new EnumMap<>(ConduitTier.class);
+    private static final Map<ConduitTier, DeferredBlock<VaultBlock>> VAULTS = new EnumMap<>(ConduitTier.class);
+
+    static {
+        for (ConduitTier tier : ConduitTier.values()) {
+            CRATES.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_crate",
+                    p -> new CrateBlock(p, tier),
+                    p -> p.mapColor(MapColor.METAL).strength(2.5F).sound(SoundType.METAL)));
+        }
+        for (ConduitTier tier : ConduitTier.values()) {
+            VAULTS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_vault",
+                    p -> new VaultBlock(p, tier),
+                    p -> p.mapColor(MapColor.METAL).strength(2.5F).sound(SoundType.METAL)));
+        }
+    }
+
+    public static DeferredBlock<CrateBlock> crate(ConduitTier tier) {
+        return CRATES.get(tier);
+    }
+
+    public static DeferredBlock<VaultBlock> vault(ConduitTier tier) {
+        return VAULTS.get(tier);
+    }
+
+    // Crates, then Vaults, each ordered by tier.
+    public static List<DeferredBlock<? extends StorageBlock>> allCratesAndVaults() {
+        List<DeferredBlock<? extends StorageBlock>> all = new ArrayList<>();
+        all.addAll(CRATES.values());
+        all.addAll(VAULTS.values());
+        return all;
     }
 
     // Every fluid tank, then every pressurized cylinder, energy cell and heat cell, each ordered by tier.

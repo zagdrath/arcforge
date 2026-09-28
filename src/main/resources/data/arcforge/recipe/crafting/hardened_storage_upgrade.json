@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "K K",
+    "AAA"
+  ],
+  "key": {
+    "A": "arcforge:hardened_alloy",
+    "K": "#c:chests/wooden"
+  },
+  "result": {
+    "id": "arcforge:hardened_storage_upgrade",
+    "count": 1
+  }
+}

@@ -16,9 +16,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.item.tool.WrenchMode;
+import net.zagdrath.arcforge.storage.VaultContents;
 
-// Item components carrying a storage block's contents while it is an item, the Wrench's mode and a Conduit
-// Filter's settings.
+// Item components carrying a storage block's or Vault's contents while it is an item, the Wrench's mode and a
+// Conduit Filter's settings.
 public final class ModDataComponents {
     public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Arcforge.MODID);
 
@@ -41,6 +42,10 @@ public final class ModDataComponents {
     // A Conduit Filter's settings (absent: unconfigured, see FilterSettings).
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<FilterSettings>> CONDUIT_FILTER =
             DATA_COMPONENTS.registerComponentType("conduit_filter", b -> b.persistent(FilterSettings.CODEC).networkSynchronized(FilterSettings.STREAM_CODEC));
+
+    // What a Vault holds while it's an item (absent: empty, unlocked, void off). Crates use minecraft:container.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<VaultContents>> VAULT_CONTENTS =
+            DATA_COMPONENTS.registerComponentType("vault_contents", b -> b.persistent(VaultContents.CODEC).networkSynchronized(VaultContents.STREAM_CODEC));
 
     private ModDataComponents() {}
 

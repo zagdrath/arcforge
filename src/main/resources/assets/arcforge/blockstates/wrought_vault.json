@@ -1,0 +1,117 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/wrought"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "locked": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/overlay_locked"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "void": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/overlay_void"
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/wrought",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "locked": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/overlay_locked",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "void": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/overlay_void",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/wrought",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "locked": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/overlay_locked",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "void": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/overlay_void",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/wrought",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "locked": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/overlay_locked",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "void": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/vault/overlay_void",
+        "y": 270
+      }
+    }
+  ]
+}

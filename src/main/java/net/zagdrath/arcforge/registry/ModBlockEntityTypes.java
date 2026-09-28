@@ -41,7 +41,9 @@ import net.zagdrath.arcforge.blockentity.multiblock.ArcforgeFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.CrateBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.VaultBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 
@@ -125,6 +127,12 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<HeatCellBlockEntity>> HEAT_CELL = BLOCK_ENTITY_TYPES.register("heat_cell",
             () -> new BlockEntityType<>(HeatCellBlockEntity::new, tierBlocks(ModBlocks::heatCell)));
+
+    public static final Supplier<BlockEntityType<CrateBlockEntity>> CRATE = BLOCK_ENTITY_TYPES.register("crate",
+            () -> new BlockEntityType<>(CrateBlockEntity::new, tierBlocks(ModBlocks::crate)));
+
+    public static final Supplier<BlockEntityType<VaultBlockEntity>> VAULT = BLOCK_ENTITY_TYPES.register("vault",
+            () -> new BlockEntityType<>(VaultBlockEntity::new, tierBlocks(ModBlocks::vault)));
 
     // Every Carbonizer block has one; the structure's master block runs it.
     public static final Supplier<BlockEntityType<CarbonizerBlockEntity>> CARBONIZER = BLOCK_ENTITY_TYPES.register("carbonizer",

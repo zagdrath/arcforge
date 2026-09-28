@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "arcforge:block/crate/arcforged"
+    },
+    "facing=east": {
+      "model": "arcforge:block/crate/arcforged",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "arcforge:block/crate/arcforged",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "arcforge:block/crate/arcforged",
+      "y": 270
+    }
+  }
+}

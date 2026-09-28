@@ -58,6 +58,7 @@ import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SolarThermalArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamBoilerArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamTurbineArrayRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.VaultRenderer;
 import net.zagdrath.arcforge.client.model.ConnectedModel;
 import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
@@ -91,10 +92,12 @@ import net.zagdrath.arcforge.client.screen.machine.ThermoelectricPlantScreen;
 import net.zagdrath.arcforge.client.screen.conduit.ConduitFilterScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.ArcforgeFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.CarbonizerScreen;
+import net.zagdrath.arcforge.client.screen.storage.CrateScreen;
 import net.zagdrath.arcforge.client.screen.storage.EnergyCellScreen;
 import net.zagdrath.arcforge.client.screen.storage.FluidTankScreen;
 import net.zagdrath.arcforge.client.screen.storage.HeatCellScreen;
 import net.zagdrath.arcforge.client.screen.storage.PressurizedCylinderScreen;
+import net.zagdrath.arcforge.client.screen.storage.VaultScreen;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.sound.MachineSounds;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -166,6 +169,8 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.DISTILLATION_ARRAY.get(), DistillationArrayScreen::new);
         event.register(ModMenuTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayScreen::new);
         event.register(ModMenuTypes.CONDUIT_FILTER.get(), ConduitFilterScreen::new);
+        event.register(ModMenuTypes.CRATE.get(), CrateScreen::new);
+        event.register(ModMenuTypes.VAULT.get(), VaultScreen::new);
     }
 
     // Lit Pressurized and Thermodynamic Conduits glow in the colour of what they hold.
@@ -300,11 +305,13 @@ public class ArcforgeClient {
         ConduitFilterModel.wrap(event);
     }
 
-    // Glass conduits (item and fluid) and fluid tanks draw their contents; everything else is pure block models.
+    // Glass conduits (item and fluid) and fluid tanks draw their contents, and Vaults their front display;
+    // everything else is pure block models.
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.TRANSPARENT_CONDUIT.get(), ConduitRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FLUID_TANK.get(), FluidTankRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.VAULT.get(), VaultRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CARBONIZER.get(), CarbonizerDoorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerArrayRenderer::new);

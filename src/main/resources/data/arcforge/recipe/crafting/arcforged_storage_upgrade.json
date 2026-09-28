@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ACA",
+    "K K",
+    "AAA"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "C": "#c:gems/arcite",
+    "K": "#c:chests/wooden"
+  },
+  "result": {
+    "id": "arcforge:arcforged_storage_upgrade",
+    "count": 1
+  }
+}

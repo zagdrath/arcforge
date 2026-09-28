@@ -57,6 +57,17 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
   fluid and pressurized conduits take a bucket, Canister or Gas Cartridge as an entry. The Wrench's Dismantle
   takes it off with its settings. A sleeve on the arm shows it, its LED grey until set, then green (allowlist)
   or red (denylist), like the item. Jade lists a conduit's filters, and the Engineer's Handbook has an entry.
+- **Crates:** tiered chests with 54 / 72 / 99 / 126 slots (the Tempered Crate and up scroll), with face
+  settings, conduit and hopper support and a comparator reading. Broken, a crate spills like a chest; picked up
+  with the Wrench it keeps its items. A filled crate can't go inside another crate, a vault or a shulker box.
+- **Vaults:** bulk storage for one stackable item, 4,096 / 16,384 / 65,536 / 262,144 by tier. The front shows the
+  item and its count. Right-click the front to put in what you hold (twice quickly: everything matching you
+  carry), left-click to take a stack (Shift: one); mine it from any other face. Lock (the Wrench on the front, or
+  the GUI) keeps the item type when it empties; Void destroys what arrives when it's full. Conduits and hoppers move
+  as much as they like in and out, and a vault keeps its contents and settings when broken or picked up.
+- **Storage Upgrades** (Tempered, Hardened, Arcforged): right-click a placed Crate or Vault of the tier below to
+  upgrade it where it stands, contents and settings included. Crafting the block with the next tier's alloy
+  also works.
 
 ### Changed
 

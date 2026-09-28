@@ -1,0 +1,33 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "overlay": "arcforge:block/vault/overlay_void",
+    "particle": "arcforge:block/vault/overlay_void"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        -0.01
+      ],
+      "to": [
+        16,
+        16,
+        -0.01
+      ],
+      "shade": false,
+      "faces": {
+        "north": {
+          "texture": "#overlay",
+          "uv": [
+            0,
+            0,
+            16,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

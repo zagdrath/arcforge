@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "arcforge:block/crate/tempered"
+    },
+    "facing=east": {
+      "model": "arcforge:block/crate/tempered",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "arcforge:block/crate/tempered",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "arcforge:block/crate/tempered",
+      "y": 270
+    }
+  }
+}

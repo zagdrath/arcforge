@@ -55,7 +55,7 @@ final class ConduitGameTests {
     // --- Helpers ---
 
     // Places a straight run of conduits from x=1 to x=length, then connects them as a player placement would.
-    private static void placeRun(GameTestHelper helper, ConduitType type, ConduitTier tier, int length) {
+    static void placeRun(GameTestHelper helper, ConduitType type, ConduitTier tier, int length) {
         for (int x = 1; x <= length; x++) {
             helper.setBlock(new BlockPos(x, 1, 0), ModBlocks.conduit(type, tier).get());
         }
@@ -65,7 +65,7 @@ final class ConduitGameTests {
     }
 
     // Sets a conduit side the way the wrench would.
-    private static void setPort(GameTestHelper helper, BlockPos pos, Direction side, SideSetting setting) {
+    static void setPort(GameTestHelper helper, BlockPos pos, Direction side, SideSetting setting) {
         BlockPos absolute = helper.absolutePos(pos);
         helper.getBlockEntity(pos, ConduitBlockEntity.class).setSetting(side, setting);
         ConduitBlock.refreshConnections(helper.getLevel(), absolute);

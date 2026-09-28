@@ -186,6 +186,10 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(), StorageBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(), StorageBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.HEAT_CELL.get(), StorageBlockEntity::getItemHandler);
+        // Crates and Vaults: their contents, through the faces set to input or output. (Neither is a vanilla
+        // Container, so hoppers use this too, and a Vault isn't mistaken for one 64-item slot.)
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CRATE.get(), StorageBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.VAULT.get(), StorageBlockEntity::getItemHandler);
 
         // Portable storage: Batteries hold FE, Canisters liquids and Gas Cartridges gases. (Thermal Capsules hold
         // heat, which has no item capability; the Heat Cell reads them through PortableStorageItem.)

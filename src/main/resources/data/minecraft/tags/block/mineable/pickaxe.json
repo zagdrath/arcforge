@@ -93,6 +93,14 @@
     "arcforge:arcite_block",
     "arcforge:solar_thermal_array_casing",
     "arcforge:solar_thermal_array_controller",
-    "arcforge:solar_collector"
+    "arcforge:solar_collector",
+    "arcforge:wrought_crate",
+    "arcforge:tempered_crate",
+    "arcforge:hardened_crate",
+    "arcforge:arcforged_crate",
+    "arcforge:wrought_vault",
+    "arcforge:tempered_vault",
+    "arcforge:hardened_vault",
+    "arcforge:arcforged_vault"
   ]
 }

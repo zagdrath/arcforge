@@ -155,8 +155,9 @@ final class AlloyGameTests {
         }
         // 72 from the alloy drop, the distillation drop's casing, tray, controller and asphalt, slab and stairs,
         // the Solar Thermal Array's casing, controller, collector, trough mirror and receiver tube, and the ores
-        // drop's 29 (storage and raw blocks both ways, invar dust, the components and the upgrade), and the Conduit Filter.
-        helper.assertTrue(crafting == 113, crafting + " crafting/ recipes, not 113");
+        // drop's 29 (storage and raw blocks both ways, invar dust, the components and the upgrade), the Conduit
+        // Filter, and the Crates and Vaults drop's 11 (two blocks, their six tier upgrades and three Storage Upgrades).
+        helper.assertTrue(crafting == 124, crafting + " crafting/ recipes, not 124");
         // Plus the fluorite-fluxed steel.
         helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
@@ -172,7 +173,7 @@ final class AlloyGameTests {
     }
 
     // Crafts a 3x3 recipe from rows of keys.
-    private static ItemStack craft(GameTestHelper helper, String recipe, String[] rows, java.util.Map<Character, ItemStack> key) {
+    static ItemStack craft(GameTestHelper helper, String recipe, String[] rows, java.util.Map<Character, ItemStack> key) {
         List<ItemStack> grid = new ArrayList<>();
         for (String row : rows) {
             for (char c : row.toCharArray()) {

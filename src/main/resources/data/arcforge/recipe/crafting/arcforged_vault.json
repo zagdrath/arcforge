@@ -1,0 +1,20 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "ACA",
+    "KXK",
+    "AAA"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "C": "#c:gems/arcite",
+    "K": "#c:chests/wooden",
+    "X": "arcforge:hardened_vault"
+  },
+  "result": {
+    "id": "arcforge:arcforged_vault",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

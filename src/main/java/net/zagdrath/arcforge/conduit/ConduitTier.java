@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.conduit;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 
@@ -211,6 +213,36 @@ public enum ConduitTier implements StringRepresentable {
 
     public int thermalCapsuleMaxTemperature() {
         return heatCellMaxTemperature();
+    }
+
+    // --- Crates and Vaults ---
+
+    // Rows of 9 slots in a crate: 54 / 72 / 99 / 126 slots.
+    public int crateRows() {
+        return switch (this) {
+            case WROUGHT -> 6;
+            case TEMPERED -> 8;
+            case HARDENED -> 11;
+            case ARCFORGED -> 14;
+        };
+    }
+
+    public int crateSlots() {
+        return crateRows() * 9;
+    }
+
+    // Items a vault holds: 4,096 / 16,384 / 65,536 / 262,144.
+    public int vaultCapacity() {
+        return quadrupled(4_096);
+    }
+
+    // The tier before and after this one (null at either end), for Storage Upgrades.
+    public @Nullable ConduitTier previous() {
+        return ordinal() == 0 ? null : values()[ordinal() - 1];
+    }
+
+    public @Nullable ConduitTier next() {
+        return ordinal() == values().length - 1 ? null : values()[ordinal() + 1];
     }
 
     public static ConduitTier lowest(ConduitTier a, ConduitTier b) {

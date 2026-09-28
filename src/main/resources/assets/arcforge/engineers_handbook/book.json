@@ -89,6 +89,7 @@
       "entries": [
         "conduits",
         "conduit_filters",
+        "crates_and_vaults",
         "fluid_tanks",
         "energy_cells",
         "portable_storage"

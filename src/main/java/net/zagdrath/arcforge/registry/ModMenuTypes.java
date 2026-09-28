@@ -34,10 +34,12 @@ import net.zagdrath.arcforge.menu.machine.InfuserMenu;
 import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
+import net.zagdrath.arcforge.menu.storage.CrateMenu;
 import net.zagdrath.arcforge.menu.storage.EnergyCellMenu;
 import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
 import net.zagdrath.arcforge.menu.storage.PressurizedCylinderMenu;
 import net.zagdrath.arcforge.menu.storage.HeatCellMenu;
+import net.zagdrath.arcforge.menu.storage.VaultMenu;
 
 public final class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, Arcforge.MODID);
@@ -107,6 +109,12 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<HeatCellMenu>> HEAT_CELL = MENU_TYPES.register("heat_cell",
             () -> IMenuTypeExtension.create(HeatCellMenu::new));
+
+    public static final Supplier<MenuType<CrateMenu>> CRATE = MENU_TYPES.register("crate",
+            () -> IMenuTypeExtension.create(CrateMenu::new));
+
+    public static final Supplier<MenuType<VaultMenu>> VAULT = MENU_TYPES.register("vault",
+            () -> IMenuTypeExtension.create(VaultMenu::new));
 
     public static final Supplier<MenuType<ConduitFilterMenu>> CONDUIT_FILTER = MENU_TYPES.register("conduit_filter",
             () -> IMenuTypeExtension.create(ConduitFilterMenu::new));

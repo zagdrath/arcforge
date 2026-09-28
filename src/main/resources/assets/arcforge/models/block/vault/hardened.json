@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable",
+  "textures": {
+    "front": "arcforge:block/vault/hardened_front",
+    "side": "arcforge:block/vault/hardened_side",
+    "top": "arcforge:block/vault/hardened_top",
+    "particle": "arcforge:block/vault/hardened_side"
+  }
+}

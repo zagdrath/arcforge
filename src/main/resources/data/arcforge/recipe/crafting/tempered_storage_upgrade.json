@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AAA",
+    "K K",
+    "AAA"
+  ],
+  "key": {
+    "A": "arcforge:tempered_alloy",
+    "K": "#c:chests/wooden"
+  },
+  "result": {
+    "id": "arcforge:tempered_storage_upgrade",
+    "count": 1
+  }
+}

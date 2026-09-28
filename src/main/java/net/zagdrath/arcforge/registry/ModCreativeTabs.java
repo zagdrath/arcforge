@@ -130,6 +130,8 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 ModItems.allConduits().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.CONDUIT_FILTER.get());
+                ModItems.allCratesAndVaults().forEach(item -> output.accept(item.get()));
+                ModItems.storageUpgrades().forEach(item -> output.accept(item.get()));
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_AND_UPGRADES = CREATIVE_MODE_TABS.register("tools_and_upgrades", () -> CreativeModeTab.builder()

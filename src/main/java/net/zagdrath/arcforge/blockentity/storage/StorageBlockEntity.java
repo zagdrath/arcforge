@@ -14,6 +14,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -57,13 +58,22 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
     private final ResourceHandler<ItemResource> itemAutomation;
     protected RedstoneMode redstoneMode = RedstoneMode.IGNORE;
     private Direction facing = Direction.NORTH;
+    private final int slotCount;
     private boolean dismantled;
+    private boolean upgrading;
 
     protected StorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, ConduitTier tier, SideConfig sideConfig) {
+        this(type, pos, state, tier, sideConfig, SLOT_COUNT);
+    }
+
+    // With slotCount item slots instead of the drain and fill slots (Crates hold their contents in them; the
+    // SLOT_IN / SLOT_OUT automation then doesn't apply, so such blocks provide their own getItemHandler).
+    protected StorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, ConduitTier tier, SideConfig sideConfig, int slotCount) {
         super(type, pos, state);
         this.tier = tier;
         this.sideConfig = sideConfig;
-        this.items = new FilteredItemHandler(SLOT_COUNT, this::isItemValid, this::setChanged);
+        this.slotCount = slotCount;
+        this.items = new FilteredItemHandler(slotCount, this::isItemValid, this::setChanged);
         this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_IN, slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUT && isFillSlotDone());
         this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_IN, slot -> slot == SLOT_OUT && isFillSlotDone());
@@ -95,8 +105,11 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
         return items;
     }
 
+    // The way the block faces: its FACING property if it has one (Crates and Vaults, turned with the Wrench),
+    // otherwise the direction the player faced when placing it.
     public Direction getFacing() {
-        return facing;
+        BlockState state = getBlockState();
+        return state.hasProperty(HorizontalDirectionalBlock.FACING) ? state.getValue(HorizontalDirectionalBlock.FACING) : facing;
     }
 
     public void setFacing(Direction facing) {
@@ -158,7 +171,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
 
     // What a face does. A null side is an internal/unsided query.
     protected @Nullable SideMode modeFor(@Nullable Direction side) {
-        return side == null ? null : sideConfig.get(facing, side);
+        return side == null ? null : sideConfig.get(getFacing(), side);
     }
 
     @Override
@@ -166,7 +179,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
         if (type != conduitType() && type != ConduitType.ITEM) {
             return ConnectionMode.NONE;
         }
-        return switch (sideConfig.get(facing, side)) {
+        return switch (sideConfig.get(getFacing(), side)) {
             case INPUT -> ConnectionMode.INPUT;
             case OUTPUT -> ConnectionMode.OUTPUT;
             default -> ConnectionMode.NONE;
@@ -197,12 +210,25 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
         return dismantled;
     }
 
+    // Called just before a Storage Upgrade swaps the block for the next tier's, which takes over everything it holds.
+    public void markUpgrading() {
+        upgrading = true;
+    }
+
+    protected boolean isUpgrading() {
+        return upgrading;
+    }
+
+    // Whether the slot items drop as the block is removed. The drain and fill slots always do, including with the wrench.
+    protected boolean dropsSlotItems() {
+        return !upgrading;
+    }
+
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        // Slot items drop however the block is removed, including with the wrench.
-        if (level != null) {
-            for (int slot = 0; slot < SLOT_COUNT; slot++) {
+        if (level != null && dropsSlotItems()) {
+            for (int slot = 0; slot < items.size(); slot++) {
                 Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), items.getStack(slot));
             }
         }
@@ -214,6 +240,8 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         items.deserialize(input.childOrEmpty("items"));
+        // A block upgraded to a bigger tier loads its old, shorter slot list: the new slots start empty.
+        items.ensureSize(slotCount);
         sideConfig.deserialize(input);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", 0));
         facing = Direction.from2DDataValue(input.getIntOr("facing", Direction.NORTH.get2DDataValue()));

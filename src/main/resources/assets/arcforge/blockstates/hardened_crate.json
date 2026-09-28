@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "arcforge:block/crate/hardened"
+    },
+    "facing=east": {
+      "model": "arcforge:block/crate/hardened",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "arcforge:block/crate/hardened",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "arcforge:block/crate/hardened",
+      "y": 270
+    }
+  }
+}

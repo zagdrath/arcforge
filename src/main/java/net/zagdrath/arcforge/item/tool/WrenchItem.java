@@ -35,6 +35,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
+import net.zagdrath.arcforge.block.storage.VaultBlock;
+import net.zagdrath.arcforge.blockentity.storage.VaultBlockEntity;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
@@ -52,7 +54,8 @@ import net.zagdrath.arcforge.registry.ModDataComponents;
 
 // The Wrench. Its mode (Shift + mouse wheel, see WrenchMode) decides what right-clicking does:
 //   Configure: a conduit side cycles through its settings (sneaking: backward); a multiblock rechecks its
-//              structure (sneaking does nothing, so it can't be broken by accident).
+//              structure (sneaking does nothing, so it can't be broken by accident); a Vault's front locks or
+//              unlocks it.
 //   Rotate:    a machine turns clockwise (sneaking: counter-clockwise).
 //   Port:      a multiblock block on the outside of its structure says what port it is, and sneaking
 //              cycles it through the modes the structure allows (see MultiblockPorts); a machine face
@@ -81,6 +84,18 @@ public class WrenchItem extends Item {
         boolean sneaking = player != null && player.isSecondaryUseActive();
         Target target = targetOf(state);
         WrenchMode mode = mode(stack);
+        // Configure on a Vault's front locks or unlocks it.
+        if (mode == WrenchMode.CONFIGURE && VaultBlock.isFront(state, context.getClickedFace())) {
+            if (!level.isClientSide() && level.getBlockEntity(pos) instanceof VaultBlockEntity vault) {
+                vault.setLocked(!vault.isLocked());
+                tell(player, vault.isLocked()
+                        ? Component.translatable("message.arcforge.vault.locked", vault.getTemplate().isEmpty()
+                                ? Component.translatable("gui.arcforge.vault.next_item") : vault.getTemplate().getHoverName())
+                        : Component.translatable("message.arcforge.vault.unlocked"));
+                level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 0.3F, 1.4F);
+            }
+            return InteractionResult.SUCCESS;
+        }
         if (!acts(mode, target, sneaking, level.getBlockEntity(pos))) {
             return InteractionResult.PASS;
         }
