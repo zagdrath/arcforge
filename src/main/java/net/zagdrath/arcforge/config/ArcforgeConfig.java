@@ -18,6 +18,10 @@ public class ArcforgeConfig {
     private static final ModConfigSpec.Builder BUILDER = new ModConfigSpec.Builder();
 
     static {
+        BUILDER.comment("Heat sources, heat transfer and the machines that turn heat into FE.").push("power");
+    }
+
+    static {
         BUILDER.comment("Heat (HU) shared by every heat machine. A machine's temperature rises from 20°C when its heat",
                 "buffer is empty to its maximum temperature when full, and heat only flows from hotter to colder.").push("heat");
     }
@@ -28,6 +32,9 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Geothermal Plant: turns lava into heat (HU). It makes no FE; feed its heat to a Thermoelectric Plant.")
                 .push("geothermalPlant");
     }
@@ -62,6 +69,9 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Combustion Plant: burns coal, charcoal and coal blocks (#arcforge:combustion_fuel) straight into FE.")
                 .push("combustionPlant");
     }
@@ -84,6 +94,9 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Firebox: burns coal, charcoal and coal blocks (#arcforge:combustion_fuel) into heat (HU).")
                 .push("firebox");
     }
@@ -106,6 +119,30 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Fuel Burner: burns liquid fuel into heat (HU). Fuels and their heat are data-driven",
+                "(data map arcforge:burner_fuels, keyed by fluid).").push("fuelBurner");
+    }
+
+    public static final ModConfigSpec.IntValue FUEL_BURNER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FUEL_BURNER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_200, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue FUEL_BURNER_TANK_CAPACITY = BUILDER
+            .comment("Fuel tank capacity in mB.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Thermoelectric Plant: turns heat (HU) into FE. The hotter it runs, the more FE each HU gives.")
                 .push("thermoelectricPlant");
     }
@@ -156,312 +193,9 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
-        BUILDER.comment("Arc Crusher: crushes ores and materials into dusts with FE. Recipes are data-driven (arcforge:crushing).")
-                .push("arcCrusher");
     }
 
-    public static final ModConfigSpec.IntValue CRUSHER_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue CRUSHER_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue CRUSHER_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t while crushing, before upgrades (a 200-tick recipe costs 200x this).")
-            .defineInRange("energyPerTick", 20, 1, 1_000_000);
-
     static {
-        BUILDER.pop();
-        BUILDER.comment("Arc Crushing Array: 3x3x3 multiblock with three crushing lanes that doubles ores.").push("arcCrushingArray");
-    }
-
-    public static final ModConfigSpec.IntValue ARRAY_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue ARRAY_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue ARRAY_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t per working lane, before upgrades.")
-            .defineInRange("energyPerTick", 16, 1, 1_000_000);
-
-    public static final ModConfigSpec.DoubleValue ARRAY_TIME_MULTIPLIER = BUILDER
-            .comment("Recipe time multiplier (0.5 = twice as fast as the Arc Crusher).")
-            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
-
-    public static final ModConfigSpec.IntValue ARRAY_ORE_YIELD = BUILDER
-            .comment("Main output multiplier for ore recipes (\"ore\": true).")
-            .defineInRange("oreYield", 2, 1, 16);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Induction Furnace: smelts anything with a furnace recipe using FE.").push("inductionFurnace");
-    }
-
-    public static final ModConfigSpec.IntValue INDUCTION_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue INDUCTION_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue INDUCTION_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t while smelting, before upgrades.")
-            .defineInRange("energyPerTick", 20, 1, 1_000_000);
-
-    public static final ModConfigSpec.DoubleValue INDUCTION_TIME_MULTIPLIER = BUILDER
-            .comment("Multiplier on the recipe's cooking time (0.5 = 100 ticks for a normal 200-tick furnace recipe).")
-            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Induction Furnace Array: 3x3x3 multiblock with three smelting lanes.").push("inductionFurnaceArray");
-    }
-
-    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t per working lane, before upgrades.")
-            .defineInRange("energyPerTick", 16, 1, 1_000_000);
-
-    public static final ModConfigSpec.DoubleValue INDUCTION_ARRAY_TIME_MULTIPLIER = BUILDER
-            .comment("Multiplier on the recipe's cooking time (0.25 = 50 ticks, twice as fast as the Induction Furnace).")
-            .defineInRange("timeMultiplier", 0.25, 0.01, 10.0);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Metal Press: presses ingots into plates, gears and rods with a die, using FE. Recipes are data-driven",
-                "(arcforge:pressing) and set the time.").push("metalPress");
-    }
-
-    public static final ModConfigSpec.IntValue PRESS_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PRESS_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PRESS_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t while pressing, before upgrades (a 100-tick recipe costs 100x this).")
-            .defineInRange("energyPerTick", 20, 1, 1_000_000);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Metal Pressing Array: 3x3x3 multiblock with three pressing lanes, each with its own die.").push("metalPressingArray");
-    }
-
-    public static final ModConfigSpec.IntValue PRESSING_ARRAY_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PRESSING_ARRAY_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PRESSING_ARRAY_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t per working lane, before upgrades.")
-            .defineInRange("energyPerTick", 16, 1, 1_000_000);
-
-    public static final ModConfigSpec.DoubleValue PRESSING_ARRAY_TIME_MULTIPLIER = BUILDER
-            .comment("Recipe time multiplier (0.5 = twice as fast as the Metal Press).")
-            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Electric Pump: pumps the fluid source block directly below it using FE.").push("electricPump");
-    }
-
-    public static final ModConfigSpec.IntValue PUMP_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PUMP_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PUMP_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t while pumping, before upgrades.")
-            .defineInRange("energyPerTick", 10, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue PUMP_CYCLE_TICKS = BUILDER
-            .comment("Ticks to pump one bucket (1,000 mB), before Speed upgrades.")
-            .defineInRange("cycleTicks", 20, 1, 1_200);
-
-    public static final ModConfigSpec.IntValue PUMP_TANK_CAPACITY = BUILDER
-            .comment("Internal tank size in mB.")
-            .defineInRange("tankCapacity", 16_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PUMP_OUTPUT_RATE = BUILDER
-            .comment("Most mB/t it pushes up out of its top face (and out of output faces with auto-eject).")
-            .defineInRange("outputRate", 1_000, 1, 1_000_000);
-
-    public static final ModConfigSpec.BooleanValue PUMP_INFINITE_WATER = BUILDER
-            .comment("Leave water in place when it is an infinite source (2+ water sources beside it), like a bucket would refill.")
-            .define("pumpInfiniteWater", true);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Steam Boiler: boils water into steam with heat. Hotter boilers make higher grades of steam.").push("steamBoiler");
-    }
-
-    public static final ModConfigSpec.IntValue BOILER_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size in HU (a full buffer is at the maximum temperature).")
-            .defineInRange("heatCapacity", 40_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue BOILER_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 1_400, 200, 10_000);
-
-    public static final ModConfigSpec.IntValue BOILER_MAX_HEAT_PER_TICK = BUILDER
-            .comment("Most HU/t it boils with.")
-            .defineInRange("maxHeatPerTick", 80, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue BOILER_TANK_CAPACITY = BUILDER
-            .comment("Water and steam tank sizes in mB.")
-            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000_000);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Steam Turbine: turns steam into FE. FE per mB depends on the steam grade.").push("steamTurbine");
-    }
-
-    public static final ModConfigSpec.IntValue TURBINE_MAX_FLOW = BUILDER
-            .comment("Most steam it uses, in mB/t.")
-            .defineInRange("maxFlow", 10, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_TANK_CAPACITY = BUILDER
-            .comment("Steam tank size in mB.")
-            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_MAX_OUTPUT = BUILDER
-            .comment("Most FE/t pushed out of its energy faces.")
-            .defineInRange("maxEnergyOutput", 400, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_LUBRICANT_CAPACITY = BUILDER
-            .comment("Lubricant (Heavy Oil) tank size in mB.")
-            .defineInRange("lubricantCapacity", 1_000, 100, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_LUBRICANT_INTERVAL = BUILDER
-            .comment("Ticks of generating per mB of lubricant used.")
-            .defineInRange("lubricantInterval", 100, 1, 100_000);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Steam Boiler Array: a 3x3 boiler 3 to 7 blocks tall. Values are per block of height.").push("steamBoilerArray");
-    }
-
-    public static final ModConfigSpec.IntValue BOILER_ARRAY_HEAT_PER_HEIGHT = BUILDER
-            .comment("Heat buffer size in HU, per block of height.")
-            .defineInRange("heatCapacityPerHeight", 100_000, 1_000, 100_000_000);
-
-    public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_HEAT_PER_HEIGHT = BUILDER
-            .comment("Most HU/t it boils with, per block of height.")
-            .defineInRange("maxHeatPerTickPerHeight", 600, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue BOILER_ARRAY_TANK_PER_HEIGHT = BUILDER
-            .comment("Water and steam tank sizes in mB, per block of height.")
-            .defineInRange("tankCapacityPerHeight", 16_000, 1_000, 100_000_000);
-
-    public static final ModConfigSpec.DoubleValue BOILER_ARRAY_HEAT_COST = BUILDER
-            .comment("Multiplier on the heat per mB of steam (0.8 = the big drum loses 20% less).")
-            .defineInRange("heatCostMultiplier", 0.8, 0.1, 10.0);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Steam Turbine Array: a 3x3 turbine 3 to 9 blocks long, whose rotor spins up and coasts down.",
-                "Values are per block of length.").push("steamTurbineArray");
-    }
-
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_FLOW_PER_LENGTH = BUILDER
-            .comment("Most steam it uses in mB/t, per block of length.")
-            .defineInRange("maxFlowPerLength", 40, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_TANK_PER_LENGTH = BUILDER
-            .comment("Steam tank size in mB, per block of length.")
-            .defineInRange("tankCapacityPerLength", 32_000, 1_000, 100_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 1_000_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_OUTPUT = BUILDER
-            .comment("Most FE/t pushed out of its energy faces.")
-            .defineInRange("maxEnergyOutput", 16_384, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_RPM = BUILDER
-            .comment("Rotor speed at a full flow of Superheated Steam (it spins in proportion to the power in the steam).")
-            .defineInRange("maxRpm", 3_600, 100, 100_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_CAPACITY = BUILDER
-            .comment("Lubricant (Heavy Oil) tank size in mB.")
-            .defineInRange("lubricantCapacity", 4_000, 100, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_INTERVAL = BUILDER
-            .comment("Ticks of generating per mB of lubricant used, for every 3 blocks of length.")
-            .defineInRange("lubricantInterval", 20, 1, 100_000);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Heavy Oil in a steam turbine's lubricant tank, while it isn't empty and the turbine generates.").push("lubricant");
-    }
-
-    public static final ModConfigSpec.DoubleValue LUBRICANT_OUTPUT_BONUS = BUILDER
-            .comment("Extra FE per mB of steam (0.08 = +8%).")
-            .defineInRange("outputBonus", 0.08, 0.0, 10.0);
-
-    public static final ModConfigSpec.DoubleValue LUBRICANT_SPIN_UP = BUILDER
-            .comment("Multiplier on how fast a Steam Turbine Array's rotor spins up.")
-            .defineInRange("arraySpinUpMultiplier", 2.0, 1.0, 100.0);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("Distillation Array: a 2x2 column 4, 6 or 8 tall that splits creosote into fractions with heat.",
-                "Recipes are data-driven (arcforge:distilling). Values scale with the height (a 4-high column gets them as given).")
-                .push("distillationArray");
-    }
-
-    public static final ModConfigSpec.IntValue DISTILLATION_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size in HU for a 4-high column.")
-            .defineInRange("heatCapacity", 40_000, 1_000, 100_000_000);
-
-    public static final ModConfigSpec.IntValue DISTILLATION_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 1_400, 400, 10_000);
-
-    public static final ModConfigSpec.IntValue DISTILLATION_FEED_RATE = BUILDER
-            .comment("Feed distilled per tick in mB, for a 4-high column (6 high: x1.5, 8 high: x2).")
-            .defineInRange("feedPerTick", 10, 1, 100_000);
-
-    public static final ModConfigSpec.IntValue DISTILLATION_FEED_CAPACITY = BUILDER
-            .comment("Feed (creosote) tank size in mB.")
-            .defineInRange("feedCapacity", 16_000, 1_000, 100_000_000);
-
-    public static final ModConfigSpec.IntValue DISTILLATION_STEAM_CAPACITY = BUILDER
-            .comment("Steam tank size in mB.")
-            .defineInRange("steamCapacity", 8_000, 1_000, 100_000_000);
-
-    public static final ModConfigSpec.IntValue DISTILLATION_OUTPUT_CAPACITY = BUILDER
-            .comment("Size of each product tank (Naphtha, Light Oil, Heavy Oil) in mB.")
-            .defineInRange("outputCapacity", 8_000, 1_000, 100_000_000);
-
-    static {
-        BUILDER.pop();
         BUILDER.comment("Solar Thermal Array: a 2x2 tower, 4 tall, whose trough mirror tracks the sun and heats a receiver.",
                 "Heat per tick = peakHeat x sun x weather x axis x biome x (collectors in sunlight / 4); the temperature",
                 "climbs from 20°C to maxTemperature with the same factors (capped at the peak).").push("solarThermalArray");
@@ -526,6 +260,260 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Boiling water into steam and steam into FE.").push("steam");
+    }
+
+    static {
+        BUILDER.comment("Steam Boiler: boils water into steam with heat. Hotter boilers make higher grades of steam.").push("steamBoiler");
+    }
+
+    public static final ModConfigSpec.IntValue BOILER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU (a full buffer is at the maximum temperature).")
+            .defineInRange("heatCapacity", 40_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue BOILER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_400, 200, 10_000);
+
+    public static final ModConfigSpec.IntValue BOILER_MAX_HEAT_PER_TICK = BUILDER
+            .comment("Most HU/t it boils with.")
+            .defineInRange("maxHeatPerTick", 80, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue BOILER_TANK_CAPACITY = BUILDER
+            .comment("Water and steam tank sizes in mB.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Steam Boiler Array: a 3x3 boiler 3 to 7 blocks tall. Values are per block of height.").push("steamBoilerArray");
+    }
+
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_HEAT_PER_HEIGHT = BUILDER
+            .comment("Heat buffer size in HU, per block of height.")
+            .defineInRange("heatCapacityPerHeight", 100_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_HEAT_PER_HEIGHT = BUILDER
+            .comment("Most HU/t it boils with, per block of height.")
+            .defineInRange("maxHeatPerTickPerHeight", 600, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_TANK_PER_HEIGHT = BUILDER
+            .comment("Water and steam tank sizes in mB, per block of height.")
+            .defineInRange("tankCapacityPerHeight", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.DoubleValue BOILER_ARRAY_HEAT_COST = BUILDER
+            .comment("Multiplier on the heat per mB of steam (0.8 = the big drum loses 20% less).")
+            .defineInRange("heatCostMultiplier", 0.8, 0.1, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Steam Turbine: turns steam into FE. FE per mB depends on the steam grade.").push("steamTurbine");
+    }
+
+    public static final ModConfigSpec.IntValue TURBINE_MAX_FLOW = BUILDER
+            .comment("Most steam it uses, in mB/t.")
+            .defineInRange("maxFlow", 10, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_TANK_CAPACITY = BUILDER
+            .comment("Steam tank size in mB.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_MAX_OUTPUT = BUILDER
+            .comment("Most FE/t pushed out of its energy faces.")
+            .defineInRange("maxEnergyOutput", 400, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_LUBRICANT_CAPACITY = BUILDER
+            .comment("Lubricant (Heavy Oil) tank size in mB.")
+            .defineInRange("lubricantCapacity", 1_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_LUBRICANT_INTERVAL = BUILDER
+            .comment("Ticks of generating per mB of lubricant used.")
+            .defineInRange("lubricantInterval", 100, 1, 100_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Steam Turbine Array: a 3x3 turbine 3 to 9 blocks long, whose rotor spins up and coasts down.",
+                "Values are per block of length.").push("steamTurbineArray");
+    }
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_FLOW_PER_LENGTH = BUILDER
+            .comment("Most steam it uses in mB/t, per block of length.")
+            .defineInRange("maxFlowPerLength", 40, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_TANK_PER_LENGTH = BUILDER
+            .comment("Steam tank size in mB, per block of length.")
+            .defineInRange("tankCapacityPerLength", 32_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 1_000_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_OUTPUT = BUILDER
+            .comment("Most FE/t pushed out of its energy faces.")
+            .defineInRange("maxEnergyOutput", 16_384, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_RPM = BUILDER
+            .comment("Rotor speed at a full flow of Superheated Steam (it spins in proportion to the power in the steam).")
+            .defineInRange("maxRpm", 3_600, 100, 100_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_CAPACITY = BUILDER
+            .comment("Lubricant (Heavy Oil) tank size in mB.")
+            .defineInRange("lubricantCapacity", 4_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_INTERVAL = BUILDER
+            .comment("Ticks of generating per mB of lubricant used, for every 3 blocks of length.")
+            .defineInRange("lubricantInterval", 20, 1, 100_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Heavy Oil in a steam turbine's lubricant tank, while it isn't empty and the turbine generates.").push("lubricant");
+    }
+
+    public static final ModConfigSpec.DoubleValue LUBRICANT_OUTPUT_BONUS = BUILDER
+            .comment("Extra FE per mB of steam (0.08 = +8%).")
+            .defineInRange("outputBonus", 0.08, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue LUBRICANT_SPIN_UP = BUILDER
+            .comment("Multiplier on how fast a Steam Turbine Array's rotor spins up.")
+            .defineInRange("arraySpinUpMultiplier", 2.0, 1.0, 100.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Single-block processing machines.").push("machines");
+    }
+
+    static {
+        BUILDER.comment("Arc Crusher: crushes ores and materials into dusts with FE. Recipes are data-driven (arcforge:crushing).")
+                .push("arcCrusher");
+    }
+
+    public static final ModConfigSpec.IntValue CRUSHER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue CRUSHER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue CRUSHER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while crushing, before upgrades (a 200-tick recipe costs 200x this).")
+            .defineInRange("energyPerTick", 20, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Induction Furnace: smelts anything with a furnace recipe using FE.").push("inductionFurnace");
+    }
+
+    public static final ModConfigSpec.IntValue INDUCTION_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while smelting, before upgrades.")
+            .defineInRange("energyPerTick", 20, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue INDUCTION_TIME_MULTIPLIER = BUILDER
+            .comment("Multiplier on the recipe's cooking time (0.5 = 100 ticks for a normal 200-tick furnace recipe).")
+            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Metal Press: presses ingots into plates, gears and rods with a die, using FE. Recipes are data-driven",
+                "(arcforge:pressing) and set the time.").push("metalPress");
+    }
+
+    public static final ModConfigSpec.IntValue PRESS_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PRESS_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PRESS_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while pressing, before upgrades (a 100-tick recipe costs 100x this).")
+            .defineInRange("energyPerTick", 20, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Electric Pump: pumps the fluid source block directly below it using FE.").push("electricPump");
+    }
+
+    public static final ModConfigSpec.IntValue PUMP_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while pumping, before upgrades.")
+            .defineInRange("energyPerTick", 10, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_CYCLE_TICKS = BUILDER
+            .comment("Ticks to pump one bucket (1,000 mB), before Speed upgrades.")
+            .defineInRange("cycleTicks", 20, 1, 1_200);
+
+    public static final ModConfigSpec.IntValue PUMP_TANK_CAPACITY = BUILDER
+            .comment("Internal tank size in mB.")
+            .defineInRange("tankCapacity", 16_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t it pushes up out of its top face (and out of output faces with auto-eject).")
+            .defineInRange("outputRate", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.BooleanValue PUMP_INFINITE_WATER = BUILDER
+            .comment("Leave water in place when it is an infinite source (2+ water sources beside it), like a bucket would refill.")
+            .define("pumpInfiniteWater", true);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
                 "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
     }
@@ -548,6 +536,9 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Infuser: soaks vanilla wood in creosote with FE, making treated wood. Recipes are data-driven",
                 "(arcforge:infusing) and set the fluid used.").push("infuser");
     }
@@ -570,24 +561,105 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
-        BUILDER.comment("Fuel Burner: burns liquid fuel into heat (HU). Fuels and their heat are data-driven",
-                "(data map arcforge:burner_fuels, keyed by fluid).").push("fuelBurner");
     }
-
-    public static final ModConfigSpec.IntValue FUEL_BURNER_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size, in HU.")
-            .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue FUEL_BURNER_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 1_200, 21, 10_000);
-
-    public static final ModConfigSpec.IntValue FUEL_BURNER_TANK_CAPACITY = BUILDER
-            .comment("Fuel tank capacity in mB.")
-            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Multiblock machines, and settings they share.").push("multiblocks");
+    }
+
+    static {
+        BUILDER.comment("Shared multiblock settings.").push("multiblock");
+    }
+
+    public static final ModConfigSpec.IntValue MULTIBLOCK_PUSH_INTERVAL = BUILDER
+            .comment("Ticks between pushes out of output and by-product faces into neighbouring inventories and tanks.")
+            .defineInRange("autoPushInterval", 10, 1, 1_200);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Arc Crushing Array: 3x3x3 multiblock with three crushing lanes that doubles ores.").push("arcCrushingArray");
+    }
+
+    public static final ModConfigSpec.IntValue ARRAY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ARRAY_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ARRAY_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t per working lane, before upgrades.")
+            .defineInRange("energyPerTick", 16, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue ARRAY_TIME_MULTIPLIER = BUILDER
+            .comment("Recipe time multiplier (0.5 = twice as fast as the Arc Crusher).")
+            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
+
+    public static final ModConfigSpec.IntValue ARRAY_ORE_YIELD = BUILDER
+            .comment("Main output multiplier for ore recipes (\"ore\": true).")
+            .defineInRange("oreYield", 2, 1, 16);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Induction Furnace Array: 3x3x3 multiblock with three smelting lanes.").push("inductionFurnaceArray");
+    }
+
+    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t per working lane, before upgrades.")
+            .defineInRange("energyPerTick", 16, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue INDUCTION_ARRAY_TIME_MULTIPLIER = BUILDER
+            .comment("Multiplier on the recipe's cooking time (0.25 = 50 ticks, twice as fast as the Induction Furnace).")
+            .defineInRange("timeMultiplier", 0.25, 0.01, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Metal Pressing Array: 3x3x3 multiblock with three pressing lanes, each with its own die.").push("metalPressingArray");
+    }
+
+    public static final ModConfigSpec.IntValue PRESSING_ARRAY_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PRESSING_ARRAY_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PRESSING_ARRAY_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t per working lane, before upgrades.")
+            .defineInRange("energyPerTick", 16, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue PRESSING_ARRAY_TIME_MULTIPLIER = BUILDER
+            .comment("Recipe time multiplier (0.5 = twice as fast as the Metal Press).")
+            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Carbonizer: multiblock that bakes coal into coal coke, collecting creosote. Recipes are data-driven (arcforge:carbonizing).")
                 .push("carbonizer");
     }
@@ -606,6 +678,9 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Arcforge Furnace: 3x3x6 brick multiblock that smelts steel. Recipes are data-driven (arcforge:arcforge_smelting).")
                 .push("arcforgeFurnace");
     }
@@ -628,15 +703,47 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
-        BUILDER.comment("Shared multiblock settings.").push("multiblock");
     }
 
-    public static final ModConfigSpec.IntValue MULTIBLOCK_PUSH_INTERVAL = BUILDER
-            .comment("Ticks between pushes out of output and by-product faces into neighbouring inventories and tanks.")
-            .defineInRange("autoPushInterval", 10, 1, 1_200);
+    static {
+        BUILDER.comment("Distillation Array: a 2x2 column 4, 6 or 8 tall that splits creosote into fractions with heat.",
+                "Recipes are data-driven (arcforge:distilling). Values scale with the height (a 4-high column gets them as given).")
+                .push("distillationArray");
+    }
+
+    public static final ModConfigSpec.IntValue DISTILLATION_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU for a 4-high column.")
+            .defineInRange("heatCapacity", 40_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_400, 400, 10_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_FEED_RATE = BUILDER
+            .comment("Feed distilled per tick in mB, for a 4-high column (6 high: x1.5, 8 high: x2).")
+            .defineInRange("feedPerTick", 10, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_FEED_CAPACITY = BUILDER
+            .comment("Feed (creosote) tank size in mB.")
+            .defineInRange("feedCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_STEAM_CAPACITY = BUILDER
+            .comment("Steam tank size in mB.")
+            .defineInRange("steamCapacity", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DISTILLATION_OUTPUT_CAPACITY = BUILDER
+            .comment("Size of each product tank (Naphtha, Light Oil, Heavy Oil) in mB.")
+            .defineInRange("outputCapacity", 8_000, 1_000, 100_000_000);
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Ore generation, per ore. Read when a world loads; changes apply to chunks generated after a restart.",
                 "Turning an ore off only stops it generating: its items and recipes stay (other mods' ores tagged",
                 "the same still work). Arcite can't be turned off.").push("ores");

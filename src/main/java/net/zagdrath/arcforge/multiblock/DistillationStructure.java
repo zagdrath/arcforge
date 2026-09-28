@@ -160,10 +160,15 @@ public final class DistillationStructure {
     }
 
     public static void unform(ServerLevel level, Column column) {
+        unform(level, column, null);
+    }
+
+    // As unform, leaving the block at skip (a controller being broken) alone.
+    public static void unform(ServerLevel level, Column column, @Nullable BlockPos skip) {
         for (BlockPos pos : column.positions()) {
             BlockPos immutable = pos.immutable();
             BlockState state = level.getBlockState(immutable);
-            if (isFormedPart(state)) {
+            if (!immutable.equals(skip) && isFormedPart(state)) {
                 BlockState loose = state.setValue(ColumnPart.FORMED, false);
                 if (loose.hasProperty(ColumnPart.LIT)) {
                     loose = loose.setValue(ColumnPart.LIT, false);

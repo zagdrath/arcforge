@@ -72,6 +72,9 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // generates, using 1 mB every 20 ticks for every 3 blocks of length.
 public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
+    // The rotor's four blades look the same every 90°, so a turn of more than 45° a tick would look like it
+    // was going backwards: full speed stays under that.
+    private static final double MAX_DEGREES_PER_TICK = 36.0;
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.LUBRICANT);
     private static final double SPIN_UP = 0.01;
     private static final double SPIN_DOWN = 0.005;
@@ -374,11 +377,12 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         return shownSteam;
     }
 
-    // Client side: the rotor angle in degrees at this moment. It turns at up to 18° a tick (one turn a
-    // second at full speed), at the last synced speed.
+    // Client side: the rotor angle in degrees at this moment, at the last synced speed. It turns at up to
+    // MAX_DEGREES_PER_TICK at full speed, on a square-root curve so it looks lively at part speed too.
     public float advanceAngle(double time) {
         if (clientTime >= 0) {
-            clientAngle = (float) ((clientAngle + (time - clientTime) * syncedRpm / maxRpm() * 18.0) % 360.0);
+            double share = Mth.clamp(syncedRpm / (double) maxRpm(), 0.0, 1.0);
+            clientAngle = (float) ((clientAngle + (time - clientTime) * Math.sqrt(share) * MAX_DEGREES_PER_TICK) % 360.0);
         }
         clientTime = time;
         return clientAngle;

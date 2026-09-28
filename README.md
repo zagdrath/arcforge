@@ -69,7 +69,7 @@ At clear noon on the north-south axis it makes 600 HU/t at 550°C (High-Pressure
 It holds 16,000 HU and gives heat out of its heat ports (a new tower has one on the bottom block behind
 the controller), at its whole output even into a touching machine. A boiler it feeds only gets to 500°C
 set to High-Pressure (see the Steam Boiler), since one array gives less heat than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
-it does nothing in the Nether or the End. Everything is configurable (`solarThermalArray`).
+it does nothing in the Nether or the End. Everything is configurable (`power.solarThermalArray`).
 
 ### Steelmaking and alloys
 
@@ -416,7 +416,10 @@ Tabs on the right of each machine's screen:
 ## Configuration
 
 All balance values (heat and FE rates, buffer sizes, temperatures, burn speeds, efficiency, output rates)
-can be changed in `config/arcforge-common.toml`.
+can be changed in `config/arcforge-common.toml`, or in game from the Mods screen. They're grouped into
+**Heat & Power** (`power`), **Steam** (`steam`), **Machines** (`machines`), **Multiblocks** (`multiblocks`) and
+**Ore Generation** (`ores`), each with a page per machine. **Reset All**, at the bottom of the first page, puts
+every value back to its default.
 
 ## License
 

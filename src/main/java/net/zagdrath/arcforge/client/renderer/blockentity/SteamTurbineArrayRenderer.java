@@ -41,7 +41,7 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 // the windows, with a reveal round each opening, so opposite windows see through; see TiledBoxes.lining),
 // then the rotor: the shaft
 // through every block from bearing to generator (stopping just short of the end caps' faces), and a set of blades in each block between them, each
-// set turned 22.5° further so they look staggered; and the steam around it, thicker the faster it flows. The rotor turns at up to one turn a second.
+// set turned 22.5° further so they look staggered; and the steam around it, thicker the faster it flows. The rotor turns at up to 36° a tick (see SteamTurbineArrayBlockEntity.advanceAngle).
 public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
     public static final StandaloneModelKey<QuadCollection> ROTOR_SHAFT = new StandaloneModelKey<>(() -> Arcforge.MODID + ":rotor_shaft");
     public static final StandaloneModelKey<QuadCollection> ROTOR_BLADES = new StandaloneModelKey<>(() -> Arcforge.MODID + ":rotor_blades");

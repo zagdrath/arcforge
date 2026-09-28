@@ -167,6 +167,17 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
         }
     }
 
+    // Breaking the controller un-forms the rest of the tower: the parts only ever tell a controller they
+    // changed, so with this one gone nothing else would, and a new controller couldn't claim them.
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level instanceof ServerLevel serverLevel && tower != null) {
+            SolarThermalStructure.unform(serverLevel, tower, pos);
+            tower = null;
+        }
+    }
+
     private void updateFormed(ServerLevel level) {
         SolarThermalStructure.Found found = SolarThermalStructure.find(level, worldPosition, tower);
         problem = found.problem();

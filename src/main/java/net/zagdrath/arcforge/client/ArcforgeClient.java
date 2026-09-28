@@ -18,9 +18,9 @@ import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.SectionPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeMap;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -42,7 +42,6 @@ import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsE
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.zagdrath.arcforge.Arcforge;
@@ -106,16 +105,20 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 public class ArcforgeClient {
     public ArcforgeClient(ModContainer container) {
         // Mods screen > Arcforge > Config
-        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        container.registerExtensionPoint(IConfigScreenFactory.class, ArcforgeConfigScreen::create);
         EngineersHandbookItem.opener = EngineersHandbookScreen::open;
         SteamTurbineArrayBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
         // Re-mesh blocks whose ports changed, and forget the ports on leaving a world.
+        // (The ports aren't block state, so the section is marked dirty itself: marking the block would skip it,
+        // as its model hasn't changed.)
         PortStore.clientRemesh = positions -> Minecraft.getInstance().execute(() -> {
             var level = Minecraft.getInstance().level;
             if (level != null) {
                 for (BlockPos pos : positions) {
-                    BlockState state = level.getBlockState(pos);
-                    level.setBlocksDirty(pos, state, state);
+                    int x = SectionPos.blockToSectionCoord(pos.getX());
+                    int y = SectionPos.blockToSectionCoord(pos.getY());
+                    int z = SectionPos.blockToSectionCoord(pos.getZ());
+                    level.setSectionRangeDirty(x, y, z, x, y, z);
                 }
             }
         });

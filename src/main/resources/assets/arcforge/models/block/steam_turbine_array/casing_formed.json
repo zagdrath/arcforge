@@ -9,9 +9,7 @@
     "base": "arcforge:block/steam_turbine_array/formed_base",
     "beam": "arcforge:block/ctm/frame_beam",
     "lip": "arcforge:block/ctm/window_lip",
-    "window": "arcforge:block/ctm/pressure_glass_base",
-    "end_generator": "arcforge:block/steam_turbine_array/end_generator",
-    "end_bearing": "arcforge:block/steam_turbine_array/end_bearing"
+    "window": "arcforge:block/ctm/pressure_glass_base"
   },
   "fallback": "arcforge:block/steam_turbine_array/casing_formed_flat"
 }

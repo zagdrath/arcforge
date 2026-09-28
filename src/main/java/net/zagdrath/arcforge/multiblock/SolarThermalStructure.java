@@ -158,10 +158,15 @@ public final class SolarThermalStructure {
     }
 
     public static void unform(ServerLevel level, Tower tower) {
+        unform(level, tower, null);
+    }
+
+    // As unform, leaving the block at skip (a controller being broken) alone.
+    public static void unform(ServerLevel level, Tower tower, @Nullable BlockPos skip) {
         for (BlockPos pos : tower.positions()) {
             BlockPos immutable = pos.immutable();
             BlockState state = level.getBlockState(immutable);
-            if (!isFormedPart(state)) {
+            if (immutable.equals(skip) || !isFormedPart(state)) {
                 continue;
             }
             BlockState loose = state.setValue(SolarPart.FORMED, false);

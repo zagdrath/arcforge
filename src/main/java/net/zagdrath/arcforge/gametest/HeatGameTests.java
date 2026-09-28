@@ -270,8 +270,9 @@ public final class HeatGameTests {
                 .thenExecute(() -> {
                     double wroughtLost = 1.0 - (double) wrought.getHeat().getStored() / wrought.getHeat().getCapacity();
                     double arcforgedLost = 1.0 - (double) arcforged.getHeat().getStored() / arcforged.getHeat().getCapacity();
-                    // 3 leaks of 10%/min: about 0.5%.
-                    helper.assertTrue(wroughtLost > 0.004 && wroughtLost < 0.006, "Wrought cell lost " + wroughtLost * 100 + "% in 3 s");
+                    // 3 or 4 leaks of 10%/min (about 0.5% or 0.67%): the cell leaks on the game clock's seconds, and
+                    // 61 ticks span 3 or 4 of them depending on when the test starts.
+                    helper.assertTrue(wroughtLost > 0.004 && wroughtLost < 0.0075, "Wrought cell lost " + wroughtLost * 100 + "% in 3 s");
                     helper.assertTrue(arcforgedLost > 0 && arcforgedLost < wroughtLost / 10, "Arcforged cell lost " + arcforgedLost * 100 + "% in 3 s");
                     helper.assertTrue(wrought.getLeakPerTick() > 0, "Wrought cell shows no leak");
                     helper.assertTrue(helper.getBlockState(wroughtPos).getValue(HeatCellBlock.HEAT) == 4, "Full cell is at heat level "

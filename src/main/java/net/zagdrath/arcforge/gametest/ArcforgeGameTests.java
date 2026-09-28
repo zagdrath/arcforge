@@ -168,6 +168,7 @@ public final class ArcforgeGameTests {
         TESTS.put("ores_toggle", OreGameTests::oreToggle);
         TESTS.put("ores_vein_generates", OreGameTests::veinGenerates);
         SOLAR_TESTS.put("solar_zero_at_night", SolarGameTests::zeroAtNight);
+        SOLAR_TESTS.put("solar_controller_rebuild", SolarGameTests::controllerRebuild);
         SOLAR_TESTS.put("solar_peak_at_noon", SolarGameTests::peakAtNoon);
         SOLAR_TESTS.put("solar_rain_reduces_output", SolarGameTests::rainReducesOutput);
         SOLAR_TESTS.put("solar_thunder_stows_panel", SolarGameTests::thunderStowsPanel);

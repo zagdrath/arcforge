@@ -46,7 +46,6 @@ import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
@@ -55,7 +54,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 // Formed casings that are ports (see MultiblockPorts) show their port plate on their outer faces.
 //
 // Model JSON (loader "arcforge:connected"): "connect" is "structure" (a casing) or "glass", "textures"
-// names base / beam / lip / window (and end_generator / end_bearing for the turbine), and "fallback" is a
+// names base / beam / lip / window, and "fallback" is a
 // plain cube used wherever the model is baked on its own. Blockstates use it through the block state model
 // type "arcforge:connected" ({"type": "arcforge:connected", "model": <that model>}), which is what sees
 // the neighbouring blocks.
@@ -202,8 +201,6 @@ public final class ConnectedModel {
         private final Map<Direction, List<BakedQuad>[]> lipUpDown = new EnumMap<>(Direction.class);
         private final Map<Direction, List<BakedQuad>[]> beam = new EnumMap<>(Direction.class);
         private final Map<Direction, List<BakedQuad>[]> edgeLip = new EnumMap<>(Direction.class);
-        private final Map<Direction, List<BakedQuad>> endGenerator = new EnumMap<>(Direction.class);
-        private final Map<Direction, List<BakedQuad>> endBearing = new EnumMap<>(Direction.class);
         private final PortOverlays ports;
         private final int materialFlags;
 
@@ -216,8 +213,6 @@ public final class ConnectedModel {
             Material.Baked beamTexture = material(baker, unbaked.textures().get("beam"), name);
             Material.Baked lipTexture = material(baker, unbaked.textures().get("lip"), name);
             Material.Baked windowTexture = glass ? baseTexture : material(baker, unbaked.textures().get("window"), name);
-            Identifier generatorId = unbaked.textures().get("end_generator");
-            Identifier bearingId = unbaked.textures().get("end_bearing");
             this.ports = new PortOverlays(baker, name);
             int flags = ports.materialFlags();
             for (Direction face : Direction.values()) {
@@ -248,12 +243,6 @@ public final class ConnectedModel {
                 lipUpDown.put(face, upDown);
                 beam.put(face, beams);
                 edgeLip.put(face, edges);
-                if (generatorId != null) {
-                    endGenerator.put(face, List.of(bake(baker, face, 0, 0, 16, 16, 0, material(baker, generatorId, name), 0, 0, 16, 16, Quadrant.R0)));
-                }
-                if (bearingId != null) {
-                    endBearing.put(face, List.of(bake(baker, face, 0, 0, 16, 16, 0, material(baker, bearingId, name), 0, 0, 16, 16, Quadrant.R0)));
-                }
                 for (List<BakedQuad>[] set : List.of(baseQuads, windowQuads, across, upDown, beams, edges)) {
                     for (List<BakedQuad> quads : set) {
                         for (BakedQuad quad : quads) {
@@ -349,20 +338,6 @@ public final class ConnectedModel {
         }
 
         private void pickFace(BlockAndTintGetter level, BlockPos pos, BlockState state, Direction face, List<BakedQuad> out) {
-            // The rotor's bearings: the end cap tile.
-            if (state.hasProperty(SteamTurbineArrayCasingBlock.END)) {
-                switch (state.getValue(SteamTurbineArrayCasingBlock.END)) {
-                    case GENERATOR -> {
-                        out.addAll(endGenerator.getOrDefault(face, List.of()));
-                        return;
-                    }
-                    case BEARING -> {
-                        out.addAll(endBearing.getOrDefault(face, List.of()));
-                        return;
-                    }
-                    case NONE -> { }
-                }
-            }
             if (glass) {
                 for (List<BakedQuad> piece : base.get(face)) {
                     out.addAll(piece);

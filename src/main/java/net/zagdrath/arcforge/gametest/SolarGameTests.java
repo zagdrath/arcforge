@@ -18,6 +18,7 @@ import net.minecraft.world.level.saveddata.WeatherData;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
+import net.zagdrath.arcforge.block.multiblock.SolarPart;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
@@ -55,6 +56,35 @@ public final class SolarGameTests {
         }
         helper.setBlock(controller, ModBlocks.SOLAR_THERMAL_ARRAY_CONTROLLER.get().defaultBlockState().setValue(SolarThermalArrayControllerBlock.FACING, facing));
         return helper.getBlockEntity(controller, SolarThermalArrayBlockEntity.class);
+    }
+
+    // Breaking the controller un-forms the whole tower (its casings and collectors go back to loose blocks), and
+    // putting a controller back forms it again.
+    static void controllerRebuild(GameTestHelper helper) {
+        plains(helper);
+        time(helper, NOON);
+        weather(helper, false, false);
+        BlockPos min = new BlockPos(1, 1, 1);
+        buildTower(helper, min, Direction.SOUTH);
+        BlockPos controller = new BlockPos(1, 1, 2);
+        BlockPos casing = new BlockPos(2, 2, 1), collector = new BlockPos(1, 4, 1);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.assertTrue(helper.getBlockEntity(controller, SolarThermalArrayBlockEntity.class).isFormed(), "Tower did not form");
+                    helper.setBlock(controller, net.minecraft.world.level.block.Blocks.AIR);
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    helper.assertTrue(!SolarPart.isFormed(helper.getBlockState(casing)) && !SolarPart.isFormed(helper.getBlockState(collector)),
+                            "Parts still formed after the controller broke");
+                    helper.setBlock(controller, ModBlocks.SOLAR_THERMAL_ARRAY_CONTROLLER.get().defaultBlockState()
+                            .setValue(SolarThermalArrayControllerBlock.FACING, Direction.SOUTH));
+                })
+                .thenIdle(3)
+                .thenExecute(() -> helper.assertTrue(helper.getBlockEntity(controller, SolarThermalArrayBlockEntity.class).isFormed()
+                        && SolarPart.isFormed(helper.getBlockState(casing)), "Tower did not form again with a new controller"))
+                .thenSucceed();
     }
 
     // The test world is a dry, hot biome: the towers stand on plains (x1.0, and it rains there).

@@ -217,6 +217,17 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         }
     }
 
+    // Breaking the controller un-forms the rest of the column: the parts only ever tell a controller they
+    // changed, so with this one gone nothing else would, and a new controller couldn't claim them.
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (level instanceof ServerLevel serverLevel && column != null) {
+            DistillationStructure.unform(serverLevel, column, pos);
+            column = null;
+        }
+    }
+
     private void updateFormed(ServerLevel level) {
         DistillationStructure.Column found = DistillationStructure.find(level, worldPosition, column);
         if (Objects.equals(found, column)) {
