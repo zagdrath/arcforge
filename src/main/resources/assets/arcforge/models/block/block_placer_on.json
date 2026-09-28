@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/block_placer_front_on",
+    "south": "arcforge:block/block_placer_back",
+    "east": "arcforge:block/block_placer_side",
+    "west": "arcforge:block/block_placer_side",
+    "up": "arcforge:block/block_placer_side",
+    "down": "arcforge:block/block_placer_side",
+    "particle": "arcforge:block/block_placer_side"
+  }
+}

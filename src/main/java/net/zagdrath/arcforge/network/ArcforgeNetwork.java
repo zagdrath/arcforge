@@ -9,7 +9,8 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-// Arcforge's own packets: the Wrench's mode change, and the port lists of open multiblock menus.
+// Arcforge's own packets: the Wrench's mode change, the port lists of open multiblock menus, and JEI setting an
+// Assembler's pattern.
 public final class ArcforgeNetwork {
     private static final String VERSION = "1";
 
@@ -23,5 +24,6 @@ public final class ArcforgeNetwork {
         PayloadRegistrar registrar = event.registrar(VERSION);
         registrar.playToServer(WrenchModePayload.TYPE, WrenchModePayload.STREAM_CODEC, WrenchModePayload::handle);
         registrar.playToClient(PortsPayload.TYPE, PortsPayload.STREAM_CODEC, PortsPayload::handle);
+        registrar.playToServer(AssemblerPatternPayload.TYPE, AssemblerPatternPayload.STREAM_CODEC, AssemblerPatternPayload::handle);
     }
 }

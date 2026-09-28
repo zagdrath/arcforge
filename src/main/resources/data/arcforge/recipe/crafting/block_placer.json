@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WDW",
+    "WSW",
+    "WRW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "D": "minecraft:dispenser",
+    "S": "#c:plates/steel",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "arcforge:block_placer",
+    "count": 1
+  }
+}

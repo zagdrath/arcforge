@@ -1,0 +1,13 @@
+{
+  "title": "Block Placer",
+  "icon": "arcforge:block_placer",
+  "items": [
+    "arcforge:block_placer"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Places blocks from its 9 slots in front of it, the first placeable one first, for 20 FE each (Wrought tier). It can face any direction.\n- It places into air, water or anything replaceable, like grass, and waits while the front is blocked.\n- Redstone: Always, With signal, Without signal, or Pulse.\n# Cobblestone loop\nA Block Breaker facing a cobblestone generator, feeding a Block Placer or a crate, runs on its own."
+    }
+  ]
+}

@@ -22,6 +22,11 @@ public interface ConfigurableMachine {
 
     default void setRedstoneMode(RedstoneMode mode) {}
 
+    // The redstone modes its Redstone tab offers; the menu refuses any other.
+    default List<RedstoneMode> getAllowedRedstoneModes() {
+        return RedstoneMode.STANDARD;
+    }
+
     // Auto-eject: whether output faces push items and fluids into neighbours (off: they wait to be
     // pulled). Machines without item or fluid outputs have no button and never push.
     default boolean isAutoEject() {

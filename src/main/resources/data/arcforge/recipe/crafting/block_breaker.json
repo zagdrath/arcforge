@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WKW",
+    "WSW",
+    "WRW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "K": "minecraft:iron_pickaxe",
+    "S": "#c:plates/steel",
+    "R": "minecraft:redstone"
+  },
+  "result": {
+    "id": "arcforge:block_breaker",
+    "count": 1
+  }
+}

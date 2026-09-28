@@ -106,5 +106,41 @@
         "stream": false
       }
     ]
+  },
+  "assembler_run": {
+    "subtitle": "subtitles.arcforge.assembler_run",
+    "sounds": [
+      {
+        "name": "arcforge:assembler_run",
+        "stream": false
+      }
+    ]
+  },
+  "block_breaker_run": {
+    "subtitle": "subtitles.arcforge.block_breaker_run",
+    "sounds": [
+      {
+        "name": "arcforge:block_breaker_run",
+        "stream": false
+      }
+    ]
+  },
+  "block_placer_run": {
+    "subtitle": "subtitles.arcforge.block_placer_run",
+    "sounds": [
+      {
+        "name": "arcforge:block_placer_run",
+        "stream": false
+      }
+    ]
+  },
+  "vacuum_collector_run": {
+    "subtitle": "subtitles.arcforge.vacuum_collector_run",
+    "sounds": [
+      {
+        "name": "arcforge:vacuum_collector_run",
+        "stream": false
+      }
+    ]
   }
 }

@@ -60,6 +60,10 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ARC_MELTER = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_MELTER);
     public static final DeferredItem<BlockItem> CHEMICAL_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.CHEMICAL_REACTOR);
     public static final DeferredItem<BlockItem> ELECTROLYZER = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTROLYZER);
+    public static final DeferredItem<BlockItem> ASSEMBLER = ITEMS.registerSimpleBlockItem(ModBlocks.ASSEMBLER);
+    public static final DeferredItem<BlockItem> BLOCK_BREAKER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_BREAKER);
+    public static final DeferredItem<BlockItem> BLOCK_PLACER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_PLACER);
+    public static final DeferredItem<BlockItem> VACUUM_COLLECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.VACUUM_COLLECTOR);
     public static final DeferredItem<BlockItem> STEAM_BOILER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_BOILER_ARRAY_CASING);
     public static final DeferredItem<BlockItem> STEAM_TURBINE_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_TURBINE_ARRAY_CASING);
     public static final DeferredItem<BlockItem> SUPERHEATER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.SUPERHEATER_ARRAY_CASING);

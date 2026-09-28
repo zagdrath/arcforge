@@ -24,6 +24,10 @@ import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.BlockPlacerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.BlockBreakerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
@@ -90,6 +94,14 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(ChemicalReactorBlockEntity::new, ModBlocks.CHEMICAL_REACTOR.get()));
     public static final Supplier<BlockEntityType<ElectrolyzerBlockEntity>> ELECTROLYZER = BLOCK_ENTITY_TYPES.register("electrolyzer",
             () -> new BlockEntityType<>(ElectrolyzerBlockEntity::new, ModBlocks.ELECTROLYZER.get()));
+    public static final Supplier<BlockEntityType<AssemblerBlockEntity>> ASSEMBLER = BLOCK_ENTITY_TYPES.register("assembler",
+            () -> new BlockEntityType<>(AssemblerBlockEntity::new, ModBlocks.ASSEMBLER.get()));
+    public static final Supplier<BlockEntityType<BlockBreakerBlockEntity>> BLOCK_BREAKER = BLOCK_ENTITY_TYPES.register("block_breaker",
+            () -> new BlockEntityType<>(BlockBreakerBlockEntity::new, ModBlocks.BLOCK_BREAKER.get()));
+    public static final Supplier<BlockEntityType<BlockPlacerBlockEntity>> BLOCK_PLACER = BLOCK_ENTITY_TYPES.register("block_placer",
+            () -> new BlockEntityType<>(BlockPlacerBlockEntity::new, ModBlocks.BLOCK_PLACER.get()));
+    public static final Supplier<BlockEntityType<VacuumCollectorBlockEntity>> VACUUM_COLLECTOR = BLOCK_ENTITY_TYPES.register("vacuum_collector",
+            () -> new BlockEntityType<>(VacuumCollectorBlockEntity::new, ModBlocks.VACUUM_COLLECTOR.get()));
 
     // Every casing has one; only the master (the minimum corner) runs.
     public static final Supplier<BlockEntityType<SteamBoilerArrayBlockEntity>> STEAM_BOILER_ARRAY = BLOCK_ENTITY_TYPES.register("steam_boiler_array",

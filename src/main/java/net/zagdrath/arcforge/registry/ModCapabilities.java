@@ -46,6 +46,10 @@ import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.BlockPlacerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.BlockBreakerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
@@ -163,6 +167,22 @@ public final class ModCapabilities {
                 ElectrolyzerBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
                 ElectrolyzerBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ASSEMBLER.get(),
+                AssemblerBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ASSEMBLER.get(),
+                AssemblerBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.BLOCK_BREAKER.get(),
+                BlockBreakerBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.BLOCK_BREAKER.get(),
+                BlockBreakerBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.BLOCK_PLACER.get(),
+                BlockPlacerBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.BLOCK_PLACER.get(),
+                BlockPlacerBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.VACUUM_COLLECTOR.get(),
+                VacuumCollectorBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.VACUUM_COLLECTOR.get(),
+                VacuumCollectorBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
                 MetalPressBlockEntity::getItemHandler);
         // Every casing of a formed Metal Pressing Array exposes the cube face it lies on (served by the centre).

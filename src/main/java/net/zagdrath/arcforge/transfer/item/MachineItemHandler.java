@@ -20,6 +20,7 @@ public class MachineItemHandler extends FilteredItemHandler {
 
     private final int firstUpgradeSlot;
     private final Set<UpgradeType> acceptedUpgrades;
+    private final java.util.Map<Integer, Integer> slotLimits = new java.util.HashMap<>();
 
     public MachineItemHandler(int machineSlots, SlotFilter filter, Set<UpgradeType> acceptedUpgrades, Runnable onChanged) {
         this(machineSlots, UPGRADE_SLOTS, filter, acceptedUpgrades, onChanged);
@@ -61,9 +62,16 @@ public class MachineItemHandler extends FilteredItemHandler {
         return true;
     }
 
+    // A machine slot that holds fewer than a stack (the Vacuum Collector's filter slot holds one).
+    public void setSlotLimit(int index, int limit) {
+        slotLimits.put(index, limit);
+    }
+
     @Override
     protected int getCapacity(int index, ItemResource resource) {
-        return isUpgradeSlot(index) ? Math.min(UpgradeType.MAX_PER_MACHINE, super.getCapacity(index, resource)) : super.getCapacity(index, resource);
+        int capacity = isUpgradeSlot(index) ? Math.min(UpgradeType.MAX_PER_MACHINE, super.getCapacity(index, resource)) : super.getCapacity(index, resource);
+        Integer limit = slotLimits.get(index);
+        return limit != null ? Math.min(limit, capacity) : capacity;
     }
 
     private UpgradeType typeIn(int slot) {

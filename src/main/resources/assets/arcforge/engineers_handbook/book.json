@@ -61,6 +61,18 @@
       ]
     },
     {
+      "id": "automation",
+      "title": "Automation",
+      "icon": "arcforge:assembler",
+      "description": "Machines that craft, break, place and collect for you.",
+      "entries": [
+        "assembler",
+        "block_breaker",
+        "block_placer",
+        "vacuum_collector"
+      ]
+    },
+    {
       "id": "arrays",
       "title": "Machine Arrays",
       "icon": "arcforge:arc_crushing_array_casing",

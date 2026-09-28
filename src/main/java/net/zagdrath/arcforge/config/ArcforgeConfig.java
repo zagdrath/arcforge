@@ -664,6 +664,120 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Assembler: crafts any crafting recipe set in its 3x3 pattern from the ingredients in its buffer, with FE.")
+                .push("assembler");
+    }
+
+    public static final ModConfigSpec.IntValue ASSEMBLER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue ASSEMBLER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue ASSEMBLER_ENERGY_PER_CRAFT = BUILDER
+            .comment("FE per craft, before Energy upgrades.")
+            .defineInRange("energyPerCraft", 400, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue ASSEMBLER_CRAFT_TICKS = BUILDER
+            .comment("Ticks per craft, before Speed upgrades.")
+            .defineInRange("craftTicks", 20, 1, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Block Breaker: breaks the block in front of it into its inventory with FE, dropping what the right tool",
+                "would (no enchantments). Harder blocks take longer.").push("blockBreaker");
+    }
+
+    public static final ModConfigSpec.IntValue BREAKER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue BREAKER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue BREAKER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while breaking, before upgrades.")
+            .defineInRange("energyPerTick", 40, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue BREAKER_TICKS_PER_HARDNESS = BUILDER
+            .comment("Ticks per point of the block's hardness (stone 1.5, iron ore 3, obsidian 50), before Speed upgrades.")
+            .defineInRange("ticksPerHardness", 4, 1, 1_000);
+
+    public static final ModConfigSpec.IntValue BREAKER_MIN_TICKS = BUILDER
+            .comment("Fewest ticks a break takes, before Speed upgrades.")
+            .defineInRange("minBreakTicks", 4, 1, 1_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Block Placer: places blocks from its inventory in front of it, with FE.").push("blockPlacer");
+    }
+
+    public static final ModConfigSpec.IntValue PLACER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 10_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue PLACER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 500, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue PLACER_ENERGY_PER_PLACE = BUILDER
+            .comment("FE per block placed, before Energy upgrades.")
+            .defineInRange("energyPerPlace", 20, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue PLACER_INTERVAL = BUILDER
+            .comment("Ticks between placements, before Speed upgrades.")
+            .defineInRange("placeInterval", 4, 1, 1_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Vacuum Collector: pulls up dropped items within its range into its buffer, with FE.").push("vacuumCollector");
+    }
+
+    public static final ModConfigSpec.IntValue VACUUM_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue VACUUM_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue VACUUM_ENERGY_PER_ITEM = BUILDER
+            .comment("FE per item entity picked up (a whole stack is one), before Energy upgrades.")
+            .defineInRange("energyPerItem", 10, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue VACUUM_DEFAULT_RANGE = BUILDER
+            .comment("Range a new collector starts at, in blocks out from it on every axis.")
+            .defineInRange("defaultRange", 5, 1, 16);
+
+    public static final ModConfigSpec.IntValue VACUUM_MAX_RANGE = BUILDER
+            .comment("Largest range it can be set to.")
+            .defineInRange("maxRange", 9, 1, 16);
+
+    public static final ModConfigSpec.IntValue VACUUM_SCAN_INTERVAL = BUILDER
+            .comment("Ticks between scans for items, before Speed upgrades.")
+            .defineInRange("scanInterval", 5, 1, 1_000);
+
+    public static final ModConfigSpec.IntValue VACUUM_MIN_ITEM_AGE = BUILDER
+            .comment("Ticks an item must have been on the ground before it's taken (so a player's own drops aren't snatched at once).")
+            .defineInRange("minItemAge", 10, 0, 6_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
                 "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
     }

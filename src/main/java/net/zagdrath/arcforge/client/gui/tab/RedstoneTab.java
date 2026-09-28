@@ -21,7 +21,7 @@ import net.minecraft.resources.Identifier;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 
-// Three buttons selecting the machine's redstone mode.
+// A button for each redstone mode the machine offers (three, or four with Pulse).
 public class RedstoneTab extends SideTab {
     private static final Identifier BUTTON = ArcforgeGui.widget("button");
     private static final Identifier BUTTON_HOVER = ArcforgeGui.widget("button_hover");
@@ -31,23 +31,30 @@ public class RedstoneTab extends SideTab {
 
     private final Supplier<RedstoneMode> current;
     private final Consumer<RedstoneMode> select;
+    private final List<RedstoneMode> modes;
 
     public RedstoneTab(Supplier<RedstoneMode> current, Consumer<RedstoneMode> select) {
-        super(ArcforgeGui.widget("icon_redstone"), Component.translatable("gui.arcforge.tab.redstone"), 100, 52);
+        this(current, select, RedstoneMode.STANDARD);
+    }
+
+    public RedstoneTab(Supplier<RedstoneMode> current, Consumer<RedstoneMode> select, List<RedstoneMode> modes) {
+        super(ArcforgeGui.widget("icon_redstone"), Component.translatable("gui.arcforge.tab.redstone"),
+                Math.max(100, BUTTONS_X + modes.size() * BUTTON_PITCH), 52);
         this.current = current;
         this.select = select;
+        this.modes = modes;
     }
 
     private static Identifier icon(RedstoneMode mode) {
         return ArcforgeGui.widget("redstone_" + mode.getSerializedName());
     }
 
-    private static int buttonX(RedstoneMode mode) {
-        return BUTTONS_X + mode.ordinal() * BUTTON_PITCH;
+    private int buttonX(RedstoneMode mode) {
+        return BUTTONS_X + modes.indexOf(mode) * BUTTON_PITCH;
     }
 
-    private static RedstoneMode buttonAt(int localX, int localY) {
-        for (RedstoneMode mode : RedstoneMode.values()) {
+    private RedstoneMode buttonAt(int localX, int localY) {
+        for (RedstoneMode mode : modes) {
             if (ArcforgeGui.isInside(localX, localY, buttonX(mode), BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
                 return mode;
             }
@@ -58,7 +65,7 @@ public class RedstoneTab extends SideTab {
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
         RedstoneMode hovered = buttonAt(mouseX - x, mouseY - y);
-        for (RedstoneMode mode : RedstoneMode.values()) {
+        for (RedstoneMode mode : modes) {
             boolean pressed = mode == current.get();
             Identifier sprite = pressed ? BUTTON_PRESSED : mode == hovered ? BUTTON_HOVER : BUTTON;
             int bx = x + buttonX(mode);

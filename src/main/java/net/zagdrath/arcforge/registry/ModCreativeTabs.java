@@ -40,6 +40,10 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ARC_MELTER.get());
                 output.accept(ModItems.CHEMICAL_REACTOR.get());
                 output.accept(ModItems.ELECTROLYZER.get());
+                output.accept(ModItems.ASSEMBLER.get());
+                output.accept(ModItems.BLOCK_BREAKER.get());
+                output.accept(ModItems.BLOCK_PLACER.get());
+                output.accept(ModItems.VACUUM_COLLECTOR.get());
                 output.accept(ModItems.STEAM_BOILER_ARRAY_CASING.get());
                 output.accept(ModItems.STEAM_TURBINE_ARRAY_CASING.get());
                 output.accept(ModItems.SUPERHEATER_ARRAY_CASING.get());

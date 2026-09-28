@@ -37,7 +37,11 @@ public final class MachineMenuButtons {
     public static boolean handle(ContainerLevelAccess access, int buttonId) {
         if (buttonId >= REDSTONE_FIRST && buttonId < REDSTONE_FIRST + RedstoneMode.values().length) {
             RedstoneMode mode = RedstoneMode.byId(buttonId - REDSTONE_FIRST);
-            apply(access, machine -> machine.setRedstoneMode(mode));
+            apply(access, machine -> {
+                if (machine.getAllowedRedstoneModes().contains(mode)) {
+                    machine.setRedstoneMode(mode);
+                }
+            });
             return true;
         }
 

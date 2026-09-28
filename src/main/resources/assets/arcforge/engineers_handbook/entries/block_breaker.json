@@ -1,0 +1,13 @@
+{
+  "title": "Block Breaker",
+  "icon": "arcforge:block_breaker",
+  "items": [
+    "arcforge:block_breaker"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Breaks the block in front of it with FE and keeps the drops in its 9 slots, sending them out through its Output faces (Wrought tier). It can face any direction.\n- No tool needed: it drops what the right tool would (stone gives cobblestone, iron ore gives raw iron). Harder blocks take longer and cost more FE.\n- It never breaks unbreakable blocks or parts of Arcforge multiblocks.\n- Redstone: Always, With signal, Without signal, or Pulse (one block per redstone pulse)."
+    }
+  ]
+}

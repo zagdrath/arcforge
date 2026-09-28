@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TCT",
+    "GRG",
+    "TPT"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "C": "minecraft:crafting_table",
+    "G": "#c:gears/steel",
+    "R": "minecraft:redstone",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:assembler",
+    "count": 1
+  }
+}

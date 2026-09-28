@@ -23,7 +23,19 @@ public enum RelativeSide {
         this.name = name;
     }
 
+    // For a machine facing up or down (the Block Breaker and Placer), the other faces are fixed: top north,
+    // bottom south, left west, right east.
     public Direction toDirection(Direction facing) {
+        if (facing.getAxis() == Direction.Axis.Y) {
+            return switch (this) {
+                case TOP -> Direction.NORTH;
+                case BOTTOM -> Direction.SOUTH;
+                case FRONT -> facing;
+                case BACK -> facing.getOpposite();
+                case LEFT -> Direction.WEST;
+                case RIGHT -> Direction.EAST;
+            };
+        }
         return switch (this) {
             case TOP -> Direction.UP;
             case BOTTOM -> Direction.DOWN;

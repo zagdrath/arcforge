@@ -45,6 +45,7 @@ public abstract class MachineMenu extends AbstractContainerMenu {
 
     protected final MachineItemHandler items;
     protected final ContainerLevelAccess access;
+    private final BlockPos pos;
     private final PortSync ports;
     private final boolean multiblock;
     private final ContainerData data;
@@ -56,6 +57,7 @@ public abstract class MachineMenu extends AbstractContainerMenu {
             ContainerData data, int dataValues, Block block) {
         super(type, containerId);
         checkContainerDataCount(data, dataValues * 2);
+        this.pos = pos;
         this.access = ContainerLevelAccess.create(inventory.player.level(), pos);
         this.ports = new PortSync(inventory, pos);
         this.multiblock = PortSync.isMultiblock(inventory, pos);
@@ -100,6 +102,11 @@ public abstract class MachineMenu extends AbstractContainerMenu {
     // Adds the upgrade slots (for the Upgrades tab at the given position in the tab stack), the player
     // inventory and the data slots. Call once, after the machine's own slots.
     protected void finish(Inventory inventory, int upgradesTabIndex) {
+        finish(inventory, upgradesTabIndex, 84);
+    }
+
+    // For taller GUIs: the player inventory's top row at inventoryY (the hotbar 58 below it).
+    protected void finish(Inventory inventory, int upgradesTabIndex, int inventoryY) {
         int y = 6 + upgradesTabIndex * 25 + 25;
         for (int i = 0; i < MachineBlockEntity.UPGRADE_SLOTS; i++) {
             ToggleableSlot slot = new ToggleableSlot(items, items::set, items.getFirstUpgradeSlot() + i, UPGRADE_SLOT_X + i * UPGRADE_SLOT_PITCH, y);
@@ -107,7 +114,7 @@ public abstract class MachineMenu extends AbstractContainerMenu {
             addSlot(slot);
         }
         machineSlots = slots.size();
-        addStandardInventorySlots(inventory, 8, 84);
+        addStandardInventorySlots(inventory, 8, inventoryY);
         addDataSlots(data);
     }
 
@@ -177,6 +184,11 @@ public abstract class MachineMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player player) {
         return MenuReach.stillValid(access, player, block);
+    }
+
+    // Where the machine is (the client reads the world around it, e.g. the Block Breaker's target).
+    public BlockPos getPos() {
+        return pos;
     }
 
     public List<ToggleableSlot> getUpgradeSlots() {

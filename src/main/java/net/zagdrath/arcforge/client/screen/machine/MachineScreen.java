@@ -34,6 +34,7 @@ import net.zagdrath.arcforge.client.gui.tab.SideTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.client.gui.tab.UpgradesTab;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.machine.MachineMenu;
@@ -63,11 +64,20 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
 
     // upgrades: false for machines without an Upgrades tab; their upgrade slots stay hidden.
     protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs, boolean upgrades) {
-        super(menu, inventory, title);
+        this(menu, inventory, title, machine, machineTabs, upgrades, 166);
+    }
+
+    // height: of the background (206 for the GUIs with an 18-slot buffer; their inventory label sits 11 above it).
+    protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs, boolean upgrades,
+            int height) {
+        super(menu, inventory, title, 176, height);
+        if (height != 166) {
+            this.inventoryLabelY = height - 93;
+        }
         this.machine = machine;
         this.background = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/" + machine + ".png");
         machineTabs.forEach(tabs::add);
-        tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenu.redstoneButtonId(mode))));
+        tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenu.redstoneButtonId(mode)), redstoneModes()));
         if (menu.isMultiblock()) {
             this.sides = null;
             this.ports = new PortsTab(menu::getPorts);
@@ -95,6 +105,12 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         if (ports != null) {
             ports.withAutoEject(menu::isAutoEject, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT));
         }
+    }
+
+    // The redstone modes its Redstone tab offers (the Block Breaker and Placer add Pulse). Called from the
+    // constructor, so return a constant.
+    protected List<RedstoneMode> redstoneModes() {
+        return RedstoneMode.STANDARD;
     }
 
     // What a side mode is called on this machine (shown in the Sides tab). Machines that take energy

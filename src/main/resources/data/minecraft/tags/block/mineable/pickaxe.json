@@ -104,6 +104,10 @@
     "arcforge:nether_sulfur_ore",
     "arcforge:chemical_reactor",
     "arcforge:electrolyzer",
+    "arcforge:assembler",
+    "arcforge:block_breaker",
+    "arcforge:block_placer",
+    "arcforge:vacuum_collector",
     "arcforge:superheater_array_casing",
     "arcforge:condenser_array_casing"
   ]

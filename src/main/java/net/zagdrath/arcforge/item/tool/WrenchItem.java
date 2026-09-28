@@ -32,6 +32,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.HorizontalDirectionalBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
@@ -150,6 +151,16 @@ public class WrenchItem extends Item {
     // --- Rotate ---
 
     private static InteractionResult rotate(Level level, BlockPos pos, BlockState state, boolean backward) {
+        // Six-way machines (the Block Breaker and Placer) cycle through every direction.
+        if (state.hasProperty(BlockStateProperties.FACING)) {
+            Direction[] all = Direction.values();
+            Direction facing = state.getValue(BlockStateProperties.FACING);
+            Direction next = all[(facing.ordinal() + (backward ? all.length - 1 : 1)) % all.length];
+            level.setBlock(pos, state.setValue(BlockStateProperties.FACING, next), Block.UPDATE_ALL);
+            level.invalidateCapabilities(pos);
+            ConduitBlock.refreshAround(level, pos);
+            return InteractionResult.SUCCESS;
+        }
         if (!state.hasProperty(HorizontalDirectionalBlock.FACING)) {
             return InteractionResult.PASS;
         }

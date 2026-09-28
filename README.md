@@ -317,6 +317,45 @@ that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as 
 **Plastic Sheet** (`#c:plastics`) goes into Conduit Filters, Storage Upgrades and the crafted crate and vault
 upgrades.
 
+### Automation
+
+**Assembler** (Tempered). An automatic crafting table.
+
+- Set a crafting recipe in its 3×3 pattern: click a cell with an item to copy it there (the item isn't used), or
+  press JEI's + on the recipe.
+- Ingredients go into its 18-slot buffer, which only takes items the pattern uses.
+- Each craft takes 400 FE over 20 ticks. The result goes to the output slot, and leftovers such as empty buckets
+  go to the two slots beside it.
+- A craft whose result or leftovers wouldn't fit waits, and uses nothing.
+- Output faces send out results and leftovers.
+
+**Block Breaker** (Wrought). Breaks the block in front of it with FE, keeping the drops in its 9 slots.
+
+- No tool is needed: it drops what the right tool would, without enchantments.
+- It takes `max(4, hardness × 4)` ticks at 40 FE/t: stone 6 ticks, iron ore 12, obsidian 200.
+- It never breaks unbreakable blocks, fluids, Arcforge multiblock parts, or anything in
+  `#arcforge:breaker_blacklist` (spawners, vaults, reinforced deepslate and end portal frames).
+- It breaks as a fake player, so protection mods can refuse.
+
+**Block Placer** (Wrought). Places the first block it can from its 9 slots into the block in front of it (air,
+water or anything replaceable), for 20 FE each, every 4 ticks. Items that aren't blocks, or blocks that can't
+stand there, are skipped.
+
+The Breaker and Placer can face any of the six directions. Facing up or down, their other faces are fixed: top
+north, bottom south, left west and right east. Their redstone setting has a fourth mode, **Pulse**: one break or
+placement per redstone pulse.
+
+**Vacuum Collector** (Tempered). Pulls dropped items into its 18-slot buffer, for 10 FE per item entity.
+
+- It reaches 5 blocks out on every axis; set 1 to 9 with the − and + buttons.
+- Items must have been on the ground for 10 ticks.
+- A Conduit Filter in its filter slot limits what it takes. An unset filter takes everything, and the filter's
+  direction is ignored.
+- The range shows as an outline while you hold a Vacuum Collector, or with the eye button in its GUI.
+
+All four take Speed and Energy upgrades. Config: `machines.assembler`, `machines.blockBreaker`,
+`machines.blockPlacer` and `machines.vacuumCollector`.
+
 ### Upgrades
 
 Speed, Energy, Heat and Thermoelectric Efficiency upgrade cards go in a machine's Upgrades tab, up to 8 of each.

@@ -56,7 +56,23 @@ public enum MachineStatus {
     SUPERHEATING("superheating", "led_running"),
     CONDENSING("condensing", "led_running"),
     // The Electrolyzer.
-    SPLITTING("splitting", "led_running");
+    SPLITTING("splitting", "led_running"),
+    // The Assembler.
+    CRAFTING("crafting", "led_running"),
+    NO_PATTERN("no_pattern", "led_idle"),
+    MISSING_ITEMS("missing_items", "led_blocked"),
+    // The Block Breaker.
+    BREAKING("breaking", "led_running"),
+    CANNOT_BREAK("cannot_break", "led_blocked"),
+    NOTHING_TO_BREAK("nothing_to_break", "led_idle"),
+    // The Block Placer.
+    PLACING("placing", "led_running"),
+    FRONT_BLOCKED("front_blocked", "led_blocked"),
+    NOTHING_TO_PLACE("nothing_to_place", "led_idle"),
+    // The Vacuum Collector.
+    COLLECTING("collecting", "led_running"),
+    // Pulse redstone mode, between pulses.
+    WAITING_PULSE("waiting_pulse", "led_idle");
 
     private final String name;
     private final String led;

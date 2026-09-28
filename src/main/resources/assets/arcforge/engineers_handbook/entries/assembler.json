@@ -1,0 +1,13 @@
+{
+  "title": "Assembler",
+  "icon": "arcforge:assembler",
+  "items": [
+    "arcforge:assembler"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "An automatic crafting table (Tempered tier). Set a recipe in its 3×3 pattern: click a cell with an item to copy it there (the item isn't used), or press JEI's + on any crafting recipe.\n- Ingredients go into its 18-slot buffer; it only accepts items the pattern uses. Each craft takes 400 FE and 1 second.\n- The result goes to the output slot. Leftovers such as empty buckets go to the two slots beside it.\n- Takes Speed and Energy upgrades. Output faces send out results and leftovers."
+    }
+  ]
+}

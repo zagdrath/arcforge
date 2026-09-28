@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/block_breaker_front",
+    "south": "arcforge:block/block_breaker_back",
+    "east": "arcforge:block/block_breaker_side",
+    "west": "arcforge:block/block_breaker_side",
+    "up": "arcforge:block/block_breaker_side",
+    "down": "arcforge:block/block_breaker_side",
+    "particle": "arcforge:block/block_breaker_side"
+  }
+}

@@ -39,7 +39,21 @@ public abstract class MachineBlock extends BaseEntityBlock implements Wrenchable
 
     protected MachineBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(LIT, false));
+        registerDefaultState(stateDefinition.any().setValue(facingProperty(), Direction.NORTH).setValue(LIT, false));
+    }
+
+    // The block state property its front is stored in: FACING (horizontal) here, six-way in
+    // DirectionalMachineBlock. Called while the block is constructed, so return a constant.
+    protected EnumProperty<Direction> facingProperty() {
+        return FACING;
+    }
+
+    // Where a machine block faces, whichever facing property it has.
+    public static Direction facing(BlockState state) {
+        if (state.hasProperty(BlockStateProperties.FACING)) {
+            return state.getValue(BlockStateProperties.FACING);
+        }
+        return state.hasProperty(FACING) ? state.getValue(FACING) : Direction.NORTH;
     }
 
     @Override
@@ -65,16 +79,16 @@ public abstract class MachineBlock extends BaseEntityBlock implements Wrenchable
 
     @Override
     protected BlockState rotate(BlockState state, Rotation rotation) {
-        return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
+        return state.setValue(facingProperty(), rotation.rotate(state.getValue(facingProperty())));
     }
 
     @Override
     protected BlockState mirror(BlockState state, Mirror mirror) {
-        return state.rotate(mirror.getRotation(state.getValue(FACING)));
+        return state.rotate(mirror.getRotation(state.getValue(facingProperty())));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, LIT);
+        builder.add(facingProperty(), LIT);
     }
 }

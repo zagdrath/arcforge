@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/vacuum_collector_front",
+    "south": "arcforge:block/vacuum_collector_back",
+    "east": "arcforge:block/vacuum_collector_side",
+    "west": "arcforge:block/vacuum_collector_side",
+    "up": "arcforge:block/vacuum_collector_top",
+    "down": "arcforge:block/vacuum_collector_bottom",
+    "particle": "arcforge:block/vacuum_collector_side"
+  }
+}

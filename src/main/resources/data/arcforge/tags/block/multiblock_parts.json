@@ -1,0 +1,22 @@
+{
+  "values": [
+    "arcforge:arc_crushing_array_casing",
+    "arcforge:arcforge_furnace_brick_wall",
+    "arcforge:arcforge_furnace_bricks",
+    "arcforge:arcforge_furnace_port",
+    "arcforge:carbonizer",
+    "arcforge:condenser_array_casing",
+    "arcforge:distillation_array_casing",
+    "arcforge:distillation_array_controller",
+    "arcforge:induction_furnace_array_casing",
+    "arcforge:metal_pressing_array_casing",
+    "arcforge:pressure_glass",
+    "arcforge:solar_collector",
+    "arcforge:solar_thermal_array_casing",
+    "arcforge:solar_thermal_array_controller",
+    "arcforge:steam_boiler_array_casing",
+    "arcforge:steam_turbine_array_casing",
+    "arcforge:superheater_array_casing",
+    "arcforge:tray_level_casing"
+  ]
+}

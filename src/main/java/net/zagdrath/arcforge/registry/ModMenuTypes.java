@@ -20,6 +20,10 @@ import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
 import net.zagdrath.arcforge.menu.machine.ArcMelterMenu;
 import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
 import net.zagdrath.arcforge.menu.machine.ElectrolyzerMenu;
+import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
+import net.zagdrath.arcforge.menu.machine.BlockPlacerMenu;
+import net.zagdrath.arcforge.menu.machine.BlockBreakerMenu;
+import net.zagdrath.arcforge.menu.machine.AssemblerMenu;
 import net.zagdrath.arcforge.menu.machine.ElectricPumpMenu;
 import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
@@ -88,6 +92,14 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));
     public static final Supplier<MenuType<ElectrolyzerMenu>> ELECTROLYZER = MENU_TYPES.register("electrolyzer",
             () -> IMenuTypeExtension.create(ElectrolyzerMenu::new));
+    public static final Supplier<MenuType<AssemblerMenu>> ASSEMBLER = MENU_TYPES.register("assembler",
+            () -> IMenuTypeExtension.create(AssemblerMenu::new));
+    public static final Supplier<MenuType<BlockBreakerMenu>> BLOCK_BREAKER = MENU_TYPES.register("block_breaker",
+            () -> IMenuTypeExtension.create(BlockBreakerMenu::new));
+    public static final Supplier<MenuType<BlockPlacerMenu>> BLOCK_PLACER = MENU_TYPES.register("block_placer",
+            () -> IMenuTypeExtension.create(BlockPlacerMenu::new));
+    public static final Supplier<MenuType<VacuumCollectorMenu>> VACUUM_COLLECTOR = MENU_TYPES.register("vacuum_collector",
+            () -> IMenuTypeExtension.create(VacuumCollectorMenu::new));
 
     public static final Supplier<MenuType<SteamTurbineArrayMenu>> STEAM_TURBINE_ARRAY = MENU_TYPES.register("steam_turbine_array",
             () -> IMenuTypeExtension.create(SteamTurbineArrayMenu::new));

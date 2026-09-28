@@ -164,6 +164,16 @@ public final class ArcforgeGameTests {
         TESTS.put("gas_conduit_feeds_burner", ElectrolysisGameTests::gasConduitFeedsBurner);
         TESTS.put("plastic_recipe", ElectrolysisGameTests::plasticRecipe);
         TESTS.put("plastic_in_recipes", ElectrolysisGameTests::plasticInRecipes);
+        TESTS.put("assembler_crafts_pistons", AutomationGameTests::assemblerCraftsPistons);
+        TESTS.put("assembler_returns_buckets", AutomationGameTests::assemblerReturnsBuckets);
+        TESTS.put("assembler_jei_payload", AutomationGameTests::assemblerJeiPayload);
+        TESTS.put("breaker_drops_without_tool", AutomationGameTests::breakerDropsWithoutTool);
+        TESTS.put("breaker_energy", AutomationGameTests::breakerEnergy);
+        TESTS.put("breaker_refuses_multiblock_and_bedrock", AutomationGameTests::breakerRefusesMultiblockAndBedrock);
+        TESTS.put("breaker_pulse", AutomationGameTests::breakerPulse);
+        TESTS.put("placer_places_from_inventory", AutomationGameTests::placerPlacesFromInventory);
+        TESTS.put("vacuum_radius", AutomationGameTests::vacuumRadius);
+        TESTS.put("vacuum_filter", AutomationGameTests::vacuumFilter);
         TESTS.put("steam_boiler_array_forms", SteamGameTests::boilerArrayForms);
         TESTS.put("steam_turbine_array_spins", SteamGameTests::turbineArraySpins);
         TESTS.put("steam_turbine_array_grade_speed", SteamGameTests::turbineArrayGradeSpeed);
@@ -204,6 +214,7 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("chain_yield_triple", ChemicalGameTests::chainYieldTriple);
         LONG_TESTS.put("furnace_smelts", MultiblockGameTests::furnaceSmelts);
         LONG_TESTS.put("oxygen_speeds_furnace", ElectrolysisGameTests::oxygenSpeedsFurnace);
+        LONG_TESTS.put("cobblestone_loop", AutomationGameTests::cobblestoneLoop);
         LONG_TESTS.put("furnace_burns_coke_blocks", MultiblockGameTests::furnaceBurnsCokeBlocks);
         LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);
         LONG_TESTS.put("crusher_recipes", CrushingGameTests::crusherRecipes);

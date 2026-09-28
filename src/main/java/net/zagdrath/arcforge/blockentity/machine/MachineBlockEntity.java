@@ -51,6 +51,9 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     private final List<SideMode> allowedSideModes;
 
     protected RedstoneMode redstoneMode = RedstoneMode.IGNORE;
+    // PULSE: the signal last tick, and whether a rising edge is still waiting for its operation (at most one).
+    private boolean lastPowered;
+    private int pendingPulses;
     protected MachineStatus status = MachineStatus.NO_FUEL;
 
     // A slot filter that needs the machine's level, e.g. to look up recipes (null on the client menu's copy).
@@ -87,7 +90,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     }
 
     public Direction getFacing() {
-        return getBlockState().getValue(MachineBlock.FACING);
+        return MachineBlock.facing(getBlockState());
     }
 
     protected void setLit(boolean lit) {
@@ -114,8 +117,35 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
 
     @Override
     public void setRedstoneMode(RedstoneMode mode) {
+        if (mode != redstoneMode) {
+            pendingPulses = 0;
+        }
         redstoneMode = mode;
         setChanged();
+    }
+
+    // Whether the redstone setting lets it work this tick. Call it once a tick. In PULSE mode a rising edge
+    // allows one operation, until consumePulse().
+    protected boolean redstoneAllows(Level level) {
+        boolean powered = level.hasNeighborSignal(worldPosition);
+        if (redstoneMode == RedstoneMode.PULSE) {
+            if (powered && !lastPowered) {
+                pendingPulses = Math.min(pendingPulses + 1, 1);
+                setChanged();
+            }
+            lastPowered = powered;
+            return pendingPulses > 0;
+        }
+        lastPowered = powered;
+        return redstoneMode.canRun(powered);
+    }
+
+    // After the single operation a pulse allowed.
+    protected void consumePulse() {
+        if (redstoneMode == RedstoneMode.PULSE && pendingPulses > 0) {
+            pendingPulses = 0;
+            setChanged();
+        }
     }
 
     @Override
@@ -193,6 +223,8 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         items.deserialize(input.childOrEmpty("items"));
         sideConfig.deserialize(input);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", 0));
+        lastPowered = input.getBooleanOr("last_powered", false);
+        pendingPulses = input.getIntOr("pending_pulses", 0);
     }
 
     @Override
@@ -201,5 +233,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         items.serialize(output.child("items"));
         sideConfig.serialize(output);
         output.putInt("redstone_mode", redstoneMode.ordinal());
+        output.putBoolean("last_powered", lastPowered);
+        output.putInt("pending_pulses", pendingPulses);
     }
 }

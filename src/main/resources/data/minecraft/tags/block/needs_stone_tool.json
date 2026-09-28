@@ -24,6 +24,10 @@
     "arcforge:arc_melter",
     "arcforge:chemical_reactor",
     "arcforge:electrolyzer",
+    "arcforge:assembler",
+    "arcforge:block_breaker",
+    "arcforge:block_placer",
+    "arcforge:vacuum_collector",
     "arcforge:nether_sulfur_ore",
     "arcforge:superheater_array_casing",
     "arcforge:condenser_array_casing"

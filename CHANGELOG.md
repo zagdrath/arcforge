@@ -57,6 +57,26 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
   hydrogen.
 - Handbook pages: **Electrolyzer** and **Hydrogen & Oxygen**. The Fuel Burner, Arcforge Furnace and Chemical
   Processing pages have new sections.
+- **Assembler** (Tempered). An automatic crafting table.
+  - A 3×3 pattern of ghost items picks any crafting recipe. Click a cell with an item to set it, or use JEI's +.
+  - Ingredients go into an 18-slot buffer that only takes pattern items. Each craft uses 400 FE over 1 second.
+  - The result goes to the output slot. Leftovers such as empty buckets go to two slots beside it. A craft
+    whose result or leftovers wouldn't fit waits and uses nothing.
+- **Block Breaker** (Wrought). Breaks the block in front of it into its 9 slots with FE. It needs no tool.
+  - It drops what the right tool would, unenchanted: stone gives cobblestone, iron ore gives raw iron.
+  - Harder blocks take longer: stone 6 ticks, obsidian 200, at 40 FE/t.
+  - It never breaks unbreakable blocks, fluids, multiblock parts or `#arcforge:breaker_blacklist`.
+  - It breaks as a fake player, so protection mods can refuse.
+- **Block Placer** (Wrought). Places the first block it can from its 9 slots, for 20 FE each. Blocks orient as
+  if a player placed them facing out of its front.
+- The Block Breaker and Block Placer can face any of the six directions.
+- **Vacuum Collector** (Tempered). Pulls dropped items within its range into an 18-slot buffer, for 10 FE per item.
+  - The range defaults to 5 blocks and can be set from 1 to 9.
+  - A Conduit Filter in its filter slot limits what it takes. An unset filter takes everything.
+  - The range shows as an outline while you hold a Vacuum Collector, or from a button in its GUI.
+- **Pulse redstone mode** for the Block Breaker and Block Placer: one break or placement per redstone pulse.
+- Running sounds, Jade lines, JEI (the Assembler is a crafting station) and a new **Automation** chapter in the
+  Handbook for all four.
 
 ### Changed
 

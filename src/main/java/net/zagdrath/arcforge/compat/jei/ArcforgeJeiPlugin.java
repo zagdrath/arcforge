@@ -38,6 +38,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.IRecipeTransferRegistration;
 
 // JEI support (only loaded when JEI is installed): a category for each Arcforge machine's recipes, steam
 // grades and burner fuels, a step-by-step build viewer for every multiblock, and each item's description
@@ -127,8 +128,15 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         RecipeLinks.setViewer(null);
     }
 
+    // JEI's + on a crafting recipe fills an open Assembler's pattern.
+    @Override
+    public void registerRecipeTransferHandlers(IRecipeTransferRegistration registration) {
+        registration.addRecipeTransferHandler(new AssemblerTransferHandler(), RecipeTypes.CRAFTING);
+    }
+
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
+        registration.addCraftingStation(RecipeTypes.CRAFTING, ModBlocks.ASSEMBLER.get());
         registration.addCraftingStation(MachineCategories.Crushing.TYPE, ModBlocks.ARC_CRUSHER.get(), ModBlocks.ARC_CRUSHING_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.Fiberizing.TYPE, ModBlocks.FIBERIZER.get());
         registration.addCraftingStation(MachineCategories.Infusing.TYPE, ModBlocks.INFUSER.get());

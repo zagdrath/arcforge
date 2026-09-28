@@ -1,0 +1,10 @@
+{
+  "values": [
+    "#arcforge:multiblock_parts",
+    "minecraft:spawner",
+    "minecraft:trial_spawner",
+    "minecraft:vault",
+    "minecraft:reinforced_deepslate",
+    "minecraft:end_portal_frame"
+  ]
+}
