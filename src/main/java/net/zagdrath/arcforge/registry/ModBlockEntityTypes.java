@@ -20,6 +20,7 @@ import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
@@ -84,6 +85,9 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<ElectricPumpBlockEntity>> ELECTRIC_PUMP = BLOCK_ENTITY_TYPES.register("electric_pump",
             () -> new BlockEntityType<>(ElectricPumpBlockEntity::new, ModBlocks.ELECTRIC_PUMP.get()));
+
+    public static final Supplier<BlockEntityType<ArcMelterBlockEntity>> ARC_MELTER = BLOCK_ENTITY_TYPES.register("arc_melter",
+            () -> new BlockEntityType<>(ArcMelterBlockEntity::new, ModBlocks.ARC_MELTER.get()));
 
     // Every casing has one; only the master (the minimum corner) runs.
     public static final Supplier<BlockEntityType<SteamBoilerArrayBlockEntity>> STEAM_BOILER_ARRAY = BLOCK_ENTITY_TYPES.register("steam_boiler_array",

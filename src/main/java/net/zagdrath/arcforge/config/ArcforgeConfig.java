@@ -514,6 +514,39 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Arc Melter: melts rock into lava with FE. Recipes are data-driven (arcforge:melting).").push("arcMelter");
+    }
+
+    public static final ModConfigSpec.IntValue MELTER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 40_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue MELTER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in. Keep it at 16x energyPerTick or more, so 8 Speed upgrades can run flat out.")
+            .defineInRange("maxEnergyInput", 2_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue MELTER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while melting, before upgrades. With energyPerMb this sets the time: 250 mB at 50 FE/mB and 100 FE/t is 125 ticks.")
+            .defineInRange("energyPerTick", 100, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue MELTER_ENERGY_PER_MB = BUILDER
+            .comment("FE per mB of fluid made, before Energy upgrades. A recipe's \"energy\" field overrides it. 50 FE/mB is about 63% of",
+                    "what a Geothermal and Thermoelectric Plant get back from the lava.")
+            .defineInRange("energyPerMb", 50, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue MELTER_TANK_CAPACITY = BUILDER
+            .comment("Internal tank size in mB.")
+            .defineInRange("tankCapacity", 4_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue MELTER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t it pushes out of its output faces.")
+            .defineInRange("lavaOutputRate", 1_000, 1, 100_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
                 "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
     }

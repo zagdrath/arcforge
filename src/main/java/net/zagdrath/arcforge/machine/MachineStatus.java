@@ -46,7 +46,9 @@ public enum MachineStatus {
     TRACKING("tracking", "led_running"),
     STOWED("stowed", "led_blocked"),
     NIGHT("night", "led_idle"),
-    NO_SKY("no_sky", "led_blocked");
+    NO_SKY("no_sky", "led_blocked"),
+    // The Arc Melter.
+    MELTING("melting", "led_running");
 
     private final String name;
     private final String led;

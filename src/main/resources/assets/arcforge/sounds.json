@@ -61,5 +61,14 @@
         "stream": false
       }
     ]
+  },
+  "arc_melter_run": {
+    "subtitle": "subtitles.arcforge.arc_melter_run",
+    "sounds": [
+      {
+        "name": "arcforge:arc_melter_run",
+        "stream": false
+      }
+    ]
   }
 }

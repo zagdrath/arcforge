@@ -1,0 +1,8 @@
+{
+  "type": "arcforge:melting",
+  "ingredient": "minecraft:netherrack",
+  "result": {
+    "id": "minecraft:lava",
+    "amount": 500
+  }
+}

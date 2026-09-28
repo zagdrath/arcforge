@@ -1,0 +1,13 @@
+{
+  "title": "Arc Melter",
+  "icon": "arcforge:arc_melter",
+  "items": [
+    "arcforge:arc_melter"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Melts rock into lava with an electric arc: cobblestone or stone gives 250 mB, netherrack 500 mB and a magma block 1,000 mB. It costs 50 FE per mB at 100 FE/t, so a bucket of lava takes 50,000 FE.\nThe lava leaves through Output faces (the bottom by default) into conduits, tanks or a Geothermal Plant. Put a Geothermal Plant straight under it and it fills itself. The internal tank holds 4,000 mB; when it is full the melter waits.\n# Is it worth it?\nA Geothermal Plant feeding a Thermoelectric Plant turns a bucket of lava back into about 79,000 FE, so a melter loop pays about 60% more than it costs. Upgrades on either side widen the margin.\n- Speed upgrades melt faster and draw more FE per tick; Energy upgrades cut the FE per bucket."
+    }
+  ]
+}

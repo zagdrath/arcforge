@@ -75,6 +75,7 @@ import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
 import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
 import net.zagdrath.arcforge.client.screen.machine.InductionFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.machine.MetalPressScreen;
+import net.zagdrath.arcforge.client.screen.machine.ArcMelterScreen;
 import net.zagdrath.arcforge.client.screen.machine.ElectricPumpScreen;
 import net.zagdrath.arcforge.client.screen.machine.SteamBoilerScreen;
 import net.zagdrath.arcforge.client.screen.machine.SteamTurbineScreen;
@@ -156,6 +157,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerScreen::array);
         event.register(ModMenuTypes.STEAM_TURBINE.get(), SteamTurbineScreen::new);
         event.register(ModMenuTypes.ELECTRIC_PUMP.get(), ElectricPumpScreen::new);
+        event.register(ModMenuTypes.ARC_MELTER.get(), ArcMelterScreen::new);
         event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
         event.register(ModMenuTypes.FIBERIZER.get(), FiberizerScreen::new);
         event.register(ModMenuTypes.FUEL_BURNER.get(), FuelBurnerScreen::new);

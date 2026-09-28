@@ -17,6 +17,7 @@ import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
 import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
+import net.zagdrath.arcforge.menu.machine.ArcMelterMenu;
 import net.zagdrath.arcforge.menu.machine.ElectricPumpMenu;
 import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
 import net.zagdrath.arcforge.menu.machine.SteamTurbineMenu;
@@ -82,6 +83,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<ElectricPumpMenu>> ELECTRIC_PUMP = MENU_TYPES.register("electric_pump",
             () -> IMenuTypeExtension.create(ElectricPumpMenu::new));
+
+    public static final Supplier<MenuType<ArcMelterMenu>> ARC_MELTER = MENU_TYPES.register("arc_melter",
+            () -> IMenuTypeExtension.create(ArcMelterMenu::new));
 
     public static final Supplier<MenuType<SteamTurbineArrayMenu>> STEAM_TURBINE_ARRAY = MENU_TYPES.register("steam_turbine_array",
             () -> IMenuTypeExtension.create(SteamTurbineArrayMenu::new));

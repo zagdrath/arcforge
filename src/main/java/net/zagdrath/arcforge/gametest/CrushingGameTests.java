@@ -29,7 +29,7 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 public final class CrushingGameTests {
     private CrushingGameTests() {}
 
-    private static void charge(EnergyHandler energy, int amount) {
+    static void charge(EnergyHandler energy, int amount) {
         for (int i = 0; i < 1_000 && amount > 0; i++) {
             try (Transaction tx = Transaction.openRoot()) {
                 int inserted = energy.insert(amount, tx);
@@ -42,7 +42,7 @@ public final class CrushingGameTests {
         }
     }
 
-    private static int insert(ResourceHandler<ItemResource> handler, Item item, int count) {
+    static int insert(ResourceHandler<ItemResource> handler, Item item, int count) {
         try (Transaction tx = Transaction.openRoot()) {
             int inserted = handler.insert(ItemResource.of(item), count, tx);
             tx.commit();
@@ -50,7 +50,7 @@ public final class CrushingGameTests {
         }
     }
 
-    private static void install(MachineItemHandler items, Item upgrade, int count) {
+    static void install(MachineItemHandler items, Item upgrade, int count) {
         for (int slot = items.getFirstUpgradeSlot(); slot < items.size(); slot++) {
             if (items.getStack(slot).isEmpty()) {
                 items.setStack(slot, new ItemStack(upgrade, count));

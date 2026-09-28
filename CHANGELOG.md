@@ -68,6 +68,11 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
 - **Storage Upgrades** (Tempered, Hardened, Arcforged): right-click a placed Crate or Vault of the tier below to
   upgrade it where it stands, contents and settings included. Crafting the block with the next tier's alloy
   also works.
+- **Arc Melter** (Tempered tier): melts cobblestone, stone, netherrack and magma blocks into lava with FE
+  (50 FE per mB by default, so a bucket costs 50,000 FE). Its 4,000 mB tank feeds conduits, tanks or a
+  Geothermal Plant set right under it, with no setup. Takes Speed and Energy upgrades, has a running sound,
+  and shows in JEI (Melting) and Jade. Recipes are data-driven (`arcforge:melting`), and the costs are in the
+  config under `machines.arcMelter`.
 
 ### Changed
 

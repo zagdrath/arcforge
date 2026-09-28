@@ -1,0 +1,8 @@
+{
+  "type": "arcforge:melting",
+  "ingredient": "minecraft:magma_block",
+  "result": {
+    "id": "minecraft:lava",
+    "amount": 1000
+  }
+}

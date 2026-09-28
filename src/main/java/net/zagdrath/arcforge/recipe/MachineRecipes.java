@@ -105,6 +105,17 @@ public final class MachineRecipes {
                 .anyMatch(holder -> holder.value().ingredient().test(stack));
     }
 
+    // The melting recipe for this item. Works on the client too (null level), for the GUI's tooltip.
+    public static Optional<RecipeHolder<MeltingRecipe>> melting(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.MELTING.get()).stream()
+                .filter(holder -> holder.value().ingredient().test(input))
+                .findFirst();
+    }
+
+    public static boolean isMelterInput(@Nullable Level level, ItemStack stack) {
+        return melting(level, stack).isPresent();
+    }
+
     public static boolean isFiberizerInput(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(ModRecipes.FIBERIZING.get()).stream()
                 .anyMatch(holder -> holder.value().ingredient().test(stack));

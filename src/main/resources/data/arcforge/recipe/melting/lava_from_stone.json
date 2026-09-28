@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:melting",
+  "ingredient": [
+    "minecraft:cobblestone",
+    "minecraft:stone"
+  ],
+  "result": {
+    "id": "minecraft:lava",
+    "amount": 250
+  }
+}

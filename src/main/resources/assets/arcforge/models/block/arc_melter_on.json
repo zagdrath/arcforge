@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/arc_melter_front_on",
+    "south": "arcforge:block/arc_melter_back",
+    "east": "arcforge:block/arc_melter_side_on",
+    "west": "arcforge:block/arc_melter_side_on",
+    "up": "arcforge:block/arc_melter_top",
+    "down": "arcforge:block/arc_melter_bottom",
+    "particle": "arcforge:block/arc_melter_side"
+  }
+}

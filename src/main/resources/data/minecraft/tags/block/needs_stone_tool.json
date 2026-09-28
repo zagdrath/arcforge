@@ -22,6 +22,7 @@
     "arcforge:tray_level_casing",
     "arcforge:solar_thermal_array_casing",
     "arcforge:solar_thermal_array_controller",
-    "arcforge:solar_collector"
+    "arcforge:solar_collector",
+    "arcforge:arc_melter"
   ]
 }

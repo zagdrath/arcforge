@@ -24,6 +24,7 @@ import net.zagdrath.arcforge.recipe.CrushingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
+import net.zagdrath.arcforge.recipe.MeltingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -201,6 +202,35 @@ final class MachineCategories {
         @Override
         public void draw(RecipeHolder<CarbonizingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             text(graphics, seconds(holder.value().time()), 0, 30);
+        }
+    }
+
+    // --- Arc Melter ---
+
+    static final class Melting extends ArcforgeCategory<RecipeHolder<MeltingRecipe>> {
+        static final IRecipeHolderType<MeltingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.MELTING.get());
+
+        Melting(IGuiHelper gui) {
+            super(TYPE, "melting", ModBlocks.ARC_MELTER.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MeltingRecipe> holder, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
+            fluid(builder, false, 83, 5, holder.value().result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MeltingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().baseTicks()).setPosition(26, 5);
+        }
+
+        // Time and FE at the configured rates, before upgrades.
+        @Override
+        public void draw(RecipeHolder<MeltingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            MeltingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.baseTicks()),
+                    String.format(Locale.ROOT, "%,d", recipe.totalEnergy())), 0, 30);
         }
     }
 

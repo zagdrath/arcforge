@@ -46,6 +46,7 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
 import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
 import net.zagdrath.arcforge.block.machine.MetalPressBlock;
+import net.zagdrath.arcforge.block.machine.ArcMelterBlock;
 import net.zagdrath.arcforge.block.machine.ElectricPumpBlock;
 import net.zagdrath.arcforge.block.machine.SteamBoilerBlock;
 import net.zagdrath.arcforge.block.machine.SteamTurbineBlock;
@@ -154,6 +155,10 @@ public final class ModBlocks {
     // Slim: light passes around it.
     public static final DeferredBlock<ElectricPumpBlock> ELECTRIC_PUMP = BLOCKS.registerBlock("electric_pump",
             ElectricPumpBlock::new, p -> machineProperties(p, 0).noOcclusion());
+
+    // The molten crucible glows while it melts.
+    public static final DeferredBlock<ArcMelterBlock> ARC_MELTER = BLOCKS.registerBlock("arc_melter",
+            ArcMelterBlock::new, p -> machineProperties(p, 10));
 
     public static final DeferredBlock<SteamBoilerArrayCasingBlock> STEAM_BOILER_ARRAY_CASING = BLOCKS.registerBlock("steam_boiler_array_casing",
             SteamBoilerArrayCasingBlock::new, ModBlocks::steamCasingProperties);

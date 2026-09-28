@@ -121,6 +121,14 @@ public final class ArcforgeGameTests {
         TESTS.put("treated_wood_strips_and_resists_fire", InfusionGameTests::treatedWoodStripsAndResistsFire);
         TESTS.put("upgrade_slots", CrushingGameTests::upgradeSlots);
         TESTS.put("crusher_upgrades", CrushingGameTests::crusherUpgrades);
+        TESTS.put("melter_stone", MeltingGameTests::stone);
+        TESTS.put("melter_netherrack", MeltingGameTests::netherrack);
+        TESTS.put("melter_rejects_non_melting", MeltingGameTests::rejectsNonMelting);
+        TESTS.put("melter_tank_full_waits", MeltingGameTests::tankFullWaits);
+        TESTS.put("melter_feeds_geothermal", MeltingGameTests::feedsGeothermalBelow);
+        TESTS.put("melter_feeds_geothermal_side", MeltingGameTests::feedsGeothermalSide);
+        TESTS.put("melter_upgrades", MeltingGameTests::upgrades);
+        TESTS.put("melter_redstone", MeltingGameTests::redstone);
         TESTS.put("firebox_heat_upgrades", CrushingGameTests::fireboxHeatUpgrades);
         TESTS.put("array_forms", CrushingGameTests::arrayForms);
         TESTS.put("press_slots_and_recipes", PressingGameTests::pressSlotsAndRecipes);
@@ -168,6 +176,7 @@ public final class ArcforgeGameTests {
         TESTS.put("carbonizer_big_forms", MultiblockGameTests::carbonizerBigForms);
         TESTS.put("carbonizer_mixed_sizes", MultiblockGameTests::carbonizerMixedSizes);
         LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);
+        LONG_TESTS.put("melter_magma_block", MeltingGameTests::magmaBlock);
         LONG_TESTS.put("furnace_smelts", MultiblockGameTests::furnaceSmelts);
         LONG_TESTS.put("furnace_burns_coke_blocks", MultiblockGameTests::furnaceBurnsCokeBlocks);
         LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);

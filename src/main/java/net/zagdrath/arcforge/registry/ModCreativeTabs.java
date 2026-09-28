@@ -39,6 +39,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.STEAM_BOILER.get());
                 output.accept(ModItems.STEAM_TURBINE.get());
                 output.accept(ModItems.ELECTRIC_PUMP.get());
+                output.accept(ModItems.ARC_MELTER.get());
                 output.accept(ModItems.STEAM_BOILER_ARRAY_CASING.get());
                 output.accept(ModItems.STEAM_TURBINE_ARRAY_CASING.get());
                 output.accept(ModItems.PRESSURE_GLASS.get());

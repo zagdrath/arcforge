@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TcT",
+    "PBP",
+    "TXT"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "c": "arcforge:tungsten_heating_coil",
+    "P": "#c:plates/steel",
+    "B": "minecraft:blast_furnace",
+    "X": "arcforge:wrought_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:arc_melter",
+    "count": 1
+  }
+}
