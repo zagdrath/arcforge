@@ -20,22 +20,36 @@ number and date.
 
 ## [Unreleased]
 
-Suggested version: **1.3.0** (new features and balance changes; ports and config values reset once).
+## [2.0.0] - 2026-09-28
 
 ### Upgrading
 
+- **Breaking: Steam Boiler and Steam Turbine are gone.**
+  - Placed ones turn into loose **Steam Boiler Array Casings** and **Steam Turbine Array Casings**.
+    Items in inventories convert too.
+  - The water and steam they held are lost.
+  - Build the arrays instead. The casing recipes no longer need the old machines.
+- **Config:** the `steam.steamBoiler` and `steam.steamTurbine` sections are removed.
+  - The boiler array's maximum temperature moves to `steam.steamBoilerArray.maxTemperature`.
+  - Re-apply it if you changed it.
 - **Multiblock ports reset once.** Ports are now stored per face (see below). Each formed structure gets
   its default ports again the first time it loads; set any custom ports again with the Wrench.
 - **Config values reset once.** The config is regrouped into categories, so `arcforge-common.toml` is
   rewritten with the defaults the first time the game starts. Re-apply any values you changed.
 - **Ore changes apply to new chunks only.**
 
+### Removed
+
+- **Steam Boiler** and **Steam Turbine** (single blocks). This covers their blocks, items, GUIs, JEI
+  entries, Handbook pages and config sections. The Steam Boiler Array and Steam Turbine Array replace
+  them.
+
 ### Added
 
 - **Per-face multiblock ports.** Each outer face of a block is its own port, so one corner can take things
   in on one side and give them out on another. Ports stay where they were set, even if the block is
   broken and put back or the structure breaks and forms again.
-- **Boiler pressure setting.** A Pressure tab on the Steam Boiler and Steam Boiler Array: Auto, or hold
+- **Boiler pressure setting.** A Pressure tab on the Steam Boiler Array: Auto, or hold
   at Steam, High-Pressure or Superheated. A held boiler heats without boiling until it reaches that grade's
   temperature, then makes that grade at whatever rate its heat comes in.
 - **Running sounds** for the Steam Turbine Array (pitch and volume follow the rotor), the Arc Crusher, Arc
@@ -84,9 +98,24 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
 - **3x ore processing:** leach raw ore in Sulfuric Acid into slurry, then precipitate the slurry with water
   into dust: 3 dust per raw ore and 6 per ore block, against 2 and 4 from the Arc Crushing Array.
 - Crushing recipes may now have only a chance output (no main result).
+- **Superheater Array.** A 3x3x3 Hardened-tier multiblock. It upgrades steam one or two grades with
+  heat: 5 HU per mB per step, gated by its temperature (500°C / 900°C). It has a Pressure tab (Auto /
+  High-Pressure / Superheated), takes up to 2,000 HU/t, and has 16,000 mB tanks.
+- **Condenser Array.** A 3x3x3 Tempered-tier multiblock. It turns Exhaust Steam back into water, 1:1.
+  - 120 mB/t base, plus water, ice, packed ice and blue ice touching it.
+  - Cold biomes ×1.25, the Nether ×0.5, capped at 400 mB/t.
+- **Turbine exhaust.** A new **Exhaust** port mode on the Steam Turbine Array. Spent steam leaves as
+  **Exhaust Steam** (a new gas).
+  - It gives +10% FE while the exhaust drains, stacking with lubricant.
+  - With no Exhaust port the turbine vents as before.
+  - A boiler → turbine → condenser loop closes without a pump.
 
 ### Changed
 
+- **Casing recipes.** Neither array casing recipe needs the old machine any more:
+  - Steam Boiler Array Casing: Tempered alloy, copper plates and a bucket.
+  - Steam Turbine Array Casing: Tempered alloy, nickel plates and a steel gear.
+  - Both still make 4.
 - Solar Thermal Array peak output 200 → **600 HU/t**, pushed in full into a touching machine.
 - Steam Boiler Array boils up to **600 HU/t per block of height** (was 200): a full 3×3×7 can feed a
   full-length Steam Turbine Array on High-Pressure Steam.

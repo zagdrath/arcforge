@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "A huge boiler: per block of height it holds 100,000 HU, boils with up to 600 HU/t and holds 16,000 mB of water and steam. Its big drum uses 20% less heat per mB.\nBuild a hollow 3x3 tower, 3 to 7 tall. The corners must be casings; anywhere else can be Pressure Glass, so you can watch the water and steam inside."
+      "text": "A huge boiler: per block of height it holds 100,000 HU, boils with up to 600 HU/t and holds 16,000 mB of water and steam. Each mB costs 8 HU of Steam, 12 of High-Pressure or 16 of Superheated.\nBuild a hollow 3x3 tower, 3 to 7 tall. The corners must be casings; anywhere else can be Pressure Glass, so you can watch the water and steam inside.\n# Pressure\nIts Pressure tab picks the grade. On Auto it boils all the heat above 100°C: feed it more heat than it boils and it climbs toward its heat source's temperature, making better steam; underfeed it and it holds at 100°C making plain Steam.\nSet to Steam, High-Pressure or Superheated, it heats without boiling until it reaches that grade's temperature, then holds there, making that grade at whatever rate its heat comes in.\nIf it cools into a lower grade, the steam it holds drops to that grade."
     },
     {
       "type": "multiblock",

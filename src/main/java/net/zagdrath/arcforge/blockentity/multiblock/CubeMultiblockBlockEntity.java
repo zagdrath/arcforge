@@ -40,15 +40,18 @@ import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// What the 3x3x3 FE lane machines share (the Arc Crushing Array, the Induction Furnace Array). Every
-// casing has one of these; only the centre's runs. Side configuration applies to the faces of the whole
-// cube (none / input / output / energy): input faces fill the lane holding the fewest items, output
-// faces give the products, energy faces take FE. Each casing drops only its own items, so the machine's
-// contents drop when the centre is broken.
+// What the 3x3x3 cube machines share (the Arc Crushing Array, the Induction Furnace Array, the Superheater
+// and Condenser Arrays). Every casing has one of these; only the centre's runs. Side configuration applies
+// to the faces of the whole cube: for the FE lane machines (none / input / output / energy) input faces fill
+// the lane holding the fewest items, output faces give the products, energy faces take FE; the fluid cubes
+// choose their own modes and serve their own fluid and heat ports. Each casing drops only its own items, so
+// the machine's contents drop when the centre is broken.
 public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity implements MultiblockController {
     protected static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY);
 
     protected final ConsumerEnergyHandler energy;
+    // Cubes without FE (the fluid cubes) have an empty buffer that isn't exposed.
+    private final boolean hasEnergy;
     private final ResourceHandler<ItemResource> itemInput;
     private final ResourceHandler<ItemResource> itemOutput;
     private final ResourceHandler<ItemResource> itemAutomation;
@@ -58,10 +61,19 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
     // inputSlots: each lane's input slot, in lane order. productSlot: the slots output faces give from.
     protected CubeMultiblockBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots, LevelSlotFilter filter,
             Set<UpgradeType> upgrades, int energyCapacity, int maxInput, int[] inputSlots, IntPredicate productSlot) {
-        super(type, pos, state, machineSlots, filter, upgrades,
+        this(type, pos, state, machineSlots, filter, upgrades,
                 new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.NONE, SideMode.NONE, SideMode.ENERGY, SideMode.NONE),
-                SIDE_MODES);
-        this.energy = new ConsumerEnergyHandler(energyCapacity, maxInput, this::setChanged);
+                SIDE_MODES, true, energyCapacity, maxInput, inputSlots, productSlot);
+    }
+
+    // A cube with its own port modes and first ports (defaults, relative to the cube's facing). Without
+    // energy it has no FE buffer to speak of and nothing is exposed on energy faces.
+    protected CubeMultiblockBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots, LevelSlotFilter filter,
+            Set<UpgradeType> upgrades, SideConfig defaults, List<SideMode> allowed, boolean hasEnergy, int energyCapacity, int maxInput,
+            int[] inputSlots, IntPredicate productSlot) {
+        super(type, pos, state, machineSlots, filter, upgrades, defaults, allowed);
+        this.hasEnergy = hasEnergy;
+        this.energy = new ConsumerEnergyHandler(hasEnergy ? energyCapacity : 0, hasEnergy ? maxInput : 0, this::setChanged);
         this.itemInput = new BalancedInput(items, inputSlots);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, productSlot::test);
         this.itemAutomation = new BalancedInput(items, inputSlots) {
@@ -208,6 +220,9 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
     }
 
     public @Nullable EnergyHandler energyHandlerAt(BlockPos pos, @Nullable Direction side) {
+        if (!hasEnergy) {
+            return null;
+        }
         if (side == null) {
             return energy;
         }

@@ -9,6 +9,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -23,8 +24,6 @@ import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
@@ -33,6 +32,8 @@ import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntit
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FiberizerBlockEntity;
@@ -78,12 +79,6 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<MetalPressBlockEntity>> METAL_PRESS = BLOCK_ENTITY_TYPES.register("metal_press",
             () -> new BlockEntityType<>(MetalPressBlockEntity::new, ModBlocks.METAL_PRESS.get()));
 
-    public static final Supplier<BlockEntityType<SteamBoilerBlockEntity>> STEAM_BOILER = BLOCK_ENTITY_TYPES.register("steam_boiler",
-            () -> new BlockEntityType<>(SteamBoilerBlockEntity::new, ModBlocks.STEAM_BOILER.get()));
-
-    public static final Supplier<BlockEntityType<SteamTurbineBlockEntity>> STEAM_TURBINE = BLOCK_ENTITY_TYPES.register("steam_turbine",
-            () -> new BlockEntityType<>(SteamTurbineBlockEntity::new, ModBlocks.STEAM_TURBINE.get()));
-
     public static final Supplier<BlockEntityType<ElectricPumpBlockEntity>> ELECTRIC_PUMP = BLOCK_ENTITY_TYPES.register("electric_pump",
             () -> new BlockEntityType<>(ElectricPumpBlockEntity::new, ModBlocks.ELECTRIC_PUMP.get()));
 
@@ -99,6 +94,13 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<SteamTurbineArrayBlockEntity>> STEAM_TURBINE_ARRAY = BLOCK_ENTITY_TYPES.register("steam_turbine_array",
             () -> new BlockEntityType<>(SteamTurbineArrayBlockEntity::new, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get()));
+
+    // Every casing has one; only the centre runs.
+    public static final Supplier<BlockEntityType<SuperheaterArrayBlockEntity>> SUPERHEATER_ARRAY = BLOCK_ENTITY_TYPES.register("superheater_array",
+            () -> new BlockEntityType<>(SuperheaterArrayBlockEntity::new, ModBlocks.SUPERHEATER_ARRAY_CASING.get()));
+
+    public static final Supplier<BlockEntityType<CondenserArrayBlockEntity>> CONDENSER_ARRAY = BLOCK_ENTITY_TYPES.register("condenser_array",
+            () -> new BlockEntityType<>(CondenserArrayBlockEntity::new, ModBlocks.CONDENSER_ARRAY_CASING.get()));
 
     // Every casing has one; only the centre's runs.
     public static final Supplier<BlockEntityType<MetalPressingArrayBlockEntity>> METAL_PRESSING_ARRAY = BLOCK_ENTITY_TYPES.register("metal_pressing_array",
@@ -170,6 +172,9 @@ public final class ModBlockEntityTypes {
     }
 
     public static void register(IEventBus modEventBus) {
+        // Removed in 2.0: a saved Steam Boiler or Steam Turbine loads into the array casing it became.
+        BLOCK_ENTITY_TYPES.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler_array"));
+        BLOCK_ENTITY_TYPES.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine_array"));
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }
 }

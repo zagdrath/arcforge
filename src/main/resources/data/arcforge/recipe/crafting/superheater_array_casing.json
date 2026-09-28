@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IcI",
+    "HGH",
+    "IcI"
+  ],
+  "key": {
+    "I": "#c:plates/invar",
+    "c": "arcforge:tungsten_heating_coil",
+    "H": "arcforge:hardened_alloy",
+    "G": "arcforge:pressure_glass"
+  },
+  "result": {
+    "id": "arcforge:superheater_array_casing",
+    "count": 4
+  }
+}

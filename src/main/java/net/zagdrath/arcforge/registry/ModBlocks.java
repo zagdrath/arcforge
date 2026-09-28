@@ -10,6 +10,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -51,8 +52,6 @@ import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
 import net.zagdrath.arcforge.block.machine.MetalPressBlock;
 import net.zagdrath.arcforge.block.machine.ArcMelterBlock;
 import net.zagdrath.arcforge.block.machine.ElectricPumpBlock;
-import net.zagdrath.arcforge.block.machine.SteamBoilerBlock;
-import net.zagdrath.arcforge.block.machine.SteamTurbineBlock;
 import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
@@ -65,6 +64,7 @@ import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.block.machine.FiberizerBlock;
 import net.zagdrath.arcforge.block.machine.FireboxBlock;
 import net.zagdrath.arcforge.block.machine.FuelBurnerBlock;
@@ -76,6 +76,7 @@ import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
+import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.block.storage.CrateBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
@@ -149,12 +150,6 @@ public final class ModBlocks {
 
     // --- Steam ---
 
-    public static final DeferredBlock<SteamBoilerBlock> STEAM_BOILER = BLOCKS.registerBlock("steam_boiler",
-            SteamBoilerBlock::new, p -> machineProperties(p, 6));
-
-    public static final DeferredBlock<SteamTurbineBlock> STEAM_TURBINE = BLOCKS.registerBlock("steam_turbine",
-            SteamTurbineBlock::new, p -> machineProperties(p, 4));
-
     // Slim: light passes around it.
     public static final DeferredBlock<ElectricPumpBlock> ELECTRIC_PUMP = BLOCKS.registerBlock("electric_pump",
             ElectricPumpBlock::new, p -> machineProperties(p, 0).noOcclusion());
@@ -171,6 +166,23 @@ public final class ModBlocks {
 
     public static final DeferredBlock<SteamTurbineArrayCasingBlock> STEAM_TURBINE_ARRAY_CASING = BLOCKS.registerBlock("steam_turbine_array_casing",
             SteamTurbineArrayCasingBlock::new, ModBlocks::steamCasingProperties);
+
+    // Upgrades steam with heat; its coils glow while they work.
+    public static final DeferredBlock<SuperheaterArrayCasingBlock> SUPERHEATER_ARRAY_CASING = BLOCKS.registerBlock("superheater_array_casing",
+            SuperheaterArrayCasingBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL)
+                    .lightLevel(state -> state.getValue(SuperheaterArrayCasingBlock.LIT) ? 6 : 0));
+
+    // Turns Exhaust Steam back into water; no glow, lit only swaps the textures.
+    public static final DeferredBlock<CondenserArrayCasingBlock> CONDENSER_ARRAY_CASING = BLOCKS.registerBlock("condenser_array_casing",
+            CondenserArrayCasingBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
 
     // The steam arrays' windows; also fine as decorative glass.
     public static final DeferredBlock<PressureGlassBlock> PRESSURE_GLASS = BLOCKS.registerBlock("pressure_glass",
@@ -639,6 +651,10 @@ public final class ModBlocks {
     }
 
     public static void register(IEventBus modEventBus) {
+        // The single-block Steam Boiler and Steam Turbine were removed in 2.0: placed ones load as loose
+        // array casings.
+        BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler_array_casing"));
+        BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine_array_casing"));
         BLOCKS.register(modEventBus);
     }
 }

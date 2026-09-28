@@ -1,0 +1,17 @@
+{
+  "title": "Superheater Array",
+  "icon": "arcforge:superheater_array_casing",
+  "items": [
+    "arcforge:superheater_array_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A solid 3×3×3 cube of Superheater Array Casings. It takes steam and heat in and sends the next steam grade out.\n- Steam → High-Pressure costs 5 HU per mB, High-Pressure → Superheated 5, Steam → Superheated 10.\n- Its own heat must reach the target's temperature: 500 °C for High-Pressure, 900 °C for Superheated. Colder, steam passes through unchanged.\n- The Pressure tab picks the target: Auto (the best its heat allows), High-Pressure or Superheated.\n- Up to 2,000 HU/t. Separate 16,000 mB tanks for steam in and steam out.\n# Ports\nBy default: steam in, steam out and heat in. Change them with the Wrench in Port mode."
+    },
+    {
+      "type": "multiblock",
+      "structure": "superheater_array"
+    }
+  ]
+}

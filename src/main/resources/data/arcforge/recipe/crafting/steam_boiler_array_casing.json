@@ -2,14 +2,14 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "PTP",
-    "TXT",
-    "PTP"
+    "pTp",
+    "TBT",
+    "pTp"
   ],
   "key": {
     "T": "arcforge:tempered_alloy",
-    "X": "arcforge:steam_boiler",
-    "P": "#c:plates/steel"
+    "p": "#c:plates/copper",
+    "B": "minecraft:bucket"
   },
   "result": {
     "id": "arcforge:steam_boiler_array_casing",

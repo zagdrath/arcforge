@@ -65,6 +65,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.ArcforgeSmelting(gui),
                 new MachineCategories.Distilling(gui),
                 new MachineCategories.Steam(gui),
+                new MachineCategories.Superheating(gui),
+                new MachineCategories.Condensing(gui),
                 new MachineCategories.BurnerFuels(gui),
                 new MultiblockCategory(gui));
     }
@@ -82,6 +84,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Distilling.TYPE, recipes(ModRecipes.DISTILLING.get()).stream()
                 .flatMap(holder -> MachineCategories.DistillingPage.of(holder).stream()).toList());
         registration.addRecipes(MachineCategories.Steam.TYPE, List.of(SteamGrade.values()).stream().map(MachineCategories.SteamRecipe::new).toList());
+        registration.addRecipes(MachineCategories.Superheating.TYPE, MachineCategories.SuperheatingRecipe.all());
+        registration.addRecipes(MachineCategories.Condensing.TYPE, List.of(new MachineCategories.CondensingRecipe()));
 
         List<MachineCategories.BurnerFuelRecipe> fuels = new ArrayList<>();
         BuiltInRegistries.FLUID.listElements().forEach(holder -> {
@@ -132,8 +136,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.ChemicalReacting.TYPE, ModBlocks.CHEMICAL_REACTOR.get());
         registration.addCraftingStation(MachineCategories.ArcforgeSmelting.TYPE, ModBlocks.ARCFORGE_FURNACE_PORT.get(),
                 ModBlocks.ARCFORGE_FURNACE_BRICKS.get());
-        registration.addCraftingStation(MachineCategories.Steam.TYPE, ModBlocks.STEAM_BOILER.get(), ModBlocks.STEAM_BOILER_ARRAY_CASING.get(),
-                ModBlocks.STEAM_TURBINE.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
+        registration.addCraftingStation(MachineCategories.Steam.TYPE, ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
+        registration.addCraftingStation(MachineCategories.Superheating.TYPE, ModBlocks.SUPERHEATER_ARRAY_CASING.get());
+        // The turbine makes the Exhaust Steam the condenser takes.
+        registration.addCraftingStation(MachineCategories.Condensing.TYPE, ModBlocks.CONDENSER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.BurnerFuels.TYPE, ModBlocks.FUEL_BURNER.get());
         registration.addCraftingStation(MachineCategories.Distilling.TYPE, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(),
                 ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get());

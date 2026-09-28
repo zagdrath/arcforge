@@ -17,7 +17,6 @@ import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock.Fraction;
 import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.heat.BurnerFuel;
@@ -26,6 +25,7 @@ import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.steam.Lubricant;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.steam.SteamTank;
 
@@ -200,19 +200,34 @@ final class DistillationGameTests {
                 .thenSucceed();
     }
 
-    // Heavy Oil lubricates a Steam Turbine: +8% (Superheated: 238 FE/t), 1 mB every 100 ticks. It takes nothing else.
+    // Heavy Oil lubricates a Steam Turbine Array: +8% on its output (flow x FE per mB x how far it has spun
+    // up), 1 mB every 20 ticks per 3 blocks of length. It takes nothing else.
     static void turbineLubricant(GameTestHelper helper) {
-        BlockPos pos = new BlockPos(0, 1, 0);
-        helper.setBlock(pos, ModBlocks.STEAM_TURBINE.get());
-        SteamTurbineBlockEntity turbine = helper.getBlockEntity(pos, SteamTurbineBlockEntity.class);
-        helper.assertTrue(SteamGameTests.fill(turbine.getFluidHandler(null), CREOSOTE, 100) == 0, "The turbine took creosote");
-        SteamGameTests.fill(turbine.getSteam(), SteamGrade.SUPERHEATED.resource(), 8_000);
-        helper.assertTrue(SteamGameTests.fill(turbine.getFluidHandler(null), HEAVY_OIL, 100) == 100, "The turbine didn't take heavy oil");
+        BlockPos min = new BlockPos(0, 1, 0);
+        SteamGameTests.buildShell(helper, min, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         helper.startSequence()
                 .thenIdle(3)
-                .thenExecute(() -> helper.assertTrue(turbine.getFePerTick() == 238, "A lubricated turbine makes " + turbine.getFePerTick() + " FE/t"))
-                .thenIdle(110)
-                .thenExecute(() -> helper.assertTrue(turbine.getLubricant().getAmount() == 99, "Lubricant left: " + turbine.getLubricant().getAmount()))
+                .thenExecute(() -> {
+                    SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
+                    helper.assertTrue(turbine.isMaster(), "Turbine did not form");
+                    helper.assertTrue(SteamGameTests.fill(turbine.getFluidHandler(null), CREOSOTE, 100) == 0, "The turbine took creosote");
+                    helper.assertTrue(SteamGameTests.fill(turbine.getFluidHandler(null), HEAVY_OIL, 100) == 100, "The turbine didn't take heavy oil");
+                    turbine.getSteam().set(0, SteamGrade.SUPERHEATED.resource(), 60_000);
+                })
+                .thenIdle(20)
+                .thenExecute(() -> {
+                    SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
+                    int flow = turbine.maxFlow();
+                    double target = (double) SteamTurbineArrayBlockEntity.maxRpm() * flow / turbine.maxFlow();
+                    double spun = Math.min(1.0, turbine.getRpm() / target);
+                    int expected = (int) Math.round(flow * SteamGrade.SUPERHEATED.arrayFePerMb() * spun * Lubricant.bonus());
+                    helper.assertTrue(Math.abs(turbine.getFePerTick() - expected) <= 1, "A lubricated turbine makes " + turbine.getFePerTick() + " FE/t, expected " + expected);
+                })
+                .thenIdle(100)
+                .thenExecute(() -> {
+                    int left = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class).getLubricant().getAmount();
+                    helper.assertTrue(left >= 93 && left <= 95, "Lubricant left after 120 ticks: " + left);
+                })
                 .thenSucceed();
     }
 

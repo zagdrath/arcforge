@@ -86,6 +86,15 @@ public final class ModFluids {
 
     private static final Map<OreSlurry, Slurry> SLURRIES = registerSlurries();
 
+    // Spent steam from a Steam Turbine Array's Exhaust ports, for a Condenser Array to turn back into water.
+    // A gas, but not a steam grade: nothing burns or boils it, and turbines don't take it.
+    public static final DeferredHolder<FluidType, FluidType> EXHAUST_STEAM_TYPE = gasType("exhaust_steam", 373);
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> EXHAUST_STEAM = FLUIDS.register("exhaust_steam",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.EXHAUST_STEAM_TYPE, ModFluids.EXHAUST_STEAM, ModFluids.FLOWING_EXHAUST_STEAM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_EXHAUST_STEAM = FLUIDS.register("flowing_exhaust_steam",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.EXHAUST_STEAM_TYPE, ModFluids.EXHAUST_STEAM, ModFluids.FLOWING_EXHAUST_STEAM)));
+
     // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
     // so they only exist in tanks, machines and Pressurized Conduits.
     public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = gasType("steam", 373);

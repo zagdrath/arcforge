@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.client.gui.tab;
 
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
@@ -26,22 +27,33 @@ public class PressureTab extends SideTab {
     private static final int WIDTH = 108;
     private static final int ROWS_X = 6, ROWS_Y = 24, ROW_W = WIDTH - 12, ROW_H = 12, TEXT_INSET = 3;
 
+    private final List<BoilerPressure> rows;
     private final Supplier<BoilerPressure> current;
     private final Consumer<BoilerPressure> select;
+    // The lang key of a row's hint.
+    private final Function<BoilerPressure, String> hint;
 
+    // Every setting, with the boiler's hints.
     public PressureTab(Supplier<BoilerPressure> current, Consumer<BoilerPressure> select) {
-        super(ArcforgeGui.widget("icon_pressure"), Component.translatable("gui.arcforge.tab.pressure"), WIDTH,
-                ROWS_Y + BoilerPressure.values().length * ROW_H + 6);
+        this(List.of(BoilerPressure.values()), current, select, pressure -> "gui.arcforge.pressure." + pressure.getSerializedName() + ".hint");
+    }
+
+    // Only these settings (the Superheater Array has no plain-Steam row), with their own hints.
+    public PressureTab(List<BoilerPressure> rows, Supplier<BoilerPressure> current, Consumer<BoilerPressure> select,
+            Function<BoilerPressure, String> hint) {
+        super(ArcforgeGui.widget("icon_pressure"), Component.translatable("gui.arcforge.tab.pressure"), WIDTH, ROWS_Y + rows.size() * ROW_H + 6);
+        this.rows = rows;
         this.current = current;
         this.select = select;
+        this.hint = hint;
     }
 
-    private static int rowY(BoilerPressure pressure) {
-        return ROWS_Y + pressure.ordinal() * ROW_H;
+    private int rowY(BoilerPressure pressure) {
+        return ROWS_Y + rows.indexOf(pressure) * ROW_H;
     }
 
-    private static @Nullable BoilerPressure rowAt(int localX, int localY) {
-        for (BoilerPressure pressure : BoilerPressure.values()) {
+    private @Nullable BoilerPressure rowAt(int localX, int localY) {
+        for (BoilerPressure pressure : rows) {
             if (ArcforgeGui.isInside(localX, localY, ROWS_X, rowY(pressure), ROW_W, ROW_H)) {
                 return pressure;
             }
@@ -52,7 +64,7 @@ public class PressureTab extends SideTab {
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
         BoilerPressure hovered = rowAt(mouseX - x, mouseY - y);
-        for (BoilerPressure pressure : BoilerPressure.values()) {
+        for (BoilerPressure pressure : rows) {
             boolean active = pressure == current.get();
             int rowX = x + ROWS_X;
             int rowY = y + rowY(pressure);
@@ -88,7 +100,7 @@ public class PressureTab extends SideTab {
         BoilerPressure pressure = rowAt(localX, localY);
         if (pressure != null) {
             lines.add(pressure.getDescription());
-            lines.add(Component.translatable("gui.arcforge.pressure." + pressure.getSerializedName() + ".hint").withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable(hint.apply(pressure)).withStyle(ChatFormatting.GRAY));
         }
     }
 }

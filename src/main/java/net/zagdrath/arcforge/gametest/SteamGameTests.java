@@ -28,8 +28,6 @@ import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
@@ -45,7 +43,7 @@ import net.zagdrath.arcforge.steam.BoilerPressure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
 // Steam and gases: the gas rules, Pressurized Conduits and Cylinders, the Electric Pump, the Steam Boiler
-// and Turbine and their arrays, and the copper parts. Machines are placed facing north.
+// and Steam Turbine Arrays, and the copper parts. Machines are placed facing north.
 public final class SteamGameTests {
     private static final FluidResource WATER = FluidResource.of(Fluids.WATER);
 
@@ -162,107 +160,160 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
-    // Heated past 900°C the boiler makes Superheated Steam; at 150°C plain Steam; below 100°C nothing.
-    // Cooling into a lower grade turns the stored steam into it.
+    // A 3-tall Steam Boiler Array at min, formed (3 ticks after this returns), with its water tank filled.
+    static void boilerArray(GameTestHelper helper, BlockPos min) {
+        buildShell(helper, min, Direction.Axis.Y, 3, ModBlocks.STEAM_BOILER_ARRAY_CASING.get());
+    }
+
+    static SteamBoilerArrayBlockEntity boilerAt(GameTestHelper helper, BlockPos min) {
+        return helper.getBlockEntity(min, SteamBoilerArrayBlockEntity.class);
+    }
+
+    // Heated past 900°C a boiler array makes Superheated Steam; at 150°C plain Steam; below 100°C nothing.
+    // Cooling into a lower grade turns the stored steam into it. A 3-tall array boils with up to 1,800 HU/t,
+    // and Superheated costs it 16 HU/mB (20 x 0.8), so the hot one (kept topped up) makes 112.5 mB/t.
     static void boilerGrades(GameTestHelper helper) {
-        BlockPos hotPos = new BlockPos(0, 1, 0);
-        BlockPos warmPos = new BlockPos(2, 1, 0);
-        BlockPos coldPos = new BlockPos(4, 1, 0);
-        SteamBoilerBlockEntity[] boilers = new SteamBoilerBlockEntity[3];
-        // The hot boiler starts full, so it stays over 900°C for the whole wait.
+        BlockPos[] mins = { new BlockPos(0, 1, 0), new BlockPos(4, 1, 0), new BlockPos(8, 1, 0) };
         int[] temperatures = { 1_400, 150, 60 };
-        BlockPos[] positions = { hotPos, warmPos, coldPos };
-        for (int i = 0; i < 3; i++) {
-            helper.setBlock(positions[i], ModBlocks.STEAM_BOILER.get());
-            boilers[i] = helper.getBlockEntity(positions[i], SteamBoilerBlockEntity.class);
-            fill(boilers[i].getWater(), WATER, 8_000);
-            FiberGameTests.heatTo(boilers[i].getHeat(), temperatures[i]);
+        boolean[] feeding = { true };
+        for (BlockPos min : mins) {
+            boilerArray(helper, min);
         }
+        helper.onEachTick(() -> {
+            if (feeding[0] && boilerAt(helper, mins[0]).isMaster()) {
+                boilerAt(helper, mins[0]).getHeat().add(1_800);
+            }
+        });
         helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    for (int i = 0; i < 3; i++) {
+                        SteamBoilerArrayBlockEntity boiler = boilerAt(helper, mins[i]);
+                        helper.assertTrue(boiler.isMaster(), "Boiler array " + i + " did not form");
+                        fill(boiler.getWater(), WATER, 40_000);
+                        FiberGameTests.heatTo(boiler.getHeat(), temperatures[i]);
+                    }
+                })
                 .thenIdle(60)
                 .thenExecute(() -> {
-                    helper.assertTrue(SteamGrade.of(boilers[0].getSteam().getResource(0)) == SteamGrade.SUPERHEATED, "Hot boiler made " + boilers[0].getSteam().getResource(0));
-                    // 80 HU/t at 20 HU/mB (the rate is smoothed, so it's there after a few seconds).
-                    helper.assertTrue(Math.abs(boilers[0].getCore().getRate() - 4.0) < 0.01, "Hot boiler makes " + boilers[0].getCore().getRate() + " mB/t");
-                    helper.assertTrue(SteamGrade.of(boilers[1].getSteam().getResource(0)) == SteamGrade.STEAM, "Warm boiler made " + boilers[1].getSteam().getResource(0));
-                    helper.assertTrue(boilers[2].getSteam().getAmount() == 0 && boilers[2].getStatus() == MachineStatus.HEATING,
-                            "Cold boiler is " + boilers[2].getStatus() + " with " + boilers[2].getSteam().getAmount() + " mB");
-                    FiberGameTests.heatTo(boilers[0].getHeat(), 600);
+                    SteamBoilerArrayBlockEntity hot = boilerAt(helper, mins[0]), warm = boilerAt(helper, mins[1]), cold = boilerAt(helper, mins[2]);
+                    helper.assertTrue(SteamGrade.of(hot.getSteam().getResource(0)) == SteamGrade.SUPERHEATED, "Hot boiler made " + hot.getSteam().getResource(0));
+                    helper.assertTrue(Math.abs(hot.getCore().getRate() - 112.5) < 0.5, "Hot boiler makes " + hot.getCore().getRate() + " mB/t");
+                    helper.assertTrue(SteamGrade.of(warm.getSteam().getResource(0)) == SteamGrade.STEAM, "Warm boiler made " + warm.getSteam().getResource(0));
+                    helper.assertTrue(cold.getSteam().getAmount() == 0 && cold.getStatus() == MachineStatus.HEATING,
+                            "Cold boiler is " + cold.getStatus() + " with " + cold.getSteam().getAmount() + " mB");
+                    feeding[0] = false;
+                    FiberGameTests.heatTo(hot.getHeat(), 600);
                 })
                 .thenIdle(2)
-                .thenExecute(() -> helper.assertTrue(SteamGrade.of(boilers[0].getSteam().getResource(0)) == SteamGrade.HIGH_PRESSURE,
-                        "Cooled boiler holds " + boilers[0].getSteam().getResource(0)))
+                .thenExecute(() -> helper.assertTrue(SteamGrade.of(boilerAt(helper, mins[0]).getSteam().getResource(0)) == SteamGrade.HIGH_PRESSURE,
+                        "Cooled boiler holds " + boilerAt(helper, mins[0]).getSteam().getResource(0)))
                 .thenSucceed();
     }
 
-    // Set to High-Pressure, a boiler fed less heat than it could boil heats to 500°C without boiling, then
-    // holds there making High-Pressure Steam at the rate its heat comes in.
+    // Set to High-Pressure, a boiler array fed less heat than it could boil heats to 500°C without boiling,
+    // then holds there making High-Pressure Steam at the rate its heat comes in: 45 HU/t at 12 HU/mB.
     static void boilerPressureHolds(GameTestHelper helper) {
-        BlockPos pos = new BlockPos(0, 1, 0);
-        helper.setBlock(pos, ModBlocks.STEAM_BOILER.get());
-        SteamBoilerBlockEntity boiler = helper.getBlockEntity(pos, SteamBoilerBlockEntity.class);
-        fill(boiler.getWater(), WATER, 8_000);
-        boiler.setPressure(BoilerPressure.HIGH_PRESSURE);
-        FiberGameTests.heatTo(boiler.getHeat(), 490);
-        // 45 HU/t: 3 mB/t of High-Pressure Steam at 15 HU/mB, well under the boiler's 80 HU/t.
-        helper.onEachTick(() -> boiler.getHeat().add(45));
+        BlockPos min = new BlockPos(0, 1, 0);
+        boilerArray(helper, min);
+        boolean[] started = { false };
+        helper.onEachTick(() -> {
+            if (started[0]) {
+                boilerAt(helper, min).getHeat().add(45);
+            }
+        });
         helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
+                    helper.assertTrue(boiler.isMaster(), "Boiler array did not form");
+                    fill(boiler.getWater(), WATER, 40_000);
+                    boiler.setPressure(BoilerPressure.HIGH_PRESSURE);
+                    FiberGameTests.heatTo(boiler.getHeat(), 490);
+                    started[0] = true;
+                })
                 .thenIdle(2)
-                .thenExecute(() -> helper.assertTrue(boiler.getSteam().getAmount() == 0 && boiler.getStatus() == MachineStatus.HEATING,
-                        "Below 500°C the boiler is " + boiler.getStatus() + " with " + boiler.getSteam().getAmount() + " mB"))
-                .thenWaitUntil(() -> helper.assertTrue(boiler.getSteam().getAmount() > 0, "No steam yet at " + boiler.getHeat().getTemperature() + "°C"))
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
+                    helper.assertTrue(boiler.getSteam().getAmount() == 0 && boiler.getStatus() == MachineStatus.HEATING,
+                            "Below 500°C the boiler is " + boiler.getStatus() + " with " + boiler.getSteam().getAmount() + " mB");
+                })
+                .thenWaitUntil(() -> helper.assertTrue(boilerAt(helper, min).getSteam().getAmount() > 0,
+                        "No steam yet at " + boilerAt(helper, min).getHeat().getTemperature() + "°C"))
                 .thenIdle(60)
                 .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
                     int temperature = boiler.getHeat().getTemperature();
                     helper.assertTrue(temperature >= 500 && temperature <= 501, "Boiler at " + temperature + "°C");
                     helper.assertTrue(SteamGrade.of(boiler.getSteam().getResource(0)) == SteamGrade.HIGH_PRESSURE, "Boiler made " + boiler.getSteam().getResource(0));
                     helper.assertTrue(boiler.getStatus() == MachineStatus.BOILING, "Boiler is " + boiler.getStatus());
-                    helper.assertTrue(Math.abs(boiler.getCore().getRate() - 3.0) < 0.1, "Boiler makes " + boiler.getCore().getRate() + " mB/t");
+                    helper.assertTrue(Math.abs(boiler.getCore().getRate() - 3.75) < 0.1, "Boiler makes " + boiler.getCore().getRate() + " mB/t");
                 })
                 .thenSucceed();
     }
 
-    // On Auto, a boiler fed heat unevenly (every other tick) holds at 100°C and stays Boiling rather than
-    // dropping below boiling and flipping back to Heating.
+    // On Auto, a boiler array fed heat unevenly (every other tick) holds at 100°C and stays Boiling rather
+    // than dropping below boiling and flipping back to Heating.
     static void boilerAutoHoldsBoiling(GameTestHelper helper) {
-        BlockPos pos = new BlockPos(0, 1, 0);
-        helper.setBlock(pos, ModBlocks.STEAM_BOILER.get());
-        SteamBoilerBlockEntity boiler = helper.getBlockEntity(pos, SteamBoilerBlockEntity.class);
-        fill(boiler.getWater(), WATER, 8_000);
-        FiberGameTests.heatTo(boiler.getHeat(), 100);
+        BlockPos min = new BlockPos(0, 1, 0);
+        boilerArray(helper, min);
+        long[] start = { -1 };
         helper.onEachTick(() -> {
-            if (helper.getTick() % 2 == 0) {
+            if (start[0] < 0) {
+                return;
+            }
+            SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
+            long ticks = helper.getTick() - start[0];
+            if (ticks % 2 == 0) {
                 boiler.getHeat().add(60);
             }
             helper.assertTrue(boiler.getHeat().getTemperature() >= 100, "Boiler fell to " + boiler.getHeat().getTemperature() + "°C");
-            if (helper.getTick() > 5) {
-                helper.assertTrue(boiler.getStatus() == MachineStatus.BOILING, "Boiler is " + boiler.getStatus() + " on tick " + helper.getTick());
+            if (ticks > 5) {
+                helper.assertTrue(boiler.getStatus() == MachineStatus.BOILING, "Boiler is " + boiler.getStatus() + " " + ticks + " ticks in");
             }
         });
         helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
+                    helper.assertTrue(boiler.isMaster(), "Boiler array did not form");
+                    fill(boiler.getWater(), WATER, 40_000);
+                    FiberGameTests.heatTo(boiler.getHeat(), 100);
+                    start[0] = helper.getTick();
+                })
                 .thenIdle(60)
-                .thenExecute(() -> helper.assertTrue(SteamGrade.of(boiler.getSteam().getResource(0)) == SteamGrade.STEAM,
-                        "Boiler made " + boiler.getSteam().getResource(0)))
+                .thenExecute(() -> helper.assertTrue(SteamGrade.of(boilerAt(helper, min).getSteam().getResource(0)) == SteamGrade.STEAM,
+                        "Boiler made " + boilerAt(helper, min).getSteam().getResource(0)))
                 .thenSucceed();
     }
 
-    // FE per mB by grade: Steam 8, High-Pressure 14, Superheated 22, at 10 mB/t.
+    // FE per mB by grade is the array's: Steam 10, High-Pressure 18, Superheated 28. Three 3-long turbines at
+    // full flow (120 mB/t) spin up at the same pace (each rotor's target follows its own grade), so at any
+    // moment their output is flow x FE per mB x the same spin share.
     static void turbineOutput(GameTestHelper helper) {
         SteamGrade[] grades = SteamGrade.values();
-        int[] expected = { 80, 140, 220 };
-        SteamTurbineBlockEntity[] turbines = new SteamTurbineBlockEntity[3];
-        for (int i = 0; i < 3; i++) {
-            BlockPos pos = new BlockPos(i * 2, 1, 0);
-            helper.setBlock(pos, ModBlocks.STEAM_TURBINE.get());
-            turbines[i] = helper.getBlockEntity(pos, SteamTurbineBlockEntity.class);
-            fill(turbines[i].getSteam(), grades[i].resource(), 1_000);
+        BlockPos[] mins = { new BlockPos(0, 1, 0), new BlockPos(0, 1, 4), new BlockPos(0, 1, 8) };
+        for (BlockPos min : mins) {
+            buildShell(helper, min, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         }
         helper.startSequence()
                 .thenIdle(3)
                 .thenExecute(() -> {
                     for (int i = 0; i < 3; i++) {
-                        helper.assertTrue(turbines[i].getFePerTick() == expected[i], grades[i] + " makes " + turbines[i].getFePerTick() + " FE/t");
-                        helper.assertTrue(turbines[i].getStatus() == MachineStatus.GENERATING, grades[i] + " turbine is " + turbines[i].getStatus());
+                        helper.getBlockEntity(mins[i], SteamTurbineArrayBlockEntity.class).getSteam().set(0, grades[i].resource(), 60_000);
+                    }
+                })
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    double share = -1;
+                    for (int i = 0; i < 3; i++) {
+                        SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(mins[i], SteamTurbineArrayBlockEntity.class);
+                        int full = turbine.maxFlow() * grades[i].arrayFePerMb();
+                        helper.assertTrue(turbine.getFePerTick() > 0 && turbine.getFePerTick() <= full,
+                                grades[i] + " makes " + turbine.getFePerTick() + " FE/t, more than " + full);
+                        double mine = (double) turbine.getFePerTick() / full;
+                        helper.assertTrue(share < 0 || Math.abs(mine - share) < 0.01, grades[i] + " is at " + mine + " of its full output, the others at " + share);
+                        share = mine;
                     }
                 })
                 .thenSucceed();

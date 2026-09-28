@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CrC",
+    "rTr",
+    "CrC"
+  ],
+  "key": {
+    "C": "#c:plates/copper",
+    "r": "#c:rods/copper",
+    "T": "arcforge:tempered_alloy"
+  },
+  "result": {
+    "id": "arcforge:condenser_array_casing",
+    "count": 4
+  }
+}

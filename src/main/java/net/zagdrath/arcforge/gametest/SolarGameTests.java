@@ -17,16 +17,16 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.saveddata.WeatherData;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
-import net.zagdrath.arcforge.block.machine.MachineBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarPart;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
-import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.SolarModel;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModBlocks;
+import net.zagdrath.arcforge.steam.BoilerPressure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
 // The Solar Thermal Array: output by the sun, the weather, the tracking axis and the collectors' sky, and
@@ -194,41 +194,65 @@ public final class SolarGameTests {
                 .thenSucceed();
     }
 
-    // 7. Through its heat port the tower heats a Steam Boiler to High-Pressure Steam at clear noon; in the
-    //    rain the receiver cools, heat stops flowing and the boiler drops back to plain Steam.
+    // 7. Through its heat port the tower heats a Steam Boiler Array, set to High-Pressure (the setting for a slow
+    //    heat source: on Auto a boiler this big boils the heat away faster than the tower gives it), to
+    //    High-Pressure Steam at clear noon; in the rain the receiver cools below the boiler and no more heat
+    //    comes in, so the boiler just holds at 500°C.
     static void boilerGrades(GameTestHelper helper) {
         plains(helper);
         time(helper, NOON);
         weather(helper, false, false);
-        // Controller facing south at (1,1,2): its default heat port is the block behind it, (1,1,1), whose
-        // north face touches the boiler; the boiler faces north, so its back (heat) face is against it.
-        SolarThermalArrayBlockEntity array = buildTower(helper, new BlockPos(1, 1, 1), Direction.SOUTH);
-        BlockPos boilerPos = new BlockPos(1, 1, 0);
-        helper.setBlock(boilerPos, ModBlocks.STEAM_BOILER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.NORTH));
-        SteamBoilerBlockEntity boiler = helper.getBlockEntity(boilerPos, SteamBoilerBlockEntity.class);
-        try (Transaction tx = Transaction.openRoot()) {
-            boiler.getWater().insert(0, FluidResource.of(Fluids.WATER), boiler.getWater().getCapacity(), tx);
-            tx.commit();
-        }
-        HeatBuffer heat = boiler.getHeat();
-        heat.add(heat.storedAt(480) - heat.getStored());
+        // Controller facing south at (1,1,5): its default heat port is the block behind it, (1,1,4), whose north
+        // face touches the boiler array's bottom ring at (1,1,3); that casing gets a heat port on its south face.
+        SolarThermalArrayBlockEntity array = buildTower(helper, new BlockPos(1, 1, 4), Direction.SOUTH);
+        BlockPos boilerMin = new BlockPos(0, 1, 1);
+        BlockPos boilerPort = new BlockPos(1, 1, 3);
+        SteamGameTests.boilerArray(helper, boilerMin);
+        int[] heatInRain = new int[1];
         helper.startSequence()
                 .thenIdle(3)
-                .thenExecute(() -> helper.assertTrue(MultiblockPorts.get(helper.getLevel(), helper.absolutePos(new BlockPos(1, 1, 1)), Direction.NORTH) == SideMode.HEAT,
-                        "No heat port behind the controller"))
-                .thenWaitUntil(() -> helper.assertTrue(boiler.getCore().currentGrade() == SteamGrade.HIGH_PRESSURE,
-                        "Boiler at " + heat.getTemperature() + "°C, not High-Pressure"))
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.isMaster(), "Boiler array did not form");
+                    MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(boilerPort), SideMode.HEAT, Direction.SOUTH);
+                    boiler.setPressure(BoilerPressure.HIGH_PRESSURE);
+                    HeatBuffer heat = boiler.getHeat();
+                    heat.add(heat.storedAt(480) - heat.getStored());
+                    helper.assertTrue(MultiblockPorts.get(helper.getLevel(), helper.absolutePos(new BlockPos(1, 1, 4)), Direction.NORTH) == SideMode.HEAT,
+                            "No heat port behind the controller");
+                })
+                .thenWaitUntil(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    drainSteam(boiler);
+                    helper.assertTrue(boiler.getCore().currentGrade() == SteamGrade.HIGH_PRESSURE,
+                            "Boiler at " + boiler.getHeat().getTemperature() + "°C, not High-Pressure");
+                })
                 .thenExecute(() -> weather(helper, true, false))
                 .thenWaitUntil(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
                     drainSteam(boiler);
-                    helper.assertTrue(boiler.getCore().currentGrade() == SteamGrade.STEAM,
-                            "Boiler still at " + heat.getTemperature() + "°C in the rain (receiver " + array.getReceiverTemperature() + "°C)");
+                    helper.assertTrue(array.getReceiverTemperature() < boiler.getHeat().getTemperature(),
+                            "Receiver still at " + array.getReceiverTemperature() + "°C in the rain, boiler at " + boiler.getHeat().getTemperature() + "°C");
+                })
+                .thenIdle(10)
+                .thenExecute(() -> heatInRain[0] = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class).getHeat().getStored())
+                .thenIdle(20)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.getHeat().getStored() <= heatInRain[0], "Heat still came in in the rain: "
+                            + heatInRain[0] + " -> " + boiler.getHeat().getStored() + " HU");
+                    helper.assertTrue(boiler.getHeat().getTemperature() >= 500, "A High-Pressure boiler cooled to " + boiler.getHeat().getTemperature() + "°C");
                 })
                 .thenExecute(() -> weather(helper, false, false))
                 .thenSucceed();
     }
 
-    private static void drainSteam(SteamBoilerBlockEntity boiler) {
+    // Takes the steam out and tops the water up, so the boiler keeps boiling as a real one would.
+    private static void drainSteam(SteamBoilerArrayBlockEntity boiler) {
+        try (Transaction tx = Transaction.openRoot()) {
+            boiler.getWater().insert(0, FluidResource.of(Fluids.WATER), boiler.getWater().getSpace(), tx);
+            tx.commit();
+        }
         if (boiler.getSteam().getAmount() > 0) {
             try (Transaction tx = Transaction.openRoot()) {
                 boiler.getSteam().extract(0, boiler.getSteam().getResource(0), boiler.getSteam().getAmount(), tx);

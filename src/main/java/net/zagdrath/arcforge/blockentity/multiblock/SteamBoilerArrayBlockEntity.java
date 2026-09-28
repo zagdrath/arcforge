@@ -27,7 +27,6 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
-import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -47,16 +46,18 @@ import net.zagdrath.arcforge.steam.BoilerCore;
 import net.zagdrath.arcforge.steam.BoilerPressure;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// The Steam Boiler Array (see ShellMultiblockBlockEntity): a Steam Boiler that grows with its height h.
-// It holds 100,000 x h HU, boils with up to 600 x h HU/t, and its big drum loses less, so each mB costs
-// 80% of the heat (Superheated: 16 HU/mB, so a 7-tall array makes up to 87.5 mB/t). Water and steam tanks
-// hold 16,000 x h mB. The grade rules are the Steam Boiler's (see BoilerCore).
+// The Steam Boiler Array (see ShellMultiblockBlockEntity): boils water into steam with heat, and grows with
+// its height h. It holds 100,000 x h HU and boils with up to 600 x h HU/t; each mB costs 8 / 12 / 16 HU for
+// Steam / High-Pressure / Superheated (Superheated from a 7-tall array: up to 262 mB/t). Water and steam
+// tanks hold 16,000 x h mB. The grade and pressure rules are in BoilerCore.
 public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity implements Boiler {
-    public static final int SLOT_BUCKET_IN = SteamBoilerBlockEntity.SLOT_BUCKET_IN;
-    public static final int SLOT_BUCKET_OUT = SteamBoilerBlockEntity.SLOT_BUCKET_OUT;
-    public static final int MACHINE_SLOTS = SteamBoilerBlockEntity.MACHINE_SLOTS;
+    // Water buckets go in the input slot and are poured into the tank; the empty buckets come out below.
+    public static final int SLOT_BUCKET_IN = 0;
+    public static final int SLOT_BUCKET_OUT = 1;
+    public static final int MACHINE_SLOTS = 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.HEAT);
     // Levels are sent to clients (for the water and steam in the windows) at most this often.
@@ -80,7 +81,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     private float shownSteam = -1;
 
     public SteamBoilerArrayBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), pos, state, MACHINE_SLOTS, SteamBoilerBlockEntity::isItemValid, UPGRADES,
+        super(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), pos, state, MACHINE_SLOTS, SteamBoilerArrayBlockEntity::isItemValid, UPGRADES,
                 new SideConfig(SideMode.OUTPUT, SideMode.NONE, SideMode.INPUT, SideMode.NONE, SideMode.HEAT, SideMode.NONE),
                 SIDE_MODES);
         int tank = ArcforgeConfig.BOILER_ARRAY_TANK_PER_HEIGHT.getAsInt() * 3;
@@ -99,12 +100,23 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
         };
     }
 
+    // The bucket slot takes full buckets of water.
+    public static boolean isItemValid(int slot, ItemResource resource) {
+        FluidResource fluid = slot == SLOT_BUCKET_IN ? BucketSlots.contents(resource.toStack(1)) : null;
+        return fluid != null && BoilerCore.isWater(fluid);
+    }
+
+    // A client-side copy of the slots, for the menu.
+    public static MachineItemHandler clientItems() {
+        return new MachineItemHandler(MACHINE_SLOTS, SteamBoilerArrayBlockEntity::isItemValid, UPGRADES, () -> {});
+    }
+
     // The heat buffer and tanks scale with the height. Stored heat and fluid carry over (clamped).
     private void resize(int height) {
         int stored = heat != null ? heat.getStored() : 0;
         heat = new HeatBuffer(
                 ArcforgeConfig.BOILER_ARRAY_HEAT_PER_HEIGHT.getAsInt() * height,
-                ArcforgeConfig.BOILER_MAX_TEMPERATURE.getAsInt(),
+                ArcforgeConfig.BOILER_ARRAY_MAX_TEMPERATURE.getAsInt(),
                 this::setChanged);
         heat.add(stored);
         heatInput = heat.input(Integer.MAX_VALUE);

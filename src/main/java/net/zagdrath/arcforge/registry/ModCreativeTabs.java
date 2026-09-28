@@ -36,13 +36,13 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.INDUCTION_FURNACE_ARRAY_CASING.get());
                 output.accept(ModItems.METAL_PRESS.get());
                 output.accept(ModItems.METAL_PRESSING_ARRAY_CASING.get());
-                output.accept(ModItems.STEAM_BOILER.get());
-                output.accept(ModItems.STEAM_TURBINE.get());
                 output.accept(ModItems.ELECTRIC_PUMP.get());
                 output.accept(ModItems.ARC_MELTER.get());
                 output.accept(ModItems.CHEMICAL_REACTOR.get());
                 output.accept(ModItems.STEAM_BOILER_ARRAY_CASING.get());
                 output.accept(ModItems.STEAM_TURBINE_ARRAY_CASING.get());
+                output.accept(ModItems.SUPERHEATER_ARRAY_CASING.get());
+                output.accept(ModItems.CONDENSER_ARRAY_CASING.get());
                 output.accept(ModItems.PRESSURE_GLASS.get());
                 output.accept(ModItems.FIBERIZER.get());
                 output.accept(ModItems.INFUSER.get());

@@ -19,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
@@ -27,7 +26,6 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -53,6 +51,7 @@ import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.heat.SolarModel;
 import net.zagdrath.arcforge.machine.MachineOutputs;
+import net.zagdrath.arcforge.machine.ClimateHelper;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -332,23 +331,13 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
     // 1.2 in hot biomes, 0.85 in cold ones (or anywhere cold enough to snow), else 1 (see the config).
     public static double biomeMultiplier(Level level, BlockPos pos) {
         Holder<Biome> biome = level.getBiome(pos);
-        if (inAny(biome, ArcforgeConfig.SOLAR_HOT_BIOME_TAGS.get())) {
+        if (ClimateHelper.inAny(biome, ArcforgeConfig.SOLAR_HOT_BIOME_TAGS.get())) {
             return ArcforgeConfig.SOLAR_HOT_BIOME_MULTIPLIER.getAsDouble();
         }
-        if (inAny(biome, ArcforgeConfig.SOLAR_COLD_BIOME_TAGS.get()) || biome.value().coldEnoughToSnow(pos, level.getSeaLevel())) {
+        if (ClimateHelper.isCold(level, pos, ArcforgeConfig.SOLAR_COLD_BIOME_TAGS.get())) {
             return ArcforgeConfig.SOLAR_COLD_BIOME_MULTIPLIER.getAsDouble();
         }
         return 1.0;
-    }
-
-    private static boolean inAny(Holder<Biome> biome, List<? extends String> tags) {
-        for (String tag : tags) {
-            Identifier id = Identifier.tryParse(tag);
-            if (id != null && biome.is(TagKey.create(Registries.BIOME, id))) {
-                return true;
-            }
-        }
-        return false;
     }
 
     // Rain or snow over any collector (none in a biome where it doesn't rain); a thunderstorm only counts

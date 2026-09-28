@@ -68,7 +68,7 @@ At clear noon on the north-south axis it makes 600 HU/t at 550°C (High-Pressure
 500°C, so about 10:00 to 14:00 in clear weather). The temperature follows the same factors, up to 550°C.
 It holds 16,000 HU and gives heat out of its heat ports (a new tower has one on the bottom block behind
 the controller), at its whole output even into a touching machine. A boiler it feeds only gets to 500°C
-set to High-Pressure (see the Steam Boiler), since one array gives less heat than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
+set to High-Pressure (see the Steam Boiler Array), since one array gives less heat than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
 it does nothing in the Nether or the End. Everything is configurable (`power.solarThermalArray`).
 
 ### Steelmaking and alloys
@@ -179,26 +179,28 @@ top slot empties a Gas Cartridge into the cylinder and the bottom one fills it.
 source is removed, except water with two or more water sources beside it, which is infinite. It
 pushes up to 1,000 mB/t out of its top. Takes Speed and Energy upgrades.
 
-**Steam Boiler.** Boils water into steam with heat, using up to 80 HU/t, and only at 100°C or hotter.
-The grade depends on its temperature: Steam from 100°C (10 HU/mB), High-Pressure from 500°C (15 HU/mB),
-Superheated from 900°C (20 HU/mB). Its **pressure** (a tab in its GUI) picks the grade:
+**Steam Boiler Array.** Boils water into steam with heat. It is a 3x3 tower, 3 to 7 blocks tall, of
+Steam Boiler Array Casings and Pressure Glass, hollow in the middle.
+
+- Only the 8 corners must be casings, so whole walls can be windows, and the water and steam show
+  through them.
+- The steam grade depends on its temperature:
+  - Steam from 100°C (8 HU/mB);
+  - High-Pressure from 500°C (12 HU/mB);
+  - Superheated from 900°C (16 HU/mB).
+- Per block of height it holds 100,000 HU, uses up to 600 HU/t, and has 16,000 mB tanks.
+- A full-height (7) boiler boils up to 4,200 HU/t. That is about 350 mB/t of High-Pressure Steam,
+  enough for a full-length Steam Turbine Array.
+
+Its **pressure** (a tab in its GUI) picks the grade:
 - **Auto** boils all the heat above 100°C. Fed more heat than it uses, it climbs toward its heat
-  source's temperature and makes better steam; underfed, it holds at 100°C making plain Steam.
+  source's temperature and makes better steam. Underfed, it holds at 100°C making plain Steam.
 - **Steam**, **High-Pressure** or **Superheated** heats without boiling until the boiler reaches that
   grade's temperature, then boils only the heat above it. It holds there, making that grade at whatever
-  rate its heat comes in, so a slow source such as a Solar Thermal Array can still make High-Pressure Steam.
+  rate its heat comes in. So a slow source such as a Solar Thermal Array can still make High-Pressure
+  Steam.
 
 Cooling into a lower grade turns the steam it holds into that grade.
-
-**Steam Turbine.** Turns up to 10 mB/t of steam into FE: 8 / 14 / 22 FE per mB by grade (80 to
-220 FE/t). The used steam vents. Heavy Oil in its 1,000 mB lubricant tank (through a **Lubricant**
-face) adds 8% to its output, using 1 mB every 100 ticks while it generates.
-
-**Steam Boiler Array.** A 3x3 tower 3 to 7 tall of Steam Boiler Array Casings and Pressure Glass,
-hollow in the middle. Only the 8 corners must be casings, so whole walls can be windows, and the water
-and steam show through them. Per block of height: 100,000 HU, up to 600 HU/t, 16,000 mB tanks; each mB
-costs 80% of a Steam Boiler's heat. It has the same pressure setting. A full-height (7) boiler boils up to 4,200 HU/t: about
-350 mB/t of High-Pressure Steam, enough for a full-length Steam Turbine Array.
 
 **Steam Turbine Array.** A 3x3 tube 3 to 9 long along either horizontal axis, built the same way. It
 takes up to 40 mB/t per block of length at 10 / 18 / 28 FE per mB (a 9-long array on Superheated makes
@@ -207,6 +209,40 @@ coasts down when the steam stops. Its speed follows the power in the steam (flow
 higher grade spins it faster: full speed is a full flow of Superheated Steam. A new one has an energy port on its generator end and a steam port on
 its bearing end. Heavy Oil in its 4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
 blocks of length.
+
+Spent steam vents, unless you give it an **Exhaust** port with the Wrench. With an Exhaust port, spent
+steam leaves as **Exhaust Steam**, a gas only a Condenser Array can use. While the exhaust drains (its
+tank isn't full), the turbine makes 10% more FE, on top of the lubricant bonus.
+
+**Superheater Array.** A solid 3x3x3 cube of Superheater Array Casings (Hardened tier). It forms like
+the Arc Crushing Array.
+
+- It takes steam and heat in, and sends the next grade out.
+- **Cost per mB:**
+  - Steam → High-Pressure: 5 HU;
+  - High-Pressure → Superheated: 5 HU;
+  - Steam → Superheated: 10 HU.
+- Its own heat must be at least the target grade's temperature (500°C / 900°C). Below that, steam
+  passes through unchanged.
+- **Pressure tab:**
+  - **Auto** makes the best grade its heat allows.
+  - **High-Pressure** and **Superheated** make only that grade.
+- It uses up to 2,000 HU/t and has separate 16,000 mB tanks for steam in and steam out.
+- A new one has a steam-in, a steam-out and a heat port.
+
+**Condenser Array.** A solid 3x3x3 cube of Condenser Array Casings (Tempered tier). It turns Exhaust
+Steam back into water, 1:1.
+
+- It condenses 120 mB/t in open air.
+- Blocks touching its outer faces add to that:
+  - each water source: 20;
+  - each ice: 30;
+  - each packed ice: 40;
+  - each blue ice: 60.
+- Cold biomes condense ×1.25 and the Nether ×0.5, up to 400 mB/t.
+- A new one has an exhaust-in and a water-out port.
+- Boiler → turbine → condenser → back to the boiler's water port is a closed loop. The ports push on
+  their own, so it runs without a pump.
 
 ### Distillation
 
@@ -386,7 +422,7 @@ by the colour of its grip). Where a mode does nothing with a block, the click go
 ### Multiblock ports
 
 Multiblocks do IO only through their **ports**: blocks on the outside of the structure set to a mode,
-marked with a plate (a blue ring takes in, an orange one gives out, red is energy, hot orange is heat).
+marked with a plate (a blue ring takes in, an orange one gives out, red is energy, hot orange is heat, grey is exhaust).
 Each outer face of a block is its own port, so a corner can take things in on one side and give them out on another. Ports stay where they were set, even if their block is broken and put back. On the cube arrays and the Solar Thermal Array, whose
 formed model isn't a cube, a port is a steel nozzle from the model out to the block face. Set them with
 the wrench in Port mode; each structure cycles only through its own modes. A new structure gets a few in

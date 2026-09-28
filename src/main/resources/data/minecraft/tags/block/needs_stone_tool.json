@@ -12,8 +12,6 @@
     "arcforge:induction_furnace_array_casing",
     "arcforge:metal_press",
     "arcforge:metal_pressing_array_casing",
-    "arcforge:steam_boiler",
-    "arcforge:steam_turbine",
     "arcforge:electric_pump",
     "arcforge:steam_boiler_array_casing",
     "arcforge:steam_turbine_array_casing",
@@ -25,6 +23,8 @@
     "arcforge:solar_collector",
     "arcforge:arc_melter",
     "arcforge:chemical_reactor",
-    "arcforge:nether_sulfur_ore"
+    "arcforge:nether_sulfur_ore",
+    "arcforge:superheater_array_casing",
+    "arcforge:condenser_array_casing"
   ]
 }

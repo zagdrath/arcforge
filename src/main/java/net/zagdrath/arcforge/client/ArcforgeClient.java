@@ -79,12 +79,13 @@ import net.zagdrath.arcforge.client.screen.machine.ArcMelterScreen;
 import net.zagdrath.arcforge.client.screen.machine.ChemicalReactorScreen;
 import net.zagdrath.arcforge.client.screen.machine.ElectricPumpScreen;
 import net.zagdrath.arcforge.client.screen.machine.SteamBoilerScreen;
-import net.zagdrath.arcforge.client.screen.machine.SteamTurbineScreen;
 import net.zagdrath.arcforge.client.screen.machine.CombustionPlantScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.ArcCrushingArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.InductionFurnaceArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.MetalPressingArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.SteamTurbineArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.CondenserArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.SuperheaterArrayScreen;
 import net.zagdrath.arcforge.client.screen.machine.FireboxScreen;
 import net.zagdrath.arcforge.client.screen.machine.FiberizerScreen;
 import net.zagdrath.arcforge.client.screen.machine.FuelBurnerScreen;
@@ -155,13 +156,13 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.INDUCTION_FURNACE_ARRAY.get(), InductionFurnaceArrayScreen::new);
         event.register(ModMenuTypes.METAL_PRESS.get(), MetalPressScreen::new);
         event.register(ModMenuTypes.METAL_PRESSING_ARRAY.get(), MetalPressingArrayScreen::new);
-        event.register(ModMenuTypes.STEAM_BOILER.get(), SteamBoilerScreen::new);
         event.register(ModMenuTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerScreen::array);
-        event.register(ModMenuTypes.STEAM_TURBINE.get(), SteamTurbineScreen::new);
         event.register(ModMenuTypes.ELECTRIC_PUMP.get(), ElectricPumpScreen::new);
         event.register(ModMenuTypes.ARC_MELTER.get(), ArcMelterScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
+        event.register(ModMenuTypes.SUPERHEATER_ARRAY.get(), SuperheaterArrayScreen::new);
+        event.register(ModMenuTypes.CONDENSER_ARRAY.get(), CondenserArrayScreen::new);
         event.register(ModMenuTypes.FIBERIZER.get(), FiberizerScreen::new);
         event.register(ModMenuTypes.FUEL_BURNER.get(), FuelBurnerScreen::new);
         event.register(ModMenuTypes.INFUSER.get(), InfuserScreen::new);
@@ -209,6 +210,12 @@ public class ArcforgeClient {
         event.register(steamModel(SteamGrade.STEAM), ModFluids.STEAM, ModFluids.FLOWING_STEAM);
         event.register(steamModel(SteamGrade.HIGH_PRESSURE), ModFluids.HIGH_PRESSURE_STEAM, ModFluids.FLOWING_HIGH_PRESSURE_STEAM);
         event.register(steamModel(SteamGrade.SUPERHEATED), ModFluids.SUPERHEATED_STEAM, ModFluids.FLOWING_SUPERHEATED_STEAM);
+        // Exhaust Steam is steam gone grey (not a grade).
+        event.register(new FluidModel.Unbaked(
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/steam_still")),
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/steam_flow")),
+                null,
+                FluidTintSources.constant(EXHAUST_STEAM_TINT)), ModFluids.EXHAUST_STEAM, ModFluids.FLOWING_EXHAUST_STEAM);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -218,6 +225,8 @@ public class ArcforgeClient {
                 null,
                 null);
     }
+
+    private static final int EXHAUST_STEAM_TINT = 0xFF9EA6AE;
 
     private static FluidModel.Unbaked steamModel(SteamGrade grade) {
         return new FluidModel.Unbaked(
@@ -244,6 +253,7 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xC89A20, 5.0F), ModFluids.LIGHT_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0x2A1A0C, 2.0F), ModFluids.HEAVY_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
+        event.registerFluidType(liquidFog(EXHAUST_STEAM_TINT & 0xFFFFFF, 6.0F), ModFluids.EXHAUST_STEAM_TYPE.get());
         for (OreSlurry slurry : OreSlurry.values()) {
             event.registerFluidType(liquidFog(slurry.tint() & 0xFFFFFF, 3.0F), ModFluids.slurry(slurry).type().get());
         }

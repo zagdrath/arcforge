@@ -1,0 +1,17 @@
+{
+  "title": "Condenser Array",
+  "icon": "arcforge:condenser_array_casing",
+  "items": [
+    "arcforge:condenser_array_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A solid 3×3×3 cube of Condenser Array Casings. It turns Exhaust Steam back into water, 1 mB for 1 mB.\n# Cooling\n- 120 mB/t in open air.\n- Each water source touching its outside adds 20 mB/t; ice 30, packed ice 40, blue ice 60.\n- Cold biomes condense ×1.25, the Nether only ×0.5. Never more than 400 mB/t.\n# Closing the loop\nBoiler → Turbine (Exhaust port) → Condenser → back to the Boiler's water port. The ports push on their own, so the loop runs without a pump."
+    },
+    {
+      "type": "multiblock",
+      "structure": "condenser_array"
+    }
+  ]
+}

@@ -19,12 +19,16 @@ import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
@@ -42,8 +46,6 @@ import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.SteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
@@ -125,16 +127,19 @@ public final class ModCapabilities {
                 casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), (casing, side) ->
                 casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
-        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.STEAM_BOILER.get(),
-                SteamBoilerBlockEntity::getItemHandler);
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.STEAM_BOILER.get(),
-                SteamBoilerBlockEntity::getFluidHandler);
-        event.registerBlockEntity(HEAT, ModBlockEntityTypes.STEAM_BOILER.get(),
-                SteamBoilerBlockEntity::getHeatHandler);
-        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.STEAM_TURBINE.get(),
-                SteamTurbineBlockEntity::getFluidHandler);
-        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.STEAM_TURBINE.get(),
-                SteamTurbineBlockEntity::getEnergyHandler);
+        // Every casing of a formed Superheater or Condenser Array exposes the cube face it lies on (served by the centre).
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.SUPERHEATER_ARRAY.get(), (casing, side) -> {
+            SuperheaterArrayBlockEntity array = SuperheaterArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.fluidHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.SUPERHEATER_ARRAY.get(), (casing, side) -> {
+            SuperheaterArrayBlockEntity array = SuperheaterArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.heatHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CONDENSER_ARRAY.get(), (casing, side) -> {
+            CondenserArrayBlockEntity array = CondenserArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.fluidHandlerAt(casing.getBlockPos(), side) : null;
+        });
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ELECTRIC_PUMP.get(),
                 ElectricPumpBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ELECTRIC_PUMP.get(),

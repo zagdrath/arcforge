@@ -27,7 +27,7 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
     private static final int ENERGY_X = 157, ENERGY_Y = 19;
     private static final int DIAL_X = 38, DIAL_Y = 22, DIAL_W = 44, DIAL_H = 26;
     private static final float PIVOT_X = 60.0F, PIVOT_Y = 45.5F, NEEDLE_LENGTH = 13.0F;
-    private static final int RPM_CENTER_X = 60, RPM_Y = 52;
+    private static final int RPM_CENTER_X = 60, RPM_Y = 52, EXHAUST_Y = 61;
     private static final int LABEL_X = 88, VALUE_RIGHT = 145, FLOW_LABEL_Y = 22, FLOW_Y = 31, OUTPUT_LABEL_Y = 42, OUTPUT_Y = 51;
     private static final int LED_X = 88, LED_Y = 61, STATUS_X = 96, STATUS_Y = 61;
     private static final int NEEDLE_COLOR = 0xFFFF5A4A;
@@ -49,6 +49,7 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
             case INPUT -> sideModeName("steam_input");
             case ENERGY -> sideModeName("energy_output");
             case LUBRICANT -> sideModeName("lubricant_input");
+            case EXHAUST -> sideModeName("exhaust");
             default -> super.sideModeName(mode);
         };
     }
@@ -85,6 +86,17 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
     protected void drawText(GuiGraphicsExtractor graphics) {
         Component rpm = Component.translatable("gui.arcforge.rpm", ArcforgeGui.grouped(menu.getRpm()));
         graphics.text(font, rpm, RPM_CENTER_X - font.width(rpm) / 2, RPM_Y, ArcforgeGui.WHITE, false);
+        // Under the dial: "Vacuum +10%" while the exhaust drains, "Venting" with no Exhaust port.
+        Component exhaust = switch (menu.getExhaustState()) {
+            case SteamTurbineArrayMenu.EXHAUST_VACUUM -> Component.translatable("gui.arcforge.turbine.vacuum",
+                    Math.round(ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() * 100));
+            case SteamTurbineArrayMenu.EXHAUST_VENTING -> Component.translatable("gui.arcforge.turbine.venting");
+            default -> null;
+        };
+        if (exhaust != null) {
+            int color = menu.getExhaustState() == SteamTurbineArrayMenu.EXHAUST_VACUUM ? ArcforgeGui.ACCENT : ArcforgeGui.LABEL;
+            graphics.text(font, exhaust, RPM_CENTER_X - font.width(exhaust) / 2, EXHAUST_Y, color, false);
+        }
         graphics.text(font, Component.translatable("gui.arcforge.flow"), LABEL_X, FLOW_LABEL_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.translatable("gui.arcforge.flow_value_compact", menu.getFlow(), menu.getMaxFlow()), VALUE_RIGHT, FLOW_Y, ArcforgeGui.TEXT);
         graphics.text(font, Component.translatable("gui.arcforge.output"), LABEL_X, OUTPUT_LABEL_Y, ArcforgeGui.LABEL, false);

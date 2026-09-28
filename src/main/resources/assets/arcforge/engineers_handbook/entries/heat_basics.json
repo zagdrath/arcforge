@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Heat machines hold heat (HU) in a buffer. Their temperature climbs from 20°C when empty to the machine's maximum when full.\nHeat only flows from a hotter block into a colder one: through touching heat faces, or through Thermodynamic Conduits.\n# Why temperature matters\n- The Thermoelectric Plant makes more FE per HU the hotter it runs.\n- The Fiberizer needs 800°C, the Arcforge Furnace 1,200°C.\n- A Steam Boiler makes better steam the hotter it gets."
+      "text": "Heat machines hold heat (HU) in a buffer. Their temperature climbs from 20°C when empty to the machine's maximum when full.\nHeat only flows from a hotter block into a colder one: through touching heat faces, or through Thermodynamic Conduits.\n# Why temperature matters\n- The Thermoelectric Plant makes more FE per HU the hotter it runs.\n- The Fiberizer needs 800°C, the Arcforge Furnace 1,200°C.\n- A Steam Boiler Array makes better steam the hotter it gets."
     }
   ]
 }

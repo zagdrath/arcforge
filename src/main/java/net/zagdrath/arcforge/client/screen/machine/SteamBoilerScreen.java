@@ -38,10 +38,6 @@ public class SteamBoilerScreen extends MachineScreen<SteamBoilerMenu> {
     private final Identifier tankGauge = sprite("tank_gauge");
     private final Identifier ghostBucket = sprite("ghost_bucket");
 
-    public SteamBoilerScreen(SteamBoilerMenu menu, Inventory inventory, Component title) {
-        this(menu, inventory, title, "steam_boiler");
-    }
-
     protected SteamBoilerScreen(SteamBoilerMenu menu, Inventory inventory, Component title, String machine) {
         super(menu, inventory, title, machine, List.of(new HeatTab(menu::getHeat,
                 Component.translatable("gui.arcforge.usage"),

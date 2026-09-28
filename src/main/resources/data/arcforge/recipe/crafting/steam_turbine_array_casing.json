@@ -3,13 +3,13 @@
   "category": "misc",
   "pattern": [
     "NTN",
-    "TXT",
+    "TGT",
     "NTN"
   ],
   "key": {
     "T": "arcforge:tempered_alloy",
-    "X": "arcforge:steam_turbine",
-    "N": "#c:plates/nickel"
+    "N": "#c:plates/nickel",
+    "G": "#c:gears/steel"
   },
   "result": {
     "id": "arcforge:steam_turbine_array_casing",

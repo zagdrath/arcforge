@@ -17,7 +17,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.material.Fluid;
-import net.zagdrath.arcforge.blockentity.machine.SteamBoilerBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
@@ -93,20 +93,10 @@ public class SteamBoilerMenu extends MachineMenu {
         return tank.getAmount() > 0 ? BuiltInRegistries.FLUID.getId(tank.getResource(0).getFluid()) : -1;
     }
 
-    // --- The single Steam Boiler ---
-
-    public static SteamBoilerMenu single(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
-        return single(containerId, inventory, extraData.readBlockPos(), SteamBoilerBlockEntity.clientItems(), WideIntContainerData.client(DATA_VALUES));
-    }
-
-    public static SteamBoilerMenu single(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
-        return new SteamBoilerMenu(ModMenuTypes.STEAM_BOILER.get(), containerId, inventory, pos, items, data, ModBlocks.STEAM_BOILER.get());
-    }
-
     // --- The Steam Boiler Array (served by its master casing) ---
 
     public static SteamBoilerMenu array(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
-        return array(containerId, inventory, extraData.readBlockPos(), SteamBoilerBlockEntity.clientItems(), WideIntContainerData.client(DATA_VALUES));
+        return array(containerId, inventory, extraData.readBlockPos(), SteamBoilerArrayBlockEntity.clientItems(), WideIntContainerData.client(DATA_VALUES));
     }
 
     public static SteamBoilerMenu array(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
@@ -115,8 +105,8 @@ public class SteamBoilerMenu extends MachineMenu {
 
     private SteamBoilerMenu(MenuType<?> type, int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data, Block block) {
         super(type, containerId, inventory, pos, items, data, DATA_VALUES, block);
-        addMachineSlot(SteamBoilerBlockEntity.SLOT_BUCKET_IN, BUCKET_IN_X, BUCKET_IN_Y);
-        addMachineSlot(SteamBoilerBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y);
+        addMachineSlot(SteamBoilerArrayBlockEntity.SLOT_BUCKET_IN, BUCKET_IN_X, BUCKET_IN_Y);
+        addMachineSlot(SteamBoilerArrayBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y);
         finish(inventory, UPGRADES_TAB);
     }
 

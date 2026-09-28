@@ -26,7 +26,9 @@ public enum SideMode implements StringRepresentable {
     HEAVY_OIL("heavy_oil"),
     PITCH("pitch"),
     // Steam turbines: Heavy Oil goes into the lubricant tank.
-    LUBRICANT("lubricant");
+    LUBRICANT("lubricant"),
+    // The Steam Turbine Array: spent steam comes out as Exhaust Steam instead of venting.
+    EXHAUST("exhaust");
 
     private final String name;
 
@@ -37,7 +39,7 @@ public enum SideMode implements StringRepresentable {
     // Whether faces in this mode give things out (and push them out with auto-eject).
     public boolean isOutput() {
         return switch (this) {
-            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH -> true;
+            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST -> true;
             default -> false;
         };
     }

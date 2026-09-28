@@ -29,7 +29,15 @@ public final class MultiblockAutomation {
     // With auto-eject on, pushes items and fluids out of every outward face in an output mode (output,
     // by-product, a distillation product), into whatever inventory or tank is next to it.
     public static void pushOutputs(ServerLevel level, MultiblockController controller) {
-        if (!controller.isAutoEject()) {
+        if (controller.isAutoEject()) {
+            pushOutputs(level, controller, true);
+        }
+    }
+
+    // Pushes out of every output face whether auto-eject is on or not (machines whose ports always push,
+    // like the Superheater and Condenser Arrays). force = false behaves like pushOutputs(level, controller).
+    public static void pushOutputs(ServerLevel level, MultiblockController controller, boolean force) {
+        if (!force && !controller.isAutoEject()) {
             return;
         }
         for (BlockPos pos : BlockPos.betweenClosed(controller.getMinCorner(), controller.getMaxCorner())) {

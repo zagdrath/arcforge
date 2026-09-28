@@ -79,5 +79,23 @@
         "stream": false
       }
     ]
+  },
+  "superheater_array_run": {
+    "subtitle": "subtitles.arcforge.superheater_array_run",
+    "sounds": [
+      {
+        "name": "arcforge:superheater_array_run",
+        "stream": false
+      }
+    ]
+  },
+  "condenser_array_run": {
+    "subtitle": "subtitles.arcforge.condenser_array_run",
+    "sounds": [
+      {
+        "name": "arcforge:condenser_array_run",
+        "stream": false
+      }
+    ]
   }
 }

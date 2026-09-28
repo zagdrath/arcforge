@@ -31,7 +31,9 @@ import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.recipe.MeltingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
+import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.registry.ModBlocks;
+import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModRecipes;
 import net.zagdrath.arcforge.steam.SteamGrade;
@@ -361,7 +363,7 @@ final class MachineCategories {
         static final IRecipeType<SteamRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "steam", SteamRecipe.class);
 
         Steam(IGuiHelper gui) {
-            super(TYPE, "steam", ModBlocks.STEAM_BOILER.get(), gui, 150, 46);
+            super(TYPE, "steam", ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), gui, 150, 46);
         }
 
         @Override
@@ -378,9 +380,75 @@ final class MachineCategories {
         @Override
         public void draw(SteamRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             SteamGrade grade = recipe.grade();
-            text(graphics, Component.translatable("jei.arcforge.steam.boil", grade.minCelsius(), grade.huPerMb()), 84, 5);
-            text(graphics, Component.translatable("jei.arcforge.steam.boil_array", String.format(Locale.ROOT, "%.0f", grade.huPerMb() * 0.8)), 84, 15);
-            text(graphics, Component.translatable("jei.arcforge.steam.turbine", grade.fePerMb(), grade.arrayFePerMb()), 0, 30);
+            // What the Steam Boiler Array pays per mB (after its heat cost multiplier) and the Steam Turbine Array makes.
+            String huPerMb = String.format(Locale.ROOT, "%.0f", grade.huPerMb() * ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble());
+            text(graphics, Component.translatable("jei.arcforge.steam.boil", grade.minCelsius(), huPerMb), 84, 5);
+            text(graphics, Component.translatable("jei.arcforge.steam.turbine", grade.arrayFePerMb()), 0, 30);
+        }
+    }
+
+    // --- Superheater Array: each grade step, its HU per mB and the temperature it needs ---
+
+    record SuperheatingRecipe(SteamGrade from, SteamGrade to) {
+        static List<SuperheatingRecipe> all() {
+            return List.of(new SuperheatingRecipe(SteamGrade.STEAM, SteamGrade.HIGH_PRESSURE),
+                    new SuperheatingRecipe(SteamGrade.HIGH_PRESSURE, SteamGrade.SUPERHEATED),
+                    new SuperheatingRecipe(SteamGrade.STEAM, SteamGrade.SUPERHEATED));
+        }
+    }
+
+    static final class Superheating extends ArcforgeCategory<SuperheatingRecipe> {
+        static final IRecipeType<SuperheatingRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "superheating", SuperheatingRecipe.class);
+
+        Superheating(IGuiHelper gui) {
+            super(TYPE, "superheating", ModBlocks.SUPERHEATER_ARRAY_CASING.get(), gui, 150, 30);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, SuperheatingRecipe recipe, IFocusGroup focuses) {
+            fluid(builder, true, 1, 5, recipe.from().fluid(), 1_000);
+            fluid(builder, false, 61, 5, recipe.to().fluid(), 1_000);
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, SuperheatingRecipe recipe, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(SuperheatingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            String cost = String.format(Locale.ROOT, "%.0f", SuperheaterArrayBlockEntity.cost(recipe.from(), recipe.to()));
+            text(graphics, Component.translatable("jei.arcforge.superheating.cost", cost, recipe.to().minCelsius()), 84, 9);
+        }
+    }
+
+    // --- Condenser Array: Exhaust Steam back to water, 1:1 ---
+
+    record CondensingRecipe() {}
+
+    static final class Condensing extends ArcforgeCategory<CondensingRecipe> {
+        static final IRecipeType<CondensingRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "condensing", CondensingRecipe.class);
+
+        Condensing(IGuiHelper gui) {
+            super(TYPE, "condensing", ModBlocks.CONDENSER_ARRAY_CASING.get(), gui, 150, 30);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, CondensingRecipe recipe, IFocusGroup focuses) {
+            fluid(builder, true, 1, 5, ModFluids.EXHAUST_STEAM.get(), 1_000);
+            fluid(builder, false, 61, 5, Fluids.WATER, 1_000);
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, CondensingRecipe recipe, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(26, 5);
+        }
+
+        // From open air up to the most any cooling gives.
+        @Override
+        public void draw(CondensingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.condensing.rate", ArcforgeConfig.CONDENSER_BASE_RATE.getAsInt(),
+                    ArcforgeConfig.CONDENSER_MAX_RATE.getAsInt()), 84, 9);
         }
     }
 

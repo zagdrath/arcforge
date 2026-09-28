@@ -271,32 +271,12 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Steam Boiler: boils water into steam with heat. Hotter boilers make higher grades of steam.").push("steamBoiler");
-    }
-
-    public static final ModConfigSpec.IntValue BOILER_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size in HU (a full buffer is at the maximum temperature).")
-            .defineInRange("heatCapacity", 40_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue BOILER_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 1_400, 200, 10_000);
-
-    public static final ModConfigSpec.IntValue BOILER_MAX_HEAT_PER_TICK = BUILDER
-            .comment("Most HU/t it boils with.")
-            .defineInRange("maxHeatPerTick", 80, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue BOILER_TANK_CAPACITY = BUILDER
-            .comment("Water and steam tank sizes in mB.")
-            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000_000);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
         BUILDER.comment("Steam Boiler Array: a 3x3 boiler 3 to 7 blocks tall. Values are per block of height.").push("steamBoilerArray");
     }
+
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_400, 200, 10_000);
 
     public static final ModConfigSpec.IntValue BOILER_ARRAY_HEAT_PER_HEIGHT = BUILDER
             .comment("Heat buffer size in HU, per block of height.")
@@ -311,40 +291,8 @@ public class ArcforgeConfig {
             .defineInRange("tankCapacityPerHeight", 16_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.DoubleValue BOILER_ARRAY_HEAT_COST = BUILDER
-            .comment("Multiplier on the heat per mB of steam (0.8 = the big drum loses 20% less).")
+            .comment("Multiplier on the heat per mB of steam (0.8: 8 / 12 / 16 HU per mB of Steam / High-Pressure / Superheated).")
             .defineInRange("heatCostMultiplier", 0.8, 0.1, 10.0);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Steam Turbine: turns steam into FE. FE per mB depends on the steam grade.").push("steamTurbine");
-    }
-
-    public static final ModConfigSpec.IntValue TURBINE_MAX_FLOW = BUILDER
-            .comment("Most steam it uses, in mB/t.")
-            .defineInRange("maxFlow", 10, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_TANK_CAPACITY = BUILDER
-            .comment("Steam tank size in mB.")
-            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_MAX_OUTPUT = BUILDER
-            .comment("Most FE/t pushed out of its energy faces.")
-            .defineInRange("maxEnergyOutput", 400, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_LUBRICANT_CAPACITY = BUILDER
-            .comment("Lubricant (Heavy Oil) tank size in mB.")
-            .defineInRange("lubricantCapacity", 1_000, 100, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_LUBRICANT_INTERVAL = BUILDER
-            .comment("Ticks of generating per mB of lubricant used.")
-            .defineInRange("lubricantInterval", 100, 1, 100_000);
 
     static {
         BUILDER.pop();
@@ -382,6 +330,101 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_INTERVAL = BUILDER
             .comment("Ticks of generating per mB of lubricant used, for every 3 blocks of length.")
             .defineInRange("lubricantInterval", 20, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_EXHAUST_PER_LENGTH = BUILDER
+            .comment("Exhaust Steam tank size in mB, per block of length (used only with an Exhaust port).")
+            .defineInRange("exhaustTankCapacityPerLength", 32_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.DoubleValue TURBINE_ARRAY_VACUUM_BONUS = BUILDER
+            .comment("Extra FE while an Exhaust port drains its spent steam (0.10 = +10%), on top of the lubricant bonus.")
+            .defineInRange("vacuumBonus", 0.10, 0.0, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Superheater Array: a 3x3x3 cube that upgrades steam one or two grades with heat, once it is at least as hot",
+                "as the grade it makes.").push("superheaterArray");
+    }
+
+    public static final ModConfigSpec.IntValue SUPERHEATER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU (a full buffer is at the maximum temperature).")
+            .defineInRange("heatCapacity", 200_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue SUPERHEATER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_400, 200, 10_000);
+
+    public static final ModConfigSpec.IntValue SUPERHEATER_MAX_HEAT_PER_TICK = BUILDER
+            .comment("Most HU/t it takes in, and most it uses.")
+            .defineInRange("maxHeatPerTick", 2_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue SUPERHEATER_TANK_CAPACITY = BUILDER
+            .comment("Steam-in and steam-out tank sizes in mB (each).")
+            .defineInRange("tankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SUPERHEATER_MAX_FLOW = BUILDER
+            .comment("Most steam it upgrades or passes through, in mB/t.")
+            .defineInRange("maxFlow", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue SUPERHEATER_HEAT_COST = BUILDER
+            .comment("Multiplier on the heat per mB (the difference in HU/mB between the grades: 5 Steam to High-Pressure,",
+                    "5 High-Pressure to Superheated, 10 Steam to Superheated).")
+            .defineInRange("heatCostMultiplier", 1.0, 0.1, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Condenser Array: a 3x3x3 cube that turns Exhaust Steam back into water, 1:1, faster with water and ice around",
+                "it and in cold biomes.").push("condenserArray");
+    }
+
+    public static final ModConfigSpec.IntValue CONDENSER_TANK_CAPACITY = BUILDER
+            .comment("Exhaust-in and water-out tank sizes in mB (each).")
+            .defineInRange("tankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue CONDENSER_BASE_RATE = BUILDER
+            .comment("mB/t it condenses in open air.")
+            .defineInRange("baseRate", 120, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CONDENSER_WATER_BONUS = BUILDER
+            .comment("mB/t added by each water source touching its outer faces.")
+            .defineInRange("waterSourceBonus", 20, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CONDENSER_ICE_BONUS = BUILDER
+            .comment("mB/t added by each ice block touching its outer faces.")
+            .defineInRange("iceBonus", 30, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CONDENSER_PACKED_ICE_BONUS = BUILDER
+            .comment("mB/t added by each packed ice block touching its outer faces.")
+            .defineInRange("packedIceBonus", 40, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CONDENSER_BLUE_ICE_BONUS = BUILDER
+            .comment("mB/t added by each blue ice block touching its outer faces.")
+            .defineInRange("blueIceBonus", 60, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue CONDENSER_COLD_MULTIPLIER = BUILDER
+            .comment("Multiplier in cold biomes (or anywhere cold enough to snow).")
+            .defineInRange("coldBiomeMultiplier", 1.25, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue CONDENSER_NETHER_MULTIPLIER = BUILDER
+            .comment("Multiplier where water evaporates (the Nether).")
+            .defineInRange("netherMultiplier", 0.5, 0.0, 10.0);
+
+    public static final ModConfigSpec.IntValue CONDENSER_MAX_RATE = BUILDER
+            .comment("Most mB/t it condenses, whatever cools it.")
+            .defineInRange("maxRate", 400, 1, 1_000_000);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> CONDENSER_COLD_BIOME_TAGS = BUILDER
+            .comment("Biome tags counted as cold.")
+            .defineListAllowEmpty("coldBiomeTags", List.of("c:is_cold"), () -> "c:is_cold", value -> value instanceof String);
+
+    public static final ModConfigSpec.IntValue CONDENSER_SCAN_INTERVAL = BUILDER
+            .comment("Ticks between looks at what's touching it (and at the biome).")
+            .defineInRange("scanInterval", 40, 1, 1_200);
 
     static {
         BUILDER.pop();

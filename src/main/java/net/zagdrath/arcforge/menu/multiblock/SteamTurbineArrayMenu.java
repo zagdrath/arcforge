@@ -36,7 +36,11 @@ public class SteamTurbineArrayMenu extends MachineMenu {
     public static final int DATA_SIDE_CONFIG = 13;
     public static final int DATA_LUBRICANT = 14;
     public static final int DATA_LUBRICANT_CAPACITY = 15;
-    public static final int DATA_VALUES = 16;
+    // What happens to spent steam: EXHAUST_VENTING (no Exhaust port), EXHAUST_VACUUM (draining, with the
+    // bonus) or EXHAUST_FULL (its exhaust tank is full, so it vents).
+    public static final int DATA_EXHAUST = 16;
+    public static final int DATA_VALUES = 17;
+    public static final int EXHAUST_VENTING = 0, EXHAUST_VACUUM = 1, EXHAUST_FULL = 2;
 
     // Tabs: Energy, Redstone, Sides; the (hidden) upgrade slots would sit under a fourth.
     private static final int UPGRADES_TAB = 3;
@@ -123,5 +127,9 @@ public class SteamTurbineArrayMenu extends MachineMenu {
     // One blade set per block between the two ends.
     public int getBladeSets() {
         return Math.max(0, getLength() - 2);
+    }
+
+    public int getExhaustState() {
+        return value(DATA_EXHAUST);
     }
 }
