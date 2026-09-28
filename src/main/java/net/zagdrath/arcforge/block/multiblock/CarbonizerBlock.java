@@ -38,18 +38,17 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
-import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.MachineInteractions;
 import net.zagdrath.arcforge.multiblock.CarbonizerStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
-import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // One block of a Carbonizer. Slices (1 wide x 2 or 3 tall x 2 or 3 deep) placed side by side form one
 // structure; ROW/HALF/DEPTH record where each block sits so the models can draw one continuous casing
 // with a door per slice, and TALL picks the 3-tall front and door art. See CarbonizerStructure for formation and CarbonizerBlockEntity for processing.
-public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
+public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart, PortHolder {
     // Position along the row of slices. NONE = not part of a formed structure.
     public enum Row implements StringRepresentable {
         NONE("none"), SINGLE("single"), LEFT("left"), MIDDLE("middle"), RIGHT("right");
@@ -121,8 +120,7 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
                 .setValue(HALF, Half.BOTTOM)
                 .setValue(DEPTH, Depth.FRONT)
                 .setValue(TALL, false)
-                .setValue(LIT, false)
-                .setValue(MultiblockPorts.PORT, SideMode.NONE));
+                .setValue(LIT, false));
     }
 
     public static boolean isFormed(BlockState state) {
@@ -224,7 +222,7 @@ public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, ROW, HALF, DEPTH, TALL, LIT, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
+        builder.add(FACING, ROW, HALF, DEPTH, TALL, LIT);
     }
 
     // Smoke curls out of the open doors of working slices.

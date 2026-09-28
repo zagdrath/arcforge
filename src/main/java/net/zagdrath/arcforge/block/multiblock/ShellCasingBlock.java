@@ -32,22 +32,21 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
-import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
-import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
 // A casing of a steam array (see ShellStructure). Loose casings are ordinary solid blocks; formed ones
 // (FORMED) draw only the outside of the structure as one connected surface and let light through, so the
 // machine's insides (drawn by its renderer) show through the windows. They keep full collision, so the
 // machine is still solid.
-public abstract class ShellCasingBlock extends BaseEntityBlock implements MultiblockPart {
+public abstract class ShellCasingBlock extends BaseEntityBlock implements MultiblockPart, PortHolder {
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
     protected ShellCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FORMED, false).setValue(MultiblockPorts.PORT, SideMode.NONE));
+        registerDefaultState(stateDefinition.any().setValue(FORMED, false));
     }
 
     public abstract ShellStructure structure();
@@ -69,7 +68,7 @@ public abstract class ShellCasingBlock extends BaseEntityBlock implements Multib
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FORMED, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
+        builder.add(FORMED);
     }
 
     // Only the master of a formed structure runs.

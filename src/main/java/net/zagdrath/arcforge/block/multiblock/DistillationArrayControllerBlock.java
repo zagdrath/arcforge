@@ -30,21 +30,19 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
-import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
-import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Distillation Array's controller: its display faces the column's front (the structure's facing),
 // and its block entity runs the column and holds its contents.
-public class DistillationArrayControllerBlock extends BaseEntityBlock implements ColumnPart {
+public class DistillationArrayControllerBlock extends BaseEntityBlock implements ColumnPart, PortHolder {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     public DistillationArrayControllerBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FORMED, false).setValue(LIT, false)
-                .setValue(MultiblockPorts.PORT, SideMode.NONE));
+        registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FORMED, false).setValue(LIT, false));
     }
 
     @Override
@@ -131,6 +129,6 @@ public class DistillationArrayControllerBlock extends BaseEntityBlock implements
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, FORMED, LIT, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
+        builder.add(FACING, FORMED, LIT);
     }
 }

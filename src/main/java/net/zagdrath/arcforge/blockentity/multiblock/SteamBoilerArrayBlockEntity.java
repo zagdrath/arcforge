@@ -50,7 +50,7 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The Steam Boiler Array (see ShellMultiblockBlockEntity): a Steam Boiler that grows with its height h.
-// It holds 100,000 x h HU, boils with up to 200 x h HU/t, and its big drum loses less, so each mB costs
+// It holds 100,000 x h HU, boils with up to 600 x h HU/t, and its big drum loses less, so each mB costs
 // 80% of the heat (Superheated: 16 HU/mB, so a 7-tall array makes up to 87.5 mB/t). Water and steam tanks
 // hold 16,000 x h mB. The grade rules are the Steam Boiler's (see BoilerCore).
 public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity implements Boiler {

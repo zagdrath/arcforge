@@ -22,6 +22,7 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
+import net.zagdrath.arcforge.menu.common.MenuReach;
 import net.zagdrath.arcforge.menu.common.PortSync;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.network.PortsPayload;
@@ -172,7 +173,7 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
 
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(access, player, ModBlocks.ARCFORGE_FURNACE_PORT.get());
+        return MenuReach.stillValid(access, player, ModBlocks.ARCFORGE_FURNACE_PORT.get());
     }
 
     public Slot getSlotFor(int machineSlot) {

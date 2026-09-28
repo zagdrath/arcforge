@@ -34,18 +34,17 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.CubeMultiblockBlockEntity;
-import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.CubeMultiblockStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
-import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 
 // A casing of a 3x3x3 cube multiblock (the Arc Crushing Array, the Induction Furnace Array). 27 of the
 // same casing form the machine: the centre block (part=center) draws the whole 48px machine model and
 // runs it; the others (part=other) draw nothing. Formed casings let light through (the centre is
 // enclosed, so its model would otherwise render black) but keep full collision and selection boxes, so
 // the machine is still solid and clickable.
-public abstract class CubeCasingBlock extends BaseEntityBlock implements MultiblockPart {
+public abstract class CubeCasingBlock extends BaseEntityBlock implements MultiblockPart, PortHolder {
     public enum Part implements StringRepresentable {
         NONE("none"), CENTER("center"), OTHER("other");
 
@@ -67,8 +66,7 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
 
     protected CubeCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(PART, Part.NONE).setValue(FACING, Direction.NORTH).setValue(LIT, false)
-                .setValue(MultiblockPorts.PORT, SideMode.NONE));
+        registerDefaultState(stateDefinition.any().setValue(PART, Part.NONE).setValue(FACING, Direction.NORTH).setValue(LIT, false));
     }
 
     public static boolean isFormed(BlockState state) {
@@ -82,7 +80,7 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(PART, FACING, LIT, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
+        builder.add(PART, FACING, LIT);
     }
 
     // Only the centre of a formed cube runs.

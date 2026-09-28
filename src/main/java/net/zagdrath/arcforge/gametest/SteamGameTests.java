@@ -8,11 +8,16 @@ package net.zagdrath.arcforge.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -32,6 +37,7 @@ import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.menu.common.MenuReach;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -310,6 +316,51 @@ public final class SteamGameTests {
                 })
                 .thenIdle(2)
                 .thenExecute(() -> helper.assertTrue(!ShellCasingBlock.isFormed(helper.getBlockState(min)), "Still formed without its window"))
+                .thenSucceed();
+    }
+
+    // A 9-long turbine's menu (at its master, the minimum corner) stays open for a player at the far end, who
+    // is out of reach of the master itself; it still closes once the player walks away from the turbine.
+    static void turbineArrayMenuReach(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 0);
+        buildShell(helper, min, Direction.Axis.X, 9, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.assertTrue(helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class).isMaster(), "Turbine did not form");
+                    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+                    ContainerLevelAccess access = ContainerLevelAccess.create(helper.getLevel(), helper.absolutePos(min));
+                    Block casing = ModBlocks.STEAM_TURBINE_ARRAY_CASING.get();
+                    // Two blocks past the far (+X) end cap, level with the middle.
+                    Vec3 farEnd = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(10, 1, 1)));
+                    player.setPos(farEnd.x, farEnd.y, farEnd.z);
+                    helper.assertTrue(!player.isWithinBlockInteractionRange(helper.absolutePos(min), 4.0), "The master is within vanilla reach; the test needs a longer turbine");
+                    helper.assertTrue(MenuReach.stillValid(access, player, casing), "The menu closes at the far end of the turbine");
+                    Vec3 away = Vec3.atBottomCenterOf(helper.absolutePos(new BlockPos(24, 1, 1)));
+                    player.setPos(away.x, away.y, away.z);
+                    helper.assertTrue(!MenuReach.stillValid(access, player, casing), "The menu stays open far from the turbine");
+                })
+                .thenSucceed();
+    }
+
+    // At the same flow, a turbine on High-Pressure Steam spins faster than one on plain Steam (its speed
+    // follows the power in the steam).
+    static void turbineArrayGradeSpeed(GameTestHelper helper) {
+        BlockPos steamMin = new BlockPos(0, 1, 0), pressureMin = new BlockPos(0, 1, 4);
+        buildShell(helper, steamMin, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
+        buildShell(helper, pressureMin, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.getBlockEntity(steamMin, SteamTurbineArrayBlockEntity.class).getSteam().set(0, SteamGrade.STEAM.resource(), 60_000);
+                    helper.getBlockEntity(pressureMin, SteamTurbineArrayBlockEntity.class).getSteam().set(0, SteamGrade.HIGH_PRESSURE.resource(), 60_000);
+                })
+                .thenIdle(100)
+                .thenExecute(() -> {
+                    double steam = helper.getBlockEntity(steamMin, SteamTurbineArrayBlockEntity.class).getRpm();
+                    double pressure = helper.getBlockEntity(pressureMin, SteamTurbineArrayBlockEntity.class).getRpm();
+                    helper.assertTrue(pressure > steam * 1.5, "High-Pressure spins at " + pressure + " RPM, Steam at " + steam);
+                })
                 .thenSucceed();
     }
 

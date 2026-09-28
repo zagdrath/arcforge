@@ -15,22 +15,20 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
-import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
-import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 
 // The Distillation Array's plain wall. Loose, it's a framed plate; formed, the column draws as one
-// connected surface (see ConnectedModel). It can be one of the column's ports (PORT; not so the trays).
-public class DistillationArrayCasingBlock extends Block implements ColumnPart {
+// connected surface (see ConnectedModel). It can be one of the column's ports (not so the trays).
+public class DistillationArrayCasingBlock extends Block implements ColumnPart, PortHolder {
     public DistillationArrayCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        BlockState state = stateDefinition.any().setValue(FORMED, false);
-        registerDefaultState(state.hasProperty(MultiblockPorts.PORT) ? state.setValue(MultiblockPorts.PORT, SideMode.NONE) : state);
+        registerDefaultState(stateDefinition.any().setValue(FORMED, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FORMED, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
+        builder.add(FORMED);
     }
 
     @Override

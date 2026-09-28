@@ -31,6 +31,7 @@ import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortFaces;
 
 // An ordinary block model (the fields of a plain blockstate variant: model, x, y, uvlock) with the port
 // plate on its outer faces when the block is one of its structure's ports (see MultiblockPorts): the faces
@@ -72,15 +73,16 @@ public final class PortedModel {
         @Override
         public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
             parts.add(base);
-            SideMode mode = MultiblockPorts.get(state);
-            if (mode == SideMode.NONE || !isFormed(state)) {
+            PortFaces faces = MultiblockPorts.faces(level, pos);
+            if (faces.isEmpty() || !isFormed(state)) {
                 return;
             }
             QuadCollection.Builder quads = new QuadCollection.Builder();
-            Direction face = MultiblockPorts.face(state);
-            BakedQuad port = ports.get(mode, face);
-            if (port != null && isOuter(level, pos.relative(face))) {
-                quads.addCulledFace(face, port);
+            for (Direction face : Direction.values()) {
+                BakedQuad port = ports.get(faces.get(face), face);
+                if (port != null && isOuter(level, pos.relative(face))) {
+                    quads.addCulledFace(face, port);
+                }
             }
             parts.add(new SimpleModelWrapper(quads.build(), true, base.particleMaterial()));
         }

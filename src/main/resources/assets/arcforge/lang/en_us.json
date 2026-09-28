@@ -130,6 +130,7 @@
   "gui.arcforge.status.no_heat": "No heat",
   "gui.arcforge.tab.energy": "Energy",
   "gui.arcforge.tab.heat": "Heat",
+  "subtitles.arcforge.turbine_array_run": "Steam turbine whirs",
   "gui.arcforge.tab.redstone": "Redstone",
   "gui.arcforge.tab.pressure": "Pressure",
   "gui.arcforge.tab.side_config": "Sides",

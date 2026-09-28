@@ -14,38 +14,32 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideMode;
 
-// Multiblock ports: a structure does IO only through the blocks set as ports, each on one of its outer
-// faces (see MultiblockController.faceMode). The port is block state (PORT, and PORT_FACE for the face it's
-// on), so it needs no block entity, bakes into the block's model (a port plate on that face) and stays with
-// the block when the structure breaks and forms again; loose blocks remember it but show nothing. Ports
-// are set with the Wrench in Port mode on the face clicked, cycling through the modes the structure allows.
+// Multiblock ports: a structure does IO only through its ports, each an outer face of one of its blocks set
+// to a mode (see MultiblockController.faceMode). Each face of a block is its own port, so a corner can take
+// items in on one side and give them out on another. Ports are kept by position (see PortStore), so they
+// stay where they were set when the structure breaks and forms again, even if a port's block is broken and
+// put back; they only count on a block that can hold ports (PortHolder) in a formed structure, and loose
+// blocks show nothing. The models draw a plate on each port face. Ports are set with the Wrench in Port
+// mode on the face clicked, cycling through the modes the structure allows.
 public final class MultiblockPorts {
-    public static final EnumProperty<SideMode> PORT = EnumProperty.create("port", SideMode.class);
-    public static final EnumProperty<Direction> PORT_FACE = EnumProperty.create("port_face", Direction.class);
-
     private MultiblockPorts() {}
 
-    public static SideMode get(BlockState state) {
-        return state.hasProperty(PORT) ? state.getValue(PORT) : SideMode.NONE;
+    // The ports on every face of the block at pos (on a server level, or a client's while its chunk meshes).
+    public static PortFaces faces(BlockGetter level, BlockPos pos) {
+        return PortStore.get(level, pos);
     }
 
-    public static Direction face(BlockState state) {
-        return state.hasProperty(PORT_FACE) ? state.getValue(PORT_FACE) : Direction.NORTH;
-    }
-
-    // The port's mode on this face of the block: NONE unless the port is on it.
-    public static SideMode get(BlockState state, Direction face) {
-        return face(state) == face ? get(state) : SideMode.NONE;
+    // The port on this face of the block at pos, or NONE.
+    public static SideMode get(BlockGetter level, BlockPos pos, Direction face) {
+        return faces(level, pos).get(face);
     }
 
     // The sides of pos that face out of the structure's box.
@@ -82,7 +76,8 @@ public final class MultiblockPorts {
 
     // Whether the block at pos can be one of the structure's ports: a part that can hold one, on its outside.
     public static boolean canHold(Level level, MultiblockController controller, BlockPos pos) {
-        return controller.isPart(pos) && level.getBlockState(pos).hasProperty(PORT) && !outerFaces(controller, pos).isEmpty();
+        return controller.isPart(pos) && level.getBlockState(pos).getBlock() instanceof PortHolder holder && holder.holdsPorts()
+                && !outerFaces(controller, pos).isEmpty();
     }
 
     // The mode after current in the structure's allowed modes (wrapping through NONE).
@@ -96,37 +91,12 @@ public final class MultiblockPorts {
         return allowed.get(index < 0 ? 0 : (index + step) % allowed.size());
     }
 
-    // Sets the port at pos to face, and reconnects everything round the structure. A block has one port,
-    // so setting it on another face moves it there.
+    // Sets this face of the block at pos to a port in mode (NONE clears it), and reconnects everything round
+    // the structure. The block's other faces keep their ports.
     public static void set(Level level, MultiblockController controller, BlockPos pos, SideMode mode, Direction face) {
-        BlockState state = level.getBlockState(pos);
-        if (state.hasProperty(PORT) && (state.getValue(PORT) != mode || mode != SideMode.NONE && face(state) != face)) {
-            level.setBlock(pos, withPort(state, mode, face), Block.UPDATE_ALL);
+        if (PortStore.set(level, pos, faces(level, pos).with(face, mode))) {
             changed(level, controller);
         }
-    }
-
-    private static BlockState withPort(BlockState state, SideMode mode, Direction face) {
-        state = state.setValue(PORT, mode);
-        return state.hasProperty(PORT_FACE) ? state.setValue(PORT_FACE, face) : state;
-    }
-
-    // Turns every port facing into the structure (one from a save made before port faces, or left facing
-    // in by a structure that formed differently) to its preferred face. Whether any turned.
-    private static boolean fixFaces(Level level, MultiblockController controller) {
-        boolean turned = false;
-        for (BlockPos pos : BlockPos.betweenClosed(controller.getMinCorner(), controller.getMaxCorner())) {
-            BlockState state = level.getBlockState(pos);
-            if (get(state) == SideMode.NONE || !controller.isPart(pos) || !controller.isInside(pos.relative(face(state)))) {
-                continue;
-            }
-            Direction face = preferredFace(controller, pos);
-            if (face != null && state.hasProperty(PORT_FACE)) {
-                level.setBlock(pos, state.setValue(PORT_FACE, face), Block.UPDATE_ALL);
-                turned = true;
-            }
-        }
-        return turned;
     }
 
     private static void changed(Level level, MultiblockController controller) {
@@ -136,17 +106,22 @@ public final class MultiblockPorts {
 
     // --- The ports of a structure ---
 
-    // A port: where it is, what it does, the face it's on, and that face's side of the structure.
+    // A port: the block it's on, what it does, the face it's on, and that face's side of the structure.
     public record Port(BlockPos pos, SideMode mode, Direction face, RelativeSide side) {}
 
+    // Every port of the structure: each outer face of a block that can hold ports, set to a mode.
     public static List<Port> list(Level level, MultiblockController controller) {
         List<Port> ports = new ArrayList<>();
         for (BlockPos pos : BlockPos.betweenClosed(controller.getMinCorner(), controller.getMaxCorner())) {
-            BlockState state = level.getBlockState(pos);
-            SideMode mode = get(state);
-            Direction face = face(state);
-            if (mode != SideMode.NONE && controller.isPart(pos) && !controller.isInside(pos.relative(face))) {
-                ports.add(new Port(pos.immutable(), mode, face, RelativeSide.fromDirection(controller.getStructureFacing(), face)));
+            if (!canHold(level, controller, pos)) {
+                continue;
+            }
+            PortFaces faces = faces(level, pos);
+            for (Direction face : outerFaces(controller, pos)) {
+                SideMode mode = faces.get(face);
+                if (mode != SideMode.NONE) {
+                    ports.add(new Port(pos.immutable(), mode, face, RelativeSide.fromDirection(controller.getStructureFacing(), face)));
+                }
             }
         }
         return ports;
@@ -202,50 +177,36 @@ public final class MultiblockPorts {
 
     // Whether any part of the structure is a port.
     private static boolean hasPorts(Level level, MultiblockController controller) {
-        for (BlockPos pos : BlockPos.betweenClosed(controller.getMinCorner(), controller.getMaxCorner())) {
-            if (get(level.getBlockState(pos)) != SideMode.NONE && controller.isPart(pos)) {
-                return true;
-            }
-        }
-        return false;
+        return !list(level, controller).isEmpty();
     }
 
     // Kept by each controller: whether its structure has been given its first ports. The first time it's
     // formed with no ports at all, it gets its defaults (or, in a save from before ports, ports where its
     // side configuration had faces); after that, nothing is filled in again, so clearing every port sticks.
-    // Each time the structure forms (or loads formed), ports facing into it are turned to face out.
+    // Saves from when a port was part of its block's state lost those ports, so they get their defaults
+    // once more.
     public static final class Defaults {
         private boolean initialised;
         // Loaded from a save that predates ports.
         private boolean fromOldSave;
-        // The port faces have been checked since the structure last formed.
-        private boolean facesChecked;
 
         public void tick(Level level, MultiblockController controller) {
-            if (!controller.isFormed()) {
-                facesChecked = false;
+            if (initialised || !controller.isFormed()) {
                 return;
             }
-            boolean changed = !facesChecked && fixFaces(level, controller);
-            facesChecked = true;
-            if (!initialised) {
-                initialised = true;
-                if (!hasPorts(level, controller)) {
-                    Map<BlockPos, DefaultPort> ports = fromOldSave ? fromSideConfig(level, controller) : controller.defaultPorts(level);
-                    for (Map.Entry<BlockPos, DefaultPort> port : ports.entrySet()) {
-                        BlockPos pos = port.getKey();
-                        BlockState state = level.getBlockState(pos);
-                        Direction face = controller.isInside(pos.relative(port.getValue().face())) ? preferredFace(controller, pos) : port.getValue().face();
-                        if (state.hasProperty(PORT) && face != null) {
-                            level.setBlock(pos, withPort(state, port.getValue().mode(), face), Block.UPDATE_ALL);
-                        }
-                    }
-                    changed = true;
+            initialised = true;
+            if (hasPorts(level, controller)) {
+                return;
+            }
+            Map<BlockPos, DefaultPort> ports = fromOldSave ? fromSideConfig(level, controller) : controller.defaultPorts(level);
+            for (Map.Entry<BlockPos, DefaultPort> port : ports.entrySet()) {
+                BlockPos pos = port.getKey();
+                Direction face = controller.isInside(pos.relative(port.getValue().face())) ? preferredFace(controller, pos) : port.getValue().face();
+                if (face != null && canHold(level, controller, pos)) {
+                    PortStore.set(level, pos, faces(level, pos).with(face, port.getValue().mode()));
                 }
             }
-            if (changed) {
-                changed(level, controller);
-            }
+            changed(level, controller);
         }
 
         public boolean isInitialised() {
@@ -253,12 +214,13 @@ public final class MultiblockPorts {
         }
 
         public void load(ValueInput input) {
-            initialised = input.getBooleanOr("ports_initialised", false);
-            fromOldSave = input.getBooleanOr("ports_initialised", true) && !initialised;
+            initialised = input.getBooleanOr("ports_v2_initialised", false);
+            fromOldSave = !initialised && input.getBooleanOr("ports_initialised", true);
         }
 
         public void save(ValueOutput output) {
-            output.putBoolean("ports_initialised", initialised);
+            output.putBoolean("ports_initialised", true);
+            output.putBoolean("ports_v2_initialised", initialised);
         }
     }
 }

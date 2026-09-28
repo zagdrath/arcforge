@@ -17,8 +17,10 @@ import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -42,7 +44,9 @@ import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyE
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.common.NeoForge;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.client.model.PortNozzleModel;
 import net.zagdrath.arcforge.client.model.PortedModel;
 import net.zagdrath.arcforge.client.renderer.blockentity.ArcforgeFurnaceRenderer;
@@ -58,8 +62,10 @@ import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.DistillationArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.SolarThermalArrayScreen;
+import net.zagdrath.arcforge.client.sound.TurbineArraySound;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
+import net.zagdrath.arcforge.multiblock.PortStore;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
 import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
@@ -102,6 +108,18 @@ public class ArcforgeClient {
         // Mods screen > Arcforge > Config
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         EngineersHandbookItem.opener = EngineersHandbookScreen::open;
+        SteamTurbineArrayBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
+        // Re-mesh blocks whose ports changed, and forget the ports on leaving a world.
+        PortStore.clientRemesh = positions -> Minecraft.getInstance().execute(() -> {
+            var level = Minecraft.getInstance().level;
+            if (level != null) {
+                for (BlockPos pos : positions) {
+                    BlockState state = level.getBlockState(pos);
+                    level.setBlocksDirty(pos, state, state);
+                }
+            }
+        });
+        NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> PortStore.clearClient());
         // Canister and cartridge fill bars take the fluid's colour from its model.
         PortableStorageItem.fluidTint = stack -> {
             var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(stack.getFluid().defaultFluidState());

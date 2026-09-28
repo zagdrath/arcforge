@@ -64,6 +64,7 @@ public final class ArcforgeGameTests {
         TESTS.put("ports_wrench_sets_port", PortGameTests::wrenchSetsPort);
         TESTS.put("ports_wrench_modes_on_multiblock", PortGameTests::wrenchModesOnMultiblock);
         TESTS.put("ports_turbine_ends", PortGameTests::turbinePorts);
+        TESTS.put("ports_survive_rebuild", PortGameTests::portsSurviveRebuild);
         TESTS.put("ports_conduits_connect", PortGameTests::conduitsConnectToPorts);
         TESTS.put("tank_buckets", StorageGameTests::tankBuckets);
         TESTS.put("tank_spills", StorageGameTests::tankSpills);
@@ -107,6 +108,8 @@ public final class ArcforgeGameTests {
         TESTS.put("steam_turbine_output", SteamGameTests::turbineOutput);
         TESTS.put("steam_boiler_array_forms", SteamGameTests::boilerArrayForms);
         TESTS.put("steam_turbine_array_spins", SteamGameTests::turbineArraySpins);
+        TESTS.put("steam_turbine_array_grade_speed", SteamGameTests::turbineArrayGradeSpeed);
+        TESTS.put("steam_turbine_array_menu_reach", SteamGameTests::turbineArrayMenuReach);
         TESTS.put("steam_turbine_array_conduits", SteamGameTests::turbineArrayConduits);
         TESTS.put("steam_boiler_array_rebuild_keeps_sides", SteamGameTests::boilerArrayRebuildKeepsSides);
         TESTS.put("alloy_carbon_dust_carbonizes", AlloyGameTests::carbonDustCarbonizes);

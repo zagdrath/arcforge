@@ -11,13 +11,12 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.zagdrath.arcforge.machine.config.SideMode;
-import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 
 // The Solar Thermal Array's tower casing. Formed, one casing draws the tower's base (PART base, at the
 // bottom layer's minimum corner) and one the mast and yoke (upper_ns / upper_ew by the tracking axis, at the
 // third layer's minimum corner); the rest draw nothing. Any casing on the outside can be a heat port.
-public class SolarThermalArrayCasingBlock extends SolarBlock {
+public class SolarThermalArrayCasingBlock extends SolarBlock implements PortHolder {
     public enum Part implements StringRepresentable {
         NONE("none"), BASE("base"), UPPER_NS("upper_ns"), UPPER_EW("upper_ew"), OTHER("other");
 
@@ -37,11 +36,11 @@ public class SolarThermalArrayCasingBlock extends SolarBlock {
 
     public SolarThermalArrayCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(FORMED, false).setValue(PART, Part.NONE).setValue(MultiblockPorts.PORT, SideMode.NONE));
+        registerDefaultState(stateDefinition.any().setValue(FORMED, false).setValue(PART, Part.NONE));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FORMED, PART, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
+        builder.add(FORMED, PART);
     }
 }

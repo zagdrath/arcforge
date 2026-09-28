@@ -16,7 +16,7 @@
     },
     {
       "type": "text",
-      "text": "# Multiblock ports\nMultiblocks do IO only through their ports: blocks on the outside of the structure set to a mode, marked with a plate (a blue ring takes in, an orange one gives out). A new structure gets a few in the middle of its sides.\nWith the Wrench in Port mode, right-click a block's face to see its port, and sneak-right-click to cycle it through the modes that structure allows. A port is on one face of its block, the one you set it on; setting it on another face of the same block moves it there. The Ports tab in the structure's GUI lists them.\nOn a single machine, Port mode shows and cycles the clicked face instead."
+      "text": "# Multiblock ports\nMultiblocks do IO only through their ports: blocks on the outside of the structure set to a mode, marked with a plate (a blue ring takes in, an orange one gives out). A new structure gets a few in the middle of its sides.\nWith the Wrench in Port mode, right-click a block's face to see its port, and sneak-right-click to cycle it through the modes that structure allows. Each outer face of a block is its own port, so one corner can take things in on one side and give them out on another. Ports stay where you set them, even if the block is broken and put back. The Ports tab in the structure's GUI lists them.\nOn a single machine, Port mode shows and cycles the clicked face instead."
     }
   ]
 }

@@ -33,9 +33,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
-import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
-import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.multiblock.SolarThermalStructure;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
@@ -43,7 +42,7 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // facing is the trough's tracking axis (north or south: the north-south axis, the better one). Formed, its
 // control panel is drawn on that side of the tower's base; if it sits at the bottom layer's minimum corner
 // it draws the base itself (BASE). LIT while the receiver takes heat.
-public class SolarThermalArrayControllerBlock extends BaseEntityBlock implements SolarPart {
+public class SolarThermalArrayControllerBlock extends BaseEntityBlock implements SolarPart, PortHolder {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final BooleanProperty BASE = BooleanProperty.create("base");
@@ -51,7 +50,7 @@ public class SolarThermalArrayControllerBlock extends BaseEntityBlock implements
     public SolarThermalArrayControllerBlock(BlockBehaviour.Properties properties) {
         super(properties);
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FORMED, false).setValue(LIT, false)
-                .setValue(BASE, false).setValue(MultiblockPorts.PORT, SideMode.NONE));
+                .setValue(BASE, false));
     }
 
     @Override
@@ -148,6 +147,6 @@ public class SolarThermalArrayControllerBlock extends BaseEntityBlock implements
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(FACING, FORMED, LIT, BASE, MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
+        builder.add(FACING, FORMED, LIT, BASE);
     }
 }

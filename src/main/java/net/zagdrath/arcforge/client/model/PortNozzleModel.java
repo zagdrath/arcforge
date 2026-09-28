@@ -45,6 +45,7 @@ import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortFaces;
 
 // Ports on multiblocks drawn as one big model (the cube arrays): their other blocks are invisible and the
 // model isn't a cube, so a port there is a nozzle: a 10x10 px steel collar from the model's surface out to
@@ -163,8 +164,8 @@ public final class PortNozzleModel {
         @Override
         public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
             parts.add(base);
-            SideMode mode = MultiblockPorts.get(state);
-            if (mode == SideMode.NONE) {
+            PortFaces faces = MultiblockPorts.faces(level, pos);
+            if (faces.isEmpty()) {
                 return;
             }
             List<Placed> placed = kind.find(level, pos, state, shapes);
@@ -172,8 +173,11 @@ public final class PortNozzleModel {
                 return;
             }
             QuadCollection.Builder quads = new QuadCollection.Builder();
-            Direction face = MultiblockPorts.face(state);
-            if (!kind.inside(level, pos, pos.relative(face)) && kind.shows(state, face)) {
+            for (Direction face : Direction.values()) {
+                SideMode mode = faces.get(face);
+                if (mode == SideMode.NONE || kind.inside(level, pos, pos.relative(face)) || !kind.shows(state, face)) {
+                    continue;
+                }
                 float depth = depth(pos, face, placed);
                 if (depth > 0) {
                     addCollar(quads, face, depth);
@@ -237,7 +241,9 @@ public final class PortNozzleModel {
             return new float[] { x0, box[1], z0, x1, box[4], z1 };
         }
 
-        // The collar's four sides, from the outer face depth pixels in, and its end at the face.
+        // The collar's four sides, from the outer face depth pixels in, and both its ends: at the face, and
+        // at the back, which closes it where the models' surface under it isn't flat (the depth is only
+        // measured at the middle, so an edge of the collar can end in the open).
         private void addCollar(QuadCollection.Builder quads, Direction face, float depth) {
             int axis = face.getAxis().ordinal();
             boolean positive = face.getAxisDirection() == Direction.AxisDirection.POSITIVE;
@@ -253,6 +259,8 @@ public final class PortNozzleModel {
                 }
             }
             quads.addCulledFace(face, FaceRects.cut(collar.get(face), face, min, max));
+            Direction back = face.getOpposite();
+            quads.addUnculledFace(FaceRects.cut(collar.get(back), back, min, max));
         }
 
         @Override

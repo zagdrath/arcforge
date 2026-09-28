@@ -18,23 +18,16 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.BlockHitResult;
-import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
-import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 
 // Arcforge Furnace bricks: an ordinary building block that also forms the furnace's edges, where any brick
-// can be one of the furnace's ports (PORT).
-public class ArcforgeFurnaceBricksBlock extends Block implements MultiblockPart {
+// can be one of the furnace's ports.
+public class ArcforgeFurnaceBricksBlock extends Block implements MultiblockPart, PortHolder {
     public ArcforgeFurnaceBricksBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(MultiblockPorts.PORT, SideMode.NONE));
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(MultiblockPorts.PORT, MultiblockPorts.PORT_FACE);
     }
 
     @Override

@@ -372,7 +372,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_HEAT_PER_HEIGHT = BUILDER
             .comment("Most HU/t it boils with, per block of height.")
-            .defineInRange("maxHeatPerTickPerHeight", 200, 1, 1_000_000);
+            .defineInRange("maxHeatPerTickPerHeight", 600, 1, 1_000_000);
 
     public static final ModConfigSpec.IntValue BOILER_ARRAY_TANK_PER_HEIGHT = BUILDER
             .comment("Water and steam tank sizes in mB, per block of height.")
@@ -405,7 +405,7 @@ public class ArcforgeConfig {
             .defineInRange("maxEnergyOutput", 16_384, 1, 1_000_000_000);
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_RPM = BUILDER
-            .comment("Rotor speed at full steam flow.")
+            .comment("Rotor speed at a full flow of Superheated Steam (it spins in proportion to the power in the steam).")
             .defineInRange("maxRpm", 3_600, 100, 100_000);
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_CAPACITY = BUILDER
@@ -469,7 +469,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue SOLAR_PEAK_HEAT = BUILDER
             .comment("HU/t at clear noon, all four collectors in sunlight, on the north-south axis, in a temperate biome.")
-            .defineInRange("peakHeat", 200, 1, 1_000_000);
+            .defineInRange("peakHeat", 600, 1, 1_000_000);
 
     public static final ModConfigSpec.IntValue SOLAR_MAX_TEMPERATURE = BUILDER
             .comment("Receiver temperature at full sun, in °C (High-Pressure Steam needs 500).")

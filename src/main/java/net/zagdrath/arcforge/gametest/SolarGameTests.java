@@ -105,10 +105,10 @@ public final class SolarGameTests {
         });
     }
 
-    // 2. Clear noon: the full 200 HU/t at 550°C.
+    // 2. Clear noon: the full 600 HU/t at 550°C.
     static void peakAtNoon(GameTestHelper helper) {
         atTime(helper, NOON, false, false, array -> {
-            helper.assertTrue(array.getHeatPerTick() == 200, "Noon gives " + array.getHeatPerTick() + " HU/t");
+            helper.assertTrue(array.getHeatPerTick() == 600, "Noon gives " + array.getHeatPerTick() + " HU/t");
             helper.assertTrue(array.getReceiverTemperature() == 550, "Noon receiver at " + array.getReceiverTemperature() + "°C");
             helper.assertTrue(!array.isStowed(), "Trough stowed at noon");
         });
@@ -117,7 +117,7 @@ public final class SolarGameTests {
     // 3. Rain at noon: 30%, too cool for High-Pressure Steam.
     static void rainReducesOutput(GameTestHelper helper) {
         atTime(helper, NOON, true, false, array -> {
-            helper.assertTrue(array.getHeatPerTick() == 60, "Rain gives " + array.getHeatPerTick() + " HU/t");
+            helper.assertTrue(array.getHeatPerTick() == 180, "Rain gives " + array.getHeatPerTick() + " HU/t");
             helper.assertTrue(array.getReceiverTemperature() < 500, "Rain receiver at " + array.getReceiverTemperature() + "°C");
         });
     }
@@ -126,7 +126,7 @@ public final class SolarGameTests {
     static void thunderStowsPanel(GameTestHelper helper) {
         atTime(helper, NOON, true, true, array -> {
             helper.assertTrue(array.isStowed(), "Trough not stowed in a thunderstorm");
-            helper.assertTrue(array.getHeatPerTick() == 20, "Thunderstorm gives " + array.getHeatPerTick() + " HU/t");
+            helper.assertTrue(array.getHeatPerTick() == 60, "Thunderstorm gives " + array.getHeatPerTick() + " HU/t");
         });
     }
 
@@ -141,12 +141,12 @@ public final class SolarGameTests {
                 .thenIdle(SETTLE)
                 .thenExecute(() -> {
                     helper.assertTrue(array.getSkyCount() == 3, array.getSkyCount() + " collectors see the sky");
-                    helper.assertTrue(array.getHeatPerTick() == 150, "One shaded collector gives " + array.getHeatPerTick() + " HU/t");
+                    helper.assertTrue(array.getHeatPerTick() == 450, "One shaded collector gives " + array.getHeatPerTick() + " HU/t");
                 })
                 .thenSucceed();
     }
 
-    // 6. North-south tracking beats east-west: 200 against 140 HU/t, and only north-south reaches 500°C.
+    // 6. North-south tracking beats east-west: 600 against 420 HU/t, and only north-south reaches 500°C.
     static void northSouthBeatsEastWest(GameTestHelper helper) {
         plains(helper);
         time(helper, NOON);
@@ -156,8 +156,8 @@ public final class SolarGameTests {
         helper.startSequence()
                 .thenIdle(SETTLE)
                 .thenExecute(() -> {
-                    helper.assertTrue(northSouth.getHeatPerTick() == 200, "North-south gives " + northSouth.getHeatPerTick() + " HU/t");
-                    helper.assertTrue(eastWest.getHeatPerTick() == 140, "East-west gives " + eastWest.getHeatPerTick() + " HU/t");
+                    helper.assertTrue(northSouth.getHeatPerTick() == 600, "North-south gives " + northSouth.getHeatPerTick() + " HU/t");
+                    helper.assertTrue(eastWest.getHeatPerTick() == 420, "East-west gives " + eastWest.getHeatPerTick() + " HU/t");
                     helper.assertTrue(northSouth.getReceiverTemperature() >= 500, "North-south only reaches " + northSouth.getReceiverTemperature() + "°C");
                     helper.assertTrue(eastWest.getReceiverTemperature() < 500, "East-west reaches " + eastWest.getReceiverTemperature() + "°C");
                 })
@@ -184,7 +184,7 @@ public final class SolarGameTests {
         heat.add(heat.storedAt(480) - heat.getStored());
         helper.startSequence()
                 .thenIdle(3)
-                .thenExecute(() -> helper.assertTrue(MultiblockPorts.get(helper.getBlockState(new BlockPos(1, 1, 1))) == SideMode.HEAT,
+                .thenExecute(() -> helper.assertTrue(MultiblockPorts.get(helper.getLevel(), helper.absolutePos(new BlockPos(1, 1, 1)), Direction.NORTH) == SideMode.HEAT,
                         "No heat port behind the controller"))
                 .thenWaitUntil(() -> helper.assertTrue(boiler.getCore().currentGrade() == SteamGrade.HIGH_PRESSURE,
                         "Boiler at " + heat.getTemperature() + "°C, not High-Pressure"))

@@ -36,6 +36,7 @@ import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortFaces;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -50,8 +51,20 @@ public final class PortGameTests {
                 .filter(port -> port.mode() == mode).map(MultiblockPorts.Port::pos).findFirst().orElse(null);
     }
 
+    // The port on this face of the block at pos (relative).
+    static SideMode portAt(GameTestHelper helper, BlockPos relative, Direction face) {
+        return MultiblockPorts.get(helper.getLevel(), helper.absolutePos(relative), face);
+    }
+
+    // The port on any face of the block at pos (relative), or NONE.
     static SideMode portAt(GameTestHelper helper, BlockPos relative) {
-        return MultiblockPorts.get(helper.getBlockState(relative));
+        PortFaces faces = MultiblockPorts.faces(helper.getLevel(), helper.absolutePos(relative));
+        for (Direction face : Direction.values()) {
+            if (faces.get(face) != SideMode.NONE) {
+                return faces.get(face);
+            }
+        }
+        return SideMode.NONE;
     }
 
     // Right-clicks face of the block at pos (relative) with a Wrench in this mode.
@@ -93,8 +106,9 @@ public final class PortGameTests {
                 .thenSucceed();
     }
 
-    // In Port mode, Shift+Right-click on an outer face cycles the block's port through the modes the
-    // structure allows; an inner face isn't a port position; a plain click only reports.
+    // In Port mode, Shift+Right-click on an outer face cycles that face's port through the modes the
+    // structure allows, and each face of a block is its own port; an inner face isn't a port position; a
+    // plain click only reports.
     static void wrenchSetsPort(GameTestHelper helper) {
         buildArray(helper);
         BlockPos corner = new BlockPos(0, 3, 2);
@@ -103,31 +117,30 @@ public final class PortGameTests {
                 .thenExecute(() -> {
                     Player player = helper.makeMockPlayer(GameType.SURVIVAL);
                     wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
-                    helper.assertTrue(portAt(helper, corner) == SideMode.NONE, "A plain click changed the port");
+                    helper.assertTrue(portAt(helper, corner, Direction.UP) == SideMode.NONE, "A plain click changed the port");
                     player.setShiftKeyDown(true);
                     wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
-                    helper.assertTrue(portAt(helper, corner) == SideMode.INPUT, "First port mode is " + portAt(helper, corner));
+                    helper.assertTrue(portAt(helper, corner, Direction.UP) == SideMode.INPUT, "First port mode is " + portAt(helper, corner, Direction.UP));
                     wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
-                    helper.assertTrue(portAt(helper, corner) == SideMode.OUTPUT, "Second port mode is " + portAt(helper, corner));
+                    helper.assertTrue(portAt(helper, corner, Direction.UP) == SideMode.OUTPUT, "Second port mode is " + portAt(helper, corner, Direction.UP));
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(corner), Direction.UP) != null,
                             "New port does not give items");
-                    // The port is on the clicked face only: the corner's other outer faces do nothing.
+                    // The port is on the clicked face only: the corner's other outer faces do nothing yet.
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(corner), Direction.SOUTH) == null,
                             "The port also works on another face of its block");
-                    // Setting it on another outer face moves it there.
+                    // Another face of the same block is its own port: the top keeps its output.
                     wrench(helper, player, corner, Direction.SOUTH, WrenchMode.PORT);
-                    helper.assertTrue(MultiblockPorts.face(helper.getBlockState(corner)) == Direction.SOUTH, "The port did not move to the south face");
-                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(corner), Direction.UP) == null,
-                            "The old face still works after the port moved");
-                    wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
-                    wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
+                    helper.assertTrue(portAt(helper, corner, Direction.SOUTH) == SideMode.INPUT, "South face is " + portAt(helper, corner, Direction.SOUTH));
+                    helper.assertTrue(portAt(helper, corner, Direction.UP) == SideMode.OUTPUT, "Setting the south face changed the top to " + portAt(helper, corner, Direction.UP));
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(corner), Direction.SOUTH) != null,
+                            "The south port does not take items");
                     // Clicking the side of the centre casing that faces into the array: not a port position.
                     wrench(helper, player, new BlockPos(1, 2, 1), Direction.UP, WrenchMode.PORT);
                     helper.assertTrue(portAt(helper, new BlockPos(1, 2, 1)) == SideMode.NONE, "The inside became a port");
                     // Round through energy back to none.
                     wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
                     wrench(helper, player, corner, Direction.UP, WrenchMode.PORT);
-                    helper.assertTrue(portAt(helper, corner) == SideMode.NONE, "Did not wrap back to none: " + portAt(helper, corner));
+                    helper.assertTrue(portAt(helper, corner, Direction.UP) == SideMode.NONE, "Did not wrap back to none: " + portAt(helper, corner, Direction.UP));
                 })
                 .thenSucceed();
     }
@@ -163,6 +176,35 @@ public final class PortGameTests {
                     helper.assertTrue(placed == ConnectionMode.INPUT, "A conduit placed after the port connects " + placed);
                     ConnectionMode side = ConduitBlock.mode(helper.getBlockState(beside), Direction.WEST);
                     helper.assertTrue(side == ConnectionMode.NONE, "A conduit on another face of the port's block connects " + side);
+                })
+                .thenSucceed();
+    }
+
+    // Ports stay where they were set: breaking a port's block un-forms the array, and putting it back brings
+    // the port back when the array forms again.
+    static void portsSurviveRebuild(GameTestHelper helper) {
+        buildArray(helper);
+        BlockPos corner = new BlockPos(0, 3, 2);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    ArcCrushingArrayBlockEntity array = helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class);
+                    MultiblockPorts.set(helper.getLevel(), array, helper.absolutePos(corner), SideMode.OUTPUT, Direction.SOUTH);
+                    MultiblockPorts.set(helper.getLevel(), array, helper.absolutePos(corner), SideMode.ENERGY, Direction.WEST);
+                    helper.setBlock(corner, net.minecraft.world.level.block.Blocks.AIR);
+                })
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.assertTrue(!helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class).isFormed(), "Array still formed");
+                    helper.setBlock(corner, ModBlocks.ARC_CRUSHING_ARRAY_CASING.get());
+                })
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.assertTrue(helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class).isFormed(), "Array did not re-form");
+                    helper.assertTrue(portAt(helper, corner, Direction.SOUTH) == SideMode.OUTPUT && portAt(helper, corner, Direction.WEST) == SideMode.ENERGY,
+                            "Ports after rebuilding: south " + portAt(helper, corner, Direction.SOUTH) + ", west " + portAt(helper, corner, Direction.WEST));
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(corner), Direction.SOUTH) != null,
+                            "The rebuilt output port gives no items");
                 })
                 .thenSucceed();
     }

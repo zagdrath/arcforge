@@ -1,0 +1,11 @@
+{
+  "turbine_array_run": {
+    "subtitle": "subtitles.arcforge.turbine_array_run",
+    "sounds": [
+      {
+        "name": "arcforge:turbine_array_run",
+        "stream": false
+      }
+    ]
+  }
+}

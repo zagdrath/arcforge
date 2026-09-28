@@ -62,4 +62,10 @@ public class TrayLevelCasingBlock extends DistillationArrayCasingBlock {
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FORMED, FRACTION, LIT);
     }
+
+    // Trays are glass-banded all round: no ports.
+    @Override
+    public boolean holdsPorts() {
+        return false;
+    }
 }

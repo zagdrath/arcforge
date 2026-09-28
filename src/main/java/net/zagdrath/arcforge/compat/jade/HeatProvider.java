@@ -63,7 +63,8 @@ public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, Heat
             }
             return new Data(network.getStored(), network.getCapacity(), network.getTemperature());
         }
-        // A pane of Pressure Glass shows its array's heat, a column casing its column's.
+        // A pane of Pressure Glass shows its array's heat, a column casing its column's, and a solar casing or
+        // collector its array's.
         BlockPos machine = WindowProviders.machinePos(level, accessor.getPosition());
         BlockPos pos = machine != null ? machine : accessor.getPosition();
         HeatHandler heat = level.getCapability(ModCapabilities.HEAT, pos, null);

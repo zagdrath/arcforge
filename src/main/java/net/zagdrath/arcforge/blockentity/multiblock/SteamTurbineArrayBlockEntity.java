@@ -11,6 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
@@ -61,7 +62,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // The Steam Turbine Array (see ShellMultiblockBlockEntity): a turbine L blocks long with a rotor of L - 2
 // blade sets. It takes up to 40 x L mB/t of steam at the array's FE per mB (Steam 10, High-Pressure 18,
 // Superheated 28; a 9-long array on Superheated makes 10,080 FE/t). The rotor spins up toward a speed set
-// by the flow (about 5 s to get there) and coasts down (about 10 s) when the steam stops; the output is
+// by the power in the steam, flow times FE per mB, so a higher grade spins it faster (full speed is a full
+// flow of Superheated); it takes about 5 s to get there and coasts down (about 10 s) when the steam stops; the output is
 // scaled by how close the rotor is to that speed, so opening the valve gives a rising output over a few
 // seconds. Steam is used either way. Its front is a long side (the window, see chooseFront), so the
 // generator end (positive along the axis) is on its left or right. A new turbine's ports are an energy port
@@ -251,7 +253,9 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
             }
         }
         boolean lubricated = lubricant.getAmount() > 0;
-        double target = (double) maxRpm() * flow / maxFlow;
+        // The rotor's speed follows the power in the steam: flow times the grade's FE per mB, against a full
+        // flow of Superheated Steam. Higher grades drive it faster for the same flow.
+        double target = grade != null ? (double) maxRpm() * flow * grade.arrayFePerMb() / (maxFlow * SteamGrade.SUPERHEATED.arrayFePerMb()) : 0.0;
         double spinUp = SPIN_UP * (lubricated && flow > 0 ? ArcforgeConfig.LUBRICANT_SPIN_UP.getAsDouble() : 1.0);
         rpm += (target - rpm) * (target > rpm ? spinUp : SPIN_DOWN);
         if (rpm < 0.5 && target == 0) {
@@ -346,6 +350,21 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     public int getFePerTick() {
         return fePerTick;
+    }
+
+    // Client side: keeps the running sound going while the rotor turns. The client sets the hook (to
+    // TurbineArraySound.keepPlaying), so this class never loads client code on a server.
+    public static Consumer<SteamTurbineArrayBlockEntity> clientSoundHook = turbine -> {};
+
+    public void clientTick() {
+        if (isMaster()) {
+            clientSoundHook.accept(this);
+        }
+    }
+
+    // Client side: the last synced rotor speed.
+    public float getSyncedRpm() {
+        return syncedRpm;
     }
 
     // Client side: the steam density to draw, easing toward the share of the maximum flow going through.

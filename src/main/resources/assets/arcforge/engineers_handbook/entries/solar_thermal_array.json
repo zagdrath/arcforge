@@ -11,11 +11,11 @@
   "pages": [
     {
       "type": "text",
-      "text": "Heats a receiver with the sun: up to 200 HU/t at 550°C at clear noon, hot enough to heat a boiler set to High-Pressure.\n# Building\nA 2x2 tower 4 tall: three layers of Solar Thermal Array Casings with one controller in the bottom layer, facing out, and four Solar Collectors on top. Formed, it becomes a tower with a trough mirror on top that follows the sun.\nThe controller's facing is the tracking axis: north or south for the north-south axis (full output), east or west for east-west (x0.7)."
+      "text": "Heats a receiver with the sun: up to 600 HU/t at 550°C at clear noon, hot enough to heat a boiler set to High-Pressure.\n# Building\nA 2x2 tower 4 tall: three layers of Solar Thermal Array Casings with one controller in the bottom layer, facing out, and four Solar Collectors on top. Formed, it becomes a tower with a trough mirror on top that follows the sun.\nThe controller's facing is the tracking axis: north or south for the north-south axis (full output), east or west for east-west (x0.7)."
     },
     {
       "type": "text",
-      "text": "# Sun and weather\nThe output follows the sun's height: nothing at night, about 70% by mid-morning, full at noon. Rain and snow cut it to 30%; in a thunderstorm the trough stows face down and gets 10%. Deserts, badlands and savannas give 20% more, cold biomes 15% less. Each collector that can't see the sky loses a quarter.\nThe receiver is only as hot as the sun allows, so High-Pressure Steam comes only around midday in clear weather, and not on the east-west axis.\n# Heat out\nThrough heat ports, at its whole output even into a touching machine: a new tower has one on the bottom block behind the controller. Set more with the Wrench in Port mode.\n200 HU/t is less than a boiler can boil, so set the boiler's pressure to High-Pressure to hold it at 500°C."
+      "text": "# Sun and weather\nThe output follows the sun's height: nothing at night, about 70% by mid-morning, full at noon. Rain and snow cut it to 30%; in a thunderstorm the trough stows face down and gets 10%. Deserts, badlands and savannas give 20% more, cold biomes 15% less. Each collector that can't see the sky loses a quarter.\nThe receiver is only as hot as the sun allows, so High-Pressure Steam comes only around midday in clear weather, and not on the east-west axis.\n# Heat out\nThrough heat ports, at its whole output even into a touching machine: a new tower has one on the bottom block behind the controller. Set more with the Wrench in Port mode.\nOne array gives less heat than a boiler can boil, so set the boiler's pressure to High-Pressure to hold it at 500°C."
     },
     {
       "type": "multiblock",

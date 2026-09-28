@@ -64,11 +64,11 @@ night and in thunderstorms), and the receiver takes in heat by it:
 | Biome | hot (desert, badlands, savanna) ×1.2, cold ×0.85 |
 | Collectors | each one that can't see the sky loses a quarter |
 
-At clear noon on the north-south axis it makes 200 HU/t at 550°C (High-Pressure Steam from a boiler needs
+At clear noon on the north-south axis it makes 600 HU/t at 550°C (High-Pressure Steam from a boiler needs
 500°C, so about 10:00 to 14:00 in clear weather). The temperature follows the same factors, up to 550°C.
 It holds 16,000 HU and gives heat out of its heat ports (a new tower has one on the bottom block behind
 the controller), at its whole output even into a touching machine. A boiler it feeds only gets to 500°C
-set to High-Pressure (see the Steam Boiler), since 200 HU/t is less than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
+set to High-Pressure (see the Steam Boiler), since one array gives less heat than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
 it does nothing in the Nether or the End. Everything is configurable (`solarThermalArray`).
 
 ### Steelmaking and alloys
@@ -196,13 +196,15 @@ face) adds 8% to its output, using 1 mB every 100 ticks while it generates.
 
 **Steam Boiler Array.** A 3x3 tower 3 to 7 tall of Steam Boiler Array Casings and Pressure Glass,
 hollow in the middle. Only the 8 corners must be casings, so whole walls can be windows, and the water
-and steam show through them. Per block of height: 100,000 HU, up to 200 HU/t, 16,000 mB tanks; each mB
-costs 80% of a Steam Boiler's heat. It has the same pressure setting.
+and steam show through them. Per block of height: 100,000 HU, up to 600 HU/t, 16,000 mB tanks; each mB
+costs 80% of a Steam Boiler's heat. It has the same pressure setting. A full-height (7) boiler boils up to 4,200 HU/t: about
+350 mB/t of High-Pressure Steam, enough for a full-length Steam Turbine Array.
 
 **Steam Turbine Array.** A 3x3 tube 3 to 9 long along either horizontal axis, built the same way. It
 takes up to 40 mB/t per block of length at 10 / 18 / 28 FE per mB (a 9-long array on Superheated makes
 10,080 FE/t). Its rotor spins up over a few seconds when steam flows, and output rises with it; it
-coasts down when the steam stops. A new one has an energy port on its generator end and a steam port on
+coasts down when the steam stops. Its speed follows the power in the steam (flow times FE per mB), so a
+higher grade spins it faster: full speed is a full flow of Superheated Steam. A new one has an energy port on its generator end and a steam port on
 its bearing end. Heavy Oil in its 4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
 blocks of length.
 
@@ -385,11 +387,11 @@ by the colour of its grip). Where a mode does nothing with a block, the click go
 
 Multiblocks do IO only through their **ports**: blocks on the outside of the structure set to a mode,
 marked with a plate (a blue ring takes in, an orange one gives out, red is energy, hot orange is heat).
-A port is on one outer face of its block, the one it was set on (setting another face moves it). On the cube arrays and the Solar Thermal Array, whose
+Each outer face of a block is its own port, so a corner can take things in on one side and give them out on another. Ports stay where they were set, even if their block is broken and put back. On the cube arrays and the Solar Thermal Array, whose
 formed model isn't a cube, a port is a steel nozzle from the model out to the block face. Set them with
 the wrench in Port mode; each structure cycles only through its own modes. A new structure gets a few in
-the middle of its sides (as listed with each machine), and ports stay on their blocks when the structure
-breaks and forms again. Worlds from before ports get ports where their side configuration had faces.
+the middle of its sides (as listed with each machine), and ports come back when the structure breaks
+and forms again. Worlds from before ports get ports where their side configuration had faces.
 
 ## Machine settings
 

@@ -16,6 +16,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.gametest.ArcforgeGameTests;
 import net.zagdrath.arcforge.gametest.TestFixtures;
+import net.zagdrath.arcforge.multiblock.PortStore;
 import net.zagdrath.arcforge.network.ArcforgeNetwork;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -27,6 +28,7 @@ import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.registry.ModRecipes;
+import net.zagdrath.arcforge.registry.ModSounds;
 import net.zagdrath.arcforge.worldgen.ModWorldgen;
 
 // Arcforge by Zagdrath. Must match the modId in META-INF/neoforge.mods.toml.
@@ -43,6 +45,8 @@ public class Arcforge {
         ModBlockEntityTypes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         ModCreativeTabs.register(modEventBus);
+        ModSounds.register(modEventBus);
+        PortStore.register(modEventBus);
         ModDataComponents.register(modEventBus);
         ModCapabilities.register(modEventBus);
         ModDataMaps.register(modEventBus);

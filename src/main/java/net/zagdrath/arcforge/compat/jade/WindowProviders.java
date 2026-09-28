@@ -12,6 +12,7 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
@@ -19,11 +20,13 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
+import net.zagdrath.arcforge.block.multiblock.SolarBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
+import net.zagdrath.arcforge.multiblock.MultiblockController;
 import snownee.jade.api.Accessor;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.view.ClientViewGroup;
@@ -68,6 +71,11 @@ public final class WindowProviders {
         if (level.getBlockState(pos).getBlock() instanceof DistillationArrayCasingBlock) {
             DistillationArrayBlockEntity column = DistillationStructure.findController(level, pos);
             return column != null ? column.getBlockPos() : null;
+        }
+        // A Solar Thermal Array casing or collector: its controller.
+        if (level instanceof Level full && level.getBlockState(pos).getBlock() instanceof SolarBlock part) {
+            MultiblockController controller = part.findController(full, pos);
+            return controller != null ? controller.getBlockPos() : null;
         }
         return null;
     }

@@ -7,11 +7,15 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import java.util.EnumSet;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -82,5 +86,19 @@ public class SteamTurbineArrayCasingBlock extends ShellCasingBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new SteamTurbineArrayBlockEntity(pos, state);
+    }
+
+    // Clients tick the formed master too, to keep its running sound going (see SteamTurbineArrayBlockEntity.clientTick).
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        if (level.isClientSide()) {
+            if (!state.getValue(FORMED) || type != blockEntityType()) {
+                return null;
+            }
+            BlockEntityTicker<SteamTurbineArrayBlockEntity> ticker = (innerLevel, pos, blockState, turbine) -> turbine.clientTick();
+            return (BlockEntityTicker<T>) (BlockEntityTicker<?>) ticker;
+        }
+        return super.getTicker(level, state, type);
     }
 }
