@@ -191,7 +191,9 @@ public final class ModBlocks {
             ArcQuarryBlock::new, p -> machineProperties(p, 6).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
     public static final DeferredBlock<ArcQuarryBoundingBlock> ARC_QUARRY_BOUNDING = BLOCKS.registerBlock("arc_quarry_bounding",
             ArcQuarryBoundingBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
-                    .noOcclusion().noLootTable().pushReaction(PushReaction.IMMOVEABLE));
+                    .noOcclusion().noLootTable().pushReaction(PushReaction.IMMOVEABLE)
+                    // Its shape depends on where its main block is, so it can't be cached per state.
+                    .dynamicShape());
 
     public static final DeferredBlock<SteamBoilerArrayCasingBlock> STEAM_BOILER_ARRAY_CASING = BLOCKS.registerBlock("steam_boiler_array_casing",
             SteamBoilerArrayCasingBlock::new, ModBlocks::steamCasingProperties);

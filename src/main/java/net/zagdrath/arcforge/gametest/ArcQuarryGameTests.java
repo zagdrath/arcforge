@@ -145,6 +145,26 @@ public final class ArcQuarryGameTests {
         helper.succeed();
     }
 
+    // The machine's shape follows its model: a top corner only has the head's edge to bump into, the base is solid, and the
+    // outline (and what can be hit) from any part is the whole machine, not one cube.
+    static void shapeFollowsModel(GameTestHelper helper) {
+        clear(helper);
+        helper.assertTrue(place(helper).consumesAction(), "The quarry wasn't placed");
+        var level = helper.getLevel();
+        BlockPos corner = helper.absolutePos(MAIN.offset(1, 1, 1));
+        BlockPos base = helper.absolutePos(MAIN.offset(0, -1, 0));
+        // The head band reaches 7 px into the top corners; the rest of the corner is open.
+        var cornerBox = level.getBlockState(corner).getCollisionShape(level, corner).bounds();
+        helper.assertTrue(cornerBox.maxX <= 7.0 / 16.0 + 1.0E-6 && cornerBox.maxZ <= 7.0 / 16.0 + 1.0E-6,
+                "The top corner's collision box is " + cornerBox);
+        helper.assertFalse(level.getBlockState(base).getCollisionShape(level, base).isEmpty(), "The base has no collision box");
+        var outline = level.getBlockState(corner).getShape(level, corner).bounds();
+        helper.assertTrue(outline.getXsize() > 2.0 && outline.getYsize() > 2.0, "The corner's outline isn't the whole machine: " + outline);
+        var main = level.getBlockState(helper.absolutePos(MAIN)).getShape(level, helper.absolutePos(MAIN)).bounds();
+        helper.assertTrue(main.maxY <= 2.0 && main.minY >= -1.0 && main.getXsize() < 3.0, "The main shape is " + main);
+        helper.succeed();
+    }
+
     // #c:ores picks the iron ore out of the stone; after mining the buffer holds that much raw iron, the stone
     // remains, and (Replace off) the ore's spaces are air.
     static void tagAllowlist(GameTestHelper helper) {

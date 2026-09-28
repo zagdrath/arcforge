@@ -23,6 +23,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -67,6 +70,27 @@ public class ArcQuarryBoundingBlock extends BaseEntityBlock {
             player.openMenu(quarry, quarry.getBlockPos());
         }
         return InteractionResult.SUCCESS;
+    }
+
+    // The facing of the quarry this part belongs to and its offset from the part to the main block, or null.
+    private static @Nullable BlockPos offsetToPart(BlockGetter level, BlockPos pos) {
+        BlockPos main = mainOf(level, pos);
+        return main != null && level.getBlockState(main).getBlock() instanceof ArcQuarryBlock ? pos.subtract(main) : null;
+    }
+
+    // The machine's own shape (so the outline and hits follow the model), not a full cube; a part whose main block
+    // is missing is a plain cube until it removes itself.
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        BlockPos offset = offsetToPart(level, pos);
+        return offset == null ? Shapes.block() : ArcQuarryBlock.partShape(MachineBlock.facing(level.getBlockState(pos.subtract(offset))), offset);
+    }
+
+    // Only the machine's piece inside this part, so entities walk round the model.
+    @Override
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        BlockPos offset = offsetToPart(level, pos);
+        return offset == null ? Shapes.block() : ArcQuarryBlock.partCollision(MachineBlock.facing(level.getBlockState(pos.subtract(offset))), offset);
     }
 
     // As hard to break as the machine.

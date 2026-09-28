@@ -110,7 +110,7 @@ final class MachineCategories {
         static final IRecipeHolderType<FiberizingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.FIBERIZING.get());
 
         Fiberizing(IGuiHelper gui) {
-            super(TYPE, "fiberizing", ModBlocks.FIBERIZER.get(), gui, 116, 40);
+            super(TYPE, "fiberizing", ModBlocks.FIBERIZER.get(), gui, 150, 40);
         }
 
         @Override
@@ -128,7 +128,7 @@ final class MachineCategories {
         public void draw(RecipeHolder<FiberizingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             FiberizingRecipe recipe = holder.value();
             text(graphics, Component.translatable("jei.arcforge.fiberizing.cost", recipe.fePerTick(), recipe.huPerTick(), recipe.minTemp()), 0, 30);
-            textRight(graphics, seconds(recipe.time()), 116, 9);
+            textRight(graphics, seconds(recipe.time()), getWidth(), 9);
         }
     }
 
@@ -252,7 +252,7 @@ final class MachineCategories {
         static final IRecipeHolderType<ElectrolyzingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.ELECTROLYZING.get());
 
         Electrolyzing(IGuiHelper gui) {
-            super(TYPE, "electrolyzing", ModBlocks.ELECTROLYZER.get(), gui, 120, 40);
+            super(TYPE, "electrolyzing", ModBlocks.ELECTROLYZER.get(), gui, 150, 50);
         }
 
         @Override
@@ -278,8 +278,8 @@ final class MachineCategories {
             int total = recipe.totalEnergy();
             int least = Math.max(EnergyBalance.ceil(total * UpgradeType.energyCostMultiplier(UpgradeType.MAX_PER_MACHINE)),
                     EnergyBalance.minEnergyFor(recipe));
-            text(graphics, Component.translatable("jei.arcforge.electrolyzing.energy", String.format(Locale.ROOT, "%,d", total),
-                    String.format(Locale.ROOT, "%,d", least)), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.electrolyzing.energy", String.format(Locale.ROOT, "%,d", total)), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.electrolyzing.floor", String.format(Locale.ROOT, "%,d", least)), 0, 40);
         }
     }
 
@@ -406,7 +406,7 @@ final class MachineCategories {
         static final IRecipeType<SteamRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "steam", SteamRecipe.class);
 
         Steam(IGuiHelper gui) {
-            super(TYPE, "steam", ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), gui, 150, 46);
+            super(TYPE, "steam", ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), gui, 150, 50);
         }
 
         @Override
@@ -425,8 +425,8 @@ final class MachineCategories {
             SteamGrade grade = recipe.grade();
             // What the Steam Boiler Array pays per mB (after its heat cost multiplier) and the Steam Turbine Array makes.
             String huPerMb = String.format(Locale.ROOT, "%.0f", grade.huPerMb() * ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble());
-            text(graphics, Component.translatable("jei.arcforge.steam.boil", grade.minCelsius(), huPerMb), 84, 5);
-            text(graphics, Component.translatable("jei.arcforge.steam.turbine", grade.arrayFePerMb()), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.steam.boil", grade.minCelsius(), huPerMb), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.steam.turbine", grade.arrayFePerMb()), 0, 40);
         }
     }
 
@@ -444,7 +444,7 @@ final class MachineCategories {
         static final IRecipeType<SuperheatingRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "superheating", SuperheatingRecipe.class);
 
         Superheating(IGuiHelper gui) {
-            super(TYPE, "superheating", ModBlocks.SUPERHEATER_ARRAY_CASING.get(), gui, 150, 30);
+            super(TYPE, "superheating", ModBlocks.SUPERHEATER_ARRAY_CASING.get(), gui, 150, 40);
         }
 
         @Override
@@ -461,7 +461,7 @@ final class MachineCategories {
         @Override
         public void draw(SuperheatingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             String cost = String.format(Locale.ROOT, "%.0f", SuperheaterArrayBlockEntity.cost(recipe.from(), recipe.to()));
-            text(graphics, Component.translatable("jei.arcforge.superheating.cost", cost, recipe.to().minCelsius()), 84, 9);
+            text(graphics, Component.translatable("jei.arcforge.superheating.cost", cost, recipe.to().minCelsius()), 0, 30);
         }
     }
 
@@ -473,7 +473,7 @@ final class MachineCategories {
         static final IRecipeType<CondensingRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "condensing", CondensingRecipe.class);
 
         Condensing(IGuiHelper gui) {
-            super(TYPE, "condensing", ModBlocks.CONDENSER_ARRAY_CASING.get(), gui, 150, 30);
+            super(TYPE, "condensing", ModBlocks.CONDENSER_ARRAY_CASING.get(), gui, 150, 40);
         }
 
         @Override
@@ -491,7 +491,7 @@ final class MachineCategories {
         @Override
         public void draw(CondensingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             text(graphics, Component.translatable("jei.arcforge.condensing.rate", ArcforgeConfig.CONDENSER_BASE_RATE.getAsInt(),
-                    ArcforgeConfig.CONDENSER_MAX_RATE.getAsInt()), 84, 9);
+                    ArcforgeConfig.CONDENSER_MAX_RATE.getAsInt()), 0, 30);
         }
     }
 
@@ -555,7 +555,7 @@ final class MachineCategories {
         static final IRecipeType<BurnerFuelRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "burner_fuel", BurnerFuelRecipe.class);
 
         BurnerFuels(IGuiHelper gui) {
-            super(TYPE, "burner_fuel", ModBlocks.FUEL_BURNER.get(), gui, 140, 30);
+            super(TYPE, "burner_fuel", ModBlocks.FUEL_BURNER.get(), gui, 140, 40);
         }
 
         @Override
@@ -570,8 +570,8 @@ final class MachineCategories {
             text(graphics, Component.translatable("jei.arcforge.burner_fuel.rate",
                     String.format(Locale.ROOT, "%.2f", fuel.mbPerTick()).replaceAll("0+$", "").replaceAll("\\.$", ""),
                     Math.round(fuel.huPerMb() * fuel.mbPerTick())), 24, 16);
-            textRight(graphics, Component.translatable("gui.arcforge.burns_at",
-                    fuel.burnTemperature(ArcforgeConfig.FUEL_BURNER_MAX_TEMPERATURE.getAsInt())), 140, 5);
+            text(graphics, Component.translatable("gui.arcforge.burns_at",
+                    fuel.burnTemperature(ArcforgeConfig.FUEL_BURNER_MAX_TEMPERATURE.getAsInt())), 24, 27);
         }
     }
 }

@@ -209,6 +209,21 @@ public class WrenchItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
+    // A machine face's mode. An Energy face says which way the energy goes: consumers take it in, generators give it out.
+    private static Component faceName(BlockEntity blockEntity, Direction face, SideMode mode) {
+        if (mode == SideMode.ENERGY && blockEntity instanceof net.zagdrath.arcforge.conduit.ConduitConnectable connectable) {
+            ConnectionMode connection = connectable.getConduitConnection(face, ConduitType.ENERGY);
+            if (connection != ConnectionMode.NONE) {
+                return energyName(connection == ConnectionMode.INPUT);
+            }
+        }
+        return mode.getDescription();
+    }
+
+    private static Component energyName(boolean input) {
+        return Component.translatable(input ? "gui.arcforge.side_mode.energy_input" : "gui.arcforge.side_mode.energy_output");
+    }
+
     // A port's mode, with which way things go through it on this structure, e.g. "Naphtha (output)".
     private static Component portName(MultiblockController controller, SideMode mode) {
         boolean in = false, out = false;
@@ -216,6 +231,9 @@ public class WrenchItem extends Item {
             ConnectionMode connection = controller.getConduitConnection(mode, type);
             in |= connection == ConnectionMode.INPUT;
             out |= connection == ConnectionMode.OUTPUT;
+        }
+        if (mode == SideMode.ENERGY && in != out) {
+            return energyName(in);
         }
         if (mode == SideMode.NONE || in == out) {
             return mode.getDescription();
@@ -239,9 +257,11 @@ public class WrenchItem extends Item {
             machine.setSideMode(side, mode);
             blockEntity.setChanged();
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_ALL);
-            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.side_set", side.getDescription(), mode.getDescription()));
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.side_set", side.getDescription(),
+                    faceName(blockEntity, context.getClickedFace(), mode)));
         } else {
-            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.side", side.getDescription(), mode.getDescription()));
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.side", side.getDescription(),
+                    faceName(blockEntity, context.getClickedFace(), mode)));
         }
         return InteractionResult.SUCCESS;
     }

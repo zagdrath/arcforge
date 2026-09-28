@@ -96,6 +96,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
     loaded.
   - The Wrench picks it up with its settings.
 - **Tungsten Drill Head** and **Quarry Scanner**, the Arc Quarry's parts.
+- **JEI from the progress arrow.** Clicking a machine's progress arrow (each lane's, on the arrays) opens JEI on
+  everything that machine makes. The Fuel Burner's flame shows its fuels.
 
 ### Changed
 
@@ -104,6 +106,24 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Fuel Burner.** Its default maximum temperature is 1,400°C (was 1,200). The other fuels still burn at their
   own lower temperatures.
 - **Pressurized Conduits** connect to Fuel Burner input faces.
+
+### Fixed
+
+- **Wrench on Energy faces.** It said "Energy output" for every machine. It now says which way the energy goes:
+  "Energy input" on machines that use it, "Energy output" on generators (multiblock ports too).
+- **Flickering and see-through edges on the formed arrays.** Parts of their models had faces in the same place,
+  which flicker against each other:
+  - the Superheater's side ribs, where they crossed its band;
+  - the top of the Condenser under its band;
+  - the Induction Furnace Array's crossed side blocks;
+  - the Metal Pressing Array's base, where it ran into its columns.
+
+  The Superheater's and Condenser's bands also had no top or bottom faces.
+- **Steam Turbine Array GUI: overlapping text.**
+  - The flow value ran into the dial. The unit is now in its label ("Flow (mB/t)").
+  - Output of 10,000 FE/t or more is shortened (e.g. "+16.4k").
+  - The exhaust line under the dial reads just "Vacuum" or "Venting", with the bonus in its tooltip.
+  - Hovering the values shows them in full.
 
 ## [2.0.0] - 2026-09-28
 

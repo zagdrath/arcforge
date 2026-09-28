@@ -50,9 +50,11 @@ public class ArcQuarryConfigScreen extends AbstractContainerScreen<ArcQuarryConf
     private static final int LABEL_Y = 16;
     private static final int GRID_X = 8, GRID_Y = 47, PITCH = 18, COLUMNS = 9;
     private static final int CHIP_W = 8, CHIP_H = 6;
-    private static final int TAG_X = 8, TAG_Y = 87, TAG_W = 112, TAG_H = 12, SUGGESTIONS = 6;
-    private static final int LIST_MODE_X = 124, SILK_X = 148, TOGGLES_Y1 = 84;
-    private static final int REPLACE_X = 8, SHOW_X = 30, SCAN_X = 52, BACK_X = 148, TOGGLES_Y2 = 102, BUTTON_SIZE = 20;
+    // The tag box spans the panel; under it one row of buttons: the filter's list mode and the switches on the left,
+    // Scan and Back on the right, 22 px apart.
+    private static final int TAG_X = 8, TAG_Y = 87, TAG_W = 160, TAG_H = 12, SUGGESTIONS = 6;
+    private static final int LIST_MODE_X = 8, SILK_X = 30, REPLACE_X = 52, SHOW_X = 74, SCAN_X = 126, BACK_X = 148;
+    private static final int BUTTONS_Y = 102, BUTTON_SIZE = 20;
     private static final int SCAN_X_TEXT = 11, SCAN_Y1 = 128, SCAN_Y2 = 138, SCAN_W = 154;
     private static final int HOVER = 0x80FFFFFF;
     private static final int BAD_TAG = 0xFFFF5555;
@@ -206,12 +208,12 @@ public class ArcQuarryConfigScreen extends AbstractContainerScreen<ArcQuarryConf
     }
 
     private int buttonAt(double mouseX, double mouseY) {
-        if (over(mouseX, mouseY, LIST_MODE_X, TOGGLES_Y1)) return ArcQuarryConfigMenu.BUTTON_LIST_MODE;
-        if (over(mouseX, mouseY, SILK_X, TOGGLES_Y1)) return ArcQuarryConfigMenu.BUTTON_SILK;
-        if (over(mouseX, mouseY, REPLACE_X, TOGGLES_Y2)) return ArcQuarryConfigMenu.BUTTON_REPLACE;
-        if (over(mouseX, mouseY, SHOW_X, TOGGLES_Y2)) return ArcQuarryConfigMenu.BUTTON_SHOW_AREA;
-        if (over(mouseX, mouseY, SCAN_X, TOGGLES_Y2)) return ArcQuarryConfigMenu.BUTTON_SCAN;
-        if (over(mouseX, mouseY, BACK_X, TOGGLES_Y2)) return ArcQuarryConfigMenu.BUTTON_BACK;
+        if (over(mouseX, mouseY, LIST_MODE_X, BUTTONS_Y)) return ArcQuarryConfigMenu.BUTTON_LIST_MODE;
+        if (over(mouseX, mouseY, SILK_X, BUTTONS_Y)) return ArcQuarryConfigMenu.BUTTON_SILK;
+        if (over(mouseX, mouseY, REPLACE_X, BUTTONS_Y)) return ArcQuarryConfigMenu.BUTTON_REPLACE;
+        if (over(mouseX, mouseY, SHOW_X, BUTTONS_Y)) return ArcQuarryConfigMenu.BUTTON_SHOW_AREA;
+        if (over(mouseX, mouseY, SCAN_X, BUTTONS_Y)) return ArcQuarryConfigMenu.BUTTON_SCAN;
+        if (over(mouseX, mouseY, BACK_X, BUTTONS_Y)) return ArcQuarryConfigMenu.BUTTON_BACK;
         return -1;
     }
 
@@ -260,12 +262,12 @@ public class ArcQuarryConfigScreen extends AbstractContainerScreen<ArcQuarryConf
                 graphics.fill(cx, cy, cx + 16, cy + 16, HOVER);
             }
         }
-        drawButton(graphics, LIST_MODE_X, TOGGLES_Y1, "container/conduit_filter/" + (settings.deny() ? "filter_deny" : "filter_allow"), mouseX, mouseY);
-        drawButton(graphics, SILK_X, TOGGLES_Y1, "container/arc_quarry/" + (settings.silkTouch() ? "silk_on" : "silk_off"), mouseX, mouseY);
-        drawButton(graphics, REPLACE_X, TOGGLES_Y2, "container/arc_quarry/" + (settings.replace() ? "replace_on" : "replace_off"), mouseX, mouseY);
-        drawButton(graphics, SHOW_X, TOGGLES_Y2, "container/vacuum_collector/" + (settings.showArea() ? "show_range" : "hide_range"), mouseX, mouseY);
-        drawButton(graphics, SCAN_X, TOGGLES_Y2, "container/arc_quarry/scan", mouseX, mouseY);
-        drawButton(graphics, BACK_X, TOGGLES_Y2, "container/arc_quarry/back", mouseX, mouseY);
+        drawButton(graphics, LIST_MODE_X, BUTTONS_Y, "container/conduit_filter/" + (settings.deny() ? "filter_deny" : "filter_allow"), mouseX, mouseY);
+        drawButton(graphics, SILK_X, BUTTONS_Y, "container/arc_quarry/" + (settings.silkTouch() ? "silk_on" : "silk_off"), mouseX, mouseY);
+        drawButton(graphics, REPLACE_X, BUTTONS_Y, "container/arc_quarry/" + (settings.replace() ? "replace_on" : "replace_off"), mouseX, mouseY);
+        drawButton(graphics, SHOW_X, BUTTONS_Y, "container/vacuum_collector/" + (settings.showArea() ? "show_range" : "hide_range"), mouseX, mouseY);
+        drawButton(graphics, SCAN_X, BUTTONS_Y, "container/arc_quarry/scan", mouseX, mouseY);
+        drawButton(graphics, BACK_X, BUTTONS_Y, "container/arc_quarry/back", mouseX, mouseY);
     }
 
     private void drawButton(GuiGraphicsExtractor graphics, int bx, int by, String icon, int mouseX, int mouseY) {
@@ -278,7 +280,7 @@ public class ArcQuarryConfigScreen extends AbstractContainerScreen<ArcQuarryConf
     @Override
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(font, title, titleLabelX, titleLabelY, ArcforgeGui.TEXT, false);
-        graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, ArcforgeGui.LABEL, false);
+        // No "Inventory" label: the scan strip runs right down to the inventory.
         graphics.text(font, Component.translatable("gui.arcforge.quarry.radius"), RADIUS_X - 1, LABEL_Y, ArcforgeGui.LABEL, false);
         graphics.text(font, Component.translatable("gui.arcforge.quarry.min_y"), MIN_Y_X - 1, LABEL_Y, ArcforgeGui.LABEL, false);
         graphics.text(font, Component.translatable("gui.arcforge.quarry.max_y"), MAX_Y_X - 1, LABEL_Y, ArcforgeGui.LABEL, false);

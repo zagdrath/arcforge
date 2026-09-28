@@ -29,8 +29,9 @@ import net.zagdrath.arcforge.menu.machine.AssemblerMenu;
 public class AssemblerScreen extends MachineScreen<AssemblerMenu> {
     private static final int ENERGY_X = 9, ENERGY_Y = 19;
     private static final int PROGRESS_X = 88, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
-    private static final int LED_X = 118, LED_Y = 60;
-    private static final int STATUS_X = 126, STATUS_Y = 60;
+    // Under the arrow, clear of the output and leftover slots, and clipped short of the panel's edge (and the tabs).
+    private static final int LED_X = 88, LED_Y = 64;
+    private static final int STATUS_X = 96, STATUS_Y = 63, STATUS_W = 72;
     // Ghosts are drawn under a wash of the panel colour.
     private static final int GHOST_WASH = 0x808B8B8B;
 
@@ -70,7 +71,7 @@ public class AssemblerScreen extends MachineScreen<AssemblerMenu> {
                 graphics.fill(cx, cy, cx + 16, cy + 16, GHOST_WASH);
             }
         }
-        graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
     }
 
     // Clicking a pattern cell sets it from the carried item or clears it, instead of picking anything up.
@@ -98,6 +99,10 @@ public class AssemblerScreen extends MachineScreen<AssemblerMenu> {
         if (isHovering(AssemblerMenu.OUTPUT_X - 1, AssemblerMenu.OUTPUT_Y - 1, 18, 18, mouseX, mouseY)
                 && !menu.getSlot(AssemblerBlockEntity.SLOT_OUTPUT).hasItem() && !menu.getPreview().isEmpty()) {
             lines.add(menu.getPreview().getHoverName());
+            return;
+        }
+        if (isHovering(STATUS_X, STATUS_Y - 1, STATUS_W, font.lineHeight + 1, mouseX, mouseY)) {
+            lines.add(menu.getStatus().getDescription());
             return;
         }
         if (isHovering(PROGRESS_X, PROGRESS_Y, PROGRESS_W, PROGRESS_H, mouseX, mouseY) && menu.getTotal() > 0) {

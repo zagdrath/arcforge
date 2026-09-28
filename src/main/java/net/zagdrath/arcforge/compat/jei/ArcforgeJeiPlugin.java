@@ -38,6 +38,22 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import net.zagdrath.arcforge.client.screen.multiblock.MetalPressingArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.InductionFurnaceArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.ArcCrushingArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.CarbonizerScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.ArcforgeFurnaceScreen;
+import net.zagdrath.arcforge.client.screen.machine.FuelBurnerScreen;
+import net.zagdrath.arcforge.client.screen.machine.MetalPressScreen;
+import net.zagdrath.arcforge.client.screen.machine.InfuserScreen;
+import net.zagdrath.arcforge.client.screen.machine.InductionFurnaceScreen;
+import net.zagdrath.arcforge.client.screen.machine.FiberizerScreen;
+import net.zagdrath.arcforge.client.screen.machine.ElectrolyzerScreen;
+import net.zagdrath.arcforge.client.screen.machine.ChemicalReactorScreen;
+import net.zagdrath.arcforge.client.screen.machine.AssemblerScreen;
+import net.zagdrath.arcforge.client.screen.machine.ArcMelterScreen;
+import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
+import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
 
 // JEI support (only loaded when JEI is installed): a category for each Arcforge machine's recipes, steam
@@ -127,6 +143,32 @@ public class ArcforgeJeiPlugin implements IModPlugin {
     public void onRuntimeUnavailable() {
         RecipeLinks.setViewer(null);
     }
+
+    // Clicking a machine's progress arrow shows everything it makes (positions from each screen's layout; arrows
+    // are 21x15). The three-lane arrays get one per lane, and the Fuel Burner's flame shows its fuels.
+    @Override
+    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        registration.addRecipeClickArea(ArcCrusherScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);
+        registration.addRecipeClickArea(ArcMelterScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Melting.TYPE);
+        registration.addRecipeClickArea(AssemblerScreen.class, 88, 35, ARROW_W, ARROW_H, RecipeTypes.CRAFTING);
+        registration.addRecipeClickArea(ChemicalReactorScreen.class, 81, 35, ARROW_W, ARROW_H, MachineCategories.ChemicalReacting.TYPE);
+        registration.addRecipeClickArea(ElectrolyzerScreen.class, 114, 35, ARROW_W, ARROW_H, MachineCategories.Electrolyzing.TYPE);
+        registration.addRecipeClickArea(FiberizerScreen.class, 68, 35, ARROW_W, ARROW_H, MachineCategories.Fiberizing.TYPE);
+        registration.addRecipeClickArea(InductionFurnaceScreen.class, 78, 35, ARROW_W, ARROW_H, RecipeTypes.SMELTING);
+        registration.addRecipeClickArea(InfuserScreen.class, 96, 35, ARROW_W, ARROW_H, MachineCategories.Infusing.TYPE);
+        registration.addRecipeClickArea(MetalPressScreen.class, 78, 35, ARROW_W, ARROW_H, MachineCategories.Pressing.TYPE);
+        registration.addRecipeClickArea(ArcforgeFurnaceScreen.class, 84, 24, ARROW_W, ARROW_H, MachineCategories.ArcforgeSmelting.TYPE);
+        registration.addRecipeClickArea(CarbonizerScreen.class, 52, 24, ARROW_W, ARROW_H, MachineCategories.Carbonizing.TYPE);
+        registration.addRecipeClickArea(FuelBurnerScreen.class, 127, 52, 14, 14, MachineCategories.BurnerFuels.TYPE);
+        for (int lane = 0; lane < 3; lane++) {
+            int y = 20 + lane * 18;
+            registration.addRecipeClickArea(ArcCrushingArrayScreen.class, 52, y, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);
+            registration.addRecipeClickArea(InductionFurnaceArrayScreen.class, 54, y, ARROW_W, ARROW_H, RecipeTypes.SMELTING);
+            registration.addRecipeClickArea(MetalPressingArrayScreen.class, 68, y, ARROW_W, ARROW_H, MachineCategories.Pressing.TYPE);
+        }
+    }
+
+    private static final int ARROW_W = 21, ARROW_H = 15;
 
     // JEI's + on a crafting recipe fills an open Assembler's pattern.
     @Override

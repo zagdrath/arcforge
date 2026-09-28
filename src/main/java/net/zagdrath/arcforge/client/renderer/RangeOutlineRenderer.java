@@ -77,7 +77,7 @@ public final class RangeOutlineRenderer {
     }
 
     // Arc Quarry areas: every quarry within 64 blocks while the player holds one, the one whose settings are open,
-    // and any set to always show its area. The layer it's mining gets a brighter rectangle.
+    // and any set to always show its area.
     private static void quarryAreas(Minecraft minecraft, LocalPlayer player) {
         Set<BlockPos> shown = new HashSet<>();
         boolean holding = player.getItemInHand(InteractionHand.MAIN_HAND).is(ModItems.ARC_QUARRY.get())
@@ -95,10 +95,12 @@ public final class RangeOutlineRenderer {
             if (minecraft.level.getBlockEntity(pos) instanceof ArcQuarryBlockEntity quarry && quarry.getSettings().radius() <= MAX_QUARRY_RADIUS) {
                 AABB area = quarry.area();
                 Gizmos.cuboid(area, GizmoStyle.stroke(COLOR, 2.0F));
+                // A brighter square where it's easy to see: the layer it's mining, or else the ground the quarry stands
+                // on (kept inside the area). A big area's own edges are far away and mostly underground or in the sky.
                 BlockPos target = quarry.getLastTarget();
-                if (target != null && quarry.getQuarryState() == ArcQuarryBlockEntity.State.MINING) {
-                    Gizmos.cuboid(new AABB(area.minX, target.getY(), area.minZ, area.maxX, target.getY() + 1, area.maxZ), GizmoStyle.stroke(LAYER_COLOR, 3.0F));
-                }
+                boolean mining = target != null && quarry.getQuarryState() == ArcQuarryBlockEntity.State.MINING;
+                double y = mining ? target.getY() : Math.max(area.minY, Math.min(area.maxY, pos.getY() - 1));
+                Gizmos.cuboid(new AABB(area.minX, y, area.minZ, area.maxX, mining ? y + 1 : y, area.maxZ), GizmoStyle.stroke(LAYER_COLOR, 3.0F));
             }
         }
     }

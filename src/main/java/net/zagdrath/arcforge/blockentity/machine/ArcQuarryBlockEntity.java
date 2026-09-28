@@ -47,6 +47,8 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraft.world.level.chunk.LevelChunkSection;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -280,6 +282,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
             releaseChunks();
         } else if (!stale && quarryState == State.STOPPED && targetIndex < targets.size()) {
             quarryState = State.MINING;
+            aimAtNext();
         } else {
             startScan(true);
         }
@@ -354,16 +357,28 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
     private void scan(ServerLevel level) {
         long volume = settings.areaVolume();
         int budget = ArcforgeConfig.QUARRY_SCAN_PER_TICK.getAsInt();
+        // Consecutive positions share a chunk (rows run along x), so look each chunk up once and read from it.
+        LevelChunk chunk = null;
+        long chunkKey = Long.MIN_VALUE;
         while (budget-- > 0 && scanCursor < volume) {
             BlockPos target = scanPos(scanCursor++);
             if (ArcQuarryBlock.isPart(worldPosition, target)) {
                 continue;
             }
-            if (!level.isLoaded(target)) {
+            long key = ChunkPos.pack(target.getX() >> 4, target.getZ() >> 4);
+            if (key != chunkKey) {
+                chunkKey = key;
+                chunk = level.getChunkSource().getChunkNow(target.getX() >> 4, target.getZ() >> 4);
+            }
+            if (chunk == null) {
                 unscanned++;
                 continue;
             }
-            BlockState state = level.getBlockState(target);
+            LevelChunkSection section = chunk.getSection(chunk.getSectionIndex(target.getY()));
+            if (section.hasOnlyAir()) {
+                continue;
+            }
+            BlockState state = section.getBlockState(target.getX() & 15, target.getY() & 15, target.getZ() & 15);
             if (isTarget(level, target, state)) {
                 targets.add(target.asLong());
                 scanCounts.merge(state.getBlock(), 1, Integer::sum);
@@ -373,6 +388,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
             stale = false;
             targetIndex = 0;
             quarryState = mineAfterScan ? (targets.isEmpty() ? State.FINISHED : State.MINING) : State.IDLE;
+            aimAtNext();
             if (quarryState != State.MINING) {
                 releaseChunks();
             }
@@ -382,9 +398,16 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
         }
     }
 
+    // The beam (and the outline's layer) points at the block it will mine next, or nothing once it's done.
+    private void aimAtNext() {
+        lastTarget = quarryState == State.MINING && targetIndex < targets.size() ? BlockPos.of(targets.getLong(targetIndex)) : null;
+    }
+
     // Whether the quarry would mine this block now.
     public boolean isTarget(Level level, BlockPos target, BlockState state) {
-        return !ArcQuarryBlock.isPart(worldPosition, target) && MineRules.canQuarry(level, target, state) && BlockFilter.matches(settings, state);
+        // Cheapest first: air, then the filter, then the rules that look at the world.
+        return !state.isAir() && !ArcQuarryBlock.isPart(worldPosition, target) && BlockFilter.matches(settings, state)
+                && MineRules.canQuarry(level, target, state);
     }
 
     // FE per block: Silk Touch multiplies it, Energy upgrades cut it.
@@ -423,6 +446,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
         // The world may have changed since the scan.
         if (!isTarget(level, target, state)) {
             targetIndex++;
+            aimAtNext();
             setChanged();
             return;
         }
@@ -440,6 +464,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
         FakePlayer player = ArcforgeFakePlayer.at(level, worldPosition, getFacing(), tool.copy());
         if (NeoForge.EVENT_BUS.post(new BreakBlockEvent(level, target, state, player)).isCanceled()) {
             targetIndex++;
+            aimAtNext();
             setChanged();
             return;
         }
@@ -460,7 +485,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
         drops.forEach(this::insert);
         minedCount++;
         targetIndex++;
-        lastTarget = target;
+        aimAtNext();
         lastMined = level.getGameTime();
         cooldown = ticksPerBlock() - 1;
         status = MachineStatus.MINING;
@@ -795,6 +820,20 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
     public void onDataPacket(net.minecraft.network.Connection connection, ValueInput input) {
         loadShared(input);
     }
+
+    // The faces are the whole cube's: every part's capabilities and conduits change.
+    @Override
+    protected void onSideConfigChanged() {
+        super.onSideConfigChanged();
+        if (level != null) {
+            for (BlockPos part : ArcQuarryBlock.positions(worldPosition)) {
+                level.invalidateCapabilities(part);
+                net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshAround(level, part);
+            }
+            changed(true);
+        }
+    }
+
 
     @Override
     public Component getDisplayName() {

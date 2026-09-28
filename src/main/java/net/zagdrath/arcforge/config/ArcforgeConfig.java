@@ -819,8 +819,8 @@ public class ArcforgeConfig {
             .defineInRange("defaultMaxY", 60, -2_048, 2_048);
 
     public static final ModConfigSpec.IntValue QUARRY_SCAN_PER_TICK = BUILDER
-            .comment("Positions it scans per tick.")
-            .defineInRange("scanBlocksPerTick", 4_096, 64, 65_536);
+            .comment("Positions it scans per tick (a radius-32 area 384 blocks deep is about 1.6 million positions: 2.5 seconds).")
+            .defineInRange("scanBlocksPerTick", 32_768, 64, 262_144);
 
     public static final ModConfigSpec.BooleanValue QUARRY_CHUNK_LOADING = BUILDER
             .comment("Keep the quarry's chunk and the chunk it's mining (or scanning) loaded while it works.")

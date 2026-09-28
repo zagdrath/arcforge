@@ -86,26 +86,47 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
     protected void drawText(GuiGraphicsExtractor graphics) {
         Component rpm = Component.translatable("gui.arcforge.rpm", ArcforgeGui.grouped(menu.getRpm()));
         graphics.text(font, rpm, RPM_CENTER_X - font.width(rpm) / 2, RPM_Y, ArcforgeGui.WHITE, false);
-        // Under the dial: "Vacuum +10%" while the exhaust drains, "Venting" with no Exhaust port.
-        Component exhaust = switch (menu.getExhaustState()) {
-            case SteamTurbineArrayMenu.EXHAUST_VACUUM -> Component.translatable("gui.arcforge.turbine.vacuum",
-                    Math.round(ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() * 100));
-            case SteamTurbineArrayMenu.EXHAUST_VENTING -> Component.translatable("gui.arcforge.turbine.venting");
-            default -> null;
-        };
+        // Under the dial: "Vacuum" while the exhaust drains (the bonus is in its tooltip), "Venting" with no Exhaust
+        // port. Short, to fit between the lubricant gauge and the status light.
+        Component exhaust = exhaustText();
         if (exhaust != null) {
             int color = menu.getExhaustState() == SteamTurbineArrayMenu.EXHAUST_VACUUM ? ArcforgeGui.ACCENT : ArcforgeGui.LABEL;
             graphics.text(font, exhaust, RPM_CENTER_X - font.width(exhaust) / 2, EXHAUST_Y, color, false);
         }
-        graphics.text(font, Component.translatable("gui.arcforge.flow"), LABEL_X, FLOW_LABEL_Y, ArcforgeGui.LABEL, false);
-        textRight(graphics, Component.translatable("gui.arcforge.flow_value_compact", menu.getFlow(), menu.getMaxFlow()), VALUE_RIGHT, FLOW_Y, ArcforgeGui.TEXT);
+        // The unit goes in the label so the value fits the column beside the dial.
+        graphics.text(font, Component.translatable("gui.arcforge.turbine.flow_label"), LABEL_X, FLOW_LABEL_Y, ArcforgeGui.LABEL, false);
+        textRight(graphics, Component.translatable("gui.arcforge.turbine.flow_value", menu.getFlow(), menu.getMaxFlow()), VALUE_RIGHT, FLOW_Y, ArcforgeGui.TEXT);
         graphics.text(font, Component.translatable("gui.arcforge.output"), LABEL_X, OUTPUT_LABEL_Y, ArcforgeGui.LABEL, false);
-        textRight(graphics, Component.translatable("gui.arcforge.fe_per_tick_gain", ArcforgeGui.grouped(menu.getFePerTick())), VALUE_RIGHT, OUTPUT_Y, ArcforgeGui.ACCENT);
+        int output = menu.getFePerTick();
+        textRight(graphics, Component.translatable("gui.arcforge.fe_per_tick_gain", output < 10_000 ? ArcforgeGui.grouped(output) : ArcforgeGui.compact(output)),
+                VALUE_RIGHT, OUTPUT_Y, ArcforgeGui.ACCENT);
         graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+    }
+
+    private Component exhaustText() {
+        return switch (menu.getExhaustState()) {
+            case SteamTurbineArrayMenu.EXHAUST_VACUUM -> Component.translatable("gui.arcforge.turbine.vacuum_short");
+            case SteamTurbineArrayMenu.EXHAUST_VENTING -> Component.translatable("gui.arcforge.turbine.venting");
+            default -> null;
+        };
     }
 
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
+        Component exhaust = exhaustText();
+        if (exhaust != null && isHovering(RPM_CENTER_X - font.width(exhaust) / 2, EXHAUST_Y - 1, font.width(exhaust), font.lineHeight + 1, mouseX, mouseY)) {
+            if (menu.getExhaustState() == SteamTurbineArrayMenu.EXHAUST_VACUUM) {
+                lines.add(Component.translatable("gui.arcforge.turbine.vacuum", Math.round(ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() * 100)));
+            } else {
+                lines.add(exhaust);
+            }
+            return;
+        }
+        if (isHovering(LABEL_X, FLOW_LABEL_Y - 1, VALUE_RIGHT - LABEL_X, OUTPUT_Y + font.lineHeight - FLOW_LABEL_Y + 1, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.flow_value_compact", menu.getFlow(), menu.getMaxFlow()));
+            lines.add(Component.translatable("gui.arcforge.fe_per_tick_gain", ArcforgeGui.grouped(menu.getFePerTick())).withStyle(ChatFormatting.GRAY));
+            return;
+        }
         if (isHovering(STEAM_X - 1, STEAM_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getSteam(), Component.translatable("gui.arcforge.steam"), menu.getSteamAmount(), menu.getSteamCapacity());
         } else if (isHovering(LUBE_X - 1, LUBE_Y - 1, LUBE_W + 2, LUBE_H + 2, mouseX, mouseY)) {

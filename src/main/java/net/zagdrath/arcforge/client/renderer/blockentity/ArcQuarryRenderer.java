@@ -36,7 +36,7 @@ import net.zagdrath.arcforge.block.machine.MachineBlock;
 import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
 
 // The Arc Quarry's moving parts, drawn from its main block (the static machine is the block model): the arc emitter
-// on top of the head, spinning while it works, and an arc beam from the emitter's tip to the block it last mined,
+// on top of the head, spinning while it works, and an arc beam from the emitter's tip to the block it's mining,
 // scrolling along its length and full-bright.
 public class ArcQuarryRenderer implements BlockEntityRenderer<ArcQuarryBlockEntity, ArcQuarryRenderer.State> {
     public static final StandaloneModelKey<QuadCollection> EMITTER = new StandaloneModelKey<>(() -> Arcforge.MODID + ":arc_quarry_emitter");
@@ -75,7 +75,7 @@ public class ArcQuarryRenderer implements BlockEntityRenderer<ArcQuarryBlockEnti
         state.spin = quarry.advanceSpin(time, state.lit);
         state.scroll = (float) (time * BEAM_SCROLL);
         BlockPos target = quarry.getLastTarget();
-        state.beamEnd = state.lit && target != null ? Vec3.atCenterOf(target).subtract(Vec3.atLowerCornerOf(quarry.getBlockPos())) : null;
+        state.beamEnd = state.lit && target != null ? beamEnd(target.subtract(quarry.getBlockPos())) : null;
         state.light = state.lightCoords;
     }
 
@@ -97,6 +97,14 @@ public class ArcQuarryRenderer implements BlockEntityRenderer<ArcQuarryBlockEnti
         if (end != null) {
             collector.submitCustomGeometry(poseStack, RenderTypes.beaconBeam(BEAM, true), (pose, buffer) -> beam(pose, buffer, TIP, end, state.scroll));
         }
+    }
+
+    // Where the beam meets the target block: the point on its surface facing the emitter (its centre if the ray misses,
+    // which it can't for a solid block).
+    private static Vec3 beamEnd(BlockPos relative) {
+        AABB block = new AABB(relative);
+        Vec3 centre = block.getCenter();
+        return block.clip(TIP, centre).orElse(centre);
     }
 
     // Two crossed quads from start to end, each drawn from both sides.

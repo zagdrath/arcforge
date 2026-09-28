@@ -28,7 +28,8 @@ public class BlockBreakerScreen extends MachineScreen<BlockBreakerMenu> {
     private static final int TARGET_X = 30, TARGET_Y = 22, TARGET_W = 60;
     private static final int BAR_X = 31, BAR_Y = 42, BAR_W = 56, BAR_H = 2;
     private static final int LED_X = 30, LED_Y = 60;
-    private static final int STATUS_X = 38, STATUS_Y = 60;
+    // Clipped short of the buffer grid (x 97).
+    private static final int STATUS_X = 38, STATUS_Y = 60, STATUS_W = 57;
 
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier progressBar = sprite("progress_bar");
@@ -71,7 +72,7 @@ public class BlockBreakerScreen extends MachineScreen<BlockBreakerMenu> {
     protected void drawText(GuiGraphicsExtractor graphics) {
         String name = font.plainSubstrByWidth(target().getString(), TARGET_W);
         graphics.text(font, Component.literal(name), TARGET_X, TARGET_Y, ArcforgeGui.LABEL, false);
-        graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
     }
 
     @Override
@@ -79,6 +80,10 @@ public class BlockBreakerScreen extends MachineScreen<BlockBreakerMenu> {
         if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getCapacity())).withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.arcforge.fe_per_tick_loss", menu.getUsage()).withStyle(ChatFormatting.RED));
+            return;
+        }
+        if (isHovering(STATUS_X, STATUS_Y - 1, STATUS_W, font.lineHeight + 1, mouseX, mouseY)) {
+            lines.add(menu.getStatus().getDescription());
             return;
         }
         if (isHovering(TARGET_X, TARGET_Y - 1, TARGET_W, font.lineHeight + 1, mouseX, mouseY)) {

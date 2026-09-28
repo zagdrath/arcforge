@@ -175,6 +175,7 @@ public final class ArcforgeGameTests {
         TESTS.put("vacuum_radius", AutomationGameTests::vacuumRadius);
         TESTS.put("vacuum_filter", AutomationGameTests::vacuumFilter);
         TESTS.put("quarry_needs_room", ArcQuarryGameTests::needsRoom);
+        TESTS.put("quarry_shape_follows_model", ArcQuarryGameTests::shapeFollowsModel);
         TESTS.put("quarry_tag_allowlist", ArcQuarryGameTests::tagAllowlist);
         TESTS.put("quarry_denylist", ArcQuarryGameTests::denylist);
         TESTS.put("quarry_replace_mode", ArcQuarryGameTests::replaceMode);

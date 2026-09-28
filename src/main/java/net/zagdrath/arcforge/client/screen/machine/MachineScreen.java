@@ -260,6 +260,15 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         graphics.text(font, text, right - font.width(text), y, color, false);
     }
 
+    // Text cut to fit a width, ending in "…" when it doesn't.
+    protected Component clipped(Component text, int width) {
+        String full = text.getString();
+        if (font.width(full) <= width) {
+            return text;
+        }
+        return Component.literal(font.plainSubstrByWidth(full, width - font.width("…")) + "…");
+    }
+
     protected static int scaled(int value, int max, int size) {
         return max <= 0 ? 0 : (int) Math.min(size, Math.round((double) value * size / max));
     }

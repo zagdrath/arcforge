@@ -24,13 +24,23 @@ abstract class ArcforgeCategory<T> extends AbstractRecipeCategory<T> {
         super(type, Component.translatable("jei.arcforge." + name), gui.createDrawableItemLike(icon), width, height);
     }
 
-    static void text(GuiGraphicsExtractor graphics, Component text, int x, int y) {
-        graphics.text(Minecraft.getInstance().font, text, x, y, TEXT_COLOR, false);
+    // A line of text from x, cut short with "…" if it would run past the category's right edge.
+    void text(GuiGraphicsExtractor graphics, Component text, int x, int y) {
+        graphics.text(Minecraft.getInstance().font, fit(text, getWidth() - x), x, y, TEXT_COLOR, false);
     }
 
-    // Right-aligned to x.
-    static void textRight(GuiGraphicsExtractor graphics, Component text, int x, int y) {
-        graphics.text(Minecraft.getInstance().font, text, x - Minecraft.getInstance().font.width(text), y, TEXT_COLOR, false);
+    // Right-aligned to x (and cut short if it's wider than the category).
+    void textRight(GuiGraphicsExtractor graphics, Component text, int x, int y) {
+        Component fitted = fit(text, x);
+        graphics.text(Minecraft.getInstance().font, fitted, x - Minecraft.getInstance().font.width(fitted), y, TEXT_COLOR, false);
+    }
+
+    private static Component fit(Component text, int width) {
+        var font = Minecraft.getInstance().font;
+        if (font.width(text) <= width) {
+            return text;
+        }
+        return Component.literal(font.plainSubstrByWidth(text.getString(), Math.max(0, width - font.width("…"))) + "…");
     }
 
     static Component seconds(int ticks) {
