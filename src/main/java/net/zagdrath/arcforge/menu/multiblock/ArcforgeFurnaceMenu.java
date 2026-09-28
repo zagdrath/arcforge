@@ -45,7 +45,10 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
     public static final int DATA_BURN_TOTAL = 7;
     public static final int DATA_REDSTONE_MODE = 8;
     public static final int DATA_SIDE_CONFIG = 9;
-    public static final int DATA_VALUES = 10;
+    // mB of oxygen in the tank, and the current smelt's oxygen speed-up x100 (0 when not boosted).
+    public static final int DATA_OXYGEN = 10;
+    public static final int DATA_BOOST = 11;
+    public static final int DATA_VALUES = 12;
 
     // Slot positions from arcforge_furnace_gui_layout.json.
     public static final int METAL_X = 9, METAL_Y = 23;
@@ -228,5 +231,19 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
 
     public boolean isAutoEject() {
         return SideConfig.unpackAutoEject(value(DATA_SIDE_CONFIG));
+    }
+
+    public int getOxygen() {
+        return value(DATA_OXYGEN);
+    }
+
+    // A speed-up for display: 1.5 -> "1.5", 2.0 -> "2".
+    public static String boostText(double boost) {
+        return boost == Math.rint(boost) ? Integer.toString((int) boost) : Double.toString(Math.round(boost * 100.0) / 100.0);
+    }
+
+    // The current smelt's speed-up from oxygen (1.5), or 0 when it has none.
+    public double getBoost() {
+        return value(DATA_BOOST) / 100.0;
     }
 }

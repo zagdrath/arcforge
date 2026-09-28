@@ -9,7 +9,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Smelts steel and the tier alloys, with slag as a by-product.\nIt has four inputs: the metal (iron for steel), two additive slots for the alloys (leave them empty for steel; the two additives go in either way round), and coal coke. Coal coke is both its fuel and its reagent: burning it heats the furnace toward 1,600°C, and it keeps back what each smelt uses. Coal coke blocks work as nine coal coke.\nEach recipe needs the furnace hot enough: steel from 1,200°C, the alloys from 1,200 to 1,500°C. A fluorite crystal as the additive fluxes steel: 4 iron + 1 fluorite + 4 coke give 4 steel (and 6 slag) in 1,000 ticks.\nOpen it from the port."
+      "text": "Smelts steel and the tier alloys, with slag as a by-product.\nIt has four inputs: the metal (iron for steel), two additive slots for the alloys (leave them empty for steel; the two additives go in either way round), and coal coke. Coal coke is both its fuel and its reagent: burning it heats the furnace toward 1,600°C, and it keeps back what each smelt uses. Coal coke blocks work as nine coal coke.\nEach recipe needs the furnace hot enough: steel from 1,200°C, the alloys from 1,200 to 1,500°C. A fluorite crystal as the additive fluxes steel: 4 iron + 1 fluorite + 4 coke give 4 steel (and 6 slag) in 1,000 ticks.\nOpen it from the port.\n# Oxygen\nSet an Oxygen port with the Wrench and pipe Oxygen in. Each smelt that starts with 50 mB of Oxygen uses it and finishes 1.5× faster."
     },
     {
       "type": "multiblock",

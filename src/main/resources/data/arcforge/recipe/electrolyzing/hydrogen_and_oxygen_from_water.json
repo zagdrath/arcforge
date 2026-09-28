@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:electrolyzing",
+  "input": {
+    "tag": "minecraft:water",
+    "amount": 100
+  },
+  "primary": {
+    "id": "arcforge:hydrogen",
+    "amount": 200
+  },
+  "secondary": {
+    "id": "arcforge:oxygen",
+    "amount": 100
+  }
+}

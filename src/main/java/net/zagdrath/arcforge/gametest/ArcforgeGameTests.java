@@ -157,6 +157,13 @@ public final class ArcforgeGameTests {
         TESTS.put("turbine_exhaust_and_vacuum_bonus", SteamCycleGameTests::turbineExhaustAndVacuumBonus);
         TESTS.put("condenser_rate_from_cooling", SteamCycleGameTests::condenserRateFromCooling);
         TESTS.put("condenser_climate", SteamCycleGameTests::condenserClimate);
+        TESTS.put("electrolysis_ratio", ElectrolysisGameTests::ratio);
+        TESTS.put("electrolysis_energy_exact", ElectrolysisGameTests::energyExact);
+        TESTS.put("hydrogen_net_negative", ElectrolysisGameTests::hydrogenNetNegative);
+        TESTS.put("hydrogen_burns_in_fuel_burner", ElectrolysisGameTests::hydrogenBurnsInFuelBurner);
+        TESTS.put("gas_conduit_feeds_burner", ElectrolysisGameTests::gasConduitFeedsBurner);
+        TESTS.put("plastic_recipe", ElectrolysisGameTests::plasticRecipe);
+        TESTS.put("plastic_in_recipes", ElectrolysisGameTests::plasticInRecipes);
         TESTS.put("steam_boiler_array_forms", SteamGameTests::boilerArrayForms);
         TESTS.put("steam_turbine_array_spins", SteamGameTests::turbineArraySpins);
         TESTS.put("steam_turbine_array_grade_speed", SteamGameTests::turbineArrayGradeSpeed);
@@ -196,6 +203,7 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("leach_raw_iron", ChemicalGameTests::leachRawIron);
         LONG_TESTS.put("chain_yield_triple", ChemicalGameTests::chainYieldTriple);
         LONG_TESTS.put("furnace_smelts", MultiblockGameTests::furnaceSmelts);
+        LONG_TESTS.put("oxygen_speeds_furnace", ElectrolysisGameTests::oxygenSpeedsFurnace);
         LONG_TESTS.put("furnace_burns_coke_blocks", MultiblockGameTests::furnaceBurnsCokeBlocks);
         LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);
         LONG_TESTS.put("crusher_recipes", CrushingGameTests::crusherRecipes);

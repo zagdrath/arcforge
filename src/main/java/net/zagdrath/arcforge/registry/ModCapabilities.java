@@ -45,6 +45,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntit
 import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
@@ -158,6 +159,10 @@ public final class ModCapabilities {
                 ChemicalReactorBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
                 ChemicalReactorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
+                ElectrolyzerBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
+                ElectrolyzerBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
                 MetalPressBlockEntity::getItemHandler);
         // Every casing of a formed Metal Pressing Array exposes the cube face it lies on (served by the centre).
@@ -234,6 +239,11 @@ public final class ModCapabilities {
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
             MultiblockController furnace = ArcforgeFurnaceStructure.findFormedPort(level, pos);
             return furnace != null ? furnace.itemHandlerAt(pos, side) : null;
+        }, furnaceParts);
+        // Oxygen ports.
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            MultiblockController furnace = ArcforgeFurnaceStructure.findFormedPort(level, pos);
+            return furnace != null ? furnace.fluidHandlerAt(pos, side) : null;
         }, furnaceParts);
         Block[] solarParts = {
                 ModBlocks.SOLAR_THERMAL_ARRAY_CONTROLLER.get(), ModBlocks.SOLAR_THERMAL_ARRAY_CASING.get(), ModBlocks.SOLAR_COLLECTOR.get() };

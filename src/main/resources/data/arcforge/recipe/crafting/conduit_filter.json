@@ -2,11 +2,12 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    " W ",
+    " P ",
     "WBW",
     " W "
   ],
   "key": {
+    "P": "#c:plastics",
     "W": "arcforge:wrought_alloy",
     "B": "minecraft:iron_bars"
   },

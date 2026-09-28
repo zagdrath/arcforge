@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TGT",
+    "NWN",
+    "TET"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "G": "#c:glass_blocks",
+    "N": "#c:plates/nickel",
+    "W": "arcforge:wrought_fluid_tank",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:electrolyzer",
+    "count": 1
+  }
+}

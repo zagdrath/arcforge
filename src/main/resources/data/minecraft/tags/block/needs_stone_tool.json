@@ -23,6 +23,7 @@
     "arcforge:solar_collector",
     "arcforge:arc_melter",
     "arcforge:chemical_reactor",
+    "arcforge:electrolyzer",
     "arcforge:nether_sulfur_ore",
     "arcforge:superheater_array_casing",
     "arcforge:condenser_array_casing"

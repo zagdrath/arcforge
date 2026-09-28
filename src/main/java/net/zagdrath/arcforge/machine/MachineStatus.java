@@ -54,7 +54,9 @@ public enum MachineStatus {
     MISSING_FLUID("missing_fluid", "led_blocked"),
     // The Superheater and Condenser Arrays.
     SUPERHEATING("superheating", "led_running"),
-    CONDENSING("condensing", "led_running");
+    CONDENSING("condensing", "led_running"),
+    // The Electrolyzer.
+    SPLITTING("splitting", "led_running");
 
     private final String name;
     private final String led;

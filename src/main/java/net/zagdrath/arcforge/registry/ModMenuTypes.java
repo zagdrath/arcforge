@@ -19,6 +19,7 @@ import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
 import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
 import net.zagdrath.arcforge.menu.machine.ArcMelterMenu;
 import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
+import net.zagdrath.arcforge.menu.machine.ElectrolyzerMenu;
 import net.zagdrath.arcforge.menu.machine.ElectricPumpMenu;
 import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
@@ -85,6 +86,8 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<ChemicalReactorMenu>> CHEMICAL_REACTOR = MENU_TYPES.register("chemical_reactor",
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));
+    public static final Supplier<MenuType<ElectrolyzerMenu>> ELECTROLYZER = MENU_TYPES.register("electrolyzer",
+            () -> IMenuTypeExtension.create(ElectrolyzerMenu::new));
 
     public static final Supplier<MenuType<SteamTurbineArrayMenu>> STEAM_TURBINE_ARRAY = MENU_TYPES.register("steam_turbine_array",
             () -> IMenuTypeExtension.create(SteamTurbineArrayMenu::new));

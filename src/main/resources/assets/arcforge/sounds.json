@@ -97,5 +97,14 @@
         "stream": false
       }
     ]
+  },
+  "electrolyzer_run": {
+    "subtitle": "subtitles.arcforge.electrolyzer_run",
+    "sounds": [
+      {
+        "name": "arcforge:electrolyzer_run",
+        "stream": false
+      }
+    ]
   }
 }

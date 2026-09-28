@@ -4,12 +4,13 @@
   "pattern": [
     "ACA",
     "KXK",
-    "AAA"
+    "APA"
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
     "C": "#c:gems/arcite",
     "K": "#c:chests/wooden",
+    "P": "#c:plastics",
     "X": "arcforge:hardened_vault"
   },
   "result": {

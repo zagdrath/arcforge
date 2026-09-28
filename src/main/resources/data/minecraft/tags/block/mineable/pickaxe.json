@@ -103,6 +103,7 @@
     "arcforge:arc_melter",
     "arcforge:nether_sulfur_ore",
     "arcforge:chemical_reactor",
+    "arcforge:electrolyzer",
     "arcforge:superheater_array_casing",
     "arcforge:condenser_array_casing"
   ]

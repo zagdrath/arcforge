@@ -77,6 +77,7 @@ import net.zagdrath.arcforge.client.screen.machine.InductionFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.machine.MetalPressScreen;
 import net.zagdrath.arcforge.client.screen.machine.ArcMelterScreen;
 import net.zagdrath.arcforge.client.screen.machine.ChemicalReactorScreen;
+import net.zagdrath.arcforge.client.screen.machine.ElectrolyzerScreen;
 import net.zagdrath.arcforge.client.screen.machine.ElectricPumpScreen;
 import net.zagdrath.arcforge.client.screen.machine.SteamBoilerScreen;
 import net.zagdrath.arcforge.client.screen.machine.CombustionPlantScreen;
@@ -160,6 +161,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.ELECTRIC_PUMP.get(), ElectricPumpScreen::new);
         event.register(ModMenuTypes.ARC_MELTER.get(), ArcMelterScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
+        event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
         event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
         event.register(ModMenuTypes.SUPERHEATER_ARRAY.get(), SuperheaterArrayScreen::new);
         event.register(ModMenuTypes.CONDENSER_ARRAY.get(), CondenserArrayScreen::new);
@@ -216,6 +218,9 @@ public class ArcforgeClient {
                 new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/steam_flow")),
                 null,
                 FluidTintSources.constant(EXHAUST_STEAM_TINT)), ModFluids.EXHAUST_STEAM, ModFluids.FLOWING_EXHAUST_STEAM);
+        // Hydrogen and Oxygen share the steam texture too: near-white and pale blue.
+        event.register(gasModel(HYDROGEN_TINT), ModFluids.HYDROGEN, ModFluids.FLOWING_HYDROGEN);
+        event.register(gasModel(OXYGEN_TINT), ModFluids.OXYGEN, ModFluids.FLOWING_OXYGEN);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -227,6 +232,16 @@ public class ArcforgeClient {
     }
 
     private static final int EXHAUST_STEAM_TINT = 0xFF9EA6AE;
+    public static final int HYDROGEN_TINT = 0xFFEAF2FA;
+    public static final int OXYGEN_TINT = 0xFF9FD4F2;
+
+    private static FluidModel.Unbaked gasModel(int tint) {
+        return new FluidModel.Unbaked(
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/steam_still")),
+                new Material(Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/fluid/steam_flow")),
+                null,
+                FluidTintSources.constant(tint));
+    }
 
     private static FluidModel.Unbaked steamModel(SteamGrade grade) {
         return new FluidModel.Unbaked(
@@ -254,6 +269,8 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0x2A1A0C, 2.0F), ModFluids.HEAVY_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(EXHAUST_STEAM_TINT & 0xFFFFFF, 6.0F), ModFluids.EXHAUST_STEAM_TYPE.get());
+        event.registerFluidType(liquidFog(HYDROGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.HYDROGEN_TYPE.get());
+        event.registerFluidType(liquidFog(OXYGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.OXYGEN_TYPE.get());
         for (OreSlurry slurry : OreSlurry.values()) {
             event.registerFluidType(liquidFog(slurry.tint() & 0xFFFFFF, 3.0F), ModFluids.slurry(slurry).type().get());
         }

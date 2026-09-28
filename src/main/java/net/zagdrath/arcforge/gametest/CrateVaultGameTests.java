@@ -145,8 +145,9 @@ final class CrateVaultGameTests {
         helper.setBlock(POS, ModBlocks.crate(ConduitTier.WROUGHT).get());
         fillCrate(helper.getBlockEntity(POS, CrateBlockEntity.class));
         ItemStack wrenched = dismantle(helper, POS);
-        ItemStack crafted = AlloyGameTests.craft(helper, "crafting/tempered_crate", new String[] { "AAA", "KXK", "AAA" }, Map.of(
-                'A', new ItemStack(ModItems.TEMPERED_ALLOY.get()), 'K', new ItemStack(Items.CHEST), 'X', wrenched));
+        ItemStack crafted = AlloyGameTests.craft(helper, "crafting/tempered_crate", new String[] { "APA", "KXK", "AAA" }, Map.of(
+                'A', new ItemStack(ModItems.TEMPERED_ALLOY.get()), 'P', new ItemStack(ModItems.PLASTIC_SHEET.get()), 'K', new ItemStack(Items.CHEST),
+                'X', wrenched));
         helper.assertTrue(crafted.is(ModBlocks.crate(ConduitTier.TEMPERED).get().asItem()), "Didn't make a Tempered Crate");
         helper.setBlock(POS, ModBlocks.crate(ConduitTier.TEMPERED).get());
         CrateBlockEntity placed = helper.getBlockEntity(POS, CrateBlockEntity.class);

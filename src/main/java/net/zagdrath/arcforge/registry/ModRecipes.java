@@ -22,6 +22,7 @@ import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.ChemicalReactingRecipe;
 import net.zagdrath.arcforge.recipe.CrushingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
+import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.MeltingRecipe;
@@ -29,7 +30,7 @@ import net.zagdrath.arcforge.recipe.PressingRecipe;
 import net.zagdrath.arcforge.recipe.TierUpgradeRecipe;
 
 // Data-driven machine recipes: data/<namespace>/recipe/*.json with type arcforge:carbonizing,
-// arcforge:arcforge_smelting, arcforge:chemical_reacting, arcforge:crushing, arcforge:distilling, arcforge:fiberizing, arcforge:infusing, arcforge:melting or arcforge:pressing. All are synced to clients so GUI slots know what they accept,
+// arcforge:arcforge_smelting, arcforge:chemical_reacting, arcforge:crushing, arcforge:distilling, arcforge:electrolyzing, arcforge:fiberizing, arcforge:infusing, arcforge:melting or arcforge:pressing. All are synced to clients so GUI slots know what they accept,
 // as are vanilla smelting recipes (for the Induction Furnaces).
 public final class ModRecipes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Arcforge.MODID);
@@ -46,6 +47,8 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("crushing")));
     public static final Supplier<RecipeType<DistillingRecipe>> DISTILLING = RECIPE_TYPES.register("distilling",
             () -> RecipeType.simple(id("distilling")));
+    public static final Supplier<RecipeType<ElectrolyzingRecipe>> ELECTROLYZING = RECIPE_TYPES.register("electrolyzing",
+            () -> RecipeType.simple(id("electrolyzing")));
     public static final Supplier<RecipeType<FiberizingRecipe>> FIBERIZING = RECIPE_TYPES.register("fiberizing",
             () -> RecipeType.simple(id("fiberizing")));
     public static final Supplier<RecipeType<InfusingRecipe>> INFUSING = RECIPE_TYPES.register("infusing",
@@ -65,6 +68,8 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(CrushingRecipe.MAP_CODEC, CrushingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<DistillingRecipe>> DISTILLING_SERIALIZER = RECIPE_SERIALIZERS.register("distilling",
             () -> new RecipeSerializer<>(DistillingRecipe.MAP_CODEC, DistillingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<ElectrolyzingRecipe>> ELECTROLYZING_SERIALIZER = RECIPE_SERIALIZERS.register("electrolyzing",
+            () -> new RecipeSerializer<>(ElectrolyzingRecipe.MAP_CODEC, ElectrolyzingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<FiberizingRecipe>> FIBERIZING_SERIALIZER = RECIPE_SERIALIZERS.register("fiberizing",
             () -> new RecipeSerializer<>(FiberizingRecipe.MAP_CODEC, FiberizingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<InfusingRecipe>> INFUSING_SERIALIZER = RECIPE_SERIALIZERS.register("infusing",
@@ -94,6 +99,6 @@ public final class ModRecipes {
     }
 
     private static void syncToClients(OnDatapackSyncEvent event) {
-        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(), RecipeType.SMELTING);
+        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(), RecipeType.SMELTING);
     }
 }

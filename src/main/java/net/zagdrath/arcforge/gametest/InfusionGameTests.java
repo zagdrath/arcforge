@@ -106,7 +106,7 @@ public final class InfusionGameTests {
             tx.commit();
         }
         full.getHeat().add(full.getHeat().getCapacity());
-        helper.assertTrue(full.getHeat().getTemperature() == 1_200, "Full burner is at " + full.getHeat().getTemperature() + "°C");
+        helper.assertTrue(full.getHeat().getTemperature() == 1_400, "Full burner is at " + full.getHeat().getTemperature() + "°C");
         helper.startSequence()
                 .thenIdle(21)
                 .thenExecute(() -> {

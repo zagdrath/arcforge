@@ -32,6 +32,7 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> CONDENSER_ARRAY_RUN = loop("condenser_array_run", 24.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> ARC_MELTER_RUN = loop("arc_melter_run", 16.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> CHEMICAL_REACTOR_RUN = loop("chemical_reactor_run", 16.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> ELECTROLYZER_RUN = loop("electrolyzer_run", 16.0F);
 
     private ModSounds() {}
 

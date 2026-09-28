@@ -1,0 +1,13 @@
+{
+  "title": "Electrolyzer",
+  "icon": "arcforge:electrolyzer",
+  "items": [
+    "arcforge:electrolyzer"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Splits water with FE: 1 mB of water makes 2 mB of Hydrogen and 1 mB of Oxygen, like the real thing.\n- 1,200 FE per mB of water (600 per mB of hydrogen) at 400 FE/t. Energy upgrades cut that, but never below the floor: hydrogen must always cost more FE than any setup can get back by burning it.\n- Water goes in through Input faces (the top by default). Hydrogen and Oxygen leave through their own faces (left and right by default) into Pressurized Conduits, Cylinders or Gas Cartridges.\n- Takes Speed and Energy upgrades and a redstone setting."
+    }
+  ]
+}

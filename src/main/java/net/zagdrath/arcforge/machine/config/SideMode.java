@@ -28,7 +28,12 @@ public enum SideMode implements StringRepresentable {
     // Steam turbines: Heavy Oil goes into the lubricant tank.
     LUBRICANT("lubricant"),
     // The Steam Turbine Array: spent steam comes out as Exhaust Steam instead of venting.
-    EXHAUST("exhaust");
+    EXHAUST("exhaust"),
+    // Gases by name. The Electrolyzer gives them out; the Arcforge Furnace takes oxygen in. Not outputs in
+    // general (see isOutput), so each machine handles them itself.
+    // SideConfig packs 4 bits per face: only one more mode fits (ordinal 15) before it has to widen.
+    OXYGEN("oxygen"),
+    HYDROGEN("hydrogen");
 
     private final String name;
 

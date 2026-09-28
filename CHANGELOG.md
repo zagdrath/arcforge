@@ -20,6 +20,52 @@ number and date.
 
 ## [Unreleased]
 
+Suggested version: **2.1.0** (new content and balance changes; worlds load as they are).
+
+### Upgrading
+
+- **Fuel Burner maximum temperature.** The default is now 1,400°C, so hydrogen burns at its full 1,400°C.
+  - An existing `arcforge-common.toml` keeps its old value (1,200).
+  - Set `power.fuelBurner.maxTemperature` to 1400 by hand, or hydrogen stops at 1,200°C.
+- **Recipes need plastic now.** Conduit Filters, Storage Upgrades and crafted crate and vault upgrades need a
+  Plastic Sheet. Plastic needs the Chemical Reactor (Hardened), Light Oil and an Electrolyzer, so these items
+  now come later in progression.
+
+### Added
+
+- **Electrolyzer.** A Tempered machine that splits water into Hydrogen and Oxygen with FE, 2:1.
+  - 100 mB of water makes 200 mB of hydrogen and 100 mB of oxygen for 120,000 FE (1,200 FE per mB of water),
+    at 400 FE/t.
+  - Water goes in on Input faces. The gases leave through the new **Hydrogen** and **Oxygen** face modes and
+    are pushed out every tick.
+  - Speed and Energy upgrades, redstone control, a GUI showing the ratio and the FE per mB of hydrogen, Jade,
+    JEI, a Handbook page, and a running sound.
+  - Recipes are data-driven (`arcforge:electrolyzing`). The primary output fills the hydrogen tank and the
+    secondary the oxygen tank.
+- **Hydrogen and Oxygen**, two new gases (Pressurized Conduits, Cylinders and Gas Cartridges only).
+- **Hydrogen fuel.** Hydrogen burns in the Fuel Burner: 60 HU/t, up to 1,400°C.
+  - It stores power but never makes it. The Electrolyzer never charges less than 1.25× the most FE the best
+    heat-to-FE setup could get back from what it makes.
+  - This floor is worked out from the live config and data maps, so packs can't make hydrogen net-positive by
+    changing them.
+  - By default the floor is 310 FE per mB of hydrogen, reached at the third Energy upgrade.
+- **Oxygen port on the Arcforge Furnace.** A smelt that starts with 50 mB of oxygen in the furnace uses it and
+  runs 1.5× as fast.
+  - The furnace's GUI, Jade and JEI show it.
+  - Config: `oxygenTankCapacity`, `oxygenPerSmelt` and `oxygenSpeedMultiplier` in `multiblocks.arcforgeFurnace`.
+- **Plastic Sheet**, tagged `#c:plastics`. The Chemical Reactor makes 2 from 100 mB Light Oil and 50 mB
+  hydrogen.
+- Handbook pages: **Electrolyzer** and **Hydrogen & Oxygen**. The Fuel Burner, Arcforge Furnace and Chemical
+  Processing pages have new sections.
+
+### Changed
+
+- **Plastic in recipes.** Conduit Filters, Storage Upgrades and crafted crate and vault upgrades now need a
+  Plastic Sheet in place of one alloy.
+- **Fuel Burner.** Its default maximum temperature is 1,400°C (was 1,200). The other fuels still burn at their
+  own lower temperatures.
+- **Pressurized Conduits** connect to Fuel Burner input faces.
+
 ## [2.0.0] - 2026-09-28
 
 ### Upgrading

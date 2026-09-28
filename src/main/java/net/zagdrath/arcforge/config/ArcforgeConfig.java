@@ -131,8 +131,9 @@ public class ArcforgeConfig {
             .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
 
     public static final ModConfigSpec.IntValue FUEL_BURNER_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 1_200, 21, 10_000);
+            .comment("Temperature of a full heat buffer, in °C. Each fuel burns no hotter than its own burn_temperature",
+                    "(hydrogen 1,400°C).")
+            .defineInRange("maxTemperature", 1_400, 21, 10_000);
 
     public static final ModConfigSpec.IntValue FUEL_BURNER_TANK_CAPACITY = BUILDER
             .comment("Fuel tank capacity in mB.")
@@ -619,6 +620,50 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Electrolyzer: splits water into Hydrogen and Oxygen with FE. Recipes are data-driven (arcforge:electrolyzing).",
+                "Whatever the settings, an operation never costs less than balanceSafetyFactor times the FE the best setup",
+                "could get back by burning what it makes (see EnergyBalance), so hydrogen is never free power.").push("electrolyzer");
+    }
+
+    public static final ModConfigSpec.IntValue ELECTROLYZER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTROLYZER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in. Keep it at 16x energyPerTick or more, so 8 Speed upgrades can run flat out.")
+            .defineInRange("maxEnergyInput", 8_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTROLYZER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while splitting, before Speed upgrades. With the FE per operation this sets the time.")
+            .defineInRange("energyPerTick", 400, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTROLYZER_ENERGY_PER_MB_INPUT = BUILDER
+            .comment("FE per mB of input (water), before Energy upgrades. A recipe's \"energy\" field overrides it.",
+                    "1,200 FE per mB of water is 600 per mB of hydrogen.")
+            .defineInRange("energyPerMbInput", 1_200, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTROLYZER_WATER_CAPACITY = BUILDER
+            .comment("Water tank size in mB.")
+            .defineInRange("waterTankCapacity", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTROLYZER_GAS_CAPACITY = BUILDER
+            .comment("Hydrogen and Oxygen tank sizes in mB (each).")
+            .defineInRange("gasTankCapacity", 16_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue ELECTROLYZER_GAS_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each gas it pushes out of its Hydrogen and Oxygen faces.")
+            .defineInRange("gasOutputRate", 1_000, 1, 100_000);
+
+    public static final ModConfigSpec.DoubleValue ELECTROLYZER_BALANCE_SAFETY_FACTOR = BUILDER
+            .comment("Least FE an operation costs, as a multiple of the most FE its products can give back when burnt in the",
+                    "best setup (1.25: always at least 25% more). Never below 1.0.")
+            .defineInRange("balanceSafetyFactor", 1.25, 1.0, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
                 "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
     }
@@ -805,6 +850,18 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue FURNACE_FUEL_BURN_TICKS = BUILDER
             .comment("Ticks one fuel item (#arcforge:arcforge_furnace_fuels, e.g. coal coke) keeps the furnace heating.")
             .defineInRange("fuelBurnTicks", 800, 1, 32_000);
+
+    public static final ModConfigSpec.IntValue FURNACE_OXYGEN_CAPACITY = BUILDER
+            .comment("Oxygen tank size in mB (fed through Oxygen ports).")
+            .defineInRange("oxygenTankCapacity", 4_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FURNACE_OXYGEN_PER_SMELT = BUILDER
+            .comment("Oxygen a smelt uses when it starts, in mB. With less than this it runs at normal speed.")
+            .defineInRange("oxygenPerSmelt", 50, 1, 100_000);
+
+    public static final ModConfigSpec.DoubleValue FURNACE_OXYGEN_SPEED = BUILDER
+            .comment("How much faster a smelt with oxygen runs (1.5: in 1/1.5 of the time).")
+            .defineInRange("oxygenSpeedMultiplier", 1.5, 1.0, 100.0);
 
     static {
         BUILDER.pop();

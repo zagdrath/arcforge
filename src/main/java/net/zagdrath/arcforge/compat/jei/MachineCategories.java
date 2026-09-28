@@ -24,6 +24,10 @@ import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.ChemicalReactingRecipe;
+import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.heat.EnergyBalance;
+import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
 import net.zagdrath.arcforge.recipe.CrushingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
@@ -242,6 +246,43 @@ final class MachineCategories {
         }
     }
 
+    // --- Electrolyzer ---
+
+    static final class Electrolyzing extends ArcforgeCategory<RecipeHolder<ElectrolyzingRecipe>> {
+        static final IRecipeHolderType<ElectrolyzingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.ELECTROLYZING.get());
+
+        Electrolyzing(IGuiHelper gui) {
+            super(TYPE, "electrolyzing", ModBlocks.ELECTROLYZER.get(), gui, 120, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ElectrolyzingRecipe> holder, IFocusGroup focuses) {
+            ElectrolyzingRecipe recipe = holder.value();
+            var input = builder.addInputSlot(1, 5).setStandardSlotBackground()
+                    .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, recipe.input().amount()), false, 16, 16);
+            // A tag lists every fluid in it.
+            recipe.input().fluids().forEach(fluid -> input.add(fluid, recipe.input().amount()));
+            fluid(builder, false, 61, 5, recipe.primary());
+            recipe.secondary().ifPresent(secondary -> fluid(builder, false, 81, 5, secondary));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<ElectrolyzingRecipe> holder, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(26, 5);
+        }
+
+        // FE before upgrades, and the least Energy upgrades can bring it to (the balance floor).
+        @Override
+        public void draw(RecipeHolder<ElectrolyzingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            ElectrolyzingRecipe recipe = holder.value();
+            int total = recipe.totalEnergy();
+            int least = Math.max(EnergyBalance.ceil(total * UpgradeType.energyCostMultiplier(UpgradeType.MAX_PER_MACHINE)),
+                    EnergyBalance.minEnergyFor(recipe));
+            text(graphics, Component.translatable("jei.arcforge.electrolyzing.energy", String.format(Locale.ROOT, "%,d", total),
+                    String.format(Locale.ROOT, "%,d", least)), 0, 30);
+        }
+    }
+
     // --- Chemical Reactor ---
 
     static final class ChemicalReacting extends ArcforgeCategory<RecipeHolder<ChemicalReactingRecipe>> {
@@ -322,7 +363,7 @@ final class MachineCategories {
         static final IRecipeHolderType<ArcforgeSmeltingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.ARCFORGE_SMELTING.get());
 
         ArcforgeSmelting(IGuiHelper gui) {
-            super(TYPE, "arcforge_smelting", ModBlocks.ARCFORGE_FURNACE_PORT.get(), gui, 158, 40);
+            super(TYPE, "arcforge_smelting", ModBlocks.ARCFORGE_FURNACE_PORT.get(), gui, 158, 50);
         }
 
         // Metal, the two additives (empty for steel) and coke, as in the furnace.
@@ -352,6 +393,8 @@ final class MachineCategories {
         public void draw(RecipeHolder<ArcforgeSmeltingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             text(graphics, Component.translatable("jei.arcforge.arcforge_smelting.heat", holder.value().minHeat()), 0, 30);
             textRight(graphics, seconds(holder.value().time()), 158, 30);
+            text(graphics, Component.translatable("jei.arcforge.arcforge_smelting.oxygen", ArcforgeConfig.FURNACE_OXYGEN_PER_SMELT.getAsInt(),
+                    ArcforgeFurnaceMenu.boostText(ArcforgeConfig.FURNACE_OXYGEN_SPEED.getAsDouble())), 0, 40);
         }
     }
 

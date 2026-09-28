@@ -166,7 +166,7 @@ whose die presses the item (the one holding the fewest first) and refuse anythin
 ### Steam
 
 **Gases.** Steam comes in three grades, each its own gas: Steam, High-Pressure Steam and Superheated
-Steam. Gases are fluids lighter than air (or tagged `#arcforge:gases`). They travel only in Pressurized
+Steam. Exhaust Steam, Hydrogen and Oxygen are gases too. Gases are fluids lighter than air (or tagged `#arcforge:gases`). They travel only in Pressurized
 Conduits and Pressurized Cylinders, which carry nothing else; Fluid Conduits and Fluid Tanks refuse
 them. A tank or network holds one gas at a time.
 
@@ -274,7 +274,7 @@ underneath, feed on the left, Naphtha on top, Heavy Oil on the right and Pitch a
 (`arcforge:distilling`: `input`, `heat`, `min_temp`, `by_height`, `item_output`, `steam_stripping`).
 
 **Fuel Burner.** Burns liquid fuels into heat, but never hotter than the fuel's burn temperature (the
-optional `burn_temperature` of the `arcforge:burner_fuels` data map; without it, the burner's 1,200°C):
+optional `burn_temperature` of the `arcforge:burner_fuels` data map; without it, the burner's 1,400°C):
 
 | Fuel | HU/mB | mB/t | HU/t | Burns at |
 |---|---|---|---|---|
@@ -282,10 +282,40 @@ optional `burn_temperature` of the `arcforge:burner_fuels` data map; without it,
 | Naphtha | 400 | 0.5 | 200 | 1,200°C |
 | Light Oil | 250 | 0.5 | 125 | 1,000°C |
 | Heavy Oil | 200 | 0.25 | 50 | 750°C |
+| Hydrogen (gas) | 60 | 1.0 | 60 | 1,400°C |
 
 Superheated Steam needs a 900°C boiler, so Naphtha is the fuel that makes it without a Geothermal Plant.
-Naphtha also catches fire in the world. **Pitch** is a long-burning furnace fuel (12 items) and spins into
+Naphtha also catches fire in the world. Hydrogen comes through Pressurized Conduits (they connect to the burner's
+input faces), Cylinders or Gas Cartridges. **Pitch** is a long-burning furnace fuel (12 items) and spins into
 Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running and riding by about 30%.
+
+### Electrolysis
+
+```
+100 mB water --[Electrolyzer]--> 200 mB Hydrogen + 100 mB Oxygen   (120,000 FE)
+100 mB Light Oil + 50 mB Hydrogen --[Chemical Reactor]--> 2 Plastic Sheet
+```
+
+**Electrolyzer** (Tempered). Splits water into Hydrogen and Oxygen with FE: 1,200 FE per mB of water (600
+per mB of hydrogen) at 400 FE/t. Water goes in through Input faces (the top by default); Hydrogen and Oxygen
+leave through their own face modes (left and right by default), pushed every tick into Pressurized Conduits,
+Cylinders or anything else that takes gas. A Gas Cartridge fills from its hydrogen first, then its oxygen. It
+has 8,000 mB of water and 16,000 mB of each gas, and takes Speed and Energy upgrades. Recipes are data-driven
+(`arcforge:electrolyzing`: `input` with `fluid` or `tag` and `amount`, `primary`, optional `secondary` and
+`energy`); the primary output fills the hydrogen tank and the secondary the oxygen tank.
+
+**Hydrogen is a battery, not a power source.** Burnt in a Fuel Burner it gives 60 HU per mB at up to 1,400°C.
+The Electrolyzer never charges less than 1.25× (`balanceSafetyFactor`) the most FE the best heat-to-FE setup
+could get back from what it makes, worked out from the live config and data maps (every Heat upgrade in the
+burner, then the better of a fully carded Thermoelectric Plant and a Superheated boiler into a lubricated,
+exhausting turbine). By default that floor is 310 FE per mB of hydrogen, reached at the third Energy upgrade.
+
+**Oxygen** speeds up the Arcforge Furnace: give it an Oxygen port with the Wrench and pipe oxygen in. A smelt
+that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as fast (config
+`multiblocks.arcforgeFurnace`).
+
+**Plastic Sheet** (`#c:plastics`) goes into Conduit Filters, Storage Upgrades and the crafted crate and vault
+upgrades.
 
 ### Upgrades
 

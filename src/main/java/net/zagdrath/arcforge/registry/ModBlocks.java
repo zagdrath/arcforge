@@ -46,6 +46,7 @@ import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
+import net.zagdrath.arcforge.block.machine.ElectrolyzerBlock;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
 import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
@@ -160,6 +161,10 @@ public final class ModBlocks {
 
     public static final DeferredBlock<ChemicalReactorBlock> CHEMICAL_REACTOR = BLOCKS.registerBlock("chemical_reactor",
             ChemicalReactorBlock::new, p -> machineProperties(p, 6));
+
+    // The cell's status LED glows while it splits water.
+    public static final DeferredBlock<ElectrolyzerBlock> ELECTROLYZER = BLOCKS.registerBlock("electrolyzer",
+            ElectrolyzerBlock::new, p -> machineProperties(p, 4));
 
     public static final DeferredBlock<SteamBoilerArrayCasingBlock> STEAM_BOILER_ARRAY_CASING = BLOCKS.registerBlock("steam_boiler_array_casing",
             SteamBoilerArrayCasingBlock::new, ModBlocks::steamCasingProperties);

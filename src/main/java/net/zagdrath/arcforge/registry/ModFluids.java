@@ -95,6 +95,20 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_EXHAUST_STEAM = FLUIDS.register("flowing_exhaust_steam",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.EXHAUST_STEAM_TYPE, ModFluids.EXHAUST_STEAM, ModFluids.FLOWING_EXHAUST_STEAM)));
 
+    // Hydrogen and Oxygen, from the Electrolyzer. Gases, but not steam grades: hydrogen burns in the Fuel Burner,
+    // oxygen speeds up the Arcforge Furnace.
+    public static final DeferredHolder<FluidType, FluidType> HYDROGEN_TYPE = gasType("hydrogen", 293);
+    public static final DeferredHolder<FluidType, FluidType> OXYGEN_TYPE = gasType("oxygen", 293);
+
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HYDROGEN = FLUIDS.register("hydrogen",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HYDROGEN_TYPE, ModFluids.HYDROGEN, ModFluids.FLOWING_HYDROGEN)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HYDROGEN = FLUIDS.register("flowing_hydrogen",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HYDROGEN_TYPE, ModFluids.HYDROGEN, ModFluids.FLOWING_HYDROGEN)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> OXYGEN = FLUIDS.register("oxygen",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.OXYGEN_TYPE, ModFluids.OXYGEN, ModFluids.FLOWING_OXYGEN)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_OXYGEN = FLUIDS.register("flowing_oxygen",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.OXYGEN_TYPE, ModFluids.OXYGEN, ModFluids.FLOWING_OXYGEN)));
+
     // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
     // so they only exist in tanks, machines and Pressurized Conduits.
     public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = gasType("steam", 373);

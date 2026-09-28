@@ -25,6 +25,7 @@ public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu>
     private static final int HEAT_X = 12, HEAT_Y = 61, HEAT_W = 152, HEAT_H = 4;
     private static final int HEAT_LABEL_X = 13, HEAT_TEXT_Y = 51, HEAT_TEXT_RIGHT = 163;
     private static final int SCREEN_X = 8, SCREEN_Y = 46, SCREEN_W = 160, SCREEN_H = 24;
+    private static final int OXYGEN_GAP = 8;
 
     private final Identifier progress = sprite("progress");
     private final Identifier heatBar = sprite("heat_bar");
@@ -69,7 +70,20 @@ public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu>
         graphics.text(font, Component.translatable("gui.arcforge.heat_label"), HEAT_LABEL_X, HEAT_TEXT_Y, ArcforgeGui.LABEL, false);
         Component celsius = Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getHeat()));
         graphics.text(font, celsius, HEAT_TEXT_RIGHT - font.width(celsius), HEAT_TEXT_Y, ArcforgeGui.TEXT, false);
+        // Oxygen, right-aligned before the temperature: "O2 1,250 mB", then "×1.5" while this smelt is boosted.
+        if (menu.getOxygen() > 0 || menu.getBoost() > 0) {
+            int right = HEAT_TEXT_RIGHT - font.width(celsius) - OXYGEN_GAP;
+            if (menu.getBoost() > 0) {
+                Component boost = Component.translatable("gui.arcforge.furnace.oxygen_boost", ArcforgeFurnaceMenu.boostText(menu.getBoost()));
+                right -= font.width(boost);
+                graphics.text(font, boost, right, HEAT_TEXT_Y, ArcforgeGui.ACCENT, false);
+                right -= 3;
+            }
+            Component oxygen = Component.translatable("gui.arcforge.furnace.oxygen", ArcforgeGui.grouped(menu.getOxygen()));
+            graphics.text(font, oxygen, right - font.width(oxygen), HEAT_TEXT_Y, ArcforgeGui.LABEL, false);
+        }
     }
+
 
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {

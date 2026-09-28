@@ -48,7 +48,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Burns liquid fuel from its tank into heat (HU). What burns, how well and how hot comes from the
 // arcforge:burner_fuels data map: creosote burns at 0.5 mB/t for 120 HU per mB, so 60 HU/t, and only
-// up to 850°C; Naphtha makes 200 HU/t up to 1,200°C (the burner's maximum). It pauses while its heat
+// up to 850°C; Naphtha makes 200 HU/t up to 1,200°C, and hydrogen 60 HU/t up to 1,400°C (the burner's maximum). It pauses while its heat
 // buffer is full, or as hot as the fuel burns (after switching to a cooler fuel it cools down to it as
 // its heat is drawn off). Speed upgrades burn fuel (and make heat) faster, Heat upgrades get more heat
 // from each mB.
@@ -211,9 +211,10 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
     public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
         SideMode mode = modeFor(side);
         return switch (type) {
-            case ITEM, FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            // Pressurized Conduits too, for gas fuels such as hydrogen.
+            case ITEM, FLUID, GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case ENERGY, GAS -> ConnectionMode.NONE;
+            case ENERGY -> ConnectionMode.NONE;
         };
     }
 

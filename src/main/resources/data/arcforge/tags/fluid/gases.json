@@ -2,6 +2,8 @@
   "values": [
     "arcforge:steam",
     "arcforge:high_pressure_steam",
-    "arcforge:superheated_steam"
+    "arcforge:superheated_steam",
+    "arcforge:hydrogen",
+    "arcforge:oxygen"
   ]
 }

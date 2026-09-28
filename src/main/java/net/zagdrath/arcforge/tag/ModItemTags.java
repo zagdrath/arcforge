@@ -27,5 +27,8 @@ public final class ModItemTags {
     // Dies: what a Metal Press die slot takes.
     public static final TagKey<Item> DIES = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "dies"));
 
+    // Plastic (Plastic Sheets), for Conduit Filters and Storage Upgrades.
+    public static final TagKey<Item> PLASTICS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "plastics"));
+
     private ModItemTags() {}
 }

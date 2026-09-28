@@ -4,12 +4,13 @@
   "pattern": [
     "ACA",
     "K K",
-    "AAA"
+    "APA"
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
     "C": "#c:gems/arcite",
-    "K": "#c:chests/wooden"
+    "K": "#c:chests/wooden",
+    "P": "#c:plastics"
   },
   "result": {
     "id": "arcforge:arcforged_storage_upgrade",

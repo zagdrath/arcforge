@@ -116,6 +116,17 @@ public final class MachineRecipes {
         return melting(level, stack).isPresent();
     }
 
+    // The electrolyzing recipe for this fluid, if any. Works on the client too (null level), for the GUI.
+    public static Optional<RecipeHolder<ElectrolyzingRecipe>> electrolyzing(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.ELECTROLYZING.get()).stream()
+                .filter(holder -> holder.value().input().test(fluid))
+                .findFirst();
+    }
+
+    public static boolean isElectrolyzerInput(@Nullable Level level, FluidResource fluid) {
+        return electrolyzing(level, fluid).isPresent();
+    }
+
     // The chemical reacting recipe for what the reactor holds, if any.
     public static Optional<RecipeHolder<ChemicalReactingRecipe>> chemicalReacting(@Nullable Level level, ChemicalReactorInput input) {
         return recipes(level).byType(ModRecipes.CHEMICAL_REACTING.get()).stream()

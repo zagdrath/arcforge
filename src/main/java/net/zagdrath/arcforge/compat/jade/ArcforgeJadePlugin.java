@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.ArcMelterBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
+import net.zagdrath.arcforge.block.machine.ElectrolyzerBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarBlock;
@@ -17,9 +18,12 @@ import net.zagdrath.arcforge.block.storage.VaultBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
+import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
+import net.zagdrath.arcforge.blockentity.multiblock.ArcforgeFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
@@ -44,6 +48,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerItemStorage(VaultProviders.HideItems.INSTANCE, VaultBlockEntity.class);
         registration.registerBlockDataProvider(ArcMelterProvider.INSTANCE, ArcMelterBlockEntity.class);
         registration.registerBlockDataProvider(ChemicalReactorProvider.INSTANCE, ChemicalReactorBlockEntity.class);
+        registration.registerBlockDataProvider(ElectrolyzerProvider.INSTANCE, ElectrolyzerBlockEntity.class);
+        registration.registerBlockDataProvider(ArcforgeFurnaceProvider.INSTANCE, ArcforgeFurnaceBlockEntity.class);
         // Any casing: the cube arrays' casings each have a block entity; a turbine's glass doesn't.
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SuperheaterArrayBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, CondenserArrayBlockEntity.class);
@@ -68,6 +74,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(VaultProviders.Info.INSTANCE, VaultBlock.class);
         registration.registerBlockComponent(ArcMelterProvider.Client.INSTANCE, ArcMelterBlock.class);
         registration.registerBlockComponent(ChemicalReactorProvider.Client.INSTANCE, ChemicalReactorBlock.class);
+        registration.registerBlockComponent(ElectrolyzerProvider.Client.INSTANCE, ElectrolyzerBlock.class);
+        registration.registerBlockComponent(ArcforgeFurnaceProvider.Client.INSTANCE, ArcforgeFurnacePortBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SuperheaterArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, CondenserArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SteamTurbineArrayCasingBlock.class);

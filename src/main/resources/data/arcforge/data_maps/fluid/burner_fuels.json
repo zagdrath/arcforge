@@ -19,6 +19,11 @@
       "hu_per_mb": 200,
       "mb_per_tick": 0.25,
       "burn_temperature": 750
+    },
+    "arcforge:hydrogen": {
+      "hu_per_mb": 60,
+      "mb_per_tick": 1.0,
+      "burn_temperature": 1400
     }
   }
 }

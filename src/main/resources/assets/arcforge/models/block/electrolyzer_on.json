@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/electrolyzer_front_on",
+    "south": "arcforge:block/electrolyzer_back",
+    "east": "arcforge:block/electrolyzer_side",
+    "west": "arcforge:block/electrolyzer_side",
+    "up": "arcforge:block/electrolyzer_top",
+    "down": "arcforge:block/electrolyzer_bottom",
+    "particle": "arcforge:block/electrolyzer_side"
+  }
+}

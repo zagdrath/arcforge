@@ -41,6 +41,9 @@ import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.registry.ModFluids;
+import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
@@ -66,7 +69,9 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 // + coke -> Hardened Alloy; the two additives go in either additive slot) only progresses while the
 // furnace is at least as hot as the recipe needs. Coal coke is both the fuel and the reagent: the furnace
 // keeps back what the smelt needs. A coal coke block in the coke slot is broken open into nine loose coal
-// coke when needed, which are burned and used before anything else in the slot.
+// coke when needed, which are burned and used before anything else in the slot. Oxygen piped into an Oxygen port
+// speeds smelts up: one that starts with oxygenPerSmelt in the tank uses it and runs oxygenSpeedMultiplier times as
+// fast.
 public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController {
     public static final int SLOT_METAL = 0;
     public static final int SLOT_ADDITIVE = 1;
@@ -87,7 +92,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     // Coal coke in a coal coke block.
     private static final int BLOCK_COKE = 9;
 
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT, SideMode.OXYGEN);
     private static final int STRUCTURE_CHECK_INTERVAL = 20;
     private static final int REDSTONE_CHECK_INTERVAL = 4;
 
@@ -96,6 +101,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     private final ResourceHandler<ItemResource> itemOutput;
     private final ResourceHandler<ItemResource> itemByproduct;
     private final ResourceHandler<ItemResource> itemAutomation;
+    private final FilteredFluidTank oxygen;
+    private final ResourceHandler<FluidResource> oxygenInput;
     private final SideConfig sideConfig = new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.NONE, SideMode.NONE, SideMode.BYPRODUCT, SideMode.NONE);
     private final ContainerData data;
 
@@ -111,6 +118,9 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     private int progress;
     private int progressTotal = ArcforgeSmeltingRecipe.DEFAULT_TIME;
     private int minHeat = ArcforgeSmeltingRecipe.DEFAULT_MIN_HEAT;
+    // Whether the current (or next) smelt has paid for its oxygen boost. It stays paid for if the smelt is
+    // interrupted, until one finishes.
+    private boolean boosted;
 
     public ArcforgeFurnaceBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), pos, state);
@@ -119,6 +129,9 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT);
         this.itemByproduct = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_BYPRODUCT);
         this.itemAutomation = new RoutedInput(items, slot -> slot == SLOT_OUTPUT || slot == SLOT_BYPRODUCT);
+        this.oxygen = new FilteredFluidTank(ArcforgeConfig.FURNACE_OXYGEN_CAPACITY.getAsInt(),
+                resource -> resource.getFluid() == ModFluids.OXYGEN.get(), this::setChanged);
+        this.oxygenInput = new AutomationResourceHandler<>(oxygen, index -> true, index -> false);
         this.data = new WideIntContainerData(ArcforgeFurnaceMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -133,6 +146,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
                     case ArcforgeFurnaceMenu.DATA_BURN_TOTAL -> burnTotal;
                     case ArcforgeFurnaceMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case ArcforgeFurnaceMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ArcforgeFurnaceMenu.DATA_OXYGEN -> oxygen.getAmount();
+                    case ArcforgeFurnaceMenu.DATA_BOOST -> boosted ? (int) Math.round(oxygenSpeed() * 100.0) : 0;
                     default -> 0;
                 };
             }
@@ -314,7 +329,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         ArcforgeSmeltingRecipe recipe = enabled ? currentRecipe(level) : null;
         boolean canSmelt = recipe != null && productsFit(recipe) && fuelAndReagentCount() >= recipe.coke();
         if (recipe != null) {
-            progressTotal = recipe.time();
+            progressTotal = timeFor(recipe);
             minHeat = recipe.minHeat();
         }
 
@@ -330,9 +345,16 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         }
 
         if (canSmelt) {
-            if (heat >= recipe.minHeat() && ++progress >= recipe.time()) {
-                smelt(recipe);
-                progress = 0;
+            if (heat >= recipe.minHeat()) {
+                if (progress == 0 && !boosted) {
+                    boostWithOxygen();
+                    progressTotal = timeFor(recipe);
+                }
+                if (++progress >= progressTotal) {
+                    smelt(recipe);
+                    progress = 0;
+                    boosted = false;
+                }
             }
         } else {
             progress = 0;
@@ -349,6 +371,54 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         if (heat != previousHeat || burnTime > 0 || progress > 0) {
             setChanged();
         }
+    }
+
+    // Pays for the starting smelt's boost, if there's enough oxygen.
+    private void boostWithOxygen() {
+        int needed = ArcforgeConfig.FURNACE_OXYGEN_PER_SMELT.getAsInt();
+        if (oxygen.getAmount() < needed) {
+            return;
+        }
+        try (Transaction tx = Transaction.openRoot()) {
+            oxygen.extract(0, oxygen.getResource(0), needed, tx);
+            tx.commit();
+        }
+        boosted = true;
+    }
+
+    private static double oxygenSpeed() {
+        return ArcforgeConfig.FURNACE_OXYGEN_SPEED.getAsDouble();
+    }
+
+    // Ticks the smelt takes: the recipe's time, divided by the oxygen speed-up if it's boosted.
+    private int timeFor(ArcforgeSmeltingRecipe recipe) {
+        return boosted ? Math.max(1, (int) Math.ceil(recipe.time() / oxygenSpeed())) : recipe.time();
+    }
+
+    public FilteredFluidTank getOxygen() {
+        return oxygen;
+    }
+
+    public boolean isBoosted() {
+        return boosted;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public int getProgressTotal() {
+        return progressTotal;
+    }
+
+    public int getHeat() {
+        return heat;
+    }
+
+    // For tests: skip the warm-up.
+    public void setHeat(int celsius) {
+        heat = Math.max(AMBIENT_HEAT, Math.min(ArcforgeConfig.FURNACE_MAX_HEAT.getAsInt(), celsius));
+        setChanged();
     }
 
     private boolean isPowered(ServerLevel level) {
@@ -481,13 +551,17 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         };
     }
 
+    // Oxygen ports fill the oxygen tank (and so does an unsided query); nothing comes back out.
     @Override
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable SideMode mode) {
-        return null;
+        return mode == null || mode == SideMode.OXYGEN ? oxygenInput : null;
     }
 
     @Override
     public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
+        if (type == ConduitType.GAS) {
+            return mode == SideMode.OXYGEN ? ConnectionMode.INPUT : ConnectionMode.NONE;
+        }
         if (type != ConduitType.ITEM) {
             return ConnectionMode.NONE;
         }
@@ -546,6 +620,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         burnTotal = input.getIntOr("burn_total", 0);
         progress = input.getIntOr("progress", 0);
         looseCoke = input.getIntOr("loose_coke", 0);
+        oxygen.deserialize(input.childOrEmpty("oxygen"));
+        boosted = input.getBooleanOr("boosted", false);
     }
 
     @Override
@@ -562,6 +638,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         output.putInt("burn_total", burnTotal);
         output.putInt("progress", progress);
         output.putInt("loose_coke", looseCoke);
+        oxygen.serialize(output.child("oxygen"));
+        output.putBoolean("boosted", boosted);
     }
 
     @Override

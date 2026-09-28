@@ -2,13 +2,14 @@
   "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
-    "AAA",
+    "APA",
     "KXK",
     "AAA"
   ],
   "key": {
     "A": "arcforge:hardened_alloy",
     "K": "#c:chests/wooden",
+    "P": "#c:plastics",
     "X": "arcforge:tempered_crate"
   },
   "result": {
