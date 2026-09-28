@@ -28,3 +28,12 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+
+      # Every build's jar, downloadable from the run's Summary page for 30 days.
+      - name: Upload jar
+        uses: actions/upload-artifact@v4
+        with:
+          name: arcforge-${{ github.sha }}
+          path: build/libs/*.jar
+          if-no-files-found: error
+          retention-days: 30

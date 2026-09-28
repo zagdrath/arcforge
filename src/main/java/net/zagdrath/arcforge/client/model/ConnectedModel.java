@@ -73,6 +73,8 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
     private static final String COLUMN = "column_2x2", TRAY = "tray_window";
+    // The tray band's glass: the top 10 px of a side face (the sill and strap are below it).
+    private static final int BAND = 10;
     private static final Identifier TRAY_FRAME = Identifier.fromNamespaceAndPath("arcforge", "block/ctm/tray_window_frame");
 
     // Overlays sit just outside the face they decorate, so they never z-fight with it.
@@ -387,14 +389,18 @@ public final class ConnectedModel {
     // face whose neighbour in that direction isn't part of the column (so beams only run up the four
     // vertical edges and round the top and bottom); the top shows its quarter of the roof hatch. Tray level
     // casings show their glass, with a frame wherever the neighbour on that side isn't a tray, so the
-    // windows of one layer merge. The controller's display is set into the tray band the same way: its face
-    // (no beams) has the frame wherever its neighbour isn't a tray, and trays leave out their frame toward
-    // it on that face; in a plain layer it reads as a framed screen. Its other faces are plate.
+    // windows of one layer merge. The controller is set into the tray band the same way on each of its side
+    // faces: its display on the front, a louvred panel (the "side" texture) on the others, each with the
+    // frame wherever its neighbour isn't a tray, and trays leave out their frame toward it. On a side face
+    // the band's frame closes the glass only: none along the bottom (the sill does that), and the left and
+    // right run down the top BAND px, stopping at the sill.
     private static final class ColumnBaked implements DynamicBlockStateModel {
         private final boolean tray;
         private final Material.Baked particle;
         private final Map<Direction, List<BakedQuad>> base = new EnumMap<>(Direction.class);
         private final Map<Direction, List<BakedQuad>> front = new EnumMap<>(Direction.class);
+        // The controller's other side faces: a panel in the tray band.
+        private final Map<Direction, List<BakedQuad>> panel = new EnumMap<>(Direction.class);
         // Beams (casings) or the window frame (trays), by side of the face.
         private final Map<Direction, List<BakedQuad>[]> edges = new EnumMap<>(Direction.class);
         // The controller's display: the window frame round it, by side.
@@ -413,6 +419,7 @@ public final class ConnectedModel {
             Material.Baked edgeTexture = Baked.material(baker, textures.get(tray ? "frame" : "beam"), name);
             Material.Baked frontTexture = textures.containsKey("front") ? Baked.material(baker, textures.get("front"), name) : null;
             Material.Baked frameTexture = frontTexture != null ? Baked.material(baker, textures.getOrDefault("frame", TRAY_FRAME), name) : null;
+            Material.Baked sideTexture = textures.containsKey("side") ? Baked.material(baker, textures.get("side"), name) : null;
             this.ports = new PortOverlays(baker, name);
             int flags = ports.materialFlags();
             for (Direction face : Direction.values()) {
@@ -424,15 +431,19 @@ public final class ConnectedModel {
                 if (frontTexture != null) {
                     front.put(face, List.of(Baked.bake(baker, face, 0, 0, 16, 16, 0, frontTexture, 0, 0, 16, 16, Quadrant.R0)));
                 }
+                if (sideTexture != null && face.getAxis().isHorizontal()) {
+                    panel.put(face, List.of(Baked.bake(baker, face, 0, 0, 16, 16, 0, sideTexture, 0, 0, 16, 16, Quadrant.R0)));
+                }
                 List<BakedQuad>[] sides = new List[4];
                 for (Side side : Side.values()) {
-                    sides[side.ordinal()] = List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, edgeTexture, 0, 0, 16, 16, side.rotation));
+                    sides[side.ordinal()] = tray ? bandFrame(baker, face, side, edgeTexture)
+                            : List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, edgeTexture, 0, 0, 16, 16, side.rotation));
                 }
                 edges.put(face, sides);
                 if (frameTexture != null) {
                     List<BakedQuad>[] frames = new List[4];
                     for (Side side : Side.values()) {
-                        frames[side.ordinal()] = List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, frameTexture, 0, 0, 16, 16, side.rotation));
+                        frames[side.ordinal()] = bandFrame(baker, face, side, frameTexture);
                     }
                     frontFrame.put(face, frames);
                 }
@@ -447,7 +458,7 @@ public final class ConnectedModel {
                     }
                 }
             }
-            for (Map<Direction, List<BakedQuad>> set : List.of(base, front)) {
+            for (Map<Direction, List<BakedQuad>> set : List.of(base, front, panel)) {
                 for (List<BakedQuad> quads : set.values()) {
                     for (BakedQuad quad : quads) {
                         flags |= quad.materialInfo().flags();
@@ -475,6 +486,22 @@ public final class ConnectedModel {
             return DistillationStructure.isFormedPart(state);
         }
 
+        // The glass band's frame on one side of a face. On a side face it closes the glass only: nothing along
+        // the bottom (the sill closes it), and the left and right frames cover just the top BAND px, so they
+        // stop at the sill instead of running down over it and the strap. The top and bottom faces keep a
+        // frame all round. (The frame texture is the same all along its length, so the clipped quads take
+        // any BAND px of it, turned like the full ones.)
+        private static List<BakedQuad> bandFrame(ModelBaker baker, Direction face, Side side, Material.Baked texture) {
+            if (face.getAxis().isVertical()) {
+                return List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, texture, 0, 0, 16, 16, side.rotation));
+            }
+            return switch (side) {
+                case TOP -> List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, texture, 0, 0, 16, 16, side.rotation));
+                case LEFT, RIGHT -> List.of(Baked.bake(baker, face, 0, 0, 16, BAND, BEAM_OFFSET, texture, 0, 0, BAND, 16, side.rotation));
+                case BOTTOM -> List.of();
+            };
+        }
+
         // A formed port shows its plate on its face (if that's drawn, i.e. on the outside).
         private void addPort(BlockAndTintGetter level, BlockPos pos, boolean formed, Direction face, List<BakedQuad> out) {
             BakedQuad port = formed ? ports.get(MultiblockPorts.get(level, pos, face), face) : null;
@@ -483,14 +510,14 @@ public final class ConnectedModel {
             }
         }
 
-        // Whether a neighbour's face on this side of the column is glass-banded: a tray, or the controller's
-        // display.
+        // Whether a neighbour's face on this side of the column is glass-banded: a tray, or any side face of the
+        // controller (its display or its panel).
         private static boolean isTray(BlockState state, Direction face) {
             if (!isPart(state)) {
                 return false;
             }
             return state.getBlock() instanceof TrayLevelCasingBlock
-                    || state.getBlock() instanceof DistillationArrayControllerBlock && state.getValue(DistillationArrayControllerBlock.FACING) == face;
+                    || state.getBlock() instanceof DistillationArrayControllerBlock && face.getAxis().isHorizontal();
         }
 
         @Override
@@ -503,8 +530,10 @@ public final class ConnectedModel {
                     continue;
                 }
                 List<BakedQuad> faceQuads = new ArrayList<>();
-                if (face == facing && front.containsKey(face)) {
-                    faceQuads.addAll(front.get(face));
+                // The controller's banded faces: its display on the front, its panel on the other sides.
+                List<BakedQuad> banded = face == facing ? front.get(face) : formed ? panel.get(face) : null;
+                if (banded != null) {
+                    faceQuads.addAll(banded);
                     for (Side side : Side.values()) {
                         BlockState neighbour = level.getBlockState(pos.relative(Baked.sideDirection(face, side)));
                         if (formed && !isTray(neighbour, face)) {

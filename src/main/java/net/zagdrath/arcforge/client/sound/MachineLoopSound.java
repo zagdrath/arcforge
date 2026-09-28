@@ -29,8 +29,8 @@ import net.zagdrath.arcforge.registry.ModSounds;
 // A machine's running loop: plays from the machine (an array's centre block) while it runs (its block is lit),
 // fading in when it starts and out when it stops or the block goes.
 public class MachineLoopSound extends AbstractTickableSoundInstance {
-    // Each machine's loop and how loud it plays (the loops are mastered to the same peak, so the steady hums
-    // are turned down and the press's stamps up).
+    // Each machine's loop and how loud it plays (the loops are mastered to the same peak, so the steady ones,
+    // the hums and the presses' drone, are turned down).
     private record Loop(Supplier<SoundEvent> sound, float volume) {}
 
     private static final Map<Block, Loop> LOOPS = new HashMap<>();
@@ -64,10 +64,10 @@ public class MachineLoopSound extends AbstractTickableSoundInstance {
         }
         LOOPS.put(ModBlocks.ARC_CRUSHER.get(), new Loop(ModSounds.ARC_CRUSHER_RUN::get, 0.8F));
         LOOPS.put(ModBlocks.ARC_CRUSHING_ARRAY_CASING.get(), new Loop(ModSounds.ARC_CRUSHING_ARRAY_RUN::get, 1.0F));
-        LOOPS.put(ModBlocks.INDUCTION_FURNACE.get(), new Loop(ModSounds.INDUCTION_FURNACE_RUN::get, 0.45F));
-        LOOPS.put(ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get(), new Loop(ModSounds.INDUCTION_FURNACE_ARRAY_RUN::get, 0.6F));
-        LOOPS.put(ModBlocks.METAL_PRESS.get(), new Loop(ModSounds.METAL_PRESS_RUN::get, 1.0F));
-        LOOPS.put(ModBlocks.METAL_PRESSING_ARRAY_CASING.get(), new Loop(ModSounds.METAL_PRESSING_ARRAY_RUN::get, 1.0F));
+        LOOPS.put(ModBlocks.INDUCTION_FURNACE.get(), new Loop(ModSounds.INDUCTION_FURNACE_RUN::get, 0.55F));
+        LOOPS.put(ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get(), new Loop(ModSounds.INDUCTION_FURNACE_ARRAY_RUN::get, 0.7F));
+        LOOPS.put(ModBlocks.METAL_PRESS.get(), new Loop(ModSounds.METAL_PRESS_RUN::get, 0.75F));
+        LOOPS.put(ModBlocks.METAL_PRESSING_ARRAY_CASING.get(), new Loop(ModSounds.METAL_PRESSING_ARRAY_RUN::get, 0.85F));
     }
 
     // Called every client tick by each machine that has a loop (see MachineSounds.clientHook).

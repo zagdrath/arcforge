@@ -10,7 +10,8 @@
     "roof_ne": "arcforge:block/distillation_array/roof_ne",
     "roof_sw": "arcforge:block/distillation_array/roof_sw",
     "roof_se": "arcforge:block/distillation_array/roof_se",
-    "front": "arcforge:block/distillation_array/controller"
+    "front": "arcforge:block/distillation_array/controller",
+    "side": "arcforge:block/distillation_array/controller_side"
   },
   "fallback": "arcforge:block/distillation_array/casing"
 }

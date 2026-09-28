@@ -39,8 +39,10 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
   at Steam, High-Pressure or Superheated. A held boiler heats without boiling until it reaches that grade's
   temperature, then makes that grade at whatever rate its heat comes in.
 - **Running sounds** for the Steam Turbine Array (pitch and volume follow the rotor), the Arc Crusher, Arc
-  Crushing Array, Induction Furnace, Induction Furnace Array, Metal Press and Metal Pressing Array. Each
-  fades in while the machine runs and out when it stops, with subtitles.
+  Crushing Array, Induction Furnace, Induction Furnace Array, Metal Press and Metal Pressing Array: grinding
+  and arc crackle for the crushers, a deep electrical hum for the induction furnaces, and heavy machinery for
+  the presses. Each fades in while the machine runs and out when it stops, with subtitles. They replace the
+  occasional vanilla sounds these machines played.
 - **Config screen:** values grouped into Heat & Power, Steam, Machines, Multiblocks and Ore Generation,
   with a page per machine; every value has a name; **Reset All** puts every value back to its default.
 - Jade shows the Solar Thermal Array's name and heat on every block of it, not just the controller.
@@ -71,6 +73,11 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
 - Port nozzles on the cube arrays and the solar tower are closed at the back.
 - The solar trough no longer flickers where it meets the mast.
 - Ports no longer show on two faces of an edge or corner block.
+- The Distillation Array's vapour no longer flickers (strobes) as you move around it.
+- The Distillation Array's controller sits in the tray band on every side face, not just its front: its other
+  faces show a louvred panel lined up with the trays.
+- Softer, cleaner frames round the Distillation Array's tray windows: no dark line along the bottom, the sides
+  stop at the sill, and no notch where a tray layer meets a casing layer.
 
 ## [1.2.0] - 2026-09-27
 

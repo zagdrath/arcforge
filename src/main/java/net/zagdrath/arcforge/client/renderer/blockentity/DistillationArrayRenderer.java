@@ -270,8 +270,10 @@ public class DistillationArrayRenderer implements BlockEntityRenderer<Distillati
         }
     }
 
-    // A vertical sheet of vapour from (x0, z0) to (x1, z1), seen from both sides: the texture repeats about
-    // once a block along it, and its bottom rows sit on the pool.
+    // A vertical sheet of vapour from (x0, z0) to (x1, z1): the texture repeats about once a block along it,
+    // and its bottom rows sit on the pool. One quad per piece: the translucent entity pipeline doesn't cull,
+    // so it's seen from both sides already (a second, back-facing copy on the same plane z-fought with it,
+    // strobing as the view moved).
     private static void vapour(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
             float x0, float z0, float x1, float z1, float y0, float y1) {
         float length = (float) Math.hypot(x1 - x0, z1 - z0);
@@ -282,15 +284,10 @@ public class DistillationArrayRenderer implements BlockEntityRenderer<Distillati
             float ax = x0 + (x1 - x0) * a, az = z0 + (z1 - z0) * a;
             float bx = x0 + (x1 - x0) * b, bz = z0 + (z1 - z0) * b;
             float u0 = sprite.getU(0.0F), u1 = sprite.getU(1.0F);
-            // Front, then back.
             vertex(pose, buffer, ax, y0, az, u0, v1, color, light);
             vertex(pose, buffer, bx, y0, bz, u1, v1, color, light);
             vertex(pose, buffer, bx, y1, bz, u1, v0, color, light);
             vertex(pose, buffer, ax, y1, az, u0, v0, color, light);
-            vertex(pose, buffer, ax, y1, az, u0, v0, color, light);
-            vertex(pose, buffer, bx, y1, bz, u1, v0, color, light);
-            vertex(pose, buffer, bx, y0, bz, u1, v1, color, light);
-            vertex(pose, buffer, ax, y0, az, u0, v1, color, light);
         }
     }
 
