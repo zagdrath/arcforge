@@ -61,11 +61,11 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_SOURCE_HEAT = BUILDER
             .comment("Passive HU/t from each touching lava source block (all 6 sides count; blocks are never consumed).")
-            .defineInRange("lavaSourceHeat", 10, 0, 10_000);
+            .defineInRange("lavaSourceHeat", 40, 0, 10_000);
 
     public static final ModConfigSpec.IntValue GEOTHERMAL_MAGMA_HEAT = BUILDER
             .comment("Passive HU/t from each touching magma block (never consumed).")
-            .defineInRange("magmaHeat", 4, 0, 10_000);
+            .defineInRange("magmaHeat", 16, 0, 10_000);
 
     static {
         BUILDER.pop();

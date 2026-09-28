@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "The hottest heat source, up to 1,400°C. It burns lava from its tank, and lava and magma blocks touching it add heat for free, without being used up.\nFill it with lava buckets in the slot, by right-clicking with a bucket, or with pipes. Pair it with an Electric Pump over a lava lake. An Arc Melter set on top keeps it fed with lava made from cobblestone."
+      "text": "The hottest heat source, up to 1,400°C. It burns lava from its tank, and lava and magma blocks touching it add heat for free, without being used up: 40 HU/t per lava source and 16 per magma block, on any of its six sides. Boxed in by lava it runs forever with no tank at all, the base of a self-sufficient steam plant. A plant making more than 100 HU/t needs Tempered or Hardened thermodynamic conduits to move it all; a touching machine takes at most 100 HU/t.\nFill it with lava buckets in the slot, by right-clicking with a bucket, or with pipes. Pair it with an Electric Pump over a lava lake. An Arc Melter set on top keeps it fed with lava made from cobblestone."
     }
   ]
 }

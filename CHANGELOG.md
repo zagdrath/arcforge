@@ -33,6 +33,11 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Superheater cost.** The default `steam.superheaterArray.heatCostMultiplier` is now 0.6 (was 1.0).
   - An existing `arcforge-common.toml` keeps 1.0; set it to 0.6 by hand.
 
+- **Geothermal passive heat.** The defaults are now 40 HU/t per lava source and 16 per magma block (were 10
+  and 4).
+  - An existing `arcforge-common.toml` keeps 10 and 4; set `power.geothermalPlant.lavaSourceHeat` to 40 and
+    `magmaHeat` to 16 by hand.
+
 ### Added
 
 - **Electrolyzer.** A Tempered machine that splits water into Hydrogen and Oxygen with FE, 2:1.
@@ -105,6 +110,14 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Changed
 
+- **Arcforge Furnace bricks redrawn** from Cody's brick texture in the furnace's fire-brick palette. The brick
+  walls and the ports (idle and lit) use the new bricks; the port openings are unchanged.
+- **Treated wood redrawn** from Cody's wood textures in the treated palette: planks (and so stairs, slabs,
+  fences, gates, buttons and pressure plates), logs and wood, stripped logs, the door, trapdoor and door item.
+- **Geothermal Plant: touching lava and magma give 4× the heat.** 40 HU/t per lava source (was 10) and 16 per
+  magma block (was 4). A plant boxed in by lava makes 200 HU/t at 1,400°C with no fuel, so a field of them
+  runs a Steam Turbine Array with no outside input: a self-sufficient plant. The hydrogen balance floor is
+  unchanged.
 - **Superheater Array: 3 HU per mB per grade step** (was 5). Boiling Steam and superheating it now costs 14 HU per
   mB of Superheated Steam, against 16 from a boiler alone, so the Superheater is the efficient way to make it.
   - The hydrogen balance floor follows automatically: 354 FE per mB of hydrogen (was 310).
@@ -116,6 +129,13 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Fixed
 
+- **Slot placeholders match the items again.** Every empty-slot hint is now a silhouette of the item that
+  goes there: the Arcforge Furnace shows an ingot, an additive crystal and Coal Coke (not dust piles and
+  blobs); the coal, bucket, die, filter, battery, capsule and cartridge hints follow their current item art;
+  the Infuser shows a block. They share one style across every GUI.
+- **JEI text overlaps.** Distillation's steam-stripping bonus, which ran into the column line, and the Chemical
+  Reactor's Leaching/Precipitating label, which could run into the cost, each get their own line. The steam
+  line now names the fluid it boosts ("Steam stripping: up to +50% Naphtha").
 - **Wrench on Energy faces.** It said "Energy output" for every machine. It now says which way the energy goes:
   "Energy input" on machines that use it, "Energy output" on generators (multiblock ports too).
 - **Flickering and see-through edges on the formed arrays.** Parts of their models had faces in the same place,

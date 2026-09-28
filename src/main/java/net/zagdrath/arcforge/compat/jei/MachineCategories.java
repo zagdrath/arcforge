@@ -290,7 +290,7 @@ final class MachineCategories {
         private static final int WIDTH = 152;
 
         ChemicalReacting(IGuiHelper gui) {
-            super(TYPE, "chemical_reacting", ModBlocks.CHEMICAL_REACTOR.get(), gui, WIDTH, 50);
+            super(TYPE, "chemical_reacting", ModBlocks.CHEMICAL_REACTOR.get(), gui, WIDTH, 60);
         }
 
         @Override
@@ -323,12 +323,15 @@ final class MachineCategories {
             ChemicalReactingRecipe recipe = holder.value();
             text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
                     String.format(Locale.ROOT, "%,d", recipe.time() * recipe.baseEnergyPerTick())), 0, 30);
+            // The category gets its own line; right-aligned beside the cost the two ran together.
+            int y = 40;
             if (!recipe.category().equals("general")) {
-                textRight(graphics, Component.translatable("jei.arcforge.chemical_reacting." + recipe.category()), WIDTH, 30);
+                text(graphics, Component.translatable("jei.arcforge.chemical_reacting." + recipe.category()), 0, y);
+                y += 10;
             }
             int[] yield = leachingYield(recipe);
             if (yield != null) {
-                text(graphics, Component.translatable("jei.arcforge.yield", yield[0], yield[1]), 0, 40);
+                text(graphics, Component.translatable("jei.arcforge.yield", yield[0], yield[1]), 0, y);
             }
         }
 
@@ -509,7 +512,7 @@ final class MachineCategories {
         static final IRecipeType<DistillingPage> TYPE = IRecipeType.create(Arcforge.MODID, "distilling", DistillingPage.class);
 
         Distilling(IGuiHelper gui) {
-            super(TYPE, "distilling", ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), gui, 150, 52);
+            super(TYPE, "distilling", ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), gui, 150, 58);
         }
 
         @Override
@@ -542,10 +545,9 @@ final class MachineCategories {
             DistillingRecipe recipe = page.recipe();
             text(graphics, Component.translatable("jei.arcforge.distilling.column", page.height(), seconds(ticks(page))), 0, 26);
             text(graphics, Component.translatable("jei.arcforge.distilling.heat", recipe.heat(), recipe.minTemp()), 0, 36);
-            if (recipe.steamStripping().isPresent()) {
-                int best = Math.round(recipe.bonusFor(SteamGrade.SUPERHEATED) * 100);
-                textRight(graphics, Component.translatable("jei.arcforge.distilling.steam", best), 150, 26);
-            }
+            // Steam stripping on its own line: beside the column text it ran into it.
+            recipe.steamStripping().ifPresent(stripping -> text(graphics, Component.translatable("jei.arcforge.distilling.steam",
+                    Math.round(recipe.bonusFor(SteamGrade.SUPERHEATED) * 100), stripping.boosts().getFluidType().getDescription()), 0, 46));
         }
     }
 

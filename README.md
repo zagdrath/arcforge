@@ -21,7 +21,7 @@ Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Ma
 ```
 coal / charcoal / coal block --[Combustion Plant]--> FE      (simple, least FE per coal)
 coal / charcoal / coal block --[Firebox]--> heat (HU)            (up to 1,100°C)
-lava (tank, pipes, nearby blocks) --[Geothermal Plant]--> heat   (up to 600°C)
+lava (tank, pipes, nearby blocks) --[Geothermal Plant]--> heat   (up to 1,400°C)
 heat --[Thermoelectric Plant]--> FE                              (hotter heat = more FE)
 ```
 
@@ -35,18 +35,23 @@ It only ever flows from a hotter machine into a colder one.
 |---|---|---|---|---|
 | Combustion Plant | 40 FE/t | 50,000 FE | — | Fuel burns at 2× furnace speed: 32,000 FE per coal |
 | Firebox | 80 HU/t | 40,000 HU | 1,100°C | Fuel burns at 2× furnace speed: 64,000 HU per coal |
-| Geothermal Plant | 40 HU/t from lava, plus passive | 20,000 HU | 600°C | 1 mB/t of lava: 40,000 HU per bucket |
+| Geothermal Plant | 80 HU/t from lava, plus passive | 60,000 HU | 1,400°C | 1 mB/t of lava: 80,000 HU per bucket |
 | Thermoelectric Plant | FE from heat | 20,000 HU + 50,000 FE | 1,100°C | Takes up to 80 HU/t |
 
 - **Fuel** for the Combustion Plant and Firebox is `#arcforge:combustion_fuel` (coal,
   charcoal, blocks of coal). Both pause while their buffer is full, keeping the rest of the burning item.
 - **Geothermal Plant:** fill its 8,000 mB lava tank with lava buckets in the slot, by right-clicking
-  with a bucket, or by piping lava into an input face. Touching lava source blocks add 3 HU/t each and
-  magma blocks 1 HU/t each, even with an empty tank; they're never used up. It makes no FE itself.
+  with a bucket, or by piping lava into an input face. Touching lava source blocks add 40 HU/t each and
+  magma blocks 16 HU/t each (all six sides count), even with an empty tank; they're never used up. It makes
+  no FE itself.
+  - **Self-sufficient power:** a plant with lava on five sides makes 200 HU/t at 1,400°C forever, with
+    no fuel and no pumping. About 25 of them run a full 9-long Steam Turbine Array (Boiler plus
+    Superheater). Move the heat with Tempered (200 HU/t) or Hardened (800 HU/t) thermodynamic
+    conduits; a touching machine only takes 100 HU/t.
 - **Thermoelectric Plant:** heat passes through it in proportion to how full its buffer is (up to
   80 HU/t when full), and becomes FE at an efficiency set by its temperature: 0% at 100°C,
-  50% at 600°C and 100% at 1,100°C. It can't get hotter than what feeds it, so a Geothermal Plant
-  drives it to about 50% at best, while a Firebox gets it close to 100% (about 64,000 FE per coal).
+  50% at 600°C and 100% at 1,100°C. It can't get hotter than what feeds it, so a Firebox gets it close to 100% (about 64,000 FE
+  per coal), while a Geothermal Plant at 1,400°C drives it past 100%, up to 115%.
   It takes a few minutes to warm up.
 - The Combustion and Thermoelectric Plants push up to 200 FE/t out of their energy faces.
 

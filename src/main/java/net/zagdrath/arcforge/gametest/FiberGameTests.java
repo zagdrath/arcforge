@@ -166,7 +166,7 @@ public final class FiberGameTests {
                 .thenSucceed();
     }
 
-    // A full plant is at 1,400°C. Touching lava and magma give +10 and +4 HU/t each; the tank's lava +80 HU/t.
+    // A full plant is at 1,400°C. Touching lava and magma give +40 and +16 HU/t each; the tank's lava +80 HU/t.
     static void geothermalRebalance(GameTestHelper helper) {
         BlockPos fullPos = new BlockPos(0, 1, 0);
         BlockPos passivePos = new BlockPos(3, 1, 0);
@@ -194,7 +194,7 @@ public final class FiberGameTests {
                     int passive = helper.getBlockEntity(passivePos, GeothermalPlantBlockEntity.class).getHeat().getStored();
                     int tanked = helper.getBlockEntity(tankedPos, GeothermalPlantBlockEntity.class).getHeat().getStored();
                     // 10 ticks, give or take the tick the test runs on.
-                    helper.assertTrue(passive >= 14 * 9 && passive <= 14 * 11, "1 lava + 1 magma made " + passive + " HU in 10 ticks, expected ~140");
+                    helper.assertTrue(passive >= 56 * 9 && passive <= 56 * 11, "1 lava + 1 magma made " + passive + " HU in 10 ticks, expected ~560");
                     helper.assertTrue(tanked >= 80 * 9 && tanked <= 80 * 11, "Draining lava made " + tanked + " HU in 10 ticks, expected ~800");
                 })
                 .thenSucceed();
