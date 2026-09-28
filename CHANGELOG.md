@@ -50,6 +50,13 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
   more), diamond (2) and emerald (2), all doubled by the Arc Crushing Array. Utility: cobblestone → gravel,
   gravel → sand (10% chance of flint), bone → 5 bone meal, blaze rod → 4 blaze powder, any wool → 4
   string, glowstone → 4 glowstone dust, sandstone → 2 sand.
+- **Conduit Filter.** Goes on a connection of an item, fluid or pressurized conduit (the arm facing a
+  machine) and decides what passes there: nine entries, allowlist or denylist, each entry matched exactly or
+  by one of its tags, an option to ignore item components (enchantments, damage, names), and whether it
+  applies when inserting, extracting or both. Right-click the connection with an empty hand to set it up;
+  fluid and pressurized conduits take a bucket, Canister or Gas Cartridge as an entry. The Wrench's Dismantle
+  takes it off with its settings. A sleeve on the arm shows it, its LED grey until set, then green (allowlist)
+  or red (denylist), like the item. Jade lists a conduit's filters, and the Engineer's Handbook has an entry.
 
 ### Changed
 
@@ -68,6 +75,10 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
 - The solar tooltip now explains that a boiler needs its pressure set to reach High-Pressure.
 - Nether gold ore has its own crushing recipe: 1 gold dust with a 25% chance of another (was 2, as gold
   ore), still doubled by the Arc Crushing Array.
+- Item conduits take turns between destinations more evenly: one that's full (or whose filter refuses the
+  items) no longer hands its turn to the next destination as well.
+- Multiblock port nozzles (on the cube arrays and the Solar Thermal Array) have their own shaded steel collar
+  instead of a flat patch of the casing texture.
 
 ### Fixed
 

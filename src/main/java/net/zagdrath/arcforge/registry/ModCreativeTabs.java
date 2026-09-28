@@ -129,6 +129,7 @@ public final class ModCreativeTabs {
             .icon(() -> ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.ARCFORGED).get().asItem().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 ModItems.allConduits().forEach(item -> output.accept(item.get()));
+                output.accept(ModItems.CONDUIT_FILTER.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> TOOLS_AND_UPGRADES = CREATIVE_MODE_TABS.register("tools_and_upgrades", () -> CreativeModeTab.builder()

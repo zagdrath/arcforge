@@ -27,6 +27,8 @@ import net.zagdrath.arcforge.steam.Gases;
 // A shared tank of one fluid (1,000 mB per conduit). Pulls from output sides and pushes into input
 // sides, each capped at the tier's mB/t. Fluid conduits never carry gases (see GasConduitNetwork). The tank is split evenly back into the conduit block
 // entities whenever it changes, so splitting or unloading a network never creates or loses fluid.
+// Conduit Filters are checked live: sources and sinks whose filter rejects the fluid are skipped. The network
+// still carries one fluid at a time, so a fluid no sink accepts stays in it until one does.
 public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidResource>> {
     private FluidResource fluid = FluidResource.EMPTY;
     private int amount;
@@ -115,7 +117,8 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
             }
             for (int index = 0; index < handler.size() && space > 0; index++) {
                 FluidResource resource = handler.getResource(index);
-                if (resource.isEmpty() || !accepts.test(resource) || (!fluid.isEmpty() && !resource.equals(fluid))) {
+                if (resource.isEmpty() || !accepts.test(resource) || (!fluid.isEmpty() && !resource.equals(fluid))
+                        || !filterAllows(source, resource.getFluid(), false)) {
                     continue;
                 }
                 try (Transaction tx = Transaction.openRoot()) {
@@ -140,7 +143,10 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
         }
         int budget = rate;
         int pushed = 0;
-        List<Endpoint<ResourceHandler<FluidResource>>> ordered = sinksInTurn();
+        // Sinks whose filter rejects the fluid are left out, so the rest share it in turn.
+        List<Endpoint<ResourceHandler<FluidResource>>> ordered = sinksInTurn().stream()
+                .filter(sink -> filterAllows(sink, fluid.getFluid(), true))
+                .toList();
         for (int i = 0; i < ordered.size() && amount > 0 && budget > 0; i++) {
             ResourceHandler<FluidResource> handler = ordered.get(i).handler();
             if (handler == null) {

@@ -88,6 +88,7 @@
       "description": "Moving and storing power, items, fluids, gases and heat.",
       "entries": [
         "conduits",
+        "conduit_filters",
         "fluid_tanks",
         "energy_cells",
         "portable_storage"

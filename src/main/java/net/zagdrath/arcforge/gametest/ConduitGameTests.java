@@ -9,6 +9,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.Player;
@@ -35,6 +37,7 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.SideSetting;
+import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
@@ -44,7 +47,7 @@ import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 
-// Conduit behaviour: transfer for every type, conservation when networks split, and the wrench.
+// Conduit behaviour: transfer for every type, conservation when networks split, the wrench and Conduit Filters.
 // Layouts run along +X at y=1: source at x=0, conduits, sink at the end.
 final class ConduitGameTests {
     private ConduitGameTests() {}
@@ -427,5 +430,301 @@ final class ConduitGameTests {
         helper.assertTrue(restored.getItemHandler(null).getAmountAsInt(GeothermalPlantBlockEntity.SLOT_INPUT) == 0, "Placed plant got its lava bucket back (duplicated)");
         helper.assertTrue(lava == 3_000, "Restored plant has " + lava + " mB of lava");
         helper.succeed();
+    }
+
+    // --- Conduit Filters ---
+    // Item layouts: a source barrel at x=0 feeding an item conduit run along +X, sink A south of conduit 2 and
+    // sink B at the east end. Barrels, not chests, so neighbouring sinks never join up.
+
+    private static final BlockPos FILTER_SOURCE = new BlockPos(0, 1, 0);
+    private static final BlockPos SINK_A = new BlockPos(2, 1, 1);
+
+    private static ItemStack filter(FilterSettings settings) {
+        ItemStack filter = new ItemStack(ModItems.CONDUIT_FILTER.get());
+        filter.set(ModDataComponents.CONDUIT_FILTER.get(), settings);
+        return filter;
+    }
+
+    private static FilterSettings list(boolean deny, FilterSettings.Entry... entries) {
+        FilterSettings settings = FilterSettings.DEFAULT.withDeny(deny);
+        for (int i = 0; i < entries.length; i++) {
+            settings = settings.withEntry(i, entries[i]);
+        }
+        return settings;
+    }
+
+    // Source, a run of `length` item conduits, sink A (south of conduit 2) and sink B (east of the last conduit).
+    private static void filterLayout(GameTestHelper helper, int length) {
+        helper.setBlock(FILTER_SOURCE, Blocks.BARREL);
+        helper.setBlock(SINK_A, Blocks.BARREL);
+        helper.setBlock(new BlockPos(length + 1, 1, 0), Blocks.BARREL);
+        placeRun(helper, ConduitType.ITEM, ConduitTier.ARCFORGED, length);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(2, 1, 0), Direction.SOUTH, SideSetting.INPUT);
+        setPort(helper, new BlockPos(length, 1, 0), Direction.EAST, SideSetting.INPUT);
+    }
+
+    private static Container container(GameTestHelper helper, BlockPos pos) {
+        return (Container) helper.getLevel().getBlockEntity(helper.absolutePos(pos));
+    }
+
+    // Stacks of one, so each item conduit operation moves a single item and round-robin shows.
+    private static void fillSingles(Container container, net.minecraft.world.item.Item item, int count) {
+        for (int i = 0; i < count; i++) {
+            for (int slot = 0; slot < container.getContainerSize(); slot++) {
+                if (container.getItem(slot).isEmpty()) {
+                    container.setItem(slot, new ItemStack(item));
+                    break;
+                }
+            }
+        }
+    }
+
+    private static int count(Container container, net.minecraft.world.item.Item item) {
+        int total = 0;
+        for (int slot = 0; slot < container.getContainerSize(); slot++) {
+            if (container.getItem(slot).is(item)) {
+                total += container.getItem(slot).getCount();
+            }
+        }
+        return total;
+    }
+
+    // An allowlist of iron on A: A gets only iron, and all the gold goes to B.
+    static void filterAllowlist(GameTestHelper helper) {
+        filterLayout(helper, 3);
+        helper.getBlockEntity(new BlockPos(2, 1, 0), ConduitBlockEntity.class)
+                .setFilter(Direction.SOUTH, filter(list(false, FilterSettings.Entry.of(new ItemStack(Items.IRON_INGOT)))));
+        Container source = container(helper, FILTER_SOURCE);
+        Container a = container(helper, SINK_A);
+        Container b = container(helper, new BlockPos(4, 1, 0));
+        fillSingles(source, Items.IRON_INGOT, 8);
+        fillSingles(source, Items.GOLD_INGOT, 8);
+        helper.onEachTick(() -> helper.assertTrue(count(a, Items.GOLD_INGOT) == 0, "Gold got past the allowlist"));
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(source.isEmpty() && count(b, Items.GOLD_INGOT) == 8
+                        && count(a, Items.IRON_INGOT) + count(b, Items.IRON_INGOT) == 8,
+                        "A: " + count(a, Items.IRON_INGOT) + " iron; B: " + count(b, Items.IRON_INGOT) + " iron, " + count(b, Items.GOLD_INGOT) + " gold"))
+                .thenExecute(() -> helper.assertTrue(count(a, Items.IRON_INGOT) > 0, "A got no iron"))
+                .thenSucceed();
+    }
+
+    // A denylist of gold on A: A never gets gold; the iron is shared between A and B.
+    static void filterDenylist(GameTestHelper helper) {
+        filterLayout(helper, 3);
+        helper.getBlockEntity(new BlockPos(2, 1, 0), ConduitBlockEntity.class)
+                .setFilter(Direction.SOUTH, filter(list(true, FilterSettings.Entry.of(new ItemStack(Items.GOLD_INGOT)))));
+        Container source = container(helper, FILTER_SOURCE);
+        Container a = container(helper, SINK_A);
+        Container b = container(helper, new BlockPos(4, 1, 0));
+        fillSingles(source, Items.IRON_INGOT, 8);
+        fillSingles(source, Items.GOLD_INGOT, 8);
+        helper.onEachTick(() -> helper.assertTrue(count(a, Items.GOLD_INGOT) == 0, "Gold got past the denylist"));
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(source.isEmpty() && count(b, Items.GOLD_INGOT) == 8, "Not all the gold reached B yet"))
+                .thenExecute(() -> {
+                    int ironA = count(a, Items.IRON_INGOT);
+                    int ironB = count(b, Items.IRON_INGOT);
+                    helper.assertTrue(ironA + ironB == 8 && ironA > 0 && ironB > 0, "Iron split " + ironA + " / " + ironB);
+                })
+                .thenSucceed();
+    }
+
+    // A tag entry (iron ingot, matching #c:ingots) on A lets copper ingots in, but not cobblestone.
+    static void filterTagMatch(GameTestHelper helper) {
+        filterLayout(helper, 3);
+        helper.getBlockEntity(new BlockPos(2, 1, 0), ConduitBlockEntity.class).setFilter(Direction.SOUTH, filter(list(false,
+                FilterSettings.Entry.of(new ItemStack(Items.IRON_INGOT)).withTag(Identifier.fromNamespaceAndPath("c", "ingots")))));
+        Container source = container(helper, FILTER_SOURCE);
+        Container a = container(helper, SINK_A);
+        Container b = container(helper, new BlockPos(4, 1, 0));
+        fillSingles(source, Items.COPPER_INGOT, 6);
+        fillSingles(source, Items.COBBLESTONE, 6);
+        helper.onEachTick(() -> helper.assertTrue(count(a, Items.COBBLESTONE) == 0, "Cobblestone matched #c:ingots"));
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(source.isEmpty() && count(b, Items.COBBLESTONE) == 6
+                        && count(a, Items.COPPER_INGOT) + count(b, Items.COPPER_INGOT) == 6, "Items still moving"))
+                .thenExecute(() -> helper.assertTrue(count(a, Items.COPPER_INGOT) > 0, "No copper reached A through the tag"))
+                .thenSucceed();
+    }
+
+    // An allowlist of a plain iron sword on A: a damaged sword goes to B while components must match; with
+    // components ignored (and B gone, so A is the only way) it reaches A.
+    static void filterIgnoreComponents(GameTestHelper helper) {
+        filterLayout(helper, 3);
+        ConduitBlockEntity conduit = helper.getBlockEntity(new BlockPos(2, 1, 0), ConduitBlockEntity.class);
+        FilterSettings swords = list(false, FilterSettings.Entry.of(new ItemStack(Items.IRON_SWORD)));
+        conduit.setFilter(Direction.SOUTH, filter(swords));
+        Container source = container(helper, FILTER_SOURCE);
+        Container a = container(helper, SINK_A);
+        Container b = container(helper, new BlockPos(4, 1, 0));
+        ItemStack damaged = new ItemStack(Items.IRON_SWORD);
+        damaged.setDamageValue(40);
+        source.setItem(0, damaged.copy());
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(count(b, Items.IRON_SWORD) == 1, "Damaged sword didn't reach B"))
+                .thenExecute(() -> helper.assertTrue(count(a, Items.IRON_SWORD) == 0, "Damaged sword matched an exact entry"))
+                .thenExecute(() -> {
+                    helper.setBlock(new BlockPos(4, 1, 0), Blocks.AIR);
+                    conduit.clearFilter(Direction.SOUTH);
+                    conduit.setFilter(Direction.SOUTH, filter(swords.withIgnoreComponents(true)));
+                    source.setItem(0, damaged.copy());
+                })
+                .thenWaitUntil(() -> helper.assertTrue(count(a, Items.IRON_SWORD) == 1, "Damaged sword didn't reach A with components ignored"))
+                .thenSucceed();
+    }
+
+    // Water and lava sources; an allowlist of water on sink A. A only ever holds water, and all the lava ends up in B
+    // (a two-slot tank, as the network carries one fluid at a time and B takes both).
+    static void filterFluid(GameTestHelper helper) {
+        BlockPos water = new BlockPos(0, 1, 0);
+        BlockPos lava = new BlockPos(1, 1, 1);
+        BlockPos sinkB = new BlockPos(4, 1, 0);
+        for (BlockPos pos : new BlockPos[] { water, lava, SINK_A, sinkB }) {
+            TestFixtures.reset(helper.absolutePos(pos));
+            helper.setBlock(pos, Blocks.TARGET);
+        }
+        placeRun(helper, ConduitType.FLUID, ConduitTier.ARCFORGED, 3);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.SOUTH, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(2, 1, 0), Direction.SOUTH, SideSetting.INPUT);
+        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, SideSetting.INPUT);
+        helper.getBlockEntity(new BlockPos(2, 1, 0), ConduitBlockEntity.class)
+                .setFilter(Direction.SOUTH, filter(list(false, FilterSettings.Entry.of(Fluids.WATER))));
+        TestFixtures.tank(helper.absolutePos(water)).set(0, FluidResource.of(Fluids.WATER), 2_000);
+        TestFixtures.tank(helper.absolutePos(lava)).set(0, FluidResource.of(Fluids.LAVA), 2_000);
+        var a = TestFixtures.tank(helper.absolutePos(SINK_A));
+        var b = TestFixtures.tank(helper.absolutePos(sinkB), 2);
+
+        helper.onEachTick(() -> helper.assertFalse(a.getResource(0).is(Fluids.LAVA), "Lava got past the water allowlist"));
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(amountOf(b, Fluids.LAVA) == 2_000 && amountOf(a, Fluids.WATER) + amountOf(b, Fluids.WATER) == 2_000,
+                        "A: " + amountOf(a, Fluids.WATER) + " mB water; B: " + amountOf(b, Fluids.WATER) + " mB water, " + amountOf(b, Fluids.LAVA) + " mB lava"))
+                .thenExecute(() -> helper.assertTrue(amountOf(a, Fluids.WATER) > 0, "A got no water"))
+                .thenSucceed();
+    }
+
+    private static int amountOf(FluidStacksResourceHandler tank, net.minecraft.world.level.material.Fluid fluid) {
+        int total = 0;
+        for (int slot = 0; slot < tank.size(); slot++) {
+            if (tank.getResource(slot).is(fluid)) {
+                total += tank.getAmountAsInt(slot);
+            }
+        }
+        return total;
+    }
+
+    // Three sinks, two allowing iron and one (C, at the east end) gold only: the iron alternates between the two
+    // that take it, splitting evenly (within one).
+    static void filterRoundRobinKept(GameTestHelper helper) {
+        BlockPos sinkB = new BlockPos(4, 1, 1);
+        filterLayout(helper, 5);
+        helper.setBlock(sinkB, Blocks.BARREL);
+        setPort(helper, new BlockPos(4, 1, 0), Direction.SOUTH, SideSetting.INPUT);
+        FilterSettings iron = list(false, FilterSettings.Entry.of(new ItemStack(Items.IRON_INGOT)));
+        helper.getBlockEntity(new BlockPos(2, 1, 0), ConduitBlockEntity.class).setFilter(Direction.SOUTH, filter(iron));
+        helper.getBlockEntity(new BlockPos(4, 1, 0), ConduitBlockEntity.class).setFilter(Direction.SOUTH, filter(iron));
+        helper.getBlockEntity(new BlockPos(5, 1, 0), ConduitBlockEntity.class)
+                .setFilter(Direction.EAST, filter(list(false, FilterSettings.Entry.of(new ItemStack(Items.GOLD_INGOT)))));
+        Container source = container(helper, FILTER_SOURCE);
+        Container a = container(helper, SINK_A);
+        Container b = container(helper, sinkB);
+        Container c = container(helper, new BlockPos(6, 1, 0));
+        fillSingles(source, Items.IRON_INGOT, 8);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(count(a, Items.IRON_INGOT) + count(b, Items.IRON_INGOT) == 8, "Iron still moving"))
+                .thenExecute(() -> {
+                    int ironA = count(a, Items.IRON_INGOT);
+                    int ironB = count(b, Items.IRON_INGOT);
+                    helper.assertTrue(Math.abs(ironA - ironB) <= 1, "Iron split " + ironA + " / " + ironB + ", expected even");
+                    helper.assertTrue(c.isEmpty(), "Sink C got iron through a gold allowlist");
+                })
+                .thenSucceed();
+    }
+
+    // An Extract allowlist of iron on the source side: only iron leaves the source, and the gold stays in it
+    // (not pulled into the conduits either).
+    static void filterExtractDirection(GameTestHelper helper) {
+        filterLayout(helper, 3);
+        helper.getBlockEntity(new BlockPos(1, 1, 0), ConduitBlockEntity.class).setFilter(Direction.WEST,
+                filter(list(false, FilterSettings.Entry.of(new ItemStack(Items.IRON_INGOT))).withFlow(FilterSettings.Flow.EXTRACT)));
+        Container source = container(helper, FILTER_SOURCE);
+        Container a = container(helper, SINK_A);
+        Container b = container(helper, new BlockPos(4, 1, 0));
+        fillSingles(source, Items.IRON_INGOT, 4);
+        fillSingles(source, Items.GOLD_INGOT, 4);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(count(a, Items.IRON_INGOT) + count(b, Items.IRON_INGOT) == 4, "Iron still moving"))
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    helper.assertTrue(count(source, Items.GOLD_INGOT) == 4, "Gold left the source: " + count(source, Items.GOLD_INGOT) + " remain");
+                    helper.assertTrue(storedItemCount(helper, 3) == 0, "Gold was pulled into the conduits");
+                })
+                .thenSucceed();
+    }
+
+    // Dismantling a filtered side takes the filter off (with its settings) and leaves the conduit; the next
+    // dismantle breaks the conduit.
+    static void filterPersistsOnRemove(GameTestHelper helper) {
+        filterLayout(helper, 3);
+        BlockPos pos = new BlockPos(2, 1, 0);
+        FilterSettings settings = list(true, FilterSettings.Entry.of(new ItemStack(Items.GOLD_INGOT)).withTag(Identifier.fromNamespaceAndPath("c", "ingots")))
+                .withFlow(FilterSettings.Flow.BOTH).withIgnoreComponents(true);
+        helper.getBlockEntity(pos, ConduitBlockEntity.class).setFilter(Direction.SOUTH, filter(settings));
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setShiftKeyDown(true);
+
+        useWrench(helper, player, pos, new Vec3(0, 0, 0.4), WrenchMode.DISMANTLE);
+        helper.assertTrue(helper.getBlockState(pos).getBlock() instanceof ConduitBlock, "Removing the filter broke the conduit");
+        helper.assertFalse(helper.getBlockEntity(pos, ConduitBlockEntity.class).hasFilter(Direction.SOUTH), "Filter still installed");
+        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        helper.assertTrue(drops.size() == 1 && drops.getFirst().getItem().is(ModItems.CONDUIT_FILTER.get()), "Expected the filter to drop, got " + drops.size() + " drops");
+        helper.assertTrue(settings.equals(drops.getFirst().getItem().get(ModDataComponents.CONDUIT_FILTER.get())), "Dropped filter lost its settings");
+
+        useWrench(helper, player, pos, new Vec3(0, 0, 0.4), WrenchMode.DISMANTLE);
+        helper.assertFalse(helper.getBlockState(pos).getBlock() instanceof ConduitBlock, "Second dismantle didn't break the conduit");
+        helper.succeed();
+    }
+
+    // A filter goes only on a connection of an item, fluid or pressurized conduit, and pops off when its side unhooks.
+    static void filterInstallRules(GameTestHelper helper) {
+        filterLayout(helper, 3);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        BlockPos pos = new BlockPos(2, 1, 0);
+        ItemStack held = new ItemStack(ModItems.CONDUIT_FILTER.get(), 3);
+        player.setItemInHand(InteractionHand.MAIN_HAND, held);
+        // The top of the conduit faces nothing: refused.
+        useFilter(helper, player, pos, new Vec3(0, 0.4, 0));
+        helper.assertFalse(helper.getBlockEntity(pos, ConduitBlockEntity.class).hasFilter(Direction.UP), "Filter went on a bare side");
+        // The side facing sink A: installed, one used up, without a settings component (so it stays unset).
+        useFilter(helper, player, pos, new Vec3(0, 0, 0.4));
+        ConduitBlockEntity conduit = helper.getBlockEntity(pos, ConduitBlockEntity.class);
+        helper.assertTrue(conduit.hasFilter(Direction.SOUTH) && held.getCount() == 2, "Filter not installed on the connection");
+        helper.assertTrue(FilterSettings.mode(conduit.getFilter(Direction.SOUTH)) == FilterSettings.Mode.UNSET, "A fresh filter isn't unset");
+        // A second one on the same side: occupied.
+        useFilter(helper, player, pos, new Vec3(0, 0, 0.4));
+        helper.assertTrue(held.getCount() == 2, "A second filter went on an occupied side");
+        // Energy conduits don't take filters.
+        BlockPos energy = new BlockPos(2, 3, 0);
+        helper.setBlock(energy, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
+        helper.getBlockEntity(energy, ConduitBlockEntity.class).setFilter(Direction.SOUTH, filter(FilterSettings.DEFAULT));
+        helper.assertFalse(helper.getBlockEntity(energy, ConduitBlockEntity.class).hasFilter(Direction.SOUTH), "An energy conduit took a filter");
+        // Breaking sink A unhooks the side: the filter drops.
+        helper.setBlock(SINK_A, Blocks.AIR);
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    helper.assertFalse(conduit.hasFilter(Direction.SOUTH), "Filter stayed on a bare pipe");
+                    helper.assertTrue(helper.getEntities(EntityTypes.ITEM, pos, 2.0).stream().anyMatch(drop -> drop.getItem().is(ModItems.CONDUIT_FILTER.get())),
+                            "The unhooked filter didn't drop");
+                })
+                .thenSucceed();
+    }
+
+    private static void useFilter(GameTestHelper helper, Player player, BlockPos pos, Vec3 offsetFromCentre) {
+        BlockPos absolute = helper.absolutePos(pos);
+        var context = new UseOnContext(player, InteractionHand.MAIN_HAND,
+                new BlockHitResult(Vec3.atCenterOf(absolute).add(offsetFromCentre), Direction.UP, absolute, false));
+        player.getMainHandItem().useOn(context);
     }
 }

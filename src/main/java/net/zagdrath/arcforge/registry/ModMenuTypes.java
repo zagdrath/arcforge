@@ -13,6 +13,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
 import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
@@ -106,6 +107,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<HeatCellMenu>> HEAT_CELL = MENU_TYPES.register("heat_cell",
             () -> IMenuTypeExtension.create(HeatCellMenu::new));
+
+    public static final Supplier<MenuType<ConduitFilterMenu>> CONDUIT_FILTER = MENU_TYPES.register("conduit_filter",
+            () -> IMenuTypeExtension.create(ConduitFilterMenu::new));
 
     public static final Supplier<MenuType<CarbonizerMenu>> CARBONIZER = MENU_TYPES.register("carbonizer",
             () -> IMenuTypeExtension.create(CarbonizerMenu::new));

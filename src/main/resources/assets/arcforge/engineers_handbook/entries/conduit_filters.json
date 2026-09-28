@@ -1,0 +1,13 @@
+{
+  "title": "Conduit Filters",
+  "icon": "arcforge:conduit_filter",
+  "items": [
+    "arcforge:conduit_filter"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Conduit Filters decide what a conduit connection lets through. They fit Item, Fluid and Pressurized conduits.\n# Installing\n- Right-click a connection (the arm facing a machine or inventory) with a filter. One filter per connection.\n- Right-click the filtered connection with an empty hand to open its settings.\n- A Wrench in Dismantle mode (Shift + Right-click) takes the filter off. Its settings stay on the item, so you can reuse it.\n# Settings\n- 9 slots: click with an item to set it (the item isn't used up). On fluid and pressurized conduits, click with a bucket, Canister or Gas Cartridge to set its fluid or gas.\n- Allowlist lets only the listed things through; Denylist lets everything else through.\n- Each slot matches Exact, or by Tag: click the chip under a slot to cycle through that item's tags.\n- Ignore components makes enchanted, damaged or renamed items match.\n- Direction: filter when inserting into the machine, when extracting from it, or both.\n# Routing\nA filtered destination that rejects something is simply skipped; the rest still share the load in turn."
+    }
+  ]
+}

@@ -11,6 +11,9 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -27,10 +30,14 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -48,7 +55,12 @@ public class ConduitBlockEntity extends BlockEntity {
     // Thermal conduits tint their glow by temperature in steps this big.
     private static final int HEAT_TINT_STEP = 50;
 
+    // What the conduit's model draws: each side's filter look (see packFilterModes).
+    public static final ModelProperty<Integer> FILTER_MODES = new ModelProperty<>();
+
     private final SideSetting[] settings = new SideSetting[Direction.values().length];
+    // The Conduit Filter on each side (ItemStack.EMPTY if none).
+    private final ItemStack[] filters = new ItemStack[Direction.values().length];
     private final List<ItemPacket> packets = new ArrayList<>();
     // Items pulled in with nowhere to go yet; shown resting in the conduit's core.
     private final List<ItemStack> storedItems = new ArrayList<>();
@@ -67,6 +79,7 @@ public class ConduitBlockEntity extends BlockEntity {
     public ConduitBlockEntity(BlockPos pos, BlockState state) {
         super(typeFor(state), pos, state);
         Arrays.fill(settings, SideSetting.AUTO);
+        Arrays.fill(filters, ItemStack.EMPTY);
     }
 
     private static net.minecraft.world.level.block.entity.BlockEntityType<ConduitBlockEntity> typeFor(BlockState state) {
@@ -94,6 +107,105 @@ public class ConduitBlockEntity extends BlockEntity {
 
     public boolean isSideDisabled(Direction side) {
         return getSetting(side) == SideSetting.DISABLED;
+    }
+
+    // --- Filters (item, fluid and pressurized conduits; see ConduitFilterItem) ---
+
+    // Whether this conduit type takes Conduit Filters.
+    public boolean acceptsFilters() {
+        return acceptsFilters(getConduitType());
+    }
+
+    public static boolean acceptsFilters(ConduitType type) {
+        return type == ConduitType.ITEM || type == ConduitType.FLUID || type == ConduitType.GAS;
+    }
+
+    // The filter installed on a side (ItemStack.EMPTY if none), carrying its settings component.
+    public ItemStack getFilter(Direction side) {
+        return filters[side.ordinal()];
+    }
+
+    public boolean hasFilter(Direction side) {
+        return !filters[side.ordinal()].isEmpty();
+    }
+
+    public void setFilter(Direction side, ItemStack filter) {
+        if (!acceptsFilters()) {
+            return;
+        }
+        filters[side.ordinal()] = filter.isEmpty() ? ItemStack.EMPTY : filter.copyWithCount(1);
+        onFiltersChanged();
+    }
+
+    // Takes the filter off a side and returns it (ItemStack.EMPTY if there was none).
+    public ItemStack clearFilter(Direction side) {
+        ItemStack removed = filters[side.ordinal()];
+        if (!removed.isEmpty()) {
+            filters[side.ordinal()] = ItemStack.EMPTY;
+            onFiltersChanged();
+        }
+        return removed;
+    }
+
+    // Whether the filter on this side lets the stack through when the network inserts into (true) or extracts
+    // from (false) the machine there. Sides without a filter, or whose filter doesn't apply that way, allow everything.
+    public boolean filterAllows(Direction side, ItemStack stack, boolean inserting) {
+        FilterSettings settings = activeFilter(side, inserting);
+        return settings == null || settings.matches(stack);
+    }
+
+    public boolean filterAllows(Direction side, Fluid fluid, boolean inserting) {
+        FilterSettings settings = activeFilter(side, inserting);
+        return settings == null || settings.matches(fluid);
+    }
+
+    private @Nullable FilterSettings activeFilter(Direction side, boolean inserting) {
+        ItemStack filter = filters[side.ordinal()];
+        if (filter.isEmpty()) {
+            return null;
+        }
+        FilterSettings settings = FilterSettings.of(filter);
+        return settings.appliesTo(inserting) ? settings : null;
+    }
+
+    // Each side's filter look (FilterSettings.Mode ordinal + 1, 0 for none) in 2 bits per side: what the model draws.
+    public int packFilterModes() {
+        int packed = 0;
+        for (Direction side : Direction.values()) {
+            ItemStack filter = filters[side.ordinal()];
+            if (!filter.isEmpty()) {
+                packed |= (FilterSettings.mode(filter).ordinal() + 1) << (side.ordinal() * 2);
+            }
+        }
+        return packed;
+    }
+
+    private void onFiltersChanged() {
+        setChanged();
+        if (level != null && !level.isClientSide()) {
+            // Sends the filters to clients (the sleeves they draw, and the filter GUI's contents).
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
+        }
+    }
+
+    // Unhooking a side (its arm no longer faces a machine, e.g. the machine was broken or the side disabled)
+    // pops its filter out: a filter never stays on a bare pipe.
+    @Override
+    public void setBlockState(BlockState state) {
+        super.setBlockState(state);
+        if (!(level instanceof ServerLevel) || !(state.getBlock() instanceof ConduitBlock)) {
+            return;
+        }
+        for (Direction side : Direction.values()) {
+            if (hasFilter(side) && !ConduitBlock.mode(state, side).isPort()) {
+                Block.popResource(level, worldPosition, clearFilter(side));
+            }
+        }
+    }
+
+    @Override
+    public ModelData getModelData() {
+        return ModelData.of(FILTER_MODES, packFilterModes());
     }
 
     // --- Energy / heat buffer ---
@@ -292,6 +404,13 @@ public class ConduitBlockEntity extends BlockEntity {
             Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
         }
         storedItems.clear();
+        // Filters drop with their settings.
+        for (Direction side : Direction.values()) {
+            if (hasFilter(side)) {
+                Block.popResource(level, pos, filters[side.ordinal()]);
+                filters[side.ordinal()] = ItemStack.EMPTY;
+            }
+        }
         if (!fluid.isEmpty()) {
             handOffFluid(pos, state);
         }
@@ -334,9 +453,29 @@ public class ConduitBlockEntity extends BlockEntity {
         heatTemperature = input.getIntOr("heat_temperature", HeatBuffer.AMBIENT_CELSIUS);
         fluid = input.read("fluid", FluidStack.OPTIONAL_CODEC).orElse(FluidStack.EMPTY);
         itemSpeed = input.getFloatOr("item_speed", 0.0F);
+        int filterModesBefore = packFilterModes();
+        Arrays.fill(filters, ItemStack.EMPTY);
+        input.listOrEmpty("filters", InstalledFilter.CODEC).forEach(installed -> {
+            if (installed.side() >= 0 && installed.side() < filters.length) {
+                filters[installed.side()] = installed.stack();
+            }
+        });
         if (level != null && level.isClientSide()) {
             syncGlow();
+            // The sleeves on the arms are part of the block model: redraw when their looks change.
+            if (packFilterModes() != filterModesBefore) {
+                requestModelDataUpdate();
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+            }
         }
+    }
+
+    // A filter as saved: the side (Direction ordinal) and the filter item with its settings.
+    private record InstalledFilter(byte side, ItemStack stack) {
+        static final Codec<InstalledFilter> CODEC = RecordCodecBuilder.create(i -> i.group(
+                Codec.BYTE.fieldOf("side").forGetter(InstalledFilter::side),
+                ItemStack.CODEC.fieldOf("stack").forGetter(InstalledFilter::stack))
+                .apply(i, InstalledFilter::new));
     }
 
     @Override
@@ -361,6 +500,14 @@ public class ConduitBlockEntity extends BlockEntity {
             output.store("fluid", FluidStack.OPTIONAL_CODEC, fluid);
         }
         output.putFloat("item_speed", itemSpeed);
+        if (packFilterModes() != 0) {
+            var list = output.list("filters", InstalledFilter.CODEC);
+            for (Direction side : Direction.values()) {
+                if (hasFilter(side)) {
+                    list.add(new InstalledFilter((byte) side.ordinal(), filters[side.ordinal()]));
+                }
+            }
+        }
     }
 
     // Two bits per side.

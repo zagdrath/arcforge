@@ -28,6 +28,7 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
+import net.zagdrath.arcforge.item.conduit.ConduitFilterItem;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.storage.StorageBlockItem;
 import net.zagdrath.arcforge.item.tool.DieItem;
@@ -60,6 +61,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> FUEL_BURNER = ITEMS.registerSimpleBlockItem(ModBlocks.FUEL_BURNER);
 
     public static final DeferredItem<WrenchItem> WRENCH = ITEMS.registerItem("wrench", WrenchItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<ConduitFilterItem> CONDUIT_FILTER = ITEMS.registerItem("conduit_filter", ConduitFilterItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<EngineersHandbookItem> ENGINEERS_HANDBOOK = ITEMS.registerItem("engineers_handbook", EngineersHandbookItem::new, p -> p.stacksTo(1));
 
     // --- Steelmaking ---

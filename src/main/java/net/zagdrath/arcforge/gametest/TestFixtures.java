@@ -51,6 +51,13 @@ public final class TestFixtures {
         return TANKS.computeIfAbsent(pos.immutable(), p -> new FluidStacksResourceHandler(1, TANK_CAPACITY));
     }
 
+    // A tank at pos with this many slots (each its own fluid), replacing any tank there.
+    public static FluidStacksResourceHandler tank(BlockPos pos, int slots) {
+        FluidStacksResourceHandler tank = new FluidStacksResourceHandler(slots, TANK_CAPACITY);
+        TANKS.put(pos.immutable(), tank);
+        return tank;
+    }
+
     public static void reset(BlockPos pos) {
         ENERGY.remove(pos);
         TANKS.remove(pos);

@@ -44,6 +44,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(MultiblockNameProvider.INSTANCE, Block.class);
         registration.registerBlockComponent(HeatProvider.Client.INSTANCE, Block.class);
         registration.registerBlockComponent(ConduitProviders.Info.INSTANCE, ConduitBlock.class);
+        registration.registerBlockComponent(ConduitProviders.Filters.INSTANCE, ConduitBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

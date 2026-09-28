@@ -34,6 +34,8 @@ import net.zagdrath.arcforge.conduit.item.ItemPacket;
 // When nothing will take the items they are pulled into the source conduit's storage anyway (up to
 // ConduitTier.ITEM_STORAGE_SLOTS stacks) and sent on once a destination has room. A destination that
 // refuses a packet makes it reroute, and if nothing can take it the items are stored where they are.
+// Conduit Filters are checked live: a destination whose filter rejects the items is skipped (the rest keep
+// their round-robin turns), and a source's extract filter leaves what it rejects in the machine.
 public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResource>> {
     // For each sink, the direction to leave each conduit in to get one step closer to it.
     private final Map<SinkKey, Map<BlockPos, Direction>> routes = new HashMap<>();
@@ -116,6 +118,10 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
             if (resource.isEmpty() || available <= 0) {
                 continue;
             }
+            // An extract filter on the source side keeps what it rejects in the machine.
+            if (!filterAllows(source, resource.toStack(1), false)) {
+                continue;
+            }
             Target target = findTarget(resource, available, source.conduit(), source.machine());
             if (target == null) {
                 // Nowhere to send it: keep it in the conduit until somewhere has room.
@@ -187,14 +193,14 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
 
     // The first sink (round-robin) reachable from `from` that will accept some of the items.
     private @Nullable Target findTarget(ItemResource resource, int amount, BlockPos from, @Nullable BlockPos excludeMachine) {
-        for (Endpoint<ResourceHandler<ItemResource>> sink : sinksInTurn()) {
+        for (Endpoint<ResourceHandler<ItemResource>> sink : sinksFromLastServed()) {
             if (sink.machine().equals(excludeMachine)) {
                 continue;
             }
             SinkKey key = new SinkKey(sink.conduit(), sink.side());
             Map<BlockPos, Direction> route = routes.get(key);
             ResourceHandler<ItemResource> handler = sink.handler();
-            if (route == null || !route.containsKey(from) || handler == null) {
+            if (route == null || !route.containsKey(from) || handler == null || !filterAllows(sink, resource.toStack(1), true)) {
                 continue;
             }
             int accepted;
@@ -202,6 +208,7 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
                 accepted = handler.insert(resource, amount, simulation);
             }
             if (accepted > 0) {
+                served(sink);
                 return new Target(key, route, accepted);
             }
         }
@@ -272,7 +279,8 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
     private ItemStack deliver(SinkKey key, ItemStack stack) {
         Endpoint<ResourceHandler<ItemResource>> sink = sinksByKey.get(key);
         ResourceHandler<ItemResource> handler = sink == null ? null : sink.handler();
-        if (handler == null) {
+        // A filter changed while the packet was on its way: treated like a full destination, so it reroutes.
+        if (handler == null || !filterAllows(sink, stack, true)) {
             return stack;
         }
         int inserted;

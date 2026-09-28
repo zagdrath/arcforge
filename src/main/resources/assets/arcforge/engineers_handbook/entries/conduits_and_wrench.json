@@ -12,7 +12,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Conduits move things between machines: FE, items, liquids, gases and heat. Conduits of the same kind join into one network; mixed tiers run at the slowest tier's speed.\nNext to a machine, a conduit connects on its own, following the machine's side settings.\n# The Wrench\nShift + mouse wheel changes its mode (the colour of its grip):\n- Configure: right-click a conduit side to cycle Auto, Input, Output and Disabled (sneak: backward), or the joint between two conduits to split or join them. Right-click a multiblock to check it.\n- Rotate: right-click a machine to turn it (sneak: the other way).\n- Port: multiblock ports and machine faces (next page).\n- Dismantle: sneak-right-click a machine to pick it up with its contents, or a conduit or a block of a multiblock."
+      "text": "Conduits move things between machines: FE, items, liquids, gases and heat. Conduits of the same kind join into one network; mixed tiers run at the slowest tier's speed.\nNext to a machine, a conduit connects on its own, following the machine's side settings.\n# The Wrench\nShift + mouse wheel changes its mode (the colour of its grip):\n- Configure: right-click a conduit side to cycle Auto, Input, Output and Disabled (sneak: backward), or the joint between two conduits to split or join them. Right-click a multiblock to check it.\n- Rotate: right-click a machine to turn it (sneak: the other way).\n- Port: multiblock ports and machine faces (next page).\n- Dismantle: sneak-right-click a machine to pick it up with its contents, or a conduit or a block of a multiblock. Dismantle on a filtered connection removes the filter first."
     },
     {
       "type": "text",

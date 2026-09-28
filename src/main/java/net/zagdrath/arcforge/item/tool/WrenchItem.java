@@ -35,6 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
+import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
@@ -56,7 +57,8 @@ import net.zagdrath.arcforge.registry.ModDataComponents;
 //   Port:      a multiblock block on the outside of its structure says what port it is, and sneaking
 //              cycles it through the modes the structure allows (see MultiblockPorts); a machine face
 //              likewise; conduits as in Configure.
-//   Dismantle: sneaking picks up a machine (keeping its contents), a conduit, or a block of a multiblock.
+//   Dismantle: sneaking picks up a machine (keeping its contents), a conduit, or a block of a multiblock. A
+//              conduit side with a Conduit Filter gives up the filter first.
 // Runs from onItemUseFirst so it acts before the block's own interaction (such as opening a GUI); where the
 // mode does nothing with a block, the click goes through to it.
 public class WrenchItem extends Item {
@@ -95,7 +97,11 @@ public class WrenchItem extends Item {
                 case MACHINE -> machineSide(context, state, sneaking);
                 default -> port(context, state, sneaking);
             };
-            case DISMANTLE -> target == Target.MACHINE ? dismantle(level, pos, state, player) : breakBlock(level, pos, player);
+            case DISMANTLE -> switch (target) {
+                case MACHINE -> dismantle(level, pos, state, player);
+                case CONDUIT -> removeFilterOrBreak(context);
+                default -> breakBlock(level, pos, player);
+            };
         };
         level.playSound(null, pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 0.3F, 1.4F);
         return result;
@@ -225,6 +231,19 @@ public class WrenchItem extends Item {
     private static InteractionResult breakBlock(Level level, BlockPos pos, @Nullable Player player) {
         level.destroyBlock(pos, true, player);
         return InteractionResult.SUCCESS;
+    }
+
+    // A filtered conduit side gives up its filter first (settings kept on the item); the next click breaks the conduit.
+    private static InteractionResult removeFilterOrBreak(UseOnContext context) {
+        Level level = context.getLevel();
+        BlockPos pos = context.getClickedPos();
+        Direction side = ConduitBlock.sideAt(pos, context.getClickLocation());
+        if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit && conduit.hasFilter(side)) {
+            Block.popResource(level, pos, conduit.clearFilter(side));
+            tell(context.getPlayer(), Component.translatable("message.arcforge.conduit_filter.removed"));
+            return InteractionResult.SUCCESS;
+        }
+        return breakBlock(level, pos, context.getPlayer());
     }
 
     // Drops the machine as an item carrying its block entity data (fluid, energy, settings), so it can be

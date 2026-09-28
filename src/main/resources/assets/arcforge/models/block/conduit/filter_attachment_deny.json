@@ -1,0 +1,79 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "filter": "arcforge:block/conduit/filter_attachment_deny",
+    "particle": "arcforge:block/conduit/filter_attachment_deny"
+  },
+  "elements": [
+    {
+      "from": [
+        4,
+        4,
+        2.25
+      ],
+      "to": [
+        12,
+        12,
+        4.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#filter",
+          "uv": [
+            0.0,
+            0.0,
+            8.0,
+            8.0
+          ]
+        },
+        "south": {
+          "texture": "#filter",
+          "uv": [
+            0.0,
+            0.0,
+            8.0,
+            8.0
+          ]
+        },
+        "up": {
+          "texture": "#filter",
+          "uv": [
+            0.0,
+            8.0,
+            8.0,
+            10.0
+          ]
+        },
+        "down": {
+          "texture": "#filter",
+          "uv": [
+            0.0,
+            10.0,
+            8.0,
+            12.0
+          ]
+        },
+        "east": {
+          "texture": "#filter",
+          "uv": [
+            0.0,
+            10.0,
+            8.0,
+            12.0
+          ],
+          "rotation": 90
+        },
+        "west": {
+          "texture": "#filter",
+          "uv": [
+            0.0,
+            10.0,
+            8.0,
+            12.0
+          ],
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

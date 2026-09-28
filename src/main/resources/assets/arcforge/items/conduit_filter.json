@@ -1,0 +1,26 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "arcforge:filter_mode",
+    "cases": [
+      {
+        "when": "allow",
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/conduit_filter_allow"
+        }
+      },
+      {
+        "when": "deny",
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/conduit_filter_deny"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:model",
+      "model": "arcforge:item/conduit_filter"
+    }
+  }
+}

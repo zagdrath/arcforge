@@ -65,6 +65,15 @@ public final class ArcforgeGameTests {
         TESTS.put("conduit_item_storage", ConduitGameTests::itemStorage);
         TESTS.put("wrench_conduit", ConduitGameTests::wrenchConduit);
         TESTS.put("wrench_machine", ConduitGameTests::wrenchMachine);
+        TESTS.put("conduit_filter_allowlist", ConduitGameTests::filterAllowlist);
+        TESTS.put("conduit_filter_denylist", ConduitGameTests::filterDenylist);
+        TESTS.put("conduit_filter_tag_match", ConduitGameTests::filterTagMatch);
+        TESTS.put("conduit_filter_ignore_components", ConduitGameTests::filterIgnoreComponents);
+        TESTS.put("conduit_filter_fluid", ConduitGameTests::filterFluid);
+        TESTS.put("conduit_filter_round_robin_kept", ConduitGameTests::filterRoundRobinKept);
+        TESTS.put("conduit_filter_extract_direction", ConduitGameTests::filterExtractDirection);
+        TESTS.put("conduit_filter_persists_on_remove", ConduitGameTests::filterPersistsOnRemove);
+        TESTS.put("conduit_filter_install_rules", ConduitGameTests::filterInstallRules);
         TESTS.put("ports_defaults", PortGameTests::defaultPorts);
         TESTS.put("ports_wrench_sets_port", PortGameTests::wrenchSetsPort);
         TESTS.put("ports_wrench_modes_on_multiblock", PortGameTests::wrenchModesOnMultiblock);

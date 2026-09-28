@@ -56,7 +56,11 @@ import net.zagdrath.arcforge.multiblock.PortFaces;
 // kind is "solar", with the shapes "base", "upper_ns" and "upper_ew".
 public final class PortNozzleModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "port_nozzle");
-    private static final Identifier COLLAR = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/distillation_array/plate");
+    // The collar's own steel, painted for its faces (1 px lit and dark edges along its length, a lip and seam at
+    // the port end): collar_v for faces whose length runs down the texture, collar_u (the same, transposed) for
+    // faces whose length runs across it, so the lit edge is always the top or left one.
+    private static final Identifier COLLAR_V = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/port_nozzle/collar_v");
+    private static final Identifier COLLAR_U = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/port_nozzle/collar_u");
     // The collar's cross-section, in pixels of the block face.
     private static final float COLLAR_MIN = 3.0F, COLLAR_MAX = 13.0F;
 
@@ -119,7 +123,7 @@ public final class PortNozzleModel {
             Map<String, List<float[]>> boxes = new HashMap<>();
             shapes.forEach((name, model) -> boxes.put(name, boxes(baker, model)));
             return new Baked(variant.bake(baker), found, boxes, new PortOverlays(baker, variant.modelLocation()),
-                    templates(baker, variant.modelLocation()));
+                    templates(baker, COLLAR_V, variant.modelLocation()), templates(baker, COLLAR_U, variant.modelLocation()));
         }
     }
 
@@ -136,9 +140,9 @@ public final class PortNozzleModel {
         return boxes;
     }
 
-    // The collar texture on a whole face of each side, to cut the collar's faces from.
-    private static Map<Direction, BakedQuad> templates(ModelBaker baker, Identifier name) {
-        Material.Baked texture = ConnectedModel.Baked.material(baker, COLLAR, name);
+    // A collar texture on a whole face of each side, to cut the collar's faces from.
+    private static Map<Direction, BakedQuad> templates(ModelBaker baker, Identifier collar, Identifier name) {
+        Material.Baked texture = ConnectedModel.Baked.material(baker, collar, name);
         Map<Direction, BakedQuad> templates = new EnumMap<>(Direction.class);
         for (Direction face : Direction.values()) {
             templates.put(face, ConnectedModel.Baked.bake(baker, face, 0, 0, 16, 16, 0, texture, 0, 0, 16, 16, Quadrant.R0));
@@ -152,13 +156,16 @@ public final class PortNozzleModel {
         private final Map<String, List<float[]>> shapes;
         private final PortOverlays ports;
         private final Map<Direction, BakedQuad> collar;
+        private final Map<Direction, BakedQuad> collarAcross;
 
-        Baked(BlockStateModelPart base, Kind kind, Map<String, List<float[]>> shapes, PortOverlays ports, Map<Direction, BakedQuad> collar) {
+        Baked(BlockStateModelPart base, Kind kind, Map<String, List<float[]>> shapes, PortOverlays ports, Map<Direction, BakedQuad> collar,
+                Map<Direction, BakedQuad> collarAcross) {
             this.base = base;
             this.kind = kind;
             this.shapes = shapes;
             this.ports = ports;
             this.collar = collar;
+            this.collarAcross = collarAcross;
         }
 
         @Override
@@ -255,12 +262,18 @@ public final class PortNozzleModel {
             max[axis] = Math.max(outer, inner);
             for (Direction side : Direction.values()) {
                 if (side.getAxis() != face.getAxis()) {
-                    quads.addUnculledFace(FaceRects.cut(collar.get(side), side, min, max));
+                    quads.addUnculledFace(FaceRects.cut((lengthDown(face, side) ? collar : collarAcross).get(side), side, min, max));
                 }
             }
             quads.addCulledFace(face, FaceRects.cut(collar.get(face), face, min, max));
             Direction back = face.getOpposite();
             quads.addUnculledFace(FaceRects.cut(collar.get(back), back, min, max));
+        }
+
+        // Whether a collar pointing out of face runs down side's texture (v) rather than across it (u). In face
+        // coordinates (FaceRects.local) y is v on every side face and z is v on the top and bottom ones.
+        private static boolean lengthDown(Direction face, Direction side) {
+            return face.getAxis() == Direction.Axis.Y || (face.getAxis() == Direction.Axis.Z && side.getAxis() == Direction.Axis.Y);
         }
 
         @Override

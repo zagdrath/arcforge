@@ -15,9 +15,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
@@ -33,6 +37,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -45,6 +50,8 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.SideSetting;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
+import net.zagdrath.arcforge.item.conduit.ConduitFilterItem;
+import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // A 6px pipe that auto-connects to conduits of the same type (any tier) and to machines. A side facing a
@@ -293,6 +300,39 @@ public class ConduitBlock extends BaseEntityBlock {
         if (player != null) {
             player.sendOverlayMessage(Component.translatable("message.arcforge.conduit.side",
                     Component.translatable("conduit_side.arcforge." + side.getSerializedName()), result));
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    // --- Conduit Filters (see ConduitFilterItem) ---
+
+    // The side of the conduit at pos that a click at `hit` points at, as the Wrench works it out.
+    public static Direction sideAt(BlockPos pos, Vec3 hit) {
+        return Direction.getApproximateNearest(hit.subtract(Vec3.atCenterOf(pos)));
+    }
+
+    // A Conduit Filter in hand goes on to the item (installing it) rather than being handled here.
+    @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
+        if (stack.getItem() instanceof ConduitFilterItem) {
+            return InteractionResult.PASS;
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+    }
+
+    // An empty hand on a filtered side opens that filter's settings.
+    @Override
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        Direction side = sideAt(pos, hit.getLocation());
+        if (!player.getMainHandItem().isEmpty() || !(level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) || !conduit.hasFilter(side)) {
+            return InteractionResult.PASS;
+        }
+        if (player instanceof ServerPlayer serverPlayer) {
+            serverPlayer.openMenu(new SimpleMenuProvider((id, inventory, p) -> new ConduitFilterMenu(id, inventory, pos, side),
+                    Component.translatable("gui.arcforge.conduit_filter.title")), buf -> {
+                        buf.writeBlockPos(pos);
+                        Direction.STREAM_CODEC.encode(buf, side);
+                    });
         }
         return InteractionResult.SUCCESS;
     }

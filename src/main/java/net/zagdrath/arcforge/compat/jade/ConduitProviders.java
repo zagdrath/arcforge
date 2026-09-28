@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -18,6 +19,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.conduit.item.ItemPacket;
 import net.zagdrath.arcforge.conduit.network.ActiveConduitNetwork;
 import net.zagdrath.arcforge.conduit.network.ConduitNetwork;
@@ -146,6 +148,36 @@ public final class ConduitProviders {
         @Override
         public Identifier getUid() {
             return Identifier.fromNamespaceAndPath(Arcforge.MODID, "conduit_info");
+        }
+    }
+
+    // One line per Conduit Filter, e.g. "Filter North: Allowlist · Insert (3)", the side looked at first. Filters
+    // are synced with the conduit (they're drawn on it), so this reads the client's copy.
+    public enum Filters implements IBlockComponentProvider {
+        INSTANCE;
+
+        @Override
+        public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+            if (!(accessor.getBlockEntity() instanceof ConduitBlockEntity conduit)) {
+                return;
+            }
+            Direction looked = ConduitBlock.sideAt(accessor.getPosition(), accessor.getHitResult().getLocation());
+            List<Direction> sides = new ArrayList<>(List.of(Direction.values()));
+            sides.remove(looked);
+            sides.addFirst(looked);
+            for (Direction side : sides) {
+                if (conduit.hasFilter(side)) {
+                    FilterSettings settings = FilterSettings.of(conduit.getFilter(side));
+                    tooltip.add(Component.translatable("jade.arcforge.conduit_filter",
+                            Component.translatable("conduit_side.arcforge." + side.getSerializedName()),
+                            settings.listName(), settings.flow().displayName(), settings.count()));
+                }
+            }
+        }
+
+        @Override
+        public Identifier getUid() {
+            return Identifier.fromNamespaceAndPath(Arcforge.MODID, "conduit_filters");
         }
     }
 }

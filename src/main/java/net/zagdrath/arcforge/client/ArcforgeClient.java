@@ -41,11 +41,13 @@ import net.neoforged.neoforge.client.fluid.FluidTintSources;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent;
+import net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.client.model.ConduitFilterModel;
 import net.zagdrath.arcforge.client.model.PortNozzleModel;
 import net.zagdrath.arcforge.client.model.PortedModel;
 import net.zagdrath.arcforge.client.renderer.blockentity.ArcforgeFurnaceRenderer;
@@ -67,6 +69,7 @@ import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
 import net.zagdrath.arcforge.multiblock.PortStore;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
+import net.zagdrath.arcforge.client.renderer.item.FilterModeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
 import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
 import net.zagdrath.arcforge.client.screen.machine.InductionFurnaceScreen;
@@ -85,6 +88,7 @@ import net.zagdrath.arcforge.client.screen.machine.FuelBurnerScreen;
 import net.zagdrath.arcforge.client.screen.machine.GeothermalPlantScreen;
 import net.zagdrath.arcforge.client.screen.machine.InfuserScreen;
 import net.zagdrath.arcforge.client.screen.machine.ThermoelectricPlantScreen;
+import net.zagdrath.arcforge.client.screen.conduit.ConduitFilterScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.ArcforgeFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.CarbonizerScreen;
 import net.zagdrath.arcforge.client.screen.storage.EnergyCellScreen;
@@ -161,6 +165,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceScreen::new);
         event.register(ModMenuTypes.DISTILLATION_ARRAY.get(), DistillationArrayScreen::new);
         event.register(ModMenuTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayScreen::new);
+        event.register(ModMenuTypes.CONDUIT_FILTER.get(), ConduitFilterScreen::new);
     }
 
     // Lit Pressurized and Thermodynamic Conduits glow in the colour of what they hold.
@@ -256,6 +261,12 @@ public class ArcforgeClient {
         event.register(CellChargeProperty.ID, CellChargeProperty.MAP_CODEC);
     }
 
+    // Conduit Filters show an unset, allowlist or denylist LED (see items/conduit_filter.json).
+    @SubscribeEvent
+    static void registerSelectItemModelProperties(RegisterSelectItemModelPropertyEvent event) {
+        event.register(FilterModeProperty.ID, FilterModeProperty.TYPE);
+    }
+
     // Connected textures for the steam arrays and Pressure Glass (see ConnectedModel).
     @SubscribeEvent
     static void registerModelLoaders(ModelEvent.RegisterLoaders event) {
@@ -271,7 +282,7 @@ public class ArcforgeClient {
     }
 
     // The Steam Turbine Array's rotor pieces and the Solar Thermal Array's trough, receiver and control panel,
-    // drawn by their renderers.
+    // drawn by their renderers; the Conduit Filter sleeves, added to the conduit models.
     @SubscribeEvent
     static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
         event.register(SteamTurbineArrayRenderer.ROTOR_SHAFT, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_SHAFT_MODEL));
@@ -280,6 +291,13 @@ public class ArcforgeClient {
         event.register(SolarThermalArrayRenderer.RECEIVER, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.RECEIVER_MODEL));
         event.register(SolarThermalArrayRenderer.PANEL, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.PANEL_MODEL));
         event.register(SolarThermalArrayRenderer.PANEL_ON, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.PANEL_ON_MODEL));
+        ConduitFilterModel.registerStandalone(event);
+    }
+
+    // Conduit Filter sleeves on filtered conduit arms (see ConduitFilterModel).
+    @SubscribeEvent
+    static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
+        ConduitFilterModel.wrap(event);
     }
 
     // Glass conduits (item and fluid) and fluid tanks draw their contents; everything else is pure block models.

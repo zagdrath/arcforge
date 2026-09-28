@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " W ",
+    "WBW",
+    " W "
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "B": "minecraft:iron_bars"
+  },
+  "result": {
+    "id": "arcforge:conduit_filter",
+    "count": 2
+  }
+}
