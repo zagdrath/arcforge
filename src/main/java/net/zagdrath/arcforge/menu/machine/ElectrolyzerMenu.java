@@ -40,7 +40,12 @@ public class ElectrolyzerMenu extends MachineMenu {
     public static final int DATA_STATUS = 18;
     public static final int DATA_REDSTONE_MODE = 19;
     public static final int DATA_SIDE_CONFIG = 20;
-    public static final int DATA_VALUES = 21;
+    // Bit 1: venting hydrogen (the primary tank), bit 2: venting oxygen (the secondary).
+    public static final int DATA_VENT = 21;
+    public static final int DATA_VALUES = 22;
+
+    public static final int BUTTON_VENT_HYDROGEN = 200;
+    public static final int BUTTON_VENT_OXYGEN = 201;
 
     // Tabs: Energy, Redstone, Sides, Upgrades.
     private static final int UPGRADES_TAB = 3;
@@ -53,6 +58,28 @@ public class ElectrolyzerMenu extends MachineMenu {
     public ElectrolyzerMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.ELECTROLYZER.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.ELECTROLYZER.get());
         finish(inventory, UPGRADES_TAB);
+    }
+
+    @Override
+    public boolean clickMenuButton(net.minecraft.world.entity.player.Player player, int buttonId) {
+        if (buttonId == BUTTON_VENT_HYDROGEN || buttonId == BUTTON_VENT_OXYGEN) {
+            boolean hydrogen = buttonId == BUTTON_VENT_HYDROGEN;
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof ElectrolyzerBlockEntity electrolyzer) {
+                    electrolyzer.setVenting(hydrogen, !(hydrogen ? electrolyzer.isVentingHydrogen() : electrolyzer.isVentingOxygen()));
+                }
+            });
+            return true;
+        }
+        return super.clickMenuButton(player, buttonId);
+    }
+
+    public boolean isVentingHydrogen() {
+        return (value(DATA_VENT) & 1) != 0;
+    }
+
+    public boolean isVentingOxygen() {
+        return (value(DATA_VENT) & 2) != 0;
     }
 
     @Override

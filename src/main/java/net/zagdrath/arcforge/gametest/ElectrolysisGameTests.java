@@ -117,11 +117,35 @@ public final class ElectrolysisGameTests {
                 .thenSucceed();
     }
 
+    // A full oxygen tank stops it; with oxygen venting on it carries on, filling hydrogen and releasing the oxygen that
+    // doesn't fit.
+    static void ventKeepsSplitting(GameTestHelper helper) {
+        ElectrolyzerBlockEntity blocked = electrolyzer(helper, new BlockPos(0, 1, 0));
+        ElectrolyzerBlockEntity vented = electrolyzer(helper, new BlockPos(2, 1, 0));
+        for (ElectrolyzerBlockEntity machine : List.of(blocked, vented)) {
+            CrushingGameTests.install(machine.getItems(), ModItems.SPEED_UPGRADE.get(), 8);
+            fill(machine.getFluidHandler(Direction.UP), Fluids.WATER, 300);
+            machine.getOxygen().set(0, FluidResource.of(ModFluids.OXYGEN.get()), machine.getOxygen().getCapacity());
+        }
+        vented.setVenting(false, true);
+        List<Meter> meters = List.of(new Meter(blocked), new Meter(vented));
+        helper.onEachTick(() -> meters.forEach(Meter::topUp));
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(vented.getWater().getAmount() == 0, "The venting Electrolyzer still has water"))
+                .thenExecute(() -> {
+                    helper.assertTrue(vented.getHydrogen().getAmount() == 600, "Vented hydrogen: " + vented.getHydrogen().getAmount() + " mB, not 600");
+                    helper.assertTrue(vented.getOxygen().getAmount() == vented.getOxygen().getCapacity(), "The oxygen tank overflowed");
+                    helper.assertTrue(blocked.getStatus() == MachineStatus.OUTPUT_FULL && blocked.getWater().getAmount() == 300,
+                            "Without venting it is " + blocked.getStatus() + " with " + blocked.getWater().getAmount() + " mB of water");
+                })
+                .thenSucceed();
+    }
+
     // One operation (100 mB of water) uses exactly its cost: 120,000 FE, 96,000 with an Energy upgrade, and the
-    // balance floor of 61,950 with eight.
+    // balance floor of 70,800 with eight.
     static void energyExact(GameTestHelper helper) {
         int[] energyUpgrades = { 0, 1, 8 };
-        int[] expected = { 120_000, 96_000, 61_950 };
+        int[] expected = { 120_000, 96_000, 70_800 };
         List<ElectrolyzerBlockEntity> machines = new ArrayList<>();
         List<Meter> meters = new ArrayList<>();
         for (int i = 0; i < energyUpgrades.length; i++) {
@@ -135,7 +159,7 @@ public final class ElectrolysisGameTests {
             meters.add(new Meter(machine));
         }
         ElectrolyzingRecipe recipe = waterRecipe(helper);
-        helper.assertTrue(EnergyBalance.minEnergyFor(recipe) == 61_950, "The floor is " + EnergyBalance.minEnergyFor(recipe) + " FE, not 61,950");
+        helper.assertTrue(EnergyBalance.minEnergyFor(recipe) == 70_800, "The floor is " + EnergyBalance.minEnergyFor(recipe) + " FE, not 70,800");
         helper.onEachTick(() -> meters.forEach(Meter::topUp));
         helper.startSequence()
                 .thenWaitUntil(() -> machines.forEach(machine -> helper.assertTrue(machine.getOxygen().getAmount() == 100, "Not split yet")))
@@ -175,7 +199,8 @@ public final class ElectrolysisGameTests {
         for (double route : routes) {
             helper.assertTrue(best >= route - 1e-9, "A route gives " + route + " FE/HU, more than bestFePerHu() " + best);
         }
-        helper.assertTrue(Math.abs(best - 2.065) < 0.001, "bestFePerHu() is " + best + ", not 2.065");
+        // Boiling Steam (8 HU) and superheating it (6 HU) into 33.04 FE: 2.36 FE per HU.
+        helper.assertTrue(Math.abs(best - 2.36) < 0.001, "bestFePerHu() is " + best + ", not 2.36");
         helper.assertTrue(Math.abs(EnergyBalance.thermoelectricFePerHu() - 1.725) < 0.001, "Thermoelectric route is " + EnergyBalance.thermoelectricFePerHu());
         double hydrogen = EnergyBalance.recoverableFePerMb(ModFluids.HYDROGEN.get());
         helper.assertTrue(Math.abs(hydrogen - 60 * 2.0 * best) < 1e-6, "Hydrogen gives back " + hydrogen + " FE/mB");

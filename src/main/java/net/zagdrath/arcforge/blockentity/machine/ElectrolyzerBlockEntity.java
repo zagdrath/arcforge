@@ -84,6 +84,10 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
     private @Nullable Identifier current;
     // The recipe for what's in the water tank (or for water, while it's empty), for the GUI and Jade.
     private @Nullable ElectrolyzingRecipe shown;
+    // Venting (set per gas in the GUI): when that tank can't take an operation's output, the overflow is released so
+    // splitting carries on, for when only the other gas is wanted. It still leaves through its faces as usual.
+    private boolean ventHydrogen;
+    private boolean ventOxygen;
 
     public ElectrolyzerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.ELECTROLYZER.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> false, UPGRADES,
@@ -129,6 +133,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
                     case ElectrolyzerMenu.DATA_STATUS -> status.ordinal();
                     case ElectrolyzerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case ElectrolyzerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ElectrolyzerMenu.DATA_VENT -> (ventHydrogen ? 1 : 0) | (ventOxygen ? 2 : 0);
                     default -> 0;
                 };
             }
@@ -194,7 +199,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
                 spent += draw;
                 if (spent >= cost) {
                     spent = 0;
-                    finish(holder.value());
+                    finish(level, holder.value());
                 }
                 setChanged();
             }
@@ -224,10 +229,10 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
     private boolean fits(ElectrolyzingRecipe recipe) {
         try (Transaction tx = Transaction.openRoot()) {
             FluidStack primary = recipe.primary().create();
-            if (hydrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx) != primary.getAmount()) {
+            if (!ventHydrogen && hydrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx) != primary.getAmount()) {
                 return false;
             }
-            if (recipe.secondary().isPresent()) {
+            if (recipe.secondary().isPresent() && !ventOxygen) {
                 FluidStack secondary = recipe.secondary().get().create();
                 return oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx) == secondary.getAmount();
             }
@@ -235,17 +240,40 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
         }
     }
 
-    private void finish(ElectrolyzingRecipe recipe) {
+    private void finish(ServerLevel level, ElectrolyzingRecipe recipe) {
+        int vented = 0;
         try (Transaction tx = Transaction.openRoot()) {
             water.extract(0, water.getResource(0), recipe.input().amount(), tx);
             FluidStack primary = recipe.primary().create();
-            hydrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx);
-            recipe.secondary().ifPresent(template -> {
-                FluidStack secondary = template.create();
-                oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
-            });
+            vented += primary.getAmount() - hydrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx);
+            if (recipe.secondary().isPresent()) {
+                FluidStack secondary = recipe.secondary().get().create();
+                vented += secondary.getAmount() - oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
+            }
             tx.commit();
         }
+        // Whatever didn't fit was vented (only possible with venting on): a puff from the top.
+        if (vented > 0) {
+            level.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, worldPosition.getX() + 0.5, worldPosition.getY() + 1.05,
+                    worldPosition.getZ() + 0.5, 3, 0.15, 0.05, 0.15, 0.01);
+        }
+    }
+
+    public boolean isVentingHydrogen() {
+        return ventHydrogen;
+    }
+
+    public boolean isVentingOxygen() {
+        return ventOxygen;
+    }
+
+    public void setVenting(boolean hydrogen, boolean on) {
+        if (hydrogen) {
+            ventHydrogen = on;
+        } else {
+            ventOxygen = on;
+        }
+        setChanged();
     }
 
     public FilteredFluidTank getWater() {
@@ -326,6 +354,8 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
         hydrogen.deserialize(input.childOrEmpty("hydrogen"));
         oxygen.deserialize(input.childOrEmpty("oxygen"));
         spent = input.getIntOr("spent", 0);
+        ventHydrogen = input.getBooleanOr("vent_hydrogen", false);
+        ventOxygen = input.getBooleanOr("vent_oxygen", false);
         current = input.getString("recipe").map(Identifier::tryParse).orElse(null);
     }
 
@@ -337,6 +367,8 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
         hydrogen.serialize(output.child("hydrogen"));
         oxygen.serialize(output.child("oxygen"));
         output.putInt("spent", spent);
+        output.putBoolean("vent_hydrogen", ventHydrogen);
+        output.putBoolean("vent_oxygen", ventOxygen);
         if (current != null) {
             output.putString("recipe", current.toString());
         }

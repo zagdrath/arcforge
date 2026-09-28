@@ -219,9 +219,12 @@ the Arc Crushing Array.
 
 - It takes steam and heat in, and sends the next grade out.
 - **Cost per mB:**
-  - Steam → High-Pressure: 5 HU;
-  - High-Pressure → Superheated: 5 HU;
-  - Steam → Superheated: 10 HU.
+  - Steam → High-Pressure: 3 HU;
+  - High-Pressure → Superheated: 3 HU;
+  - Steam → Superheated: 6 HU.
+- **Why use one:** boiling plain Steam (8 HU per mB) and superheating it (6) costs 14 HU per mB of Superheated
+  Steam, against 16 to boil it directly. Only the superheater needs 900°C heat, so the boiler can run on any
+  heat above 100°C.
 - Its own heat must be at least the target grade's temperature (500°C / 900°C). Below that, steam
   passes through unchanged.
 - **Pressure tab:**
@@ -300,7 +303,8 @@ Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running a
 per mB of hydrogen) at 400 FE/t. Water goes in through Input faces (the top by default); Hydrogen and Oxygen
 leave through their own face modes (left and right by default), pushed every tick into Pressurized Conduits,
 Cylinders or anything else that takes gas. A Gas Cartridge fills from its hydrogen first, then its oxygen. It
-has 8,000 mB of water and 16,000 mB of each gas, and takes Speed and Energy upgrades. Recipes are data-driven
+has 8,000 mB of water and 16,000 mB of each gas, and takes Speed and Energy upgrades. A full gas tank stops
+it; switch on the vent under that tank in its GUI and the gas that doesn't fit is released instead. Recipes are data-driven
 (`arcforge:electrolyzing`: `input` with `fluid` or `tag` and `amount`, `primary`, optional `secondary` and
 `energy`); the primary output fills the hydrogen tank and the secondary the oxygen tank.
 
@@ -308,7 +312,7 @@ has 8,000 mB of water and 16,000 mB of each gas, and takes Speed and Energy upgr
 The Electrolyzer never charges less than 1.25× (`balanceSafetyFactor`) the most FE the best heat-to-FE setup
 could get back from what it makes, worked out from the live config and data maps (every Heat upgrade in the
 burner, then the better of a fully carded Thermoelectric Plant and a Superheated boiler into a lubricated,
-exhausting turbine). By default that floor is 310 FE per mB of hydrogen, reached at the third Energy upgrade.
+exhausting turbine). By default that floor is 354 FE per mB of hydrogen, reached at the fourth Energy upgrade.
 
 **Oxygen** speeds up the Arcforge Furnace: give it an Oxygen port with the Wrench and pipe oxygen in. A smelt
 that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as fast (config

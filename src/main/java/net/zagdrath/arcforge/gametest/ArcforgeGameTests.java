@@ -159,6 +159,7 @@ public final class ArcforgeGameTests {
         TESTS.put("condenser_climate", SteamCycleGameTests::condenserClimate);
         TESTS.put("electrolysis_ratio", ElectrolysisGameTests::ratio);
         TESTS.put("electrolysis_energy_exact", ElectrolysisGameTests::energyExact);
+        TESTS.put("electrolysis_vent", ElectrolysisGameTests::ventKeepsSplitting);
         TESTS.put("hydrogen_net_negative", ElectrolysisGameTests::hydrogenNetNegative);
         TESTS.put("hydrogen_burns_in_fuel_burner", ElectrolysisGameTests::hydrogenBurnsInFuelBurner);
         TESTS.put("gas_conduit_feeds_burner", ElectrolysisGameTests::gasConduitFeedsBurner);

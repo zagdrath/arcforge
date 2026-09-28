@@ -31,6 +31,12 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier progress = sprite("progress");
     private final Identifier tankGauge = sprite("tank_gauge");
+    private final Identifier ventOn = sprite("vent_on");
+    private final Identifier ventOff = sprite("vent_off");
+    // A vent toggle under each gas tank, in the gap above the inventory.
+    private static final int VENT_Y = 71, VENT_W = 14, VENT_H = 12;
+    private static final int HOVER = 0x30FFFFFF;
+    private int mouseX, mouseY;
 
     public ElectrolyzerScreen(ElectrolyzerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "electrolyzer", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)));
@@ -53,7 +59,37 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
         drawFluidTank(graphics, menu.getSecondaryFluid(), menu.getSecondary(), menu.getGasCapacity(), tankGauge, tankGauge,
                 x, y, OXYGEN_X, TANK_Y, TANK_W, TANK_H);
         ArcCrusherScreen.drawProgress(graphics, progress, x + PROGRESS_X, y + PROGRESS_Y, menu.getProgress(), menu.getTotal());
+        vent(graphics, x, y, HYDROGEN_X - 1, menu.isVentingHydrogen());
+        vent(graphics, x, y, OXYGEN_X - 1, menu.isVentingOxygen());
         drawLed(graphics, x, y, LED_X, LED_Y);
+    }
+
+    private void vent(GuiGraphicsExtractor graphics, int x, int y, int ventX, boolean on) {
+        graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, on ? ventOn : ventOff, x + ventX, y + VENT_Y, VENT_W, VENT_H);
+        if (isHovering(ventX, VENT_Y, VENT_W, VENT_H, mouseX, mouseY)) {
+            graphics.fill(x + ventX, y + VENT_Y, x + ventX + VENT_W, y + VENT_Y + VENT_H, HOVER);
+        }
+    }
+
+    @Override
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT && minecraft.gameMode != null) {
+            int button = isHovering(HYDROGEN_X - 1, VENT_Y, VENT_W, VENT_H, event.x(), event.y()) ? ElectrolyzerMenu.BUTTON_VENT_HYDROGEN
+                    : isHovering(OXYGEN_X - 1, VENT_Y, VENT_W, VENT_H, event.x(), event.y()) ? ElectrolyzerMenu.BUTTON_VENT_OXYGEN : -1;
+            if (button >= 0) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, button);
+                ArcforgeGui.playClickSound();
+                return true;
+            }
+        }
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -94,6 +130,15 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
 
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
+        for (boolean hydrogen : new boolean[] { true, false }) {
+            if (isHovering((hydrogen ? HYDROGEN_X : OXYGEN_X) - 1, VENT_Y, VENT_W, VENT_H, mouseX, mouseY)) {
+                boolean on = hydrogen ? menu.isVentingHydrogen() : menu.isVentingOxygen();
+                lines.add(Component.translatable(hydrogen ? "gui.arcforge.electrolyzer.vent_hydrogen" : "gui.arcforge.electrolyzer.vent_oxygen"));
+                lines.add(Component.translatable(on ? "gui.arcforge.electrolyzer.vent_on" : "gui.arcforge.electrolyzer.vent_off")
+                        .withStyle(ChatFormatting.GRAY));
+                return;
+            }
+        }
         if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getCapacity())).withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.arcforge.fe_per_tick_loss", menu.getUsage()).withStyle(ChatFormatting.RED));

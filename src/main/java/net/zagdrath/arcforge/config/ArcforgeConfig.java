@@ -371,8 +371,10 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.DoubleValue SUPERHEATER_HEAT_COST = BUILDER
             .comment("Multiplier on the heat per mB (the difference in HU/mB between the grades: 5 Steam to High-Pressure,",
-                    "5 High-Pressure to Superheated, 10 Steam to Superheated).")
-            .defineInRange("heatCostMultiplier", 1.0, 0.1, 10.0);
+                    "5 High-Pressure to Superheated, 10 Steam to Superheated). At 0.6 (3 / 3 / 6 HU), boiling plain Steam and",
+                    "superheating it (8 + 6 = 14 HU per mB) beats boiling Superheated Steam directly (16), and only the",
+                    "superheating needs 900°C heat.")
+            .defineInRange("heatCostMultiplier", 0.6, 0.1, 10.0);
 
     static {
         BUILDER.pop();

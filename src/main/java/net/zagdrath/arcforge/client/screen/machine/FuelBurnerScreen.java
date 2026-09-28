@@ -20,7 +20,6 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.FuelBurnerMenu;
-import net.zagdrath.arcforge.registry.ModFluids;
 
 // Layout follows fuel_burner_gui_layout.json: the Geothermal Plant's frame with a fuel tank.
 // All positions are relative to leftPos/topPos.
@@ -84,7 +83,8 @@ public class FuelBurnerScreen extends MachineScreen<FuelBurnerMenu> {
             lines.add(Component.translatable("gui.arcforge.hu_stored", ArcforgeGui.grouped(menu.getHeat()), ArcforgeGui.grouped(menu.getHeatCapacity())));
             lines.add(Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getHeatPerTick()).withStyle(ChatFormatting.GOLD));
         } else if (isHovering(TANK_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
-            addFluidTooltip(lines, menu.getFluid(), ModFluids.CREOSOTE_TYPE.get().getDescription(), menu.getFluidAmount(), menu.getFluidCapacity());
+            // It takes any burner fuel (creosote, the oils, Naphtha, hydrogen...), so an empty tank is just "Fuel".
+            addFluidTooltip(lines, menu.getFluid(), Component.translatable("gui.arcforge.fuel"), menu.getFluidAmount(), menu.getFluidCapacity());
             BurnerFuel fuel = BurnerFuel.of(menu.getFluid());
             if (fuel != null) {
                 lines.add(Component.translatable("gui.arcforge.burns_at", ArcforgeGui.grouped(fuel.burnTemperature(ArcforgeConfig.FUEL_BURNER_MAX_TEMPERATURE.getAsInt())))

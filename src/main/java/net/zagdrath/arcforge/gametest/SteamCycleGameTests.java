@@ -86,8 +86,8 @@ public final class SteamCycleGameTests {
                 .thenSucceed();
     }
 
-    // At 1,000°C on Auto, 400 mB Steam becomes 400 mB Superheated for 10 HU/mB (4,000 HU), at most 2,000 HU a
-    // tick; 400 mB High-Pressure becomes Superheated for 5 HU/mB (2,000 HU).
+    // At 1,000°C on Auto, 400 mB Steam becomes 400 mB Superheated for 6 HU/mB (2,400 HU), at most 2,000 HU a
+    // tick; 400 mB High-Pressure becomes Superheated for 3 HU/mB (1,200 HU).
     static void superheaterHuCost(GameTestHelper helper) {
         BlockPos steamMin = MIN, pressureMin = new BlockPos(4, 1, 0);
         MultiblockTestHelpers.buildCube(helper, steamMin, ModBlocks.SUPERHEATER_ARRAY_CASING.get());
@@ -116,7 +116,7 @@ public final class SteamCycleGameTests {
                 })
                 .thenIdle(6)
                 .thenExecute(() -> {
-                    int[] expected = { 4_000, 2_000 };
+                    int[] expected = { 2_400, 1_200 };
                     BlockPos[] mins = { steamMin, pressureMin };
                     for (int i = 0; i < 2; i++) {
                         SuperheaterArrayBlockEntity array = superheater(helper, mins[i]);

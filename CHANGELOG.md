@@ -30,6 +30,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Recipes need plastic now.** Conduit Filters, Storage Upgrades and crafted crate and vault upgrades need a
   Plastic Sheet. Plastic needs the Chemical Reactor (Hardened), Light Oil and an Electrolyzer, so these items
   now come later in progression.
+- **Superheater cost.** The default `steam.superheaterArray.heatCostMultiplier` is now 0.6 (was 1.0).
+  - An existing `arcforge-common.toml` keeps 1.0; set it to 0.6 by hand.
 
 ### Added
 
@@ -42,13 +44,15 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
     JEI, a Handbook page, and a running sound.
   - Recipes are data-driven (`arcforge:electrolyzing`). The primary output fills the hydrogen tank and the
     secondary the oxygen tank.
+  - A vent button under each gas tank. With it on, gas that doesn't fit is released, so a full tank doesn't stop
+    it when you only want the other gas.
 - **Hydrogen and Oxygen**, two new gases (Pressurized Conduits, Cylinders and Gas Cartridges only).
 - **Hydrogen fuel.** Hydrogen burns in the Fuel Burner: 60 HU/t, up to 1,400°C.
   - It stores power but never makes it. The Electrolyzer never charges less than 1.25× the most FE the best
     heat-to-FE setup could get back from what it makes.
   - This floor is worked out from the live config and data maps, so packs can't make hydrogen net-positive by
     changing them.
-  - By default the floor is 310 FE per mB of hydrogen, reached at the third Energy upgrade.
+  - By default the floor is 354 FE per mB of hydrogen, reached at the fourth Energy upgrade.
 - **Oxygen port on the Arcforge Furnace.** A smelt that starts with 50 mB of oxygen in the furnace uses it and
   runs 1.5× as fast.
   - The furnace's GUI, Jade and JEI show it.
@@ -101,6 +105,9 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Changed
 
+- **Superheater Array: 3 HU per mB per grade step** (was 5). Boiling Steam and superheating it now costs 14 HU per
+  mB of Superheated Steam, against 16 from a boiler alone, so the Superheater is the efficient way to make it.
+  - The hydrogen balance floor follows automatically: 354 FE per mB of hydrogen (was 310).
 - **Plastic in recipes.** Conduit Filters, Storage Upgrades and crafted crate and vault upgrades now need a
   Plastic Sheet in place of one alloy.
 - **Fuel Burner.** Its default maximum temperature is 1,400°C (was 1,200). The other fuels still burn at their
@@ -124,6 +131,9 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
   - Output of 10,000 FE/t or more is shortened (e.g. "+16.4k").
   - The exhaust line under the dial reads just "Vacuum" or "Venting", with the bonus in its tooltip.
   - Hovering the values shows them in full.
+- **Pressurized Conduits: hard black lines along their edges.** The gas conduits' bottom bevel is now a normal
+  1 px dark edge instead of a 2 px near-black band.
+- **Fuel Burner:** its empty tank's tooltip said "Creosote"; it takes any burner fuel, so it now says "Fuel".
 
 ## [2.0.0] - 2026-09-28
 
