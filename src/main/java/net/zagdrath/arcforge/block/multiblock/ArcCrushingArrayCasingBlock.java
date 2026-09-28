@@ -8,8 +8,6 @@ package net.zagdrath.arcforge.block.multiblock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -58,9 +56,6 @@ public class ArcCrushingArrayCasingBlock extends CubeCasingBlock {
         double z = pos.getZ() + 0.5 + facing.getStepZ() * 1.4 + facing.getClockWise().getStepZ() * along;
         if (random.nextInt(2) == 0) {
             level.addParticle(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0.0, 0.0, 0.0);
-        }
-        if (random.nextDouble() < 0.08) {
-            level.playLocalSound(x, y, z, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 0.35F, 0.5F, false);
         }
     }
 }

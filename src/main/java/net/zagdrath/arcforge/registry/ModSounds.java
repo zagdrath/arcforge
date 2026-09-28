@@ -21,7 +21,19 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> TURBINE_ARRAY_RUN = SOUND_EVENTS.register("turbine_array_run",
             () -> SoundEvent.createFixedRangeEvent(Identifier.fromNamespaceAndPath(Arcforge.MODID, "turbine_array_run"), 24.0F));
 
+    // Machines' running loops (see MachineLoopSound): single machines are heard over 16 blocks, the arrays 24.
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARC_CRUSHER_RUN = loop("arc_crusher_run", 16.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARC_CRUSHING_ARRAY_RUN = loop("arc_crushing_array_run", 24.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> INDUCTION_FURNACE_RUN = loop("induction_furnace_run", 16.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> INDUCTION_FURNACE_ARRAY_RUN = loop("induction_furnace_array_run", 24.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> METAL_PRESS_RUN = loop("metal_press_run", 16.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> METAL_PRESSING_ARRAY_RUN = loop("metal_pressing_array_run", 24.0F);
+
     private ModSounds() {}
+
+    private static DeferredHolder<SoundEvent, SoundEvent> loop(String name, float range) {
+        return SOUND_EVENTS.register(name, () -> SoundEvent.createFixedRangeEvent(Identifier.fromNamespaceAndPath(Arcforge.MODID, name), range));
+    }
 
     public static void register(IEventBus modEventBus) {
         SOUND_EVENTS.register(modEventBus);

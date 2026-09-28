@@ -38,6 +38,7 @@ import net.zagdrath.arcforge.multiblock.CubeMultiblockStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import net.zagdrath.arcforge.multiblock.PortHolder;
+import net.zagdrath.arcforge.sound.MachineSounds;
 
 // A casing of a 3x3x3 cube multiblock (the Arc Crushing Array, the Induction Furnace Array). 27 of the
 // same casing form the machine: the centre block (part=center) draws the whole 48px machine model and
@@ -83,12 +84,15 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
         builder.add(PART, FACING, LIT);
     }
 
-    // Only the centre of a formed cube runs.
+    // Only the centre of a formed cube runs; on clients it keeps its running loop going.
     @Override
     @SuppressWarnings("unchecked")
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
-        if (!(level instanceof ServerLevel serverLevel) || state.getValue(PART) != Part.CENTER || type != blockEntityType()) {
+        if (state.getValue(PART) != Part.CENTER || type != blockEntityType()) {
             return null;
+        }
+        if (!(level instanceof ServerLevel serverLevel)) {
+            return MachineSounds.clientTicker();
         }
         BlockEntityTicker<CubeMultiblockBlockEntity> ticker = (innerLevel, pos, blockState, machine) -> machine.serverTick(serverLevel, pos, blockState);
         return (BlockEntityTicker<T>) (BlockEntityTicker<?>) ticker;

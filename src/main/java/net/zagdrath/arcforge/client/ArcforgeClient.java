@@ -61,6 +61,7 @@ import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.DistillationArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.SolarThermalArrayScreen;
+import net.zagdrath.arcforge.client.sound.MachineLoopSound;
 import net.zagdrath.arcforge.client.sound.TurbineArraySound;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
@@ -91,6 +92,7 @@ import net.zagdrath.arcforge.client.screen.storage.FluidTankScreen;
 import net.zagdrath.arcforge.client.screen.storage.HeatCellScreen;
 import net.zagdrath.arcforge.client.screen.storage.PressurizedCylinderScreen;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
+import net.zagdrath.arcforge.sound.MachineSounds;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -108,6 +110,7 @@ public class ArcforgeClient {
         container.registerExtensionPoint(IConfigScreenFactory.class, ArcforgeConfigScreen::create);
         EngineersHandbookItem.opener = EngineersHandbookScreen::open;
         SteamTurbineArrayBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
+        MachineSounds.clientHook = MachineLoopSound::keepPlaying;
         // Re-mesh blocks whose ports changed, and forget the ports on leaving a world.
         // (The ports aren't block state, so the section is marked dirty itself: marking the block would skip it,
         // as its model hasn't changed.)

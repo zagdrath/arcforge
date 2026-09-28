@@ -7,5 +7,59 @@
         "stream": false
       }
     ]
+  },
+  "arc_crusher_run": {
+    "subtitle": "subtitles.arcforge.arc_crusher_run",
+    "sounds": [
+      {
+        "name": "arcforge:arc_crusher_run",
+        "stream": false
+      }
+    ]
+  },
+  "arc_crushing_array_run": {
+    "subtitle": "subtitles.arcforge.arc_crushing_array_run",
+    "sounds": [
+      {
+        "name": "arcforge:arc_crushing_array_run",
+        "stream": false
+      }
+    ]
+  },
+  "induction_furnace_run": {
+    "subtitle": "subtitles.arcforge.induction_furnace_run",
+    "sounds": [
+      {
+        "name": "arcforge:induction_furnace_run",
+        "stream": false
+      }
+    ]
+  },
+  "induction_furnace_array_run": {
+    "subtitle": "subtitles.arcforge.induction_furnace_array_run",
+    "sounds": [
+      {
+        "name": "arcforge:induction_furnace_array_run",
+        "stream": false
+      }
+    ]
+  },
+  "metal_press_run": {
+    "subtitle": "subtitles.arcforge.metal_press_run",
+    "sounds": [
+      {
+        "name": "arcforge:metal_press_run",
+        "stream": false
+      }
+    ]
+  },
+  "metal_pressing_array_run": {
+    "subtitle": "subtitles.arcforge.metal_pressing_array_run",
+    "sounds": [
+      {
+        "name": "arcforge:metal_pressing_array_run",
+        "stream": false
+      }
+    ]
   }
 }

@@ -8,8 +8,6 @@ package net.zagdrath.arcforge.block.multiblock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -64,9 +62,6 @@ public class InductionFurnaceArrayCasingBlock extends CubeCasingBlock {
             double stackZ = pos.getZ() + 0.5 - facing.getStepZ() * 0.6;
             level.addParticle(ParticleTypes.SMOKE, stackX + (random.nextDouble() - 0.5) * 0.4, pos.getY() + 2.1,
                     stackZ + (random.nextDouble() - 0.5) * 0.4, 0.0, 0.05, 0.0);
-        }
-        if (random.nextDouble() < 0.1) {
-            level.playLocalSound(x, y, z, SoundEvents.BLASTFURNACE_FIRE_CRACKLE, SoundSource.BLOCKS, 0.8F, 1.1F, false);
         }
     }
 }

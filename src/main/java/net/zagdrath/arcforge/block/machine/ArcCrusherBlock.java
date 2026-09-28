@@ -11,8 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -22,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.sound.MachineSounds;
 
 public class ArcCrusherBlock extends MachineBlock {
     public ArcCrusherBlock(BlockBehaviour.Properties properties) {
@@ -38,10 +37,10 @@ public class ArcCrusherBlock extends MachineBlock {
         return level instanceof ServerLevel serverLevel
                 ? createTickerHelper(type, ModBlockEntityTypes.ARC_CRUSHER.get(),
                         (innerLevel, pos, blockState, crusher) -> crusher.serverTick(serverLevel, pos, blockState))
-                : null;
+                : createTickerHelper(type, ModBlockEntityTypes.ARC_CRUSHER.get(), MachineSounds.clientTicker());
     }
 
-    // Arc sparks at the rollers and a grinding hum while crushing.
+    // Arc sparks at the rollers while crushing (the sound is its running loop, see MachineLoopSound).
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (!state.getValue(LIT)) {
@@ -53,9 +52,6 @@ public class ArcCrusherBlock extends MachineBlock {
         double z = pos.getZ() + 0.5 + facing.getStepZ() * 0.52 + (random.nextDouble() - 0.5) * 0.3;
         if (random.nextInt(3) == 0) {
             level.addParticle(ParticleTypes.ELECTRIC_SPARK, x, y, z, 0.0, 0.0, 0.0);
-        }
-        if (random.nextDouble() < 0.08) {
-            level.playLocalSound(x, y, z, SoundEvents.GRINDSTONE_USE, SoundSource.BLOCKS, 0.25F, 0.6F, false);
         }
     }
 }
