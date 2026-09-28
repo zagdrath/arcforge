@@ -175,6 +175,14 @@ public final class ArcforgeGameTests {
         TESTS.put("placer_places_from_inventory", AutomationGameTests::placerPlacesFromInventory);
         TESTS.put("vacuum_radius", AutomationGameTests::vacuumRadius);
         TESTS.put("vacuum_filter", AutomationGameTests::vacuumFilter);
+        TESTS.put("steel_tool_levels", SteelEquipmentGameTests::toolLevels);
+        TESTS.put("steel_armor_values", SteelEquipmentGameTests::armorValues);
+        TESTS.put("hammer_3x3_valid_only", SteelEquipmentGameTests::hammerValidOnly);
+        TESTS.put("hammer_skips_block_entities", SteelEquipmentGameTests::hammerSkipsBlockEntities);
+        TESTS.put("excavator_dirt_and_gravel", SteelEquipmentGameTests::excavatorDirtAndGravel);
+        TESTS.put("area_sneak_single", SteelEquipmentGameTests::sneakSingle);
+        TESTS.put("area_durability_per_block", SteelEquipmentGameTests::durabilityPerBlock);
+        TESTS.put("area_break_event_cancel", SteelEquipmentGameTests::breakEventCancel);
         TESTS.put("quarry_needs_room", ArcQuarryGameTests::needsRoom);
         TESTS.put("quarry_shape_follows_model", ArcQuarryGameTests::shapeFollowsModel);
         TESTS.put("quarry_tag_allowlist", ArcQuarryGameTests::tagAllowlist);

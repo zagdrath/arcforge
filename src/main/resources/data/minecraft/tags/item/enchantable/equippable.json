@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:steel_helmet",
+    "arcforge:steel_chestplate",
+    "arcforge:steel_leggings",
+    "arcforge:steel_boots"
+  ]
+}

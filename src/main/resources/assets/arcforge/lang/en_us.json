@@ -1135,5 +1135,20 @@
   "arcforge.configuration.silkTouchMultiplier": "Silk Touch energy multiplier",
   "arcforge.configuration.ticksPerBlock": "Ticks per block",
   "arcforge.configuration.scanBlocksPerTick": "Blocks scanned per tick",
-  "arcforge.configuration.chunkLoading": "Keep mined chunks loaded"
+  "arcforge.configuration.chunkLoading": "Keep mined chunks loaded",
+  "item.arcforge.steel_sword": "Steel Sword",
+  "item.arcforge.steel_pickaxe": "Steel Pickaxe",
+  "item.arcforge.steel_axe": "Steel Axe",
+  "item.arcforge.steel_shovel": "Steel Shovel",
+  "item.arcforge.steel_hoe": "Steel Hoe",
+  "item.arcforge.steel_helmet": "Steel Helmet",
+  "item.arcforge.steel_chestplate": "Steel Chestplate",
+  "item.arcforge.steel_leggings": "Steel Leggings",
+  "item.arcforge.steel_boots": "Steel Boots",
+  "item.arcforge.steel_hammer": "Steel Hammer",
+  "item.arcforge.steel_excavator": "Steel Excavator",
+  "tooltip.arcforge.info.steel_hammer": "Mines a 3×3 area facing the side you hit, one durability per block. Sneak to mine a single block.",
+  "tooltip.arcforge.info.steel_excavator": "Digs a 3×3 area facing the side you hit, one durability per block. Sneak to dig a single block.",
+  "tooltip.arcforge.area_tool": "Breaks 3×3 · Sneak for one block",
+  "tooltip.arcforge.area_tool.rules": "Only blocks it is good against, no harder than the one you hit"
 }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "BBB",
+    " R ",
+    " R "
+  ],
+  "key": {
+    "B": "#c:storage_blocks/steel",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:steel_hammer",
+    "count": 1
+  }
+}

@@ -69,8 +69,10 @@ night and in thunderstorms), and the receiver takes in heat by it:
 | Biome | hot (desert, badlands, savanna) ×1.2, cold ×0.85 |
 | Collectors | each one that can't see the sky loses a quarter |
 
-At clear noon on the north-south axis it makes 600 HU/t at 550°C (High-Pressure Steam from a boiler needs
-500°C, so about 10:00 to 14:00 in clear weather). The temperature follows the same factors, up to 550°C.
+At clear noon on the north-south axis it makes 600 HU/t at 1,100°C. The temperature follows the same factors,
+up to 1,100°C: in clear weather it's above 500°C (High-Pressure Steam) from about 7:45 to 16:15, and above
+900°C (a Superheater Array, or Superheated Steam) from about 9:40 to 14:20. On the east-west axis (×0.7) it
+tops out at about 780°C, too cool to superheat.
 It holds 16,000 HU and gives heat out of its heat ports (a new tower has one on the bottom block behind
 the controller), at its whole output even into a touching machine. A boiler it feeds only gets to 500°C
 set to High-Pressure (see the Steam Boiler Array), since one array gives less heat than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
@@ -107,6 +109,22 @@ tanks, cylinders and the portables are crafted from their tier's alloy, and each
 (the `arcforge:tier_upgrade` recipe keeps what it holds). The machine array casings need Tempered Alloy.
 Crushing coal ore (2 carbon dust + a chance of a third) and carbonizing the dust is the high-yield coke route.
 Carbon Fiber comes from the Distillation Array's pitch, so the top tier needs distillation.
+
+### Steel tools and armour
+
+Steel sits between iron and diamond, and mines at iron level (obsidian, ancient debris and Arcite still need
+diamond). All of it repairs with Steel Ingots.
+
+- **Tools** (sword, pickaxe, axe, shovel, hoe): vanilla recipes with Steel Ingots and sticks. 500 uses,
+  7.0 mining speed.
+- **Armour:** 2 / 7 / 5 / 2 armour and 1.0 toughness per piece.
+- **Steel Hammer** (a pickaxe) and **Steel Excavator** (a shovel): three Steel Blocks on two Steel Rods (the
+  Excavator takes one block). They break a 3×3 facing the side you hit, 1 durability per block, 1,500 uses, at
+  70% of the speed.
+  - The other 8 only break if the tool is good against them and they're no harder than the block you hit.
+    Chests and other block entities, and unbreakable blocks, are skipped.
+  - Each block fires its own break event, so claims and protection mods can stop it.
+  - Sneak to break a single block. An outline shows what will break.
 
 ### Ores
 

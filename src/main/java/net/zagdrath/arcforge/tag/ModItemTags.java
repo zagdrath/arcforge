@@ -30,5 +30,8 @@ public final class ModItemTags {
     // Plastic (Plastic Sheets), for Conduit Filters and Storage Upgrades.
     public static final TagKey<Item> PLASTICS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "plastics"));
 
+    // Steel ingots: what steel tools and armour repair with.
+    public static final TagKey<Item> STEEL_INGOTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/steel"));
+
     private ModItemTags() {}
 }

@@ -1,0 +1,16 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:steel_sword",
+    "arcforge:steel_pickaxe",
+    "arcforge:steel_axe",
+    "arcforge:steel_shovel",
+    "arcforge:steel_hoe",
+    "arcforge:steel_hammer",
+    "arcforge:steel_excavator",
+    "arcforge:steel_helmet",
+    "arcforge:steel_chestplate",
+    "arcforge:steel_leggings",
+    "arcforge:steel_boots"
+  ]
+}

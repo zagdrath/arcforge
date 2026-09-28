@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "I",
+    "S",
+    "S"
+  ],
+  "key": {
+    "I": "#c:ingots/steel",
+    "S": "#c:rods/wooden"
+  },
+  "result": {
+    "id": "arcforge:steel_shovel",
+    "count": 1
+  }
+}

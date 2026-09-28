@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "arcforge:steel"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "arcforge:steel"
+      }
+    ]
+  }
+}

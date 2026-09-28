@@ -38,8 +38,17 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
   - An existing `arcforge-common.toml` keeps 10 and 4; set `power.geothermalPlant.lavaSourceHeat` to 40 and
     `magmaHeat` to 16 by hand.
 
+- **Solar Thermal Array temperature.** The default `solarThermalArray.maxTemperature` is now 1,100°C (was 550).
+  - An existing `arcforge-common.toml` keeps 550; set it to 1100 by hand.
+
 ### Added
 
+- **Steel tools and armour.** Sword, pickaxe, axe, shovel and hoe (500 uses, 7.0 speed) and a full armour set
+  (2 / 7 / 5 / 2, 1.0 toughness): between iron and diamond, mining at iron level, repaired with Steel Ingots.
+- **Steel Hammer and Steel Excavator.** Break a 3×3 facing the side you hit, only blocks the tool is good
+  against and no harder than the one you hit; chests and other block entities are skipped. 1 durability per
+  block, 1,500 uses; sneak for a single block. An outline shows what will break, and each block fires its own
+  break event for protection mods.
 - **Electrolyzer.** A Tempered machine that splits water into Hydrogen and Oxygen with FE, 2:1.
   - 100 mB of water makes 200 mB of hydrogen and 100 mB of oxygen for 120,000 FE (1,200 FE per mB of water),
     at 400 FE/t.
@@ -110,6 +119,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Changed
 
+- **Solar Thermal Array: up to 1,100°C** (was 550), so it can feed a Superheater Array. In clear weather on the
+  north-south axis it stays above 900°C from about 9:40 to 14:20. Its HU/t is unchanged.
 - **Arcforge Furnace bricks redrawn** from Cody's brick texture in the furnace's fire-brick palette. The brick
   walls and the ports (idle and lit) use the new bricks; the port openings are unchanged.
 - **Treated wood redrawn** from Cody's wood textures in the treated palette: planks (and so stairs, slabs,

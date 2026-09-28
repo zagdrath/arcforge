@@ -11,7 +11,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Heats a receiver with the sun: up to 600 HU/t at 550°C at clear noon, hot enough to heat a boiler set to High-Pressure.\n# Building\nA 2x2 tower 4 tall: three layers of Solar Thermal Array Casings with one controller in the bottom layer, facing out, and four Solar Collectors on top. Formed, it becomes a tower with a trough mirror on top that follows the sun.\nThe controller's facing is the tracking axis: north or south for the north-south axis (full output), east or west for east-west (x0.7)."
+      "text": "Heats a receiver with the sun: up to 600 HU/t at 1,100°C at clear noon. The temperature follows the sun: above 500°C (High-Pressure Steam) from about 7:45 to 16:15 in clear weather, and above 900°C (a Superheater Array, or Superheated Steam) from about 9:40 to 14:20.\n# Building\nA 2x2 tower 4 tall: three layers of Solar Thermal Array Casings with one controller in the bottom layer, facing out, and four Solar Collectors on top. Formed, it becomes a tower with a trough mirror on top that follows the sun.\nThe controller's facing is the tracking axis: north or south for the north-south axis (full output), east or west for east-west (x0.7)."
     },
     {
       "type": "text",

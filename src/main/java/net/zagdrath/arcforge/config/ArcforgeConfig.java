@@ -207,8 +207,9 @@ public class ArcforgeConfig {
             .defineInRange("peakHeat", 600, 1, 1_000_000);
 
     public static final ModConfigSpec.IntValue SOLAR_MAX_TEMPERATURE = BUILDER
-            .comment("Receiver temperature at full sun, in °C (High-Pressure Steam needs 500).")
-            .defineInRange("maxTemperature", 550, 100, 10_000);
+            .comment("Receiver temperature at full sun, in °C. High-Pressure Steam needs 500 and a Superheater 900; at 1,100",
+                    "a clear north-south tower stays above 900 from about 9:40 to 14:20.")
+            .defineInRange("maxTemperature", 1_100, 100, 10_000);
 
     public static final ModConfigSpec.IntValue SOLAR_HEAT_CAPACITY = BUILDER
             .comment("Heat buffer size in HU.")

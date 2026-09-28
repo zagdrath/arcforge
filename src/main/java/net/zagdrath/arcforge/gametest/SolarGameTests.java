@@ -135,11 +135,11 @@ public final class SolarGameTests {
         });
     }
 
-    // 2. Clear noon: the full 600 HU/t at 550°C.
+    // 2. Clear noon: the full 600 HU/t at 1,100°C.
     static void peakAtNoon(GameTestHelper helper) {
         atTime(helper, NOON, false, false, array -> {
             helper.assertTrue(array.getHeatPerTick() == 600, "Noon gives " + array.getHeatPerTick() + " HU/t");
-            helper.assertTrue(array.getReceiverTemperature() == 550, "Noon receiver at " + array.getReceiverTemperature() + "°C");
+            helper.assertTrue(array.getReceiverTemperature() == 1_100, "Noon receiver at " + array.getReceiverTemperature() + "°C");
             helper.assertTrue(!array.isStowed(), "Trough stowed at noon");
         });
     }
@@ -176,7 +176,7 @@ public final class SolarGameTests {
                 .thenSucceed();
     }
 
-    // 6. North-south tracking beats east-west: 600 against 420 HU/t, and only north-south reaches 500°C.
+    // 6. North-south tracking beats east-west: 600 against 420 HU/t, and only north-south reaches 900°C (superheating).
     static void northSouthBeatsEastWest(GameTestHelper helper) {
         plains(helper);
         time(helper, NOON);
@@ -188,8 +188,8 @@ public final class SolarGameTests {
                 .thenExecute(() -> {
                     helper.assertTrue(northSouth.getHeatPerTick() == 600, "North-south gives " + northSouth.getHeatPerTick() + " HU/t");
                     helper.assertTrue(eastWest.getHeatPerTick() == 420, "East-west gives " + eastWest.getHeatPerTick() + " HU/t");
-                    helper.assertTrue(northSouth.getReceiverTemperature() >= 500, "North-south only reaches " + northSouth.getReceiverTemperature() + "°C");
-                    helper.assertTrue(eastWest.getReceiverTemperature() < 500, "East-west reaches " + eastWest.getReceiverTemperature() + "°C");
+                    helper.assertTrue(northSouth.getReceiverTemperature() >= 900, "North-south only reaches " + northSouth.getReceiverTemperature() + "°C");
+                    helper.assertTrue(eastWest.getReceiverTemperature() < 900, "East-west reaches " + eastWest.getReceiverTemperature() + "°C");
                 })
                 .thenSucceed();
     }

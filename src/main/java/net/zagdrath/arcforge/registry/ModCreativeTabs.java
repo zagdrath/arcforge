@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.registry;
 
+import java.util.List;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
@@ -154,6 +156,11 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.ENGINEERS_HANDBOOK.get());
                 output.accept(ModItems.WRENCH.get());
+                for (var item : List.of(ModItems.STEEL_SWORD, ModItems.STEEL_PICKAXE, ModItems.STEEL_AXE, ModItems.STEEL_SHOVEL, ModItems.STEEL_HOE,
+                        ModItems.STEEL_HAMMER, ModItems.STEEL_EXCAVATOR, ModItems.STEEL_HELMET, ModItems.STEEL_CHESTPLATE, ModItems.STEEL_LEGGINGS,
+                        ModItems.STEEL_BOOTS)) {
+                    output.accept(item.get());
+                }
                 output.accept(ModItems.SPEED_UPGRADE.get());
                 output.accept(ModItems.ENERGY_UPGRADE.get());
                 output.accept(ModItems.HEAT_UPGRADE.get());

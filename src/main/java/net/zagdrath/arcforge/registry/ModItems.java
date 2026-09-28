@@ -38,8 +38,11 @@ import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.storage.StorageBlockItem;
 import net.zagdrath.arcforge.item.storage.StorageUpgradeItem;
 import net.zagdrath.arcforge.item.storage.VaultBlockItem;
+import net.minecraft.world.item.equipment.ArmorType;
+import net.zagdrath.arcforge.item.tool.AreaToolItem;
 import net.zagdrath.arcforge.item.tool.DieItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
+import net.zagdrath.arcforge.item.tool.SteelMaterials;
 import net.zagdrath.arcforge.item.tool.WrenchItem;
 import net.zagdrath.arcforge.item.upgrade.UpgradeItem;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
@@ -80,6 +83,21 @@ public final class ModItems {
     public static final DeferredItem<WrenchItem> WRENCH = ITEMS.registerItem("wrench", WrenchItem::new, p -> p.stacksTo(1));
     public static final DeferredItem<ConduitFilterItem> CONDUIT_FILTER = ITEMS.registerItem("conduit_filter", ConduitFilterItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<EngineersHandbookItem> ENGINEERS_HANDBOOK = ITEMS.registerItem("engineers_handbook", EngineersHandbookItem::new, p -> p.stacksTo(1));
+
+    // Steel tools and armour (between iron and diamond, mining at iron level), and the 3x3 Hammer and Excavator.
+    public static final DeferredItem<Item> STEEL_SWORD = ITEMS.registerItem("steel_sword", Item::new, p -> p.sword(SteelMaterials.STEEL, 3.0F, -2.4F));
+    public static final DeferredItem<Item> STEEL_PICKAXE = ITEMS.registerItem("steel_pickaxe", Item::new, p -> p.pickaxe(SteelMaterials.STEEL, 1.0F, -2.8F));
+    public static final DeferredItem<Item> STEEL_AXE = ITEMS.registerItem("steel_axe", Item::new, p -> p.axe(SteelMaterials.STEEL, 6.0F, -3.1F));
+    public static final DeferredItem<Item> STEEL_SHOVEL = ITEMS.registerItem("steel_shovel", Item::new, p -> p.shovel(SteelMaterials.STEEL, 1.5F, -3.0F));
+    public static final DeferredItem<Item> STEEL_HOE = ITEMS.registerItem("steel_hoe", Item::new, p -> p.hoe(SteelMaterials.STEEL, -2.5F, -0.5F));
+    public static final DeferredItem<AreaToolItem> STEEL_HAMMER = ITEMS.registerItem("steel_hammer", AreaToolItem::new,
+            p -> p.pickaxe(SteelMaterials.STEEL_AREA, 2.0F, -3.2F));
+    public static final DeferredItem<AreaToolItem> STEEL_EXCAVATOR = ITEMS.registerItem("steel_excavator", AreaToolItem::new,
+            p -> p.shovel(SteelMaterials.STEEL_AREA, 1.5F, -3.1F));
+    public static final DeferredItem<Item> STEEL_HELMET = ITEMS.registerItem("steel_helmet", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.HELMET));
+    public static final DeferredItem<Item> STEEL_CHESTPLATE = ITEMS.registerItem("steel_chestplate", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.CHESTPLATE));
+    public static final DeferredItem<Item> STEEL_LEGGINGS = ITEMS.registerItem("steel_leggings", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.LEGGINGS));
+    public static final DeferredItem<Item> STEEL_BOOTS = ITEMS.registerItem("steel_boots", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.BOOTS));
 
     // --- Steelmaking ---
 

@@ -1,0 +1,27 @@
+{
+  "title": "Steel Tools & Armor",
+  "icon": "arcforge:steel_pickaxe",
+  "items": [
+    "arcforge:steel_sword",
+    "arcforge:steel_pickaxe",
+    "arcforge:steel_axe",
+    "arcforge:steel_shovel",
+    "arcforge:steel_hoe",
+    "arcforge:steel_helmet",
+    "arcforge:steel_chestplate",
+    "arcforge:steel_leggings",
+    "arcforge:steel_boots",
+    "arcforge:steel_hammer",
+    "arcforge:steel_excavator"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Steel sits between iron and diamond. Steel tools last 500 uses and dig at 7.0 speed, a little faster than iron, but they mine what iron mines: obsidian and Arcite still need diamond.\n- Tools use vanilla recipes with Steel Ingots and sticks. Repair them, and the armor, with Steel Ingots.\n- Steel armor: 2 / 7 / 5 / 2 armor, 1.0 toughness, like iron plus a little toughness."
+    },
+    {
+      "type": "text",
+      "text": "# Steel Hammer and Excavator\nThe Hammer (a pickaxe) and Excavator (a shovel) break a 3×3 area facing the side you hit, 1 durability per block, 1,500 uses.\n- The extra blocks only break if the tool is good against them and they are no harder than the block you hit, so a hammer on stone won't eat the ores around it.\n- They skip chests and other block entities, and unbreakable blocks.\n- Sneak to break one block. The outline shows what will break.\n- They dig at 70% of a normal steel pickaxe or shovel."
+    }
+  ]
+}

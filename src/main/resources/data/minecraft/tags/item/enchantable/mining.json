@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:steel_pickaxe",
+    "arcforge:steel_axe",
+    "arcforge:steel_shovel",
+    "arcforge:steel_hoe",
+    "arcforge:steel_hammer",
+    "arcforge:steel_excavator"
+  ]
+}
