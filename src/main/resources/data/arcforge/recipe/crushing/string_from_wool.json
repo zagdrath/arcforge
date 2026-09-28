@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#minecraft:wool",
+  "result": {
+    "count": 4,
+    "id": "minecraft:string"
+  },
+  "time": 200,
+  "ore": false
+}

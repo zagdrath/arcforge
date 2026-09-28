@@ -203,4 +203,28 @@ public final class CrushingGameTests {
                 })
                 .thenSucceed();
     }
+
+    // Nether gold ore uses its own recipe (one dust, doubled), not the gold ore one; gravel gives one sand, not doubled.
+    static void arrayVanillaRecipes(GameTestHelper helper) {
+        buildArray(helper);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    ArcCrushingArrayBlockEntity array = helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class);
+                    charge(array.getEnergy(), 100_000);
+                    array.getItems().setStack(ArcCrushingArrayBlockEntity.inputSlot(0), new ItemStack(Items.NETHER_GOLD_ORE));
+                    array.getItems().setStack(ArcCrushingArrayBlockEntity.inputSlot(1), new ItemStack(Items.GRAVEL));
+                })
+                .thenIdle(105)
+                .thenExecute(() -> {
+                    ArcCrushingArrayBlockEntity array = helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class);
+                    ItemStack gold = array.getItems().getStack(ArcCrushingArrayBlockEntity.outputSlot(0));
+                    helper.assertTrue(gold.is(ModItems.GOLD_DUST.get()) && gold.getCount() == 2, "Nether gold ore made " + gold + ", expected 2 gold dust");
+                    ItemStack sand = array.getItems().getStack(ArcCrushingArrayBlockEntity.outputSlot(1));
+                    helper.assertTrue(sand.is(Items.SAND) && sand.getCount() == 1, "Gravel made " + sand + ", expected 1 sand");
+                    ItemStack flint = array.getItems().getStack(ArcCrushingArrayBlockEntity.bonusSlot(1));
+                    helper.assertTrue(flint.isEmpty() || flint.is(Items.FLINT), "Gravel's bonus was " + flint + ", expected flint or nothing");
+                })
+                .thenSucceed();
+    }
 }

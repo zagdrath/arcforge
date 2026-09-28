@@ -150,6 +150,7 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("carbonizer_big_batch", MultiblockGameTests::carbonizerBigBatch);
         LONG_TESTS.put("crusher_recipes", CrushingGameTests::crusherRecipes);
         LONG_TESTS.put("array_doubles_ores", CrushingGameTests::arrayDoublesOres);
+        LONG_TESTS.put("array_vanilla_recipes", CrushingGameTests::arrayVanillaRecipes);
         LONG_TESTS.put("firebox_heats_plant_from_cold", HeatGameTests::fireboxHeatsPlantFromCold);
         LONG_TESTS.put("induction_furnace_smelts", InductionGameTests::furnaceSmelts);
         LONG_TESTS.put("induction_array_smelts", InductionGameTests::arraySmelts);

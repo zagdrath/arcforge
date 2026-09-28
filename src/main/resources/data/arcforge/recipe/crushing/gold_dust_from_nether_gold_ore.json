@@ -1,12 +1,8 @@
 {
   "type": "arcforge:crushing",
-  "ingredient": {
-    "neoforge:ingredient_type": "neoforge:difference",
-    "base": "#c:ores/gold",
-    "subtracted": "minecraft:nether_gold_ore"
-  },
+  "ingredient": "minecraft:nether_gold_ore",
   "result": {
-    "count": 2,
+    "count": 1,
     "id": "arcforge:gold_dust"
   },
   "bonus": {

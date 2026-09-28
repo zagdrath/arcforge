@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:ores/redstone",
+  "result": {
+    "count": 6,
+    "id": "minecraft:redstone"
+  },
+  "bonus": {
+    "count": 2,
+    "id": "minecraft:redstone"
+  },
+  "bonus_chance": 0.25,
+  "time": 200,
+  "ore": true
+}

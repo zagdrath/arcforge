@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:cobblestones/normal",
+  "result": {
+    "count": 1,
+    "id": "minecraft:gravel"
+  },
+  "time": 200,
+  "ore": false
+}

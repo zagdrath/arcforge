@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:gravels",
+  "result": {
+    "count": 1,
+    "id": "minecraft:sand"
+  },
+  "bonus": {
+    "count": 1,
+    "id": "minecraft:flint"
+  },
+  "bonus_chance": 0.1,
+  "time": 200,
+  "ore": false
+}

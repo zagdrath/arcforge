@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:rods/blaze",
+  "result": {
+    "count": 4,
+    "id": "minecraft:blaze_powder"
+  },
+  "time": 200,
+  "ore": false
+}

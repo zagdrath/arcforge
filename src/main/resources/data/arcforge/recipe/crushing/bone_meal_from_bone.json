@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:bones",
+  "result": {
+    "count": 5,
+    "id": "minecraft:bone_meal"
+  },
+  "time": 200,
+  "ore": false
+}

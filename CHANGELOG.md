@@ -46,6 +46,10 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
 - **Config screen:** values grouped into Heat & Power, Steam, Machines, Multiblocks and Ore Generation,
   with a page per machine; every value has a name; **Reset All** puts every value back to its default.
 - Jade shows the Solar Thermal Array's name and heat on every block of it, not just the controller.
+- **More Arc Crusher recipes.** Ores: redstone (6, 25% chance of 2 more), lapis (8, 25% chance of 2
+  more), diamond (2) and emerald (2), all doubled by the Arc Crushing Array. Utility: cobblestone → gravel,
+  gravel → sand (10% chance of flint), bone → 5 bone meal, blaze rod → 4 blaze powder, any wool → 4
+  string, glowstone → 4 glowstone dust, sandstone → 2 sand.
 
 ### Changed
 
@@ -62,6 +66,8 @@ Suggested version: **1.3.0** (new features and balance changes; ports and config
 - New textures for the Trough Mirror, Tungsten Heating Coil and Thermocouple.
 - The Steam Turbine Array's end caps are plain casing; only ports you set show plates.
 - The solar tooltip now explains that a boiler needs its pressure set to reach High-Pressure.
+- Nether gold ore has its own crushing recipe: 1 gold dust with a 25% chance of another (was 2, as gold
+  ore), still doubled by the Arc Crushing Array.
 
 ### Fixed
 
