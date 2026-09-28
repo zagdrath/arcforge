@@ -4,7 +4,7 @@
     {
       "type": "arcforge:config_count",
       "ore": "tungsten",
-      "default": 2
+      "default": 6
     },
     {
       "type": "minecraft:in_square"

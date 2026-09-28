@@ -17,7 +17,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Six ores, in stone and deepslate:\n- Silver: common, Y -32 to 64.\n- Nickel: deep, Y -64 to 16.\n- Fluorite: Y -16 to 48 (crystals, drops experience).\n- Bismuth: Y 0 to 56 (drops experience).\n- Tungsten, as wolframite ore: rare, Y -64 to -16.\n- Arcite: the rarest and deepest, Y -64 to -40, and only a diamond pickaxe breaks it. It glows.\nEach drops its raw item (more with Fortune). Smelt the raw item, the ore or its dust into an ingot or crystal; crushing gives two dust per ore, so crush first."
+      "text": "Six ores, in stone and deepslate:\n- Silver: common, Y -32 to 64.\n- Nickel: deep, Y -64 to 16.\n- Fluorite: Y -16 to 48 (crystals, drops experience).\n- Bismuth: Y 0 to 56 (drops experience).\n- Tungsten, as wolframite ore: uncommon, Y -64 to -16.\n- Arcite: the rarest and deepest, Y -64 to -40, and only a diamond pickaxe breaks it. It glows.\nEach drops its raw item (more with Fortune). Smelt the raw item, the ore or its dust into an ingot or crystal; crushing gives two dust per ore, so crush first."
     },
     {
       "type": "text",

@@ -1,8 +1,8 @@
 {
   "type": "arcforge:config_ore",
   "ore": "bismuth",
-  "size": 6,
-  "discard_chance_on_air_exposure": 0,
+  "size": 8,
+  "discard_chance_on_air_exposure": 0.0,
   "targets": [
     {
       "target": {

@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
@@ -24,7 +25,9 @@ import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.steam.Boiler;
 import net.zagdrath.arcforge.steam.BoilerCore;
+import net.zagdrath.arcforge.steam.BoilerPressure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
@@ -48,7 +51,11 @@ public class SteamBoilerMenu extends MachineMenu {
     public static final int DATA_REDSTONE_MODE = 13;
     public static final int DATA_SIDE_CONFIG = 14;
     public static final int DATA_HEIGHT = 15;
-    public static final int DATA_VALUES = 16;
+    public static final int DATA_PRESSURE = 16;
+    public static final int DATA_VALUES = 17;
+
+    // Menu buttons selecting the pressure, one per BoilerPressure (after MachineMenuButtons' ids).
+    private static final int PRESSURE_BUTTON_FIRST = 200;
 
     // Slot positions from steam_boiler_gui_layout.json.
     public static final int BUCKET_IN_X = 27, BUCKET_IN_Y = 19;
@@ -77,6 +84,7 @@ public class SteamBoilerMenu extends MachineMenu {
             case DATA_REDSTONE_MODE -> redstoneMode.ordinal();
             case DATA_SIDE_CONFIG -> sideConfig.pack();
             case DATA_HEIGHT -> height;
+            case DATA_PRESSURE -> core.getPressure().ordinal();
             default -> 0;
         };
     }
@@ -110,6 +118,24 @@ public class SteamBoilerMenu extends MachineMenu {
         addMachineSlot(SteamBoilerBlockEntity.SLOT_BUCKET_IN, BUCKET_IN_X, BUCKET_IN_Y);
         addMachineSlot(SteamBoilerBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y);
         finish(inventory, UPGRADES_TAB);
+    }
+
+    public static int pressureButtonId(BoilerPressure pressure) {
+        return PRESSURE_BUTTON_FIRST + pressure.ordinal();
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int buttonId) {
+        int pressure = buttonId - PRESSURE_BUTTON_FIRST;
+        if (pressure >= 0 && pressure < BoilerPressure.values().length) {
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof Boiler boiler) {
+                    boiler.setPressure(BoilerPressure.byId(pressure));
+                }
+            });
+            return true;
+        }
+        return super.clickMenuButton(player, buttonId);
     }
 
     @Override
@@ -183,5 +209,9 @@ public class SteamBoilerMenu extends MachineMenu {
 
     public int getHeight() {
         return value(DATA_HEIGHT);
+    }
+
+    public BoilerPressure getPressure() {
+        return BoilerPressure.byId(value(DATA_PRESSURE));
     }
 }

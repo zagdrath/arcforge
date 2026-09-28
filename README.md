@@ -27,7 +27,8 @@ heat --[Thermoelectric Plant]--> FE                              (hotter heat = 
 
 **Heat.** Heat machines store heat (HU) in a buffer. Their temperature rises from 20°C when the
 buffer is empty to the machine's maximum when it's full. Heat leaves through faces set to **Heat**,
-either into a touching machine's heat face (up to 100 HU/t) or through thermodynamic conduits.
+either into a touching machine's heat face (up to 100 HU/t, or a Solar Thermal Array's whole output) or
+through thermodynamic conduits.
 It only ever flows from a hotter machine into a colder one.
 
 | Machine | Makes | Buffer | Max temp | Notes |
@@ -66,7 +67,8 @@ night and in thunderstorms), and the receiver takes in heat by it:
 At clear noon on the north-south axis it makes 200 HU/t at 550°C (High-Pressure Steam from a boiler needs
 500°C, so about 10:00 to 14:00 in clear weather). The temperature follows the same factors, up to 550°C.
 It holds 16,000 HU and gives heat out of its heat ports (a new tower has one on the bottom block behind
-the controller); a buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
+the controller), at its whole output even into a touching machine. A boiler it feeds only gets to 500°C
+set to High-Pressure (see the Steam Boiler), since 200 HU/t is less than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
 it does nothing in the Nether or the End. Everything is configurable (`solarThermalArray`).
 
 ### Steelmaking and alloys
@@ -114,10 +116,10 @@ takes the common tags (`c:ingots/silver`, `c:gems/arcite`, ...), so other mods' 
 |---|---|---|---|---|
 | Silver | 8 | 9 | -32 to 64 (peaks mid) | batteries, trough mirrors |
 | Nickel | 6 | 8 | -64 to 16 (peaks mid) | Invar, Hardened Alloy, turbine casings |
-| Fluorite | 4 | 7 | -16 to 48 | Pressure Glass, steel flux |
-| Bismuth | 4 | 6 | 0 to 56 | thermocouples |
-| Tungsten | 2 | 5 | -64 to -16 | heating coils, the Arcforged composite |
-| Arcite | 1 | 4 | -64 to -40 | Arcforged conduits and upgrades |
+| Fluorite | 8 | 8 | -16 to 48 | Pressure Glass, steel flux |
+| Bismuth | 8 | 8 | 0 to 56 | thermocouples |
+| Tungsten | 6 | 6 | -64 to -16 | heating coils, the Arcforged composite |
+| Arcite | 4 | 5 | -64 to -40 | Arcforged conduits and upgrades |
 
 **Invar**: 2 iron dust + 1 nickel dust make 3 invar dust, which smelts into invar ingots. **Plates** (silver,
 nickel, tungsten, invar) come from the Metal Press. **Components**: the Tungsten Heating Coil (Induction
@@ -179,9 +181,14 @@ pushes up to 1,000 mB/t out of its top. Takes Speed and Energy upgrades.
 
 **Steam Boiler.** Boils water into steam with heat, using up to 80 HU/t, and only at 100°C or hotter.
 The grade depends on its temperature: Steam from 100°C (10 HU/mB), High-Pressure from 500°C (15 HU/mB),
-Superheated from 900°C (20 HU/mB). Fed more heat than it uses, it climbs toward its heat source's
-temperature; underfed, it sits near 100°C making plain Steam. Cooling into a lower grade turns the
-steam it holds into that grade.
+Superheated from 900°C (20 HU/mB). Its **pressure** (a tab in its GUI) picks the grade:
+- **Auto** boils all the heat above 100°C. Fed more heat than it uses, it climbs toward its heat
+  source's temperature and makes better steam; underfed, it holds at 100°C making plain Steam.
+- **Steam**, **High-Pressure** or **Superheated** heats without boiling until the boiler reaches that
+  grade's temperature, then boils only the heat above it. It holds there, making that grade at whatever
+  rate its heat comes in, so a slow source such as a Solar Thermal Array can still make High-Pressure Steam.
+
+Cooling into a lower grade turns the steam it holds into that grade.
 
 **Steam Turbine.** Turns up to 10 mB/t of steam into FE: 8 / 14 / 22 FE per mB by grade (80 to
 220 FE/t). The used steam vents. Heavy Oil in its 1,000 mB lubricant tank (through a **Lubricant**
@@ -190,7 +197,7 @@ face) adds 8% to its output, using 1 mB every 100 ticks while it generates.
 **Steam Boiler Array.** A 3x3 tower 3 to 7 tall of Steam Boiler Array Casings and Pressure Glass,
 hollow in the middle. Only the 8 corners must be casings, so whole walls can be windows, and the water
 and steam show through them. Per block of height: 100,000 HU, up to 200 HU/t, 16,000 mB tanks; each mB
-costs 80% of a Steam Boiler's heat.
+costs 80% of a Steam Boiler's heat. It has the same pressure setting.
 
 **Steam Turbine Array.** A 3x3 tube 3 to 9 long along either horizontal axis, built the same way. It
 takes up to 40 mB/t per block of length at 10 / 18 / 28 FE per mB (a 9-long array on Superheated makes

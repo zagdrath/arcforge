@@ -39,7 +39,9 @@ import net.zagdrath.arcforge.machine.interaction.FluidInteractable;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.steam.Boiler;
 import net.zagdrath.arcforge.steam.BoilerCore;
+import net.zagdrath.arcforge.steam.BoilerPressure;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
@@ -49,7 +51,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // High-Pressure or 4 of Superheated. Heat only flows in from hotter blocks on its heat faces; water
 // comes in on input faces (or from buckets), steam goes out of output faces. No upgrades: it is limited
 // by the heat it is fed.
-public class SteamBoilerBlockEntity extends MachineBlockEntity implements FluidInteractable {
+public class SteamBoilerBlockEntity extends MachineBlockEntity implements FluidInteractable, Boiler {
     public static final int SLOT_BUCKET_IN = 0;
     public static final int SLOT_BUCKET_OUT = 1;
     public static final int MACHINE_SLOTS = 2;
@@ -136,8 +138,15 @@ public class SteamBoilerBlockEntity extends MachineBlockEntity implements FluidI
         return steam;
     }
 
+    @Override
     public BoilerCore getCore() {
         return core;
+    }
+
+    @Override
+    public void setPressure(BoilerPressure pressure) {
+        core.setPressure(pressure);
+        setChanged();
     }
 
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---

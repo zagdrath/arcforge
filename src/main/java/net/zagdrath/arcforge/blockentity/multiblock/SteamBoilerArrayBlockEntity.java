@@ -42,7 +42,9 @@ import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.steam.Boiler;
 import net.zagdrath.arcforge.steam.BoilerCore;
+import net.zagdrath.arcforge.steam.BoilerPressure;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
@@ -51,7 +53,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // It holds 100,000 x h HU, boils with up to 200 x h HU/t, and its big drum loses less, so each mB costs
 // 80% of the heat (Superheated: 16 HU/mB, so a 7-tall array makes up to 87.5 mB/t). Water and steam tanks
 // hold 16,000 x h mB. The grade rules are the Steam Boiler's (see BoilerCore).
-public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity {
+public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity implements Boiler {
     public static final int SLOT_BUCKET_IN = SteamBoilerBlockEntity.SLOT_BUCKET_IN;
     public static final int SLOT_BUCKET_OUT = SteamBoilerBlockEntity.SLOT_BUCKET_OUT;
     public static final int MACHINE_SLOTS = SteamBoilerBlockEntity.MACHINE_SLOTS;
@@ -109,7 +111,9 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity {
         int tank = ArcforgeConfig.BOILER_ARRAY_TANK_PER_HEIGHT.getAsInt() * height;
         water.setCapacity(tank);
         steam.setCapacity(tank);
+        BoilerPressure pressure = core != null ? core.getPressure() : BoilerPressure.AUTO;
         core = new BoilerCore(heat, water, steam);
+        core.setPressure(pressure);
     }
 
     public int getHeight() {
@@ -161,6 +165,17 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity {
             lastSync = level.getGameTime();
             sync();
         }
+    }
+
+    @Override
+    public BoilerCore getCore() {
+        return core;
+    }
+
+    @Override
+    public void setPressure(BoilerPressure pressure) {
+        core.setPressure(pressure);
+        setChanged();
     }
 
     public HeatBuffer getHeat() {

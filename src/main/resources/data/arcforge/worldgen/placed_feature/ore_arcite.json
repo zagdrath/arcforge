@@ -4,7 +4,7 @@
     {
       "type": "arcforge:config_count",
       "ore": "arcite",
-      "default": 1
+      "default": 4
     },
     {
       "type": "minecraft:in_square"

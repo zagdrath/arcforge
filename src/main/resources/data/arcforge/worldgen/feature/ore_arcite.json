@@ -1,8 +1,8 @@
 {
   "type": "arcforge:config_ore",
   "ore": "arcite",
-  "size": 4,
-  "discard_chance_on_air_exposure": 0.7,
+  "size": 5,
+  "discard_chance_on_air_exposure": 0.2,
   "targets": [
     {
       "target": {

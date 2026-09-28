@@ -355,7 +355,8 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
         return rain ? SolarModel.Weather.RAIN : snow ? SolarModel.Weather.SNOW : SolarModel.Weather.CLEAR;
     }
 
-    // Heat out of the face of every heat port, into whatever cooler heat handler it touches.
+    // Heat out of the face of every heat port, into whatever cooler heat handler it touches, at the contact
+    // rate or the array's output, whichever is more.
     private void pushHeat(ServerLevel level) {
         if (targetsDirty) {
             targetsDirty = false;
@@ -367,7 +368,8 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
                 heatTargets.add(BlockCapabilityCache.create(ModCapabilities.HEAT, level, port.pos().relative(port.face()), port.face().getOpposite()));
             }
         }
-        int rate = ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt();
+        // At least what it's making, so none of it is lost when the contact rate is lower.
+        int rate = Math.max(ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt(), heatPerTick);
         for (BlockCapabilityCache<HeatHandler, @Nullable Direction> target : heatTargets) {
             HeatHandler handler = target.getCapability();
             if (handler != null) {

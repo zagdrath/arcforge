@@ -102,6 +102,8 @@ public final class ArcforgeGameTests {
         TESTS.put("steam_pump_drains_source", SteamGameTests::pumpDrainsSource);
         TESTS.put("steam_pump_leaves_infinite_water", SteamGameTests::pumpLeavesInfiniteWater);
         TESTS.put("steam_boiler_grades", SteamGameTests::boilerGrades);
+        TESTS.put("steam_boiler_pressure_holds", SteamGameTests::boilerPressureHolds);
+        TESTS.put("steam_boiler_auto_holds_boiling", SteamGameTests::boilerAutoHoldsBoiling);
         TESTS.put("steam_turbine_output", SteamGameTests::turbineOutput);
         TESTS.put("steam_boiler_array_forms", SteamGameTests::boilerArrayForms);
         TESTS.put("steam_turbine_array_spins", SteamGameTests::turbineArraySpins);

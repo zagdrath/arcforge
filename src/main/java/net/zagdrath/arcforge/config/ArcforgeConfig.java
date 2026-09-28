@@ -668,10 +668,10 @@ public class ArcforgeConfig {
     static {
         ore("silver", "Silver: common, mid-depth.", true, 8, 9, -32, 64, 0.0);
         ore("nickel", "Nickel: deep, near iron's lower band.", true, 6, 8, -64, 16, 0.0);
-        ore("fluorite", "Fluorite: uncommon, mid-depth.", true, 4, 7, -16, 48, 0.0);
-        ore("bismuth", "Bismuth: uncommon, mid-depth.", true, 4, 6, 0, 56, 0.0);
-        ore("tungsten", "Tungsten (wolframite ore): rare and deep.", true, 2, 5, -64, -16, 0.5);
-        ore("arcite", "Arcite: rare, the deepest; needs a diamond pickaxe.", false, 1, 4, -64, -40, 0.7);
+        ore("fluorite", "Fluorite: fairly common, mid-depth.", true, 8, 8, -16, 48, 0.0);
+        ore("bismuth", "Bismuth: fairly common, mid-depth.", true, 8, 8, 0, 56, 0.0);
+        ore("tungsten", "Tungsten (wolframite ore): uncommon and deep.", true, 6, 6, -64, -16, 0.0);
+        ore("arcite", "Arcite: rare, the deepest; needs a diamond pickaxe.", false, 4, 5, -64, -40, 0.2);
         BUILDER.pop();
     }
 

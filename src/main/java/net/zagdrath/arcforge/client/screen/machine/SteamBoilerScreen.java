@@ -8,6 +8,7 @@ package net.zagdrath.arcforge.client.screen.machine;
 import java.util.List;
 import java.util.Locale;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -15,9 +16,11 @@ import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.HeatScale;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
+import net.zagdrath.arcforge.client.gui.tab.PressureTab;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
+import net.zagdrath.arcforge.steam.BoilerPressure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
 // The Steam Boiler and Steam Boiler Array screen: steam_boiler_gui_layout.json (the array's layout has the
@@ -44,8 +47,16 @@ public class SteamBoilerScreen extends MachineScreen<SteamBoilerMenu> {
                 Component.translatable("gui.arcforge.usage"),
                 () -> Component.translatable("gui.arcforge.hu_per_tick_loss", menu.getHeatUsed()),
                 Component.translatable("gui.arcforge.temp"),
-                () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())))), false);
+                () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature()))),
+                new PressureTab(menu::getPressure, pressure -> sendPressure(menu, pressure))), false);
         enableAutoEject();
+    }
+
+    private static void sendPressure(SteamBoilerMenu menu, BoilerPressure pressure) {
+        Minecraft minecraft = Minecraft.getInstance();
+        if (minecraft.gameMode != null) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, SteamBoilerMenu.pressureButtonId(pressure));
+        }
     }
 
     // The array's screen: its own background, and its size in the title.

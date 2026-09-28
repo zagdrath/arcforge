@@ -43,7 +43,7 @@ public abstract class MachineMenu extends AbstractContainerMenu {
     private static final int UPGRADE_SLOT_X = 181, UPGRADE_SLOT_PITCH = 20;
 
     protected final MachineItemHandler items;
-    private final ContainerLevelAccess access;
+    protected final ContainerLevelAccess access;
     private final PortSync ports;
     private final boolean multiblock;
     private final ContainerData data;

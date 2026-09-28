@@ -71,6 +71,15 @@ public class HeatBuffer {
         return (int) ((long) capacity * Math.max(0, celsius - AMBIENT_CELSIUS) / (maxCelsius - AMBIENT_CELSIUS));
     }
 
+    // The least heat the buffer can hold and still be at least this hot (storedAt rounds down).
+    public int minStoredAt(int celsius) {
+        if (celsius >= maxCelsius) {
+            return capacity;
+        }
+        long span = maxCelsius - AMBIENT_CELSIUS;
+        return (int) (((long) capacity * Math.max(0, celsius - AMBIENT_CELSIUS) + span - 1) / span);
+    }
+
     public int getRoom() {
         return capacity - stored;
     }

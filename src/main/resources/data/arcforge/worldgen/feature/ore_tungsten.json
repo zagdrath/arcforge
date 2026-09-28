@@ -1,8 +1,8 @@
 {
   "type": "arcforge:config_ore",
   "ore": "tungsten",
-  "size": 5,
-  "discard_chance_on_air_exposure": 0.5,
+  "size": 6,
+  "discard_chance_on_air_exposure": 0.0,
   "targets": [
     {
       "target": {

@@ -35,6 +35,7 @@ import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.steam.BoilerPressure;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
 // Steam and gases: the gas rules, Pressurized Conduits and Cylinders, the Electric Pump, the Steam Boiler
@@ -162,7 +163,8 @@ public final class SteamGameTests {
         BlockPos warmPos = new BlockPos(2, 1, 0);
         BlockPos coldPos = new BlockPos(4, 1, 0);
         SteamBoilerBlockEntity[] boilers = new SteamBoilerBlockEntity[3];
-        int[] temperatures = { 1_000, 150, 60 };
+        // The hot boiler starts full, so it stays over 900°C for the whole wait.
+        int[] temperatures = { 1_400, 150, 60 };
         BlockPos[] positions = { hotPos, warmPos, coldPos };
         for (int i = 0; i < 3; i++) {
             helper.setBlock(positions[i], ModBlocks.STEAM_BOILER.get());
@@ -171,10 +173,10 @@ public final class SteamGameTests {
             FiberGameTests.heatTo(boilers[i].getHeat(), temperatures[i]);
         }
         helper.startSequence()
-                .thenIdle(20)
+                .thenIdle(60)
                 .thenExecute(() -> {
                     helper.assertTrue(SteamGrade.of(boilers[0].getSteam().getResource(0)) == SteamGrade.SUPERHEATED, "Hot boiler made " + boilers[0].getSteam().getResource(0));
-                    // 80 HU/t at 20 HU/mB.
+                    // 80 HU/t at 20 HU/mB (the rate is smoothed, so it's there after a few seconds).
                     helper.assertTrue(Math.abs(boilers[0].getCore().getRate() - 4.0) < 0.01, "Hot boiler makes " + boilers[0].getCore().getRate() + " mB/t");
                     helper.assertTrue(SteamGrade.of(boilers[1].getSteam().getResource(0)) == SteamGrade.STEAM, "Warm boiler made " + boilers[1].getSteam().getResource(0));
                     helper.assertTrue(boilers[2].getSteam().getAmount() == 0 && boilers[2].getStatus() == MachineStatus.HEATING,
@@ -184,6 +186,57 @@ public final class SteamGameTests {
                 .thenIdle(2)
                 .thenExecute(() -> helper.assertTrue(SteamGrade.of(boilers[0].getSteam().getResource(0)) == SteamGrade.HIGH_PRESSURE,
                         "Cooled boiler holds " + boilers[0].getSteam().getResource(0)))
+                .thenSucceed();
+    }
+
+    // Set to High-Pressure, a boiler fed less heat than it could boil heats to 500°C without boiling, then
+    // holds there making High-Pressure Steam at the rate its heat comes in.
+    static void boilerPressureHolds(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(0, 1, 0);
+        helper.setBlock(pos, ModBlocks.STEAM_BOILER.get());
+        SteamBoilerBlockEntity boiler = helper.getBlockEntity(pos, SteamBoilerBlockEntity.class);
+        fill(boiler.getWater(), WATER, 8_000);
+        boiler.setPressure(BoilerPressure.HIGH_PRESSURE);
+        FiberGameTests.heatTo(boiler.getHeat(), 490);
+        // 45 HU/t: 3 mB/t of High-Pressure Steam at 15 HU/mB, well under the boiler's 80 HU/t.
+        helper.onEachTick(() -> boiler.getHeat().add(45));
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> helper.assertTrue(boiler.getSteam().getAmount() == 0 && boiler.getStatus() == MachineStatus.HEATING,
+                        "Below 500°C the boiler is " + boiler.getStatus() + " with " + boiler.getSteam().getAmount() + " mB"))
+                .thenWaitUntil(() -> helper.assertTrue(boiler.getSteam().getAmount() > 0, "No steam yet at " + boiler.getHeat().getTemperature() + "°C"))
+                .thenIdle(60)
+                .thenExecute(() -> {
+                    int temperature = boiler.getHeat().getTemperature();
+                    helper.assertTrue(temperature >= 500 && temperature <= 501, "Boiler at " + temperature + "°C");
+                    helper.assertTrue(SteamGrade.of(boiler.getSteam().getResource(0)) == SteamGrade.HIGH_PRESSURE, "Boiler made " + boiler.getSteam().getResource(0));
+                    helper.assertTrue(boiler.getStatus() == MachineStatus.BOILING, "Boiler is " + boiler.getStatus());
+                    helper.assertTrue(Math.abs(boiler.getCore().getRate() - 3.0) < 0.1, "Boiler makes " + boiler.getCore().getRate() + " mB/t");
+                })
+                .thenSucceed();
+    }
+
+    // On Auto, a boiler fed heat unevenly (every other tick) holds at 100°C and stays Boiling rather than
+    // dropping below boiling and flipping back to Heating.
+    static void boilerAutoHoldsBoiling(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(0, 1, 0);
+        helper.setBlock(pos, ModBlocks.STEAM_BOILER.get());
+        SteamBoilerBlockEntity boiler = helper.getBlockEntity(pos, SteamBoilerBlockEntity.class);
+        fill(boiler.getWater(), WATER, 8_000);
+        FiberGameTests.heatTo(boiler.getHeat(), 100);
+        helper.onEachTick(() -> {
+            if (helper.getTick() % 2 == 0) {
+                boiler.getHeat().add(60);
+            }
+            helper.assertTrue(boiler.getHeat().getTemperature() >= 100, "Boiler fell to " + boiler.getHeat().getTemperature() + "°C");
+            if (helper.getTick() > 5) {
+                helper.assertTrue(boiler.getStatus() == MachineStatus.BOILING, "Boiler is " + boiler.getStatus() + " on tick " + helper.getTick());
+            }
+        });
+        helper.startSequence()
+                .thenIdle(60)
+                .thenExecute(() -> helper.assertTrue(SteamGrade.of(boiler.getSteam().getResource(0)) == SteamGrade.STEAM,
+                        "Boiler made " + boiler.getSteam().getResource(0)))
                 .thenSucceed();
     }
 

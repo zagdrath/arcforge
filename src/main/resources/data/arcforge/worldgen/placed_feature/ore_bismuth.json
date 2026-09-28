@@ -4,7 +4,7 @@
     {
       "type": "arcforge:config_count",
       "ore": "bismuth",
-      "default": 4
+      "default": 8
     },
     {
       "type": "minecraft:in_square"
