@@ -1129,6 +1129,8 @@
   "jade.arcforge.quarry.layer": "Layer Y %s",
   "jade.arcforge.quarry.why": "Paused: %s",
   "config.jade.plugin_arcforge.arc_quarry": "Arcforge Arc Quarry",
+  "config.jade.plugin_arcforge.gas_turbine": "Arcforge Gas Turbine Array",
+  "config.jade.plugin_arcforge.security": "Arcforge machine security",
   "arcforge.configuration.arcQuarry": "Arc Quarry",
   "arcforge.configuration.maxRadius": "Maximum radius",
   "arcforge.configuration.defaultRadius": "Default radius",

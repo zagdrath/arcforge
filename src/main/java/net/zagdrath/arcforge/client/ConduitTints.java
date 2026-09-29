@@ -28,6 +28,9 @@ public final class ConduitTints implements BlockTintSource {
     public static final ConduitTints INSTANCE = new ConduitTints();
 
     private static final int WHITE = 0xFFFFFFFF;
+    // Tint index 0 on conduits without a lit state (item and fluid). They have nothing to glow, and no ACTIVE
+    // property: the model loader reads every relevant property of a tint source, so they can't use INSTANCE.
+    public static final BlockTintSource UNLIT = state -> WHITE;
     // Heat colours and the temperatures (°C) they are reached at; in between they blend.
     private static final int[] HEAT_CELSIUS = { 100, 500, 900, 1_200, 1_500 };
     private static final int[] HEAT_COLORS = { 0xFF9A2A18, 0xFFE0461A, 0xFFFF8A2A, 0xFFFFD35A, 0xFFFFF4D6 };

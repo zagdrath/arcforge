@@ -12,6 +12,7 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
@@ -25,6 +26,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.crafting.RecipeMap;
+import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
@@ -55,6 +57,7 @@ import net.zagdrath.arcforge.client.sound.GasTurbineArraySound;
 import net.zagdrath.arcforge.client.screen.multiblock.GasTurbineArrayScreen;
 import net.zagdrath.arcforge.client.renderer.blockentity.GasTurbineArrayRenderer;
 import net.zagdrath.arcforge.client.particle.HeatHazeParticle;
+import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
@@ -223,7 +226,9 @@ public class ArcforgeClient {
         // Tint index 0 is the gas and thermal glow, index 1 a sheathed conduit's dye colour (on every conduit).
         for (ConduitTier tier : ConduitTier.values()) {
             for (ConduitType type : ConduitType.values()) {
-                event.register(List.of(ConduitTints.INSTANCE, ConduitSheathModel.Tint.INSTANCE), ModBlocks.conduit(type, tier).get());
+                Block conduit = ModBlocks.conduit(type, tier).get();
+                BlockTintSource glow = conduit.defaultBlockState().hasProperty(ActiveConduitBlock.ACTIVE) ? ConduitTints.INSTANCE : ConduitTints.UNLIT;
+                event.register(List.of(glow, ConduitSheathModel.Tint.INSTANCE), conduit);
             }
         }
     }
