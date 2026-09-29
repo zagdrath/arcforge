@@ -211,8 +211,7 @@ public final class OreGameTests {
                 .thenIdle(3)
                 .thenExecute(() -> {
                     ArcforgeFurnaceBlockEntity furnace = helper.getBlockEntity(port, ArcforgeFurnaceBlockEntity.class);
-                    BlockPos input = PortGameTests.port(helper, furnace, net.zagdrath.arcforge.machine.config.SideMode.INPUT);
-                    helper.assertTrue(input != null, "Furnace has no input port");
+                    BlockPos input = MultiblockGameTests.setFurnaceInputPort(helper, furnace);
                     ResourceHandler<ItemResource> handler = helper.getLevel().getCapability(Capabilities.Item.BLOCK, input, Direction.UP);
                     helper.assertTrue(handler != null, "Input port takes no items");
                     try (Transaction tx = Transaction.openRoot()) {

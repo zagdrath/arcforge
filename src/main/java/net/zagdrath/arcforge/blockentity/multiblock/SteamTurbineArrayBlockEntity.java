@@ -7,9 +7,7 @@ package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -25,7 +23,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -199,21 +196,6 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         // A rebuilt turbine breaks a tie the way it faced before.
         setStructureFacing(chooseFront(shell, wasFormedBefore() ? getFacing() : facing));
         super.onFormed(null);
-    }
-
-    // Energy out of the generator end, steam into the bearing end.
-    @Override
-    public Map<BlockPos, MultiblockPorts.DefaultPort> defaultPorts(Level level) {
-        ShellStructure.Shell shell = getShell();
-        if (shell == null) {
-            return super.defaultPorts(level);
-        }
-        Map<BlockPos, MultiblockPorts.DefaultPort> ports = new LinkedHashMap<>();
-        ports.put(shell.endCenter(Direction.AxisDirection.POSITIVE), new MultiblockPorts.DefaultPort(SideMode.ENERGY,
-                Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.POSITIVE)));
-        ports.put(shell.endCenter(Direction.AxisDirection.NEGATIVE), new MultiblockPorts.DefaultPort(SideMode.INPUT,
-                Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.NEGATIVE)));
-        return ports;
     }
 
     @Override

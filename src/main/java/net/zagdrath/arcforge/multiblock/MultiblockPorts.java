@@ -14,6 +14,8 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.ValueInput;
@@ -155,7 +157,7 @@ public final class MultiblockPorts {
     }
 
     // A port in the middle of each side of the structure that its side configuration uses: how the side
-    // configuration of saves from before ports carries over, and the usual defaults.
+    // configuration of saves from before ports carries over.
     public static Map<BlockPos, DefaultPort> fromSideConfig(Level level, MultiblockController controller) {
         Map<BlockPos, DefaultPort> ports = new LinkedHashMap<>();
         for (RelativeSide side : RelativeSide.values()) {
@@ -181,11 +183,14 @@ public final class MultiblockPorts {
     }
 
     // Kept by each controller: whether its structure has been given its first ports. The first time it's
-    // formed with no ports at all, it gets its defaults (or, in a save from before ports, ports where its
-    // side configuration had faces); after that, nothing is filled in again, so clearing every port sticks.
-    // Saves from when a port was part of its block's state lost those ports, so they get their defaults
-    // once more.
+    // formed with no ports at all, it gets its defaults (none for new structures; in a save from before
+    // ports, ports where its side configuration had faces), and players nearby are told when it still has
+    // none. After that, nothing is filled in again, so clearing every port sticks. Saves from when a port
+    // was part of its block's state lost those ports, so they get their defaults once more.
     public static final class Defaults {
+        // How far from the structure's centre players are told it has no ports.
+        private static final double NOTIFY_RANGE = 16.0;
+
         private boolean initialised;
         // Loaded from a save that predates ports.
         private boolean fromOldSave;
@@ -207,6 +212,20 @@ public final class MultiblockPorts {
                 }
             }
             changed(level, controller);
+            if (!hasPorts(level, controller)) {
+                notifyNoPorts(level, controller);
+            }
+        }
+
+        private static void notifyNoPorts(Level level, MultiblockController controller) {
+            BlockPos min = controller.getMinCorner();
+            BlockPos max = controller.getMaxCorner();
+            Vec3 centre = new Vec3((min.getX() + max.getX() + 1) / 2.0, (min.getY() + max.getY() + 1) / 2.0, (min.getZ() + max.getZ() + 1) / 2.0);
+            for (Player player : level.players()) {
+                if (player.position().closerThan(centre, NOTIFY_RANGE)) {
+                    player.sendSystemMessage(Component.translatable("arcforge.multiblock.no_ports"));
+                }
+            }
         }
 
         public boolean isInitialised() {
@@ -215,12 +234,15 @@ public final class MultiblockPorts {
 
         public void load(ValueInput input) {
             initialised = input.getBooleanOr("ports_v2_initialised", false);
-            fromOldSave = !initialised && input.getBooleanOr("ports_initialised", true);
+            // Saved before its structure first formed: it's still new unless it was already waiting on
+            // old-save ports. Saves from before this flag go by whether they predate ports.
+            fromOldSave = !initialised && input.getBooleanOr("ports_from_old_save", input.getBooleanOr("ports_initialised", true));
         }
 
         public void save(ValueOutput output) {
             output.putBoolean("ports_initialised", true);
             output.putBoolean("ports_v2_initialised", initialised);
+            output.putBoolean("ports_from_old_save", fromOldSave);
         }
     }
 }

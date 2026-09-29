@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -82,8 +83,9 @@ public final class MultiblockGameTests {
                 .thenSucceed();
     }
 
-    // Coal goes in through the top (input port), coke comes out of the bottom (output port) and creosote
-    // out of the back (by-product port). The working slice lights up while its chamber runs.
+    // With an input port on top, an output port underneath and a by-product port on the back, coal goes in
+    // through the top, coke comes out of the bottom and creosote out of the back. The working slice lights
+    // up while its chamber runs.
     public static void carbonizerProcesses(GameTestHelper helper) {
         buildCarbonizer(helper, 1);
         BlockPos[] ports = new BlockPos[3];
@@ -91,10 +93,13 @@ public final class MultiblockGameTests {
                 .thenIdle(3)
                 .thenExecute(() -> {
                     CarbonizerBlockEntity master = helper.getBlockEntity(new BlockPos(0, 1, 0), CarbonizerBlockEntity.class);
+                    MultiblockPorts.set(helper.getLevel(), master, helper.absolutePos(new BlockPos(0, 2, 0)), SideMode.INPUT, Direction.UP);
+                    MultiblockPorts.set(helper.getLevel(), master, helper.absolutePos(new BlockPos(0, 1, 1)), SideMode.OUTPUT, Direction.DOWN);
+                    MultiblockPorts.set(helper.getLevel(), master, helper.absolutePos(new BlockPos(0, 2, 1)), SideMode.BYPRODUCT, Direction.SOUTH);
                     ports[0] = PortGameTests.port(helper, master, SideMode.INPUT);
                     ports[1] = PortGameTests.port(helper, master, SideMode.OUTPUT);
                     ports[2] = PortGameTests.port(helper, master, SideMode.BYPRODUCT);
-                    helper.assertTrue(ports[0] != null && ports[1] != null && ports[2] != null, "Missing a default port");
+                    helper.assertTrue(ports[0] != null && ports[1] != null && ports[2] != null, "A port did not set");
                     ResourceHandler<ItemResource> input = helper.getLevel().getCapability(Capabilities.Item.BLOCK, ports[0], Direction.UP);
                     helper.assertTrue(input != null, "Top port does not accept items");
                     try (Transaction tx = Transaction.openRoot()) {
@@ -219,7 +224,15 @@ public final class MultiblockGameTests {
         }
     }
 
-    // The cross pattern forms; a top brick then accepts items from above; losing a wall or the hearth breaks it.
+    // Sets an input port on top of the front brick of the furnace's top layer, and returns where it is (absolute).
+    static BlockPos setFurnaceInputPort(GameTestHelper helper, ArcforgeFurnaceBlockEntity furnace) {
+        BlockPos topBrick = helper.absolutePos(new BlockPos(1, 6, 0));
+        MultiblockPorts.set(helper.getLevel(), furnace, topBrick, SideMode.INPUT, Direction.UP);
+        return topBrick;
+    }
+
+    // The cross pattern forms; a top brick with an input port then accepts items from above; losing a wall or
+    // the hearth breaks it.
     public static void furnaceForms(GameTestHelper helper) {
         buildFurnace(helper);
         helper.startSequence()
@@ -229,9 +242,9 @@ public final class MultiblockGameTests {
                     BlockPos wrong = ArcforgeFurnaceStructure.firstMismatch(helper.getLevel(), furnace.getBlockPos(), furnace.getFacing());
                     helper.assertTrue(furnace.isFormed(), "Furnace did not form; first mismatch at "
                             + (wrong == null ? "none" : helper.relativePos(wrong) + " = " + helper.getLevel().getBlockState(wrong)));
-                    // The input port is one of the top layer's bricks; its face into the stack isn't outer.
-                    BlockPos topBrick = PortGameTests.port(helper, furnace, SideMode.INPUT);
-                    helper.assertTrue(topBrick != null && helper.relativePos(topBrick).getY() == 6, "Input port is not on the top layer: " + topBrick);
+                    // An input port on one of the top layer's bricks; its face into the stack isn't outer.
+                    BlockPos topBrick = setFurnaceInputPort(helper, furnace);
+                    helper.assertTrue(PortGameTests.port(helper, furnace, SideMode.INPUT) != null, "The input port did not set");
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, topBrick, Direction.UP) != null,
                             "Top brick does not accept items");
                     BlockPos stack = helper.absolutePos(new BlockPos(1, 6, 1));

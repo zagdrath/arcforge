@@ -201,6 +201,10 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Fuel Burner.** Its default maximum temperature is 1,400°C (was 1,200). The other fuels still burn at their
   own lower temperatures.
 - **Pressurized Conduits** connect to Fuel Burner input faces.
+- **New multiblocks start with no ports.** A newly built structure does no IO until you set its ports with the
+  Wrench in Port mode. Players nearby get a chat hint when it forms, and the Ports tab says the same. This
+  covers the Steam Turbine, Solar Thermal and Gas Turbine Arrays, which used to get theirs automatically.
+  Structures you've already built keep their ports.
 - **Pressurized Conduits are see-through.** They're pressure glass now, like Fluid Conduits, and show the gas
   inside in its colour, denser the fuller the conduit. Empty ones are clear. They no longer glow.
 - **Every port face on a single-block machine shows a port.** Each face that has a side mode by default now

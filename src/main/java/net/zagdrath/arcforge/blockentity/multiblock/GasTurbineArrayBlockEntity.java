@@ -7,9 +7,7 @@ package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -296,29 +294,6 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     public boolean isIntakeOpen() {
         return intakeOpen;
-    }
-
-    // Energy out of the intake end's bottom-left casing (the cap leaves it clear), heat out of the exhaust's
-    // middle, and fuel into the bottom of the middle casing.
-    @Override
-    public Map<BlockPos, MultiblockPorts.DefaultPort> defaultPorts(Level level) {
-        ShellStructure.Shell shell = getShell();
-        if (shell == null) {
-            return super.defaultPorts(level);
-        }
-        Direction intakeOut = Direction.fromAxisAndDirection(shell.axis(), intakeEnd);
-        Direction exhaustOut = intakeOut.getOpposite();
-        // Seen from outside, looking in (toward exhaustOut), left is counter-clockwise of that.
-        BlockPos energyPos = shell.endCenter(intakeEnd).below().relative(exhaustOut.getCounterClockWise());
-        int middle = shell.length() / 2;
-        BlockPos fuelPos = shell.min().relative(Direction.fromAxisAndDirection(shell.axis(), Direction.AxisDirection.POSITIVE), middle)
-                .relative(Direction.fromAxisAndDirection(shell.axis() == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X,
-                        Direction.AxisDirection.POSITIVE));
-        Map<BlockPos, MultiblockPorts.DefaultPort> ports = new LinkedHashMap<>();
-        ports.put(energyPos, new MultiblockPorts.DefaultPort(SideMode.ENERGY, intakeOut));
-        ports.put(shell.endCenter(intakeEnd.opposite()), new MultiblockPorts.DefaultPort(SideMode.HEAT, exhaustOut));
-        ports.put(fuelPos, new MultiblockPorts.DefaultPort(SideMode.INPUT, Direction.DOWN));
-        return ports;
     }
 
     @Override

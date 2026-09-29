@@ -74,7 +74,8 @@ public final class ArcforgeGameTests {
         TESTS.put("conduit_filter_extract_direction", ConduitGameTests::filterExtractDirection);
         TESTS.put("conduit_filter_persists_on_remove", ConduitGameTests::filterPersistsOnRemove);
         TESTS.put("conduit_filter_install_rules", ConduitGameTests::filterInstallRules);
-        TESTS.put("ports_defaults", PortGameTests::defaultPorts);
+        TESTS.put("ports_start_empty", PortGameTests::portsStartEmpty);
+        TESTS.put("ports_start_empty_after_reload", PortGameTests::portsStartEmptyAfterReload);
         TESTS.put("ports_wrench_sets_port", PortGameTests::wrenchSetsPort);
         TESTS.put("ports_wrench_modes_on_multiblock", PortGameTests::wrenchModesOnMultiblock);
         TESTS.put("ports_turbine_ends", PortGameTests::turbinePorts);

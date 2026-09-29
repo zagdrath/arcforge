@@ -202,8 +202,8 @@ public final class SolarGameTests {
         plains(helper);
         time(helper, NOON);
         weather(helper, false, false);
-        // Controller facing south at (1,1,5): its default heat port is the block behind it, (1,1,4), whose north
-        // face touches the boiler array's bottom ring at (1,1,3); that casing gets a heat port on its south face.
+        // Controller facing south at (1,1,5): the tower's heat port goes on the block behind it, (1,1,4), whose
+        // north face touches the boiler array's bottom ring at (1,1,3); that casing gets a heat port on its south face.
         SolarThermalArrayBlockEntity array = buildTower(helper, new BlockPos(1, 1, 4), Direction.SOUTH);
         BlockPos boilerMin = new BlockPos(0, 1, 1);
         BlockPos boilerPort = new BlockPos(1, 1, 3);
@@ -214,6 +214,7 @@ public final class SolarGameTests {
                 .thenExecute(() -> {
                     SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
                     helper.assertTrue(boiler.isMaster(), "Boiler array did not form");
+                    MultiblockPorts.set(helper.getLevel(), array, helper.absolutePos(new BlockPos(1, 1, 4)), SideMode.HEAT, Direction.NORTH);
                     MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(boilerPort), SideMode.HEAT, Direction.SOUTH);
                     boiler.setPressure(BoilerPressure.HIGH_PRESSURE);
                     HeatBuffer heat = boiler.getHeat();

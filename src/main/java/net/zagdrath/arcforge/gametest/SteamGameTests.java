@@ -35,7 +35,9 @@ import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MenuReach;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -359,10 +361,10 @@ public final class SteamGameTests {
                     helper.assertTrue(boiler.getWater().getCapacity() == 64_000, "Water tank holds " + boiler.getWater().getCapacity());
                     helper.assertTrue(!ShellCasingBlock.isFormed(helper.getBlockState(tallMin)), "A 3x3x8 boiler formed");
                     helper.assertTrue(!ShellCasingBlock.isFormed(helper.getBlockState(cornerMin)), "A boiler with glass on a corner formed");
-                    // Water goes in through the left face (default input), from any casing on it.
+                    // Water goes in through an input port on the left (east) face.
+                    MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(new BlockPos(2, 2, 1)), SideMode.INPUT, Direction.EAST);
                     var left = helper.getLevel().getCapability(Capabilities.Fluid.BLOCK, helper.absolutePos(new BlockPos(2, 2, 1)), Direction.EAST);
-                    helper.assertTrue(left != null || helper.getLevel().getCapability(Capabilities.Fluid.BLOCK,
-                            helper.absolutePos(new BlockPos(0, 2, 1)), Direction.WEST) != null, "No side takes water");
+                    helper.assertTrue(left != null, "The left input port takes no water");
                     helper.setBlock(pane, Blocks.AIR);
                 })
                 .thenIdle(2)
@@ -457,7 +459,8 @@ public final class SteamGameTests {
     }
 
     // The turbine's front is its window, so its ends are its left and right: with glass on the north side it
-    // faces north, and by default the generator (east) end takes FE out and the bearing (west) end takes steam.
+    // faces north. With an energy port on the generator (east) end and an input port on the bearing (west)
+    // end, conduits there connect to take FE out and put steam in.
     static void turbineArrayConduits(GameTestHelper helper) {
         BlockPos min = new BlockPos(1, 1, 1);
         buildShell(helper, min, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get(), new BlockPos(2, 2, 1));
@@ -469,6 +472,8 @@ public final class SteamGameTests {
                     SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
                     helper.assertTrue(turbine.isMaster(), "Turbine did not form");
                     helper.assertTrue(turbine.getStructureFacing() == Direction.NORTH, "Facing " + turbine.getStructureFacing());
+                    MultiblockPorts.set(helper.getLevel(), turbine, helper.absolutePos(west.east()), SideMode.INPUT, Direction.WEST);
+                    MultiblockPorts.set(helper.getLevel(), turbine, helper.absolutePos(east.west()), SideMode.ENERGY, Direction.EAST);
                     helper.setBlock(west, ModBlocks.conduit(ConduitType.GAS, ConduitTier.WROUGHT).get());
                     helper.setBlock(east, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
                     net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(west));
@@ -484,8 +489,8 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
-    // Breaking a boiler array and finishing it again from another side keeps its facing, so its side
-    // configuration stays on the same faces and the conduits there reconnect.
+    // Breaking a boiler array and finishing it again from another side keeps its facing and its ports, so
+    // the conduits there reconnect.
     static void boilerArrayRebuildKeepsSides(GameTestHelper helper) {
         BlockPos min = new BlockPos(1, 1, 1);
         buildShell(helper, min, Direction.Axis.Y, 3, ModBlocks.STEAM_BOILER_ARRAY_CASING.get());
@@ -496,6 +501,7 @@ public final class SteamGameTests {
                 .thenExecute(() -> {
                     SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(min, SteamBoilerArrayBlockEntity.class);
                     helper.assertTrue(boiler.isMaster() && boiler.getStructureFacing() == Direction.NORTH, "Boiler did not form facing north");
+                    MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(east.west()), SideMode.INPUT, Direction.EAST);
                     helper.setBlock(east, ModBlocks.conduit(ConduitType.FLUID, ConduitTier.WROUGHT).get());
                     net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(east));
                 })

@@ -881,6 +881,7 @@
   "gui.arcforge.ports.controller": "the controller",
   "gui.arcforge.ports.location": "%s · %s",
   "gui.arcforge.ports.hint": "Use a Wrench in Port mode (Shift+Scroll) and Shift+Right-click a block",
+  "arcforge.multiblock.no_ports": "No ports yet: use a Wrench in Port mode (Shift+Scroll) and Shift+Right-click an outer face.",
   "block.arcforge.solar_thermal_array_casing": "Solar Thermal Array Casing",
   "block.arcforge.solar_thermal_array_controller": "Solar Thermal Array Controller",
   "block.arcforge.solar_collector": "Solar Collector",

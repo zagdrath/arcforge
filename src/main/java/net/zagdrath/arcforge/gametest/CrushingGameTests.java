@@ -21,6 +21,8 @@ import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
@@ -163,8 +165,10 @@ public final class CrushingGameTests {
                     helper.assertTrue(part(helper, 1, 2, 1) == ArcCrushingArrayCasingBlock.Part.CENTER, "Centre is " + part(helper, 1, 2, 1));
                     helper.assertTrue(part(helper, 0, 1, 0) == ArcCrushingArrayCasingBlock.Part.OTHER, "Corner is " + part(helper, 0, 1, 0));
                     helper.assertTrue(helper.getBlockState(new BlockPos(1, 2, 1)).getLightDampening() == 0, "Formed casings block light");
-                    // Only the default input port in the middle of the top takes items, not the rest of the top.
+                    // Only an input port in the middle of the top takes items, not the rest of the top.
                     BlockPos top = helper.absolutePos(new BlockPos(1, 3, 1));
+                    ArcCrushingArrayBlockEntity array = helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class);
+                    MultiblockPorts.set(helper.getLevel(), array, top, SideMode.INPUT, Direction.UP);
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, top, Direction.UP) != null, "Top port does not accept items");
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(new BlockPos(0, 3, 2)), Direction.UP) == null,
                             "A top casing that isn't a port accepts items");

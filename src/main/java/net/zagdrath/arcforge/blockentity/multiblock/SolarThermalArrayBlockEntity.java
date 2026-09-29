@@ -7,9 +7,7 @@ package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -215,17 +213,6 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
     @Override
     public boolean isPart(BlockPos pos) {
         return tower != null && tower.contains(pos);
-    }
-
-    // A heat port on the back of the bottom-layer block behind the controller.
-    @Override
-    public Map<BlockPos, MultiblockPorts.DefaultPort> defaultPorts(Level level) {
-        Map<BlockPos, MultiblockPorts.DefaultPort> ports = new LinkedHashMap<>();
-        BlockPos behind = worldPosition.relative(getFacing().getOpposite());
-        if (tower != null && tower.contains(behind)) {
-            ports.put(behind, new MultiblockPorts.DefaultPort(SideMode.HEAT, getFacing().getOpposite()));
-        }
-        return ports;
     }
 
     @Override

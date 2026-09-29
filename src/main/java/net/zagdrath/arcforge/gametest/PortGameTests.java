@@ -5,14 +5,12 @@
 
 package net.zagdrath.arcforge.gametest;
 
-import java.util.EnumSet;
-import java.util.Set;
-
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -20,6 +18,7 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -41,7 +40,7 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModItems;
 
-// Multiblock ports: a new structure's default ports, only ports doing IO, and setting them with the Wrench.
+// Multiblock ports: a new structure starts with none, only ports do IO, and the Wrench sets them.
 public final class PortGameTests {
     private PortGameTests() {}
 
@@ -84,24 +83,43 @@ public final class PortGameTests {
         return helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class);
     }
 
-    // A new array gets a port in the middle of each face its default configuration used (items in at the
-    // top, out at the bottom, energy at the back); only those blocks do IO.
-    static void defaultPorts(GameTestHelper helper) {
+    // A new array starts with no ports, so no block does IO.
+    static void portsStartEmpty(GameTestHelper helper) {
         buildArray(helper);
         helper.startSequence()
                 .thenIdle(3)
                 .thenExecute(() -> {
                     ArcCrushingArrayBlockEntity array = helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class);
                     helper.assertTrue(array.isFormed(), "Array did not form");
-                    Set<SideMode> modes = EnumSet.noneOf(SideMode.class);
-                    MultiblockPorts.list(helper.getLevel(), array).forEach(port -> modes.add(port.mode()));
-                    helper.assertTrue(modes.equals(EnumSet.of(SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY)), "Default ports are " + modes);
-                    helper.assertTrue(portAt(helper, new BlockPos(1, 3, 1)) == SideMode.INPUT, "Top middle is " + portAt(helper, new BlockPos(1, 3, 1)));
-                    helper.assertTrue(portAt(helper, new BlockPos(1, 1, 1)) == SideMode.OUTPUT, "Bottom middle is " + portAt(helper, new BlockPos(1, 1, 1)));
-                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(new BlockPos(1, 3, 1)), Direction.UP) != null,
-                            "Top port does not accept items");
-                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(new BlockPos(0, 3, 2)), Direction.UP) == null,
-                            "A top block that isn't a port accepts items");
+                    helper.assertTrue(MultiblockPorts.list(helper.getLevel(), array).isEmpty(),
+                            "New array has ports: " + MultiblockPorts.list(helper.getLevel(), array));
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Item.BLOCK, helper.absolutePos(new BlockPos(1, 3, 1)), Direction.UP) == null,
+                            "Top middle accepts items without a port");
+                })
+                .thenSucceed();
+    }
+
+    // An array saved and loaded before it first forms is still new: finishing it after the reload gives
+    // it no ports (only saves from before ports get ports from their side configuration).
+    static void portsStartEmptyAfterReload(GameTestHelper helper) {
+        buildArray(helper);
+        BlockPos corner = new BlockPos(0, 1, 0);
+        helper.setBlock(corner, net.minecraft.world.level.block.Blocks.AIR);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    ArcCrushingArrayBlockEntity array = helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class);
+                    helper.assertTrue(!array.isFormed(), "Array formed without a corner");
+                    var registries = helper.getLevel().registryAccess();
+                    array.loadCustomOnly(TagValueInput.create(ProblemReporter.DISCARDING, registries, array.saveCustomOnly(registries)));
+                    helper.setBlock(corner, ModBlocks.ARC_CRUSHING_ARRAY_CASING.get());
+                })
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    ArcCrushingArrayBlockEntity array = helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class);
+                    helper.assertTrue(array.isFormed(), "Array did not form");
+                    helper.assertTrue(MultiblockPorts.list(helper.getLevel(), array).isEmpty(),
+                            "Array reloaded before forming got ports: " + MultiblockPorts.list(helper.getLevel(), array));
                 })
                 .thenSucceed();
     }
@@ -228,23 +246,25 @@ public final class PortGameTests {
                 .thenSucceed();
     }
 
-    // A new turbine gets an energy port on its generator end cap and a steam port on its bearing end cap.
+    // A new turbine starts with no ports, even on its end caps; an energy port set on the generator end
+    // cap gives energy.
     static void turbinePorts(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
         SteamGameTests.buildShell(helper, min, Direction.Axis.X, 4, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get(), new BlockPos(1, 2, 0));
+        BlockPos generator = new BlockPos(3, 2, 1);
         helper.startSequence()
                 .thenIdle(3)
                 .thenExecute(() -> {
                     SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
                     helper.assertTrue(turbine.isFormed(), "Turbine did not form");
-                    BlockPos generator = new BlockPos(3, 2, 1), bearing = new BlockPos(0, 2, 1);
                     helper.assertTrue(helper.getBlockState(generator).getValue(SteamTurbineArrayCasingBlock.END) == SteamTurbineArrayCasingBlock.End.GENERATOR,
                             "Generator cap is not at +X");
-                    helper.assertTrue(portAt(helper, generator) == SideMode.ENERGY, "Generator end is " + portAt(helper, generator));
-                    helper.assertTrue(portAt(helper, bearing) == SideMode.INPUT, "Bearing end is " + portAt(helper, bearing));
-                    helper.assertTrue(MultiblockPorts.list(helper.getLevel(), turbine).size() == 2, "Turbine has other ports");
+                    helper.assertTrue(MultiblockPorts.list(helper.getLevel(), turbine).isEmpty(), "New turbine has ports");
+                    helper.assertTrue(helper.getLevel().getCapability(Capabilities.Energy.BLOCK, helper.absolutePos(generator), Direction.EAST) == null,
+                            "Generator end gives energy without a port");
+                    MultiblockPorts.set(helper.getLevel(), turbine, helper.absolutePos(generator), SideMode.ENERGY, Direction.EAST);
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Energy.BLOCK, helper.absolutePos(generator), Direction.EAST) != null,
-                            "Generator end gives no energy");
+                            "Generator end port gives no energy");
                 })
                 .thenSucceed();
     }

@@ -149,7 +149,7 @@ public final class GasTurbineGameTests {
     }
 
     // A quarter of the fuel heat leaves the exhaust at half the burn temperature (Naphtha: 700 HU/t at 600°C).
-    // Its default Heat port, the middle of the exhaust end, feeds a Steam Boiler Array's Heat port, which
+    // A Heat port in the middle of the exhaust end feeds a Steam Boiler Array's Heat port, which
     // boils with it; nothing is vented.
     static void exhaustToBoiler(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
@@ -162,6 +162,7 @@ public final class GasTurbineGameTests {
                     GasTurbineArrayBlockEntity turbine = turbine(helper, min);
                     SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
                     helper.assertTrue(turbine.isMaster() && boiler.isMaster(), "Something did not form");
+                    MultiblockPorts.set(helper.getLevel(), turbine, helper.absolutePos(new BlockPos(4, 2, 1)), SideMode.HEAT, Direction.EAST);
                     MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(new BlockPos(5, 2, 1)), SideMode.HEAT, Direction.WEST);
                     SteamGameTests.fill(boiler.getWater(), FluidResource.of(Fluids.WATER), 40_000);
                     fill(turbine, ModFluids.NAPHTHA.get(), 20_000);

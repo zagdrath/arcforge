@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "A solid 3×3×3 cube of Superheater Array Casings. It takes steam and heat in and sends the next steam grade out.\n- Steam → High-Pressure costs 3 HU per mB, High-Pressure → Superheated 3, Steam → Superheated 6.\n- Boiling plain Steam and superheating it is the cheapest way to Superheated Steam (14 HU per mB against 16 from a boiler alone), and only the superheater needs 900 °C heat.\n- Its own heat must reach the target's temperature: 500 °C for High-Pressure, 900 °C for Superheated. Colder, steam passes through unchanged.\n- The Pressure tab picks the target: Auto (the best its heat allows), High-Pressure or Superheated.\n- Up to 2,000 HU/t. Separate 16,000 mB tanks for steam in and steam out.\n# Ports\nBy default: steam in, steam out and heat in. Change them with the Wrench in Port mode."
+      "text": "A solid 3×3×3 cube of Superheater Array Casings. It takes steam and heat in and sends the next steam grade out.\n- Steam → High-Pressure costs 3 HU per mB, High-Pressure → Superheated 3, Steam → Superheated 6.\n- Boiling plain Steam and superheating it is the cheapest way to Superheated Steam (14 HU per mB against 16 from a boiler alone), and only the superheater needs 900 °C heat.\n- Its own heat must reach the target's temperature: 500 °C for High-Pressure, 900 °C for Superheated. Colder, steam passes through unchanged.\n- The Pressure tab picks the target: Auto (the best its heat allows), High-Pressure or Superheated.\n- Up to 2,000 HU/t. Separate 16,000 mB tanks for steam in and steam out.\n# Ports\nA new array has none: set steam in, steam out and heat in with the Wrench in Port mode."
     },
     {
       "type": "multiblock",
