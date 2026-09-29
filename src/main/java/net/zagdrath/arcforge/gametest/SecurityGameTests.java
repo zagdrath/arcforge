@@ -72,6 +72,29 @@ public final class SecurityGameTests {
         }
     }
 
+    // `player` opens the menu of the block at pos, as the server does (mock players can't be sent the screen).
+    private static void open(GameTestHelper helper, ServerPlayer player, BlockPos pos) {
+        var provider = (net.minecraft.world.MenuProvider) helper.getBlockEntity(pos, net.minecraft.world.level.block.entity.BlockEntity.class);
+        var menu = provider.createMenu(1, player.getInventory(), player);
+        net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerContainerEvent.Open(player, menu));
+    }
+
+    // A machine with no owner (placed before security) belongs to the first player to open it; opening it again
+    // later, as someone else, doesn't change that.
+    static void firstOpenClaims(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        ServerPlayer first = player(helper, new BlockPos(0, 1, 0));
+        ServerPlayer second = player(helper, new BlockPos(2, 1, 0));
+        helper.setBlock(pos, ModBlocks.ARC_MELTER.get());
+        Owned owned = (Owned) helper.getBlockEntity(pos, net.minecraft.world.level.block.entity.BlockEntity.class);
+        helper.assertTrue(owned.owner() == null, "A machine set without a player has an owner");
+        open(helper, first, pos);
+        helper.assertTrue(first.getUUID().equals(owned.owner()), "Opening an unowned machine did not claim it: owner " + owned.owner());
+        open(helper, second, pos);
+        helper.assertTrue(first.getUUID().equals(owned.owner()), "Opening someone else's machine took it: owner " + owned.owner());
+        helper.succeed();
+    }
+
     // A Private machine turns another player away (using, wrenching, breaking) but not automation; an operator
     // still gets in.
     static void privateBlocksPlayersNotConduits(GameTestHelper helper) {

@@ -186,10 +186,15 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
 
     // A bottom-to-top gauge cropped from the bottom so its pixel pattern stays put.
     protected void drawGauge(GuiGraphicsExtractor graphics, Identifier sprite, int x, int y, int gaugeX, int gaugeY, int value, int max) {
-        int height = scaled(value, max, GAUGE_H);
+        drawGauge(graphics, sprite, x, y, gaugeX, gaugeY, GAUGE_H, value, max);
+    }
+
+    // The same, gaugeH tall (at most GAUGE_H), for screens with less room.
+    protected void drawGauge(GuiGraphicsExtractor graphics, Identifier sprite, int x, int y, int gaugeX, int gaugeY, int gaugeH, int value, int max) {
+        int height = scaled(value, max, gaugeH);
         if (height > 0) {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, GAUGE_W, GAUGE_H, 0, GAUGE_H - height,
-                    x + gaugeX, y + gaugeY + GAUGE_H - height, GAUGE_W, height);
+                    x + gaugeX, y + gaugeY + gaugeH - height, GAUGE_W, height);
         }
     }
 

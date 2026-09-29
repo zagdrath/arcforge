@@ -20,7 +20,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 
-// Stack of side tabs on the right of a machine GUI. Only one tab is open at a time;
+// Stacks of side tabs on the left and right of a machine GUI. Only one tab is open at a time;
 // tabs below an open panel shift down, and panels animate open/closed over ~6 ticks.
 public class SideTabPanel {
     private static final Identifier TAB = ArcforgeGui.widget("tab");
@@ -30,6 +30,7 @@ public class SideTabPanel {
     private static final Identifier TAB_LEFT_HOVER = ArcforgeGui.widget("tab_left_hover");
     private static final Identifier TAB_LEFT_SELECTED = ArcforgeGui.widget("tab_left_selected");
     private static final Identifier TAB_PANEL = ArcforgeGui.widget("tab_panel");
+    private static final Identifier TAB_LEFT_PANEL = ArcforgeGui.widget("tab_left_panel");
 
     // Right tabs start 4 px inside the GUI's 176 px width, left tabs overlap its left edge by as much.
     private static final int RIGHT_X = 172;
@@ -98,7 +99,7 @@ public class SideTabPanel {
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, left ? TAB_LEFT_SELECTED : TAB_SELECTED,
                         left ? tab.x + width - SideTab.SELECTED_WIDTH : tab.x, tab.y, SideTab.SELECTED_WIDTH, SideTab.COLLAPSED_HEIGHT);
             } else {
-                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, TAB_PANEL, tab.x, tab.y, width, height);
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, left ? TAB_LEFT_PANEL : TAB_PANEL, tab.x, tab.y, width, height);
             }
 
             // The icon sits 3 px from the tab's outer edge.

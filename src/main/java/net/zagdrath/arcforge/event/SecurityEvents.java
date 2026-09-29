@@ -33,7 +33,8 @@ import net.zagdrath.arcforge.tag.ModBlockTags;
 // Where machine security is enforced, all server side and in one place: a player placing an Owned block becomes its
 // owner; using one (its GUI, buckets, the Wrench, the Settings Card), left-clicking or breaking one is refused
 // unless SecurityRules allows it; and a multiblock part can't be added to a structure the player may not use. Menus
-// learn their block's security when they open (for the Security tab).
+// learn their block's security when they open (for the Security tab), and a player opening a block with no owner (one
+// placed before security) becomes its owner.
 @EventBusSubscriber(modid = Arcforge.MODID)
 public final class SecurityEvents {
     private SecurityEvents() {}
@@ -120,6 +121,10 @@ public final class SecurityEvents {
     @SubscribeEvent
     static void onMenuOpen(PlayerContainerEvent.Open event) {
         if (event.getEntity() instanceof ServerPlayer player && event.getContainer() instanceof SecuredMenu menu) {
+            if (!(player instanceof FakePlayer)) {
+                menu.securityAccess().execute((level, pos) -> SecurityRules.of(level, pos).filter(owned -> owned.owner() == null)
+                        .ifPresent(owned -> owned.setOwner(player.getUUID(), player.getGameProfile().name())));
+            }
             SecuredMenu.sync(player, event.getContainer().containerId, menu.securityAccess());
         }
     }

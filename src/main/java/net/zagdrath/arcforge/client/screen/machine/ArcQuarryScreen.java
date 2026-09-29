@@ -33,7 +33,8 @@ import net.zagdrath.arcforge.menu.machine.ArcQuarryMenu;
 public class ArcQuarryScreen extends MachineScreen<ArcQuarryMenu> {
     private static final Identifier BUTTON = ArcforgeGui.widget("button");
     private static final Identifier BUTTON_HOVER = ArcforgeGui.widget("button_hover");
-    private static final int ENERGY_X = 9, ENERGY_Y = 17;
+    // The gauge ends level with the status screen, above the buffer.
+    private static final int ENERGY_X = 9, ENERGY_Y = 17, ENERGY_H = 44;
     private static final int LED_X = 27, LED_Y = 21;
     private static final int TEXT_X = 27, STATUS_X = 35, STATUS_Y = 20, AREA_Y = 31, TARGETS_Y = 42, MINED_Y = 52, TEXT_W = 90;
     private static final int START_X = 146, START_Y = 16, RESET_X = 146, RESET_Y = 40, SETTINGS_X = 123, SETTINGS_Y = 40, BUTTON_SIZE = 20;
@@ -72,7 +73,7 @@ public class ArcQuarryScreen extends MachineScreen<ArcQuarryMenu> {
 
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
-        drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.getEnergy(), menu.getCapacity());
+        drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, ENERGY_H, menu.getEnergy(), menu.getCapacity());
         drawLed(graphics, x, y, LED_X, LED_Y);
         if (!menu.getSlot(0).hasItem()) {
             int gx = x + ArcQuarryMenu.REPLACE_X;
@@ -139,7 +140,7 @@ public class ArcQuarryScreen extends MachineScreen<ArcQuarryMenu> {
 
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
-        if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
+        if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, ENERGY_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getCapacity()))
                     .withStyle(ChatFormatting.GRAY));
             return;

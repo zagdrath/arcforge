@@ -11,7 +11,7 @@
     },
     {
       "type": "text",
-      "text": "# Security Terminal\nUse any Security Terminal to edit your own profile: your default mode and your trusted players. Changes apply to all your machines instantly, at any distance.\n# Per machine\nEach machine has a Security tab. Leave it on your profile's default, or set Public, Trusted or Private for that one machine. Only the owner can change it."
+      "text": "# Security Terminal\nUse any Security Terminal to edit your own profile: your default mode and your trusted players. Changes apply to all your machines instantly, at any distance.\n# Per machine\nEach machine has a Security tab, with the mode it uses selected: your profile's, until you pick another for that one machine. Pick your profile's mode again and it follows your profile once more. Only the owner can change it.\nMachines placed before security have no owner: the first player to open one becomes its owner."
     }
   ]
 }

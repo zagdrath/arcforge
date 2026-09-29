@@ -42,7 +42,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
   - An existing `arcforge-common.toml` keeps 550; set it to 1100 by hand.
 
 - **Machine security.** Machines, storage blocks and multiblocks placed before this update have no owner, so
-  anyone can use them, as before. Break and re-place one (or build a new one) to own it. Ops bypass security
+  anyone can use them, as before, until someone opens one: the first player to open its screen becomes its owner.
+  On a shared server, open your own machines before someone else does. Ops bypass security
   unless `security.opsBypass` is false; `security.enabled = false` turns it off.
 - **Burner fuel data packs.** `arcforge:burner_fuels` entries take an optional `"gas_turbine": false` to keep
   a fuel out of the Gas Turbine Array. Entries without it are burned there, so a pack that adds a slow,
@@ -59,7 +60,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Machine security.**
   - Every machine, storage block and multiblock records who placed it. Each player picks a default of
     **Public**, **Trusted** or **Private** at the new **Security Terminal**, and lists the players they trust.
-  - A **Security** tab on every machine screen lets the owner override the mode for that machine.
+  - A **Security** tab on every machine screen shows the machine's mode (Public, Trusted or Private) and lets the
+    owner pick another for that machine; picking their profile's mode makes it follow the profile again.
   - Others can't open, break, wrench, paste onto or hand-fill a machine they can't access, and can't extend
     someone else's multiblock. Conduits, hoppers and other automation still work, so shared lines never
     break. The Block Breaker and Block Placer act as their owner.
@@ -222,6 +224,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Wrong port marks on machine textures.** The Block Placer's back showed an input port instead of energy.
   The Electrolyzer and Geothermal Plant bottoms showed ports they don't have, and the Fuel Burner's sides had a
   stray red nub.
+- **Induction Furnace Array screen: the speed ran past its edge.** It now reads "x2/lane"; hover for the full
+  line.
 
 - **Slot placeholders match the items again.** Every empty-slot hint is now a silhouette of the item that
   goes there: the Arcforge Furnace shows an ingot, an additive crystal and Coal Coke (not dust piles and
