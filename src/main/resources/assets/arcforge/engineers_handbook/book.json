@@ -78,7 +78,8 @@
         "block_breaker",
         "block_placer",
         "vacuum_collector",
-        "arc_quarry"
+        "arc_quarry",
+        "throttle_lever"
       ]
     },
     {

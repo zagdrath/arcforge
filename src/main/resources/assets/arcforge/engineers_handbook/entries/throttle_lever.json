@@ -1,0 +1,13 @@
+{
+  "title": "Throttle Lever",
+  "icon": "arcforge:throttle_lever",
+  "items": [
+    "arcforge:throttle_lever"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A lever that sets a redstone signal from 0 to 15 instead of just on or off. Place it on a floor, wall or ceiling like a lever.\n- **Use** it to raise the signal by 1, **sneak-use** to lower it. It stops at 0 and 15.\n- The gauge beside the slot lights up with the signal, and the action bar shows it.\nIt powers the block it's on and its neighbours like a lever, so it sets a Gas Turbine Array's Throttle mode directly."
+    }
+  ]
+}

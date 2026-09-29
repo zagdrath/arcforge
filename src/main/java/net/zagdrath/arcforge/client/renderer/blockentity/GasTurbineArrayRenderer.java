@@ -8,12 +8,14 @@ package net.zagdrath.arcforge.client.renderer.blockentity;
 import java.util.List;
 import java.util.Set;
 
+import org.joml.Vector3fc;
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -39,25 +41,65 @@ import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
 // Draws the inside of a formed Gas Turbine Array, seen through its windows: the Steam Turbine Array's ribbed
-// lining, then the rotor along the core: the shaft through every block, compressor blades in the first third
-// from the intake, the combustor can in the middle (still, its glow full-bright with the fuel burned and
-// flickering a little), and turbine blades on to the exhaust. Blade sets are staggered 22.5° per block and turn
-// at up to 60° a tick (see GasTurbineArrayBlockEntity.advanceAngle). The intake and exhaust caps are drawn over
-// the two end faces.
+// lining, then the rotor along the core. The compressor fills the first third from the intake and the turbine the
+// rest past the combustor can in the middle (still, its glow full-bright with the fuel burned and flickering a
+// little); the shaft runs through the combustor and the end blocks. Compressor and turbine blocks each hold a
+// rotor drum and several stages of thin blades: 4 stages of 36 in a compressor block, 3 of 28 in a turbine block.
+// The compressor narrows toward the combustor and the turbine widens toward the exhaust, and neighbouring stages
+// are offset by half a blade. The rotor turns at up to 60° a tick (see GasTurbineArrayBlockEntity.advanceAngle).
+// The intake and exhaust caps are drawn over the two end faces.
 public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineArrayBlockEntity, GasTurbineArrayRenderer.State> {
     public static final StandaloneModelKey<QuadCollection> SHAFT = key("gas_turbine_rotor_shaft");
-    public static final StandaloneModelKey<QuadCollection> COMPRESSOR = key("gas_turbine_compressor_blades");
-    public static final StandaloneModelKey<QuadCollection> TURBINE = key("gas_turbine_turbine_blades");
+    public static final StandaloneModelKey<QuadCollection> COMPRESSOR_BLADE = key("gas_turbine_compressor_blade");
+    public static final StandaloneModelKey<QuadCollection> TURBINE_BLADE = key("gas_turbine_turbine_blade");
+    public static final StandaloneModelKey<QuadCollection> ROTOR_DRUM = key("gas_turbine_rotor_drum");
     public static final StandaloneModelKey<QuadCollection> COMBUSTOR = key("gas_turbine_combustor");
     public static final StandaloneModelKey<QuadCollection> COMBUSTOR_GLOW = key("gas_turbine_combustor_glow");
     public static final StandaloneModelKey<QuadCollection> INTAKE_CAP = key("gas_turbine_intake_cap");
     public static final StandaloneModelKey<QuadCollection> EXHAUST_CAP = key("gas_turbine_exhaust_cap");
     // Each key and the model it bakes (for ArcforgeClient.registerStandaloneModels).
-    public static final List<StandaloneModelKey<QuadCollection>> KEYS = List.of(SHAFT, COMPRESSOR, TURBINE, COMBUSTOR, COMBUSTOR_GLOW, INTAKE_CAP, EXHAUST_CAP);
-    public static final List<String> MODELS = List.of("rotor_shaft", "compressor_blades", "turbine_blades", "combustor", "combustor_glow", "intake_cap", "exhaust_cap");
+    public static final List<StandaloneModelKey<QuadCollection>> KEYS = List.of(SHAFT, COMPRESSOR_BLADE, TURBINE_BLADE, ROTOR_DRUM, COMBUSTOR,
+            COMBUSTOR_GLOW, INTAKE_CAP, EXHAUST_CAP);
+    public static final List<String> MODELS = List.of("rotor_shaft", "compressor_blade", "turbine_blade", "rotor_drum", "combustor", "combustor_glow",
+            "intake_cap", "exhaust_cap");
 
     private static final float LINER_INSET = SteamBoilerArrayRenderer.LINER_INSET;
-    private static final float STAGGER = 22.5F;
+    // A blade model's tip radius, in px.
+    private static final float MODEL_TIP = 16.0F;
+
+    // The blading of a compressor or turbine block: its stages (centres in px along the axis), blades per stage, and
+    // the tip radius (px) of its first and last stage counted from the intake.
+    private enum Blading {
+        COMPRESSOR(new float[] { 2, 6, 10, 14 }, 36, 17.0F, 12.0F),
+        TURBINE(new float[] { 3, 8, 13 }, 28, 13.0F, 20.0F);
+
+        final float[] centres;
+        final int blades;
+        final float firstTip, lastTip;
+        // One ring of blades baked from the blade model, and the model it was baked from (a reload replaces it).
+        @Nullable QuadCollection bakedFrom;
+        float[] ring = new float[0];
+
+        Blading(float[] centres, int blades, float firstTip, float lastTip) {
+            this.centres = centres;
+            this.blades = blades;
+            this.firstTip = firstTip;
+            this.lastTip = lastTip;
+        }
+
+        float[] ring(QuadCollection blade) {
+            if (bakedFrom != blade) {
+                ring = bakeRing(blade, blades);
+                bakedFrom = blade;
+            }
+            return ring;
+        }
+
+        // The tip radius (px) of stage `stage` of a section `stages` long, counted from the intake.
+        float tip(int stage, int stages) {
+            return Mth.lerp(stages > 1 ? stage / (float) (stages - 1) : 0.0F, firstTip, lastTip);
+        }
+    }
     private static final float SHAFT_END_INSET = 1.5F / 16.0F;
     private static final float FLICKER = 0.1F;
 
@@ -154,33 +196,40 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
 
         var models = Minecraft.getInstance().getModelManager();
         QuadCollection shaft = models.getStandaloneModel(SHAFT);
-        QuadCollection compressor = models.getStandaloneModel(COMPRESSOR);
-        QuadCollection turbineBlades = models.getStandaloneModel(TURBINE);
+        QuadCollection compressorBlade = models.getStandaloneModel(COMPRESSOR_BLADE);
+        QuadCollection turbineBlade = models.getStandaloneModel(TURBINE_BLADE);
+        QuadCollection drum = models.getStandaloneModel(ROTOR_DRUM);
         QuadCollection combustor = models.getStandaloneModel(COMBUSTOR);
         QuadCollection glow = models.getStandaloneModel(COMBUSTOR_GLOW);
-        if (shaft == null || compressor == null || turbineBlades == null || combustor == null || glow == null) {
+        if (shaft == null || compressorBlade == null || turbineBlade == null || drum == null || combustor == null || glow == null) {
             return;
         }
         RenderType cutout = RenderTypes.entityCutout(liner.atlasLocation());
         List<BakedQuad> shaftQuads = shaft.getAll();
+        List<BakedQuad> drumQuads = drum.getAll();
         int core = state.length - 2;
+        int compressorBlocks = (core + 2) / 3;
+        int combustorBlocks = Math.max(1, core - 2 * compressorBlocks);
+        int turbineBlocks = core - compressorBlocks - combustorBlocks;
         for (int i = 0; i < state.length; i++) {
-            poseStack.pushPose();
-            rotorPose(poseStack, state, i, state.angle);
-            if (i == 0) {
-                poseStack.translate(0.0F, 0.0F, SHAFT_END_INSET);
-                poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
-            } else if (i == state.length - 1) {
-                poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
+            int fromIntake = state.intakeNegative ? i - 1 : core - i;
+            Section section = i == 0 || i == state.length - 1 ? null : section(fromIntake, core);
+            if (section == null || section == Section.COMBUSTOR) {
+                // The bare shaft: through the end blocks and the combustor.
+                poseStack.pushPose();
+                rotorPose(poseStack, state, i, state.angle);
+                if (i == 0) {
+                    poseStack.translate(0.0F, 0.0F, SHAFT_END_INSET);
+                    poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
+                } else if (i == state.length - 1) {
+                    poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
+                }
+                collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, shaftQuads, -1, state.light));
+                poseStack.popPose();
             }
-            collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, shaftQuads, -1, state.light));
-            poseStack.popPose();
-
-            if (i == 0 || i == state.length - 1) {
+            if (section == null) {
                 continue;
             }
-            int fromIntake = state.intakeNegative ? i - 1 : core - i;
-            Section section = section(fromIntake, core);
             if (section == Section.COMBUSTOR) {
                 poseStack.pushPose();
                 rotorPose(poseStack, state, i, 0.0F);
@@ -194,13 +243,37 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
                             (pose, buffer) -> TiledBoxes.quads(pose, buffer, flame, color, LightCoordsUtil.FULL_BRIGHT));
                 }
                 poseStack.popPose();
-            } else {
-                List<BakedQuad> blades = (section == Section.COMPRESSOR ? compressor : turbineBlades).getAll();
+                continue;
+            }
+            boolean compressor = section == Section.COMPRESSOR;
+            Blading blading = compressor ? Blading.COMPRESSOR : Blading.TURBINE;
+            float[] ring = blading.ring(compressor ? compressorBlade : turbineBlade);
+            // This block's place in its section, from the intake, and the section's stage count.
+            int block = compressor ? fromIntake : fromIntake - compressorBlocks - combustorBlocks;
+            int perBlock = blading.centres.length;
+            int stages = (compressor ? compressorBlocks : turbineBlocks) * perBlock;
+            float scaleSum = 0.0F;
+            for (int k = 0; k < perBlock; k++) {
+                // Stage k is the k-th along the axis; counted from the intake, reversed when the intake is at the far end.
+                int stage = block * perBlock + (state.intakeNegative ? k : perBlock - 1 - k);
+                float scale = blading.tip(stage, stages) / MODEL_TIP;
+                scaleSum += scale;
                 poseStack.pushPose();
-                rotorPose(poseStack, state, i, state.angle + i * STAGGER);
-                collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, blades, -1, state.light));
+                axisPose(poseStack, state, i, blading.centres[k] / 16.0F - 0.5F);
+                poseStack.rotate(Axis.ZP.rotationDegrees(state.angle + (stage % 2) * 180.0F / blading.blades));
+                poseStack.scale(scale, scale, 1.0F);
+                collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.vertices(pose, buffer, ring, -1, state.light));
                 poseStack.popPose();
             }
+            // The drum, sized to the stages on it so the blade roots sit inside it.
+            float drumScale = scaleSum / perBlock;
+            poseStack.pushPose();
+            axisPose(poseStack, state, i, 0.0F);
+            poseStack.rotate(Axis.ZP.rotationDegrees(state.angle));
+            poseStack.scale(drumScale, drumScale, 1.0F);
+            poseStack.translate(-0.5, -0.5, -0.5);
+            collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, drumQuads, -1, state.light));
+            poseStack.popPose();
         }
         submitCap(state, poseStack, collector, models.getStandaloneModel(INTAKE_CAP), state.intakeNegative, state.intakeLight, cutout);
         submitCap(state, poseStack, collector, models.getStandaloneModel(EXHAUST_CAP), !state.intakeNegative, state.exhaustLight, cutout);
@@ -229,6 +302,13 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
     // Places a rotor model (built along Z, one block long) in block i along the axis, in the centre of the
     // cross-section, turned to the given angle about the axis.
     private static void rotorPose(PoseStack poseStack, State state, int i, float angle) {
+        axisPose(poseStack, state, i, 0.0F);
+        poseStack.rotate(Axis.ZP.rotationDegrees(angle));
+        poseStack.translate(-0.5, -0.5, -0.5);
+    }
+
+    // Moves to the axis at `offset` blocks along it from the centre of block i, with local Z along the axis.
+    private static void axisPose(PoseStack poseStack, State state, int i, float offset) {
         poseStack.translate(
                 state.axis == Direction.Axis.X ? i + 0.5 : 1.5,
                 1.5,
@@ -236,8 +316,38 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
         if (state.axis == Direction.Axis.X) {
             poseStack.rotate(Axis.YP.rotationDegrees(90.0F));
         }
-        poseStack.rotate(Axis.ZP.rotationDegrees(angle));
-        poseStack.translate(-0.5, -0.5, -0.5);
+        poseStack.translate(0.0F, 0.0F, offset);
+    }
+
+    // One ring of `count` blades from a blade model (one blade pointing along +X, centred on the block), baked
+    // once into vertices centred on the axis: x, y, z, u, v, nx, ny, nz each (for TiledBoxes.vertices).
+    private static float[] bakeRing(QuadCollection blade, int count) {
+        List<BakedQuad> quads = blade.getAll();
+        float[] out = new float[quads.size() * count * BakedQuad.VERTEX_COUNT * 8];
+        int n = 0;
+        for (int b = 0; b < count; b++) {
+            double radians = Math.toRadians(360.0 * b / count);
+            float cos = (float) Math.cos(radians), sin = (float) Math.sin(radians);
+            for (BakedQuad quad : quads) {
+                var normal = quad.direction().getUnitVec3i();
+                float nx = normal.getX() * cos - normal.getY() * sin;
+                float ny = normal.getX() * sin + normal.getY() * cos;
+                for (int v = 0; v < BakedQuad.VERTEX_COUNT; v++) {
+                    Vector3fc position = quad.position(v);
+                    float x = position.x() - 0.5F, y = position.y() - 0.5F;
+                    long uv = quad.packedUV(v);
+                    out[n++] = x * cos - y * sin;
+                    out[n++] = x * sin + y * cos;
+                    out[n++] = position.z() - 0.5F;
+                    out[n++] = UVPair.unpackU(uv);
+                    out[n++] = UVPair.unpackV(uv);
+                    out[n++] = nx;
+                    out[n++] = ny;
+                    out[n++] = normal.getZ();
+                }
+            }
+        }
+        return out;
     }
 
     @Override

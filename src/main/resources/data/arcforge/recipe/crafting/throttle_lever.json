@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    " L ",
+    "RCR",
+    " P "
+  ],
+  "key": {
+    "L": "minecraft:lever",
+    "R": "#c:dusts/redstone",
+    "C": "minecraft:comparator",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:throttle_lever",
+    "count": 1
+  }
+}

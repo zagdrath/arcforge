@@ -451,4 +451,33 @@ public final class AutomationGameTests {
                 })
                 .thenSucceed();
     }
+
+    // A Throttle Lever on the floor steps its signal: 5 uses give 5, and the block it's on is powered at 5; 2 sneak-uses
+    // take it to 3; it stops at 15.
+    static void throttleLeverSteps(GameTestHelper helper) {
+        BlockPos stone = new BlockPos(1, 1, 1);
+        BlockPos lever = new BlockPos(1, 2, 1);
+        helper.setBlock(stone, Blocks.STONE);
+        helper.setBlock(lever, ModBlocks.THROTTLE_LEVER.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.FLOOR)
+                .setValue(net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACING, Direction.NORTH));
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        var power = net.zagdrath.arcforge.block.redstone.ThrottleLeverBlock.POWER;
+        for (int i = 0; i < 5; i++) {
+            helper.useBlock(lever, player);
+        }
+        helper.assertTrue(helper.getBlockState(lever).getValue(power) == 5, "5 uses set the lever to " + helper.getBlockState(lever).getValue(power));
+        int signal = helper.getLevel().getDirectSignalTo(helper.absolutePos(stone));
+        helper.assertTrue(signal == 5, "The block under the lever is powered at " + signal);
+        player.setShiftKeyDown(true);
+        helper.useBlock(lever, player);
+        helper.useBlock(lever, player);
+        helper.assertTrue(helper.getBlockState(lever).getValue(power) == 3, "2 sneak-uses left the lever at " + helper.getBlockState(lever).getValue(power));
+        player.setShiftKeyDown(false);
+        for (int i = 0; i < 20; i++) {
+            helper.useBlock(lever, player);
+        }
+        helper.assertTrue(helper.getBlockState(lever).getValue(power) == 15, "The lever went past 15: " + helper.getBlockState(lever).getValue(power));
+        helper.succeed();
+    }
 }

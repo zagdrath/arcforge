@@ -1,0 +1,77 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "#blade",
+    "blade": "arcforge:block/gas_turbine_array/turbine_blade"
+  },
+  "elements": [
+    {
+      "from": [
+        12.5,
+        7.625,
+        6.25
+      ],
+      "to": [
+        24,
+        8.375,
+        9.75
+      ],
+      "rotation": {
+        "angle": -22.5,
+        "axis": "x",
+        "origin": [
+          8,
+          8,
+          8
+        ]
+      },
+      "faces": {
+        "up": {
+          "texture": "#blade",
+          "uv": [
+            4.5,
+            0,
+            16,
+            4
+          ]
+        },
+        "down": {
+          "texture": "#blade",
+          "uv": [
+            4.5,
+            0,
+            16,
+            4
+          ]
+        },
+        "north": {
+          "texture": "#blade",
+          "uv": [
+            4.5,
+            4,
+            16,
+            5
+          ]
+        },
+        "south": {
+          "texture": "#blade",
+          "uv": [
+            4.5,
+            4,
+            16,
+            5
+          ]
+        },
+        "east": {
+          "texture": "#blade",
+          "uv": [
+            15,
+            0,
+            16,
+            4
+          ]
+        }
+      }
+    }
+  ]
+}

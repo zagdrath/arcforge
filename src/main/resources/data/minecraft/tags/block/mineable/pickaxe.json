@@ -113,6 +113,7 @@
     "arcforge:arc_quarry",
     "arcforge:arc_quarry_bounding",
     "arcforge:security_terminal",
+    "arcforge:throttle_lever",
     "arcforge:fermenter",
     "arcforge:gas_turbine_array_casing"
   ]

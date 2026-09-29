@@ -1,0 +1,79 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "#drum",
+    "drum": "arcforge:block/gas_turbine_array/rotor_drum"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        3,
+        0
+      ],
+      "to": [
+        13,
+        13,
+        16
+      ],
+      "faces": {
+        "east": {
+          "texture": "#drum",
+          "uv": [
+            3,
+            0,
+            13,
+            16
+          ],
+          "rotation": 90
+        },
+        "west": {
+          "texture": "#drum",
+          "uv": [
+            3,
+            0,
+            13,
+            16
+          ],
+          "rotation": 90
+        },
+        "up": {
+          "texture": "#drum",
+          "uv": [
+            3,
+            0,
+            13,
+            16
+          ]
+        },
+        "down": {
+          "texture": "#drum",
+          "uv": [
+            3,
+            0,
+            13,
+            16
+          ]
+        },
+        "north": {
+          "texture": "#drum",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        },
+        "south": {
+          "texture": "#drum",
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -83,13 +83,17 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
     9-long array makes up to 7,560 FE/t on Naphtha, under the Superheated Steam Turbine Array's 10,080.
   - One end is the intake, which needs air in front of it; the other is the exhaust. A quarter of the fuel's
     heat leaves the exhaust at half its burn temperature, through Heat ports into a Steam Boiler Array (the
-    combined cycle, about 1.94× the burner route), or vents as heat haze.
+    combined cycle, about 1.94× the burner route), a Heat Cell or a Thermodynamic Conduit, or vents as heat haze.
   - The new **Throttle** redstone mode sets the fuel burned by signal strength (1-15). Starting takes a
     second of ignition; running dry is a flameout, with a short wait before it relights.
-  - The rotor spools up and coasts down, with compressor and turbine blades and a glowing combustor through
-    its windows, and a whine that climbs with its speed. Heavy Oil lubricant adds 8%.
+  - The rotor spools up and coasts down, and a whine climbs with its speed. Through its windows: a compressor of
+    many thin blades in stages that narrow toward a glowing combustor, and turbine stages that widen toward the
+    exhaust. Heavy Oil lubricant adds 8%.
   - New parts: the **Turbine Blade Set** and **Combustor**. JEI lists its fuels; Jade, a Handbook page and a
     config section `[gasTurbineArray]`.
+- **Throttle Lever.** A lever with a signal of 0 to 15: use it to raise the signal by 1, sneak-use to lower it.
+  Its gauge lights up with the signal. It powers the block it's on like a lever, so it sets a Gas Turbine
+  Array's Throttle mode directly. Crafted from a lever, a comparator, redstone and a Steel Plate.
 - **Jetpacks** (Tempered / Hardened / Arcforged). They burn Steam, High-Pressure Steam, Superheated Steam or
   Hydrogen (data map `arcforge:jetpack_fuels`), with Normal / Hover / Off modes on a key (H), a fuel gauge by
   the hotbar, steam puffs or a blue hydrogen flame, and a thrust sound. Fill them in a Pressurized Cylinder or

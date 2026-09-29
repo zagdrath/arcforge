@@ -92,6 +92,7 @@ import net.zagdrath.arcforge.block.storage.CrateBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
 import net.zagdrath.arcforge.block.storage.HeatCellBlock;
 import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
+import net.zagdrath.arcforge.block.redstone.ThrottleLeverBlock;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.block.storage.VaultBlock;
@@ -164,6 +165,11 @@ public final class ModBlocks {
     public static final DeferredBlock<SecurityTerminalBlock> SECURITY_TERMINAL = BLOCKS.registerBlock("security_terminal",
             SecurityTerminalBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.METAL).noOcclusion());
+
+    // A lever with a signal of 0-15. Only its gauge LED glows (in the model), so it gives no light.
+    public static final DeferredBlock<ThrottleLeverBlock> THROTTLE_LEVER = BLOCKS.registerBlock("throttle_lever",
+            ThrottleLeverBlock::new, p -> p.mapColor(MapColor.METAL).noCollision().strength(0.5F).sound(SoundType.METAL)
+                    .pushReaction(PushReaction.POPPED));
 
     // Slim: light passes around it.
     public static final DeferredBlock<ElectricPumpBlock> ELECTRIC_PUMP = BLOCKS.registerBlock("electric_pump",

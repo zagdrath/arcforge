@@ -196,6 +196,13 @@ public final class TiledBoxes {
         }
     }
 
+    // Pre-baked quads: x, y, z, u, v, nx, ny, nz per vertex, four vertices a quad (see GasTurbineArrayRenderer's rings).
+    public static void vertices(PoseStack.Pose pose, VertexConsumer buffer, float[] data, int color, int light) {
+        for (int i = 0; i + 7 < data.length; i += 8) {
+            vertex(pose, buffer, data[i], data[i + 1], data[i + 2], data[i + 3], data[i + 4], color, light, data[i + 5], data[i + 6], data[i + 7]);
+        }
+    }
+
     private static void vertex(PoseStack.Pose pose, VertexConsumer buffer, float x, float y, float z, float u, float v,
             int color, int light, float nx, float ny, float nz) {
         buffer.addVertex(pose, x, y, z)

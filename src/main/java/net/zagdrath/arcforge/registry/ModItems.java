@@ -69,6 +69,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> METAL_PRESSING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.METAL_PRESSING_ARRAY_CASING);
     public static final DeferredItem<BlockItem> ELECTRIC_PUMP = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTRIC_PUMP);
     public static final DeferredItem<BlockItem> SECURITY_TERMINAL = ITEMS.registerSimpleBlockItem(ModBlocks.SECURITY_TERMINAL);
+    public static final DeferredItem<BlockItem> THROTTLE_LEVER = ITEMS.registerSimpleBlockItem(ModBlocks.THROTTLE_LEVER);
     public static final DeferredItem<BlockItem> ARC_MELTER = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_MELTER);
     public static final DeferredItem<BlockItem> FERMENTER = ITEMS.registerSimpleBlockItem(ModBlocks.FERMENTER);
     public static final DeferredItem<BlockItem> CHEMICAL_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.CHEMICAL_REACTOR);

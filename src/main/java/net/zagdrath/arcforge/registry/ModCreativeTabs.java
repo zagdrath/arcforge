@@ -163,6 +163,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.ENGINEERS_HANDBOOK.get());
                 output.accept(ModItems.WRENCH.get());
+                output.accept(ModItems.THROTTLE_LEVER.get());
                 output.accept(ModItems.SETTINGS_CARD.get());
                 for (var item : List.of(ModItems.STEEL_SWORD, ModItems.STEEL_PICKAXE, ModItems.STEEL_AXE, ModItems.STEEL_SHOVEL, ModItems.STEEL_HOE,
                         ModItems.STEEL_HAMMER, ModItems.STEEL_EXCAVATOR, ModItems.STEEL_HELMET, ModItems.STEEL_CHESTPLATE, ModItems.STEEL_LEGGINGS,

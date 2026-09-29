@@ -370,6 +370,11 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         if (rpm < 0.5 && target == 0) {
             rpm = 0;
         }
+        // Exhaust nothing took since last tick is vented. Heat ports push it out in pushHeat, but Thermodynamic
+        // Conduits pull it on their own tick, after this one, so it has to wait a tick for them.
+        int vented = exhaust.getStored();
+        venting = vented > 0;
+        exhaust.remove(vented);
         fePerTick = 0;
         exhaustHu = 0;
         if (burnedHu > 0 && burning != null) {
@@ -388,11 +393,8 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         } else {
             exhaust.setProducing(false);
         }
-        // Exhaust heat goes out of the Heat ports; whatever they don't take is vented.
+        // Exhaust heat goes out of the Heat ports; whatever nothing takes by next tick is vented (above).
         pushHeat(level);
-        int vented = exhaust.getStored();
-        venting = vented > 0;
-        exhaust.remove(vented);
 
         status = status(allowed, hasFuel, target);
         pushEnergy(level);

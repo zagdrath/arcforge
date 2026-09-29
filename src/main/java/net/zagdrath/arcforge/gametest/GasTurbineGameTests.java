@@ -180,6 +180,70 @@ public final class GasTurbineGameTests {
                 .thenSucceed();
     }
 
+    // A Throttle Lever sets the throttle directly: at 15 the turbine burns at full throttle (4,200 FE/t), at 1 a
+    // fifteenth of that (280 FE/t). The lever hangs on a stone block beside the turbine, which it powers.
+    static void throttleLeverDrivesTurbine(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 0);
+        BlockPos stone = new BlockPos(2, 1, 3);
+        BlockPos lever = new BlockPos(2, 1, 4);
+        build(helper, min);
+        helper.setBlock(stone, Blocks.STONE);
+        helper.setBlock(lever, ModBlocks.THROTTLE_LEVER.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.WALL)
+                .setValue(net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACING, Direction.SOUTH));
+        Runnable setFull = () -> ModBlocks.THROTTLE_LEVER.get().setPower(helper.getBlockState(lever), helper.getLevel(), helper.absolutePos(lever), 15, null);
+        Runnable setOne = () -> ModBlocks.THROTTLE_LEVER.get().setPower(helper.getBlockState(lever), helper.getLevel(), helper.absolutePos(lever), 1, null);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    GasTurbineArrayBlockEntity turbine = turbine(helper, min);
+                    helper.assertTrue(turbine.isMaster(), "The turbine did not form");
+                    turbine.setRedstoneMode(RedstoneMode.THROTTLE);
+                    fill(turbine, ModFluids.NAPHTHA.get(), 20_000);
+                    setFull.run();
+                })
+                .thenIdle(180)
+                .thenExecute(() -> {
+                    GasTurbineArrayBlockEntity turbine = turbine(helper, min);
+                    helper.assertTrue(turbine.getFePerTick() == 4_200, "A lever at 15 makes " + turbine.getFePerTick() + " FE/t");
+                    setOne.run();
+                })
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    GasTurbineArrayBlockEntity turbine = turbine(helper, min);
+                    helper.assertTrue(Math.abs(turbine.throttle() - 1.0 / 15.0) < 1e-9, "A lever at 1 throttles to " + turbine.throttle());
+                    helper.assertTrue(turbine.getFePerTick() == 280, "A lever at 1 makes " + turbine.getFePerTick() + " FE/t");
+                })
+                .thenSucceed();
+    }
+
+    // A Heat port can feed a Thermodynamic Conduit too: the conduit pulls the exhaust (between the turbine's ticks)
+    // and carries it into a Heat Cell.
+    static void exhaustThroughThermalConduit(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 0);
+        BlockPos conduit = new BlockPos(5, 2, 1);
+        BlockPos cellPos = new BlockPos(6, 2, 1);
+        build(helper, min);
+        helper.setBlock(conduit, ModBlocks.conduit(net.zagdrath.arcforge.conduit.ConduitType.THERMAL, net.zagdrath.arcforge.conduit.ConduitTier.WROUGHT).get());
+        helper.setBlock(cellPos, ModBlocks.heatCell(net.zagdrath.arcforge.conduit.ConduitTier.WROUGHT).get());
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    GasTurbineArrayBlockEntity turbine = turbine(helper, min);
+                    helper.assertTrue(turbine.isMaster(), "The turbine did not form");
+                    MultiblockPorts.set(helper.getLevel(), turbine, helper.absolutePos(new BlockPos(4, 2, 1)), SideMode.HEAT, Direction.EAST);
+                    net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(conduit));
+                    fill(turbine, ModFluids.NAPHTHA.get(), 20_000);
+                })
+                .thenIdle(200)
+                .thenExecute(() -> {
+                    var cell = helper.getBlockEntity(cellPos, net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity.class);
+                    helper.assertTrue(turbine(helper, min).getExhaustHu() > 0, "The turbine isn't making exhaust");
+                    helper.assertTrue(cell.getHeat().getStored() > 0, "No exhaust heat reached the Heat Cell through the conduit");
+                })
+                .thenSucceed();
+    }
+
     // A block in front of the intake shuts it (within the 20-tick check): no fuel burns and the status says so.
     // A turbine built with its west end already blocked takes its intake at the east end instead. The intake's
     // middle casing never holds a port.

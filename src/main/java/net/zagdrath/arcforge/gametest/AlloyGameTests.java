@@ -161,8 +161,8 @@ final class AlloyGameTests {
         // with its two parts, the 11 steel tools and armour pieces, the jetpack and arc tool drop's 16 (three
         // tier-one crafts, six tier upgrades and seven modules), and the security, foundry and gas turbine drop's 11
         // (Settings Card, Security Terminal, Fermenter, four Foundry Suit pieces, conduit dyeing, Turbine Blade Set,
-        // Combustor and Gas Turbine Array Casing).
-        helper.assertTrue(crafting == 172, crafting + " crafting/ recipes, not 172");
+        // Combustor and Gas Turbine Array Casing), and the Throttle Lever.
+        helper.assertTrue(crafting == 173, crafting + " crafting/ recipes, not 173");
         // Plus the fluorite-fluxed steel.
         helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
