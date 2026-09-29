@@ -164,13 +164,6 @@ public class ArcToolItem extends Item {
         return stack.getOrDefault(ModDataComponents.FELLING.get(), true);
     }
 
-    // A full one, for the creative tab.
-    public ItemStack charged() {
-        ItemStack stack = new ItemStack(this);
-        setEnergy(stack, capacity());
-        return stack;
-    }
-
     // FE to break a block: base x (1 + hardnessFactor x hardness), then x (1 + the modules' factors), each rounded
     // up; felled logs after the first are multiplied again.
     public static int cost(ItemStack stack, Level level, BlockPos pos, BlockState state) {

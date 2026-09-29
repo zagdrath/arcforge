@@ -102,13 +102,6 @@ public class JetpackItem extends Item {
         return held.isEmpty() || held.getFluid() == fluid;
     }
 
-    // A full one, for the creative tab.
-    public ItemStack filled(Fluid fluid) {
-        ItemStack stack = new ItemStack(this);
-        setFluid(stack, new FluidStack(fluid, capacity()));
-        return stack;
-    }
-
     // A Gas Cartridge clicked onto it pours in as much of an accepted gas as fits.
     @Override
     public boolean overrideOtherStackedOnMe(ItemStack self, ItemStack other, Slot slot, ClickAction clickAction, Player player, SlotAccess carriedItem) {

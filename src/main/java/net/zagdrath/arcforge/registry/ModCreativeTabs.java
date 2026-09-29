@@ -167,9 +167,6 @@ public final class ModCreativeTabs {
                 for (ModuleType type : ModuleType.values()) {
                     output.accept(ModItems.toolModule(type).get());
                 }
-                // Full of Hydrogen and fully charged, after the empty ones.
-                ModItems.jetpacks().forEach(item -> output.accept(item.get().filled(ModFluids.HYDROGEN.get())));
-                ModItems.arcTools().forEach(item -> output.accept(item.get().charged()));
                 output.accept(ModItems.SPEED_UPGRADE.get());
                 output.accept(ModItems.ENERGY_UPGRADE.get());
                 output.accept(ModItems.HEAT_UPGRADE.get());
