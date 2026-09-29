@@ -20,11 +20,14 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.ItemInfoTooltips;
+import net.zagdrath.arcforge.client.screen.machine.FermenterScreen;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.multiblock.MultiblockBlueprints;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlocks;
+import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModDataMaps;
+import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModRecipes;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import mezz.jei.api.IModPlugin;
@@ -68,6 +71,25 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         return UID;
     }
 
+    // Sheathed conduits are their own ingredients, one per colour, listed after the plain ones.
+    @Override
+    public void registerItemSubtypes(mezz.jei.api.registration.ISubtypeRegistration registration) {
+        ModItems.allConduits().forEach(conduit -> registration.registerFromDataComponentTypes(conduit.get(), ModDataComponents.CONDUIT_COLOR.get()));
+    }
+
+    @Override
+    public void registerExtraIngredients(mezz.jei.api.registration.IExtraIngredientRegistration registration) {
+        List<ItemStack> sheathed = new ArrayList<>();
+        for (var conduit : ModItems.allConduits()) {
+            for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
+                ItemStack stack = new ItemStack(conduit.get());
+                stack.set(ModDataComponents.CONDUIT_COLOR.get(), color);
+                sheathed.add(stack);
+            }
+        }
+        registration.addExtraItemStacks(sheathed);
+    }
+
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         IGuiHelper gui = registration.getJeiHelpers().getGuiHelper();
@@ -78,6 +100,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Pressing(gui),
                 new MachineCategories.Carbonizing(gui),
                 new MachineCategories.Melting(gui),
+                new MachineCategories.Fermenting(gui),
+                new MachineCategories.ConduitDyeingCategory(gui),
                 new MachineCategories.ChemicalReacting(gui),
                 new MachineCategories.Electrolyzing(gui),
                 new MachineCategories.ArcforgeSmelting(gui),
@@ -86,6 +110,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Superheating(gui),
                 new MachineCategories.Condensing(gui),
                 new MachineCategories.BurnerFuels(gui),
+                new MachineCategories.GasTurbineFuels(gui),
                 new MultiblockCategory(gui));
     }
 
@@ -97,6 +122,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Pressing.TYPE, recipes(ModRecipes.PRESSING.get()));
         registration.addRecipes(MachineCategories.Carbonizing.TYPE, recipes(ModRecipes.CARBONIZING.get()));
         registration.addRecipes(MachineCategories.Melting.TYPE, recipes(ModRecipes.MELTING.get()));
+        registration.addRecipes(MachineCategories.Fermenting.TYPE, recipes(ModRecipes.FERMENTING.get()));
+        registration.addRecipes(MachineCategories.ConduitDyeingCategory.TYPE,
+                ModItems.allConduits().stream().map(conduit -> new MachineCategories.ConduitDyeing(conduit.get())).toList());
         registration.addRecipes(MachineCategories.ChemicalReacting.TYPE, recipes(ModRecipes.CHEMICAL_REACTING.get()));
         registration.addRecipes(MachineCategories.Electrolyzing.TYPE, recipes(ModRecipes.ELECTROLYZING.get()));
         registration.addRecipes(MachineCategories.ArcforgeSmelting.TYPE, recipes(ModRecipes.ARCFORGE_SMELTING.get()));
@@ -114,6 +142,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
             }
         });
         registration.addRecipes(MachineCategories.BurnerFuels.TYPE, fuels);
+        registration.addRecipes(MachineCategories.GasTurbineFuels.TYPE, fuels.stream().filter(fuel -> fuel.fuel().gasTurbine()).toList());
 
         registration.addRecipes(MultiblockCategory.TYPE, MultiblockBlueprints.all().stream().map(MultiblockCategory.Build::new).toList());
 
@@ -150,6 +179,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addRecipeClickArea(ArcCrusherScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);
         registration.addRecipeClickArea(ArcMelterScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Melting.TYPE);
+        registration.addRecipeClickArea(FermenterScreen.class, 72, 35, ARROW_W, ARROW_H, MachineCategories.Fermenting.TYPE);
         registration.addRecipeClickArea(AssemblerScreen.class, 88, 35, ARROW_W, ARROW_H, RecipeTypes.CRAFTING);
         registration.addRecipeClickArea(ChemicalReactorScreen.class, 81, 35, ARROW_W, ARROW_H, MachineCategories.ChemicalReacting.TYPE);
         registration.addRecipeClickArea(ElectrolyzerScreen.class, 114, 35, ARROW_W, ARROW_H, MachineCategories.Electrolyzing.TYPE);
@@ -185,6 +215,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Pressing.TYPE, ModBlocks.METAL_PRESS.get(), ModBlocks.METAL_PRESSING_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.Carbonizing.TYPE, ModBlocks.CARBONIZER.get());
         registration.addCraftingStation(MachineCategories.Melting.TYPE, ModBlocks.ARC_MELTER.get());
+        registration.addCraftingStation(MachineCategories.Fermenting.TYPE, ModBlocks.FERMENTER.get());
+        registration.addCraftingStation(MachineCategories.ConduitDyeingCategory.TYPE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
         registration.addCraftingStation(MachineCategories.ChemicalReacting.TYPE, ModBlocks.CHEMICAL_REACTOR.get());
         registration.addCraftingStation(MachineCategories.Electrolyzing.TYPE, ModBlocks.ELECTROLYZER.get());
         registration.addCraftingStation(MachineCategories.ArcforgeSmelting.TYPE, ModBlocks.ARCFORGE_FURNACE_PORT.get(),
@@ -194,6 +226,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         // The turbine makes the Exhaust Steam the condenser takes.
         registration.addCraftingStation(MachineCategories.Condensing.TYPE, ModBlocks.CONDENSER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.BurnerFuels.TYPE, ModBlocks.FUEL_BURNER.get());
+        registration.addCraftingStation(MachineCategories.GasTurbineFuels.TYPE, ModBlocks.GAS_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.Distilling.TYPE, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(),
                 ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get());
         registration.addCraftingStation(RecipeTypes.SMELTING, ModBlocks.INDUCTION_FURNACE.get(), ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get());

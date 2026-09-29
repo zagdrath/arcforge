@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:foundry_helmet",
+    "arcforge:foundry_chestplate",
+    "arcforge:foundry_leggings",
+    "arcforge:foundry_boots"
+  ]
+}

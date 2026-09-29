@@ -1,0 +1,82 @@
+{
+  "textures": {
+    "sheath": "arcforge:block/conduit/sheath",
+    "particle": "arcforge:block/conduit/sheath"
+  },
+  "elements": [
+    {
+      "from": [
+        4.75,
+        7,
+        4.75
+      ],
+      "to": [
+        11.25,
+        9,
+        11.25
+      ],
+      "faces": {
+        "north": {
+          "texture": "#sheath",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "tintindex": 1
+        },
+        "south": {
+          "texture": "#sheath",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "tintindex": 1
+        },
+        "east": {
+          "texture": "#sheath",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "tintindex": 1
+        },
+        "west": {
+          "texture": "#sheath",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "tintindex": 1
+        },
+        "up": {
+          "texture": "#sheath",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "tintindex": 1
+        },
+        "down": {
+          "texture": "#sheath",
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "tintindex": 1
+        }
+      }
+    }
+  ]
+}

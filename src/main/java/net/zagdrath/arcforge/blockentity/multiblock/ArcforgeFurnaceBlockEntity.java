@@ -5,7 +5,9 @@
 
 package net.zagdrath.arcforge.blockentity.multiblock;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
@@ -17,6 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -42,7 +45,12 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
+import net.zagdrath.arcforge.item.tool.SettingsCardData;
+import net.zagdrath.arcforge.item.tool.SettingsCopyable;
 import net.zagdrath.arcforge.registry.ModFluids;
+import net.zagdrath.arcforge.security.Owned;
+import net.zagdrath.arcforge.security.Ownership;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
@@ -63,6 +71,8 @@ import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
+import com.mojang.serialization.Codec;
+
 // The Arcforge Furnace, run from its port. Burning fuel (coal coke) heats the furnace towards its
 // maximum; with no fuel burning it cools. A smelt (metal, up to two additives and coal coke -> a result
 // and slag, e.g. iron + coke -> steel, iron + gold + coke -> Wrought Alloy, steel + amethyst + nickel plate
@@ -72,7 +82,10 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 // coke when needed, which are burned and used before anything else in the slot. Oxygen piped into an Oxygen port
 // speeds smelts up: one that starts with oxygenPerSmelt in the tank uses it and runs oxygenSpeedMultiplier times as
 // fast.
-public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController {
+public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController, Owned, SettingsCopyable {
+    // Who placed it and its security override (see SecurityRules).
+    protected final Ownership ownership = new Ownership(this::setChanged);
+
     public static final int SLOT_METAL = 0;
     public static final int SLOT_ADDITIVE = 1;
     public static final int SLOT_ADDITIVE_2 = 2;
@@ -592,9 +605,56 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
 
     // --- Saving and syncing (clients need to know whether the furnace is formed) ---
 
+    // --- Settings Card ---
+
+    @Override
+    public Identifier settingsKind() {
+        return MachineSettings.kind(this);
+    }
+
+    @Override
+    public Optional<SettingsCardData.StructureSize> settingsSize() {
+        return isFormed() ? Optional.of(MachineSettings.Frame.of(this).size()) : Optional.empty();
+    }
+
+    @Override
+    public void writeSettings(ValueOutput output) {
+        MachineSettings.writeRedstone(output, redstoneMode);
+        if (level != null && isFormed()) {
+            MachineSettings.writePorts(output, level, this);
+        }
+        output.putBoolean("auto_eject", isAutoEject());
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        int skipped = MachineSettings.readRedstone(input, this);
+        if (level != null && isFormed()) {
+            skipped += MachineSettings.readPorts(input, level, this);
+        }
+        input.read("auto_eject", Codec.BOOL).ifPresent(this::setAutoEject);
+        setChanged();
+        return skipped;
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new ArrayList<>();
+        MachineSettings.describePorts(input, lines);
+        MachineSettings.describeRedstone(input, lines);
+        MachineSettings.describeAutoEject(input, lines);
+        return lines;
+    }
+
+    @Override
+    public Ownership ownership() {
+        return ownership;
+    }
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        ownership.load(input);
         portDefaults.load(input);
         int layout = input.getIntOr("slot_layout", 1);
         if (layout >= SLOT_LAYOUT) {
@@ -627,6 +687,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        ownership.save(output);
         portDefaults.save(output);
         items.serialize(output.child("items"));
         output.putInt("slot_layout", SLOT_LAYOUT);

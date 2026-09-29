@@ -18,7 +18,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // back from a mB of a burnable fluid, so the Electrolyzer can charge more than that (see minEnergyFor).
 //
 // If another way to turn heat into FE is ever added, add it to bestFePerHu() (and to the hydrogen_net_negative
-// GameTest), or hydrogen could become a free power source.
+// GameTest), or hydrogen could become a free power source. The Gas Turbine Array burns fuel straight to FE, so
+// recoverableFePerMb also counts it (gasTurbineFePerHu).
 public final class EnergyBalance {
     private EnergyBalance() {}
 
@@ -61,10 +62,27 @@ public final class EnergyBalance {
         return UpgradeType.outputMultiplier(UpgradeType.MAX_PER_MACHINE);
     }
 
-    // The most FE a mB of this fluid can give back when burnt, or 0 if it isn't a fuel.
+    // The most FE a mB of this fluid can give back when burnt, or 0 if it isn't a fuel: through a fully upgraded
+    // burner and the best heat route, or through a lubricated Gas Turbine Array with its exhaust raising steam.
     public static double recoverableFePerMb(Fluid fluid) {
         BurnerFuel fuel = BurnerFuel.of(fluid);
-        return fuel == null ? 0.0 : fuel.huPerMb() * maxHeatMultiplier() * bestFePerHu();
+        if (fuel == null) {
+            return 0.0;
+        }
+        double burner = fuel.huPerMb() * maxHeatMultiplier() * bestFePerHu();
+        if (!fuel.gasTurbine()) {
+            return burner;
+        }
+        int celsius = fuel.burnTemperature().orElse(ArcforgeConfig.GAS_TURBINE_REFERENCE_TEMPERATURE.getAsInt());
+        return Math.max(burner, fuel.huPerMb() * gasTurbineFePerHu(celsius));
+    }
+
+    // FE per HU of fuel a lubricated Gas Turbine Array makes burning at this temperature, counting its exhaust
+    // heat turned into FE by the best steam route (the combined cycle).
+    public static double gasTurbineFePerHu(int celsius) {
+        double efficiency = Math.min(1.0, celsius / (double) ArcforgeConfig.GAS_TURBINE_REFERENCE_TEMPERATURE.getAsInt());
+        return ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * efficiency * (1.0 + ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble())
+                + ArcforgeConfig.GAS_TURBINE_EXHAUST_FRACTION.getAsDouble() * bestSteamFePerHu();
     }
 
     // The least FE an operation of this recipe may cost: the safety factor times what its products give back.

@@ -76,8 +76,8 @@ public final class MultiblockPorts {
 
     // Whether the block at pos can be one of the structure's ports: a part that can hold one, on its outside.
     public static boolean canHold(Level level, MultiblockController controller, BlockPos pos) {
-        return controller.isPart(pos) && level.getBlockState(pos).getBlock() instanceof PortHolder holder && holder.holdsPorts()
-                && !outerFaces(controller, pos).isEmpty();
+        return controller.isPart(pos) && level.getBlockState(pos).getBlock() instanceof PortHolder holder
+                && holder.holdsPorts(level.getBlockState(pos)) && !outerFaces(controller, pos).isEmpty();
     }
 
     // The mode after current in the structure's allowed modes (wrapping through NONE).

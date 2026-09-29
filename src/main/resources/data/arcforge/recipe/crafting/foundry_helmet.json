@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "RWR",
+    "S S"
+  ],
+  "key": {
+    "R": "arcforge:rock_wool",
+    "W": "arcforge:slag_wool",
+    "S": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:foundry_helmet",
+    "count": 1
+  }
+}

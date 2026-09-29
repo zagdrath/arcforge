@@ -16,12 +16,14 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
+import net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
@@ -137,6 +139,12 @@ public final class ModCapabilities {
                 casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), (casing, side) ->
                 casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), (casing, side) ->
+                casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), (casing, side) ->
+                casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), (casing, side) ->
+                casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine ? turbine.heatHandlerAt(casing.getBlockPos(), side) : null);
         // Every casing of a formed Superheater or Condenser Array exposes the cube face it lies on (served by the centre).
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.SUPERHEATER_ARRAY.get(), (casing, side) -> {
             SuperheaterArrayBlockEntity array = SuperheaterArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
@@ -162,6 +170,12 @@ public final class ModCapabilities {
                 ArcMelterBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_MELTER.get(),
                 ArcMelterBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FERMENTER.get(),
+                FermenterBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FERMENTER.get(),
+                FermenterBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.FERMENTER.get(),
+                FermenterBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
                 ChemicalReactorBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),

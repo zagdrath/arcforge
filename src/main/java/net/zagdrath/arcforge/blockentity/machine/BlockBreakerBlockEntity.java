@@ -44,6 +44,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.BlockBreakerMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.security.SecurityRules;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
@@ -112,6 +113,11 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
     }
 
     // Whether it may break this block at all.
+    // It acts as its owner: it won't break a block its owner couldn't (see SecurityRules).
+    private boolean ownerMayBreak(ServerLevel level, BlockPos target) {
+        return SecurityRules.of(level, target).map(owned -> SecurityRules.canAccess(owner(), owned)).orElse(true);
+    }
+
     public static boolean canBreak(ServerLevel level, BlockPos pos, BlockState state) {
         return MineRules.canBreak(level, pos, state);
     }
@@ -151,7 +157,7 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
             status = MachineStatus.NOTHING_TO_BREAK;
             progress = 0;
             total = 0;
-        } else if (!canBreak(level, target, targetState)) {
+        } else if (!canBreak(level, target, targetState) || !ownerMayBreak(level, target)) {
             status = MachineStatus.CANNOT_BREAK;
             progress = 0;
             total = 0;

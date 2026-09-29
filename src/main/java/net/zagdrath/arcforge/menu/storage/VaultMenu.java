@@ -26,12 +26,13 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.security.SecuredMenu;
 
 // A Vault's GUI: an input slot whose items go straight into the vault (whatever doesn't fit stays in the slot), an
 // output slot showing up to a stack of what it holds (taking from it takes from the vault), the lock and void
 // buttons, and the player inventory. The amount and settings are synced as data; the item type comes with the
 // block entity's own sync.
-public class VaultMenu extends AbstractContainerMenu {
+public class VaultMenu extends AbstractContainerMenu implements SecuredMenu {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
     public static final int BUTTON_LOCK = 200;
@@ -182,7 +183,7 @@ public class VaultMenu extends AbstractContainerMenu {
             }
             return true;
         }
-        return MachineMenuButtons.handle(access, buttonId);
+        return MachineMenuButtons.handle(access, player, buttonId);
     }
 
     @Override
@@ -223,10 +224,15 @@ public class VaultMenu extends AbstractContainerMenu {
 
     // Closes if the vault is gone or was swapped for another (a Storage Upgrade), or the player walked away.
     @Override
+    public ContainerLevelAccess securityAccess() {
+        return access;
+    }
+
+    @Override
     public boolean stillValid(Player player) {
         return access.evaluate((level, blockPos) -> level.getBlockState(blockPos).getBlock() instanceof VaultBlock
                 && (vault == null || (level.getBlockEntity(blockPos) == vault && !vault.isRemoved()))
-                && player.isWithinBlockInteractionRange(blockPos, 4.0), true);
+                && player.isWithinBlockInteractionRange(blockPos, 4.0) && SecuredMenu.stillAllowed(player, level, blockPos), true);
     }
 
     // Anything left in the input slot goes back to the player.

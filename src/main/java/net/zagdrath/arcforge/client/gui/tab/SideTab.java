@@ -17,14 +17,20 @@ import net.minecraft.util.Mth;
 // One expandable tab on the right edge of a machine GUI. Subclasses draw the panel content.
 // All content coordinates are relative to the tab's top-left corner.
 public abstract class SideTab {
-    public static final int COLLAPSED_WIDTH = 26;
-    public static final int SELECTED_WIDTH = 28;
-    public static final int COLLAPSED_HEIGHT = 24;
+    public static final int COLLAPSED_WIDTH = 22;
+    public static final int SELECTED_WIDTH = 24;
+    public static final int COLLAPSED_HEIGHT = 20;
+
+    // Which edge of the GUI the tab hangs off: the machine's readouts on the left, its settings on the right.
+    public enum Side {
+        LEFT, RIGHT
+    }
 
     private final Identifier icon;
     private final Component title;
     private final int expandedWidth;
     private final int expandedHeight;
+    private final Side side;
 
     // 0 = collapsed, 1 = fully open. Animated by SideTabPanel.
     float progress;
@@ -33,10 +39,24 @@ public abstract class SideTab {
     int y;
 
     protected SideTab(Identifier icon, Component title, int expandedWidth, int expandedHeight) {
+        this(icon, title, expandedWidth, expandedHeight, Side.RIGHT);
+    }
+
+    protected SideTab(Identifier icon, Component title, int expandedWidth, int expandedHeight, Side side) {
         this.icon = icon;
         this.title = title;
         this.expandedWidth = expandedWidth;
         this.expandedHeight = expandedHeight;
+        this.side = side;
+    }
+
+    public Side getSide() {
+        return side;
+    }
+
+    // A tab can hide itself (the Security tab, when security is off); hidden tabs take no room.
+    public boolean isVisible() {
+        return true;
     }
 
     public Identifier getIcon() {

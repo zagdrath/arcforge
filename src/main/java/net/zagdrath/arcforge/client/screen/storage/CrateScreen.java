@@ -19,6 +19,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.SecurityTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
@@ -39,6 +40,7 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
     private static final int STANDARD_WIDTH = 176;
 
     private final SideTabPanel tabs = new SideTabPanel();
+    private boolean securityTabAdded;
     private final boolean scrolls;
     private boolean dragging;
 
@@ -64,6 +66,10 @@ public class CrateScreen extends AbstractContainerScreen<CrateMenu> {
     @Override
     public void init() {
         super.init();
+        if (!securityTabAdded) {
+            securityTabAdded = true;
+            tabs.add(new SecurityTab(() -> menu.containerId, this::sendButton));
+        }
         tabs.layout(tabsLeft(), topPos);
     }
 

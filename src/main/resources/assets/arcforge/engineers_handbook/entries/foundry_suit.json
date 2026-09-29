@@ -1,0 +1,16 @@
+{
+  "title": "Foundry Suit",
+  "icon": "arcforge:foundry_chestplate",
+  "items": [
+    "arcforge:foundry_helmet",
+    "arcforge:foundry_chestplate",
+    "arcforge:foundry_leggings",
+    "arcforge:foundry_boots"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Insulated gear made from Rock Wool, Slag Wool and Steel Plates. It armors like leather.\n- Each piece cuts fire and hot-block damage by 25%.\n# Full suit\n- Immune to fire and burning, and safe on magma.\n- **Lava shield**: 8 seconds of protection in lava. A bar over your hotbar counts it down; once you leave the lava it recharges after 60 seconds."
+    }
+  ]
+}

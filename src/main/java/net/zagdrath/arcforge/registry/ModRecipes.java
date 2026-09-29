@@ -20,9 +20,11 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.ChemicalReactingRecipe;
+import net.zagdrath.arcforge.recipe.ConduitDyeingRecipe;
 import net.zagdrath.arcforge.recipe.CrushingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
+import net.zagdrath.arcforge.recipe.FermentingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.JetpackPlatingRecipe;
@@ -56,6 +58,8 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("infusing")));
     public static final Supplier<RecipeType<MeltingRecipe>> MELTING = RECIPE_TYPES.register("melting",
             () -> RecipeType.simple(id("melting")));
+    public static final Supplier<RecipeType<FermentingRecipe>> FERMENTING = RECIPE_TYPES.register("fermenting",
+            () -> RecipeType.simple(id("fermenting")));
     public static final Supplier<RecipeType<PressingRecipe>> PRESSING = RECIPE_TYPES.register("pressing",
             () -> RecipeType.simple(id("pressing")));
 
@@ -77,11 +81,17 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(InfusingRecipe.MAP_CODEC, InfusingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<MeltingRecipe>> MELTING_SERIALIZER = RECIPE_SERIALIZERS.register("melting",
             () -> new RecipeSerializer<>(MeltingRecipe.MAP_CODEC, MeltingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<FermentingRecipe>> FERMENTING_SERIALIZER = RECIPE_SERIALIZERS.register("fermenting",
+            () -> new RecipeSerializer<>(FermentingRecipe.MAP_CODEC, FermentingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<PressingRecipe>> PRESSING_SERIALIZER = RECIPE_SERIALIZERS.register("pressing",
             () -> new RecipeSerializer<>(PressingRecipe.MAP_CODEC, PressingRecipe.STREAM_CODEC));
     // A crafting recipe (vanilla's crafting type) that keeps the contents of what it upgrades.
     public static final Supplier<RecipeSerializer<TierUpgradeRecipe>> TIER_UPGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("tier_upgrade",
             () -> new RecipeSerializer<>(TierUpgradeRecipe.MAP_CODEC, TierUpgradeRecipe.STREAM_CODEC));
+
+    // Sheathing conduits in coloured plastic, and stripping it (a crafting recipe of vanilla's type).
+    public static final Supplier<RecipeSerializer<ConduitDyeingRecipe>> CONDUIT_DYEING_SERIALIZER = RECIPE_SERIALIZERS.register("conduit_dyeing",
+            () -> new RecipeSerializer<>(ConduitDyeingRecipe.MAP_CODEC, ConduitDyeingRecipe.STREAM_CODEC));
 
     // Smithing a Steel Chestplate onto a Jetpack (a smithing recipe, so it has no type of its own).
     public static final Supplier<RecipeSerializer<JetpackPlatingRecipe>> JETPACK_PLATING_SERIALIZER = RECIPE_SERIALIZERS.register("jetpack_plating",
@@ -104,6 +114,6 @@ public final class ModRecipes {
     }
 
     private static void syncToClients(OnDatapackSyncEvent event) {
-        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(), RecipeType.SMELTING);
+        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(), RecipeType.SMELTING);
     }
 }

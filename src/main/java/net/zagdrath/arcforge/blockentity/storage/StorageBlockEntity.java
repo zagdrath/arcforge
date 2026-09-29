@@ -33,6 +33,8 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.Dismantleable;
+import net.zagdrath.arcforge.security.Owned;
+import net.zagdrath.arcforge.security.Ownership;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
@@ -43,7 +45,10 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 // filled from it. The stored contents travel on the dropped item instead (see the loot tables).
 // Automation puts items into the drain slot through input faces and takes them out of the fill slot
 // through output faces once they can take no more.
-public abstract class StorageBlockEntity extends BlockEntity implements MenuProvider, ConfigurableMachine, ConduitConnectable, Dismantleable {
+public abstract class StorageBlockEntity extends BlockEntity implements MenuProvider, ConfigurableMachine, ConduitConnectable, Dismantleable, Owned {
+    // Who placed it and its security override (see SecurityRules).
+    protected final Ownership ownership = new Ownership(this::setChanged);
+
     public static final int SLOT_IN = 0;
     public static final int SLOT_OUT = 1;
     public static final int SLOT_COUNT = 2;
@@ -237,8 +242,14 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
     // --- Saving ---
 
     @Override
+    public Ownership ownership() {
+        return ownership;
+    }
+
+    @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        ownership.load(input);
         items.deserialize(input.childOrEmpty("items"));
         // A block upgraded to a bigger tier loads its old, shorter slot list: the new slots start empty.
         items.ensureSize(slotCount);
@@ -250,6 +261,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        ownership.save(output);
         items.serialize(output.child("items"));
         sideConfig.serialize(output);
         output.putInt("redstone_mode", redstoneMode.ordinal());

@@ -33,6 +33,7 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.client.model.WindowQuadrants;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
@@ -151,7 +152,9 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
                     if (PressureGlassBlock.isFormed(state)) {
                         window = true;
                     } else if (!ShellCasingBlock.isFormed(state) || state.hasProperty(SteamTurbineArrayCasingBlock.END)
-                            && state.getValue(SteamTurbineArrayCasingBlock.END) != SteamTurbineArrayCasingBlock.End.NONE) {
+                            && state.getValue(SteamTurbineArrayCasingBlock.END) != SteamTurbineArrayCasingBlock.End.NONE
+                            || state.hasProperty(GasTurbineArrayCasingBlock.END)
+                            && state.getValue(GasTurbineArrayCasingBlock.END) != GasTurbineArrayCasingBlock.End.NONE) {
                         window = false;
                     } else {
                         // Which quadrant of the casing's face the tile lies behind, from its centre.

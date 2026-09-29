@@ -34,6 +34,7 @@ import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -48,6 +49,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+
+import com.mojang.serialization.Codec;
 
 // The Superheater Array (see CubeMultiblockBlockEntity): a solid 3x3x3 cube that upgrades steam with heat.
 // Steam comes in through input ports and heat through heat ports; the next grade goes out of output ports.
@@ -274,6 +277,27 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
     }
 
     // --- Saving ---
+
+    // The Settings Card also copies the pressure setting.
+    @Override
+    public void writeSettings(ValueOutput output) {
+        super.writeSettings(output);
+        output.putInt("pressure", getPressure().ordinal());
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        input.getInt("pressure").ifPresent(id -> setPressure(BoilerPressure.values()[Math.clamp(id, 0, BoilerPressure.values().length - 1)]));
+        return super.readSettings(input);
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new java.util.ArrayList<>(super.describe(input));
+        input.getInt("pressure").ifPresent(id -> lines.add(Component.translatable("settings.arcforge.pressure",
+                BoilerPressure.values()[Math.clamp(id, 0, BoilerPressure.values().length - 1)].getDescription())));
+        return lines;
+    }
 
     @Override
     protected void loadAdditional(ValueInput input) {

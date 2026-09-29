@@ -5,8 +5,10 @@
 
 package net.zagdrath.arcforge.blockentity.multiblock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
@@ -14,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -45,6 +48,9 @@ import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
+import net.zagdrath.arcforge.item.tool.SettingsCardData;
+import net.zagdrath.arcforge.item.tool.SettingsCopyable;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
@@ -59,9 +65,13 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.security.Owned;
+import net.zagdrath.arcforge.security.Ownership;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+
+import com.mojang.serialization.Codec;
 
 // Every Carbonizer block has one of these. In a formed structure each points at the master (the left,
 // bottom, front block), which runs one chamber per slice in parallel, holds the shared slots and the
@@ -70,7 +80,10 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 //
 // The master's contents stay with that block when the structure breaks and come back when it re-forms.
 // If a different block becomes master, the old one hands everything over (see absorb).
-public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, MultiblockController {
+public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, MultiblockController, Owned, SettingsCopyable {
+    // Who placed it and its security override (see SecurityRules).
+    protected final Ownership ownership = new Ownership(this::setChanged);
+
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
     public static final int SLOT_BUCKET_IN = 2;
@@ -646,9 +659,56 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
 
     // --- Saving ---
 
+    // --- Settings Card ---
+
+    @Override
+    public Identifier settingsKind() {
+        return MachineSettings.kind(this);
+    }
+
+    @Override
+    public Optional<SettingsCardData.StructureSize> settingsSize() {
+        return isFormed() ? Optional.of(MachineSettings.Frame.of(this).size()) : Optional.empty();
+    }
+
+    @Override
+    public void writeSettings(ValueOutput output) {
+        MachineSettings.writeRedstone(output, redstoneMode);
+        if (level != null && isFormed()) {
+            MachineSettings.writePorts(output, level, this);
+        }
+        output.putBoolean("auto_eject", isAutoEject());
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        int skipped = MachineSettings.readRedstone(input, this);
+        if (level != null && isFormed()) {
+            skipped += MachineSettings.readPorts(input, level, this);
+        }
+        input.read("auto_eject", Codec.BOOL).ifPresent(this::setAutoEject);
+        setChanged();
+        return skipped;
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new ArrayList<>();
+        MachineSettings.describePorts(input, lines);
+        MachineSettings.describeRedstone(input, lines);
+        MachineSettings.describeAutoEject(input, lines);
+        return lines;
+    }
+
+    @Override
+    public Ownership ownership() {
+        return ownership;
+    }
+
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        ownership.load(input);
         portDefaults.load(input);
         masterPos = input.read("master", BlockPos.CODEC).orElse(null);
         formation = input.read("formation", CarbonizerStructure.Formation.CODEC).orElse(null);
@@ -676,6 +736,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        ownership.save(output);
         portDefaults.save(output);
         output.storeNullable("master", BlockPos.CODEC, masterPos);
         output.storeNullable("formation", CarbonizerStructure.Formation.CODEC, formation);

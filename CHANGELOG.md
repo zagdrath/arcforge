@@ -41,8 +41,53 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Solar Thermal Array temperature.** The default `solarThermalArray.maxTemperature` is now 1,100°C (was 550).
   - An existing `arcforge-common.toml` keeps 550; set it to 1100 by hand.
 
+- **Machine security.** Machines, storage blocks and multiblocks placed before this update have no owner, so
+  anyone can use them, as before. Break and re-place one (or build a new one) to own it. Ops bypass security
+  unless `security.opsBypass` is false; `security.enabled = false` turns it off.
+- **Burner fuel data packs.** `arcforge:burner_fuels` entries take an optional `"gas_turbine": false` to keep
+  a fuel out of the Gas Turbine Array. Entries without it are burned there, so a pack that adds a slow,
+  dirty fuel may want to set it.
+
 ### Added
 
+- **Settings Card.** Sneak-use it on a machine, conduit, Vault or multiblock to copy its setup (sides or ports,
+  redstone mode, auto-eject, and extras such as the Electrolyzer's vents, the Arc Quarry's area and filter or
+  a boiler's pressure); use it on another of the same kind to paste. Multiblocks must be the same size; ports
+  paste relative to the structure, so a card from an east-west turbine fits a north-south one. Conduit filter
+  settings paste onto sides that already have a filter (others are skipped and counted). It never copies
+  items, fluids or upgrades. Sneak-use in the air to clear it.
+- **Machine security.**
+  - Every machine, storage block and multiblock records who placed it. Each player picks a default of
+    **Public**, **Trusted** or **Private** at the new **Security Terminal**, and lists the players they trust.
+  - A **Security** tab on every machine screen lets the owner override the mode for that machine.
+  - Others can't open, break, wrench, paste onto or hand-fill a machine they can't access, and can't extend
+    someone else's multiblock. Conduits, hoppers and other automation still work, so shared lines never
+    break. The Block Breaker and Block Placer act as their owner.
+  - Jade shows the owner and mode. Config `[security]`: `enabled`, `opsBypass`, `defaultMode`.
+- **Foundry Suit.** Fire-resistant armour from Rock Wool, Slag Wool and Steel Plates. Each piece cuts fire,
+  campfire and hot-floor damage by 25%; the full set makes you immune to them and gives an 8-second lava
+  shield (a bar over the hotbar), which recharges a minute after you leave the lava. Repaired with Rock Wool.
+- **Fermenter and Ethanol.** A Tempered machine that ferments crops (wheat, potatoes, carrots, beetroot, sugar
+  cane, melon slices and sweet berries) with water and FE into **Ethanol**, sometimes leaving bone meal.
+  Ethanol burns in the Fuel Burner (300 HU/mB at up to 900°C) and the Gas Turbine Array. Speed and Energy
+  upgrades, JEI (`arcforge:fermenting` recipes), a Handbook page and a running sound.
+- **Dyed conduits.** Craft 1 to 7 conduits of one kind with a Plastic Sheet and a dye to sheathe them in that
+  colour; a sheathed conduit alone strips back to plain. Sheathed conduits only join their own colour (or
+  plain ones), so parallel lines of the same type stay separate. They keep their colour when broken, and JEI
+  lists every colour.
+- **Gas Turbine Array** (Hardened). A 3x3 tube 5 to 9 long that burns Naphtha, Light Oil, Ethanol or Hydrogen
+  straight to FE.
+  - It burns up to 560 HU/t per block of length at 1.5 FE per HU (less for fuels burning under 1,200°C): a
+    9-long array makes up to 7,560 FE/t on Naphtha, under the Superheated Steam Turbine Array's 10,080.
+  - One end is the intake, which needs air in front of it; the other is the exhaust. A quarter of the fuel's
+    heat leaves the exhaust at half its burn temperature, through Heat ports into a Steam Boiler Array (the
+    combined cycle, about 1.94× the burner route), or vents as heat haze.
+  - The new **Throttle** redstone mode sets the fuel burned by signal strength (1-15). Starting takes a
+    second of ignition; running dry is a flameout, with a short wait before it relights.
+  - The rotor spools up and coasts down, with compressor and turbine blades and a glowing combustor through
+    its windows, and a whine that climbs with its speed. Heavy Oil lubricant adds 8%.
+  - New parts: the **Turbine Blade Set** and **Combustor**. JEI lists its fuels; Jade, a Handbook page and a
+    config section `[gasTurbineArray]`.
 - **Jetpacks** (Tempered / Hardened / Arcforged). They burn Steam, High-Pressure Steam, Superheated Steam or
   Hydrogen (data map `arcforge:jetpack_fuels`), with Normal / Hover / Off modes on a key (H), a fuel gauge by
   the hotbar, steam puffs or a blue hydrogen flame, and a thrust sound. Fill them in a Pressurized Cylinder or
@@ -126,6 +171,16 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Changed
 
+- **GUI tabs are smaller and on both sides.** Readouts (Energy, Heat, Pressure) are on the left of a machine's
+  screen; settings (Redstone, Sides or Ports, Upgrades, Security) stay on the right. One tab can be open on
+  each side.
+- **Heavy Oil and Creosote don't burn in the Gas Turbine Array** (`"gas_turbine": false` in
+  `burner_fuels.json`). They still burn in the Fuel Burner.
+- **Plastic Sheets** go into the Settings Card, Security Terminal, Fermenter, conduit dyeing and the Gas
+  Turbine Array Casing.
+- **The hydrogen balance also counts the Gas Turbine Array** (fuel straight to FE, plus its exhaust raising
+  steam). With the defaults it gives back less than the upgraded burner route, so the floor is unchanged.
+- **Fuel Burner JEI** notes the fuels the Gas Turbine Array won't burn.
 - Pressurized Cylinder slots also fill and drain Jetpacks.
 - The Steel Hammer's area rules are shared with the Arc tools' Area module.
 - **Solar Thermal Array: up to 1,100°C** (was 550), so it can feed a Superheater Array. In clear weather on the

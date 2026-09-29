@@ -25,7 +25,7 @@ public class EnergyTab extends SideTab {
     }
 
     private EnergyTab(IntSupplier stored, IntSupplier perTick, boolean usage) {
-        super(ArcforgeGui.widget("icon_energy"), Component.translatable("gui.arcforge.tab.energy"), 100, 74);
+        super(ArcforgeGui.widget("icon_energy"), Component.translatable("gui.arcforge.tab.energy"), 100, 74, Side.LEFT);
         this.stored = stored;
         this.perTick = perTick;
         this.usage = usage;

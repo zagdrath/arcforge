@@ -29,6 +29,7 @@ import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.HeatScale;
 import net.zagdrath.arcforge.client.gui.tab.PortsTab;
 import net.zagdrath.arcforge.client.gui.tab.RedstoneTab;
+import net.zagdrath.arcforge.client.gui.tab.SecurityTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
@@ -55,6 +56,7 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     private final Identifier background;
     private final String machine;
     protected final SideTabPanel tabs = new SideTabPanel();
+    private boolean securityTabAdded;
     private final @Nullable SideConfigTab sides;
     private final @Nullable PortsTab ports;
 
@@ -136,6 +138,10 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     @Override
     public void init() {
         super.init();
+        if (!securityTabAdded) {
+            securityTabAdded = true;
+            tabs.add(new SecurityTab(() -> menu.containerId, this::sendButton));
+        }
         titleLabelX = (imageWidth - font.width(title)) / 2;
         tabs.layout(leftPos, topPos);
     }

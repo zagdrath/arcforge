@@ -19,6 +19,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
+import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
@@ -65,6 +66,7 @@ public final class MultiblockBlueprints {
                 arcforgeFurnace(),
                 steamBoilerArray(),
                 steamTurbineArray(),
+                gasTurbineArray(),
                 distillationArray(),
                 solarThermalArray());
     }
@@ -200,5 +202,20 @@ public final class MultiblockBlueprints {
         BlockPos size = new BlockPos(5, 3, 3);
         List<BlockPos> glass = List.of(new BlockPos(1, 1, 2), new BlockPos(2, 1, 2), new BlockPos(3, 1, 2));
         return new Blueprint("steam_turbine_array", shell(size, Direction.Axis.X, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get(), glass), size);
+    }
+
+    // 3x3, 5 long along X (5 to 9 work), with windows along the front and top, the intake at the west end and
+    // the exhaust at the east.
+    private static Blueprint gasTurbineArray() {
+        BlockPos size = new BlockPos(5, 3, 3);
+        List<BlockPos> glass = List.of(new BlockPos(1, 1, 2), new BlockPos(2, 1, 2), new BlockPos(3, 1, 2),
+                new BlockPos(1, 2, 1), new BlockPos(2, 2, 1), new BlockPos(3, 2, 1));
+        List<Placement> placements = new ArrayList<>();
+        for (Placement placement : shell(size, Direction.Axis.X, ModBlocks.GAS_TURBINE_ARRAY_CASING.get(), glass)) {
+            GasTurbineArrayCasingBlock.End end = placement.pos().equals(new BlockPos(0, 1, 1)) ? GasTurbineArrayCasingBlock.End.INTAKE
+                    : placement.pos().equals(new BlockPos(4, 1, 1)) ? GasTurbineArrayCasingBlock.End.EXHAUST : null;
+            placements.add(end == null ? placement : new Placement(placement.pos(), placement.state().setValue(GasTurbineArrayCasingBlock.END, end)));
+        }
+        return new Blueprint("gas_turbine_array", placements, size);
     }
 }

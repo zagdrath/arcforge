@@ -41,6 +41,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.METAL_PRESSING_ARRAY_CASING.get());
                 output.accept(ModItems.ELECTRIC_PUMP.get());
                 output.accept(ModItems.ARC_MELTER.get());
+                output.accept(ModItems.FERMENTER.get());
                 output.accept(ModItems.CHEMICAL_REACTOR.get());
                 output.accept(ModItems.ELECTROLYZER.get());
                 output.accept(ModItems.ASSEMBLER.get());
@@ -48,8 +49,10 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.BLOCK_PLACER.get());
                 output.accept(ModItems.VACUUM_COLLECTOR.get());
                 output.accept(ModItems.ARC_QUARRY.get());
+                output.accept(ModItems.SECURITY_TERMINAL.get());
                 output.accept(ModItems.STEAM_BOILER_ARRAY_CASING.get());
                 output.accept(ModItems.STEAM_TURBINE_ARRAY_CASING.get());
+                output.accept(ModItems.GAS_TURBINE_ARRAY_CASING.get());
                 output.accept(ModItems.SUPERHEATER_ARRAY_CASING.get());
                 output.accept(ModItems.CONDENSER_ARRAY_CASING.get());
                 output.accept(ModItems.PRESSURE_GLASS.get());
@@ -100,6 +103,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.CARBON_FIBER.get());
                 output.accept(ModItems.TROUGH_MIRROR.get());
                 output.accept(ModItems.RECEIVER_TUBE.get());
+                output.accept(ModItems.TURBINE_BLADE_SET.get());
+                output.accept(ModItems.COMBUSTOR.get());
                 output.accept(ModItems.PLATE_DIE.get());
                 output.accept(ModItems.GEAR_DIE.get());
                 output.accept(ModItems.ROD_DIE.get());
@@ -134,6 +139,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.CREOSOTE_BUCKET.get());
                 output.accept(ModItems.NAPHTHA_BUCKET.get());
+                output.accept(ModItems.ETHANOL_BUCKET.get());
                 output.accept(ModItems.LIGHT_OIL_BUCKET.get());
                 output.accept(ModItems.HEAVY_OIL_BUCKET.get());
                 ModItems.chemicalBuckets().forEach(item -> output.accept(item.get()));
@@ -157,9 +163,10 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.ENGINEERS_HANDBOOK.get());
                 output.accept(ModItems.WRENCH.get());
+                output.accept(ModItems.SETTINGS_CARD.get());
                 for (var item : List.of(ModItems.STEEL_SWORD, ModItems.STEEL_PICKAXE, ModItems.STEEL_AXE, ModItems.STEEL_SHOVEL, ModItems.STEEL_HOE,
                         ModItems.STEEL_HAMMER, ModItems.STEEL_EXCAVATOR, ModItems.STEEL_HELMET, ModItems.STEEL_CHESTPLATE, ModItems.STEEL_LEGGINGS,
-                        ModItems.STEEL_BOOTS)) {
+                        ModItems.STEEL_BOOTS, ModItems.FOUNDRY_HELMET, ModItems.FOUNDRY_CHESTPLATE, ModItems.FOUNDRY_LEGGINGS, ModItems.FOUNDRY_BOOTS)) {
                     output.accept(item.get());
                 }
                 ModItems.jetpacks().forEach(item -> output.accept(item.get()));

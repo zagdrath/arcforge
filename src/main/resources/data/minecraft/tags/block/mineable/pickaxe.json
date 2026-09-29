@@ -111,6 +111,9 @@
     "arcforge:superheater_array_casing",
     "arcforge:condenser_array_casing",
     "arcforge:arc_quarry",
-    "arcforge:arc_quarry_bounding"
+    "arcforge:arc_quarry_bounding",
+    "arcforge:security_terminal",
+    "arcforge:fermenter",
+    "arcforge:gas_turbine_array_casing"
   ]
 }

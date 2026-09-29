@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "arcforge:block/gas_turbine_array/casing"
+  }
+}

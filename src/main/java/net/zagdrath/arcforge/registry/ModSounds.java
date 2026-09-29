@@ -31,6 +31,7 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> SUPERHEATER_ARRAY_RUN = loop("superheater_array_run", 24.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> CONDENSER_ARRAY_RUN = loop("condenser_array_run", 24.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> ARC_MELTER_RUN = loop("arc_melter_run", 16.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> FERMENTER_RUN = loop("fermenter_run", 16.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> CHEMICAL_REACTOR_RUN = loop("chemical_reactor_run", 16.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> ELECTROLYZER_RUN = loop("electrolyzer_run", 16.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> ASSEMBLER_RUN = loop("assembler_run", 16.0F);
@@ -46,6 +47,12 @@ public final class ModSounds {
     // The Arc Drill and Arc Saw while they cut; see ArcToolSound.
     public static final DeferredHolder<SoundEvent, SoundEvent> ARC_DRILL_RUN = loop("arc_drill_run", 16.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> ARC_SAW_RUN = loop("arc_saw_run", 16.0F);
+
+    // The Gas Turbine Array: its running loop (pitch and volume follow the rotor, see GasTurbineArraySound),
+    // and the igniter and flameout one-shots.
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAS_TURBINE_ARRAY_RUN = loop("gas_turbine_array_run", 24.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAS_TURBINE_ARRAY_IGNITE = loop("gas_turbine_array_ignite", 24.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> GAS_TURBINE_ARRAY_FLAMEOUT = loop("gas_turbine_array_flameout", 24.0F);
 
     private ModSounds() {}
 

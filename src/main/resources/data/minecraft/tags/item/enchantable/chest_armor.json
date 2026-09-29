@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "arcforge:steel_chestplate"
+    "arcforge:steel_chestplate",
+    "arcforge:foundry_chestplate"
   ]
 }

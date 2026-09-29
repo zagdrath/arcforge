@@ -3,7 +3,8 @@
     "arcforge:creosote": {
       "hu_per_mb": 120,
       "mb_per_tick": 0.5,
-      "burn_temperature": 850
+      "burn_temperature": 850,
+      "gas_turbine": false
     },
     "arcforge:naphtha": {
       "hu_per_mb": 400,
@@ -18,12 +19,18 @@
     "arcforge:heavy_oil": {
       "hu_per_mb": 200,
       "mb_per_tick": 0.25,
-      "burn_temperature": 750
+      "burn_temperature": 750,
+      "gas_turbine": false
     },
     "arcforge:hydrogen": {
       "hu_per_mb": 60,
       "mb_per_tick": 1.0,
       "burn_temperature": 1400
+    },
+    "arcforge:ethanol": {
+      "hu_per_mb": 300,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 900
     }
   }
 }

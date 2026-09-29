@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "S S",
+    "R R"
+  ],
+  "key": {
+    "R": "arcforge:rock_wool",
+    "S": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:foundry_boots",
+    "count": 1
+  }
+}

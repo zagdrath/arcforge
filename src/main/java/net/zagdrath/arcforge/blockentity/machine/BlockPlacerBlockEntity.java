@@ -43,6 +43,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.BlockPlacerMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.security.Owned;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
@@ -157,6 +158,10 @@ public class BlockPlacerBlockEntity extends MachineBlockEntity {
             boolean placed = blockItem.place(context).consumesAction();
             player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
             if (placed) {
+                // What it places belongs to its owner.
+                if (owner() != null && level.getBlockEntity(front) instanceof Owned owned && owned.owner() == null) {
+                    owned.setOwner(owner(), ownerName());
+                }
                 items.setStack(slot, stack.copyWithCount(stack.getCount() - 1));
                 energy.consume(cost);
                 lastPlaced = level.getGameTime();

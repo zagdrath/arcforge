@@ -24,6 +24,11 @@ public final class ArcforgeFakePlayer {
 
     private ArcforgeFakePlayer() {}
 
+    // Whether this is the fake player Arcforge's machines act through.
+    public static boolean is(net.minecraft.world.entity.player.Player player) {
+        return player instanceof FakePlayer && PROFILE.id().equals(player.getUUID());
+    }
+
     public static FakePlayer get(ServerLevel level) {
         return FakePlayerFactory.get(level, PROFILE);
     }

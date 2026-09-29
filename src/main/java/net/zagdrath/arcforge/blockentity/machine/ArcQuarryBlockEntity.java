@@ -63,6 +63,7 @@ import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.machine.ArcforgeFakePlayer;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.MineRules;
@@ -731,6 +732,27 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
     }
 
     // --- Saving and syncing ---
+
+    // The Settings Card also copies its area, Y range, filter and switches.
+    @Override
+    public void writeSettings(ValueOutput output) {
+        super.writeSettings(output);
+        output.store("quarry", QuarrySettings.CODEC, settings);
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        input.read("quarry", QuarrySettings.CODEC).ifPresent(this::setSettings);
+        return super.readSettings(input);
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new java.util.ArrayList<>(super.describe(input));
+        input.read("quarry", QuarrySettings.CODEC).ifPresent(quarry -> lines.add(Component.translatable("settings.arcforge.mode",
+                Component.translatable("gui.arcforge.quarry.radius"), quarry.radius())));
+        return lines;
+    }
 
     @Override
     protected void loadAdditional(ValueInput input) {

@@ -22,6 +22,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.SecurityTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
@@ -44,6 +45,7 @@ public class VaultScreen extends AbstractContainerScreen<VaultMenu> {
     private static final int GHOST_SHADE = 0xA0101214;
 
     private final SideTabPanel tabs = new SideTabPanel();
+    private boolean securityTabAdded;
 
     public VaultScreen(VaultMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title);
@@ -61,6 +63,10 @@ public class VaultScreen extends AbstractContainerScreen<VaultMenu> {
     @Override
     public void init() {
         super.init();
+        if (!securityTabAdded) {
+            securityTabAdded = true;
+            tabs.add(new SecurityTab(() -> menu.containerId, this::sendButton));
+        }
         titleLabelX = (imageWidth - font.width(title)) / 2;
         tabs.layout(leftPos, topPos);
     }

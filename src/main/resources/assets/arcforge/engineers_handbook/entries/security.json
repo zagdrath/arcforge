@@ -1,0 +1,17 @@
+{
+  "title": "Security",
+  "icon": "arcforge:security_terminal",
+  "items": [
+    "arcforge:security_terminal"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Every machine, multiblock, Crate and Vault remembers who placed it.\n# Modes\n- **Public**: anyone can use it.\n- **Trusted**: you and your trusted players.\n- **Private**: only you.\nAnyone else can't open, wrench, dismantle, break it or paste settings onto it. Conduits, hoppers and other automation always work, whatever the mode."
+    },
+    {
+      "type": "text",
+      "text": "# Security Terminal\nUse any Security Terminal to edit your own profile: your default mode and your trusted players. Changes apply to all your machines instantly, at any distance.\n# Per machine\nEach machine has a Security tab. Leave it on your profile's default, or set Public, Trusted or Private for that one machine. Only the owner can change it."
+    }
+  ]
+}

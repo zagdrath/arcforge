@@ -33,5 +33,9 @@ public final class ModItemTags {
     // Steel ingots: what steel tools and armour repair with.
     public static final TagKey<Item> STEEL_INGOTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/steel"));
 
+    // The Foundry Suit's pieces, and what repairs them (Rock Wool).
+    public static final TagKey<Item> FOUNDRY_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "foundry_suit"));
+    public static final TagKey<Item> REPAIRS_FOUNDRY_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "repairs_foundry_suit"));
+
     private ModItemTags() {}
 }

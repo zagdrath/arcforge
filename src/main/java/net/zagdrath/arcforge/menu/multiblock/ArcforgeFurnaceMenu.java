@@ -28,12 +28,13 @@ import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.network.PortsPayload;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.security.SecuredMenu;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 import java.util.List;
 
 // Served by the furnace's port; opened from any of its blocks.
-public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
+public class ArcforgeFurnaceMenu extends AbstractContainerMenu implements SecuredMenu {
     // Logical data indices (each is a full int, see WideIntContainerData).
     public static final int DATA_FORMED = 0;
     public static final int DATA_HEAT = 1;
@@ -93,7 +94,7 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
     // Runs on the server when the client clicks a redstone or side-config button.
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
-        return MachineMenuButtons.handle(access, buttonId);
+        return MachineMenuButtons.handle(access, player, buttonId);
     }
 
     // Multiblocks: their ports, for the Ports tab (see PortSync).
@@ -172,6 +173,11 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu {
             }
         }
         return -1;
+    }
+
+    @Override
+    public ContainerLevelAccess securityAccess() {
+        return access;
     }
 
     @Override

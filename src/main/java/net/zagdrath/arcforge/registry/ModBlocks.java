@@ -41,12 +41,15 @@ import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
 import net.zagdrath.arcforge.block.machine.ElectrolyzerBlock;
+import net.zagdrath.arcforge.block.machine.FermenterBlock;
+import net.zagdrath.arcforge.block.machine.SecurityTerminalBlock;
 import net.zagdrath.arcforge.block.machine.VacuumCollectorBlock;
 import net.zagdrath.arcforge.block.machine.ArcQuarryBoundingBlock;
 import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
@@ -157,9 +160,18 @@ public final class ModBlocks {
 
     // --- Steam ---
 
+    // A desk console, not a full block.
+    public static final DeferredBlock<SecurityTerminalBlock> SECURITY_TERMINAL = BLOCKS.registerBlock("security_terminal",
+            SecurityTerminalBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL).noOcclusion());
+
     // Slim: light passes around it.
     public static final DeferredBlock<ElectricPumpBlock> ELECTRIC_PUMP = BLOCKS.registerBlock("electric_pump",
             ElectricPumpBlock::new, p -> machineProperties(p, 0).noOcclusion());
+
+    // A glass vessel; its status light glows while it ferments.
+    public static final DeferredBlock<FermenterBlock> FERMENTER = BLOCKS.registerBlock("fermenter",
+            FermenterBlock::new, p -> machineProperties(p, 5).noOcclusion());
 
     // The molten crucible glows while it melts.
     public static final DeferredBlock<ArcMelterBlock> ARC_MELTER = BLOCKS.registerBlock("arc_melter",
@@ -200,6 +212,10 @@ public final class ModBlocks {
 
     public static final DeferredBlock<SteamTurbineArrayCasingBlock> STEAM_TURBINE_ARRAY_CASING = BLOCKS.registerBlock("steam_turbine_array_casing",
             SteamTurbineArrayCasingBlock::new, ModBlocks::steamCasingProperties);
+
+    // Burns fuel straight to FE (Hardened tier).
+    public static final DeferredBlock<GasTurbineArrayCasingBlock> GAS_TURBINE_ARRAY_CASING = BLOCKS.registerBlock("gas_turbine_array_casing",
+            GasTurbineArrayCasingBlock::new, ModBlocks::steamCasingProperties);
 
     // Upgrades steam with heat; its coils glow while they work.
     public static final DeferredBlock<SuperheaterArrayCasingBlock> SUPERHEATER_ARRAY_CASING = BLOCKS.registerBlock("superheater_array_casing",
@@ -386,6 +402,21 @@ public final class ModBlocks {
                     .sound(SoundType.EMPTY));
 
     // The Distillation Array's products. Naphtha burns where it lies, like a flammable block.
+    // Ethanol burns where it lies, like Naphtha.
+    public static final DeferredBlock<LiquidBlock> ETHANOL = BLOCKS.registerBlock("ethanol",
+            p -> new LiquidBlock(ModFluids.ETHANOL.get(), p) {
+                @Override
+                public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 300;
+                }
+
+                @Override
+                public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 60;
+                }
+            },
+            p -> liquidProperties(p, MapColor.SAND));
+
     public static final DeferredBlock<LiquidBlock> NAPHTHA = BLOCKS.registerBlock("naphtha",
             p -> new LiquidBlock(ModFluids.NAPHTHA.get(), p) {
                 @Override

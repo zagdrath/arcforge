@@ -8,7 +8,16 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "arcforge:hardened_thermal_conduit"
+          "name": "arcforge:hardened_thermal_conduit",
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "source": "block_entity",
+              "include": [
+                "arcforge:conduit_color"
+              ]
+            }
+          ]
         }
       ],
       "rolls": 1

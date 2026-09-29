@@ -5,6 +5,9 @@
 
 package net.zagdrath.arcforge.blockentity.storage;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
@@ -20,6 +23,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -35,6 +39,9 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.storage.VaultBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
+import net.zagdrath.arcforge.item.tool.SettingsCardData;
+import net.zagdrath.arcforge.item.tool.SettingsCopyable;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -45,12 +52,14 @@ import net.zagdrath.arcforge.storage.VaultContents;
 import net.zagdrath.arcforge.storage.VaultStorage;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 
+import com.mojang.serialization.Codec;
+
 // A Vault: one stackable item type in bulk (see VaultStorage), shown on its front by VaultRenderer. Conduits and
 // hoppers use its input and output faces; players use the front (VaultBlock) or the GUI. What it holds, and its
 // lock and void settings, stay with it when it's broken or picked up (the arcforge:vault_contents component).
 // Clients are sent the contents for the front display: at once when the type or a setting changes, and at most
 // every SYNC_INTERVAL ticks as the amount changes, so a busy conduit doesn't send a packet per item.
-public class VaultBlockEntity extends StorageBlockEntity {
+public class VaultBlockEntity extends StorageBlockEntity implements SettingsCopyable {
     public static final int DATA_AMOUNT = 0;
     public static final int DATA_CAPACITY = 1;
     public static final int DATA_FLAGS = 2;
@@ -143,6 +152,42 @@ public class VaultBlockEntity extends StorageBlockEntity {
     @Override
     public int getComparatorSignal() {
         return storage.getAmount() == 0 ? 0 : 1 + (int) (14L * storage.getAmount() / storage.getCapacity());
+    }
+
+    // --- Settings Card ---
+
+    @Override
+    public Identifier settingsKind() {
+        return MachineSettings.kind(this);
+    }
+
+    @Override
+    public void writeSettings(ValueOutput output) {
+        output.putBoolean("locked", isLocked());
+        output.putBoolean("void", isVoidMode());
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        int skipped = 0;
+        input.read("void", Codec.BOOL).ifPresent(this::setVoidMode);
+        Optional<Boolean> locked = input.read("locked", Codec.BOOL);
+        if (locked.isPresent() && locked.get() != isLocked()) {
+            if (locked.get() && getTemplate().isEmpty()) {
+                skipped++;
+            } else {
+                setLocked(locked.get());
+            }
+        }
+        return skipped;
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new ArrayList<>();
+        input.read("locked", Codec.BOOL).ifPresent(on -> lines.add(Component.translatable("settings.arcforge.vault_lock", MachineSettings.onOff(on))));
+        input.read("void", Codec.BOOL).ifPresent(on -> lines.add(Component.translatable("settings.arcforge.vault_void", MachineSettings.onOff(on))));
+        return lines;
     }
 
     // --- Settings ---

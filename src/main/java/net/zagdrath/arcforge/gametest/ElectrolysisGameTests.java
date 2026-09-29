@@ -176,8 +176,9 @@ public final class ElectrolysisGameTests {
     }
 
     // Hydrogen can never make FE: at every Energy-upgrade count the cost beats the best recovery by the safety
-    // factor, and bestFePerHu() is at least every heat -> FE route worked out here on its own. If this fails after
-    // adding a route, add that route to EnergyBalance.bestFePerHu().
+    // factor, and bestFePerHu() is at least every heat -> FE route worked out here on its own (and the fuel -> FE
+    // Gas Turbine Array route is counted too). If this fails after adding a route, add that route to
+    // EnergyBalance.bestFePerHu().
     static void hydrogenNetNegative(GameTestHelper helper) {
         double lubricant = ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble();
         double vacuum = ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble();
@@ -204,6 +205,12 @@ public final class ElectrolysisGameTests {
         helper.assertTrue(Math.abs(EnergyBalance.thermoelectricFePerHu() - 1.725) < 0.001, "Thermoelectric route is " + EnergyBalance.thermoelectricFePerHu());
         double hydrogen = EnergyBalance.recoverableFePerMb(ModFluids.HYDROGEN.get());
         helper.assertTrue(Math.abs(hydrogen - 60 * 2.0 * best) < 1e-6, "Hydrogen gives back " + hydrogen + " FE/mB");
+        // The Gas Turbine Array burns it straight to FE (1.5 x 1.08 lubricated, plus a quarter of the heat as
+        // exhaust raising steam: 2.21 FE per HU), under the upgraded burner route (4.72), so the floor stays the
+        // burner's. recoverableFePerMb takes the larger of the two if the turbine is ever tuned past it.
+        double turbine = 60 * EnergyBalance.gasTurbineFePerHu(1_400);
+        helper.assertTrue(Math.abs(turbine / 60 - (1.5 * 1.08 + 0.25 * best)) < 1e-6, "The Gas Turbine route is " + turbine / 60 + " FE/HU");
+        helper.assertTrue(hydrogen >= turbine, "Hydrogen gives back " + hydrogen + " FE/mB, less than the Gas Turbine's " + turbine);
         helper.assertTrue(EnergyBalance.recoverableFePerMb(ModFluids.OXYGEN.get()) == 0.0, "Oxygen burns");
 
         ElectrolyzingRecipe recipe = waterRecipe(helper);

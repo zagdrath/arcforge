@@ -33,10 +33,12 @@ import net.zagdrath.arcforge.blockentity.machine.BlockBreakerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcforgeFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.VaultBlockEntity;
@@ -54,6 +56,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, BlockEntity.class);
+        // Owner and security of any owned block, or any part of an owned structure (glass included).
+        registration.registerBlockDataProvider(SecurityProvider.INSTANCE, Block.class);
         registration.registerEnergyStorage(ConduitProviders.Energy.INSTANCE, ConduitBlockEntity.class);
         registration.registerFluidStorage(ConduitProviders.Fluid.INSTANCE, ConduitBlockEntity.class);
         registration.registerItemStorage(ConduitProviders.Items.INSTANCE, ConduitBlockEntity.class);
@@ -72,6 +76,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SuperheaterArrayBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, CondenserArrayBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SteamTurbineArrayBlockEntity.class);
+        registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, GasTurbineArrayBlockEntity.class);
         // Pressure Glass has no block entity: these read the array it belongs to.
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, PressureGlassBlock.class);
@@ -86,6 +91,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerBlockComponent(MultiblockNameProvider.INSTANCE, Block.class);
+        registration.registerBlockComponent(SecurityProvider.Client.INSTANCE, Block.class);
         registration.registerBlockComponent(HeatProvider.Client.INSTANCE, Block.class);
         registration.registerBlockComponent(ConduitProviders.Info.INSTANCE, ConduitBlock.class);
         registration.registerBlockComponent(ConduitProviders.Filters.INSTANCE, ConduitBlock.class);
@@ -103,6 +109,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SuperheaterArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, CondenserArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SteamTurbineArrayCasingBlock.class);
+        registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, GasTurbineArrayCasingBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

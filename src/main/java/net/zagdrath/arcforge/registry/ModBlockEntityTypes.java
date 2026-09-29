@@ -16,14 +16,17 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.SecurityTerminalBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
@@ -86,8 +89,14 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<MetalPressBlockEntity>> METAL_PRESS = BLOCK_ENTITY_TYPES.register("metal_press",
             () -> new BlockEntityType<>(MetalPressBlockEntity::new, ModBlocks.METAL_PRESS.get()));
 
+    public static final Supplier<BlockEntityType<SecurityTerminalBlockEntity>> SECURITY_TERMINAL = BLOCK_ENTITY_TYPES.register("security_terminal",
+            () -> new BlockEntityType<>(SecurityTerminalBlockEntity::new, ModBlocks.SECURITY_TERMINAL.get()));
+
     public static final Supplier<BlockEntityType<ElectricPumpBlockEntity>> ELECTRIC_PUMP = BLOCK_ENTITY_TYPES.register("electric_pump",
             () -> new BlockEntityType<>(ElectricPumpBlockEntity::new, ModBlocks.ELECTRIC_PUMP.get()));
+
+    public static final Supplier<BlockEntityType<FermenterBlockEntity>> FERMENTER = BLOCK_ENTITY_TYPES.register("fermenter",
+            () -> new BlockEntityType<>(FermenterBlockEntity::new, ModBlocks.FERMENTER.get()));
 
     public static final Supplier<BlockEntityType<ArcMelterBlockEntity>> ARC_MELTER = BLOCK_ENTITY_TYPES.register("arc_melter",
             () -> new BlockEntityType<>(ArcMelterBlockEntity::new, ModBlocks.ARC_MELTER.get()));
@@ -115,6 +124,8 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<SteamTurbineArrayBlockEntity>> STEAM_TURBINE_ARRAY = BLOCK_ENTITY_TYPES.register("steam_turbine_array",
             () -> new BlockEntityType<>(SteamTurbineArrayBlockEntity::new, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get()));
+    public static final Supplier<BlockEntityType<GasTurbineArrayBlockEntity>> GAS_TURBINE_ARRAY = BLOCK_ENTITY_TYPES.register("gas_turbine_array",
+            () -> new BlockEntityType<>(GasTurbineArrayBlockEntity::new, ModBlocks.GAS_TURBINE_ARRAY_CASING.get()));
 
     // Every casing has one; only the centre runs.
     public static final Supplier<BlockEntityType<SuperheaterArrayBlockEntity>> SUPERHEATER_ARRAY = BLOCK_ENTITY_TYPES.register("superheater_array",

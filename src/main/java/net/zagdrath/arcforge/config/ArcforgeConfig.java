@@ -346,6 +346,75 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Gas Turbine Array: a 3x3 turbine 5 to 9 blocks long that burns Fuel Burner fuels (those not marked",
+                "\"gas_turbine\": false) straight to FE, and passes part of the heat out of its exhaust.").push("gasTurbineArray");
+    }
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_MAX_HU_PER_LENGTH = BUILDER
+            .comment("Most fuel heat it burns in HU/t, per block of length (the limit is heat, not mB, so thin fuels aren't punished).")
+            .defineInRange("maxFuelHuPerLength", 560, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue GAS_TURBINE_SIMPLE_CYCLE_FACTOR = BUILDER
+            .comment("FE per HU of fuel burned, at or above the reference temperature.")
+            .defineInRange("simpleCycleFactor", 1.5, 0.0, 100.0);
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_REFERENCE_TEMPERATURE = BUILDER
+            .comment("Burn temperature (°C) for full efficiency; a cooler fuel gets burnTemperature / this.")
+            .defineInRange("referenceTemperature", 1_200, 1, 100_000);
+
+    public static final ModConfigSpec.DoubleValue GAS_TURBINE_EXHAUST_FRACTION = BUILDER
+            .comment("Share of the fuel heat that leaves as exhaust heat (HU) through its Heat ports.")
+            .defineInRange("exhaustFraction", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue GAS_TURBINE_EXHAUST_TEMPERATURE_FACTOR = BUILDER
+            .comment("Exhaust temperature as a share of the fuel's burn temperature.")
+            .defineInRange("exhaustTemperatureFactor", 0.5, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_MAX_RPM = BUILDER
+            .comment("Rotor speed at full throttle.")
+            .defineInRange("maxRpm", 12_000, 100, 100_000);
+
+    public static final ModConfigSpec.DoubleValue GAS_TURBINE_SPIN_UP = BUILDER
+            .comment("Share of the gap to its target speed the rotor closes each tick while speeding up.")
+            .defineInRange("spinUp", 0.10, 0.001, 1.0);
+
+    public static final ModConfigSpec.DoubleValue GAS_TURBINE_SPIN_DOWN = BUILDER
+            .comment("Share of the gap to its target speed the rotor closes each tick while slowing down.")
+            .defineInRange("spinDown", 0.04, 0.001, 1.0);
+
+    public static final ModConfigSpec.DoubleValue GAS_TURBINE_LUBRICANT_SPIN_UP = BUILDER
+            .comment("Spin-up multiplier while it has lubricant.")
+            .defineInRange("lubricantSpinUpMultiplier", 1.5, 1.0, 10.0);
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_IGNITION_TICKS = BUILDER
+            .comment("Ticks the igniter runs before it burns fuel.")
+            .defineInRange("ignitionTicks", 20, 1, 1_200);
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_REIGNITION_DELAY = BUILDER
+            .comment("Ticks after a flameout before it can ignite again.")
+            .defineInRange("reignitionDelay", 20, 0, 1_200);
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_TANK_PER_LENGTH = BUILDER
+            .comment("Fuel tank size in mB, per block of length.")
+            .defineInRange("fuelTankPerLength", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 1_000_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_MAX_OUTPUT = BUILDER
+            .comment("Most FE/t pushed out of its energy faces.")
+            .defineInRange("maxEnergyOutput", 16_384, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue GAS_TURBINE_INTAKE_CHECK_INTERVAL = BUILDER
+            .comment("Ticks between checks that the intake has air in front of it.")
+            .defineInRange("intakeCheckInterval", 20, 1, 1_200);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Superheater Array: a 3x3x3 cube that upgrades steam one or two grades with heat, once it is at least as hot",
                 "as the grade it makes.").push("superheaterArray");
     }
@@ -588,6 +657,35 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue MELTER_OUTPUT_RATE = BUILDER
             .comment("Most mB/t it pushes out of its output faces.")
             .defineInRange("lavaOutputRate", 1_000, 1, 100_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Fermenter: ferments crops and water into Ethanol with FE. Recipes are data-driven (arcforge:fermenting)",
+                "and set the time; FE per operation is time x energyPerTick unless a recipe sets its own energy.").push("fermenter");
+    }
+
+    public static final ModConfigSpec.IntValue FERMENTER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while fermenting, before upgrades.")
+            .defineInRange("energyPerTick", 10, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FERMENTER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue FERMENTER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FERMENTER_WATER_TANK = BUILDER
+            .comment("Water tank size in mB.")
+            .defineInRange("waterTank", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FERMENTER_ETHANOL_TANK = BUILDER
+            .comment("Ethanol tank size in mB.")
+            .defineInRange("ethanolTank", 8_000, 1_000, 1_000_000);
 
     static {
         BUILDER.pop();
@@ -1070,6 +1168,52 @@ public class ArcforgeConfig {
     static {
         BUILDER.pop();
     }
+
+    static {
+        BUILDER.pop();
+    }
+
+    // --- Machine security ---
+
+    static {
+        BUILDER.comment("Who may use, configure and break machines. Every machine, multiblock and storage block records the player",
+                "who placed it; its owner's Security Terminal profile (or the block's own override) decides who else may use it.",
+                "Conduits, hoppers and other automation always work.").push("security");
+    }
+
+    public static final ModConfigSpec.BooleanValue SECURITY_ENABLED = BUILDER
+            .comment("Whether security is enforced. Off, anyone may use anything (owners are still recorded).")
+            .define("enabled", true);
+
+    public static final ModConfigSpec.BooleanValue SECURITY_OPS_BYPASS = BUILDER
+            .comment("Whether operators (permission level 2) may use and edit everything.")
+            .define("opsBypass", true);
+
+    public static final ModConfigSpec.EnumValue<net.zagdrath.arcforge.security.SecurityMode> SECURITY_DEFAULT_MODE = BUILDER
+            .comment("The mode of a player who never set one at a Security Terminal.")
+            .defineEnum("defaultMode", net.zagdrath.arcforge.security.SecurityMode.PUBLIC);
+
+    static {
+        BUILDER.pop();
+    }
+
+    // --- The Foundry Suit ---
+
+    static {
+        BUILDER.comment("Foundry Suit: fire-resistant armour. Fire and hot-block damage is #arcforge:foundry_resists.").push("foundrySuit");
+    }
+
+    public static final ModConfigSpec.DoubleValue FOUNDRY_FIRE_REDUCTION = BUILDER
+            .comment("Share of fire and hot-block damage each piece cuts (the full set stops it all).")
+            .defineInRange("fireReductionPerPiece", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue FOUNDRY_LAVA_SHIELD_TICKS = BUILDER
+            .comment("Ticks in lava the full set protects from lava damage.")
+            .defineInRange("lavaShieldTicks", 160, 0, 72_000);
+
+    public static final ModConfigSpec.IntValue FOUNDRY_LAVA_COOLDOWN_TICKS = BUILDER
+            .comment("Ticks out of lava before the shield refills.")
+            .defineInRange("lavaCooldownTicks", 1_200, 1, 72_000);
 
     static {
         BUILDER.pop();

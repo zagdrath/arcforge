@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CHC",
+    "HRH",
+    "CHC"
+  ],
+  "key": {
+    "C": "arcforge:carbon_fiber",
+    "H": "arcforge:hardened_alloy",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:turbine_blade_set",
+    "count": 1
+  }
+}

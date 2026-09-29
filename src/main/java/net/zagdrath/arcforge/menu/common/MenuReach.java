@@ -10,6 +10,7 @@ import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.phys.AABB;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.security.SecuredMenu;
 
 // Whether a machine's menu stays open. As vanilla's check (the block is still there, and the player is within
 // reach of it plus 4 blocks), except that for a formed multiblock the reach is to the nearest block of the
@@ -30,7 +31,7 @@ public final class MenuReach {
                 box = AABB.encapsulatingFullBlocks(controller.getMinCorner(), controller.getMaxCorner());
             }
             double reach = player.blockInteractionRange() + SLACK;
-            return box.distanceToSqr(player.getEyePosition()) <= reach * reach;
+            return box.distanceToSqr(player.getEyePosition()) <= reach * reach && SecuredMenu.stillAllowed(player, level, pos);
         }, true);
     }
 }

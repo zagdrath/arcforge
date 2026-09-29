@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.PortsTab;
 import net.zagdrath.arcforge.client.gui.tab.RedstoneTab;
+import net.zagdrath.arcforge.client.gui.tab.SecurityTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
@@ -34,6 +35,7 @@ public abstract class MultiblockScreen<M extends AbstractContainerMenu> extends 
     private final Identifier background;
     private final String machine;
     protected final SideTabPanel tabs;
+    private boolean securityTabAdded;
     private final PortsTab ports;
 
     protected MultiblockScreen(M menu, Inventory inventory, Component title, String machine,
@@ -65,6 +67,10 @@ public abstract class MultiblockScreen<M extends AbstractContainerMenu> extends 
     @Override
     public void init() {
         super.init();
+        if (!securityTabAdded) {
+            securityTabAdded = true;
+            tabs.add(new SecurityTab(() -> menu.containerId, this::sendButton));
+        }
         tabs.layout(leftPos, topPos);
     }
 

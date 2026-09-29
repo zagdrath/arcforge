@@ -35,6 +35,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -45,6 +46,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+
+import com.mojang.serialization.Codec;
 
 // An automatic crafting table. A 3x3 pattern of ghost items (set in the GUI or with JEI's +) picks a crafting
 // recipe; each craft takes one of each pattern item from its 18-slot buffer (which only takes pattern items) and
@@ -391,6 +394,31 @@ public class AssemblerBlockEntity extends MachineBlockEntity {
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
         };
+    }
+
+    // The Settings Card also copies the pattern (ghosts only, never items).
+    @Override
+    public void writeSettings(ValueOutput output) {
+        super.writeSettings(output);
+        output.store("pattern", ItemStack.OPTIONAL_CODEC.listOf(), patternCells());
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        input.read("pattern", ItemStack.OPTIONAL_CODEC.listOf()).ifPresent(cells -> {
+            for (int i = 0; i < PATTERN_SIZE; i++) {
+                setPatternCell(i, i < cells.size() ? cells.get(i) : ItemStack.EMPTY);
+            }
+        });
+        return super.readSettings(input);
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new java.util.ArrayList<>(super.describe(input));
+        input.read("pattern", ItemStack.OPTIONAL_CODEC.listOf()).ifPresent(cells -> lines.add(Component.translatable("settings.arcforge.pattern",
+                cells.stream().filter(cell -> !cell.isEmpty()).count())));
+        return lines;
     }
 
     @Override

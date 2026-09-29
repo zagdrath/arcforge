@@ -1,0 +1,13 @@
+{
+  "title": "Settings Card",
+  "icon": "arcforge:settings_card",
+  "items": [
+    "arcforge:settings_card"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Settings Card copies a block's setup so you can repeat it.\n- **Sneak-use** a machine, conduit, Vault or multiblock to copy. The tooltip lists what it holds.\n- **Use** it on another block of the same kind to paste.\n- **Sneak-use in the air** to clear it.\n# What it copies\n- Sides or ports, redstone mode and auto-eject\n- Settings of Conduit Filters already fitted on the target's matching sides\n- Boiler pressure, Vault lock and void, and machine modes like vent toggles and quarry areas\nIt never copies items, fluids or upgrades. Multiblock ports only paste onto the same kind of structure at the same size. You need access to both blocks."
+    }
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "variants": {
+    "end=none,formed=false": {
+      "model": "arcforge:block/gas_turbine_array/casing"
+    },
+    "end=none,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/gas_turbine_array/casing_formed"
+    },
+    "end=intake,formed=false": {
+      "model": "arcforge:block/gas_turbine_array/casing"
+    },
+    "end=intake,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/gas_turbine_array/casing_formed"
+    },
+    "end=exhaust,formed=false": {
+      "model": "arcforge:block/gas_turbine_array/casing"
+    },
+    "end=exhaust,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/gas_turbine_array/casing_formed"
+    }
+  }
+}

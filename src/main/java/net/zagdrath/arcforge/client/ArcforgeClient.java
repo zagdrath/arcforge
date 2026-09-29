@@ -43,15 +43,23 @@ import net.neoforged.neoforge.client.event.RegisterFluidModelsEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.neoforged.neoforge.client.fluid.FluidTintSources;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterRangeSelectItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
+import net.zagdrath.arcforge.registry.ModParticleTypes;
+import net.zagdrath.arcforge.client.sound.GasTurbineArraySound;
+import net.zagdrath.arcforge.client.screen.multiblock.GasTurbineArrayScreen;
+import net.zagdrath.arcforge.client.renderer.blockentity.GasTurbineArrayRenderer;
+import net.zagdrath.arcforge.client.particle.HeatHazeParticle;
+import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.client.model.ConduitFilterModel;
+import net.zagdrath.arcforge.client.model.ConduitSheathModel;
 import net.zagdrath.arcforge.client.model.PortNozzleModel;
 import net.zagdrath.arcforge.client.model.PortedModel;
 import net.zagdrath.arcforge.client.renderer.JetpackLayer;
@@ -68,6 +76,8 @@ import net.zagdrath.arcforge.client.renderer.blockentity.VaultRenderer;
 import net.zagdrath.arcforge.client.model.ConnectedModel;
 import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
+import net.zagdrath.arcforge.client.screen.machine.FermenterScreen;
+import net.zagdrath.arcforge.client.screen.machine.SecurityTerminalScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.DistillationArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.SolarThermalArrayScreen;
 import net.zagdrath.arcforge.client.screen.tool.ArcToolScreen;
@@ -136,6 +146,7 @@ public class ArcforgeClient {
         container.registerExtensionPoint(IConfigScreenFactory.class, ArcforgeConfigScreen::create);
         EngineersHandbookItem.opener = EngineersHandbookScreen::open;
         SteamTurbineArrayBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
+        GasTurbineArrayBlockEntity.clientHook = GasTurbineArraySound::clientTick;
         MachineSounds.clientHook = MachineLoopSound::keepPlaying;
         JetpackStatePayload.clientHandler = JetpackClient::onState;
         // Re-mesh blocks whose ports changed, and forget the ports on leaving a world.
@@ -163,6 +174,7 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.ARC_TOOL.get(), ArcToolScreen::new);
+        event.register(ModMenuTypes.SECURITY_TERMINAL.get(), SecurityTerminalScreen::new);
         event.register(ModMenuTypes.GEOTHERMAL_PLANT.get(), GeothermalPlantScreen::new);
         event.register(ModMenuTypes.COMBUSTION_PLANT.get(), CombustionPlantScreen::new);
         event.register(ModMenuTypes.FIREBOX.get(), FireboxScreen::new);
@@ -176,6 +188,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerScreen::array);
         event.register(ModMenuTypes.ELECTRIC_PUMP.get(), ElectricPumpScreen::new);
         event.register(ModMenuTypes.ARC_MELTER.get(), ArcMelterScreen::new);
+        event.register(ModMenuTypes.FERMENTER.get(), FermenterScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
         event.register(ModMenuTypes.ASSEMBLER.get(), AssemblerScreen::new);
@@ -185,6 +198,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.ARC_QUARRY.get(), ArcQuarryScreen::new);
         event.register(ModMenuTypes.ARC_QUARRY_CONFIG.get(), ArcQuarryConfigScreen::new);
         event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
+        event.register(ModMenuTypes.GAS_TURBINE_ARRAY.get(), GasTurbineArrayScreen::new);
         event.register(ModMenuTypes.SUPERHEATER_ARRAY.get(), SuperheaterArrayScreen::new);
         event.register(ModMenuTypes.CONDENSER_ARRAY.get(), CondenserArrayScreen::new);
         event.register(ModMenuTypes.FIBERIZER.get(), FiberizerScreen::new);
@@ -206,8 +220,11 @@ public class ArcforgeClient {
     // Lit Pressurized and Thermodynamic Conduits glow in the colour of what they hold.
     @SubscribeEvent
     static void registerBlockTints(RegisterColorHandlersEvent.BlockTintSources event) {
+        // Tint index 0 is the gas and thermal glow, index 1 a sheathed conduit's dye colour (on every conduit).
         for (ConduitTier tier : ConduitTier.values()) {
-            event.register(List.of(ConduitTints.INSTANCE), ModBlocks.conduit(ConduitType.GAS, tier).get(), ModBlocks.conduit(ConduitType.THERMAL, tier).get());
+            for (ConduitType type : ConduitType.values()) {
+                event.register(List.of(ConduitTints.INSTANCE, ConduitSheathModel.Tint.INSTANCE), ModBlocks.conduit(type, tier).get());
+            }
         }
     }
 
@@ -222,6 +239,7 @@ public class ArcforgeClient {
     static void registerFluidModels(RegisterFluidModelsEvent event) {
         event.register(liquidModel("creosote"), ModFluids.CREOSOTE, ModFluids.FLOWING_CREOSOTE);
         event.register(liquidModel("naphtha"), ModFluids.NAPHTHA, ModFluids.FLOWING_NAPHTHA);
+        event.register(liquidModel("ethanol"), ModFluids.ETHANOL, ModFluids.FLOWING_ETHANOL);
         event.register(liquidModel("light_oil"), ModFluids.LIGHT_OIL, ModFluids.FLOWING_LIGHT_OIL);
         event.register(liquidModel("heavy_oil"), ModFluids.HEAVY_OIL, ModFluids.FLOWING_HEAVY_OIL);
         event.register(liquidModel("sulfuric_acid"), ModFluids.SULFURIC_ACID, ModFluids.FLOWING_SULFURIC_ACID);
@@ -287,6 +305,7 @@ public class ArcforgeClient {
     static void registerClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerFluidType(liquidFog(0x1A1109, 3.0F), ModFluids.CREOSOTE_TYPE.get());
         event.registerFluidType(liquidFog(0xE0C080, 8.0F), ModFluids.NAPHTHA_TYPE.get());
+        event.registerFluidType(liquidFog(0xE8DCA0, 10.0F), ModFluids.ETHANOL_TYPE.get());
         event.registerFluidType(liquidFog(0xC89A20, 5.0F), ModFluids.LIGHT_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0x2A1A0C, 2.0F), ModFluids.HEAVY_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
@@ -378,7 +397,7 @@ public class ArcforgeClient {
         event.registerModel(PortNozzleModel.ID, PortNozzleModel.Unbaked.MAP_CODEC);
     }
 
-    // The Steam Turbine Array's rotor pieces and the Solar Thermal Array's trough, receiver and control panel,
+    // The Steam Turbine and Gas Turbine Arrays' rotor pieces and the Solar Thermal Array's trough, receiver and control panel,
     // drawn by their renderers; the Conduit Filter sleeves, added to the conduit models.
     @SubscribeEvent
     static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
@@ -389,13 +408,31 @@ public class ArcforgeClient {
         event.register(SolarThermalArrayRenderer.RECEIVER, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.RECEIVER_MODEL));
         event.register(SolarThermalArrayRenderer.PANEL, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.PANEL_MODEL));
         event.register(SolarThermalArrayRenderer.PANEL_ON, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.PANEL_ON_MODEL));
+        for (int i = 0; i < GasTurbineArrayRenderer.KEYS.size(); i++) {
+            event.register(GasTurbineArrayRenderer.KEYS.get(i),
+                    SimpleUnbakedStandaloneModel.quadCollection(GasTurbineArrayRenderer.model(GasTurbineArrayRenderer.MODELS.get(i))));
+        }
         ConduitFilterModel.registerStandalone(event);
+        ConduitSheathModel.registerStandalone(event);
+    }
+
+    // The Gas Turbine Array's exhaust haze.
+    @SubscribeEvent
+    static void registerParticles(RegisterParticleProvidersEvent event) {
+        event.registerSpriteSet(ModParticleTypes.HEAT_HAZE.get(), HeatHazeParticle.Provider::new);
     }
 
     // Conduit Filter sleeves on filtered conduit arms (see ConduitFilterModel).
     @SubscribeEvent
     static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
         ConduitFilterModel.wrap(event);
+        ConduitSheathModel.wrap(event);
+    }
+
+    // A sheathed conduit item's band colour.
+    @SubscribeEvent
+    static void registerItemTints(RegisterColorHandlersEvent.ItemTintSources event) {
+        event.register(ConduitSheathModel.ItemTint.ID, ConduitSheathModel.ItemTint.MAP_CODEC);
     }
 
     // Glass conduits (item and fluid) and fluid tanks draw their contents, and Vaults their front display;
@@ -409,6 +446,7 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CARBONIZER.get(), CarbonizerDoorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), GasTurbineArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARC_QUARRY.get(), ArcQuarryRenderer::new);

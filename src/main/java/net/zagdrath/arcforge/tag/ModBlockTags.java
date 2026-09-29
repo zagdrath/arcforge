@@ -26,5 +26,8 @@ public final class ModBlockTags {
     public static final TagKey<Block> VEIN_MINEABLE = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Arcforge.MODID, "vein_mineable"));
     public static final TagKey<Block> FELLABLE = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Arcforge.MODID, "fellable"));
 
+    // Blocks security never protects, even when they have an owner (empty by default; for packs and other mods).
+    public static final TagKey<Block> SECURITY_EXEMPT = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Arcforge.MODID, "security_exempt"));
+
     private ModBlockTags() {}
 }

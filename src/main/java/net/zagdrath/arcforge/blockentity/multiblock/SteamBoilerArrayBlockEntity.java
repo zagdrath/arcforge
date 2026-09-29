@@ -32,6 +32,7 @@ import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.machine.BucketSlots;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
@@ -48,6 +49,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+
+import com.mojang.serialization.Codec;
 
 // The Steam Boiler Array (see ShellMultiblockBlockEntity): boils water into steam with heat, and grows with
 // its height h. It holds 100,000 x h HU and boils with up to 600 x h HU/t; each mB costs 8 / 12 / 16 HU for
@@ -255,6 +258,27 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     }
 
     // --- Saving ---
+
+    // The Settings Card also copies the pressure setting.
+    @Override
+    public void writeSettings(ValueOutput output) {
+        super.writeSettings(output);
+        output.putInt("pressure", getCore().getPressure().ordinal());
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        input.getInt("pressure").ifPresent(id -> setPressure(BoilerPressure.values()[Math.clamp(id, 0, BoilerPressure.values().length - 1)]));
+        return super.readSettings(input);
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new java.util.ArrayList<>(super.describe(input));
+        input.getInt("pressure").ifPresent(id -> lines.add(Component.translatable("settings.arcforge.pressure",
+                BoilerPressure.values()[Math.clamp(id, 0, BoilerPressure.values().length - 1)].getDescription())));
+        return lines;
+    }
 
     @Override
     protected void loadAdditional(ValueInput input) {

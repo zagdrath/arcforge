@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "arcforge:steel_boots"
+    "arcforge:steel_boots",
+    "arcforge:foundry_boots"
   ]
 }

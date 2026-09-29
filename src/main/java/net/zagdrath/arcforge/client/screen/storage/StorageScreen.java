@@ -18,6 +18,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.SecurityTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
 import net.zagdrath.arcforge.menu.storage.StorageMenu;
 
@@ -27,6 +28,7 @@ public abstract class StorageScreen<M extends StorageMenu> extends AbstractConta
     private final Identifier background;
     private final Identifier ghostInput;
     protected final SideTabPanel tabs = new SideTabPanel();
+    private boolean securityTabAdded;
 
     protected StorageScreen(M menu, Inventory inventory, Component title, String name) {
         super(menu, inventory, title);
@@ -53,6 +55,10 @@ public abstract class StorageScreen<M extends StorageMenu> extends AbstractConta
     @Override
     public void init() {
         super.init();
+        if (!securityTabAdded) {
+            securityTabAdded = true;
+            tabs.add(new SecurityTab(() -> menu.containerId, this::sendButton));
+        }
         titleLabelX = (imageWidth - font.width(title)) / 2;
         tabs.layout(leftPos, topPos);
     }

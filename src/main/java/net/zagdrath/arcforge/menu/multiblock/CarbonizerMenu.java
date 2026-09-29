@@ -31,12 +31,13 @@ import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.network.PortsPayload;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.security.SecuredMenu;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 import java.util.List;
 
 // Served by the master block of a Carbonizer; opened from any of its blocks.
-public class CarbonizerMenu extends AbstractContainerMenu {
+public class CarbonizerMenu extends AbstractContainerMenu implements SecuredMenu {
     // Logical data indices (each is a full int, see WideIntContainerData).
     public static final int DATA_CHAMBERS = 0;
     // One per chamber: permille progress while working, -1 while idle.
@@ -93,7 +94,7 @@ public class CarbonizerMenu extends AbstractContainerMenu {
     // Runs on the server when the client clicks a redstone or side-config button.
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
-        return MachineMenuButtons.handle(access, buttonId);
+        return MachineMenuButtons.handle(access, player, buttonId);
     }
 
     // Multiblocks: their ports, for the Ports tab (see PortSync).
@@ -150,6 +151,11 @@ public class CarbonizerMenu extends AbstractContainerMenu {
 
         slot.onTake(player, stack);
         return original;
+    }
+
+    @Override
+    public ContainerLevelAccess securityAccess() {
+        return access;
     }
 
     @Override

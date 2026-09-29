@@ -39,6 +39,7 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.EnergyBalance;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -54,6 +55,8 @@ import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+
+import com.mojang.serialization.Codec;
 
 // Splits water into Hydrogen and Oxygen with FE (arcforge:electrolyzing recipes): 100 mB of water makes 200 mB of
 // hydrogen and 100 mB of oxygen for 120,000 FE, at 400 FE/t. The recipe's primary output goes into the hydrogen
@@ -344,6 +347,31 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ITEM, THERMAL -> ConnectionMode.NONE;
         };
+    }
+
+    // The Settings Card also copies the vent toggles.
+    @Override
+    public void writeSettings(ValueOutput output) {
+        super.writeSettings(output);
+        output.putBoolean("vent_hydrogen", ventHydrogen);
+        output.putBoolean("vent_oxygen", ventOxygen);
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        input.read("vent_hydrogen", Codec.BOOL).ifPresent(on -> setVenting(true, on));
+        input.read("vent_oxygen", Codec.BOOL).ifPresent(on -> setVenting(false, on));
+        return super.readSettings(input);
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new java.util.ArrayList<>(super.describe(input));
+        input.read("vent_hydrogen", Codec.BOOL).ifPresent(on -> lines.add(Component.translatable("settings.arcforge.mode",
+                Component.translatable("gui.arcforge.electrolyzer.vent_hydrogen"), MachineSettings.onOff(on))));
+        input.read("vent_oxygen", Codec.BOOL).ifPresent(on -> lines.add(Component.translatable("settings.arcforge.mode",
+                Component.translatable("gui.arcforge.electrolyzer.vent_oxygen"), MachineSettings.onOff(on))));
+        return lines;
     }
 
     @Override

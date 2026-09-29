@@ -109,12 +109,24 @@ public final class ShellStructure {
     private final Set<Direction.Axis> axes;
     private final int minLength;
     private final int maxLength;
+    // Whether the middle blocks of the two end faces must be casings, not glass (the Gas Turbine Array's
+    // intake and exhaust).
+    private final boolean casingEndCenters;
 
     public ShellStructure(Predicate<Block> casing, Set<Direction.Axis> axes, int minLength, int maxLength) {
+        this(casing, axes, minLength, maxLength, false);
+    }
+
+    public ShellStructure(Predicate<Block> casing, Set<Direction.Axis> axes, int minLength, int maxLength, boolean casingEndCenters) {
         this.casing = casing;
         this.axes = axes;
         this.minLength = minLength;
         this.maxLength = maxLength;
+        this.casingEndCenters = casingEndCenters;
+    }
+
+    public int minLength() {
+        return minLength;
     }
 
     public int maxLength() {
@@ -171,6 +183,14 @@ public final class ShellStructure {
         for (BlockPos corner : shell.corners()) {
             if (!level.isLoaded(corner) || !isCasing(level.getBlockState(corner))) {
                 return false;
+            }
+        }
+        if (casingEndCenters) {
+            for (Direction.AxisDirection end : Direction.AxisDirection.values()) {
+                BlockPos center = shell.endCenter(end);
+                if (!level.isLoaded(center) || !isCasing(level.getBlockState(center))) {
+                    return false;
+                }
             }
         }
         for (BlockPos pos : shell.positions()) {

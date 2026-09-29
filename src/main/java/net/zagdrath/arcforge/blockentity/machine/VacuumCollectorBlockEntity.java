@@ -40,6 +40,7 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -51,6 +52,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+
+import com.mojang.serialization.Codec;
 
 // Pulls dropped items within its range (a cube reaching `range` blocks out from it on every axis) into its
 // 18-slot buffer, for energyPerItem FE per item entity, every scanInterval ticks. Items must have been on the
@@ -288,6 +291,45 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
         };
+    }
+
+    // The Settings Card also copies its range, and its filter's settings onto a filter already in the target's slot.
+    @Override
+    public void writeSettings(ValueOutput output) {
+        super.writeSettings(output);
+        output.putInt("range", range);
+        ItemStack filter = items.getStack(SLOT_FILTER);
+        if (!filter.isEmpty()) {
+            output.store("filter", FilterSettings.CODEC, FilterSettings.of(filter));
+        }
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        input.getInt("range").ifPresent(this::setRange);
+        int skipped = 0;
+        var filter = input.read("filter", FilterSettings.CODEC);
+        if (filter.isPresent()) {
+            ItemStack installed = items.getStack(SLOT_FILTER);
+            if (installed.isEmpty()) {
+                skipped++;
+            } else {
+                ItemStack copy = installed.copy();
+                copy.set(net.zagdrath.arcforge.registry.ModDataComponents.CONDUIT_FILTER.get(), filter.get());
+                items.setStack(SLOT_FILTER, copy);
+            }
+        }
+        return skipped + super.readSettings(input);
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new java.util.ArrayList<>(super.describe(input));
+        input.getInt("range").ifPresent(value -> lines.add(Component.translatable("gui.arcforge.vacuum.range", value)));
+        if (input.read("filter", FilterSettings.CODEC).isPresent()) {
+            lines.add(Component.translatable("settings.arcforge.filters", 1));
+        }
+        return lines;
     }
 
     @Override

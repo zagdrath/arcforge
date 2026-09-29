@@ -7,6 +7,7 @@
     "minecraft:reinforced_deepslate",
     "minecraft:end_portal_frame",
     "arcforge:arc_quarry",
-    "arcforge:arc_quarry_bounding"
+    "arcforge:arc_quarry_bounding",
+    "arcforge:security_terminal"
   ]
 }

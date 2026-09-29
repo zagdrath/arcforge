@@ -30,7 +30,7 @@ public class HeatTab extends SideTab {
 
     public HeatTab(IntSupplier stored, Component rateLabel, Supplier<Component> rate,
             @Nullable Component extraLabel, @Nullable Supplier<Component> extra) {
-        super(ArcforgeGui.widget("icon_heat"), Component.translatable("gui.arcforge.tab.heat"), 100, extra == null ? 74 : 96);
+        super(ArcforgeGui.widget("icon_heat"), Component.translatable("gui.arcforge.tab.heat"), 100, extra == null ? 74 : 96, Side.LEFT);
         this.stored = stored;
         this.rateLabel = rateLabel;
         this.rate = rate;

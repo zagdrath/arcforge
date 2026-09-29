@@ -33,12 +33,13 @@ import net.zagdrath.arcforge.menu.common.PortSync;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.slot.ToggleableSlot;
 import net.zagdrath.arcforge.network.PortsPayload;
+import net.zagdrath.arcforge.security.SecuredMenu;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
 // Shared menu for single-block machines: the machine's own slots, then its upgrade slots (which live in
 // the Upgrades side tab), then the player's inventory. Subclasses add their slots in the constructor
 // before calling finish(), and declare where the status, redstone and side data sit.
-public abstract class MachineMenu extends AbstractContainerMenu {
+public abstract class MachineMenu extends AbstractContainerMenu implements SecuredMenu {
     public static final int BUTTON_CLEAR_SIDES = MachineMenuButtons.CLEAR_SIDES;
     // Upgrade slots sit in the Upgrades side tab (x 172, the Nth tab at y = 6 + N * 25), with slot items at +9,+25.
     private static final int UPGRADE_SLOT_X = 181, UPGRADE_SLOT_PITCH = 20;
@@ -129,7 +130,7 @@ public abstract class MachineMenu extends AbstractContainerMenu {
     // Runs on the server when the client clicks a redstone or side-config button.
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
-        return MachineMenuButtons.handle(access, buttonId);
+        return MachineMenuButtons.handle(access, player, buttonId);
     }
 
     // Shift-click: machine slots go to the player; player items go to the first machine slot that
@@ -179,6 +180,11 @@ public abstract class MachineMenu extends AbstractContainerMenu {
             }
         }
         return false;
+    }
+
+    @Override
+    public ContainerLevelAccess securityAccess() {
+        return access;
     }
 
     @Override

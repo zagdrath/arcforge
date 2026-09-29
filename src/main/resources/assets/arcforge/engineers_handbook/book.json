@@ -10,7 +10,9 @@
         "first_power",
         "making_steel",
         "conduits_and_wrench",
-        "upgrades"
+        "upgrades",
+        "settings_card",
+        "security"
       ]
     },
     {
@@ -24,6 +26,7 @@
         "firebox",
         "geothermal_plant",
         "fuel_burner",
+        "gas_turbine_array",
         "hydrogen_and_oxygen",
         "solar_thermal_array",
         "thermoelectric_plant",
@@ -42,6 +45,7 @@
         "steel_equipment",
         "jetpack",
         "arc_tools",
+        "foundry_suit",
         "coal_coke_and_creosote"
       ]
     },
@@ -60,7 +64,8 @@
         "electric_pump",
         "arc_melter",
         "chemical_processing",
-        "electrolyzer"
+        "electrolyzer",
+        "fermenter"
       ]
     },
     {
@@ -109,6 +114,7 @@
       "entries": [
         "conduits",
         "conduit_filters",
+        "dyed_conduits",
         "crates_and_vaults",
         "fluid_tanks",
         "energy_cells",

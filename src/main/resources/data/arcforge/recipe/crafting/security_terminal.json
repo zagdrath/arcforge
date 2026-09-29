@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WPW",
+    "GXG",
+    "WRW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "P": "arcforge:plastic_sheet",
+    "G": "#c:glass_panes",
+    "X": "minecraft:comparator",
+    "R": "#c:dusts/redstone"
+  },
+  "result": {
+    "id": "arcforge:security_terminal",
+    "count": 1
+  }
+}

@@ -44,9 +44,9 @@ public class PressureGlassBlock extends TransparentBlock {
         return state.getBlock() instanceof PressureGlassBlock && state.getValue(FORMED);
     }
 
-    // Both steam arrays can use glass.
+    // The steam arrays and the Gas Turbine Array can use glass.
     private static List<ShellStructure> structures() {
-        return List.of(SteamBoilerArrayCasingBlock.STRUCTURE, SteamTurbineArrayCasingBlock.STRUCTURE);
+        return List.of(SteamBoilerArrayCasingBlock.STRUCTURE, SteamTurbineArrayCasingBlock.STRUCTURE, GasTurbineArrayCasingBlock.STRUCTURE);
     }
 
     @Override

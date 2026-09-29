@@ -25,11 +25,12 @@ import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
+import net.zagdrath.arcforge.security.SecuredMenu;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // Storage block menus: a drain slot above a fill slot, the player inventory, and synced data including
 // the side configuration. One menu type serves every tier of a block.
-public abstract class StorageMenu extends AbstractContainerMenu {
+public abstract class StorageMenu extends AbstractContainerMenu implements SecuredMenu {
     // Energy Cells and Fluid Tanks put their slots here; Heat Cells and Pressurized Cylinders at SLOT_X_LEFT.
     public static final int SLOT_X = 27, SLOT_X_LEFT = 9;
     public static final int SLOT_IN_Y = 19, SLOT_OUT_Y = 53;
@@ -79,7 +80,7 @@ public abstract class StorageMenu extends AbstractContainerMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
-        return MachineMenuButtons.handle(access, buttonId);
+        return MachineMenuButtons.handle(access, player, buttonId);
     }
 
     @Override
@@ -124,9 +125,14 @@ public abstract class StorageMenu extends AbstractContainerMenu {
     }
 
     @Override
+    public ContainerLevelAccess securityAccess() {
+        return access;
+    }
+
+    @Override
     public boolean stillValid(Player player) {
         return access.evaluate((level, pos) -> validBlock.test(level.getBlockState(pos).getBlock())
-                && player.isWithinBlockInteractionRange(pos, 4.0), true);
+                && player.isWithinBlockInteractionRange(pos, 4.0) && SecuredMenu.stillAllowed(player, level, pos), true);
     }
 
     public Slot getInputSlot() {

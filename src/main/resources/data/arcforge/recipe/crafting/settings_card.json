@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "RXR",
+    " P "
+  ],
+  "key": {
+    "P": "arcforge:plastic_sheet",
+    "R": "#c:dusts/redstone",
+    "X": "minecraft:paper"
+  },
+  "result": {
+    "id": "arcforge:settings_card",
+    "count": 1
+  }
+}

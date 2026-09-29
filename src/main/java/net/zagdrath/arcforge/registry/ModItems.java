@@ -18,6 +18,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
@@ -43,8 +44,10 @@ import net.zagdrath.arcforge.item.tool.ArcToolItem;
 import net.zagdrath.arcforge.item.tool.AreaToolItem;
 import net.zagdrath.arcforge.item.tool.DieItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
+import net.zagdrath.arcforge.item.tool.FoundrySuit;
 import net.zagdrath.arcforge.item.tool.JetpackItem;
 import net.zagdrath.arcforge.item.tool.ModuleType;
+import net.zagdrath.arcforge.item.tool.SettingsCardItem;
 import net.zagdrath.arcforge.item.tool.SteelMaterials;
 import net.zagdrath.arcforge.item.tool.ToolModuleItem;
 import net.zagdrath.arcforge.item.tool.WrenchItem;
@@ -65,7 +68,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> METAL_PRESS = ITEMS.registerSimpleBlockItem(ModBlocks.METAL_PRESS);
     public static final DeferredItem<BlockItem> METAL_PRESSING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.METAL_PRESSING_ARRAY_CASING);
     public static final DeferredItem<BlockItem> ELECTRIC_PUMP = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTRIC_PUMP);
+    public static final DeferredItem<BlockItem> SECURITY_TERMINAL = ITEMS.registerSimpleBlockItem(ModBlocks.SECURITY_TERMINAL);
     public static final DeferredItem<BlockItem> ARC_MELTER = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_MELTER);
+    public static final DeferredItem<BlockItem> FERMENTER = ITEMS.registerSimpleBlockItem(ModBlocks.FERMENTER);
     public static final DeferredItem<BlockItem> CHEMICAL_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.CHEMICAL_REACTOR);
     public static final DeferredItem<BlockItem> ELECTROLYZER = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTROLYZER);
     public static final DeferredItem<BlockItem> ASSEMBLER = ITEMS.registerSimpleBlockItem(ModBlocks.ASSEMBLER);
@@ -77,6 +82,7 @@ public final class ModItems {
             p -> new ArcQuarryItem(ModBlocks.ARC_QUARRY.get(), p), p -> p.useBlockDescriptionPrefix());
     public static final DeferredItem<BlockItem> STEAM_BOILER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_BOILER_ARRAY_CASING);
     public static final DeferredItem<BlockItem> STEAM_TURBINE_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_TURBINE_ARRAY_CASING);
+    public static final DeferredItem<BlockItem> GAS_TURBINE_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.GAS_TURBINE_ARRAY_CASING);
     public static final DeferredItem<BlockItem> SUPERHEATER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.SUPERHEATER_ARRAY_CASING);
     public static final DeferredItem<BlockItem> CONDENSER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CONDENSER_ARRAY_CASING);
     public static final DeferredItem<BlockItem> PRESSURE_GLASS = ITEMS.registerSimpleBlockItem(ModBlocks.PRESSURE_GLASS);
@@ -84,6 +90,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> INFUSER = ITEMS.registerSimpleBlockItem(ModBlocks.INFUSER);
     public static final DeferredItem<BlockItem> FUEL_BURNER = ITEMS.registerSimpleBlockItem(ModBlocks.FUEL_BURNER);
 
+    public static final DeferredItem<SettingsCardItem> SETTINGS_CARD = ITEMS.registerItem("settings_card", SettingsCardItem::new);
     public static final DeferredItem<WrenchItem> WRENCH = ITEMS.registerItem("wrench", WrenchItem::new, p -> p.stacksTo(1));
     public static final DeferredItem<ConduitFilterItem> CONDUIT_FILTER = ITEMS.registerItem("conduit_filter", ConduitFilterItem::new, p -> p.stacksTo(16));
     public static final DeferredItem<EngineersHandbookItem> ENGINEERS_HANDBOOK = ITEMS.registerItem("engineers_handbook", EngineersHandbookItem::new, p -> p.stacksTo(1));
@@ -102,6 +109,23 @@ public final class ModItems {
     public static final DeferredItem<Item> STEEL_CHESTPLATE = ITEMS.registerItem("steel_chestplate", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.CHESTPLATE));
     public static final DeferredItem<Item> STEEL_LEGGINGS = ITEMS.registerItem("steel_leggings", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.LEGGINGS));
     public static final DeferredItem<Item> STEEL_BOOTS = ITEMS.registerItem("steel_boots", Item::new, p -> p.humanoidArmor(SteelMaterials.STEEL_ARMOR, ArmorType.BOOTS));
+
+    // The Foundry Suit (see FoundrySuit).
+    public static final DeferredItem<Item> FOUNDRY_HELMET = foundry("foundry_helmet", ArmorType.HELMET);
+    public static final DeferredItem<Item> FOUNDRY_CHESTPLATE = foundry("foundry_chestplate", ArmorType.CHESTPLATE);
+    public static final DeferredItem<Item> FOUNDRY_LEGGINGS = foundry("foundry_leggings", ArmorType.LEGGINGS);
+    public static final DeferredItem<Item> FOUNDRY_BOOTS = foundry("foundry_boots", ArmorType.BOOTS);
+
+    private static DeferredItem<Item> foundry(String name, ArmorType type) {
+        return ITEMS.registerItem(name, p -> new Item(p) {
+            @Override
+            public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
+                    java.util.function.Consumer<net.minecraft.network.chat.Component> builder, net.minecraft.world.item.TooltipFlag flag) {
+                builder.accept(net.minecraft.network.chat.Component.translatable("tooltip.arcforge.foundry.piece").withStyle(net.minecraft.ChatFormatting.GRAY));
+                builder.accept(net.minecraft.network.chat.Component.translatable("tooltip.arcforge.foundry.set").withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+            }
+        }, p -> p.humanoidArmor(FoundrySuit.ARMOR, type));
+    }
 
     // Jetpacks, Arc Drills and Arc Saws in the Tempered, Hardened and Arcforged tiers, and the tools' modules.
     public static final DeferredItem<JetpackItem> TEMPERED_JETPACK = jetpack(ConduitTier.TEMPERED);
@@ -209,6 +233,8 @@ public final class ModItems {
 
     public static final DeferredItem<BucketItem> CREOSOTE_BUCKET = ITEMS.registerItem("creosote_bucket",
             p -> new BucketItem(ModFluids.CREOSOTE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> ETHANOL_BUCKET = ITEMS.registerItem("ethanol_bucket",
+            p -> new BucketItem(ModFluids.ETHANOL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> NAPHTHA_BUCKET = ITEMS.registerItem("naphtha_bucket",
             p -> new BucketItem(ModFluids.NAPHTHA.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> LIGHT_OIL_BUCKET = ITEMS.registerItem("light_oil_bucket",
@@ -318,6 +344,11 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> DISTILLATION_ARRAY_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.DISTILLATION_ARRAY_CONTROLLER);
     public static final DeferredItem<Item> PITCH = ITEMS.registerSimpleItem("pitch", p -> p.cookingFuel(PITCH_BURN_TIME));
     public static final DeferredItem<Item> CARBON_FIBER = ITEMS.registerSimpleItem("carbon_fiber");
+
+    // --- Gas Turbine Array parts ---
+
+    public static final DeferredItem<Item> TURBINE_BLADE_SET = ITEMS.registerSimpleItem("turbine_blade_set");
+    public static final DeferredItem<Item> COMBUSTOR = ITEMS.registerSimpleItem("combustor");
     public static final DeferredItem<BlockItem> ASPHALT = ITEMS.registerSimpleBlockItem(ModBlocks.ASPHALT);
 
     // --- Solar Thermal Array ---

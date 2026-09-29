@@ -69,6 +69,7 @@ public class MachineLoopSound extends AbstractTickableSoundInstance {
         LOOPS.put(ModBlocks.METAL_PRESS.get(), new Loop(ModSounds.METAL_PRESS_RUN::get, 0.75F));
         LOOPS.put(ModBlocks.METAL_PRESSING_ARRAY_CASING.get(), new Loop(ModSounds.METAL_PRESSING_ARRAY_RUN::get, 0.85F));
         LOOPS.put(ModBlocks.ARC_MELTER.get(), new Loop(ModSounds.ARC_MELTER_RUN::get, 0.8F));
+        LOOPS.put(ModBlocks.FERMENTER.get(), new Loop(ModSounds.FERMENTER_RUN::get, 0.7F));
         LOOPS.put(ModBlocks.CHEMICAL_REACTOR.get(), new Loop(ModSounds.CHEMICAL_REACTOR_RUN::get, 0.8F));
         LOOPS.put(ModBlocks.ELECTROLYZER.get(), new Loop(ModSounds.ELECTROLYZER_RUN::get, 0.8F));
         LOOPS.put(ModBlocks.ASSEMBLER.get(), new Loop(ModSounds.ASSEMBLER_RUN::get, 0.8F));

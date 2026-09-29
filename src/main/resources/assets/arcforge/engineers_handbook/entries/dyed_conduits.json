@@ -1,0 +1,17 @@
+{
+  "title": "Dyed Conduits",
+  "icon": "arcforge:wrought_item_conduit",
+  "items": [
+    "arcforge:wrought_energy_conduit",
+    "arcforge:wrought_item_conduit",
+    "arcforge:wrought_fluid_conduit",
+    "arcforge:wrought_pressurized_conduit",
+    "arcforge:wrought_thermal_conduit"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Craft up to 8 conduits of one kind with a Plastic Sheet and a dye to sheathe them in that colour. They keep their stats.\n- Sheathed conduits only join conduits of the same colour, or unsheathed ones.\n- So two red and blue lines can run side by side without merging.\n- Put a sheathed conduit in the crafting grid on its own to strip the sheath."
+    }
+  ]
+}

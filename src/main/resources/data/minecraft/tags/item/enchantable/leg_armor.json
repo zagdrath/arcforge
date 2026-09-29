@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "arcforge:steel_leggings"
+    "arcforge:steel_leggings",
+    "arcforge:foundry_leggings"
   ]
 }

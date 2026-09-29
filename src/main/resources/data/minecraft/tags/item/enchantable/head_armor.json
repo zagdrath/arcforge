@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "arcforge:steel_helmet"
+    "arcforge:steel_helmet",
+    "arcforge:foundry_helmet"
   ]
 }

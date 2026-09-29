@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "arcforge:foundry"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "arcforge:foundry"
+      }
+    ]
+  }
+}

@@ -79,7 +79,15 @@ public enum MachineStatus {
     OUT_OF_REPLACE("out_of_replace", "led_blocked"),
     WAITING_CHUNK("waiting_chunk", "led_blocked"),
     FINISHED("finished", "led_idle"),
-    STOPPED("stopped", "led_off");
+    STOPPED("stopped", "led_off"),
+    // The Fermenter.
+    FERMENTING("fermenting", "led_running"),
+    // The Gas Turbine Array.
+    SPOOLING("spooling", "led_running"),
+    IGNITING("igniting", "led_running"),
+    FLAMEOUT("flameout", "led_blocked"),
+    INTAKE_SHUT("intake_shut", "led_blocked"),
+    NO_SIGNAL("no_signal", "led_off");
 
     private final String name;
     private final String led;

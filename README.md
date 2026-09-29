@@ -126,6 +126,12 @@ diamond). All of it repairs with Steel Ingots.
   - Each block fires its own break event, so claims and protection mods can stop it.
   - Sneak to break a single block. An outline shows what will break.
 
+### Foundry Suit
+
+Armour from Rock Wool, Slag Wool and Steel Plates, repaired with Rock Wool. Each piece cuts fire, campfire and
+magma damage by 25%; the full set makes you immune to it and gives an 8-second **lava shield** (a bar over the
+hotbar) that refills a minute after you leave the lava.
+
 ### Jetpacks
 
 Worn in the chest slot, in Tempered, Hardened and Arcforged tiers (16,000 / 64,000 / 256,000 mB tanks). A
@@ -281,6 +287,37 @@ Spent steam vents, unless you give it an **Exhaust** port with the Wrench. With 
 steam leaves as **Exhaust Steam**, a gas only a Condenser Array can use. While the exhaust drains (its
 tank isn't full), the turbine makes 10% more FE, on top of the lubricant bonus.
 
+**Gas Turbine Array** (Hardened). A 3x3 tube 5 to 9 long along either horizontal axis, built like the Steam
+Turbine Array (Pressure Glass windows allowed, but the middle of each end must be a casing). It burns fuel
+straight to FE.
+
+- **Intake and exhaust.** The end with air in front of its middle is the intake (the west or north end if
+  both are open); the other is the exhaust. Block the intake and it shuts down. The intake's middle can't
+  hold a port.
+- **Fuel.** Any `arcforge:burner_fuels` fuel not marked `"gas_turbine": false`: Naphtha, Light Oil, Ethanol
+  and Hydrogen (Heavy Oil and Creosote are refused). 8,000 mB of tank per block of length, one fuel at a time;
+  liquids through fluid conduits, Hydrogen through Pressurized Conduits.
+- **Output.** It burns up to 560 HU/t per block of length, at 1.5 FE per HU times the fuel's burn temperature
+  over 1,200°C (at most 1):
+
+  | Fuel | FE/mB | 9-long max FE/t | mB/t (9-long) |
+  |---|---|---|---|
+  | Naphtha | 600 | 7,560 | 12.6 |
+  | Light Oil | 312.5 | 6,300 | 20.2 |
+  | Ethanol | 337.5 | 5,670 | 16.8 |
+  | Hydrogen | 90 | 7,560 | 84 |
+
+- **Throttle.** In the **Throttle** redstone mode the signal strength sets the fuel burned (signal 5 burns a
+  third); the other modes run it flat out.
+- **Starting and stopping.** It ignites for a second before it burns. Running out of fuel is a flameout, and
+  it waits a second before it relights. The rotor spools up in about 1.5 s (faster with Heavy Oil
+  lubricant, which also adds 8%) and coasts down over about 4 s; output follows the rotor.
+- **Exhaust heat.** A quarter of the fuel's heat leaves at half its burn temperature (Naphtha: 600°C) through
+  Heat ports, e.g. into a Steam Boiler Array's Heat port for High-Pressure Steam: about 1.94× the FE of the
+  burner-and-boiler route in all. With nowhere to go, it vents as a heat haze.
+- A new one has an energy port on the bottom-left block of the intake end, a heat port in the middle of the
+  exhaust end, and a fuel port under the middle of its length.
+
 **Superheater Array.** A solid 3x3x3 cube of Superheater Array Casings (Hardened tier). It forms like
 the Arc Crushing Array.
 
@@ -353,6 +390,7 @@ optional `burn_temperature` of the `arcforge:burner_fuels` data map; without it,
 | Light Oil | 250 | 0.5 | 125 | 1,000°C |
 | Heavy Oil | 200 | 0.25 | 50 | 750°C |
 | Hydrogen (gas) | 60 | 1.0 | 60 | 1,400°C |
+| Ethanol | 300 | 0.5 | 150 | 900°C |
 
 Superheated Steam needs a 900°C boiler, so Naphtha is the fuel that makes it without a Geothermal Plant.
 Naphtha also catches fire in the world. Hydrogen comes through Pressurized Conduits (they connect to the burner's
@@ -385,8 +423,17 @@ exhausting turbine). By default that floor is 354 FE per mB of hydrogen, reached
 that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as fast (config
 `multiblocks.arcforgeFurnace`).
 
-**Plastic Sheet** (`#c:plastics`) goes into Conduit Filters, Storage Upgrades and the crafted crate and vault
-upgrades.
+**Plastic Sheet** (`#c:plastics`) goes into Conduit Filters, Storage Upgrades, the crafted crate and vault
+upgrades, the Settings Card, the Security Terminal, the Fermenter, dyed conduits and the Gas Turbine Array
+Casing.
+
+### Fermenting
+
+**Fermenter** (Tempered). Ferments a crop with 100 mB of water into 50 mB of **Ethanol** in 10 seconds at 10
+FE/t, with a 10% chance of bone meal (wheat, potatoes, carrots, beetroot, sugar cane, melon slices and sweet
+berries; recipes are data-driven, `arcforge:fermenting`). Crops go in on top, bone meal comes out the bottom,
+energy at the back; 8,000 mB tanks of water and ethanol; Speed and Energy upgrades. Ethanol burns in the Fuel
+Burner and the Gas Turbine Array, and catches fire in the world like Naphtha.
 
 ### Automation
 
@@ -461,7 +508,12 @@ Speed, Energy, Heat and Thermoelectric Efficiency upgrade cards go in a machine'
 
 ### Conduits
 
-Thin pipes that connect automatically to other conduits of the same type and to machines. A side
+Thin pipes that connect automatically to other conduits of the same type and to machines.
+
+**Dyed conduits.** Craft 1 to 7 conduits of one kind with a Plastic Sheet and a dye to sheathe them in that
+colour (a sheathed conduit on its own in the grid strips it). Sheathed conduits join only their own colour or
+plain conduits, so two lines of the same type can run side by side without merging.
+ A side
 touching a machine starts on **Auto**: it follows the machine's own side configuration, so an
 Arcforge machine's output faces are pulled from and its input faces are pushed into. Other mods'
 blocks are pushed into (energy and heat blocks that can only give are pulled from). Use the wrench
@@ -590,11 +642,13 @@ and forms again. Worlds from before ports get ports where their side configurati
 
 ## Machine settings
 
-Tabs on the right of each machine's screen:
+Tabs on the sides of each machine's screen: readouts (Energy, Heat, Pressure) on the left, settings on the
+right. One tab can be open on each side.
 
 - **Energy** / **Heat**: stored FE or HU and the current rate (the Geothermal Plant also shows the
   lava and magma touching it).
-- **Redstone**: ignore redstone, run only with a signal, or run only without one.
+- **Redstone**: ignore redstone, run only with a signal, or run only without one (the Gas Turbine Array
+  also has **Throttle**: the signal strength sets how hard it runs).
 - **Sides**: choose what each face does, including the front. Left-click to cycle, right-click to
   cycle back, shift-click to clear one face, or use the clear button to reset every face to none.
   - Combustion Plant: none, input, energy. Top is input, back is energy.
@@ -607,6 +661,29 @@ Tabs on the right of each machine's screen:
   auto-eject toggle. Set ports with the wrench in Port mode.
 - **Upgrades**: four slots. Each holds up to 8 of one upgrade type, so a machine takes at most 8 of
   each (see Upgrades below).
+- **Security**: the machine's owner and mode (see Security below). The owner can override their default
+  here.
+
+**Settings Card.** Sneak-use it on a machine, conduit, Vault or multiblock to copy its setup, then use it on
+another of the same kind (and, for multiblocks, the same size) to paste it: sides or ports, redstone mode,
+auto-eject and the machine's own options (vents, quarry area and filter, boiler pressure, the Assembler's
+pattern and so on). Ports are kept relative to the structure, so they fit however the other one is turned.
+Conduit filter settings paste only onto sides that already have a filter. It never moves items, fluids or
+upgrades. Sneak-use it in the air to clear it.
+
+### Security
+
+Every machine, storage block and multiblock remembers who placed it. At a **Security Terminal** each player
+sets their default mode and the players they trust:
+
+- **Public**: anyone can use it.
+- **Trusted**: you and the players you trust.
+- **Private**: only you.
+
+The Security tab overrides the mode for one machine. Others can't open, break, wrench, fill by hand or paste
+settings onto a machine they can't access, or extend a multiblock that isn't theirs. Automation (conduits,
+hoppers, other mods' pipes) always works, and the Block Breaker and Block Placer act as their owner. Ops
+bypass it; Jade shows the owner. Blocks placed before security was added have no owner and stay public.
 
 ## Configuration
 

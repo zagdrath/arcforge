@@ -10,6 +10,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Unit;
+import net.minecraft.world.item.DyeColor;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -17,6 +18,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.item.tool.JetpackMode;
+import net.zagdrath.arcforge.item.tool.SettingsCardData;
 import net.zagdrath.arcforge.item.tool.ToolModules;
 import net.zagdrath.arcforge.machine.quarry.QuarrySettings;
 import net.zagdrath.arcforge.item.tool.WrenchMode;
@@ -72,6 +74,14 @@ public final class ModDataComponents {
     // Whether an Arc Saw fells whole trunks (absent: on).
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> FELLING =
             DATA_COMPONENTS.registerComponentType("felling", b -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
+
+    // What a Settings Card copied (absent: empty).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<SettingsCardData>> SETTINGS_CARD =
+            DATA_COMPONENTS.registerComponentType("settings_card", b -> b.persistent(SettingsCardData.CODEC).networkSynchronized(SettingsCardData.STREAM_CODEC));
+
+    // A conduit's plastic sheath colour (absent: unsheathed). Sheathed conduits only join their own colour.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<DyeColor>> CONDUIT_COLOR =
+            DATA_COMPONENTS.registerComponentType("conduit_color", b -> b.persistent(DyeColor.CODEC).networkSynchronized(DyeColor.STREAM_CODEC));
 
     private ModDataComponents() {}
 

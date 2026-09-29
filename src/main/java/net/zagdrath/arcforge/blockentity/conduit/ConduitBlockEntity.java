@@ -19,11 +19,14 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -44,12 +47,15 @@ import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.SideSetting;
 import net.zagdrath.arcforge.conduit.item.ItemPacket;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
+import net.zagdrath.arcforge.item.tool.SettingsCopyable;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModDataComponents;
 
 // Per-block conduit state: the wrench setting of each side, plus what this conduit holds (its share of
 // the network's energy/heat/fluid, items in transit and items stored). All transfer logic lives in
 // ConduitNetworkManager.
-public class ConduitBlockEntity extends BlockEntity {
+public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable {
     // Fluid and item conduits sync their contents to clients at most this often.
     private static final int CONTENTS_SYNC_INTERVAL = 5;
     // Thermal conduits tint their glow by temperature in steps this big.
@@ -57,8 +63,12 @@ public class ConduitBlockEntity extends BlockEntity {
 
     // What the conduit's model draws: each side's filter look (see packFilterModes).
     public static final ModelProperty<Integer> FILTER_MODES = new ModelProperty<>();
+    // The sheath colour for the model: 0 unsheathed, else the dye id + 1.
+    public static final ModelProperty<Integer> COLOR = new ModelProperty<>();
 
     private final SideSetting[] settings = new SideSetting[Direction.values().length];
+    // The plastic sheath's colour, or null: sheathed conduits connect only to their own colour (or to unsheathed ones).
+    private @Nullable DyeColor color;
     // The Conduit Filter on each side (ItemStack.EMPTY if none).
     private final ItemStack[] filters = new ItemStack[Direction.values().length];
     private final List<ItemPacket> packets = new ArrayList<>();
@@ -205,7 +215,42 @@ public class ConduitBlockEntity extends BlockEntity {
 
     @Override
     public ModelData getModelData() {
-        return ModelData.of(FILTER_MODES, packFilterModes());
+        return ModelData.builder().with(FILTER_MODES, packFilterModes()).with(COLOR, color == null ? 0 : color.getId() + 1).build();
+    }
+
+    // --- Sheath colour ---
+
+    public @Nullable DyeColor getColor() {
+        return color;
+    }
+
+    public void setColor(@Nullable DyeColor color) {
+        if (this.color != color) {
+            this.color = color;
+            setChanged();
+            if (level != null && !level.isClientSide()) {
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+            }
+        }
+    }
+
+    // Two conduits join unless both are sheathed in different colours.
+    public static boolean colorsMatch(@Nullable ConduitBlockEntity a, @Nullable ConduitBlockEntity b) {
+        return a == null || b == null || a.color == null || b.color == null || a.color == b.color;
+    }
+
+    @Override
+    protected void applyImplicitComponents(net.minecraft.core.component.DataComponentGetter components) {
+        super.applyImplicitComponents(components);
+        color = components.get(ModDataComponents.CONDUIT_COLOR.get());
+    }
+
+    @Override
+    protected void collectImplicitComponents(net.minecraft.core.component.DataComponentMap.Builder components) {
+        super.collectImplicitComponents(components);
+        if (color != null) {
+            components.set(ModDataComponents.CONDUIT_COLOR.get(), color);
+        }
     }
 
     // --- Energy / heat buffer ---
@@ -441,6 +486,12 @@ public class ConduitBlockEntity extends BlockEntity {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         input.getInt("sides").ifPresentOrElse(this::unpackSettings, () -> migrateSettings(input.getIntOr("disabled_sides", 0)));
+        DyeColor colorBefore = color;
+        color = input.getInt("color").map(DyeColor::byId).orElse(null);
+        if (level != null && level.isClientSide() && color != colorBefore) {
+            requestModelDataUpdate();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
         packets.clear();
         input.listOrEmpty("packets", ItemPacket.CODEC).forEach(packets::add);
         storedItems.clear();
@@ -482,6 +533,9 @@ public class ConduitBlockEntity extends BlockEntity {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.putInt("sides", packSettings());
+        if (color != null) {
+            output.putInt("color", color.getId());
+        }
         if (!packets.isEmpty()) {
             var list = output.list("packets", ItemPacket.CODEC);
             packets.forEach(list::add);
@@ -508,6 +562,64 @@ public class ConduitBlockEntity extends BlockEntity {
                 }
             }
         }
+    }
+
+    // --- Settings Card ---
+
+    @Override
+    public Identifier settingsKind() {
+        return MachineSettings.kind(this);
+    }
+
+    @Override
+    public void writeSettings(ValueOutput output) {
+        output.putInt("sides", packSettings());
+        ValueOutput.TypedOutputList<FilterSettings> filterList = output.list("filters", FilterSettings.CODEC);
+        int[] filterSides = java.util.Arrays.stream(Direction.values()).filter(this::hasFilter).mapToInt(Direction::ordinal).toArray();
+        for (int side : filterSides) {
+            filterList.add(FilterSettings.of(filters[side]));
+        }
+        output.putIntArray("filter_sides", filterSides);
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        input.getInt("sides").ifPresent(this::unpackSettings);
+        int skipped = 0;
+        int[] sides = input.getIntArray("filter_sides").orElse(new int[0]);
+        int index = 0;
+        for (FilterSettings settings : input.listOrEmpty("filters", FilterSettings.CODEC)) {
+            if (index >= sides.length) {
+                break;
+            }
+            Direction side = Direction.values()[sides[index++]];
+            if (!hasFilter(side)) {
+                skipped++;
+                continue;
+            }
+            ItemStack filter = getFilter(side).copy();
+            filter.set(ModDataComponents.CONDUIT_FILTER.get(), settings);
+            setFilter(side, filter);
+        }
+        setChanged();
+        if (level != null) {
+            ConduitBlock.refreshConnections(level, worldPosition);
+        }
+        return skipped;
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new ArrayList<>();
+        input.getInt("sides").ifPresent(packed -> {
+            long forced = java.util.Arrays.stream(Direction.values()).filter(side -> ((packed >>> (side.ordinal() * 2)) & 3) != SideSetting.AUTO.ordinal()).count();
+            lines.add(Component.translatable("settings.arcforge.sides", forced));
+        });
+        int filters = input.getIntArray("filter_sides").map(sides -> sides.length).orElse(0);
+        if (filters > 0) {
+            lines.add(Component.translatable("settings.arcforge.filters", filters));
+        }
+        return lines;
     }
 
     // Two bits per side.
@@ -549,6 +661,6 @@ public class ConduitBlockEntity extends BlockEntity {
 
     @Override
     public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
-        return getConduitType().isTransparent() || hasGlowTint(getConduitType()) ? ClientboundBlockEntityDataPacket.create(this) : null;
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 }

@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "arcforge:block/security_terminal"
+  }
+}

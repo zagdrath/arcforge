@@ -20,6 +20,7 @@ import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
@@ -30,6 +31,7 @@ import net.zagdrath.arcforge.heat.EnergyBalance;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
 import net.zagdrath.arcforge.recipe.CrushingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
+import net.zagdrath.arcforge.recipe.FermentingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
@@ -243,6 +245,76 @@ final class MachineCategories {
             MeltingRecipe recipe = holder.value();
             text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.baseTicks()),
                     String.format(Locale.ROOT, "%,d", recipe.totalEnergy())), 0, 30);
+        }
+    }
+
+    // --- Fermenter ---
+
+    static final class Fermenting extends ArcforgeCategory<RecipeHolder<FermentingRecipe>> {
+        static final IRecipeHolderType<FermentingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.FERMENTING.get());
+
+        Fermenting(IGuiHelper gui) {
+            super(TYPE, "fermenting", ModBlocks.FERMENTER.get(), gui, 130, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<FermentingRecipe> holder, IFocusGroup focuses) {
+            FermentingRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
+            fluid(builder, true, 21, 5, recipe.fluidInput().fluid(), recipe.fluidInput().amount());
+            fluid(builder, false, 79, 5, recipe.result());
+            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(99, 5).setStandardSlotBackground().add(byproduct.create())
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                            Math.round(recipe.byproductChance() * 100)))));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<FermentingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        // Time and FE at the configured rates, before upgrades.
+        @Override
+        public void draw(RecipeHolder<FermentingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            FermentingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
+                    String.format(Locale.ROOT, "%,d", recipe.totalEnergy())), 0, 30);
+        }
+    }
+
+    // --- Conduit dyeing (a crafting-table recipe) ---
+
+    record ConduitDyeing(net.minecraft.world.item.Item conduit) {}
+
+    // Eight conduits, a Plastic Sheet and a dye make eight sheathed conduits; the dye and result cycle together.
+    static final class ConduitDyeingCategory extends ArcforgeCategory<ConduitDyeing> {
+        static final IRecipeType<ConduitDyeing> TYPE = IRecipeType.create(Arcforge.MODID, "conduit_dyeing", ConduitDyeing.class);
+
+        ConduitDyeingCategory(IGuiHelper gui) {
+            super(TYPE, "conduit_dyeing", ModItems.PLASTIC_SHEET.get(), gui, 116, 22);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, ConduitDyeing recipe, IFocusGroup focuses) {
+            builder.addInputSlot(1, 3).setStandardSlotBackground().add(new ItemStack(recipe.conduit(), 8));
+            builder.addInputSlot(19, 3).setStandardSlotBackground().add(new ItemStack(ModItems.PLASTIC_SHEET.get()));
+            List<ItemStack> dyes = new java.util.ArrayList<>();
+            List<ItemStack> results = new java.util.ArrayList<>();
+            for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
+                dyes.add(new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.withDefaultNamespace(color.getSerializedName() + "_dye"))));
+                ItemStack result = new ItemStack(recipe.conduit(), 8);
+                result.set(net.zagdrath.arcforge.registry.ModDataComponents.CONDUIT_COLOR.get(), color);
+                results.add(result);
+            }
+            var dye = builder.addInputSlot(37, 3).setStandardSlotBackground().addItemStacks(dyes);
+            var output = builder.addOutputSlot(95, 3).setStandardSlotBackground().addItemStacks(results);
+            builder.createFocusLink(dye, output);
+            builder.setShapeless();
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, ConduitDyeing recipe, IFocusGroup focuses) {
+            builder.addRecipeArrow().setPosition(62, 3);
         }
     }
 
@@ -557,7 +629,7 @@ final class MachineCategories {
         static final IRecipeType<BurnerFuelRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "burner_fuel", BurnerFuelRecipe.class);
 
         BurnerFuels(IGuiHelper gui) {
-            super(TYPE, "burner_fuel", ModBlocks.FUEL_BURNER.get(), gui, 140, 40);
+            super(TYPE, "burner_fuel", ModBlocks.FUEL_BURNER.get(), gui, 140, 51);
         }
 
         @Override
@@ -574,6 +646,37 @@ final class MachineCategories {
                     Math.round(fuel.huPerMb() * fuel.mbPerTick())), 24, 16);
             text(graphics, Component.translatable("gui.arcforge.burns_at",
                     fuel.burnTemperature(ArcforgeConfig.FUEL_BURNER_MAX_TEMPERATURE.getAsInt())), 24, 27);
+            if (!fuel.gasTurbine()) {
+                text(graphics, Component.translatable("jei.arcforge.gas_turbine.not_accepted"), 24, 38);
+            }
+        }
+    }
+
+    // --- Gas Turbine Array fuels ---
+
+    static final class GasTurbineFuels extends ArcforgeCategory<BurnerFuelRecipe> {
+        static final IRecipeType<BurnerFuelRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "gas_turbine_fuel", BurnerFuelRecipe.class);
+
+        GasTurbineFuels(IGuiHelper gui) {
+            super(TYPE, "gas_turbine_fuels", ModBlocks.GAS_TURBINE_ARRAY_CASING.get(), gui, 150, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, BurnerFuelRecipe recipe, IFocusGroup focuses) {
+            fluid(builder, true, 1, 7, recipe.fluid(), 1_000);
+        }
+
+        @Override
+        public void draw(BurnerFuelRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            BurnerFuel fuel = recipe.fuel();
+            int celsius = GasTurbineArrayBlockEntity.burnTemperature(fuel);
+            String fePerMb = String.format(Locale.ROOT, "%.1f", GasTurbineArrayBlockEntity.fePerMb(fuel)).replaceAll("\\.0$", "");
+            text(graphics, Component.translatable("jei.arcforge.gas_turbine.fe_per_mb", fePerMb,
+                    Math.round(GasTurbineArrayBlockEntity.efficiency(celsius) * 100)), 24, 5);
+            text(graphics, Component.translatable("jei.arcforge.gas_turbine.exhaust",
+                    Math.round(fuel.huPerMb() * ArcforgeConfig.GAS_TURBINE_EXHAUST_FRACTION.getAsDouble()),
+                    GasTurbineArrayBlockEntity.exhaustCelsius(fuel)), 24, 16);
+            text(graphics, Component.translatable("gui.arcforge.burns_at", celsius), 24, 27);
         }
     }
 }

@@ -59,6 +59,13 @@ public final class ModFluids {
     public static final DeferredHolder<FluidType, FluidType> LIGHT_OIL_TYPE = liquidType("light_oil", 850, 1_500, 0.02F, 0.7, 0.8);
     public static final DeferredHolder<FluidType, FluidType> HEAVY_OIL_TYPE = liquidType("heavy_oil", 1_050, 6_000, 0.015F, 0.5, 0.6);
 
+    // The Fermenter's product: pale, thin and flammable.
+    public static final DeferredHolder<FluidType, FluidType> ETHANOL_TYPE = liquidType("ethanol", 790, 1_200, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> ETHANOL = FLUIDS.register("ethanol",
+            () -> new BaseFlowingFluid.Source(ethanolProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_ETHANOL = FLUIDS.register("flowing_ethanol",
+            () -> new BaseFlowingFluid.Flowing(ethanolProperties()));
+
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> NAPHTHA = FLUIDS.register("naphtha",
             () -> new BaseFlowingFluid.Source(naphthaProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NAPHTHA = FLUIDS.register("flowing_naphtha",
@@ -190,6 +197,16 @@ public final class ModFluids {
         return new BaseFlowingFluid.Properties(NAPHTHA_TYPE, NAPHTHA, FLOWING_NAPHTHA)
                 .bucket(ModItems.NAPHTHA_BUCKET)
                 .block(ModBlocks.NAPHTHA)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    private static BaseFlowingFluid.Properties ethanolProperties() {
+        return new BaseFlowingFluid.Properties(ETHANOL_TYPE, ETHANOL, FLOWING_ETHANOL)
+                .bucket(ModItems.ETHANOL_BUCKET)
+                .block(ModBlocks.ETHANOL)
                 .slopeFindDistance(4)
                 .levelDecreasePerBlock(1)
                 .tickRate(5)

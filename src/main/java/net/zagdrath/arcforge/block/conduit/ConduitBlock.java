@@ -179,8 +179,8 @@ public class ConduitBlock extends BaseEntityBlock {
     }
 
     // Decides a side's connection from its wrench setting:
-    //  - a same-type conduit connects unless either end is disabled
-    //    (or, for fluid conduits, the two hold different fluids);
+    //  - a same-type conduit connects unless either end is disabled, the two are sheathed in different colours,
+    //    or (for fluid conduits) the two hold different fluids;
     //  - next to anything else, auto asks the block (see ConduitCapabilities.autoMode), a forced
     //    input/output applies while the block has the capability, and disabled never connects;
     //  - once the neighbour is gone (air) the setting goes back to auto.
@@ -193,7 +193,7 @@ public class ConduitBlock extends BaseEntityBlock {
         if (neighbourState.getBlock() instanceof ConduitBlock other && other.conduitType == conduitType) {
             ConduitBlockEntity neighbour = level.getBlockEntity(neighbourPos) instanceof ConduitBlockEntity be ? be : null;
             boolean disabled = setting == SideSetting.DISABLED || (neighbour != null && neighbour.isSideDisabled(side.getOpposite()));
-            if (disabled || hasConflictingFluids(own, neighbour)) {
+            if (disabled || hasConflictingFluids(own, neighbour) || !ConduitBlockEntity.colorsMatch(own, neighbour)) {
                 return ConnectionMode.NONE;
             }
             return ConnectionMode.PIPE;
@@ -225,6 +225,18 @@ public class ConduitBlock extends BaseEntityBlock {
         FluidStack fa = a.getFluid();
         FluidStack fb = b.getFluid();
         return !fa.isEmpty() && !fb.isEmpty() && !FluidStack.isSameFluidSameComponents(fa, fb);
+    }
+
+    // Once placed (and its item's colour applied), it and its neighbours reconsider their joins.
+    @Override
+    public void setPlacedBy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.@Nullable LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
+        super.setPlacedBy(level, pos, state, placer, stack);
+        if (!level.isClientSide()) {
+            refreshConnections(level, pos);
+            for (Direction side : Direction.values()) {
+                refreshConnections(level, pos.relative(side));
+            }
+        }
     }
 
     // Re-evaluates the conduits touching a machine, e.g. after its side configuration or facing changed.

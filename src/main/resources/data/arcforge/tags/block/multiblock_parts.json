@@ -17,6 +17,7 @@
     "arcforge:steam_boiler_array_casing",
     "arcforge:steam_turbine_array_casing",
     "arcforge:superheater_array_casing",
-    "arcforge:tray_level_casing"
+    "arcforge:tray_level_casing",
+    "arcforge:gas_turbine_array_casing"
   ]
 }

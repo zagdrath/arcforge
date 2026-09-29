@@ -187,5 +187,41 @@
         "stream": false
       }
     ]
+  },
+  "fermenter_run": {
+    "sounds": [
+      {
+        "name": "arcforge:fermenter_run",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.fermenter_run"
+  },
+  "gas_turbine_array_run": {
+    "sounds": [
+      {
+        "name": "arcforge:gas_turbine_array_run",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.gas_turbine_array_run"
+  },
+  "gas_turbine_array_ignite": {
+    "sounds": [
+      {
+        "name": "arcforge:gas_turbine_array_ignite",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.gas_turbine_array_ignite"
+  },
+  "gas_turbine_array_flameout": {
+    "sounds": [
+      {
+        "name": "arcforge:gas_turbine_array_flameout",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.gas_turbine_array_flameout"
   }
 }

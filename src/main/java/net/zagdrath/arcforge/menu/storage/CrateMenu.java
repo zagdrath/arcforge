@@ -30,6 +30,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.security.SecuredMenu;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // A Crate's GUI: a window of 6 rows over its slots (all of them on a Wrought Crate; the larger ones scroll),
@@ -37,7 +38,7 @@ import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 // row on; the client holds just the window, filled by the usual slot sync, so a scroll shows the new rows one
 // sync later. Scrolling is a menu button (SCROLL_BUTTON + row), sent before any click on the moved slots.
 // Shift-clicking from the inventory fills the whole crate, not just the rows in view.
-public class CrateMenu extends AbstractContainerMenu {
+public class CrateMenu extends AbstractContainerMenu implements SecuredMenu {
     public static final int COLUMNS = 9;
     public static final int VISIBLE_ROWS = 6;
     public static final int VISIBLE_SLOTS = COLUMNS * VISIBLE_ROWS;
@@ -143,7 +144,7 @@ public class CrateMenu extends AbstractContainerMenu {
             setRowOffset(buttonId - SCROLL_BUTTON);
             return true;
         }
-        return MachineMenuButtons.handle(access, buttonId);
+        return MachineMenuButtons.handle(access, player, buttonId);
     }
 
     @Override
@@ -199,10 +200,15 @@ public class CrateMenu extends AbstractContainerMenu {
 
     // Closes if the crate is gone or was swapped for another (a Storage Upgrade), or the player walked away.
     @Override
+    public ContainerLevelAccess securityAccess() {
+        return access;
+    }
+
+    @Override
     public boolean stillValid(Player player) {
         return access.evaluate((level, pos) -> level.getBlockState(pos).getBlock() instanceof CrateBlock
                 && (crate == null || (level.getBlockEntity(pos) == crate && !crate.isRemoved()))
-                && player.isWithinBlockInteractionRange(pos, 4.0), true);
+                && player.isWithinBlockInteractionRange(pos, 4.0) && SecuredMenu.stillAllowed(player, level, pos), true);
     }
 
     @Override

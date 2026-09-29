@@ -41,7 +41,7 @@ public class PressureTab extends SideTab {
     // Only these settings (the Superheater Array has no plain-Steam row), with their own hints.
     public PressureTab(List<BoilerPressure> rows, Supplier<BoilerPressure> current, Consumer<BoilerPressure> select,
             Function<BoilerPressure, String> hint) {
-        super(ArcforgeGui.widget("icon_pressure"), Component.translatable("gui.arcforge.tab.pressure"), WIDTH, ROWS_Y + rows.size() * ROW_H + 6);
+        super(ArcforgeGui.widget("icon_pressure"), Component.translatable("gui.arcforge.tab.pressure"), WIDTH, ROWS_Y + rows.size() * ROW_H + 6, Side.LEFT);
         this.rows = rows;
         this.current = current;
         this.select = select;

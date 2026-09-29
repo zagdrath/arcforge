@@ -158,9 +158,11 @@ final class AlloyGameTests {
         // drop's 29 (storage and raw blocks both ways, invar dust, the components and the upgrade), the Conduit
         // Filter, the Crates and Vaults drop's 11 (two blocks, their six tier upgrades and three Storage Upgrades),
         // the Arc Melter, the Chemical Reactor, the Electrolyzer, the four automation blocks, the Arc Quarry
-        // with its two parts, the 11 steel tools and armour pieces, and the jetpack and arc tool drop's 16 (three
-        // tier-one crafts, six tier upgrades and seven modules).
-        helper.assertTrue(crafting == 161, crafting + " crafting/ recipes, not 161");
+        // with its two parts, the 11 steel tools and armour pieces, the jetpack and arc tool drop's 16 (three
+        // tier-one crafts, six tier upgrades and seven modules), and the security, foundry and gas turbine drop's 11
+        // (Settings Card, Security Terminal, Fermenter, four Foundry Suit pieces, conduit dyeing, Turbine Blade Set,
+        // Combustor and Gas Turbine Array Casing).
+        helper.assertTrue(crafting == 172, crafting + " crafting/ recipes, not 172");
         // Plus the fluorite-fluxed steel.
         helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

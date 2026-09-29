@@ -12,14 +12,17 @@ import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.menu.multiblock.GasTurbineArrayMenu;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
+import net.zagdrath.arcforge.menu.machine.FermenterMenu;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
 import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
 import net.zagdrath.arcforge.menu.machine.ArcMelterMenu;
 import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
 import net.zagdrath.arcforge.menu.machine.ElectrolyzerMenu;
+import net.zagdrath.arcforge.menu.machine.SecurityTerminalMenu;
 import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
 import net.zagdrath.arcforge.menu.machine.ArcQuarryConfigMenu;
 import net.zagdrath.arcforge.menu.machine.ArcQuarryMenu;
@@ -88,8 +91,14 @@ public final class ModMenuTypes {
     public static final Supplier<MenuType<ElectricPumpMenu>> ELECTRIC_PUMP = MENU_TYPES.register("electric_pump",
             () -> IMenuTypeExtension.create(ElectricPumpMenu::new));
 
+    public static final Supplier<MenuType<SecurityTerminalMenu>> SECURITY_TERMINAL = MENU_TYPES.register("security_terminal",
+            () -> IMenuTypeExtension.create(SecurityTerminalMenu::new));
+
     public static final Supplier<MenuType<ArcMelterMenu>> ARC_MELTER = MENU_TYPES.register("arc_melter",
             () -> IMenuTypeExtension.create(ArcMelterMenu::new));
+
+    public static final Supplier<MenuType<FermenterMenu>> FERMENTER = MENU_TYPES.register("fermenter",
+            () -> IMenuTypeExtension.create(FermenterMenu::new));
 
     public static final Supplier<MenuType<ChemicalReactorMenu>> CHEMICAL_REACTOR = MENU_TYPES.register("chemical_reactor",
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));
@@ -110,6 +119,8 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<SteamTurbineArrayMenu>> STEAM_TURBINE_ARRAY = MENU_TYPES.register("steam_turbine_array",
             () -> IMenuTypeExtension.create(SteamTurbineArrayMenu::new));
+    public static final Supplier<MenuType<GasTurbineArrayMenu>> GAS_TURBINE_ARRAY = MENU_TYPES.register("gas_turbine_array",
+            () -> IMenuTypeExtension.create(GasTurbineArrayMenu::new));
 
     public static final Supplier<MenuType<SuperheaterArrayMenu>> SUPERHEATER_ARRAY = MENU_TYPES.register("superheater_array",
             () -> IMenuTypeExtension.create(SuperheaterArrayMenu::new));

@@ -5,13 +5,17 @@
 
 package net.zagdrath.arcforge.blockentity.machine;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
@@ -27,6 +31,9 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
 import net.zagdrath.arcforge.conduit.ConduitConnectable;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.tool.MachineSettings;
+import net.zagdrath.arcforge.item.tool.SettingsCardData;
+import net.zagdrath.arcforge.item.tool.SettingsCopyable;
 import net.zagdrath.arcforge.machine.MachineOutputs;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.ConfigurableMachine;
@@ -35,14 +42,22 @@ import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.Dismantleable;
+import net.zagdrath.arcforge.multiblock.MultiblockController;
+import net.zagdrath.arcforge.security.Owned;
+import net.zagdrath.arcforge.security.Ownership;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
+import com.mojang.serialization.Codec;
+
 // What every single-block machine shares: its item slots (the machine's own, then four upgrade slots),
 // the side configuration and redstone mode set from its GUI, pushing output into touching blocks,
 // and dropping its items when removed.
-public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider, Dismantleable, ConduitConnectable, ConfigurableMachine {
+public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider, Dismantleable, ConduitConnectable, ConfigurableMachine, Owned, SettingsCopyable {
+    // Who placed it and its security override (see SecurityRules).
+    protected final Ownership ownership = new Ownership(this::setChanged);
+
     public static final int UPGRADE_SLOTS = MachineItemHandler.UPGRADE_SLOTS;
 
     protected final MachineItemHandler items;
@@ -206,6 +221,65 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         return allowedSideModes;
     }
 
+    // --- Settings Card: redstone mode, auto-eject, and the side modes (a formed structure's ports instead) ---
+
+    @Override
+    public Identifier settingsKind() {
+        return MachineSettings.kind(this);
+    }
+
+    @Override
+    public Optional<SettingsCardData.StructureSize> settingsSize() {
+        return this instanceof MultiblockController controller && controller.isFormed()
+                ? Optional.of(MachineSettings.Frame.of(controller).size()) : Optional.empty();
+    }
+
+    @Override
+    public void writeSettings(ValueOutput output) {
+        MachineSettings.writeRedstone(output, redstoneMode);
+        if (this instanceof MultiblockController controller) {
+            if (level != null && controller.isFormed()) {
+                MachineSettings.writePorts(output, level, controller);
+            }
+        } else {
+            output.putInt("side_config", sideConfig.pack());
+        }
+        if (hasOutputs()) {
+            output.putBoolean("auto_eject", sideConfig.isAutoEject());
+        }
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        int skipped = MachineSettings.readRedstone(input, this);
+        if (this instanceof MultiblockController controller) {
+            if (level != null && controller.isFormed()) {
+                skipped += MachineSettings.readPorts(input, level, controller);
+            }
+        } else {
+            input.getInt("side_config").ifPresent(packed -> {
+                sideConfig.load(packed);
+                onSideConfigChanged();
+            });
+        }
+        input.read("auto_eject", Codec.BOOL).ifPresent(this::setAutoEject);
+        setChanged();
+        return skipped;
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new ArrayList<>();
+        input.getInt("side_config").ifPresent(packed -> {
+            long configured = java.util.Arrays.stream(RelativeSide.values()).filter(side -> SideConfig.unpack(packed, side) != SideMode.NONE).count();
+            lines.add(Component.translatable("settings.arcforge.sides", configured));
+        });
+        MachineSettings.describePorts(input, lines);
+        MachineSettings.describeRedstone(input, lines);
+        MachineSettings.describeAutoEject(input, lines);
+        return lines;
+    }
+
     // Slot items drop however the machine is removed, including with the wrench.
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
@@ -218,8 +292,14 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     }
 
     @Override
+    public Ownership ownership() {
+        return ownership;
+    }
+
+    @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        ownership.load(input);
         items.deserialize(input.childOrEmpty("items"));
         sideConfig.deserialize(input);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", 0));
@@ -230,6 +310,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        ownership.save(output);
         items.serialize(output.child("items"));
         sideConfig.serialize(output);
         output.putInt("redstone_mode", redstoneMode.ordinal());
