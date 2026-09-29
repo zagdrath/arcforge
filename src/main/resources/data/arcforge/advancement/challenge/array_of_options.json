@@ -1,0 +1,49 @@
+{
+  "parent": "arcforge:processing/array",
+  "display": {
+    "icon": {
+      "id": "arcforge:metal_pressing_array_casing"
+    },
+    "title": {
+      "translate": "advancements.arcforge.challenge.array_of_options.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.challenge.array_of_options.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "arc_crushing_array": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:arc_crushing_array"
+      }
+    },
+    "induction_furnace_array": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:induction_furnace_array"
+      }
+    },
+    "metal_pressing_array": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:metal_pressing_array"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "arc_crushing_array"
+    ],
+    [
+      "induction_furnace_array"
+    ],
+    [
+      "metal_pressing_array"
+    ]
+  ]
+}

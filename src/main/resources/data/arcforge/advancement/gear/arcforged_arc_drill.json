@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:gear/jetpack",
+  "display": {
+    "icon": {
+      "id": "arcforge:arcforged_arc_drill"
+    },
+    "title": {
+      "translate": "advancements.arcforge.gear.arcforged_arc_drill.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.gear.arcforged_arc_drill.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "drill": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:arcforged_arc_drill"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "drill"
+    ]
+  ]
+}

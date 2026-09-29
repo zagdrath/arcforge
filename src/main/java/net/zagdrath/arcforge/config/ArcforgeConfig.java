@@ -117,6 +117,14 @@ public class ArcforgeConfig {
             .comment("How much faster than a vanilla furnace fuel burns (2 = coal lasts 800 ticks instead of 1,600).")
             .defineInRange("burnSpeed", 2.0, 0.1, 100.0);
 
+    public static final ModConfigSpec.IntValue FIREBOX_OXYGEN_TANK_CAPACITY = BUILDER
+            .comment("Oxygen tank capacity in mB (oxy-fuel, see oxyFuel).")
+            .defineInRange("oxygenTankCapacity", 2_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue FIREBOX_OXYGEN_PER_TICK = BUILDER
+            .comment("mB of oxygen burnt per tick of oxy-fuel.")
+            .defineInRange("oxygenPerTick", 0.25, 0.001, 1_000.0);
+
     static {
         BUILDER.pop();
     }
@@ -138,6 +146,35 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue FUEL_BURNER_TANK_CAPACITY = BUILDER
             .comment("Fuel tank capacity in mB.")
             .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FUEL_BURNER_OXYGEN_TANK_CAPACITY = BUILDER
+            .comment("Oxygen tank capacity in mB (oxy-fuel, see oxyFuel).")
+            .defineInRange("oxygenTankCapacity", 2_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue FUEL_BURNER_OXYGEN_PER_TICK = BUILDER
+            .comment("mB of oxygen burnt per tick of oxy-fuel.")
+            .defineInRange("oxygenPerTick", 0.25, 0.001, 1_000.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Oxy-fuel: a Firebox or Fuel Burner fed oxygen through an Oxygen face burns hotter and makes more heat",
+                "per fuel while the oxygen lasts. Without oxygen they run as normal.").push("oxyFuel");
+    }
+
+    public static final ModConfigSpec.IntValue OXY_FUEL_TEMPERATURE_BONUS = BUILDER
+            .comment("°C added to the burn temperature (the Firebox's maximum, or the fuel's).")
+            .defineInRange("temperatureBonus", 300, 0, 2_000);
+
+    public static final ModConfigSpec.IntValue OXY_FUEL_MAX_TEMPERATURE = BUILDER
+            .comment("The hottest oxy-fuel burns, in °C.")
+            .defineInRange("maxTemperature", 1_600, 21, 10_000);
+
+    public static final ModConfigSpec.DoubleValue OXY_FUEL_HEAT_MULTIPLIER = BUILDER
+            .comment("Heat made per fuel on oxy-fuel, as a multiple of the normal heat.")
+            .defineInRange("heatMultiplier", 1.25, 1.0, 10.0);
 
     static {
         BUILDER.pop();
@@ -1357,6 +1394,59 @@ public class ArcforgeConfig {
         ore("tungsten", "Tungsten (wolframite ore): uncommon and deep.", true, 6, 6, -64, -16, 0.0);
         ore("arcite", "Arcite: rare, the deepest; needs a diamond pickaxe.", false, 4, 5, -64, -40, 0.2);
         ore("sulfur", "Nether Sulfur Ore: common through the Nether's netherrack; drops Sulfur Dust.", true, 12, 10, 10, 117, 0.0);
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Energy, Heat, Fluid and Gas Meters: pass flow from their left side to their right, up to a cap per tick, and",
+                "report the rate. The caps default to the Arcforged conduit rates.").push("meters");
+    }
+
+    public static final ModConfigSpec.IntValue METER_ENERGY_CAP = BUILDER
+            .comment("Most FE an Energy Meter passes per tick.")
+            .defineInRange("energyRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.energyPerTick(), 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue METER_HEAT_CAP = BUILDER
+            .comment("Most HU a Heat Meter passes per tick.")
+            .defineInRange("heatRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.heatPerTick(), 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue METER_FLUID_CAP = BUILDER
+            .comment("Most mB of liquid a Fluid Meter passes per tick.")
+            .defineInRange("fluidRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.fluidPerTick(), 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue METER_GAS_CAP = BUILDER
+            .comment("Most mB of gas a Gas Meter passes per tick.")
+            .defineInRange("gasRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.gasPerTick(), 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue METER_SMOOTHING_TICKS = BUILDER
+            .comment("The rate shown is the average over this many ticks.")
+            .defineInRange("smoothingTicks", 20, 1, 1_200);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Chargepad: charges the FE items of players standing on it, from FE fed into its back.").push("chargepad");
+    }
+
+    public static final ModConfigSpec.IntValue CHARGEPAD_CAPACITY = BUILDER
+            .comment("FE buffer size.")
+            .defineInRange("energyCapacity", 500_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue CHARGEPAD_MAX_INPUT = BUILDER
+            .comment("Most FE it takes in per tick.")
+            .defineInRange("maxInput", 8_192, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue CHARGEPAD_RATE_PER_ITEM = BUILDER
+            .comment("Most FE it gives one item per tick.")
+            .defineInRange("chargeRatePerItem", 2_048, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue CHARGEPAD_MAX_TRANSFER = BUILDER
+            .comment("Most FE it gives out per tick in all.")
+            .defineInRange("maxTransferPerTick", 8_192, 1, Integer.MAX_VALUE);
+
+    static {
         BUILDER.pop();
     }
 

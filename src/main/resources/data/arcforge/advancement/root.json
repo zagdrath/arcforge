@@ -1,0 +1,35 @@
+{
+  "display": {
+    "icon": {
+      "id": "arcforge:engineers_handbook"
+    },
+    "title": {
+      "translate": "advancements.arcforge.root.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.root.description"
+    },
+    "frame": "task",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false,
+    "background": "arcforge:gui/advancements/backgrounds/arcforge"
+  },
+  "criteria": {
+    "handbook": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:engineers_handbook"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "handbook"
+    ]
+  ]
+}

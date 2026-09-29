@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PGP",
+    "XCX",
+    "PRP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:glass_panes/colorless",
+    "C": "minecraft:comparator",
+    "R": "#c:dusts/redstone",
+    "X": "arcforge:tempered_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:energy_meter",
+    "count": 1
+  }
+}

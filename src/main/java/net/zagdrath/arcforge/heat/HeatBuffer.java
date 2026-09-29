@@ -12,7 +12,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 // A machine's store of heat (HU). Its temperature rises linearly with how full it is, from ambient
 // when empty to the machine's maximum when full. A producer that is making heat right now (a fire
 // burning, lava draining) sets a source temperature, and is at least that hot however full it is, so
-// its heat flows out at once instead of waiting for the buffer to fill. The owning machine adds and removes heat directly;
+// its heat flows out at once instead of waiting for the buffer to fill. Oxy-fuel lifts a buffer's ceiling above its
+// maximum (setCeiling): it then holds more heat, at the same °C per HU, up to the ceiling's temperature. The owning machine adds and removes heat directly;
 // other blocks see one of the one-way views (output() for producers, input() for consumers).
 public class HeatBuffer {
     public static final int AMBIENT_CELSIUS = 20;
@@ -21,6 +22,8 @@ public class HeatBuffer {
     private final int maxCelsius;
     private final Runnable onChanged;
     private int stored;
+    // How hot it may get: maxCelsius, or higher while a machine runs on oxy-fuel. Not saved: set every tick.
+    private int ceilingCelsius;
     // Not saved: the owning machine sets it every tick.
     private int sourceCelsius = AMBIENT_CELSIUS;
 
@@ -28,6 +31,7 @@ public class HeatBuffer {
         this.capacity = Math.max(1, capacity);
         this.maxCelsius = maxCelsius;
         this.onChanged = onChanged;
+        this.ceilingCelsius = maxCelsius;
     }
 
     public static int temperature(int stored, int capacity, int maxCelsius) {
@@ -50,7 +54,33 @@ public class HeatBuffer {
     }
 
     public int getTemperature() {
-        return Math.max(sourceCelsius, temperature(stored, capacity, maxCelsius));
+        if (maxCelsius <= AMBIENT_CELSIUS) {
+            return Math.max(sourceCelsius, AMBIENT_CELSIUS);
+        }
+        // Linear in what it holds, past maxCelsius when the ceiling let it fill further.
+        return Math.max(sourceCelsius, AMBIENT_CELSIUS + (int) ((long) (maxCelsius - AMBIENT_CELSIUS) * Math.max(0, stored) / capacity));
+    }
+
+    // Lets the buffer run hotter than its maximum (oxy-fuel), or back to it; never below maxCelsius.
+    public void setCeiling(int celsius) {
+        ceilingCelsius = Math.max(maxCelsius, celsius);
+    }
+
+    public int getCeiling() {
+        return ceilingCelsius;
+    }
+
+    // The most heat it may hold: its capacity, or more when the ceiling is above maxCelsius.
+    public int getLimit() {
+        return ceilingCelsius <= maxCelsius ? capacity : linearStored(ceilingCelsius);
+    }
+
+    // How much heat it holds at this temperature on its linear scale, uncapped.
+    private int linearStored(int celsius) {
+        if (maxCelsius <= AMBIENT_CELSIUS) {
+            return capacity;
+        }
+        return (int) Math.min(Integer.MAX_VALUE, (long) capacity * Math.max(0, celsius - AMBIENT_CELSIUS) / (maxCelsius - AMBIENT_CELSIUS));
     }
 
     // Whether the machine is making heat this tick: while it is, the buffer is at its maximum temperature.
@@ -60,32 +90,32 @@ public class HeatBuffer {
 
     // The machine is making heat this tick at this temperature (capped at the maximum).
     public void setProducingAt(int celsius) {
-        sourceCelsius = Math.min(celsius, maxCelsius);
+        sourceCelsius = Math.min(celsius, ceilingCelsius);
     }
 
     // How much heat the buffer holds at this temperature.
     public int storedAt(int celsius) {
-        if (celsius >= maxCelsius) {
-            return capacity;
+        if (celsius >= ceilingCelsius) {
+            return getLimit();
         }
-        return (int) ((long) capacity * Math.max(0, celsius - AMBIENT_CELSIUS) / (maxCelsius - AMBIENT_CELSIUS));
+        return linearStored(celsius);
     }
 
     // The least heat the buffer can hold and still be at least this hot (storedAt rounds down).
     public int minStoredAt(int celsius) {
-        if (celsius >= maxCelsius) {
-            return capacity;
+        if (celsius >= ceilingCelsius) {
+            return getLimit();
         }
         long span = maxCelsius - AMBIENT_CELSIUS;
         return (int) (((long) capacity * Math.max(0, celsius - AMBIENT_CELSIUS) + span - 1) / span);
     }
 
     public int getRoom() {
-        return capacity - stored;
+        return Math.max(0, getLimit() - stored);
     }
 
     public boolean isFull() {
-        return stored >= capacity;
+        return stored >= getLimit();
     }
 
     // Adds up to the given heat, returning how much fit.

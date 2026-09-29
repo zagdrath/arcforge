@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:root",
+  "display": {
+    "icon": {
+      "id": "arcforge:iron_dust"
+    },
+    "title": {
+      "translate": "advancements.arcforge.processing.dust.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.processing.dust.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "dust": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:dusts"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "dust"
+    ]
+  ]
+}

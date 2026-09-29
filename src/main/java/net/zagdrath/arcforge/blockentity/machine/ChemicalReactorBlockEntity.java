@@ -34,6 +34,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -274,6 +275,8 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         if (recipe.byproduct().isPresent() && level.getRandom().nextFloat() < recipe.byproductChance()) {
             add(SLOT_BYPRODUCT, recipe.byproduct().get().create());
         }
+        ArcforgeAdvancements.produced(this, recipe.itemOutput().map(template -> template.create()).orElse(ItemStack.EMPTY),
+                recipe.fluidOutput().map(template -> template.create().getFluid()).orElse(null), recipe.category());
     }
 
     private void add(int slot, ItemStack product) {

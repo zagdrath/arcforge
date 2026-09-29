@@ -35,6 +35,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -255,6 +256,9 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
             }
             tx.commit();
         }
+        ArcforgeAdvancements.produced(this, net.minecraft.world.item.ItemStack.EMPTY, recipe.primary().create().getFluid(), null);
+        recipe.secondary().ifPresent(secondary -> ArcforgeAdvancements.produced(this, net.minecraft.world.item.ItemStack.EMPTY,
+                secondary.create().getFluid(), null));
         // Whatever didn't fit was vented (only possible with venting on): a puff from the top.
         if (vented > 0) {
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, worldPosition.getX() + 0.5, worldPosition.getY() + 1.05,

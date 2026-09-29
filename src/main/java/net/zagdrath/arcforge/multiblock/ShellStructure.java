@@ -19,6 +19,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
@@ -303,6 +304,9 @@ public final class ShellStructure {
         }
         MultiblockAutomation.refresh(level, shell.min(), shell.max());
         MultiblockEffects.formed(level, shell.min(), shell.max());
+        if (level.getBlockEntity(shell.min()) instanceof ShellMultiblockBlockEntity master) {
+            ArcforgeAdvancements.formed(level, master, null);
+        }
     }
 
     private void unform(ServerLevel level, Shell shell) {

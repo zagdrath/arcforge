@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:root",
+  "display": {
+    "icon": {
+      "id": "arcforge:steam_boiler_array_casing"
+    },
+    "title": {
+      "translate": "advancements.arcforge.steam.boiler.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.steam.boiler.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:steam_boiler_array"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "title": "Oxy-Fuel",
+  "icon": "arcforge:fuel_burner",
+  "items": [
+    "arcforge:firebox",
+    "arcforge:fuel_burner",
+    "arcforge:electrolyzer",
+    "arcforge:tempered_pressurized_conduit"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Burning in oxygen instead of air makes a hotter, more efficient flame. The Firebox and the Fuel Burner both take oxygen.\n# Setting up\n- With the Wrench in Port mode (or in the Sides tab), set a face to Oxygen.\n- Pipe oxygen in with a Pressurized Conduit, from an Electrolyzer or a Pressurized Cylinder. The machine keeps a small oxygen tank (2,000 mB).\n# What it does\nWhile it has oxygen, a burning machine:\n- burns 300°C hotter, up to 1,600°C;\n- makes 25% more heat from each fuel;\n- uses 0.25 mB of oxygen per tick.\nWithout oxygen it works exactly as before. The flame in the GUI turns blue-white and the status reads Oxy-fuel. The Heat tab shows how much oxygen is left."
+    },
+    {
+      "type": "text",
+      "text": "# Why bother\n- A Firebox on oxy-fuel reaches 1,400°C: hot enough for Superheated Steam, which needs 900°C, with room to spare.\n- A Fuel Burner on hydrogen and oxygen hits the 1,600°C cap.\n- An Electrolyzer makes 1 mB of oxygen with every 2 mB of hydrogen, so a hydrogen burner can feed on its own oxygen."
+    }
+  ]
+}

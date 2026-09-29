@@ -1,0 +1,16 @@
+{
+  "title": "Meters",
+  "icon": "arcforge:energy_meter",
+  "items": [
+    "arcforge:energy_meter",
+    "arcforge:heat_meter",
+    "arcforge:fluid_meter",
+    "arcforge:gas_meter"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Meters sit in a line and measure what flows through them: in on the left side (as you face the screen), out on the right.\n- Energy Meter: FE, up to 65,536 FE/t.\n- Heat Meter: heat, up to 3,200 HU/t.\n- Fluid Meter: liquids only, up to 12,800 mB/t.\n- Gas Meter: gases only, through Pressurized Conduits, up to 25,600 mB/t.\nThe front screen shows the live rate.\n# Redstone\nIn the GUI, set a threshold and a mode:\n- Above: signal while the rate is above the threshold.\n- Below: signal while the rate is below it.\nThe meter outputs a signal of 15 on every side while the condition holds, and its LED lights. A comparator reads the rate on its own: 0 when idle, 15 at the meter's maximum."
+    }
+  ]
+}

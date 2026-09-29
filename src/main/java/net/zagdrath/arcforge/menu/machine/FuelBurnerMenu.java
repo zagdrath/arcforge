@@ -33,7 +33,11 @@ public class FuelBurnerMenu extends MachineMenu {
     public static final int DATA_STATUS = 8;
     public static final int DATA_REDSTONE_MODE = 9;
     public static final int DATA_SIDE_CONFIG = 10;
-    public static final int DATA_VALUES = 11;
+    // Oxy-fuel.
+    public static final int DATA_OXYGEN = 11;
+    public static final int DATA_OXYGEN_CAPACITY = 12;
+    public static final int DATA_OXY_ACTIVE = 13;
+    public static final int DATA_VALUES = 14;
 
     // Slot positions from fuel_burner_gui_layout.json (the Geothermal Plant's frame).
     public static final int BUCKET_IN_X = 31, BUCKET_IN_Y = 19;
@@ -97,6 +101,18 @@ public class FuelBurnerMenu extends MachineMenu {
 
     public int getHeatPerTick() {
         return value(DATA_HEAT_PER_TICK);
+    }
+
+    public int getOxygen() {
+        return value(DATA_OXYGEN);
+    }
+
+    public int getOxygenCapacity() {
+        return value(DATA_OXYGEN_CAPACITY);
+    }
+
+    public boolean isOxyActive() {
+        return value(DATA_OXY_ACTIVE) != 0;
     }
 
     // mB burnt per tick.

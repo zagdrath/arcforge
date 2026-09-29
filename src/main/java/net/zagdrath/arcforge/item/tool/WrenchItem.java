@@ -290,10 +290,16 @@ public class WrenchItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    // A filtered conduit side gives up its filter first (settings kept on the item); the next click breaks the conduit.
+    // A covered conduit gives up its cover first, then a filtered side its filter (settings kept on the item); the next
+    // click breaks the conduit.
     private static InteractionResult removeFilterOrBreak(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
+        if (level.getBlockEntity(pos) instanceof ConduitBlockEntity covered && covered.hasCover()) {
+            covered.setCover(null);
+            Block.popResource(level, pos, new ItemStack(ModItems.CONDUIT_COVER.get()));
+            return InteractionResult.SUCCESS;
+        }
         Direction side = ConduitBlock.sideAt(pos, context.getClickLocation());
         if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit && conduit.hasFilter(side)) {
             Block.popResource(level, pos, conduit.clearFilter(side));

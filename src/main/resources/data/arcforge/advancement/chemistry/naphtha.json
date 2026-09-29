@@ -1,0 +1,42 @@
+{
+  "parent": "arcforge:root",
+  "display": {
+    "icon": {
+      "id": "arcforge:naphtha_bucket"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.naphtha.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.naphtha.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "distilled": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:naphtha"
+      }
+    },
+    "bucket": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:naphtha_bucket"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "distilled",
+      "bucket"
+    ]
+  ]
+}

@@ -410,3 +410,42 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - Single-block machines may use UV-unwrapped element models (64x64 sheet, 1 px bevels per face) instead of cubes; emissive screens are separate animated textures with light_emission 15. First: Security Terminal (desk console, monitor tilted 22.5°).
 - Gas Turbine Array skin: the steam turbine's banded plates at double height with a thin Hardened-purple line; 3x3 end caps (48x48) drawn by the BER keep the outer 3 px clear for frame beams.
 - Any 3D machine with default ports follows "Ports": 8×8 plates at its default faces, on a socket to the block edge when the body is inset.
+
+## Meters, Chargepad, Conduit Cover, oxy-fuel, advancements
+- Meters (Energy / Heat / Fluid / Gas): the standard casing on every face.
+  - Front: a 10×8 LCD recess at x3..12, y3..10 with a `#16181B` floor; the renderer draws the rate there in
+    status cyan at full brightness.
+  - Under the screen: a 3 px type strip (FE red, Heat, input blue, gas `#DDF3FD` / `#7FC8F0`), a 4 px flow
+    arrow (→, pointing at the output side) and a 1×2 redstone LED at x12 (`#8E231C` off, `#FF8577` / `#E5483C`
+    on).
+  - The left and right sides carry the 8×8 port of their mode:
+    - Energy: FE red on both sides.
+    - Heat: Heat on both sides.
+    - Fluid: input blue on the left, output orange on the right.
+    - Gas: blue in / orange out with a gas-white chip.
+  - The back has a 3-slat vent.
+- Chargepad: a 2 px pad (x/z 1..15) with an offset hazard checker on its edge.
+  - Top: a recessed coil in `#2F6E68`, drawn emissive cyan (`#5FD4C4` / `#B8F2EA`) while charging.
+  - A thin housing at the back (x3..13, y0..14, z13..16), so the standing area runs to z13:
+    - a 4-segment charge gauge on its front, using the FE row lit and the cell dims unlit;
+    - the 8×8 FE port on its back face at the block edge (the housing is the socket).
+- Conduit Cover (default look): a translucent pane.
+  - Fill: `#DCE8EE` at alpha 40, with a `#DCE8EE` / `#A9BCC6` inner ring at alpha 140.
+  - A crisp opaque 1 px outline: `#727982` on the top and left, `#2B2F34` on the bottom and right.
+  - Two glass glints.
+  - Rendered translucent; a copied look uses that block's own model.
+- Oxy-fuel GUI: no new frames. The flame sprite swaps to `flame_oxy` (orange edge, blue-white core `#BFE0FF` /
+  `#F4FAFF`), the status reads "Oxy-fuel", and the oxygen level is a row in the Heat tab.
+- Meter GUI (no player inventory, like the Security Terminal): a 176×124 panel with the standard frame.
+  - The house screen recess (7,18)–(168,69):
+    - Rate label/value on row y 23;
+    - a 152×4 rate bar on a baked `#0E0E0E` track at (12,34), flat 3-tone in the kind's colour (FE cyan, Heat,
+      input blue, gas), with a 1×6 `#E0E0E0` threshold tick;
+    - the Threshold row on y 42;
+    - the status LED + text on y 56.
+  - Below the recess:
+    - "Signal when" with two 20×20 house buttons carrying the `meter_above` / `meter_below` icons (selected =
+      pressed + ACCENT outline);
+    - a threshold field recess (66,100)–(168,117) holding the EditBox, with the unit right-aligned inside it.
+- Advancement tab background: the wall plate one step darker (`#40454C` / `#383C42` split at x = 10) with
+  the riveted strap on rows 13–15.

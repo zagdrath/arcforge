@@ -13,6 +13,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
@@ -33,7 +34,9 @@ public class FireboxScreen extends MachineScreen<BurnerMenu> {
     public FireboxScreen(BurnerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "firebox", List.of(new HeatTab(menu::getStored,
                 Component.translatable("gui.arcforge.output"),
-                () -> Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getOutputPerTick()))));
+                () -> Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getOutputPerTick()),
+                List.of(new HeatTab.Row(null, () -> Component.translatable("gui.arcforge.heat_tab.oxygen", ArcforgeGui.grouped(menu.getOxygen()),
+                        ArcforgeGui.grouped(menu.getOxygenCapacity())), () -> menu.getOxygen() > 0)))));
     }
 
     @Override
@@ -44,7 +47,7 @@ public class FireboxScreen extends MachineScreen<BurnerMenu> {
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         ghost(graphics, ghostCoal, !menu.getFuelSlot().hasItem(), BurnerMenu.FUEL_SLOT_X, BurnerMenu.FUEL_SLOT_Y);
-        drawFlame(graphics, x, y, FLAME_X, FLAME_Y, menu.getBurnTime(), menu.getBurnTotal());
+        drawFlame(graphics, x, y, FLAME_X, FLAME_Y, menu.getBurnTime(), menu.getBurnTotal(), menu.isOxyActive());
         drawGauge(graphics, heatBuffer, x, y, BUFFER_X, BUFFER_Y, menu.getStored(), menu.getCapacity());
         drawHeatBar(graphics, x, y, HEAT_X, HEAT_Y, HEAT_W, menu.getTemperature());
         drawLed(graphics, x, y, LED_X, LED_Y);
@@ -66,8 +69,15 @@ public class FireboxScreen extends MachineScreen<BurnerMenu> {
             lines.add(Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getOutputPerTick()).withStyle(ChatFormatting.GOLD));
         } else if (isHovering(HEAT_X, HEAT_Y - 2, HEAT_W, 8, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.celsius", menu.getTemperature()));
-        } else if (isHovering(FLAME_X, FLAME_Y, FLAME_SIZE, FLAME_SIZE, mouseX, mouseY) && menu.getBurnTime() > 0) {
-            lines.add(Component.translatable("gui.arcforge.burn_time", (menu.getBurnTime() + 19) / 20));
+        } else if (isHovering(FLAME_X, FLAME_Y, FLAME_SIZE, FLAME_SIZE, mouseX, mouseY)) {
+            if (menu.getBurnTime() > 0) {
+                lines.add(Component.translatable("gui.arcforge.burn_time", (menu.getBurnTime() + 19) / 20));
+            }
+            if (menu.isOxyActive() || menu.getOxygen() > 0) {
+                addOxyFuelTooltip(lines, menu.getOxygen(), menu.getOxygenCapacity(), ArcforgeConfig.FIREBOX_OXYGEN_PER_TICK.getAsDouble());
+            }
+        } else if (menu.isOxyActive() && isHovering(STATUS_X, STATUS_Y, font.width(menu.getStatus().getDescription()), 9, mouseX, mouseY)) {
+            addOxyFuelTooltip(lines, menu.getOxygen(), menu.getOxygenCapacity(), ArcforgeConfig.FIREBOX_OXYGEN_PER_TICK.getAsDouble());
         }
     }
 }

@@ -87,7 +87,9 @@ public enum MachineStatus {
     IGNITING("igniting", "led_running"),
     FLAMEOUT("flameout", "led_blocked"),
     INTAKE_SHUT("intake_shut", "led_blocked"),
-    NO_SIGNAL("no_signal", "led_off");
+    NO_SIGNAL("no_signal", "led_off"),
+    // A Firebox or Fuel Burner burning with oxygen.
+    OXY_FUEL("oxy_fuel", "led_running");
 
     private final String name;
     private final String led;

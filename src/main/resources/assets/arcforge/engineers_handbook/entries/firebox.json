@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Burns coal, charcoal and coal blocks into heat: 80 HU/t, up to 1,100°C. The heat leaves through its heat face into touching machines or Thermodynamic Conduits.\nHeat upgrades get more heat from each fuel."
+      "text": "Burns coal, charcoal and coal blocks into heat: 80 HU/t, up to 1,100°C. The heat leaves through its heat face into touching machines or Thermodynamic Conduits.\nHeat upgrades get more heat from each fuel.\nFeed it oxygen for oxy-fuel: see Oxy-Fuel."
     }
   ]
 }

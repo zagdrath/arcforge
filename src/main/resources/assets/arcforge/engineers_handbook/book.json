@@ -26,6 +26,7 @@
         "firebox",
         "geothermal_plant",
         "fuel_burner",
+        "oxy_fuel",
         "gas_turbine_array",
         "hydrogen_and_oxygen",
         "solar_thermal_array",
@@ -116,9 +117,12 @@
         "conduits",
         "conduit_filters",
         "dyed_conduits",
+        "conduit_covers",
         "crates_and_vaults",
         "fluid_tanks",
         "energy_cells",
+        "meters",
+        "chargepad",
         "portable_storage"
       ]
     },

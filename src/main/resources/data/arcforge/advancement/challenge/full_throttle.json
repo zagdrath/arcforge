@@ -1,0 +1,32 @@
+{
+  "parent": "arcforge:chemistry/electrolyzer",
+  "display": {
+    "icon": {
+      "id": "arcforge:gas_turbine_array_casing"
+    },
+    "title": {
+      "translate": "advancements.arcforge.challenge.full_throttle.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.challenge.full_throttle.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "turbine": {
+      "trigger": "arcforge:turbine_full_speed",
+      "conditions": {
+        "multiblock": "arcforge:gas_turbine_array",
+        "min_signal": 15
+      }
+    }
+  },
+  "requirements": [
+    [
+      "turbine"
+    ]
+  ]
+}

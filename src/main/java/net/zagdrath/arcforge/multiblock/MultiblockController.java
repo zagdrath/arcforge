@@ -11,7 +11,10 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -26,6 +29,17 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 // mode's capability on each outer face that's a port. Its side configuration is kept only for auto-eject
 // and for carrying ports over from saves made before ports.
 public interface MultiblockController extends ConfigurableMachine {
+    // Which structure this is, for advancements (arcforge:multiblock_formed): its block entity type's id, e.g.
+    // arcforge:steam_turbine_array.
+    default Identifier multiblockId() {
+        return BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(((BlockEntity) this).getType());
+    }
+
+    // How many blocks long the structure is along its axis (the shell arrays), or 0.
+    default int length() {
+        return 0;
+    }
+
     // Every controller is a block entity.
     @Nullable Level getLevel();
 

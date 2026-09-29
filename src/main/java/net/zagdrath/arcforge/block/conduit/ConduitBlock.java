@@ -8,6 +8,7 @@ package net.zagdrath.arcforge.block.conduit;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
@@ -53,6 +54,11 @@ import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.item.conduit.ConduitFilterItem;
 import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.RenderShape;
+import net.zagdrath.arcforge.registry.ModItems;
 
 // A 6px pipe that auto-connects to conduits of the same type (any tier) and to machines. A side facing a
 // machine follows the machine's side configuration ("auto"), unless the wrench forces it to input,
@@ -136,6 +142,10 @@ public class ConduitBlock extends BaseEntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        // A covered conduit is a full block to click, stand on and see (its collision and visual shapes follow this).
+        if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit && conduit.hasCover()) {
+            return Shapes.block();
+        }
         return shapeCache.computeIfAbsent(state, ConduitBlock::buildShape);
     }
 
@@ -323,18 +333,55 @@ public class ConduitBlock extends BaseEntityBlock {
         return Direction.getApproximateNearest(hit.subtract(Vec3.atCenterOf(pos)));
     }
 
-    // A Conduit Filter in hand goes on to the item (installing it) rather than being handled here.
+    // A Conduit Filter in hand goes on to the item (installing it) rather than being handled here. A Conduit Cover
+    // encases a bare conduit; a full block held against a covered one copies its look onto the cover.
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (stack.getItem() instanceof ConduitFilterItem) {
             return InteractionResult.PASS;
         }
+        if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
+            if (stack.is(ModItems.CONDUIT_COVER.get()) && !conduit.hasCover()) {
+                if (!level.isClientSide()) {
+                    conduit.setCover(ConduitBlockEntity.Cover.PLAIN);
+                    stack.consume(1, player);
+                    level.playSound(null, pos, SoundEvents.METAL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+                }
+                return InteractionResult.SUCCESS;
+            }
+            if (conduit.hasCover() && stack.getItem() instanceof BlockItem blockItem) {
+                BlockState look = blockItem.getBlock().defaultBlockState();
+                if (!level.isClientSide()) {
+                    if (isFullSolidBlock(look, level, pos)) {
+                        conduit.setCover(new ConduitBlockEntity.Cover(Optional.of(look)));
+                        player.sendOverlayMessage(Component.translatable("message.arcforge.cover.look_set", look.getBlock().getName()));
+                    } else {
+                        player.sendOverlayMessage(Component.translatable("message.arcforge.cover.not_full_block"));
+                    }
+                }
+                return InteractionResult.SUCCESS;
+            }
+        }
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
 
-    // An empty hand on a filtered side opens that filter's settings.
+    // What a cover can look like: a full, solid, opaque cube drawn by its model, with no block entity.
+    public static boolean isFullSolidBlock(BlockState look, BlockGetter level, BlockPos pos) {
+        return look.isCollisionShapeFullBlock(level, pos) && look.canOcclude() && !look.hasBlockEntity() && look.getRenderShape() == RenderShape.MODEL;
+    }
+
+    // Sneaking with an empty hand clears a cover's copied look; otherwise an empty hand on a filtered side opens that
+    // filter's settings.
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
+        if (player.isShiftKeyDown() && player.getMainHandItem().isEmpty() && level.getBlockEntity(pos) instanceof ConduitBlockEntity covered
+                && covered.getCover() != null && covered.getCover().look().isPresent()) {
+            if (!level.isClientSide()) {
+                covered.setCover(ConduitBlockEntity.Cover.PLAIN);
+                player.sendOverlayMessage(Component.translatable("message.arcforge.cover.cleared"));
+            }
+            return InteractionResult.SUCCESS;
+        }
         Direction side = sideAt(pos, hit.getLocation());
         if (!player.getMainHandItem().isEmpty() || !(level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) || !conduit.hasFilter(side)) {
             return InteractionResult.PASS;

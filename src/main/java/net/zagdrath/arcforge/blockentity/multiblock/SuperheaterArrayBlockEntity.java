@@ -28,6 +28,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -201,6 +202,9 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
             steamIn.extract(0, in.resource(), n, tx);
             steamOut.insert(0, out.resource(), n, tx);
             tx.commit();
+        }
+        if (n > 0) {
+            ArcforgeAdvancements.produced(this, net.minecraft.world.item.ItemStack.EMPTY, out.resource().getFluid(), null);
         }
     }
 

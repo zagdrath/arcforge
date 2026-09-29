@@ -100,6 +100,18 @@ public final class ModCapabilities {
                 FireboxBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FIREBOX.get(),
                 FireboxBlockEntity::getItemHandler);
+        // Oxygen faces take oxygen for oxy-fuel.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FIREBOX.get(),
+                FireboxBlockEntity::getFluidHandler);
+        // Meters: in on their left, out on their right; the Chargepad takes FE through its back.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.METER.get(),
+                net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.METER.get(),
+                net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.METER.get(),
+                net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHARGEPAD.get(),
+                net.zagdrath.arcforge.blockentity.logistics.ChargepadBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_CRUSHER.get(),
                 ArcCrusherBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ARC_CRUSHER.get(),

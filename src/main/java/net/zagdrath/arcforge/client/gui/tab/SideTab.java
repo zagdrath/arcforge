@@ -68,11 +68,20 @@ public abstract class SideTab {
     }
 
     public int getWidth() {
-        return progress <= 0 ? COLLAPSED_WIDTH : Math.round(Mth.lerp(progress, SELECTED_WIDTH, expandedWidth));
+        return progress <= 0 ? COLLAPSED_WIDTH : Math.round(Mth.lerp(progress, SELECTED_WIDTH, expandedWidth()));
     }
 
     public int getHeight() {
-        return Math.round(Mth.lerp(progress, COLLAPSED_HEIGHT, expandedHeight));
+        return Math.round(Mth.lerp(progress, COLLAPSED_HEIGHT, expandedHeight()));
+    }
+
+    // The open panel's size. A tab whose content changes can size it to what it shows now.
+    protected int expandedWidth() {
+        return expandedWidth;
+    }
+
+    protected int expandedHeight() {
+        return expandedHeight;
     }
 
     public boolean isFullyOpen() {

@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.compat.jade;
 
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -15,6 +16,9 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
+import net.zagdrath.arcforge.heat.OxyFuel;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
@@ -34,7 +38,8 @@ import snownee.jade.api.view.ProgressView;
 
 // Heat (HU) in anything that holds it: heat machines, Heat Cells, formed arrays and Thermodynamic Conduits
 // (whose whole network is shown). A bar filled by how much is stored, coloured by how hot it is, with the
-// temperature and the amount on it. This half gathers the data on the server; Client draws it.
+// temperature and the amount on it; a Firebox or Fuel Burner also shows its oxygen and when it's on oxy-fuel.
+// This half gathers the data on the server; Client draws it.
 public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, HeatProvider.Data> {
     INSTANCE;
 
@@ -43,12 +48,19 @@ public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, Heat
     private static final int COLD = 0xFF5A8FD6, HOT = 0xFFFF5A1F;
     private static final int COLD_CELSIUS = 20, HOT_CELSIUS = 1_400;
 
-    public record Data(int stored, int capacity, int celsius) {
+    // oxygen: mB of oxygen held (a burner with oxy-fuel), or -1.
+    public record Data(int stored, int capacity, int celsius, int oxygen, boolean oxyActive) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Data::stored,
                 ByteBufCodecs.VAR_INT, Data::capacity,
                 ByteBufCodecs.VAR_INT, Data::celsius,
+                ByteBufCodecs.INT, Data::oxygen,
+                ByteBufCodecs.BOOL, Data::oxyActive,
                 Data::new);
+
+        Data(int stored, int capacity, int celsius) {
+            this(stored, capacity, celsius, -1, false);
+        }
     }
 
     @Override
@@ -68,7 +80,13 @@ public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, Heat
         BlockPos machine = WindowProviders.machinePos(level, accessor.getPosition());
         BlockPos pos = machine != null ? machine : accessor.getPosition();
         HeatHandler heat = level.getCapability(ModCapabilities.HEAT, pos, null);
-        return heat != null && heat.getMaxHeat() > 0 ? new Data(heat.getHeat(), heat.getMaxHeat(), heat.getTemperature()) : null;
+        if (heat == null || heat.getMaxHeat() <= 0) {
+            return null;
+        }
+        OxyFuel oxy = accessor.getBlockEntity() instanceof FireboxBlockEntity firebox ? firebox.getOxyFuel()
+                : accessor.getBlockEntity() instanceof FuelBurnerBlockEntity burner ? burner.getOxyFuel() : null;
+        return oxy != null ? new Data(heat.getHeat(), heat.getMaxHeat(), heat.getTemperature(), oxy.getTank().getAmount(), oxy.isActive())
+                : new Data(heat.getHeat(), heat.getMaxHeat(), heat.getTemperature());
     }
 
     @Override
@@ -96,6 +114,13 @@ public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, Heat
                         new ProgressView.PartBuilder().progress(ratio).color(heatColor(data.celsius())).build(),
                         text, JadeUI.progressStyle(), BoxStyle.nestedBox());
                 tooltip.add(JadeUI.progress(view));
+                if (data.oxyActive()) {
+                    tooltip.add(Component.translatable("jade.arcforge.oxy_fuel").withStyle(ChatFormatting.AQUA));
+                }
+                if (data.oxygen() > 0) {
+                    tooltip.add(Component.translatable("jade.arcforge.oxygen", display.humanReadableNumber(data.oxygen(), "", false))
+                            .withStyle(ChatFormatting.GRAY));
+                }
             });
         }
 

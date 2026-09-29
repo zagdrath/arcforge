@@ -19,6 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
@@ -205,6 +206,7 @@ public final class CarbonizerStructure {
         MultiblockAutomation.refresh(level, formation.min(), formation.max());
         if (!unchanged) {
             MultiblockEffects.formed(level, formation.min(), formation.max());
+            ArcforgeAdvancements.formed(level, controller, null);
         }
     }
 

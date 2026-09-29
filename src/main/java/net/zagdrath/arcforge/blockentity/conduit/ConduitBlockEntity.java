@@ -8,6 +8,8 @@ package net.zagdrath.arcforge.blockentity.conduit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
@@ -50,6 +52,7 @@ import net.zagdrath.arcforge.conduit.item.ItemPacket;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.item.tool.SettingsCopyable;
+import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 
@@ -66,10 +69,21 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     public static final ModelProperty<Integer> FILTER_MODES = new ModelProperty<>();
     // The sheath colour for the model: 0 unsheathed, else the dye id + 1.
     public static final ModelProperty<Integer> COLOR = new ModelProperty<>();
+    // The Conduit Cover, if one is fitted (see ConduitCoverModel).
+    public static final ModelProperty<Cover> COVER = new ModelProperty<>();
+
+    // A Conduit Cover: the clear default pane, or the look of a full block copied onto it.
+    public record Cover(Optional<BlockState> look) {
+        public static final Cover PLAIN = new Cover(Optional.empty());
+        public static final Codec<Cover> CODEC = RecordCodecBuilder.create(i -> i.group(
+                BlockState.CODEC.optionalFieldOf("look").forGetter(Cover::look))
+                .apply(i, Cover::new));
+    }
 
     private final SideSetting[] settings = new SideSetting[Direction.values().length];
     // The plastic sheath's colour, or null: sheathed conduits connect only to their own colour (or to unsheathed ones).
     private @Nullable DyeColor color;
+    private @Nullable Cover cover;
     // The Conduit Filter on each side (ItemStack.EMPTY if none).
     private final ItemStack[] filters = new ItemStack[Direction.values().length];
     private final List<ItemPacket> packets = new ArrayList<>();
@@ -219,7 +233,7 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
 
     @Override
     public ModelData getModelData() {
-        return ModelData.builder().with(FILTER_MODES, packFilterModes()).with(COLOR, color == null ? 0 : color.getId() + 1).build();
+        return ModelData.builder().with(FILTER_MODES, packFilterModes()).with(COLOR, color == null ? 0 : color.getId() + 1).with(COVER, cover).build();
     }
 
     // --- Sheath colour ---
@@ -464,6 +478,10 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
             Containers.dropItemStack(level, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, stack);
         }
         storedItems.clear();
+        if (cover != null) {
+            Block.popResource(level, pos, new ItemStack(ModItems.CONDUIT_COVER.get()));
+            cover = null;
+        }
         // Filters drop with their settings.
         for (Direction side : Direction.values()) {
             if (hasFilter(side)) {
@@ -495,6 +513,30 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         fluid = FluidStack.EMPTY;
     }
 
+    // --- Conduit Cover ---
+
+    public @Nullable Cover getCover() {
+        return cover;
+    }
+
+    public boolean hasCover() {
+        return cover != null;
+    }
+
+    // Fits, changes or (null) takes off the cover. Only the model and the shape change: the conduit keeps its
+    // connections and network.
+    public void setCover(@Nullable Cover cover) {
+        if (Objects.equals(cover, this.cover)) {
+            return;
+        }
+        this.cover = cover;
+        setChanged();
+        if (level != null) {
+            requestModelDataUpdate();
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
+        }
+    }
+
     // --- Saving and syncing ---
 
     @Override
@@ -521,6 +563,8 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         flowingGas = input.read("flowing_gas", BuiltInRegistries.FLUID.byNameCodec()).orElse(Fluids.EMPTY);
         itemSpeed = input.getFloatOr("item_speed", 0.0F);
         int filterModesBefore = packFilterModes();
+        Cover coverBefore = cover;
+        cover = input.read("cover", Cover.CODEC).orElse(null);
         Arrays.fill(filters, ItemStack.EMPTY);
         input.listOrEmpty("filters", InstalledFilter.CODEC).forEach(installed -> {
             if (installed.side() >= 0 && installed.side() < filters.length) {
@@ -529,8 +573,8 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         });
         if (level != null && level.isClientSide()) {
             syncGlow();
-            // The sleeves on the arms are part of the block model: redraw when their looks change.
-            if (packFilterModes() != filterModesBefore) {
+            // The sleeves on the arms and the cover are part of the block model: redraw when their looks change.
+            if (packFilterModes() != filterModesBefore || !Objects.equals(cover, coverBefore)) {
                 requestModelDataUpdate();
                 level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
             }
@@ -568,6 +612,9 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         }
         if (!fluid.isEmpty()) {
             output.store("fluid", FluidStack.OPTIONAL_CODEC, fluid);
+        }
+        if (cover != null) {
+            output.store("cover", Cover.CODEC, cover);
         }
         if (flowingGas != Fluids.EMPTY) {
             output.store("flowing_gas", BuiltInRegistries.FLUID.byNameCodec(), flowingGas);

@@ -40,6 +40,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -296,6 +297,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         MultiblockAutomation.refresh(level, getMinCorner(), getMaxCorner());
         if (formed && level instanceof ServerLevel serverLevel) {
             MultiblockEffects.formed(serverLevel, getMinCorner(), getMaxCorner());
+            ArcforgeAdvancements.formed(serverLevel, this, null);
         }
     }
 

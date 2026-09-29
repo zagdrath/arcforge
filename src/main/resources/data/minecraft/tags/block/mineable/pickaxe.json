@@ -114,6 +114,11 @@
     "arcforge:arc_quarry_bounding",
     "arcforge:security_terminal",
     "arcforge:throttle_lever",
+    "arcforge:energy_meter",
+    "arcforge:heat_meter",
+    "arcforge:fluid_meter",
+    "arcforge:gas_meter",
+    "arcforge:chargepad",
     "arcforge:fermenter",
     "arcforge:gas_turbine_array_casing"
   ]

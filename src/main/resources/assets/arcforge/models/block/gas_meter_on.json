@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/meter/gas_front_on",
+    "south": "arcforge:block/meter/back",
+    "east": "arcforge:block/meter/gas_in",
+    "west": "arcforge:block/meter/gas_out",
+    "up": "arcforge:block/meter/top",
+    "down": "arcforge:block/meter/bottom",
+    "particle": "arcforge:block/meter/top"
+  }
+}

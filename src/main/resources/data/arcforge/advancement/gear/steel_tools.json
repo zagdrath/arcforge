@@ -1,0 +1,43 @@
+{
+  "parent": "arcforge:root",
+  "display": {
+    "icon": {
+      "id": "arcforge:steel_pickaxe"
+    },
+    "title": {
+      "translate": "advancements.arcforge.gear.steel_tools.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.gear.steel_tools.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "tool": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "arcforge:steel_sword",
+              "arcforge:steel_pickaxe",
+              "arcforge:steel_axe",
+              "arcforge:steel_shovel",
+              "arcforge:steel_hoe",
+              "arcforge:steel_hammer",
+              "arcforge:steel_excavator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "tool"
+    ]
+  ]
+}

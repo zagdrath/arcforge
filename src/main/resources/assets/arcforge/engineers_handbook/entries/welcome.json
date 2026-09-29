@@ -5,7 +5,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Arcforge is about power, heat and industry: burn fuel for heat, turn heat into Forge Energy (FE), make steel, and build bigger and better machines from it.\n# How to read this book\n- Each chapter covers one part of the mod.\n- Click the items at the top of an entry to see their recipes (with JEI installed).\n- Multiblock entries show the build step by step: drag to turn it, scroll or use the arrows to go layer by layer.\n- In your inventory, hold Shift over any Arcforge item for a short description.\n# A good path\n1. Heat and power: a Firebox and a Thermoelectric Plant.\n2. Steel: a Carbonizer for coal coke, then the Arcforge Furnace.\n3. Processing: crush, press and smelt with FE.\n4. Steam: boilers and turbines for serious power."
+      "text": "Arcforge is about power, heat and industry: burn fuel for heat, turn heat into Forge Energy (FE), make steel, and build bigger and better machines from it.\n# How to read this book\n- Each chapter covers one part of the mod.\n- Click the items at the top of an entry to see their recipes (with JEI installed).\n- Multiblock entries show the build step by step: drag to turn it, scroll or use the arrows to go layer by layer.\n- In your inventory, hold Shift over any Arcforge item for a short description.\n# A good path\n1. Heat and power: a Firebox and a Thermoelectric Plant.\n2. Craft a Wrench first; then steel: a Carbonizer for coal coke, then the Arcforge Furnace.\n3. Processing: crush, press and smelt with FE.\n4. Steam: boilers and turbines for serious power.\nYour progress shows in the Arcforge advancement tab (press L)."
     }
   ]
 }

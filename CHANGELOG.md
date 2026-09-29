@@ -24,6 +24,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Upgrading
 
+- **New config keys** (`oxyFuel`, the Firebox's and Fuel Burner's oxygen tank, `meters`, `chargepad`) get their
+  defaults; nothing to redo.
 - **Fuel Burner maximum temperature.** The default is now 1,400°C, so hydrogen burns at its full 1,400°C.
   - An existing `arcforge-common.toml` keeps its old value (1,200).
   - Set `power.fuelBurner.maxTemperature` to 1400 by hand, or hydrogen stops at 1,200°C.
@@ -51,6 +53,19 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Added
 
+- **Advancements.** An Arcforge tab, starting from the Engineer's Handbook, with six branches (Getting Started,
+  Steel, Processing, Steam, Chemistry, Gear) and four challenges. Each one says what to do next.
+- **Oxy-fuel.** The Firebox and Fuel Burner take oxygen through an Oxygen face. With it, they burn 300°C hotter (up
+  to 1,600°C) and make 25% more heat per fuel, for 0.25 mB of oxygen a tick. Without it, nothing changes. Values
+  under `oxyFuel`, `firebox` and `fuelBurner` in the config.
+- **Conduit Cover.** Right-click a conduit to hide it inside a clear, outlined pane; it keeps working and
+  connecting as before. Right-click the cover with any full block to copy that block's look, sneak-right-click
+  with an empty hand to clear it, and take it off with the Wrench (Dismantle). 8 from steel plates and glass.
+- **Meters.** Energy, Heat, Fluid and Gas Meters pass flow from their left side to their right, at up to the
+  Arcforged conduit rate, and show the live rate on their screen. Set a threshold and Above/Below in the GUI for a
+  redstone signal; comparators read the rate.
+- **Chargepad.** Stand on it to charge the FE items in your hand, hotbar and armour slots. Feed it through the
+  energy port on its back.
 - **Settings Card.** Sneak-use it on a machine, conduit, Vault or multiblock to copy its setup (sides or ports,
   redstone mode, auto-eject, and extras such as the Electrolyzer's vents, the Arc Quarry's area and filter or
   a boiler's pressure); use it on another of the same kind to paste. Multiblocks must be the same size; ports
@@ -226,6 +241,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Fixed
 
+- **The Wrench can be crafted.** Three iron ingots and a copper ingot, early enough to set ports on the
+  Carbonizer and Arcforge Furnace before you have steel. It was creative-only before.
 - **Wrong port marks on machine textures.** The Block Placer's back showed an input port instead of energy.
   The Electrolyzer and Geothermal Plant bottoms showed ports they don't have, and the Fuel Burner's sides had a
   stray red nub.

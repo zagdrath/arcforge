@@ -61,6 +61,7 @@ import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.client.model.ConduitCoverModel;
 import net.zagdrath.arcforge.client.model.ConduitFilterModel;
 import net.zagdrath.arcforge.client.model.ConduitSheathModel;
 import net.zagdrath.arcforge.client.model.PortNozzleModel;
@@ -178,6 +179,7 @@ public class ArcforgeClient {
     static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.ARC_TOOL.get(), ArcToolScreen::new);
         event.register(ModMenuTypes.SECURITY_TERMINAL.get(), SecurityTerminalScreen::new);
+        event.register(ModMenuTypes.METER.get(), net.zagdrath.arcforge.client.screen.logistics.MeterScreen::new);
         event.register(ModMenuTypes.GEOTHERMAL_PLANT.get(), GeothermalPlantScreen::new);
         event.register(ModMenuTypes.COMBUSTION_PLANT.get(), CombustionPlantScreen::new);
         event.register(ModMenuTypes.FIREBOX.get(), FireboxScreen::new);
@@ -419,6 +421,7 @@ public class ArcforgeClient {
         }
         ConduitFilterModel.registerStandalone(event);
         ConduitSheathModel.registerStandalone(event);
+        ConduitCoverModel.registerStandalone(event);
     }
 
     // The Gas Turbine Array's exhaust haze.
@@ -432,6 +435,7 @@ public class ArcforgeClient {
     static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
         ConduitFilterModel.wrap(event);
         ConduitSheathModel.wrap(event);
+        ConduitCoverModel.wrap(event);
     }
 
     // A sheathed conduit item's band colour.
@@ -454,6 +458,7 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), GasTurbineArrayRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.METER.get(), net.zagdrath.arcforge.client.renderer.blockentity.MeterRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARC_QUARRY.get(), ArcQuarryRenderer::new);

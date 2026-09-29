@@ -75,6 +75,11 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
         return shell;
     }
 
+    @Override
+    public int length() {
+        return shell != null ? shell.length() : 0;
+    }
+
     public void setShell(ShellStructure.@Nullable Shell shell) {
         this.shell = shell;
         windowQuads = null;

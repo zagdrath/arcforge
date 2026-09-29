@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.menu.machine.ArcMelterMenu;
 import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
 import net.zagdrath.arcforge.menu.machine.ElectrolyzerMenu;
 import net.zagdrath.arcforge.menu.machine.SecurityTerminalMenu;
+import net.zagdrath.arcforge.menu.logistics.MeterMenu;
 import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
 import net.zagdrath.arcforge.menu.machine.ArcQuarryConfigMenu;
 import net.zagdrath.arcforge.menu.machine.ArcQuarryMenu;
@@ -93,6 +94,8 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<SecurityTerminalMenu>> SECURITY_TERMINAL = MENU_TYPES.register("security_terminal",
             () -> IMenuTypeExtension.create(SecurityTerminalMenu::new));
+
+    public static final Supplier<MenuType<MeterMenu>> METER = MENU_TYPES.register("meter", () -> IMenuTypeExtension.create(MeterMenu::new));
 
     public static final Supplier<MenuType<ArcMelterMenu>> ARC_MELTER = MENU_TYPES.register("arc_melter",
             () -> IMenuTypeExtension.create(ArcMelterMenu::new));

@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:steam/boiler",
+  "display": {
+    "icon": {
+      "id": "arcforge:superheater_array_casing"
+    },
+    "title": {
+      "translate": "advancements.arcforge.steam.superheated_steam.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.steam.superheated_steam.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "steam": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:superheated_steam"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "steam"
+    ]
+  ]
+}

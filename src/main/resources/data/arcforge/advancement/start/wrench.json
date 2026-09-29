@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:root",
+  "display": {
+    "icon": {
+      "id": "arcforge:wrench"
+    },
+    "title": {
+      "translate": "advancements.arcforge.start.wrench.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.start.wrench.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "wrench": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:wrench"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "wrench"
+    ]
+  ]
+}

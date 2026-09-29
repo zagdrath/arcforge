@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/meter/heat_front_on",
+    "south": "arcforge:block/meter/back",
+    "east": "arcforge:block/meter/heat_in",
+    "west": "arcforge:block/meter/heat_out",
+    "up": "arcforge:block/meter/top",
+    "down": "arcforge:block/meter/bottom",
+    "particle": "arcforge:block/meter/top"
+  }
+}

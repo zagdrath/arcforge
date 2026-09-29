@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:steel/arcforge_furnace",
+  "display": {
+    "icon": {
+      "id": "arcforge:steel_ingot"
+    },
+    "title": {
+      "translate": "advancements.arcforge.steel.steel_ingot.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.steel.steel_ingot.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "steel": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:steel_ingot"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "steel"
+    ]
+  ]
+}

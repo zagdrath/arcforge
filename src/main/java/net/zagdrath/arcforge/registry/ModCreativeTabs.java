@@ -69,6 +69,11 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.SOLAR_THERMAL_ARRAY_CASING.get());
                 output.accept(ModItems.SOLAR_COLLECTOR.get());
                 ModItems.allStorage().forEach(item -> output.accept(item.get()));
+                output.accept(ModItems.ENERGY_METER.get());
+                output.accept(ModItems.HEAT_METER.get());
+                output.accept(ModItems.FLUID_METER.get());
+                output.accept(ModItems.GAS_METER.get());
+                output.accept(ModItems.CHARGEPAD.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS = CREATIVE_MODE_TABS.register("materials", () -> CreativeModeTab.builder()
@@ -152,6 +157,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 ModItems.allConduits().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.CONDUIT_FILTER.get());
+                output.accept(ModItems.CONDUIT_COVER.get());
                 ModItems.allCratesAndVaults().forEach(item -> output.accept(item.get()));
                 ModItems.storageUpgrades().forEach(item -> output.accept(item.get()));
             }).build());

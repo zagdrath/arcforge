@@ -1,0 +1,154 @@
+{
+  "variants": {
+    "charge=0,charging=false,facing=north": {
+      "model": "arcforge:block/chargepad/level_0"
+    },
+    "charge=0,charging=true,facing=north": {
+      "model": "arcforge:block/chargepad/level_0_on"
+    },
+    "charge=1,charging=false,facing=north": {
+      "model": "arcforge:block/chargepad/level_1"
+    },
+    "charge=1,charging=true,facing=north": {
+      "model": "arcforge:block/chargepad/level_1_on"
+    },
+    "charge=2,charging=false,facing=north": {
+      "model": "arcforge:block/chargepad/level_2"
+    },
+    "charge=2,charging=true,facing=north": {
+      "model": "arcforge:block/chargepad/level_2_on"
+    },
+    "charge=3,charging=false,facing=north": {
+      "model": "arcforge:block/chargepad/level_3"
+    },
+    "charge=3,charging=true,facing=north": {
+      "model": "arcforge:block/chargepad/level_3_on"
+    },
+    "charge=4,charging=false,facing=north": {
+      "model": "arcforge:block/chargepad/level_4"
+    },
+    "charge=4,charging=true,facing=north": {
+      "model": "arcforge:block/chargepad/level_4_on"
+    },
+    "charge=0,charging=false,facing=east": {
+      "model": "arcforge:block/chargepad/level_0",
+      "y": 90
+    },
+    "charge=0,charging=true,facing=east": {
+      "model": "arcforge:block/chargepad/level_0_on",
+      "y": 90
+    },
+    "charge=1,charging=false,facing=east": {
+      "model": "arcforge:block/chargepad/level_1",
+      "y": 90
+    },
+    "charge=1,charging=true,facing=east": {
+      "model": "arcforge:block/chargepad/level_1_on",
+      "y": 90
+    },
+    "charge=2,charging=false,facing=east": {
+      "model": "arcforge:block/chargepad/level_2",
+      "y": 90
+    },
+    "charge=2,charging=true,facing=east": {
+      "model": "arcforge:block/chargepad/level_2_on",
+      "y": 90
+    },
+    "charge=3,charging=false,facing=east": {
+      "model": "arcforge:block/chargepad/level_3",
+      "y": 90
+    },
+    "charge=3,charging=true,facing=east": {
+      "model": "arcforge:block/chargepad/level_3_on",
+      "y": 90
+    },
+    "charge=4,charging=false,facing=east": {
+      "model": "arcforge:block/chargepad/level_4",
+      "y": 90
+    },
+    "charge=4,charging=true,facing=east": {
+      "model": "arcforge:block/chargepad/level_4_on",
+      "y": 90
+    },
+    "charge=0,charging=false,facing=south": {
+      "model": "arcforge:block/chargepad/level_0",
+      "y": 180
+    },
+    "charge=0,charging=true,facing=south": {
+      "model": "arcforge:block/chargepad/level_0_on",
+      "y": 180
+    },
+    "charge=1,charging=false,facing=south": {
+      "model": "arcforge:block/chargepad/level_1",
+      "y": 180
+    },
+    "charge=1,charging=true,facing=south": {
+      "model": "arcforge:block/chargepad/level_1_on",
+      "y": 180
+    },
+    "charge=2,charging=false,facing=south": {
+      "model": "arcforge:block/chargepad/level_2",
+      "y": 180
+    },
+    "charge=2,charging=true,facing=south": {
+      "model": "arcforge:block/chargepad/level_2_on",
+      "y": 180
+    },
+    "charge=3,charging=false,facing=south": {
+      "model": "arcforge:block/chargepad/level_3",
+      "y": 180
+    },
+    "charge=3,charging=true,facing=south": {
+      "model": "arcforge:block/chargepad/level_3_on",
+      "y": 180
+    },
+    "charge=4,charging=false,facing=south": {
+      "model": "arcforge:block/chargepad/level_4",
+      "y": 180
+    },
+    "charge=4,charging=true,facing=south": {
+      "model": "arcforge:block/chargepad/level_4_on",
+      "y": 180
+    },
+    "charge=0,charging=false,facing=west": {
+      "model": "arcforge:block/chargepad/level_0",
+      "y": 270
+    },
+    "charge=0,charging=true,facing=west": {
+      "model": "arcforge:block/chargepad/level_0_on",
+      "y": 270
+    },
+    "charge=1,charging=false,facing=west": {
+      "model": "arcforge:block/chargepad/level_1",
+      "y": 270
+    },
+    "charge=1,charging=true,facing=west": {
+      "model": "arcforge:block/chargepad/level_1_on",
+      "y": 270
+    },
+    "charge=2,charging=false,facing=west": {
+      "model": "arcforge:block/chargepad/level_2",
+      "y": 270
+    },
+    "charge=2,charging=true,facing=west": {
+      "model": "arcforge:block/chargepad/level_2_on",
+      "y": 270
+    },
+    "charge=3,charging=false,facing=west": {
+      "model": "arcforge:block/chargepad/level_3",
+      "y": 270
+    },
+    "charge=3,charging=true,facing=west": {
+      "model": "arcforge:block/chargepad/level_3_on",
+      "y": 270
+    },
+    "charge=4,charging=false,facing=west": {
+      "model": "arcforge:block/chargepad/level_4",
+      "y": 270
+    },
+    "charge=4,charging=true,facing=west": {
+      "model": "arcforge:block/chargepad/level_4_on",
+      "y": 270
+    }
+  }
+}

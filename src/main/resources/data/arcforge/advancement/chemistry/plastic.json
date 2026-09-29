@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:chemistry/electrolyzer",
+  "display": {
+    "icon": {
+      "id": "arcforge:plastic_sheet"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.plastic.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.plastic.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "plastic": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:plastic_sheet"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "plastic"
+    ]
+  ]
+}

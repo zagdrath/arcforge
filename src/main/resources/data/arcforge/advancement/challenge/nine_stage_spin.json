@@ -1,0 +1,32 @@
+{
+  "parent": "arcforge:steam/condenser",
+  "display": {
+    "icon": {
+      "id": "arcforge:steam_turbine_array_casing"
+    },
+    "title": {
+      "translate": "advancements.arcforge.challenge.nine_stage_spin.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.challenge.nine_stage_spin.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "turbine": {
+      "trigger": "arcforge:turbine_full_speed",
+      "conditions": {
+        "multiblock": "arcforge:steam_turbine_array",
+        "min_length": 9
+      }
+    }
+  },
+  "requirements": [
+    [
+      "turbine"
+    ]
+  ]
+}

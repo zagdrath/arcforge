@@ -42,9 +42,11 @@ public class FuelBurnerScreen extends MachineScreen<FuelBurnerMenu> {
         super(menu, inventory, title, "fuel_burner", List.of(new HeatTab(menu::getHeat,
                 Component.translatable("gui.arcforge.output"),
                 () -> Component.translatable("gui.arcforge.hu_per_tick_gain", menu.getHeatPerTick()),
-                Component.translatable("gui.arcforge.fuel"),
-                () -> Component.translatable("gui.arcforge.fuel_burner.fuel_value", fuelName(menu),
-                        String.format(Locale.ROOT, "%.2f", menu.getBurnRate()).replaceAll("0+$", "").replaceAll("\\.$", "")))));
+                List.of(HeatTab.Row.always(Component.translatable("gui.arcforge.fuel"),
+                                () -> Component.translatable("gui.arcforge.fuel_burner.fuel_value", fuelName(menu),
+                                        String.format(Locale.ROOT, "%.2f", menu.getBurnRate()).replaceAll("0+$", "").replaceAll("\\.$", ""))),
+                        new HeatTab.Row(null, () -> Component.translatable("gui.arcforge.heat_tab.oxygen", ArcforgeGui.grouped(menu.getOxygen()),
+                                ArcforgeGui.grouped(menu.getOxygenCapacity())), () -> menu.getOxygen() > 0)))));
     }
 
     private static Component fuelName(FuelBurnerMenu menu) {
@@ -63,7 +65,7 @@ public class FuelBurnerScreen extends MachineScreen<FuelBurnerMenu> {
         drawGauge(graphics, heatBuffer, x, y, BUFFER_X, BUFFER_Y, menu.getHeat(), menu.getHeatCapacity());
         drawHeatBar(graphics, x, y, HEAT_X, HEAT_Y, HEAT_W, menu.getTemperature());
         // A continuous burner: the flame is fully lit while fuel flows.
-        drawFlame(graphics, x, y, FLAME_X, FLAME_Y, menu.getHeatPerTick() > 0 ? 1 : 0, 1);
+        drawFlame(graphics, x, y, FLAME_X, FLAME_Y, menu.getHeatPerTick() > 0 ? 1 : 0, 1, menu.isOxyActive());
         drawLed(graphics, x, y, LED_X, LED_Y);
         ghost(graphics, ghostBucket, !menu.getOutputSlot().hasItem(), FuelBurnerMenu.BUCKET_OUT_X, FuelBurnerMenu.BUCKET_OUT_Y);
     }
@@ -92,6 +94,9 @@ public class FuelBurnerScreen extends MachineScreen<FuelBurnerMenu> {
             }
         } else if (isHovering(HEAT_X, HEAT_Y - 2, HEAT_W, 8, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())));
+        } else if ((menu.isOxyActive() || menu.getOxygen() > 0) && isHovering(FLAME_X, FLAME_Y, FLAME_SIZE, FLAME_SIZE, mouseX, mouseY)
+                || menu.isOxyActive() && isHovering(STATUS_X, STATUS_Y, font.width(menu.getStatus().getDescription()), 9, mouseX, mouseY)) {
+            addOxyFuelTooltip(lines, menu.getOxygen(), menu.getOxygenCapacity(), ArcforgeConfig.FUEL_BURNER_OXYGEN_PER_TICK.getAsDouble());
         }
     }
 }

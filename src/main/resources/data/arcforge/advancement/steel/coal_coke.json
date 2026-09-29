@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:steel/carbonizer",
+  "display": {
+    "icon": {
+      "id": "arcforge:coal_coke"
+    },
+    "title": {
+      "translate": "advancements.arcforge.steel.coal_coke.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.steel.coal_coke.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "coke": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:coal_coke"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "coke"
+    ]
+  ]
+}

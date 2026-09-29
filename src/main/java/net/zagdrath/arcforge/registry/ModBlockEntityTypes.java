@@ -34,6 +34,8 @@ import net.zagdrath.arcforge.blockentity.machine.BlockPlacerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.BlockBreakerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
+import net.zagdrath.arcforge.blockentity.logistics.ChargepadBlockEntity;
+import net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
@@ -91,6 +93,14 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<SecurityTerminalBlockEntity>> SECURITY_TERMINAL = BLOCK_ENTITY_TYPES.register("security_terminal",
             () -> new BlockEntityType<>(SecurityTerminalBlockEntity::new, ModBlocks.SECURITY_TERMINAL.get()));
+
+    // One type for all four meters: the block says which kind it is.
+    public static final Supplier<BlockEntityType<MeterBlockEntity>> METER = BLOCK_ENTITY_TYPES.register("meter",
+            () -> new BlockEntityType<>(MeterBlockEntity::new, ModBlocks.ENERGY_METER.get(), ModBlocks.HEAT_METER.get(), ModBlocks.FLUID_METER.get(),
+                    ModBlocks.GAS_METER.get()));
+
+    public static final Supplier<BlockEntityType<ChargepadBlockEntity>> CHARGEPAD = BLOCK_ENTITY_TYPES.register("chargepad",
+            () -> new BlockEntityType<>(ChargepadBlockEntity::new, ModBlocks.CHARGEPAD.get()));
 
     public static final Supplier<BlockEntityType<ElectricPumpBlockEntity>> ELECTRIC_PUMP = BLOCK_ENTITY_TYPES.register("electric_pump",
             () -> new BlockEntityType<>(ElectricPumpBlockEntity::new, ModBlocks.ELECTRIC_PUMP.get()));

@@ -14,6 +14,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.zagdrath.arcforge.registry.ModParticleTypes;
+import net.zagdrath.arcforge.registry.ModTriggers;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.gametest.ArcforgeGameTests;
 import net.zagdrath.arcforge.gametest.TestFixtures;
@@ -55,6 +56,7 @@ public class Arcforge {
         ModDataComponents.register(modEventBus);
         ModCapabilities.register(modEventBus);
         ModDataMaps.register(modEventBus);
+        ModTriggers.register(modEventBus);
         ModChunkLoading.register(modEventBus);
         ArcforgeNetwork.register(modEventBus);
         ModWorldgen.register(modEventBus);

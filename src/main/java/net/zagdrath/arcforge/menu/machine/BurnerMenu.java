@@ -36,7 +36,11 @@ public class BurnerMenu extends MachineMenu {
     public static final int DATA_STATUS = 7;
     public static final int DATA_REDSTONE_MODE = 8;
     public static final int DATA_SIDE_CONFIG = 9;
-    public static final int DATA_VALUES = 10;
+    // Oxy-fuel (the Firebox; 0 for the Combustion Plant).
+    public static final int DATA_OXYGEN = 10;
+    public static final int DATA_OXYGEN_CAPACITY = 11;
+    public static final int DATA_OXY_ACTIVE = 12;
+    public static final int DATA_VALUES = 13;
 
     public static final int FUEL_SLOT_X = 20, FUEL_SLOT_Y = 23;
 
@@ -106,6 +110,18 @@ public class BurnerMenu extends MachineMenu {
 
     public int getOutputPerTick() {
         return value(DATA_OUTPUT_PER_TICK);
+    }
+
+    public int getOxygen() {
+        return value(DATA_OXYGEN);
+    }
+
+    public int getOxygenCapacity() {
+        return value(DATA_OXYGEN_CAPACITY);
+    }
+
+    public boolean isOxyActive() {
+        return value(DATA_OXY_ACTIVE) != 0;
     }
 
     // The item burning now, or null between items.

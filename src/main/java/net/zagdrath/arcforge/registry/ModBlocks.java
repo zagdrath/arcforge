@@ -93,6 +93,9 @@ import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
 import net.zagdrath.arcforge.block.storage.HeatCellBlock;
 import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
 import net.zagdrath.arcforge.block.redstone.ThrottleLeverBlock;
+import net.zagdrath.arcforge.block.logistics.ChargepadBlock;
+import net.zagdrath.arcforge.block.logistics.MeterBlock;
+import net.zagdrath.arcforge.machine.meter.MeterKind;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.block.storage.VaultBlock;
@@ -170,6 +173,26 @@ public final class ModBlocks {
     public static final DeferredBlock<ThrottleLeverBlock> THROTTLE_LEVER = BLOCKS.registerBlock("throttle_lever",
             ThrottleLeverBlock::new, p -> p.mapColor(MapColor.METAL).noCollision().strength(0.5F).sound(SoundType.METAL)
                     .pushReaction(PushReaction.POPPED));
+
+    // Meters pass one kind of flow from their left side to their right and read its rate.
+    public static final DeferredBlock<MeterBlock> ENERGY_METER = meter("energy_meter", MeterKind.ENERGY);
+    public static final DeferredBlock<MeterBlock> HEAT_METER = meter("heat_meter", MeterKind.HEAT);
+    public static final DeferredBlock<MeterBlock> FLUID_METER = meter("fluid_meter", MeterKind.FLUID);
+    public static final DeferredBlock<MeterBlock> GAS_METER = meter("gas_meter", MeterKind.GAS);
+
+    // Charges the FE items of players standing on it.
+    public static final DeferredBlock<ChargepadBlock> CHARGEPAD = BLOCKS.registerBlock("chargepad",
+            ChargepadBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL).noOcclusion());
+
+    private static DeferredBlock<MeterBlock> meter(String name, MeterKind kind) {
+        return BLOCKS.registerBlock(name, properties -> new MeterBlock(kind, properties),
+                p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL));
+    }
+
+    public static List<DeferredBlock<MeterBlock>> meters() {
+        return List.of(ENERGY_METER, HEAT_METER, FLUID_METER, GAS_METER);
+    }
 
     // Slim: light passes around it.
     public static final DeferredBlock<ElectricPumpBlock> ELECTRIC_PUMP = BLOCKS.registerBlock("electric_pump",

@@ -1,0 +1,15 @@
+{
+  "title": "Chargepad",
+  "icon": "arcforge:chargepad",
+  "items": [
+    "arcforge:chargepad",
+    "arcforge:tempered_battery",
+    "arcforge:tempered_arc_drill"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Stand on a Chargepad to charge your FE items: the one in your hand, everything in your hotbar, and anything you wear, such as Arc Drills, Arc Saws and Batteries.\n- Feed it FE through the energy port on the back of its housing: a conduit connects there, and only there.\n- It holds 500,000 FE and charges each item at up to 2,048 FE/t, 8,192 FE/t in total.\n- The gauge on the housing shows how full it is, and the coil glows while it's charging something."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:root",
+  "display": {
+    "icon": {
+      "id": "arcforge:carbonizer"
+    },
+    "title": {
+      "translate": "advancements.arcforge.steel.carbonizer.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.steel.carbonizer.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:carbonizer"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

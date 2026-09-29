@@ -143,6 +143,12 @@ public final class ConduitProviders {
                 tooltip.add(Component.translatable("jade.arcforge.conduit_rate", conduit.getTier().getDisplayName(),
                         conduit.getTier().describeThroughput(conduit.getConduitType())));
             }
+            // The cover is synced with the conduit (it's drawn on it), so this reads the client's copy.
+            if (accessor.getBlockEntity() instanceof ConduitBlockEntity covered && covered.getCover() != null) {
+                tooltip.add(Component.translatable("jade.arcforge.cover"));
+                covered.getCover().look().ifPresent(look -> tooltip.add(Component.translatable("jade.arcforge.cover.look", look.getBlock().getName())
+                        .withStyle(net.minecraft.ChatFormatting.GRAY)));
+            }
         }
 
         @Override

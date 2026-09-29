@@ -40,6 +40,7 @@ import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
@@ -188,6 +189,7 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
         if (tower != null) {
             SolarThermalStructure.form(level, tower);
             MultiblockEffects.formed(level, tower.min(), tower.max());
+            ArcforgeAdvancements.formed(level, this, null);
             lastScan = Long.MIN_VALUE;
         }
         targetsDirty = true;

@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:start/first_power",
+  "display": {
+    "icon": {
+      "id": "arcforge:fuel_burner"
+    },
+    "title": {
+      "translate": "advancements.arcforge.challenge.white_heat.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.challenge.white_heat.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "oxy": {
+      "trigger": "arcforge:oxy_fuel",
+      "conditions": {
+        "min_temperature": 1600
+      }
+    }
+  },
+  "requirements": [
+    [
+      "oxy"
+    ]
+  ]
+}

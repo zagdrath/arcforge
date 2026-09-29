@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:processing/array",
+  "display": {
+    "icon": {
+      "id": "arcforge:chemical_reactor"
+    },
+    "title": {
+      "translate": "advancements.arcforge.processing.leached_dust.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.processing.leached_dust.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "precipitated": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "precipitating"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "precipitated"
+    ]
+  ]
+}

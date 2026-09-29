@@ -1,0 +1,40 @@
+{
+  "parent": "arcforge:start/first_power",
+  "display": {
+    "icon": {
+      "id": "arcforge:wrought_energy_cell"
+    },
+    "title": {
+      "translate": "advancements.arcforge.start.energy_cell.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.start.energy_cell.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "arcforge:wrought_energy_cell",
+              "arcforge:tempered_energy_cell",
+              "arcforge:hardened_energy_cell",
+              "arcforge:arcforged_energy_cell"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "cell"
+    ]
+  ]
+}

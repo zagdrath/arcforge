@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:steam/superheated_steam",
+  "display": {
+    "icon": {
+      "id": "arcforge:condenser_array_casing"
+    },
+    "title": {
+      "translate": "advancements.arcforge.steam.condenser.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.steam.condenser.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:condenser_array"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

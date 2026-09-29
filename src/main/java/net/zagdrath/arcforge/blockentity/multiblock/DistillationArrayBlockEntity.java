@@ -43,6 +43,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -241,6 +242,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
             resize(found.height());
             DistillationStructure.form(level, found);
             MultiblockEffects.formed(level, found.min(), found.max());
+            ArcforgeAdvancements.formed(level, this, null);
         }
         running = false;
         setChanged();
@@ -470,6 +472,9 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
                 }
             }
             tx.commit();
+        }
+        for (Fluid made : recipe.outputs(height, batchBonus).keySet()) {
+            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, made, null);
         }
         int count = recipe.items(height);
         if (count > 0) {

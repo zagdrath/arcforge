@@ -30,6 +30,8 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.heat.OxyFuel;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
@@ -51,19 +53,22 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // up to 850°C; Naphtha makes 200 HU/t up to 1,200°C, and hydrogen 60 HU/t up to 1,400°C (the burner's maximum). It pauses while its heat
 // buffer is full, or as hot as the fuel burns (after switching to a cooler fuel it cools down to it as
 // its heat is drawn off). Speed upgrades burn fuel (and make heat) faster, Heat upgrades get more heat
-// from each mB.
+// from each mB. Fed oxygen through an Oxygen face it burns on oxy-fuel (see OxyFuel): each fuel 300°C hotter, up
+// to 1,600°C, with more heat per mB. The Oxygen face is separate from the fuel's Input face, which still takes
+// hydrogen as a fuel.
 public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int SLOT_BUCKET_IN = 0;
     public static final int SLOT_BUCKET_OUT = 1;
     public static final int MACHINE_SLOTS = 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT, SideMode.OXYGEN);
 
     private final HeatBuffer heat;
     private final HeatHandler heatOutput;
     private final FilteredFluidTank tank;
     private final ResourceHandler<FluidResource> fluidInput;
     private final ResourceHandler<ItemResource> itemAutomation;
+    private final OxyFuel oxy;
     private final ContainerData data;
 
     // Fuel taken from the tank (in whole mB) but not burnt yet.
@@ -87,6 +92,8 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         this.fluidInput = new AutomationResourceHandler<>(tank, index -> true, index -> false);
         // With no output face mode, input faces also hand back the empty buckets.
         this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_BUCKET_IN, slot -> slot == SLOT_BUCKET_OUT);
+        this.oxy = new OxyFuel(ArcforgeConfig.FUEL_BURNER_OXYGEN_TANK_CAPACITY.getAsInt(), ArcforgeConfig.FUEL_BURNER_OXYGEN_PER_TICK::getAsDouble,
+                this::setChanged);
         this.data = new WideIntContainerData(FuelBurnerMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -102,6 +109,9 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
                     case FuelBurnerMenu.DATA_STATUS -> status.ordinal();
                     case FuelBurnerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case FuelBurnerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case FuelBurnerMenu.DATA_OXYGEN -> oxy.getTank().getAmount();
+                    case FuelBurnerMenu.DATA_OXYGEN_CAPACITY -> oxy.getTank().getCapacity();
+                    case FuelBurnerMenu.DATA_OXY_ACTIVE -> oxy.isActive() ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -128,9 +138,19 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         burnedPerTick = 0;
         BurnerFuel fuel = BurnerFuel.of(tank.getResource(0));
         int burnCelsius = fuel != null ? fuel.burnTemperature(heat.getMaxCelsius()) : heat.getMaxCelsius();
+        // With oxygen to hand it burns hotter, and the buffer may fill as far as that temperature.
+        boolean oxyReady = fuel != null && oxy.available();
+        if (oxyReady) {
+            burnCelsius = OxyFuel.temperature(burnCelsius);
+        }
+        heat.setCeiling(oxyReady ? burnCelsius : heat.getMaxCelsius());
         boolean hotEnough = heat.getStored() >= heat.storedAt(burnCelsius);
         if (enabled && !heat.isFull() && !hotEnough && fuel != null) {
-            burn(fuel, heat.storedAt(burnCelsius) - heat.getStored());
+            boolean onOxy = oxyReady && oxy.burn();
+            burn(fuel, heat.storedAt(burnCelsius) - heat.getStored(), onOxy ? OxyFuel.heatMultiplier() : 1.0);
+        }
+        if (heatPerTick <= 0) {
+            oxy.idle();
         }
         // While it's burning it is at the fuel's temperature, so the heat moves on straight away.
         if (heatPerTick > 0) {
@@ -145,16 +165,19 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         } else if (heat.isFull() || hotEnough && fuel != null) {
             status = MachineStatus.FULL;
         } else if (heatPerTick > 0) {
-            status = MachineStatus.BURNING;
+            status = oxy.isActive() ? MachineStatus.OXY_FUEL : MachineStatus.BURNING;
         } else {
             status = MachineStatus.NO_FUEL;
         }
         setLit(heatPerTick > 0);
+        if (oxy.isActive() && level.getGameTime() % 20 == 0) {
+            ArcforgeAdvancements.oxyFuel(this, heat.getTemperature());
+        }
     }
 
     // Burns one tick's fuel (faster with Speed upgrades), taking whole mB from the tank as it needs them.
-    // room: the most heat the buffer takes before it's as hot as the fuel burns.
-    private void burn(BurnerFuel fuel, int room) {
+    // room: the most heat the buffer takes before it's as hot as the fuel burns; multiplier: oxy-fuel's heat (or 1).
+    private void burn(BurnerFuel fuel, int room, double multiplier) {
         double wanted = fuel.mbPerTick() * speedMultiplier();
         if (fuelTaken < wanted) {
             int take = Math.min(tank.getAmount(), (int) Math.ceil(wanted - fuelTaken));
@@ -165,7 +188,8 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         }
         burnedPerTick = Math.min(wanted, fuelTaken);
         fuelTaken -= burnedPerTick;
-        heatPerTick = heat.add(Math.min(room, (int) Math.round(burnedPerTick * fuel.huPerMb() * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT)))));
+        heatPerTick = heat.add(Math.min(room, (int) Math.round(burnedPerTick * fuel.huPerMb() * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT))
+                * multiplier)));
         setChanged();
     }
 
@@ -181,6 +205,10 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         return heatPerTick;
     }
 
+    public OxyFuel getOxyFuel() {
+        return oxy;
+    }
+
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---
 
     // Input faces take full buckets and give back the empty ones.
@@ -189,9 +217,12 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         return mode == null || mode == SideMode.INPUT ? itemAutomation : null;
     }
 
-    // Input faces take fuel from pipes and fluid conduits.
+    // Input faces take fuel from pipes and fluid conduits; Oxygen faces take oxygen for oxy-fuel.
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
+        if (mode == SideMode.OXYGEN) {
+            return oxy.getInput();
+        }
         return mode == null || mode == SideMode.INPUT ? fluidInput : null;
     }
 
@@ -211,8 +242,9 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
     public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
         SideMode mode = modeFor(side);
         return switch (type) {
-            // Pressurized Conduits too, for gas fuels such as hydrogen.
-            case ITEM, FLUID, GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            // Pressurized Conduits too, for gas fuels such as hydrogen, and oxygen on Oxygen faces.
+            case ITEM, FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case GAS -> mode == SideMode.INPUT || mode == SideMode.OXYGEN ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> ConnectionMode.NONE;
         };
@@ -224,6 +256,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         tank.deserialize(input.childOrEmpty("tank"));
         heat.deserialize(input);
         fuelTaken = input.getDoubleOr("fuel_taken", 0.0);
+        oxy.load(input);
     }
 
     @Override
@@ -232,6 +265,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         tank.serialize(output.child("tank"));
         heat.serialize(output);
         output.putDouble("fuel_taken", fuelTaken);
+        oxy.save(output);
     }
 
     @Override

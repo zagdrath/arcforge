@@ -18,6 +18,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.CubeCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.CubeCasingBlock.Part;
 import net.zagdrath.arcforge.blockentity.multiblock.CubeMultiblockBlockEntity;
@@ -159,6 +160,9 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
         MultiblockAutomation.refresh(level, min, max);
         if (changed && !wasFormed) {
             MultiblockEffects.formed(level, min, max);
+            if (level.getBlockEntity(center) instanceof MultiblockController controller) {
+                ArcforgeAdvancements.formed(level, controller, null);
+            }
         }
     }
 

@@ -66,6 +66,9 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
                     case BurnerMenu.DATA_STATUS -> status.ordinal();
                     case BurnerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case BurnerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case BurnerMenu.DATA_OXYGEN -> oxygenAmount();
+                    case BurnerMenu.DATA_OXYGEN_CAPACITY -> oxygenCapacity();
+                    case BurnerMenu.DATA_OXY_ACTIVE -> isOxyActive() ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -104,8 +107,30 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         return outputPerTick;
     }
 
+    public int getOutputPerTick() {
+        return outputPerTick;
+    }
+
     protected int getTemperature() {
         return 0;
+    }
+
+    // Oxy-fuel (the Firebox): the oxygen held, and whether it's burning with it. None here.
+    protected int oxygenAmount() {
+        return 0;
+    }
+
+    protected int oxygenCapacity() {
+        return 0;
+    }
+
+    public boolean isOxyActive() {
+        return false;
+    }
+
+    // The status while it burns.
+    protected MachineStatus runningStatus() {
+        return MachineStatus.RUNNING;
     }
 
     protected ContainerData getData() {
@@ -136,7 +161,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         if (!enabled) {
             status = MachineStatus.DISABLED;
         } else if (produced > 0) {
-            status = MachineStatus.RUNNING;
+            status = runningStatus();
         } else if (isBufferFull()) {
             status = MachineStatus.FULL;
         } else {

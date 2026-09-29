@@ -70,6 +70,11 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ELECTRIC_PUMP = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTRIC_PUMP);
     public static final DeferredItem<BlockItem> SECURITY_TERMINAL = ITEMS.registerSimpleBlockItem(ModBlocks.SECURITY_TERMINAL);
     public static final DeferredItem<BlockItem> THROTTLE_LEVER = ITEMS.registerSimpleBlockItem(ModBlocks.THROTTLE_LEVER);
+    public static final DeferredItem<BlockItem> ENERGY_METER = ITEMS.registerSimpleBlockItem(ModBlocks.ENERGY_METER);
+    public static final DeferredItem<BlockItem> HEAT_METER = ITEMS.registerSimpleBlockItem(ModBlocks.HEAT_METER);
+    public static final DeferredItem<BlockItem> FLUID_METER = ITEMS.registerSimpleBlockItem(ModBlocks.FLUID_METER);
+    public static final DeferredItem<BlockItem> GAS_METER = ITEMS.registerSimpleBlockItem(ModBlocks.GAS_METER);
+    public static final DeferredItem<BlockItem> CHARGEPAD = ITEMS.registerSimpleBlockItem(ModBlocks.CHARGEPAD);
     public static final DeferredItem<BlockItem> ARC_MELTER = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_MELTER);
     public static final DeferredItem<BlockItem> FERMENTER = ITEMS.registerSimpleBlockItem(ModBlocks.FERMENTER);
     public static final DeferredItem<BlockItem> CHEMICAL_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.CHEMICAL_REACTOR);
@@ -94,6 +99,8 @@ public final class ModItems {
     public static final DeferredItem<SettingsCardItem> SETTINGS_CARD = ITEMS.registerItem("settings_card", SettingsCardItem::new);
     public static final DeferredItem<WrenchItem> WRENCH = ITEMS.registerItem("wrench", WrenchItem::new, p -> p.stacksTo(1));
     public static final DeferredItem<ConduitFilterItem> CONDUIT_FILTER = ITEMS.registerItem("conduit_filter", ConduitFilterItem::new, p -> p.stacksTo(16));
+    // Encases a conduit (right-click it); ConduitBlock handles fitting it and copying a look onto it.
+    public static final DeferredItem<Item> CONDUIT_COVER = ITEMS.registerSimpleItem("conduit_cover");
     public static final DeferredItem<EngineersHandbookItem> ENGINEERS_HANDBOOK = ITEMS.registerItem("engineers_handbook", EngineersHandbookItem::new, p -> p.stacksTo(1));
 
     // Steel tools and armour (between iron and diamond, mining at iron level), and the 3x3 Hammer and Excavator.

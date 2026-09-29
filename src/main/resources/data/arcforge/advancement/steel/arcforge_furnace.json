@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:steel/coal_coke",
+  "display": {
+    "icon": {
+      "id": "arcforge:arcforge_furnace_bricks"
+    },
+    "title": {
+      "translate": "advancements.arcforge.steel.arcforge_furnace.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.steel.arcforge_furnace.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:arcforge_furnace"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

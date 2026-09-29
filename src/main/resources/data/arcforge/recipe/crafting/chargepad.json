@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "IBI"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "I": "#c:ingots/steel",
+    "B": "arcforge:tempered_battery"
+  },
+  "result": {
+    "id": "arcforge:chargepad",
+    "count": 1
+  }
+}

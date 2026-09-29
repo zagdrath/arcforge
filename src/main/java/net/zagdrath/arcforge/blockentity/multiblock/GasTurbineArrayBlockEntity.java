@@ -39,6 +39,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -309,6 +310,12 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     @Override
     protected void tickMaster(ServerLevel level) {
+        // Once a second: full speed counts for the advancements (arcforge:turbine_full_speed), with the throttle
+        // signal (15 in any mode but Throttle).
+        if (level.getGameTime() % 20 == 0 && rpm >= 0.99 * maxRpm()) {
+            int throttleSignal = getRedstoneMode() == RedstoneMode.THROTTLE ? Math.max(signal, 0) : 15;
+            ArcforgeAdvancements.turbineFullSpeed(this, multiblockId(), length(), throttleSignal);
+        }
         ShellStructure.Shell shell = getShell();
         if (shell == null) {
             return;

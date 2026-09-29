@@ -1,0 +1,13 @@
+{
+  "title": "Conduit Covers",
+  "icon": "arcforge:conduit_cover",
+  "items": [
+    "arcforge:conduit_cover"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A Conduit Cover hides a conduit inside a block. The conduit keeps working and connecting exactly as before.\n- Right-click a conduit with a cover to encase it. By default it shows as a clear pane with a steel outline, so you can see it's there.\n- Right-click the cover with any full, solid block to make it look like that block. It only takes the look: it's still a cover, and you keep the block.\n- Sneak-right-click it with an empty hand to go back to the clear pane.\n- The Wrench in Dismantle mode takes the cover off and gives it back. Breaking the conduit drops the cover too.\n- Covers keep their look through chunk reloads and restarts.\nCrafted 8 at a time from steel plates and glass."
+    }
+  ]
+}

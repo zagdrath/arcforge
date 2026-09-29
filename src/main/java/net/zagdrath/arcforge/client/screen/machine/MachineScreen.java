@@ -213,12 +213,30 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
 
     // The flame: off, then lit from the bottom up to how much is left burning.
     protected void drawFlame(GuiGraphicsExtractor graphics, int x, int y, int flameX, int flameY, int left, int total) {
+        drawFlame(graphics, x, y, flameX, flameY, left, total, false);
+    }
+
+    // The same, with the oxy-fuel flame (flame_oxy) when oxy is set.
+    protected void drawFlame(GuiGraphicsExtractor graphics, int x, int y, int flameX, int flameY, int left, int total, boolean oxy) {
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("flame_off"), x + flameX, y + flameY, FLAME_SIZE, FLAME_SIZE);
         if (total > 0 && left > 0) {
             int height = Mth.ceil(FLAME_SIZE * (float) Math.min(left, total) / total);
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("flame_on"), FLAME_SIZE, FLAME_SIZE, 0, FLAME_SIZE - height,
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite(oxy ? "flame_oxy" : "flame_on"), FLAME_SIZE, FLAME_SIZE, 0, FLAME_SIZE - height,
                     x + flameX, y + flameY + FLAME_SIZE - height, FLAME_SIZE, height);
         }
+    }
+
+    // A burner's flame and status tooltip on oxy-fuel: its values (with this burner's oxygen per tick), and the oxygen held.
+    protected static void addOxyFuelTooltip(List<Component> lines, int oxygen, int capacity, double oxygenPerTick) {
+        lines.add(Component.translatable("gui.arcforge.oxy_fuel.tooltip", ArcforgeConfig.OXY_FUEL_TEMPERATURE_BONUS.getAsInt(),
+                ArcforgeGui.grouped(ArcforgeConfig.OXY_FUEL_MAX_TEMPERATURE.getAsInt()), trimmed(ArcforgeConfig.OXY_FUEL_HEAT_MULTIPLIER.getAsDouble()),
+                trimmed(oxygenPerTick)).withStyle(ChatFormatting.GRAY));
+        lines.add(Component.translatable("gui.arcforge.oxygen_tank", ArcforgeGui.grouped(oxygen), ArcforgeGui.grouped(capacity)).withStyle(ChatFormatting.AQUA));
+    }
+
+    // "1.25", "0.25", "2" (up to three decimals, no trailing zeros).
+    private static String trimmed(double value) {
+        return String.format(java.util.Locale.ROOT, "%.3f", value).replaceAll("0+$", "").replaceAll("\\.$", "");
     }
 
     // A tank: the fluid's still texture, tinted and tiled in 16px steps, clipped to the fill (the fallback

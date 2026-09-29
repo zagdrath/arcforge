@@ -1,0 +1,146 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "arcforge:block/chargepad/pad_side",
+    "pad_top": "arcforge:block/chargepad/pad_top",
+    "pad_glow": "arcforge:block/chargepad/pad_glow",
+    "pad_side": "arcforge:block/chargepad/pad_side",
+    "bottom": "arcforge:block/chargepad/bottom",
+    "housing_side": "arcforge:block/chargepad/housing_side",
+    "housing_top": "arcforge:block/chargepad/housing_top",
+    "back": "arcforge:block/chargepad/back",
+    "housing_front": "arcforge:block/chargepad/housing_front_1"
+  },
+  "elements": [
+    {
+      "from": [
+        1,
+        0,
+        1
+      ],
+      "to": [
+        15,
+        2,
+        15
+      ],
+      "faces": {
+        "up": {
+          "texture": "#pad_top",
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ]
+        },
+        "down": {
+          "texture": "#bottom",
+          "uv": [
+            1,
+            1,
+            15,
+            15
+          ],
+          "cullface": "down"
+        },
+        "north": {
+          "texture": "#pad_side",
+          "uv": [
+            1,
+            0,
+            15,
+            2
+          ]
+        },
+        "south": {
+          "texture": "#pad_side",
+          "uv": [
+            1,
+            0,
+            15,
+            2
+          ]
+        },
+        "east": {
+          "texture": "#pad_side",
+          "uv": [
+            1,
+            0,
+            15,
+            2
+          ]
+        },
+        "west": {
+          "texture": "#pad_side",
+          "uv": [
+            1,
+            0,
+            15,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        0,
+        13
+      ],
+      "to": [
+        13,
+        14,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#housing_front",
+          "uv": [
+            3,
+            2,
+            13,
+            16
+          ]
+        },
+        "south": {
+          "texture": "#back",
+          "uv": [
+            3,
+            2,
+            13,
+            16
+          ],
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#housing_side",
+          "uv": [
+            13,
+            2,
+            16,
+            16
+          ]
+        },
+        "west": {
+          "texture": "#housing_side",
+          "uv": [
+            13,
+            2,
+            16,
+            16
+          ]
+        },
+        "up": {
+          "texture": "#housing_top",
+          "uv": [
+            3,
+            13,
+            13,
+            16
+          ]
+        }
+      }
+    }
+  ]
+}

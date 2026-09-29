@@ -83,6 +83,11 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<DyeColor>> CONDUIT_COLOR =
             DATA_COMPONENTS.registerComponentType("conduit_color", b -> b.persistent(DyeColor.CODEC).networkSynchronized(DyeColor.STREAM_CODEC));
 
+    // A Meter's threshold and mode, kept on the item when it's broken.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.zagdrath.arcforge.machine.meter.MeterSettings>> METER_SETTINGS =
+            DATA_COMPONENTS.registerComponentType("meter_settings", b -> b.persistent(net.zagdrath.arcforge.machine.meter.MeterSettings.CODEC)
+                    .networkSynchronized(net.zagdrath.arcforge.machine.meter.MeterSettings.STREAM_CODEC));
+
     private ModDataComponents() {}
 
     public static void register(IEventBus modEventBus) {

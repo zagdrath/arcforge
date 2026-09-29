@@ -36,6 +36,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
@@ -237,6 +238,10 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     @Override
     protected void tickMaster(ServerLevel level) {
+        // Once a second: full speed counts for the advancements (arcforge:turbine_full_speed).
+        if (level.getGameTime() % 20 == 0 && rpm >= 0.99 * maxRpm()) {
+            ArcforgeAdvancements.turbineFullSpeed(this, multiblockId(), length(), 15);
+        }
         // Arrays formed before the front moved to the window faced along the axis: turn them and reset
         // their side modes, which were relative to that facing.
         ShellStructure.Shell shell = getShell();

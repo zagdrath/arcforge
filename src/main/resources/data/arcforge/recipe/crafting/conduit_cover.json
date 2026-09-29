@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    "PGP",
+    "G G",
+    "PGP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:glass_blocks/colorless"
+  },
+  "result": {
+    "id": "arcforge:conduit_cover",
+    "count": 8
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:gear/steel_tools",
+  "display": {
+    "icon": {
+      "id": "arcforge:tempered_jetpack"
+    },
+    "title": {
+      "translate": "advancements.arcforge.gear.jetpack.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.gear.jetpack.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "jetpack": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "#arcforge:jetpacks"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "jetpack"
+    ]
+  ]
+}
