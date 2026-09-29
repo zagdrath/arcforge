@@ -20,6 +20,13 @@ number and date.
 
 ## [Unreleased]
 
+Suggested version: **2.1.1** (a texture fix).
+
+### Fixed
+
+- **Gas Turbine Array combustor:** the slotted grille on its sides and underside was squashed sideways. It now
+  looks the same all the way around, as it does on top.
+
 ## [2.1.0] - 2026-09-29
 
 ### Upgrading
