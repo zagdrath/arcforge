@@ -39,6 +39,14 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> VACUUM_COLLECTOR_RUN = loop("vacuum_collector_run", 16.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> ARC_QUARRY_RUN = loop("arc_quarry_run", 24.0F);
 
+    // Jetpack thrust (steam fuels and hydrogen), heard over 16 blocks; see JetpackSound.
+    public static final DeferredHolder<SoundEvent, SoundEvent> JETPACK_STEAM = loop("jetpack_steam", 16.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> JETPACK_FLAME = loop("jetpack_flame", 16.0F);
+
+    // The Arc Drill and Arc Saw while they cut; see ArcToolSound.
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARC_DRILL_RUN = loop("arc_drill_run", 16.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> ARC_SAW_RUN = loop("arc_saw_run", 16.0F);
+
     private ModSounds() {}
 
     private static DeferredHolder<SoundEvent, SoundEvent> loop(String name, float range) {

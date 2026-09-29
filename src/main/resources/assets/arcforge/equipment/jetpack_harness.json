@@ -1,0 +1,9 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "arcforge:jetpack_harness"
+      }
+    ]
+  }
+}

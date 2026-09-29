@@ -1,0 +1,21 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "CAC",
+    "AXA",
+    "PEP"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "P": "arcforge:plastic_sheet",
+    "E": "arcforge:arcforged_battery",
+    "X": "arcforge:hardened_arc_saw",
+    "C": "#c:gems/arcite"
+  },
+  "result": {
+    "id": "arcforge:arcforged_arc_saw",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

@@ -126,6 +126,50 @@ diamond). All of it repairs with Steel Ingots.
   - Each block fires its own break event, so claims and protection mods can stop it.
   - Sneak to break a single block. An outline shows what will break.
 
+### Jetpacks
+
+Worn in the chest slot, in Tempered, Hardened and Arcforged tiers (16,000 / 64,000 / 256,000 mB tanks). A
+jetpack holds one gas at a time, filled in a Pressurized Cylinder's slots or by clicking a Gas Cartridge onto it
+in your inventory.
+
+| Fuel | Thrust | mB/t | Exhaust |
+|---|---|---|---|
+| Steam | 0.10 | 10 | steam puffs |
+| High-Pressure Steam | 0.13 | 8 | steam puffs |
+| Superheated Steam | 0.16 | 6 | steam puffs |
+| Hydrogen | 0.20 | 4 | blue flame |
+
+- **Modes** (the Jetpack Mode key, H by default): Normal thrusts while you hold jump and steers with the movement
+  keys; Hover holds your height in the air (jump climbs, sneak sinks) for 1.5x the fuel; Off doesn't fire.
+- A gauge left of the hotbar shows the fuel and mode. Flying clears fall damage, and the server won't kick you
+  for it.
+- **Armored Jetpack:** smith a Steel Chestplate onto a jetpack (with a Steel Plate as the template) for the
+  chestplate's 7 armour and 1.0 toughness.
+- Fuels are the data map `arcforge:jetpack_fuels`; tank sizes, climb speed and hover cost are in the config.
+
+### Arc Drill and Arc Saw
+
+FE-powered tools that never break, in three tiers: charge them in an Energy Cell or a Battery slot.
+
+| | Tempered | Hardened | Arcforged |
+|---|---|---|---|
+| FE | 100,000 | 400,000 | 1,600,000 |
+| Charge rate | 2,000 FE/t | 8,000 FE/t | 32,000 FE/t |
+| Speed | 8 | 10 | 14 |
+| Mines | diamond level | netherite level | netherite level |
+| Module slots | 2 | 3 | 4 |
+
+- The **Arc Drill** is a pickaxe and shovel (and makes paths); the **Arc Saw** is an axe (and strips logs), and
+  fells whole trunks (sneak + right-click toggles Felling).
+- **FE per block:** 50 x (1 + 0.25 x hardness), plus each active module's share: stone 69 FE, deepslate 88,
+  obsidian 675. With too little FE they don't dig.
+- **Modules** (right-click in the air to install; sneak + scroll to switch one on or off):
+  - Area: a 3x3 (5x5 on Arcforged), with the Steel Hammer's rules, +25% FE;
+  - Silk Touch (+100%) or Fortune I / II / III (+50% per level), never both on;
+  - Vein Mining: up to 64 connected ore blocks (the Saw fells up to 256 logs), +25%;
+  - Speed: digs 50% faster, +50%.
+- They whir and buzz while cutting, and the drill's auger spins and the saw's chain runs in your hand.
+
 ### Ores
 
 Six ores generate in stone and deepslate (Silver, Nickel, Tungsten as wolframite ore, Fluorite, Bismuth and

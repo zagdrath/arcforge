@@ -6,6 +6,7 @@
     "arcforge:steel_shovel",
     "arcforge:steel_hoe",
     "arcforge:steel_hammer",
-    "arcforge:steel_excavator"
+    "arcforge:steel_excavator",
+    "#arcforge:arc_tools"
   ]
 }

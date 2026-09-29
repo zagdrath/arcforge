@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "arcforge:steel_axe"
+    "arcforge:steel_axe",
+    "#arcforge:arc_saws"
   ]
 }

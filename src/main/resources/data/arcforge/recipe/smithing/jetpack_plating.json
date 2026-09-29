@@ -1,0 +1,6 @@
+{
+  "type": "arcforge:jetpack_plating",
+  "template": "#c:plates/steel",
+  "base": "#arcforge:jetpacks",
+  "addition": "arcforge:steel_chestplate"
+}

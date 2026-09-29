@@ -27,5 +27,9 @@ public final class ArcforgeNetwork {
         registrar.playToServer(AssemblerPatternPayload.TYPE, AssemblerPatternPayload.STREAM_CODEC, AssemblerPatternPayload::handle);
         registrar.playToServer(ArcQuarryAreaPayload.TYPE, ArcQuarryAreaPayload.STREAM_CODEC, ArcQuarryAreaPayload::handle);
         registrar.playToServer(ArcQuarryTagPayload.TYPE, ArcQuarryTagPayload.STREAM_CODEC, ArcQuarryTagPayload::handle);
+        registrar.playToServer(JetpackInputPayload.TYPE, JetpackInputPayload.STREAM_CODEC, JetpackInputPayload::handle);
+        registrar.playToServer(JetpackModePayload.TYPE, JetpackModePayload.STREAM_CODEC, JetpackModePayload::handle);
+        registrar.playToClient(JetpackStatePayload.TYPE, JetpackStatePayload.STREAM_CODEC, JetpackStatePayload::handle);
+        registrar.playToServer(ToolModuleScrollPayload.TYPE, ToolModuleScrollPayload.STREAM_CODEC, ToolModuleScrollPayload::handle);
     }
 }

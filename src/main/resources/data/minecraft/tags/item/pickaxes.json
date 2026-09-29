@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "arcforge:steel_pickaxe",
-    "arcforge:steel_hammer"
+    "arcforge:steel_hammer",
+    "#arcforge:arc_drills"
   ]
 }

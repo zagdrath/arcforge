@@ -50,6 +50,7 @@ import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
 import net.zagdrath.arcforge.menu.storage.PressurizedCylinderMenu;
 import net.zagdrath.arcforge.menu.storage.HeatCellMenu;
 import net.zagdrath.arcforge.menu.storage.VaultMenu;
+import net.zagdrath.arcforge.menu.tool.ArcToolMenu;
 
 public final class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, Arcforge.MODID);
@@ -148,6 +149,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<ConduitFilterMenu>> CONDUIT_FILTER = MENU_TYPES.register("conduit_filter",
             () -> IMenuTypeExtension.create(ConduitFilterMenu::new));
+
+    public static final Supplier<MenuType<ArcToolMenu>> ARC_TOOL = MENU_TYPES.register("arc_tool",
+            () -> IMenuTypeExtension.create(ArcToolMenu::new));
 
     public static final Supplier<MenuType<CarbonizerMenu>> CARBONIZER = MENU_TYPES.register("carbonizer",
             () -> IMenuTypeExtension.create(CarbonizerMenu::new));

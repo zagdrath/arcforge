@@ -1,0 +1,21 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "CAC",
+    "AXA",
+    "PEP"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "P": "arcforge:plastic_sheet",
+    "E": "arcforge:arcforged_gas_cartridge",
+    "X": "arcforge:hardened_jetpack",
+    "C": "#c:gems/arcite"
+  },
+  "result": {
+    "id": "arcforge:arcforged_jetpack",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

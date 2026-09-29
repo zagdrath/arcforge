@@ -1,0 +1,33 @@
+{
+  "title": "Arc Drill & Arc Saw",
+  "icon": "arcforge:tempered_arc_drill",
+  "items": [
+    "arcforge:tempered_arc_drill",
+    "arcforge:hardened_arc_drill",
+    "arcforge:arcforged_arc_drill",
+    "arcforge:tempered_arc_saw",
+    "arcforge:hardened_arc_saw",
+    "arcforge:arcforged_arc_saw",
+    "arcforge:area_module",
+    "arcforge:silk_touch_module",
+    "arcforge:fortune_i_module",
+    "arcforge:fortune_ii_module",
+    "arcforge:fortune_iii_module",
+    "arcforge:vein_module",
+    "arcforge:speed_module"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Arc Drill is a pickaxe and shovel in one; the Arc Saw is an axe. They never break, but they run on FE. Charge them in an Energy Cell or any Battery slot.\n| Tier | FE | Mines | Speed | Modules |\n| Tempered | 100,000 | Diamond | 8 | 2 |\n| Hardened | 400,000 | Netherite | 10 | 3 |\n| Arcforged | 1,600,000 | Netherite | 14 | 4 |\nEach block costs about 50 FE, more for hard blocks (stone 69 FE, obsidian 675 FE). With no FE left the tool can't mine."
+    },
+    {
+      "type": "text",
+      "text": "# Modules\nRight-click in the air to open the tool and drop module cards into its slots. Sneak + scroll switches modules on and off; the action bar shows which are on. Each active module adds to the FE per block.\n- **Area** (+25%): 3×3 facing the side you hit, 5×5 on Arcforged. Same rules as the Steel Hammer.\n- **Silk Touch** (+100%)\n- **Fortune I / II / III** (+50% / +100% / +150%). Only one of Silk Touch or Fortune is on at a time.\n- **Vein Mining** (+25%): the Drill takes up to 64 connected blocks of the ore you hit; the Saw's Felling mode takes the whole tree.\n- **Speed** (+50%): digs 50% faster."
+    },
+    {
+      "type": "text",
+      "text": "# Felling\nSneak + right-click the Arc Saw to toggle Felling mode. With it on, cutting a log also cuts up to 32 connected logs above and around it; with a Vein Mining module it takes the whole tree (up to 256). Every log costs FE."
+    }
+  ]
+}

@@ -14,12 +14,16 @@ import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.fog.environment.FogEnvironment;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -50,6 +54,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity
 import net.zagdrath.arcforge.client.model.ConduitFilterModel;
 import net.zagdrath.arcforge.client.model.PortNozzleModel;
 import net.zagdrath.arcforge.client.model.PortedModel;
+import net.zagdrath.arcforge.client.renderer.JetpackLayer;
 import net.zagdrath.arcforge.client.renderer.blockentity.ArcforgeFurnaceRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.CarbonizerDoorRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
@@ -65,6 +70,7 @@ import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.DistillationArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.SolarThermalArrayScreen;
+import net.zagdrath.arcforge.client.screen.tool.ArcToolScreen;
 import net.zagdrath.arcforge.client.sound.MachineLoopSound;
 import net.zagdrath.arcforge.client.sound.TurbineArraySound;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
@@ -109,6 +115,7 @@ import net.zagdrath.arcforge.client.screen.storage.FluidTankScreen;
 import net.zagdrath.arcforge.client.screen.storage.HeatCellScreen;
 import net.zagdrath.arcforge.client.screen.storage.PressurizedCylinderScreen;
 import net.zagdrath.arcforge.client.screen.storage.VaultScreen;
+import net.zagdrath.arcforge.network.JetpackStatePayload;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.sound.MachineSounds;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -130,6 +137,7 @@ public class ArcforgeClient {
         EngineersHandbookItem.opener = EngineersHandbookScreen::open;
         SteamTurbineArrayBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
         MachineSounds.clientHook = MachineLoopSound::keepPlaying;
+        JetpackStatePayload.clientHandler = JetpackClient::onState;
         // Re-mesh blocks whose ports changed, and forget the ports on leaving a world.
         // (The ports aren't block state, so the section is marked dirty itself: marking the block would skip it,
         // as its model hasn't changed.)
@@ -154,6 +162,7 @@ public class ArcforgeClient {
 
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
+        event.register(ModMenuTypes.ARC_TOOL.get(), ArcToolScreen::new);
         event.register(ModMenuTypes.GEOTHERMAL_PLANT.get(), GeothermalPlantScreen::new);
         event.register(ModMenuTypes.COMBUSTION_PLANT.get(), CombustionPlantScreen::new);
         event.register(ModMenuTypes.FIREBOX.get(), FireboxScreen::new);
@@ -318,6 +327,26 @@ public class ArcforgeClient {
     }
 
     // Fluid tank items draw the fluid they carry (see items/<tier>_fluid_tank.json).
+    @SubscribeEvent
+    static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
+        event.registerLayerDefinition(JetpackLayer.LAYER, JetpackLayer::createLayer);
+    }
+
+    // The worn Jetpack's pack, on players (both skin models) and armor stands.
+    @SubscribeEvent
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    static void addLayers(EntityRenderersEvent.AddLayers event) {
+        for (PlayerModelType skin : event.getSkins()) {
+            AvatarRenderer<?> renderer = event.getPlayerRenderer(skin);
+            if (renderer != null) {
+                renderer.addLayer(new JetpackLayer(renderer, event.getEntityModels()));
+            }
+        }
+        if (event.getRenderer(EntityTypes.ARMOR_STAND) instanceof LivingEntityRenderer renderer) {
+            renderer.addLayer(new JetpackLayer(renderer, event.getEntityModels()));
+        }
+    }
+
     @SubscribeEvent
     static void registerSpecialRenderers(RegisterSpecialModelRendererEvent event) {
         event.register(FluidTankContentsRenderer.ID, FluidTankContentsRenderer.Unbaked.MAP_CODEC);

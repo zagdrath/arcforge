@@ -25,6 +25,7 @@ import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
+import net.zagdrath.arcforge.recipe.JetpackPlatingRecipe;
 import net.zagdrath.arcforge.recipe.MeltingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
 import net.zagdrath.arcforge.recipe.TierUpgradeRecipe;
@@ -81,6 +82,10 @@ public final class ModRecipes {
     // A crafting recipe (vanilla's crafting type) that keeps the contents of what it upgrades.
     public static final Supplier<RecipeSerializer<TierUpgradeRecipe>> TIER_UPGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("tier_upgrade",
             () -> new RecipeSerializer<>(TierUpgradeRecipe.MAP_CODEC, TierUpgradeRecipe.STREAM_CODEC));
+
+    // Smithing a Steel Chestplate onto a Jetpack (a smithing recipe, so it has no type of its own).
+    public static final Supplier<RecipeSerializer<JetpackPlatingRecipe>> JETPACK_PLATING_SERIALIZER = RECIPE_SERIALIZERS.register("jetpack_plating",
+            () -> new RecipeSerializer<>(JetpackPlatingRecipe.MAP_CODEC, JetpackPlatingRecipe.STREAM_CODEC));
 
     // Machine recipes never show in the recipe book, but every recipe must name a category.
     public static final Supplier<RecipeBookCategory> MACHINE_CATEGORY = RECIPE_BOOK_CATEGORIES.register("machine", RecipeBookCategory::new);

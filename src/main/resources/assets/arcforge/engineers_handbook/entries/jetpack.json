@@ -1,0 +1,27 @@
+{
+  "title": "Jetpack",
+  "icon": "arcforge:tempered_jetpack",
+  "items": [
+    "arcforge:tempered_jetpack",
+    "arcforge:hardened_jetpack",
+    "arcforge:arcforged_jetpack"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Jetpack goes in your chest slot and burns gas for thrust. It holds one gas at a time.\n- Fill it in a Pressurized Cylinder's item slot, or pick up a Gas Cartridge and click it onto the Jetpack in your inventory.\n- Tanks: 16,000 mB Tempered, 64,000 mB Hardened, 256,000 mB Arcforged. Higher tiers also climb faster: 0.5, 0.65 and 0.8 blocks per tick."
+    },
+    {
+      "type": "text",
+      "text": "# Fuels\n| Gas | Thrust | mB/t |\n| Steam | 0.10 | 10 |\n| High-Pressure Steam | 0.13 | 8 |\n| Superheated Steam | 0.16 | 6 |\n| Hydrogen | 0.20 | 4 |\nGravity pulls 0.08, so every fuel can lift you; better fuels climb faster and last longer. Steam fuels puff white steam, Hydrogen burns with a blue flame."
+    },
+    {
+      "type": "text",
+      "text": "# Modes\nPress the Jetpack Mode key (H by default) to cycle:\n- **Normal**: hold jump to rise.\n- **Hover**: holds your altitude and uses 50% more fuel. Jump to rise, sneak to sink. No fall damage.\n- **Off**: the Jetpack does nothing.\nThe gauge beside your hotbar shows fuel and mode. You take no fall damage while the Jetpack is firing."
+    },
+    {
+      "type": "text",
+      "text": "# Armored Jetpack\nIn a Smithing Table, put a Steel Plate as the template, the Jetpack, then a Steel Chestplate. The Jetpack gains the chestplate's armor (7 armor, 1 toughness) and keeps it through tier upgrades."
+    }
+  ]
+}

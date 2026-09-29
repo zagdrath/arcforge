@@ -1,0 +1,24 @@
+{
+  "values": {
+    "arcforge:steam": {
+      "thrust": 0.1,
+      "mb_per_tick": 10,
+      "particle": "steam"
+    },
+    "arcforge:high_pressure_steam": {
+      "thrust": 0.13,
+      "mb_per_tick": 8,
+      "particle": "steam"
+    },
+    "arcforge:superheated_steam": {
+      "thrust": 0.16,
+      "mb_per_tick": 6,
+      "particle": "steam"
+    },
+    "arcforge:hydrogen": {
+      "thrust": 0.2,
+      "mb_per_tick": 4,
+      "particle": "flame"
+    }
+  }
+}

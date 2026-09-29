@@ -151,5 +151,41 @@
         "stream": false
       }
     ]
+  },
+  "jetpack_steam": {
+    "sounds": [
+      {
+        "name": "arcforge:jetpack_steam",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.jetpack_steam"
+  },
+  "jetpack_flame": {
+    "sounds": [
+      {
+        "name": "arcforge:jetpack_flame",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.jetpack_flame"
+  },
+  "arc_drill_run": {
+    "subtitle": "subtitles.arcforge.arc_drill_run",
+    "sounds": [
+      {
+        "name": "arcforge:arc_drill_run",
+        "stream": false
+      }
+    ]
+  },
+  "arc_saw_run": {
+    "subtitle": "subtitles.arcforge.arc_saw_run",
+    "sounds": [
+      {
+        "name": "arcforge:arc_saw_run",
+        "stream": false
+      }
+    ]
   }
 }

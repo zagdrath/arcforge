@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "RXR",
+    " P "
+  ],
+  "key": {
+    "P": "arcforge:plastic_sheet",
+    "R": "#c:dusts/redstone",
+    "X": "#c:gems/emerald"
+  },
+  "result": {
+    "id": "arcforge:silk_touch_module",
+    "count": 1
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "parent": "arcforge:item/arcforged_arc_drill_3d",
+  "textures": {
+    "t": "arcforge:item/arc_drill_3d/arcforged_running",
+    "particle": "arcforge:item/arc_drill_3d/arcforged_running"
+  }
+}

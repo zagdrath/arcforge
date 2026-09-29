@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:tempered_arc_saw",
+    "arcforge:hardened_arc_saw",
+    "arcforge:arcforged_arc_saw"
+  ]
+}

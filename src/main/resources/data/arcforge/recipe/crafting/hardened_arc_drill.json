@@ -1,0 +1,20 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "PAP",
+    "AXA",
+    "PEP"
+  ],
+  "key": {
+    "A": "arcforge:hardened_alloy",
+    "P": "arcforge:plastic_sheet",
+    "E": "arcforge:hardened_battery",
+    "X": "arcforge:tempered_arc_drill"
+  },
+  "result": {
+    "id": "arcforge:hardened_arc_drill",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

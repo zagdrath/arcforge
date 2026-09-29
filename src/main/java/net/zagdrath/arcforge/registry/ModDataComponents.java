@@ -9,15 +9,20 @@ import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.Unit;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
+import net.zagdrath.arcforge.item.tool.JetpackMode;
+import net.zagdrath.arcforge.item.tool.ToolModules;
 import net.zagdrath.arcforge.machine.quarry.QuarrySettings;
 import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.storage.VaultContents;
+
+import com.mojang.serialization.Codec;
 
 // Item components carrying a storage block's or Vault's contents while it is an item, the Wrench's mode and a
 // Conduit Filter's settings.
@@ -51,6 +56,22 @@ public final class ModDataComponents {
     // An Arc Quarry's area, filter and switches, kept when it's picked up (see QuarrySettings).
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<QuarrySettings>> QUARRY_SETTINGS =
             DATA_COMPONENTS.registerComponentType("quarry_settings", b -> b.persistent(QuarrySettings.CODEC).networkSynchronized(QuarrySettings.STREAM_CODEC));
+
+    // A Jetpack's flight mode (absent: Normal).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<JetpackMode>> JETPACK_MODE =
+            DATA_COMPONENTS.registerComponentType("jetpack_mode", b -> b.persistent(JetpackMode.CODEC).networkSynchronized(JetpackMode.STREAM_CODEC));
+
+    // Present on a Jetpack smithed with a Steel Chestplate (see JetpackPlatingRecipe).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> JETPACK_PLATING =
+            DATA_COMPONENTS.registerComponentType("jetpack_plating", b -> b.persistent(Unit.CODEC).networkSynchronized(Unit.STREAM_CODEC));
+
+    // An Arc Drill or Arc Saw's modules and which are on (absent: none).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<ToolModules>> TOOL_MODULES =
+            DATA_COMPONENTS.registerComponentType("tool_modules", b -> b.persistent(ToolModules.CODEC).networkSynchronized(ToolModules.STREAM_CODEC));
+
+    // Whether an Arc Saw fells whole trunks (absent: on).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> FELLING =
+            DATA_COMPONENTS.registerComponentType("felling", b -> b.persistent(Codec.BOOL).networkSynchronized(ByteBufCodecs.BOOL));
 
     private ModDataComponents() {}
 

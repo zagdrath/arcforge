@@ -1,0 +1,31 @@
+{
+  "model": {
+    "type": "minecraft:select",
+    "property": "minecraft:display_context",
+    "cases": [
+      {
+        "when": [
+          "gui",
+          "ground",
+          "fixed"
+        ],
+        "model": {
+          "type": "minecraft:model",
+          "model": "arcforge:item/arcforged_arc_drill"
+        }
+      }
+    ],
+    "fallback": {
+      "type": "minecraft:condition",
+      "property": "arcforge:arc_tool_running",
+      "on_true": {
+        "type": "minecraft:model",
+        "model": "arcforge:item/arcforged_arc_drill_3d_running"
+      },
+      "on_false": {
+        "type": "minecraft:model",
+        "model": "arcforge:item/arcforged_arc_drill_3d"
+      }
+    }
+  }
+}

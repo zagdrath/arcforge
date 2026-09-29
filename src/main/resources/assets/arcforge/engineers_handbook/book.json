@@ -40,6 +40,8 @@
         "arcforge_furnace",
         "alloys",
         "steel_equipment",
+        "jetpack",
+        "arc_tools",
         "coal_coke_and_creosote"
       ]
     },

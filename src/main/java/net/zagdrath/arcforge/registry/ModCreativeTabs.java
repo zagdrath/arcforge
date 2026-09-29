@@ -17,6 +17,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.item.tool.ModuleType;
 
 // Arcforge tabs, in order: Machines, Materials, Components, Building Blocks, Fluids, Logistics, Tools & Upgrades.
 public final class ModCreativeTabs {
@@ -161,6 +162,14 @@ public final class ModCreativeTabs {
                         ModItems.STEEL_BOOTS)) {
                     output.accept(item.get());
                 }
+                ModItems.jetpacks().forEach(item -> output.accept(item.get()));
+                ModItems.arcTools().forEach(item -> output.accept(item.get()));
+                for (ModuleType type : ModuleType.values()) {
+                    output.accept(ModItems.toolModule(type).get());
+                }
+                // Full of Hydrogen and fully charged, after the empty ones.
+                ModItems.jetpacks().forEach(item -> output.accept(item.get().filled(ModFluids.HYDROGEN.get())));
+                ModItems.arcTools().forEach(item -> output.accept(item.get().charged()));
                 output.accept(ModItems.SPEED_UPGRADE.get());
                 output.accept(ModItems.ENERGY_UPGRADE.get());
                 output.accept(ModItems.HEAT_UPGRADE.get());

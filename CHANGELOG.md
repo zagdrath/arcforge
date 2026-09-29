@@ -43,6 +43,13 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Added
 
+- **Jetpacks** (Tempered / Hardened / Arcforged). They burn Steam, High-Pressure Steam, Superheated Steam or
+  Hydrogen (data map `arcforge:jetpack_fuels`), with Normal / Hover / Off modes on a key (H), a fuel gauge by
+  the hotbar, steam puffs or a blue hydrogen flame, and a thrust sound. Fill them in a Pressurized Cylinder or
+  from a Gas Cartridge. Smith a Steel Chestplate onto one for an Armored Jetpack.
+- **Arc Drill and Arc Saw** (Tempered / Hardened / Arcforged): FE-powered tools that never break, with module
+  slots for Area, Silk Touch, Fortune I-III, Vein Mining and Speed. The Arc Saw fells trees. Both play a running
+  sound and animate in hand (the auger spins, the chain runs) while they cut.
 - **Steel tools and armour.** Sword, pickaxe, axe, shovel and hoe (500 uses, 7.0 speed) and a full armour set
   (2 / 7 / 5 / 2, 1.0 toughness): between iron and diamond, mining at iron level, repaired with Steel Ingots.
 - **Steel Hammer and Steel Excavator.** Break a 3×3 facing the side you hit, only blocks the tool is good
@@ -119,6 +126,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Changed
 
+- Pressurized Cylinder slots also fill and drain Jetpacks.
+- The Steel Hammer's area rules are shared with the Arc tools' Area module.
 - **Solar Thermal Array: up to 1,100°C** (was 550), so it can feed a Superheater Array. In clear weather on the
   north-south axis it stays above 900°C from about 9:40 to 14:20. Its HU/t is unchanged.
 - **Arcforge Furnace bricks redrawn** from Cody's brick texture in the furnace's fire-brick palette. The brick

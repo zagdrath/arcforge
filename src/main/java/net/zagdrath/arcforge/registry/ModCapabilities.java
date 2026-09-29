@@ -61,6 +61,9 @@ import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.item.storage.PortableFluidHandler;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
+import net.zagdrath.arcforge.item.tool.ArcToolItem;
+import net.zagdrath.arcforge.item.tool.JetpackFluidHandler;
+import net.zagdrath.arcforge.item.tool.JetpackItem;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
@@ -259,6 +262,17 @@ public final class ModCapabilities {
                 case THERMAL_CAPSULE -> {
                 }
             }
+        }
+
+        // Jetpacks hold a jetpack fuel gas; Arc Drills and Saws charge like a battery but can't be drained.
+        for (DeferredItem<JetpackItem> holder : ModItems.jetpacks()) {
+            JetpackItem item = holder.get();
+            event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new JetpackFluidHandler(access, item), item);
+        }
+        for (DeferredItem<ArcToolItem> holder : ModItems.arcTools()) {
+            ArcToolItem item = holder.get();
+            event.registerItem(Capabilities.Energy.ITEM,
+                    (stack, access) -> new ItemAccessEnergyHandler(access, ModDataComponents.ENERGY.get(), item.capacity(), item.receiveRate(), 0), item);
         }
 
         // Multiblocks: every block of a formed structure exposes the structure face it lies on (served by the controller).

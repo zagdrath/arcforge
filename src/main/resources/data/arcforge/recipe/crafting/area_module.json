@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "RXR",
+    " P "
+  ],
+  "key": {
+    "P": "arcforge:plastic_sheet",
+    "R": "#c:dusts/redstone",
+    "X": "arcforge:steel_hammer"
+  },
+  "result": {
+    "id": "arcforge:area_module",
+    "count": 1
+  }
+}

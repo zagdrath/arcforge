@@ -39,6 +39,7 @@ import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
+import net.zagdrath.arcforge.item.tool.JetpackItem;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -91,12 +92,19 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
         return accepts(resource);
     }
 
+    // Gas Cartridges and Jetpacks.
     public static boolean accepts(ItemResource resource) {
-        return PortableStorageItem.is(resource.toStack(1), PortableStorageItem.Kind.GAS_CARTRIDGE);
+        ItemStack stack = resource.toStack(1);
+        return PortableStorageItem.is(stack, PortableStorageItem.Kind.GAS_CARTRIDGE) || stack.getItem() instanceof JetpackItem;
     }
 
     @Override
     protected boolean canFill(ItemStack stack) {
+        if (stack.getItem() instanceof JetpackItem jetpack) {
+            // Only while the cylinder holds a gas the jetpack takes.
+            return JetpackItem.fluid(stack).getAmount() < jetpack.capacity()
+                    && (tank.getAmount() == 0 || JetpackItem.accepts(stack, tank.getResource(0).getFluid()));
+        }
         return stack.getItem() instanceof PortableStorageItem cartridge && cartridge.amount(stack) < cartridge.capacity();
     }
 

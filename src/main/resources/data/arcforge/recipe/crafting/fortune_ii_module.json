@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " P ",
+    "EXE",
+    " P "
+  ],
+  "key": {
+    "P": "arcforge:plastic_sheet",
+    "X": "arcforge:fortune_i_module",
+    "E": "#c:gems/diamond"
+  },
+  "result": {
+    "id": "arcforge:fortune_ii_module",
+    "count": 1
+  }
+}

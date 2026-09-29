@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:area_module",
+    "arcforge:silk_touch_module",
+    "arcforge:fortune_i_module",
+    "arcforge:fortune_ii_module",
+    "arcforge:fortune_iii_module",
+    "arcforge:vein_module",
+    "arcforge:speed_module"
+  ]
+}

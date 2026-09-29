@@ -1075,6 +1075,107 @@ public class ArcforgeConfig {
         BUILDER.pop();
     }
 
+    // --- Tools: the Jetpack, Arc Drill and Arc Saw ---
+
+    static {
+        BUILDER.comment("Jetpacks, Arc Drills and Arc Saws. Per-tier values are listed Tempered, Hardened, Arcforged.").push("tools");
+    }
+
+    public static final ModConfigSpec.BooleanValue ENABLE_JETPACKS = BUILDER
+            .comment("Whether jetpacks fly. Off, they can still be worn and filled.")
+            .define("enableJetpacks", true);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> JETPACK_TANK = BUILDER
+            .comment("Jetpack tank size in mB, per tier.")
+            .defineList("jetpackTank", List.of(16_000, 64_000, 256_000), () -> 16_000, value -> value instanceof Integer i && i > 0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Double>> JETPACK_MAX_RISE = BUILDER
+            .comment("Fastest a jetpack climbs, in blocks per tick, per tier.")
+            .defineList("jetpackMaxRise", List.of(0.5, 0.65, 0.8), () -> 0.5, value -> value instanceof Double d && d > 0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Double>> JETPACK_AIR_SPEED = BUILDER
+            .comment("Horizontal push while thrusting, in blocks per tick per tick, per tier.")
+            .defineList("jetpackAirSpeed", List.of(0.03, 0.035, 0.04), () -> 0.03, value -> value instanceof Double d && d >= 0);
+
+    public static final ModConfigSpec.DoubleValue JETPACK_HOVER_FUEL_MULTIPLIER = BUILDER
+            .comment("Fuel used per tick in Hover mode, as a multiple of the fuel's normal rate.")
+            .defineInRange("hoverFuelMultiplier", 1.5, 0.0, 100.0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ARC_TOOL_CAPACITY = BUILDER
+            .comment("Arc Drill and Arc Saw FE capacity, per tier.")
+            .defineList("arcToolCapacity", List.of(100_000, 400_000, 1_600_000), () -> 100_000, value -> value instanceof Integer i && i > 0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ARC_TOOL_RECEIVE = BUILDER
+            .comment("Arc Drill and Arc Saw charge rate in FE/t, per tier.")
+            .defineList("arcToolReceive", List.of(2_000, 8_000, 32_000), () -> 2_000, value -> value instanceof Integer i && i > 0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Double>> ARC_TOOL_SPEED = BUILDER
+            .comment("Arc Drill and Arc Saw mining speed, per tier (a diamond pickaxe is 8, netherite 9).")
+            .defineList("arcToolSpeed", List.of(8.0, 10.0, 14.0), () -> 8.0, value -> value instanceof Double d && d > 0);
+
+    public static final ModConfigSpec.IntValue ARC_TOOL_BASE_FE = BUILDER
+            .comment("FE per block before hardness and modules: cost = base x (1 + hardnessFactor x hardness) x (1 + module factors).")
+            .defineInRange("baseFePerBlock", 50, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue ARC_TOOL_HARDNESS_FACTOR = BUILDER
+            .comment("How much each point of block hardness adds to the FE per block.")
+            .defineInRange("hardnessFactor", 0.25, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_AREA_FE = BUILDER
+            .comment("Extra FE per block with the Area module on, as a fraction of the base.")
+            .defineInRange("areaModuleFe", 0.25, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_SILK_FE = BUILDER
+            .comment("Extra FE per block with the Silk Touch module on.")
+            .defineInRange("silkTouchModuleFe", 1.0, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_FORTUNE_FE = BUILDER
+            .comment("Extra FE per block per Fortune level with a Fortune module on.")
+            .defineInRange("fortuneModuleFe", 0.5, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_VEIN_FE = BUILDER
+            .comment("Extra FE per block with the Vein Mining module on.")
+            .defineInRange("veinModuleFe", 0.25, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_SPEED_FE = BUILDER
+            .comment("Extra FE per block with the Speed module on.")
+            .defineInRange("speedModuleFe", 0.5, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue SPEED_MODULE_MULTIPLIER = BUILDER
+            .comment("Mining speed multiplier with the Speed module on.")
+            .defineInRange("speedModuleMultiplier", 1.5, 1.0, 100.0);
+
+    public static final ModConfigSpec.IntValue VEIN_LIMIT = BUILDER
+            .comment("Most blocks the Vein Mining module breaks at once on an Arc Drill, the first included.")
+            .defineInRange("veinLimit", 64, 1, 4_096);
+
+    public static final ModConfigSpec.IntValue FELLING_LIMIT = BUILDER
+            .comment("Most logs an Arc Saw fells at once.")
+            .defineInRange("fellingLimit", 32, 1, 4_096);
+
+    public static final ModConfigSpec.IntValue FELLING_VEIN_LIMIT = BUILDER
+            .comment("Most logs an Arc Saw fells at once with the Vein Mining module on.")
+            .defineInRange("fellingVeinLimit", 256, 1, 4_096);
+
+    public static final ModConfigSpec.DoubleValue FELLING_FE_MULTIPLIER = BUILDER
+            .comment("Multiplier on the FE for each log felled after the first.")
+            .defineInRange("fellingFeMultiplier", 1.0, 0.0, 100.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    // A per-tier list value (Tempered, Hardened, Arcforged); a short list repeats its last entry.
+    public static int perTier(ModConfigSpec.ConfigValue<List<? extends Integer>> value, int tierIndex) {
+        List<? extends Integer> list = value.get();
+        return list.get(Math.min(tierIndex, list.size() - 1));
+    }
+
+    public static double perTierDouble(ModConfigSpec.ConfigValue<List<? extends Double>> value, int tierIndex) {
+        List<? extends Double> list = value.get();
+        return list.get(Math.min(tierIndex, list.size() - 1));
+    }
+
     static {
         BUILDER.comment("Ore generation, per ore. Read when a world loads; changes apply to chunks generated after a restart.",
                 "Turning an ore off only stops it generating: its items and recipes stay (other mods' ores tagged",

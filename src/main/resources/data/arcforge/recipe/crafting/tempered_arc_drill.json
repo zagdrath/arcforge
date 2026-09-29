@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    " D ",
+    "TGT",
+    "PBP"
+  ],
+  "key": {
+    "D": "arcforge:tungsten_drill_head",
+    "T": "arcforge:tempered_alloy",
+    "G": "#c:gears/steel",
+    "P": "arcforge:plastic_sheet",
+    "B": "arcforge:tempered_battery"
+  },
+  "result": {
+    "id": "arcforge:tempered_arc_drill",
+    "count": 1
+  }
+}

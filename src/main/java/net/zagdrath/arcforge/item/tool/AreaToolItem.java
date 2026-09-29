@@ -34,13 +34,19 @@ public class AreaToolItem extends Item {
     // against, no harder than the centre, breakable and without a block entity. None if the tool isn't good
     // against the centre. The client outline and the server break share this, so they always agree.
     public static List<BlockPos> targets(Level level, BlockPos centre, BlockState centreState, Direction.Axis axis, ItemStack tool) {
+        return targets(level, centre, centreState, axis, tool, 1);
+    }
+
+    // The same, over a square `radius` blocks out from the centre (1 is 3x3, 2 is 5x5). The Arc tools' Area
+    // module uses this too.
+    public static List<BlockPos> targets(Level level, BlockPos centre, BlockState centreState, Direction.Axis axis, ItemStack tool, int radius) {
         List<BlockPos> targets = new ArrayList<>();
         if (!isEffective(tool, centreState)) {
             return targets;
         }
         float hardness = centreState.getDestroySpeed(level, centre);
-        for (int a = -1; a <= 1; a++) {
-            for (int b = -1; b <= 1; b++) {
+        for (int a = -radius; a <= radius; a++) {
+            for (int b = -radius; b <= radius; b++) {
                 if (a == 0 && b == 0) {
                     continue;
                 }

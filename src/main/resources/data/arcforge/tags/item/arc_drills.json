@@ -1,0 +1,8 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:tempered_arc_drill",
+    "arcforge:hardened_arc_drill",
+    "arcforge:arcforged_arc_drill"
+  ]
+}
