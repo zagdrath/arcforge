@@ -219,6 +219,7 @@ public final class ArcforgeGameTests {
         TESTS.put("gas_turbine_exhaust_through_thermal_conduit", GasTurbineGameTests::exhaustThroughThermalConduit);
         TESTS.put("throttle_lever_drives_gas_turbine", GasTurbineGameTests::throttleLeverDrivesTurbine);
         TESTS.put("throttle_lever_steps", AutomationGameTests::throttleLeverSteps);
+        TESTS.put("throttle_lever_payload_range", AutomationGameTests::throttleLeverPayloadRange);
         TESTS.put("advancement_tree_loads", AdvancementGameTests::treeLoads);
         TESTS.put("multiblock_formed_trigger", AdvancementGameTests::multiblockFormedTrigger);
         TESTS.put("turbine_full_speed_needs_length", AdvancementGameTests::turbineFullSpeedNeedsLength);

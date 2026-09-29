@@ -28,8 +28,10 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
     private static final int DIAL_X = 38, DIAL_Y = 22, DIAL_W = 44, DIAL_H = 26;
     private static final float PIVOT_X = 60.0F, PIVOT_Y = 45.5F, NEEDLE_LENGTH = 13.0F;
     private static final int RPM_CENTER_X = 60, RPM_Y = 52, EXHAUST_Y = 61;
-    private static final int LABEL_X = 88, VALUE_RIGHT = 145, FLOW_LABEL_Y = 22, FLOW_Y = 31, OUTPUT_LABEL_Y = 42, OUTPUT_Y = 51;
+    private static final int LABEL_X = 88, VALUE_RIGHT = 147, FLOW_LABEL_Y = 22, FLOW_Y = 31, OUTPUT_LABEL_Y = 42, OUTPUT_Y = 51;
     private static final int LED_X = 88, LED_Y = 61, STATUS_X = 96, STATUS_Y = 61;
+    // The screen's inner right edge is x150: values end 3 px in from it, the status is clipped 2 px short of it.
+    private static final int STATUS_W = 150 - 2 - STATUS_X + 2;
     private static final int NEEDLE_COLOR = 0xFFFF5A4A;
     // Share of the gap to the synced speed the needle closes each frame.
     private static final float NEEDLE_EASE = 0.15F;
@@ -100,7 +102,7 @@ public class SteamTurbineArrayScreen extends MachineScreen<SteamTurbineArrayMenu
         int output = menu.getFePerTick();
         textRight(graphics, Component.translatable("gui.arcforge.fe_per_tick_gain", output < 10_000 ? ArcforgeGui.grouped(output) : ArcforgeGui.compact(output)),
                 VALUE_RIGHT, OUTPUT_Y, ArcforgeGui.ACCENT);
-        graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
     }
 
     private Component exhaustText() {

@@ -61,13 +61,21 @@ public class ElectricPumpScreen extends MachineScreen<ElectricPumpMenu> {
 
     @Override
     protected void drawText(GuiGraphicsExtractor graphics) {
-        Fluid source = menu.getSource();
         graphics.text(font, Component.translatable("gui.arcforge.source"), LABEL_X, SOURCE_Y, ArcforgeGui.LABEL, false);
-        textRight(graphics, source != Fluids.EMPTY ? source.getFluidType().getDescription() : Component.translatable("gui.arcforge.none"),
-                VALUE_RIGHT, SOURCE_Y, ArcforgeGui.TEXT);
+        // Clipped to the room right of the label (4 px gap); the tooltip has the full name.
+        textRight(graphics, clipped(sourceName(), valueRoom("gui.arcforge.source")), VALUE_RIGHT, SOURCE_Y, ArcforgeGui.TEXT);
         graphics.text(font, Component.translatable("gui.arcforge.rate"), LABEL_X, RATE_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.translatable("gui.arcforge.mb_per_second", ArcforgeGui.grouped(menu.getRate())), VALUE_RIGHT, RATE_Y, ArcforgeGui.TEXT);
         graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+    }
+
+    private Component sourceName() {
+        Fluid source = menu.getSource();
+        return source != Fluids.EMPTY ? source.getFluidType().getDescription() : Component.translatable("gui.arcforge.none");
+    }
+
+    private int valueRoom(String labelKey) {
+        return VALUE_RIGHT - (LABEL_X + font.width(Component.translatable(labelKey)) + 4);
     }
 
     @Override
@@ -77,8 +85,11 @@ public class ElectricPumpScreen extends MachineScreen<ElectricPumpMenu> {
             lines.add(Component.translatable("gui.arcforge.fe_per_tick_loss", menu.getUsage()).withStyle(ChatFormatting.RED));
         } else if (isHovering(TANK_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getFluid(), Component.translatable("gui.arcforge.empty"), menu.getFluidAmount(), menu.getFluidCapacity());
-        } else if (isHovering(LABEL_X, SOURCE_Y - 1, VALUE_RIGHT - LABEL_X, 10, mouseX, mouseY) && menu.isInfiniteSource()) {
-            lines.add(Component.translatable("gui.arcforge.infinite_source").withColor(ArcforgeGui.ACCENT));
+        } else if (isHovering(LABEL_X, SOURCE_Y - 1, VALUE_RIGHT - LABEL_X, 10, mouseX, mouseY) && menu.getSource() != Fluids.EMPTY) {
+            lines.add(sourceName());
+            if (menu.isInfiniteSource()) {
+                lines.add(Component.translatable("gui.arcforge.infinite_source").withColor(ArcforgeGui.ACCENT));
+            }
         } else if (isHovering(BAR_X, BAR_Y - 2, BAR_W, BAR_H + 4, mouseX, mouseY) && menu.getTotal() > 0) {
             lines.add(Component.translatable("gui.arcforge.progress_ticks", menu.getProgress(), menu.getTotal()));
         }

@@ -70,8 +70,7 @@ public class BlockBreakerScreen extends MachineScreen<BlockBreakerMenu> {
 
     @Override
     protected void drawText(GuiGraphicsExtractor graphics) {
-        String name = font.plainSubstrByWidth(target().getString(), TARGET_W);
-        graphics.text(font, Component.literal(name), TARGET_X, TARGET_Y, ArcforgeGui.LABEL, false);
+        graphics.text(font, clipped(target(), TARGET_W), TARGET_X, TARGET_Y, ArcforgeGui.LABEL, false);
         graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
     }
 

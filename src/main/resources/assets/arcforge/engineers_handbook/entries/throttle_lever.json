@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "A lever that sets a redstone signal from 0 to 15 instead of just on or off. Place it on a floor, wall or ceiling like a lever.\n- **Use** it to raise the signal by 1, **sneak-use** to lower it. It stops at 0 and 15.\n- The gauge beside the slot lights up with the signal, and the action bar shows it.\nIt powers the block it's on and its neighbours like a lever, so it sets a Gas Turbine Array's Throttle mode directly."
+      "text": "An aircraft-style throttle that sets a redstone signal from 0 to 15 instead of just on or off. Place it on a floor, wall or ceiling like a lever.\n- **Look at it and scroll** the mouse wheel to move the throttle up or down, one step at a time. A popup under the crosshair shows the signal. (Sneak + scroll still works your held tool.)\n- Or **use** it to raise the signal by 1 and **sneak-use** to lower it. It stops at 0 and 15.\n- The arm swings back at 0 and forward at 15 (down and up on a wall), and the gauge beside the slot lights with the signal.\nIt powers the block it's on and its neighbours like a lever, so it sets a Gas Turbine Array's Throttle mode directly."
     }
   ]
 }

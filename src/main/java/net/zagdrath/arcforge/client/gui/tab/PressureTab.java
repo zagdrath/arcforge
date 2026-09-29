@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -24,8 +25,7 @@ import net.zagdrath.arcforge.steam.BoilerPressure;
 
 // A boiler's pressure setting (see BoilerPressure): one row per setting, the active one outlined.
 public class PressureTab extends SideTab {
-    private static final int WIDTH = 108;
-    private static final int ROWS_X = 6, ROWS_Y = 24, ROW_W = WIDTH - 12, ROW_H = 12, TEXT_INSET = 3;
+    private static final int ROWS_X = CONTENT_INSET, ROWS_Y = 24, ROW_H = 12, TEXT_INSET = 3;
 
     private final List<BoilerPressure> rows;
     private final Supplier<BoilerPressure> current;
@@ -41,11 +41,26 @@ public class PressureTab extends SideTab {
     // Only these settings (the Superheater Array has no plain-Steam row), with their own hints.
     public PressureTab(List<BoilerPressure> rows, Supplier<BoilerPressure> current, Consumer<BoilerPressure> select,
             Function<BoilerPressure, String> hint) {
-        super(ArcforgeGui.widget("icon_pressure"), Component.translatable("gui.arcforge.tab.pressure"), WIDTH, ROWS_Y + rows.size() * ROW_H + 6, Side.LEFT);
+        super(ArcforgeGui.widget("icon_pressure"), Component.translatable("gui.arcforge.tab.pressure"), 92, ROWS_Y + rows.size() * ROW_H + 6, Side.LEFT);
         this.rows = rows;
         this.current = current;
         this.select = select;
         this.hint = hint;
+    }
+
+    // Just wide enough for the longest setting name (the panel hangs off the left, so no blank strip on the right).
+    @Override
+    protected int expandedWidth() {
+        Font font = Minecraft.getInstance().font;
+        int widest = 0;
+        for (BoilerPressure pressure : rows) {
+            widest = Math.max(widest, font.width(pressure.getDescription()));
+        }
+        return fitWidth(font, widest + 2 * TEXT_INSET + 1);
+    }
+
+    private int rowWidth() {
+        return expandedWidth() - 2 * ROWS_X;
     }
 
     private int rowY(BoilerPressure pressure) {
@@ -54,7 +69,7 @@ public class PressureTab extends SideTab {
 
     private @Nullable BoilerPressure rowAt(int localX, int localY) {
         for (BoilerPressure pressure : rows) {
-            if (ArcforgeGui.isInside(localX, localY, ROWS_X, rowY(pressure), ROW_W, ROW_H)) {
+            if (ArcforgeGui.isInside(localX, localY, ROWS_X, rowY(pressure), rowWidth(), ROW_H)) {
                 return pressure;
             }
         }
@@ -69,7 +84,7 @@ public class PressureTab extends SideTab {
             int rowX = x + ROWS_X;
             int rowY = y + rowY(pressure);
             if (active) {
-                graphics.outline(rowX, rowY, ROW_W, ROW_H, ArcforgeGui.ACCENT);
+                graphics.outline(rowX, rowY, rowWidth(), ROW_H, ArcforgeGui.ACCENT);
             }
             int color = active ? ArcforgeGui.ACCENT : pressure == hovered ? ArcforgeGui.TEXT : ArcforgeGui.LABEL;
             graphics.text(font, pressure.getDescription(), rowX + TEXT_INSET, rowY + 2, color, false);

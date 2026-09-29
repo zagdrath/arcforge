@@ -39,10 +39,16 @@ public class RedstoneTab extends SideTab {
 
     public RedstoneTab(Supplier<RedstoneMode> current, Consumer<RedstoneMode> select, List<RedstoneMode> modes) {
         super(ArcforgeGui.widget("icon_redstone"), Component.translatable("gui.arcforge.tab.redstone"),
-                Math.max(100, BUTTONS_X + modes.size() * BUTTON_PITCH), 52);
+                Math.max(100, buttonsWidth(modes.size()) + 2 * BUTTONS_X), 52);
         this.current = current;
         this.select = select;
         this.modes = modes;
+    }
+
+    // The buttons' total span: the gap after the last one isn't part of it, so the panel keeps BUTTONS_X of margin on
+    // both sides (four buttons: 8 + 92 + 8 = 108).
+    private static int buttonsWidth(int count) {
+        return count * BUTTON_PITCH - (BUTTON_PITCH - BUTTON_SIZE);
     }
 
     private static Identifier icon(RedstoneMode mode) {

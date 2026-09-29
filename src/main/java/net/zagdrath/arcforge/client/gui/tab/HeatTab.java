@@ -21,9 +21,9 @@ import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 
 // Shows stored heat and the rate it's made or used at, plus extra rows (e.g. the Geothermal Plant's nearby lava
 // and magma, or a burner's oxygen). A row is a label over a value, or one line; rows can hide themselves. The panel
-// is as wide as its widest line (at least 100) and as tall as the rows it shows.
+// is as wide as its widest line (see SideTab.fitWidth) and as tall as the rows it shows.
 public class HeatTab extends SideTab {
-    private static final int MIN_WIDTH = 100, PADDING = 12, BASE_HEIGHT = 74;
+    private static final int BASE_HEIGHT = 74;
     private static final int PAIR_HEIGHT = 22, LINE_HEIGHT = 12;
 
     // An extra row: a label and a value (or just the value, on one line when the label is null), shown while `shown`.
@@ -52,7 +52,7 @@ public class HeatTab extends SideTab {
     }
 
     public HeatTab(IntSupplier stored, Component rateLabel, Supplier<Component> rate, List<Row> rows) {
-        super(ArcforgeGui.widget("icon_heat"), Component.translatable("gui.arcforge.tab.heat"), MIN_WIDTH, BASE_HEIGHT, Side.LEFT);
+        super(ArcforgeGui.widget("icon_heat"), Component.translatable("gui.arcforge.tab.heat"), 64, BASE_HEIGHT, Side.LEFT);
         this.stored = stored;
         this.rateLabel = rateLabel;
         this.rate = rate;
@@ -84,7 +84,7 @@ public class HeatTab extends SideTab {
                 widest = Math.max(widest, font.width(row.label()));
             }
         }
-        return Math.max(MIN_WIDTH, widest + PADDING);
+        return fitWidth(font, widest);
     }
 
     @Override
@@ -98,17 +98,17 @@ public class HeatTab extends SideTab {
 
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
-        graphics.text(font, Component.translatable("gui.arcforge.stored"), x + 6, y + 26, ArcforgeGui.TOOLTIP_GRAY, false);
-        graphics.text(font, storedText(), x + 6, y + 36, ArcforgeGui.WHITE, false);
-        graphics.text(font, rateLabel, x + 6, y + 48, ArcforgeGui.TOOLTIP_GRAY, false);
-        graphics.text(font, rate.get(), x + 6, y + 58, ArcforgeGui.HEAT, false);
+        graphics.text(font, Component.translatable("gui.arcforge.stored"), x + CONTENT_INSET, y + 26, ArcforgeGui.TOOLTIP_GRAY, false);
+        graphics.text(font, storedText(), x + CONTENT_INSET, y + 36, ArcforgeGui.WHITE, false);
+        graphics.text(font, rateLabel, x + CONTENT_INSET, y + 48, ArcforgeGui.TOOLTIP_GRAY, false);
+        graphics.text(font, rate.get(), x + CONTENT_INSET, y + 58, ArcforgeGui.HEAT, false);
         int rowY = y + 70;
         for (Row row : shownRows()) {
             if (row.label() != null) {
-                graphics.text(font, row.label(), x + 6, rowY, ArcforgeGui.TOOLTIP_GRAY, false);
-                graphics.text(font, row.value().get(), x + 6, rowY + 10, ArcforgeGui.TEXT, false);
+                graphics.text(font, row.label(), x + CONTENT_INSET, rowY, ArcforgeGui.TOOLTIP_GRAY, false);
+                graphics.text(font, row.value().get(), x + CONTENT_INSET, rowY + 10, ArcforgeGui.TEXT, false);
             } else {
-                graphics.text(font, row.value().get(), x + 6, rowY, ArcforgeGui.TEXT, false);
+                graphics.text(font, row.value().get(), x + CONTENT_INSET, rowY, ArcforgeGui.TEXT, false);
             }
             rowY += row.height();
         }

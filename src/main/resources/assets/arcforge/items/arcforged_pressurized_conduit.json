@@ -4,21 +4,16 @@
     "property": "minecraft:has_component",
     "component": "arcforge:conduit_color",
     "on_true": {
-      "type": "minecraft:composite",
-      "models": [
+      "type": "minecraft:model",
+      "model": "arcforge:item/arcforged_pressurized_conduit_dyed",
+      "tints": [
         {
-          "type": "minecraft:model",
-          "model": "arcforge:item/arcforged_pressurized_conduit"
+          "type": "minecraft:constant",
+          "value": -1
         },
         {
-          "type": "minecraft:model",
-          "model": "arcforge:item/conduit_sheath",
-          "tints": [
-            {
-              "type": "arcforge:conduit_color",
-              "default": -1
-            }
-          ]
+          "type": "arcforge:conduit_color",
+          "default": -1
         }
       ]
     },

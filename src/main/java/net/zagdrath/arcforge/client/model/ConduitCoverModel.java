@@ -25,7 +25,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 
-// A covered conduit: its own model (and filter sleeves and sheath, which the wrappers before this add), inside a
+// A covered conduit: its own model (and filter sleeves, which the wrapper before this adds), inside a
 // full-block cover. With no look copied onto it the cover is the clear pane arcforge:block/conduit/cover
 // (translucent); with one it is that block's own model, in that block's own render type. An opaque look hides the
 // conduit; the pane shows it. Tint indices of a copied look (grass, leaves) are not passed through.
@@ -44,7 +44,7 @@ public final class ConduitCoverModel extends DelegateBlockStateModel {
                 BlockModelRotation.IDENTITY));
     }
 
-    // Wraps every conduit's block state models (after the filter and sheath wrappers).
+    // Wraps every conduit's block state models (after the filter wrapper).
     public static void wrap(ModelEvent.ModifyBakingResult event) {
         var result = event.getBakingResult();
         BlockStateModelPart pane = result.standaloneModels().get(PANE);

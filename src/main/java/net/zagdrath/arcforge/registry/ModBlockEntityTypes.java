@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.blockentity.redstone.ThrottleLeverBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
@@ -91,6 +92,8 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<MetalPressBlockEntity>> METAL_PRESS = BLOCK_ENTITY_TYPES.register("metal_press",
             () -> new BlockEntityType<>(MetalPressBlockEntity::new, ModBlocks.METAL_PRESS.get()));
 
+    public static final Supplier<BlockEntityType<ThrottleLeverBlockEntity>> THROTTLE_LEVER = BLOCK_ENTITY_TYPES.register("throttle_lever",
+            () -> new BlockEntityType<>(ThrottleLeverBlockEntity::new, ModBlocks.THROTTLE_LEVER.get()));
     public static final Supplier<BlockEntityType<SecurityTerminalBlockEntity>> SECURITY_TERMINAL = BLOCK_ENTITY_TYPES.register("security_terminal",
             () -> new BlockEntityType<>(SecurityTerminalBlockEntity::new, ModBlocks.SECURITY_TERMINAL.get()));
 

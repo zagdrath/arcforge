@@ -80,9 +80,11 @@ public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
         textRight(graphics, Component.translatable("gui.arcforge.hu_stored_compact", compact(menu.getHeat()), compact(menu.getCapacity())), STORED_Y, ArcforgeGui.WHITE);
         graphics.text(font, Component.translatable("gui.arcforge.temp"), TEXT_LEFT, TEMP_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.translatable("gui.arcforge.celsius", menu.getTemperature()), TEMP_Y, ArcforgeGui.TEXT);
-        graphics.text(font, Component.translatable("gui.arcforge.heat_cell.in", menu.getReceivedPerTick()), TEXT_LEFT, IN_OUT_Y, ArcforgeGui.HEAT, false);
-        textRight(graphics, Component.translatable("gui.arcforge.heat_cell.out", menu.getExtractedPerTick()), IN_OUT_Y, OUT_COLOR);
-        graphics.text(font, Component.translatable("gui.arcforge.heat_cell.leak", menu.getLeakPerTick()), TEXT_LEFT, LEAK_Y, LEAK_COLOR, false);
+        // In and Out share a row, so they drop the unit (the Leak row and the tooltip carry it): at an Arcforged cell's
+        // 3,200 HU/t, "In +3,200" and "Out -3,200" still leave an 11 px gap.
+        graphics.text(font, Component.translatable("gui.arcforge.heat_cell.in", ArcforgeGui.grouped(menu.getReceivedPerTick())), TEXT_LEFT, IN_OUT_Y, ArcforgeGui.HEAT, false);
+        textRight(graphics, Component.translatable("gui.arcforge.heat_cell.out", ArcforgeGui.grouped(menu.getExtractedPerTick())), IN_OUT_Y, OUT_COLOR);
+        graphics.text(font, Component.translatable("gui.arcforge.heat_cell.leak", ArcforgeGui.grouped(menu.getLeakPerTick())), TEXT_LEFT, LEAK_Y, LEAK_COLOR, false);
     }
 
     private void textRight(GuiGraphicsExtractor graphics, Component text, int y, int color) {
@@ -99,6 +101,9 @@ public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
         if (isHovering(RECESS_X, RECESS_Y, RECESS_W, RECESS_H, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.hu_stored", ArcforgeGui.grouped(menu.getHeat()), ArcforgeGui.grouped(menu.getCapacity())));
             lines.add(Component.translatable("gui.arcforge.celsius", menu.getTemperature()).withStyle(ChatFormatting.GRAY));
+        } else if (isHovering(TEXT_LEFT, IN_OUT_Y - 1, TEXT_RIGHT - TEXT_LEFT, 10, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.heat_cell.in_full", ArcforgeGui.grouped(menu.getReceivedPerTick())));
+            lines.add(Component.translatable("gui.arcforge.heat_cell.out_full", ArcforgeGui.grouped(menu.getExtractedPerTick())));
         } else if (isHovering(PIPS_X, PIPS_Y, ConduitTier.values().length * PIP_PITCH, PIP_SIZE, mouseX, mouseY)) {
             ConduitTier tier = menu.getTier();
             int insulation = menu.getInsulation();

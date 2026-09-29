@@ -38,7 +38,7 @@ public class SideTabPanel {
     private static final int TABS_Y = 6;
     private static final int GAP = 1;
     private static final int ICON_X = 3, ICON_Y = 2;
-    private static final int TITLE_X = 22, TITLE_Y = 6;
+    private static final int TITLE_X = SideTab.TITLE_INSET, TITLE_Y = 6;
     private static final float ANIMATION_MILLIS = 300.0F;
 
     private final List<SideTab> tabs = new ArrayList<>();

@@ -1,0 +1,155 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "particle": "#conduit"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        5,
+        0
+      ],
+      "to": [
+        11,
+        11,
+        16
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "texture": "#conduit"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "texture": "#conduit"
+        },
+        "up": {
+          "uv": [
+            0,
+            6,
+            16,
+            0
+          ],
+          "texture": "#conduit",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            0,
+            6,
+            16,
+            0
+          ],
+          "texture": "#conduit",
+          "rotation": 90
+        },
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "south": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        5,
+        0
+      ],
+      "to": [
+        11,
+        11,
+        16
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            16,
+            6
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "up": {
+          "uv": [
+            0,
+            6,
+            16,
+            0
+          ],
+          "texture": "#dye",
+          "rotation": 90,
+          "tintindex": 1
+        },
+        "down": {
+          "uv": [
+            0,
+            6,
+            16,
+            0
+          ],
+          "texture": "#dye",
+          "rotation": 90,
+          "tintindex": 1
+        },
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "south": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        }
+      }
+    }
+  ]
+}

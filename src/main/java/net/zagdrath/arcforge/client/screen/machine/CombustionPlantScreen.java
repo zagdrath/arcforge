@@ -51,7 +51,9 @@ public class CombustionPlantScreen extends MachineScreen<BurnerMenu> {
         graphics.text(font, Component.translatable("gui.arcforge.fuel"), SCREEN_LEFT, FUEL_TEXT_Y, ArcforgeGui.LABEL, false);
         Item burning = menu.getBurningItem();
         Component fuel = burning != null ? burning.getName(burning.getDefaultInstance()) : Component.translatable("gui.arcforge.none");
-        textRight(graphics, fuel, SCREEN_RIGHT, FUEL_TEXT_Y, ArcforgeGui.TEXT);
+        // Clipped to the room right of the "Fuel" label (4 px gap), e.g. "Block of Coal"; the tooltip has the full name.
+        int room = SCREEN_RIGHT - (SCREEN_LEFT + font.width(Component.translatable("gui.arcforge.fuel")) + 4);
+        textRight(graphics, clipped(fuel, room), SCREEN_RIGHT, FUEL_TEXT_Y, ArcforgeGui.TEXT);
         graphics.text(font, Component.translatable("gui.arcforge.output"), SCREEN_LEFT, OUTPUT_TEXT_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.translatable("gui.arcforge.fe_per_tick_gain", menu.getOutputPerTick()), SCREEN_RIGHT, OUTPUT_TEXT_Y, ArcforgeGui.ACCENT);
         graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
@@ -65,6 +67,9 @@ public class CombustionPlantScreen extends MachineScreen<BurnerMenu> {
         } else if ((isHovering(FLAME_X, FLAME_Y, FLAME_SIZE, FLAME_SIZE, mouseX, mouseY) || isHovering(BURN_X, BURN_Y - 2, BURN_W, 8, mouseX, mouseY))
                 && menu.getBurnTime() > 0) {
             lines.add(Component.translatable("gui.arcforge.burn_time", (menu.getBurnTime() + 19) / 20));
+        } else if (isHovering(SCREEN_LEFT, FUEL_TEXT_Y - 1, SCREEN_RIGHT - SCREEN_LEFT, 10, mouseX, mouseY) && menu.getBurningItem() != null) {
+            Item burning = menu.getBurningItem();
+            lines.add(burning.getName(burning.getDefaultInstance()));
         }
     }
 }

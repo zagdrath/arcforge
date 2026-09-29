@@ -480,4 +480,25 @@ public final class AutomationGameTests {
         helper.assertTrue(helper.getBlockState(lever).getValue(power) == 15, "The lever went past 15: " + helper.getBlockState(lever).getValue(power));
         helper.succeed();
     }
+
+    // The Throttle Lever's scroll payload only moves a lever the player can reach: from 10 blocks away nothing changes,
+    // from next to it the lever steps up.
+    @SuppressWarnings("removal")
+    static void throttleLeverPayloadRange(GameTestHelper helper) {
+        BlockPos lever = new BlockPos(1, 1, 1);
+        helper.setBlock(lever, ModBlocks.THROTTLE_LEVER.get().defaultBlockState()
+                .setValue(net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.FLOOR)
+                .setValue(net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACING, Direction.NORTH));
+        var power = net.zagdrath.arcforge.block.redstone.ThrottleLeverBlock.POWER;
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        BlockPos absolute = helper.absolutePos(lever);
+        player.snapTo(absolute.getX() + 10.5, absolute.getY(), absolute.getZ() + 0.5);
+        net.zagdrath.arcforge.network.ThrottleLeverPayload.apply(player, absolute, 1);
+        helper.assertTrue(helper.getBlockState(lever).getValue(power) == 0, "A player 10 blocks away moved the lever to " + helper.getBlockState(lever).getValue(power));
+        player.snapTo(absolute.getX() + 1.5, absolute.getY(), absolute.getZ() + 0.5);
+        net.zagdrath.arcforge.network.ThrottleLeverPayload.apply(player, absolute, 1);
+        helper.assertTrue(helper.getBlockState(lever).getValue(power) == 1, "A player next to the lever moved it to " + helper.getBlockState(lever).getValue(power));
+        helper.succeed();
+    }
 }

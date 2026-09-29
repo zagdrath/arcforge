@@ -1,0 +1,9 @@
+{
+  "parent": "arcforge:block/conduit/base_thermal_straight_dyed",
+  "textures": {
+    "conduit": "arcforge:block/conduit/tempered_thermal_on_dyed",
+    "port_in": "arcforge:block/conduit/port_input",
+    "port_out": "arcforge:block/conduit/port_output",
+    "dye": "arcforge:block/conduit/dye/thermal_on"
+  }
+}

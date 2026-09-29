@@ -22,6 +22,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.resources.DefaultPlayerSkin;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.util.Util;
@@ -49,7 +50,8 @@ public class SecurityTerminalScreen extends AbstractContainerScreen<SecurityTerm
     private static final int MODE_X = 8, MODE_Y = 30, MODE_PITCH = 24, BUTTON_SIZE = 20, MODE_NAME_X = 84, MODE_NAME_Y = 36;
     private static final int LIST_X = 7, LIST_Y = 68, LIST_W = 162, ROW_H = 14, ROWS = 5, REMOVE_SIZE = 12;
     private static final int FIELD_X = 7, FIELD_Y = 146, FIELD_W = 118, ADD_X = 129, ADD_Y = 145, ADD_W = 40, ADD_H = 20;
-    private static final int FEEDBACK_Y = 170;
+    // One line at FEEDBACK_Y; a long message (a 16-character player name) wraps onto two lines from FEEDBACK_Y2.
+    private static final int FEEDBACK_Y = 170, FEEDBACK_Y2 = 166, FEEDBACK_W = 160, LINE_HEIGHT = 9;
     private static final List<SecurityMode> MODES = List.of(SecurityMode.PUBLIC, SecurityMode.TRUSTED, SecurityMode.PRIVATE);
 
     private @Nullable EditBox name;
@@ -178,7 +180,11 @@ public class SecurityTerminalScreen extends AbstractContainerScreen<SecurityTerm
         } else {
             feedback = Component.translatable("gui.arcforge.security_terminal.applies");
         }
-        graphics.text(font, feedback, MODE_X, FEEDBACK_Y, color, false);
+        List<FormattedCharSequence> lines = font.split(feedback, FEEDBACK_W);
+        int lineY = lines.size() > 1 ? FEEDBACK_Y2 : FEEDBACK_Y;
+        for (int i = 0; i < Math.min(2, lines.size()); i++) {
+            graphics.text(font, lines.get(i), MODE_X, lineY + i * LINE_HEIGHT, color, false);
+        }
     }
 
     @Override

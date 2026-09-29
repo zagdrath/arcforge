@@ -72,7 +72,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_core"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/tempered_fluid_core",
+        "dyed": "arcforge:block/conduit/tempered_fluid_core_dyed"
       }
     },
     {
@@ -85,7 +87,9 @@
         "down": "none"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_straight"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/tempered_fluid_straight",
+        "dyed": "arcforge:block/conduit/tempered_fluid_straight_dyed"
       }
     },
     {
@@ -98,8 +102,10 @@
         "down": "none"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_straight",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/tempered_fluid_straight_dyed"
       }
     },
     {
@@ -112,8 +118,10 @@
         "down": "pipe"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_straight",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/tempered_fluid_straight_dyed"
       }
     },
     {
@@ -147,7 +155,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/tempered_fluid_arm",
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_dyed"
       }
     },
     {
@@ -155,7 +165,9 @@
         "north": "input"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm_input"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_input",
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_input_dyed"
       }
     },
     {
@@ -163,7 +175,9 @@
         "north": "output"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm_output"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_output",
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_output_dyed"
       }
     },
     {
@@ -197,8 +211,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_s_dyed"
       }
     },
     {
@@ -206,8 +222,10 @@
         "south": "input"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_input_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_input_s_dyed"
       }
     },
     {
@@ -215,8 +233,10 @@
         "south": "output"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_output_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_output_s_dyed"
       }
     },
     {
@@ -250,8 +270,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_dyed"
       }
     },
     {
@@ -259,8 +281,10 @@
         "east": "input"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_input",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_input_dyed"
       }
     },
     {
@@ -268,8 +292,10 @@
         "east": "output"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_output",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_output_dyed"
       }
     },
     {
@@ -303,8 +329,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_s_dyed"
       }
     },
     {
@@ -312,8 +340,10 @@
         "west": "input"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_input_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_input_s_dyed"
       }
     },
     {
@@ -321,8 +351,10 @@
         "west": "output"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_output_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_output_s_dyed"
       }
     },
     {
@@ -356,8 +388,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_u_dyed"
       }
     },
     {
@@ -365,8 +399,10 @@
         "up": "input"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_input_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_input_u_dyed"
       }
     },
     {
@@ -374,8 +410,10 @@
         "up": "output"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_output_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_output_u_dyed"
       }
     },
     {
@@ -409,8 +447,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_dyed"
       }
     },
     {
@@ -418,8 +458,10 @@
         "down": "input"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_input",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_input_dyed"
       }
     },
     {
@@ -427,8 +469,10 @@
         "down": "output"
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/tempered_fluid_arm_output",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/tempered_fluid_arm_output_dyed"
       }
     }
   ]

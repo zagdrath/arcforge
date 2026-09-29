@@ -34,5 +34,6 @@ public final class ArcforgeNetwork {
         registrar.playToClient(SecuritySyncPayload.TYPE, SecuritySyncPayload.STREAM_CODEC, SecuritySyncPayload::handle);
         registrar.playToClient(SecurityProfilePayload.TYPE, SecurityProfilePayload.STREAM_CODEC, SecurityProfilePayload::handle);
         registrar.playToServer(SecurityEditPayload.TYPE, SecurityEditPayload.STREAM_CODEC, SecurityEditPayload::handle);
+        registrar.playToServer(ThrottleLeverPayload.TYPE, ThrottleLeverPayload.STREAM_CODEC, ThrottleLeverPayload::handle);
     }
 }

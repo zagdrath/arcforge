@@ -11,7 +11,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Craft up to 8 conduits of one kind with a Plastic Sheet and a dye to sheathe them in that colour. They keep their stats.\n- Sheathed conduits only join conduits of the same colour, or unsheathed ones.\n- So two red and blue lines can run side by side without merging.\n- Put a sheathed conduit in the crafting grid on its own to strip the sheath."
+      "text": "Craft up to 8 conduits of one kind with a Plastic Sheet and a dye to sheathe them in that colour: an Energy or Thermodynamic Conduit's core glows in it, and the glass of the others takes its tint. They keep their stats.\n- Sheathed conduits only join conduits of the same colour, or unsheathed ones.\n- So two red and blue lines can run side by side without merging.\n- Put a sheathed conduit in the crafting grid on its own to strip the sheath."
     }
   ]
 }

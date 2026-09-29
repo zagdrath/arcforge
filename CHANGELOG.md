@@ -20,7 +20,7 @@ number and date.
 
 ## [Unreleased]
 
-Suggested version: **2.1.0** (new content and balance changes; worlds load as they are).
+## [2.1.0] - 2026-09-29
 
 ### Upgrading
 
@@ -91,7 +91,9 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Dyed conduits.** Craft 1 to 7 conduits of one kind with a Plastic Sheet and a dye to sheathe them in that
   colour; a sheathed conduit alone strips back to plain. Sheathed conduits only join their own colour (or
   plain ones), so parallel lines of the same type stay separate. They keep their colour when broken, and JEI
-  lists every colour.
+  lists every colour. The colour is in the conduit itself: an Energy or Thermodynamic Conduit's core stripe
+  takes it (dim when idle, lit when carrying power; a hot thermal one brightens with its temperature), and
+  the glass of Item, Fluid and Pressurized Conduits is tinted with it.
 - **Gas Turbine Array** (Hardened). A 3x3 tube 5 to 9 long that burns Naphtha, Light Oil, Ethanol or Hydrogen
   straight to FE.
   - It burns up to 560 HU/t per block of length at 1.5 FE per HU (less for fuels burning under 1,200°C): a
@@ -106,9 +108,11 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
     exhaust. Heavy Oil lubricant adds 8%.
   - New parts: the **Turbine Blade Set** and **Combustor**. JEI lists its fuels; Jade, a Handbook page and a
     config section `[gasTurbineArray]`.
-- **Throttle Lever.** A lever with a signal of 0 to 15: use it to raise the signal by 1, sneak-use to lower it.
-  Its gauge lights up with the signal. It powers the block it's on like a lever, so it sets a Gas Turbine
-  Array's Throttle mode directly. Crafted from a lever, a comparator, redstone and a Steel Plate.
+- **Throttle Lever.** An aircraft-style throttle quadrant with a signal of 0 to 15. Look at it and scroll the mouse
+  wheel to move it (a popup under the crosshair shows the signal), or use / sneak-use it to step it up or down.
+  The arm pivots on its axle, swinging back at 0 and forward at 15, and the gauge beside the slot lights with the
+  signal. It powers the block it's on like a lever, so it sets a Gas Turbine Array's Throttle mode directly.
+  Crafted from a lever, a comparator, redstone and a Steel Plate.
 - **Jetpacks** (Tempered / Hardened / Arcforged). They burn Steam, High-Pressure Steam, Superheated Steam or
   Hydrogen (data map `arcforge:jetpack_fuels`), with Normal / Hover / Off modes on a key (H), a fuel gauge by
   the hotbar, steam puffs or a blue hydrogen flame, and a thrust sound. Fill them in a Pressurized Cylinder or
@@ -192,6 +196,18 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 
 ### Changed
 
+- **Machine tabs.** Collapsed tabs now use the GUI panel's own grey. Open tabs fit their content: the Energy,
+  Heat and Pressure tabs on the left no longer leave a blank strip. The Ports tab grows to fit its longest line
+  and starts its rows under the header when there's no auto-eject button. The Redstone tab keeps an even margin
+  round four buttons.
+- **Energy tab.** An idle machine shows a grey "0 FE/t" rather than a red "-0 FE/t".
+- **Meters.** The front screen is a bezel framing an LCD centred on the block, and the reading is centred on it.
+- **Fermenter.** The model is redone to the texture guide, without the three loose protrusions. Its default
+  ports are built in: input on top, output under the base, energy on the back.
+- **Gas Turbine Array rotor.** The combustor is round, and a bearing on the inside of each end holds the shaft.
+- **Status names.** "Intake shut" is now "Intake off", and "Spinning up" is now "Spin-up", so they fit the
+  turbine screens.
+
 - **GUI tabs are smaller and on both sides.** Readouts (Energy, Heat, Pressure) are on the left of a machine's
   screen; settings (Redstone, Sides or Ports, Upgrades, Security) stay on the right. One tab can be open on
   each side.
@@ -240,6 +256,14 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
   dies and gears, and Energy/Heat Cell level bars.
 
 ### Fixed
+
+- **Text running off GUIs.**
+  - Distillation Array: the screen is wider and its status is clipped, so "No steam" and "No feed" no longer run
+    into the tanks.
+  - Security Terminal: long messages wrap onto two lines.
+  - Heat Cell: In and Out no longer overlap at an Arcforged cell's rate.
+  - The Combustion Plant's fuel, the Electric Pump's source, the Arc Quarry's status, the Block Breaker's target
+    and the turbine statuses are clipped with "…", with the full text in the tooltip where one exists.
 
 - **The Wrench can be crafted.** Three iron ingots and a copper ingot, early enough to set ports on the
   Carbonizer and Arcforge Furnace before you have steel. It was creative-only before.
@@ -463,7 +487,9 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/7b3fbce...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.1.0...HEAD
+[2.1.0]: https://github.com/zagdrath/arcforge/compare/v2.0.0...v2.1.0
+[2.0.0]: https://github.com/zagdrath/arcforge/compare/v1.2.0...v2.0.0
 [1.2.0]: https://github.com/zagdrath/arcforge/compare/f8e4679...7b3fbce
 [1.1.0]: https://github.com/zagdrath/arcforge/compare/d39ded7...f8e4679
 [1.0.0]: https://github.com/zagdrath/arcforge/commit/d39ded7

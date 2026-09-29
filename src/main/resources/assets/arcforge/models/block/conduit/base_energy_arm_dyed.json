@@ -1,0 +1,135 @@
+{
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "#conduit"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        5,
+        0
+      ],
+      "to": [
+        11,
+        11,
+        5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            6,
+            6,
+            11,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "west": {
+          "uv": [
+            6,
+            6,
+            11,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "up": {
+          "uv": [
+            6,
+            12,
+            11,
+            6
+          ],
+          "texture": "#conduit",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            6,
+            12,
+            11,
+            6
+          ],
+          "texture": "#conduit",
+          "rotation": 90
+        },
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        5,
+        0
+      ],
+      "to": [
+        11,
+        11,
+        5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            6,
+            6,
+            11,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "west": {
+          "uv": [
+            6,
+            6,
+            11,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "up": {
+          "uv": [
+            6,
+            12,
+            11,
+            6
+          ],
+          "texture": "#dye",
+          "rotation": 90,
+          "tintindex": 1
+        },
+        "down": {
+          "uv": [
+            6,
+            12,
+            11,
+            6
+          ],
+          "texture": "#dye",
+          "rotation": 90,
+          "tintindex": 1
+        },
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        }
+      }
+    }
+  ]
+}

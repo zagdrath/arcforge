@@ -67,7 +67,7 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
 
     // What the conduit's model draws: each side's filter look (see packFilterModes).
     public static final ModelProperty<Integer> FILTER_MODES = new ModelProperty<>();
-    // The sheath colour for the model: 0 unsheathed, else the dye id + 1.
+    // The dye colour for the model (ConduitDyeModel picks the _dyed pieces): 0 undyed, else the dye id + 1.
     public static final ModelProperty<Integer> COLOR = new ModelProperty<>();
     // The Conduit Cover, if one is fitted (see ConduitCoverModel).
     public static final ModelProperty<Cover> COVER = new ModelProperty<>();

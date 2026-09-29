@@ -1,0 +1,9 @@
+{
+  "parent": "arcforge:block/conduit/base_gas_straight_dyed",
+  "textures": {
+    "conduit": "arcforge:block/conduit/hardened_gas_off_dyed",
+    "port_in": "arcforge:block/conduit/port_input",
+    "port_out": "arcforge:block/conduit/port_output",
+    "dye": "arcforge:block/conduit/dye/glass_gas"
+  }
+}

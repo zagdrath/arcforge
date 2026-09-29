@@ -79,7 +79,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_off_core"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_off_core",
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_core_dyed"
       }
     },
     {
@@ -99,7 +101,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_off_straight"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_off_straight",
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_straight_dyed"
       }
     },
     {
@@ -119,8 +123,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_straight",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_straight_dyed"
       }
     },
     {
@@ -140,8 +146,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_straight",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_straight_dyed"
       }
     },
     {
@@ -182,7 +190,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_off_arm"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_off_arm",
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_dyed"
       }
     },
     {
@@ -197,7 +207,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_off_arm_input"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_off_arm_input",
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_input_dyed"
       }
     },
     {
@@ -212,7 +224,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_off_arm_output"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_off_arm_output",
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_output_dyed"
       }
     },
     {
@@ -253,8 +267,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_s_dyed"
       }
     },
     {
@@ -269,8 +285,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_input_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_input_s_dyed"
       }
     },
     {
@@ -285,8 +303,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_output_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_output_s_dyed"
       }
     },
     {
@@ -327,8 +347,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_dyed"
       }
     },
     {
@@ -343,8 +365,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_input",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_input_dyed"
       }
     },
     {
@@ -359,8 +383,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_output",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_output_dyed"
       }
     },
     {
@@ -401,8 +427,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_s_dyed"
       }
     },
     {
@@ -417,8 +445,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_input_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_input_s_dyed"
       }
     },
     {
@@ -433,8 +463,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_output_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_output_s_dyed"
       }
     },
     {
@@ -475,8 +507,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_u_dyed"
       }
     },
     {
@@ -491,8 +525,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_input_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_input_u_dyed"
       }
     },
     {
@@ -507,8 +543,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_output_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_output_u_dyed"
       }
     },
     {
@@ -549,8 +587,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_dyed"
       }
     },
     {
@@ -565,8 +605,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_input",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_input_dyed"
       }
     },
     {
@@ -581,8 +623,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_off_arm_output",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_off_arm_output_dyed"
       }
     },
     {
@@ -664,7 +708,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_on_core"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_on_core",
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_core_dyed"
       }
     },
     {
@@ -684,7 +730,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_on_straight"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_on_straight",
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_straight_dyed"
       }
     },
     {
@@ -704,8 +752,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_straight",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_straight_dyed"
       }
     },
     {
@@ -725,8 +775,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_straight",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_straight_dyed"
       }
     },
     {
@@ -767,7 +819,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_on_arm"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_on_arm",
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_dyed"
       }
     },
     {
@@ -782,7 +836,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_on_arm_input"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_on_arm_input",
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_input_dyed"
       }
     },
     {
@@ -797,7 +853,9 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/hardened_thermal_on_arm_output"
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/hardened_thermal_on_arm_output",
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_output_dyed"
       }
     },
     {
@@ -838,8 +896,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_s_dyed"
       }
     },
     {
@@ -854,8 +914,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_input_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_input_s_dyed"
       }
     },
     {
@@ -870,8 +932,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_output_s",
-        "y": 180
+        "y": 180,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_output_s_dyed"
       }
     },
     {
@@ -912,8 +976,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_dyed"
       }
     },
     {
@@ -928,8 +994,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_input",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_input_dyed"
       }
     },
     {
@@ -944,8 +1012,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_output",
-        "y": 90
+        "y": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_output_dyed"
       }
     },
     {
@@ -986,8 +1056,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_s_dyed"
       }
     },
     {
@@ -1002,8 +1074,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_input_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_input_s_dyed"
       }
     },
     {
@@ -1018,8 +1092,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_output_s",
-        "y": 270
+        "y": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_output_s_dyed"
       }
     },
     {
@@ -1060,8 +1136,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_u_dyed"
       }
     },
     {
@@ -1076,8 +1154,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_input_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_input_u_dyed"
       }
     },
     {
@@ -1092,8 +1172,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_output_u",
-        "x": 270
+        "x": 270,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_output_u_dyed"
       }
     },
     {
@@ -1134,8 +1216,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_dyed"
       }
     },
     {
@@ -1150,8 +1234,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_input",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_input_dyed"
       }
     },
     {
@@ -1166,8 +1252,10 @@
         ]
       },
       "apply": {
+        "type": "arcforge:dyeable",
         "model": "arcforge:block/conduit/hardened_thermal_on_arm_output",
-        "x": 90
+        "x": 90,
+        "dyed": "arcforge:block/conduit/hardened_thermal_on_arm_output_dyed"
       }
     }
   ]

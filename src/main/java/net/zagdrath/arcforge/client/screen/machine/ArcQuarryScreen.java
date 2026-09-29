@@ -108,7 +108,7 @@ public class ArcQuarryScreen extends MachineScreen<ArcQuarryMenu> {
 
     @Override
     protected void drawText(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Component.literal(font.plainSubstrByWidth(statusLine().getString(), TEXT_W - 8)), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        graphics.text(font, clipped(statusLine(), TEXT_W - 6), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
         ArcQuarryBlockEntity quarry = quarry();
         long area = quarry != null ? quarry.getSettings().areaVolume() : 0;
         graphics.text(font, Component.translatable("gui.arcforge.quarry.area", ArcforgeGui.grouped(area)), TEXT_X, AREA_Y, ArcforgeGui.LABEL, false);

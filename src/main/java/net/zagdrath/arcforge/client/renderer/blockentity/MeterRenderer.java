@@ -27,15 +27,18 @@ import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.block.logistics.MeterBlock;
 import net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity;
 
-// A Meter's front screen: the smoothed rate in two lines on the LCD (x3..12, y3..10 px of the front face), the value
+// A Meter's front screen: the smoothed rate in two lines centred on the LCD (x3..12, y4..9 px of the front face, centred
+// on it at 8, 7), the value
 // compact ("850", "12.5k", "1.2M") over its unit, at sign-text scale, in status cyan at full brightness.
 public class MeterRenderer implements BlockEntityRenderer<MeterBlockEntity, MeterRenderer.State> {
     private static final int COLOR = 0xFF5FD4C4;
     // Sign text: 1/96 of a block per font pixel.
     private static final float SCALE = 1.0F / 96.0F;
-    // The LCD's centre on the front face, in px from its top-left.
+    // The LCD's centre on the front face, in px from its top-left (the screen is x3..12, y4..9).
     private static final float LCD_X = 8.0F, LCD_Y = 7.0F;
-    private static final int LINE_HEIGHT = 9;
+    // The two lines' tops in font px from the LCD centre: glyph ink is 7 rows, so the value's ink runs -8..-2 and the
+    // unit's 1..7, centring the pair (a 1 px gap between them).
+    private static final int VALUE_TOP = -8, UNIT_TOP = 1;
 
     public static class State extends BlockEntityRenderState {
         public Direction facing = Direction.NORTH;
@@ -62,6 +65,11 @@ public class MeterRenderer implements BlockEntityRenderer<MeterBlockEntity, Mete
 
     private static String trim(String number) {
         return number.endsWith(".0") ? number.substring(0, number.length() - 2) : number;
+    }
+
+    // A line's ink width: Font.width counts the 1 px spacing after the last glyph, which would pull the text left.
+    private float inkWidth(FormattedCharSequence text) {
+        return Math.max(0, font.width(text) - 1);
     }
 
     @Override
@@ -96,9 +104,9 @@ public class MeterRenderer implements BlockEntityRenderer<MeterBlockEntity, Mete
         poseStack.scale(SCALE, -SCALE, SCALE);
         FormattedCharSequence value = Component.literal(state.value).getVisualOrderText();
         FormattedCharSequence unit = state.unit.getVisualOrderText();
-        collector.submitText(poseStack, -font.width(value) / 2.0F, -LINE_HEIGHT, value, false, Font.DisplayMode.POLYGON_OFFSET,
+        collector.submitText(poseStack, -inkWidth(value) / 2.0F, VALUE_TOP, value, false, Font.DisplayMode.POLYGON_OFFSET,
                 LightCoordsUtil.FULL_BRIGHT, COLOR, 0, 0);
-        collector.submitText(poseStack, -font.width(unit) / 2.0F, 1, unit, false, Font.DisplayMode.POLYGON_OFFSET,
+        collector.submitText(poseStack, -inkWidth(unit) / 2.0F, UNIT_TOP, unit, false, Font.DisplayMode.POLYGON_OFFSET,
                 LightCoordsUtil.FULL_BRIGHT, COLOR, 0, 0);
         poseStack.popPose();
     }

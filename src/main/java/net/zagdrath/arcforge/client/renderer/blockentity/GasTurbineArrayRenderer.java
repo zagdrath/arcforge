@@ -57,11 +57,13 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
     public static final StandaloneModelKey<QuadCollection> COMBUSTOR_GLOW = key("gas_turbine_combustor_glow");
     public static final StandaloneModelKey<QuadCollection> INTAKE_CAP = key("gas_turbine_intake_cap");
     public static final StandaloneModelKey<QuadCollection> EXHAUST_CAP = key("gas_turbine_exhaust_cap");
+    // The round bearing housing that holds each end of the shaft against the end wall (modelled for the -Z end).
+    public static final StandaloneModelKey<QuadCollection> BEARING = key("gas_turbine_bearing");
     // Each key and the model it bakes (for ArcforgeClient.registerStandaloneModels).
     public static final List<StandaloneModelKey<QuadCollection>> KEYS = List.of(SHAFT, COMPRESSOR_BLADE, TURBINE_BLADE, ROTOR_DRUM, COMBUSTOR,
-            COMBUSTOR_GLOW, INTAKE_CAP, EXHAUST_CAP);
+            COMBUSTOR_GLOW, INTAKE_CAP, EXHAUST_CAP, BEARING);
     public static final List<String> MODELS = List.of("rotor_shaft", "compressor_blade", "turbine_blade", "rotor_drum", "combustor", "combustor_glow",
-            "intake_cap", "exhaust_cap");
+            "intake_cap", "exhaust_cap", "bearing");
 
     private static final float LINER_INSET = SteamBoilerArrayRenderer.LINER_INSET;
     // A blade model's tip radius, in px.
@@ -275,8 +277,30 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
             collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, drumQuads, -1, state.light));
             poseStack.popPose();
         }
+        submitBearings(state, poseStack, collector, models.getStandaloneModel(BEARING), cutout);
         submitCap(state, poseStack, collector, models.getStandaloneModel(INTAKE_CAP), state.intakeNegative, state.intakeLight, cutout);
         submitCap(state, poseStack, collector, models.getStandaloneModel(EXHAUST_CAP), !state.intakeNegative, state.exhaustLight, cutout);
+    }
+
+    // The bearing housings: static, in the first and last blocks along the axis, against the end walls. The model is
+    // built for the -Z end; the far end's copy is turned 180° about Y so its flange sits on that wall.
+    private static void submitBearings(State state, PoseStack poseStack, SubmitNodeCollector collector, @Nullable QuadCollection bearing,
+            RenderType renderType) {
+        if (bearing == null) {
+            return;
+        }
+        List<BakedQuad> quads = bearing.getAll();
+        for (int i : new int[] { 0, state.length - 1 }) {
+            poseStack.pushPose();
+            rotorPose(poseStack, state, i, 0.0F);
+            if (i != 0) {
+                poseStack.translate(0.5, 0.5, 0.5);
+                poseStack.rotate(Axis.YP.rotationDegrees(180.0F));
+                poseStack.translate(-0.5, -0.5, -0.5);
+            }
+            collector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> TiledBoxes.quads(pose, buffer, quads, -1, state.light));
+            poseStack.popPose();
+        }
     }
 
     // A cap over the middle block of one end face, its model's north face turned to face out along the axis.

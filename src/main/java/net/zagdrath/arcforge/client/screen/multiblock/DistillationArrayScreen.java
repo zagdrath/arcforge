@@ -30,8 +30,9 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
     private static final int FEED_X = 9, STEAM_X = 25, NAPHTHA_X = 97, LIGHT_X = 115, HEAVY_X = 133;
     private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int LIGHT_HEIGHT = 8, HEAVY_HEIGHT = 6;
-    private static final int SCREEN_X = 46, TEMP_RIGHT = 87, TEMP_Y = 23, HEAT_Y = 34, HEAT_W = 42, BONUS_Y = 43;
-    private static final int LED_X = 46, LED_Y = 56, STATUS_X = 54, STATUS_Y = 56;
+    // The screen recess is x40..93 (inner 41..92); text keeps 2 px off its inner edges, the heat bar is centred.
+    private static final int SCREEN_X = 43, TEMP_RIGHT = 92, TEMP_Y = 23, HEAT_X = 46, HEAT_Y = 34, HEAT_W = 42, BONUS_Y = 43;
+    private static final int LED_X = 43, LED_Y = 56, STATUS_X = 51, STATUS_Y = 56, STATUS_W = TEMP_RIGHT - STATUS_X;
     private static final int NO_STEAM_COLOR = 0xFF707070;
 
     private final Identifier tankGauge = sprite("tank_gauge");
@@ -74,7 +75,7 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
         if (menu.getHeight() < HEAVY_HEIGHT) {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, locked, x + HEAVY_X, y + TANK_Y, TANK_W, TANK_H);
         }
-        drawHeatBar(graphics, x, y, SCREEN_X, HEAT_Y, HEAT_W, menu.getTemperature());
+        drawHeatBar(graphics, x, y, HEAT_X, HEAT_Y, HEAT_W, menu.getTemperature());
         drawLed(graphics, x, y, LED_X, LED_Y);
     }
 
@@ -87,7 +88,7 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
         } else {
             graphics.text(font, Component.translatable("gui.arcforge.no_steam"), SCREEN_X, BONUS_Y, NO_STEAM_COLOR, false);
         }
-        graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
     }
 
     @Override
@@ -104,11 +105,14 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
         } else if (overTank(HEAVY_X, mouseX, mouseY)) {
             addOutputTooltip(lines, ModFluids.HEAVY_OIL.get(), menu.getHeavyOil(), HEAVY_HEIGHT);
         } else if (isHovering(SCREEN_X, TEMP_Y - 1, TEMP_RIGHT - SCREEN_X, 10, mouseX, mouseY)
-                || isHovering(SCREEN_X, HEAT_Y - 2, HEAT_W, 8, mouseX, mouseY)) {
+                || isHovering(HEAT_X, HEAT_Y - 2, HEAT_W, 8, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.column_temperature", ArcforgeGui.grouped(DistillingRecipe.DEFAULT_MIN_TEMP)));
         } else if (isHovering(SCREEN_X, BONUS_Y - 1, TEMP_RIGHT - SCREEN_X, 10, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.steam_stripping"));
             lines.add(Component.translatable("gui.arcforge.naphtha_bonus", menu.getBonus()).withStyle(ChatFormatting.GRAY));
+        } else if (isHovering(LED_X, STATUS_Y - 1, TEMP_RIGHT - LED_X, 10, mouseX, mouseY)) {
+            // The status can be clipped to fit the screen; the tooltip has it in full.
+            lines.add(menu.getStatus().getDescription());
         }
     }
 

@@ -1,0 +1,9 @@
+{
+  "parent": "arcforge:block/conduit/base_energy_arm_u_dyed",
+  "textures": {
+    "conduit": "arcforge:block/conduit/wrought_energy_off_dyed",
+    "port_in": "arcforge:block/conduit/port_input",
+    "port_out": "arcforge:block/conduit/port_output",
+    "dye": "arcforge:block/conduit/dye/energy_off"
+  }
+}

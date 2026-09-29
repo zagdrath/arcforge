@@ -1,0 +1,151 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "particle": "#conduit"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        5,
+        5
+      ],
+      "to": [
+        11,
+        11,
+        11
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "south": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "east": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "west": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "up": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        },
+        "down": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        5,
+        5
+      ],
+      "to": [
+        11,
+        11,
+        11
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "south": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "east": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "west": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "up": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        },
+        "down": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#dye",
+          "tintindex": 1
+        }
+      }
+    }
+  ]
+}

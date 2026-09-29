@@ -63,7 +63,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.client.model.ConduitCoverModel;
 import net.zagdrath.arcforge.client.model.ConduitFilterModel;
-import net.zagdrath.arcforge.client.model.ConduitSheathModel;
+import net.zagdrath.arcforge.client.model.ConduitDyeModel;
 import net.zagdrath.arcforge.client.model.PortNozzleModel;
 import net.zagdrath.arcforge.client.model.PortedModel;
 import net.zagdrath.arcforge.client.renderer.JetpackLayer;
@@ -72,6 +72,7 @@ import net.zagdrath.arcforge.client.renderer.blockentity.CarbonizerDoorRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.ConduitRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.DistillationArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.ThrottleLeverRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SolarThermalArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamBoilerArrayRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.SteamTurbineArrayRenderer;
@@ -225,12 +226,12 @@ public class ArcforgeClient {
     // Lit Pressurized and Thermodynamic Conduits glow in the colour of what they hold.
     @SubscribeEvent
     static void registerBlockTints(RegisterColorHandlersEvent.BlockTintSources event) {
-        // Tint index 0 is the gas and thermal glow, index 1 a sheathed conduit's dye colour (on every conduit).
+        // Tint index 0 is the thermal glow, index 1 a dyed conduit's colour (its _dyed pieces; see ConduitDyeModel).
         for (ConduitTier tier : ConduitTier.values()) {
             for (ConduitType type : ConduitType.values()) {
                 Block conduit = ModBlocks.conduit(type, tier).get();
                 BlockTintSource glow = conduit.defaultBlockState().hasProperty(ActiveConduitBlock.ACTIVE) ? ConduitTints.INSTANCE : ConduitTints.UNLIT;
-                event.register(List.of(glow, ConduitSheathModel.Tint.INSTANCE), conduit);
+                event.register(List.of(glow, ConduitDyeModel.Tint.INSTANCE), conduit);
             }
         }
     }
@@ -396,12 +397,14 @@ public class ArcforgeClient {
         event.register(ConnectedModel.ID, ConnectedModel.Loader.INSTANCE);
     }
 
-    // Connected textures, and the port plates and nozzles of multiblocks (see PortedModel, PortNozzleModel).
+    // Connected textures, the port plates and nozzles of multiblocks (see PortedModel, PortNozzleModel), and dyed
+    // conduit pieces (ConduitDyeModel).
     @SubscribeEvent
     static void registerBlockStateModels(RegisterBlockStateModels event) {
         event.registerModel(ConnectedModel.ID, ConnectedModel.BlockStateUnbaked.MAP_CODEC);
         event.registerModel(PortedModel.ID, PortedModel.Unbaked.MAP_CODEC);
         event.registerModel(PortNozzleModel.ID, PortNozzleModel.Unbaked.MAP_CODEC);
+        event.registerModel(ConduitDyeModel.ID, ConduitDyeModel.Unbaked.MAP_CODEC);
     }
 
     // The Steam Turbine and Gas Turbine Arrays' rotor pieces and the Solar Thermal Array's trough, receiver and control panel,
@@ -409,6 +412,7 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
         event.register(SteamTurbineArrayRenderer.ROTOR_SHAFT, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_SHAFT_MODEL));
+        event.register(ThrottleLeverRenderer.ARM, SimpleUnbakedStandaloneModel.quadCollection(ThrottleLeverRenderer.ARM_MODEL));
         event.register(ArcQuarryRenderer.EMITTER, SimpleUnbakedStandaloneModel.quadCollection(ArcQuarryRenderer.EMITTER_MODEL));
         event.register(SteamTurbineArrayRenderer.ROTOR_BLADES, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_BLADES_MODEL));
         event.register(SolarThermalArrayRenderer.MIRROR, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.MIRROR_MODEL));
@@ -420,7 +424,6 @@ public class ArcforgeClient {
                     SimpleUnbakedStandaloneModel.quadCollection(GasTurbineArrayRenderer.model(GasTurbineArrayRenderer.MODELS.get(i))));
         }
         ConduitFilterModel.registerStandalone(event);
-        ConduitSheathModel.registerStandalone(event);
         ConduitCoverModel.registerStandalone(event);
     }
 
@@ -434,14 +437,13 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
         ConduitFilterModel.wrap(event);
-        ConduitSheathModel.wrap(event);
         ConduitCoverModel.wrap(event);
     }
 
-    // A sheathed conduit item's band colour.
+    // A dyed conduit item's colour.
     @SubscribeEvent
     static void registerItemTints(RegisterColorHandlersEvent.ItemTintSources event) {
-        event.register(ConduitSheathModel.ItemTint.ID, ConduitSheathModel.ItemTint.MAP_CODEC);
+        event.register(ConduitDyeModel.ItemTint.ID, ConduitDyeModel.ItemTint.MAP_CODEC);
     }
 
     // Glass conduits (item and fluid) and fluid tanks draw their contents, and Vaults their front display;
@@ -452,6 +454,7 @@ public class ArcforgeClient {
         // Pressurized conduits keep the plain conduit block entity (they have a lit state) but show their gas.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CONDUIT.get(), ConduitRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FLUID_TANK.get(), FluidTankRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.THROTTLE_LEVER.get(), ThrottleLeverRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.VAULT.get(), VaultRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CARBONIZER.get(), CarbonizerDoorRenderer::new);

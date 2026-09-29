@@ -5,6 +5,12 @@
 
 package net.zagdrath.arcforge.block.redstone;
 
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.zagdrath.arcforge.blockentity.redstone.ThrottleLeverBlockEntity;
+import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -12,7 +18,6 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -36,11 +41,13 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-// The Throttle Lever: a lever with a redstone signal of 0-15, placed on floors, walls and ceilings like a vanilla
-// lever. Right-click raises the signal by 1 and sneak + right-click lowers it, stopping at 0 and 15. Like a lever it
-// powers the block it's attached to strongly and its other neighbours weakly, so it can set a Gas Turbine Array's
-// Throttle mode directly.
-public class ThrottleLeverBlock extends FaceAttachedHorizontalDirectionalBlock {
+// The Throttle Lever: an aircraft-style throttle quadrant with a redstone signal of 0-15, placed on floors, walls and
+// ceilings like a vanilla lever. Scroll the mouse wheel while looking at it (ThrottleLeverClient) or right-click to
+// raise the signal by 1 and sneak + right-click to lower it, stopping at 0 and 15. Like a lever it powers the block
+// it's attached to strongly and its other neighbours weakly, so it can set a Gas Turbine Array's Throttle mode
+// directly. The housing (with its LED gauge) comes from the blockstate model; the arm pivots on the quadrant's axle,
+// drawn by ThrottleLeverRenderer.
+public class ThrottleLeverBlock extends FaceAttachedHorizontalDirectionalBlock implements EntityBlock {
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
 
     private final Function<BlockState, VoxelShape> shapes;
@@ -51,9 +58,10 @@ public class ThrottleLeverBlock extends FaceAttachedHorizontalDirectionalBlock {
         shapes = makeShapes();
     }
 
-    // The 10 x 14 plate and the grip, 9 px deep, turned for each face and facing as a lever's shape is.
+    // The 10 x 14 quadrant and the arm's full sweep (up to 14 px from the mounting face), turned for each face and
+    // facing as a lever's shape is.
     private Function<BlockState, VoxelShape> makeShapes() {
-        Map<AttachFace, Map<Direction, VoxelShape>> byFace = Shapes.rotateAttachFace(Block.boxZ(10.0, 14.0, 7.0, 16.0));
+        Map<AttachFace, Map<Direction, VoxelShape>> byFace = Shapes.rotateAttachFace(Block.boxZ(10.0, 14.0, 2.0, 16.0));
         return getShapeForEachState(state -> byFace.get(state.getValue(FACE)).get(state.getValue(FACING)), POWER);
     }
 
@@ -70,14 +78,35 @@ public class ThrottleLeverBlock extends FaceAttachedHorizontalDirectionalBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!level.isClientSide()) {
-            int power = state.getValue(POWER);
-            int next = Math.clamp(power + (player.isShiftKeyDown() ? -1 : 1), 0, 15);
-            if (next != power) {
-                setPower(state, level, pos, next, player);
-            }
-            player.sendOverlayMessage(Component.translatable("block.arcforge.throttle_lever.signal", next, Math.round(next * 100 / 15.0F)));
+            step(level, pos, state, player.isShiftKeyDown() ? -1 : 1, player);
         }
         return InteractionResult.SUCCESS;
+    }
+
+    // Moves the throttle by delta notches, stopping at 0 and 15 (right-click, and the mouse wheel through
+    // ThrottleLeverPayload). The signal shows in the popup under the crosshair (ThrottleLeverClient).
+    public static void step(Level level, BlockPos pos, BlockState state, int delta, @Nullable Player player) {
+        if (!(state.getBlock() instanceof ThrottleLeverBlock block)) {
+            return;
+        }
+        int power = state.getValue(POWER);
+        int next = Math.clamp(power + delta, 0, 15);
+        if (next != power) {
+            block.setPower(state, level, pos, next, player);
+        }
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new ThrottleLeverBlockEntity(pos, state);
+    }
+
+    // Client only: eases the arm toward the angle for the current signal.
+    @Override
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return level.isClientSide() && type == ModBlockEntityTypes.THROTTLE_LEVER.get()
+                ? (l, p, s, be) -> ((ThrottleLeverBlockEntity) be).clientTick(s)
+                : null;
     }
 
     // Sets the signal and tells the neighbours, with a click that rises in pitch with the level.

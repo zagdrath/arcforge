@@ -20,6 +20,9 @@ public abstract class SideTab {
     public static final int COLLAPSED_WIDTH = 22;
     public static final int SELECTED_WIDTH = 24;
     public static final int COLLAPSED_HEIGHT = 20;
+    // The header title starts TITLE_INSET px in from the tab's outer edge (past the icon); content sits CONTENT_INSET px
+    // in from the panel edge.
+    public static final int TITLE_INSET = 22, CONTENT_INSET = 6;
 
     // Which edge of the GUI the tab hangs off: the machine's readouts on the left, its settings on the right.
     public enum Side {
@@ -78,6 +81,12 @@ public abstract class SideTab {
     // The open panel's size. A tab whose content changes can size it to what it shows now.
     protected int expandedWidth() {
         return expandedWidth;
+    }
+
+    // A panel just wide enough for its header (icon + title) and for its widest content line, with CONTENT_INSET px of
+    // margin either side, so short readouts don't leave a blank strip on the far side.
+    protected int fitWidth(Font font, int widestContent) {
+        return Math.max(TITLE_INSET + font.width(title) + CONTENT_INSET, widestContent + 2 * CONTENT_INSET);
     }
 
     protected int expandedHeight() {

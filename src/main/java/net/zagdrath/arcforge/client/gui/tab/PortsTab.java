@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
@@ -29,12 +30,13 @@ import net.zagdrath.arcforge.network.PortsPayload;
 // mode and where it is (the side of the structure, and the offset from the controller), the auto-eject
 // toggle, and how to set ports. Ports themselves are set in the world with the Wrench.
 public class PortsTab extends SideTab {
-    private static final int WIDTH = 128;
+    // The panel grows past MIN_WIDTH to fit its longest port line, and is as tall as what it shows: rows start right
+    // under the header when there's no auto-eject button.
+    private static final int MIN_WIDTH = 128;
     private static final int EJECT_X = 8, EJECT_Y = 24, BUTTON_SIZE = 16;
-    private static final int ROWS_Y = 44, ROW_HEIGHT = 20, MAX_ROWS = 3;
+    private static final int ROWS_Y = 44, ROWS_Y_NO_EJECT = 24, ROW_HEIGHT = 20, MAX_ROWS = 3;
+    private static final int MORE_HEIGHT = 10, HINT_GAP = 4, LINE_HEIGHT = 9, BOTTOM = 6;
     private static final int TEXT_X = 28;
-    private static final int HINT_Y = ROWS_Y + MAX_ROWS * ROW_HEIGHT + 12;
-    private static final int HEIGHT = HINT_Y + 4 * 9 + 6;
     private static final Identifier EJECT_OFF = ArcforgeGui.widget("auto_eject_off");
     private static final Identifier EJECT_ON = ArcforgeGui.widget("auto_eject_on");
     private static final Identifier FACE_HOVER = ArcforgeGui.widget("face_hover");
@@ -44,7 +46,7 @@ public class PortsTab extends SideTab {
     private @Nullable Runnable toggleAutoEject;
 
     public PortsTab(Supplier<List<PortsPayload.Entry>> ports) {
-        super(ArcforgeGui.widget("icon_side_config"), Component.translatable("gui.arcforge.tab.ports"), WIDTH, HEIGHT);
+        super(ArcforgeGui.widget("icon_side_config"), Component.translatable("gui.arcforge.tab.ports"), MIN_WIDTH, ROWS_Y + ROW_HEIGHT + HINT_GAP + 4 * LINE_HEIGHT + BOTTOM);
         this.ports = ports;
     }
 
@@ -79,6 +81,36 @@ public class PortsTab extends SideTab {
         }
     }
 
+    private int rowsY() {
+        return autoEject != null ? ROWS_Y : ROWS_Y_NO_EJECT;
+    }
+
+    private int hintY(int portCount) {
+        int y = rowsY() + Math.max(1, Math.min(MAX_ROWS, portCount)) * ROW_HEIGHT;
+        return y + (portCount > MAX_ROWS ? MORE_HEIGHT : 0) + HINT_GAP;
+    }
+
+    private List<FormattedCharSequence> hintLines(Font font, int width) {
+        return font.split(Component.translatable("gui.arcforge.ports.hint"), width - 2 * EJECT_X);
+    }
+
+    @Override
+    protected int expandedWidth() {
+        Font font = Minecraft.getInstance().font;
+        int width = MIN_WIDTH;
+        for (PortsPayload.Entry port : ports.get()) {
+            int line = Math.max(font.width(port.mode().getDescription()), font.width(location(port)));
+            width = Math.max(width, TEXT_X + line + CONTENT_INSET);
+        }
+        return width;
+    }
+
+    @Override
+    protected int expandedHeight() {
+        Font font = Minecraft.getInstance().font;
+        return hintY(ports.get().size()) + hintLines(font, expandedWidth()).size() * LINE_HEIGHT + BOTTOM;
+    }
+
     @Override
     protected void renderContent(GuiGraphicsExtractor graphics, Font font, int x, int y, int mouseX, int mouseY) {
         if (autoEject != null) {
@@ -90,25 +122,26 @@ public class PortsTab extends SideTab {
         }
 
         List<PortsPayload.Entry> list = ports.get();
+        int rowsY = y + rowsY();
         if (list.isEmpty()) {
-            graphics.text(font, Component.translatable("gui.arcforge.ports.none"), x + EJECT_X, y + ROWS_Y + 4, ArcforgeGui.LABEL, false);
+            graphics.text(font, Component.translatable("gui.arcforge.ports.none"), x + EJECT_X, rowsY + 4, ArcforgeGui.LABEL, false);
         }
         for (int i = 0; i < Math.min(MAX_ROWS, list.size()); i++) {
             PortsPayload.Entry port = list.get(i);
-            int rowY = y + ROWS_Y + i * ROW_HEIGHT;
+            int rowY = rowsY + i * ROW_HEIGHT;
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.widget("face_" + port.mode().getSerializedName()), x + EJECT_X, rowY, BUTTON_SIZE, BUTTON_SIZE);
             graphics.text(font, port.mode().getDescription(), x + TEXT_X, rowY, ArcforgeGui.TEXT, false);
             graphics.text(font, location(port), x + TEXT_X, rowY + 9, ArcforgeGui.LABEL, false);
         }
         if (list.size() > MAX_ROWS) {
             graphics.text(font, Component.translatable("gui.arcforge.ports.more", list.size() - MAX_ROWS),
-                    x + TEXT_X, y + ROWS_Y + MAX_ROWS * ROW_HEIGHT, ArcforgeGui.LABEL, false);
+                    x + TEXT_X, rowsY + MAX_ROWS * ROW_HEIGHT, ArcforgeGui.LABEL, false);
         }
 
-        int lineY = y + HINT_Y;
-        for (FormattedCharSequence line : font.split(Component.translatable("gui.arcforge.ports.hint"), WIDTH - 2 * EJECT_X)) {
+        int lineY = y + hintY(list.size());
+        for (FormattedCharSequence line : hintLines(font, getWidth())) {
             graphics.text(font, line, x + EJECT_X, lineY, ArcforgeGui.LABEL, false);
-            lineY += 9;
+            lineY += LINE_HEIGHT;
         }
     }
 
