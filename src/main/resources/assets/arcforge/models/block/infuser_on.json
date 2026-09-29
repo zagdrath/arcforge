@@ -3,7 +3,7 @@
   "textures": {
     "north": "arcforge:block/infuser_front_on",
     "south": "arcforge:block/infuser_back",
-    "east": "arcforge:block/infuser_side_on",
+    "east": "arcforge:block/infuser_left_on",
     "west": "arcforge:block/infuser_side_on",
     "up": "arcforge:block/infuser_top",
     "down": "arcforge:block/infuser_bottom",

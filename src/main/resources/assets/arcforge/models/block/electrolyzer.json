@@ -3,8 +3,8 @@
   "textures": {
     "north": "arcforge:block/electrolyzer_front",
     "south": "arcforge:block/electrolyzer_back",
-    "east": "arcforge:block/electrolyzer_side",
-    "west": "arcforge:block/electrolyzer_side",
+    "east": "arcforge:block/electrolyzer_left",
+    "west": "arcforge:block/electrolyzer_right",
     "up": "arcforge:block/electrolyzer_top",
     "down": "arcforge:block/electrolyzer_bottom",
     "particle": "arcforge:block/electrolyzer_side"

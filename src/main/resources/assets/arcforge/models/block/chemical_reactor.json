@@ -3,8 +3,8 @@
   "textures": {
     "north": "arcforge:block/chemical_reactor_front",
     "south": "arcforge:block/chemical_reactor_back",
-    "east": "arcforge:block/chemical_reactor_side",
-    "west": "arcforge:block/chemical_reactor_side",
+    "east": "arcforge:block/chemical_reactor_left",
+    "west": "arcforge:block/chemical_reactor_right",
     "up": "arcforge:block/chemical_reactor_top",
     "down": "arcforge:block/chemical_reactor_bottom",
     "particle": "arcforge:block/chemical_reactor_side"

@@ -31,7 +31,9 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
+import net.zagdrath.arcforge.client.ConduitTints;
 import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.item.ItemPacket;
 
@@ -39,6 +41,9 @@ import net.zagdrath.arcforge.conduit.item.ItemPacket;
 // The glass itself comes from the block model.
 public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, ConduitRenderState> {
     private static final float ITEM_SCALE = 0.3F;
+    // Gas tint opacity from a nearly empty to a full pressurized conduit.
+    private static final int GAS_MIN_ALPHA = 60;
+    private static final int GAS_MAX_ALPHA = 200;
     // Fluid cross-section inside the 6px pipe, in 1/16 block units.
     private static final float LO = 6.0F / 16.0F, HI = 10.0F / 16.0F, SPAN = HI - LO;
     private static final float CORE_LO = 6.0F / 16.0F, CORE_HI = 10.0F / 16.0F;
@@ -81,7 +86,15 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
             int tint = model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(fluid) : -1;
             state.fluidColor = tint | 0xFF000000;
             state.fluidLight = LightCoordsUtil.lightCoordsWithEmission(state.lightCoords, fluid.getFluidType().getLightLevel());
-            state.fill = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.FLUID_CAPACITY_PER_CONDUIT);
+            if (conduit.getConduitType() == ConduitType.GAS) {
+                // Gas fills the whole bore; how full the conduit is shows as how dense the tint is.
+                float share = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.GAS_CAPACITY_PER_CONDUIT);
+                int alpha = Math.round(GAS_MIN_ALPHA + (GAS_MAX_ALPHA - GAS_MIN_ALPHA) * share);
+                state.fluidColor = (ConduitTints.gasColor(fluid) & 0x00FFFFFF) | (alpha << 24);
+                state.fill = 1.0F;
+            } else {
+                state.fill = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.FLUID_CAPACITY_PER_CONDUIT);
+            }
         }
 
         state.items.clear();

@@ -5,9 +5,10 @@
     "side": "arcforge:block/electric_pump/side",
     "side_on": "arcforge:block/electric_pump/side_on",
     "back": "arcforge:block/electric_pump/back",
-    "fe": "arcforge:block/electric_pump/fe",
     "top": "arcforge:block/electric_pump/top",
-    "rim": "arcforge:block/electric_pump/rim"
+    "rim": "arcforge:block/electric_pump/rim",
+    "socket": "arcforge:block/electric_pump/socket",
+    "socket_face": "arcforge:block/electric_pump/socket_face"
   },
   "elements": [
     {
@@ -200,24 +201,24 @@
     },
     {
       "from": [
-        5,
+        4,
         4,
         13
       ],
       "to": [
-        11,
-        10,
+        12,
+        12,
         16
       ],
       "faces": {
         "south": {
           "uv": [
-            5,
-            5,
-            11,
-            11
+            4,
+            4,
+            12,
+            12
           ],
-          "texture": "#fe",
+          "texture": "#socket_face",
           "cullface": "south"
         },
         "east": {
@@ -225,38 +226,36 @@
             0,
             0,
             3,
-            3
+            8
           ],
-          "texture": "#fe",
-          "rotation": 90
+          "texture": "#socket"
         },
         "west": {
           "uv": [
+            13,
             0,
-            0,
-            3,
-            3
+            16,
+            8
           ],
-          "texture": "#fe",
-          "rotation": 90
+          "texture": "#socket"
         },
         "up": {
           "uv": [
-            5,
+            4,
             0,
-            11,
+            12,
             3
           ],
-          "texture": "#fe"
+          "texture": "#socket"
         },
         "down": {
           "uv": [
-            5,
-            0,
-            11,
-            3
+            4,
+            13,
+            12,
+            16
           ],
-          "texture": "#fe"
+          "texture": "#socket"
         }
       }
     }

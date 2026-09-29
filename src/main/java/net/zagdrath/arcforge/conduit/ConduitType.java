@@ -13,7 +13,7 @@ public enum ConduitType implements StringRepresentable {
     ENERGY("energy", true),
     ITEM("item", false),
     FLUID("fluid", false),
-    // Pressurized conduits: gases only (see Gases). Steel pipe that glows while gas moves.
+    // Pressurized conduits: gases only (see Gases). Pressure glass; the gas inside is drawn tinted to the gas.
     GAS("pressurized", true),
     THERMAL("thermal", true);
 
@@ -33,6 +33,11 @@ public enum ConduitType implements StringRepresentable {
     // Glass conduits render their contents with a block entity renderer.
     public boolean isTransparent() {
         return !hasActiveState;
+    }
+
+    // Whether the block entity renderer draws what's inside (fluid, gas or items), so contents sync to clients.
+    public boolean showsContents() {
+        return isTransparent() || this == GAS;
     }
 
     public Component getDisplayName() {

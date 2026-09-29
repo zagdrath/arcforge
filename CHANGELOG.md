@@ -201,8 +201,23 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Fuel Burner.** Its default maximum temperature is 1,400°C (was 1,200). The other fuels still burn at their
   own lower temperatures.
 - **Pressurized Conduits** connect to Fuel Burner input faces.
+- **Pressurized Conduits are see-through.** They're pressure glass now, like Fluid Conduits, and show the gas
+  inside in its colour, denser the fuller the conduit. Empty ones are clear. They no longer glow.
+- **Every port face on a single-block machine shows a port.** Each face that has a side mode by default now
+  carries the same 8×8 port plate, centred, in that mode's colour. This includes the Chemical Reactor's and
+  Electrolyzer's left and right faces, the Fiberizer's and Infuser's input side, and the Block Breaker's top
+  and bottom. Hopper and intake tops keep their art behind the port.
+- **Electric Pump:** an 8×8 energy socket replaces the small FE box, and the top shows the output port. The
+  **Arc Quarry** shows its output and energy ports.
+- **Texture clean-up.** The conduit palettes follow the tier colours. Filter LEDs are cyan (allow), red (deny) and
+  steel (unset). Firebox, Induction Furnace and coil textures use flat tones, as do upgrade cards, tool modules,
+  dies and gears, and Energy/Heat Cell level bars.
 
 ### Fixed
+
+- **Wrong port marks on machine textures.** The Block Placer's back showed an input port instead of energy.
+  The Electrolyzer and Geothermal Plant bottoms showed ports they don't have, and the Fuel Burner's sides had a
+  stray red nub.
 
 - **Slot placeholders match the items again.** Every empty-slot hint is now a silhouette of the item that
   goes there: the Arcforge Furnace shows an ingot, an additive crystal and Coal Coke (not dust piles and

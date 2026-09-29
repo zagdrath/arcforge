@@ -53,7 +53,7 @@ public final class ConduitTints implements BlockTintSource {
         return Set.of(ActiveConduitBlock.ACTIVE);
     }
 
-    static int gasColor(FluidStack stack) {
+    public static int gasColor(FluidStack stack) {
         if (stack.isEmpty()) {
             return WHITE;
         }

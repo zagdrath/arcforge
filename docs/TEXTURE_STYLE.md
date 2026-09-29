@@ -50,6 +50,9 @@ texture-unification drop.
 | Lit (top/left outer bevel, recess lower lip, edge beams) | `#727982` |
 | Rivet / spec highlight | `#959DA6` |
 
+Block textures never use near-blacks or greys off this ramp (`#0C0D0F`, the item outline, is for items
+only).
+
 ---
 
 ## 3. Building blocks
@@ -119,9 +122,11 @@ texture-unification drop.
 |---|---|
 | FE port / power (red) | `#FF8577`, `#E5483C`, `#8E231C` |
 | Fluid/heat output (orange) | `#F5B574`, `#E8913A`, `#C8782A`, `#9E5A1C` |
+| Heat (hot orange): heat ports, flames, hot thermal conduit cores | `#FFB02E`, `#F26A16`, `#C73A0E`, `#7A1B0A` |
 | Input (blue) | `#7FB3F0`, `#4A8FE0`, `#3A76C0`, `#22497E` |
 | Status LED / arc (cyan) | `#B8F2EA`, `#5FD4C4`, `#2F6E68` |
 | Hazard stripe | `#E0B020` / `#1A1A1A` |
+| Furnace brick (firebox and furnace interiors) | `#553F34`, `#3A2C23`, `#2B211B` |
 
 **Tier colours.** Each tier palette runs outline, end face, front, bevel, top, rim highlight.
 
@@ -147,6 +152,8 @@ texture-unification drop.
   - 5-tone steel in vertical column bands.
   - Adjacent columns differ by at most one step.
   - The tier colour appears as a flat band.
+- **Upgrade cards and tool modules:** a flat card body, `#474C53` left of x = 10 and `#40454C` right of
+  it, with a 1 px bevel, the accent strip and one glyph. No grain in the body.
 - **Porous or fibrous materials** (coke, slag, wools):
   - Use 4 flat tone clusters.
   - Show porosity with a few deliberate 2 px pits: a dark pit with a lit lower lip.
@@ -164,7 +171,8 @@ texture-unification drop.
 ### Cells (Energy/Heat)
 
 - Flat bevelled rim.
-- The core window keeps its level art (levels 0–4).
+- The core window keeps its level art (levels 0–4), drawn as flat bars of 3 tones from the FE or Heat
+  row.
 - Frame rails are flat: a lit row `#727982` and a shade row `#383C42`, with tier accents at the
   ends and middle.
 
@@ -203,16 +211,64 @@ The controller is a screen pane inside that band, not a boxed bezel.
 - Window openings get a 1/16 reveal (`ctm/shell_jamb`).
 - Never put an interior plane in the same plane as an outer face.
 
-### Multiblock port overlays (`block/port/<mode>`)
+### Ports: one design, two sizes
 
-- A 10×10 steel collar, 1 px bevel, sitting at x3..12.
-- A coloured ring inside it:
-  - blue = in;
-  - orange = out;
-  - red = FE;
-  - hot orange = heat.
-- A dark bore with a 4×4 resource-colour chip.
-- The overlay is transparent outside the collar.
+- **Layers, outside in:**
+  - a steel collar with a 1 px bevel;
+  - a 1 px coloured ring:
+    - blue = in;
+    - orange = out;
+    - red = FE;
+    - hot orange = heat (the Heat row);
+  - a dark bore;
+  - a resource-colour chip.
+  Everything outside the collar is transparent.
+- **Multiblocks: 10×10 (`block/port/<mode>`).**
+  - Collar at x3..12, bore 6×6 (x5..10), chip 4×4.
+  - Drawn by PortOverlays on the faces set with the Wrench.
+  - New structures start with **no ports**.
+  - Nozzles use the same 10 px collar.
+- **Single-block machines: 8×8, perfectly centred at x/y 4..11.**
+  - This is the 10×10 plate with its chip shrunk to 2×2: rows and columns 0,1,2,3,6,7,8,9 of the 10×10.
+  - The collar is the size of a conduit's output flange, and the 4×4 bore is the conduit input nub.
+  - It's painted into the face textures at every face that the default side configuration
+    (`new SideConfig(top, bottom, left, right, back, front)`) gives a mode.
+  - For a north-facing block, LEFT is east.
+  - Plain port faces (backs, bottoms, port tops) are clean casing with the four rivets and the plate.
+  - Hopper and intake tops keep their art behind the port. Only the collar and ring are painted, and
+    the hopper shows through the 4×4 bore.
+  - When left and right have different defaults, the machine has separate `_left` / `_right` textures.
+    It also gets its own top and bottom textures when those differ from the sides.
+  - Faces set to NONE show no port marks.
+- **3D machine models:** the 8×8 plate is centred on the face. When the body is inset, the port sits
+  on an 8×8 socket that reaches the block edge, so a conduit meets it flush (Electric Pump back).
+- **Storage blocks** (tanks, cylinders, crates, vaults, cells) get no port overlays.
+
+### Conduits
+
+- **UV layout:**
+  - straight side (0,0,16,6): row 0 lit edge, rows 1–4 contents, row 5 dark edge;
+  - cap (0,6,6,12);
+  - arm sides (6,6,14,12).
+- **Tier colour:** the end flanges and the cap ring are flat tier tones:
+  - dark = end face (tone 2);
+  - mid = bevel (tone 4);
+  - light = rim highlight (tone 6).
+- **Steel:** body `#40454C`, hoops and clamps `#575D65` / `#727982` / `#959DA6`, all from the ramp.
+- **Contents by type:**
+  - **Energy (solid):** the running core is `#FF8577` / `#E5483C`; the idle core is `#8E231C` on
+    `#2B2F34`.
+  - **Item and fluid (translucent):** glass with a `#DCE8EE` sheen row (alpha ~110–120), a `#DCE8EE`
+    body (alpha ~40) and an `#A9BCC6` lower row (alpha ~60–70).
+  - **Pressurized / gas (translucent):** the same glass, with opaque steel hoops every 4 px. The gas
+    is drawn inside by ConduitRenderer across the whole bore, tinted to the gas, and its opacity
+    follows how full the conduit is. There's no glow layer.
+  - **Thermal (cutout):** a tempered-copper jacket (`#E0A062 #C98244 #AE6632 #8A4822`). Its core is
+    `#7A1B0A` / `#3C1C0C` when cold, and the Heat row when hot.
+- **Connectors:**
+  - The output flange (8×8) is a steel lip round the orange ring with a `#16181B` centre.
+  - The input nub (4×4) is blue ring tones with a `#16181B` pip.
+- **Filter attachments:** allow is status cyan, deny is FE red, unset is steel.
 
 ### Tool modes
 
@@ -298,6 +354,18 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - **Ingots:** Cody's reference ingot shape (exact 16×16, 8 light levels, tonal outline) for every ingot,
   including steel.
 - **Coal Coke:** his reference lump shape, in its light grey.
+- **Treated wood:** Cody's own wood textures (planks, trapdoor, door top/bottom, log side/top, stripped
+  log side/top), recoloured by brightness onto the treated ramp `#120C07 → #725033`.
+  - Bark sits in the darker part of the ramp and stripped wood one step lighter.
+  - Grey hinge and handle pixels map onto the hardware greys `#5A5F66 #6A6F76 #7E848B #9AA0A7`.
+  - The door item is redrawn to match the door.
+- **Arcforge Furnace bricks:** Cody's own brick texture, its 7 tones recoloured by rank onto the
+  fire-brick ramp `#2B211B #33271F #3A2C23 #47352C #553F34 #644B3F #74584A` (the two darkest are the mortar). Port textures are the
+  bricks with the port opening laid over them.
+- **Steel tools and armour:** Cody's own tool/armour textures and his two worn-armour layers, recoloured by
+  brightness onto the steel-ingot ramp `#3C3F45 → #C4C9CF` (outline `#16181B`), topping out below white
+  so steel reads darker and bluer than iron. Wooden handles are kept exactly. New tools of the family
+  (Hammer, Excavator) are drawn in his style on his handle.
 
 ---
 
@@ -308,8 +376,34 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
    - Greys come only from the ramp above; accents come from their tables.
    - Count the colours: aim for 8–15 on a machine face and 4–8 on an item.
 3. **Speckle check.** No isolated pixel unless it is a rivet, glint or pore.
-4. **Preview it.**
+4. **Port check.** Every single-machine face with a default side mode shows the 8×8 port; faces
+   set to NONE show none.
+5. **Preview it.**
    - At 6–8× next to the Distillation Array and an existing machine.
    - As an iso render of the model, to check UVs and that edges join.
-5. **Before/after.** When a texture is replaced, keep the same size and UV region, and keep the
+6. **Before/after.** When a texture is replaced, keep the same size and UV region, and keep the
    same frame count for animations so the `.mcmeta` still applies.
+
+## Jetpack & arc tools
+- Jetpack tanks: column-banded portable steel with the flat tier band (like Gas Cartridges); harness and grips in dark polymer #1C1F24 #2A2E35 #3A3F47 with plastic buckles #F0ECE4 #DCD6CA.
+- Arc Drill / Arc Saw: machine-steel body with the tier band, tungsten bit/bar (#1C1F24…#6A717B), a cyan arc glint at the tip and a small cyan charge LED.
+- Tool module cards: the upgrade card with its accent recoloured amber (#F5D060 #E0B020 #8A6A10), one glyph each; machine upgrades keep the cyan accent.
+- Worn jetpack: 3D pack model (32x32 texture, same tank banding) plus a strap layer on the humanoid equipment layer.
+
+## Settings, security, Foundry Suit, Fermenter, dyed conduits, Gas Turbine
+- Card family accents: machine upgrades cyan, tool modules amber, Settings Card violet (#D6B8FF #A47CE8 #5E3E96).
+- Security icons: gold padlock (#F5D060 #E0B020 #8A6A10) with steel shackle; people figures cyan (own) / grey (others).
+- Foundry Suit: the steel armour recoloured by brightness onto the rock-wool ochre ramp #2A2014 #4A3A22 #6E5630 #8E7040 #AE8C52 #CCAA6A #E2C688 #F2DEAA; gold visor on the worn helmet.
+- Ethanol: pale straw, semi-transparent (alpha ~190): #D8C688 → #FCF8E6.
+- Dyed conduit sheath: greyscale ribbed plastic (#EC/#D6/#C4 ribs), always tinted by the dye colour at runtime.
+- Gas Turbine Array (Hardened): machine steel with vertical cooling fins and a purple heat-blued band; compressor blades light steel, turbine blades Hardened purple; combustor glow blue-white core fading to orange.
+
+## GUI icons, tabs and buttons
+- Tab/button icons: 16x16, one flat fill per shape with a 1 px hue-matched dark outline (never #0C0D0F black), glyph about 12 px centred; torches are copied from the redstone sprites. Padlock #E8B830 / #5A4410 with steel shackle #B4BAC0 / #3A3F47; people #5FD4C4 / #1F4E48 (own) and #A0A0A0 / #3A3A3A (others).
+- Tabs are 22x20 (selected 24x20), cut from the original sprites; left-side tabs are the mirror. Left = machine readouts (Energy, Heat, Pressure), right = settings (Redstone, Sides/Ports, Upgrades, Security).
+- Buttons: only the widget/button nine-slice family (normal/hover/pressed/disabled); selected = pressed + 1 px ACCENT (#5FD4C4) outline outside. No custom button sprites.
+
+## Mekanism-style block models
+- Single-block machines may use UV-unwrapped element models (64x64 sheet, 1 px bevels per face) instead of cubes; emissive screens are separate animated textures with light_emission 15. First: Security Terminal (desk console, monitor tilted 22.5°).
+- Gas Turbine Array skin: the steam turbine's banded plates at double height with a thin Hardened-purple line; 3x3 end caps (48x48) drawn by the BER keep the outer 3 px clear for frame beams.
+- Any 3D machine with default ports follows "Ports": 8×8 plates at its default faces, on a socket to the block edge when the body is inset.

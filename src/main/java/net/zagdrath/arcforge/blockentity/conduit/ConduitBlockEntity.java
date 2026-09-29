@@ -385,7 +385,7 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     // fluid levels change every tick and are throttled.
     public void markContentsChanged(boolean immediate) {
         setChanged();
-        if (!getConduitType().isTransparent()) {
+        if (!getConduitType().showsContents()) {
             return;
         }
         syncPending = true;

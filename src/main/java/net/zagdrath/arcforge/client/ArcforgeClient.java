@@ -440,6 +440,8 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.TRANSPARENT_CONDUIT.get(), ConduitRenderer::new);
+        // Pressurized conduits keep the plain conduit block entity (they have a lit state) but show their gas.
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.CONDUIT.get(), ConduitRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FLUID_TANK.get(), FluidTankRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.VAULT.get(), VaultRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceRenderer::new);
