@@ -7,7 +7,7 @@
     "PBP"
   ],
   "key": {
-    "D": "arcforge:tungsten_drill_head",
+    "D": "#c:ingots/tungsten",
     "T": "arcforge:tempered_alloy",
     "G": "#c:gears/steel",
     "P": "arcforge:plastic_sheet",
