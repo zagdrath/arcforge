@@ -39,8 +39,6 @@ public class BurnerMenu extends MachineMenu {
     public static final int DATA_VALUES = 10;
 
     public static final int FUEL_SLOT_X = 20, FUEL_SLOT_Y = 23;
-    // Tabs: Energy/Heat, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructors, called with the block position written by the server.
     public static BurnerMenu combustionPlant(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -60,7 +58,7 @@ public class BurnerMenu extends MachineMenu {
     public BurnerMenu(MenuType<BurnerMenu> type, int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(type, containerId, inventory, pos, items, data, DATA_VALUES, blockFor(type));
         addMachineSlot(BurnerBlockEntity.SLOT_FUEL, FUEL_SLOT_X, FUEL_SLOT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     private static Block blockFor(MenuType<BurnerMenu> type) {

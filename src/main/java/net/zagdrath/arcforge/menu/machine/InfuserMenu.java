@@ -39,8 +39,6 @@ public class InfuserMenu extends MachineMenu {
     public static final int BUCKET_OUT_X = 43, BUCKET_OUT_Y = 53;
     public static final int INPUT_X = 73, INPUT_Y = 35;
     public static final int OUTPUT_X = 129, OUTPUT_Y = 35;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public InfuserMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -53,7 +51,7 @@ public class InfuserMenu extends MachineMenu {
         addMachineSlot(InfuserBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y);
         addMachineSlot(InfuserBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(InfuserBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

@@ -39,8 +39,6 @@ public class ChemicalReactorMenu extends MachineMenu {
     public static final int INPUT_X = 60, INPUT_Y = 35;
     public static final int OUTPUT_X = 108, OUTPUT_Y = 35;
     public static final int BYPRODUCT_X = 130, BYPRODUCT_Y = 35;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public ChemicalReactorMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -52,7 +50,7 @@ public class ChemicalReactorMenu extends MachineMenu {
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y);
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_BYPRODUCT, BYPRODUCT_X, BYPRODUCT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

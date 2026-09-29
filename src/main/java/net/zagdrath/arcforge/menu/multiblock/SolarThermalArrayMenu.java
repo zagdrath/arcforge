@@ -34,8 +34,6 @@ public class SolarThermalArrayMenu extends MachineMenu {
     public static final int DATA_SIDE_CONFIG = 11;
     public static final int DATA_VALUES = 12;
 
-    // Tabs: Heat, Redstone, Ports; the (hidden) upgrade slots would sit under a fourth.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the controller's position written by the server.
     public SolarThermalArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -46,7 +44,7 @@ public class SolarThermalArrayMenu extends MachineMenu {
 
     public SolarThermalArrayMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.SOLAR_THERMAL_ARRAY.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.SOLAR_THERMAL_ARRAY_CONTROLLER.get());
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

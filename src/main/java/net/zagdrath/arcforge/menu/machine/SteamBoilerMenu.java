@@ -60,8 +60,6 @@ public class SteamBoilerMenu extends MachineMenu {
     // Slot positions from steam_boiler_gui_layout.json.
     public static final int BUCKET_IN_X = 27, BUCKET_IN_Y = 19;
     public static final int BUCKET_OUT_X = 27, BUCKET_OUT_Y = 53;
-    // Tabs: Heat, Redstone, Sides; the (hidden) upgrade slots would sit under a fourth.
-    private static final int UPGRADES_TAB = 3;
 
     // The synced value at an index, for both boilers. height: the array's height (1 for the single boiler).
     public static int value(int index, HeatBuffer heat, FilteredFluidTank water, FilteredFluidTank steam, BoilerCore core,
@@ -107,7 +105,7 @@ public class SteamBoilerMenu extends MachineMenu {
         super(type, containerId, inventory, pos, items, data, DATA_VALUES, block);
         addMachineSlot(SteamBoilerArrayBlockEntity.SLOT_BUCKET_IN, BUCKET_IN_X, BUCKET_IN_Y);
         addMachineSlot(SteamBoilerArrayBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     public static int pressureButtonId(BoilerPressure pressure) {

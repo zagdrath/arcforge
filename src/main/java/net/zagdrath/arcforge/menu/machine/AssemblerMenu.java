@@ -46,8 +46,6 @@ public class AssemblerMenu extends MachineMenu {
     public static final int OUTPUT_X = 123, OUTPUT_Y = 35;
     public static final int REMAINDER_X = 150, REMAINDER_Y = 26, REMAINDER_Y2 = 44;
     public static final int INVENTORY_Y = 124;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     private final SimpleContainer pattern;
     private final int firstPatternSlot;
@@ -72,7 +70,7 @@ public class AssemblerMenu extends MachineMenu {
         addMachineSlot(AssemblerBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y);
         addMachineSlot(AssemblerBlockEntity.FIRST_REMAINDER, REMAINDER_X, REMAINDER_Y);
         addMachineSlot(AssemblerBlockEntity.FIRST_REMAINDER + 1, REMAINDER_X, REMAINDER_Y2);
-        finish(inventory, UPGRADES_TAB, INVENTORY_Y);
+        finish(inventory, INVENTORY_Y);
         // After everything else, so the shared shift-click logic never counts them.
         this.firstPatternSlot = slots.size();
         for (int i = 0; i < AssemblerBlockEntity.PATTERN_SIZE; i++) {

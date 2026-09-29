@@ -45,8 +45,6 @@ public class GasTurbineArrayMenu extends MachineMenu {
     public static final int DATA_FE_PER_MB_X10 = 19;
     public static final int DATA_VALUES = 20;
 
-    // Tabs: Energy, Redstone, Ports; the (hidden) upgrade slots would sit under a fourth.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the master's position written by the server.
     public GasTurbineArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -57,7 +55,7 @@ public class GasTurbineArrayMenu extends MachineMenu {
 
     public GasTurbineArrayMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.GAS_TURBINE_ARRAY.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.GAS_TURBINE_ARRAY_CASING.get());
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

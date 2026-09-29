@@ -17,6 +17,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.ScheduledTickAccess;
@@ -27,6 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
 // Pressure Glass: the windows of the Steam Boiler Array and Steam Turbine Array, and a decorative glass on
@@ -47,6 +49,21 @@ public class PressureGlassBlock extends TransparentBlock {
     // The steam arrays and the Gas Turbine Array can use glass.
     private static List<ShellStructure> structures() {
         return List.of(SteamBoilerArrayCasingBlock.STRUCTURE, SteamTurbineArrayCasingBlock.STRUCTURE, GasTurbineArrayCasingBlock.STRUCTURE);
+    }
+
+    // The master of the formed array the pane at pos is a window of, or null. Glass isn't a MultiblockPart (it never
+    // does IO), so security and Jade find the array through this.
+    public static @Nullable ShellMultiblockBlockEntity findMaster(BlockGetter level, BlockPos pos) {
+        if (!isFormed(level.getBlockState(pos))) {
+            return null;
+        }
+        for (ShellStructure structure : structures()) {
+            ShellMultiblockBlockEntity master = structure.findMaster(level, pos);
+            if (master != null) {
+                return master;
+            }
+        }
+        return null;
     }
 
     @Override

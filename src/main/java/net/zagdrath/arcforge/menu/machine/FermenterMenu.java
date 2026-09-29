@@ -35,8 +35,6 @@ public class FermenterMenu extends MachineMenu {
     // Slot positions from the handoff's gui_layouts.json.
     public static final int INPUT_X = 48, INPUT_Y = 35;
     public static final int BYPRODUCT_X = 134, BYPRODUCT_Y = 35;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public FermenterMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -47,7 +45,7 @@ public class FermenterMenu extends MachineMenu {
         super(ModMenuTypes.FERMENTER.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.FERMENTER.get());
         addMachineSlot(FermenterBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(FermenterBlockEntity.SLOT_BYPRODUCT, BYPRODUCT_X, BYPRODUCT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

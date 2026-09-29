@@ -35,8 +35,6 @@ public class VacuumCollectorMenu extends MachineMenu {
     public static final int FILTER_X = 30, FILTER_Y = 18;
     public static final int BUFFER_X = 8, BUFFER_Y = 76;
     public static final int INVENTORY_Y = 124;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public VacuumCollectorMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -49,7 +47,7 @@ public class VacuumCollectorMenu extends MachineMenu {
         for (int i = 0; i < VacuumCollectorBlockEntity.BUFFER_SLOTS; i++) {
             addMachineSlot(VacuumCollectorBlockEntity.FIRST_BUFFER + i, BUFFER_X + (i % 9) * 18, BUFFER_Y + (i / 9) * 18);
         }
-        finish(inventory, UPGRADES_TAB, INVENTORY_Y);
+        finish(inventory, INVENTORY_Y);
     }
 
     @Override

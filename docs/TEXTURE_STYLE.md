@@ -171,8 +171,9 @@ only).
 ### Cells (Energy/Heat)
 
 - Flat bevelled rim.
-- The core window keeps its level art (levels 0–4), drawn as flat bars of 3 tones from the FE or Heat
-  row.
+- The core window keeps its level art (levels 0–4): flat bars of 3 tones from the FE or Heat row where it's
+  charged, and the same bars in dim tones where it isn't (FE: `#8E231C` / `#5A1712` bars, `#3A100C` gaps;
+  Heat: the cold `#7A1B0A` / `#3C1C0C`). The window's left lip stays `#16181B` at every level.
 - Frame rails are flat: a lit row `#727982` and a shade row `#383C42`, with tier accents at the
   ends and middle.
 
@@ -248,6 +249,8 @@ The controller is a screen pane inside that band, not a boxed bezel.
 
 - **UV layout:**
   - straight side (0,0,16,6): row 0 lit edge, rows 1–4 contents, row 5 dark edge;
+  - the top and bottom faces use the same strip mirrored across the conduit, so the lit edge is on the north or west
+    side. South and west arms use the `_s` models and up arms the `_u` models, which undo their 180° turn;
   - cap (0,6,6,12);
   - arm sides (6,6,14,12).
 - **Tier colour:** the end flanges and the cap ring are flat tier tones:
@@ -256,8 +259,8 @@ The controller is a screen pane inside that band, not a boxed bezel.
   - light = rim highlight (tone 6).
 - **Steel:** body `#40454C`, hoops and clamps `#575D65` / `#727982` / `#959DA6`, all from the ramp.
 - **Contents by type:**
-  - **Energy (solid):** the running core is `#FF8577` / `#E5483C`; the idle core is `#8E231C` on
-    `#2B2F34`.
+  - **Energy (solid):** the running core is `#FF8577` / `#E5483C`; the idle core is `#8E231C` in both
+    rows.
   - **Item and fluid (translucent):** glass with a `#DCE8EE` sheen row (alpha ~110–120), a `#DCE8EE`
     body (alpha ~40) and an `#A9BCC6` lower row (alpha ~60–70).
   - **Pressurized / gas (translucent):** the same glass, with opaque steel hoops every 4 px. The gas

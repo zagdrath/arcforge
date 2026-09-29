@@ -38,8 +38,6 @@ public class FuelBurnerMenu extends MachineMenu {
     // Slot positions from fuel_burner_gui_layout.json (the Geothermal Plant's frame).
     public static final int BUCKET_IN_X = 31, BUCKET_IN_Y = 19;
     public static final int BUCKET_OUT_X = 31, BUCKET_OUT_Y = 53;
-    // Tabs: Heat, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public FuelBurnerMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -50,7 +48,7 @@ public class FuelBurnerMenu extends MachineMenu {
         super(ModMenuTypes.FUEL_BURNER.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.FUEL_BURNER.get());
         addMachineSlot(FuelBurnerBlockEntity.SLOT_BUCKET_IN, BUCKET_IN_X, BUCKET_IN_Y);
         addMachineSlot(FuelBurnerBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

@@ -36,8 +36,6 @@ public class GeothermalPlantMenu extends MachineMenu {
     // Slot positions from the GUI layout.
     public static final int INPUT_SLOT_X = 31, INPUT_SLOT_Y = 19;
     public static final int OUTPUT_SLOT_X = 31, OUTPUT_SLOT_Y = 53;
-    // Tabs: Heat, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public GeothermalPlantMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -50,7 +48,7 @@ public class GeothermalPlantMenu extends MachineMenu {
         super(ModMenuTypes.GEOTHERMAL_PLANT.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.GEOTHERMAL_PLANT.get());
         addMachineSlot(GeothermalPlantBlockEntity.SLOT_INPUT, INPUT_SLOT_X, INPUT_SLOT_Y);
         addMachineSlot(GeothermalPlantBlockEntity.SLOT_OUTPUT, OUTPUT_SLOT_X, OUTPUT_SLOT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

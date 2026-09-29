@@ -25,6 +25,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.ArcforgeFakePlayer;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
+import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.tag.ModBlockTags;
 
 // Who may use an Owned block. Unowned blocks (placed before security existed) are public; the owner and, with
@@ -98,6 +99,10 @@ public final class SecurityRules {
             if (controller instanceof Owned owned) {
                 return Optional.of(owned);
             }
+        }
+        // A window of a formed array belongs to the array, like its casings.
+        if (PressureGlassBlock.findMaster(level, pos) instanceof Owned owned) {
+            return Optional.of(owned);
         }
         var blockEntity = level.getBlockEntity(pos);
         if (blockEntity instanceof ArcQuarryBoundingBlockEntity bounding && level.getBlockEntity(bounding.mainPos()) instanceof Owned quarry) {

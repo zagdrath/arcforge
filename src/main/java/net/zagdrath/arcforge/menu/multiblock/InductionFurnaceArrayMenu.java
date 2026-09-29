@@ -35,8 +35,6 @@ public class InductionFurnaceArrayMenu extends MachineMenu {
 
     // Slot positions from induction_furnace_array_gui_layout.json: one row per lane.
     public static final int INPUT_X = 31, OUTPUT_X = 83, FIRST_LANE_Y = 19, LANE_PITCH = 18;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the centre's position written by the server.
     public InductionFurnaceArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -54,7 +52,7 @@ public class InductionFurnaceArrayMenu extends MachineMenu {
             addMachineSlot(InductionFurnaceArrayBlockEntity.inputSlot(lane), INPUT_X, y);
             addOutputSlot(InductionFurnaceArrayBlockEntity.outputSlot(lane), OUTPUT_X, y, onTakeOutput);
         }
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

@@ -68,7 +68,8 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
         if (condenser != null) {
             return new Data(Kind.CONDENSER.ordinal(), 0, 0, condenser.getCondensed(), 0);
         }
-        if (blockEntity instanceof SteamTurbineArrayBlockEntity casing && casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine) {
+        var turbineMaster = blockEntity instanceof SteamTurbineArrayBlockEntity casing ? casing.getMaster() : WindowProviders.master(level, accessor.getPosition());
+        if (turbineMaster instanceof SteamTurbineArrayBlockEntity turbine) {
             return new Data(Kind.TURBINE.ordinal(), turbine.hasExhaust() ? 1 : 0, turbine.isVacuum() ? 1 : 0, turbine.getExhaust().getAmount(), 0);
         }
         return null;

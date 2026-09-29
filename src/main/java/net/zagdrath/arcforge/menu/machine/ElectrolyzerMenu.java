@@ -47,8 +47,6 @@ public class ElectrolyzerMenu extends MachineMenu {
     public static final int BUTTON_VENT_HYDROGEN = 200;
     public static final int BUTTON_VENT_OXYGEN = 201;
 
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public ElectrolyzerMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -57,7 +55,7 @@ public class ElectrolyzerMenu extends MachineMenu {
 
     public ElectrolyzerMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.ELECTROLYZER.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.ELECTROLYZER.get());
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

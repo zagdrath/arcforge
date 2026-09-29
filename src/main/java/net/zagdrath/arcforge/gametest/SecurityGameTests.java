@@ -79,6 +79,30 @@ public final class SecurityGameTests {
         net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.PlayerContainerEvent.Open(player, menu));
     }
 
+    // A window of a Private array belongs to the array: an outsider can't break it (which would break the array) or
+    // open the array through it.
+    static void windowsAreSecured(GameTestHelper helper) {
+        BlockPos min = new BlockPos(1, 1, 1);
+        BlockPos pane = new BlockPos(2, 2, 1);
+        ServerPlayer owner = player(helper, new BlockPos(0, 1, 0));
+        ServerPlayer other = player(helper, new BlockPos(4, 1, 0));
+        SteamGameTests.buildShell(helper, min, Direction.Axis.Y, 3, ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), pane);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    var boiler = helper.getBlockEntity(min, net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.isMaster(), "Boiler array did not form");
+                    boiler.setOwner(owner.getUUID(), "owner");
+                    boiler.setSecurityOverride(java.util.Optional.of(SecurityMode.PRIVATE));
+                    helper.assertTrue(SecurityRules.of(helper.getLevel(), helper.absolutePos(pane)).orElse(null) == boiler,
+                            "The window doesn't belong to its array");
+                    helper.assertTrue(use(helper, other, pane, ItemStack.EMPTY) == InteractionResult.FAIL, "An outsider opened the array through its window");
+                    helper.assertFalse(other.gameMode.destroyBlock(helper.absolutePos(pane)), "An outsider broke a private array's window");
+                    helper.assertBlockPresent(ModBlocks.PRESSURE_GLASS.get(), pane);
+                })
+                .thenSucceed();
+    }
+
     // A machine with no owner (placed before security) belongs to the first player to open it; opening it again
     // later, as someone else, doesn't change that.
     static void firstOpenClaims(GameTestHelper helper) {

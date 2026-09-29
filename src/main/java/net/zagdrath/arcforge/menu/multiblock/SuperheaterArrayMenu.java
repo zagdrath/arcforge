@@ -46,7 +46,6 @@ public class SuperheaterArrayMenu extends MachineMenu {
     private static final int PRESSURE_BUTTON_FIRST = 200;
 
     // No slots: the upgrade tab index only has to be past the other tabs.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the centre's position written by the server.
     public SuperheaterArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -55,7 +54,7 @@ public class SuperheaterArrayMenu extends MachineMenu {
 
     public SuperheaterArrayMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.SUPERHEATER_ARRAY.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.SUPERHEATER_ARRAY_CASING.get());
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

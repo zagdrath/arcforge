@@ -38,9 +38,9 @@
         "up": {
           "uv": [
             11,
-            6,
+            12,
             14,
-            12
+            6
           ],
           "texture": "#conduit",
           "rotation": 90
@@ -48,9 +48,9 @@
         "down": {
           "uv": [
             11,
-            6,
+            12,
             14,
-            12
+            6
           ],
           "texture": "#conduit",
           "rotation": 90
@@ -118,9 +118,9 @@
         "up": {
           "uv": [
             8,
-            0,
+            8,
             10,
-            8
+            0
           ],
           "texture": "#port_out",
           "rotation": 90
@@ -128,9 +128,9 @@
         "down": {
           "uv": [
             8,
-            0,
+            8,
             10,
-            8
+            0
           ],
           "texture": "#port_out",
           "rotation": 90
@@ -172,9 +172,9 @@
         "up": {
           "uv": [
             11,
-            6,
+            12,
             14,
-            12
+            6
           ],
           "texture": "#glow",
           "rotation": 90,
@@ -183,9 +183,9 @@
         "down": {
           "uv": [
             11,
-            6,
+            12,
             14,
-            12
+            6
           ],
           "texture": "#glow",
           "rotation": 90,

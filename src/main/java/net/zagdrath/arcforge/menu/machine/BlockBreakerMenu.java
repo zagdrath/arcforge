@@ -28,8 +28,6 @@ public class BlockBreakerMenu extends MachineMenu {
 
     // The 3x3 buffer from gui_layouts.json.
     public static final int GRID_X = 98, GRID_Y = 17;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public BlockBreakerMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -41,7 +39,7 @@ public class BlockBreakerMenu extends MachineMenu {
         for (int slot = 0; slot < BlockBreakerBlockEntity.SLOTS; slot++) {
             addMachineSlot(slot, GRID_X + (slot % 3) * 18, GRID_Y + (slot / 3) * 18);
         }
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

@@ -197,7 +197,7 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_s",
         "y": 180
       }
     },
@@ -206,7 +206,7 @@
         "south": "input"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm_input",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_input_s",
         "y": 180
       }
     },
@@ -215,7 +215,7 @@
         "south": "output"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm_output",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_output_s",
         "y": 180
       }
     },
@@ -303,7 +303,7 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_s",
         "y": 270
       }
     },
@@ -312,7 +312,7 @@
         "west": "input"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm_input",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_input_s",
         "y": 270
       }
     },
@@ -321,7 +321,7 @@
         "west": "output"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm_output",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_output_s",
         "y": 270
       }
     },
@@ -356,7 +356,7 @@
         ]
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_u",
         "x": 270
       }
     },
@@ -365,7 +365,7 @@
         "up": "input"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm_input",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_input_u",
         "x": 270
       }
     },
@@ -374,7 +374,7 @@
         "up": "output"
       },
       "apply": {
-        "model": "arcforge:block/conduit/tempered_fluid_arm_output",
+        "model": "arcforge:block/conduit/tempered_fluid_arm_output_u",
         "x": 270
       }
     },

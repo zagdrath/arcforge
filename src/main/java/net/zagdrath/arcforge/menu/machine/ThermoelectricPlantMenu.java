@@ -30,8 +30,6 @@ public class ThermoelectricPlantMenu extends MachineMenu {
     public static final int DATA_SIDE_CONFIG = 10;
     public static final int DATA_VALUES = 11;
 
-    // Tabs: Energy, Heat, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 4;
 
     // Client constructor, called with the block position written by the server.
     public ThermoelectricPlantMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -42,7 +40,7 @@ public class ThermoelectricPlantMenu extends MachineMenu {
 
     public ThermoelectricPlantMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.THERMOELECTRIC_PLANT.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.THERMOELECTRIC_PLANT.get());
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

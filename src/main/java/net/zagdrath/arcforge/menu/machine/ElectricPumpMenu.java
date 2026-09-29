@@ -38,8 +38,6 @@ public class ElectricPumpMenu extends MachineMenu {
     // Slot positions from electric_pump_gui_layout.json.
     public static final int BUCKET_IN_X = 133, BUCKET_IN_Y = 19;
     public static final int BUCKET_OUT_X = 133, BUCKET_OUT_Y = 53;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public ElectricPumpMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -50,7 +48,7 @@ public class ElectricPumpMenu extends MachineMenu {
         super(ModMenuTypes.ELECTRIC_PUMP.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.ELECTRIC_PUMP.get());
         addMachineSlot(ElectricPumpBlockEntity.SLOT_BUCKET_IN, BUCKET_IN_X, BUCKET_IN_Y);
         addMachineSlot(ElectricPumpBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

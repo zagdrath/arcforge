@@ -33,8 +33,6 @@ public class MetalPressingArrayMenu extends MachineMenu {
 
     // Slot positions from metal_pressing_array_gui_layout.json: one row per lane.
     public static final int DIE_X = 27, INPUT_X = 47, OUTPUT_X = 94, FIRST_LANE_Y = 19, LANE_PITCH = 18;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the centre's position written by the server.
     public MetalPressingArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -49,7 +47,7 @@ public class MetalPressingArrayMenu extends MachineMenu {
             addMachineSlot(MetalPressingArrayBlockEntity.inputSlot(lane), INPUT_X, y);
             addMachineSlot(MetalPressingArrayBlockEntity.outputSlot(lane), OUTPUT_X, y);
         }
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

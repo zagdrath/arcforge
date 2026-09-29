@@ -31,8 +31,6 @@ public class MetalPressMenu extends MachineMenu {
     public static final int DIE_X = 29, DIE_Y = 35;
     public static final int INPUT_X = 53, INPUT_Y = 35;
     public static final int OUTPUT_X = 113, OUTPUT_Y = 35;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public MetalPressMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -44,7 +42,7 @@ public class MetalPressMenu extends MachineMenu {
         addMachineSlot(MetalPressBlockEntity.SLOT_DIE, DIE_X, DIE_Y);
         addMachineSlot(MetalPressBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(MetalPressBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

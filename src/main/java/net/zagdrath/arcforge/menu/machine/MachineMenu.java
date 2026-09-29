@@ -41,8 +41,10 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 // before calling finish(), and declare where the status, redstone and side data sit.
 public abstract class MachineMenu extends AbstractContainerMenu implements SecuredMenu {
     public static final int BUTTON_CLEAR_SIDES = MachineMenuButtons.CLEAR_SIDES;
-    // Upgrade slots sit in the Upgrades side tab (x 172, the Nth tab at y = 6 + N * 25), with slot items at +9,+25.
-    private static final int UPGRADE_SLOT_X = 181, UPGRADE_SLOT_PITCH = 20;
+    // Upgrade slots sit in the Upgrades side tab. It's always the third tab on the right (after Redstone and Sides or
+    // Ports; the readouts are on the left), and SideTabPanel stacks those 20 px tabs 1 px apart from x 172, y 6, with
+    // UpgradesTab's slot frames at +8,+24 (so the items at +9,+25).
+    public static final int UPGRADE_SLOT_X = 172 + 9, UPGRADE_SLOT_Y = 6 + 2 * 21 + 25, UPGRADE_SLOT_PITCH = 20;
 
     protected final MachineItemHandler items;
     protected final ContainerLevelAccess access;
@@ -100,17 +102,17 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
         });
     }
 
-    // Adds the upgrade slots (for the Upgrades tab at the given position in the tab stack), the player
-    // inventory and the data slots. Call once, after the machine's own slots.
-    protected void finish(Inventory inventory, int upgradesTabIndex) {
-        finish(inventory, upgradesTabIndex, 84);
+    // Adds the upgrade slots (in the Upgrades tab), the player inventory and the data slots. Call once, after the
+    // machine's own slots.
+    protected void finish(Inventory inventory) {
+        finish(inventory, 84);
     }
 
     // For taller GUIs: the player inventory's top row at inventoryY (the hotbar 58 below it).
-    protected void finish(Inventory inventory, int upgradesTabIndex, int inventoryY) {
-        int y = 6 + upgradesTabIndex * 25 + 25;
+    protected void finish(Inventory inventory, int inventoryY) {
         for (int i = 0; i < MachineBlockEntity.UPGRADE_SLOTS; i++) {
-            ToggleableSlot slot = new ToggleableSlot(items, items::set, items.getFirstUpgradeSlot() + i, UPGRADE_SLOT_X + i * UPGRADE_SLOT_PITCH, y);
+            ToggleableSlot slot = new ToggleableSlot(items, items::set, items.getFirstUpgradeSlot() + i, UPGRADE_SLOT_X + i * UPGRADE_SLOT_PITCH,
+                    UPGRADE_SLOT_Y);
             upgradeSlots.add(slot);
             addSlot(slot);
         }

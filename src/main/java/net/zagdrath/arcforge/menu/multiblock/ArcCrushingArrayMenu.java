@@ -32,8 +32,6 @@ public class ArcCrushingArrayMenu extends MachineMenu {
 
     // Slot positions from arc_crushing_array_gui_layout.json: one row per lane.
     public static final int INPUT_X = 31, OUTPUT_X = 79, BONUS_X = 99, FIRST_LANE_Y = 19, LANE_PITCH = 18;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the centre's position written by the server.
     public ArcCrushingArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -48,7 +46,7 @@ public class ArcCrushingArrayMenu extends MachineMenu {
             addMachineSlot(ArcCrushingArrayBlockEntity.outputSlot(lane), OUTPUT_X, y);
             addMachineSlot(ArcCrushingArrayBlockEntity.bonusSlot(lane), BONUS_X, y);
         }
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

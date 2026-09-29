@@ -24,7 +24,7 @@ import snownee.jade.api.StreamServerDataProvider;
 import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.ui.IDisplayHelper;
 
-// The Gas Turbine Array in Jade, looking at any casing: "8.4k rpm · 4,200 FE/t", the throttle in Throttle mode,
+// The Gas Turbine Array in Jade, looking at any casing or window: "8.4k rpm · 4,200 FE/t", the throttle in Throttle mode,
 // the exhaust ("Exhaust 700 HU/t at 600°C", plus "Venting to air" when no Heat port takes it) and the status.
 // Its fuel, lubricant and FE show through Jade's own views.
 public enum GasTurbineProvider implements StreamServerDataProvider<BlockAccessor, GasTurbineProvider.Data> {
@@ -47,7 +47,10 @@ public enum GasTurbineProvider implements StreamServerDataProvider<BlockAccessor
 
     @Override
     public @Nullable Data streamData(BlockAccessor accessor) {
-        if (!(accessor.getBlockEntity() instanceof GasTurbineArrayBlockEntity casing) || !(casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine)) {
+        // A casing's master, or the array a window belongs to.
+        var master = accessor.getBlockEntity() instanceof GasTurbineArrayBlockEntity casing ? casing.getMaster()
+                : WindowProviders.master(accessor.getLevel(), accessor.getPosition());
+        if (!(master instanceof GasTurbineArrayBlockEntity turbine)) {
             return null;
         }
         int throttle = turbine.getRedstoneMode() == RedstoneMode.THROTTLE ? (int) Math.round(turbine.throttle() * 100.0) : -1;

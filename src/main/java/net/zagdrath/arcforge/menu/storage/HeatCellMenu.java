@@ -17,6 +17,7 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
+import net.zagdrath.arcforge.menu.machine.MachineMenu;
 import net.zagdrath.arcforge.menu.slot.ToggleableSlot;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
@@ -38,9 +39,8 @@ public class HeatCellMenu extends StorageMenu {
     public static final int DATA_INSULATION = 9;
     public static final int DATA_VALUES = 10;
 
-    // The Upgrades tab is the third (after Redstone and Sides): tab N sits at y = 6 + N * 25, its slot at +9,+25.
-    private static final int UPGRADES_TAB = 2;
-    private static final int UPGRADE_SLOT_X = 181, UPGRADE_SLOT_Y = 6 + UPGRADES_TAB * 25 + 25;
+    // The upgrade slot sits where a machine's first one does: the Upgrades tab is the third, after Redstone and Sides.
+    private static final int UPGRADE_SLOT_X = MachineMenu.UPGRADE_SLOT_X, UPGRADE_SLOT_Y = MachineMenu.UPGRADE_SLOT_Y;
 
     private final ToggleableSlot upgradeSlot;
     private final int upgradeSlotIndex;

@@ -208,7 +208,8 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
   covers the Steam Turbine, Solar Thermal and Gas Turbine Arrays, which used to get theirs automatically.
   Structures you've already built keep their ports.
 - **Pressurized Conduits are see-through.** They're pressure glass now, like Fluid Conduits, and show the gas
-  inside in its colour, denser the fuller the conduit. Empty ones are clear. They no longer glow.
+  inside in its colour, denser the fuller the conduit. Gas that passes straight through (a fast conduit may hold
+  none between ticks) still shows while it's moving. Idle, empty ones are clear. They no longer glow.
 - **Every port face on a single-block machine shows a port.** Each face that has a side mode by default now
   carries the same 8×8 port plate, centred, in that mode's colour. This includes the Chemical Reactor's and
   Electrolyzer's left and right faces, the Fiberizer's and Infuser's input side, and the Block Breaker's top
@@ -224,6 +225,12 @@ Suggested version: **2.1.0** (new content and balance changes; worlds load as th
 - **Wrong port marks on machine textures.** The Block Placer's back showed an input port instead of energy.
   The Electrolyzer and Geothermal Plant bottoms showed ports they don't have, and the Fuel Burner's sides had a
   stray red nub.
+- **Conduits: the dark edge along the top flipped sides from block to block.** The top of every conduit now
+  has its lit edge on the same side, whichever way each piece points.
+- **Energy Conduits: the idle core is two red rows again**, not one red row over a dark one.
+- **Energy and Heat Cells:** the window shows its bars at every charge level again (dim where it's empty), its
+  lit bars fill the whole window, and the black pixel at its bottom-left corner is back.
+- **Jade on a Steam Turbine Array's windows** shows the turbine's exhaust line, as its casings do.
 - **Induction Furnace Array screen: the speed ran past its edge.** It now reads "x2/lane"; hover for the full
   line.
 

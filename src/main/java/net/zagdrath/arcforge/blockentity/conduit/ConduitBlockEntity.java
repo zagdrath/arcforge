@@ -34,6 +34,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.model.data.ModelData;
@@ -79,6 +80,9 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     // Thermal conduits: the temperature (°C) of the heat held, so a rebuilt network remembers it.
     private int heatTemperature = HeatBuffer.AMBIENT_CELSIUS;
     private FluidStack fluid = FluidStack.EMPTY;
+    // Pressurized conduits: the gas moving through while the network is lit, drawn even when this conduit's share of
+    // the tank is empty (a fast network can pass all its gas straight through in a tick). EMPTY when idle.
+    private Fluid flowingGas = Fluids.EMPTY;
     private float itemSpeed;
     private boolean syncPending;
     // Game time is never negative, so the first sync is always allowed. (Long.MIN_VALUE would overflow the subtraction.)
@@ -381,6 +385,17 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         }
     }
 
+    public Fluid getFlowingGas() {
+        return flowingGas;
+    }
+
+    public void setFlowingGas(Fluid gas) {
+        if (gas != flowingGas) {
+            flowingGas = gas;
+            markContentsChanged(true);
+        }
+    }
+
     // Records a content change. Items sync right away so clients see packets enter and leave;
     // fluid levels change every tick and are throttled.
     public void markContentsChanged(boolean immediate) {
@@ -503,6 +518,7 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         stored = input.getIntOr("stored", 0);
         heatTemperature = input.getIntOr("heat_temperature", HeatBuffer.AMBIENT_CELSIUS);
         fluid = input.read("fluid", FluidStack.OPTIONAL_CODEC).orElse(FluidStack.EMPTY);
+        flowingGas = input.read("flowing_gas", BuiltInRegistries.FLUID.byNameCodec()).orElse(Fluids.EMPTY);
         itemSpeed = input.getFloatOr("item_speed", 0.0F);
         int filterModesBefore = packFilterModes();
         Arrays.fill(filters, ItemStack.EMPTY);
@@ -552,6 +568,9 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         }
         if (!fluid.isEmpty()) {
             output.store("fluid", FluidStack.OPTIONAL_CODEC, fluid);
+        }
+        if (flowingGas != Fluids.EMPTY) {
+            output.store("flowing_gas", BuiltInRegistries.FLUID.byNameCodec(), flowingGas);
         }
         output.putFloat("item_speed", itemSpeed);
         if (packFilterModes() != 0) {

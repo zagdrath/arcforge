@@ -27,6 +27,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
@@ -44,6 +45,8 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
     // Gas tint opacity from a nearly empty to a full pressurized conduit.
     private static final int GAS_MIN_ALPHA = 60;
     private static final int GAS_MAX_ALPHA = 200;
+    // Gas flowing through a conduit that holds none of it is drawn as if it were this full, so it can be seen.
+    private static final float GAS_FLOWING_SHARE = 0.4F;
     // Fluid cross-section inside the 6px pipe, in 1/16 block units.
     private static final float LO = 6.0F / 16.0F, HI = 10.0F / 16.0F, SPAN = HI - LO;
     private static final float CORE_LO = 6.0F / 16.0F, CORE_HI = 10.0F / 16.0F;
@@ -80,15 +83,24 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
 
         state.fluidSprite = null;
         FluidStack fluid = conduit.getFluid();
+        boolean gas = conduit.getConduitType() == ConduitType.GAS;
+        boolean flowing = gas && conduit.getFlowingGas() != Fluids.EMPTY;
+        if (fluid.isEmpty() && flowing) {
+            fluid = new FluidStack(conduit.getFlowingGas(), 1);
+        }
         if (!fluid.isEmpty()) {
             var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.getFluid().defaultFluidState());
             state.fluidSprite = model.stillMaterial().sprite();
             int tint = model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(fluid) : -1;
             state.fluidColor = tint | 0xFF000000;
             state.fluidLight = LightCoordsUtil.lightCoordsWithEmission(state.lightCoords, fluid.getFluidType().getLightLevel());
-            if (conduit.getConduitType() == ConduitType.GAS) {
-                // Gas fills the whole bore; how full the conduit is shows as how dense the tint is.
+            if (gas) {
+                // Gas fills the whole bore; how full the conduit is shows as how dense the tint is, and gas moving
+                // through shows at least GAS_FLOWING_SHARE.
                 float share = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.GAS_CAPACITY_PER_CONDUIT);
+                if (flowing) {
+                    share = Math.max(share, GAS_FLOWING_SHARE);
+                }
                 int alpha = Math.round(GAS_MIN_ALPHA + (GAS_MAX_ALPHA - GAS_MIN_ALPHA) * share);
                 state.fluidColor = (ConduitTints.gasColor(fluid) & 0x00FFFFFF) | (alpha << 24);
                 state.fill = 1.0F;

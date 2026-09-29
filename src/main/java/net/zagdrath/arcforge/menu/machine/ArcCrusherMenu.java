@@ -31,8 +31,6 @@ public class ArcCrusherMenu extends MachineMenu {
     public static final int INPUT_X = 44, INPUT_Y = 35;
     public static final int OUTPUT_X = 100, OUTPUT_Y = 35;
     public static final int BONUS_X = 128, BONUS_Y = 35;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public ArcCrusherMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -44,7 +42,7 @@ public class ArcCrusherMenu extends MachineMenu {
         addMachineSlot(ArcCrusherBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(ArcCrusherBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y);
         addMachineSlot(ArcCrusherBlockEntity.SLOT_BONUS, BONUS_X, BONUS_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

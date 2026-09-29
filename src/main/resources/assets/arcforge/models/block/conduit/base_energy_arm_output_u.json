@@ -1,0 +1,140 @@
+{
+  "render_type": "minecraft:solid",
+  "textures": {
+    "particle": "#conduit"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        5,
+        2
+      ],
+      "to": [
+        11,
+        11,
+        5
+      ],
+      "faces": {
+        "east": {
+          "uv": [
+            11,
+            12,
+            14,
+            6
+          ],
+          "texture": "#conduit"
+        },
+        "west": {
+          "uv": [
+            11,
+            12,
+            14,
+            6
+          ],
+          "texture": "#conduit"
+        },
+        "up": {
+          "uv": [
+            11,
+            6,
+            14,
+            12
+          ],
+          "texture": "#conduit",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            11,
+            6,
+            14,
+            12
+          ],
+          "texture": "#conduit",
+          "rotation": 90
+        },
+        "north": {
+          "uv": [
+            0,
+            6,
+            6,
+            12
+          ],
+          "texture": "#conduit"
+        }
+      }
+    },
+    {
+      "from": [
+        4,
+        4,
+        0
+      ],
+      "to": [
+        12,
+        12,
+        2
+      ],
+      "faces": {
+        "north": {
+          "uv": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "texture": "#port_out",
+          "cullface": "north"
+        },
+        "south": {
+          "uv": [
+            0,
+            0,
+            8,
+            8
+          ],
+          "texture": "#port_out"
+        },
+        "east": {
+          "uv": [
+            8,
+            8,
+            10,
+            0
+          ],
+          "texture": "#port_out"
+        },
+        "west": {
+          "uv": [
+            8,
+            8,
+            10,
+            0
+          ],
+          "texture": "#port_out"
+        },
+        "up": {
+          "uv": [
+            8,
+            0,
+            10,
+            8
+          ],
+          "texture": "#port_out",
+          "rotation": 90
+        },
+        "down": {
+          "uv": [
+            8,
+            0,
+            10,
+            8
+          ],
+          "texture": "#port_out",
+          "rotation": 90
+        }
+      }
+    }
+  ]
+}

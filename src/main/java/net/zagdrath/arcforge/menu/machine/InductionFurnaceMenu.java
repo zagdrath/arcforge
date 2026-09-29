@@ -33,8 +33,6 @@ public class InductionFurnaceMenu extends MachineMenu {
     // Slot positions from induction_furnace_gui_layout.json.
     public static final int INPUT_X = 53, INPUT_Y = 35;
     public static final int OUTPUT_X = 113, OUTPUT_Y = 35;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public InductionFurnaceMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -48,7 +46,7 @@ public class InductionFurnaceMenu extends MachineMenu {
         super(ModMenuTypes.INDUCTION_FURNACE.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.INDUCTION_FURNACE.get());
         addMachineSlot(InductionFurnaceBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addOutputSlot(InductionFurnaceBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y, onTakeOutput);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

@@ -77,6 +77,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, CondenserArrayBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SteamTurbineArrayBlockEntity.class);
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, GasTurbineArrayBlockEntity.class);
+        registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, PressureGlassBlock.class);
+        registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, PressureGlassBlock.class);
         // Pressure Glass has no block entity: these read the array it belongs to.
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, PressureGlassBlock.class);
@@ -110,6 +112,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, CondenserArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SteamTurbineArrayCasingBlock.class);
         registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, GasTurbineArrayCasingBlock.class);
+        registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, PressureGlassBlock.class);
+        registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, PressureGlassBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

@@ -42,8 +42,6 @@ public class SteamTurbineArrayMenu extends MachineMenu {
     public static final int DATA_VALUES = 17;
     public static final int EXHAUST_VENTING = 0, EXHAUST_VACUUM = 1, EXHAUST_FULL = 2;
 
-    // Tabs: Energy, Redstone, Sides; the (hidden) upgrade slots would sit under a fourth.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the master's position written by the server.
     public SteamTurbineArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -54,7 +52,7 @@ public class SteamTurbineArrayMenu extends MachineMenu {
 
     public SteamTurbineArrayMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

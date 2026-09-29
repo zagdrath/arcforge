@@ -42,8 +42,6 @@ public class DistillationArrayMenu extends MachineMenu {
     public static final int DATA_VALUES = 19;
 
     public static final int PITCH_X = 151, PITCH_Y = 36;
-    // Tabs: Heat, Redstone, Sides; the (hidden) upgrade slots would sit under a fourth.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the controller's position written by the server.
     public DistillationArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -55,7 +53,7 @@ public class DistillationArrayMenu extends MachineMenu {
     public DistillationArrayMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.DISTILLATION_ARRAY.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get());
         addMachineSlot(DistillationArrayBlockEntity.SLOT_PITCH, PITCH_X, PITCH_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

@@ -33,8 +33,6 @@ public class ArcMelterMenu extends MachineMenu {
 
     // Slot position from arc_melter_gui_layout.json.
     public static final int INPUT_X = 44, INPUT_Y = 35;
-    // Tabs: Energy, Redstone, Sides, Upgrades.
-    private static final int UPGRADES_TAB = 3;
 
     // Client constructor, called with the block position written by the server.
     public ArcMelterMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -44,7 +42,7 @@ public class ArcMelterMenu extends MachineMenu {
     public ArcMelterMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.ARC_MELTER.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.ARC_MELTER.get());
         addMachineSlot(ArcMelterBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
-        finish(inventory, UPGRADES_TAB);
+        finish(inventory);
     }
 
     @Override

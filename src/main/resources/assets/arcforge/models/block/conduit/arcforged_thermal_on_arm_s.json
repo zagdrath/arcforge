@@ -1,0 +1,9 @@
+{
+  "parent": "arcforge:block/conduit/base_thermal_arm_s",
+  "textures": {
+    "conduit": "arcforge:block/conduit/arcforged_thermal_on",
+    "port_in": "arcforge:block/conduit/port_input",
+    "port_out": "arcforge:block/conduit/port_output",
+    "glow": "arcforge:block/conduit/arcforged_thermal_glow"
+  }
+}

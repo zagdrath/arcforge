@@ -85,8 +85,9 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
-    // A Pressurized Conduit carries steam from one cylinder to the one below and glows while it does.
-    // A Fluid Conduit doesn't even connect to a cylinder.
+    // A Pressurized Conduit carries steam from one cylinder to the one below and is lit while it does, showing the
+    // steam moving through; once nothing moves it goes dark and shows none. A Fluid Conduit doesn't even connect
+    // to a cylinder.
     static void gasConduitCarriesSteam(GameTestHelper helper) {
         BlockPos top = new BlockPos(0, 3, 0);
         BlockPos conduit = new BlockPos(0, 2, 0);
@@ -109,8 +110,16 @@ public final class SteamGameTests {
                 .thenExecute(() -> {
                     helper.assertTrue(SteamGrade.of(target.getGas().getFluid()) == SteamGrade.HIGH_PRESSURE, "Wrong gas arrived: " + target.getGas());
                     helper.assertTrue(helper.getBlockState(conduit).getValue(ActiveConduitBlock.ACTIVE), "The conduit is dark while steam moves");
+                    var flowing = helper.getBlockEntity(conduit, net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity.class).getFlowingGas();
+                    helper.assertTrue(SteamGrade.of(flowing) == SteamGrade.HIGH_PRESSURE, "The conduit shows " + flowing + " moving through");
                     helper.assertTrue(helper.getBlockState(fluidConduit).getValue(net.zagdrath.arcforge.block.conduit.ConduitBlock.DOWN)
                             == net.zagdrath.arcforge.conduit.ConnectionMode.NONE, "A fluid conduit connected to a cylinder");
+                    source.getTank().set(0, net.neoforged.neoforge.transfer.fluid.FluidResource.EMPTY, 0);
+                })
+                .thenWaitUntil(() -> helper.assertFalse(helper.getBlockState(conduit).getValue(ActiveConduitBlock.ACTIVE), "The conduit stays lit"))
+                .thenExecute(() -> {
+                    var flowing = helper.getBlockEntity(conduit, net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity.class).getFlowingGas();
+                    helper.assertTrue(flowing == net.minecraft.world.level.material.Fluids.EMPTY, "A dark conduit still shows " + flowing);
                 })
                 .thenSucceed();
     }

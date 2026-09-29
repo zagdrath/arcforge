@@ -37,9 +37,9 @@
         "up": {
           "uv": [
             6,
-            6,
+            12,
             11,
-            12
+            6
           ],
           "texture": "#conduit",
           "rotation": 90
@@ -47,9 +47,9 @@
         "down": {
           "uv": [
             6,
-            6,
+            12,
             11,
-            12
+            6
           ],
           "texture": "#conduit",
           "rotation": 90

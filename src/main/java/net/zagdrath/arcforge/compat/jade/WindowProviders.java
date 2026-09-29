@@ -21,9 +21,6 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarBlock;
-import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
@@ -51,14 +48,7 @@ public final class WindowProviders {
 
     // The master of the formed array the pane at pos is part of, or null.
     static @Nullable ShellMultiblockBlockEntity master(BlockGetter level, BlockPos pos) {
-        if (!PressureGlassBlock.isFormed(level.getBlockState(pos))) {
-            return null;
-        }
-        ShellMultiblockBlockEntity master = SteamBoilerArrayCasingBlock.STRUCTURE.findMaster(level, pos);
-        if (master == null) {
-            master = SteamTurbineArrayCasingBlock.STRUCTURE.findMaster(level, pos);
-        }
-        return master != null ? master : GasTurbineArrayCasingBlock.STRUCTURE.findMaster(level, pos);
+        return PressureGlassBlock.findMaster(level, pos);
     }
 
     private static @Nullable ShellMultiblockBlockEntity master(Accessor<?> accessor) {
