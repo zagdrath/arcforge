@@ -460,14 +460,13 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   the riveted strap on rows 13–15.
 
 ## Farming
-- Soil (Loam and its farmland) is a natural block: the asphalt method in soil browns. It has three close tones
-  (`#3B2A1D #4C3625 #5E432D`) in flat 2–4 px blotches that tile seamlessly, plus a few 1–2 px chips (`#78573B` /
-  `#2A1D14`).
-- Farmland tops cut that soil into four 4-row furrows:
-  - each band's top row is the ridge, one tone lighter;
-  - its bottom row is the furrow (`#2A1D14`), bridged by a 2 px clod or two.
-  - Moist farmland is the same art three steps darker (`#2A1D14 #352519 #42301F`, furrow `#160F0A`). Only moisture 7
-    shows as moist, as in vanilla.
+- Soil (Loam and its farmland) uses Cody's soil texture (his pink block), recoloured by brightness onto the loam
+  browns `#2A1D14 #3B2A1D #4C3625 #5E432D #72533A #8A6A4C`, with every pixel kept.
+- Farmland tops cut that texture into four 4-row furrows:
+  - each band's top row is the ridge, every pixel two tones lighter on the texture's own palette;
+  - its bottom row is the furrow (the darkest tone), bridged by a 2 px clod or two.
+  - Moist farmland is the same texture on the darker ramp `#160F0A → #5C432E`. Only moisture 7 shows as moist,
+    as in vanilla.
 - Irrigated Loam Farmland:
   - The top is the moist top with a copper channel down the middle (x5..10). The channel has a lit lip, walls in shade
     and in light, two water rows (`#4A8FE0` / `#3A76C0`, a `#7FB3F0` glint every half block) and clamp bands at y0/y8.
@@ -477,11 +476,12 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - The sides are the treated planks with a `TREATED[0]` gap row under each 4 px slat, and a bark post at each edge
     (one step darker on the right).
   - The inside is the planks two steps darker, and the rim is stripped-log end grain.
-  - The heap is flat blotches of moss greens and humus (`#2E3A1A #42501F #5A6628 #727A30`). Ready compost is dark humus.
+  - The heap while composting is Cody's green block, recoloured by rank onto `#2E3A1A #42501F #5A6628 #727A30 #8A8A3C`.
+    Ready compost is his soil texture on dark humus `#140E0A → #5E432D`.
 - Fertilizer items:
   - Wood Ash and Basic Slag are the dust texture recoloured by brightness: ash grey `#242322 → #B3AEA7`, slag slate
     blue `#1A1E24 → #A2ABB5`.
-  - Compost is the coke lump recoloured by rank onto humus `#1C130D → #8A6A4C`.
+  - Compost is Cody's lump texture, recoloured by rank onto humus `#1C130D → #8A6A4C` (his own tonal outline, no black).
   - Mixed Fertilizer is a tied paper sack (`#6E5634 … #CCAE74`) with a `#0C0D0F` outline. It has a green label
     carrying three 2×2 chips in the compost, ash and slag colours.
 - GUI: the Firebox and Combustion Plant have a fuel → flame → ash column that runs down the screen recess's height.
