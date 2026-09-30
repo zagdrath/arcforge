@@ -243,6 +243,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.DIGESTATE.get());
                 output.accept(ModItems.NUTRIENT_SOLUTION_BUCKET.get());
                 output.accept(ModItems.BIODIESEL_BUCKET.get());
+                output.accept(ModItems.GLASS_CLOCHE.get());
+                output.accept(ModItems.GROW_CHAMBER.get());
+                output.accept(ModItems.HYDROPONIC_CELL.get());
             }).build());
 
     private ModCreativeTabs() {}

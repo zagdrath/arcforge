@@ -1,0 +1,30 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:jungle_sapling",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:jungle_log",
+        "count": 6
+      }
+    },
+    {
+      "item": {
+        "id": "minecraft:jungle_sapling"
+      },
+      "chance": 0.5
+    },
+    {
+      "item": {
+        "id": "minecraft:stick",
+        "count": 2
+      },
+      "chance": 0.5
+    }
+  ],
+  "time": 6000,
+  "hydroponic_only": true,
+  "render": {
+    "grow": "scale"
+  }
+}

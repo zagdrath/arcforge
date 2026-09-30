@@ -20,6 +20,7 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.item.crafting.SmeltingRecipe;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.zagdrath.arcforge.farming.ClochePlants;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Recipe lookups for Arcforge machines that work on both sides: the server reads its recipe manager,
@@ -274,5 +275,27 @@ public final class MachineRecipes {
 
     public static boolean isDigesterInput(@Nullable Level level, ItemStack stack) {
         return digesting(level, stack).isPresent();
+    }
+
+    // --- Automated farms ---
+
+    // The cloche recipe that grows this seed in this soil (any soil hydroponically), if any. See ClochePlants.find for the
+    // fallback to vanilla-style crops.
+    public static Optional<RecipeHolder<ClocheRecipe>> cloche(@Nullable Level level, ItemStack seed, ItemStack soil, boolean hydroponic) {
+        return recipes(level).byType(ModRecipes.CLOCHE.get()).stream()
+                .filter(holder -> holder.value().grows(seed, soil, hydroponic))
+                .findFirst();
+    }
+
+    // Whether some cloche recipe names this seed (in any soil, in any farm).
+    public static boolean isClocheSeed(@Nullable Level level, ItemStack stack) {
+        return !stack.isEmpty() && recipes(level).byType(ModRecipes.CLOCHE.get()).stream()
+                .anyMatch(holder -> holder.value().seed().test(stack));
+    }
+
+    // Whether some cloche recipe grows in this soil (or it's a farmland soil, where fallback crops grow).
+    public static boolean isClocheSoil(@Nullable Level level, ItemStack stack) {
+        return !stack.isEmpty() && (stack.is(ClochePlants.FARMLAND_SOILS) || recipes(level).byType(ModRecipes.CLOCHE.get()).stream()
+                .anyMatch(holder -> holder.value().soil().isPresent() && holder.value().soil().get().test(stack)));
     }
 }

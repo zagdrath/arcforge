@@ -57,6 +57,7 @@ import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.types.IRecipeHolderType;
 import mezz.jei.api.recipe.types.IRecipeType;
+import net.zagdrath.arcforge.recipe.ClocheRecipe;
 
 // JEI categories for Arcforge's machines: what goes in, what comes out, and what it takes.
 final class MachineCategories {
@@ -532,6 +533,60 @@ final class MachineCategories {
         public void draw(RecipeHolder<DigestingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             text(graphics, Component.translatable("jei.arcforge.digesting.warm", seconds(holder.value().time()),
                     ArcforgeConfig.DIGESTER_MIN_TEMPERATURE.getAsInt()), 0, 28);
+        }
+    }
+
+    // --- Automated farms ---
+
+    // A seed in a soil -> its harvest, each output with its chance, and how long a harvest takes in each farm (before
+    // soil, fertilizer and upgrades). Hydroponic-only recipes have no soil.
+    static final class Cloche extends ArcforgeCategory<RecipeHolder<ClocheRecipe>> {
+        static final IRecipeHolderType<ClocheRecipe> TYPE = IRecipeHolderType.create(ModRecipes.CLOCHE.get());
+
+        Cloche(IGuiHelper gui) {
+            super(TYPE, "cloche", ModBlocks.GLASS_CLOCHE.get(), gui, 160, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ClocheRecipe> holder, IFocusGroup focuses) {
+            ClocheRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.seed());
+            if (!recipe.hydroponicOnly()) {
+                recipe.soil().ifPresent(soil -> builder.addInputSlot(21, 5).setStandardSlotBackground().add(soil));
+            }
+            int x = 76;
+            for (ClocheRecipe.Output output : recipe.results()) {
+                var slot = builder.addOutputSlot(x, 5).setStandardSlotBackground().add(output.item().create());
+                if (output.chance() < 1.0F) {
+                    slot.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                            Math.round(output.chance() * 100))));
+                }
+                x += 20;
+            }
+            if (recipe.seedOutput() > 0 && x <= 136) {
+                // The planted item itself (flowers): the seed slot's items, seed_output of each.
+                builder.addOutputSlot(x, 5).setStandardSlotBackground()
+                        .addItemStacks(recipe.seed().items().map(item -> new ItemStack(item, recipe.seedOutput())).toList());
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<ClocheRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<ClocheRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            ClocheRecipe recipe = holder.value();
+            int cell = (int) Math.ceil(recipe.time() / ArcforgeConfig.HYDROPONIC_CELL_SPEED.getAsDouble());
+            if (recipe.hydroponicOnly()) {
+                text(graphics, Component.translatable("jei.arcforge.cloche.hydroponic_only", seconds(cell)), 0, 28);
+                return;
+            }
+            int cloche = (int) Math.ceil(recipe.time() / ArcforgeConfig.GLASS_CLOCHE_SPEED.getAsDouble());
+            int chamber = (int) Math.ceil(recipe.time() / ArcforgeConfig.GROW_CHAMBER_SPEED.getAsDouble());
+            text(graphics, Component.translatable("jei.arcforge.cloche.time", seconds(cloche)), 0, 28);
+            text(graphics, Component.translatable("jei.arcforge.cloche.faster", seconds(chamber), seconds(cell)), 0, 38);
         }
     }
 

@@ -454,6 +454,11 @@ public final class ModItems {
     public static final DeferredItem<FertilizerItem> DIGESTATE = ITEMS.registerItem("digestate",
             p -> new FertilizerItem(ArcforgeConfig.DIGESTATE_NUTRIENTS::getAsInt, p));
 
+    // Automated farms.
+    public static final DeferredItem<BlockItem> GLASS_CLOCHE = ITEMS.registerSimpleBlockItem(ModBlocks.GLASS_CLOCHE);
+    public static final DeferredItem<BlockItem> GROW_CHAMBER = ITEMS.registerSimpleBlockItem(ModBlocks.GROW_CHAMBER);
+    public static final DeferredItem<BlockItem> HYDROPONIC_CELL = ITEMS.registerSimpleBlockItem(ModBlocks.HYDROPONIC_CELL);
+
     // --- Solar Thermal Array ---
 
     public static final DeferredItem<BlockItem> SOLAR_THERMAL_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.SOLAR_THERMAL_ARRAY_CASING);

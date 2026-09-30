@@ -1,0 +1,59 @@
+{
+  "values": {
+    "minecraft:dirt": {
+      "block": "minecraft:farmland",
+      "properties": {
+        "moisture": "7"
+      }
+    },
+    "minecraft:coarse_dirt": {
+      "block": "minecraft:farmland",
+      "properties": {
+        "moisture": "7"
+      }
+    },
+    "minecraft:rooted_dirt": {
+      "block": "minecraft:farmland",
+      "properties": {
+        "moisture": "7"
+      }
+    },
+    "minecraft:grass_block": {
+      "block": "minecraft:farmland",
+      "properties": {
+        "moisture": "7"
+      }
+    },
+    "minecraft:podzol": {
+      "block": "minecraft:farmland",
+      "properties": {
+        "moisture": "7"
+      }
+    },
+    "minecraft:mycelium": {
+      "block": "minecraft:farmland",
+      "properties": {
+        "moisture": "7"
+      }
+    },
+    "arcforge:loam": {
+      "block": "arcforge:loam_farmland",
+      "properties": {
+        "moisture": "7"
+      },
+      "growth": 1.25
+    },
+    "minecraft:sand": {
+      "block": "minecraft:sand"
+    },
+    "minecraft:red_sand": {
+      "block": "minecraft:red_sand"
+    },
+    "minecraft:soul_sand": {
+      "block": "minecraft:soul_sand"
+    },
+    "minecraft:soul_soil": {
+      "block": "minecraft:soul_soil"
+    }
+  }
+}

@@ -578,6 +578,32 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   Seed Oil) are Ethanol's frames recoloured by brightness. The gases are the steam texture tinted: Nitrogen `#C4C0EC`,
   Ammonia `#E2F0A0`, Biogas `#A8B478`.
 
+## Automated farms
+- Glass Cloche, Grow Chamber and Hydroponic Cell are UV-unwrapped element models (one 64×64 sheet each, cutout). What
+  grows inside is not in the model: `ClocheRenderer` draws the soil's own block, squashed into the bed, and the plant's
+  own block model (its crop stage, or grown in size for saplings, flowers and cane), shrunk to fit under the glass.
+- Their glass follows "Glass": each pane is a face painted fully transparent with two opaque 1 px diagonal glints
+  (`#DCE8EE`, `#A9BCC6`) near its top left, sized to the face.
+- **Glass Cloche** (rustic, see "Rustic farming machines"): a treated-planks planter (floor and 1 px board walls to
+  y 3.5) with a stripped-log post at each corner, a glass bell (x/z 2.5..13.5, to y 13.5) with thin iron corner bars, an
+  iron lid and a log knob. Its faces are fixed and it has no port plates, like the other rustic machines; its underside
+  has an iron drain grate (a recess with three slats) where the harvest drops out. Bed: x/z 2..14, y 1.5..3.
+- **Grow Chamber / Hydroponic Cell:** machine steel. A 2 px plinth, a solid back wall, a 3 px cap and two front corner
+  posts frame clear glass on the front and both sides. The default ports are painted on whole 16×16 casing faces split
+  across the parts that make up the face: input on top, output underneath, FE on the back (left, right and front are
+  NONE, so the glass stays clear). The cap's three open sides carry the tier band on their middle row: Wrought gold on
+  the Grow Chamber, Tempered copper on the Hydroponic Cell. Inside, a 1 px steel tray rim (x/z 1.5..14.5, y 2..4).
+  - Grow lamp: a 10×10 housing under the cap with its own texture (`lamp` / `lamp_on`): three tubes along x on a steel
+    reflector, off `#5E4868 / #4E3A56`, on `#F7B8FF / #E27AF0` (with `#B04CC8`), `light_emission` 15 in the `_on` model.
+  - Grow Chamber bed: the soil at x/z 2.5..13.5, y 2..3.5. Hydroponic Cell: a flat Nutrient Solution surface at y 3
+    (`#44802E` with a `#2F6424` lit row and `#6FA850` sheen streaks) under a plastic raft (x/z 4..12, the NPK sack's
+    plastic tones) with a dark 4×4 net pot in the middle, where the plant stands.
+- GUIs (176×166): cut from the existing backgrounds. The tank on the left (x 8), the seed slot (29,19), soil (29,39) and
+  fertilizer (49,39) in input blue (the Hydroponic Cell's fertilizer slot takes the soil's place), the arrow at (72,30),
+  a 2×2 of output-orange slots from (99,20), and on the powered two the FE gauge at x 156 (the Hydroponic Cell's Carbon
+  Dioxide tank at x 138). The status LED and text sit under the slots (y 60). Ghosts are the Infuser's style: white at
+  alpha 55 with a 105 rim, a seed, a soil block and a tied sack.
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

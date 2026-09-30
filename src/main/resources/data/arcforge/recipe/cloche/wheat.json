@@ -1,0 +1,21 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:wheat_seeds",
+  "soil": "#arcforge:cloche_soils/farmland",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:wheat"
+      }
+    },
+    {
+      "item": {
+        "id": "minecraft:wheat_seeds"
+      },
+      "chance": 0.5
+    }
+  ],
+  "render": {
+    "block": "minecraft:wheat"
+  }
+}

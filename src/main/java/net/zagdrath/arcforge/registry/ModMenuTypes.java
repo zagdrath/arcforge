@@ -62,6 +62,7 @@ import net.zagdrath.arcforge.menu.storage.PressurizedCylinderMenu;
 import net.zagdrath.arcforge.menu.storage.HeatCellMenu;
 import net.zagdrath.arcforge.menu.storage.VaultMenu;
 import net.zagdrath.arcforge.menu.tool.ArcToolMenu;
+import net.zagdrath.arcforge.menu.machine.ClocheMenu;
 
 public final class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, Arcforge.MODID);
@@ -127,6 +128,14 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(HaberReactorMenu::new));
     public static final Supplier<MenuType<BiogasDigesterMenu>> BIOGAS_DIGESTER = MENU_TYPES.register("biogas_digester",
             () -> IMenuTypeExtension.create(BiogasDigesterMenu::new));
+
+    // Automated farms: one menu class, one type each.
+    public static final Supplier<MenuType<ClocheMenu>> GLASS_CLOCHE = MENU_TYPES.register("glass_cloche",
+            () -> IMenuTypeExtension.create(ClocheMenu::glassCloche));
+    public static final Supplier<MenuType<ClocheMenu>> GROW_CHAMBER = MENU_TYPES.register("grow_chamber",
+            () -> IMenuTypeExtension.create(ClocheMenu::growChamber));
+    public static final Supplier<MenuType<ClocheMenu>> HYDROPONIC_CELL = MENU_TYPES.register("hydroponic_cell",
+            () -> IMenuTypeExtension.create(ClocheMenu::hydroponicCell));
 
     public static final Supplier<MenuType<ChemicalReactorMenu>> CHEMICAL_REACTOR = MENU_TYPES.register("chemical_reactor",
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));

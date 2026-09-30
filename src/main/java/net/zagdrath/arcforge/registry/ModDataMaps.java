@@ -7,11 +7,13 @@ package net.zagdrath.arcforge.registry;
 
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.farming.ClocheSoil;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.item.tool.JetpackFuel;
 
@@ -29,12 +31,20 @@ public final class ModDataMaps {
             .synced(JetpackFuel.CODEC, false)
             .build();
 
+    // Soils for the Glass Cloche and Grow Chamber, keyed by item: the block drawn inside and how fast crops grow in it.
+    // Synced so the client can draw it and the GUI's soil slot knows what it takes.
+    public static final DataMapType<Item, ClocheSoil> CLOCHE_SOILS = DataMapType.builder(
+            Identifier.fromNamespaceAndPath(Arcforge.MODID, "cloche_soils"), Registries.ITEM, ClocheSoil.CODEC)
+            .synced(ClocheSoil.CODEC, false)
+            .build();
+
     private ModDataMaps() {}
 
     public static void register(IEventBus modEventBus) {
         modEventBus.addListener(RegisterDataMapTypesEvent.class, event -> {
             event.register(BURNER_FUELS);
             event.register(JETPACK_FUELS);
+            event.register(CLOCHE_SOILS);
         });
     }
 }

@@ -25,8 +25,8 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
 ### Upgrading
 
 - **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`, `hops`, `rusticMachines`, `millstone`,
-  `mill`, `oilPress`, `seedExtractor`, `grainDryer`, `airSeparator`, `haberReactor`, `biogasDigester`) gets its defaults,
-  as do the Fermenter's new keys; nothing to redo.
+  `mill`, `oilPress`, `seedExtractor`, `grainDryer`, `airSeparator`, `haberReactor`, `biogasDigester`, `cloche`) gets its
+  defaults, as do the Fermenter's new keys; nothing to redo.
 - **Chemical Reactor second item slot.** Saved Chemical Reactors keep their items, tanks and upgrades: the upgrades move
   up past the new slot when the world loads.
 - **Fermenter additive slot.** Saved Fermenters keep their crops, byproduct and upgrades: the upgrades move up past the
@@ -111,8 +111,7 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
   - **NPK Fertilizer:** Basic Slag, Wood Ash and 100 mB of Ammonia make two in the Chemical Reactor. It adds 15
     nutrients to Loam Farmland and enriches it: the crop on it grows twice as fast (instead of 1.5 times) until those
     nutrients run out.
-  - **Nutrient Solution:** NPK Fertilizer and water in the Chemical Reactor. A fluid for hydroponics, which is still
-    to come; for now it can be stored and carried.
+  - **Nutrient Solution:** NPK Fertilizer and water in the Chemical Reactor. It feeds the Hydroponic Cell.
   - **Biodiesel:** 100 mB of Seed Oil and 25 mB of Ethanol make 100 mB in the Chemical Reactor. A Fuel Burner fuel:
     320 HU per mB at up to 1,000°C.
   - **Biogas Digester:** a solid 3x3x3 of **Digester Casings** with a **Biogas Digester Controller** in the middle of a
@@ -121,6 +120,22 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
     fertilizer worth 4 nutrients. It needs a little heat: it only works at 35°C or hotter, using 2 HU/t.
   - Handbook pages, Jade tooltips, a build page for the digester, and five new Farming advancements (Thin Air, Bread
     from Air, N, P, K, Fryer to Fuel, Waste Not).
+- **Automated farms:** single blocks that grow a crop over and over, the plant growing inside where you can see it
+  through the glass. Recipes are data-driven (`arcforge:cloche`: a seed, the soils it grows in, the harvest with
+  chances, the time, and how it's drawn), with a JEI category; the soils are the `arcforge:cloche_soils` data map (how
+  each looks, and how fast crops grow in it: Loam 1.25x). Any ordinary crop from another mod (a `CropBlock`) that no
+  recipe names still grows in dirt or Loam, giving its own drops. Every speed and cost is in config (`farming.cloche`).
+  - **Glass Cloche** (unpowered): a glass bell on a treated-wood planter. A soil (dirt, Loam, sand, or soul sand for
+    nether wart), a seed and 100 mB of water a harvest; about 2 minutes a crop. The harvest drops out of the bottom
+    into what's under it. Its faces are fixed, with no Sides tab.
+  - **Grow Chamber** (FE and water): steel and Pressure Glass with a grow lamp, 3x as fast, 24 FE/t. Side
+    configuration, Speed and Energy upgrades.
+  - **Hydroponic Cell** (FE and Nutrient Solution): no soil, 6x as fast, 48 FE/t and 50 mB of Nutrient Solution a
+    harvest. Carbon Dioxide, if it has some, makes it 1.25x faster again. Only it grows saplings (6 logs, and sometimes
+    a sapling, sticks and apples), flowers (2 a harvest) and Hops (no trellis needed).
+  - All three take fertilizer (and bone meal) in a fertilizer slot: each harvest uses a nutrient point and grows 1.5x
+    as fast, or 2x with NPK Fertilizer. The seed and soil are never used up.
+  - Handbook pages, Jade tooltips, and three new Farming advancements (Under Glass, Grow Lights, Soil Not Included).
 - **Carbon Dioxide**, a new gas.
 - **Gas Output**, a new side mode: a machine's own gas comes out of it. The Fermenter gives out Carbon Dioxide through it,
   the Air Separator Nitrogen, the Haber Reactor Ammonia and the Biogas Digester Biogas.

@@ -38,6 +38,7 @@ import net.zagdrath.arcforge.recipe.OilPressingRecipe;
 import net.zagdrath.arcforge.recipe.MillingRecipe;
 import net.zagdrath.arcforge.recipe.SynthesizingRecipe;
 import net.zagdrath.arcforge.recipe.TierUpgradeRecipe;
+import net.zagdrath.arcforge.recipe.ClocheRecipe;
 
 // Data-driven machine recipes: data/<namespace>/recipe/*.json with type arcforge:carbonizing,
 // arcforge:arcforge_smelting, arcforge:chemical_reacting, arcforge:crushing, arcforge:distilling, arcforge:electrolyzing, arcforge:fiberizing, arcforge:infusing, arcforge:melting, arcforge:pressing, and the farm processing
@@ -85,6 +86,8 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("air_separating")));
     public static final Supplier<RecipeType<SynthesizingRecipe>> SYNTHESIZING = RECIPE_TYPES.register("synthesizing",
             () -> RecipeType.simple(id("synthesizing")));
+    public static final Supplier<RecipeType<ClocheRecipe>> CLOCHE = RECIPE_TYPES.register("cloche",
+            () -> RecipeType.simple(id("cloche")));
     public static final Supplier<RecipeType<DigestingRecipe>> DIGESTING = RECIPE_TYPES.register("digesting",
             () -> RecipeType.simple(id("digesting")));
 
@@ -122,6 +125,8 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(AirSeparatingRecipe.MAP_CODEC, AirSeparatingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<SynthesizingRecipe>> SYNTHESIZING_SERIALIZER = RECIPE_SERIALIZERS.register("synthesizing",
             () -> new RecipeSerializer<>(SynthesizingRecipe.MAP_CODEC, SynthesizingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<ClocheRecipe>> CLOCHE_SERIALIZER = RECIPE_SERIALIZERS.register("cloche",
+            () -> new RecipeSerializer<>(ClocheRecipe.MAP_CODEC, ClocheRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<DigestingRecipe>> DIGESTING_SERIALIZER = RECIPE_SERIALIZERS.register("digesting",
             () -> new RecipeSerializer<>(DigestingRecipe.MAP_CODEC, DigestingRecipe.STREAM_CODEC));
     // A crafting recipe (vanilla's crafting type) that keeps the contents of what it upgrades.
@@ -154,7 +159,7 @@ public final class ModRecipes {
 
     private static void syncToClients(OnDatapackSyncEvent event) {
         event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
-                MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(),
+                MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(),
                 RecipeType.SMELTING);
     }
 }

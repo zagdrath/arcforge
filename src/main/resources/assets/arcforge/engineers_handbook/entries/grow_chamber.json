@@ -1,0 +1,13 @@
+{
+  "title": "Grow Chamber",
+  "icon": "arcforge:grow_chamber",
+  "items": [
+    "arcforge:grow_chamber"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A steel chamber of Pressure Glass with a grow lamp inside. It grows the same crops as the Glass Cloche, 3 times as fast, with FE and water.\n- 24 FE/t while it grows, and 100 mB of water a harvest.\n- Soil, seed and fertilizer slots work like the Glass Cloche's.\n- Its faces can be set in the Sides tab: by default items and water go in the top, the harvest comes out of the bottom (turn on auto-eject), and FE goes in the back.\n- Speed upgrades make it faster (and draw FE just as much faster); Energy upgrades cut the FE.\nThe lamp lights up while it grows."
+    }
+  ]
+}

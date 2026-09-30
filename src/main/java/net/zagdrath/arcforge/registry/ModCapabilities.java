@@ -70,6 +70,7 @@ import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.SolarThermalStructure;
+import net.zagdrath.arcforge.blockentity.farming.ClocheBlockEntity;
 
 // Exposes machine storage through NeoForge's standard capabilities, so any mod using
 // Capabilities.Energy (FE), Capabilities.Fluid or Capabilities.Item can interact with Arcforge machines.
@@ -241,6 +242,15 @@ public final class ModCapabilities {
                 net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity::getEnergyHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.HABER_REACTOR.get(),
                 net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity::getHeatHandler);
+        // Automated farms: items, their water or Nutrient Solution (and Carbon Dioxide), and FE for the powered two.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.HYDROPONIC_CELL.get(), ClocheBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.HYDROPONIC_CELL.get(), ClocheBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.HYDROPONIC_CELL.get(), ClocheBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
                 ElectrolyzerBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ASSEMBLER.get(),

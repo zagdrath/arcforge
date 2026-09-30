@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,lit=false": {
+      "model": "arcforge:block/glass_cloche"
+    },
+    "facing=north,lit=true": {
+      "model": "arcforge:block/glass_cloche"
+    },
+    "facing=east,lit=false": {
+      "model": "arcforge:block/glass_cloche",
+      "y": 90
+    },
+    "facing=east,lit=true": {
+      "model": "arcforge:block/glass_cloche",
+      "y": 90
+    },
+    "facing=south,lit=false": {
+      "model": "arcforge:block/glass_cloche",
+      "y": 180
+    },
+    "facing=south,lit=true": {
+      "model": "arcforge:block/glass_cloche",
+      "y": 180
+    },
+    "facing=west,lit=false": {
+      "model": "arcforge:block/glass_cloche",
+      "y": 270
+    },
+    "facing=west,lit=true": {
+      "model": "arcforge:block/glass_cloche",
+      "y": 270
+    }
+  }
+}

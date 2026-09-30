@@ -121,6 +121,8 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 
 import org.jspecify.annotations.Nullable;
+import net.zagdrath.arcforge.block.farming.ClocheBlock;
+import net.zagdrath.arcforge.blockentity.farming.ClocheBlockEntity;
 
 public final class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Arcforge.MODID);
@@ -631,6 +633,16 @@ public final class ModBlocks {
     public static final DeferredBlock<BiogasDigesterControllerBlock> BIOGAS_DIGESTER_CONTROLLER = BLOCKS.registerBlock("biogas_digester_controller",
             BiogasDigesterControllerBlock::new, ModBlocks::columnProperties);
 
+    // Automated farms, each growing a plant inside (see ClocheBlockEntity): the Glass Cloche is a glass bell on a
+    // treated-wood planter; the Grow Chamber and Hydroponic Cell are steel frames glazed with Pressure Glass, lit by
+    // their grow lamps while they grow.
+    public static final DeferredBlock<ClocheBlock> GLASS_CLOCHE = BLOCKS.registerBlock("glass_cloche",
+            p -> new ClocheBlock(ClocheBlockEntity.Kind.GLASS_CLOCHE, p), p -> treatedWood(p).strength(1.5F).sound(SoundType.GLASS).noOcclusion());
+    public static final DeferredBlock<ClocheBlock> GROW_CHAMBER = BLOCKS.registerBlock("grow_chamber",
+            p -> new ClocheBlock(ClocheBlockEntity.Kind.GROW_CHAMBER, p), p -> glazedMachine(machineProperties(p, 10)));
+    public static final DeferredBlock<ClocheBlock> HYDROPONIC_CELL = BLOCKS.registerBlock("hydroponic_cell",
+            p -> new ClocheBlock(ClocheBlockEntity.Kind.HYDROPONIC_CELL, p), p -> glazedMachine(machineProperties(p, 10)));
+
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);
 
@@ -736,6 +748,11 @@ public final class ModBlocks {
                 .strength(0.6F)
                 .sound(SoundType.GRAVEL)
                 .isSuffocating((state, level, pos) -> true);
+    }
+
+    // A full-block machine you can see into: light and view pass through its glass.
+    private static BlockBehaviour.Properties glazedMachine(BlockBehaviour.Properties p) {
+        return p.noOcclusion().isViewBlocking((state, level, pos, box) -> false).isSuffocating((state, level, pos) -> false);
     }
 
     // Like oak (an axe breaks it), much darker, and never ignited by lava or fire.

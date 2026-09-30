@@ -1,0 +1,34 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:mangrove_propagule",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:mangrove_log",
+        "count": 6
+      }
+    },
+    {
+      "item": {
+        "id": "minecraft:mangrove_propagule"
+      },
+      "chance": 0.5
+    },
+    {
+      "item": {
+        "id": "minecraft:stick",
+        "count": 2
+      },
+      "chance": 0.5
+    }
+  ],
+  "time": 6000,
+  "hydroponic_only": true,
+  "render": {
+    "grow": "scale",
+    "properties": {
+      "hanging": "false",
+      "age": "4"
+    }
+  }
+}

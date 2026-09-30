@@ -1,0 +1,21 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:bamboo",
+  "soil": "#arcforge:cloche_soils/cane",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:bamboo",
+        "count": 3
+      }
+    }
+  ],
+  "time": 1600,
+  "render": {
+    "block": "minecraft:bamboo",
+    "properties": {
+      "leaves": "large"
+    },
+    "grow": "scale"
+  }
+}

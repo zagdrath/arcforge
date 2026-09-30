@@ -98,6 +98,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity.class);
         registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.BiogasDigesterBlockEntity.class);
         registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock.class);
+        // Automated farms: what's growing, how fast, the fertilizer left.
+        registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GlassClocheBlockEntity.class);
+        registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GrowChamberBlockEntity.class);
+        registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.HydroponicCellBlockEntity.class);
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock.class);
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, PressureGlassBlock.class);
@@ -162,6 +166,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock.class)) {
             registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
+        registration.registerBlockComponent(ClocheProvider.Client.INSTANCE, net.zagdrath.arcforge.block.farming.ClocheBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

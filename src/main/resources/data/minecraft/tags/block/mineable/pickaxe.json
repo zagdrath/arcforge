@@ -130,6 +130,8 @@
     "arcforge:air_separator",
     "arcforge:haber_reactor",
     "arcforge:digester_casing",
-    "arcforge:biogas_digester_controller"
+    "arcforge:biogas_digester_controller",
+    "arcforge:grow_chamber",
+    "arcforge:hydroponic_cell"
   ]
 }

@@ -1,0 +1,36 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:dark_oak_sapling",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:dark_oak_log",
+        "count": 6
+      }
+    },
+    {
+      "item": {
+        "id": "minecraft:dark_oak_sapling"
+      },
+      "chance": 0.5
+    },
+    {
+      "item": {
+        "id": "minecraft:stick",
+        "count": 2
+      },
+      "chance": 0.5
+    },
+    {
+      "item": {
+        "id": "minecraft:apple"
+      },
+      "chance": 0.1
+    }
+  ],
+  "time": 6000,
+  "hydroponic_only": true,
+  "render": {
+    "grow": "scale"
+  }
+}

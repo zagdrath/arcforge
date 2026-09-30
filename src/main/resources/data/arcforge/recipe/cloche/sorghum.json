@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "arcforge:sorghum_seeds",
+  "soil": "#arcforge:cloche_soils/farmland",
+  "results": [
+    {
+      "item": {
+        "id": "arcforge:sorghum_stalks"
+      }
+    },
+    {
+      "item": {
+        "id": "arcforge:sorghum_seeds"
+      },
+      "chance": 0.5
+    }
+  ],
+  "render": {
+    "block": "arcforge:sorghum",
+    "height": 2
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TLT",
+    "GCG",
+    "EWE"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "L": "minecraft:redstone_lamp",
+    "G": "arcforge:pressure_glass",
+    "C": "arcforge:grow_chamber",
+    "W": "arcforge:wrought_fluid_tank",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:hydroponic_cell",
+    "count": 1
+  }
+}

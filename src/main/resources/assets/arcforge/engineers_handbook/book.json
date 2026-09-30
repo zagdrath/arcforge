@@ -163,7 +163,10 @@
         "air_separator",
         "haber_reactor",
         "npk_fertilizer",
-        "biogas_digester"
+        "biogas_digester",
+        "glass_cloche",
+        "grow_chamber",
+        "hydroponic_cell"
       ]
     }
   ]

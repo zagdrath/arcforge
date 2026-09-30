@@ -13,7 +13,7 @@
     },
     {
       "type": "text",
-      "text": "# Nutrient Solution\n- 1 NPK Fertilizer + 1,000 mB Water make 1,000 mB Nutrient Solution.\n- It feeds hydroponics, which is still to come. For now it can be stored and carried in buckets and tanks.\n# Biodiesel\n- 100 mB Seed Oil + 25 mB Ethanol make 100 mB Biodiesel.\n- A Fuel Burner fuel: 160 HU/t, up to 1,000°C. It doesn't burn in the Gas Turbine Array."
+      "text": "# Nutrient Solution\n- 1 NPK Fertilizer + 1,000 mB Water make 1,000 mB Nutrient Solution.\n- It feeds the Hydroponic Cell: 50 mB a harvest.\n# Biodiesel\n- 100 mB Seed Oil + 25 mB Ethanol make 100 mB Biodiesel.\n- A Fuel Burner fuel: 160 HU/t, up to 1,000°C. It doesn't burn in the Gas Turbine Array."
     }
   ]
 }

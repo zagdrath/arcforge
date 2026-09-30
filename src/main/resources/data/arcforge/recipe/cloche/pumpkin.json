@@ -1,0 +1,16 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:pumpkin_seeds",
+  "soil": "#arcforge:cloche_soils/farmland",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:pumpkin"
+      }
+    }
+  ],
+  "time": 3000,
+  "render": {
+    "block": "minecraft:pumpkin_stem"
+  }
+}

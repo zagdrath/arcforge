@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:nether_wart",
+  "soil": "#arcforge:cloche_soils/soul_sand",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:nether_wart",
+        "count": 2
+      }
+    }
+  ],
+  "time": 3000,
+  "render": {
+    "block": "minecraft:nether_wart"
+  }
+}

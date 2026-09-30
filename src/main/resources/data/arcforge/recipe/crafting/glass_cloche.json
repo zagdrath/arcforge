@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "G G",
+    "TTT"
+  ],
+  "key": {
+    "G": "minecraft:glass_pane",
+    "T": "arcforge:treated_planks"
+  },
+  "result": {
+    "id": "arcforge:glass_cloche",
+    "count": 1
+  }
+}

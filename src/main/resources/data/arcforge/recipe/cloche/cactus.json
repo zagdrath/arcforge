@@ -1,0 +1,16 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:cactus",
+  "soil": "#arcforge:cloche_soils/sand",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:cactus"
+      }
+    }
+  ],
+  "time": 3000,
+  "render": {
+    "grow": "scale"
+  }
+}

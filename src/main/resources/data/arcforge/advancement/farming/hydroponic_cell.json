@@ -1,0 +1,38 @@
+{
+  "parent": "arcforge:farming/grow_chamber",
+  "display": {
+    "icon": {
+      "id": "arcforge:hydroponic_cell"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.hydroponic_cell.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.hydroponic_cell.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "hydroponic_cell": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:hydroponic_cell"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "hydroponic_cell"
+    ]
+  ]
+}

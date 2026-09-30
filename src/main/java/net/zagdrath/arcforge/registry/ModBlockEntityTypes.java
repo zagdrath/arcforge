@@ -75,6 +75,9 @@ import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.VaultBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.blockentity.farming.GlassClocheBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.GrowChamberBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.HydroponicCellBlockEntity;
 
 public final class ModBlockEntityTypes {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITY_TYPES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, Arcforge.MODID);
@@ -142,6 +145,14 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(HaberReactorBlockEntity::new, ModBlocks.HABER_REACTOR.get()));
     public static final Supplier<BlockEntityType<BiogasDigesterBlockEntity>> BIOGAS_DIGESTER = BLOCK_ENTITY_TYPES.register("biogas_digester",
             () -> new BlockEntityType<>(BiogasDigesterBlockEntity::new, ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get()));
+
+    // Automated farms.
+    public static final Supplier<BlockEntityType<GlassClocheBlockEntity>> GLASS_CLOCHE = BLOCK_ENTITY_TYPES.register("glass_cloche",
+            () -> new BlockEntityType<>(GlassClocheBlockEntity::new, ModBlocks.GLASS_CLOCHE.get()));
+    public static final Supplier<BlockEntityType<GrowChamberBlockEntity>> GROW_CHAMBER = BLOCK_ENTITY_TYPES.register("grow_chamber",
+            () -> new BlockEntityType<>(GrowChamberBlockEntity::new, ModBlocks.GROW_CHAMBER.get()));
+    public static final Supplier<BlockEntityType<HydroponicCellBlockEntity>> HYDROPONIC_CELL = BLOCK_ENTITY_TYPES.register("hydroponic_cell",
+            () -> new BlockEntityType<>(HydroponicCellBlockEntity::new, ModBlocks.HYDROPONIC_CELL.get()));
 
     public static final Supplier<BlockEntityType<ChargepadBlockEntity>> CHARGEPAD = BLOCK_ENTITY_TYPES.register("chargepad",
             () -> new BlockEntityType<>(ChargepadBlockEntity::new, ModBlocks.CHARGEPAD.get()));

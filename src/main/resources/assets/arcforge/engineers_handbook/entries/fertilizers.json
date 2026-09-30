@@ -13,7 +13,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Right-click Loam Farmland, or the crop on it, to add nutrients (up to 15):\n- Compost: +2, from a Compost Bin.\n- Wood Ash: +3. Burning charcoal in a Firebox or Combustion Plant leaves Wood Ash in its ash slot half the time.\n- Basic Slag: +3. An Arc Crusher crushes one Slag into two.\n- Mixed Fertilizer: +8, crafted from one of each.\n- Seed Meal: +1, from a Millstone or Mill.\n- Digestate: +4, from the Biogas Digester.\n- NPK Fertilizer: +15, from the Chemical Reactor. It also enriches the soil: see NPK Fertilizer."
+      "text": "Right-click Loam Farmland, or the crop on it, to add nutrients (up to 15):\n- Compost: +2, from a Compost Bin.\n- Wood Ash: +3. Burning charcoal in a Firebox or Combustion Plant leaves Wood Ash in its ash slot half the time.\n- Basic Slag: +3. An Arc Crusher crushes one Slag into two.\n- Mixed Fertilizer: +8, crafted from one of each.\n- Seed Meal: +1, from a Millstone or Mill.\n- Digestate: +4, from the Biogas Digester.\n- NPK Fertilizer: +15, from the Chemical Reactor. It also enriches the soil: see NPK Fertilizer.\nThey also go in the fertilizer slot of the Glass Cloche, Grow Chamber and Hydroponic Cell."
     }
   ]
 }

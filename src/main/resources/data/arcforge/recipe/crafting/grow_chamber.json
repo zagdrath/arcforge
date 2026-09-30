@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PLP",
+    "GCG",
+    "PEP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "L": "minecraft:redstone_lamp",
+    "G": "arcforge:pressure_glass",
+    "C": "arcforge:glass_cloche",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:grow_chamber",
+    "count": 1
+  }
+}

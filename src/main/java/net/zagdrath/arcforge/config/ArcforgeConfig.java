@@ -1874,6 +1874,125 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Automated farms (Glass Cloche, Grow Chamber, Hydroponic Cell): a seed grows inside and is harvested over",
+                "and over. Recipes (arcforge:cloche) set each crop's time at the Glass Cloche's speed and its harvest; the",
+                "arcforge:cloche_soils data map sets how fast crops grow in each soil. Each farm's speed multiplies that.").push("cloche");
+    }
+
+    public static final ModConfigSpec.IntValue CLOCHE_FALLBACK_TIME = BUILDER
+            .comment("Ticks a crop no recipe names (any vanilla-style crop from another mod) takes at speed 1.")
+            .defineInRange("fallbackTime", 2_400, 20, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue CLOCHE_FERTILIZER_BONUS = BUILDER
+            .comment("Growth multiplier while fertilized (each harvest uses one of a fertilizer's nutrient points).")
+            .defineInRange("fertilizerBonus", 1.5, 1.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue CLOCHE_ENRICHED_BONUS = BUILDER
+            .comment("Growth multiplier while fertilized with an enriching fertilizer (NPK Fertilizer).")
+            .defineInRange("enrichedBonus", 2.0, 1.0, 100.0);
+
+    static {
+        BUILDER.comment("Glass Cloche: unpowered; needs water and a soil. Pushes its harvest down.").push("glassCloche");
+    }
+
+    public static final ModConfigSpec.DoubleValue GLASS_CLOCHE_SPEED = BUILDER
+            .comment("Growth speed (recipe times are for speed 1).")
+            .defineInRange("speed", 1.0, 0.01, 100.0);
+
+    public static final ModConfigSpec.IntValue GLASS_CLOCHE_WATER_CAPACITY = BUILDER
+            .comment("Water tank size, in mB.")
+            .defineInRange("waterCapacity", 4_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GLASS_CLOCHE_WATER_PER_HARVEST = BUILDER
+            .comment("Water each harvest uses, in mB (taken when it starts growing).")
+            .defineInRange("waterPerHarvest", 100, 0, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Grow Chamber: FE and water, with a grow lamp; takes Speed and Energy upgrades.").push("growChamber");
+    }
+
+    public static final ModConfigSpec.DoubleValue GROW_CHAMBER_SPEED = BUILDER
+            .comment("Growth speed, before Speed upgrades (recipe times are for speed 1).")
+            .defineInRange("speed", 3.0, 0.01, 100.0);
+
+    public static final ModConfigSpec.IntValue GROW_CHAMBER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 40_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue GROW_CHAMBER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it accepts.")
+            .defineInRange("maxInput", 400, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GROW_CHAMBER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while growing, before upgrades.")
+            .defineInRange("energyPerTick", 24, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GROW_CHAMBER_WATER_CAPACITY = BUILDER
+            .comment("Water tank size, in mB.")
+            .defineInRange("waterCapacity", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GROW_CHAMBER_WATER_PER_HARVEST = BUILDER
+            .comment("Water each harvest uses, in mB (taken when it starts growing).")
+            .defineInRange("waterPerHarvest", 100, 0, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Hydroponic Cell: FE and Nutrient Solution, no soil; optional Carbon Dioxide speeds it up. Also grows",
+                "saplings, flowers, nether wart and Hops. Takes Speed and Energy upgrades.").push("hydroponicCell");
+    }
+
+    public static final ModConfigSpec.DoubleValue HYDROPONIC_CELL_SPEED = BUILDER
+            .comment("Growth speed, before Speed upgrades and Carbon Dioxide (recipe times are for speed 1).")
+            .defineInRange("speed", 6.0, 0.01, 100.0);
+
+    public static final ModConfigSpec.IntValue HYDROPONIC_CELL_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 80_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROPONIC_CELL_MAX_INPUT = BUILDER
+            .comment("Most FE/t it accepts.")
+            .defineInRange("maxInput", 800, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROPONIC_CELL_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while growing, before upgrades.")
+            .defineInRange("energyPerTick", 48, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROPONIC_CELL_NUTRIENT_CAPACITY = BUILDER
+            .comment("Nutrient Solution tank size, in mB.")
+            .defineInRange("nutrientCapacity", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROPONIC_CELL_NUTRIENT_PER_HARVEST = BUILDER
+            .comment("Nutrient Solution each harvest uses, in mB (taken when it starts growing).")
+            .defineInRange("nutrientPerHarvest", 50, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROPONIC_CELL_CO2_CAPACITY = BUILDER
+            .comment("Carbon Dioxide tank size, in mB.")
+            .defineInRange("co2Capacity", 4_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROPONIC_CELL_CO2_PER_TICK = BUILDER
+            .comment("Carbon Dioxide it uses per tick while growing, in mB, for the bonus.")
+            .defineInRange("co2PerTick", 1, 1, 1_000);
+
+    public static final ModConfigSpec.DoubleValue HYDROPONIC_CELL_CO2_BONUS = BUILDER
+            .comment("Growth multiplier while it has Carbon Dioxide.")
+            .defineInRange("co2Bonus", 1.25, 1.0, 100.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.pop();
     }
 

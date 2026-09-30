@@ -1,0 +1,38 @@
+{
+  "parent": "arcforge:farming/hands_free",
+  "display": {
+    "icon": {
+      "id": "arcforge:glass_cloche"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.glass_cloche.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.glass_cloche.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "glass_cloche": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:glass_cloche"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "glass_cloche"
+    ]
+  ]
+}

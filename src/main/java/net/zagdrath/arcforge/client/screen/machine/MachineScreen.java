@@ -72,6 +72,12 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     // height: of the background (206 for the GUIs with an 18-slot buffer; their inventory label sits 11 above it).
     protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs, boolean upgrades,
             int height) {
+        this(menu, inventory, title, machine, machineTabs, upgrades, height, true);
+    }
+
+    // sideTab: false for machines whose faces are fixed (the Glass Cloche); they get no Sides tab.
+    protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs, boolean upgrades,
+            int height, boolean sideTab) {
         super(menu, inventory, title, 176, height);
         if (height != 166) {
             this.inventoryLabelY = height - 93;
@@ -84,6 +90,9 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
             this.sides = null;
             this.ports = new PortsTab(menu::getPorts);
             tabs.add(ports);
+        } else if (!sideTab) {
+            this.sides = null;
+            this.ports = null;
         } else {
             this.ports = null;
             this.sides = new SideConfigTab(menu::getSideMode,

@@ -450,13 +450,30 @@ full, that gas goes back into the air.
 
 The **Chemical Reactor** (now with two item slots) makes **NPK Fertilizer** (Basic Slag, Wood Ash and 100 mB of Ammonia
 make two; +15 nutrients, and crops on the enriched Loam Farmland grow twice as fast until those run out), **Nutrient
-Solution** (NPK Fertilizer in water, for hydroponics to come) and **Biodiesel** (Seed Oil and Ethanol; a Fuel Burner
+Solution** (NPK Fertilizer in water, for the Hydroponic Cell) and **Biodiesel** (Seed Oil and Ethanol; a Fuel Burner
 fuel, 320 HU per mB up to 1,000°C).
 
 **Biogas Digester.** A solid 3×3×3 of Digester Casings with a controller in the middle of one side. Plant matter (crops,
 seeds, leaves, Press Cake, Compost) and water go in through ports, four items digesting at once, and come out as
 **Biogas** (burns in the Fuel Burner and the Gas Turbine Array) and **Digestate** (+4 nutrients). It only works at 35°C
 or hotter. Recipes are data-driven (`arcforge:air_separating`, `arcforge:synthesizing`, `arcforge:digesting`).
+
+### Automated farms
+
+Single blocks that grow one crop over and over, drawn growing inside behind the glass. The seed and soil stay; each
+harvest takes water (or Nutrient Solution) as it starts, and fertilizer (or bone meal) in the fertilizer slot makes it
+1.5x faster (2x with NPK Fertilizer) for as many harvests as it has nutrients.
+
+| Farm | Needs | Speed | Grows |
+|---|---|---|---|
+| **Glass Cloche** | a soil, 100 mB water a harvest | 1x (about 2 min a crop) | crops, cane, bamboo, cactus, nether wart |
+| **Grow Chamber** | a soil, 100 mB water a harvest, 24 FE/t | 3x | the same |
+| **Hydroponic Cell** | 50 mB Nutrient Solution a harvest, 48 FE/t | 6x (7.5x with Carbon Dioxide) | the same, plus saplings, flowers and Hops |
+
+Soils: dirt and its kin, Loam (1.25x), sand, and soul sand. The Glass Cloche drops its harvest into what's under it
+and has fixed faces; the other two have side configuration, auto-eject, and Speed and Energy upgrades. Recipes are
+data-driven (`arcforge:cloche`, with the `arcforge:cloche_soils` data map), and any ordinary crop from another mod
+grows in dirt or Loam without one.
 
 ### Automation
 

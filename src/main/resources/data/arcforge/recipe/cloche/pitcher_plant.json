@@ -1,0 +1,16 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:pitcher_pod",
+  "soil": "#arcforge:cloche_soils/farmland",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:pitcher_plant"
+      }
+    }
+  ],
+  "time": 3600,
+  "render": {
+    "block": "minecraft:pitcher_crop"
+  }
+}

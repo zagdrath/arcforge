@@ -1,0 +1,17 @@
+{
+  "title": "Glass Cloche",
+  "icon": "arcforge:glass_cloche",
+  "items": [
+    "arcforge:glass_cloche"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A glass bell on a treated-wood planter that grows a crop by itself, with no power. You can watch it grow through the glass.\n- Put a soil and a seed in it, and fill it with water (pipes, or a bucket). Each harvest takes 100 mB.\n- The seed stays planted: when the crop is grown it's harvested and grows again.\n- The harvest drops out of the bottom into whatever is under it: a chest, a hopper, a conduit. It also collects in its four output slots.\n- Everything else goes in from the top or the sides. Its faces are fixed: there's no Sides tab.\n- A crop takes about 2 minutes (wheat: 2 min, melons: 2.5 min, saplings can't grow here)."
+    },
+    {
+      "type": "text",
+      "text": "# Soils\n| Soil | For |\n| Dirt, grass, podzol | Crops, cane, bamboo |\n| Loam | The same, 1.25x as fast |\n| Sand, red sand | Cactus, cane, bamboo |\n| Soul sand, soul soil | Nether wart |\n# Fertilizer\nFertilizers (and bone meal) in its fertilizer slot give nutrient points: each harvest uses one and grows 1.5x as fast. NPK Fertilizer makes it 2x.\nCrops from other mods grow in dirt or Loam too, as long as they're ordinary crops."
+    }
+  ]
+}

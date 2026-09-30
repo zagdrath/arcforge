@@ -1,0 +1,16 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:torchflower_seeds",
+  "soil": "#arcforge:cloche_soils/farmland",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:torchflower"
+      }
+    }
+  ],
+  "time": 3600,
+  "render": {
+    "block": "minecraft:torchflower_crop"
+  }
+}

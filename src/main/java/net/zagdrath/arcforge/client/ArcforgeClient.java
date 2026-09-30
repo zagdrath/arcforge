@@ -145,6 +145,8 @@ import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.steam.SteamGrade;
+import net.zagdrath.arcforge.client.renderer.blockentity.ClocheRenderer;
+import net.zagdrath.arcforge.client.screen.machine.ClocheScreen;
 
 // Client-only entrypoint; never loaded on dedicated servers.
 @Mod(value = Arcforge.MODID, dist = Dist.CLIENT)
@@ -206,6 +208,9 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.AIR_SEPARATOR.get(), net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen::new);
         event.register(ModMenuTypes.HABER_REACTOR.get(), net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen::new);
         event.register(ModMenuTypes.BIOGAS_DIGESTER.get(), net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen::new);
+        event.register(ModMenuTypes.GLASS_CLOCHE.get(), ClocheScreen::new);
+        event.register(ModMenuTypes.GROW_CHAMBER.get(), ClocheScreen::new);
+        event.register(ModMenuTypes.HYDROPONIC_CELL.get(), ClocheScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
         event.register(ModMenuTypes.ASSEMBLER.get(), AssemblerScreen::new);
@@ -496,5 +501,9 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARC_QUARRY.get(), ArcQuarryRenderer::new);
+        // The automated farms draw the soil and the plant growing inside.
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.HYDROPONIC_CELL.get(), ClocheRenderer::new);
     }
 }

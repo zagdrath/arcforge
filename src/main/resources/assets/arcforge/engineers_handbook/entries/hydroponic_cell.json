@@ -1,0 +1,18 @@
+{
+  "title": "Hydroponic Cell",
+  "icon": "arcforge:hydroponic_cell",
+  "items": [
+    "arcforge:hydroponic_cell",
+    "arcforge:nutrient_solution_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The fastest farm: no soil, the roots hang in Nutrient Solution under a grow lamp. It grows 6 times as fast as the Glass Cloche.\n- 48 FE/t while it grows, and 50 mB of Nutrient Solution a harvest.\n- Carbon Dioxide is optional: with it in its gas tank it grows 1.25 times faster again, using 1 mB/t. Pipe it in with Pressurized Conduits through an input face (the top, by default, like its items and Nutrient Solution).\n- Fertilizer still helps. Speed and Energy upgrades work."
+    },
+    {
+      "type": "text",
+      "text": "# What only it grows\n- Saplings: 6 logs, and sometimes a sapling, sticks and (oak) apples. About 50 s each.\n- Flowers: 2 of the flower each harvest.\n- Hops: 2 Hop Cones a harvest, no trellis needed.\nIt also grows everything the Glass Cloche does, nether wart and cactus included, without any soil.\nNutrient Solution comes from the Chemical Reactor: NPK Fertilizer and water."
+    }
+  ]
+}

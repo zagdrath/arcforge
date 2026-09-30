@@ -5,6 +5,7 @@
     "arcforge:planter",
     "arcforge:harvester",
     "arcforge:fertilizer_spreader",
-    "arcforge:scarecrow"
+    "arcforge:scarecrow",
+    "arcforge:glass_cloche"
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "arcforge:rapeseeds",
+  "soil": "#arcforge:cloche_soils/farmland",
+  "results": [
+    {
+      "item": {
+        "id": "arcforge:rapeseeds",
+        "count": 2
+      }
+    }
+  ],
+  "render": {
+    "block": "arcforge:rapeseed",
+    "height": 2
+  }
+}

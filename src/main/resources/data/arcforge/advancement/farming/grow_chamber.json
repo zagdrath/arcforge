@@ -1,0 +1,38 @@
+{
+  "parent": "arcforge:farming/glass_cloche",
+  "display": {
+    "icon": {
+      "id": "arcforge:grow_chamber"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.grow_chamber.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.grow_chamber.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "grow_chamber": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:grow_chamber"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "grow_chamber"
+    ]
+  ]
+}

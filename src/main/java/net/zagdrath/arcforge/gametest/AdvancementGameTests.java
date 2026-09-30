@@ -39,7 +39,8 @@ public final class AdvancementGameTests {
             "farming/mixed_fertilizer", "farming/irrigated", "farming/new_crop", "farming/linen", "farming/hop_harvest", "farming/every_crop",
             "farming/hands_free", "farming/sprinkler", "farming/scythe",
             "farming/millstone", "farming/mill", "farming/seed_oil", "farming/dried_hops",
-            "farming/air_separator", "farming/ammonia", "farming/npk_fertilizer", "farming/biodiesel", "farming/biogas_digester");
+            "farming/air_separator", "farming/ammonia", "farming/npk_fertilizer", "farming/biodiesel", "farming/biogas_digester",
+            "farming/glass_cloche", "farming/grow_chamber", "farming/hydroponic_cell");
 
     @SuppressWarnings("removal")
     private static ServerPlayer player(GameTestHelper helper, BlockPos standRelative) {
@@ -58,7 +59,7 @@ public final class AdvancementGameTests {
         return player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 
-    // All 46 advancements of the tab load.
+    // All 49 advancements of the tab load.
     static void treeLoads(GameTestHelper helper) {
         List<String> missing = new ArrayList<>();
         for (String id : IDS) {

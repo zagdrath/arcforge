@@ -98,7 +98,12 @@ public enum MachineStatus {
     SEPARATING("separating", "led_running"),
     NO_AIR("no_air", "led_blocked"),
     SYNTHESIZING("synthesizing", "led_running"),
-    DIGESTING("digesting", "led_running");
+    DIGESTING("digesting", "led_running"),
+    // The automated farms: the Glass Cloche, Grow Chamber and Hydroponic Cell.
+    GROWING("growing", "led_running"),
+    NO_SOIL("no_soil", "led_idle"),
+    CANT_GROW("cant_grow", "led_blocked"),
+    NO_NUTRIENTS("no_nutrients", "led_blocked");
 
     private final String name;
     private final String led;

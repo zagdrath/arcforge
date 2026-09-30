@@ -1,0 +1,16 @@
+{
+  "type": "arcforge:cloche",
+  "seed": "minecraft:melon_seeds",
+  "soil": "#arcforge:cloche_soils/farmland",
+  "results": [
+    {
+      "item": {
+        "id": "minecraft:melon"
+      }
+    }
+  ],
+  "time": 3000,
+  "render": {
+    "block": "minecraft:melon_stem"
+  }
+}
