@@ -22,6 +22,7 @@ number and date.
 
 ### Changed
 
+- **New banner** in the README and on the mod list's details screen.
 - **Wild crops spawn in more places, and more often.** Each has a biome tag (`#arcforge:wild_crops/flax`, `/rapeseed`,
   `/sorghum`, `/hops`) built on the common `c:` biome tags, so modded biomes such as Biomes O' Plenty's get them too;
   Biomes O' Plenty's grasslands, scrublands and woodlands are listed by name as well. Hops now also grow in taigas and
