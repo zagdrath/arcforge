@@ -82,6 +82,10 @@ import net.zagdrath.arcforge.client.model.ConnectedModel;
 import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
 import net.zagdrath.arcforge.client.screen.machine.FermenterScreen;
+import net.zagdrath.arcforge.client.screen.machine.GrainDryerScreen;
+import net.zagdrath.arcforge.client.screen.machine.MillScreen;
+import net.zagdrath.arcforge.client.screen.machine.OilPressScreen;
+import net.zagdrath.arcforge.client.screen.machine.SeedExtractorScreen;
 import net.zagdrath.arcforge.client.screen.machine.SecurityTerminalScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.DistillationArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.SolarThermalArrayScreen;
@@ -195,6 +199,10 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.ELECTRIC_PUMP.get(), ElectricPumpScreen::new);
         event.register(ModMenuTypes.ARC_MELTER.get(), ArcMelterScreen::new);
         event.register(ModMenuTypes.FERMENTER.get(), FermenterScreen::new);
+        event.register(ModMenuTypes.MILL.get(), MillScreen::new);
+        event.register(ModMenuTypes.OIL_PRESS.get(), OilPressScreen::new);
+        event.register(ModMenuTypes.SEED_EXTRACTOR.get(), SeedExtractorScreen::new);
+        event.register(ModMenuTypes.GRAIN_DRYER.get(), GrainDryerScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
         event.register(ModMenuTypes.ASSEMBLER.get(), AssemblerScreen::new);
@@ -250,6 +258,7 @@ public class ArcforgeClient {
         event.register(liquidModel("ethanol"), ModFluids.ETHANOL, ModFluids.FLOWING_ETHANOL);
         event.register(liquidModel("light_oil"), ModFluids.LIGHT_OIL, ModFluids.FLOWING_LIGHT_OIL);
         event.register(liquidModel("heavy_oil"), ModFluids.HEAVY_OIL, ModFluids.FLOWING_HEAVY_OIL);
+        event.register(liquidModel("seed_oil"), ModFluids.SEED_OIL, ModFluids.FLOWING_SEED_OIL);
         event.register(liquidModel("sulfuric_acid"), ModFluids.SULFURIC_ACID, ModFluids.FLOWING_SULFURIC_ACID);
         // The slurries share one greyscale texture, tinted per metal.
         for (OreSlurry slurry : OreSlurry.values()) {
@@ -269,6 +278,7 @@ public class ArcforgeClient {
         // Hydrogen and Oxygen share the steam texture too: near-white and pale blue.
         event.register(gasModel(HYDROGEN_TINT), ModFluids.HYDROGEN, ModFluids.FLOWING_HYDROGEN);
         event.register(gasModel(OXYGEN_TINT), ModFluids.OXYGEN, ModFluids.FLOWING_OXYGEN);
+        event.register(gasModel(CARBON_DIOXIDE_TINT), ModFluids.CARBON_DIOXIDE, ModFluids.FLOWING_CARBON_DIOXIDE);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -282,6 +292,8 @@ public class ArcforgeClient {
     private static final int EXHAUST_STEAM_TINT = 0xFF9EA6AE;
     public static final int HYDROGEN_TINT = 0xFFEAF2FA;
     public static final int OXYGEN_TINT = 0xFF9FD4F2;
+    // Carbon Dioxide: a cool grey, darker than steam.
+    public static final int CARBON_DIOXIDE_TINT = 0xFFB4BCC4;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(
@@ -316,10 +328,12 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xE8DCA0, 10.0F), ModFluids.ETHANOL_TYPE.get());
         event.registerFluidType(liquidFog(0xC89A20, 5.0F), ModFluids.LIGHT_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0x2A1A0C, 2.0F), ModFluids.HEAVY_OIL_TYPE.get());
+        event.registerFluidType(liquidFog(0xC8961E, 4.0F), ModFluids.SEED_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(EXHAUST_STEAM_TINT & 0xFFFFFF, 6.0F), ModFluids.EXHAUST_STEAM_TYPE.get());
         event.registerFluidType(liquidFog(HYDROGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.HYDROGEN_TYPE.get());
         event.registerFluidType(liquidFog(OXYGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.OXYGEN_TYPE.get());
+        event.registerFluidType(liquidFog(CARBON_DIOXIDE_TINT & 0xFFFFFF, 6.0F), ModFluids.CARBON_DIOXIDE_TYPE.get());
         for (OreSlurry slurry : OreSlurry.values()) {
             event.registerFluidType(liquidFog(slurry.tint() & 0xFFFFFF, 3.0F), ModFluids.slurry(slurry).type().get());
         }

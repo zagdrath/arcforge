@@ -1,0 +1,13 @@
+{
+  "title": "Seed Extractor",
+  "icon": "arcforge:seed_extractor",
+  "items": [
+    "arcforge:seed_extractor"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Seed Extractor threshes crops into their seeds, for replanting and for the Oil Press. It uses 10 FE/t and takes 5 s per crop.\n| Crop | Seeds |\n| Wheat | 2 Wheat Seeds (50%: a third) |\n| Beetroot | 2 Beetroot Seeds (50%: a third) |\n| Melon Slice | 1 Melon Seeds (50%: another) |\n| Pumpkin | 4 Pumpkin Seeds (50%: a fifth) |\n| Sorghum Stalks | 2 Sorghum Seeds (50%: a third) |\n| Hop Cones | 1 Hop Seeds (25%: another) |\n| Flax Fibre | 1 Flax Seeds (25%: another) |\nSpeed and Energy upgrades work."
+    }
+  ]
+}

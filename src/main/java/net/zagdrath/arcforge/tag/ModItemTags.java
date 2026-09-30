@@ -43,5 +43,8 @@ public final class ModItemTags {
     // Fertilizers for Loam Farmland (Compost, Wood Ash, Basic Slag, Mixed Fertilizer).
     public static final TagKey<Item> FERTILIZERS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "fertilizers"));
 
+    // What the Fermenter's additive slot takes (Dried Hops): each one raises the Ethanol of a few operations.
+    public static final TagKey<Item> FERMENTER_ADDITIVES = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "fermenter_additives"));
+
     private ModItemTags() {}
 }

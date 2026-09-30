@@ -4,12 +4,13 @@
   "items": [
     "arcforge:fermenter",
     "arcforge:ethanol_bucket",
-    "arcforge:sorghum_stalks"
+    "arcforge:sorghum_stalks",
+    "arcforge:dried_hops"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "The Fermenter turns crops and water into Ethanol, using a little power.\n| Crop | Ethanol |\n| Sorghum Stalks | 80 mB |\n| Wheat, Potato, Carrot, Beetroot | 50 mB |\n| Sugar Cane | 60 mB |\n| Sweet Berries | 25 mB |\n| Melon Slice | 20 mB |\nEach takes 100 mB of water and 10 s, and has a 10% chance to leave Bone Meal. Speed and Energy upgrades work.\n# Ethanol\nA light fuel: 300 HU per mB at up to 900°C in the Fuel Burner (Naphtha is 400 HU at 1,200°C). It also runs the Gas Turbine Array."
+      "text": "The Fermenter turns crops and water into Ethanol, using a little power.\n| Crop | Ethanol |\n| Sorghum Stalks, Dried Sorghum | 80 mB |\n| Wheat, Dried Grain, Potato, Carrot, Beetroot | 50 mB |\n| Sugar Cane | 60 mB |\n| Sweet Berries | 25 mB |\n| Melon Slice | 20 mB |\nEach takes 100 mB of water and 10 s (Dried Grain and Dried Sorghum 5 s), and has a 10% chance to leave Bone Meal. Speed and Energy upgrades work.\n# Dried Hops\nDried Hops in the additive slot (under the crop) raise the Ethanol of each operation by 20%. One lasts 4 operations.\n# Carbon Dioxide\nFermenting gives off Carbon Dioxide, 1 mB for each mB of Ethanol. Set a face to Gas Output to pipe it away through Pressurized Conduits; with no Gas Output face, or once its tank is full, it goes into the air. It never stops the Fermenter.\n# Ethanol\nA light fuel: 300 HU per mB at up to 900°C in the Fuel Burner (Naphtha is 400 HU at 1,200°C). It also runs the Gas Turbine Array."
     }
   ]
 }

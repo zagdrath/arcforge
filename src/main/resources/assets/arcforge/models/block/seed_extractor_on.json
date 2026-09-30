@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/seed_extractor_front_on",
+    "south": "arcforge:block/seed_extractor_back",
+    "east": "arcforge:block/seed_extractor_side",
+    "west": "arcforge:block/seed_extractor_side",
+    "up": "arcforge:block/seed_extractor_top",
+    "down": "arcforge:block/seed_extractor_bottom",
+    "particle": "arcforge:block/seed_extractor_side"
+  }
+}

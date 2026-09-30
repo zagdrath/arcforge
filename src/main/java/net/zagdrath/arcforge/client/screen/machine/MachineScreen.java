@@ -259,14 +259,16 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     // The thin Heavy Oil gauge of the steam turbines.
     protected static final int LUBE_X = 25, LUBE_Y = 19, LUBE_W = 6, LUBE_H = 50;
 
-    protected void drawLubricant(GuiGraphicsExtractor graphics, int x, int y, int amount, int capacity) {
-        drawFluidTank(graphics, ModFluids.HEAVY_OIL.get(), amount, capacity, sprite("lube_fill"), sprite("lube_gauge"),
+    // fluid: the lubricant in the tank (Heavy Oil, Seed Oil or any #arcforge:lubricants), or empty.
+    protected void drawLubricant(GuiGraphicsExtractor graphics, int x, int y, Fluid fluid, int amount, int capacity) {
+        drawFluidTank(graphics, fluid == Fluids.EMPTY ? ModFluids.HEAVY_OIL.get() : fluid, amount, capacity, sprite("lube_fill"), sprite("lube_gauge"),
                 x, y, LUBE_X, LUBE_Y, LUBE_W, LUBE_H);
     }
 
     // spinUp: the spin-up multiplier, or 0 for a turbine without a rotor to spin up.
-    protected static void addLubricantTooltip(List<Component> lines, int amount, int capacity, double spinUp) {
-        lines.add(Component.translatable("gui.arcforge.lubricant"));
+    protected static void addLubricantTooltip(List<Component> lines, Fluid fluid, int amount, int capacity, double spinUp) {
+        lines.add(fluid != Fluids.EMPTY ? Component.translatable("gui.arcforge.lubricant_of", fluid.getFluidType().getDescription())
+                : Component.translatable("gui.arcforge.lubricant"));
         lines.add(Component.translatable("gui.arcforge.mb_stored", ArcforgeGui.grouped(amount), ArcforgeGui.grouped(capacity)).withStyle(ChatFormatting.GRAY));
         int bonus = (int) Math.round(ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble() * 100);
         String spin = String.format(Locale.ROOT, "%.1f", spinUp).replaceAll("\\.0$", "");

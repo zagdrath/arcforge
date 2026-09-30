@@ -155,7 +155,11 @@
         "fertilizer_spreader",
         "copper_sprinkler",
         "scarecrow",
-        "sickles"
+        "sickles",
+        "millstone_and_mill",
+        "seed_extractor",
+        "oil_press",
+        "grain_dryer"
       ]
     }
   ]

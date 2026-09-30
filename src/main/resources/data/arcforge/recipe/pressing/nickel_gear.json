@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:gear_die",
+  "ingredient": "#c:ingots/nickel",
+  "count": 4,
+  "result": {
+    "id": "arcforge:nickel_gear",
+    "count": 1
+  },
+  "time": 100
+}

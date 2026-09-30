@@ -31,9 +31,11 @@ public enum SideMode implements StringRepresentable {
     EXHAUST("exhaust"),
     // Gases by name. The Electrolyzer gives them out; the Arcforge Furnace takes oxygen in. Not outputs in
     // general (see isOutput), so each machine handles them itself.
-    // SideConfig packs 4 bits per face: only one more mode fits (ordinal 15) before it has to widen.
     OXYGEN("oxygen"),
-    HYDROGEN("hydrogen");
+    HYDROGEN("hydrogen"),
+    // A machine's own waste gas out, whatever it is (the Fermenter's Carbon Dioxide). Handled by the machine.
+    // SideConfig packs 4 bits per face and this is ordinal 15, the last that fits: another mode means widening it.
+    GAS_OUTPUT("gas_output");
 
     private final String name;
 

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/mill_front_on",
+    "south": "arcforge:block/mill_back",
+    "east": "arcforge:block/mill_side",
+    "west": "arcforge:block/mill_side",
+    "up": "arcforge:block/mill_top",
+    "down": "arcforge:block/mill_bottom",
+    "particle": "arcforge:block/mill_side"
+  }
+}

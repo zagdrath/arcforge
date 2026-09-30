@@ -41,6 +41,38 @@ public final class PressingGameTests {
         }
     }
 
+    // Every plate metal also presses into gears and rods, at the same rates as steel, and each part is in its c: tag.
+    static void everyPlateMetalHasGearsAndRods(GameTestHelper helper) {
+        var level = helper.getLevel();
+        Object[][] metals = {
+                { "steel", ModItems.STEEL_INGOT.get(), ModItems.STEEL_PLATE.get(), ModItems.STEEL_GEAR.get(), ModItems.STEEL_ROD.get() },
+                { "copper", Items.COPPER_INGOT, ModItems.COPPER_PLATE.get(), ModItems.COPPER_GEAR.get(), ModItems.COPPER_ROD.get() },
+                { "silver", ModItems.SILVER_INGOT.get(), ModItems.SILVER_PLATE.get(), ModItems.SILVER_GEAR.get(), ModItems.SILVER_ROD.get() },
+                { "nickel", ModItems.NICKEL_INGOT.get(), ModItems.NICKEL_PLATE.get(), ModItems.NICKEL_GEAR.get(), ModItems.NICKEL_ROD.get() },
+                { "tungsten", ModItems.TUNGSTEN_INGOT.get(), ModItems.TUNGSTEN_PLATE.get(), ModItems.TUNGSTEN_GEAR.get(), ModItems.TUNGSTEN_ROD.get() },
+                { "invar", ModItems.INVAR_INGOT.get(), ModItems.INVAR_PLATE.get(), ModItems.INVAR_GEAR.get(), ModItems.INVAR_ROD.get() },
+        };
+        Item[] dies = { ModItems.PLATE_DIE.get(), ModItems.GEAR_DIE.get(), ModItems.ROD_DIE.get() };
+        int[] uses = { 1, 4, 1 };
+        int[] makes = { 1, 1, 2 };
+        String[] tags = { "plates", "gears", "rods" };
+        for (Object[] m : metals) {
+            Item ingot = (Item) m[1];
+            for (int i = 0; i < 3; i++) {
+                Item part = (Item) m[2 + i];
+                var recipe = MachineRecipes.pressing(level, new ItemStack(dies[i]), new ItemStack(ingot, uses[i])).orElse(null);
+                helper.assertTrue(recipe != null, "No " + tags[i] + " recipe for " + m[0]);
+                ItemStack result = recipe.value().result().create();
+                helper.assertTrue(recipe.value().count() == uses[i] && result.is(part) && result.getCount() == makes[i],
+                        m[0] + " " + tags[i] + ": " + recipe.value().count() + " ingots make " + result);
+                var tag = net.minecraft.tags.TagKey.create(net.minecraft.core.registries.Registries.ITEM,
+                        net.minecraft.resources.Identifier.fromNamespaceAndPath("c", tags[i] + "/" + m[0]));
+                helper.assertTrue(new ItemStack(part).is(tag), part + " isn't in #c:" + tags[i] + "/" + m[0]);
+            }
+        }
+        helper.succeed();
+    }
+
     // Plate: 1 ingot -> 1 plate. Gear: 4 ingots -> 1 gear (3 aren't enough). Rod: 1 ingot -> 2 rods.
     // The die slot takes dies only; automation never reaches it, and only feeds what the die presses.
     static void pressSlotsAndRecipes(GameTestHelper helper) {

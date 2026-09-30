@@ -1,0 +1,38 @@
+{
+  "parent": "arcforge:farming/millstone",
+  "display": {
+    "icon": {
+      "id": "arcforge:mill"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.mill.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.mill.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "mill": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:mill"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "mill"
+    ]
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:milling",
+  "ingredient": "minecraft:sugar_cane",
+  "result": {
+    "id": "minecraft:sugar",
+    "count": 2
+  },
+  "turns": 1,
+  "time": 60
+}

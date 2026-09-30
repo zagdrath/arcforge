@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "GMG",
+    "PBP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:gears/steel",
+    "M": "arcforge:millstone",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:mill",
+    "count": 1
+  }
+}

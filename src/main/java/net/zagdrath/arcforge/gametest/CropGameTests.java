@@ -164,7 +164,8 @@ public final class CropGameTests {
         helper.succeed();
     }
 
-    // Fibre makes String and Linen; the Fermenter gets more Ethanol from Sorghum Stalks than from anything else.
+    // Fibre makes String and Linen; the Fermenter gets more Ethanol from Sorghum Stalks (or Dried Sorghum) than from
+    // anything else.
     static void recipes(GameTestHelper helper) {
         var recipes = helper.getLevel().recipeAccess().recipeMap();
         RecipeHolder<?> linen = recipes.byKey(ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(Arcforge.MODID, "crafting/linen")));
@@ -182,7 +183,7 @@ public final class CropGameTests {
                 int amount = fermenting.result().amount();
                 if (fermenting.ingredient().test(new ItemStack(ModItems.SORGHUM_STALKS.get()))) {
                     sorghum = amount;
-                } else {
+                } else if (!fermenting.ingredient().test(new ItemStack(ModItems.DRIED_SORGHUM.get()))) {
                     best = Math.max(best, amount);
                 }
             }

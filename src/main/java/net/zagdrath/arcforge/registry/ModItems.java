@@ -257,6 +257,8 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.HEAVY_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SULFURIC_ACID_BUCKET = ITEMS.registerItem("sulfuric_acid_bucket",
             p -> new BucketItem(ModFluids.SULFURIC_ACID.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> SEED_OIL_BUCKET = ITEMS.registerItem("seed_oil_bucket",
+            p -> new BucketItem(ModFluids.SEED_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
 
     private static final Map<OreSlurry, DeferredItem<BucketItem>> SLURRY_BUCKETS = registerSlurryBuckets();
 
@@ -319,9 +321,17 @@ public final class ModItems {
     public static final DeferredItem<Item> ARCITE_CRYSTAL = ITEMS.registerSimpleItem("arcite_crystal");
     public static final DeferredItem<BlockItem> ARCITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.ARCITE_BLOCK);
     public static final DeferredItem<Item> SILVER_PLATE = ITEMS.registerSimpleItem("silver_plate");
+    public static final DeferredItem<Item> SILVER_GEAR = ITEMS.registerSimpleItem("silver_gear");
+    public static final DeferredItem<Item> SILVER_ROD = ITEMS.registerSimpleItem("silver_rod");
     public static final DeferredItem<Item> NICKEL_PLATE = ITEMS.registerSimpleItem("nickel_plate");
+    public static final DeferredItem<Item> NICKEL_GEAR = ITEMS.registerSimpleItem("nickel_gear");
+    public static final DeferredItem<Item> NICKEL_ROD = ITEMS.registerSimpleItem("nickel_rod");
     public static final DeferredItem<Item> TUNGSTEN_PLATE = ITEMS.registerSimpleItem("tungsten_plate");
+    public static final DeferredItem<Item> TUNGSTEN_GEAR = ITEMS.registerSimpleItem("tungsten_gear");
+    public static final DeferredItem<Item> TUNGSTEN_ROD = ITEMS.registerSimpleItem("tungsten_rod");
     public static final DeferredItem<Item> INVAR_PLATE = ITEMS.registerSimpleItem("invar_plate");
+    public static final DeferredItem<Item> INVAR_GEAR = ITEMS.registerSimpleItem("invar_gear");
+    public static final DeferredItem<Item> INVAR_ROD = ITEMS.registerSimpleItem("invar_rod");
     public static final DeferredItem<Item> INVAR_DUST = ITEMS.registerSimpleItem("invar_dust");
     public static final DeferredItem<Item> INVAR_INGOT = ITEMS.registerSimpleItem("invar_ingot");
     public static final DeferredItem<Item> TUNGSTEN_HEATING_COIL = ITEMS.registerSimpleItem("tungsten_heating_coil");
@@ -344,9 +354,9 @@ public final class ModItems {
         return List.of(SILVER_ORE, DEEPSLATE_SILVER_ORE, RAW_SILVER, RAW_SILVER_BLOCK, SILVER_DUST, SILVER_INGOT, SILVER_BLOCK, NICKEL_ORE, DEEPSLATE_NICKEL_ORE, RAW_NICKEL, RAW_NICKEL_BLOCK, NICKEL_DUST, NICKEL_INGOT, NICKEL_BLOCK, WOLFRAMITE_ORE, DEEPSLATE_WOLFRAMITE_ORE, RAW_WOLFRAMITE, RAW_WOLFRAMITE_BLOCK, TUNGSTEN_DUST, TUNGSTEN_INGOT, TUNGSTEN_BLOCK, FLUORITE_ORE, DEEPSLATE_FLUORITE_ORE, RAW_FLUORITE, RAW_FLUORITE_BLOCK, FLUORITE_DUST, FLUORITE_CRYSTAL, FLUORITE_BLOCK, BISMUTH_ORE, DEEPSLATE_BISMUTH_ORE, RAW_BISMUTH, RAW_BISMUTH_BLOCK, BISMUTH_DUST, BISMUTH_INGOT, BISMUTH_BLOCK, ARCITE_ORE, DEEPSLATE_ARCITE_ORE, RAW_ARCITE, RAW_ARCITE_BLOCK, ARCITE_DUST, ARCITE_CRYSTAL, ARCITE_BLOCK, NETHER_SULFUR_ORE, INVAR_DUST, INVAR_INGOT);
     }
 
-    // What's made from the ores, in creative tab order (Components): the plates, then the components.
+    // What's made from the ores, in creative tab order (Components): each metal's plate, gear and rod, then the components.
     public static List<DeferredItem<Item>> oreComponents() {
-        return List.of(SILVER_PLATE, NICKEL_PLATE, TUNGSTEN_PLATE, INVAR_PLATE, TUNGSTEN_HEATING_COIL, THERMOCOUPLE, ARCITE_TUNGSTEN_COMPOSITE);
+        return List.of(SILVER_PLATE, SILVER_GEAR, SILVER_ROD, NICKEL_PLATE, NICKEL_GEAR, NICKEL_ROD, TUNGSTEN_PLATE, TUNGSTEN_GEAR, TUNGSTEN_ROD, INVAR_PLATE, INVAR_GEAR, INVAR_ROD, TUNGSTEN_HEATING_COIL, THERMOCOUPLE, ARCITE_TUNGSTEN_COMPOSITE);
     }
 
     // --- Distillation ---
@@ -413,6 +423,21 @@ public final class ModItems {
             p -> new SickleItem(ArcforgeConfig.SICKLE_RADIUS::getAsInt, p), p -> p.durability(500).repairable(ModItemTags.STEEL_INGOTS).enchantable(12));
     public static final DeferredItem<SickleItem> STEEL_SCYTHE = ITEMS.registerItem("steel_scythe",
             p -> new SickleItem(ArcforgeConfig.SCYTHE_RADIUS::getAsInt, p), p -> p.durability(1_000).repairable(ModItemTags.STEEL_INGOTS).enchantable(12));
+
+    // Farm processing: the machines and what they make. Flour smelts into bread; Seed Meal is a light fertilizer; Press
+    // Cake, the dried crops and Dried Hops go in a Compost Bin like the crops they came from.
+    public static final DeferredItem<BlockItem> MILLSTONE = ITEMS.registerSimpleBlockItem(ModBlocks.MILLSTONE);
+    public static final DeferredItem<BlockItem> MILL = ITEMS.registerSimpleBlockItem(ModBlocks.MILL);
+    public static final DeferredItem<BlockItem> OIL_PRESS = ITEMS.registerSimpleBlockItem(ModBlocks.OIL_PRESS);
+    public static final DeferredItem<BlockItem> SEED_EXTRACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.SEED_EXTRACTOR);
+    public static final DeferredItem<BlockItem> GRAIN_DRYER = ITEMS.registerSimpleBlockItem(ModBlocks.GRAIN_DRYER);
+    public static final DeferredItem<Item> FLOUR = ITEMS.registerSimpleItem("flour");
+    public static final DeferredItem<FertilizerItem> SEED_MEAL = ITEMS.registerItem("seed_meal",
+            p -> new FertilizerItem(ArcforgeConfig.SEED_MEAL_NUTRIENTS::getAsInt, p));
+    public static final DeferredItem<Item> PRESS_CAKE = ITEMS.registerSimpleItem("press_cake", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<Item> DRIED_HOPS = ITEMS.registerSimpleItem("dried_hops", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<Item> DRIED_GRAIN = ITEMS.registerSimpleItem("dried_grain", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<Item> DRIED_SORGHUM = ITEMS.registerSimpleItem("dried_sorghum", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
 
     // --- Solar Thermal Array ---
 

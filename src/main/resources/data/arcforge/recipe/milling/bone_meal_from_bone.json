@@ -1,0 +1,14 @@
+{
+  "type": "arcforge:milling",
+  "ingredient": "minecraft:bone",
+  "result": {
+    "id": "minecraft:bone_meal",
+    "count": 4
+  },
+  "bonus": {
+    "id": "minecraft:bone_meal"
+  },
+  "bonus_chance": 0.5,
+  "turns": 3,
+  "time": 120
+}

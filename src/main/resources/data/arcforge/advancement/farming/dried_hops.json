@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:farming/hop_harvest",
+  "display": {
+    "icon": {
+      "id": "arcforge:dried_hops"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.dried_hops.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.dried_hops.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "dried_hops": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:dried_hops"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "dried_hops"
+    ]
+  ]
+}

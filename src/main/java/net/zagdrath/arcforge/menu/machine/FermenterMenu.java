@@ -30,11 +30,18 @@ public class FermenterMenu extends MachineMenu {
     public static final int DATA_STATUS = 10;
     public static final int DATA_REDSTONE_MODE = 11;
     public static final int DATA_SIDE_CONFIG = 12;
-    public static final int DATA_VALUES = 13;
+    public static final int DATA_CO2 = 13;
+    public static final int DATA_CO2_CAPACITY = 14;
+    // Operations the Dried Hops already taken still boost.
+    public static final int DATA_ADDITIVE_LEFT = 15;
+    public static final int DATA_VALUES = 16;
 
-    // Slot positions from the handoff's gui_layouts.json.
-    public static final int INPUT_X = 48, INPUT_Y = 35;
-    public static final int BYPRODUCT_X = 134, BYPRODUCT_Y = 35;
+    // Slot positions: the crop over the additive, left of the arrow; the byproduct after it; the tanks on the right.
+    public static final int INPUT_X = 44, INPUT_Y = 25;
+    public static final int ADDITIVE_X = 44, ADDITIVE_Y = 45;
+    public static final int BYPRODUCT_X = 94, BYPRODUCT_Y = 35;
+    // The additive slot's index among the menu's slots (added third).
+    public static final int ADDITIVE_SLOT_INDEX = 2;
 
     // Client constructor, called with the block position written by the server.
     public FermenterMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -45,6 +52,7 @@ public class FermenterMenu extends MachineMenu {
         super(ModMenuTypes.FERMENTER.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.FERMENTER.get());
         addMachineSlot(FermenterBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(FermenterBlockEntity.SLOT_BYPRODUCT, BYPRODUCT_X, BYPRODUCT_Y);
+        addMachineSlot(FermenterBlockEntity.SLOT_ADDITIVE, ADDITIVE_X, ADDITIVE_Y);
         finish(inventory);
     }
 
@@ -101,5 +109,17 @@ public class FermenterMenu extends MachineMenu {
 
     public int getEthanolCapacity() {
         return value(DATA_ETHANOL_CAPACITY);
+    }
+
+    public int getCarbonDioxide() {
+        return value(DATA_CO2);
+    }
+
+    public int getCarbonDioxideCapacity() {
+        return value(DATA_CO2_CAPACITY);
+    }
+
+    public int getAdditiveLeft() {
+        return value(DATA_ADDITIVE_LEFT);
     }
 }

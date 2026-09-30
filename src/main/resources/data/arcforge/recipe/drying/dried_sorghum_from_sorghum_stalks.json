@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:drying",
+  "ingredient": "arcforge:sorghum_stalks",
+  "result": {
+    "id": "arcforge:dried_sorghum"
+  },
+  "time": 200,
+  "hu_per_tick": 4
+}

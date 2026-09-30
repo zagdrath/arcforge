@@ -37,6 +37,10 @@ import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.recipe.MeltingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
+import net.zagdrath.arcforge.recipe.DryingRecipe;
+import net.zagdrath.arcforge.recipe.MillingRecipe;
+import net.zagdrath.arcforge.recipe.OilPressingRecipe;
+import net.zagdrath.arcforge.recipe.SeedExtractingRecipe;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModFluids;
@@ -262,7 +266,12 @@ final class MachineCategories {
             FermentingRecipe recipe = holder.value();
             builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
             fluid(builder, true, 21, 5, recipe.fluidInput().fluid(), recipe.fluidInput().amount());
-            fluid(builder, false, 79, 5, recipe.result());
+            // The Ethanol, with the Dried Hops bonus on its tooltip.
+            builder.addOutputSlot(79, 5).setStandardSlotBackground()
+                    .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, recipe.result().amount()), false, 16, 16)
+                    .add(recipe.result().fluid().value(), recipe.result().amount())
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.fermenting.hops",
+                            Math.round(ArcforgeConfig.FERMENTER_ADDITIVE_BONUS.getAsDouble() * 100))));
             recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(99, 5).setStandardSlotBackground().add(byproduct.create())
                     .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
                             Math.round(recipe.byproductChance() * 100)))));
@@ -279,6 +288,137 @@ final class MachineCategories {
             FermentingRecipe recipe = holder.value();
             text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
                     String.format(Locale.ROOT, "%,d", recipe.totalEnergy())), 0, 30);
+        }
+    }
+
+    // --- Millstone and Mill ---
+
+    static final class Milling extends ArcforgeCategory<RecipeHolder<MillingRecipe>> {
+        static final IRecipeHolderType<MillingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.MILLING.get());
+
+        Milling(IGuiHelper gui) {
+            super(TYPE, "milling", ModBlocks.MILLSTONE.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<MillingRecipe> holder, IFocusGroup focuses) {
+            MillingRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(recipe.result());
+            recipe.bonus().ifPresent(bonus -> builder.addOutputSlot(83, 5).setStandardSlotBackground().add(bonus)
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                            Math.round(recipe.bonusChance() * 100)))));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<MillingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(millTicks(holder.value())).setPosition(26, 5);
+        }
+
+        // Turns on the Millstone, and the time per lane on the Mill (before upgrades).
+        @Override
+        public void draw(RecipeHolder<MillingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            MillingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.milling.cost", recipe.turns(), seconds(millTicks(recipe))), 0, 30);
+        }
+
+        private static int millTicks(MillingRecipe recipe) {
+            return Math.max(1, (int) Math.round(recipe.time() * ArcforgeConfig.MILL_TIME_MULTIPLIER.getAsDouble()));
+        }
+    }
+
+    // --- Oil Press ---
+
+    static final class OilPressing extends ArcforgeCategory<RecipeHolder<OilPressingRecipe>> {
+        static final IRecipeHolderType<OilPressingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.OIL_PRESSING.get());
+
+        OilPressing(IGuiHelper gui) {
+            super(TYPE, "oil_pressing", ModBlocks.OIL_PRESS.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<OilPressingRecipe> holder, IFocusGroup focuses) {
+            OilPressingRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
+            fluid(builder, false, 61, 5, recipe.result());
+            recipe.byproduct().ifPresent(cake -> builder.addOutputSlot(83, 5).setStandardSlotBackground().add(cake.create())
+                    .addRichTooltipCallback((view, tooltip) -> {
+                        if (recipe.byproductChance() < 1.0F) {
+                            tooltip.add(Component.translatable("jei.arcforge.chance", Math.round(recipe.byproductChance() * 100)));
+                        }
+                    }));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<OilPressingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        // Time and FE at the configured rates, before upgrades.
+        @Override
+        public void draw(RecipeHolder<OilPressingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            OilPressingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
+                    String.format(Locale.ROOT, "%,d", recipe.totalEnergy())), 0, 30);
+        }
+    }
+
+    // --- Seed Extractor ---
+
+    static final class SeedExtracting extends ArcforgeCategory<RecipeHolder<SeedExtractingRecipe>> {
+        static final IRecipeHolderType<SeedExtractingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.SEED_EXTRACTING.get());
+
+        SeedExtracting(IGuiHelper gui) {
+            super(TYPE, "seed_extracting", ModBlocks.SEED_EXTRACTOR.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<SeedExtractingRecipe> holder, IFocusGroup focuses) {
+            SeedExtractingRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(recipe.result());
+            recipe.bonus().ifPresent(bonus -> builder.addOutputSlot(83, 5).setStandardSlotBackground().add(bonus)
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                            Math.round(recipe.bonusChance() * 100)))));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<SeedExtractingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<SeedExtractingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, seconds(holder.value().time()), 0, 30);
+        }
+    }
+
+    // --- Grain Dryer ---
+
+    static final class Drying extends ArcforgeCategory<RecipeHolder<DryingRecipe>> {
+        static final IRecipeHolderType<DryingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.DRYING.get());
+
+        Drying(IGuiHelper gui) {
+            super(TYPE, "drying", ModBlocks.GRAIN_DRYER.get(), gui, 130, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<DryingRecipe> holder, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(holder.value().result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<DryingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        // The heat per tick and the temperature it needs, and the time, before upgrades.
+        @Override
+        public void draw(RecipeHolder<DryingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            DryingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.drying.cost", recipe.huPerTick(), ArcforgeConfig.GRAIN_DRYER_MIN_TEMPERATURE.getAsInt()), 0, 30);
+            textRight(graphics, seconds(recipe.time()), getWidth(), 9);
         }
     }
 

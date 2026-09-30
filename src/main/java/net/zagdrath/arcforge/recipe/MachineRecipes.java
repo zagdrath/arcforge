@@ -200,4 +200,46 @@ public final class MachineRecipes {
         return recipes(level).byType(ModRecipes.ARCFORGE_SMELTING.get()).stream()
                 .anyMatch(holder -> holder.value().isAdditive(stack));
     }
+
+    // --- Farm processing ---
+
+    public static Optional<RecipeHolder<MillingRecipe>> milling(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.MILLING.get()).stream()
+                .filter(holder -> holder.value().ingredient().test(input))
+                .findFirst();
+    }
+
+    public static boolean isMillingInput(@Nullable Level level, ItemStack stack) {
+        return milling(level, stack).isPresent();
+    }
+
+    public static Optional<RecipeHolder<OilPressingRecipe>> oilPressing(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.OIL_PRESSING.get()).stream()
+                .filter(holder -> holder.value().ingredient().test(input))
+                .findFirst();
+    }
+
+    public static boolean isOilPressInput(@Nullable Level level, ItemStack stack) {
+        return oilPressing(level, stack).isPresent();
+    }
+
+    public static Optional<RecipeHolder<SeedExtractingRecipe>> seedExtracting(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.SEED_EXTRACTING.get()).stream()
+                .filter(holder -> holder.value().ingredient().test(input))
+                .findFirst();
+    }
+
+    public static boolean isSeedExtractorInput(@Nullable Level level, ItemStack stack) {
+        return seedExtracting(level, stack).isPresent();
+    }
+
+    public static Optional<RecipeHolder<DryingRecipe>> drying(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.DRYING.get()).stream()
+                .filter(holder -> holder.value().ingredient().test(input))
+                .findFirst();
+    }
+
+    public static boolean isDryerInput(@Nullable Level level, ItemStack stack) {
+        return drying(level, stack).isPresent();
+    }
 }

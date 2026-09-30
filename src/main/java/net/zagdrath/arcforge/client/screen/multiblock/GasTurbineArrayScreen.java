@@ -67,7 +67,7 @@ public class GasTurbineArrayScreen extends MachineScreen<GasTurbineArrayMenu> {
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         drawFluidTank(graphics, menu.getFuel(), menu.getFuelAmount(), menu.getFuelCapacity(), tankGauge, tankGauge,
                 x, y, FUEL_X, FUEL_Y, TANK_W, TANK_H);
-        drawLubricant(graphics, x, y, menu.getLubricant(), menu.getLubricantCapacity());
+        drawLubricant(graphics, x, y, menu.getLubricantFluid(), menu.getLubricant(), menu.getLubricantCapacity());
         drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.getEnergy(), menu.getCapacity());
         drawNeedle(graphics, x, y);
         drawLed(graphics, x, y, LED_X, LED_Y);
@@ -137,7 +137,7 @@ public class GasTurbineArrayScreen extends MachineScreen<GasTurbineArrayMenu> {
                         .withStyle(ChatFormatting.GRAY));
             }
         } else if (isHovering(LUBE_X - 1, LUBE_Y - 1, LUBE_W + 2, LUBE_H + 2, mouseX, mouseY)) {
-            addLubricantTooltip(lines, menu.getLubricant(), menu.getLubricantCapacity(), ArcforgeConfig.GAS_TURBINE_LUBRICANT_SPIN_UP.getAsDouble());
+            addLubricantTooltip(lines, menu.getLubricantFluid(), menu.getLubricant(), menu.getLubricantCapacity(), ArcforgeConfig.GAS_TURBINE_LUBRICANT_SPIN_UP.getAsDouble());
         } else if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getCapacity())).withStyle(ChatFormatting.GRAY));
         } else if (isHovering(DIAL_X, DIAL_Y, DIAL_W, DIAL_H, mouseX, mouseY)) {

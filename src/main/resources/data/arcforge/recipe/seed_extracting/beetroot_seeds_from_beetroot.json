@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:seed_extracting",
+  "ingredient": "minecraft:beetroot",
+  "result": {
+    "id": "minecraft:beetroot_seeds",
+    "count": 2
+  },
+  "bonus": {
+    "id": "minecraft:beetroot_seeds"
+  },
+  "bonus_chance": 0.5,
+  "time": 100
+}

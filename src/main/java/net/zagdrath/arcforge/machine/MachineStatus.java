@@ -89,7 +89,11 @@ public enum MachineStatus {
     INTAKE_SHUT("intake_shut", "led_blocked"),
     NO_SIGNAL("no_signal", "led_off"),
     // A Firebox or Fuel Burner burning with oxygen.
-    OXY_FUEL("oxy_fuel", "led_running");
+    OXY_FUEL("oxy_fuel", "led_running"),
+    // Farm processing: the Mill, the Seed Extractor and the Grain Dryer (the Oil Press says PRESSING).
+    MILLING("milling", "led_running"),
+    EXTRACTING("extracting", "led_running"),
+    DRYING("drying", "led_running");
 
     private final String name;
     private final String led;

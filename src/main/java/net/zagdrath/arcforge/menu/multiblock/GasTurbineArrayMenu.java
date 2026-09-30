@@ -43,7 +43,9 @@ public class GasTurbineArrayMenu extends MachineMenu {
     public static final int DATA_VENTING = 18;
     // The tank's fuel in tenths of an FE per mB.
     public static final int DATA_FE_PER_MB_X10 = 19;
-    public static final int DATA_VALUES = 20;
+    // The lubricant in the tank (a fluid id), for the gauge and its tooltip.
+    public static final int DATA_LUBRICANT_FLUID = 20;
+    public static final int DATA_VALUES = 21;
 
 
     // Client constructor, called with the master's position written by the server.
@@ -127,6 +129,10 @@ public class GasTurbineArrayMenu extends MachineMenu {
 
     public int getLubricantCapacity() {
         return value(DATA_LUBRICANT_CAPACITY);
+    }
+
+    public net.minecraft.world.level.material.Fluid getLubricantFluid() {
+        return net.zagdrath.arcforge.menu.machine.ElectricPumpMenu.fluid(value(DATA_LUBRICANT_FLUID));
     }
 
     public int getExhaustHu() {

@@ -24,8 +24,10 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
 
 ### Upgrading
 
-- **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`, `hops`, `rusticMachines`) gets its defaults;
-  nothing to redo.
+- **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`, `hops`, `rusticMachines`, `millstone`,
+  `mill`, `oilPress`, `seedExtractor`, `grainDryer`) gets its defaults, as do the Fermenter's new keys; nothing to redo.
+- **Fermenter additive slot.** Saved Fermenters keep their crops, byproduct and upgrades: the upgrades move up past the
+  new slot when the world loads.
 - **Wild crops generate only in newly explored chunks.**
 - **Firebox and Combustion Plant ash slot.** Both machines gain an ash slot. Saved machines keep their fuel and
   upgrades: the upgrades move up past the new slot when the world loads.
@@ -78,6 +80,40 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
   - **Scarecrow.** A treated-wood and linen figure, two blocks tall. Mobs can't trample farmland within 9 blocks of it.
   - **Iron Sickle** and **Steel Sickle** harvest and replant the ripe crops in a 3x3; the **Steel Scythe** does a 5x5.
   - Handbook pages, JEI info, Jade tooltips and three new Farming advancements (Hands Free, April Showers, Reaper).
+- **Farm processing:** machines that turn the harvest into goods. Recipes are data-driven (`arcforge:milling`,
+  `arcforge:oil_pressing`, `arcforge:seed_extracting` and `arcforge:drying`), each with its own JEI category, and every
+  rate is in config.
+  - **Millstone** (rustic, no power). Put the item in and turn the stone by hand, or with a redstone pulse: wheat into
+    **Flour**, any seeds into **Seed Meal**, bones into 4 Bone Meal (crafting gives 3), sugar cane into 2 Sugar. Flour
+    smelts or smokes into Bread; Seed Meal is a light fertilizer (+1 nutrient).
+  - **Mill** (FE). The powered Millstone: three lanes, each twice as fast as a recipe's base time, fed evenly from its
+    input faces. Takes Speed and Energy upgrades.
+  - **Oil Press** (FE). Presses Rapeseeds (125 mB), Flax Seeds (80 mB) and other seeds (25 mB) into **Seed Oil** and
+    **Press Cake**. Seed Oil is a new fluid with a bucket; Press Cake goes in the Compost Bin.
+  - **Seed Extractor** (FE). Threshes crops into their seeds (wheat into 2 Wheat Seeds, Hop Cones into Hop Seeds, and
+    so on), for replanting and pressing.
+  - **Grain Dryer** (heat). Dries Hop Cones into **Dried Hops**, wheat into **Dried Grain** and Sorghum Stalks into
+    **Dried Sorghum** with HU and no FE. It only runs above 60°C.
+  - Handbook pages, Jade tooltips and four new Farming advancements (Daily Grind, Grist for the Mill, Cold Pressed,
+    Hop to It).
+- **Carbon Dioxide**, a new gas.
+- **Gas Output**, a new side mode: a machine's waste gas comes out of it. The Fermenter uses it.
+- **Silver, Nickel, Tungsten and Invar Gears and Rods.** Every metal with a plate now has a gear and a rod too, pressed
+  in the Metal Press like steel's (4 ingots make a gear, 1 ingot makes 2 rods), and tagged `c:gears/<metal>` and
+  `c:rods/<metal>` for other mods' recipes.
+
+### Changed
+
+- **Fermenter.**
+  - A new additive slot: Dried Hops add 20% Ethanol, one lasting 4 operations (`#arcforge:fermenter_additives`).
+  - Dried Grain and Dried Sorghum ferment in half the time of wheat and sorghum.
+  - It gives off Carbon Dioxide (1 mB per mB of Ethanol) through Gas Output faces. With none set, or with its tank
+    full, the gas goes into the air, so it never stops the Fermenter.
+  - The GUI is rearranged to fit the additive slot and a Carbon Dioxide tank: the Ethanol tank is now on the right.
+- **Plate and gear textures:** every plate, gear and rod now uses Cody's plate and gear style, recoloured per metal:
+  rods are redrawn to match, with a tonal outline instead of black.
+- **Turbine lubricants are data-driven:** any fluid in `#arcforge:lubricants` (Heavy Oil and Seed Oil). The Steam and
+  Gas Turbine Arrays' lubricant gauge shows the oil in the tank.
 
 ### Fixed
 

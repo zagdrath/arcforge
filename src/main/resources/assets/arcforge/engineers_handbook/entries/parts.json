@@ -10,12 +10,24 @@
     "arcforge:steel_rod",
     "arcforge:copper_plate",
     "arcforge:copper_gear",
-    "arcforge:copper_rod"
+    "arcforge:copper_rod",
+    "arcforge:silver_plate",
+    "arcforge:silver_gear",
+    "arcforge:silver_rod",
+    "arcforge:nickel_plate",
+    "arcforge:nickel_gear",
+    "arcforge:nickel_rod",
+    "arcforge:tungsten_plate",
+    "arcforge:tungsten_gear",
+    "arcforge:tungsten_rod",
+    "arcforge:invar_plate",
+    "arcforge:invar_gear",
+    "arcforge:invar_rod"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Pressed in the Metal Press from steel and copper ingots. They go into upgrades, the steam machines and the bigger arrays."
+      "text": "Pressed in the Metal Press from steel, copper, silver, nickel, tungsten and invar ingots: a Plate Die makes 1 plate from 1 ingot, a Gear Die 1 gear from 4, and a Rod Die 2 rods from 1. They go into upgrades, the steam machines and the bigger arrays."
     }
   ]
 }

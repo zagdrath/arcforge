@@ -16,6 +16,10 @@ import net.zagdrath.arcforge.menu.multiblock.GasTurbineArrayMenu;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
+import net.zagdrath.arcforge.menu.machine.GrainDryerMenu;
+import net.zagdrath.arcforge.menu.machine.MillMenu;
+import net.zagdrath.arcforge.menu.machine.OilPressMenu;
+import net.zagdrath.arcforge.menu.machine.SeedExtractorMenu;
 import net.zagdrath.arcforge.menu.machine.FermenterMenu;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
 import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
@@ -102,6 +106,16 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<FermenterMenu>> FERMENTER = MENU_TYPES.register("fermenter",
             () -> IMenuTypeExtension.create(FermenterMenu::new));
+
+    // Farm processing.
+    public static final Supplier<MenuType<MillMenu>> MILL = MENU_TYPES.register("mill",
+            () -> IMenuTypeExtension.create(MillMenu::new));
+    public static final Supplier<MenuType<OilPressMenu>> OIL_PRESS = MENU_TYPES.register("oil_press",
+            () -> IMenuTypeExtension.create(OilPressMenu::new));
+    public static final Supplier<MenuType<SeedExtractorMenu>> SEED_EXTRACTOR = MENU_TYPES.register("seed_extractor",
+            () -> IMenuTypeExtension.create(SeedExtractorMenu::new));
+    public static final Supplier<MenuType<GrainDryerMenu>> GRAIN_DRYER = MENU_TYPES.register("grain_dryer",
+            () -> IMenuTypeExtension.create(GrainDryerMenu::new));
 
     public static final Supplier<MenuType<ChemicalReactorMenu>> CHEMICAL_REACTOR = MENU_TYPES.register("chemical_reactor",
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));

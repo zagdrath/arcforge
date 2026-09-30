@@ -1,0 +1,20 @@
+{
+  "title": "Millstone & Mill",
+  "icon": "arcforge:millstone",
+  "items": [
+    "arcforge:millstone",
+    "arcforge:mill",
+    "arcforge:flour",
+    "arcforge:seed_meal"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Millstone\nTwo stones on a treated-wood frame, turned by hand or by redstone. No power.\n- Use it holding something to mill to put the stack in (hoppers and conduits can feed it from the sides and top).\n- Use it with an empty hand to turn the stone once. Each item takes a few turns.\n- A redstone pulse turns it too, so a clock or an observer can run it.\n- Sneak-use with an empty hand to take what it made; hoppers and conduits take it from underneath."
+    },
+    {
+      "type": "text",
+      "text": "| In | Out | Turns |\n| Wheat | Flour (25%: another) | 2 |\n| Any seeds | Seed Meal | 1 |\n| Bone | 4 Bone Meal (50%: a fifth) | 3 |\n| Sugar Cane | 2 Sugar | 1 |\nFlour smelts or smokes into Bread. Seed Meal is a light fertilizer for Loam Farmland (+1 nutrient), and the Fertilizer Spreader takes it.\n# Mill\nThe powered Millstone: three lanes, each milling an item in half the recipe's time (5 s for wheat), with 8 FE/t per working lane. Items put in through an input face go to the emptiest lane. Speed and Energy upgrades work."
+    }
+  ]
+}

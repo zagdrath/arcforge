@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:rod_die",
+  "ingredient": "#c:ingots/tungsten",
+  "count": 1,
+  "result": {
+    "id": "arcforge:tungsten_rod",
+    "count": 2
+  },
+  "time": 100
+}

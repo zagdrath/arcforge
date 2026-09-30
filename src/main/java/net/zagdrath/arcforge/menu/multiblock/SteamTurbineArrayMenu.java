@@ -39,7 +39,9 @@ public class SteamTurbineArrayMenu extends MachineMenu {
     // What happens to spent steam: EXHAUST_VENTING (no Exhaust port), EXHAUST_VACUUM (draining, with the
     // bonus) or EXHAUST_FULL (its exhaust tank is full, so it vents).
     public static final int DATA_EXHAUST = 16;
-    public static final int DATA_VALUES = 17;
+    // The lubricant in the tank (a fluid id), for the gauge and its tooltip.
+    public static final int DATA_LUBRICANT_FLUID = 17;
+    public static final int DATA_VALUES = 18;
     public static final int EXHAUST_VENTING = 0, EXHAUST_VACUUM = 1, EXHAUST_FULL = 2;
 
 
@@ -108,6 +110,10 @@ public class SteamTurbineArrayMenu extends MachineMenu {
 
     public int getLubricantCapacity() {
         return value(DATA_LUBRICANT_CAPACITY);
+    }
+
+    public net.minecraft.world.level.material.Fluid getLubricantFluid() {
+        return net.zagdrath.arcforge.menu.machine.ElectricPumpMenu.fluid(value(DATA_LUBRICANT_FLUID));
     }
 
     public int getRpm() {

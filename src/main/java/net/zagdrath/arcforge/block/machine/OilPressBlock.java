@@ -1,0 +1,62 @@
+/*
+ * Copyright (c) 2026 Zagdrath
+ * SPDX-License-Identifier: MIT
+ */
+
+package net.zagdrath.arcforge.block.machine;
+
+import org.jspecify.annotations.Nullable;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
+import net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity;
+import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+
+// The Oil Press (see OilPressBlockEntity). Its front shows the press plate coming down on the seeds.
+public class OilPressBlock extends MachineBlock {
+    public OilPressBlock(BlockBehaviour.Properties properties) {
+        super(properties);
+    }
+
+    @Override
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+        return new OilPressBlockEntity(pos, state);
+    }
+
+    @Override
+    public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
+        return level instanceof ServerLevel serverLevel
+                ? createTickerHelper(type, ModBlockEntityTypes.OIL_PRESS.get(),
+                        (innerLevel, pos, blockState, machine) -> machine.serverTick(serverLevel, pos, blockState))
+                : null;
+    }
+
+    // Oil dripping at the front, and the thump of the press.
+    @Override
+    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (!state.getValue(LIT)) {
+            return;
+        }
+        Direction facing = state.getValue(FACING);
+        double x = pos.getX() + 0.5 + facing.getStepX() * 0.52 + (random.nextDouble() - 0.5) * 0.5;
+        double y = pos.getY() + 0.3 + random.nextDouble() * 0.4;
+        double z = pos.getZ() + 0.5 + facing.getStepZ() * 0.52 + (random.nextDouble() - 0.5) * 0.5;
+        if (random.nextInt(4) == 0) {
+            level.addParticle(ParticleTypes.DRIPPING_HONEY, x, y, z, 0.0, 0.0, 0.0);
+        }
+        if (random.nextDouble() < 0.06) {
+            level.playLocalSound(x, y, z, SoundEvents.PISTON_EXTEND, SoundSource.BLOCKS, 0.15F, 0.6F, false);
+        }
+    }
+}

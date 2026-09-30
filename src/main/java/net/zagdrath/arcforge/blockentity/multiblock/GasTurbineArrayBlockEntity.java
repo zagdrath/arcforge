@@ -172,6 +172,8 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
                     case GasTurbineArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
                     case GasTurbineArrayMenu.DATA_LUBRICANT -> lubricant.getAmount();
                     case GasTurbineArrayMenu.DATA_LUBRICANT_CAPACITY -> lubricant.getCapacity();
+                    case GasTurbineArrayMenu.DATA_LUBRICANT_FLUID -> lubricant.getAmount() > 0
+                            ? net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(lubricant.getResource(0).getFluid()) : -1;
                     case GasTurbineArrayMenu.DATA_EXHAUST_HU -> exhaustHu;
                     case GasTurbineArrayMenu.DATA_EXHAUST_CELSIUS -> exhaustCelsius;
                     case GasTurbineArrayMenu.DATA_VENTING -> venting ? 1 : 0;

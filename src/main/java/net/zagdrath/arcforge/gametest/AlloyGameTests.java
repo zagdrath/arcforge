@@ -163,9 +163,10 @@ final class AlloyGameTests {
         // (Settings Card, Security Terminal, Fermenter, four Foundry Suit pieces, conduit dyeing, Turbine Blade Set,
         // Combustor and Gas Turbine Array Casing), the Throttle Lever, the Wrench, Conduit Cover, four Meters and
         // Chargepad, farming's four (Compost Bin, Loam, Irrigated Loam Farmland and Mixed Fertilizer), and
-        // the crops' three (String from Flax Fibre, Linen and the Trellis), and the rustic farming eight (Planter,
-        // Harvester, Fertilizer Spreader, Copper Sprinkler, Scarecrow, two Sickles and the Scythe).
-        helper.assertTrue(crafting == 195, crafting + " crafting/ recipes, not 195");
+        // the crops' three (String from Flax Fibre, Linen and the Trellis), the rustic farming eight (Planter,
+        // Harvester, Fertilizer Spreader, Copper Sprinkler, Scarecrow, two Sickles and the Scythe), and the farm
+        // processing five (Millstone, Mill, Oil Press, Seed Extractor and Grain Dryer).
+        helper.assertTrue(crafting == 200, crafting + " crafting/ recipes, not 200");
         // Plus the fluorite-fluxed steel.
         helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

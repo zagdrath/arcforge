@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:seed_extracting",
+  "ingredient": "arcforge:flax_fibre",
+  "result": {
+    "id": "arcforge:flax_seeds"
+  },
+  "bonus": {
+    "id": "arcforge:flax_seeds"
+  },
+  "bonus_chance": 0.25,
+  "time": 100
+}

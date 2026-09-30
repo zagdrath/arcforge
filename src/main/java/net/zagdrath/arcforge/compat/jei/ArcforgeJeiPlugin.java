@@ -101,6 +101,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Carbonizing(gui),
                 new MachineCategories.Melting(gui),
                 new MachineCategories.Fermenting(gui),
+                new MachineCategories.Milling(gui),
+                new MachineCategories.OilPressing(gui),
+                new MachineCategories.SeedExtracting(gui),
+                new MachineCategories.Drying(gui),
                 new MachineCategories.ConduitDyeingCategory(gui),
                 new MachineCategories.ChemicalReacting(gui),
                 new MachineCategories.Electrolyzing(gui),
@@ -123,6 +127,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Carbonizing.TYPE, recipes(ModRecipes.CARBONIZING.get()));
         registration.addRecipes(MachineCategories.Melting.TYPE, recipes(ModRecipes.MELTING.get()));
         registration.addRecipes(MachineCategories.Fermenting.TYPE, recipes(ModRecipes.FERMENTING.get()));
+        registration.addRecipes(MachineCategories.Milling.TYPE, recipes(ModRecipes.MILLING.get()));
+        registration.addRecipes(MachineCategories.OilPressing.TYPE, recipes(ModRecipes.OIL_PRESSING.get()));
+        registration.addRecipes(MachineCategories.SeedExtracting.TYPE, recipes(ModRecipes.SEED_EXTRACTING.get()));
+        registration.addRecipes(MachineCategories.Drying.TYPE, recipes(ModRecipes.DRYING.get()));
         registration.addRecipes(MachineCategories.ConduitDyeingCategory.TYPE,
                 ModItems.allConduits().stream().map(conduit -> new MachineCategories.ConduitDyeing(conduit.get())).toList());
         registration.addRecipes(MachineCategories.ChemicalReacting.TYPE, recipes(ModRecipes.CHEMICAL_REACTING.get()));
@@ -179,7 +187,11 @@ public class ArcforgeJeiPlugin implements IModPlugin {
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
         registration.addRecipeClickArea(ArcCrusherScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);
         registration.addRecipeClickArea(ArcMelterScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Melting.TYPE);
-        registration.addRecipeClickArea(FermenterScreen.class, 72, 35, ARROW_W, ARROW_H, MachineCategories.Fermenting.TYPE);
+        registration.addRecipeClickArea(FermenterScreen.class, 66, 35, ARROW_W, ARROW_H, MachineCategories.Fermenting.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.OilPressScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.OilPressing.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.SeedExtractorScreen.class, 67, 35, ARROW_W, ARROW_H,
+                MachineCategories.SeedExtracting.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.GrainDryerScreen.class, 68, 35, ARROW_W, ARROW_H, MachineCategories.Drying.TYPE);
         registration.addRecipeClickArea(AssemblerScreen.class, 88, 35, ARROW_W, ARROW_H, RecipeTypes.CRAFTING);
         registration.addRecipeClickArea(ChemicalReactorScreen.class, 81, 35, ARROW_W, ARROW_H, MachineCategories.ChemicalReacting.TYPE);
         registration.addRecipeClickArea(ElectrolyzerScreen.class, 114, 35, ARROW_W, ARROW_H, MachineCategories.Electrolyzing.TYPE);
@@ -195,6 +207,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
             registration.addRecipeClickArea(ArcCrushingArrayScreen.class, 52, y, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);
             registration.addRecipeClickArea(InductionFurnaceArrayScreen.class, 54, y, ARROW_W, ARROW_H, RecipeTypes.SMELTING);
             registration.addRecipeClickArea(MetalPressingArrayScreen.class, 68, y, ARROW_W, ARROW_H, MachineCategories.Pressing.TYPE);
+            registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.MillScreen.class, 52, y, ARROW_W, ARROW_H, MachineCategories.Milling.TYPE);
         }
     }
 
@@ -216,6 +229,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Carbonizing.TYPE, ModBlocks.CARBONIZER.get());
         registration.addCraftingStation(MachineCategories.Melting.TYPE, ModBlocks.ARC_MELTER.get());
         registration.addCraftingStation(MachineCategories.Fermenting.TYPE, ModBlocks.FERMENTER.get());
+        registration.addCraftingStation(MachineCategories.Milling.TYPE, ModBlocks.MILLSTONE.get(), ModBlocks.MILL.get());
+        registration.addCraftingStation(MachineCategories.OilPressing.TYPE, ModBlocks.OIL_PRESS.get());
+        registration.addCraftingStation(MachineCategories.SeedExtracting.TYPE, ModBlocks.SEED_EXTRACTOR.get());
+        registration.addCraftingStation(MachineCategories.Drying.TYPE, ModBlocks.GRAIN_DRYER.get());
         registration.addCraftingStation(MachineCategories.ConduitDyeingCategory.TYPE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
         registration.addCraftingStation(MachineCategories.ChemicalReacting.TYPE, ModBlocks.CHEMICAL_REACTOR.get());
         registration.addCraftingStation(MachineCategories.Electrolyzing.TYPE, ModBlocks.ELECTROLYZER.get());

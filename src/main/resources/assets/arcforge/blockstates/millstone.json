@@ -1,0 +1,195 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "facing": "north"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone"
+      }
+    },
+    {
+      "when": {
+        "facing": "east"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "south"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "west"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "turn": "0"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top"
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "turn": "1"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "turn": "2"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "north",
+        "turn": "3"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "turn": "0"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "turn": "1"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "turn": "2"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "east",
+        "turn": "3"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top"
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "turn": "0"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "turn": "1"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "turn": "2"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top"
+      }
+    },
+    {
+      "when": {
+        "facing": "south",
+        "turn": "3"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "turn": "0"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "turn": "1"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top"
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "turn": "2"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "facing": "west",
+        "turn": "3"
+      },
+      "apply": {
+        "model": "arcforge:block/millstone_top",
+        "y": 180
+      }
+    }
+  ]
+}

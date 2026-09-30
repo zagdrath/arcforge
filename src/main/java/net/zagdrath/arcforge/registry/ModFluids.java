@@ -66,6 +66,14 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_ETHANOL = FLUIDS.register("flowing_ethanol",
             () -> new BaseFlowingFluid.Flowing(ethanolProperties()));
 
+    // The Oil Press's product: a pressed vegetable oil, thicker than water. It lubricates turbines like Heavy Oil
+    // (#arcforge:lubricants).
+    public static final DeferredHolder<FluidType, FluidType> SEED_OIL_TYPE = liquidType("seed_oil", 920, 3_000, 0.018F, 0.6, 0.7);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SEED_OIL = FLUIDS.register("seed_oil",
+            () -> new BaseFlowingFluid.Source(seedOilProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SEED_OIL = FLUIDS.register("flowing_seed_oil",
+            () -> new BaseFlowingFluid.Flowing(seedOilProperties()));
+
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> NAPHTHA = FLUIDS.register("naphtha",
             () -> new BaseFlowingFluid.Source(naphthaProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NAPHTHA = FLUIDS.register("flowing_naphtha",
@@ -115,6 +123,14 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.OXYGEN_TYPE, ModFluids.OXYGEN, ModFluids.FLOWING_OXYGEN)));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_OXYGEN = FLUIDS.register("flowing_oxygen",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.OXYGEN_TYPE, ModFluids.OXYGEN, ModFluids.FLOWING_OXYGEN)));
+
+    // Carbon Dioxide, given off by the Fermenter. A gas with nothing to burn it; it goes out of Gas Output faces, or into
+    // the air when it can't.
+    public static final DeferredHolder<FluidType, FluidType> CARBON_DIOXIDE_TYPE = gasType("carbon_dioxide", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CARBON_DIOXIDE = FLUIDS.register("carbon_dioxide",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.CARBON_DIOXIDE_TYPE, ModFluids.CARBON_DIOXIDE, ModFluids.FLOWING_CARBON_DIOXIDE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CARBON_DIOXIDE = FLUIDS.register("flowing_carbon_dioxide",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.CARBON_DIOXIDE_TYPE, ModFluids.CARBON_DIOXIDE, ModFluids.FLOWING_CARBON_DIOXIDE)));
 
     // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
     // so they only exist in tanks, machines and Pressurized Conduits.
@@ -210,6 +226,17 @@ public final class ModFluids {
                 .slopeFindDistance(4)
                 .levelDecreasePerBlock(1)
                 .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // Slower than water: spreads 3 blocks, every 15 ticks, like Light Oil.
+    private static BaseFlowingFluid.Properties seedOilProperties() {
+        return new BaseFlowingFluid.Properties(SEED_OIL_TYPE, SEED_OIL, FLOWING_SEED_OIL)
+                .bucket(ModItems.SEED_OIL_BUCKET)
+                .block(ModBlocks.SEED_OIL)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(15)
                 .explosionResistance(100.0F);
     }
 

@@ -49,6 +49,11 @@ import net.zagdrath.arcforge.block.farming.CompostBinBlock;
 import net.zagdrath.arcforge.block.farming.CopperSprinklerBlock;
 import net.zagdrath.arcforge.block.farming.FarmMachineBlock;
 import net.zagdrath.arcforge.block.farming.FertilizerSpreaderBlock;
+import net.zagdrath.arcforge.block.farming.MillstoneBlock;
+import net.zagdrath.arcforge.block.machine.GrainDryerBlock;
+import net.zagdrath.arcforge.block.machine.MillBlock;
+import net.zagdrath.arcforge.block.machine.OilPressBlock;
+import net.zagdrath.arcforge.block.machine.SeedExtractorBlock;
 import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
 import net.zagdrath.arcforge.block.farming.ScarecrowBlock;
 import net.zagdrath.arcforge.block.farming.TrellisBlock;
@@ -477,6 +482,11 @@ public final class ModBlocks {
             p -> new LiquidBlock(ModFluids.HEAVY_OIL.get(), p) {},
             p -> liquidProperties(p, MapColor.COLOR_BROWN));
 
+    // The Oil Press's Seed Oil.
+    public static final DeferredBlock<LiquidBlock> SEED_OIL = BLOCKS.registerBlock("seed_oil",
+            p -> new LiquidBlock(ModFluids.SEED_OIL.get(), p) {},
+            p -> liquidProperties(p, MapColor.GOLD));
+
     // The Chemical Reactor's fluids. Sulfuric Acid hurts whatever wades in; the slurries are harmless.
     public static final DeferredBlock<LiquidBlock> SULFURIC_ACID = BLOCKS.registerBlock("sulfuric_acid",
             p -> new SulfuricAcidBlock(ModFluids.SULFURIC_ACID.get(), p),
@@ -573,6 +583,20 @@ public final class ModBlocks {
     // Not solid, so it can stand on farmland among the crops.
     public static final DeferredBlock<ScarecrowBlock> SCARECROW = BLOCKS.registerBlock("scarecrow",
             ScarecrowBlock::new, p -> treatedWood(p).strength(0.8F).noOcclusion().forceSolidOff().pushReaction(PushReaction.POPPED));
+
+    // Farm processing. The Millstone is rustic (stone on a treated-wood frame, broken with a pickaxe); the Mill, Oil
+    // Press and Seed Extractor are FE machines, and the Grain Dryer runs on heat.
+    public static final DeferredBlock<MillstoneBlock> MILLSTONE = BLOCKS.registerBlock("millstone",
+            MillstoneBlock::new, p -> p.mapColor(MapColor.STONE).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.STONE).noOcclusion());
+    public static final DeferredBlock<MillBlock> MILL = BLOCKS.registerBlock("mill",
+            MillBlock::new, p -> machineProperties(p, 0));
+    public static final DeferredBlock<OilPressBlock> OIL_PRESS = BLOCKS.registerBlock("oil_press",
+            OilPressBlock::new, p -> machineProperties(p, 0));
+    public static final DeferredBlock<SeedExtractorBlock> SEED_EXTRACTOR = BLOCKS.registerBlock("seed_extractor",
+            SeedExtractorBlock::new, p -> machineProperties(p, 0));
+    // The heating element glows while it dries.
+    public static final DeferredBlock<GrainDryerBlock> GRAIN_DRYER = BLOCKS.registerBlock("grain_dryer",
+            GrainDryerBlock::new, p -> machineProperties(p, 7));
 
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);

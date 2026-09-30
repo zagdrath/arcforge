@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/grain_dryer_front_on",
+    "south": "arcforge:block/grain_dryer_back",
+    "east": "arcforge:block/grain_dryer_side",
+    "west": "arcforge:block/grain_dryer_side",
+    "up": "arcforge:block/grain_dryer_top",
+    "down": "arcforge:block/grain_dryer_bottom",
+    "particle": "arcforge:block/grain_dryer_side"
+  }
+}

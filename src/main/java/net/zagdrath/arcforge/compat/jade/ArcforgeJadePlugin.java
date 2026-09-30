@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.compat.jade;
 
+import java.util.List;
+
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
@@ -82,6 +84,15 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.FarmMachineBlockEntity.class);
         registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity.class);
         registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity.class);
+        for (Class<? extends net.minecraft.world.level.block.entity.BlockEntity> type : List.of(
+                net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.MillBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity.class)) {
+            registration.registerBlockDataProvider(FarmProcessingProvider.INSTANCE, type);
+        }
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, PressureGlassBlock.class);
         // Pressure Glass has no block entity: these read the array it belongs to.
@@ -129,6 +140,15 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(FarmingProviders.RusticMachine.Client.INSTANCE, net.zagdrath.arcforge.block.farming.FarmMachineBlock.class);
         registration.registerBlockComponent(FarmingProviders.RusticMachine.Client.INSTANCE, net.zagdrath.arcforge.block.farming.FertilizerSpreaderBlock.class);
         registration.registerBlockComponent(FarmingProviders.RusticMachine.Client.INSTANCE, net.zagdrath.arcforge.block.farming.CopperSprinklerBlock.class);
+        for (Class<? extends Block> type : List.of(
+                net.zagdrath.arcforge.block.farming.MillstoneBlock.class,
+                net.zagdrath.arcforge.block.machine.MillBlock.class,
+                net.zagdrath.arcforge.block.machine.OilPressBlock.class,
+                net.zagdrath.arcforge.block.machine.SeedExtractorBlock.class,
+                net.zagdrath.arcforge.block.machine.GrainDryerBlock.class,
+                net.zagdrath.arcforge.block.machine.FermenterBlock.class)) {
+            registration.registerBlockComponent(FarmProcessingProvider.Client.INSTANCE, type);
+        }
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

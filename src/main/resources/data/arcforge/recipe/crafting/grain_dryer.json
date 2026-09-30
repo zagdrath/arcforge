@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "BXB",
+    "PCP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "B": "minecraft:iron_bars",
+    "X": "minecraft:barrel",
+    "C": "#c:ingots/copper"
+  },
+  "result": {
+    "id": "arcforge:grain_dryer",
+    "count": 1
+  }
+}

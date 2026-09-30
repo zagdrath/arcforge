@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:seed_extracting",
+  "ingredient": "minecraft:melon_slice",
+  "result": {
+    "id": "minecraft:melon_seeds"
+  },
+  "bonus": {
+    "id": "minecraft:melon_seeds"
+  },
+  "bonus_chance": 0.5,
+  "time": 100
+}

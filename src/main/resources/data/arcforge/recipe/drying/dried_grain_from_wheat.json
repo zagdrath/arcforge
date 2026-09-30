@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:drying",
+  "ingredient": "minecraft:wheat",
+  "result": {
+    "id": "arcforge:dried_grain"
+  },
+  "time": 200,
+  "hu_per_tick": 4
+}

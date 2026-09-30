@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:oil_pressing",
+  "ingredient": "#arcforge:pressable_seeds",
+  "result": {
+    "id": "arcforge:seed_oil",
+    "amount": 25
+  },
+  "byproduct": {
+    "id": "arcforge:press_cake"
+  },
+  "byproduct_chance": 0.5,
+  "time": 60
+}

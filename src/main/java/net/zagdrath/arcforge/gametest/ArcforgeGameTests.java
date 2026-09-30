@@ -141,6 +141,7 @@ public final class ArcforgeGameTests {
         TESTS.put("firebox_heat_upgrades", CrushingGameTests::fireboxHeatUpgrades);
         TESTS.put("array_forms", CrushingGameTests::arrayForms);
         TESTS.put("press_slots_and_recipes", PressingGameTests::pressSlotsAndRecipes);
+        TESTS.put("press_every_plate_metal", PressingGameTests::everyPlateMetalHasGearsAndRods);
         TESTS.put("press_upgrades", PressingGameTests::pressUpgrades);
         TESTS.put("pressing_array_routes_input", PressingGameTests::arrayRoutesInput);
         TESTS.put("steam_gas_rules", SteamGameTests::gasRules);
@@ -248,6 +249,16 @@ public final class ArcforgeGameTests {
         TESTS.put("rustic_scarecrow_protects", RusticGameTests::scarecrowProtects);
         TESTS.put("rustic_sickle_reaps", RusticGameTests::sickleReaps);
         TESTS.put("rustic_recipes", RusticGameTests::recipes);
+        TESTS.put("processing_millstone_grinds", ProcessingGameTests::millstoneGrinds);
+        TESTS.put("processing_mill_three_lanes", ProcessingGameTests::millRunsThreeLanes);
+        TESTS.put("processing_oil_press_makes_oil", ProcessingGameTests::oilPressMakesOil);
+        TESTS.put("processing_seed_oil_lubricates", ProcessingGameTests::seedOilLubricates);
+        TESTS.put("processing_seed_extractor_threshes", ProcessingGameTests::seedExtractorThreshes);
+        TESTS.put("processing_grain_dryer_needs_heat", ProcessingGameTests::grainDryerNeedsHeat);
+        TESTS.put("processing_fermenter_hops_and_co2", ProcessingGameTests::fermenterHopsAndCarbonDioxide);
+        TESTS.put("processing_gas_output_side_mode", ProcessingGameTests::gasOutputSideMode);
+        TESTS.put("processing_flour_and_dried_crops", ProcessingGameTests::flourAndDriedCrops);
+        TESTS.put("processing_recipes", ProcessingGameTests::recipes);
         TESTS.put("advancement_tree_loads", AdvancementGameTests::treeLoads);
         TESTS.put("multiblock_formed_trigger", AdvancementGameTests::multiblockFormedTrigger);
         TESTS.put("turbine_full_speed_needs_length", AdvancementGameTests::turbineFullSpeedNeedsLength);

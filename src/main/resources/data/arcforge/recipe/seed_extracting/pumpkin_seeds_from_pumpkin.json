@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:seed_extracting",
+  "ingredient": "minecraft:pumpkin",
+  "result": {
+    "id": "minecraft:pumpkin_seeds",
+    "count": 4
+  },
+  "bonus": {
+    "id": "minecraft:pumpkin_seeds"
+  },
+  "bonus_chance": 0.5,
+  "time": 100
+}

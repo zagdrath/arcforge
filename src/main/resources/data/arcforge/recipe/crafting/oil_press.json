@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PXP",
+    "GCG",
+    "PBP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "X": "minecraft:piston",
+    "G": "#c:gears/steel",
+    "C": "minecraft:cauldron",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:oil_press",
+    "count": 1
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:drying",
+  "ingredient": "arcforge:hop_cones",
+  "result": {
+    "id": "arcforge:dried_hops"
+  },
+  "time": 200,
+  "hu_per_tick": 4
+}

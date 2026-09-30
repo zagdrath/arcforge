@@ -3,6 +3,7 @@
     "arcforge:compost",
     "arcforge:wood_ash",
     "arcforge:basic_slag",
-    "arcforge:mixed_fertilizer"
+    "arcforge:mixed_fertilizer",
+    "arcforge:seed_meal"
   ]
 }

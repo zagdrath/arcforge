@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:seed_extracting",
+  "ingredient": "arcforge:sorghum_stalks",
+  "result": {
+    "id": "arcforge:sorghum_seeds",
+    "count": 2
+  },
+  "bonus": {
+    "id": "arcforge:sorghum_seeds"
+  },
+  "bonus_chance": 0.5,
+  "time": 100
+}

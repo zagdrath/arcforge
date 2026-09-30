@@ -1,6 +1,10 @@
 {
   "values": [
     "#c:gears/steel",
-    "#c:gears/copper"
+    "#c:gears/copper",
+    "#c:gears/silver",
+    "#c:gears/nickel",
+    "#c:gears/tungsten",
+    "#c:gears/invar"
   ]
 }

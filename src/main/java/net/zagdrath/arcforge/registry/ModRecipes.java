@@ -30,10 +30,15 @@ import net.zagdrath.arcforge.recipe.InfusingRecipe;
 import net.zagdrath.arcforge.recipe.JetpackPlatingRecipe;
 import net.zagdrath.arcforge.recipe.MeltingRecipe;
 import net.zagdrath.arcforge.recipe.PressingRecipe;
+import net.zagdrath.arcforge.recipe.DryingRecipe;
+import net.zagdrath.arcforge.recipe.SeedExtractingRecipe;
+import net.zagdrath.arcforge.recipe.OilPressingRecipe;
+import net.zagdrath.arcforge.recipe.MillingRecipe;
 import net.zagdrath.arcforge.recipe.TierUpgradeRecipe;
 
 // Data-driven machine recipes: data/<namespace>/recipe/*.json with type arcforge:carbonizing,
-// arcforge:arcforge_smelting, arcforge:chemical_reacting, arcforge:crushing, arcforge:distilling, arcforge:electrolyzing, arcforge:fiberizing, arcforge:infusing, arcforge:melting or arcforge:pressing. All are synced to clients so GUI slots know what they accept,
+// arcforge:arcforge_smelting, arcforge:chemical_reacting, arcforge:crushing, arcforge:distilling, arcforge:electrolyzing, arcforge:fiberizing, arcforge:infusing, arcforge:melting, arcforge:pressing, and the farm processing
+// arcforge:milling, arcforge:oil_pressing, arcforge:seed_extracting and arcforge:drying. All are synced to clients so GUI slots know what they accept,
 // as are vanilla smelting recipes (for the Induction Furnaces).
 public final class ModRecipes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Arcforge.MODID);
@@ -62,6 +67,15 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("fermenting")));
     public static final Supplier<RecipeType<PressingRecipe>> PRESSING = RECIPE_TYPES.register("pressing",
             () -> RecipeType.simple(id("pressing")));
+    // Farm processing: the Millstone and Mill, the Oil Press, the Seed Extractor and the Grain Dryer.
+    public static final Supplier<RecipeType<MillingRecipe>> MILLING = RECIPE_TYPES.register("milling",
+            () -> RecipeType.simple(id("milling")));
+    public static final Supplier<RecipeType<OilPressingRecipe>> OIL_PRESSING = RECIPE_TYPES.register("oil_pressing",
+            () -> RecipeType.simple(id("oil_pressing")));
+    public static final Supplier<RecipeType<SeedExtractingRecipe>> SEED_EXTRACTING = RECIPE_TYPES.register("seed_extracting",
+            () -> RecipeType.simple(id("seed_extracting")));
+    public static final Supplier<RecipeType<DryingRecipe>> DRYING = RECIPE_TYPES.register("drying",
+            () -> RecipeType.simple(id("drying")));
 
     public static final Supplier<RecipeSerializer<CarbonizingRecipe>> CARBONIZING_SERIALIZER = RECIPE_SERIALIZERS.register("carbonizing",
             () -> new RecipeSerializer<>(CarbonizingRecipe.MAP_CODEC, CarbonizingRecipe.STREAM_CODEC));
@@ -85,6 +99,14 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(FermentingRecipe.MAP_CODEC, FermentingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<PressingRecipe>> PRESSING_SERIALIZER = RECIPE_SERIALIZERS.register("pressing",
             () -> new RecipeSerializer<>(PressingRecipe.MAP_CODEC, PressingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<MillingRecipe>> MILLING_SERIALIZER = RECIPE_SERIALIZERS.register("milling",
+            () -> new RecipeSerializer<>(MillingRecipe.MAP_CODEC, MillingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<OilPressingRecipe>> OIL_PRESSING_SERIALIZER = RECIPE_SERIALIZERS.register("oil_pressing",
+            () -> new RecipeSerializer<>(OilPressingRecipe.MAP_CODEC, OilPressingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<SeedExtractingRecipe>> SEED_EXTRACTING_SERIALIZER = RECIPE_SERIALIZERS.register("seed_extracting",
+            () -> new RecipeSerializer<>(SeedExtractingRecipe.MAP_CODEC, SeedExtractingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<DryingRecipe>> DRYING_SERIALIZER = RECIPE_SERIALIZERS.register("drying",
+            () -> new RecipeSerializer<>(DryingRecipe.MAP_CODEC, DryingRecipe.STREAM_CODEC));
     // A crafting recipe (vanilla's crafting type) that keeps the contents of what it upgrades.
     public static final Supplier<RecipeSerializer<TierUpgradeRecipe>> TIER_UPGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("tier_upgrade",
             () -> new RecipeSerializer<>(TierUpgradeRecipe.MAP_CODEC, TierUpgradeRecipe.STREAM_CODEC));
@@ -114,6 +136,7 @@ public final class ModRecipes {
     }
 
     private static void syncToClients(OnDatapackSyncEvent event) {
-        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(), RecipeType.SMELTING);
+        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
+                MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), RecipeType.SMELTING);
     }
 }

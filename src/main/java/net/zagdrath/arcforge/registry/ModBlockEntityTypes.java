@@ -19,6 +19,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.MillBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.HarvesterBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.PlanterBlockEntity;
 import net.zagdrath.arcforge.blockentity.redstone.ThrottleLeverBlockEntity;
@@ -117,6 +122,16 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(FertilizerSpreaderBlockEntity::new, ModBlocks.FERTILIZER_SPREADER.get()));
     public static final Supplier<BlockEntityType<CopperSprinklerBlockEntity>> COPPER_SPRINKLER = BLOCK_ENTITY_TYPES.register("copper_sprinkler",
             () -> new BlockEntityType<>(CopperSprinklerBlockEntity::new, ModBlocks.COPPER_SPRINKLER.get()));
+    public static final Supplier<BlockEntityType<MillstoneBlockEntity>> MILLSTONE = BLOCK_ENTITY_TYPES.register("millstone",
+            () -> new BlockEntityType<>(MillstoneBlockEntity::new, ModBlocks.MILLSTONE.get()));
+    public static final Supplier<BlockEntityType<MillBlockEntity>> MILL = BLOCK_ENTITY_TYPES.register("mill",
+            () -> new BlockEntityType<>(MillBlockEntity::new, ModBlocks.MILL.get()));
+    public static final Supplier<BlockEntityType<OilPressBlockEntity>> OIL_PRESS = BLOCK_ENTITY_TYPES.register("oil_press",
+            () -> new BlockEntityType<>(OilPressBlockEntity::new, ModBlocks.OIL_PRESS.get()));
+    public static final Supplier<BlockEntityType<SeedExtractorBlockEntity>> SEED_EXTRACTOR = BLOCK_ENTITY_TYPES.register("seed_extractor",
+            () -> new BlockEntityType<>(SeedExtractorBlockEntity::new, ModBlocks.SEED_EXTRACTOR.get()));
+    public static final Supplier<BlockEntityType<GrainDryerBlockEntity>> GRAIN_DRYER = BLOCK_ENTITY_TYPES.register("grain_dryer",
+            () -> new BlockEntityType<>(GrainDryerBlockEntity::new, ModBlocks.GRAIN_DRYER.get()));
 
     public static final Supplier<BlockEntityType<ChargepadBlockEntity>> CHARGEPAD = BLOCK_ENTITY_TYPES.register("chargepad",
             () -> new BlockEntityType<>(ChargepadBlockEntity::new, ModBlocks.CHARGEPAD.get()));

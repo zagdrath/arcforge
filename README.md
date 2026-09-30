@@ -435,6 +435,10 @@ berries; recipes are data-driven, `arcforge:fermenting`). Crops go in on top, bo
 energy at the back; 8,000 mB tanks of water and ethanol; Speed and Energy upgrades. Ethanol burns in the Fuel
 Burner and the Gas Turbine Array, and catches fire in the world like Naphtha.
 
+Dried Hops (from the Grain Dryer) in its additive slot add 20% Ethanol, one lasting 4 operations, and Dried Grain
+and Dried Sorghum ferment in half the time. Fermenting gives off **Carbon Dioxide** (a gas, 1 mB per mB of Ethanol)
+out of any face set to Gas Output; with none, or with its 4,000 mB tank full, it goes into the air.
+
 ### Automation
 
 **Assembler** (Tempered). An automatic crafting table.

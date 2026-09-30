@@ -223,6 +223,18 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.IRON_SICKLE.get());
                 output.accept(ModItems.STEEL_SICKLE.get());
                 output.accept(ModItems.STEEL_SCYTHE.get());
+                output.accept(ModItems.MILLSTONE.get());
+                output.accept(ModItems.MILL.get());
+                output.accept(ModItems.OIL_PRESS.get());
+                output.accept(ModItems.SEED_EXTRACTOR.get());
+                output.accept(ModItems.GRAIN_DRYER.get());
+                output.accept(ModItems.FLOUR.get());
+                output.accept(ModItems.SEED_MEAL.get());
+                output.accept(ModItems.PRESS_CAKE.get());
+                output.accept(ModItems.SEED_OIL_BUCKET.get());
+                output.accept(ModItems.DRIED_HOPS.get());
+                output.accept(ModItems.DRIED_GRAIN.get());
+                output.accept(ModItems.DRIED_SORGHUM.get());
             }).build());
 
     private ModCreativeTabs() {}

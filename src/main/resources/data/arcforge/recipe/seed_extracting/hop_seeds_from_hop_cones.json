@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:seed_extracting",
+  "ingredient": "arcforge:hop_cones",
+  "result": {
+    "id": "arcforge:hop_seeds"
+  },
+  "bonus": {
+    "id": "arcforge:hop_seeds"
+  },
+  "bonus_chance": 0.25,
+  "time": 100
+}

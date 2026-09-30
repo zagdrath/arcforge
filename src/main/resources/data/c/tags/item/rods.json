@@ -1,6 +1,10 @@
 {
   "values": [
     "#c:rods/steel",
-    "#c:rods/copper"
+    "#c:rods/copper",
+    "#c:rods/silver",
+    "#c:rods/nickel",
+    "#c:rods/tungsten",
+    "#c:rods/invar"
   ]
 }

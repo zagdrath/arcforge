@@ -8,6 +8,8 @@
     "minecraft:sugar_cane",
     "minecraft:sweet_berries",
     "minecraft:melon_slice",
-    "arcforge:sorghum_stalks"
+    "arcforge:sorghum_stalks",
+    "arcforge:dried_grain",
+    "arcforge:dried_sorghum"
   ]
 }

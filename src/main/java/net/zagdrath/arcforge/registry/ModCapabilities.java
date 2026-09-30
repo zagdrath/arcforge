@@ -200,6 +200,28 @@ public final class ModCapabilities {
                 FermenterBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.FERMENTER.get(),
                 FermenterBlockEntity::getEnergyHandler);
+        // Farm processing: the Millstone's items; the Mill, Oil Press and Seed Extractor's items and FE (and the press's
+        // oil); the Grain Dryer's items and heat.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.MILLSTONE.get(),
+                net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.MILL.get(),
+                net.zagdrath.arcforge.blockentity.machine.MillBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.MILL.get(),
+                net.zagdrath.arcforge.blockentity.machine.MillBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.OIL_PRESS.get(),
+                net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.OIL_PRESS.get(),
+                net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.OIL_PRESS.get(),
+                net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.SEED_EXTRACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.SEED_EXTRACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.GRAIN_DRYER.get(),
+                net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity::getItemHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.GRAIN_DRYER.get(),
+                net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
                 ChemicalReactorBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),

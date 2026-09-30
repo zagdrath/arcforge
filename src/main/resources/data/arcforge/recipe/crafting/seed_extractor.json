@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "GSG",
+    "PBP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "H": "minecraft:hopper",
+    "G": "#c:gears/steel",
+    "S": "minecraft:shears",
+    "B": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:seed_extractor",
+    "count": 1
+  }
+}

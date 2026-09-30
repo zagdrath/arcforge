@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:milling",
+  "ingredient": "#c:seeds",
+  "result": {
+    "id": "arcforge:seed_meal"
+  },
+  "turns": 1,
+  "time": 60
+}

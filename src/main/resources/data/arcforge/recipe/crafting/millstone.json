@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " R ",
+    "SGS",
+    "PPP"
+  ],
+  "key": {
+    "R": "#c:rods/wooden",
+    "S": "minecraft:smooth_stone_slab",
+    "G": "minecraft:grindstone",
+    "P": "arcforge:treated_planks"
+  },
+  "result": {
+    "id": "arcforge:millstone",
+    "count": 1
+  }
+}

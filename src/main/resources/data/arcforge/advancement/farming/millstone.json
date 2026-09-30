@@ -1,0 +1,38 @@
+{
+  "parent": "arcforge:farming/new_crop",
+  "display": {
+    "icon": {
+      "id": "arcforge:millstone"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.millstone.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.millstone.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "millstone": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:millstone"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "millstone"
+    ]
+  ]
+}

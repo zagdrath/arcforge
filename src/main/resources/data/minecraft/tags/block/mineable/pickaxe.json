@@ -121,6 +121,11 @@
     "arcforge:chargepad",
     "arcforge:fermenter",
     "arcforge:gas_turbine_array_casing",
-    "arcforge:copper_sprinkler"
+    "arcforge:copper_sprinkler",
+    "arcforge:millstone",
+    "arcforge:mill",
+    "arcforge:oil_press",
+    "arcforge:seed_extractor",
+    "arcforge:grain_dryer"
   ]
 }

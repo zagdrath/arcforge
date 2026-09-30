@@ -724,6 +724,27 @@ public class ArcforgeConfig {
             .comment("Ethanol tank size in mB.")
             .defineInRange("ethanolTank", 8_000, 1_000, 1_000_000);
 
+    public static final ModConfigSpec.DoubleValue FERMENTER_ADDITIVE_BONUS = BUILDER
+            .comment("Extra Ethanol from each operation while the additive slot holds Dried Hops (#arcforge:fermenter_additives): 0.2 = +20%.")
+            .defineInRange("additiveBonus", 0.2, 0.0, 10.0);
+
+    public static final ModConfigSpec.IntValue FERMENTER_ADDITIVE_OPERATIONS = BUILDER
+            .comment("Operations one Dried Hops lasts.")
+            .defineInRange("additiveOperations", 4, 1, 1_000);
+
+    public static final ModConfigSpec.DoubleValue FERMENTER_CO2_PER_ETHANOL = BUILDER
+            .comment("Carbon Dioxide given off per mB of Ethanol made. It leaves through Gas Output faces; what doesn't fit in the "
+                    + "tank goes into the air.")
+            .defineInRange("carbonDioxidePerEthanol", 1.0, 0.0, 100.0);
+
+    public static final ModConfigSpec.IntValue FERMENTER_CO2_TANK = BUILDER
+            .comment("Carbon Dioxide tank size in mB.")
+            .defineInRange("carbonDioxideTank", 4_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FERMENTER_GAS_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of Carbon Dioxide it pushes out of its Gas Output faces (shared across them).")
+            .defineInRange("gasOutputRate", 100, 1, 1_000_000);
+
     static {
         BUILDER.pop();
     }
@@ -1497,6 +1518,10 @@ public class ArcforgeConfig {
             .comment("Nutrients from one Mixed Fertilizer.")
             .defineInRange("mixedFertilizer", 8, 0, 15);
 
+    public static final ModConfigSpec.IntValue SEED_MEAL_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Seed Meal (milled seeds).")
+            .defineInRange("seedMeal", 1, 0, 15);
+
     public static final ModConfigSpec.DoubleValue WOOD_ASH_CHANCE = BUILDER
             .comment("Chance that burning one item of #arcforge:leaves_wood_ash (charcoal) in a Firebox or Combustion Plant",
                     "leaves a Wood Ash in its ash slot. A full ash slot loses it.")
@@ -1608,6 +1633,117 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue SCYTHE_RADIUS = BUILDER
             .comment("Scythe area: a square of (2 x radius + 1) crops around the one used (2 = 5x5).")
             .defineInRange("scytheRadius", 2, 0, 8);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Millstone: an unpowered quern. Recipes (arcforge:milling) set how many turns an item takes.").push("millstone");
+    }
+
+    public static final ModConfigSpec.IntValue MILLSTONE_HAND_COOLDOWN = BUILDER
+            .comment("Ticks between turns by hand, so holding use turns it at a steady pace.")
+            .defineInRange("handCooldown", 5, 0, 200);
+
+    public static final ModConfigSpec.IntValue MILLSTONE_TURNS_PER_PULSE = BUILDER
+            .comment("Turns each rising redstone pulse gives it.")
+            .defineInRange("turnsPerPulse", 1, 1, 64);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Mill: the powered Millstone, with three lanes. Recipes (arcforge:milling) set the time per item.").push("mill");
+    }
+
+    public static final ModConfigSpec.IntValue MILL_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue MILL_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue MILL_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t for each lane that is milling, before upgrades.")
+            .defineInRange("energyPerTick", 8, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue MILL_TIME_MULTIPLIER = BUILDER
+            .comment("Each lane's time per item, as a share of the recipe's time (0.5 = twice as fast), before Speed upgrades.")
+            .defineInRange("timeMultiplier", 0.5, 0.01, 100.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Oil Press: presses seeds into Seed Oil and Press Cake. Recipes (arcforge:oil_pressing) set the oil, cake and time.")
+                .push("oilPress");
+    }
+
+    public static final ModConfigSpec.IntValue OIL_PRESS_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue OIL_PRESS_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue OIL_PRESS_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while pressing, before upgrades (unless a recipe sets its own energy).")
+            .defineInRange("energyPerTick", 16, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue OIL_PRESS_OIL_TANK = BUILDER
+            .comment("Seed Oil tank size in mB.")
+            .defineInRange("oilTank", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue OIL_PRESS_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of Seed Oil it pushes out of its Output faces (shared across them).")
+            .defineInRange("fluidOutputRate", 100, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Seed Extractor: threshes crops into extra seeds. Recipes (arcforge:seed_extracting) set the seeds and time.")
+                .push("seedExtractor");
+    }
+
+    public static final ModConfigSpec.IntValue SEED_EXTRACTOR_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue SEED_EXTRACTOR_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue SEED_EXTRACTOR_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while threshing, before upgrades.")
+            .defineInRange("energyPerTick", 10, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Grain Dryer: dries Hop Cones, grain and sorghum with heat (HU), no FE. Recipes (arcforge:drying) set the time "
+                + "and HU/t.").push("grainDryer");
+    }
+
+    public static final ModConfigSpec.IntValue GRAIN_DRYER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 4_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue GRAIN_DRYER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 250, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue GRAIN_DRYER_MIN_TEMPERATURE = BUILDER
+            .comment("It only dries while its heat buffer is above this, in °C.")
+            .defineInRange("minTemperature", 60, 21, 10_000);
 
     static {
         BUILDER.pop();

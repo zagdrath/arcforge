@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:gear_die",
+  "ingredient": "#c:ingots/silver",
+  "count": 4,
+  "result": {
+    "id": "arcforge:silver_gear",
+    "count": 1
+  },
+  "time": 100
+}

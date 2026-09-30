@@ -1,0 +1,16 @@
+{
+  "title": "Grain Dryer",
+  "icon": "arcforge:grain_dryer",
+  "items": [
+    "arcforge:grain_dryer",
+    "arcforge:dried_hops",
+    "arcforge:dried_grain",
+    "arcforge:dried_sorghum"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Grain Dryer dries crops with heat and no FE. It only works while it's above 60°C, so it needs a heat source: a Firebox, a Geothermal Plant or a warm Heat Cell against its heat face (the back, by default). It takes 4 HU/t and 10 s per item.\n| In | Out |\n| Hop Cones | Dried Hops |\n| Wheat | Dried Grain |\n| Sorghum Stalks | Dried Sorghum |\nDried Grain and Dried Sorghum ferment in half the time, for the same Ethanol. Dried Hops go in the Fermenter's additive slot. Speed and Heat upgrades work."
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "parent": "arcforge:farming/millstone",
+  "display": {
+    "icon": {
+      "id": "arcforge:seed_oil_bucket"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.seed_oil.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.seed_oil.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "oil_press": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:oil_press"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "oil_press"
+    ]
+  ]
+}

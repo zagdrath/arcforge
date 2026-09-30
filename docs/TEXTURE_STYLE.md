@@ -531,3 +531,40 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   `#E6E6E6 / #9A9A9A`, the steel one the hoe's `#C4C9CF / #7D8289`, with a bright edge on the inside of the curve.
 - Wild crops use the grown crop's own model and textures (Wild Hops: the bearing vine as a cross); they have no art of
   their own.
+
+## Farm processing
+- The Mill, Oil Press, Seed Extractor and Grain Dryer are single-block machine casings (section 3) with the 8x8 ports
+  at their default faces: input on top, output underneath, and energy (the Grain Dryer: heat) at the back. The sides are
+  the casing with a 3-slat vent. The front is a recessed window (x3..12) showing the machine at work, with a 4-frame
+  `_on` animation:
+  - Mill: a buhrstone runner edge-on over its bed stone on a steel spindle; the dressing grooves move and flour falls.
+  - Oil Press: a steel ram and platen over a seed bed in a trough, an amber oil pan; the platen presses down and drips.
+  - Seed Extractor: a threshing drum with rasp bars over a sieve; the bars turn and seeds fall.
+  - Grain Dryer: three slatted racks of cones and grain over a heating element, `#3A2C23` off and heat orange on.
+- Buhrstone (millstones) is a warm grit stone, not machine steel: `#4A4436 #6A614E #8A7F66 #A89C80 #C2B79B`.
+- Millstone: a rustic UV-unwrapped model (see "Rustic farming machines") on one 64x64 sheet. A treated-wood table on
+  log legs with an iron band and a spout at the front, a bed stone one step darker, and the runner stone (its top cut
+  with four dressing furrows) with an iron rynd and a log handle peg. The runner is its own model, stepped a quarter
+  turn per TURN by the blockstate.
+- Items: Flour and Seed Meal are the dust texture recoloured (flour `#6E6454 -> #FBF8EE`, meal `#3E2E1A -> #D8BE88`);
+  Dried Hops, Dried Sorghum and Dried Grain are Hop Cones, Sorghum Stalks and the Rapeseeds cluster recoloured to straw
+  and wheat gold; Press Cake is drawn: a round cake with weave marks and a `#0C0D0F` outline.
+- Seed Oil: Ethanol's fluid frames recoloured onto amber `#7A5010 -> #FFE08A`, a little more opaque. Carbon Dioxide
+  uses the steam texture tinted `#B4BCC4`.
+- The Gas Output port is the output ring round a gas-white chip; its Sides-tab face is the output face's orange bevel
+  round `#DCE6F0`.
+
+## Plates, gears and rods
+- Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
+  every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),
+  quantised into 6 brightness levels, and recoloured by level onto the metal's 5-tone item ramp, with a sixth tone
+  (the darkest ×0.72) for his own tonal outline: no `#0C0D0F` black.
+  - Steel `#2E3237 #484C54 #5C646C #747880 #A8AFB6`; copper `#8A4822 #AE6632 #C98244 #E0A062 #F6C898`;
+    silver `#4B5663 #5E6C7C #98A8BA #CAD8E6 #FFFFFF`; nickel `#584E2B #6E6236 #AFA26A #DDD29C #FFF9DC`;
+    tungsten `#25292D #2E3338 #545B63 #7C848D #B4BBC2`; invar `#4A4E46 #5C6258 #8E9588 #BCC2B4 #E6EADE`.
+  - A new metal's plate or gear uses the same level maps (`plate_levels` / `gear_levels`) on its own ramp.
+- Rods follow the plate and gear: a 6-level map (`rod_levels`) painted on the same tones, with no `#0C0D0F` black.
+  A 4 px diagonal body (bottom-left to top-right) between a tonal outline: the upper-left edge on tone 1, the
+  lower-right edge on the darker outline tone. Across the body: highlight (5/4), bright (4/3), mid (3/2), shade (2/1),
+  varied row by row for the same grain as the plate. The top end is a lit cut face; the bottom end sits in shadow.
+- Every metal with a plate also gets a gear and a rod.

@@ -47,6 +47,8 @@ import net.zagdrath.arcforge.menu.machine.FermenterMenu;
 import net.zagdrath.arcforge.recipe.FermentingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModFluids;
+import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
@@ -54,19 +56,30 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Ferments crops and water into Ethanol with FE (arcforge:fermenting recipes): a crop and 100 mB of water become
-// 20-60 mB of Ethanol over 200 ticks, now and then with some Bone Meal. Crops and water come in through input faces,
-// Ethanol and the byproduct leave through output faces; a full tank or byproduct slot pauses it. Speed upgrades make
-// it faster (drawing FE just as much faster), Energy upgrades cut the FE per operation.
+// 20-80 mB of Ethanol over 200 ticks (Dried Grain and Dried Sorghum in half that), now and then with some Bone Meal.
+// Crops, the additive and water come in through input faces; Ethanol and the byproduct leave through output faces; a
+// full tank or byproduct slot pauses it.
+// Additive: while the additive slot holds Dried Hops (#arcforge:fermenter_additives), each operation makes additiveBonus
+// more Ethanol (+20%), and one lasts additiveOperations operations.
+// Carbon Dioxide: each operation gives off carbonDioxidePerEthanol mB per mB of Ethanol into its gas tank, pushed out of
+// Gas Output faces; what doesn't fit goes into the air, so it never stops the Fermenter.
+// Speed upgrades make it faster (drawing FE just as much faster), Energy upgrades cut the FE per operation.
 public class FermenterBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_BYPRODUCT = 1;
-    public static final int MACHINE_SLOTS = 2;
+    public static final int SLOT_ADDITIVE = 2;
+    public static final int MACHINE_SLOTS = 3;
+    // Saves before the additive slot (layout 1) had the upgrade slots straight after the byproduct slot.
+    private static final int SLOT_LAYOUT = 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.GAS_OUTPUT);
 
     private final ConsumerEnergyHandler energy;
     private final FilteredFluidTank water;
     private final FilteredFluidTank ethanol;
+    private final FilteredFluidTank carbonDioxide;
+    private final ResourceHandler<FluidResource> carbonDioxideOutput;
+    private final ResourceHandler<FluidResource> fluidAutomation;
     private final ResourceHandler<FluidResource> waterInput;
     private final ResourceHandler<FluidResource> ethanolOutput;
     private final ResourceHandler<FluidResource> fluidInteraction;
@@ -77,6 +90,8 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
     private int progress;
     private int total;
     private int usage;
+    // Operations the Dried Hops already taken from the additive slot still boost.
+    private int additiveLeft;
 
     public FermenterBlockEntity(BlockPos pos, BlockState state) {
         // Defaults: top input, bottom output, back energy.
@@ -90,7 +105,11 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         this.waterInput = new AutomationResourceHandler<>(water, index -> true, index -> false);
         this.ethanolOutput = new AutomationResourceHandler<>(ethanol, index -> false, index -> true);
         this.fluidInteraction = new CombinedResourceHandler<>(ethanolOutput, waterInput);
-        this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> false);
+        this.carbonDioxide = new FilteredFluidTank(ArcforgeConfig.FERMENTER_CO2_TANK.getAsInt(), resource -> resource.is(ModFluids.CARBON_DIOXIDE.get()),
+                this::setChanged);
+        this.carbonDioxideOutput = new AutomationResourceHandler<>(carbonDioxide, index -> false, index -> true);
+        this.fluidAutomation = new CombinedResourceHandler<>(ethanolOutput, waterInput, carbonDioxideOutput);
+        this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT || slot == SLOT_ADDITIVE, slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_BYPRODUCT);
         this.data = new WideIntContainerData(FermenterMenu.DATA_VALUES) {
             @Override
@@ -109,16 +128,38 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
                     case FermenterMenu.DATA_STATUS -> status.ordinal();
                     case FermenterMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case FermenterMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case FermenterMenu.DATA_CO2 -> carbonDioxide.getAmount();
+                    case FermenterMenu.DATA_CO2_CAPACITY -> carbonDioxide.getCapacity();
+                    case FermenterMenu.DATA_ADDITIVE_LEFT -> additiveLeft;
                     default -> 0;
                 };
             }
         };
     }
 
-    // The input slot takes any fermenting ingredient; nothing goes into the byproduct slot. The client passes a null
-    // level and checks against the recipes the server synced.
+    // The input slot takes any fermenting ingredient and the additive slot Dried Hops; nothing goes into the byproduct
+    // slot. The client passes a null level and checks against the recipes the server synced.
     public static boolean isItemValid(@Nullable Level level, int slot, ItemResource resource) {
-        return slot == SLOT_INPUT && MachineRecipes.isFermenterInput(level, resource.toStack(1));
+        return switch (slot) {
+            case SLOT_INPUT -> MachineRecipes.isFermenterInput(level, resource.toStack(1));
+            case SLOT_ADDITIVE -> isAdditive(resource.toStack(1));
+            default -> false;
+        };
+    }
+
+    public static boolean isAdditive(ItemStack stack) {
+        return stack.is(ModItemTags.FERMENTER_ADDITIVES);
+    }
+
+    // Whether this operation gets the additive's bonus: Dried Hops already taken, or one in the slot to take.
+    private boolean additiveReady() {
+        return additiveLeft > 0 || isAdditive(items.getStack(SLOT_ADDITIVE));
+    }
+
+    // The Ethanol this recipe makes now, with the additive's bonus if there is one.
+    public int ethanolFor(FermentingRecipe recipe) {
+        int base = recipe.result().amount();
+        return additiveReady() ? (int) Math.round(base * (1.0 + ArcforgeConfig.FERMENTER_ADDITIVE_BONUS.getAsDouble())) : base;
     }
 
     public static MachineItemHandler clientItems() {
@@ -167,14 +208,29 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         setLit(status == MachineStatus.FERMENTING);
 
         outputs.pushFluid(level, pos, getFacing(), sideConfig, ethanolOutput, ArcforgeConfig.MELTER_OUTPUT_RATE.getAsInt(), null);
+        pushGas(level, pos);
         autoEject(level, itemOutput);
+    }
+
+    // Carbon Dioxide out of Gas Output faces, up to gasOutputRate mB/t shared across them.
+    private void pushGas(ServerLevel level, BlockPos pos) {
+        int budget = ArcforgeConfig.FERMENTER_GAS_OUTPUT_RATE.getAsInt();
+        for (Direction direction : Direction.values()) {
+            if (budget <= 0 || carbonDioxide.getAmount() <= 0) {
+                return;
+            }
+            if (sideConfig.get(getFacing(), direction) == SideMode.GAS_OUTPUT) {
+                budget -= outputs.pushFluid(level, pos, direction, carbonDioxideOutput, budget);
+            }
+        }
     }
 
     // Whether the ethanol and (if it might come) the byproduct fit.
     private boolean fits(FermentingRecipe recipe) {
         FluidStack result = recipe.result().create();
+        int amount = ethanolFor(recipe);
         try (Transaction tx = Transaction.openRoot()) {
-            if (ethanol.insert(0, FluidResource.of(result), result.getAmount(), tx) != result.getAmount()) {
+            if (ethanol.insert(0, FluidResource.of(result), amount, tx) != amount) {
                 return false;
             }
         }
@@ -188,9 +244,23 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
 
     private void ferment(ServerLevel level, FermentingRecipe recipe) {
         FluidStack result = recipe.result().create();
+        int amount = ethanolFor(recipe);
+        if (additiveLeft <= 0 && isAdditive(items.getStack(SLOT_ADDITIVE))) {
+            ItemStack additive = items.getStack(SLOT_ADDITIVE);
+            items.setStack(SLOT_ADDITIVE, additive.copyWithCount(additive.getCount() - 1));
+            additiveLeft = ArcforgeConfig.FERMENTER_ADDITIVE_OPERATIONS.getAsInt();
+        }
+        if (additiveLeft > 0) {
+            additiveLeft--;
+        }
         try (Transaction tx = Transaction.openRoot()) {
             water.extract(0, water.getResource(0), recipe.fluidInput().amount(), tx);
-            ethanol.insert(0, FluidResource.of(result), result.getAmount(), tx);
+            ethanol.insert(0, FluidResource.of(result), amount, tx);
+            // The gas that doesn't fit goes into the air.
+            int gas = (int) Math.round(amount * ArcforgeConfig.FERMENTER_CO2_PER_ETHANOL.getAsDouble());
+            if (gas > 0) {
+                carbonDioxide.insert(0, FluidResource.of(ModFluids.CARBON_DIOXIDE.get()), gas, tx);
+            }
             tx.commit();
         }
         ItemStack input = items.getStack(SLOT_INPUT);
@@ -208,6 +278,14 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
 
     public FilteredFluidTank getEthanol() {
         return ethanol;
+    }
+
+    public FilteredFluidTank getCarbonDioxide() {
+        return carbonDioxide;
+    }
+
+    public int getAdditiveLeft() {
+        return additiveLeft;
     }
 
     public ConsumerEnergyHandler getEnergy() {
@@ -235,9 +313,14 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
         if (mode == null) {
-            return fluidInteraction;
+            return fluidAutomation;
         }
-        return mode == SideMode.INPUT ? waterInput : mode == SideMode.OUTPUT ? ethanolOutput : null;
+        return switch (mode) {
+            case INPUT -> waterInput;
+            case OUTPUT -> ethanolOutput;
+            case GAS_OUTPUT -> carbonDioxideOutput;
+            default -> null;
+        };
     }
 
     public @Nullable EnergyHandler getEnergyHandler(@Nullable Direction side) {
@@ -257,7 +340,8 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         return switch (type) {
             case ITEM, FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case GAS, THERMAL -> ConnectionMode.NONE;
+            case GAS -> mode == SideMode.GAS_OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case THERMAL -> ConnectionMode.NONE;
         };
     }
 
@@ -267,7 +351,17 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         energy.deserialize(input.childOrEmpty("energy"));
         water.deserialize(input.childOrEmpty("water"));
         ethanol.deserialize(input.childOrEmpty("ethanol"));
+        carbonDioxide.deserialize(input.childOrEmpty("carbon_dioxide"));
         progress = input.getIntOr("progress", 0);
+        additiveLeft = input.getIntOr("additive_left", 0);
+        if (input.getIntOr("slot_layout", 1) < SLOT_LAYOUT) {
+            // Layout 1 was input, byproduct, then the upgrade slots: move the upgrades up past the new additive slot.
+            items.ensureSize(MACHINE_SLOTS + UPGRADE_SLOTS);
+            for (int slot = MACHINE_SLOTS + UPGRADE_SLOTS - 1; slot > SLOT_ADDITIVE; slot--) {
+                items.setStack(slot, items.getStack(slot - 1));
+            }
+            items.setStack(SLOT_ADDITIVE, ItemStack.EMPTY);
+        }
     }
 
     @Override
@@ -276,7 +370,10 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         energy.serialize(output.child("energy"));
         water.serialize(output.child("water"));
         ethanol.serialize(output.child("ethanol"));
+        carbonDioxide.serialize(output.child("carbon_dioxide"));
         output.putInt("progress", progress);
+        output.putInt("additive_left", additiveLeft);
+        output.putInt("slot_layout", SLOT_LAYOUT);
     }
 
     @Override

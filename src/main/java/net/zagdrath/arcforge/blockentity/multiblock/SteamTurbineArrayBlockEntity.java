@@ -151,6 +151,8 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
                     case SteamTurbineArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
                     case SteamTurbineArrayMenu.DATA_LUBRICANT -> lubricant.getAmount();
                     case SteamTurbineArrayMenu.DATA_LUBRICANT_CAPACITY -> lubricant.getCapacity();
+                    case SteamTurbineArrayMenu.DATA_LUBRICANT_FLUID -> lubricant.getAmount() > 0
+                            ? net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(lubricant.getResource(0).getFluid()) : -1;
                     case SteamTurbineArrayMenu.DATA_EXHAUST -> !hasExhaust ? SteamTurbineArrayMenu.EXHAUST_VENTING
                             : vacuum ? SteamTurbineArrayMenu.EXHAUST_VACUUM : SteamTurbineArrayMenu.EXHAUST_FULL;
                     default -> 0;
