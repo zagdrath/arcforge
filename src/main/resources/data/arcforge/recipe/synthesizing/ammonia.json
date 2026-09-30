@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:synthesizing",
+  "inputs": [
+    {
+      "fluid": "arcforge:hydrogen",
+      "amount": 60
+    },
+    {
+      "fluid": "arcforge:nitrogen",
+      "amount": 20
+    }
+  ],
+  "output": {
+    "id": "arcforge:ammonia",
+    "amount": 40
+  },
+  "time": 20,
+  "heat_per_tick": 10
+}

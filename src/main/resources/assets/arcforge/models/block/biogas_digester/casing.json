@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "arcforge:block/biogas_digester/casing",
+    "end": "arcforge:block/biogas_digester/casing_top"
+  }
+}

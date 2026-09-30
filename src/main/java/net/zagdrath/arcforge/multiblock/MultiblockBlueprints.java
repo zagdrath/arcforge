@@ -17,6 +17,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
+import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
@@ -68,7 +69,8 @@ public final class MultiblockBlueprints {
                 steamTurbineArray(),
                 gasTurbineArray(),
                 distillationArray(),
-                solarThermalArray());
+                solarThermalArray(),
+                biogasDigester());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -169,6 +171,22 @@ public final class MultiblockBlueprints {
             }
         }
         return new Blueprint("solar_thermal_array", placements, new BlockPos(2, SolarThermalStructure.HEIGHT, 2));
+    }
+
+    // A solid 3x3x3 of Digester Casings with the controller in the middle of the front (facing south).
+    private static Blueprint biogasDigester() {
+        BlockState casing = ModBlocks.DIGESTER_CASING.get().defaultBlockState();
+        BlockState controller = ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get().defaultBlockState()
+                .setValue(BiogasDigesterControllerBlock.FACING, Direction.SOUTH);
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < 3; y++) {
+            for (int z = 0; z < 3; z++) {
+                for (int x = 0; x < 3; x++) {
+                    placements.add(new Placement(new BlockPos(x, y, z), x == 1 && y == 1 && z == 2 ? controller : casing));
+                }
+            }
+        }
+        return new Blueprint("biogas_digester", placements, new BlockPos(3, 3, 3));
     }
 
     // 2x2, 8 tall (4 and 6 work too): casings top and bottom, the controller at the front of the second

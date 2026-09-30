@@ -126,6 +126,10 @@
     "arcforge:mill",
     "arcforge:oil_press",
     "arcforge:seed_extractor",
-    "arcforge:grain_dryer"
+    "arcforge:grain_dryer",
+    "arcforge:air_separator",
+    "arcforge:haber_reactor",
+    "arcforge:digester_casing",
+    "arcforge:biogas_digester_controller"
   ]
 }

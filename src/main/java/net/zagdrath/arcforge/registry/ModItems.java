@@ -259,6 +259,10 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.SULFURIC_ACID.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SEED_OIL_BUCKET = ITEMS.registerItem("seed_oil_bucket",
             p -> new BucketItem(ModFluids.SEED_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> NUTRIENT_SOLUTION_BUCKET = ITEMS.registerItem("nutrient_solution_bucket",
+            p -> new BucketItem(ModFluids.NUTRIENT_SOLUTION.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> BIODIESEL_BUCKET = ITEMS.registerItem("biodiesel_bucket",
+            p -> new BucketItem(ModFluids.BIODIESEL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
 
     private static final Map<OreSlurry, DeferredItem<BucketItem>> SLURRY_BUCKETS = registerSlurryBuckets();
 
@@ -438,6 +442,17 @@ public final class ModItems {
     public static final DeferredItem<Item> DRIED_HOPS = ITEMS.registerSimpleItem("dried_hops", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<Item> DRIED_GRAIN = ITEMS.registerSimpleItem("dried_grain", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<Item> DRIED_SORGHUM = ITEMS.registerSimpleItem("dried_sorghum", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+
+    // Farm chemistry: the machines, and the fertilizers they lead to. NPK Fertilizer fills Loam Farmland and enriches it
+    // (crops on it grow faster than on any other fertilizer); Digestate, the Biogas Digester's by-product, is a middling one.
+    public static final DeferredItem<BlockItem> AIR_SEPARATOR = ITEMS.registerSimpleBlockItem(ModBlocks.AIR_SEPARATOR);
+    public static final DeferredItem<BlockItem> HABER_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.HABER_REACTOR);
+    public static final DeferredItem<BlockItem> BIOGAS_DIGESTER_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.BIOGAS_DIGESTER_CONTROLLER);
+    public static final DeferredItem<BlockItem> DIGESTER_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.DIGESTER_CASING);
+    public static final DeferredItem<FertilizerItem> NPK_FERTILIZER = ITEMS.registerItem("npk_fertilizer",
+            p -> new FertilizerItem(ArcforgeConfig.NPK_NUTRIENTS::getAsInt, true, p));
+    public static final DeferredItem<FertilizerItem> DIGESTATE = ITEMS.registerItem("digestate",
+            p -> new FertilizerItem(ArcforgeConfig.DIGESTATE_NUTRIENTS::getAsInt, p));
 
     // --- Solar Thermal Array ---
 

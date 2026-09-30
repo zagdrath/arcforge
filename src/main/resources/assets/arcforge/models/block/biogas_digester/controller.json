@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/biogas_digester/controller_unformed",
+    "particle": "arcforge:block/biogas_digester/casing",
+    "south": "arcforge:block/biogas_digester/casing",
+    "east": "arcforge:block/biogas_digester/casing",
+    "west": "arcforge:block/biogas_digester/casing",
+    "up": "arcforge:block/biogas_digester/casing_top",
+    "down": "arcforge:block/biogas_digester/casing_top"
+  }
+}

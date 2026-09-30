@@ -1,0 +1,19 @@
+{
+  "title": "NPK Fertilizer",
+  "icon": "arcforge:npk_fertilizer",
+  "items": [
+    "arcforge:npk_fertilizer",
+    "arcforge:nutrient_solution_bucket",
+    "arcforge:biodiesel_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Chemical Reactor turns farm chemistry into three products.\n# NPK Fertilizer\n- 1 Basic Slag + 1 Wood Ash + 100 mB Ammonia make 2 NPK Fertilizer. The reactor has two item slots, one for each.\n- It adds 15 nutrients to Loam Farmland (filling it), and enriches it: until those nutrients run out, the crop on it grows twice as fast instead of 1.5 times. Jade shows \"Enriched\".\n- It works in the Fertilizer Spreader too."
+    },
+    {
+      "type": "text",
+      "text": "# Nutrient Solution\n- 1 NPK Fertilizer + 1,000 mB Water make 1,000 mB Nutrient Solution.\n- It feeds hydroponics, which is still to come. For now it can be stored and carried in buckets and tanks.\n# Biodiesel\n- 100 mB Seed Oil + 25 mB Ethanol make 100 mB Biodiesel.\n- A Fuel Burner fuel: 160 HU/t, up to 1,000°C. It doesn't burn in the Gas Turbine Array."
+    }
+  ]
+}

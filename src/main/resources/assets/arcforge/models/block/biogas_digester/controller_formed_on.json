@@ -1,0 +1,13 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "digester",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "arcforge:block/biogas_digester/plate",
+    "base": "arcforge:block/biogas_digester/plate",
+    "top": "arcforge:block/biogas_digester/top",
+    "beam": "arcforge:block/ctm/column_beam",
+    "front": "arcforge:block/biogas_digester/controller_on"
+  },
+  "fallback": "arcforge:block/biogas_digester/controller"
+}

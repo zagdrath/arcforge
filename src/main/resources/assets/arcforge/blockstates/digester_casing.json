@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/biogas_digester/casing"
+    },
+    "formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/biogas_digester/casing_formed"
+    }
+  }
+}

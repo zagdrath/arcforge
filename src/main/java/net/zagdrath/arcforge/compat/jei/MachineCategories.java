@@ -22,10 +22,13 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.heat.BurnerFuel;
+import net.zagdrath.arcforge.recipe.AirSeparatingRecipe;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.ChemicalReactingRecipe;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
+import net.zagdrath.arcforge.recipe.DigestingRecipe;
+import net.zagdrath.arcforge.recipe.SynthesizingRecipe;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 import net.zagdrath.arcforge.heat.EnergyBalance;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
@@ -422,6 +425,116 @@ final class MachineCategories {
         }
     }
 
+    // --- Farm chemistry ---
+
+    // Air -> the primary and secondary gases. Where it works (not the End), the FE and the time, before upgrades.
+    static final class AirSeparating extends ArcforgeCategory<RecipeHolder<AirSeparatingRecipe>> {
+        static final IRecipeHolderType<AirSeparatingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.AIR_SEPARATING.get());
+
+        AirSeparating(IGuiHelper gui) {
+            super(TYPE, "air_separating", ModBlocks.AIR_SEPARATOR.get(), gui, 130, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<AirSeparatingRecipe> holder, IFocusGroup focuses) {
+            AirSeparatingRecipe recipe = holder.value();
+            fluid(builder, false, 61, 5, recipe.primary());
+            recipe.secondary().ifPresent(secondary -> fluid(builder, false, 81, 5, secondary));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<AirSeparatingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<AirSeparatingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            AirSeparatingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.air_separating.air"), 0, 9);
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
+                    String.format(Locale.ROOT, "%,d", recipe.time() * recipe.baseEnergyPerTick())), 0, 30);
+            if (!recipe.excludedDimensions().isEmpty() || !recipe.dimensions().isEmpty()) {
+                text(graphics, Component.translatable(recipe.dimensions().isEmpty() ? "jei.arcforge.air_separating.not_in" : "jei.arcforge.air_separating.only_in",
+                        dimensionNames(recipe.dimensions().isEmpty() ? recipe.excludedDimensions() : recipe.dimensions())), 0, 40);
+            }
+        }
+
+        private static Component dimensionNames(List<net.minecraft.resources.ResourceKey<net.minecraft.world.level.Level>> dimensions) {
+            return Component.literal(String.join(", ", dimensions.stream().map(key -> {
+                String path = key.identifier().getPath();
+                String name = path.startsWith("the_") ? path.substring(4) : path;
+                return Character.toUpperCase(name.charAt(0)) + name.substring(1).replace('_', ' ');
+            }).toList()));
+        }
+    }
+
+    // One or two gases -> a gas (the Haber Reactor), with the FE, heat and temperature it needs.
+    static final class Synthesizing extends ArcforgeCategory<RecipeHolder<SynthesizingRecipe>> {
+        static final IRecipeHolderType<SynthesizingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.SYNTHESIZING.get());
+
+        Synthesizing(IGuiHelper gui) {
+            super(TYPE, "synthesizing", ModBlocks.HABER_REACTOR.get(), gui, 130, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<SynthesizingRecipe> holder, IFocusGroup focuses) {
+            SynthesizingRecipe recipe = holder.value();
+            for (int i = 0; i < recipe.inputs().size(); i++) {
+                ChemicalReactingRecipe.FluidInput input = recipe.inputs().get(i);
+                var slot = builder.addInputSlot(1 + 20 * i, 5).setStandardSlotBackground()
+                        .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, input.amount()), false, 16, 16);
+                input.fluids().forEach(fluid -> slot.add(fluid, input.amount()));
+            }
+            fluid(builder, false, 81, 5, recipe.output());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<SynthesizingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<SynthesizingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            SynthesizingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
+                    String.format(Locale.ROOT, "%,d", recipe.time() * recipe.baseEnergyPerTick())), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.synthesizing.heat", recipe.heatPerTick(), recipe.minTemperatureOrDefault()), 0, 40);
+        }
+    }
+
+    // Plant matter + water -> Biogas, and a chance of Digestate (the Biogas Digester), with the time a lane takes.
+    static final class Digesting extends ArcforgeCategory<RecipeHolder<DigestingRecipe>> {
+        static final IRecipeHolderType<DigestingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.DIGESTING.get());
+
+        Digesting(IGuiHelper gui) {
+            super(TYPE, "digesting", ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get(), gui, 130, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<DigestingRecipe> holder, IFocusGroup focuses) {
+            DigestingRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
+            if (recipe.water() > 0) {
+                fluid(builder, true, 21, 5, net.minecraft.world.level.material.Fluids.WATER, recipe.water());
+            }
+            fluid(builder, false, 81, 5, recipe.result());
+            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(101, 5).setStandardSlotBackground().add(byproduct)
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                            Math.round(recipe.byproductChance() * 100)))));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<DigestingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<DigestingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.digesting.warm", seconds(holder.value().time()),
+                    ArcforgeConfig.DIGESTER_MIN_TEMPERATURE.getAsInt()), 0, 28);
+        }
+    }
+
     // --- Conduit dyeing (a crafting-table recipe) ---
 
     record ConduitDyeing(net.minecraft.world.item.Item conduit) {}
@@ -497,9 +610,10 @@ final class MachineCategories {
 
     // --- Chemical Reactor ---
 
+    // Inputs left to right (items, then fluids), the arrow after them, then the outputs.
     static final class ChemicalReacting extends ArcforgeCategory<RecipeHolder<ChemicalReactingRecipe>> {
         static final IRecipeHolderType<ChemicalReactingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.CHEMICAL_REACTING.get());
-        private static final int WIDTH = 152;
+        private static final int WIDTH = 172;
 
         ChemicalReacting(IGuiHelper gui) {
             super(TYPE, "chemical_reacting", ModBlocks.CHEMICAL_REACTOR.get(), gui, WIDTH, 60);
@@ -508,25 +622,39 @@ final class MachineCategories {
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<ChemicalReactingRecipe> holder, IFocusGroup focuses) {
             ChemicalReactingRecipe recipe = holder.value();
-            recipe.itemInput().ifPresent(input -> builder.addInputSlot(1, 5).setStandardSlotBackground()
-                    .addItemStacks(input.ingredient().items().map(item -> new ItemStack(item, input.count())).toList()));
+            int x = 1;
+            for (ChemicalReactingRecipe.ItemInput input : recipe.itemInputs()) {
+                builder.addInputSlot(x, 5).setStandardSlotBackground()
+                        .addItemStacks(input.ingredient().items().map(item -> new ItemStack(item, input.count())).toList());
+                x += 20;
+            }
+            // Recipes with one item keep their fluids where they always were.
+            x = Math.max(x, 21);
             for (int i = 0; i < recipe.fluidInputs().size(); i++) {
                 ChemicalReactingRecipe.FluidInput input = recipe.fluidInputs().get(i);
-                var slot = builder.addInputSlot(21 + 20 * i, 5).setStandardSlotBackground()
+                var slot = builder.addInputSlot(x, 5).setStandardSlotBackground()
                         .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, input.amount()), false, 16, 16);
                 // A tag lists every fluid in it.
                 input.fluids().forEach(fluid -> slot.add(fluid, input.amount()));
+                x += 20;
             }
-            recipe.itemOutput().ifPresent(output -> builder.addOutputSlot(91, 5).setStandardSlotBackground().add(output));
-            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(111, 5).setStandardSlotBackground().add(byproduct)
+            int out = arrowX(recipe) + 29;
+            recipe.itemOutput().ifPresent(output -> builder.addOutputSlot(out, 5).setStandardSlotBackground().add(output));
+            recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(out + 20, 5).setStandardSlotBackground().add(byproduct)
                     .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
                             Math.round(recipe.byproductChance() * 100)))));
-            recipe.fluidOutput().ifPresent(output -> fluid(builder, false, 131, 5, output));
+            recipe.fluidOutput().ifPresent(output -> fluid(builder, false, out + 40, 5, output));
         }
 
         @Override
         public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<ChemicalReactingRecipe> holder, IFocusGroup focuses) {
-            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(62, 5);
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(arrowX(holder.value()), 5);
+        }
+
+        // The arrow sits after the inputs: where it always was (62) unless a second item pushes it along.
+        private static int arrowX(ChemicalReactingRecipe recipe) {
+            int inputs = Math.max(recipe.itemInputs().size(), 1) + recipe.fluidInputs().size();
+            return Math.max(62, 1 + 20 * inputs + 1);
         }
 
         // Time and FE before upgrades, the category, and for leaching what a raw ore or ore block comes to.

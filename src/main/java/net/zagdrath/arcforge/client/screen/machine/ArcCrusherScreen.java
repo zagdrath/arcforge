@@ -47,7 +47,7 @@ public class ArcCrusherScreen extends MachineScreen<ArcCrusherMenu> {
     }
 
     // The arrow fills left to right: w = ceil(21 * progress / total).
-    static void drawProgress(GuiGraphicsExtractor graphics, Identifier sprite, int x, int y, int progress, int total) {
+    public static void drawProgress(GuiGraphicsExtractor graphics, Identifier sprite, int x, int y, int progress, int total) {
         if (total > 0 && progress > 0) {
             int width = Math.min(PROGRESS_W, Mth.ceil(PROGRESS_W * (float) progress / total));
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, PROGRESS_W, PROGRESS_H, 0, 0, x, y, width, PROGRESS_H);

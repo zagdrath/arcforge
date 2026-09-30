@@ -10,11 +10,11 @@
   "pages": [
     {
       "type": "text",
-      "text": "The Gas Turbine Array burns fuel straight to FE, with no boiler in between.\n- A hollow 3x3 tube, 5 to 9 long, lying on its side. Pressure Glass can replace any casing except the corners.\n- One end is the **intake**: it needs open air in front of its centre. The other end is the **exhaust**.\n- Feed fuel into an input port. Naphtha, Light Oil, Ethanol and Hydrogen burn; Heavy Oil and Creosote don't.\n- It spools up in about a second and a half, and coasts down over about 4 seconds."
+      "text": "The Gas Turbine Array burns fuel straight to FE, with no boiler in between.\n- A hollow 3x3 tube, 5 to 9 long, lying on its side. Pressure Glass can replace any casing except the corners.\n- One end is the **intake**: it needs open air in front of its centre. The other end is the **exhaust**.\n- Feed fuel into an input port. Naphtha, Light Oil, Ethanol, Hydrogen and Biogas burn; Heavy Oil, Creosote and Biodiesel don't.\n- It spools up in about a second and a half, and coasts down over about 4 seconds."
     },
     {
       "type": "text",
-      "text": "# Output\nEach mB of fuel gives about 1.5× the FE a Fuel Burner and Thermoelectric Plant would make from it, scaled by how hot the fuel burns.\n| Fuel | FE per mB |\n| Naphtha | 600 |\n| Light Oil | 313 |\n| Ethanol | 338 |\n| Hydrogen | 90 |\nA 9-long array handles 5,040 HU of fuel per tick: about 7,560 FE/t on Naphtha. Heavy Oil or Seed Oil in a lubricant port adds 8% and spools it up faster."
+      "text": "# Output\nEach mB of fuel gives about 1.5× the FE a Fuel Burner and Thermoelectric Plant would make from it, scaled by how hot the fuel burns.\n| Fuel | FE per mB |\n| Naphtha | 600 |\n| Light Oil | 313 |\n| Ethanol | 338 |\n| Hydrogen | 90 |\n| Biogas | 62 |\nA 9-long array handles 5,040 HU of fuel per tick: about 7,560 FE/t on Naphtha. Heavy Oil or Seed Oil in a lubricant port adds 8% and spools it up faster."
     },
     {
       "type": "text",

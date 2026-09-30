@@ -1,0 +1,13 @@
+{
+  "title": "Air Separator",
+  "icon": "arcforge:air_separator",
+  "items": [
+    "arcforge:air_separator"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Air Separator pulls in air and separates it into Nitrogen and Oxygen with FE. It needs no input: every 2 s it makes 80 mB of Nitrogen and 20 mB of Oxygen, at 80 FE/t.\n- It works anywhere except the End, which has no air to separate.\n- Oxygen leaves through Oxygen faces (the left, by default) and Nitrogen through Gas Output faces (the right). Pipe them away with Pressurized Conduits.\n- When one tank is full, what doesn't fit goes back into the air, so it keeps making the other. It only stops when both are full.\n# Why\n- Nitrogen goes into the Haber Reactor to make Ammonia.\n- Oxygen is a second source besides the Electrolyzer, for oxy-fuel and the Arcforge Furnace, with no hydrogen to deal with. One Air Separator keeps two oxy-fuel burners going.\nSpeed and Energy upgrades work."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/air_separator",
+  "display": {
+    "icon": {
+      "id": "arcforge:haber_reactor"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.ammonia.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.ammonia.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ammonia": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:ammonia"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ammonia"
+    ]
+  ]
+}

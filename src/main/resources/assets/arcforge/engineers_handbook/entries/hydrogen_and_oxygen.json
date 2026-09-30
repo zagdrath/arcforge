@@ -10,7 +10,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Both are gases: they travel only in Pressurized Conduits, Pressurized Cylinders and Gas Cartridges.\n# Hydrogen\nA Fuel Burner fuel: 60 HU/t at up to 1,400°C, hot enough for Superheated Steam and a Thermoelectric Plant's bonus.\nIt is a battery, not a power source. Making hydrogen always costs at least 25% more FE than the best setup gets back by burning it, so use it to store power and carry it, not to make it.\n# Oxygen\nPipe it into an Arcforge Furnace through an Oxygen port. Each smelt that starts with 50 mB of Oxygen available uses it and runs 1.5× faster.\n# Plastic\nLight Oil and Hydrogen in a Chemical Reactor make Plastic Sheets, used in Conduit Filters and Storage Upgrades."
+      "text": "Both are gases: they travel only in Pressurized Conduits, Pressurized Cylinders and Gas Cartridges.\n# Hydrogen\nA Fuel Burner fuel: 60 HU/t at up to 1,400°C, hot enough for Superheated Steam and a Thermoelectric Plant's bonus.\nIt is a battery, not a power source. Making hydrogen always costs at least 25% more FE than the best setup gets back by burning it, so use it to store power and carry it, not to make it.\n# Oxygen\nThe Electrolyzer and the Air Separator both make it.\nPipe it into an Arcforge Furnace through an Oxygen port. Each smelt that starts with 50 mB of Oxygen available uses it and runs 1.5× faster.\nHydrogen and Nitrogen make Ammonia in the Haber Reactor.\n# Plastic\nLight Oil and Hydrogen in a Chemical Reactor make Plastic Sheets, used in Conduit Filters and Storage Upgrades."
     }
   ]
 }

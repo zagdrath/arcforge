@@ -40,10 +40,12 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
-// Chemical Reactor: an item (with a count) and up to two fluids react into an item, a fluid or both, with an
-// optional byproduct rolled once per operation (Slag, when precipitating). Each fluid input is drawn from a
-// different input tank. "category" only labels the recipe in JEI: general, leaching or precipitating.
-public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, List<FluidInput> fluidInputs, Optional<ItemStackTemplate> itemOutput,
+// Chemical Reactor: up to two items (each with a count) and up to two fluids react into an item, a fluid or both, with
+// an optional byproduct rolled once per operation (Slag, when precipitating). The items are item_input and
+// second_item_input, each drawn from a different input slot; each fluid input from a different input tank. "category"
+// only labels the recipe in JEI: general, leaching or precipitating.
+public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<ItemInput> secondItemInput, List<FluidInput> fluidInputs,
+        Optional<ItemStackTemplate> itemOutput,
         Optional<FluidStackTemplate> fluidOutput, Optional<ItemStackTemplate> byproduct, float byproductChance, int time,
         Optional<Integer> energyPerTick, String category) implements Recipe<ChemicalReactorInput> {
     public static final int DEFAULT_TIME = 100;
@@ -100,6 +102,7 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, List<FluidIn
 
     public static final MapCodec<ChemicalReactingRecipe> MAP_CODEC = RecordCodecBuilder.<ChemicalReactingRecipe>mapCodec(i -> i.group(
             ItemInput.CODEC.optionalFieldOf("item_input").forGetter(ChemicalReactingRecipe::itemInput),
+            ItemInput.CODEC.optionalFieldOf("second_item_input").forGetter(ChemicalReactingRecipe::secondItemInput),
             FluidInput.CODEC.listOf(0, MAX_FLUID_INPUTS).optionalFieldOf("fluid_inputs", List.of()).forGetter(ChemicalReactingRecipe::fluidInputs),
             ItemStackTemplate.CODEC.optionalFieldOf("item_output").forGetter(ChemicalReactingRecipe::itemOutput),
             FluidStackTemplate.CODEC.optionalFieldOf("fluid_output").forGetter(ChemicalReactingRecipe::fluidOutput),
@@ -111,22 +114,37 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, List<FluidIn
             .apply(i, ChemicalReactingRecipe::new))
             .validate(ChemicalReactingRecipe::validate);
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ChemicalReactingRecipe> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.optional(ItemInput.STREAM_CODEC), ChemicalReactingRecipe::itemInput,
-            FluidInput.STREAM_CODEC.apply(ByteBufCodecs.list(MAX_FLUID_INPUTS)), ChemicalReactingRecipe::fluidInputs,
-            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), ChemicalReactingRecipe::itemOutput,
-            ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC), ChemicalReactingRecipe::fluidOutput,
-            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), ChemicalReactingRecipe::byproduct,
-            ByteBufCodecs.FLOAT, ChemicalReactingRecipe::byproductChance,
-            ByteBufCodecs.VAR_INT, ChemicalReactingRecipe::time,
-            ByteBufCodecs.optional(ByteBufCodecs.VAR_INT), ChemicalReactingRecipe::energyPerTick,
-            ByteBufCodecs.STRING_UTF8, ChemicalReactingRecipe::category,
-            ChemicalReactingRecipe::new);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<ItemInput>> OPTIONAL_ITEM = ByteBufCodecs.optional(ItemInput.STREAM_CODEC);
+    private static final StreamCodec<RegistryFriendlyByteBuf, List<FluidInput>> FLUID_INPUTS = FluidInput.STREAM_CODEC.apply(ByteBufCodecs.list(MAX_FLUID_INPUTS));
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<ItemStackTemplate>> OPTIONAL_TEMPLATE = ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<FluidStackTemplate>> OPTIONAL_FLUID = ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC);
+    private static final StreamCodec<io.netty.buffer.ByteBuf, Optional<Integer>> OPTIONAL_INT = ByteBufCodecs.optional(ByteBufCodecs.VAR_INT);
+
+    // Written out by hand: ten fields.
+    public static final StreamCodec<RegistryFriendlyByteBuf, ChemicalReactingRecipe> STREAM_CODEC = StreamCodec.of(
+            (buf, recipe) -> {
+                OPTIONAL_ITEM.encode(buf, recipe.itemInput());
+                OPTIONAL_ITEM.encode(buf, recipe.secondItemInput());
+                FLUID_INPUTS.encode(buf, recipe.fluidInputs());
+                OPTIONAL_TEMPLATE.encode(buf, recipe.itemOutput());
+                OPTIONAL_FLUID.encode(buf, recipe.fluidOutput());
+                OPTIONAL_TEMPLATE.encode(buf, recipe.byproduct());
+                buf.writeFloat(recipe.byproductChance());
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.time());
+                OPTIONAL_INT.encode(buf, recipe.energyPerTick());
+                ByteBufCodecs.STRING_UTF8.encode(buf, recipe.category());
+            },
+            buf -> new ChemicalReactingRecipe(OPTIONAL_ITEM.decode(buf), OPTIONAL_ITEM.decode(buf), FLUID_INPUTS.decode(buf),
+                    OPTIONAL_TEMPLATE.decode(buf), OPTIONAL_FLUID.decode(buf), OPTIONAL_TEMPLATE.decode(buf), buf.readFloat(),
+                    ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INT.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf)));
 
     // Something goes in and something comes out.
     private static DataResult<ChemicalReactingRecipe> validate(ChemicalReactingRecipe recipe) {
         if (recipe.itemInput.isEmpty() && recipe.fluidInputs.isEmpty()) {
             return DataResult.error(() -> "A chemical_reacting recipe needs an item_input or a fluid_input");
+        }
+        if (recipe.secondItemInput.isPresent() && recipe.itemInput.isEmpty()) {
+            return DataResult.error(() -> "A chemical_reacting recipe with a second_item_input needs an item_input");
         }
         if (recipe.itemOutput.isEmpty() && recipe.fluidOutput.isEmpty()) {
             return DataResult.error(() -> "A chemical_reacting recipe needs an item_output or a fluid_output");
@@ -141,7 +159,32 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, List<FluidIn
 
     @Override
     public boolean matches(ChemicalReactorInput input, Level level) {
-        return (itemInput.isEmpty() || itemInput.get().test(input.item())) && tanksFor(input) != null;
+        return slotsFor(input) != null && tanksFor(input) != null;
+    }
+
+    // Which input slot (0 or 1) supplies each item input (item_input, then second_item_input), each from a different
+    // slot, or null if they can't all be supplied. A recipe with one item takes it from either slot.
+    public int @Nullable [] slotsFor(ChemicalReactorInput input) {
+        if (itemInput.isEmpty()) {
+            return new int[0];
+        }
+        ItemInput first = itemInput.get();
+        if (secondItemInput.isEmpty()) {
+            return first.test(input.item()) ? new int[] { 0 } : first.test(input.itemB()) ? new int[] { 1 } : null;
+        }
+        ItemInput second = secondItemInput.get();
+        if (first.test(input.item()) && second.test(input.itemB())) {
+            return new int[] { 0, 1 };
+        }
+        if (first.test(input.itemB()) && second.test(input.item())) {
+            return new int[] { 1, 0 };
+        }
+        return null;
+    }
+
+    // The item inputs in order (none, one or two).
+    public List<ItemInput> itemInputs() {
+        return java.util.stream.Stream.of(itemInput, secondItemInput).flatMap(Optional::stream).toList();
     }
 
     // Which input tank (0 or 1) supplies each fluid input, each from a different tank, or null if they can't all
@@ -166,7 +209,7 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, List<FluidIn
 
     // Whether this item could be part of the recipe (ignoring the count), for the input slot.
     public boolean usesItem(ItemStack stack) {
-        return itemInput.isPresent() && itemInput.get().ingredient().test(stack);
+        return itemInputs().stream().anyMatch(input -> input.ingredient().test(stack));
     }
 
     public boolean usesFluid(FluidResource resource) {

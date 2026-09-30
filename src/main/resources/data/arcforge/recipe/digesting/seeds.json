@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:digesting",
+  "ingredient": "#c:seeds",
+  "water": 25,
+  "result": {
+    "id": "arcforge:biogas",
+    "amount": 15
+  },
+  "byproduct": {
+    "id": "arcforge:digestate",
+    "count": 1
+  },
+  "byproduct_chance": 0.1,
+  "time": 100
+}

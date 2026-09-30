@@ -25,7 +25,10 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
 ### Upgrading
 
 - **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`, `hops`, `rusticMachines`, `millstone`,
-  `mill`, `oilPress`, `seedExtractor`, `grainDryer`) gets its defaults, as do the Fermenter's new keys; nothing to redo.
+  `mill`, `oilPress`, `seedExtractor`, `grainDryer`, `airSeparator`, `haberReactor`, `biogasDigester`) gets its defaults,
+  as do the Fermenter's new keys; nothing to redo.
+- **Chemical Reactor second item slot.** Saved Chemical Reactors keep their items, tanks and upgrades: the upgrades move
+  up past the new slot when the world loads.
 - **Fermenter additive slot.** Saved Fermenters keep their crops, byproduct and upgrades: the upgrades move up past the
   new slot when the world loads.
 - **Wild crops generate only in newly explored chunks.**
@@ -96,8 +99,31 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
     **Dried Sorghum** with HU and no FE. It only runs above 60°C.
   - Handbook pages, Jade tooltips and four new Farming advancements (Daily Grind, Grist for the Mill, Cold Pressed,
     Hop to It).
+- **Farm chemistry:** from air and crops to fertilizer and fuel. Recipes are data-driven (`arcforge:air_separating`,
+  `arcforge:synthesizing` and `arcforge:digesting`, plus new `arcforge:chemical_reacting` recipes), each with a JEI
+  category, and every rate is in config.
+  - **Air Separator** (FE). Separates the air round it into **Nitrogen** and Oxygen (80 mB and 20 mB every 2 s, at
+    80 FE/t) with no input, anywhere but the End. Oxygen goes out of Oxygen faces and Nitrogen out of Gas Output faces;
+    when one tank is full that gas goes back into the air, so it keeps making the other. A second source of Oxygen
+    besides the Electrolyzer.
+  - **Haber Reactor** (FE and heat). 60 mB of Hydrogen and 20 mB of Nitrogen make 40 mB of **Ammonia** every second,
+    at 60 FE/t and 10 HU/t, but only at 450°C or hotter.
+  - **NPK Fertilizer:** Basic Slag, Wood Ash and 100 mB of Ammonia make two in the Chemical Reactor. It adds 15
+    nutrients to Loam Farmland and enriches it: the crop on it grows twice as fast (instead of 1.5 times) until those
+    nutrients run out.
+  - **Nutrient Solution:** NPK Fertilizer and water in the Chemical Reactor. A fluid for hydroponics, which is still
+    to come; for now it can be stored and carried.
+  - **Biodiesel:** 100 mB of Seed Oil and 25 mB of Ethanol make 100 mB in the Chemical Reactor. A Fuel Burner fuel:
+    320 HU per mB at up to 1,000°C.
+  - **Biogas Digester:** a solid 3x3x3 of **Digester Casings** with a **Biogas Digester Controller** in the middle of a
+    side. It digests crops, seeds, leaves, Press Cake and Compost in water, four at a time, into **Biogas** (a gas that
+    burns in the Fuel Burner, 45 HU per mB at up to 1,100°C, and in the Gas Turbine Array) and **Digestate**, a
+    fertilizer worth 4 nutrients. It needs a little heat: it only works at 35°C or hotter, using 2 HU/t.
+  - Handbook pages, Jade tooltips, a build page for the digester, and five new Farming advancements (Thin Air, Bread
+    from Air, N, P, K, Fryer to Fuel, Waste Not).
 - **Carbon Dioxide**, a new gas.
-- **Gas Output**, a new side mode: a machine's waste gas comes out of it. The Fermenter uses it.
+- **Gas Output**, a new side mode: a machine's own gas comes out of it. The Fermenter gives out Carbon Dioxide through it,
+  the Air Separator Nitrogen, the Haber Reactor Ammonia and the Biogas Digester Biogas.
 - **Silver, Nickel, Tungsten and Invar Gears and Rods.** Every metal with a plate now has a gear and a rod too, pressed
   in the Metal Press like steel's (4 ingots make a gear, 1 ingot makes 2 rods), and tagged `c:gears/<metal>` and
   `c:rods/<metal>` for other mods' recipes.
@@ -112,6 +138,9 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
   - The GUI is rearranged to fit the additive slot and a Carbon Dioxide tank: the Ethanol tank is now on the right.
 - **Plate and gear textures:** every plate, gear and rod now uses Cody's plate and gear style, recoloured per metal:
   rods are redrawn to match, with a tonal outline instead of black.
+- **Chemical Reactor.** A second item slot, for recipes with two items (`second_item_input`): items sort into the two
+  slots like fluids into its two tanks, one kind to a slot. The status moved under the arrow to make room.
+- **Loam Farmland** can be enriched (NPK Fertilizer); Jade says so.
 - **Turbine lubricants are data-driven:** any fluid in `#arcforge:lubricants` (Heavy Oil and Seed Oil). The Steam and
   Gas Turbine Arrays' lubricant gauge shows the oil in the tank.
 

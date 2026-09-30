@@ -43,10 +43,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.DynamicBlockStateModel;
 import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
+import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
+import net.zagdrath.arcforge.multiblock.BiogasDigesterStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 
@@ -69,10 +71,11 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 //
 // The Distillation Array's solid column uses two more modes (see ColumnBaked): "column_2x2" for its casings
 // and controller (base / beam / roof_nw / roof_ne / roof_sw / roof_se, and front for the controller) and
-// "tray_window" for its tray level casings (base / frame / top / bottom).
+// "tray_window" for its tray level casings (base / frame / top / bottom). The Biogas Digester's solid tank uses
+// "digester" (base / beam / top, and front for the controller; see DigesterBaked).
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
-    private static final String COLUMN = "column_2x2", TRAY = "tray_window";
+    private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester";
     // The tray band's glass: the top 10 px of a side face (the sill and strap are below it).
     private static final int BAND = 10;
     private static final Identifier TRAY_FRAME = Identifier.fromNamespaceAndPath("arcforge", "block/ctm/tray_window_frame");
@@ -101,6 +104,10 @@ public final class ConnectedModel {
             return connect.equals(COLUMN) || connect.equals(TRAY);
         }
 
+        public boolean digester() {
+            return connect.equals(DIGESTER);
+        }
+
         // Anything that bakes this as an ordinary model gets the plain fallback cube.
         @Override
         public Identifier parent() {
@@ -123,6 +130,7 @@ public final class ConnectedModel {
                 case "glass" -> new String[] { "base", "beam", "lip" };
                 case COLUMN -> new String[] { "base", "beam", "roof_nw", "roof_ne", "roof_sw", "roof_se" };
                 case TRAY -> new String[] { "base", "frame", "top", "bottom" };
+                case DIGESTER -> new String[] { "base", "beam", "top" };
                 default -> new String[] { "base", "beam", "lip", "window" };
             };
             for (String required : needed) {
@@ -157,7 +165,8 @@ public final class ConnectedModel {
             if (!(resolved.wrapped() instanceof JsonModel unbaked)) {
                 throw new IllegalStateException("Model " + model + " is not an arcforge:connected model");
             }
-            return unbaked.column() ? new ColumnBaked(baker, unbaked, model) : new Baked(baker, unbaked, model);
+            return unbaked.digester() ? new DigesterBaked(baker, unbaked, model)
+                    : unbaked.column() ? new ColumnBaked(baker, unbaked, model) : new Baked(baker, unbaked, model);
         }
     }
 
@@ -373,6 +382,104 @@ public final class ConnectedModel {
                     out.addAll(beam.get(face)[side.ordinal()]);
                 }
             }
+        }
+
+        @Override
+        public @Nullable Object createGeometryKey(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random) {
+            return null;
+        }
+
+        @Override
+        public Material.Baked particleMaterial() {
+            return particle;
+        }
+
+        @Override
+        @BakedQuad.MaterialFlags
+        public int materialFlags() {
+            return materialFlags;
+        }
+    }
+
+    // The Biogas Digester's solid 3x3x3 tank: a formed block draws each face that isn't against another block of the tank
+    // (culled like any block). Side faces show the banded plate ("base") and the top face the lid ("top"), each with a 2px
+    // beam along every edge of the face whose neighbour that way isn't part of the tank, so beams run round the tank's
+    // edges and corners only. The controller shows its "front" (sight glass and gauge) on the side it faces instead of the
+    // plate. Formed ports show their plate.
+    private static final class DigesterBaked implements DynamicBlockStateModel {
+        private final Material.Baked particle;
+        private final Map<Direction, List<BakedQuad>> base = new EnumMap<>(Direction.class);
+        private final Map<Direction, List<BakedQuad>> front = new EnumMap<>(Direction.class);
+        private final Map<Direction, List<BakedQuad>[]> beams = new EnumMap<>(Direction.class);
+        private final PortOverlays ports;
+        private final int materialFlags;
+
+        @SuppressWarnings("unchecked")
+        DigesterBaked(ModelBaker baker, JsonModel unbaked, Identifier name) {
+            Map<String, Identifier> textures = unbaked.textures();
+            this.particle = Baked.material(baker, textures.getOrDefault("particle", textures.get("base")), name);
+            Material.Baked side = Baked.material(baker, textures.get("base"), name);
+            Material.Baked top = Baked.material(baker, textures.get("top"), name);
+            Material.Baked bottom = Baked.material(baker, textures.getOrDefault("bottom", textures.get("top")), name);
+            Material.Baked beam = Baked.material(baker, textures.get("beam"), name);
+            Material.Baked frontTexture = textures.containsKey("front") ? Baked.material(baker, textures.get("front"), name) : null;
+            this.ports = new PortOverlays(baker, name);
+            int flags = ports.materialFlags();
+            for (Direction face : Direction.values()) {
+                Material.Baked texture = face == Direction.UP ? top : face == Direction.DOWN ? bottom : side;
+                base.put(face, List.of(Baked.bake(baker, face, 0, 0, 16, 16, 0, texture, 0, 0, 16, 16, Quadrant.R0)));
+                if (frontTexture != null && face.getAxis().isHorizontal()) {
+                    front.put(face, List.of(Baked.bake(baker, face, 0, 0, 16, 16, 0, frontTexture, 0, 0, 16, 16, Quadrant.R0)));
+                }
+                List<BakedQuad>[] sides = new List[4];
+                for (Side edge : Side.values()) {
+                    sides[edge.ordinal()] = List.of(Baked.bake(baker, face, 0, 0, 16, 16, offset(BEAM_OFFSET, edge), beam, 0, 0, 16, 16, edge.rotation));
+                }
+                beams.put(face, sides);
+            }
+            for (Map<Direction, List<BakedQuad>> set : List.of(base, front)) {
+                for (List<BakedQuad> quads : set.values()) {
+                    for (BakedQuad quad : quads) {
+                        flags |= quad.materialInfo().flags();
+                    }
+                }
+            }
+            for (List<BakedQuad>[] sides : beams.values()) {
+                for (List<BakedQuad> quads : sides) {
+                    for (BakedQuad quad : quads) {
+                        flags |= quad.materialInfo().flags();
+                    }
+                }
+            }
+            this.materialFlags = flags;
+        }
+
+        private static boolean isPart(BlockState state) {
+            return BiogasDigesterStructure.isFormedPart(state);
+        }
+
+        @Override
+        public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
+            QuadCollection.Builder quads = new QuadCollection.Builder();
+            boolean formed = isPart(state);
+            Direction facing = state.hasProperty(BiogasDigesterControllerBlock.FACING) ? state.getValue(BiogasDigesterControllerBlock.FACING) : null;
+            for (Direction face : Direction.values()) {
+                if (formed && isPart(level.getBlockState(pos.relative(face)))) {
+                    continue;
+                }
+                List<BakedQuad> faceQuads = new ArrayList<>(face == facing && front.containsKey(face) ? front.get(face) : base.get(face));
+                for (Side edge : Side.values()) {
+                    if (!formed || !isPart(level.getBlockState(pos.relative(Baked.sideDirection(face, edge))))) {
+                        faceQuads.addAll(beams.get(face)[edge.ordinal()]);
+                    }
+                }
+                BakedQuad port = formed ? ports.get(MultiblockPorts.get(level, pos, face), face) : null;
+                if (port != null) {
+                    faceQuads.add(port);
+                }
+                faceQuads.forEach(quad -> quads.addCulledFace(face, quad));
+            }
+            parts.add(new SimpleModelWrapper(quads.build(), true, particle));
         }
 
         @Override

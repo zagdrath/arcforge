@@ -132,6 +132,37 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CARBON_DIOXIDE = FLUIDS.register("flowing_carbon_dioxide",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.CARBON_DIOXIDE_TYPE, ModFluids.CARBON_DIOXIDE, ModFluids.FLOWING_CARBON_DIOXIDE)));
 
+    // Farm chemistry. Nitrogen (the Air Separator's), Ammonia (the Haber Reactor's) and Biogas (the Biogas Digester's)
+    // are gases; Biogas burns in the Fuel Burner and the Gas Turbine Array (the arcforge:burner_fuels data map).
+    public static final DeferredHolder<FluidType, FluidType> NITROGEN_TYPE = gasType("nitrogen", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> NITROGEN = FLUIDS.register("nitrogen",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.NITROGEN_TYPE, ModFluids.NITROGEN, ModFluids.FLOWING_NITROGEN)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NITROGEN = FLUIDS.register("flowing_nitrogen",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.NITROGEN_TYPE, ModFluids.NITROGEN, ModFluids.FLOWING_NITROGEN)));
+    public static final DeferredHolder<FluidType, FluidType> AMMONIA_TYPE = gasType("ammonia", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> AMMONIA = FLUIDS.register("ammonia",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.AMMONIA_TYPE, ModFluids.AMMONIA, ModFluids.FLOWING_AMMONIA)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_AMMONIA = FLUIDS.register("flowing_ammonia",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.AMMONIA_TYPE, ModFluids.AMMONIA, ModFluids.FLOWING_AMMONIA)));
+    public static final DeferredHolder<FluidType, FluidType> BIOGAS_TYPE = gasType("biogas", 308);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> BIOGAS = FLUIDS.register("biogas",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.BIOGAS_TYPE, ModFluids.BIOGAS, ModFluids.FLOWING_BIOGAS)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BIOGAS = FLUIDS.register("flowing_biogas",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.BIOGAS_TYPE, ModFluids.BIOGAS, ModFluids.FLOWING_BIOGAS)));
+
+    // The Chemical Reactor's farm liquids: Nutrient Solution (NPK Fertilizer in water, for hydroponics) runs like water;
+    // Biodiesel (Seed Oil and Ethanol) is a Fuel Burner fuel, a little thinner than the oil it came from.
+    public static final DeferredHolder<FluidType, FluidType> NUTRIENT_SOLUTION_TYPE = liquidType("nutrient_solution", 1_050, 1_000, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> NUTRIENT_SOLUTION = FLUIDS.register("nutrient_solution",
+            () -> new BaseFlowingFluid.Source(nutrientSolutionProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NUTRIENT_SOLUTION = FLUIDS.register("flowing_nutrient_solution",
+            () -> new BaseFlowingFluid.Flowing(nutrientSolutionProperties()));
+    public static final DeferredHolder<FluidType, FluidType> BIODIESEL_TYPE = liquidType("biodiesel", 880, 2_000, 0.018F, 0.7, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> BIODIESEL = FLUIDS.register("biodiesel",
+            () -> new BaseFlowingFluid.Source(biodieselProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BIODIESEL = FLUIDS.register("flowing_biodiesel",
+            () -> new BaseFlowingFluid.Flowing(biodieselProperties()));
+
     // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
     // so they only exist in tanks, machines and Pressurized Conduits.
     public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = gasType("steam", 373);
@@ -237,6 +268,28 @@ public final class ModFluids {
                 .slopeFindDistance(3)
                 .levelDecreasePerBlock(1)
                 .tickRate(15)
+                .explosionResistance(100.0F);
+    }
+
+    // Like water: spreads 4 blocks, every 5 ticks.
+    private static BaseFlowingFluid.Properties nutrientSolutionProperties() {
+        return new BaseFlowingFluid.Properties(NUTRIENT_SOLUTION_TYPE, NUTRIENT_SOLUTION, FLOWING_NUTRIENT_SOLUTION)
+                .bucket(ModItems.NUTRIENT_SOLUTION_BUCKET)
+                .block(ModBlocks.NUTRIENT_SOLUTION)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // Between water and Seed Oil: spreads 3 blocks, every 10 ticks.
+    private static BaseFlowingFluid.Properties biodieselProperties() {
+        return new BaseFlowingFluid.Properties(BIODIESEL_TYPE, BIODIESEL, FLOWING_BIODIESEL)
+                .bucket(ModItems.BIODIESEL_BUCKET)
+                .block(ModBlocks.BIODIESEL)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
                 .explosionResistance(100.0F);
     }
 

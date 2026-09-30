@@ -419,7 +419,7 @@ could get back from what it makes, worked out from the live config and data maps
 burner, then the better of a fully carded Thermoelectric Plant and a Superheated boiler into a lubricated,
 exhausting turbine). By default that floor is 354 FE per mB of hydrogen, reached at the fourth Energy upgrade.
 
-**Oxygen** speeds up the Arcforge Furnace: give it an Oxygen port with the Wrench and pipe oxygen in. A smelt
+**Oxygen** (from the Electrolyzer or the Air Separator) speeds up the Arcforge Furnace: give it an Oxygen port with the Wrench and pipe oxygen in. A smelt
 that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as fast (config
 `multiblocks.arcforgeFurnace`).
 
@@ -438,6 +438,25 @@ Burner and the Gas Turbine Array, and catches fire in the world like Naphtha.
 Dried Hops (from the Grain Dryer) in its additive slot add 20% Ethanol, one lasting 4 operations, and Dried Grain
 and Dried Sorghum ferment in half the time. Fermenting gives off **Carbon Dioxide** (a gas, 1 mB per mB of Ethanol)
 out of any face set to Gas Output; with none, or with its 4,000 mB tank full, it goes into the air.
+
+### Farm chemistry
+
+**Air Separator** (FE). Separates the air round it into 80 mB of **Nitrogen** and 20 mB of Oxygen every 2 seconds at
+80 FE/t, anywhere but the End. Oxygen goes out of Oxygen faces, Nitrogen out of Gas Output faces; when one tank is
+full, that gas goes back into the air.
+
+**Haber Reactor** (FE and heat). 60 mB of Hydrogen and 20 mB of Nitrogen make 40 mB of **Ammonia** every second at
+60 FE/t and 10 HU/t, only at 450°C or hotter (heat through its heat face, e.g. from a Fuel Burner).
+
+The **Chemical Reactor** (now with two item slots) makes **NPK Fertilizer** (Basic Slag, Wood Ash and 100 mB of Ammonia
+make two; +15 nutrients, and crops on the enriched Loam Farmland grow twice as fast until those run out), **Nutrient
+Solution** (NPK Fertilizer in water, for hydroponics to come) and **Biodiesel** (Seed Oil and Ethanol; a Fuel Burner
+fuel, 320 HU per mB up to 1,000°C).
+
+**Biogas Digester.** A solid 3×3×3 of Digester Casings with a controller in the middle of one side. Plant matter (crops,
+seeds, leaves, Press Cake, Compost) and water go in through ports, four items digesting at once, and come out as
+**Biogas** (burns in the Fuel Burner and the Gas Turbine Array) and **Digestate** (+4 nutrients). It only works at 35°C
+or hotter. Recipes are data-driven (`arcforge:air_separating`, `arcforge:synthesizing`, `arcforge:digesting`).
 
 ### Automation
 

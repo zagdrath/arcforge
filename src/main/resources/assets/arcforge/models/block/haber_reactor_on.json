@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/haber_reactor_front_on",
+    "south": "arcforge:block/haber_reactor_back",
+    "east": "arcforge:block/haber_reactor_left",
+    "west": "arcforge:block/haber_reactor_right",
+    "up": "arcforge:block/haber_reactor_top",
+    "down": "arcforge:block/haber_reactor_bottom",
+    "particle": "arcforge:block/haber_reactor_back"
+  }
+}

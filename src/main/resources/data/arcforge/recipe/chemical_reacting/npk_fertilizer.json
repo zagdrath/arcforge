@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:basic_slag",
+    "count": 1
+  },
+  "second_item_input": {
+    "ingredient": "arcforge:wood_ash",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:ammonia",
+      "amount": 100
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:npk_fertilizer",
+    "count": 2
+  },
+  "time": 100
+}

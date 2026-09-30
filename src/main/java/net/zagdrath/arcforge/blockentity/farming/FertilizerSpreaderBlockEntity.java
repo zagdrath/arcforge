@@ -114,7 +114,7 @@ public class FertilizerSpreaderBlockEntity extends BlockEntity implements Condui
             }
             ItemStack stack = items.getStack(slot);
             FertilizerItem fertilizer = (FertilizerItem) stack.getItem();
-            FertilizerItem.fertilize(level, pos, soil, fertilizer.nutrients());
+            fertilizer.apply(level, pos, soil);
             items.setStack(slot, stack.copyWithCount(stack.getCount() - 1));
             fed++;
         }

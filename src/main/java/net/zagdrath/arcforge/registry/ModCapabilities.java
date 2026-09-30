@@ -230,6 +230,17 @@ public final class ModCapabilities {
                 ChemicalReactorBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
                 ElectrolyzerBlockEntity::getFluidHandler);
+        // Farm chemistry: the Air Separator's gases and FE; the Haber Reactor's gases, FE and heat.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.AIR_SEPARATOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.AIR_SEPARATOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.HABER_REACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.HABER_REACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.HABER_REACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
                 ElectrolyzerBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ASSEMBLER.get(),
@@ -357,6 +368,20 @@ public final class ModCapabilities {
             SolarThermalArrayBlockEntity solar = SolarThermalStructure.findController(level, pos);
             return solar != null ? solar.heatHandlerAt(pos, side) : null;
         }, solarParts);
+        // The Biogas Digester: plant matter and water in, Biogas and Digestate out, and heat in, through its ports.
+        Block[] digesterParts = { ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get(), ModBlocks.DIGESTER_CASING.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var digester = net.zagdrath.arcforge.multiblock.BiogasDigesterStructure.findController(level, pos);
+            return digester != null ? digester.itemHandlerAt(pos, side) : null;
+        }, digesterParts);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var digester = net.zagdrath.arcforge.multiblock.BiogasDigesterStructure.findController(level, pos);
+            return digester != null ? digester.fluidHandlerAt(pos, side) : null;
+        }, digesterParts);
+        event.registerBlock(HEAT, (level, pos, state, blockEntity, side) -> {
+            var digester = net.zagdrath.arcforge.multiblock.BiogasDigesterStructure.findController(level, pos);
+            return digester != null ? digester.heatHandlerAt(pos, side) : null;
+        }, digesterParts);
         Block[] columnParts = {
                 ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {

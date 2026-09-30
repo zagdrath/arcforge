@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:npk_fertilizer",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "minecraft:water",
+      "amount": 1000
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:nutrient_solution",
+    "amount": 1000
+  },
+  "time": 60
+}

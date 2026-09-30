@@ -4,6 +4,8 @@
     "arcforge:wood_ash",
     "arcforge:basic_slag",
     "arcforge:mixed_fertilizer",
-    "arcforge:seed_meal"
+    "arcforge:seed_meal",
+    "arcforge:npk_fertilizer",
+    "arcforge:digestate"
   ]
 }

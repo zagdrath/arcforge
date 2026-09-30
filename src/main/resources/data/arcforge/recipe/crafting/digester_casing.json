@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PCP",
+    "CWC",
+    "PCP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "C": "#c:plates/copper",
+    "W": "arcforge:wrought_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:digester_casing",
+    "count": 4
+  }
+}

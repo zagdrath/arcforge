@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:air_separating",
+  "primary": {
+    "id": "arcforge:nitrogen",
+    "amount": 80
+  },
+  "secondary": {
+    "id": "arcforge:oxygen",
+    "amount": 20
+  },
+  "time": 40,
+  "excluded_dimensions": [
+    "minecraft:the_end"
+  ]
+}

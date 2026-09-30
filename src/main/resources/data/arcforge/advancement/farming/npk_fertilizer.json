@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:farming/ammonia",
+  "display": {
+    "icon": {
+      "id": "arcforge:npk_fertilizer"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.npk_fertilizer.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.npk_fertilizer.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "npk": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:npk_fertilizer"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "npk"
+    ]
+  ]
+}

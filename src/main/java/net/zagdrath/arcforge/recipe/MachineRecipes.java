@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -241,5 +242,37 @@ public final class MachineRecipes {
 
     public static boolean isDryerInput(@Nullable Level level, ItemStack stack) {
         return drying(level, stack).isPresent();
+    }
+
+    // --- Farm chemistry ---
+
+    // The air separating recipe for the dimension the Air Separator is in, if any (none in the End).
+    public static Optional<RecipeHolder<AirSeparatingRecipe>> airSeparating(@Nullable Level level, ResourceKey<Level> dimension) {
+        return recipes(level).byType(ModRecipes.AIR_SEPARATING.get()).stream()
+                .filter(holder -> holder.value().worksIn(dimension))
+                .findFirst();
+    }
+
+    // The synthesizing recipe for what the Haber Reactor's input tanks hold, if any.
+    public static Optional<RecipeHolder<SynthesizingRecipe>> synthesizing(@Nullable Level level, SynthesizingRecipe.Input input) {
+        return recipes(level).byType(ModRecipes.SYNTHESIZING.get()).stream()
+                .filter(holder -> holder.value().tanksFor(input) != null)
+                .findFirst();
+    }
+
+    // Gases some synthesizing recipe takes: the only ones the Haber Reactor's input tanks take.
+    public static boolean isSynthesizingInput(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.SYNTHESIZING.get()).stream()
+                .anyMatch(holder -> holder.value().usesFluid(fluid));
+    }
+
+    public static Optional<RecipeHolder<DigestingRecipe>> digesting(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.DIGESTING.get()).stream()
+                .filter(holder -> holder.value().ingredient().test(input))
+                .findFirst();
+    }
+
+    public static boolean isDigesterInput(@Nullable Level level, ItemStack stack) {
+        return digesting(level, stack).isPresent();
     }
 }

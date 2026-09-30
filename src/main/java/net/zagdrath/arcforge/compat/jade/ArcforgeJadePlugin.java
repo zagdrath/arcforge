@@ -93,6 +93,12 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity.class)) {
             registration.registerBlockDataProvider(FarmProcessingProvider.INSTANCE, type);
         }
+        // Farm chemistry: the Air Separator, the Haber Reactor, and the Biogas Digester's controller and casings.
+        registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity.class);
+        registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity.class);
+        registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.BiogasDigesterBlockEntity.class);
+        registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock.class);
+        registration.registerBlockDataProvider(HeatProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock.class);
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, PressureGlassBlock.class);
         // Pressure Glass has no block entity: these read the array it belongs to.
@@ -148,6 +154,13 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.block.machine.GrainDryerBlock.class,
                 net.zagdrath.arcforge.block.machine.FermenterBlock.class)) {
             registration.registerBlockComponent(FarmProcessingProvider.Client.INSTANCE, type);
+        }
+        for (Class<? extends Block> type : List.of(
+                net.zagdrath.arcforge.block.machine.AirSeparatorBlock.class,
+                net.zagdrath.arcforge.block.machine.HaberReactorBlock.class,
+                net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock.class)) {
+            registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);

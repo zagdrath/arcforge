@@ -21,6 +21,7 @@ import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -28,7 +29,8 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 // Loam Farmland: tilled Loam. Like vanilla farmland it's moistened by water within 4 blocks (or rain), but it dries
 // only dryingChance as often, so it stays moist about twice as long, and it can't be trampled (FarmingEvents cancels
 // that). It holds NUTRIENTS (0-15), added with fertilizers (FertilizerItem); while it has any, the crop on it grows
-// faster and each growth stage uses some (FarmingEvents). Dry with nothing growing on it, or covered by a solid block,
+// faster and each growth stage uses some (FarmingEvents). NPK Fertilizer also sets ENRICHED, for a stronger growth bonus
+// until the nutrients run out (LoamGrowth). Dry with nothing growing on it, or covered by a solid block,
 // it turns back into Loam, and its nutrients go with it.
 // Crops plant and grow on it through #minecraft:supports_crops and #minecraft:grows_crops; like any FarmlandBlock it
 // counts as fertile (the moist-farmland growth rate) while it's moist.
@@ -36,6 +38,7 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 public class LoamFarmlandBlock extends FarmlandBlock {
     public static final int MAX_NUTRIENTS = 15;
     public static final IntegerProperty NUTRIENTS = IntegerProperty.create("nutrients", 0, MAX_NUTRIENTS);
+    public static final BooleanProperty ENRICHED = BooleanProperty.create("enriched");
     private static final int WET = 7;
 
     private final boolean irrigated;
@@ -44,7 +47,7 @@ public class LoamFarmlandBlock extends FarmlandBlock {
     public LoamFarmlandBlock(Block loam, boolean irrigated, BlockBehaviour.Properties properties) {
         super(loam, properties);
         this.irrigated = irrigated;
-        registerDefaultState(stateDefinition.any().setValue(MOISTURE, irrigated ? WET : 0).setValue(NUTRIENTS, 0));
+        registerDefaultState(stateDefinition.any().setValue(MOISTURE, irrigated ? WET : 0).setValue(NUTRIENTS, 0).setValue(ENRICHED, false));
     }
 
     public boolean isIrrigated() {
@@ -55,10 +58,14 @@ public class LoamFarmlandBlock extends FarmlandBlock {
         return state.getBlock() instanceof LoamFarmlandBlock ? state.getValue(NUTRIENTS) : 0;
     }
 
+    public static boolean isEnriched(BlockState state) {
+        return state.getBlock() instanceof LoamFarmlandBlock && state.getValue(ENRICHED);
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(NUTRIENTS);
+        builder.add(NUTRIENTS, ENRICHED);
     }
 
     @Override

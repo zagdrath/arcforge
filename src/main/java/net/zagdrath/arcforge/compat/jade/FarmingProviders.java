@@ -52,6 +52,9 @@ public final class FarmingProviders {
             }
             tooltip.add(Component.translatable("jade.arcforge.loam_farmland.nutrients", state.getValue(LoamFarmlandBlock.NUTRIENTS),
                     LoamFarmlandBlock.MAX_NUTRIENTS));
+            if (state.getValue(LoamFarmlandBlock.ENRICHED)) {
+                tooltip.add(Component.translatable("jade.arcforge.loam_farmland.enriched"));
+            }
             tooltip.add(Component.translatable(state.getValue(FarmlandBlock.MOISTURE) > 0 ? "jade.arcforge.loam_farmland.moist" : "jade.arcforge.loam_farmland.dry"));
         }
 

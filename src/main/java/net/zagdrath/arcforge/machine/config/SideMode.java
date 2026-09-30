@@ -33,7 +33,8 @@ public enum SideMode implements StringRepresentable {
     // general (see isOutput), so each machine handles them itself.
     OXYGEN("oxygen"),
     HYDROGEN("hydrogen"),
-    // A machine's own waste gas out, whatever it is (the Fermenter's Carbon Dioxide). Handled by the machine.
+    // A machine's own gas out, whatever it is: the Fermenter's Carbon Dioxide, the Air Separator's Nitrogen, the Haber
+    // Reactor's Ammonia, the Biogas Digester's Biogas (their Sides tabs name the gas). Handled by the machine.
     // SideConfig packs 4 bits per face and this is ordinal 15, the last that fits: another mode means widening it.
     GAS_OUTPUT("gas_output");
 

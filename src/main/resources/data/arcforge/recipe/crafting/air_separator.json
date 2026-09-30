@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TBT",
+    "GWG",
+    "TET"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "B": "minecraft:iron_bars",
+    "G": "#c:gears/nickel",
+    "W": "arcforge:wrought_fluid_tank",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:air_separator",
+    "count": 1
+  }
+}

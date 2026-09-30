@@ -1,0 +1,23 @@
+{
+  "title": "Biogas Digester",
+  "icon": "arcforge:biogas_digester_controller",
+  "items": [
+    "arcforge:biogas_digester_controller",
+    "arcforge:digester_casing",
+    "arcforge:digestate"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A warm tank that digests plant matter in water into Biogas, and sometimes Digestate.\n# Building\nA solid 3x3x3 of Digester Casings with one Biogas Digester Controller in the middle of a side, facing out. A new digester starts without ports: set them with the Wrench in Port mode.\n- Input: plant matter and water in.\n- Gas Output: Biogas out, every tick.\n- By-product: Digestate out (with auto-eject).\n- Heat: heat in.\nIt must be at 35°C or hotter to work, and uses 2 HU/t while it digests. A little heat from a Firebox, a Geothermal Plant or a warm Heat Cell is plenty; it holds heat up to 80°C."
+    },
+    {
+      "type": "text",
+      "text": "# What it takes\nIt digests 4 items at once. Each takes water when it starts.\n| Item | Water | Biogas | Digestate | Time |\n| Crops | 100 | 60 | 50% | 10 s |\n| Seeds | 25 | 15 | 10% | 5 s |\n| Leaves | 50 | 20 | 25% | 8 s |\n| Press Cake | 50 | 80 | 50% | 10 s |\n| Compost | 100 | 40 | always | 12 s |\n# What it makes\n- Biogas burns in the Fuel Burner (45 HU/t, up to 1,100°C) and the Gas Turbine Array (about 62 FE per mB).\n- Digestate is a fertilizer: +4 nutrients."
+    },
+    {
+      "type": "multiblock",
+      "structure": "biogas_digester"
+    }
+  ]
+}

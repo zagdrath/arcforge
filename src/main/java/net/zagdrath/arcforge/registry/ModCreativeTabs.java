@@ -235,6 +235,14 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.DRIED_HOPS.get());
                 output.accept(ModItems.DRIED_GRAIN.get());
                 output.accept(ModItems.DRIED_SORGHUM.get());
+                output.accept(ModItems.AIR_SEPARATOR.get());
+                output.accept(ModItems.HABER_REACTOR.get());
+                output.accept(ModItems.BIOGAS_DIGESTER_CONTROLLER.get());
+                output.accept(ModItems.DIGESTER_CASING.get());
+                output.accept(ModItems.NPK_FERTILIZER.get());
+                output.accept(ModItems.DIGESTATE.get());
+                output.accept(ModItems.NUTRIENT_SOLUTION_BUCKET.get());
+                output.accept(ModItems.BIODIESEL_BUCKET.get());
             }).build());
 
     private ModCreativeTabs() {}

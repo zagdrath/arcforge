@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PKP",
+    "RWR",
+    "PEP"
+  ],
+  "key": {
+    "P": "#c:plates/invar",
+    "K": "arcforge:thermocouple",
+    "R": "#c:rods/nickel",
+    "W": "arcforge:wrought_fluid_tank",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:haber_reactor",
+    "count": 1
+  }
+}

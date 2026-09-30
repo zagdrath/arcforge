@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/fertilize",
+  "display": {
+    "icon": {
+      "id": "arcforge:air_separator"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.air_separator.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.air_separator.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "nitrogen": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:nitrogen"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "nitrogen"
+    ]
+  ]
+}

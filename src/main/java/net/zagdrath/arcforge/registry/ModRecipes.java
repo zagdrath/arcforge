@@ -17,11 +17,13 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.OnDatapackSyncEvent;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.recipe.AirSeparatingRecipe;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.ChemicalReactingRecipe;
 import net.zagdrath.arcforge.recipe.ConduitDyeingRecipe;
 import net.zagdrath.arcforge.recipe.CrushingRecipe;
+import net.zagdrath.arcforge.recipe.DigestingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
 import net.zagdrath.arcforge.recipe.FermentingRecipe;
@@ -34,11 +36,13 @@ import net.zagdrath.arcforge.recipe.DryingRecipe;
 import net.zagdrath.arcforge.recipe.SeedExtractingRecipe;
 import net.zagdrath.arcforge.recipe.OilPressingRecipe;
 import net.zagdrath.arcforge.recipe.MillingRecipe;
+import net.zagdrath.arcforge.recipe.SynthesizingRecipe;
 import net.zagdrath.arcforge.recipe.TierUpgradeRecipe;
 
 // Data-driven machine recipes: data/<namespace>/recipe/*.json with type arcforge:carbonizing,
 // arcforge:arcforge_smelting, arcforge:chemical_reacting, arcforge:crushing, arcforge:distilling, arcforge:electrolyzing, arcforge:fiberizing, arcforge:infusing, arcforge:melting, arcforge:pressing, and the farm processing
-// arcforge:milling, arcforge:oil_pressing, arcforge:seed_extracting and arcforge:drying. All are synced to clients so GUI slots know what they accept,
+// arcforge:milling, arcforge:oil_pressing, arcforge:seed_extracting and arcforge:drying, and the farm chemistry
+// arcforge:air_separating, arcforge:synthesizing and arcforge:digesting. All are synced to clients so GUI slots know what they accept,
 // as are vanilla smelting recipes (for the Induction Furnaces).
 public final class ModRecipes {
     public static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(Registries.RECIPE_TYPE, Arcforge.MODID);
@@ -76,6 +80,13 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("seed_extracting")));
     public static final Supplier<RecipeType<DryingRecipe>> DRYING = RECIPE_TYPES.register("drying",
             () -> RecipeType.simple(id("drying")));
+    // Farm chemistry: the Air Separator, the Haber Reactor and the Biogas Digester.
+    public static final Supplier<RecipeType<AirSeparatingRecipe>> AIR_SEPARATING = RECIPE_TYPES.register("air_separating",
+            () -> RecipeType.simple(id("air_separating")));
+    public static final Supplier<RecipeType<SynthesizingRecipe>> SYNTHESIZING = RECIPE_TYPES.register("synthesizing",
+            () -> RecipeType.simple(id("synthesizing")));
+    public static final Supplier<RecipeType<DigestingRecipe>> DIGESTING = RECIPE_TYPES.register("digesting",
+            () -> RecipeType.simple(id("digesting")));
 
     public static final Supplier<RecipeSerializer<CarbonizingRecipe>> CARBONIZING_SERIALIZER = RECIPE_SERIALIZERS.register("carbonizing",
             () -> new RecipeSerializer<>(CarbonizingRecipe.MAP_CODEC, CarbonizingRecipe.STREAM_CODEC));
@@ -107,6 +118,12 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(SeedExtractingRecipe.MAP_CODEC, SeedExtractingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<DryingRecipe>> DRYING_SERIALIZER = RECIPE_SERIALIZERS.register("drying",
             () -> new RecipeSerializer<>(DryingRecipe.MAP_CODEC, DryingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<AirSeparatingRecipe>> AIR_SEPARATING_SERIALIZER = RECIPE_SERIALIZERS.register("air_separating",
+            () -> new RecipeSerializer<>(AirSeparatingRecipe.MAP_CODEC, AirSeparatingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<SynthesizingRecipe>> SYNTHESIZING_SERIALIZER = RECIPE_SERIALIZERS.register("synthesizing",
+            () -> new RecipeSerializer<>(SynthesizingRecipe.MAP_CODEC, SynthesizingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<DigestingRecipe>> DIGESTING_SERIALIZER = RECIPE_SERIALIZERS.register("digesting",
+            () -> new RecipeSerializer<>(DigestingRecipe.MAP_CODEC, DigestingRecipe.STREAM_CODEC));
     // A crafting recipe (vanilla's crafting type) that keeps the contents of what it upgrades.
     public static final Supplier<RecipeSerializer<TierUpgradeRecipe>> TIER_UPGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("tier_upgrade",
             () -> new RecipeSerializer<>(TierUpgradeRecipe.MAP_CODEC, TierUpgradeRecipe.STREAM_CODEC));
@@ -137,6 +154,7 @@ public final class ModRecipes {
 
     private static void syncToClients(OnDatapackSyncEvent event) {
         event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
-                MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), RecipeType.SMELTING);
+                MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(),
+                RecipeType.SMELTING);
     }
 }

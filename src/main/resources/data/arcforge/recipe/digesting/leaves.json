@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:digesting",
+  "ingredient": "#minecraft:leaves",
+  "water": 50,
+  "result": {
+    "id": "arcforge:biogas",
+    "amount": 20
+  },
+  "byproduct": {
+    "id": "arcforge:digestate",
+    "count": 1
+  },
+  "byproduct_chance": 0.25,
+  "time": 160
+}

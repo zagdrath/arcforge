@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/seed_oil",
+  "display": {
+    "icon": {
+      "id": "arcforge:biodiesel_bucket"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.biodiesel.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.biodiesel.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "biodiesel": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:biodiesel"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "biodiesel"
+    ]
+  ]
+}

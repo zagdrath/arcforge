@@ -6,12 +6,13 @@
     "arcforge:creosote_bucket",
     "arcforge:naphtha_bucket",
     "arcforge:light_oil_bucket",
-    "arcforge:heavy_oil_bucket"
+    "arcforge:heavy_oil_bucket",
+    "arcforge:biodiesel_bucket"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Burns liquid fuel into heat, but never hotter than the fuel burns:\n- Creosote: 60 HU/t, up to 850°C.\n- Naphtha: 200 HU/t, up to 1,200°C.\n- Light Oil: 125 HU/t, up to 1,000°C.\n- Heavy Oil: 50 HU/t, up to 750°C.\nSuperheated Steam needs a 900°C boiler, so a creosote burner only reaches High-Pressure: distil the creosote into Naphtha for that. Switching to a cooler fuel lets it cool down to that fuel's temperature.\n- Hydrogen (a gas, from the Electrolyzer): 60 HU/t, up to 1,400°C. Feed it with a Pressurized Conduit, a Cylinder or a Gas Cartridge.\nFeed it oxygen for oxy-fuel: see Oxy-Fuel."
+      "text": "Burns liquid fuel into heat, but never hotter than the fuel burns:\n- Creosote: 60 HU/t, up to 850°C.\n- Naphtha: 200 HU/t, up to 1,200°C.\n- Light Oil: 125 HU/t, up to 1,000°C.\n- Heavy Oil: 50 HU/t, up to 750°C.\nSuperheated Steam needs a 900°C boiler, so a creosote burner only reaches High-Pressure: distil the creosote into Naphtha for that. Switching to a cooler fuel lets it cool down to that fuel's temperature.\n- Hydrogen (a gas, from the Electrolyzer): 60 HU/t, up to 1,400°C. Feed it with a Pressurized Conduit, a Cylinder or a Gas Cartridge.\n- Biodiesel (from Seed Oil and Ethanol): 160 HU/t, up to 1,000°C.\n- Biogas (a gas, from the Biogas Digester): 45 HU/t, up to 1,100°C.\nFeed it oxygen for oxy-fuel: see Oxy-Fuel."
     }
   ]
 }

@@ -41,6 +41,10 @@ import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.block.machine.AirSeparatorBlock;
+import net.zagdrath.arcforge.block.machine.HaberReactorBlock;
+import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
+import net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
@@ -487,6 +491,24 @@ public final class ModBlocks {
             p -> new LiquidBlock(ModFluids.SEED_OIL.get(), p) {},
             p -> liquidProperties(p, MapColor.GOLD));
 
+    // Farm chemistry: Nutrient Solution and Biodiesel. Biodiesel burns where it lies, like Ethanol.
+    public static final DeferredBlock<LiquidBlock> NUTRIENT_SOLUTION = BLOCKS.registerBlock("nutrient_solution",
+            p -> new LiquidBlock(ModFluids.NUTRIENT_SOLUTION.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_LIGHT_GREEN));
+    public static final DeferredBlock<LiquidBlock> BIODIESEL = BLOCKS.registerBlock("biodiesel",
+            p -> new LiquidBlock(ModFluids.BIODIESEL.get(), p) {
+                @Override
+                public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 200;
+                }
+
+                @Override
+                public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 30;
+                }
+            },
+            p -> liquidProperties(p, MapColor.GOLD));
+
     // The Chemical Reactor's fluids. Sulfuric Acid hurts whatever wades in; the slurries are harmless.
     public static final DeferredBlock<LiquidBlock> SULFURIC_ACID = BLOCKS.registerBlock("sulfuric_acid",
             p -> new SulfuricAcidBlock(ModFluids.SULFURIC_ACID.get(), p),
@@ -597,6 +619,17 @@ public final class ModBlocks {
     // The heating element glows while it dries.
     public static final DeferredBlock<GrainDryerBlock> GRAIN_DRYER = BLOCKS.registerBlock("grain_dryer",
             GrainDryerBlock::new, p -> machineProperties(p, 7));
+
+    // Farm chemistry. The Air Separator runs on FE; the Haber Reactor on FE and heat (its catalyst bed glows while it
+    // runs). The Biogas Digester is a 3x3x3 of Digester Casings with one controller (see BiogasDigesterStructure).
+    public static final DeferredBlock<AirSeparatorBlock> AIR_SEPARATOR = BLOCKS.registerBlock("air_separator",
+            AirSeparatorBlock::new, p -> machineProperties(p, 0));
+    public static final DeferredBlock<HaberReactorBlock> HABER_REACTOR = BLOCKS.registerBlock("haber_reactor",
+            HaberReactorBlock::new, p -> machineProperties(p, 7));
+    public static final DeferredBlock<DigesterCasingBlock> DIGESTER_CASING = BLOCKS.registerBlock("digester_casing",
+            DigesterCasingBlock::new, ModBlocks::columnProperties);
+    public static final DeferredBlock<BiogasDigesterControllerBlock> BIOGAS_DIGESTER_CONTROLLER = BLOCKS.registerBlock("biogas_digester_controller",
+            BiogasDigesterControllerBlock::new, ModBlocks::columnProperties);
 
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);

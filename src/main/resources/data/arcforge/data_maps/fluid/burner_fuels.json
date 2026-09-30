@@ -31,6 +31,17 @@
       "hu_per_mb": 300,
       "mb_per_tick": 0.5,
       "burn_temperature": 900
+    },
+    "arcforge:biodiesel": {
+      "hu_per_mb": 320,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1000,
+      "gas_turbine": false
+    },
+    "arcforge:biogas": {
+      "hu_per_mb": 45,
+      "mb_per_tick": 1.0,
+      "burn_temperature": 1100
     }
   }
 }

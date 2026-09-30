@@ -20,12 +20,15 @@ import net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MillBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.SeedExtractorBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.HarvesterBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.PlanterBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.BiogasDigesterBlockEntity;
 import net.zagdrath.arcforge.blockentity.redstone.ThrottleLeverBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
@@ -132,6 +135,13 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(SeedExtractorBlockEntity::new, ModBlocks.SEED_EXTRACTOR.get()));
     public static final Supplier<BlockEntityType<GrainDryerBlockEntity>> GRAIN_DRYER = BLOCK_ENTITY_TYPES.register("grain_dryer",
             () -> new BlockEntityType<>(GrainDryerBlockEntity::new, ModBlocks.GRAIN_DRYER.get()));
+    // Farm chemistry.
+    public static final Supplier<BlockEntityType<AirSeparatorBlockEntity>> AIR_SEPARATOR = BLOCK_ENTITY_TYPES.register("air_separator",
+            () -> new BlockEntityType<>(AirSeparatorBlockEntity::new, ModBlocks.AIR_SEPARATOR.get()));
+    public static final Supplier<BlockEntityType<HaberReactorBlockEntity>> HABER_REACTOR = BLOCK_ENTITY_TYPES.register("haber_reactor",
+            () -> new BlockEntityType<>(HaberReactorBlockEntity::new, ModBlocks.HABER_REACTOR.get()));
+    public static final Supplier<BlockEntityType<BiogasDigesterBlockEntity>> BIOGAS_DIGESTER = BLOCK_ENTITY_TYPES.register("biogas_digester",
+            () -> new BlockEntityType<>(BiogasDigesterBlockEntity::new, ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get()));
 
     public static final Supplier<BlockEntityType<ChargepadBlockEntity>> CHARGEPAD = BLOCK_ENTITY_TYPES.register("chargepad",
             () -> new BlockEntityType<>(ChargepadBlockEntity::new, ModBlocks.CHARGEPAD.get()));

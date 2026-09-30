@@ -1522,6 +1522,14 @@ public class ArcforgeConfig {
             .comment("Nutrients from one Seed Meal (milled seeds).")
             .defineInRange("seedMeal", 1, 0, 15);
 
+    public static final ModConfigSpec.IntValue NPK_NUTRIENTS = BUILDER
+            .comment("Nutrients from one NPK Fertilizer. It also enriches the farmland (see loamFarmland.npkGrowthMultiplier).")
+            .defineInRange("npk", 15, 0, 15);
+
+    public static final ModConfigSpec.IntValue DIGESTATE_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Digestate (the Biogas Digester's by-product).")
+            .defineInRange("digestate", 4, 0, 15);
+
     public static final ModConfigSpec.DoubleValue WOOD_ASH_CHANCE = BUILDER
             .comment("Chance that burning one item of #arcforge:leaves_wood_ash (charcoal) in a Firebox or Combustion Plant",
                     "leaves a Wood Ash in its ash slot. A full ash slot loses it.")
@@ -1544,6 +1552,11 @@ public class ArcforgeConfig {
             .comment("How much faster crops grow on it while it has nutrients (1.5 = half again as fast; up to 2).",
                     "Each natural growth stage then has a (multiplier - 1) chance of an extra stage.")
             .defineInRange("growthMultiplier", 1.5, 1.0, 2.0);
+
+    public static final ModConfigSpec.DoubleValue LOAM_NPK_GROWTH_MULTIPLIER = BUILDER
+            .comment("How much faster crops grow on farmland enriched with NPK Fertilizer, while its nutrients last (2.0 = twice",
+                    "as fast: every natural growth stage brings one more). Past 2, the rest is the chance of a third stage.")
+            .defineInRange("npkGrowthMultiplier", 2.0, 1.0, 3.0);
 
     public static final ModConfigSpec.IntValue LOAM_NUTRIENTS_PER_STAGE = BUILDER
             .comment("Nutrients each growth stage of the crop on it uses.")
@@ -1744,6 +1757,117 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue GRAIN_DRYER_MIN_TEMPERATURE = BUILDER
             .comment("It only dries while its heat buffer is above this, in °C.")
             .defineInRange("minTemperature", 60, 21, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Air Separator: separates air into Nitrogen and Oxygen with FE, anywhere but the End. Recipes",
+                "(arcforge:air_separating) set the amounts, time and FE/t.").push("airSeparator");
+    }
+
+    public static final ModConfigSpec.IntValue AIR_SEPARATOR_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 40_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue AIR_SEPARATOR_MAX_INPUT = BUILDER
+            .comment("Most FE/t it accepts.")
+            .defineInRange("maxInput", 400, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue AIR_SEPARATOR_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t for a recipe that doesn't set its own.")
+            .defineInRange("energyPerTick", 80, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue AIR_SEPARATOR_GAS_CAPACITY = BUILDER
+            .comment("Size of each gas tank (Nitrogen, Oxygen), in mB.")
+            .defineInRange("gasCapacity", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue AIR_SEPARATOR_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each gas it pushes out of its faces for that gas (shared across them).")
+            .defineInRange("outputRate", 200, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Haber Reactor: makes Ammonia from Hydrogen and Nitrogen with FE and heat, at minTemperature or hotter.",
+                "Recipes (arcforge:synthesizing) set the gases, time, FE/t and HU/t.").push("haberReactor");
+    }
+
+    public static final ModConfigSpec.IntValue HABER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 40_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue HABER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it accepts.")
+            .defineInRange("maxInput", 400, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HABER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t for a recipe that doesn't set its own.")
+            .defineInRange("energyPerTick", 60, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HABER_TANK_CAPACITY = BUILDER
+            .comment("Size of each gas tank (two inputs, one output), in mB.")
+            .defineInRange("tankCapacity", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HABER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 20_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue HABER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 800, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue HABER_MIN_TEMPERATURE = BUILDER
+            .comment("It only runs at this temperature or hotter, in °C.")
+            .defineInRange("minTemperature", 450, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue HABER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of Ammonia it pushes out of its Gas Output faces (shared across them).")
+            .defineInRange("outputRate", 200, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Biogas Digester: a 3x3x3 multiblock that digests plant matter in water into Biogas and Digestate, while",
+                "warm. Recipes (arcforge:digesting) set what each item gives and how long it takes.").push("biogasDigester");
+    }
+
+    public static final ModConfigSpec.IntValue DIGESTER_WATER_CAPACITY = BUILDER
+            .comment("Water tank size, in mB.")
+            .defineInRange("waterCapacity", 16_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue DIGESTER_GAS_CAPACITY = BUILDER
+            .comment("Biogas tank size, in mB.")
+            .defineInRange("gasCapacity", 32_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue DIGESTER_LANES = BUILDER
+            .comment("Items it digests at once (each with its own recipe time).")
+            .defineInRange("lanes", 4, 1, 9);
+
+    public static final ModConfigSpec.IntValue DIGESTER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 8_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue DIGESTER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 80, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue DIGESTER_MIN_TEMPERATURE = BUILDER
+            .comment("It only digests at this temperature or hotter, in °C.")
+            .defineInRange("minTemperature", 35, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue DIGESTER_HEAT_PER_TICK = BUILDER
+            .comment("HU/t it uses while digesting (to stay warm), however many lanes are busy.")
+            .defineInRange("heatPerTick", 2, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue DIGESTER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of Biogas it pushes out of its Gas Output ports (shared across them).")
+            .defineInRange("outputRate", 400, 1, 1_000_000);
 
     static {
         BUILDER.pop();

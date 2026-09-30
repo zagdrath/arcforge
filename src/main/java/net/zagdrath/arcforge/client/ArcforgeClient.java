@@ -203,6 +203,9 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.OIL_PRESS.get(), OilPressScreen::new);
         event.register(ModMenuTypes.SEED_EXTRACTOR.get(), SeedExtractorScreen::new);
         event.register(ModMenuTypes.GRAIN_DRYER.get(), GrainDryerScreen::new);
+        event.register(ModMenuTypes.AIR_SEPARATOR.get(), net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen::new);
+        event.register(ModMenuTypes.HABER_REACTOR.get(), net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen::new);
+        event.register(ModMenuTypes.BIOGAS_DIGESTER.get(), net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
         event.register(ModMenuTypes.ASSEMBLER.get(), AssemblerScreen::new);
@@ -259,6 +262,8 @@ public class ArcforgeClient {
         event.register(liquidModel("light_oil"), ModFluids.LIGHT_OIL, ModFluids.FLOWING_LIGHT_OIL);
         event.register(liquidModel("heavy_oil"), ModFluids.HEAVY_OIL, ModFluids.FLOWING_HEAVY_OIL);
         event.register(liquidModel("seed_oil"), ModFluids.SEED_OIL, ModFluids.FLOWING_SEED_OIL);
+        event.register(liquidModel("nutrient_solution"), ModFluids.NUTRIENT_SOLUTION, ModFluids.FLOWING_NUTRIENT_SOLUTION);
+        event.register(liquidModel("biodiesel"), ModFluids.BIODIESEL, ModFluids.FLOWING_BIODIESEL);
         event.register(liquidModel("sulfuric_acid"), ModFluids.SULFURIC_ACID, ModFluids.FLOWING_SULFURIC_ACID);
         // The slurries share one greyscale texture, tinted per metal.
         for (OreSlurry slurry : OreSlurry.values()) {
@@ -279,6 +284,9 @@ public class ArcforgeClient {
         event.register(gasModel(HYDROGEN_TINT), ModFluids.HYDROGEN, ModFluids.FLOWING_HYDROGEN);
         event.register(gasModel(OXYGEN_TINT), ModFluids.OXYGEN, ModFluids.FLOWING_OXYGEN);
         event.register(gasModel(CARBON_DIOXIDE_TINT), ModFluids.CARBON_DIOXIDE, ModFluids.FLOWING_CARBON_DIOXIDE);
+        event.register(gasModel(NITROGEN_TINT), ModFluids.NITROGEN, ModFluids.FLOWING_NITROGEN);
+        event.register(gasModel(AMMONIA_TINT), ModFluids.AMMONIA, ModFluids.FLOWING_AMMONIA);
+        event.register(gasModel(BIOGAS_TINT), ModFluids.BIOGAS, ModFluids.FLOWING_BIOGAS);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -294,6 +302,10 @@ public class ArcforgeClient {
     public static final int OXYGEN_TINT = 0xFF9FD4F2;
     // Carbon Dioxide: a cool grey, darker than steam.
     public static final int CARBON_DIOXIDE_TINT = 0xFFB4BCC4;
+    // Farm chemistry: Nitrogen a cold lilac, Ammonia a pale sharp yellow-green, Biogas a murky olive.
+    public static final int NITROGEN_TINT = 0xFFC4C0EC;
+    public static final int AMMONIA_TINT = 0xFFE2F0A0;
+    public static final int BIOGAS_TINT = 0xFFA8B478;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(
@@ -334,6 +346,11 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(HYDROGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.HYDROGEN_TYPE.get());
         event.registerFluidType(liquidFog(OXYGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.OXYGEN_TYPE.get());
         event.registerFluidType(liquidFog(CARBON_DIOXIDE_TINT & 0xFFFFFF, 6.0F), ModFluids.CARBON_DIOXIDE_TYPE.get());
+        event.registerFluidType(liquidFog(NITROGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.NITROGEN_TYPE.get());
+        event.registerFluidType(liquidFog(AMMONIA_TINT & 0xFFFFFF, 6.0F), ModFluids.AMMONIA_TYPE.get());
+        event.registerFluidType(liquidFog(BIOGAS_TINT & 0xFFFFFF, 6.0F), ModFluids.BIOGAS_TYPE.get());
+        event.registerFluidType(liquidFog(0x7FB84A, 5.0F), ModFluids.NUTRIENT_SOLUTION_TYPE.get());
+        event.registerFluidType(liquidFog(0xD8A838, 4.0F), ModFluids.BIODIESEL_TYPE.get());
         for (OreSlurry slurry : OreSlurry.values()) {
             event.registerFluidType(liquidFog(slurry.tint() & 0xFFFFFF, 3.0F), ModFluids.slurry(slurry).type().get());
         }

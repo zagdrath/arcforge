@@ -1,0 +1,13 @@
+{
+  "title": "Haber Reactor",
+  "icon": "arcforge:haber_reactor",
+  "items": [
+    "arcforge:haber_reactor"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Haber Reactor makes Ammonia, a gas, from Hydrogen and Nitrogen over a hot catalyst:\n- 60 mB Hydrogen + 20 mB Nitrogen make 40 mB Ammonia every second.\n- It uses 60 FE/t and 10 HU/t, and only works at 450°C or hotter. Below that it waits, keeping its progress.\n# Setting up\n- Heat: a Fuel Burner or a Firebox against its heat face (the bottom, by default). It holds heat up to 800°C.\n- Gases: pipe Hydrogen (from an Electrolyzer) and Nitrogen (from an Air Separator) into its input faces (the top and left). Each gas keeps a tank of its own.\n- Ammonia leaves through its Gas Output face (the right) every tick.\nAmmonia goes into the Chemical Reactor to make NPK Fertilizer. Speed and Energy upgrades work."
+    }
+  ]
+}

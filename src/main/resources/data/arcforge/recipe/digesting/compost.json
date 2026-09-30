@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:digesting",
+  "ingredient": "arcforge:compost",
+  "water": 100,
+  "result": {
+    "id": "arcforge:biogas",
+    "amount": 40
+  },
+  "byproduct": {
+    "id": "arcforge:digestate",
+    "count": 1
+  },
+  "byproduct_chance": 1.0,
+  "time": 240
+}

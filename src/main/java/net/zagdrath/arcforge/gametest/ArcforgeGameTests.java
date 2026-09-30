@@ -259,6 +259,15 @@ public final class ArcforgeGameTests {
         TESTS.put("processing_gas_output_side_mode", ProcessingGameTests::gasOutputSideMode);
         TESTS.put("processing_flour_and_dried_crops", ProcessingGameTests::flourAndDriedCrops);
         TESTS.put("processing_recipes", ProcessingGameTests::recipes);
+        TESTS.put("chemistry_air_separator_makes_gases", FarmChemistryGameTests::airSeparatorMakesGases);
+        TESTS.put("chemistry_air_separator_vents", FarmChemistryGameTests::airSeparatorVents);
+        TESTS.put("chemistry_haber_needs_heat", FarmChemistryGameTests::haberNeedsHeat);
+        TESTS.put("chemistry_reactor_makes_npk", FarmChemistryGameTests::reactorMakesNpk);
+        TESTS.put("chemistry_npk_enriches_loam", FarmChemistryGameTests::npkEnrichesLoam);
+        TESTS.put("chemistry_digester_forms", FarmChemistryGameTests::digesterForms);
+        TESTS.put("chemistry_digester_digests", FarmChemistryGameTests::digesterDigests);
+        TESTS.put("chemistry_fuels_and_gases", FarmChemistryGameTests::fuelsAndGases);
+        TESTS.put("chemistry_recipes", FarmChemistryGameTests::recipes);
         TESTS.put("advancement_tree_loads", AdvancementGameTests::treeLoads);
         TESTS.put("multiblock_formed_trigger", AdvancementGameTests::multiblockFormedTrigger);
         TESTS.put("turbine_full_speed_needs_length", AdvancementGameTests::turbineFullSpeedNeedsLength);

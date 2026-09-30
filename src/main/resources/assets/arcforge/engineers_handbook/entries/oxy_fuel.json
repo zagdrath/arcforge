@@ -5,12 +5,13 @@
     "arcforge:firebox",
     "arcforge:fuel_burner",
     "arcforge:electrolyzer",
-    "arcforge:tempered_pressurized_conduit"
+    "arcforge:tempered_pressurized_conduit",
+    "arcforge:air_separator"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Burning in oxygen instead of air makes a hotter, more efficient flame. The Firebox and the Fuel Burner both take oxygen.\n# Setting up\n- With the Wrench in Port mode (or in the Sides tab), set a face to Oxygen.\n- Pipe oxygen in with a Pressurized Conduit, from an Electrolyzer or a Pressurized Cylinder. The machine keeps a small oxygen tank (2,000 mB).\n# What it does\nWhile it has oxygen, a burning machine:\n- burns 300°C hotter, up to 1,600°C;\n- makes 25% more heat from each fuel;\n- uses 0.25 mB of oxygen per tick.\nWithout oxygen it works exactly as before. The flame in the GUI turns blue-white and the status reads Oxy-fuel. The Heat tab shows how much oxygen is left."
+      "text": "Burning in oxygen instead of air makes a hotter, more efficient flame. The Firebox and the Fuel Burner both take oxygen.\n# Setting up\n- With the Wrench in Port mode (or in the Sides tab), set a face to Oxygen.\n- Pipe oxygen in with a Pressurized Conduit, from an Electrolyzer, an Air Separator or a Pressurized Cylinder. The machine keeps a small oxygen tank (2,000 mB).\n# What it does\nWhile it has oxygen, a burning machine:\n- burns 300°C hotter, up to 1,600°C;\n- makes 25% more heat from each fuel;\n- uses 0.25 mB of oxygen per tick.\nWithout oxygen it works exactly as before. The flame in the GUI turns blue-white and the status reads Oxy-fuel. The Heat tab shows how much oxygen is left."
     },
     {
       "type": "text",

@@ -93,7 +93,12 @@ public enum MachineStatus {
     // Farm processing: the Mill, the Seed Extractor and the Grain Dryer (the Oil Press says PRESSING).
     MILLING("milling", "led_running"),
     EXTRACTING("extracting", "led_running"),
-    DRYING("drying", "led_running");
+    DRYING("drying", "led_running"),
+    // Farm chemistry: the Air Separator (NO_AIR in the End), the Haber Reactor and the Biogas Digester.
+    SEPARATING("separating", "led_running"),
+    NO_AIR("no_air", "led_blocked"),
+    SYNTHESIZING("synthesizing", "led_running"),
+    DIGESTING("digesting", "led_running");
 
     private final String name;
     private final String led;

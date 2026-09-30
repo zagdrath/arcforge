@@ -144,7 +144,7 @@
       "id": "farming",
       "title": "Farming",
       "icon": "arcforge:compost_bin",
-      "description": "Compost, fertilizers, rich soil, and the crops that grow in it.",
+      "description": "Compost, fertilizers, rich soil, the crops that grow in it, and what to make of them.",
       "entries": [
         "compost_bin",
         "loam_farmland",
@@ -159,7 +159,11 @@
         "millstone_and_mill",
         "seed_extractor",
         "oil_press",
-        "grain_dryer"
+        "grain_dryer",
+        "air_separator",
+        "haber_reactor",
+        "npk_fertilizer",
+        "biogas_digester"
       ]
     }
   ]

@@ -554,6 +554,30 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - The Gas Output port is the output ring round a gas-white chip; its Sides-tab face is the output face's orange bevel
   round `#DCE6F0`.
 
+## Farm chemistry
+- The Air Separator and Haber Reactor are single-block machine casings (section 3) with the 8x8 ports at their default
+  faces and a recessed front window (x3..12) with a 4-frame `_on` animation. Left and right differ, so each has `_left`
+  and `_right` textures (for a north-facing block LEFT is east).
+  - Air Separator: an intake grille on top (four slats in a recess), a plain bottom, FE at the back, the Oxygen port on
+    the left and the Gas Output port on the right. The window is a cold box: two slim steel columns joined by a pipe,
+    a frost row on their caps, liquid Oxygen (`#9FD4F2`) and liquid Nitrogen (`#C4C0EC`) pooled at their feet; running,
+    a bubble rises through each pool.
+  - Haber Reactor: gas input ports (the input ring round a gas-white chip) on top and left, heat underneath, FE at the
+    back, Gas Output on the right. The window is a sight glass onto the catalyst bed: 2x2 pellets in furnace brick
+    (`#553F34 #3A2C23 #2B211B`) when cold, on the Heat row when running, with the lit pellets shifting frame to frame.
+- Biogas Digester (connected, `ConnectedModel` "digester"): the side plate is the wall plate (the split face, the
+  riveted strap on rows 13-15) with a Tempered-copper hoop band on rows 5-7 (`#E0A062 #C98244 #8A4822`); the lid is the
+  plain split face with a seam round each block and four rivets. Edges use the Distillation Array's `ctm/column_beam`.
+  The loose casing is the plate with that beam on all four sides. The controller is the plate without the band, with a
+  recessed sight glass (x3..12, y2..9) onto the slurry (`#8A8A3C #727A30 #5A6628 #42501F`, gas space dark above) and a
+  small cyan readout below it; running, bubbles rise through the slurry and the readout fills.
+- Items: NPK Fertilizer is the Mixed Fertilizer sack as a white poly sack (`#F0ECE4 #DCD6CA #B8B2A6 #8E887E`, the
+  plastic tones) with a blue tie and label (the Input row) and N/P/K chips (ammonia `#C8DC78`, slag, ash). Digestate is
+  Cody's compost lump recoloured by rank onto a wet olive-brown `#161408 -> #8C8650` (his own tonal outline, no black).
+- Fluids: Nutrient Solution (`#1E4A18 -> #B2E284`) and Biodiesel (a pale lemon-gold `#8C7E1E -> #F6F2B0`, paler than
+  Seed Oil) are Ethanol's frames recoloured by brightness. The gases are the steam texture tinted: Nitrogen `#C4C0EC`,
+  Ammonia `#E2F0A0`, Biogas `#A8B478`.
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

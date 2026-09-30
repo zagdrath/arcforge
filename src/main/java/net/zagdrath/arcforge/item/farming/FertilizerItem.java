@@ -21,18 +21,44 @@ import net.minecraft.world.level.block.LevelEvent;
 import net.minecraft.world.level.block.state.BlockState;
 import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
 
-// Compost, Wood Ash, Basic Slag and Mixed Fertilizer: used on Loam Farmland (or on the crop growing on it), one adds
-// its nutrients (config farming.fertilizers), up to 15. They do nothing on anything else.
+// Compost, Wood Ash, Basic Slag, Mixed Fertilizer, Seed Meal, Digestate and NPK Fertilizer: used on Loam Farmland (or on
+// the crop growing on it), one adds its nutrients (config farming.fertilizers), up to 15. They do nothing on anything
+// else. NPK Fertilizer also enriches the farmland (LoamFarmlandBlock.ENRICHED): until its nutrients run out, the crop on
+// it grows at loamFarmland.npkGrowthMultiplier instead of growthMultiplier.
 public class FertilizerItem extends Item {
     private final IntSupplier nutrients;
+    private final boolean enriches;
 
     public FertilizerItem(IntSupplier nutrients, Item.Properties properties) {
+        this(nutrients, false, properties);
+    }
+
+    public FertilizerItem(IntSupplier nutrients, boolean enriches, Item.Properties properties) {
         super(properties);
         this.nutrients = nutrients;
+        this.enriches = enriches;
     }
 
     public int nutrients() {
         return nutrients.getAsInt();
+    }
+
+    public boolean enriches() {
+        return enriches;
+    }
+
+    // Whether using it on this soil would change anything: it has room for nutrients, or this enriches soil that isn't.
+    public boolean wouldHelp(BlockState soil) {
+        if (!(soil.getBlock() instanceof LoamFarmlandBlock)) {
+            return false;
+        }
+        return soil.getValue(LoamFarmlandBlock.NUTRIENTS) < LoamFarmlandBlock.MAX_NUTRIENTS && nutrients() > 0
+                || enriches && !soil.getValue(LoamFarmlandBlock.ENRICHED);
+    }
+
+    // Fertilizes the Loam Farmland at pos with this item (and enriches it, if this enriches). Returns the new level.
+    public int apply(Level level, BlockPos pos, BlockState soil) {
+        return fertilize(level, pos, enriches ? soil.setValue(LoamFarmlandBlock.ENRICHED, true) : soil, nutrients());
     }
 
     @Override
@@ -47,8 +73,7 @@ public class FertilizerItem extends Item {
             return InteractionResult.PASS;
         }
         Player player = context.getPlayer();
-        int before = soil.getValue(LoamFarmlandBlock.NUTRIENTS);
-        if (before >= LoamFarmlandBlock.MAX_NUTRIENTS || nutrients() <= 0) {
+        if (!wouldHelp(soil)) {
             if (!level.isClientSide() && player != null) {
                 player.sendOverlayMessage(Component.translatable("message.arcforge.loam_farmland.full"));
             }
@@ -57,7 +82,7 @@ public class FertilizerItem extends Item {
         if (level.isClientSide()) {
             return InteractionResult.SUCCESS;
         }
-        fertilize(level, pos, soil, nutrients());
+        apply(level, pos, soil);
         if (player == null || !player.hasInfiniteMaterials()) {
             context.getItemInHand().shrink(1);
         }

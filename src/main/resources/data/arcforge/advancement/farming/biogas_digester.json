@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/compost_bin",
+  "display": {
+    "icon": {
+      "id": "arcforge:biogas_digester_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.biogas_digester.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.biogas_digester.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:biogas_digester"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

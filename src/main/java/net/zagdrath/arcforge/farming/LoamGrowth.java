@@ -21,7 +21,9 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 // What nutrients do for the crop on Loam Farmland. Whenever the crop grows a stage by itself (a random tick, not bone
 // meal) while its soil has nutrients, the stage uses nutrientsPerStage, and with a (growthMultiplier - 1) chance it
 // grows one more stage straight away, which uses as much again. So on average it grows growthMultiplier times as fast
-// (1.5 by default) for as long as the nutrients last. Anything with an "age" property counts: wheat, carrots, potatoes,
+// (1.5 by default) for as long as the nutrients last. On soil enriched with NPK Fertilizer the multiplier is
+// npkGrowthMultiplier (2 by default: every stage brings one more; past 2, a chance of a third), and the enrichment goes
+// when the nutrients run out. Anything with an "age" property counts: wheat, carrots, potatoes,
 // beetroots, melon and pumpkin stems, and most modded crops.
 public final class LoamGrowth {
     private LoamGrowth() {}
@@ -38,18 +40,23 @@ public final class LoamGrowth {
         int perStage = ArcforgeConfig.LOAM_NUTRIENTS_PER_STAGE.getAsInt();
         nutrients = Math.max(0, nutrients - perStage);
         int stages = 1;
-        double bonusChance = ArcforgeConfig.LOAM_GROWTH_MULTIPLIER.getAsDouble() - 1.0;
-        BlockState crop = level.getBlockState(cropPos);
-        boolean room = !(crop.getBlock() instanceof ArcforgeCropBlock tall) || tall.hasRoomToGrow(level, cropPos, crop);
-        if (nutrients > 0 && room && random.nextDouble() < bonusChance) {
-            BlockState grown = nextStage(crop);
-            if (grown != null) {
-                level.setBlock(cropPos, grown, Block.UPDATE_CLIENTS);
-                nutrients = Math.max(0, nutrients - perStage);
-                stages++;
+        boolean enriched = LoamFarmlandBlock.isEnriched(soil);
+        double bonus = (enriched ? ArcforgeConfig.LOAM_NPK_GROWTH_MULTIPLIER : ArcforgeConfig.LOAM_GROWTH_MULTIPLIER).getAsDouble() - 1.0;
+        // Each whole unit of bonus is a sure extra stage; what's left over is the chance of one more.
+        while (nutrients > 0 && bonus > 0 && (bonus >= 1.0 || random.nextDouble() < bonus)) {
+            bonus -= 1.0;
+            BlockState crop = level.getBlockState(cropPos);
+            boolean room = !(crop.getBlock() instanceof ArcforgeCropBlock tall) || tall.hasRoomToGrow(level, cropPos, crop);
+            BlockState grown = room ? nextStage(crop) : null;
+            if (grown == null) {
+                break;
             }
+            level.setBlock(cropPos, grown, Block.UPDATE_CLIENTS);
+            nutrients = Math.max(0, nutrients - perStage);
+            stages++;
         }
-        level.setBlock(soilPos, soil.setValue(LoamFarmlandBlock.NUTRIENTS, nutrients), Block.UPDATE_CLIENTS);
+        level.setBlock(soilPos, soil.setValue(LoamFarmlandBlock.NUTRIENTS, nutrients).setValue(LoamFarmlandBlock.ENRICHED, enriched && nutrients > 0),
+                Block.UPDATE_CLIENTS);
         return stages;
     }
 

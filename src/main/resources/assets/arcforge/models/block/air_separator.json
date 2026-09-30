@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/air_separator_front",
+    "south": "arcforge:block/air_separator_back",
+    "east": "arcforge:block/air_separator_left",
+    "west": "arcforge:block/air_separator_right",
+    "up": "arcforge:block/air_separator_top",
+    "down": "arcforge:block/air_separator_bottom",
+    "particle": "arcforge:block/air_separator_back"
+  }
+}

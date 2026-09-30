@@ -12,6 +12,9 @@ import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.menu.machine.AirSeparatorMenu;
+import net.zagdrath.arcforge.menu.machine.HaberReactorMenu;
+import net.zagdrath.arcforge.menu.multiblock.BiogasDigesterMenu;
 import net.zagdrath.arcforge.menu.multiblock.GasTurbineArrayMenu;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
@@ -116,6 +119,14 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(SeedExtractorMenu::new));
     public static final Supplier<MenuType<GrainDryerMenu>> GRAIN_DRYER = MENU_TYPES.register("grain_dryer",
             () -> IMenuTypeExtension.create(GrainDryerMenu::new));
+
+    // Farm chemistry.
+    public static final Supplier<MenuType<AirSeparatorMenu>> AIR_SEPARATOR = MENU_TYPES.register("air_separator",
+            () -> IMenuTypeExtension.create(AirSeparatorMenu::new));
+    public static final Supplier<MenuType<HaberReactorMenu>> HABER_REACTOR = MENU_TYPES.register("haber_reactor",
+            () -> IMenuTypeExtension.create(HaberReactorMenu::new));
+    public static final Supplier<MenuType<BiogasDigesterMenu>> BIOGAS_DIGESTER = MENU_TYPES.register("biogas_digester",
+            () -> IMenuTypeExtension.create(BiogasDigesterMenu::new));
 
     public static final Supplier<MenuType<ChemicalReactorMenu>> CHEMICAL_REACTOR = MENU_TYPES.register("chemical_reactor",
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));

@@ -35,8 +35,9 @@ public class ChemicalReactorMenu extends MachineMenu {
     public static final int DATA_SIDE_CONFIG = 14;
     public static final int DATA_VALUES = 15;
 
-    // Slot positions from chemical_reactor_gui_layout.json.
-    public static final int INPUT_X = 60, INPUT_Y = 35;
+    // Slot positions from chemical_reactor_gui_layout.json; the two input slots stack at the old input's x.
+    public static final int INPUT_X = 60, INPUT_Y = 25;
+    public static final int INPUT_B_X = 60, INPUT_B_Y = 45;
     public static final int OUTPUT_X = 108, OUTPUT_Y = 35;
     public static final int BYPRODUCT_X = 130, BYPRODUCT_Y = 35;
 
@@ -48,6 +49,7 @@ public class ChemicalReactorMenu extends MachineMenu {
     public ChemicalReactorMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.CHEMICAL_REACTOR.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.CHEMICAL_REACTOR.get());
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
+        addMachineSlot(ChemicalReactorBlockEntity.SLOT_INPUT_B, INPUT_B_X, INPUT_B_Y);
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y);
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_BYPRODUCT, BYPRODUCT_X, BYPRODUCT_Y);
         finish(inventory);
