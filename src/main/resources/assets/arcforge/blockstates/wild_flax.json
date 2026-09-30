@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "arcforge:block/wild_flax"
+      "model": "arcforge:block/flax_stage4"
     }
   }
 }

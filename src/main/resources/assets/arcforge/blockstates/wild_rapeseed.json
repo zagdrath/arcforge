@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "arcforge:block/wild_rapeseed"
+      "model": "arcforge:block/rapeseed_stage7"
     }
   }
 }

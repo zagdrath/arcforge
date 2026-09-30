@@ -124,8 +124,10 @@ public final class CropGameTests {
         var level = helper.getLevel();
         helper.assertTrue(trellis.canSurvive(level, helper.absolutePos(base.above())), "A trellis can't stand on farmland");
         helper.setBlock(base.above(), trellis);
+        helper.assertTrue(helper.getBlockState(base.above()).getValue(TrellisBlock.ON_FARMLAND), "A trellis on farmland has no feet");
         helper.assertTrue(trellis.canSurvive(level, helper.absolutePos(base.above(2))), "A second trellis can't stack");
         helper.setBlock(base.above(2), trellis);
+        helper.assertTrue(!helper.getBlockState(base.above(2)).getValue(TrellisBlock.ON_FARMLAND), "A trellis on a trellis has feet");
         helper.assertTrue(!trellis.canSurvive(level, helper.absolutePos(base.above(3))), "A third trellis stacks");
         helper.assertBlockPresent(Blocks.FARMLAND, base);
         helper.succeed();

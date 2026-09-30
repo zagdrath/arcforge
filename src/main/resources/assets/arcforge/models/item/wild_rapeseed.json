@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "arcforge:block/wild_rapeseed"
+    "layer0": "arcforge:block/rapeseed_stage7_top"
   }
 }

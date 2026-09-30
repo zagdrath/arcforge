@@ -2,6 +2,6 @@
   "parent": "minecraft:block/cross",
   "render_type": "minecraft:cutout",
   "textures": {
-    "cross": "arcforge:block/wild_hops"
+    "cross": "arcforge:block/hops_vine4"
   }
 }

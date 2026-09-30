@@ -166,8 +166,30 @@ public class TrellisBlock extends Block implements BonemealableBlock {
         return isBottom(level, pos) ? onFarmland(level, pos) : level.getBlockState(pos.below()).getValue(AGE) >= FULL_VINE;
     }
 
+    // Placed any way at all (by hand, a command, a structure): take up what it stands on.
+    @Override
+    protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        super.onPlace(state, level, pos, oldState, movedByPiston);
+        if (!level.isClientSide()) {
+            matchGround(state, level, pos);
+        }
+    }
+
+    // Sets ON_FARMLAND from the block below if it's wrong. Returns the state it leaves.
+    private static BlockState matchGround(BlockState state, Level level, BlockPos pos) {
+        boolean onFarmland = onFarmland(level, pos);
+        if (state.getValue(ON_FARMLAND) == onFarmland) {
+            return state;
+        }
+        BlockState fixed = state.setValue(ON_FARMLAND, onFarmland);
+        level.setBlock(pos, fixed, Block.UPDATE_CLIENTS);
+        return fixed;
+    }
+
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        // Trellises from before ON_FARMLAND, or under farmland that changed without a shape update, catch up here.
+        state = matchGround(state, level, pos);
         if (level.getRawBrightness(pos, 0) < MIN_LIGHT) {
             return;
         }

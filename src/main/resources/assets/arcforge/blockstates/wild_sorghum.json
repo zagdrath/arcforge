@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "arcforge:block/wild_sorghum"
+      "model": "arcforge:block/sorghum_stage3"
     }
   }
 }

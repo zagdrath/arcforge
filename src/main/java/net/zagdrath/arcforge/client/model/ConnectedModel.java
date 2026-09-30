@@ -79,6 +79,14 @@ public final class ConnectedModel {
 
     // Overlays sit just outside the face they decorate, so they never z-fight with it.
     private static final float WINDOW_OFFSET = 0.0F, LIP_OFFSET = 0.02F, BEAM_OFFSET = 0.04F;
+    // Where a face's overlays for two sides meet (a frame's corners), the left and right ones stand this much further
+    // out, so they cover the top and bottom ones instead of z-fighting with them: the corner posts run unbroken.
+    private static final float SIDE_STEP = 0.01F;
+
+    // An overlay's offset for one side of a face: left and right a step in front of top and bottom.
+    private static float offset(float base, Side side) {
+        return side == Side.LEFT || side == Side.RIGHT ? base + SIDE_STEP : base;
+    }
 
     private ConnectedModel() {}
 
@@ -230,14 +238,14 @@ public final class ConnectedModel {
                     // 8px of the lip texture, its top edge turned onto that side.
                     Side acrossSide = quad.right ? Side.LEFT : Side.RIGHT;
                     Side upDownSide = quad.top ? Side.BOTTOM : Side.TOP;
-                    across[quad.ordinal()] = List.of(bake(baker, face, u0, v0, u0 + 8, v0 + 8, LIP_OFFSET, lipTexture, 0, 0, 8, 8, acrossSide.rotation));
+                    across[quad.ordinal()] = List.of(bake(baker, face, u0, v0, u0 + 8, v0 + 8, offset(LIP_OFFSET, acrossSide), lipTexture, 0, 0, 8, 8, acrossSide.rotation));
                     upDown[quad.ordinal()] = List.of(bake(baker, face, u0, v0, u0 + 8, v0 + 8, LIP_OFFSET, lipTexture, 0, 0, 8, 8, upDownSide.rotation));
                 }
                 List<BakedQuad>[] beams = new List[4];
                 List<BakedQuad>[] edges = new List[4];
                 for (Side side : Side.values()) {
-                    beams[side.ordinal()] = List.of(bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, beamTexture, 0, 0, 16, 16, side.rotation));
-                    edges[side.ordinal()] = List.of(bake(baker, face, 0, 0, 16, 16, LIP_OFFSET, lipTexture, 0, 0, 16, 16, side.rotation));
+                    beams[side.ordinal()] = List.of(bake(baker, face, 0, 0, 16, 16, offset(BEAM_OFFSET, side), beamTexture, 0, 0, 16, 16, side.rotation));
+                    edges[side.ordinal()] = List.of(bake(baker, face, 0, 0, 16, 16, offset(LIP_OFFSET, side), lipTexture, 0, 0, 16, 16, side.rotation));
                 }
                 base.put(face, baseQuads);
                 window.put(face, windowQuads);
@@ -437,7 +445,7 @@ public final class ConnectedModel {
                 List<BakedQuad>[] sides = new List[4];
                 for (Side side : Side.values()) {
                     sides[side.ordinal()] = tray ? bandFrame(baker, face, side, edgeTexture)
-                            : List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, edgeTexture, 0, 0, 16, 16, side.rotation));
+                            : List.of(Baked.bake(baker, face, 0, 0, 16, 16, offset(BEAM_OFFSET, side), edgeTexture, 0, 0, 16, 16, side.rotation));
                 }
                 edges.put(face, sides);
                 if (frameTexture != null) {
@@ -493,11 +501,11 @@ public final class ConnectedModel {
         // any BAND px of it, turned like the full ones.)
         private static List<BakedQuad> bandFrame(ModelBaker baker, Direction face, Side side, Material.Baked texture) {
             if (face.getAxis().isVertical()) {
-                return List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, texture, 0, 0, 16, 16, side.rotation));
+                return List.of(Baked.bake(baker, face, 0, 0, 16, 16, offset(BEAM_OFFSET, side), texture, 0, 0, 16, 16, side.rotation));
             }
             return switch (side) {
                 case TOP -> List.of(Baked.bake(baker, face, 0, 0, 16, 16, BEAM_OFFSET, texture, 0, 0, 16, 16, side.rotation));
-                case LEFT, RIGHT -> List.of(Baked.bake(baker, face, 0, 0, 16, BAND, BEAM_OFFSET, texture, 0, 0, BAND, 16, side.rotation));
+                case LEFT, RIGHT -> List.of(Baked.bake(baker, face, 0, 0, 16, BAND, offset(BEAM_OFFSET, side), texture, 0, 0, BAND, 16, side.rotation));
                 case BOTTOM -> List.of();
             };
         }

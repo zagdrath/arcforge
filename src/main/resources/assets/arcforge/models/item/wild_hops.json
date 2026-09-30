@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "arcforge:block/wild_hops"
+    "layer0": "arcforge:block/hops_vine4"
   }
 }

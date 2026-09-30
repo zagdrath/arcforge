@@ -1,7 +1,0 @@
-{
-  "parent": "arcforge:block/tall_cross",
-  "textures": {
-    "cross": "arcforge:block/wild_sorghum",
-    "top": "arcforge:block/wild_sorghum_top"
-  }
-}

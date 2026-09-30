@@ -19,8 +19,8 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 // its seeds (and now and then the crop), from its loot table.
 public class WildCropBlock extends VegetationBlock {
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 13, 14);
-    // Flax, Rapeseed and Sorghum stand two blocks tall, like the grown crop: the outline covers the upper half too.
-    private static final VoxelShape TALL_SHAPE = Block.box(2, 0, 2, 14, 28, 14);
+    // Flax, Rapeseed and Sorghum stand two blocks tall (they use the grown crop's model): the outline covers it.
+    private static final VoxelShape TALL_SHAPE = Block.box(1, 0, 1, 15, 30, 15);
 
     private final boolean tall;
 
