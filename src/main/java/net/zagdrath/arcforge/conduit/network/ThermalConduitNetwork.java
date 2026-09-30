@@ -49,6 +49,10 @@ public class ThermalConduitNetwork extends ActiveConduitNetwork<HeatHandler> {
     public void tick(long gameTime) {
         pulledThisTick = false;
         int before = temperature;
+        // Heat at ambient can't flow anywhere, so a network full of it would never draw hotter heat in. It's lost.
+        if (temperature <= HeatBuffer.AMBIENT_CELSIUS) {
+            clear();
+        }
         super.tick(gameTime);
         if (getStored() == 0) {
             temperature = HeatBuffer.AMBIENT_CELSIUS;
@@ -74,6 +78,9 @@ public class ThermalConduitNetwork extends ActiveConduitNetwork<HeatHandler> {
     @Override
     protected int extract(HeatHandler source, int max) {
         int sourceTemperature = source.getTemperature();
+        if (sourceTemperature <= HeatBuffer.AMBIENT_CELSIUS) {
+            return 0;
+        }
         int extracted = source.extractHeat(max, false);
         if (extracted > 0) {
             // The first heat drawn in a tick sets the temperature; hotter sources that tick raise it.

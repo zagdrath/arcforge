@@ -20,10 +20,17 @@ number and date.
 
 ## [Unreleased]
 
-Suggested version: **2.1.1** (a texture fix).
+Suggested version: **2.1.1** (bug fixes).
 
 ### Fixed
 
+- **Heat Meter between Thermodynamic Conduits passed no heat.** It couldn't tell how hot heat from a conduit was,
+  so it passed it on at 20°C, which nothing takes: the conduits backed up and a Gas Turbine Array vented its
+  exhaust. It now carries the conduit's temperature.
+- **Thermodynamic Conduits could get stuck full of 20°C heat** (from the Heat Meter bug above) and never move
+  anything again. They no longer take heat at 20°C, and drop any they already hold.
+- **Gas Turbine Array end caps went dark** when a block sat right against the middle of the end, such as a
+  conduit or Heat Meter on its port. The cap is now lit by the brightest block in front of it.
 - **Gas Turbine Array combustor:** the slotted grille on its sides and underside was squashed sideways. It now
   looks the same all the way around, as it does on top.
 

@@ -91,6 +91,14 @@ public abstract class ActiveConduitNetwork<H> extends ConduitNetwork<H> {
         }
     }
 
+    // Empties the network (what it holds is lost).
+    protected void clear() {
+        if (stored > 0) {
+            stored = 0;
+            distribute();
+        }
+    }
+
     private int pull() {
         int budget = Math.min(budget(), capacity - stored);
         int pulled = 0;

@@ -180,10 +180,20 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
         }
     }
 
-    // The light just outside an end face (what the cap there is lit by).
+    // The light just outside an end face (what the cap there is lit by): the brightest of the 3x3 blocks in front of
+    // its middle, so a solid block against the centre (a conduit's meter, say) doesn't black the whole cap out.
     private static int endLight(GasTurbineArrayBlockEntity turbine, ShellStructure.Shell shell, Direction.AxisDirection end) {
-        BlockPos outside = shell.endCenter(end).relative(Direction.fromAxisAndDirection(shell.axis(), end));
-        return LightCoordsUtil.getLightCoords(turbine.getLevel(), outside);
+        Direction out = Direction.fromAxisAndDirection(shell.axis(), end);
+        BlockPos outside = shell.endCenter(end).relative(out);
+        // One block either side of the middle across the face, none along the axis.
+        int dx = out.getAxis() == Direction.Axis.X ? 0 : 1;
+        int dy = out.getAxis() == Direction.Axis.Y ? 0 : 1;
+        int dz = out.getAxis() == Direction.Axis.Z ? 0 : 1;
+        int light = 0;
+        for (BlockPos pos : BlockPos.betweenClosed(outside.offset(-dx, -dy, -dz), outside.offset(dx, dy, dz))) {
+            light = LightCoordsUtil.max(light, LightCoordsUtil.getLightCoords(turbine.getLevel(), pos));
+        }
+        return light;
     }
 
     @Override

@@ -217,6 +217,8 @@ public final class ArcforgeGameTests {
         TESTS.put("gas_turbine_flameout_restart", GasTurbineGameTests::flameoutRestart);
         TESTS.put("gas_turbine_exhaust_to_boiler", GasTurbineGameTests::exhaustToBoiler);
         TESTS.put("gas_turbine_exhaust_through_thermal_conduit", GasTurbineGameTests::exhaustThroughThermalConduit);
+        TESTS.put("gas_turbine_exhaust_arcforged_run", GasTurbineGameTests::exhaustArcforgedRun);
+        TESTS.put("gas_turbine_exhaust_through_heat_meter", GasTurbineGameTests::exhaustThroughHeatMeter);
         TESTS.put("throttle_lever_drives_gas_turbine", GasTurbineGameTests::throttleLeverDrivesTurbine);
         TESTS.put("throttle_lever_steps", AutomationGameTests::throttleLeverSteps);
         TESTS.put("throttle_lever_payload_range", AutomationGameTests::throttleLeverPayloadRange);

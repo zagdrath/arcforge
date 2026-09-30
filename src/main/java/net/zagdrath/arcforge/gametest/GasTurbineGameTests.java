@@ -316,4 +316,66 @@ public final class GasTurbineGameTests {
                 })
                 .thenSucceed();
     }
+
+    // The user's layout: Arcforged conduits from the exhaust's middle to an Arcforged Heat Cell, optionally through a
+    // Heat Meter (its left side toward the turbine).
+    static void exhaustArcforgedRun(GameTestHelper helper) {
+        exhaustRun(helper, false);
+    }
+
+    static void exhaustThroughHeatMeter(GameTestHelper helper) {
+        exhaustRun(helper, true);
+    }
+
+    private static void exhaustRun(GameTestHelper helper, boolean meter) {
+        BlockPos min = new BlockPos(0, 1, 0);
+        var arcforged = net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED;
+        var thermal = net.zagdrath.arcforge.conduit.ConduitType.THERMAL;
+        BlockPos[] conduits = meter ? new BlockPos[] { new BlockPos(5, 2, 1), new BlockPos(7, 2, 1) } : new BlockPos[] { new BlockPos(5, 2, 1), new BlockPos(6, 2, 1) };
+        BlockPos meterPos = new BlockPos(6, 2, 1);
+        BlockPos cellPos = new BlockPos(8, 2, 1).relative(Direction.WEST, meter ? 0 : 1);
+        build(helper, min);
+        for (BlockPos conduit : conduits) {
+            helper.setBlock(conduit, ModBlocks.conduit(thermal, arcforged).get());
+        }
+        if (meter) {
+            helper.setBlock(meterPos, ModBlocks.HEAT_METER.get().defaultBlockState().setValue(net.zagdrath.arcforge.block.logistics.MeterBlock.FACING, Direction.SOUTH));
+        }
+        helper.setBlock(cellPos, ModBlocks.heatCell(arcforged).get());
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    GasTurbineArrayBlockEntity turbine = turbine(helper, min);
+                    helper.assertTrue(turbine.isMaster(), "The turbine did not form");
+                    MultiblockPorts.set(helper.getLevel(), turbine, helper.absolutePos(new BlockPos(4, 2, 1)), SideMode.HEAT, Direction.EAST);
+                    for (BlockPos conduit : conduits) {
+                        net.zagdrath.arcforge.block.conduit.ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(conduit));
+                    }
+                    fill(turbine, ModFluids.NAPHTHA.get(), 20_000);
+                })
+                .thenIdle(200)
+                .thenExecute(() -> {
+                    var cell = helper.getBlockEntity(cellPos, net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity.class);
+                    GasTurbineArrayBlockEntity turbine = turbine(helper, min);
+                    helper.assertTrue(turbine.getExhaustHu() > 0, "The turbine isn't making exhaust");
+                    helper.assertTrue(cell.getHeat().getStored() > 0, "No exhaust heat reached the Arcforged Heat Cell" + (meter ? " through the meter" : "")
+                            + "; cell at " + cell.getHeat().getTemperature() + "°C, venting " + turbine.isVenting() + diag(helper, conduits));
+                    helper.assertFalse(turbine.isVenting(), "The turbine vents with a cell taking its exhaust");
+                    if (meter) {
+                        int rate = helper.getBlockEntity(meterPos, net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity.class).getRate();
+                        helper.assertTrue(rate > 0, "The Heat Meter reads " + rate + " HU/t");
+                    }
+                })
+                .thenSucceed();
+    }
+
+    private static String diag(GameTestHelper helper, BlockPos[] conduits) {
+        StringBuilder out = new StringBuilder();
+        for (BlockPos pos : conduits) {
+            var conduit = helper.getBlockEntity(pos, net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity.class);
+            out.append("; conduit ").append(pos.toShortString()).append(" ").append(conduit.getStored()).append(" HU at ").append(conduit.getHeatTemperature())
+                    .append(" modes ").append(helper.getBlockState(pos));
+        }
+        return out.toString();
+    }
 }

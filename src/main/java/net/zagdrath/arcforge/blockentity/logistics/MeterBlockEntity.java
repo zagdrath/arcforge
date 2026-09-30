@@ -41,6 +41,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.block.logistics.MeterBlock;
+import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitConnectable;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -201,7 +202,7 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
             }
             case HEAT -> {
                 HeatHandler source = level.getCapability(ModCapabilities.HEAT, leftPos, left.getOpposite());
-                heatCelsius = source != null ? source.getTemperature() : heat > 0 ? heatCelsius : HeatBuffer.AMBIENT_CELSIUS;
+                heatCelsius = sourceCelsius(level, leftPos, source);
                 HeatHandler target = level.getCapability(ModCapabilities.HEAT, rightPos, right.getOpposite());
                 if (target != null && heat > 0 && heatCelsius > target.getTemperature()) {
                     int moved = target.receiveHeat(Math.min(heat, cap), false);
@@ -251,6 +252,19 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
             lastSync = level.getGameTime();
             level.sendBlockUpdated(pos, state, state, Block.UPDATE_CLIENTS);
         }
+    }
+
+    // How hot the heat coming in on the left is. A Thermodynamic Conduit pushes in without exposing a handler to ask,
+    // so it's the temperature its network saves on each conduit. With nothing to ask, heat already held keeps its own.
+    private int sourceCelsius(ServerLevel level, BlockPos leftPos, @Nullable HeatHandler source) {
+        if (source != null) {
+            return source.getTemperature();
+        }
+        if (level.getBlockEntity(leftPos) instanceof ConduitBlockEntity conduit && conduit.getConduitType() == ConduitType.THERMAL
+                && conduit.getHeatTemperature() > HeatBuffer.AMBIENT_CELSIUS) {
+            return conduit.getHeatTemperature();
+        }
+        return heat > 0 ? heatCelsius : HeatBuffer.AMBIENT_CELSIUS;
     }
 
     // Fluid that left the tank (pushed out, or pulled by a conduit) is flow.
@@ -315,6 +329,10 @@ public class MeterBlockEntity extends BlockEntity implements MenuProvider, Owned
         public int receiveHeat(int amount, boolean simulate) {
             int accepted = Math.max(0, Math.min(amount, kind.cap() - heat));
             if (!simulate && accepted > 0) {
+                // Take the heat's temperature now, before anything pulls it out of the right side this tick.
+                if (level instanceof ServerLevel server) {
+                    heatCelsius = sourceCelsius(server, worldPosition.relative(left()), null);
+                }
                 heat += accepted;
                 setChanged();
             }
