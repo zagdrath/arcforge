@@ -1,0 +1,4 @@
+-proc:none
+-d
+/tmp/jx
+src/main/java/net/zagdrath/arcforge/blockentity/machine/CombustionPlantBlockEntity.java

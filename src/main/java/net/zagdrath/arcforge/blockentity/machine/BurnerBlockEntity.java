@@ -24,23 +24,33 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.CombustionFuel;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
+import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // A machine that burns #arcforge:combustion_fuel from one slot, making something (FE or heat) into a
 // buffer each tick it burns. While the buffer is full it pauses, keeping what's left of the burning item.
+// Each item of #arcforge:leaves_wood_ash (charcoal) that burns out leaves a Wood Ash in the ash slot with
+// farming.fertilizers.woodAshChance; the ash comes out through Output faces, and a full ash slot loses it.
 public abstract class BurnerBlockEntity extends MachineBlockEntity {
     public static final int SLOT_FUEL = 0;
-    public static final int MACHINE_SLOTS = 1;
+    public static final int SLOT_ASH = 1;
+    public static final int MACHINE_SLOTS = 2;
+    // Saves before the ash slot (layout 1) had the upgrade slots straight after the fuel slot.
+    private static final int SLOT_LAYOUT = 2;
 
     private final ResourceHandler<ItemResource> fuelInput;
+    private final ResourceHandler<ItemResource> ashOutput;
+    private final ResourceHandler<ItemResource> automation;
     private final ContainerData data;
 
     private int burnTime;
@@ -52,6 +62,8 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
             SideConfig sideConfig, List<SideMode> allowedSideModes) {
         super(type, pos, state, MACHINE_SLOTS, BurnerBlockEntity::isItemValid, upgrades, sideConfig, allowedSideModes);
         this.fuelInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_FUEL, slot -> false);
+        this.ashOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_ASH);
+        this.automation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_FUEL, slot -> slot == SLOT_ASH);
         this.data = new WideIntContainerData(BurnerMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -75,6 +87,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         };
     }
 
+    // Only fuel can be put in; the ash slot is filled by the burner alone.
     public static boolean isItemValid(int slot, ItemResource resource) {
         return slot == SLOT_FUEL && CombustionFuel.isFuel(resource.toStack(1));
     }
@@ -150,6 +163,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
                 if (produced > 0) {
                     burnTime--;
                     if (burnTime == 0) {
+                        leaveAsh(level, burning);
                         burning = null;
                     }
                 }
@@ -157,6 +171,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         }
         outputPerTick = produced;
         pushOutput(level, pos, getFacing());
+        autoEject(level, ashOutput);
 
         if (!enabled) {
             status = MachineStatus.DISABLED;
@@ -192,17 +207,56 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         return burnTime;
     }
 
+    // What a burnt-out item leaves: Wood Ash, now and then, from charcoal.
+    private void leaveAsh(ServerLevel level, @Nullable Item burnt) {
+        if (burnt != null && leavesAsh(burnt.getDefaultInstance()) && level.getRandom().nextDouble() < ArcforgeConfig.WOOD_ASH_CHANCE.getAsDouble()) {
+            addAsh(1);
+        }
+    }
+
+    public static boolean leavesAsh(ItemStack stack) {
+        return stack.is(ModItemTags.LEAVES_WOOD_ASH);
+    }
+
+    // Puts Wood Ash in the ash slot, up to a stack; returns how many fit (the rest is lost).
+    public int addAsh(int count) {
+        ItemStack ash = items.getStack(SLOT_ASH);
+        if (!ash.isEmpty() && !ash.is(ModItems.WOOD_ASH.get())) {
+            return 0;
+        }
+        int fit = Math.min(count, new ItemStack(ModItems.WOOD_ASH.get()).getMaxStackSize() - ash.getCount());
+        if (fit > 0) {
+            items.setStack(SLOT_ASH, new ItemStack(ModItems.WOOD_ASH.get(), ash.getCount() + fit));
+        }
+        return fit;
+    }
+
     // --- Capabilities ---
 
-    // Fuel goes in through input faces (and unsided queries); nothing comes back out.
+    // Fuel goes in through input faces, ash comes out of output faces, and unsided queries get both.
     public @Nullable ResourceHandler<ItemResource> getItemHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
-        return mode == null || mode == SideMode.INPUT ? fuelInput : null;
+        if (mode == null) {
+            return automation;
+        }
+        return switch (mode) {
+            case INPUT -> fuelInput;
+            case OUTPUT -> ashOutput;
+            default -> null;
+        };
     }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        if (input.getIntOr("slot_layout", 1) < SLOT_LAYOUT) {
+            // Layout 1 was fuel, then the upgrade slots: move the upgrades up past the new ash slot.
+            items.ensureSize(MACHINE_SLOTS + UPGRADE_SLOTS);
+            for (int slot = MACHINE_SLOTS + UPGRADE_SLOTS - 1; slot > SLOT_ASH; slot--) {
+                items.setStack(slot, items.getStack(slot - 1));
+            }
+            items.setStack(SLOT_ASH, ItemStack.EMPTY);
+        }
         burnTime = input.getIntOr("burn_time", 0);
         burnTotal = input.getIntOr("burn_total", 0);
         burning = input.getString("burning")
@@ -214,6 +268,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        output.putInt("slot_layout", SLOT_LAYOUT);
         output.putInt("burn_time", burnTime);
         output.putInt("burn_total", burnTotal);
         if (burning != null) {

@@ -20,7 +20,7 @@ import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 // Layout follows combustion_plant_gui_layout.json. All positions are relative to leftPos/topPos.
 public class CombustionPlantScreen extends MachineScreen<BurnerMenu> {
     private static final int ENERGY_X = 157, ENERGY_Y = 19;
-    private static final int FLAME_X = 21, FLAME_Y = 46;
+    private static final int FLAME_X = BurnerMenu.FLAME_X, FLAME_Y = BurnerMenu.FLAME_Y;
     private static final int BURN_X = 57, BURN_Y = 34, BURN_W = 84, BURN_H = 4;
     private static final int LED_X = 57, LED_Y = 56;
     private static final int STATUS_X = 65, STATUS_Y = 56;

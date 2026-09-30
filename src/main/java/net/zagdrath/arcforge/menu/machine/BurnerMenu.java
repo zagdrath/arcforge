@@ -24,7 +24,8 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
-// The Combustion Plant's and the Firebox's menu: one fuel slot, and a buffer of FE or heat.
+// The Combustion Plant's and the Firebox's menu: the fuel slot over the flame, the ash slot under it, and a buffer of FE
+// or heat.
 public class BurnerMenu extends MachineMenu {
     public static final int DATA_STORED = 0;
     public static final int DATA_CAPACITY = 1;
@@ -42,7 +43,10 @@ public class BurnerMenu extends MachineMenu {
     public static final int DATA_OXY_ACTIVE = 12;
     public static final int DATA_VALUES = 13;
 
-    public static final int FUEL_SLOT_X = 20, FUEL_SLOT_Y = 23;
+    // The left column runs down the height of the screen recess: fuel (frame y18..35), flame (y37..50), ash (y52..69).
+    public static final int FUEL_SLOT_X = 20, FUEL_SLOT_Y = 19;
+    public static final int ASH_SLOT_X = 20, ASH_SLOT_Y = 53;
+    public static final int FLAME_X = 21, FLAME_Y = 37;
 
     // Client constructors, called with the block position written by the server.
     public static BurnerMenu combustionPlant(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -62,6 +66,7 @@ public class BurnerMenu extends MachineMenu {
     public BurnerMenu(MenuType<BurnerMenu> type, int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(type, containerId, inventory, pos, items, data, DATA_VALUES, blockFor(type));
         addMachineSlot(BurnerBlockEntity.SLOT_FUEL, FUEL_SLOT_X, FUEL_SLOT_Y);
+        addMachineSlot(BurnerBlockEntity.SLOT_ASH, ASH_SLOT_X, ASH_SLOT_Y);
         finish(inventory);
     }
 

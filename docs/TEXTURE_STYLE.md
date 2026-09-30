@@ -458,3 +458,31 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     - a threshold field recess (66,100)–(168,117) holding the EditBox, with the unit right-aligned inside it.
 - Advancement tab background: the wall plate one step darker (`#40454C` / `#383C42` split at x = 10) with
   the riveted strap on rows 13–15.
+
+## Farming
+- Soil (Loam and its farmland) is a natural block: the asphalt method in soil browns. It has three close tones
+  (`#3B2A1D #4C3625 #5E432D`) in flat 2–4 px blotches that tile seamlessly, plus a few 1–2 px chips (`#78573B` /
+  `#2A1D14`).
+- Farmland tops cut that soil into four 4-row furrows:
+  - each band's top row is the ridge, one tone lighter;
+  - its bottom row is the furrow (`#2A1D14`), bridged by a 2 px clod or two.
+  - Moist farmland is the same art three steps darker (`#2A1D14 #352519 #42301F`, furrow `#160F0A`). Only moisture 7
+    shows as moist, as in vanilla.
+- Irrigated Loam Farmland:
+  - The top is the moist top with a copper channel down the middle (x5..10). The channel has a lit lip, walls in shade
+    and in light, two water rows (`#4A8FE0` / `#3A76C0`, a `#7FB3F0` glint every half block) and clamp bands at y0/y8.
+  - The sides are Loam with a 3-row copper liner band and two rivets.
+  - The copper is the Tempered row.
+- Compost Bin: vanilla composter geometry, built from the treated-wood textures.
+  - The sides are the treated planks with a `TREATED[0]` gap row under each 4 px slat, and a bark post at each edge
+    (one step darker on the right).
+  - The inside is the planks two steps darker, and the rim is stripped-log end grain.
+  - The heap is flat blotches of moss greens and humus (`#2E3A1A #42501F #5A6628 #727A30`). Ready compost is dark humus.
+- Fertilizer items:
+  - Wood Ash and Basic Slag are the dust texture recoloured by brightness: ash grey `#242322 → #B3AEA7`, slag slate
+    blue `#1A1E24 → #A2ABB5`.
+  - Compost is the coke lump recoloured by rank onto humus `#1C130D → #8A6A4C`.
+  - Mixed Fertilizer is a tied paper sack (`#6E5634 … #CCAE74`) with a `#0C0D0F` outline. It has a green label
+    carrying three 2×2 chips in the compost, ash and slag colours.
+- GUI: the Firebox and Combustion Plant have a fuel → flame → ash column that runs down the screen recess's height.
+  The input frame is at y18..35, the flame at y37, and the output-orange ash frame at y52..69.

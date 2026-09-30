@@ -31,7 +31,9 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
+import net.zagdrath.arcforge.item.farming.FertilizerItem;
 import net.zagdrath.arcforge.item.conduit.ConduitFilterItem;
 import net.zagdrath.arcforge.item.machine.ArcQuarryItem;
 import net.zagdrath.arcforge.item.storage.CrateBlockItem;
@@ -358,6 +360,21 @@ public final class ModItems {
     public static final DeferredItem<Item> TURBINE_BLADE_SET = ITEMS.registerSimpleItem("turbine_blade_set");
     public static final DeferredItem<Item> COMBUSTOR = ITEMS.registerSimpleItem("combustor");
     public static final DeferredItem<BlockItem> ASPHALT = ITEMS.registerSimpleBlockItem(ModBlocks.ASPHALT);
+
+    // --- Farming ---
+
+    public static final DeferredItem<BlockItem> COMPOST_BIN = ITEMS.registerSimpleBlockItem(ModBlocks.COMPOST_BIN);
+    public static final DeferredItem<BlockItem> LOAM = ITEMS.registerSimpleBlockItem(ModBlocks.LOAM);
+    public static final DeferredItem<BlockItem> IRRIGATED_LOAM_FARMLAND = ITEMS.registerSimpleBlockItem(ModBlocks.IRRIGATED_LOAM_FARMLAND);
+    // Fertilizers: each adds its nutrients (config farming.fertilizers) to Loam Farmland.
+    public static final DeferredItem<FertilizerItem> COMPOST = ITEMS.registerItem("compost",
+            p -> new FertilizerItem(ArcforgeConfig.COMPOST_NUTRIENTS::getAsInt, p));
+    public static final DeferredItem<FertilizerItem> WOOD_ASH = ITEMS.registerItem("wood_ash",
+            p -> new FertilizerItem(ArcforgeConfig.WOOD_ASH_NUTRIENTS::getAsInt, p));
+    public static final DeferredItem<FertilizerItem> BASIC_SLAG = ITEMS.registerItem("basic_slag",
+            p -> new FertilizerItem(ArcforgeConfig.BASIC_SLAG_NUTRIENTS::getAsInt, p));
+    public static final DeferredItem<FertilizerItem> MIXED_FERTILIZER = ITEMS.registerItem("mixed_fertilizer",
+            p -> new FertilizerItem(ArcforgeConfig.MIXED_FERTILIZER_NUTRIENTS::getAsInt, p));
 
     // --- Solar Thermal Array ---
 

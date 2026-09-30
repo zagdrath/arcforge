@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "building",
+  "ingredients": [
+    "minecraft:dirt",
+    "arcforge:compost"
+  ],
+  "result": {
+    "id": "arcforge:loam",
+    "count": 1
+  }
+}

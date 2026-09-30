@@ -19,7 +19,7 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.item.tool.ModuleType;
 
-// Arcforge tabs, in order: Machines, Materials, Components, Building Blocks, Fluids, Logistics, Tools & Upgrades.
+// Arcforge tabs, in order: Machines, Materials, Components, Building Blocks, Fluids, Logistics, Tools & Upgrades, Farming.
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Arcforge.MODID);
 
@@ -188,6 +188,20 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.THERMOELECTRIC_UPGRADE.get());
                 // Portable storage: Batteries, Canisters, Gas Cartridges and Thermal Capsules, empty.
                 ModItems.allPortables().forEach(item -> output.accept(item.get()));
+            }).build());
+
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> FARMING = CREATIVE_MODE_TABS.register("farming", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.arcforge.farming"))
+            .withTabsBefore(TOOLS_AND_UPGRADES.getKey())
+            .icon(() -> ModItems.COMPOST_BIN.get().getDefaultInstance())
+            .displayItems((parameters, output) -> {
+                output.accept(ModItems.COMPOST_BIN.get());
+                output.accept(ModItems.LOAM.get());
+                output.accept(ModItems.IRRIGATED_LOAM_FARMLAND.get());
+                output.accept(ModItems.COMPOST.get());
+                output.accept(ModItems.WOOD_ASH.get());
+                output.accept(ModItems.BASIC_SLAG.get());
+                output.accept(ModItems.MIXED_FERTILIZER.get());
             }).build());
 
     private ModCreativeTabs() {}

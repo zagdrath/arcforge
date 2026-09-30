@@ -1,0 +1,31 @@
+{
+  "textures": {
+    "particle": "arcforge:block/compost_bin_compost",
+    "inside": "arcforge:block/compost_bin_compost"
+  },
+  "elements": [
+    {
+      "from": [
+        2,
+        0,
+        2
+      ],
+      "to": [
+        14,
+        15,
+        14
+      ],
+      "faces": {
+        "up": {
+          "texture": "#inside",
+          "uv": [
+            2,
+            2,
+            14,
+            14
+          ]
+        }
+      }
+    }
+  ]
+}

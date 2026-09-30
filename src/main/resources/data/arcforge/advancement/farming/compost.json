@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:farming/compost_bin",
+  "display": {
+    "icon": {
+      "id": "arcforge:compost"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.compost.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.compost.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "compost": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:compost"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "compost"
+    ]
+  ]
+}

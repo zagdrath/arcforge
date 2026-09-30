@@ -1,0 +1,49 @@
+{
+  "parent": "arcforge:farming/compost",
+  "display": {
+    "icon": {
+      "id": "arcforge:loam"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.loam_farmland.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.loam_farmland.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "till": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:all_of",
+          "terms": [
+            {
+              "type": "minecraft:location_check",
+              "predicate": {
+                "block": {
+                  "blocks": "arcforge:loam_farmland"
+                }
+              }
+            },
+            {
+              "type": "minecraft:match_tool",
+              "predicate": {
+                "items": "#minecraft:hoes"
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "till"
+    ]
+  ]
+}

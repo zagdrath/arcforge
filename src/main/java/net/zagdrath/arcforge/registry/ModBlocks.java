@@ -44,6 +44,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
+import net.zagdrath.arcforge.block.farming.CompostBinBlock;
+import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
@@ -524,6 +526,19 @@ public final class ModBlocks {
     public static final DeferredBlock<SlabBlock> ASPHALT_SLAB = BLOCKS.registerBlock("asphalt_slab",
             SlabBlock::new, ModBlocks::asphaltProperties);
 
+    // --- Farming ---
+
+    // The Compost Bin: treated wood like the rest of the building set, so an axe breaks it and fire doesn't take it.
+    public static final DeferredBlock<CompostBinBlock> COMPOST_BIN = BLOCKS.registerBlock("compost_bin",
+            CompostBinBlock::new, p -> treatedWood(p).strength(0.6F).noOcclusion());
+    // Loam: dirt worked with compost. A hoe tills it into Loam Farmland (FarmingEvents).
+    public static final DeferredBlock<Block> LOAM = BLOCKS.registerSimpleBlock("loam",
+            p -> p.mapColor(MapColor.DIRT).strength(0.5F).sound(SoundType.ROOTED_DIRT));
+    public static final DeferredBlock<LoamFarmlandBlock> LOAM_FARMLAND = BLOCKS.registerBlock("loam_farmland",
+            p -> new LoamFarmlandBlock(LOAM.get(), false, p), ModBlocks::farmlandProperties);
+    public static final DeferredBlock<LoamFarmlandBlock> IRRIGATED_LOAM_FARMLAND = BLOCKS.registerBlock("irrigated_loam_farmland",
+            p -> new LoamFarmlandBlock(LOAM.get(), true, p), p -> farmlandProperties(p).sound(SoundType.COPPER));
+
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);
 
@@ -599,6 +614,15 @@ public final class ModBlocks {
                 .requiresCorrectToolForDrops()
                 .sound(SoundType.METAL)
                 .lightLevel(state -> state.getValue(MachineBlock.LIT) ? litLight : 0);
+    }
+
+    // Like vanilla farmland: random ticks for moisture, a shovel breaks it, and it suffocates like a full block.
+    private static BlockBehaviour.Properties farmlandProperties(BlockBehaviour.Properties p) {
+        return p.mapColor(MapColor.DIRT)
+                .randomTicks()
+                .strength(0.6F)
+                .sound(SoundType.GRAVEL)
+                .isSuffocating((state, level, pos) -> true);
     }
 
     // Like oak (an axe breaks it), much darker, and never ignited by lava or fire.

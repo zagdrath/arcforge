@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "arcforge:compost",
+    "arcforge:wood_ash",
+    "arcforge:basic_slag"
+  ],
+  "result": {
+    "id": "arcforge:mixed_fertilizer",
+    "count": 1
+  }
+}

@@ -21,7 +21,7 @@ import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 // Layout follows firebox_gui_layout.json. All positions are relative to leftPos/topPos.
 public class FireboxScreen extends MachineScreen<BurnerMenu> {
     private static final int BUFFER_X = 157, BUFFER_Y = 19;
-    private static final int FLAME_X = 21, FLAME_Y = 46;
+    private static final int FLAME_X = BurnerMenu.FLAME_X, FLAME_Y = BurnerMenu.FLAME_Y;
     private static final int HEAT_X = 57, HEAT_Y = 34, HEAT_W = 84;
     private static final int LED_X = 57, LED_Y = 56;
     private static final int STATUS_X = 65, STATUS_Y = 56;

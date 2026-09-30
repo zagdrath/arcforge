@@ -1,0 +1,38 @@
+{
+  "parent": "arcforge:farming/loam_farmland",
+  "display": {
+    "icon": {
+      "id": "arcforge:irrigated_loam_farmland"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.irrigated.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.irrigated.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "irrigated": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:irrigated_loam_farmland"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "irrigated"
+    ]
+  ]
+}

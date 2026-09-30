@@ -1450,5 +1450,87 @@ public class ArcforgeConfig {
         BUILDER.pop();
     }
 
+    // --- Farming ---
+
+    static {
+        BUILDER.comment("Farming: the Compost Bin, fertilizers, Loam and Loam Farmland.").push("farming");
+    }
+
+    static {
+        BUILDER.comment("Compost Bin: fills with plant matter like a vanilla composter (each item's chance is the",
+                "neoforge:compostables data map) and, once full, turns it into Compost.").push("compostBin");
+    }
+
+    public static final ModConfigSpec.IntValue COMPOST_BIN_ITEM_INTERVAL = BUILDER
+            .comment("Ticks between items taken from its input slot (items fed by hoppers and conduits wait there).")
+            .defineInRange("itemInterval", 10, 1, 1_200);
+
+    public static final ModConfigSpec.IntValue COMPOST_BIN_READY_DELAY = BUILDER
+            .comment("Ticks from full to the Compost being ready.")
+            .defineInRange("readyDelay", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue COMPOST_BIN_YIELD = BUILDER
+            .comment("Compost made from a full bin.")
+            .defineInRange("compostPerBatch", 1, 1, 64);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Fertilizers: nutrients each adds to Loam Farmland (which holds 0 to 15).").push("fertilizers");
+    }
+
+    public static final ModConfigSpec.IntValue COMPOST_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Compost.")
+            .defineInRange("compost", 2, 0, 15);
+
+    public static final ModConfigSpec.IntValue WOOD_ASH_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Wood Ash.")
+            .defineInRange("woodAsh", 3, 0, 15);
+
+    public static final ModConfigSpec.IntValue BASIC_SLAG_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Basic Slag.")
+            .defineInRange("basicSlag", 3, 0, 15);
+
+    public static final ModConfigSpec.IntValue MIXED_FERTILIZER_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Mixed Fertilizer.")
+            .defineInRange("mixedFertilizer", 8, 0, 15);
+
+    public static final ModConfigSpec.DoubleValue WOOD_ASH_CHANCE = BUILDER
+            .comment("Chance that burning one item of #arcforge:leaves_wood_ash (charcoal) in a Firebox or Combustion Plant",
+                    "leaves a Wood Ash in its ash slot. A full ash slot loses it.")
+            .defineInRange("woodAshChance", 0.5, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Loam Farmland (tilled Loam) and Irrigated Loam Farmland. Neither can be trampled.").push("loamFarmland");
+    }
+
+    public static final ModConfigSpec.DoubleValue LOAM_DRYING_CHANCE = BUILDER
+            .comment("Chance that a random tick away from water dries Loam Farmland by one step (vanilla farmland: 1.0,",
+                    "so 0.5 stays moist twice as long). Irrigated Loam Farmland never dries.")
+            .defineInRange("dryingChance", 0.5, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue LOAM_GROWTH_MULTIPLIER = BUILDER
+            .comment("How much faster crops grow on it while it has nutrients (1.5 = half again as fast; up to 2).",
+                    "Each natural growth stage then has a (multiplier - 1) chance of an extra stage.")
+            .defineInRange("growthMultiplier", 1.5, 1.0, 2.0);
+
+    public static final ModConfigSpec.IntValue LOAM_NUTRIENTS_PER_STAGE = BUILDER
+            .comment("Nutrients each growth stage of the crop on it uses.")
+            .defineInRange("nutrientsPerStage", 1, 0, 15);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

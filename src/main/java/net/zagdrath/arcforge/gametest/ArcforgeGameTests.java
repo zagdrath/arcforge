@@ -222,6 +222,15 @@ public final class ArcforgeGameTests {
         TESTS.put("throttle_lever_drives_gas_turbine", GasTurbineGameTests::throttleLeverDrivesTurbine);
         TESTS.put("throttle_lever_steps", AutomationGameTests::throttleLeverSteps);
         TESTS.put("throttle_lever_payload_range", AutomationGameTests::throttleLeverPayloadRange);
+        TESTS.put("farming_compost_bin_makes_compost", FarmingGameTests::compostBinMakesCompost);
+        TESTS.put("farming_compost_bin_by_hand", FarmingGameTests::compostBinByHand);
+        TESTS.put("farming_loam_tills", FarmingGameTests::loamTills);
+        TESTS.put("farming_fertilizers_add_nutrients", FarmingGameTests::fertilizersAddNutrients);
+        TESTS.put("farming_growth_uses_nutrients", FarmingGameTests::growthUsesNutrients);
+        TESTS.put("farming_irrigation_and_drying", FarmingGameTests::irrigationAndDrying);
+        TESTS.put("farming_firebox_ash_slot", FarmingGameTests::fireboxAshSlot);
+        TESTS.put("farming_burner_old_save_migrates", FarmingGameTests::burnerOldSaveMigrates);
+        TESTS.put("farming_recipes", FarmingGameTests::recipes);
         TESTS.put("advancement_tree_loads", AdvancementGameTests::treeLoads);
         TESTS.put("multiblock_formed_trigger", AdvancementGameTests::multiblockFormedTrigger);
         TESTS.put("turbine_full_speed_needs_length", AdvancementGameTests::turbineFullSpeedNeedsLength);

@@ -1,0 +1,16 @@
+{
+  "title": "Fertilizers",
+  "icon": "arcforge:mixed_fertilizer",
+  "items": [
+    "arcforge:compost",
+    "arcforge:wood_ash",
+    "arcforge:basic_slag",
+    "arcforge:mixed_fertilizer"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Right-click Loam Farmland, or the crop on it, to add nutrients (up to 15):\n- Compost: +2, from a Compost Bin.\n- Wood Ash: +3. Burning charcoal in a Firebox or Combustion Plant leaves Wood Ash in its ash slot half the time.\n- Basic Slag: +3. An Arc Crusher crushes one Slag into two.\n- Mixed Fertilizer: +8, crafted from one of each."
+    }
+  ]
+}

@@ -20,7 +20,36 @@ number and date.
 
 ## [Unreleased]
 
-Suggested version: **2.1.1** (bug fixes).
+Suggested version: **2.2.0** (new content; worlds load as they are).
+
+### Upgrading
+
+- **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`) gets its defaults; nothing to redo.
+- **Firebox and Combustion Plant ash slot.** Both machines gain an ash slot. Saved machines keep their fuel and
+  upgrades: the upgrades move up past the new slot when the world loads.
+
+### Added
+
+- **Farming,** the base of a new section, with its own creative tab (**Arcforge: Farming**), a Handbook
+  chapter and a Farming branch in the advancement tab.
+  - **Compost Bin.** A treated-wood bin that plant matter fills like a vanilla composter (seeds, crops, leaves,
+    saplings, flowers and food scraps, at the vanilla chances). When full, it makes Compost after a short
+    delay. Drop items in by hand, or feed it with hoppers and conduits; they can also pull the Compost out from
+    underneath.
+  - **Loam** (dirt + Compost). Till it into **Loam Farmland**, which:
+    - stays moist twice as long;
+    - can't be trampled;
+    - holds nutrients (0 to 15, shown in Jade).
+    While it has nutrients, crops on it grow 1.5 times as fast, and each growth stage uses 1 nutrient.
+  - **Irrigated Loam Farmland** (four Loam round a Copper Plate): Loam Farmland with a copper water channel,
+    always moist with no water nearby.
+  - **Fertilizers.** Use one on Loam Farmland, or on the crop growing on it:
+    - Compost: +2 nutrients.
+    - Wood Ash: +3. The Firebox and Combustion Plant have a new ash slot, and charcoal leaves Wood Ash half the
+      time. The ash comes out through an Output face.
+    - Basic Slag: +3. The Arc Crusher crushes 1 Slag into 2.
+    - Mixed Fertilizer: +8, crafted from one of each.
+  - Every value is in the new `farming` config section.
 
 ### Fixed
 

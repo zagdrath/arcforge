@@ -37,7 +37,7 @@ import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 // coal that a Firebox feeding a hot Thermoelectric Plant gets. Fuel burns at twice furnace speed.
 public class CombustionPlantBlockEntity extends BurnerBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY);
 
     private final GeneratorEnergyHandler energy;
 
@@ -98,7 +98,7 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
     public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
         SideMode mode = modeFor(side);
         return switch (type) {
-            case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
         };

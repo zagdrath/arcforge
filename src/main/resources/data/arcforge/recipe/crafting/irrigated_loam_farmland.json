@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "pattern": [
+    " L ",
+    "LPL",
+    " L "
+  ],
+  "key": {
+    "L": "arcforge:loam",
+    "P": "arcforge:copper_plate"
+  },
+  "result": {
+    "id": "arcforge:irrigated_loam_farmland",
+    "count": 4
+  }
+}

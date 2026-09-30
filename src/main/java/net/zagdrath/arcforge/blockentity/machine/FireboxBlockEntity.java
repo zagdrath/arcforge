@@ -43,7 +43,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // oxy-fuel (see OxyFuel): hotter, up to 1,400°C, and with more heat per fuel.
 public class FireboxBlockEntity extends BurnerBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT, SideMode.OXYGEN);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.HEAT, SideMode.OXYGEN);
 
     private final HeatBuffer heat;
     private final HeatHandler heatOutput;
@@ -173,7 +173,7 @@ public class FireboxBlockEntity extends BurnerBlockEntity {
     public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
         SideMode mode = modeFor(side);
         return switch (type) {
-            case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             // Pressurized Conduits bring oxygen to Oxygen faces.
             case GAS -> mode == SideMode.OXYGEN ? ConnectionMode.INPUT : ConnectionMode.NONE;

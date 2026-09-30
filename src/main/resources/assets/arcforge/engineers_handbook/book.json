@@ -139,6 +139,17 @@
         "treated_wood",
         "fractions_and_pitch"
       ]
+    },
+    {
+      "id": "farming",
+      "title": "Farming",
+      "icon": "arcforge:compost_bin",
+      "description": "Compost, fertilizers and rich soil that grows crops faster.",
+      "entries": [
+        "compost_bin",
+        "loam_farmland",
+        "fertilizers"
+      ]
     }
   ]
 }

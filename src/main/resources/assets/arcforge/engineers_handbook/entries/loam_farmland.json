@@ -1,0 +1,18 @@
+{
+  "title": "Loam Farmland",
+  "icon": "arcforge:loam",
+  "items": [
+    "arcforge:loam",
+    "arcforge:irrigated_loam_farmland"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Craft dirt with Compost into Loam, then till it with a hoe.\n- Loam Farmland stays moist twice as long as farmland and can't be trampled.\n- It holds nutrients, from 0 to 15 (Jade shows them). Add them with fertilizers.\n- While it has nutrients, the crop on it grows 1.5 times as fast, and each growth stage uses 1 nutrient.\n- Dry with nothing growing on it, it turns back into Loam and loses its nutrients."
+    },
+    {
+      "type": "text",
+      "text": "Irrigated Loam Farmland has a copper water channel, so it's always moist with no water nearby. It never turns back into Loam.\nCraft four from four Loam round a Copper Plate."
+    }
+  ]
+}

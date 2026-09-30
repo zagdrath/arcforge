@@ -1,0 +1,38 @@
+{
+  "parent": "arcforge:root",
+  "display": {
+    "icon": {
+      "id": "arcforge:compost_bin"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.compost_bin.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.compost_bin.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "compost_bin": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:compost_bin"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "compost_bin"
+    ]
+  ]
+}

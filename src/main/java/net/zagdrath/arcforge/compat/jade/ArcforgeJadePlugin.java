@@ -49,8 +49,8 @@ import snownee.jade.api.WailaPlugin;
 
 // Jade support (only loaded when Jade is installed): formed multiblocks are named as the machine, heat is
 // shown for everything that holds it, conduits show what their network carries, and an Arc Melter or
-// Chemical Reactor what it is making. Looking through a Pressure Glass window shows the same as looking at
-// its array's casings.
+// Chemical Reactor what it is making. Loam Farmland shows its nutrients and a Compost Bin how full it is. Looking
+// through a Pressure Glass window shows the same as looking at its array's casings.
 @WailaPlugin
 public class ArcforgeJadePlugin implements IWailaPlugin {
     @Override
@@ -118,6 +118,9 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(MeterProviders.Chargepad.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.ChargepadBlock.class);
         registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, PressureGlassBlock.class);
+        // Farming: read from the block state on the client.
+        registration.registerBlockComponent(FarmingProviders.LoamFarmland.INSTANCE, net.zagdrath.arcforge.block.farming.LoamFarmlandBlock.class);
+        registration.registerBlockComponent(FarmingProviders.CompostBin.INSTANCE, net.zagdrath.arcforge.block.farming.CompostBinBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

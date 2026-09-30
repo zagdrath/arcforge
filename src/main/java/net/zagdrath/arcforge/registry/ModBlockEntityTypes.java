@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity;
 import net.zagdrath.arcforge.blockentity.redstone.ThrottleLeverBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
@@ -101,6 +102,9 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<MeterBlockEntity>> METER = BLOCK_ENTITY_TYPES.register("meter",
             () -> new BlockEntityType<>(MeterBlockEntity::new, ModBlocks.ENERGY_METER.get(), ModBlocks.HEAT_METER.get(), ModBlocks.FLUID_METER.get(),
                     ModBlocks.GAS_METER.get()));
+
+    public static final Supplier<BlockEntityType<CompostBinBlockEntity>> COMPOST_BIN = BLOCK_ENTITY_TYPES.register("compost_bin",
+            () -> new BlockEntityType<>(CompostBinBlockEntity::new, ModBlocks.COMPOST_BIN.get()));
 
     public static final Supplier<BlockEntityType<ChargepadBlockEntity>> CHARGEPAD = BLOCK_ENTITY_TYPES.register("chargepad",
             () -> new BlockEntityType<>(ChargepadBlockEntity::new, ModBlocks.CHARGEPAD.get()));

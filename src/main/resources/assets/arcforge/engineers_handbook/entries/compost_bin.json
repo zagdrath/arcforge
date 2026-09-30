@@ -1,0 +1,14 @@
+{
+  "title": "Compost Bin",
+  "icon": "arcforge:compost_bin",
+  "items": [
+    "arcforge:compost_bin",
+    "arcforge:compost"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A treated-wood bin that turns plant matter into Compost. Seeds, crops, leaves, saplings, flowers and food scraps go in, each with the same chance as in a vanilla composter of raising the heap a level.\n- Right-click with plant matter to drop it straight in.\n- Hoppers and conduits fill its input slot, which it works through one item every half second.\n- Two seconds after it's full, it makes Compost. Right-click it to take the Compost, or pull it out from underneath with a hopper or conduit; then it starts again."
+    }
+  ]
+}

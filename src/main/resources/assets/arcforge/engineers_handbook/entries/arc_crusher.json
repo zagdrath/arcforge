@@ -10,7 +10,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Crushes ores into dusts with FE: 20 FE/t for 200 ticks. Raw ores give a dust and a 25% chance of another; ore blocks give two.\nDusts smelt back into ingots. Coal and charcoal crush into carbon dust, a furnace fuel.\nVanilla ores give extra: 6 redstone, 8 lapis, 2 diamonds or 2 emeralds. It also grinds cobblestone to gravel, gravel and sandstone to sand, and bones, blaze rods, wool and glowstone into their dusts and string."
+      "text": "Crushes ores into dusts with FE: 20 FE/t for 200 ticks. Raw ores give a dust and a 25% chance of another; ore blocks give two.\nDusts smelt back into ingots. Coal and charcoal crush into carbon dust, a furnace fuel.\nVanilla ores give extra: 6 redstone, 8 lapis, 2 diamonds or 2 emeralds. It also grinds cobblestone to gravel, gravel and sandstone to sand, and bones, blaze rods, wool and glowstone into their dusts and string. It crushes Slag into two Basic Slag, a fertilizer."
     }
   ]
 }

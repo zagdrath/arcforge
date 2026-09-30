@@ -37,5 +37,11 @@ public final class ModItemTags {
     public static final TagKey<Item> FOUNDRY_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "foundry_suit"));
     public static final TagKey<Item> REPAIRS_FOUNDRY_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "repairs_foundry_suit"));
 
+    // Fuel whose burnt-out items leave Wood Ash in a Firebox or Combustion Plant (charcoal by default).
+    public static final TagKey<Item> LEAVES_WOOD_ASH = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "leaves_wood_ash"));
+
+    // Fertilizers for Loam Farmland (Compost, Wood Ash, Basic Slag, Mixed Fertilizer).
+    public static final TagKey<Item> FERTILIZERS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "fertilizers"));
+
     private ModItemTags() {}
 }
