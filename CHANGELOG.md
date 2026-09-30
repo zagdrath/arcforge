@@ -79,6 +79,13 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
   - **Iron Sickle** and **Steel Sickle** harvest and replant the ripe crops in a 3x3; the **Steel Scythe** does a 5x5.
   - Handbook pages, JEI info, Jade tooltips and three new Farming advancements (Hands Free, April Showers, Reaper).
 
+### Changed
+
+- **Experimental: Create-style shading** (branch `experiment/create-shading` only). Every block, item, armour
+  and GUI icon texture keeps its design and colours but is lit the way Create's are: deeper, hue-shifted
+  shadows, paler highlights up to a near-white glint, rounded machine faces, and a lit top-left edge on
+  coloured parts. Treated wood, glow layers, tinted textures, particles and GUI panels are unchanged.
+
 ### Fixed
 
 - **Heat Meter between Thermodynamic Conduits passed no heat.** It couldn't tell how hot heat from a conduit was,
