@@ -7,10 +7,27 @@
     },
     {
       "when": {
+        "on_farmland": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/trellis_feet"
+      }
+    },
+    {
+      "when": {
         "age": "1"
       },
       "apply": {
         "model": "arcforge:block/trellis_vine1"
+      }
+    },
+    {
+      "when": {
+        "age": "1",
+        "on_farmland": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/trellis_vine1_foot"
       }
     },
     {
@@ -23,6 +40,15 @@
     },
     {
       "when": {
+        "age": "2",
+        "on_farmland": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/trellis_vine2_foot"
+      }
+    },
+    {
+      "when": {
         "age": "3"
       },
       "apply": {
@@ -31,10 +57,28 @@
     },
     {
       "when": {
+        "age": "3",
+        "on_farmland": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/trellis_vine3_foot"
+      }
+    },
+    {
+      "when": {
         "age": "4"
       },
       "apply": {
         "model": "arcforge:block/trellis_vine4"
+      }
+    },
+    {
+      "when": {
+        "age": "4",
+        "on_farmland": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/trellis_vine4_foot"
       }
     }
   ]

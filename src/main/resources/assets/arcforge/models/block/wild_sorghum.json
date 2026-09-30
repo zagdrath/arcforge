@@ -1,7 +1,7 @@
 {
-  "parent": "minecraft:block/cross",
-  "render_type": "minecraft:cutout",
+  "parent": "arcforge:block/tall_cross",
   "textures": {
-    "cross": "arcforge:block/wild_sorghum"
+    "cross": "arcforge:block/wild_sorghum",
+    "top": "arcforge:block/wild_sorghum_top"
   }
 }

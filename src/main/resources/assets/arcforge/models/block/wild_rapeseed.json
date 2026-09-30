@@ -1,7 +1,7 @@
 {
-  "parent": "minecraft:block/cross",
-  "render_type": "minecraft:cutout",
+  "parent": "arcforge:block/tall_cross",
   "textures": {
-    "cross": "arcforge:block/wild_rapeseed"
+    "cross": "arcforge:block/wild_rapeseed",
+    "top": "arcforge:block/wild_rapeseed_top"
   }
 }

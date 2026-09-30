@@ -10,22 +10,24 @@ import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 // Flax, Rapeseed and Sorghum: vanilla crops (ages 0-7, planted from their seeds) that grow on anything in
 // #minecraft:supports_crops, so vanilla farmland and both Loam Farmlands, and use Loam Farmland's nutrients like any
 // crop (LoamGrowth). What a crop drops is in its loot table.
-// Flax and Rapeseed grow two blocks tall: from tallFromAge their model reaches into the block above, so they only grow
-// into that stage (by random tick or bone meal) while the space above is empty.
+// Flax, Rapeseed and Sorghum grow two blocks tall: from tallFromAge their model reaches into the block above, so they
+// only grow into that stage (by random tick or bone meal) while the space above is empty, and their outline follows.
 public class ArcforgeCropBlock extends CropBlock {
-    public static final int NEVER_TALL = Integer.MAX_VALUE;
-
     private final Supplier<? extends ItemLike> seed;
     private final int tallFromAge;
 
@@ -39,6 +41,17 @@ public class ArcforgeCropBlock extends CropBlock {
     @Override
     protected ItemLike getBaseSeedId() {
         return seed.get();
+    }
+
+    // The tall stages' outline rises through the block above as they grow, to 30 px when grown (the art's tallest).
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        int age = getAge(state);
+        if (age < tallFromAge) {
+            return super.getShape(state, level, pos, context);
+        }
+        int tallStages = getMaxAge() - tallFromAge + 1;
+        return Block.box(0, 0, 0, 16, 16 + 14.0 * (age - tallFromAge + 1) / tallStages, 16);
     }
 
     // Whether the next stage fits: a stage that reaches the block above needs it empty.

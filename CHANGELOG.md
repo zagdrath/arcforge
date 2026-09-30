@@ -57,7 +57,7 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
     crafts into String, and four make Linen.
   - **Rapeseed** (wild in meadows and plains) grows two blocks tall and flowers yellow. It gives Rapeseeds, the oil
     crop, for the Oil Press to come.
-  - **Sorghum** (wild in savannas) gives Sorghum Stalks. In the Fermenter a stalk makes 80 mB of Ethanol, more than
+  - **Sorghum** (wild in savannas) grows two blocks tall with rust-red seed heads. It gives Sorghum Stalks. In the Fermenter a stalk makes 80 mB of Ethanol, more than
     any vanilla crop.
   - **Hops** (wild in forests) are perennial. Stand a **Trellis** (treated wood, up to 2 high) on farmland and plant
     Hop Seeds in the bottom one. The vine climbs, then bears Hop Cones. Picking them leaves the vine to bear again.

@@ -75,7 +75,7 @@ public final class CropGameTests {
         helper.succeed();
     }
 
-    // Rapeseed grows into its two-block stages (age 4 up) only with air above; flax from age 2; sorghum always.
+    // Rapeseed and Sorghum grow into their two-block stages (age 4 up) only with air above; flax from age 2.
     static void tallCropsNeedRoom(GameTestHelper helper) {
         BlockPos rape = new BlockPos(0, 2, 0), flax = new BlockPos(2, 2, 0), sorghum = new BlockPos(4, 2, 0);
         for (BlockPos pos : List.of(rape, flax, sorghum)) {
@@ -84,11 +84,11 @@ public final class CropGameTests {
         }
         helper.setBlock(rape, ModBlocks.RAPESEED.get().getStateForAge(3));
         helper.setBlock(flax, ModBlocks.FLAX.get().getStateForAge(1));
-        helper.setBlock(sorghum, ModBlocks.SORGHUM.get().getStateForAge(5));
+        helper.setBlock(sorghum, ModBlocks.SORGHUM.get().getStateForAge(3));
         var level = helper.getLevel();
         helper.assertTrue(!ModBlocks.RAPESEED.get().hasRoomToGrow(level, helper.absolutePos(rape), helper.getBlockState(rape)), "Rapeseed grows into stone");
         helper.assertTrue(!ModBlocks.FLAX.get().hasRoomToGrow(level, helper.absolutePos(flax), helper.getBlockState(flax)), "Flax grows into stone");
-        helper.assertTrue(ModBlocks.SORGHUM.get().hasRoomToGrow(level, helper.absolutePos(sorghum), helper.getBlockState(sorghum)), "Sorghum needs room");
+        helper.assertTrue(!ModBlocks.SORGHUM.get().hasRoomToGrow(level, helper.absolutePos(sorghum), helper.getBlockState(sorghum)), "Sorghum grows into stone");
         helper.setBlock(rape.above(), Blocks.AIR);
         helper.assertTrue(ModBlocks.RAPESEED.get().hasRoomToGrow(level, helper.absolutePos(rape), helper.getBlockState(rape)), "Rapeseed has no room under air");
         helper.succeed();

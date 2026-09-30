@@ -542,20 +542,20 @@ public final class ModBlocks {
     public static final DeferredBlock<LoamFarmlandBlock> IRRIGATED_LOAM_FARMLAND = BLOCKS.registerBlock("irrigated_loam_farmland",
             p -> new LoamFarmlandBlock(LOAM.get(), true, p), p -> farmlandProperties(p).sound(SoundType.COPPER));
 
-    // Crops: Flax, Rapeseed and Sorghum grow like wheat (Flax and Rapeseed two blocks tall); Hops climb a Trellis. Each has a wild clump that worldgen places.
+    // Crops: Flax, Rapeseed and Sorghum grow like wheat, but two blocks tall; Hops climb a Trellis. Each has a wild clump that worldgen places.
     public static final DeferredBlock<ArcforgeCropBlock> FLAX = BLOCKS.registerBlock("flax",
             p -> new ArcforgeCropBlock(() -> ModItems.FLAX_SEEDS.get(), 2, p), ModBlocks::cropProperties);
     public static final DeferredBlock<ArcforgeCropBlock> RAPESEED = BLOCKS.registerBlock("rapeseed",
             p -> new ArcforgeCropBlock(() -> ModItems.RAPESEEDS.get(), 4, p), ModBlocks::cropProperties);
     public static final DeferredBlock<ArcforgeCropBlock> SORGHUM = BLOCKS.registerBlock("sorghum",
-            p -> new ArcforgeCropBlock(() -> ModItems.SORGHUM_SEEDS.get(), ArcforgeCropBlock.NEVER_TALL, p), ModBlocks::cropProperties);
+            p -> new ArcforgeCropBlock(() -> ModItems.SORGHUM_SEEDS.get(), 4, p), ModBlocks::cropProperties);
     // Not solid, so farmland under it stays farmland.
     public static final DeferredBlock<TrellisBlock> TRELLIS = BLOCKS.registerBlock("trellis",
             TrellisBlock::new, p -> treatedWood(p).strength(0.6F).noOcclusion().forceSolidOff().randomTicks());
-    public static final DeferredBlock<WildCropBlock> WILD_FLAX = BLOCKS.registerBlock("wild_flax", WildCropBlock::new, ModBlocks::wildCropProperties);
-    public static final DeferredBlock<WildCropBlock> WILD_RAPESEED = BLOCKS.registerBlock("wild_rapeseed", WildCropBlock::new, ModBlocks::wildCropProperties);
-    public static final DeferredBlock<WildCropBlock> WILD_SORGHUM = BLOCKS.registerBlock("wild_sorghum", WildCropBlock::new, ModBlocks::wildCropProperties);
-    public static final DeferredBlock<WildCropBlock> WILD_HOPS = BLOCKS.registerBlock("wild_hops", WildCropBlock::new, ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_FLAX = BLOCKS.registerBlock("wild_flax", p -> new WildCropBlock(true, p), ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_RAPESEED = BLOCKS.registerBlock("wild_rapeseed", p -> new WildCropBlock(true, p), ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_SORGHUM = BLOCKS.registerBlock("wild_sorghum", p -> new WildCropBlock(true, p), ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_HOPS = BLOCKS.registerBlock("wild_hops", p -> new WildCropBlock(false, p), ModBlocks::wildCropProperties);
 
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);

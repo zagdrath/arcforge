@@ -1,7 +1,7 @@
 {
-  "parent": "minecraft:block/crop",
-  "render_type": "minecraft:cutout",
+  "parent": "arcforge:block/tall_crop",
   "textures": {
-    "crop": "arcforge:block/sorghum_stage3"
+    "crop": "arcforge:block/sorghum_stage3",
+    "top": "arcforge:block/sorghum_stage3_top"
   }
 }

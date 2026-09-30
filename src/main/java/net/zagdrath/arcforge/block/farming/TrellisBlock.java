@@ -15,6 +15,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -27,6 +28,7 @@ import net.minecraft.world.level.block.FarmlandBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
@@ -44,17 +46,19 @@ public class TrellisBlock extends Block implements BonemealableBlock {
     public static final int BARE = 0, SHOOT = 1, FULL_VINE = 3, BEARING = 4;
     // Named "age" so LoamGrowth and Jade treat it like a crop's age.
     public static final IntegerProperty AGE = IntegerProperty.create("age", BARE, BEARING);
+    // Standing on farmland, which is a pixel short of a full block: the model adds feet reaching down into it.
+    public static final BooleanProperty ON_FARMLAND = BooleanProperty.create("on_farmland");
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 16, 14);
     private static final int MIN_LIGHT = 9;
 
     public TrellisBlock(BlockBehaviour.Properties properties) {
         super(properties);
-        registerDefaultState(stateDefinition.any().setValue(AGE, BARE));
+        registerDefaultState(stateDefinition.any().setValue(AGE, BARE).setValue(ON_FARMLAND, false));
     }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(AGE);
+        builder.add(AGE, ON_FARMLAND);
     }
 
     @Override
@@ -87,12 +91,19 @@ public class TrellisBlock extends Block implements BonemealableBlock {
         return below.getBlock() instanceof FarmlandBlock || below.isFaceSturdy(level, pos.below(), Direction.UP);
     }
 
-    // A trellis whose support is gone breaks (dropping what it holds).
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        return defaultBlockState().setValue(ON_FARMLAND, onFarmland(context.getLevel(), context.getClickedPos()));
+    }
+
+    // A trellis whose support is gone breaks (dropping what it holds); otherwise it follows what it stands on.
     @Override
     protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction direction,
             BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-        return direction == Direction.DOWN && !state.canSurvive(level, pos) ? Blocks.AIR.defaultBlockState()
-                : super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);
+        if (direction == Direction.DOWN) {
+            return state.canSurvive(level, pos) ? state.setValue(ON_FARMLAND, onFarmland(level, pos)) : Blocks.AIR.defaultBlockState();
+        }
+        return super.updateShape(state, level, ticks, pos, direction, neighborPos, neighborState, random);
     }
 
     // --- Planting and picking ---
