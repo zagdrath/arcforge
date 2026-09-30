@@ -20,7 +20,7 @@ number and date.
 
 ## [Unreleased]
 
-Suggested version: **2.2.0** (new content; worlds load as they are).
+## [2.2.0] - 2026-09-30
 
 ### Upgrading
 
@@ -652,7 +652,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.1.0...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.2.0...HEAD
+[2.2.0]: https://github.com/zagdrath/arcforge/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/zagdrath/arcforge/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/zagdrath/arcforge/compare/v1.2.0...v2.0.0
 [1.2.0]: https://github.com/zagdrath/arcforge/compare/f8e4679...7b3fbce
