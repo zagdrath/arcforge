@@ -136,12 +136,18 @@ public class TrellisBlock extends Block implements BonemealableBlock {
 
     // Picks the cones (conesMin to conesMax) and leaves the full vine to bear again. Returns how many were picked.
     public static int harvest(ServerLevel level, BlockPos pos, BlockState state) {
+        ItemStack cones = pickCones(level, pos, state);
+        popResource(level, pos, cones);
+        return cones.getCount();
+    }
+
+    // Takes the cones off a bearing vine and hands them back (the Harvester stores them), leaving the full vine.
+    public static ItemStack pickCones(ServerLevel level, BlockPos pos, BlockState state) {
         int min = ArcforgeConfig.HOP_CONES_MIN.getAsInt();
         int count = min + level.getRandom().nextInt(Math.max(0, ArcforgeConfig.HOP_CONES_MAX.getAsInt() - min) + 1);
-        popResource(level, pos, new ItemStack(ModItems.HOP_CONES.get(), count));
         level.setBlock(pos, state.setValue(AGE, FULL_VINE), Block.UPDATE_ALL);
         level.playSound(null, pos, SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, SoundSource.BLOCKS, 1.0F, 0.8F + level.getRandom().nextFloat() * 0.4F);
-        return count;
+        return new ItemStack(ModItems.HOP_CONES.get(), count);
     }
 
     // --- Growing ---

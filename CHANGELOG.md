@@ -24,7 +24,8 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
 
 ### Upgrading
 
-- **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`, `hops`) gets its defaults; nothing to redo.
+- **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`, `hops`, `rusticMachines`) gets its defaults;
+  nothing to redo.
 - **Wild crops generate only in newly explored chunks.**
 - **Firebox and Combustion Plant ash slot.** Both machines gain an ash slot. Saved machines keep their fuel and
   upgrades: the upgrades move up past the new slot when the world loads.
@@ -62,6 +63,21 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
   - **Hops** (wild in forests) are perennial. Stand a **Trellis** (treated wood, up to 2 high) on farmland and plant
     Hop Seeds in the bottom one. The vine climbs, then bears Hop Cones. Picking them leaves the vine to bear again.
   - Handbook pages, Jade shows a trellis's vine, and four new Farming advancements.
+- **Rustic farming machines and tools:** unpowered, built from treated wood, copper and iron. All ranges, rates and
+  timers are in the new `farming.rusticMachines` config section.
+  - **Planter.** Plants seeds from its 9 slots on the empty farmland in the 3x3 in front of it, and Hop Seeds into a
+    bare Trellis.
+  - **Harvester.** Harvests the ripe crops in the 3x3 in front of it into its 18 slots and replants each with a seed
+    from its own harvest. It picks Hop Cones and leaves the vine.
+  - Both run once per redstone pulse, or every 5 seconds with no redstone attached. Hoppers and conduits fill the
+    Planter and empty the Harvester. There's no GUI: use them by hand to add seeds or take the harvest.
+  - **Fertilizer Spreader.** Holds fertilizer and tops up the Loam Farmland in the 5x5 around it when a block's
+    nutrients drop below 4.
+  - **Copper Sprinkler.** Fed water from a pipe, tank, conduit or bucket, it uses 1 mB/t. It keeps farmland within 4
+    blocks moist and gives the crops on it a small growth bonus. It sprays while it runs.
+  - **Scarecrow.** A treated-wood and linen figure, two blocks tall. Mobs can't trample farmland within 9 blocks of it.
+  - **Iron Sickle** and **Steel Sickle** harvest and replant the ripe crops in a 3x3; the **Steel Scythe** does a 5x5.
+  - Handbook pages, JEI info, Jade tooltips and three new Farming advancements (Hands Free, April Showers, Reaper).
 
 ### Fixed
 

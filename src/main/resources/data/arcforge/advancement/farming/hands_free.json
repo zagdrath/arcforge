@@ -1,0 +1,54 @@
+{
+  "parent": "arcforge:farming/new_crop",
+  "display": {
+    "icon": {
+      "id": "arcforge:harvester"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.hands_free.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.hands_free.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "planter": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:planter"
+            }
+          }
+        }
+      }
+    },
+    "harvester": {
+      "trigger": "minecraft:placed_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:location_check",
+          "predicate": {
+            "block": {
+              "blocks": "arcforge:harvester"
+            }
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "planter"
+    ],
+    [
+      "harvester"
+    ]
+  ]
+}

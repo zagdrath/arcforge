@@ -1,6 +1,10 @@
 {
   "values": [
     "arcforge:compost_bin",
-    "arcforge:trellis"
+    "arcforge:trellis",
+    "arcforge:planter",
+    "arcforge:harvester",
+    "arcforge:fertilizer_spreader",
+    "arcforge:scarecrow"
   ]
 }

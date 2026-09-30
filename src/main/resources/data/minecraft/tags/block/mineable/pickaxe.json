@@ -120,6 +120,7 @@
     "arcforge:gas_meter",
     "arcforge:chargepad",
     "arcforge:fermenter",
-    "arcforge:gas_turbine_array_casing"
+    "arcforge:gas_turbine_array_casing",
+    "arcforge:copper_sprinkler"
   ]
 }

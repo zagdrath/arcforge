@@ -14,6 +14,7 @@ import java.util.Map;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.DoubleHighBlockItem;
@@ -33,8 +34,10 @@ import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
 import net.zagdrath.arcforge.item.farming.FertilizerItem;
+import net.zagdrath.arcforge.item.farming.SickleItem;
 import net.zagdrath.arcforge.item.conduit.ConduitFilterItem;
 import net.zagdrath.arcforge.item.machine.ArcQuarryItem;
 import net.zagdrath.arcforge.item.storage.CrateBlockItem;
@@ -396,6 +399,20 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> WILD_RAPESEED = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RAPESEED, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<BlockItem> WILD_SORGHUM = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SORGHUM, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<BlockItem> WILD_HOPS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_HOPS, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+
+    // Rustic farming machines and tools. Durability is fixed here (it's set before the config loads); the areas are config.
+    public static final DeferredItem<BlockItem> PLANTER = ITEMS.registerSimpleBlockItem(ModBlocks.PLANTER);
+    public static final DeferredItem<BlockItem> HARVESTER = ITEMS.registerSimpleBlockItem(ModBlocks.HARVESTER);
+    public static final DeferredItem<BlockItem> FERTILIZER_SPREADER = ITEMS.registerSimpleBlockItem(ModBlocks.FERTILIZER_SPREADER);
+    public static final DeferredItem<BlockItem> COPPER_SPRINKLER = ITEMS.registerSimpleBlockItem(ModBlocks.COPPER_SPRINKLER);
+    public static final DeferredItem<DoubleHighBlockItem> SCARECROW = ITEMS.registerItem("scarecrow",
+            p -> new DoubleHighBlockItem(ModBlocks.SCARECROW.get(), p), p -> p.useBlockDescriptionPrefix());
+    public static final DeferredItem<SickleItem> IRON_SICKLE = ITEMS.registerItem("iron_sickle",
+            p -> new SickleItem(ArcforgeConfig.SICKLE_RADIUS::getAsInt, p), p -> p.durability(250).repairable(ItemTags.IRON_TOOL_MATERIALS).enchantable(14));
+    public static final DeferredItem<SickleItem> STEEL_SICKLE = ITEMS.registerItem("steel_sickle",
+            p -> new SickleItem(ArcforgeConfig.SICKLE_RADIUS::getAsInt, p), p -> p.durability(500).repairable(ModItemTags.STEEL_INGOTS).enchantable(12));
+    public static final DeferredItem<SickleItem> STEEL_SCYTHE = ITEMS.registerItem("steel_scythe",
+            p -> new SickleItem(ArcforgeConfig.SCYTHE_RADIUS::getAsInt, p), p -> p.durability(1_000).repairable(ModItemTags.STEEL_INGOTS).enchantable(12));
 
     // --- Solar Thermal Array ---
 

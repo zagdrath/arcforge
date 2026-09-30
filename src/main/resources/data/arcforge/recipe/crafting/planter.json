@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "PCP",
+    "F F"
+  ],
+  "key": {
+    "P": "arcforge:treated_planks",
+    "H": "minecraft:hopper",
+    "C": "#c:ingots/copper",
+    "F": "arcforge:treated_fence"
+  },
+  "result": {
+    "id": "arcforge:planter",
+    "count": 1
+  }
+}

@@ -3,6 +3,7 @@
     "arcforge:flax",
     "arcforge:rapeseed",
     "arcforge:sorghum",
-    "arcforge:trellis"
+    "arcforge:trellis",
+    "arcforge:scarecrow"
   ]
 }

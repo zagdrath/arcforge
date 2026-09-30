@@ -1,0 +1,15 @@
+{
+  "title": "Sickles & the Scythe",
+  "icon": "arcforge:steel_scythe",
+  "items": [
+    "arcforge:iron_sickle",
+    "arcforge:steel_sickle",
+    "arcforge:steel_scythe"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Use one on a crop (or the farmland under it) to harvest every ripe crop around it and replant each from its own drops, which fall on the ground. Unripe crops are left alone, and a bearing Trellis has its cones picked.\n- Iron Sickle: 3x3, 250 uses.\n- Steel Sickle: 3x3, 500 uses.\n- Steel Scythe: 5x5, 1,000 uses.\nEach crop harvested costs one use. They repair with iron or steel ingots."
+    }
+  ]
+}

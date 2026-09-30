@@ -79,6 +79,9 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, GasTurbineArrayBlockEntity.class);
         registration.registerBlockDataProvider(MeterProviders.Meter.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity.class);
         registration.registerBlockDataProvider(MeterProviders.Chargepad.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.ChargepadBlockEntity.class);
+        registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.FarmMachineBlockEntity.class);
+        registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity.class);
+        registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity.class);
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, PressureGlassBlock.class);
         // Pressure Glass has no block entity: these read the array it belongs to.
@@ -122,6 +125,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(FarmingProviders.LoamFarmland.INSTANCE, net.zagdrath.arcforge.block.farming.LoamFarmlandBlock.class);
         registration.registerBlockComponent(FarmingProviders.CompostBin.INSTANCE, net.zagdrath.arcforge.block.farming.CompostBinBlock.class);
         registration.registerBlockComponent(FarmingProviders.Trellis.INSTANCE, net.zagdrath.arcforge.block.farming.TrellisBlock.class);
+        registration.registerBlockComponent(FarmingProviders.Scarecrow.INSTANCE, net.zagdrath.arcforge.block.farming.ScarecrowBlock.class);
+        registration.registerBlockComponent(FarmingProviders.RusticMachine.Client.INSTANCE, net.zagdrath.arcforge.block.farming.FarmMachineBlock.class);
+        registration.registerBlockComponent(FarmingProviders.RusticMachine.Client.INSTANCE, net.zagdrath.arcforge.block.farming.FertilizerSpreaderBlock.class);
+        registration.registerBlockComponent(FarmingProviders.RusticMachine.Client.INSTANCE, net.zagdrath.arcforge.block.farming.CopperSprinklerBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

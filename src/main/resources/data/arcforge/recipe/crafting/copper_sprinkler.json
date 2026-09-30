@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " C ",
+    "CBC",
+    " C "
+  ],
+  "key": {
+    "C": "#c:ingots/copper",
+    "B": "minecraft:bucket"
+  },
+  "result": {
+    "id": "arcforge:copper_sprinkler",
+    "count": 1
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:all_of",
+        "terms": [
+          {
+            "type": "minecraft:survives_explosion"
+          },
+          {
+            "type": "minecraft:match_block",
+            "blocks": "arcforge:scarecrow",
+            "state": {
+              "half": "lower"
+            }
+          }
+        ]
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:scarecrow"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "arcforge:blocks/scarecrow"
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PSP",
+    "ICI",
+    "F F"
+  ],
+  "key": {
+    "P": "arcforge:treated_planks",
+    "S": "minecraft:shears",
+    "I": "#c:ingots/iron",
+    "C": "#c:ingots/copper",
+    "F": "arcforge:treated_fence"
+  },
+  "result": {
+    "id": "arcforge:harvester",
+    "count": 1
+  }
+}

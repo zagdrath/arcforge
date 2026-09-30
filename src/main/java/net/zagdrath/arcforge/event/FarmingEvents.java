@@ -6,15 +6,18 @@
 package net.zagdrath.arcforge.event;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.level.block.CropGrowEvent;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
+import net.zagdrath.arcforge.block.farming.ScarecrowBlock;
 import net.zagdrath.arcforge.farming.LoamGrowth;
 
-// Loam Farmland can't be trampled, and crops growing on it use its nutrients (LoamGrowth). A hoe tills Loam through
+// Loam Farmland can't be trampled, nor can a mob trample any farmland near a Scarecrow, and crops growing on Loam use
+// its nutrients (LoamGrowth). A hoe tills Loam through
 // data/neoforge/data_maps/block_transformer/block_transform_appenders.json (a rule added to minecraft:hoe).
 @EventBusSubscriber(modid = Arcforge.MODID)
 public final class FarmingEvents {
@@ -23,6 +26,11 @@ public final class FarmingEvents {
     @SubscribeEvent
     static void onTrample(BlockEvent.FarmlandTrampleEvent event) {
         if (event.getState().getBlock() instanceof LoamFarmlandBlock) {
+            event.setCanceled(true);
+            return;
+        }
+        // A Scarecrow nearby keeps mobs (not players) off the farmland.
+        if (!(event.getEntity() instanceof Player) && ScarecrowBlock.protects(event.getLevel(), event.getPos())) {
             event.setCanceled(true);
         }
     }

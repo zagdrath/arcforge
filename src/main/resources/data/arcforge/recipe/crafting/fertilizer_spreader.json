@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P P",
+    "PHP",
+    "FIF"
+  ],
+  "key": {
+    "P": "arcforge:treated_planks",
+    "H": "minecraft:hopper",
+    "I": "#c:ingots/iron",
+    "F": "arcforge:treated_fence"
+  },
+  "result": {
+    "id": "arcforge:fertilizer_spreader",
+    "count": 1
+  }
+}

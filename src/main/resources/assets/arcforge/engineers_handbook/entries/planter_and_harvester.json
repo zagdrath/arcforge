@@ -1,0 +1,22 @@
+{
+  "title": "Planter & Harvester",
+  "icon": "arcforge:harvester",
+  "items": [
+    "arcforge:planter",
+    "arcforge:harvester"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Two unpowered machines of treated wood, copper and iron that work the 3x3 of crops in front of them. Place one facing the field; it works its own level and the one below, so it can stand on the ground beside raised farmland or on the farmland's level.\n- With a redstone signal wired to it, it runs once on each pulse.\n- With no redstone next to it, it runs every 5 seconds by itself."
+    },
+    {
+      "type": "text",
+      "text": "Planter: holds 9 stacks of seeds. Use it with seeds to put them in; sneak-use with an empty hand to take them back. Each run it plants a seed on every empty farmland in front of it: wheat, beetroot, carrots, potatoes, melon and pumpkin seeds, Flax, Rapeseed and Sorghum. Hop Seeds go into a bare Trellis standing on farmland. Hoppers and conduits can fill it from any side."
+    },
+    {
+      "type": "text",
+      "text": "Harvester: harvests every ripe crop in front of it into its 18 slots and replants each one with a seed from its own harvest. A Trellis bearing Hop Cones has them picked and keeps its vine. Use it with an empty hand to take the harvest, or pull it out with a hopper or conduit. A crop whose harvest won't fit is left standing.\nAreas and the timer are in the config (farming.rusticMachines)."
+    }
+  ]
+}

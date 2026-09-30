@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=north": {
+      "model": "arcforge:block/harvester"
+    },
+    "facing=east": {
+      "model": "arcforge:block/harvester",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "arcforge:block/harvester",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "arcforge:block/harvester",
+      "y": 270
+    }
+  }
+}

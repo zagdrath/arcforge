@@ -17,6 +17,10 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.HarvesterBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.PlanterBlockEntity;
 import net.zagdrath.arcforge.blockentity.redstone.ThrottleLeverBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
@@ -105,6 +109,14 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<CompostBinBlockEntity>> COMPOST_BIN = BLOCK_ENTITY_TYPES.register("compost_bin",
             () -> new BlockEntityType<>(CompostBinBlockEntity::new, ModBlocks.COMPOST_BIN.get()));
+    public static final Supplier<BlockEntityType<PlanterBlockEntity>> PLANTER = BLOCK_ENTITY_TYPES.register("planter",
+            () -> new BlockEntityType<>(PlanterBlockEntity::new, ModBlocks.PLANTER.get()));
+    public static final Supplier<BlockEntityType<HarvesterBlockEntity>> HARVESTER = BLOCK_ENTITY_TYPES.register("harvester",
+            () -> new BlockEntityType<>(HarvesterBlockEntity::new, ModBlocks.HARVESTER.get()));
+    public static final Supplier<BlockEntityType<FertilizerSpreaderBlockEntity>> FERTILIZER_SPREADER = BLOCK_ENTITY_TYPES.register("fertilizer_spreader",
+            () -> new BlockEntityType<>(FertilizerSpreaderBlockEntity::new, ModBlocks.FERTILIZER_SPREADER.get()));
+    public static final Supplier<BlockEntityType<CopperSprinklerBlockEntity>> COPPER_SPRINKLER = BLOCK_ENTITY_TYPES.register("copper_sprinkler",
+            () -> new BlockEntityType<>(CopperSprinklerBlockEntity::new, ModBlocks.COPPER_SPRINKLER.get()));
 
     public static final Supplier<BlockEntityType<ChargepadBlockEntity>> CHARGEPAD = BLOCK_ENTITY_TYPES.register("chargepad",
             () -> new BlockEntityType<>(ChargepadBlockEntity::new, ModBlocks.CHARGEPAD.get()));

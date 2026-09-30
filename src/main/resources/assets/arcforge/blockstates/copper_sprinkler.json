@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "running=false": {
+      "model": "arcforge:block/copper_sprinkler"
+    },
+    "running=true": {
+      "model": "arcforge:block/copper_sprinkler"
+    }
+  }
+}

@@ -115,6 +115,15 @@ public final class ModCapabilities {
         // The Compost Bin: plant matter in, Compost out (hoppers and conduits).
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.COMPOST_BIN.get(),
                 net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity::getItemHandler);
+        // Rustic farming machines: seeds and fertilizer in, the harvest out, water in (hoppers, pipes and conduits).
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.PLANTER.get(),
+                net.zagdrath.arcforge.blockentity.farming.PlanterBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.HARVESTER.get(),
+                net.zagdrath.arcforge.blockentity.farming.HarvesterBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FERTILIZER_SPREADER.get(),
+                net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.COPPER_SPRINKLER.get(),
+                net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ARC_CRUSHER.get(),
                 ArcCrusherBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ARC_CRUSHER.get(),

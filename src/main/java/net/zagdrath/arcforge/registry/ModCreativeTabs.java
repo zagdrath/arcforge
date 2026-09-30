@@ -215,6 +215,14 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.WILD_RAPESEED.get());
                 output.accept(ModItems.WILD_SORGHUM.get());
                 output.accept(ModItems.WILD_HOPS.get());
+                output.accept(ModItems.PLANTER.get());
+                output.accept(ModItems.HARVESTER.get());
+                output.accept(ModItems.FERTILIZER_SPREADER.get());
+                output.accept(ModItems.COPPER_SPRINKLER.get());
+                output.accept(ModItems.SCARECROW.get());
+                output.accept(ModItems.IRON_SICKLE.get());
+                output.accept(ModItems.STEEL_SICKLE.get());
+                output.accept(ModItems.STEEL_SCYTHE.get());
             }).build());
 
     private ModCreativeTabs() {}

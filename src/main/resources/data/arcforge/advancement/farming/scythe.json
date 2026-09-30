@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:farming/hands_free",
+  "display": {
+    "icon": {
+      "id": "arcforge:steel_scythe"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.scythe.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.scythe.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "scythe": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:steel_scythe"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "scythe"
+    ]
+  ]
+}

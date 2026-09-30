@@ -46,7 +46,11 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.farming.ArcforgeCropBlock;
 import net.zagdrath.arcforge.block.farming.CompostBinBlock;
+import net.zagdrath.arcforge.block.farming.CopperSprinklerBlock;
+import net.zagdrath.arcforge.block.farming.FarmMachineBlock;
+import net.zagdrath.arcforge.block.farming.FertilizerSpreaderBlock;
 import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
+import net.zagdrath.arcforge.block.farming.ScarecrowBlock;
 import net.zagdrath.arcforge.block.farming.TrellisBlock;
 import net.zagdrath.arcforge.block.farming.WildCropBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
@@ -556,6 +560,19 @@ public final class ModBlocks {
     public static final DeferredBlock<WildCropBlock> WILD_RAPESEED = BLOCKS.registerBlock("wild_rapeseed", p -> new WildCropBlock(true, p), ModBlocks::wildCropProperties);
     public static final DeferredBlock<WildCropBlock> WILD_SORGHUM = BLOCKS.registerBlock("wild_sorghum", p -> new WildCropBlock(true, p), ModBlocks::wildCropProperties);
     public static final DeferredBlock<WildCropBlock> WILD_HOPS = BLOCKS.registerBlock("wild_hops", p -> new WildCropBlock(false, p), ModBlocks::wildCropProperties);
+
+    // Rustic farming machines: unpowered, treated wood with copper and iron fittings.
+    public static final DeferredBlock<FarmMachineBlock> PLANTER = BLOCKS.registerBlock("planter",
+            p -> new FarmMachineBlock(FarmMachineBlock.Kind.PLANTER, p), p -> treatedWood(p).strength(1.5F).noOcclusion());
+    public static final DeferredBlock<FarmMachineBlock> HARVESTER = BLOCKS.registerBlock("harvester",
+            p -> new FarmMachineBlock(FarmMachineBlock.Kind.HARVESTER, p), p -> treatedWood(p).strength(1.5F).noOcclusion());
+    public static final DeferredBlock<FertilizerSpreaderBlock> FERTILIZER_SPREADER = BLOCKS.registerBlock("fertilizer_spreader",
+            FertilizerSpreaderBlock::new, p -> treatedWood(p).strength(1.5F).noOcclusion());
+    public static final DeferredBlock<CopperSprinklerBlock> COPPER_SPRINKLER = BLOCKS.registerBlock("copper_sprinkler",
+            CopperSprinklerBlock::new, p -> p.mapColor(MapColor.COLOR_ORANGE).strength(2.0F, 6.0F).sound(SoundType.COPPER).noOcclusion());
+    // Not solid, so it can stand on farmland among the crops.
+    public static final DeferredBlock<ScarecrowBlock> SCARECROW = BLOCKS.registerBlock("scarecrow",
+            ScarecrowBlock::new, p -> treatedWood(p).strength(0.8F).noOcclusion().forceSolidOff().pushReaction(PushReaction.POPPED));
 
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);

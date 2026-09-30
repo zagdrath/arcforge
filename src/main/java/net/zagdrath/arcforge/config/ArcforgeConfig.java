@@ -1549,6 +1549,71 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Rustic farming machines and tools: unpowered, built from treated wood, copper and iron.").push("rusticMachines");
+    }
+
+    public static final ModConfigSpec.IntValue MACHINE_TIMER_TICKS = BUILDER
+            .comment("Ticks between runs of a Planter or Harvester with no redstone attached (100 = 5 seconds). With redstone "
+                    + "attached, each rising pulse runs it once instead.")
+            .defineInRange("timerTicks", 100, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue PLANTER_RADIUS = BUILDER
+            .comment("Planter area: a square of (2 x radius + 1) blocks in front of it (1 = 3x3).")
+            .defineInRange("planterRadius", 1, 0, 8);
+
+    public static final ModConfigSpec.IntValue HARVESTER_RADIUS = BUILDER
+            .comment("Harvester area: a square of (2 x radius + 1) blocks in front of it (1 = 3x3).")
+            .defineInRange("harvesterRadius", 1, 0, 8);
+
+    public static final ModConfigSpec.IntValue SPREADER_RADIUS = BUILDER
+            .comment("Fertilizer Spreader area: a square of (2 x radius + 1) blocks centred on it (2 = 5x5), down to 3 blocks below.")
+            .defineInRange("spreaderRadius", 2, 0, 8);
+
+    public static final ModConfigSpec.IntValue SPREADER_INTERVAL = BUILDER
+            .comment("Ticks between the Fertilizer Spreader's checks of the soil.")
+            .defineInRange("spreaderInterval", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue SPREADER_THRESHOLD = BUILDER
+            .comment("The Fertilizer Spreader tops up Loam Farmland whose nutrients are below this (0 to 15).")
+            .defineInRange("spreaderThreshold", 4, 1, 15);
+
+    public static final ModConfigSpec.IntValue SPRINKLER_RADIUS = BUILDER
+            .comment("Copper Sprinkler range: farmland within this many blocks across (a square), down to 3 blocks below.")
+            .defineInRange("sprinklerRadius", 4, 0, 8);
+
+    public static final ModConfigSpec.IntValue SPRINKLER_WATER_PER_TICK = BUILDER
+            .comment("Water (mB) the Copper Sprinkler uses each tick while it runs.")
+            .defineInRange("sprinklerWaterPerTick", 1, 1, 1_000);
+
+    public static final ModConfigSpec.IntValue SPRINKLER_TANK_CAPACITY = BUILDER
+            .comment("Copper Sprinkler water tank capacity (mB).")
+            .defineInRange("sprinklerTankCapacity", 1_000, 100, 64_000);
+
+    public static final ModConfigSpec.IntValue SPRINKLER_INTERVAL = BUILDER
+            .comment("Ticks between the Copper Sprinkler's passes over its area (moistening and the growth bonus).")
+            .defineInRange("sprinklerInterval", 20, 1, 1_200);
+
+    public static final ModConfigSpec.DoubleValue SPRINKLER_GROWTH_CHANCE = BUILDER
+            .comment("Chance, each pass, that a crop in range gets an extra growth tick (a random tick).")
+            .defineInRange("sprinklerGrowthChance", 0.05, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue SCARECROW_RADIUS = BUILDER
+            .comment("Mobs can't trample farmland within this many blocks of a Scarecrow (a cube).")
+            .defineInRange("scarecrowRadius", 9, 0, 32);
+
+    public static final ModConfigSpec.IntValue SICKLE_RADIUS = BUILDER
+            .comment("Sickle area: a square of (2 x radius + 1) crops around the one used (1 = 3x3).")
+            .defineInRange("sickleRadius", 1, 0, 8);
+
+    public static final ModConfigSpec.IntValue SCYTHE_RADIUS = BUILDER
+            .comment("Scythe area: a square of (2 x radius + 1) crops around the one used (2 = 5x5).")
+            .defineInRange("scytheRadius", 2, 0, 8);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.pop();
     }
 

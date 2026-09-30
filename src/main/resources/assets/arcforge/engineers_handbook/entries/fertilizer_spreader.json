@@ -1,0 +1,13 @@
+{
+  "title": "Fertilizer Spreader",
+  "icon": "arcforge:fertilizer_spreader",
+  "items": [
+    "arcforge:fertilizer_spreader"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A hopper on legs with an iron spinner under it. It holds 9 stacks of fertilizer: Compost, Wood Ash, Basic Slag or Mixed Fertilizer. Use it with fertilizer to fill it (hoppers and conduits work too); sneak-use with an empty hand to empty it.\nEvery 2 seconds it checks the Loam Farmland in the 5x5 around it, down to 3 blocks below, and spreads one fertilizer on any whose nutrients have dropped below 4. It needs no power or redstone."
+    }
+  ]
+}

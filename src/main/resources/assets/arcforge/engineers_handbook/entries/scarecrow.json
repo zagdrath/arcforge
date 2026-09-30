@@ -1,0 +1,13 @@
+{
+  "title": "Scarecrow",
+  "icon": "arcforge:scarecrow",
+  "items": [
+    "arcforge:scarecrow"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A treated-wood post dressed in linen with a straw hat, two blocks tall. It can stand on farmland among the crops.\nNo mob can trample farmland within 9 blocks of it: jumping rabbits, wandering villagers and anything that falls on it. Players still can (Loam Farmland can't be trampled at all)."
+    }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " H ",
+    "FLF",
+    " S "
+  ],
+  "key": {
+    "H": "minecraft:hay_block",
+    "L": "arcforge:linen",
+    "F": "#c:rods/wooden",
+    "S": "arcforge:stripped_treated_log"
+  },
+  "result": {
+    "id": "arcforge:scarecrow",
+    "count": 1
+  }
+}

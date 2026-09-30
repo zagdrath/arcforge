@@ -504,3 +504,22 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - four 2×2 corner posts and 1 px rails at y 5, 10 and 15, textured with the stripped treated log;
   - the hop vine is four outward planes just outside the frame (`hops_vine1-4`), so it wraps the lattice;
   - stage 4 carries pale green cones (`#D6EC9E #A8CC6A #7FA24A`).
+
+## Rustic farming machines
+- The Planter, Harvester, Fertilizer Spreader, Copper Sprinkler and Scarecrow are UV-unwrapped element models: one
+  64×64 sheet per model (the Scarecrow's two halves share one), each face painted flat and sized to it, identical faces
+  sharing one region. Geometry carries the detail, in the feel of Create and Immersive Engineering.
+- Materials:
+  - treated wood on the treated planks / stripped log ramp `#120C07 … #725033`: planks faces are boards 4 px tall with a
+    `#20160D` gap row, a lit top row, a lit left and dark right edge, and a steel nail at each board end on faces 9 px or
+    wider; posts and legs are two lengthwise tones with end grain on their ends;
+  - iron on the machine steel ramp (straps, angles, chutes, the reel, the spinner), rivets only on faces 9 px or wider;
+  - copper on the Tempered row (seed drums, spouts, the whole Sprinkler);
+  - linen on the Linen item's ramp `#4A3934 #9D7860 #D2B192 #EDCFB4 #FDE8D0` (Cody's cloth), with stitched seams and a
+    sewn patch; the Scarecrow's sack head is one step darker (`#B89574`), with stitched X eyes and mouth;
+  - straw `#5C4318 #8A6A26 #B48E36 #D4AE4A #ECD072` in 3 px strands.
+- Planter and Harvester share one body: four log legs, a planks hopper with a stripped-log rim, an iron band and iron
+  corner angles. The Planter has copper seed drums with iron hubs and an iron seed chute at the front; the Harvester has
+  a reel (iron end plates, log axle, four slats), a toothed iron cutter bar and a copper outlet at the back.
+- The Sickles and the Scythe reuse the steel hoe's handle; the iron blade is vanilla-light `#E6E6E6 / #9A9A9A`, the
+  steel one the hoe's `#C4C9CF / #7D8289`.

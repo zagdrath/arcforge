@@ -240,6 +240,14 @@ public final class ArcforgeGameTests {
         TESTS.put("crops_hops_grow_and_regrow", CropGameTests::hopsGrowAndRegrow);
         TESTS.put("crops_recipes", CropGameTests::recipes);
         TESTS.put("crops_wild_plants", CropGameTests::wildPlantsGenerate);
+        TESTS.put("rustic_planter_plants", RusticGameTests::planterPlants);
+        TESTS.put("rustic_harvester_harvests", RusticGameTests::harvesterHarvests);
+        TESTS.put("rustic_pulse_and_timer", RusticGameTests::pulseAndTimer);
+        TESTS.put("rustic_spreader_tops_up", RusticGameTests::spreaderTopsUp);
+        TESTS.put("rustic_sprinkler_waters", RusticGameTests::sprinklerWaters);
+        TESTS.put("rustic_scarecrow_protects", RusticGameTests::scarecrowProtects);
+        TESTS.put("rustic_sickle_reaps", RusticGameTests::sickleReaps);
+        TESTS.put("rustic_recipes", RusticGameTests::recipes);
         TESTS.put("advancement_tree_loads", AdvancementGameTests::treeLoads);
         TESTS.put("multiblock_formed_trigger", AdvancementGameTests::multiblockFormedTrigger);
         TESTS.put("turbine_full_speed_needs_length", AdvancementGameTests::turbineFullSpeedNeedsLength);

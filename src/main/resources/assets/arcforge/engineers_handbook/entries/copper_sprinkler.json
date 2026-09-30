@@ -1,0 +1,13 @@
+{
+  "title": "Copper Sprinkler",
+  "icon": "arcforge:copper_sprinkler",
+  "items": [
+    "arcforge:copper_sprinkler"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A copper spray head fed with water from a pipe, tank or conduit, or a bucket by hand. It holds 1,000 mB and uses 1 mB/t while it has any, spraying water all round.\n- Farmland within 4 blocks (a 9x9, down to 3 blocks below) stays fully moist, no water source needed.\n- Crops on that farmland now and then get an extra growth tick, a small growth bonus on top of moisture.\nIt makes no difference to Irrigated Loam Farmland's moisture, but the growth bonus still applies."
+    }
+  ]
+}
