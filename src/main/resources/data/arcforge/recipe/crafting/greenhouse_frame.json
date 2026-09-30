@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PRP",
+    "R R",
+    "PRP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:greenhouse_frame",
+    "count": 4
+  }
+}

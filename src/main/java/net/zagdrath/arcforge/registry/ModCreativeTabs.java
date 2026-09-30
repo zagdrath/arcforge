@@ -246,6 +246,10 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.GLASS_CLOCHE.get());
                 output.accept(ModItems.GROW_CHAMBER.get());
                 output.accept(ModItems.HYDROPONIC_CELL.get());
+                output.accept(ModItems.GREENHOUSE_CONTROLLER.get());
+                output.accept(ModItems.GREENHOUSE_FRAME.get());
+                output.accept(ModItems.PLANTING_BED.get());
+                output.accept(ModItems.GROW_LAMP.get());
             }).build());
 
     private ModCreativeTabs() {}

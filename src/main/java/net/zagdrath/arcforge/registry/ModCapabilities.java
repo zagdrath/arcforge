@@ -16,6 +16,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import net.zagdrath.arcforge.blockentity.farming.GreenhouseBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
@@ -68,6 +69,7 @@ import net.zagdrath.arcforge.item.tool.JetpackFluidHandler;
 import net.zagdrath.arcforge.item.tool.JetpackItem;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
+import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.SolarThermalStructure;
 import net.zagdrath.arcforge.blockentity.farming.ClocheBlockEntity;
@@ -392,6 +394,24 @@ public final class ModCapabilities {
             var digester = net.zagdrath.arcforge.multiblock.BiogasDigesterStructure.findController(level, pos);
             return digester != null ? digester.heatHandlerAt(pos, side) : null;
         }, digesterParts);
+        // The Greenhouse Array: fertilizer and fluids in, the harvest out, FE and heat in, through the ports on its frames.
+        Block[] greenhouseParts = { ModBlocks.GREENHOUSE_CONTROLLER.get(), ModBlocks.GREENHOUSE_FRAME.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            GreenhouseBlockEntity greenhouse = GreenhouseStructure.findController(level, pos);
+            return greenhouse != null ? greenhouse.itemHandlerAt(pos, side) : null;
+        }, greenhouseParts);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            GreenhouseBlockEntity greenhouse = GreenhouseStructure.findController(level, pos);
+            return greenhouse != null ? greenhouse.fluidHandlerAt(pos, side) : null;
+        }, greenhouseParts);
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
+            GreenhouseBlockEntity greenhouse = GreenhouseStructure.findController(level, pos);
+            return greenhouse != null ? greenhouse.energyHandlerAt(pos, side) : null;
+        }, greenhouseParts);
+        event.registerBlock(HEAT, (level, pos, state, blockEntity, side) -> {
+            GreenhouseBlockEntity greenhouse = GreenhouseStructure.findController(level, pos);
+            return greenhouse != null ? greenhouse.heatHandlerAt(pos, side) : null;
+        }, greenhouseParts);
         Block[] columnParts = {
                 ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {

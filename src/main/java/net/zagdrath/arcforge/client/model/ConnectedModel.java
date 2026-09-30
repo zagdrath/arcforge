@@ -10,6 +10,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 
 import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
@@ -50,6 +51,7 @@ import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.multiblock.BiogasDigesterStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
+import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 
 // Connected textures for the steam arrays and Pressure Glass: a formed structure reads as one surface.
@@ -72,10 +74,11 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 // The Distillation Array's solid column uses two more modes (see ColumnBaked): "column_2x2" for its casings
 // and controller (base / beam / roof_nw / roof_ne / roof_sw / roof_se, and front for the controller) and
 // "tray_window" for its tray level casings (base / frame / top / bottom). The Biogas Digester's solid tank uses
-// "digester" (base / beam / top, and front for the controller; see DigesterBaked).
+// "digester" (base / beam / top, and front for the controller; see DigesterBaked), and the Greenhouse Array's frame
+// "greenhouse" (the same pieces, joined with the greenhouse's frames and controller instead).
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
-    private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester";
+    private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester", GREENHOUSE = "greenhouse";
     // The tray band's glass: the top 10 px of a side face (the sill and strap are below it).
     private static final int BAND = 10;
     private static final Identifier TRAY_FRAME = Identifier.fromNamespaceAndPath("arcforge", "block/ctm/tray_window_frame");
@@ -105,7 +108,7 @@ public final class ConnectedModel {
         }
 
         public boolean digester() {
-            return connect.equals(DIGESTER);
+            return connect.equals(DIGESTER) || connect.equals(GREENHOUSE);
         }
 
         // Anything that bakes this as an ordinary model gets the plain fallback cube.
@@ -130,7 +133,7 @@ public final class ConnectedModel {
                 case "glass" -> new String[] { "base", "beam", "lip" };
                 case COLUMN -> new String[] { "base", "beam", "roof_nw", "roof_ne", "roof_sw", "roof_se" };
                 case TRAY -> new String[] { "base", "frame", "top", "bottom" };
-                case DIGESTER -> new String[] { "base", "beam", "top" };
+                case DIGESTER, GREENHOUSE -> new String[] { "base", "beam", "top" };
                 default -> new String[] { "base", "beam", "lip", "window" };
             };
             for (String required : needed) {
@@ -299,7 +302,7 @@ public final class ConnectedModel {
         // --- Picking the pieces ---
 
         private static boolean isPart(BlockState state) {
-            return ShellCasingBlock.isFormed(state) || PressureGlassBlock.isFormed(state);
+            return ShellCasingBlock.isFormed(state) || PressureGlassBlock.isFormed(state) || GreenhouseStructure.isFormedPart(state);
         }
 
         // Air enclosed by the structure on two axes: the hollow core.
@@ -417,6 +420,7 @@ public final class ConnectedModel {
         @SuppressWarnings("unchecked")
         DigesterBaked(ModelBaker baker, JsonModel unbaked, Identifier name) {
             Map<String, Identifier> textures = unbaked.textures();
+            this.part = unbaked.connect().equals(GREENHOUSE) ? GreenhouseStructure::isFormedPart : BiogasDigesterStructure::isFormedPart;
             this.particle = Baked.material(baker, textures.getOrDefault("particle", textures.get("base")), name);
             Material.Baked side = Baked.material(baker, textures.get("base"), name);
             Material.Baked top = Baked.material(baker, textures.get("top"), name);
@@ -454,8 +458,11 @@ public final class ConnectedModel {
             this.materialFlags = flags;
         }
 
-        private static boolean isPart(BlockState state) {
-            return BiogasDigesterStructure.isFormedPart(state);
+        // Which blocks count as the same structure: the digester's parts, or the greenhouse's frames and controller.
+        private final Predicate<BlockState> part;
+
+        private boolean isPart(BlockState state) {
+            return part.test(state);
         }
 
         @Override

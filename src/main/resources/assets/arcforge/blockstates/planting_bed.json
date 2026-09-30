@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "arcforge:block/greenhouse/planting_bed"
+    }
+  }
+}

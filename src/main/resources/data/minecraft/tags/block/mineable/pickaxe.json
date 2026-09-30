@@ -132,6 +132,10 @@
     "arcforge:digester_casing",
     "arcforge:biogas_digester_controller",
     "arcforge:grow_chamber",
-    "arcforge:hydroponic_cell"
+    "arcforge:hydroponic_cell",
+    "arcforge:greenhouse_frame",
+    "arcforge:greenhouse_controller",
+    "arcforge:planting_bed",
+    "arcforge:grow_lamp"
   ]
 }

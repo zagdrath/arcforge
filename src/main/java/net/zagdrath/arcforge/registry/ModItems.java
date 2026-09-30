@@ -459,6 +459,12 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> GROW_CHAMBER = ITEMS.registerSimpleBlockItem(ModBlocks.GROW_CHAMBER);
     public static final DeferredItem<BlockItem> HYDROPONIC_CELL = ITEMS.registerSimpleBlockItem(ModBlocks.HYDROPONIC_CELL);
 
+    // The Greenhouse Array.
+    public static final DeferredItem<BlockItem> GREENHOUSE_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.GREENHOUSE_CONTROLLER);
+    public static final DeferredItem<BlockItem> GREENHOUSE_FRAME = ITEMS.registerSimpleBlockItem(ModBlocks.GREENHOUSE_FRAME);
+    public static final DeferredItem<BlockItem> PLANTING_BED = ITEMS.registerSimpleBlockItem(ModBlocks.PLANTING_BED);
+    public static final DeferredItem<BlockItem> GROW_LAMP = ITEMS.registerSimpleBlockItem(ModBlocks.GROW_LAMP);
+
     // --- Solar Thermal Array ---
 
     public static final DeferredItem<BlockItem> SOLAR_THERMAL_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.SOLAR_THERMAL_ARRAY_CASING);

@@ -1,0 +1,13 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "greenhouse",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "arcforge:block/greenhouse/frame",
+    "base": "arcforge:block/greenhouse/frame",
+    "top": "arcforge:block/greenhouse/top",
+    "beam": "arcforge:block/ctm/column_beam",
+    "front": "arcforge:block/greenhouse/controller"
+  },
+  "fallback": "arcforge:block/greenhouse/controller"
+}

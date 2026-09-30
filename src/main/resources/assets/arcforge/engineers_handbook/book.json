@@ -166,7 +166,8 @@
         "biogas_digester",
         "glass_cloche",
         "grow_chamber",
-        "hydroponic_cell"
+        "hydroponic_cell",
+        "greenhouse"
       ]
     }
   ]

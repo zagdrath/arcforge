@@ -19,7 +19,9 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.GreenhouseBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.PlantingBedBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity;
@@ -153,6 +155,12 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(GrowChamberBlockEntity::new, ModBlocks.GROW_CHAMBER.get()));
     public static final Supplier<BlockEntityType<HydroponicCellBlockEntity>> HYDROPONIC_CELL = BLOCK_ENTITY_TYPES.register("hydroponic_cell",
             () -> new BlockEntityType<>(HydroponicCellBlockEntity::new, ModBlocks.HYDROPONIC_CELL.get()));
+
+    // The Greenhouse Array: its controller, and each Planting Bed (its soil, seed and growth).
+    public static final Supplier<BlockEntityType<GreenhouseBlockEntity>> GREENHOUSE = BLOCK_ENTITY_TYPES.register("greenhouse",
+            () -> new BlockEntityType<>(GreenhouseBlockEntity::new, ModBlocks.GREENHOUSE_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<PlantingBedBlockEntity>> PLANTING_BED = BLOCK_ENTITY_TYPES.register("planting_bed",
+            () -> new BlockEntityType<>(PlantingBedBlockEntity::new, ModBlocks.PLANTING_BED.get()));
 
     public static final Supplier<BlockEntityType<ChargepadBlockEntity>> CHARGEPAD = BLOCK_ENTITY_TYPES.register("chargepad",
             () -> new BlockEntityType<>(ChargepadBlockEntity::new, ModBlocks.CHARGEPAD.get()));

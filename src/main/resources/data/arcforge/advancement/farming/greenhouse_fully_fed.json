@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/greenhouse",
+  "display": {
+    "icon": {
+      "id": "arcforge:planting_bed"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.greenhouse_fully_fed.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.greenhouse_fully_fed.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fed": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "greenhouse_fully_fed"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "fed"
+    ]
+  ]
+}

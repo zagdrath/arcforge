@@ -604,6 +604,28 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   Dioxide tank at x 138). The status LED and text sit under the slots (y 60). Ghosts are the Infuser's style: white at
   alpha 55 with a 105 rim, a seed, a soil block and a tied sack.
 
+## Greenhouse Array
+- The walls and roof are ordinary Pressure Glass (its connected, see-through window look); the crops inside are drawn by
+  `PlantingBedRenderer` from each bed (the soil's own block squashed into the bed's recess, the crop's own block model
+  over it), never painted into a texture.
+- Greenhouse Frame (connected, `ConnectedModel` "greenhouse"): the wall plate (the split face, a panel joint at rows
+  7-8 in `#2B2F34` / `#575D65`, two top rivets, the riveted strap on rows 13-15) with the digester's plain lid on top.
+  Formed, frames and the controller join into one surface with the Distillation `ctm/column_beam` along the outer edges;
+  the glass counts the frames as part of the structure, so it draws no beam against them. Loose, the beam runs round
+  every edge. Any frame on the outside can take a port plate.
+- Greenhouse Controller: the plate with a recessed climate panel (x3..12, y2..9, `#16181B` floor): a leaf on the left
+  (`#2C5E22 … #779C43`), a heat-row thermometer on the right, and a strip of three system LEDs below (water blue,
+  nutrient green, lamp cyan), dim when idle. `controller_on` is 4 frames: the thermometer rises and the readout blinks.
+- Planting Bed: a UV-unwrapped steel planter (64×64 sheet), a 12 px body and a 4 px rim 2 px thick. Its outer faces are
+  whole-block faces split between body and rim (lit rim rows, the split face, the strap at the bottom); inside is
+  `#2B2F34`. The recess (x/z 2..14, y 12..15) is where the renderer puts the soil.
+- Grow Lamp: a UV-unwrapped steel fixture hanging from the roof (a 6×6 mount, a 12×12 housing) with the Grow Chamber's
+  grow tubes underneath (`grow_lamp_tubes` / `_on`, `light_emission` 15 lit).
+- GUI (176×206): the FE gauge and the water, Nutrient Solution and Carbon Dioxide tanks at x 8/24/40/56, the fertilizer
+  slot at (75,19) in input blue, beds / speed / temperature text under it (x 76), a 3×3 of output-orange slots from
+  (115,19), and the house screen recess (7,76)-(168,109) with the status line, a 1 px `#2A2A2A` divider at y 87, and two
+  rows of system LEDs with labels in three columns (x 10, 60, 118).
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

@@ -590,6 +590,56 @@ final class MachineCategories {
         }
     }
 
+    // --- The Greenhouse Array ---
+
+    // A Planting Bed's crop: seed and soil -> the harvest, with how long a bed takes on water alone and what the systems
+    // add. Every arcforge:cloche recipe that isn't hydroponic-only.
+    record GreenhousePlanting(RecipeHolder<ClocheRecipe> holder) {}
+
+    static final class Greenhouse extends ArcforgeCategory<GreenhousePlanting> {
+        static final IRecipeType<GreenhousePlanting> TYPE = IRecipeType.create(Arcforge.MODID, "greenhouse", GreenhousePlanting.class);
+
+        Greenhouse(IGuiHelper gui) {
+            super(TYPE, "greenhouse", ModBlocks.GREENHOUSE_CONTROLLER.get(), gui, 160, 50);
+        }
+
+        static List<GreenhousePlanting> plantings(List<RecipeHolder<ClocheRecipe>> recipes) {
+            return recipes.stream().filter(holder -> !holder.value().hydroponicOnly()).map(GreenhousePlanting::new).toList();
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, GreenhousePlanting planting, IFocusGroup focuses) {
+            ClocheRecipe recipe = planting.holder().value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.seed());
+            recipe.soil().ifPresent(soil -> builder.addInputSlot(21, 5).setStandardSlotBackground().add(soil));
+            int x = 76;
+            for (ClocheRecipe.Output output : recipe.results()) {
+                var slot = builder.addOutputSlot(x, 5).setStandardSlotBackground().add(output.item().create());
+                if (output.chance() < 1.0F) {
+                    slot.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                            Math.round(output.chance() * 100))));
+                }
+                x += 20;
+            }
+            if (recipe.seedOutput() > 0 && x <= 136) {
+                builder.addOutputSlot(x, 5).setStandardSlotBackground()
+                        .addItemStacks(recipe.seed().items().map(item -> new ItemStack(item, recipe.seedOutput())).toList());
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, GreenhousePlanting planting, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(planting.holder().value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(GreenhousePlanting planting, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            int time = (int) Math.ceil(planting.holder().value().time() / ArcforgeConfig.GREENHOUSE_BASE_SPEED.getAsDouble());
+            text(graphics, Component.translatable("jei.arcforge.greenhouse.time", seconds(time)), 0, 28);
+            text(graphics, Component.translatable("jei.arcforge.greenhouse.faster"), 0, 38);
+        }
+    }
+
     // --- Conduit dyeing (a crafting-table recipe) ---
 
     record ConduitDyeing(net.minecraft.world.item.Item conduit) {}

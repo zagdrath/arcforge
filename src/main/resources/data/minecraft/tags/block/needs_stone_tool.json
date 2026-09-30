@@ -34,6 +34,9 @@
     "arcforge:air_separator",
     "arcforge:haber_reactor",
     "arcforge:digester_casing",
-    "arcforge:biogas_digester_controller"
+    "arcforge:biogas_digester_controller",
+    "arcforge:greenhouse_frame",
+    "arcforge:greenhouse_controller",
+    "arcforge:planting_bed"
   ]
 }

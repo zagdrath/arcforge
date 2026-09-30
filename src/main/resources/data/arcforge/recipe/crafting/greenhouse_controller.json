@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PTP",
+    "GFG",
+    "PCP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "T": "arcforge:thermocouple",
+    "G": "arcforge:pressure_glass",
+    "F": "arcforge:greenhouse_frame",
+    "C": "minecraft:comparator"
+  },
+  "result": {
+    "id": "arcforge:greenhouse_controller",
+    "count": 1
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P P",
+    "PFP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "F": "arcforge:greenhouse_frame"
+  },
+  "result": {
+    "id": "arcforge:planting_bed",
+    "count": 2
+  }
+}

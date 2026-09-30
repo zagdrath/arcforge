@@ -23,6 +23,7 @@ import net.neoforged.neoforge.common.util.FakePlayer;
 import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.ArcforgeFakePlayer;
+import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
@@ -102,6 +103,9 @@ public final class SecurityRules {
         }
         // A window of a formed array belongs to the array, like its casings.
         if (PressureGlassBlock.findMaster(level, pos) instanceof Owned owned) {
+            return Optional.of(owned);
+        }
+        if (PressureGlassBlock.isFormed(state) && GreenhouseStructure.findController(level, pos) instanceof Owned owned) {
             return Optional.of(owned);
         }
         var blockEntity = level.getBlockEntity(pos);

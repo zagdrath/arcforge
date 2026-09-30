@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/grow_chamber",
+  "display": {
+    "icon": {
+      "id": "arcforge:greenhouse_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.greenhouse.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.greenhouse.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:greenhouse"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

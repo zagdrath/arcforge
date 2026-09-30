@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "arcforge:block/greenhouse/grow_lamp"
+    },
+    "lit=true": {
+      "model": "arcforge:block/greenhouse/grow_lamp_on"
+    }
+  }
+}

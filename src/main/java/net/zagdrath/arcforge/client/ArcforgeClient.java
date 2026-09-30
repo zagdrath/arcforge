@@ -52,6 +52,8 @@ import net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
+import net.zagdrath.arcforge.client.renderer.blockentity.PlantingBedRenderer;
+import net.zagdrath.arcforge.client.screen.multiblock.GreenhouseScreen;
 import net.zagdrath.arcforge.registry.ModParticleTypes;
 import net.zagdrath.arcforge.client.sound.GasTurbineArraySound;
 import net.zagdrath.arcforge.client.screen.multiblock.GasTurbineArrayScreen;
@@ -211,6 +213,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.GLASS_CLOCHE.get(), ClocheScreen::new);
         event.register(ModMenuTypes.GROW_CHAMBER.get(), ClocheScreen::new);
         event.register(ModMenuTypes.HYDROPONIC_CELL.get(), ClocheScreen::new);
+        event.register(ModMenuTypes.GREENHOUSE.get(), GreenhouseScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
         event.register(ModMenuTypes.ASSEMBLER.get(), AssemblerScreen::new);
@@ -505,5 +508,7 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.HYDROPONIC_CELL.get(), ClocheRenderer::new);
+        // The Greenhouse Array's beds draw their soil and crop.
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.PLANTING_BED.get(), PlantingBedRenderer::new);
     }
 }

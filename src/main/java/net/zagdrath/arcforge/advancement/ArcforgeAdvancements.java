@@ -74,7 +74,9 @@ public final class ArcforgeAdvancements {
         if (!(machine.getLevel() instanceof ServerLevel level)) {
             return;
         }
-        Object what = fluid != null ? BuiltInRegistries.FLUID.getKey(fluid) : BuiltInRegistries.ITEM.getKey(item.getItem());
+        Object product = fluid != null ? BuiltInRegistries.FLUID.getKey(fluid) : BuiltInRegistries.ITEM.getKey(item.getItem());
+        // Throttled per product and category, so one output can count for several categories at once.
+        Object what = category == null ? product : product + "#" + category;
         Map<Object, Long> last = LAST_PRODUCED.computeIfAbsent(machine, key -> new HashMap<>());
         long now = level.getGameTime();
         Long before = last.get(what);

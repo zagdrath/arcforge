@@ -109,6 +109,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Synthesizing(gui),
                 new MachineCategories.Digesting(gui),
                 new MachineCategories.Cloche(gui),
+                new MachineCategories.Greenhouse(gui),
                 new MachineCategories.ConduitDyeingCategory(gui),
                 new MachineCategories.ChemicalReacting(gui),
                 new MachineCategories.Electrolyzing(gui),
@@ -139,6 +140,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Synthesizing.TYPE, recipes(ModRecipes.SYNTHESIZING.get()));
         registration.addRecipes(MachineCategories.Digesting.TYPE, recipes(ModRecipes.DIGESTING.get()));
         registration.addRecipes(MachineCategories.Cloche.TYPE, recipes(ModRecipes.CLOCHE.get()));
+        registration.addRecipes(MachineCategories.Greenhouse.TYPE, MachineCategories.Greenhouse.plantings(recipes(ModRecipes.CLOCHE.get())));
         registration.addRecipes(MachineCategories.ConduitDyeingCategory.TYPE,
                 ModItems.allConduits().stream().map(conduit -> new MachineCategories.ConduitDyeing(conduit.get())).toList());
         registration.addRecipes(MachineCategories.ChemicalReacting.TYPE, recipes(ModRecipes.CHEMICAL_REACTING.get()));
@@ -207,6 +209,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen.class, 52, 27, ARROW_W, ARROW_H,
                 MachineCategories.Digesting.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.ClocheScreen.class, 72, 30, ARROW_W, ARROW_H, MachineCategories.Cloche.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.GreenhouseScreen.class, 76, 50, 36, 10, MachineCategories.Greenhouse.TYPE);
         registration.addRecipeClickArea(AssemblerScreen.class, 88, 35, ARROW_W, ARROW_H, RecipeTypes.CRAFTING);
         registration.addRecipeClickArea(ChemicalReactorScreen.class, 81, 35, ARROW_W, ARROW_H, MachineCategories.ChemicalReacting.TYPE);
         registration.addRecipeClickArea(ElectrolyzerScreen.class, 114, 35, ARROW_W, ARROW_H, MachineCategories.Electrolyzing.TYPE);
@@ -252,6 +255,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Synthesizing.TYPE, ModBlocks.HABER_REACTOR.get());
         registration.addCraftingStation(MachineCategories.Digesting.TYPE, ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get(), ModBlocks.DIGESTER_CASING.get());
         registration.addCraftingStation(MachineCategories.Cloche.TYPE, ModBlocks.GLASS_CLOCHE.get(), ModBlocks.GROW_CHAMBER.get(), ModBlocks.HYDROPONIC_CELL.get());
+        registration.addCraftingStation(MachineCategories.Greenhouse.TYPE, ModBlocks.GREENHOUSE_CONTROLLER.get(), ModBlocks.PLANTING_BED.get());
         registration.addCraftingStation(MachineCategories.ConduitDyeingCategory.TYPE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
         registration.addCraftingStation(MachineCategories.ChemicalReacting.TYPE, ModBlocks.CHEMICAL_REACTOR.get());
         registration.addCraftingStation(MachineCategories.Electrolyzing.TYPE, ModBlocks.ELECTROLYZER.get());

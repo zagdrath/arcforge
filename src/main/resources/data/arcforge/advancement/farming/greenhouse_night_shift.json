@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/greenhouse",
+  "display": {
+    "icon": {
+      "id": "arcforge:grow_lamp"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.greenhouse_night_shift.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.greenhouse_night_shift.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "lamps": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "greenhouse_lamps"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "lamps"
+    ]
+  ]
+}

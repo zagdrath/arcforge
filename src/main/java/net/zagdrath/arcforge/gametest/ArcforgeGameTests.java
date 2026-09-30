@@ -273,6 +273,11 @@ public final class ArcforgeGameTests {
         TESTS.put("cloche_grow_chamber_harvests", ClocheGameTests::growChamberHarvests);
         TESTS.put("cloche_fallback_crop", ClocheGameTests::fallbackCrop);
         TESTS.put("cloche_recipes", ClocheGameTests::recipes);
+        TESTS.put("greenhouse_forms", GreenhouseGameTests::forms);
+        TESTS.put("greenhouse_rejects_clutter", GreenhouseGameTests::rejectsClutter);
+        TESTS.put("greenhouse_beds_take_soil_and_seed", GreenhouseGameTests::bedsTakeSoilAndSeed);
+        TESTS.put("greenhouse_temperature", GreenhouseGameTests::temperature);
+        TESTS.put("greenhouse_needs_water", GreenhouseGameTests::needsWater);
         TESTS.put("advancement_tree_loads", AdvancementGameTests::treeLoads);
         TESTS.put("multiblock_formed_trigger", AdvancementGameTests::multiblockFormedTrigger);
         TESTS.put("turbine_full_speed_needs_length", AdvancementGameTests::turbineFullSpeedNeedsLength);
@@ -362,6 +367,7 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("press_presses", PressingGameTests::pressPresses);
         LONG_TESTS.put("pressing_array_lanes", PressingGameTests::arrayPressesLanes);
         LONG_TESTS.put("cloche_hydroponic_cell_grows_trees", ClocheGameTests::hydroponicCellGrowsTrees);
+        LONG_TESTS.put("greenhouse_fully_fed_harvests", GreenhouseGameTests::fullyFedHarvests);
         TESTS.put("solar_model_worked_values", SolarGameTests::modelWorkedValues);
         TESTS.put("ores_crushing_doubles", OreGameTests::crushingDoubles);
         TESTS.put("ores_raw_to_ingot", OreGameTests::rawToIngot);

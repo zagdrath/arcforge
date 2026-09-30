@@ -1,0 +1,254 @@
+{
+  "parent": "minecraft:block/block",
+  "texture_size": [
+    64,
+    64
+  ],
+  "textures": {
+    "t": "arcforge:block/greenhouse/planting_bed",
+    "particle": "arcforge:block/greenhouse/planting_bed"
+  },
+  "elements": [
+    {
+      "from": [
+        0,
+        0,
+        0
+      ],
+      "to": [
+        16,
+        12,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#t",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            3.0
+          ],
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#t",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            3.0
+          ],
+          "cullface": "south"
+        },
+        "east": {
+          "texture": "#t",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            3.0
+          ],
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#t",
+          "uv": [
+            8.0,
+            0.0,
+            12.0,
+            3.0
+          ],
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#t",
+          "uv": [
+            0.0,
+            0.0,
+            4.0,
+            4.0
+          ]
+        },
+        "down": {
+          "texture": "#t",
+          "uv": [
+            4.0,
+            0.0,
+            8.0,
+            4.0
+          ],
+          "cullface": "down"
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        12,
+        0
+      ],
+      "to": [
+        16,
+        16,
+        2
+      ],
+      "faces": {
+        "north": {
+          "texture": "#t",
+          "uv": [
+            0.0,
+            4.0,
+            4.0,
+            5.0
+          ],
+          "cullface": "north"
+        },
+        "south": {
+          "texture": "#t",
+          "uv": [
+            4.0,
+            4.0,
+            8.0,
+            5.0
+          ]
+        },
+        "up": {
+          "texture": "#t",
+          "uv": [
+            0.0,
+            5.0,
+            4.0,
+            5.5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        12,
+        14
+      ],
+      "to": [
+        16,
+        16,
+        16
+      ],
+      "faces": {
+        "north": {
+          "texture": "#t",
+          "uv": [
+            4.0,
+            4.0,
+            8.0,
+            5.0
+          ]
+        },
+        "south": {
+          "texture": "#t",
+          "uv": [
+            0.0,
+            4.0,
+            4.0,
+            5.0
+          ],
+          "cullface": "south"
+        },
+        "up": {
+          "texture": "#t",
+          "uv": [
+            0.0,
+            5.0,
+            4.0,
+            5.5
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        0,
+        12,
+        2
+      ],
+      "to": [
+        2,
+        16,
+        14
+      ],
+      "faces": {
+        "east": {
+          "texture": "#t",
+          "uv": [
+            8.0,
+            4.0,
+            11.0,
+            5.0
+          ]
+        },
+        "west": {
+          "texture": "#t",
+          "uv": [
+            11.0,
+            4.0,
+            14.0,
+            5.0
+          ],
+          "cullface": "west"
+        },
+        "up": {
+          "texture": "#t",
+          "uv": [
+            12.0,
+            0.0,
+            12.5,
+            3.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        14,
+        12,
+        2
+      ],
+      "to": [
+        16,
+        16,
+        14
+      ],
+      "faces": {
+        "east": {
+          "texture": "#t",
+          "uv": [
+            11.0,
+            4.0,
+            14.0,
+            5.0
+          ],
+          "cullface": "east"
+        },
+        "west": {
+          "texture": "#t",
+          "uv": [
+            8.0,
+            4.0,
+            11.0,
+            5.0
+          ]
+        },
+        "up": {
+          "texture": "#t",
+          "uv": [
+            12.0,
+            0.0,
+            12.5,
+            3.0
+          ]
+        }
+      }
+    }
+  ]
+}

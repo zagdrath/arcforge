@@ -41,6 +41,10 @@ import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseControllerBlock;
+import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseFrameBlock;
+import net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock;
+import net.zagdrath.arcforge.block.farming.greenhouse.PlantingBedBlock;
 import net.zagdrath.arcforge.block.machine.AirSeparatorBlock;
 import net.zagdrath.arcforge.block.machine.HaberReactorBlock;
 import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
@@ -642,6 +646,18 @@ public final class ModBlocks {
             p -> new ClocheBlock(ClocheBlockEntity.Kind.GROW_CHAMBER, p), p -> glazedMachine(machineProperties(p, 10)));
     public static final DeferredBlock<ClocheBlock> HYDROPONIC_CELL = BLOCKS.registerBlock("hydroponic_cell",
             p -> new ClocheBlock(ClocheBlockEntity.Kind.HYDROPONIC_CELL, p), p -> glazedMachine(machineProperties(p, 10)));
+
+    // The Greenhouse Array (see GreenhouseStructure): a Greenhouse Frame and Pressure Glass building with one controller,
+    // Planting Beds in its floor and Grow Lamps under its roof.
+    public static final DeferredBlock<GreenhouseFrameBlock> GREENHOUSE_FRAME = BLOCKS.registerBlock("greenhouse_frame",
+            GreenhouseFrameBlock::new, ModBlocks::columnProperties);
+    public static final DeferredBlock<GreenhouseControllerBlock> GREENHOUSE_CONTROLLER = BLOCKS.registerBlock("greenhouse_controller",
+            GreenhouseControllerBlock::new, p -> columnProperties(p).lightLevel(state -> state.getValue(GreenhouseControllerBlock.LIT) ? 4 : 0));
+    public static final DeferredBlock<PlantingBedBlock> PLANTING_BED = BLOCKS.registerBlock("planting_bed",
+            PlantingBedBlock::new, ModBlocks::columnProperties);
+    public static final DeferredBlock<GrowLampBlock> GROW_LAMP = BLOCKS.registerBlock("grow_lamp",
+            GrowLampBlock::new, p -> p.mapColor(MapColor.METAL).strength(1.5F, 6.0F).sound(SoundType.METAL).noOcclusion()
+                    .lightLevel(state -> state.getValue(GrowLampBlock.LIT) ? 15 : 0));
 
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);

@@ -1,0 +1,32 @@
+{
+  "title": "Greenhouse Array",
+  "icon": "arcforge:greenhouse_controller",
+  "items": [
+    "arcforge:greenhouse_controller",
+    "arcforge:greenhouse_frame",
+    "arcforge:planting_bed",
+    "arcforge:grow_lamp"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A glass building that farms by itself: every Planting Bed in its floor grows one crop, and the greenhouse harvests and replants it over and over.\n# Building\nA box 5x5 to 11x11 across and 4 to 8 tall:\n- the twelve edges are Greenhouse Frame;\n- the walls and roof are Pressure Glass (or frame);\n- the floor is Planting Beds (or frame);\n- one Greenhouse Controller in a wall, not on an edge, facing out;\n- inside is air, except Grow Lamps hanging from the roof (the top layer inside).\nLike the other arrays it starts without ports: set them on its frames with the Wrench in Port mode."
+    },
+    {
+      "type": "multiblock",
+      "structure": "greenhouse"
+    },
+    {
+      "type": "text",
+      "text": "# Planting\nRight-click a bed with a soil (dirt, Loam, sand, soul sand), then a seed. Sneak-right-click with an empty hand to take them back. Beds grow what the Glass Cloche grows (not saplings, flowers or Hops), and any ordinary crop from another mod in dirt or Loam. Loam makes a bed 1.25x as fast.\n# Ports\n- Input: fertilizer, water, Nutrient Solution and Carbon Dioxide (one face takes them all).\n- Output: the harvest (turn on auto-eject).\n- Energy: FE for the lamps. Heat: HU to keep it warm."
+    },
+    {
+      "type": "text",
+      "text": "# Growing\nEach bed grows at 1x on water alone (50 mB a harvest; without water nothing grows), in warmth and light. More beds, more harvests. Each system it's fed makes every bed faster:\n| System | Through | Effect |\n| Nutrients | Nutrient Solution (25 mB), or fertilizer | x2 (plain fertilizer x1.5) |\n| Carbon Dioxide | 20 mB a harvest | x1.3 |\n| Heat | HU through a heat port | keeps it at 24°C |\n| Grow Lamps | 16 FE/t each while lit | growth at night and without sky |\nFully fed, a bed grows 2.6x as fast, day and night."
+    },
+    {
+      "type": "text",
+      "text": "# Climate\nThe air inside starts at the outside temperature: the biome's (plains about 20°C, snowy biomes 0°C), and a cold 5°C in the Nether and the End, which have no sky. By day under the sky the glass keeps it 6°C warmer.\nCrops grow at full speed from 18 to 30°C, and 5% slower for every degree outside that (not at all 20°C outside it).\nWith heat in its buffer it heats itself up to 24°C, using about 4 HU/t plus 1 for every 20 blocks of wall and roof.\n# Light\nA bed grows by day if the sky shines on it through the glass. A lit Grow Lamp lights every bed within 3 blocks across of it, so lamps keep it growing at night, underground and in the Nether."
+    }
+  ]
+}

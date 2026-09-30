@@ -103,7 +103,11 @@ public enum MachineStatus {
     GROWING("growing", "led_running"),
     NO_SOIL("no_soil", "led_idle"),
     CANT_GROW("cant_grow", "led_blocked"),
-    NO_NUTRIENTS("no_nutrients", "led_blocked");
+    NO_NUTRIENTS("no_nutrients", "led_blocked"),
+    // The Greenhouse Array (TOO_COLD for cold air too).
+    NO_CROPS("no_crops", "led_idle"),
+    NO_LIGHT("no_light", "led_idle"),
+    TOO_HOT("too_hot", "led_blocked");
 
     private final String name;
     private final String led;

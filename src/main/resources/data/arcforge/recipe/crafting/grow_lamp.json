@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RPR",
+    "GLG"
+  ],
+  "key": {
+    "R": "#c:rods/steel",
+    "P": "#c:plates/steel",
+    "G": "minecraft:glass_pane",
+    "L": "minecraft:redstone_lamp"
+  },
+  "result": {
+    "id": "arcforge:grow_lamp",
+    "count": 2
+  }
+}

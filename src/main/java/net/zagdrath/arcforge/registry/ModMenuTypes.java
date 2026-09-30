@@ -44,6 +44,7 @@ import net.zagdrath.arcforge.menu.machine.FiberizerMenu;
 import net.zagdrath.arcforge.menu.machine.FuelBurnerMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.DistillationArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.GreenhouseMenu;
 import net.zagdrath.arcforge.menu.multiblock.InductionFurnaceArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.MetalPressingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.SolarThermalArrayMenu;
@@ -136,6 +137,8 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(ClocheMenu::growChamber));
     public static final Supplier<MenuType<ClocheMenu>> HYDROPONIC_CELL = MENU_TYPES.register("hydroponic_cell",
             () -> IMenuTypeExtension.create(ClocheMenu::hydroponicCell));
+    public static final Supplier<MenuType<GreenhouseMenu>> GREENHOUSE = MENU_TYPES.register("greenhouse",
+            () -> IMenuTypeExtension.create(GreenhouseMenu::new));
 
     public static final Supplier<MenuType<ChemicalReactorMenu>> CHEMICAL_REACTOR = MENU_TYPES.register("chemical_reactor",
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));

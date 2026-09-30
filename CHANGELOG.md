@@ -25,8 +25,8 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
 ### Upgrading
 
 - **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`, `hops`, `rusticMachines`, `millstone`,
-  `mill`, `oilPress`, `seedExtractor`, `grainDryer`, `airSeparator`, `haberReactor`, `biogasDigester`, `cloche`) gets its
-  defaults, as do the Fermenter's new keys; nothing to redo.
+  `mill`, `oilPress`, `seedExtractor`, `grainDryer`, `airSeparator`, `haberReactor`, `biogasDigester`, `cloche`, `greenhouse`)
+  gets its defaults, as do the Fermenter's new keys; nothing to redo.
 - **Chemical Reactor second item slot.** Saved Chemical Reactors keep their items, tanks and upgrades: the upgrades move
   up past the new slot when the world loads.
 - **Fermenter additive slot.** Saved Fermenters keep their crops, byproduct and upgrades: the upgrades move up past the
@@ -136,6 +136,20 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
   - All three take fertilizer (and bone meal) in a fertilizer slot: each harvest uses a nutrient point and grows 1.5x
     as fast, or 2x with NPK Fertilizer. The seed and soil are never used up.
   - Handbook pages, Jade tooltips, and three new Farming advancements (Under Glass, Grow Lights, Soil Not Included).
+- **Greenhouse Array:** the farming section's multiblock, a glass building 5x5 to 11x11 and 4 to 8 tall. Greenhouse
+  Frame edges, Pressure Glass walls and roof, a Greenhouse Controller in a wall, **Planting Beds** in the floor and
+  **Grow Lamps** hanging from the roof. It forms and takes ports like the other arrays.
+  - Each bed holds a soil and a seed (put in by hand) and grows it over and over, harvesting into the output ports: the
+    `arcforge:cloche` recipes (not the hydroponic-only ones) and any ordinary crop from another mod. Beds are drawn with
+    their crop growing on them.
+  - Water is all it needs (50 mB a harvest). Each system fed through its ports makes every bed faster: Nutrient Solution
+    or fertilizer (x2, plain fertilizer x1.5), Carbon Dioxide (x1.3), heat (HU keeps it at 24°C), and Grow Lamps (FE:
+    growth at night and without sky).
+  - Climate: the air starts at the biome's temperature (a cold 5°C in the Nether and the End), 6°C warmer by day under
+    the glass. Crops grow at full speed from 18 to 30°C and slower outside that.
+  - The GUI shows its temperature, each system's state and the resulting growth speed. Every value is in config
+    (`farming.greenhouse`). Handbook page with a build view, JEI category, Jade tooltips, and three new Farming
+    advancements (Glasshouse, Night Shift, Climate Controlled).
 - **Carbon Dioxide**, a new gas.
 - **Gas Output**, a new side mode: a machine's own gas comes out of it. The Fermenter gives out Carbon Dioxide through it,
   the Air Separator Nitrogen, the Haber Reactor Ammonia and the Biogas Digester Biogas.

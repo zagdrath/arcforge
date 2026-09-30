@@ -98,6 +98,12 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity.class);
         registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.BiogasDigesterBlockEntity.class);
         registration.registerBlockDataProvider(FarmChemistryProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock.class);
+        // The Greenhouse Array: its climate, speed and beds from any part; a bed's crop.
+        registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GreenhouseBlockEntity.class);
+        registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.PlantingBedBlockEntity.class);
+        registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseFrameBlock.class);
+        registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock.class);
+        registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, PressureGlassBlock.class);
         // Automated farms: what's growing, how fast, the fertilizer left.
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GlassClocheBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GrowChamberBlockEntity.class);
@@ -167,6 +173,14 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(ClocheProvider.Client.INSTANCE, net.zagdrath.arcforge.block.farming.ClocheBlock.class);
+        for (Class<? extends Block> type : List.of(
+                net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseControllerBlock.class,
+                net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseFrameBlock.class,
+                net.zagdrath.arcforge.block.farming.greenhouse.PlantingBedBlock.class,
+                net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock.class,
+                PressureGlassBlock.class)) {
+            registration.registerBlockComponent(GreenhouseProvider.Client.INSTANCE, type);
+        }
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

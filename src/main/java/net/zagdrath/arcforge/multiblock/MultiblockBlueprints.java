@@ -16,6 +16,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
@@ -70,7 +71,8 @@ public final class MultiblockBlueprints {
                 gasTurbineArray(),
                 distillationArray(),
                 solarThermalArray(),
-                biogasDigester());
+                biogasDigester(),
+                greenhouse());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -187,6 +189,38 @@ public final class MultiblockBlueprints {
             }
         }
         return new Blueprint("biogas_digester", placements, new BlockPos(3, 3, 3));
+    }
+
+    // The smallest Greenhouse Array, 5x5 and 4 tall (up to 11x11 and 8 tall work): frame edges, glass walls and roof, the
+    // controller in the middle of the front wall, a 3x3 of Planting Beds in the floor and a Grow Lamp under the roof.
+    private static Blueprint greenhouse() {
+        BlockState frame = ModBlocks.GREENHOUSE_FRAME.get().defaultBlockState();
+        BlockState glass = ModBlocks.PRESSURE_GLASS.get().defaultBlockState();
+        BlockState bed = ModBlocks.PLANTING_BED.get().defaultBlockState();
+        BlockState lamp = ModBlocks.GROW_LAMP.get().defaultBlockState();
+        BlockState controller = ModBlocks.GREENHOUSE_CONTROLLER.get().defaultBlockState()
+                .setValue(GreenhouseControllerBlock.FACING, Direction.SOUTH);
+        int size = GreenhouseStructure.MIN_WIDTH, height = GreenhouseStructure.MIN_HEIGHT;
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < height; y++) {
+            for (int z = 0; z < size; z++) {
+                for (int x = 0; x < size; x++) {
+                    int boundaries = (x == 0 || x == size - 1 ? 1 : 0) + (y == 0 || y == height - 1 ? 1 : 0) + (z == 0 || z == size - 1 ? 1 : 0);
+                    BlockState state;
+                    if (boundaries >= 2) {
+                        state = frame;
+                    } else if (boundaries == 1) {
+                        state = y == 0 ? bed : x == size / 2 && y == 1 && z == size - 1 ? controller : glass;
+                    } else {
+                        state = x == size / 2 && z == size / 2 && y == height - 2 ? lamp : null;
+                    }
+                    if (state != null) {
+                        placements.add(new Placement(new BlockPos(x, y, z), state));
+                    }
+                }
+            }
+        }
+        return new Blueprint("greenhouse", placements, new BlockPos(size, height, size));
     }
 
     // 2x2, 8 tall (4 and 6 work too): casings top and bottom, the controller at the front of the second

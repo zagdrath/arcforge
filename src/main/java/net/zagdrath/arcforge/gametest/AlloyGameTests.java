@@ -167,8 +167,9 @@ final class AlloyGameTests {
         // Harvester, Fertilizer Spreader, Copper Sprinkler, Scarecrow, two Sickles and the Scythe), and the farm
         // processing five (Millstone, Mill, Oil Press, Seed Extractor and Grain Dryer), and farm chemistry's four (Air
         // Separator, Haber Reactor, Digester Casing and Biogas Digester Controller), and the automated farms' three
-        // (Glass Cloche, Grow Chamber and Hydroponic Cell).
-        helper.assertTrue(crafting == 207, crafting + " crafting/ recipes, not 207");
+        // (Glass Cloche, Grow Chamber and Hydroponic Cell), and the Greenhouse Array's four (Greenhouse Frame and
+        // Controller, Planting Bed and Grow Lamp).
+        helper.assertTrue(crafting == 211, crafting + " crafting/ recipes, not 211");
         // Plus the fluorite-fluxed steel.
         helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

@@ -475,6 +475,24 @@ and has fixed faces; the other two have side configuration, auto-eject, and Spee
 data-driven (`arcforge:cloche`, with the `arcforge:cloche_soils` data map), and any ordinary crop from another mod
 grows in dirt or Loam without one.
 
+### Greenhouse Array
+
+A glass building, 5x5 to 11x11 and 4 to 8 tall: Greenhouse Frame edges, Pressure Glass walls and roof, a Greenhouse
+Controller in one wall, **Planting Beds** in the floor and **Grow Lamps** under the roof. Put a soil and a seed in each
+bed; the greenhouse grows, harvests and replants them all, sending the harvest out of its output ports.
+
+Water is required (50 mB a harvest); everything else makes every bed faster:
+
+| System | Through | Effect |
+|---|---|---|
+| Nutrients | Nutrient Solution or fertilizer | x2 (plain fertilizer x1.5) |
+| Carbon Dioxide | a gas port | x1.3 |
+| Heat | HU through a heat port | keeps the air at 24°C |
+| Grow Lamps | FE | growth at night, underground and in the Nether |
+
+The air starts at the biome's temperature (cold without a sky), and crops grow at full speed from 18 to 30°C. The GUI
+shows the temperature, each system's state and the growth speed.
+
 ### Automation
 
 **Assembler** (Tempered). An automatic crafting table.

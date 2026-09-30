@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/greenhouse/controller_unformed",
+    "particle": "arcforge:block/greenhouse/frame_loose",
+    "south": "arcforge:block/greenhouse/frame_loose",
+    "east": "arcforge:block/greenhouse/frame_loose",
+    "west": "arcforge:block/greenhouse/frame_loose",
+    "up": "arcforge:block/greenhouse/top_loose",
+    "down": "arcforge:block/greenhouse/top_loose"
+  }
+}

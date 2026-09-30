@@ -1,0 +1,193 @@
+{
+  "parent": "minecraft:block/block",
+  "texture_size": [
+    64,
+    64
+  ],
+  "textures": {
+    "t": "arcforge:block/greenhouse/grow_lamp",
+    "particle": "arcforge:block/greenhouse/grow_lamp",
+    "lamp": "arcforge:block/greenhouse/grow_lamp_tubes"
+  },
+  "elements": [
+    {
+      "from": [
+        5,
+        15,
+        5
+      ],
+      "to": [
+        11,
+        16,
+        11
+      ],
+      "faces": {
+        "north": {
+          "texture": "#t",
+          "uv": [
+            12.5,
+            0.0,
+            14.0,
+            0.25
+          ]
+        },
+        "south": {
+          "texture": "#t",
+          "uv": [
+            12.5,
+            0.0,
+            14.0,
+            0.25
+          ]
+        },
+        "east": {
+          "texture": "#t",
+          "uv": [
+            12.5,
+            0.0,
+            14.0,
+            0.25
+          ]
+        },
+        "west": {
+          "texture": "#t",
+          "uv": [
+            12.5,
+            0.0,
+            14.0,
+            0.25
+          ]
+        },
+        "up": {
+          "texture": "#t",
+          "uv": [
+            5.5,
+            0.0,
+            7.0,
+            1.5
+          ],
+          "cullface": "up"
+        }
+      }
+    },
+    {
+      "from": [
+        2,
+        13,
+        2
+      ],
+      "to": [
+        14,
+        15,
+        14
+      ],
+      "faces": {
+        "north": {
+          "texture": "#t",
+          "uv": [
+            7.0,
+            0.0,
+            10.0,
+            0.5
+          ]
+        },
+        "south": {
+          "texture": "#t",
+          "uv": [
+            7.0,
+            0.0,
+            10.0,
+            0.5
+          ]
+        },
+        "east": {
+          "texture": "#t",
+          "uv": [
+            7.0,
+            0.0,
+            10.0,
+            0.5
+          ]
+        },
+        "west": {
+          "texture": "#t",
+          "uv": [
+            7.0,
+            0.0,
+            10.0,
+            0.5
+          ]
+        },
+        "up": {
+          "texture": "#t",
+          "uv": [
+            0.0,
+            0.0,
+            3.0,
+            3.0
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        3,
+        12,
+        3
+      ],
+      "to": [
+        13,
+        13,
+        13
+      ],
+      "faces": {
+        "north": {
+          "texture": "#t",
+          "uv": [
+            10.0,
+            0.0,
+            12.5,
+            0.25
+          ]
+        },
+        "south": {
+          "texture": "#t",
+          "uv": [
+            10.0,
+            0.0,
+            12.5,
+            0.25
+          ]
+        },
+        "east": {
+          "texture": "#t",
+          "uv": [
+            10.0,
+            0.0,
+            12.5,
+            0.25
+          ]
+        },
+        "west": {
+          "texture": "#t",
+          "uv": [
+            10.0,
+            0.0,
+            12.5,
+            0.25
+          ]
+        },
+        "down": {
+          "texture": "#lamp",
+          "uv": [
+            0,
+            0,
+            10,
+            10
+          ]
+        }
+      }
+    }
+  ],
+  "render_type": "minecraft:cutout"
+}

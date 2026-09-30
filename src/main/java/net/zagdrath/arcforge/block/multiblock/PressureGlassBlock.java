@@ -29,11 +29,12 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
+import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
-// Pressure Glass: the windows of the Steam Boiler Array and Steam Turbine Array, and a decorative glass on
-// its own. Neighbouring panes merge into one window. When a structure forms around it, FORMED is set and
-// clicking it opens the machine's GUI; glass never does IO.
+// Pressure Glass: the windows of the Steam Boiler Array and Steam Turbine Array, the walls and roof of the
+// Greenhouse Array, and a decorative glass on its own. Neighbouring panes merge into one window. When a
+// structure forms around it, FORMED is set and clicking it opens the machine's GUI; glass never does IO.
 public class PressureGlassBlock extends TransparentBlock {
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
@@ -84,6 +85,7 @@ public class PressureGlassBlock extends TransparentBlock {
         super.onPlace(state, level, pos, oldState, movedByPiston);
         if (!oldState.is(this)) {
             level.scheduleTick(pos, this, 1);
+            GreenhouseStructure.notifyChanged(level, pos);
         }
     }
 
@@ -114,12 +116,19 @@ public class PressureGlassBlock extends TransparentBlock {
         if (!level.getBlockState(pos).is(this) && state.getValue(FORMED)) {
             structures().forEach(structure -> structure.onRemoved(level, pos));
         }
+        if (!level.getBlockState(pos).is(this)) {
+            GreenhouseStructure.notifyChanged(level, pos);
+        }
     }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!state.getValue(FORMED)) {
             return InteractionResult.PASS;
+        }
+        InteractionResult greenhouse = GreenhouseStructure.useOnPart(level, pos, player);
+        if (greenhouse != InteractionResult.PASS) {
+            return greenhouse;
         }
         for (ShellStructure structure : structures()) {
             InteractionResult result = ShellCasingBlock.openMenu(level, pos, player, structure);

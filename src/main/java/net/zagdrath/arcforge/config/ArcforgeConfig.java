@@ -1993,6 +1993,133 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Greenhouse Array: a Greenhouse Frame and Pressure Glass building (5x5 to 11x11, 4 to 8 tall) whose Planting",
+                "Beds grow the arcforge:cloche recipes (and any vanilla-style crop) by themselves. Each bed grows at baseSpeed x the",
+                "soil's growth x the temperature factor x the bonuses of the systems fed through its ports, while it has light.")
+                .push("greenhouse");
+    }
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_BASE_SPEED = BUILDER
+            .comment("Each bed's growth speed on water alone, in ideal warmth and light (recipe times are for speed 1).")
+            .defineInRange("baseSpeed", 1.0, 0.01, 100.0);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_WATER_CAPACITY = BUILDER
+            .comment("Water tank size, in mB.")
+            .defineInRange("waterCapacity", 16_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_WATER_PER_HARVEST = BUILDER
+            .comment("Water each bed's harvest takes when it starts growing, in mB. Without it, nothing grows.")
+            .defineInRange("waterPerHarvest", 50, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_NUTRIENT_CAPACITY = BUILDER
+            .comment("Nutrient Solution tank size, in mB.")
+            .defineInRange("nutrientCapacity", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_NUTRIENT_PER_HARVEST = BUILDER
+            .comment("Nutrient Solution a harvest takes for the nutrient bonus, in mB (used before fertilizer).")
+            .defineInRange("nutrientPerHarvest", 25, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_FERTILIZER_BONUS = BUILDER
+            .comment("Growth multiplier of a harvest fed with a fertilizer point (fertilizer or bone meal).")
+            .defineInRange("fertilizerBonus", 1.5, 1.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_NUTRIENT_BONUS = BUILDER
+            .comment("Growth multiplier of a harvest fed with Nutrient Solution or an enriching fertilizer (NPK Fertilizer).")
+            .defineInRange("nutrientBonus", 2.0, 1.0, 100.0);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_CO2_CAPACITY = BUILDER
+            .comment("Carbon Dioxide tank size, in mB.")
+            .defineInRange("co2Capacity", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_CO2_PER_HARVEST = BUILDER
+            .comment("Carbon Dioxide a harvest takes for the CO2 bonus, in mB.")
+            .defineInRange("co2PerHarvest", 20, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_CO2_BONUS = BUILDER
+            .comment("Growth multiplier of a harvest fed with Carbon Dioxide.")
+            .defineInRange("co2Bonus", 1.3, 1.0, 100.0);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_IDEAL_MIN = BUILDER
+            .comment("Crops grow at full speed from this temperature, in °C...")
+            .defineInRange("idealMin", 18, -50, 100);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_IDEAL_MAX = BUILDER
+            .comment("...up to this one.")
+            .defineInRange("idealMax", 30, -50, 100);
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_TEMPERATURE_FALLOFF = BUILDER
+            .comment("Growth lost per °C outside the ideal range (0.05: growth stops 20°C outside it).")
+            .defineInRange("temperatureFalloff", 0.05, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_CELSIUS_PER_BIOME_TEMPERATURE = BUILDER
+            .comment("The outside temperature is the biome's temperature times this, in °C (plains 0.8: 20°C, snowy 0: 0°C).")
+            .defineInRange("celsiusPerBiomeTemperature", 25.0, 0.0, 100.0);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_NO_SKY_AMBIENT = BUILDER
+            .comment("The outside temperature in dimensions without a sky (the Nether, the End), in °C: cold and dark.")
+            .defineInRange("noSkyAmbient", 5, -50, 100);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_SOLAR_GAIN = BUILDER
+            .comment("How much warmer than outside the glass keeps it by day under the sky, in °C.")
+            .defineInRange("solarGain", 6, 0, 100);
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_HEAT_EXCHANGE = BUILDER
+            .comment("How fast the air inside drifts toward the outside temperature, per tick (a fraction of the difference).")
+            .defineInRange("heatExchange", 0.002, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_TARGET_TEMPERATURE = BUILDER
+            .comment("With heat through a heat port, it heats up to this temperature, in °C.")
+            .defineInRange("targetTemperature", 24, -50, 100);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_HEAT_BASE = BUILDER
+            .comment("HU/t it uses while heating, plus heatPerSurface for each block of its walls and roof.")
+            .defineInRange("heatBase", 4, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_HEAT_PER_SURFACE = BUILDER
+            .comment("HU/t per block of walls and roof while heating.")
+            .defineInRange("heatPerSurface", 0.05, 0.0, 1_000.0);
+
+    public static final ModConfigSpec.DoubleValue GREENHOUSE_HEATING_RATE = BUILDER
+            .comment("°C per tick it warms by while heating (and at most up to targetTemperature).")
+            .defineInRange("heatingRate", 0.05, 0.0, 100.0);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 20_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_HEAT_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C (heat sources must be hotter than the buffer to feed it).")
+            .defineInRange("heatMaxTemperature", 200, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size, for the Grow Lamps.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_MAX_INPUT = BUILDER
+            .comment("Most FE/t it accepts.")
+            .defineInRange("maxInput", 2_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_LAMP_ENERGY = BUILDER
+            .comment("FE/t each Grow Lamp draws while it's lit (at night, or without sky, while beds grow).")
+            .defineInRange("lampEnergyPerTick", 16, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_LAMP_RANGE = BUILDER
+            .comment("How far a Grow Lamp lights beds, in blocks across (3: a 7x7 patch under it).")
+            .defineInRange("lampRange", 3, 0, 16);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_MIN_SKY_LIGHT = BUILDER
+            .comment("Sky light a bed needs to grow by day without a lamp (glass lets all of it through).")
+            .defineInRange("minSkyLight", 13, 0, 15);
+
+    public static final ModConfigSpec.IntValue GREENHOUSE_CHECK_INTERVAL = BUILDER
+            .comment("Ticks between full checks of the structure (placing or breaking its blocks rechecks at once).")
+            .defineInRange("checkInterval", 40, 1, 1_200);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.pop();
     }
 
