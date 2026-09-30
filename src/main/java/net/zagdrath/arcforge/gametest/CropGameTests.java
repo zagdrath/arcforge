@@ -206,4 +206,26 @@ public final class CropGameTests {
         }
         helper.succeed();
     }
+
+    // The biome modifiers put each wild plant in the biomes of its tag (through the c: tags, as modded biomes are) and
+    // keep it out of snowy ones.
+    static void wildPlantBiomes(GameTestHelper helper) {
+        var biomes = helper.getLevel().registryAccess().lookupOrThrow(Registries.BIOME);
+        var features = helper.getLevel().registryAccess().lookupOrThrow(Registries.PLACED_FEATURE);
+        record Case(String biome, String feature, boolean expected) {}
+        List<Case> cases = List.of(
+                new Case("plains", "wild_flax", true), new Case("meadow", "wild_flax", true),
+                new Case("plains", "wild_rapeseed", true), new Case("flower_forest", "wild_rapeseed", true),
+                new Case("savanna", "wild_sorghum", true), new Case("wooded_badlands", "wild_sorghum", true),
+                new Case("forest", "wild_hops", true), new Case("taiga", "wild_hops", true),
+                new Case("snowy_taiga", "wild_hops", false), new Case("grove", "wild_hops", false),
+                new Case("snowy_plains", "wild_flax", false), new Case("desert", "wild_sorghum", false));
+        for (Case c : cases) {
+            var biome = biomes.getOrThrow(ResourceKey.create(Registries.BIOME, Identifier.withDefaultNamespace(c.biome())));
+            var feature = features.getOrThrow(ResourceKey.create(Registries.PLACED_FEATURE, Identifier.fromNamespaceAndPath(Arcforge.MODID, c.feature())));
+            helper.assertTrue(biome.value().getGenerationSettings().hasFeature(feature.value()) == c.expected(),
+                    c.feature() + (c.expected() ? " missing from " : " shouldn't be in ") + c.biome());
+        }
+        helper.succeed();
+    }
 }

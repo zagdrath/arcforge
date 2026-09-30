@@ -241,6 +241,7 @@ public final class ArcforgeGameTests {
         TESTS.put("crops_hops_grow_and_regrow", CropGameTests::hopsGrowAndRegrow);
         TESTS.put("crops_recipes", CropGameTests::recipes);
         TESTS.put("crops_wild_plants", CropGameTests::wildPlantsGenerate);
+        TESTS.put("crops_wild_biomes", CropGameTests::wildPlantBiomes);
         TESTS.put("rustic_planter_plants", RusticGameTests::planterPlants);
         TESTS.put("rustic_harvester_harvests", RusticGameTests::harvesterHarvests);
         TESTS.put("rustic_pulse_and_timer", RusticGameTests::pulseAndTimer);

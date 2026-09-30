@@ -1,0 +1,55 @@
+{
+  "values": [
+    "#c:is_forest",
+    "#c:is_birch_forest",
+    "#c:is_taiga",
+    {
+      "id": "biomesoplenty:woodland",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:old_growth_woodland",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:seasonal_forest",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:maple_woods",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:orchard",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:aspen_glade",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:mediterranean_forest",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:coniferous_forest",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:redwood_forest",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:forested_field",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:fir_clearing",
+      "required": false
+    },
+    {
+      "id": "biomesoplenty:lavender_forest",
+      "required": false
+    }
+  ]
+}

@@ -15,7 +15,10 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 // Wild Flax, Rapeseed, Sorghum and Hops: a clump of the plant growing on grass and dirt (#minecraft:supports_vegetation),
-// placed by worldgen in the biomes that suit it (data/arcforge/neoforge/biome_modifier/wild_*.json). Breaking one gives
+// placed by worldgen in the biomes that suit it (data/arcforge/tags/worldgen/biome/wild_crops/*.json, which take in modded
+// biomes through the c: tags, less the ones in wild_crops/*_excluded; applied by neoforge/biome_modifier/wild_*.json). Each
+// modifier names only its own crop's tags: NeoForge's and/not holder sets attach listeners to a named tag without locking,
+// and modifiers load in parallel, so two sharing a tag (say #c:is_snowy) can crash the registry load. Breaking one gives
 // its seeds (and now and then the crop), from its loot table.
 public class WildCropBlock extends VegetationBlock {
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 13, 14);

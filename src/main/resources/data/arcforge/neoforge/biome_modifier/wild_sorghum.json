@@ -1,6 +1,15 @@
 {
   "type": "neoforge:add_features",
-  "biomes": "#minecraft:is_savanna",
+  "biomes": {
+    "type": "neoforge:and",
+    "values": [
+      "#arcforge:wild_crops/sorghum",
+      {
+        "type": "neoforge:not",
+        "value": "#arcforge:wild_crops/sorghum_excluded"
+      }
+    ]
+  },
   "features": "arcforge:wild_sorghum",
   "step": "vegetal_decoration"
 }

@@ -1,9 +1,15 @@
 {
   "type": "neoforge:add_features",
-  "biomes": [
-    "minecraft:plains",
-    "minecraft:sunflower_plains"
-  ],
+  "biomes": {
+    "type": "neoforge:and",
+    "values": [
+      "#arcforge:wild_crops/flax",
+      {
+        "type": "neoforge:not",
+        "value": "#arcforge:wild_crops/flax_excluded"
+      }
+    ]
+  },
   "features": "arcforge:wild_flax",
   "step": "vegetal_decoration"
 }

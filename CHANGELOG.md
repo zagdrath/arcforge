@@ -22,6 +22,10 @@ number and date.
 
 ### Changed
 
+- **Wild crops spawn in more places, and more often.** Each has a biome tag (`#arcforge:wild_crops/flax`, `/rapeseed`,
+  `/sorghum`, `/hops`) built on the common `c:` biome tags, so modded biomes such as Biomes O' Plenty's get them too;
+  Biomes O' Plenty's grasslands, scrublands and woodlands are listed by name as well. Hops now also grow in taigas and
+  Sorghum on wooded badlands, never in snowy biomes. Patches turn up about twice as often.
 - **Textures:** plates are shaded softer (no bright centre); the Arcite-Tungsten Composite is a tungsten plate with
   arcite fibres; the Plate, Gear and Rod Dies engrave the new plate, gear and rod shapes; Digestate, the Sickles and
   the Steel Scythe use Cody's own textures.
