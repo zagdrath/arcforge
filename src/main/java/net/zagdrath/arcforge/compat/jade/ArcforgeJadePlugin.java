@@ -121,6 +121,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         // Farming: read from the block state on the client.
         registration.registerBlockComponent(FarmingProviders.LoamFarmland.INSTANCE, net.zagdrath.arcforge.block.farming.LoamFarmlandBlock.class);
         registration.registerBlockComponent(FarmingProviders.CompostBin.INSTANCE, net.zagdrath.arcforge.block.farming.CompostBinBlock.class);
+        registration.registerBlockComponent(FarmingProviders.Trellis.INSTANCE, net.zagdrath.arcforge.block.farming.TrellisBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

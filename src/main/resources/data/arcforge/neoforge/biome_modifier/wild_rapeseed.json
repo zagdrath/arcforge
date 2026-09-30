@@ -1,0 +1,9 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "minecraft:meadow",
+    "minecraft:plains"
+  ],
+  "features": "arcforge:wild_rapeseed",
+  "step": "vegetal_decoration"
+}

@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:farming/new_crop",
+  "display": {
+    "icon": {
+      "id": "arcforge:linen"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.linen.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.linen.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "linen": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:linen"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "linen"
+    ]
+  ]
+}

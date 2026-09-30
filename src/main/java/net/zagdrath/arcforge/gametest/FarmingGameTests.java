@@ -277,4 +277,25 @@ public final class FarmingGameTests {
         helper.assertTrue(recipe.assemble(grid).is(ModItems.MIXED_FERTILIZER.get()), "The recipe doesn't make Mixed Fertilizer");
         helper.succeed();
     }
+
+    // The user's steps on a Combustion Plant: it starts on coal, the rest of the coal is taken out, the burning coal
+    // burns out, and charcoal put in afterwards burns.
+    static void combustionPlantCoalThenCharcoal(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.COMBUSTION_PLANT.get());
+        var plant = helper.getBlockEntity(pos, net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity.class);
+        var items = plant.getItems();
+        items.setStack(BurnerBlockEntity.SLOT_FUEL, new ItemStack(Items.COAL, 2));
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(plant.getBurnTime() > 0, "It didn't light the coal"))
+                .thenExecute(() -> items.setStack(BurnerBlockEntity.SLOT_FUEL, ItemStack.EMPTY))
+                .thenWaitUntil(() -> helper.assertTrue(plant.getBurnTime() == 0, "The last coal is still burning: " + plant.getBurnTime()
+                        + " ticks left, " + plant.getStored() + " / " + plant.getCapacity() + " FE, " + plant.getStatus()))
+                .thenExecute(() -> items.setStack(BurnerBlockEntity.SLOT_FUEL, new ItemStack(Items.CHARCOAL, 4)))
+                .thenWaitUntil(() -> helper.assertTrue(plant.getBurnTime() > 0 && items.getStack(BurnerBlockEntity.SLOT_FUEL).getCount() == 3,
+                        "The charcoal didn't light: " + plant.getBurnTime() + " ticks, " + items.getStack(BurnerBlockEntity.SLOT_FUEL)
+                                + ", " + plant.getStored() + " / " + plant.getCapacity() + " FE, " + plant.getStatus()))
+                .thenSucceed();
+    }
 }
+

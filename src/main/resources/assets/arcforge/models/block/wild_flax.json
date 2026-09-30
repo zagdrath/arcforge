@@ -1,0 +1,7 @@
+{
+  "parent": "arcforge:block/tall_cross",
+  "textures": {
+    "cross": "arcforge:block/wild_flax",
+    "top": "arcforge:block/wild_flax_top"
+  }
+}

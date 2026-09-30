@@ -44,8 +44,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
+import net.zagdrath.arcforge.block.farming.ArcforgeCropBlock;
 import net.zagdrath.arcforge.block.farming.CompostBinBlock;
 import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
+import net.zagdrath.arcforge.block.farming.TrellisBlock;
+import net.zagdrath.arcforge.block.farming.WildCropBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
@@ -539,6 +542,21 @@ public final class ModBlocks {
     public static final DeferredBlock<LoamFarmlandBlock> IRRIGATED_LOAM_FARMLAND = BLOCKS.registerBlock("irrigated_loam_farmland",
             p -> new LoamFarmlandBlock(LOAM.get(), true, p), p -> farmlandProperties(p).sound(SoundType.COPPER));
 
+    // Crops: Flax, Rapeseed and Sorghum grow like wheat (Flax and Rapeseed two blocks tall); Hops climb a Trellis. Each has a wild clump that worldgen places.
+    public static final DeferredBlock<ArcforgeCropBlock> FLAX = BLOCKS.registerBlock("flax",
+            p -> new ArcforgeCropBlock(() -> ModItems.FLAX_SEEDS.get(), 2, p), ModBlocks::cropProperties);
+    public static final DeferredBlock<ArcforgeCropBlock> RAPESEED = BLOCKS.registerBlock("rapeseed",
+            p -> new ArcforgeCropBlock(() -> ModItems.RAPESEEDS.get(), 4, p), ModBlocks::cropProperties);
+    public static final DeferredBlock<ArcforgeCropBlock> SORGHUM = BLOCKS.registerBlock("sorghum",
+            p -> new ArcforgeCropBlock(() -> ModItems.SORGHUM_SEEDS.get(), ArcforgeCropBlock.NEVER_TALL, p), ModBlocks::cropProperties);
+    // Not solid, so farmland under it stays farmland.
+    public static final DeferredBlock<TrellisBlock> TRELLIS = BLOCKS.registerBlock("trellis",
+            TrellisBlock::new, p -> treatedWood(p).strength(0.6F).noOcclusion().forceSolidOff().randomTicks());
+    public static final DeferredBlock<WildCropBlock> WILD_FLAX = BLOCKS.registerBlock("wild_flax", WildCropBlock::new, ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_RAPESEED = BLOCKS.registerBlock("wild_rapeseed", WildCropBlock::new, ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_SORGHUM = BLOCKS.registerBlock("wild_sorghum", WildCropBlock::new, ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_HOPS = BLOCKS.registerBlock("wild_hops", WildCropBlock::new, ModBlocks::wildCropProperties);
+
     // arcforge:<tier>_<type>_conduit for every type and tier.
     private static final Map<ConduitType, Map<ConduitTier, DeferredBlock<ConduitBlock>>> CONDUITS = new EnumMap<>(ConduitType.class);
 
@@ -614,6 +632,27 @@ public final class ModBlocks {
                 .requiresCorrectToolForDrops()
                 .sound(SoundType.METAL)
                 .lightLevel(state -> state.getValue(MachineBlock.LIT) ? litLight : 0);
+    }
+
+    // Like wheat: no collision, broken at a touch, pushed off by pistons.
+    private static BlockBehaviour.Properties cropProperties(BlockBehaviour.Properties p) {
+        return p.mapColor(MapColor.PLANT)
+                .noCollision()
+                .randomTicks()
+                .instabreak()
+                .sound(SoundType.CROP)
+                .pushReaction(PushReaction.POPPED);
+    }
+
+    // Like a flower: replaceable, set off-centre, no collision.
+    private static BlockBehaviour.Properties wildCropProperties(BlockBehaviour.Properties p) {
+        return p.mapColor(MapColor.PLANT)
+                .replaceable()
+                .noCollision()
+                .instabreak()
+                .sound(SoundType.GRASS)
+                .offsetType(BlockBehaviour.OffsetType.XZ)
+                .pushReaction(PushReaction.POPPED);
     }
 
     // Like vanilla farmland: random ticks for moisture, a shovel breaks it, and it suffocates like a full block.

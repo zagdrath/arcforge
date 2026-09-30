@@ -3,12 +3,13 @@
   "icon": "arcforge:fermenter",
   "items": [
     "arcforge:fermenter",
-    "arcforge:ethanol_bucket"
+    "arcforge:ethanol_bucket",
+    "arcforge:sorghum_stalks"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "The Fermenter turns crops and water into Ethanol, using a little power.\n| Crop | Ethanol |\n| Wheat, Potato, Carrot, Beetroot | 50 mB |\n| Sugar Cane | 60 mB |\n| Sweet Berries | 25 mB |\n| Melon Slice | 20 mB |\nEach takes 100 mB of water and 10 s, and has a 10% chance to leave Bone Meal. Speed and Energy upgrades work.\n# Ethanol\nA light fuel: 300 HU per mB at up to 900°C in the Fuel Burner (Naphtha is 400 HU at 1,200°C). It also runs the Gas Turbine Array."
+      "text": "The Fermenter turns crops and water into Ethanol, using a little power.\n| Crop | Ethanol |\n| Sorghum Stalks | 80 mB |\n| Wheat, Potato, Carrot, Beetroot | 50 mB |\n| Sugar Cane | 60 mB |\n| Sweet Berries | 25 mB |\n| Melon Slice | 20 mB |\nEach takes 100 mB of water and 10 s, and has a 10% chance to leave Bone Meal. Speed and Energy upgrades work.\n# Ethanol\nA light fuel: 300 HU per mB at up to 900°C in the Fuel Burner (Naphtha is 400 HU at 1,200°C). It also runs the Gas Turbine Array."
     }
   ]
 }

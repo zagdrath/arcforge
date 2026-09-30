@@ -229,8 +229,17 @@ public final class ArcforgeGameTests {
         TESTS.put("farming_growth_uses_nutrients", FarmingGameTests::growthUsesNutrients);
         TESTS.put("farming_irrigation_and_drying", FarmingGameTests::irrigationAndDrying);
         TESTS.put("farming_firebox_ash_slot", FarmingGameTests::fireboxAshSlot);
+        LONG_TESTS.put("farming_combustion_plant_coal_then_charcoal", FarmingGameTests::combustionPlantCoalThenCharcoal);
         TESTS.put("farming_burner_old_save_migrates", FarmingGameTests::burnerOldSaveMigrates);
         TESTS.put("farming_recipes", FarmingGameTests::recipes);
+        TESTS.put("crops_seeds_plant", CropGameTests::seedsPlant);
+        TESTS.put("crops_tall_need_room", CropGameTests::tallCropsNeedRoom);
+        TESTS.put("crops_use_nutrients", CropGameTests::cropsUseNutrients);
+        TESTS.put("crops_harvests", CropGameTests::harvests);
+        TESTS.put("crops_trellis_stacks_two", CropGameTests::trellisStacksTwo);
+        TESTS.put("crops_hops_grow_and_regrow", CropGameTests::hopsGrowAndRegrow);
+        TESTS.put("crops_recipes", CropGameTests::recipes);
+        TESTS.put("crops_wild_plants", CropGameTests::wildPlantsGenerate);
         TESTS.put("advancement_tree_loads", AdvancementGameTests::treeLoads);
         TESTS.put("multiblock_formed_trigger", AdvancementGameTests::multiblockFormedTrigger);
         TESTS.put("turbine_full_speed_needs_length", AdvancementGameTests::turbineFullSpeedNeedsLength);

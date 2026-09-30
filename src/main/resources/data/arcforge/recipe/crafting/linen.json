@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "FF",
+    "FF"
+  ],
+  "key": {
+    "F": "arcforge:flax_fibre"
+  },
+  "result": {
+    "id": "arcforge:linen",
+    "count": 1
+  }
+}

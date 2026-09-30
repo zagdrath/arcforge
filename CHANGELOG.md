@@ -24,7 +24,8 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
 
 ### Upgrading
 
-- **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`) gets its defaults; nothing to redo.
+- **New config section** `farming` (`compostBin`, `fertilizers`, `loamFarmland`, `hops`) gets its defaults; nothing to redo.
+- **Wild crops generate only in newly explored chunks.**
 - **Firebox and Combustion Plant ash slot.** Both machines gain an ash slot. Saved machines keep their fuel and
   upgrades: the upgrades move up past the new slot when the world loads.
 
@@ -50,6 +51,17 @@ Suggested version: **2.2.0** (new content; worlds load as they are).
     - Basic Slag: +3. The Arc Crusher crushes 1 Slag into 2.
     - Mixed Fertilizer: +8, crafted from one of each.
   - Every value is in the new `farming` config section.
+- **Crops:** four new crops. All grow on vanilla farmland and Loam Farmland (and use its nutrients). Each has a wild
+  version in the biomes that suit it, and their seeds sometimes drop from grass.
+  - **Flax** (wild in plains) grows two blocks tall with blue flowers. It gives Flax Fibre and Flax Seeds. One fibre
+    crafts into String, and four make Linen.
+  - **Rapeseed** (wild in meadows and plains) grows two blocks tall and flowers yellow. It gives Rapeseeds, the oil
+    crop, for the Oil Press to come.
+  - **Sorghum** (wild in savannas) gives Sorghum Stalks. In the Fermenter a stalk makes 80 mB of Ethanol, more than
+    any vanilla crop.
+  - **Hops** (wild in forests) are perennial. Stand a **Trellis** (treated wood, up to 2 high) on farmland and plant
+    Hop Seeds in the bottom one. The vine climbs, then bears Hop Cones. Picking them leaves the vine to bear again.
+  - Handbook pages, Jade shows a trellis's vine, and four new Farming advancements.
 
 ### Fixed
 

@@ -1,0 +1,7 @@
+{
+  "parent": "arcforge:block/tall_crop",
+  "textures": {
+    "crop": "arcforge:block/rapeseed_stage5",
+    "top": "arcforge:block/rapeseed_stage5_top"
+  }
+}

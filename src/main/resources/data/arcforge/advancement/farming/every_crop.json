@@ -1,0 +1,74 @@
+{
+  "parent": "arcforge:farming/hop_harvest",
+  "display": {
+    "icon": {
+      "id": "arcforge:sorghum_stalks"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.every_crop.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.every_crop.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "flax": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:flax_fibre"
+          }
+        ]
+      }
+    },
+    "rapeseed": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:rapeseeds"
+          }
+        ]
+      }
+    },
+    "sorghum": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:sorghum_stalks"
+          }
+        ]
+      }
+    },
+    "hops": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:hop_cones"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "flax"
+    ],
+    [
+      "rapeseed"
+    ],
+    [
+      "sorghum"
+    ],
+    [
+      "hops"
+    ]
+  ]
+}

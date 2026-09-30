@@ -1453,7 +1453,7 @@ public class ArcforgeConfig {
     // --- Farming ---
 
     static {
-        BUILDER.comment("Farming: the Compost Bin, fertilizers, Loam and Loam Farmland.").push("farming");
+        BUILDER.comment("Farming: the Compost Bin, fertilizers, Loam and Loam Farmland, and the crops.").push("farming");
     }
 
     static {
@@ -1523,6 +1523,26 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue LOAM_NUTRIENTS_PER_STAGE = BUILDER
             .comment("Nutrients each growth stage of the crop on it uses.")
             .defineInRange("nutrientsPerStage", 1, 0, 15);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Hops: a perennial vine that climbs a Trellis on farmland and bears Hop Cones.").push("hops");
+    }
+
+    public static final ModConfigSpec.DoubleValue HOPS_GROWTH_CHANCE = BUILDER
+            .comment("Chance that a random tick grows a vine one stage on moist farmland (half on dry).")
+            .defineInRange("growthChance", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue HOP_CONES_MIN = BUILDER
+            .comment("Fewest Hop Cones picked from a bearing trellis.")
+            .defineInRange("conesMin", 1, 0, 64);
+
+    public static final ModConfigSpec.IntValue HOP_CONES_MAX = BUILDER
+            .comment("Most Hop Cones picked from a bearing trellis.")
+            .defineInRange("conesMax", 3, 0, 64);
 
     static {
         BUILDER.pop();

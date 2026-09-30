@@ -1,0 +1,45 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "rolls": 1,
+      "condition": {
+        "type": "minecraft:all_of",
+        "terms": [
+          {
+            "type": "minecraft:random_chance",
+            "chance": 0.06
+          },
+          {
+            "type": "minecraft:inverted",
+            "term": {
+              "type": "minecraft:match_tool",
+              "predicate": {
+                "items": "minecraft:shears"
+              }
+            }
+          }
+        ]
+      },
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:flax_seeds"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:rapeseeds"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:sorghum_seeds"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:hop_seeds"
+        }
+      ]
+    }
+  ],
+  "random_sequence": "arcforge:gameplay/grass_seeds"
+}

@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "age=0": {
+      "model": "arcforge:block/rapeseed_stage0"
+    },
+    "age=1": {
+      "model": "arcforge:block/rapeseed_stage1"
+    },
+    "age=2": {
+      "model": "arcforge:block/rapeseed_stage2"
+    },
+    "age=3": {
+      "model": "arcforge:block/rapeseed_stage3"
+    },
+    "age=4": {
+      "model": "arcforge:block/rapeseed_stage4"
+    },
+    "age=5": {
+      "model": "arcforge:block/rapeseed_stage5"
+    },
+    "age=6": {
+      "model": "arcforge:block/rapeseed_stage6"
+    },
+    "age=7": {
+      "model": "arcforge:block/rapeseed_stage7"
+    }
+  }
+}

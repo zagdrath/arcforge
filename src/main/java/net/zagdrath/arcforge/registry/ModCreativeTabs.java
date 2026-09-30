@@ -202,6 +202,19 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.WOOD_ASH.get());
                 output.accept(ModItems.BASIC_SLAG.get());
                 output.accept(ModItems.MIXED_FERTILIZER.get());
+                output.accept(ModItems.TRELLIS.get());
+                output.accept(ModItems.FLAX_SEEDS.get());
+                output.accept(ModItems.FLAX_FIBRE.get());
+                output.accept(ModItems.LINEN.get());
+                output.accept(ModItems.RAPESEEDS.get());
+                output.accept(ModItems.SORGHUM_SEEDS.get());
+                output.accept(ModItems.SORGHUM_STALKS.get());
+                output.accept(ModItems.HOP_SEEDS.get());
+                output.accept(ModItems.HOP_CONES.get());
+                output.accept(ModItems.WILD_FLAX.get());
+                output.accept(ModItems.WILD_RAPESEED.get());
+                output.accept(ModItems.WILD_SORGHUM.get());
+                output.accept(ModItems.WILD_HOPS.get());
             }).build());
 
     private ModCreativeTabs() {}

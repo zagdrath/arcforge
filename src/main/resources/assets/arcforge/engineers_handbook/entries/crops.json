@@ -1,0 +1,18 @@
+{
+  "title": "Flax, Rapeseed & Sorghum",
+  "icon": "arcforge:flax_seeds",
+  "items": [
+    "arcforge:flax_seeds",
+    "arcforge:flax_fibre",
+    "arcforge:linen",
+    "arcforge:rapeseeds",
+    "arcforge:sorghum_seeds",
+    "arcforge:sorghum_stalks"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Three crops that grow like wheat, on farmland or Loam Farmland (where nutrients speed them up). Find their seeds on wild plants or in grass.\n- Flax (wild in plains) gives Flax Fibre and seeds. Craft one fibre into String, or four into Linen.\n- Rapeseed (wild in meadows and plains) gives Rapeseeds, the oil crop. They plant more.\n- Sorghum (wild in savannas) gives Sorghum Stalks and seeds. In a Fermenter a stalk makes 80 mB of Ethanol, more than any vanilla crop."
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:fermenting",
+  "ingredient": "arcforge:sorghum_stalks",
+  "fluid_input": {
+    "fluid": "minecraft:water",
+    "amount": 100
+  },
+  "result": {
+    "id": "arcforge:ethanol",
+    "amount": 80
+  },
+  "byproduct": {
+    "id": "minecraft:bone_meal",
+    "count": 1
+  },
+  "byproduct_chance": 0.1,
+  "time": 200
+}

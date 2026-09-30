@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S S",
+    "SSS",
+    "S S"
+  ],
+  "key": {
+    "S": "arcforge:treated_slab"
+  },
+  "result": {
+    "id": "arcforge:trellis",
+    "count": 2
+  }
+}

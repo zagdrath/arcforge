@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.zagdrath.arcforge.block.farming.ArcforgeCropBlock;
 import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 
@@ -38,8 +39,10 @@ public final class LoamGrowth {
         nutrients = Math.max(0, nutrients - perStage);
         int stages = 1;
         double bonusChance = ArcforgeConfig.LOAM_GROWTH_MULTIPLIER.getAsDouble() - 1.0;
-        if (nutrients > 0 && random.nextDouble() < bonusChance) {
-            BlockState grown = nextStage(level.getBlockState(cropPos));
+        BlockState crop = level.getBlockState(cropPos);
+        boolean room = !(crop.getBlock() instanceof ArcforgeCropBlock tall) || tall.hasRoomToGrow(level, cropPos, crop);
+        if (nutrients > 0 && room && random.nextDouble() < bonusChance) {
+            BlockState grown = nextStage(crop);
             if (grown != null) {
                 level.setBlock(cropPos, grown, Block.UPDATE_CLIENTS);
                 nutrients = Math.max(0, nutrients - perStage);

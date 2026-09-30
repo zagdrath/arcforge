@@ -1,0 +1,7 @@
+{
+  "parent": "arcforge:block/tall_crop",
+  "textures": {
+    "crop": "arcforge:block/flax_stage2",
+    "top": "arcforge:block/flax_stage2_top"
+  }
+}

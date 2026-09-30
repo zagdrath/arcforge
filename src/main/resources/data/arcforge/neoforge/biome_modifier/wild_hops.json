@@ -1,0 +1,6 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_forest",
+  "features": "arcforge:wild_hops",
+  "step": "vegetal_decoration"
+}

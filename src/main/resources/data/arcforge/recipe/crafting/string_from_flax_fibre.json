@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "arcforge:flax_fibre"
+  ],
+  "result": {
+    "id": "minecraft:string",
+    "count": 1
+  }
+}

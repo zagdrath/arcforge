@@ -22,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -375,6 +376,26 @@ public final class ModItems {
             p -> new FertilizerItem(ArcforgeConfig.BASIC_SLAG_NUTRIENTS::getAsInt, p));
     public static final DeferredItem<FertilizerItem> MIXED_FERTILIZER = ITEMS.registerItem("mixed_fertilizer",
             p -> new FertilizerItem(ArcforgeConfig.MIXED_FERTILIZER_NUTRIENTS::getAsInt, p));
+
+    // Crops. Seeds that plant a crop are block items named as items ("Flax Seeds", not the crop). Compost Bins take them
+    // at vanilla's chances: 30% for seeds, 65% for the harvest.
+    public static final DeferredItem<BlockItem> FLAX_SEEDS = ITEMS.registerItem("flax_seeds",
+            p -> new BlockItem(ModBlocks.FLAX.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
+    public static final DeferredItem<Item> FLAX_FIBRE = ITEMS.registerSimpleItem("flax_fibre", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<Item> LINEN = ITEMS.registerSimpleItem("linen");
+    public static final DeferredItem<BlockItem> RAPESEEDS = ITEMS.registerItem("rapeseeds",
+            p -> new BlockItem(ModBlocks.RAPESEED.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
+    public static final DeferredItem<BlockItem> SORGHUM_SEEDS = ITEMS.registerItem("sorghum_seeds",
+            p -> new BlockItem(ModBlocks.SORGHUM.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
+    public static final DeferredItem<Item> SORGHUM_STALKS = ITEMS.registerSimpleItem("sorghum_stalks", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    // Hop Seeds are planted by using them on a Trellis (TrellisBlock), so they're a plain item.
+    public static final DeferredItem<Item> HOP_SEEDS = ITEMS.registerSimpleItem("hop_seeds", p -> p.compostable(ContextIntProviders.COMPOSTABLE_LOW));
+    public static final DeferredItem<Item> HOP_CONES = ITEMS.registerSimpleItem("hop_cones", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<BlockItem> TRELLIS = ITEMS.registerSimpleBlockItem(ModBlocks.TRELLIS);
+    public static final DeferredItem<BlockItem> WILD_FLAX = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_FLAX, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<BlockItem> WILD_RAPESEED = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RAPESEED, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<BlockItem> WILD_SORGHUM = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SORGHUM, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<BlockItem> WILD_HOPS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_HOPS, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
 
     // --- Solar Thermal Array ---
 

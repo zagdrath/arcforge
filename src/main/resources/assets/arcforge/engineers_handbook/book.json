@@ -144,11 +144,13 @@
       "id": "farming",
       "title": "Farming",
       "icon": "arcforge:compost_bin",
-      "description": "Compost, fertilizers and rich soil that grows crops faster.",
+      "description": "Compost, fertilizers, rich soil, and the crops that grow in it.",
       "entries": [
         "compost_bin",
         "loam_farmland",
-        "fertilizers"
+        "fertilizers",
+        "crops",
+        "hops"
       ]
     }
   ]

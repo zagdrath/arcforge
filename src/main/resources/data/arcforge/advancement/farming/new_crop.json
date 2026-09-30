@@ -1,0 +1,68 @@
+{
+  "parent": "arcforge:farming/compost_bin",
+  "display": {
+    "icon": {
+      "id": "arcforge:flax_seeds"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.new_crop.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.new_crop.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "flax": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:flax_seeds"
+          }
+        ]
+      }
+    },
+    "rapeseeds": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:rapeseeds"
+          }
+        ]
+      }
+    },
+    "sorghum": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:sorghum_seeds"
+          }
+        ]
+      }
+    },
+    "hops": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:hop_seeds"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "flax",
+      "rapeseeds",
+      "sorghum",
+      "hops"
+    ]
+  ]
+}

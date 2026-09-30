@@ -486,3 +486,21 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     carrying three 2×2 chips in the compost, ash and slag colours.
 - GUI: the Firebox and Combustion Plant have a fuel → flame → ash column that runs down the screen recess's height.
   The input frame is at y18..35, the flame at y37, and the output-orange ash frame at y52..69.
+
+## Crops
+- Crops are natural materials, so they use the vanilla plant language and Cody's own crop textures.
+  - **Rapeseed:** his 8-stage plant, one texture per age, with its white flowers recoloured rapeseed yellow
+    (`#EBC52C` / `#FFE66A`). His greens are `#204C1D #2C5E22 #40712B #5B8838 #779C43`. The last stage keeps its browned
+    ripe pods. Rapeseeds are his dark seed cluster, and Wild Rapeseed is his small flowering bush.
+  - **Flax:** his 5-stage sheet (spread over ages 0-7 as 0,0,1,1,2,2,3,4), with Flax Seeds, Flax Fibre (the green bundle)
+    and Linen (the cloth) from the same sheet. That sheet was recovered from a resized screenshot and quantised to 10
+    tones, so if the original PNGs turn up, drop them in over `flax_stage*` / `flax_stage*_top`.
+  - Sorghum, Hops and the Trellis items are drawn to match, on his greens.
+- **Tall crops:** a crop stage 16×32 tall is split into `<crop>_stageN` (bottom) and `<crop>_stageN_top`, drawn by
+  `block/tall_crop`. That model is vanilla's crop planes twice, the top set a block higher. Wild Flax uses
+  `block/tall_cross` the same way.
+  - Flax is tall from age 2 and Rapeseed from age 4. They only grow into those stages with air above them.
+- **Trellis:**
+  - four 2×2 corner posts and 1 px rails at y 5, 10 and 15, textured with the stripped treated log;
+  - the hop vine is four outward planes just outside the frame (`hops_vine1-4`), so it wraps the lattice;
+  - stage 4 carries pale green cones (`#D6EC9E #A8CC6A #7FA24A`).

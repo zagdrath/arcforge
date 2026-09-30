@@ -162,8 +162,9 @@ final class AlloyGameTests {
         // tier-one crafts, six tier upgrades and seven modules), and the security, foundry and gas turbine drop's 11
         // (Settings Card, Security Terminal, Fermenter, four Foundry Suit pieces, conduit dyeing, Turbine Blade Set,
         // Combustor and Gas Turbine Array Casing), the Throttle Lever, the Wrench, Conduit Cover, four Meters and
-        // Chargepad, and farming's four (Compost Bin, Loam, Irrigated Loam Farmland and Mixed Fertilizer).
-        helper.assertTrue(crafting == 184, crafting + " crafting/ recipes, not 184");
+        // Chargepad, farming's four (Compost Bin, Loam, Irrigated Loam Farmland and Mixed Fertilizer), and
+        // the crops' three (String from Flax Fibre, Linen and the Trellis).
+        helper.assertTrue(crafting == 187, crafting + " crafting/ recipes, not 187");
         // Plus the fluorite-fluxed steel.
         helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
