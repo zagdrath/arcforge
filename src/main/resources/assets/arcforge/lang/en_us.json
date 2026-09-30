@@ -1714,7 +1714,7 @@
   "arcforge.configuration.seedMeal": "Seed Meal",
   "block.arcforge.air_separator": "Air Separator",
   "block.arcforge.haber_reactor": "Haber Reactor",
-  "block.arcforge.digester_casing": "Digester Casing",
+  "block.arcforge.digester_casing": "Biogas Digester Casing",
   "block.arcforge.biogas_digester_controller": "Biogas Digester Controller",
   "block.arcforge.nutrient_solution": "Nutrient Solution",
   "block.arcforge.biodiesel": "Biodiesel",
@@ -1733,7 +1733,7 @@
   "tooltip.arcforge.info.air_separator": "Separates air into Nitrogen and Oxygen with FE. Needs no input, and works anywhere but the End. Oxygen goes out of Oxygen faces, Nitrogen out of Gas Output faces.",
   "tooltip.arcforge.info.haber_reactor": "Makes Ammonia from Hydrogen and Nitrogen with FE and heat. Only works at 450°C or hotter: feed it heat through its heat face.",
   "tooltip.arcforge.info.digester_casing": "Build a solid 3x3x3 of these with a Biogas Digester Controller in the middle of one side to make a Biogas Digester.",
-  "tooltip.arcforge.info.biogas_digester_controller": "Runs the Biogas Digester and opens its GUI. Goes in the middle of one side of a solid 3x3x3 of Digester Casings, facing out.",
+  "tooltip.arcforge.info.biogas_digester_controller": "Runs the Biogas Digester and opens its GUI. Goes in the middle of one side of a solid 3x3x3 of Biogas Digester Casings, facing out.",
   "tooltip.arcforge.info.npk_fertilizer": "Adds 15 nutrients to Loam Farmland and enriches it: crops on it grow twice as fast until those nutrients run out. Made in the Chemical Reactor.",
   "tooltip.arcforge.info.digestate": "The Biogas Digester's by-product. A fertilizer: adds 4 nutrients to Loam Farmland.",
   "tooltip.arcforge.info.nutrient_solution_bucket": "NPK Fertilizer dissolved in water, from the Chemical Reactor. It feeds the Hydroponic Cell.",
@@ -1771,7 +1771,7 @@
   "message.arcforge.biogas_digester.formed": "Biogas Digester complete",
   "message.arcforge.biogas_digester.incomplete": "Biogas Digester incomplete",
   "multiblock.arcforge.biogas_digester": "Biogas Digester",
-  "multiblock.arcforge.biogas_digester.rules": "A solid 3x3x3 of Digester Casings with one controller in the middle of a side, facing out.",
+  "multiblock.arcforge.biogas_digester.rules": "A solid 3x3x3 of Biogas Digester Casings with one controller in the middle of a side, facing out.",
   "advancements.arcforge.farming.air_separator.title": "Thin Air",
   "advancements.arcforge.farming.air_separator.description": "Separate Nitrogen out of the air with an Air Separator.",
   "advancements.arcforge.farming.ammonia.title": "Bread from Air",
@@ -1920,5 +1920,7 @@
   "arcforge.configuration.lampRange": "Grow Lamp Range",
   "arcforge.configuration.minSkyLight": "Sky Light Needed",
   "arcforge.configuration.checkInterval": "Structure Check Interval",
-  "arcforge.configuration.co2PerHarvest": "Carbon Dioxide per Harvest"
+  "arcforge.configuration.co2PerHarvest": "Carbon Dioxide per Harvest",
+  "arcforge.configuration.spoolTime": "Spool Time",
+  "gui.arcforge.greenhouse.energy_hint": "Only the Grow Lamps use FE, while they're lit (at night or without sky). By day under the sky it grows without any."
 }

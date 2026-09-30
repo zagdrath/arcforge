@@ -453,7 +453,7 @@ make two; +15 nutrients, and crops on the enriched Loam Farmland grow twice as f
 Solution** (NPK Fertilizer in water, for the Hydroponic Cell) and **Biodiesel** (Seed Oil and Ethanol; a Fuel Burner
 fuel, 320 HU per mB up to 1,000°C).
 
-**Biogas Digester.** A solid 3×3×3 of Digester Casings with a controller in the middle of one side. Plant matter (crops,
+**Biogas Digester.** A solid 3×3×3 of Biogas Digester Casings with a controller in the middle of one side. Plant matter (crops,
 seeds, leaves, Press Cake, Compost) and water go in through ports, four items digesting at once, and come out as
 **Biogas** (burns in the Fuel Burner and the Gas Turbine Array) and **Digestate** (+4 nutrients). It only works at 35°C
 or hotter. Recipes are data-driven (`arcforge:air_separating`, `arcforge:synthesizing`, `arcforge:digesting`).

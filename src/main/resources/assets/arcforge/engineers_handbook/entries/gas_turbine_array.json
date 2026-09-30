@@ -10,7 +10,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "The Gas Turbine Array burns fuel straight to FE, with no boiler in between.\n- A hollow 3x3 tube, 5 to 9 long, lying on its side. Pressure Glass can replace any casing except the corners.\n- One end is the **intake**: it needs open air in front of its centre. The other end is the **exhaust**.\n- Feed fuel into an input port. Naphtha, Light Oil, Ethanol, Hydrogen and Biogas burn; Heavy Oil, Creosote and Biodiesel don't.\n- It spools up in about a second and a half, and coasts down over about 4 seconds."
+      "text": "The Gas Turbine Array burns fuel straight to FE, with no boiler in between.\n- A hollow 3x3 tube, 5 to 9 long, lying on its side. Pressure Glass can replace any casing except the corners.\n- One end is the **intake**: it needs open air in front of its centre. The other end is the **exhaust**.\n- Feed fuel into an input port. Naphtha, Light Oil, Ethanol, Hydrogen and Biogas burn; Heavy Oil, Creosote and Biodiesel don't.\n- From standstill at full throttle it takes about 10 seconds to spool up (lubricant shortens that), making less FE until it's up to speed. Smaller throttle changes follow quickly. It coasts down over about 4 seconds."
     },
     {
       "type": "text",

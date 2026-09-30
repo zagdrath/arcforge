@@ -525,10 +525,12 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   every face is painted from scratch on that material's ramp with 1 px bevels, identical faces sharing one region. Change
   the art there and re-run it rather than editing the PNGs. The Planter's seed tray is the Compost Bin heap texture and
   the Fertilizer Spreader's top is Loam, tiled.
-- The Sickles are a slim hook: a 1 px arm up from the handle, a spur at the top left, and a back sweeping over to a
-  thicker hook whose point turns back toward the handle. The Scythe is a long diagonal snath with a short grip and a
-  blade curving back over the top. Both use the steel hoe's handle tones; the iron blade is vanilla-light
-  `#E6E6E6 / #9A9A9A`, the steel one the hoe's `#C4C9CF / #7D8289`, with a bright edge on the inside of the curve.
+- The Sickles are Cody's hook sickle, cleaned (no guard nubs at the handle), with the blade on three tones: iron
+  `#E6E6E6 #9A9A9A #5E5E5E`, steel `#C4C9CF #7D8289 #3C3F45`; the handle on the house wood `#291E0B #493615 #684E1E
+  #896727` and a `#16181B` end cap.
+- The Steel Scythe is Cody's scythe (a long snath with a hand grip), every pixel kept: its wood snapped to the house
+  wood and its greys mapped by brightness onto the steel tool ramp (`#16181B … #C4C9CF`, `#DDE1E5` for the brightest
+  glint).
 - Wild crops use the grown crop's own model and textures (Wild Hops: the bearing vine as a cross); they have no art of
   their own.
 
@@ -573,7 +575,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   small cyan readout below it; running, bubbles rise through the slurry and the readout fills.
 - Items: NPK Fertilizer is the Mixed Fertilizer sack as a white poly sack (`#F0ECE4 #DCD6CA #B8B2A6 #8E887E`, the
   plastic tones) with a blue tie and label (the Input row) and N/P/K chips (ammonia `#C8DC78`, slag, ash). Digestate is
-  Cody's compost lump recoloured by rank onto a wet olive-brown `#161408 -> #8C8650` (his own tonal outline, no black).
+  Cody's red lump, sampled off its screenshot's 9 px grid and quantised into 7 brightness levels, recoloured by level
+  onto a wet olive-brown `#161408 #24200E #363018 #4A4424 #5E5830 #746E3E #8C8650` (his own tonal outline, no black).
 - Fluids: Nutrient Solution (`#1E4A18 -> #B2E284`) and Biodiesel (a pale lemon-gold `#8C7E1E -> #F6F2B0`, paler than
   Seed Oil) are Ethanol's frames recoloured by brightness. The gases are the steam texture tinted: Nitrogen `#C4C0EC`,
   Ammonia `#E2F0A0`, Biogas `#A8B478`.
@@ -585,7 +588,7 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - Their glass follows "Glass": each pane is a face painted fully transparent with two opaque 1 px diagonal glints
   (`#DCE8EE`, `#A9BCC6`) near its top left, sized to the face.
 - **Glass Cloche** (rustic, see "Rustic farming machines"): a treated-planks planter (floor and 1 px board walls to
-  y 3.5) with a stripped-log post at each corner, a glass bell (x/z 2.5..13.5, to y 13.5) with thin iron corner bars, an
+  y 3.5) with a stripped-log post at each corner, a glass bell (x/z 2.5..13.5, to y 13.5) with thin iron corner bars (standing on the planter floor, y 1.5), an
   iron lid and a log knob. Its faces are fixed and it has no port plates, like the other rustic machines; its underside
   has an iron drain grate (a recess with three slats) where the harvest drops out. Bed: x/z 2..14, y 1.5..3.
 - **Grow Chamber / Hydroponic Cell:** machine steel. A 2 px plinth, a solid back wall, a 3 px cap and two front corner
@@ -617,10 +620,11 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   (`#2C5E22 … #779C43`), a heat-row thermometer on the right, and a strip of three system LEDs below (water blue,
   nutrient green, lamp cyan), dim when idle. `controller_on` is 4 frames: the thermometer rises and the readout blinks.
 - Planting Bed: a UV-unwrapped steel planter (64×64 sheet), a 12 px body and a 4 px rim 2 px thick. Its outer faces are
-  whole-block faces split between body and rim (lit rim rows, the split face, the strap at the bottom); inside is
+  whole-block faces split between body and rim (lit rim rows, the split face, the strap at the bottom; the north and
+  south rims run the full width, so their ends are the corners of the east and west faces); inside is
   `#2B2F34`. The recess (x/z 2..14, y 12..15) is where the renderer puts the soil.
-- Grow Lamp: a UV-unwrapped steel fixture hanging from the roof (a 6×6 mount, a 12×12 housing) with the Grow Chamber's
-  grow tubes underneath (`grow_lamp_tubes` / `_on`, `light_emission` 15 lit).
+- Grow Lamp: a UV-unwrapped steel fixture hanging from the roof (a 6×6 mount, a 12×12 housing, every face drawn,
+  undersides too, since it's seen from below) with the Grow Chamber's grow tubes underneath (`grow_lamp_tubes` / `_on`, `light_emission` 15 lit).
 - GUI (176×206): the FE gauge and the water, Nutrient Solution and Carbon Dioxide tanks at x 8/24/40/56, the fertilizer
   slot at (75,19) in input blue, beds / speed / temperature text under it (x 76), a 3×3 of output-orange slots from
   (115,19), and the house screen recess (7,76)-(168,109) with the status line, a 1 px `#2A2A2A` divider at y 87, and two
@@ -631,6 +635,11 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),
   quantised into 6 brightness levels, and recoloured by level onto the metal's 5-tone item ramp, with a sixth tone
   (the darkest ×0.72) for his own tonal outline: no `#0C0D0F` black.
+  - Plates are painted soft (the gears and rods keep the full ramp): levels 0-5 are outline, tone 1, tone 2, halfway
+    from 2 to 3, tone 3, and 60% of the way from 3 to 4. The centre reads a step lighter than the rim, never the
+    highlight tone.
+  - Arcite-Tungsten Composite is the tungsten plate with two arcite fibres laid across it (slope 1/2): `#B8F0FF` with
+    a `#E8FCFF` glint every third pixel, over a `#2E3338` groove row.
   - Steel `#2E3237 #484C54 #5C646C #747880 #A8AFB6`; copper `#8A4822 #AE6632 #C98244 #E0A062 #F6C898`;
     silver `#4B5663 #5E6C7C #98A8BA #CAD8E6 #FFFFFF`; nickel `#584E2B #6E6236 #AFA26A #DDD29C #FFF9DC`;
     tungsten `#25292D #2E3338 #545B63 #7C848D #B4BBC2`; invar `#4A4E46 #5C6258 #8E9588 #BCC2B4 #E6EADE`.
@@ -640,3 +649,6 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   lower-right edge on the darker outline tone. Across the body: highlight (5/4), bright (4/3), mid (3/2), shade (2/1),
   varied row by row for the same grain as the plate. The top end is a lit cut face; the bottom end sits in shadow.
 - Every metal with a plate also gets a gear and a rod.
+- The Metal Press dies engrave the part they press, in the die's face (x/y 3..12): the plate's silhouette, a 10 px gear
+  (eight teeth round a ring, a 2×2 hole) and the rod's diagonal, each a `#2E3237` floor with a `#0C0D0F` shadow along its
+  top edge and a `#5C646C` lit lip under its bottom edge. The coloured strip at the bottom stays.

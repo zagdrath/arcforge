@@ -18,6 +18,7 @@ import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
+import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import snownee.jade.api.BlockAccessor;
@@ -50,6 +51,10 @@ public enum MultiblockNameProvider implements IBlockComponentProvider {
             controller = part.findController(level, pos);
         } else if (block instanceof PressureGlassBlock) {
             controller = WindowProviders.master(level, pos);
+            if (controller == null) {
+                // A pane in a Greenhouse Array's wall or roof.
+                controller = GreenhouseStructure.findController(level, pos);
+            }
         }
         return controller != null && controller.isFormed() && controller instanceof MenuProvider menu ? menu.getDisplayName() : null;
     }

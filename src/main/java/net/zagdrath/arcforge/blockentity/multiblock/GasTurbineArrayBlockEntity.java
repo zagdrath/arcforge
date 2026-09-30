@@ -373,9 +373,16 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         int maxHu = maxHuPerTick();
         boolean lubricated = lubricant.getAmount() > 0;
         double target = maxRpm() * burnedHu / maxHu;
-        double spinUp = ArcforgeConfig.GAS_TURBINE_SPIN_UP.getAsDouble()
-                * (lubricated && burnedHu > 0 ? ArcforgeConfig.GAS_TURBINE_LUBRICANT_SPIN_UP.getAsDouble() : 1.0);
-        rpm += (target - rpm) * (target > rpm ? spinUp : ArcforgeConfig.GAS_TURBINE_SPIN_DOWN.getAsDouble());
+        double lubricantBoost = lubricated && burnedHu > 0 ? ArcforgeConfig.GAS_TURBINE_LUBRICANT_SPIN_UP.getAsDouble() : 1.0;
+        double spinUp = ArcforgeConfig.GAS_TURBINE_SPIN_UP.getAsDouble() * lubricantBoost;
+        if (target > rpm) {
+            // Speeding up closes a share of the gap, but never more than full speed / spoolTime a tick, so a throttle
+            // slammed from 0 to 15 takes spoolTime ticks to wind up while small changes still follow quickly.
+            double maxStep = maxRpm() * lubricantBoost / Math.max(1, ArcforgeConfig.GAS_TURBINE_SPOOL_TIME.getAsInt());
+            rpm += Math.min((target - rpm) * spinUp, maxStep);
+        } else {
+            rpm += (target - rpm) * ArcforgeConfig.GAS_TURBINE_SPIN_DOWN.getAsDouble();
+        }
         if (rpm < 0.5 && target == 0) {
             rpm = 0;
         }

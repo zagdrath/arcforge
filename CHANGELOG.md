@@ -20,6 +20,27 @@ number and date.
 
 ## [Unreleased]
 
+### Changed
+
+- **Textures:** plates are shaded softer (no bright centre); the Arcite-Tungsten Composite is a tungsten plate with
+  arcite fibres; the Plate, Gear and Rod Dies engrave the new plate, gear and rod shapes; Digestate, the Sickles and
+  the Steel Scythe use Cody's own textures.
+- **Greenhouse Array FE:** the gauge's tooltip and the Handbook say that only the Grow Lamps use FE, so by day under the
+  sky it grows without any.
+- **Gas Turbine Array spool-up.** The rotor now speeds up by at most full speed / `steam.gasTurbineArray.spoolTime`
+  a tick (200: about 10 seconds from standstill to full at full throttle, less with lubricant), so slamming the
+  throttle from 0 to 15 winds it up gradually; smaller throttle changes still follow quickly.
+- **Digester Casing** is now called **Biogas Digester Casing** (same block, same id).
+
+### Fixed
+
+- **Glass Cloche:** its corner bars now reach the planter floor, so there's no gap at the corners inside the tray.
+- **Planting Bed:** the rim's corners were missing, so the rim looked set back from the sides.
+- **Grow Lamp:** its housing and mount had no underside, so from below you saw into it.
+- **Jade named the block, not the machine, on the Biogas Digester and Greenhouse Array.** Their controllers never told
+  clients the structure's shape, so Jade couldn't find the machine a casing, bed, lamp or pane belongs to. They now
+  sync it when they form or break up, and Jade shows "Biogas Digester" / "Greenhouse Array" on any of their blocks.
+
 ## [2.2.0] - 2026-09-30
 
 ### Upgrading

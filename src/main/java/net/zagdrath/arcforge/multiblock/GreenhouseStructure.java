@@ -90,30 +90,36 @@ public final class GreenhouseStructure {
         }
     }
 
-    private static final Map<Level, Set<GreenhouseBlockEntity>> CONTROLLERS = new WeakHashMap<>();
+    // One registry per side: the server's for forming and GUIs, the client's so Jade can name the greenhouse any of its
+    // blocks belongs to. Each is only touched from its own thread (in single player the two share a JVM).
+    private static final Map<Level, Set<GreenhouseBlockEntity>> SERVER_CONTROLLERS = new WeakHashMap<>();
+    private static final Map<Level, Set<GreenhouseBlockEntity>> CLIENT_CONTROLLERS = new WeakHashMap<>();
 
     private GreenhouseStructure() {}
 
     // --- The registry of controllers ---
 
-    // Server side only: clients never know a greenhouse's shape (and the two threads mustn't share this map).
+    private static Map<Level, Set<GreenhouseBlockEntity>> registry(Level level) {
+        return level.isClientSide() ? CLIENT_CONTROLLERS : SERVER_CONTROLLERS;
+    }
+
     public static void register(GreenhouseBlockEntity controller) {
         Level level = controller.getLevel();
-        if (level != null && !level.isClientSide()) {
-            CONTROLLERS.computeIfAbsent(level, key -> Collections.newSetFromMap(new WeakHashMap<>())).add(controller);
+        if (level != null) {
+            registry(level).computeIfAbsent(level, key -> Collections.newSetFromMap(new WeakHashMap<>())).add(controller);
         }
     }
 
     public static void unregister(GreenhouseBlockEntity controller) {
         Level level = controller.getLevel();
-        Set<GreenhouseBlockEntity> set = level != null && !level.isClientSide() ? CONTROLLERS.get(level) : null;
+        Set<GreenhouseBlockEntity> set = level != null ? registry(level).get(level) : null;
         if (set != null) {
             set.remove(controller);
         }
     }
 
     private static List<GreenhouseBlockEntity> controllers(BlockGetter level) {
-        Set<GreenhouseBlockEntity> set = level instanceof Level key && !key.isClientSide() ? CONTROLLERS.get(key) : null;
+        Set<GreenhouseBlockEntity> set = level instanceof Level key ? registry(key).get(key) : null;
         if (set == null) {
             return List.of();
         }

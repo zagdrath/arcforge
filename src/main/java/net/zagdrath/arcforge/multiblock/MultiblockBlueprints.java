@@ -175,7 +175,7 @@ public final class MultiblockBlueprints {
         return new Blueprint("solar_thermal_array", placements, new BlockPos(2, SolarThermalStructure.HEIGHT, 2));
     }
 
-    // A solid 3x3x3 of Digester Casings with the controller in the middle of the front (facing south).
+    // A solid 3x3x3 of Biogas Digester Casings with the controller in the middle of the front (facing south).
     private static Blueprint biogasDigester() {
         BlockState casing = ModBlocks.DIGESTER_CASING.get().defaultBlockState();
         BlockState controller = ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get().defaultBlockState()

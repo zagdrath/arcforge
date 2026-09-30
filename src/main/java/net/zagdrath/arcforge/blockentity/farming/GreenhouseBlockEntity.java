@@ -16,7 +16,12 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.entity.player.Inventory;
@@ -289,6 +294,8 @@ public class GreenhouseBlockEntity extends MachineBlockEntity implements Multibl
         }
         running = false;
         setChanged();
+        // Clients learn the shape too, so Jade can name the machine from any of its blocks.
+        level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
     }
 
     // The beds in the floor and the lamps under the roof, and which beds each lamp reaches.
@@ -836,6 +843,17 @@ public class GreenhouseBlockEntity extends MachineBlockEntity implements Multibl
         output.putBoolean("lamps_on", lampsOn);
         output.putBoolean("running", running);
         portDefaults.save(output);
+    }
+
+    // Clients get the saved state when the chunk loads and whenever the structure forms or breaks up.
+    @Override
+    public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+        return saveCustomOnly(registries);
+    }
+
+    @Override
+    public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
+        return ClientboundBlockEntityDataPacket.create(this);
     }
 
     @Override

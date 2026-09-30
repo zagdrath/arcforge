@@ -129,6 +129,8 @@ public class GreenhouseScreen extends MachineScreen<GreenhouseMenu> {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.get(GreenhouseMenu.DATA_ENERGY)),
                     ArcforgeGui.grouped(menu.get(GreenhouseMenu.DATA_ENERGY_CAPACITY))).withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.arcforge.fe_per_tick_loss", menu.get(GreenhouseMenu.DATA_ENERGY_USAGE)).withStyle(ChatFormatting.RED));
+            // FE only runs the Grow Lamps: by day under the sky it stays full.
+            lines.add(Component.translatable("gui.arcforge.greenhouse.energy_hint").withStyle(ChatFormatting.DARK_GRAY));
         } else if (isHovering(WATER_X - 1, GAUGE_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, Fluids.WATER, Fluids.WATER.getFluidType().getDescription(), menu.get(GreenhouseMenu.DATA_WATER),
                     menu.get(GreenhouseMenu.DATA_WATER_CAPACITY));

@@ -16,7 +16,7 @@ import net.zagdrath.arcforge.multiblock.BiogasDigesterStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 
-// A block of the Biogas Digester's tank (see BiogasDigesterStructure): a Digester Casing or the controller. FORMED is set
+// A block of the Biogas Digester's tank (see BiogasDigesterStructure): a Biogas Digester Casing or the controller. FORMED is set
 // on every block of a formed tank, which then draws as one connected surface (see ConnectedModel, "digester").
 public interface DigesterPart extends MultiblockPart {
     BooleanProperty FORMED = BooleanProperty.create("formed");

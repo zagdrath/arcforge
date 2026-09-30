@@ -415,6 +415,11 @@ public class ArcforgeConfig {
             .comment("Share of the gap to its target speed the rotor closes each tick while speeding up.")
             .defineInRange("spinUp", 0.10, 0.001, 1.0);
 
+    public static final ModConfigSpec.IntValue GAS_TURBINE_SPOOL_TIME = BUILDER
+            .comment("Fewest ticks the rotor takes from standstill to full speed: however far the throttle jumps, it speeds up",
+                    "by at most full speed / spoolTime each tick (Heavy Oil or Seed Oil lubricant shortens it like spinUp).")
+            .defineInRange("spoolTime", 200, 1, 12_000);
+
     public static final ModConfigSpec.DoubleValue GAS_TURBINE_SPIN_DOWN = BUILDER
             .comment("Share of the gap to its target speed the rotor closes each tick while slowing down.")
             .defineInRange("spinDown", 0.04, 0.001, 1.0);

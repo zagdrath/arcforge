@@ -18,7 +18,7 @@
     },
     {
       "type": "text",
-      "text": "# Planting\nRight-click a bed with a soil (dirt, Loam, sand, soul sand), then a seed. Sneak-right-click with an empty hand to take them back. Beds grow what the Glass Cloche grows (not saplings, flowers or Hops), and any ordinary crop from another mod in dirt or Loam. Loam makes a bed 1.25x as fast.\n# Ports\n- Input: fertilizer, water, Nutrient Solution and Carbon Dioxide (one face takes them all).\n- Output: the harvest (turn on auto-eject).\n- Energy: FE for the lamps. Heat: HU to keep it warm."
+      "text": "# Planting\nRight-click a bed with a soil (dirt, Loam, sand, soul sand), then a seed. Sneak-right-click with an empty hand to take them back. Beds grow what the Glass Cloche grows (not saplings, flowers or Hops), and any ordinary crop from another mod in dirt or Loam. Loam makes a bed 1.25x as fast.\n# Ports\n- Input: fertilizer, water, Nutrient Solution and Carbon Dioxide (one face takes them all).\n- Output: the harvest (turn on auto-eject).\n- Energy: FE for the Grow Lamps only. By day under the sky it needs none, and the gauge stays full.\n- Heat: HU to keep it warm."
     },
     {
       "type": "text",

@@ -25,7 +25,7 @@ import net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.DigesterPart;
 import net.zagdrath.arcforge.blockentity.multiblock.BiogasDigesterBlockEntity;
 
-// The Biogas Digester: a solid 3x3x3 tank of Digester Casings with exactly one Biogas Digester Controller, in the middle
+// The Biogas Digester: a solid 3x3x3 tank of Biogas Digester Casings with exactly one Biogas Digester Controller, in the middle
 // of one of its four sides (the middle block of the middle layer), facing out. The controller's block entity runs it
 // and decides whether it is formed; the other parts find the controller by searching around themselves.
 public final class BiogasDigesterStructure {

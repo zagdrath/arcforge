@@ -166,7 +166,7 @@ final class AlloyGameTests {
         // the crops' three (String from Flax Fibre, Linen and the Trellis), the rustic farming eight (Planter,
         // Harvester, Fertilizer Spreader, Copper Sprinkler, Scarecrow, two Sickles and the Scythe), and the farm
         // processing five (Millstone, Mill, Oil Press, Seed Extractor and Grain Dryer), and farm chemistry's four (Air
-        // Separator, Haber Reactor, Digester Casing and Biogas Digester Controller), and the automated farms' three
+        // Separator, Haber Reactor, Biogas Digester Casing and Biogas Digester Controller), and the automated farms' three
         // (Glass Cloche, Grow Chamber and Hydroponic Cell), and the Greenhouse Array's four (Greenhouse Frame and
         // Controller, Planting Bed and Grow Lamp).
         helper.assertTrue(crafting == 211, crafting + " crafting/ recipes, not 211");

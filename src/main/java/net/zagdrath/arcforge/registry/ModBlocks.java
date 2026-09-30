@@ -627,7 +627,7 @@ public final class ModBlocks {
             GrainDryerBlock::new, p -> machineProperties(p, 7));
 
     // Farm chemistry. The Air Separator runs on FE; the Haber Reactor on FE and heat (its catalyst bed glows while it
-    // runs). The Biogas Digester is a 3x3x3 of Digester Casings with one controller (see BiogasDigesterStructure).
+    // runs). The Biogas Digester is a 3x3x3 of Biogas Digester Casings with one controller (see BiogasDigesterStructure).
     public static final DeferredBlock<AirSeparatorBlock> AIR_SEPARATOR = BLOCKS.registerBlock("air_separator",
             AirSeparatorBlock::new, p -> machineProperties(p, 0));
     public static final DeferredBlock<HaberReactorBlock> HABER_REACTOR = BLOCKS.registerBlock("haber_reactor",

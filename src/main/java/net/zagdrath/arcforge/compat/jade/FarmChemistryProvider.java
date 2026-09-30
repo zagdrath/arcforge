@@ -64,7 +64,7 @@ public enum FarmChemistryProvider implements StreamServerDataProvider<BlockAcces
             }
             case BiogasDigesterBlockEntity digester -> addDigester(lines, digester);
             case null, default -> {
-                // A Digester Casing has no block entity: read its tank's controller.
+                // A Biogas Digester Casing has no block entity: read its tank's controller.
                 BiogasDigesterBlockEntity digester = BiogasDigesterStructure.findController(accessor.getLevel(), accessor.getPosition());
                 if (digester == null) {
                     return null;

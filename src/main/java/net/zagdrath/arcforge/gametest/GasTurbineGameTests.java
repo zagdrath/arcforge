@@ -19,6 +19,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -103,7 +104,7 @@ public final class GasTurbineGameTests {
                         fill(turbine, ModFluids.NAPHTHA.get(), 20_000);
                     }
                 })
-                .thenIdle(180)
+                .thenIdle(320)
                 .thenExecute(() -> fuelBefore[0] = turbine(helper, full).getFuel().getAmount())
                 .thenIdle(1)
                 .thenExecute(() -> {
@@ -202,7 +203,7 @@ public final class GasTurbineGameTests {
                     fill(turbine, ModFluids.NAPHTHA.get(), 20_000);
                     setFull.run();
                 })
-                .thenIdle(180)
+                .thenIdle(320)
                 .thenExecute(() -> {
                     GasTurbineArrayBlockEntity turbine = turbine(helper, min);
                     helper.assertTrue(turbine.getFePerTick() == 4_200, "A lever at 15 makes " + turbine.getFePerTick() + " FE/t");
@@ -304,9 +305,18 @@ public final class GasTurbineGameTests {
                 .thenWaitUntil(() -> helper.assertTrue(turbine(helper, min).getPhase() == GasTurbineArrayBlockEntity.Phase.RUNNING, "Not running"))
                 .thenIdle(32)
                 .thenExecute(() -> {
+                    // Full throttle from standstill: the rotor winds up at most full speed / spoolTime a tick.
                     GasTurbineArrayBlockEntity turbine = turbine(helper, min);
                     double share = turbine.getRpm() / GasTurbineArrayBlockEntity.maxRpm();
-                    helper.assertTrue(share >= 0.95, "The rotor is at " + Math.round(share * 100) + "% after 32 ticks");
+                    double most = 34.0 / ArcforgeConfig.GAS_TURBINE_SPOOL_TIME.getAsInt();
+                    helper.assertTrue(share > 0.05 && share <= most, "The rotor is at " + Math.round(share * 100) + "% after 32 ticks");
+                    helper.assertTrue(turbine.getStatus() == MachineStatus.SPOOLING, "Winding up, it's " + turbine.getStatus());
+                })
+                .thenIdle(ArcforgeConfig.GAS_TURBINE_SPOOL_TIME.getAsInt() + 40)
+                .thenExecute(() -> {
+                    GasTurbineArrayBlockEntity turbine = turbine(helper, min);
+                    double share = turbine.getRpm() / GasTurbineArrayBlockEntity.maxRpm();
+                    helper.assertTrue(share >= 0.95, "The rotor is at " + Math.round(share * 100) + "% after spooling");
                     turbine.getFuel().set(0, FluidResource.EMPTY, 0);
                 })
                 .thenIdle(80)

@@ -9,7 +9,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "A warm tank that digests plant matter in water into Biogas, and sometimes Digestate.\n# Building\nA solid 3x3x3 of Digester Casings with one Biogas Digester Controller in the middle of a side, facing out. A new digester starts without ports: set them with the Wrench in Port mode.\n- Input: plant matter and water in.\n- Gas Output: Biogas out, every tick.\n- By-product: Digestate out (with auto-eject).\n- Heat: heat in.\nIt must be at 35°C or hotter to work, and uses 2 HU/t while it digests. A little heat from a Firebox, a Geothermal Plant or a warm Heat Cell is plenty; it holds heat up to 80°C."
+      "text": "A warm tank that digests plant matter in water into Biogas, and sometimes Digestate.\n# Building\nA solid 3x3x3 of Biogas Digester Casings with one Biogas Digester Controller in the middle of a side, facing out. A new digester starts without ports: set them with the Wrench in Port mode.\n- Input: plant matter and water in.\n- Gas Output: Biogas out, every tick.\n- By-product: Digestate out (with auto-eject).\n- Heat: heat in.\nIt must be at 35°C or hotter to work, and uses 2 HU/t while it digests. A little heat from a Firebox, a Geothermal Plant or a warm Heat Cell is plenty; it holds heat up to 80°C."
     },
     {
       "type": "text",
