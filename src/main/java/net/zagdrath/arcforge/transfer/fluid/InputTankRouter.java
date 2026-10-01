@@ -9,25 +9,30 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 
-// Two input tanks that sort what comes in: a fluid goes into the tank that already holds it, otherwise into an
-// empty tank, but never into an empty one while the other holds it. So two fluids (water and acid) each keep a
-// tank of their own, one fluid is never split across both, and a third is refused while both are in use.
-// Taking out works from either tank, A first.
+// Input tanks (two or more) that sort what comes in: a fluid goes into the tank that already holds it, otherwise
+// into an empty tank, but never into an empty one while another holds it. So each fluid (water, acid, lye) keeps a
+// tank of its own, one fluid is never split across two, and one more than there are tanks is refused while all are
+// in use. Taking out works from any tank, A first.
 public class InputTankRouter implements ResourceHandler<FluidResource> {
     private final FilteredFluidTank[] tanks;
 
-    public InputTankRouter(FilteredFluidTank tankA, FilteredFluidTank tankB) {
-        this.tanks = new FilteredFluidTank[] { tankA, tankB };
+    public InputTankRouter(FilteredFluidTank... tanks) {
+        this.tanks = tanks.clone();
     }
 
-    // Whether this fluid may go into that tank now.
+    // Whether this fluid may go into that tank now: it's the tank's own fluid, or the tank is empty and no other
+    // tank holds it.
     private boolean accepts(int index, FluidResource resource) {
         FilteredFluidTank tank = tanks[index];
-        FilteredFluidTank other = tanks[1 - index];
         if (tank.getAmount() > 0) {
             return tank.getResource(0).equals(resource);
         }
-        return other.getAmount() == 0 || !other.getResource(0).equals(resource);
+        for (int other = 0; other < tanks.length; other++) {
+            if (other != index && tanks[other].getAmount() > 0 && tanks[other].getResource(0).equals(resource)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     @Override

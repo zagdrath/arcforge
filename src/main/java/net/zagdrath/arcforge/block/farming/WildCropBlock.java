@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-// Wild Flax, Rapeseed, Sorghum and Hops: a clump of the plant growing on grass and dirt (#minecraft:supports_vegetation),
+// Wild Flax, Rapeseed, Sorghum, Hops and Soybeans: a clump of the plant growing on grass and dirt (#minecraft:supports_vegetation),
 // placed by worldgen in the biomes that suit it (data/arcforge/tags/worldgen/biome/wild_crops/*.json, which take in modded
 // biomes through the c: tags, less the ones in wild_crops/*_excluded; applied by neoforge/biome_modifier/wild_*.json). Each
 // modifier names only its own crop's tags: NeoForge's and/not holder sets attach listeners to a named tag without locking,

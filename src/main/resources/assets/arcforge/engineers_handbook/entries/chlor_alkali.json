@@ -1,0 +1,22 @@
+{
+  "title": "Salt & Chlor-Alkali",
+  "icon": "arcforge:brine_bucket",
+  "items": [
+    "arcforge:salt",
+    "arcforge:rock_salt",
+    "arcforge:seawater_bucket",
+    "arcforge:brine_bucket",
+    "arcforge:lye_bucket",
+    "arcforge:hydrochloric_acid_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Salt and Brine are the start of a second acid and a cheaper biodiesel.\n# Salt and Brine\n- Mine Halite for Rock Salt; the Arc Crusher grinds each into 2 Salt (4 in the Arc Crushing Array).\n- Or pump Seawater from an ocean and boil it down in the Thermal Evaporator Array: 1,000 mB Seawater makes 250 mB Brine, and 250 mB Brine makes 1 Salt.\n- 1 Salt + 250 mB Water in the Chemical Reactor makes 250 mB Brine.\n# Electrolysis\n- The Electrolyzer splits 100 mB Brine into 50 mB Hydrogen, 50 mB Chlorine and 100 mB Lye (sodium hydroxide solution), for 60,000 FE.\n- Hydrogen leaves by its own face, Chlorine by the second gas face (where Oxygen goes from water), and Lye, a liquid, by an Output face: the bottom by default."
+    },
+    {
+      "type": "text",
+      "text": "# Hydrochloric Acid\n- 50 mB Chlorine + 50 mB Hydrogen in the Chemical Reactor makes 100 mB Hydrochloric Acid.\n- Every leaching recipe takes it instead of Sulfuric Acid, in the same amounts: no sulfur needed.\n# Lye biodiesel\n- 100 mB Seed Oil + 25 mB Ethanol + 10 mB Lye makes 150 mB Biodiesel, half as much again as without Lye. The reactor's third input tank holds the Lye.\nChlorine is a gas (Pressurized Conduits, Cylinders, Gas Cartridges). Lye and Hydrochloric Acid burn anything that wades into them."
+    }
+  ]
+}

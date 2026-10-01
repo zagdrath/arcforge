@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:farming/new_crop",
+  "display": {
+    "icon": {
+      "id": "arcforge:soybeans"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.soybeans.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.soybeans.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "soybeans": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:soybeans"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "soybeans"
+    ]
+  ]
+}

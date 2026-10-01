@@ -25,6 +25,7 @@ import net.zagdrath.arcforge.blockentity.farming.FarmMachineBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.farming.CropRotation;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
@@ -32,7 +33,8 @@ import snownee.jade.api.StreamServerDataProvider;
 import snownee.jade.api.config.IPluginConfig;
 
 // Farming blocks in Jade, read from their block states (no server data needed): Loam Farmland's nutrients and whether
-// it's moist ("Nutrients: 7 / 15", "Moist"), a Compost Bin's fill ("Compost: 3 / 7", or "Compost ready") and a
+// it's moist ("Nutrients: 7 / 15", "Moist") and whether a legume was its last crop (crop rotation), a crop's rotation
+// bonus or that it's a legume feeding the soil, a Compost Bin's fill ("Compost: 3 / 7", or "Compost ready") and a
 // Trellis's hop vine. The rustic machines send a little server data: how a Planter or Harvester is triggered ("Runs on
 // each redstone pulse", "Next run in 3 s"), a Fertilizer Spreader's stock and a Copper Sprinkler's water; their items
 // and water also show through Jade's own storage views. A Scarecrow shows its range.
@@ -56,6 +58,37 @@ public final class FarmingProviders {
                 tooltip.add(Component.translatable("jade.arcforge.loam_farmland.enriched"));
             }
             tooltip.add(Component.translatable(state.getValue(FarmlandBlock.MOISTURE) > 0 ? "jade.arcforge.loam_farmland.moist" : "jade.arcforge.loam_farmland.dry"));
+            if (state.getValue(LoamFarmlandBlock.AFTER_LEGUME)) {
+                tooltip.add(Component.translatable("jade.arcforge.loam_farmland.after_legume",
+                        String.format(java.util.Locale.ROOT, "%.2f", ArcforgeConfig.LOAM_ROTATION_MULTIPLIER.getAsDouble())).withStyle(ChatFormatting.GREEN));
+            }
+        }
+
+        @Override
+        public Identifier getUid() {
+            return UID;
+        }
+    }
+
+    // A crop on Loam Farmland: a legume says it feeds the soil; a non-legume after one shows its crop rotation bonus.
+    public enum Rotation implements IBlockComponentProvider {
+        INSTANCE;
+
+        public static final Identifier UID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "crop_rotation");
+
+        @Override
+        public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+            BlockState soil = accessor.getLevel().getBlockState(accessor.getPosition().below());
+            if (!(soil.getBlock() instanceof LoamFarmlandBlock)) {
+                return;
+            }
+            if (CropRotation.isLegume(accessor.getBlockState())) {
+                tooltip.add(Component.translatable("jade.arcforge.crop.legume", ArcforgeConfig.LOAM_LEGUME_NUTRIENTS_PER_STAGE.getAsInt())
+                        .withStyle(ChatFormatting.GREEN));
+            } else if (soil.getValue(LoamFarmlandBlock.AFTER_LEGUME)) {
+                tooltip.add(Component.translatable("jade.arcforge.crop.rotation",
+                        String.format(java.util.Locale.ROOT, "%.2f", ArcforgeConfig.LOAM_ROTATION_MULTIPLIER.getAsDouble())).withStyle(ChatFormatting.GREEN));
+            }
         }
 
         @Override

@@ -107,7 +107,9 @@ public enum MachineStatus {
     // The Greenhouse Array (TOO_COLD for cold air too).
     NO_CROPS("no_crops", "led_idle"),
     NO_LIGHT("no_light", "led_idle"),
-    TOO_HOT("too_hot", "led_blocked");
+    TOO_HOT("too_hot", "led_blocked"),
+    // The Thermal Evaporator Array (TOO_COLD below 100°C, NO_FLUID when its input is empty).
+    EVAPORATING("evaporating", "led_running");
 
     private final String name;
     private final String led;

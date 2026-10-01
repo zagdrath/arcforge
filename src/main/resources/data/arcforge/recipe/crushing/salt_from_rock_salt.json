@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:raw_materials/rock_salt",
+  "result": {
+    "count": 2,
+    "id": "arcforge:salt"
+  },
+  "time": 200,
+  "ore": true
+}

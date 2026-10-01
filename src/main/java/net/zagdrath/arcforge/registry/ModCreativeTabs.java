@@ -44,6 +44,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.FERMENTER.get());
                 output.accept(ModItems.CHEMICAL_REACTOR.get());
                 output.accept(ModItems.ELECTROLYZER.get());
+                output.accept(ModItems.THERMAL_EVAPORATOR_CONTROLLER.get());
+                output.accept(ModItems.THERMAL_EVAPORATOR_CASING.get());
                 output.accept(ModItems.ASSEMBLER.get());
                 output.accept(ModItems.BLOCK_BREAKER.get());
                 output.accept(ModItems.BLOCK_PLACER.get());
@@ -96,6 +98,12 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.CARBON_DUST.get());
                 output.accept(ModItems.NETHER_QUARTZ_DUST.get());
                 output.accept(ModItems.SULFUR_DUST.get());
+                output.accept(ModItems.HALITE_ORE.get());
+                output.accept(ModItems.DEEPSLATE_HALITE_ORE.get());
+                output.accept(ModItems.ROCK_SALT.get());
+                output.accept(ModItems.RAW_ROCK_SALT_BLOCK.get());
+                output.accept(ModItems.SALT.get());
+                output.accept(ModItems.SALT_BLOCK.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> COMPONENTS = CREATIVE_MODE_TABS.register("components", () -> CreativeModeTab.builder()
@@ -211,10 +219,12 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.SORGHUM_STALKS.get());
                 output.accept(ModItems.HOP_SEEDS.get());
                 output.accept(ModItems.HOP_CONES.get());
+                output.accept(ModItems.SOYBEANS.get());
                 output.accept(ModItems.WILD_FLAX.get());
                 output.accept(ModItems.WILD_RAPESEED.get());
                 output.accept(ModItems.WILD_SORGHUM.get());
                 output.accept(ModItems.WILD_HOPS.get());
+                output.accept(ModItems.WILD_SOYBEANS.get());
                 output.accept(ModItems.PLANTER.get());
                 output.accept(ModItems.HARVESTER.get());
                 output.accept(ModItems.FERTILIZER_SPREADER.get());

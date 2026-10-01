@@ -667,6 +667,11 @@ public class ArcforgeConfig {
             .comment("Leave water in place when it is an infinite source (2+ water sources beside it), like a bucket would refill.")
             .define("pumpInfiniteWater", true);
 
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> PUMP_SEAWATER_BIOME_TAGS = BUILDER
+            .comment("Biome tags where water pumps up as Seawater (ocean and beach biomes).")
+            .defineListAllowEmpty("seawaterBiomeTags", List.of("minecraft:is_ocean", "minecraft:is_beach"), () -> "minecraft:is_ocean",
+                    value -> value instanceof String);
+
     static {
         BUILDER.pop();
     }
@@ -814,8 +819,12 @@ public class ArcforgeConfig {
             .comment("Hydrogen and Oxygen tank sizes in mB (each).")
             .defineInRange("gasTankCapacity", 16_000, 1_000, 1_000_000);
 
+    public static final ModConfigSpec.IntValue ELECTROLYZER_LIQUID_CAPACITY = BUILDER
+            .comment("Liquid output tank size in mB: a recipe's third product (Lye, from Brine).")
+            .defineInRange("liquidTankCapacity", 8_000, 1_000, 1_000_000);
+
     public static final ModConfigSpec.IntValue ELECTROLYZER_GAS_OUTPUT_RATE = BUILDER
-            .comment("Most mB/t of each gas it pushes out of its Hydrogen and Oxygen faces.")
+            .comment("Most mB/t of each product it pushes out of its Hydrogen, Oxygen and Output faces.")
             .defineInRange("gasOutputRate", 1_000, 1, 100_000);
 
     public static final ModConfigSpec.DoubleValue ELECTROLYZER_BALANCE_SAFETY_FACTOR = BUILDER
@@ -1233,6 +1242,53 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Thermal Evaporator Array: a fixed 3x3x9 tower that boils fluids down with heat (Seawater into Brine, Brine",
+                "into Salt), returning most of the steam as Water. Recipes are data-driven (arcforge:evaporating) and set the heat per",
+                "operation; how fast it works is set here.").push("thermalEvaporator");
+    }
+
+    public static final ModConfigSpec.IntValue EVAPORATOR_THROUGHPUT = BUILDER
+            .comment("mB of input evaporated per tick at fullSpeedTemperature or hotter.")
+            .defineInRange("throughput", 25, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue EVAPORATOR_MIN_TEMPERATURE = BUILDER
+            .comment("It works only at this temperature (°C) or hotter.")
+            .defineInRange("minTemperature", 100, 20, 10_000);
+
+    public static final ModConfigSpec.IntValue EVAPORATOR_FULL_SPEED_TEMPERATURE = BUILDER
+            .comment("At this temperature (°C) or hotter it runs at its full throughput.")
+            .defineInRange("fullSpeedTemperature", 400, 21, 10_000);
+
+    public static final ModConfigSpec.DoubleValue EVAPORATOR_MIN_SPEED = BUILDER
+            .comment("Share of its throughput at minTemperature; it rises in a straight line to 1 at fullSpeedTemperature.")
+            .defineInRange("minSpeed", 0.2, 0.01, 1.0);
+
+    public static final ModConfigSpec.IntValue EVAPORATOR_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 200_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue EVAPORATOR_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C. Heat only flows in from something hotter.")
+            .defineInRange("maxTemperature", 1_000, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue EVAPORATOR_INPUT_CAPACITY = BUILDER
+            .comment("Input tank (Seawater or Brine) size in mB.")
+            .defineInRange("inputCapacity", 32_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue EVAPORATOR_OUTPUT_CAPACITY = BUILDER
+            .comment("Brine (fluid result) tank size in mB.")
+            .defineInRange("outputCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue EVAPORATOR_WATER_CAPACITY = BUILDER
+            .comment("Returned Water tank size in mB. When it's full, the water that doesn't fit is lost as steam and evaporating",
+                    "carries on.")
+            .defineInRange("waterCapacity", 16_000, 1_000, 100_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.pop();
     }
 
@@ -1420,6 +1476,34 @@ public class ArcforgeConfig {
         ore("tungsten", "Tungsten (wolframite ore): uncommon and deep.", true, 6, 6, -64, -16, 0.0);
         ore("arcite", "Arcite: rare, the deepest; needs a diamond pickaxe.", false, 4, 5, -64, -40, 0.2);
         ore("sulfur", "Nether Sulfur Ore: common through the Nether's netherrack; drops Sulfur Dust.", true, 12, 10, 10, 117, 0.0);
+        ore("halite", "Halite: large flat beds of Rock Salt (veinsPerChunk: beds tried in 1 chunk in 4; veinSize: each small vein of a bed).",
+                true, 1, 12, -32, 40, 0.0);
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Halite beds: how the ore's flat beds are laid (see ores.halite for whether, how often and how deep).")
+                .push("haliteBeds");
+    }
+
+    public static final ModConfigSpec.IntValue HALITE_BED_RADIUS = BUILDER
+            .comment("Largest radius of a bed, in blocks (each bed is an oval between 60% and 100% of it each way).")
+            .defineInRange("radius", 11, 3, 14);
+
+    public static final ModConfigSpec.IntValue HALITE_BED_LAYERS = BUILDER
+            .comment("How many vein layers a bed is laid in (each about 2 blocks thick).")
+            .defineInRange("layers", 1, 1, 8);
+
+    public static final ModConfigSpec.IntValue HALITE_THICK_BED_LAYERS = BUILDER
+            .comment("Layers under thickBiomeTags (deserts and oceans, where the old seas dried).")
+            .defineInRange("thickLayers", 3, 1, 8);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> HALITE_THICK_BIOME_TAGS = BUILDER
+            .comment("Biome tags (at the bed's centre) whose beds use thickLayers.")
+            .defineListAllowEmpty("thickBiomeTags", List.of("c:is_desert", "minecraft:is_ocean", "minecraft:is_deep_ocean"), () -> "c:is_desert",
+                    value -> value instanceof String);
+
+    static {
         BUILDER.pop();
     }
 
@@ -1566,6 +1650,16 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue LOAM_NUTRIENTS_PER_STAGE = BUILDER
             .comment("Nutrients each growth stage of the crop on it uses.")
             .defineInRange("nutrientsPerStage", 1, 0, 15);
+
+    public static final ModConfigSpec.IntValue LOAM_LEGUME_NUTRIENTS_PER_STAGE = BUILDER
+            .comment("Nutrients each growth stage of a legume (#arcforge:legumes, e.g. Soybeans) adds to the Loam Farmland under it",
+                    "instead of using any (capped at 15). Legumes grow at the nutrient rate even on empty farmland.")
+            .defineInRange("legumeNutrientsPerStage", 1, 0, 15);
+
+    public static final ModConfigSpec.DoubleValue LOAM_ROTATION_MULTIPLIER = BUILDER
+            .comment("Crop rotation: how much faster a non-legume grows on Loam Farmland whose last harvested crop was a legume,",
+                    "until it is harvested (1.25 = a quarter again as fast; on top of the nutrient bonus).")
+            .defineInRange("rotationMultiplier", 1.25, 1.0, 2.0);
 
     static {
         BUILDER.pop();

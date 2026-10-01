@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/thermal_evaporator/casing"
+    },
+    "formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/casing_formed"
+    }
+  }
+}

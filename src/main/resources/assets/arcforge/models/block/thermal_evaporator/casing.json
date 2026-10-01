@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "arcforge:block/thermal_evaporator/casing",
+    "end": "arcforge:block/thermal_evaporator/casing_top"
+  }
+}

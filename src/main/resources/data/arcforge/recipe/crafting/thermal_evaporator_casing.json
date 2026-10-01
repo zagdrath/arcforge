@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "BFB",
+    "PBP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "B": "minecraft:bricks",
+    "F": "arcforge:firebox"
+  },
+  "result": {
+    "id": "arcforge:thermal_evaporator_casing",
+    "count": 8
+  }
+}

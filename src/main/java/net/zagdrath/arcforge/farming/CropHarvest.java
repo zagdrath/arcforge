@@ -27,6 +27,7 @@ import net.zagdrath.arcforge.registry.ModItems;
 // crops) is ripe at its max age. Its drops come from its loot table as if broken by hand; one seed is taken back out of
 // them and the crop is reset to age 0, so it replants itself. With no seed in the drops it's left as air.
 // A Trellis is ripe while bearing: its cones are picked and the vine is left full (TrellisBlock.pickCones).
+// Every harvest counts for crop rotation (CropRotation.onHarvested).
 public final class CropHarvest {
     private CropHarvest() {}
 
@@ -64,6 +65,7 @@ public final class CropHarvest {
             if (!cones.isEmpty()) {
                 sink.put(cones);
             }
+            CropRotation.onHarvested(level, pos, state, null);
             return true;
         }
         CropBlock crop = (CropBlock) state.getBlock();
@@ -76,6 +78,7 @@ public final class CropHarvest {
         level.setBlock(pos, replant ? crop.getStateForAge(0) : Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
         level.levelEvent(LevelEvent.PARTICLES_DESTROY_BLOCK, pos, Block.getId(state));
         drops.forEach(sink::put);
+        CropRotation.onHarvested(level, pos, state, null);
         return true;
     }
 

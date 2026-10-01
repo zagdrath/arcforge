@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:seed_oil",
+      "amount": 100
+    },
+    {
+      "fluid": "arcforge:ethanol",
+      "amount": 25
+    },
+    {
+      "fluid": "arcforge:lye",
+      "amount": 10
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:biodiesel",
+    "amount": 150
+  },
+  "time": 80
+}

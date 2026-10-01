@@ -148,6 +148,11 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<BiogasDigesterBlockEntity>> BIOGAS_DIGESTER = BLOCK_ENTITY_TYPES.register("biogas_digester",
             () -> new BlockEntityType<>(BiogasDigesterBlockEntity::new, ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get()));
 
+    // The Thermal Evaporator Array, on its controller; casings and panes are plain blocks that find it.
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity>> THERMAL_EVAPORATOR =
+            BLOCK_ENTITY_TYPES.register("thermal_evaporator", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity::new, ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get()));
+
     // Automated farms.
     public static final Supplier<BlockEntityType<GlassClocheBlockEntity>> GLASS_CLOCHE = BLOCK_ENTITY_TYPES.register("glass_cloche",
             () -> new BlockEntityType<>(GlassClocheBlockEntity::new, ModBlocks.GLASS_CLOCHE.get()));
@@ -280,6 +285,8 @@ public final class ModBlockEntityTypes {
         // Removed in 2.0: a saved Steam Boiler or Steam Turbine loads into the array casing it became.
         BLOCK_ENTITY_TYPES.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler_array"));
         BLOCK_ENTITY_TYPES.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine_array"));
+        // The Evaporation Pond's Outlet became the Thermal Evaporator Controller; its old contents are dropped on load.
+        BLOCK_ENTITY_TYPES.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "evaporation_pond"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator"));
         BLOCK_ENTITY_TYPES.register(modEventBus);
     }
 }

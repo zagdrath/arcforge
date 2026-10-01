@@ -22,10 +22,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-// Flax, Rapeseed and Sorghum: vanilla crops (ages 0-7, planted from their seeds) that grow on anything in
+// Flax, Rapeseed, Sorghum and Soybeans: vanilla crops (ages 0-7, planted from their seeds) that grow on anything in
 // #minecraft:supports_crops, so vanilla farmland and both Loam Farmlands, and use Loam Farmland's nutrients like any
 // crop (LoamGrowth). What a crop drops is in its loot table.
-// Flax, Rapeseed and Sorghum grow two blocks tall: from tallFromAge their model reaches into the block above, so they
+// Flax, Rapeseed and Sorghum grow two blocks tall (Soybeans never do: their tallFromAge is past the last age): from tallFromAge their model reaches into the block above, so they
 // only grow into that stage (by random tick or bone meal) while the space above is empty, and their outline follows.
 public class ArcforgeCropBlock extends CropBlock {
     private final Supplier<? extends ItemLike> seed;

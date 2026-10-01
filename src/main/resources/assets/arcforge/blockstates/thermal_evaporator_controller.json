@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "facing=north,formed=false,lit=false": {
+      "model": "arcforge:block/thermal_evaporator/controller"
+    },
+    "facing=north,formed=false,lit=true": {
+      "model": "arcforge:block/thermal_evaporator/controller"
+    },
+    "facing=north,formed=true,lit=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/controller_formed"
+    },
+    "facing=north,formed=true,lit=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/controller_formed_on"
+    },
+    "facing=east,formed=false,lit=false": {
+      "model": "arcforge:block/thermal_evaporator/controller",
+      "y": 90
+    },
+    "facing=east,formed=false,lit=true": {
+      "model": "arcforge:block/thermal_evaporator/controller",
+      "y": 90
+    },
+    "facing=east,formed=true,lit=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/controller_formed"
+    },
+    "facing=east,formed=true,lit=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/controller_formed_on"
+    },
+    "facing=south,formed=false,lit=false": {
+      "model": "arcforge:block/thermal_evaporator/controller",
+      "y": 180
+    },
+    "facing=south,formed=false,lit=true": {
+      "model": "arcforge:block/thermal_evaporator/controller",
+      "y": 180
+    },
+    "facing=south,formed=true,lit=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/controller_formed"
+    },
+    "facing=south,formed=true,lit=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/controller_formed_on"
+    },
+    "facing=west,formed=false,lit=false": {
+      "model": "arcforge:block/thermal_evaporator/controller",
+      "y": 270
+    },
+    "facing=west,formed=false,lit=true": {
+      "model": "arcforge:block/thermal_evaporator/controller",
+      "y": 270
+    },
+    "facing=west,formed=true,lit=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/controller_formed"
+    },
+    "facing=west,formed=true,lit=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/thermal_evaporator/controller_formed_on"
+    }
+  }
+}

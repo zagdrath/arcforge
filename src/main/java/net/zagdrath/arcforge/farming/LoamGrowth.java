@@ -24,40 +24,73 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 // (1.5 by default) for as long as the nutrients last. On soil enriched with NPK Fertilizer the multiplier is
 // npkGrowthMultiplier (2 by default: every stage brings one more; past 2, a chance of a third), and the enrichment goes
 // when the nutrients run out. Anything with an "age" property counts: wheat, carrots, potatoes,
-// beetroots, melon and pumpkin stems, and most modded crops.
+// beetroots, melon and pumpkin stems, and most modded crops. Legumes (Soybeans) put legumeNutrientsPerStage back instead
+// of using any, and grow at the nutrient rate whatever the soil holds; a non-legume after a legume also gets the crop
+// rotation bonus (CropRotation).
 public final class LoamGrowth {
     private LoamGrowth() {}
 
-    // Called after the plant at cropPos grew by itself. Returns how many stages were paid for (0 when its soil isn't
-    // Loam Farmland with nutrients).
+    // Called after the plant at cropPos grew by itself. Returns how many stages Loam Farmland counted (0 when its soil
+    // isn't Loam Farmland, or has no nutrients and no bonus to give).
     public static int onCropGrew(ServerLevel level, BlockPos cropPos, RandomSource random) {
         BlockPos soilPos = cropPos.below();
         BlockState soil = level.getBlockState(soilPos);
-        int nutrients = LoamFarmlandBlock.nutrients(soil);
-        if (nutrients <= 0) {
+        if (!(soil.getBlock() instanceof LoamFarmlandBlock)) {
             return 0;
         }
-        int perStage = ArcforgeConfig.LOAM_NUTRIENTS_PER_STAGE.getAsInt();
-        nutrients = Math.max(0, nutrients - perStage);
-        int stages = 1;
+        boolean legume = CropRotation.isLegume(level.getBlockState(cropPos));
+        int nutrients = LoamFarmlandBlock.nutrients(soil);
+        int stages = 0;
         boolean enriched = LoamFarmlandBlock.isEnriched(soil);
-        double bonus = (enriched ? ArcforgeConfig.LOAM_NPK_GROWTH_MULTIPLIER : ArcforgeConfig.LOAM_GROWTH_MULTIPLIER).getAsDouble() - 1.0;
-        // Each whole unit of bonus is a sure extra stage; what's left over is the chance of one more.
-        while (nutrients > 0 && bonus > 0 && (bonus >= 1.0 || random.nextDouble() < bonus)) {
-            bonus -= 1.0;
-            BlockState crop = level.getBlockState(cropPos);
-            boolean room = !(crop.getBlock() instanceof ArcforgeCropBlock tall) || tall.hasRoomToGrow(level, cropPos, crop);
-            BlockState grown = room ? nextStage(crop) : null;
-            if (grown == null) {
-                break;
+        if (legume) {
+            // A legume puts nutrients back with every stage instead of using them, so it always has the bonus.
+            int perStage = ArcforgeConfig.LOAM_LEGUME_NUTRIENTS_PER_STAGE.getAsInt();
+            nutrients = Math.min(LoamFarmlandBlock.MAX_NUTRIENTS, nutrients + perStage);
+            stages = 1;
+            double bonus = (enriched ? ArcforgeConfig.LOAM_NPK_GROWTH_MULTIPLIER : ArcforgeConfig.LOAM_GROWTH_MULTIPLIER).getAsDouble() - 1.0;
+            while (bonus > 0 && (bonus >= 1.0 || random.nextDouble() < bonus) && growOnce(level, cropPos)) {
+                bonus -= 1.0;
+                nutrients = Math.min(LoamFarmlandBlock.MAX_NUTRIENTS, nutrients + perStage);
+                stages++;
             }
-            level.setBlock(cropPos, grown, Block.UPDATE_CLIENTS);
+        } else if (nutrients > 0) {
+            int perStage = ArcforgeConfig.LOAM_NUTRIENTS_PER_STAGE.getAsInt();
             nutrients = Math.max(0, nutrients - perStage);
-            stages++;
+            stages = 1;
+            double bonus = (enriched ? ArcforgeConfig.LOAM_NPK_GROWTH_MULTIPLIER : ArcforgeConfig.LOAM_GROWTH_MULTIPLIER).getAsDouble() - 1.0;
+            // Each whole unit of bonus is a sure extra stage; what's left over is the chance of one more.
+            while (nutrients > 0 && bonus > 0 && (bonus >= 1.0 || random.nextDouble() < bonus) && growOnce(level, cropPos)) {
+                bonus -= 1.0;
+                nutrients = Math.max(0, nutrients - perStage);
+                stages++;
+            }
         }
-        level.setBlock(soilPos, soil.setValue(LoamFarmlandBlock.NUTRIENTS, nutrients).setValue(LoamFarmlandBlock.ENRICHED, enriched && nutrients > 0),
-                Block.UPDATE_CLIENTS);
+        // Crop rotation: a non-legume after a legume has a (rotationMultiplier - 1) chance of a stage more, nutrients or
+        // not, which uses none.
+        if (!legume && LoamFarmlandBlock.isAfterLegume(soil)) {
+            double rotation = ArcforgeConfig.LOAM_ROTATION_MULTIPLIER.getAsDouble() - 1.0;
+            while (rotation > 0 && (rotation >= 1.0 || random.nextDouble() < rotation) && growOnce(level, cropPos)) {
+                rotation -= 1.0;
+                stages++;
+            }
+        }
+        if (nutrients != soil.getValue(LoamFarmlandBlock.NUTRIENTS) || enriched && nutrients == 0) {
+            level.setBlock(soilPos, soil.setValue(LoamFarmlandBlock.NUTRIENTS, nutrients).setValue(LoamFarmlandBlock.ENRICHED, enriched && nutrients > 0),
+                    Block.UPDATE_CLIENTS);
+        }
         return stages;
+    }
+
+    // Grows the plant at cropPos one more stage, if it can (not ripe, and a tall crop has room). Returns whether it did.
+    private static boolean growOnce(ServerLevel level, BlockPos cropPos) {
+        BlockState crop = level.getBlockState(cropPos);
+        boolean room = !(crop.getBlock() instanceof ArcforgeCropBlock tall) || tall.hasRoomToGrow(level, cropPos, crop);
+        BlockState grown = room ? nextStage(crop) : null;
+        if (grown == null) {
+            return false;
+        }
+        level.setBlock(cropPos, grown, Block.UPDATE_CLIENTS);
+        return true;
     }
 
     // The plant one "age" stage on, or null if it has no age or is fully grown.

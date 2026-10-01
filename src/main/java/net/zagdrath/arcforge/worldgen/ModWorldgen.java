@@ -32,10 +32,14 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.machine.ClimateHelper;
 
 // Ore generation that follows the "ores" config (see ArcforgeConfig.ORES), for the ores' worldgen files:
 //   feature arcforge:config_ore             an ore vein ("targets", "size", "discard_chance_on_air_exposure" as
 //                                           minecraft:ore, plus "ore"), its size and air discard from the config
+//   feature arcforge:config_bed             a large flat bed of ore (Halite), the same fields: small veins laid on a
+//                                           3-block grid over an oval (haliteBeds.radius), in one or more layers
+//                                           (haliteBeds.layers, thickLayers under thickBiomeTags)
 //   placement arcforge:config_count         "ore", "default": veins per chunk from the config
 //   placement arcforge:config_height        "ore", "shape" (uniform or trapezoid), "default_min", "default_max":
 //                                           a height between the config's minY and maxY
@@ -50,6 +54,7 @@ public final class ModWorldgen {
 
     static {
         FEATURE_TYPES.register("config_ore", () -> ConfigOre.CODEC);
+        FEATURE_TYPES.register("config_bed", () -> ConfigBed.CODEC);
         PLACEMENT_TYPES.register("config_count", () -> ConfigCount.CODEC);
         PLACEMENT_TYPES.register("config_height", () -> ConfigHeight.CODEC);
         CONDITIONS.register("ore_enabled", () -> OreEnabled.CODEC);
@@ -91,6 +96,54 @@ public final class ModWorldgen {
             int veinSize = settings != null ? settings.veinSize().getAsInt() : size;
             float airDiscard = settings != null ? (float) settings.airExposureDiscard().getAsDouble() : discard;
             return new OreFeature(targets, veinSize, airDiscard).place(level, generator, random, origin);
+        }
+    }
+
+    // --- A flat bed ---
+
+    public record ConfigBed(String ore, List<BlockReplacement> targets, int size, float discard) implements Feature {
+        public static final MapCodec<ConfigBed> CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
+                Codec.STRING.fieldOf("ore").forGetter(ConfigBed::ore),
+                Codec.list(BlockReplacement.CODEC).fieldOf("targets").forGetter(ConfigBed::targets),
+                Codec.intRange(0, 64).fieldOf("size").forGetter(ConfigBed::size),
+                Codec.floatRange(0.0F, 1.0F).optionalFieldOf("discard_chance_on_air_exposure", 0.0F).forGetter(ConfigBed::discard))
+                .apply(i, ConfigBed::new));
+        // Veins a bed is laid from sit this far apart, and its layers this far apart in height.
+        private static final int SPACING = 3, LAYER_STEP = 2;
+
+        @Override
+        public MapCodec<ConfigBed> codec() {
+            return CODEC;
+        }
+
+        // An oval of small vanilla ore veins, 60% to 100% of the radius each way, on a grid with a block of jitter, in
+        // layers stacked LAYER_STEP apart: a bed a block or two thick per layer that follows no surface, like a dried-up
+        // sea. Thicker (more layers) where the bed's centre is under thickBiomeTags.
+        @Override
+        public boolean place(WorldGenLevel level, ChunkGenerator generator, RandomSource random, BlockPos origin) {
+            ArcforgeConfig.OreSettings settings = settings(ore);
+            int veinSize = settings != null ? settings.veinSize().getAsInt() : size;
+            float airDiscard = settings != null ? (float) settings.airExposureDiscard().getAsDouble() : discard;
+            boolean loaded = ArcforgeConfig.SPEC.isLoaded();
+            int radius = loaded ? ArcforgeConfig.HALITE_BED_RADIUS.getAsInt() : 11;
+            boolean thick = loaded && ClimateHelper.inAny(level.getBiome(origin), ArcforgeConfig.HALITE_THICK_BIOME_TAGS.get());
+            int layers = !loaded ? 1 : thick ? ArcforgeConfig.HALITE_THICK_BED_LAYERS.getAsInt() : ArcforgeConfig.HALITE_BED_LAYERS.getAsInt();
+            double rx = radius * (0.6 + 0.4 * random.nextDouble());
+            double rz = radius * (0.6 + 0.4 * random.nextDouble());
+            OreFeature vein = new OreFeature(targets, veinSize, airDiscard);
+            boolean placed = false;
+            for (int dx = -radius; dx <= radius; dx += SPACING) {
+                for (int dz = -radius; dz <= radius; dz += SPACING) {
+                    if ((dx * dx) / (rx * rx) + (dz * dz) / (rz * rz) > 1.0) {
+                        continue;
+                    }
+                    for (int layer = 0; layer < layers; layer++) {
+                        BlockPos at = origin.offset(dx + random.nextInt(3) - 1, layer * LAYER_STEP + random.nextInt(2), dz + random.nextInt(3) - 1);
+                        placed |= vein.place(level, generator, random, at);
+                    }
+                }
+            }
+            return placed;
         }
     }
 

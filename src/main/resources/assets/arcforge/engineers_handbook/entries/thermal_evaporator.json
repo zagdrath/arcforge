@@ -1,0 +1,30 @@
+{
+  "title": "Thermal Evaporator Array",
+  "icon": "arcforge:thermal_evaporator_controller",
+  "items": [
+    "arcforge:thermal_evaporator_controller",
+    "arcforge:thermal_evaporator_casing",
+    "arcforge:pressure_glass",
+    "arcforge:seawater_bucket",
+    "arcforge:brine_bucket",
+    "arcforge:salt"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A tall, hot tower that boils liquids down. Seawater becomes Brine, and Brine becomes Salt; most of the water boiled off condenses and comes back out.\n# Building\nA fixed 3x3x9 tower of Thermal Evaporator Casings:\n- Bottom: a solid 3x3, with the Thermal Evaporator Controller in the middle of one side, facing out.\n- Layers 2 to 8: a ring of 8 round a hollow 1x1 core (leave it empty). The middle block of any side may be Pressure Glass instead, so a window can run up the tower.\n- Top: a solid 3x3 cap.\nEach window reaches half a block into the casings round it, so a window column is two blocks wide (on the controller's side the base stays solid). Through the windows you can watch the liquid inside rise and fall, and the white salt bed while it makes Salt."
+    },
+    {
+      "type": "text",
+      "text": "# Heat\nIt runs on heat (HU) and only at 100°C or hotter. The hotter it is, the faster: 20% speed at 100°C, full speed (25 mB/t) at 400°C. It holds up to 1,000°C.\n| Input | Output | Water back | Heat |\n| 1,000 mB Seawater | 250 mB Brine | 675 mB | 6,000 HU |\n| 250 mB Brine | 1 Salt | 200 mB | 1,800 HU |\nAt full speed that's 150 HU/t on Seawater and 180 HU/t on Brine; with less heat it simply runs slower.\n# Ports\nA new tower has no ports: set them on any casing with the Wrench in Port mode.\n- Input: Seawater or Brine in.\n- Heat: heat in.\n- Brine: Brine out.\n- Salt: Salt out.\n- Water: condensed Water out."
+    },
+    {
+      "type": "text",
+      "text": "# Seawater\nAn Electric Pump on water in an ocean or beach biome pumps Seawater instead of Water. Pipe it straight into an Input port.\n# Brine and Salt\nOne tower can do both steps, one after the other: when its Seawater runs out, feed the Brine back in. Two towers side by side, one per step, keep running without you. Salt goes on to the Chemical Reactor and the Electrolyzer (see Salt & Chlor-Alkali)."
+    },
+    {
+      "type": "multiblock",
+      "structure": "thermal_evaporator"
+    }
+  ]
+}

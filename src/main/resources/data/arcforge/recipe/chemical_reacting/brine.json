@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#c:dusts/salt",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "minecraft:water",
+      "amount": 250
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:brine",
+    "amount": 250
+  },
+  "time": 60
+}

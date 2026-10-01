@@ -394,6 +394,20 @@ public final class ModCapabilities {
             var digester = net.zagdrath.arcforge.multiblock.BiogasDigesterStructure.findController(level, pos);
             return digester != null ? digester.heatHandlerAt(pos, side) : null;
         }, digesterParts);
+        // The Thermal Evaporator Array: Seawater or Brine in, heat in, Brine, Salt and Water out, through its ports.
+        Block[] evaporatorParts = { ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get(), ModBlocks.THERMAL_EVAPORATOR_CASING.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var evaporator = net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure.findController(level, pos);
+            return evaporator != null ? evaporator.itemHandlerAt(pos, side) : null;
+        }, evaporatorParts);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var evaporator = net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure.findController(level, pos);
+            return evaporator != null ? evaporator.fluidHandlerAt(pos, side) : null;
+        }, evaporatorParts);
+        event.registerBlock(HEAT, (level, pos, state, blockEntity, side) -> {
+            var evaporator = net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure.findController(level, pos);
+            return evaporator != null ? evaporator.heatHandlerAt(pos, side) : null;
+        }, evaporatorParts);
         // The Greenhouse Array: fertilizer and fluids in, the harvest out, FE and heat in, through the ports on its frames.
         Block[] greenhouseParts = { ModBlocks.GREENHOUSE_CONTROLLER.get(), ModBlocks.GREENHOUSE_FRAME.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {

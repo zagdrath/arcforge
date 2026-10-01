@@ -140,10 +140,12 @@ public final class MachineRecipes {
     }
 
     // The chemical reacting recipe for what the reactor holds, if any.
+    // When several match, the one that uses the most inputs wins: Seed Oil, Ethanol and Lye together make the Lye
+    // biodiesel, not the plain one that ignores the Lye.
     public static Optional<RecipeHolder<ChemicalReactingRecipe>> chemicalReacting(@Nullable Level level, ChemicalReactorInput input) {
         return recipes(level).byType(ModRecipes.CHEMICAL_REACTING.get()).stream()
                 .filter(holder -> holder.value().matches(input, level))
-                .findFirst();
+                .max(java.util.Comparator.comparingInt(holder -> holder.value().itemInputs().size() + holder.value().fluidInputs().size()));
     }
 
     // Anything some chemical reacting recipe takes as its item: what the reactor's input slot takes.
@@ -275,6 +277,20 @@ public final class MachineRecipes {
 
     public static boolean isDigesterInput(@Nullable Level level, ItemStack stack) {
         return digesting(level, stack).isPresent();
+    }
+
+    // --- Thermal Evaporator Array ---
+
+    // The evaporating recipe for what the tower holds, if any.
+    public static Optional<RecipeHolder<EvaporatingRecipe>> evaporating(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.EVAPORATING.get()).stream()
+                .filter(holder -> holder.value().input().test(fluid))
+                .findFirst();
+    }
+
+    // Fluids the tower takes: those some evaporating recipe boils down.
+    public static boolean isEvaporatingInput(@Nullable Level level, FluidResource fluid) {
+        return evaporating(level, fluid).isPresent();
     }
 
     // --- Automated farms ---

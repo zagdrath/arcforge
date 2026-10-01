@@ -41,6 +41,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.farming.CropRotation;
 import net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -281,8 +282,11 @@ public abstract class ClocheBlockEntity extends MachineBlockEntity implements Fl
             plantKey = current.key();
         }
         total = current.time();
+        // Legumes fix their own nitrogen: no fertilizer, and in the Hydroponic Cell no Nutrient Solution (water they
+        // still need), yet they grow at the fertilized rate (CropRotation).
+        boolean legume = CropRotation.isLegumeSeed(seed);
         if (!cycling) {
-            int needed = fluidPerHarvest();
+            int needed = legume && kind.hydroponic() ? 0 : fluidPerHarvest();
             if (tank.getAmount() < needed) {
                 return noFluidStatus();
             }
@@ -292,7 +296,7 @@ public abstract class ClocheBlockEntity extends MachineBlockEntity implements Fl
                     tx.commit();
                 }
             }
-            cycleBonus = takeFertilizer();
+            cycleBonus = legume ? (float) ArcforgeConfig.CLOCHE_FERTILIZER_BONUS.getAsDouble() : takeFertilizer();
             cycling = true;
             setChanged();
         }

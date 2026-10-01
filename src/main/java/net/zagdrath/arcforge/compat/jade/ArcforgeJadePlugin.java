@@ -105,6 +105,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock.class);
         registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, PressureGlassBlock.class);
         // Automated farms: what's growing, how fast, the fertilizer left.
+        registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity.class);
+        registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);
+        registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, PressureGlassBlock.class);
+        registration.registerBlockDataProvider(HeatProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GlassClocheBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GrowChamberBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.HydroponicCellBlockEntity.class);
@@ -150,6 +154,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, PressureGlassBlock.class);
         // Farming: read from the block state on the client.
         registration.registerBlockComponent(FarmingProviders.LoamFarmland.INSTANCE, net.zagdrath.arcforge.block.farming.LoamFarmlandBlock.class);
+        registration.registerBlockComponent(FarmingProviders.Rotation.INSTANCE, net.minecraft.world.level.block.CropBlock.class);
+        registration.registerBlockComponent(FarmingProviders.Rotation.INSTANCE, net.zagdrath.arcforge.block.farming.TrellisBlock.class);
         registration.registerBlockComponent(FarmingProviders.CompostBin.INSTANCE, net.zagdrath.arcforge.block.farming.CompostBinBlock.class);
         registration.registerBlockComponent(FarmingProviders.Trellis.INSTANCE, net.zagdrath.arcforge.block.farming.TrellisBlock.class);
         registration.registerBlockComponent(FarmingProviders.Scarecrow.INSTANCE, net.zagdrath.arcforge.block.farming.ScarecrowBlock.class);
@@ -173,6 +179,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(ClocheProvider.Client.INSTANCE, net.zagdrath.arcforge.block.farming.ClocheBlock.class);
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class, PressureGlassBlock.class)) {
+            registration.registerBlockComponent(ThermalEvaporatorProvider.Client.INSTANCE, type);
+        }
         for (Class<? extends Block> type : List.of(
                 net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseControllerBlock.class,
                 net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseFrameBlock.class,

@@ -19,6 +19,7 @@ import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
+import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import snownee.jade.api.BlockAccessor;
@@ -54,6 +55,10 @@ public enum MultiblockNameProvider implements IBlockComponentProvider {
             if (controller == null) {
                 // A pane in a Greenhouse Array's wall or roof.
                 controller = GreenhouseStructure.findController(level, pos);
+            }
+            if (controller == null) {
+                // A window up a Thermal Evaporator Array.
+                controller = ThermalEvaporatorStructure.findController(level, pos);
             }
         }
         return controller != null && controller.isFormed() && controller instanceof MenuProvider menu ? menu.getDisplayName() : null;

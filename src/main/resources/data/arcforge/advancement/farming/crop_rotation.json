@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/soybeans",
+  "display": {
+    "icon": {
+      "id": "minecraft:wheat"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.crop_rotation.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.crop_rotation.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "rotated": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "crop_rotation"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "rotated"
+    ]
+  ]
+}

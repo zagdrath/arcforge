@@ -46,5 +46,9 @@ public final class ModItemTags {
     // What the Fermenter's additive slot takes (Dried Hops): each one raises the Ethanol of a few operations.
     public static final TagKey<Item> FERMENTER_ADDITIVES = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "fermenter_additives"));
 
+    // Legumes (Soybeans): they put nutrients back into Loam Farmland, set up crop rotation, and need no fertilizer or
+    // Nutrient Solution in the automated farms (CropRotation). The seeds; ModBlockTags.LEGUMES holds the crops.
+    public static final TagKey<Item> LEGUMES = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "legumes"));
+
     private ModItemTags() {}
 }

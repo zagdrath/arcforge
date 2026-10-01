@@ -163,6 +163,37 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BIODIESEL = FLUIDS.register("flowing_biodiesel",
             () -> new BaseFlowingFluid.Flowing(biodieselProperties()));
 
+    // Salt and chlor-alkali chemistry. Brine (Salt in water, from the Chemical Reactor) runs like water; the Electrolyzer
+    // splits it into Hydrogen, Chlorine (a gas) and Lye (Sodium Hydroxide solution, caustic). Hydrochloric Acid (Chlorine
+    // and Hydrogen) leaches ores like Sulfuric Acid, and burns like it.
+    // Seawater: what an Electric Pump draws from water in ocean and beach biomes. It runs like water; the Thermal
+    // Evaporator Array boils it down into Brine.
+    public static final DeferredHolder<FluidType, FluidType> SEAWATER_TYPE = liquidType("seawater", 1_025, 1_050, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SEAWATER = FLUIDS.register("seawater",
+            () -> new BaseFlowingFluid.Source(seawaterProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SEAWATER = FLUIDS.register("flowing_seawater",
+            () -> new BaseFlowingFluid.Flowing(seawaterProperties()));
+    public static final DeferredHolder<FluidType, FluidType> BRINE_TYPE = liquidType("brine", 1_200, 1_100, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> BRINE = FLUIDS.register("brine",
+            () -> new BaseFlowingFluid.Source(brineProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BRINE = FLUIDS.register("flowing_brine",
+            () -> new BaseFlowingFluid.Flowing(brineProperties()));
+    public static final DeferredHolder<FluidType, FluidType> LYE_TYPE = liquidType("lye", 1_300, 1_500, 0.02F, 0.75, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LYE = FLUIDS.register("lye",
+            () -> new BaseFlowingFluid.Source(lyeProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LYE = FLUIDS.register("flowing_lye",
+            () -> new BaseFlowingFluid.Flowing(lyeProperties()));
+    public static final DeferredHolder<FluidType, FluidType> HYDROCHLORIC_ACID_TYPE = liquidType("hydrochloric_acid", 1_180, 1_200, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HYDROCHLORIC_ACID = FLUIDS.register("hydrochloric_acid",
+            () -> new BaseFlowingFluid.Source(hydrochloricAcidProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HYDROCHLORIC_ACID = FLUIDS.register("flowing_hydrochloric_acid",
+            () -> new BaseFlowingFluid.Flowing(hydrochloricAcidProperties()));
+    public static final DeferredHolder<FluidType, FluidType> CHLORINE_TYPE = gasType("chlorine", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CHLORINE = FLUIDS.register("chlorine",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.CHLORINE_TYPE, ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CHLORINE = FLUIDS.register("flowing_chlorine",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.CHLORINE_TYPE, ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE)));
+
     // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
     // so they only exist in tanks, machines and Pressurized Conduits.
     public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = gasType("steam", 373);
@@ -311,6 +342,50 @@ public final class ModFluids {
                 .slopeFindDistance(2)
                 .levelDecreasePerBlock(2)
                 .tickRate(30)
+                .explosionResistance(100.0F);
+    }
+
+    // Like water: spreads 4 blocks, every 5 ticks.
+    private static BaseFlowingFluid.Properties seawaterProperties() {
+        return new BaseFlowingFluid.Properties(SEAWATER_TYPE, SEAWATER, FLOWING_SEAWATER)
+                .bucket(ModItems.SEAWATER_BUCKET)
+                .block(ModBlocks.SEAWATER)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // Like water: spreads 4 blocks, every 5 ticks.
+    private static BaseFlowingFluid.Properties brineProperties() {
+        return new BaseFlowingFluid.Properties(BRINE_TYPE, BRINE, FLOWING_BRINE)
+                .bucket(ModItems.BRINE_BUCKET)
+                .block(ModBlocks.BRINE)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // A little thicker than water: spreads 3 blocks, every 10 ticks.
+    private static BaseFlowingFluid.Properties lyeProperties() {
+        return new BaseFlowingFluid.Properties(LYE_TYPE, LYE, FLOWING_LYE)
+                .bucket(ModItems.LYE_BUCKET)
+                .block(ModBlocks.LYE)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
+                .explosionResistance(100.0F);
+    }
+
+    // Spreads 3 blocks, every 10 ticks, like Sulfuric Acid.
+    private static BaseFlowingFluid.Properties hydrochloricAcidProperties() {
+        return new BaseFlowingFluid.Properties(HYDROCHLORIC_ACID_TYPE, HYDROCHLORIC_ACID, FLOWING_HYDROCHLORIC_ACID)
+                .bucket(ModItems.HYDROCHLORIC_ACID_BUCKET)
+                .block(ModBlocks.HYDROCHLORIC_ACID)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
                 .explosionResistance(100.0F);
     }
 

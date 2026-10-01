@@ -68,6 +68,8 @@ import net.zagdrath.arcforge.block.farming.TrellisBlock;
 import net.zagdrath.arcforge.block.farming.WildCropBlock;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
+import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
 import net.zagdrath.arcforge.block.machine.ElectrolyzerBlock;
 import net.zagdrath.arcforge.block.machine.FermenterBlock;
@@ -415,6 +417,11 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> ARCITE_BLOCK = BLOCKS.registerSimpleBlock("arcite_block", p -> storageProperties(p, SoundType.AMETHYST, MapColor.DIAMOND, 12));
 
     // Sulfur, through the Nether: it drops Sulfur Dust (see its loot table) and needs a stone pickaxe.
+    // Halite: rock salt in large flat beds, in stone and deepslate (see ModWorldgen.ConfigBed). Softer than the metal ores.
+    public static final DeferredBlock<DropExperienceBlock> HALITE_ORE = ore("halite_ore", UniformInt.of(0, 1), false, 0, MapColor.TERRACOTTA_WHITE);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_HALITE_ORE = ore("deepslate_halite_ore", UniformInt.of(0, 1), true, 0, null);
+    public static final DeferredBlock<Block> RAW_ROCK_SALT_BLOCK = BLOCKS.registerSimpleBlock("raw_rock_salt_block",
+            p -> storageProperties(p, SoundType.CALCITE, MapColor.TERRACOTTA_WHITE, 0));
     public static final DeferredBlock<DropExperienceBlock> NETHER_SULFUR_ORE = BLOCKS.registerBlock("nether_sulfur_ore",
             p -> new DropExperienceBlock(UniformInt.of(1, 3), p), p -> p
                     .mapColor(MapColor.NETHER)
@@ -520,6 +527,32 @@ public final class ModBlocks {
             p -> new SulfuricAcidBlock(ModFluids.SULFURIC_ACID.get(), p),
             p -> liquidProperties(p, MapColor.COLOR_LIGHT_GREEN));
 
+    // Salt and chlor-alkali chemistry: Brine is harmless; Lye and Hydrochloric Acid burn like Sulfuric Acid.
+    public static final DeferredBlock<LiquidBlock> BRINE = BLOCKS.registerBlock("brine",
+            p -> new LiquidBlock(ModFluids.BRINE.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_LIGHT_BLUE));
+    public static final DeferredBlock<LiquidBlock> LYE = BLOCKS.registerBlock("lye",
+            p -> new SulfuricAcidBlock(ModFluids.LYE.get(), ModDamageTypes.LYE, p),
+            p -> liquidProperties(p, MapColor.SNOW));
+    public static final DeferredBlock<LiquidBlock> HYDROCHLORIC_ACID = BLOCKS.registerBlock("hydrochloric_acid",
+            p -> new SulfuricAcidBlock(ModFluids.HYDROCHLORIC_ACID.get(), ModDamageTypes.HYDROCHLORIC_ACID, p),
+            p -> liquidProperties(p, MapColor.COLOR_YELLOW));
+
+    // The Thermal Evaporator Array: a 3x3x9 steel tower (see ThermalEvaporatorStructure), like the other arrays' casings.
+    public static final DeferredBlock<ThermalEvaporatorCasingBlock> THERMAL_EVAPORATOR_CASING = BLOCKS.registerBlock("thermal_evaporator_casing",
+            ThermalEvaporatorCasingBlock::new, ModBlocks::columnProperties);
+    public static final DeferredBlock<ThermalEvaporatorControllerBlock> THERMAL_EVAPORATOR_CONTROLLER = BLOCKS.registerBlock(
+            "thermal_evaporator_controller", ThermalEvaporatorControllerBlock::new,
+            p -> columnProperties(p).lightLevel(state -> state.getValue(ThermalEvaporatorControllerBlock.LIT) ? 7 : 0));
+    // Seawater, pumped from oceans and beaches.
+    public static final DeferredBlock<LiquidBlock> SEAWATER = BLOCKS.registerBlock("seawater",
+            p -> new LiquidBlock(ModFluids.SEAWATER.get(), p) {},
+            p -> liquidProperties(p, MapColor.WATER));
+    // Nine Salt, packed: brittle like calcite, a pickaxe to drop it.
+    public static final DeferredBlock<Block> SALT_BLOCK = BLOCKS.registerSimpleBlock("salt_block",
+            p -> p.mapColor(MapColor.SNOW).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 3.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.CALCITE));
+
     private static final Map<OreSlurry, DeferredBlock<LiquidBlock>> SLURRY_BLOCKS = registerSlurryBlocks();
 
     public static DeferredBlock<LiquidBlock> slurryBlock(OreSlurry slurry) {
@@ -591,6 +624,9 @@ public final class ModBlocks {
             p -> new ArcforgeCropBlock(() -> ModItems.RAPESEEDS.get(), 4, p), ModBlocks::cropProperties);
     public static final DeferredBlock<ArcforgeCropBlock> SORGHUM = BLOCKS.registerBlock("sorghum",
             p -> new ArcforgeCropBlock(() -> ModItems.SORGHUM_SEEDS.get(), 4, p), ModBlocks::cropProperties);
+    // Soybeans: a low bush, one block tall at every age (tallFromAge past the last). A legume (#arcforge:legumes).
+    public static final DeferredBlock<ArcforgeCropBlock> SOYBEANS = BLOCKS.registerBlock("soybeans",
+            p -> new ArcforgeCropBlock(() -> ModItems.SOYBEANS.get(), 8, p), ModBlocks::cropProperties);
     // Not solid, so farmland under it stays farmland.
     public static final DeferredBlock<TrellisBlock> TRELLIS = BLOCKS.registerBlock("trellis",
             TrellisBlock::new, p -> treatedWood(p).strength(0.6F).noOcclusion().forceSolidOff().randomTicks());
@@ -598,6 +634,7 @@ public final class ModBlocks {
     public static final DeferredBlock<WildCropBlock> WILD_RAPESEED = BLOCKS.registerBlock("wild_rapeseed", p -> new WildCropBlock(true, p), ModBlocks::wildCropProperties);
     public static final DeferredBlock<WildCropBlock> WILD_SORGHUM = BLOCKS.registerBlock("wild_sorghum", p -> new WildCropBlock(true, p), ModBlocks::wildCropProperties);
     public static final DeferredBlock<WildCropBlock> WILD_HOPS = BLOCKS.registerBlock("wild_hops", p -> new WildCropBlock(false, p), ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_SOYBEANS = BLOCKS.registerBlock("wild_soybeans", p -> new WildCropBlock(false, p), ModBlocks::wildCropProperties);
 
     // Rustic farming machines: unpowered, treated wood with copper and iron fittings.
     public static final DeferredBlock<FarmMachineBlock> PLANTER = BLOCKS.registerBlock("planter",
@@ -919,6 +956,9 @@ public final class ModBlocks {
         // array casings.
         BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler_array_casing"));
         BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine_array_casing"));
+        // Removed with the Evaporation Pond: its blocks load as the Thermal Evaporator Array's (ponds need rebuilding as towers).
+        BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_liner"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_casing"));
+        BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_outlet"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_controller"));
         BLOCKS.register(modEventBus);
     }
 }

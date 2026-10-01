@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:oil_pressing",
+  "ingredient": "arcforge:soybeans",
+  "result": {
+    "id": "arcforge:seed_oil",
+    "amount": 150
+  },
+  "byproduct": {
+    "id": "arcforge:press_cake"
+  },
+  "time": 100
+}

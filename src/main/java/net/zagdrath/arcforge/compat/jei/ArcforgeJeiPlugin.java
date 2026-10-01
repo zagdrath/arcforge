@@ -113,6 +113,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.ConduitDyeingCategory(gui),
                 new MachineCategories.ChemicalReacting(gui),
                 new MachineCategories.Electrolyzing(gui),
+                new MachineCategories.Evaporating(gui),
                 new MachineCategories.ArcforgeSmelting(gui),
                 new MachineCategories.Distilling(gui),
                 new MachineCategories.Steam(gui),
@@ -145,6 +146,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 ModItems.allConduits().stream().map(conduit -> new MachineCategories.ConduitDyeing(conduit.get())).toList());
         registration.addRecipes(MachineCategories.ChemicalReacting.TYPE, recipes(ModRecipes.CHEMICAL_REACTING.get()));
         registration.addRecipes(MachineCategories.Electrolyzing.TYPE, recipes(ModRecipes.ELECTROLYZING.get()));
+        registration.addRecipes(MachineCategories.Evaporating.TYPE, recipes(ModRecipes.EVAPORATING.get()));
         registration.addRecipes(MachineCategories.ArcforgeSmelting.TYPE, recipes(ModRecipes.ARCFORGE_SMELTING.get()));
         registration.addRecipes(MachineCategories.Distilling.TYPE, recipes(ModRecipes.DISTILLING.get()).stream()
                 .flatMap(holder -> MachineCategories.DistillingPage.of(holder).stream()).toList());
@@ -206,13 +208,15 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 MachineCategories.AirSeparating.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen.class, 81, 35, ARROW_W, ARROW_H,
                 MachineCategories.Synthesizing.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.ThermalEvaporatorScreen.class, 28, 27, ARROW_W, ARROW_H,
+                MachineCategories.Evaporating.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen.class, 52, 27, ARROW_W, ARROW_H,
                 MachineCategories.Digesting.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.ClocheScreen.class, 72, 30, ARROW_W, ARROW_H, MachineCategories.Cloche.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.GreenhouseScreen.class, 76, 50, 36, 10, MachineCategories.Greenhouse.TYPE);
         registration.addRecipeClickArea(AssemblerScreen.class, 88, 35, ARROW_W, ARROW_H, RecipeTypes.CRAFTING);
-        registration.addRecipeClickArea(ChemicalReactorScreen.class, 81, 35, ARROW_W, ARROW_H, MachineCategories.ChemicalReacting.TYPE);
-        registration.addRecipeClickArea(ElectrolyzerScreen.class, 114, 35, ARROW_W, ARROW_H, MachineCategories.Electrolyzing.TYPE);
+        registration.addRecipeClickArea(ChemicalReactorScreen.class, 90, 35, ARROW_W, ARROW_H, MachineCategories.ChemicalReacting.TYPE);
+        registration.addRecipeClickArea(ElectrolyzerScreen.class, 98, 35, ARROW_W, ARROW_H, MachineCategories.Electrolyzing.TYPE);
         registration.addRecipeClickArea(FiberizerScreen.class, 68, 35, ARROW_W, ARROW_H, MachineCategories.Fiberizing.TYPE);
         registration.addRecipeClickArea(InductionFurnaceScreen.class, 78, 35, ARROW_W, ARROW_H, RecipeTypes.SMELTING);
         registration.addRecipeClickArea(InfuserScreen.class, 96, 35, ARROW_W, ARROW_H, MachineCategories.Infusing.TYPE);
@@ -259,6 +263,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.ConduitDyeingCategory.TYPE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
         registration.addCraftingStation(MachineCategories.ChemicalReacting.TYPE, ModBlocks.CHEMICAL_REACTOR.get());
         registration.addCraftingStation(MachineCategories.Electrolyzing.TYPE, ModBlocks.ELECTROLYZER.get());
+        registration.addCraftingStation(MachineCategories.Evaporating.TYPE, ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get(),
+                ModBlocks.THERMAL_EVAPORATOR_CASING.get());
         registration.addCraftingStation(MachineCategories.ArcforgeSmelting.TYPE, ModBlocks.ARCFORGE_FURNACE_PORT.get(),
                 ModBlocks.ARCFORGE_FURNACE_BRICKS.get());
         registration.addCraftingStation(MachineCategories.Steam.TYPE, ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());

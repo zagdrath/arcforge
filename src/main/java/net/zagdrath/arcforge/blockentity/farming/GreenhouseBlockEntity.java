@@ -41,6 +41,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.farming.CropRotation;
 import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.PlantingBedBlock;
@@ -79,7 +80,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // Systems, all through ports (Input faces take items and every fluid; Heat and Energy faces the rest):
 //  - Water (required): each harvest takes waterPerHarvest as it starts; without it nothing starts.
 //  - Nutrients (optional): Nutrient Solution (nutrientPerHarvest a harvest, x nutrientBonus), or else a fertilizer point
-//    from the fertilizer slot (x fertilizerBonus; NPK Fertilizer's are x nutrientBonus).
+//    from the fertilizer slot (x fertilizerBonus; NPK Fertilizer's are x nutrientBonus). Legumes take neither and always
+//    get x nutrientBonus.
 //  - Carbon Dioxide (optional): co2PerHarvest a harvest, x co2Bonus.
 //  - Heat (optional): the air inside drifts toward the outside temperature (the biome's, a set cold in dimensions without
 //    a sky, and solarGain warmer by day under the sky); with HU in its heat buffer it heats itself up to
@@ -508,7 +510,9 @@ public class GreenhouseBlockEntity extends MachineBlockEntity implements Multibl
                     continue;
                 }
                 drain(water, per);
-                bed.startCycle((float) (nutrientBonus(true) * co2Bonus(true)));
+                // Legumes need no Nutrient Solution or fertilizer, and grow as if they had Nutrient Solution (CropRotation).
+                double nutrientBonus = CropRotation.isLegumeSeed(bed.getSeed()) ? ArcforgeConfig.GREENHOUSE_NUTRIENT_BONUS.getAsDouble() : nutrientBonus(true);
+                bed.startCycle((float) (nutrientBonus * co2Bonus(true)));
             }
             if (!bed.isGrown()) {
                 if (!sunlit.contains(pos) && !(lit && lampLit.contains(pos))) {

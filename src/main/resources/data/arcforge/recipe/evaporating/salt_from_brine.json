@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:evaporating",
+  "input": {
+    "tag": "c:brine",
+    "amount": 250
+  },
+  "item_result": {
+    "id": "arcforge:salt"
+  },
+  "water": 200,
+  "heat": 1800
+}

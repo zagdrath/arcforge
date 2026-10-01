@@ -1,0 +1,20 @@
+{
+  "type": "arcforge:electrolyzing",
+  "input": {
+    "fluid": "arcforge:brine",
+    "amount": 100
+  },
+  "primary": {
+    "id": "arcforge:hydrogen",
+    "amount": 50
+  },
+  "secondary": {
+    "id": "arcforge:chlorine",
+    "amount": 50
+  },
+  "tertiary": {
+    "id": "arcforge:lye",
+    "amount": 100
+  },
+  "energy": 60000
+}

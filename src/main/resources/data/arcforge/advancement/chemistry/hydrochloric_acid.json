@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/chlorine",
+  "display": {
+    "icon": {
+      "id": "arcforge:hydrochloric_acid_bucket"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.hydrochloric_acid.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.hydrochloric_acid.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "acid": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:hydrochloric_acid"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "acid"
+    ]
+  ]
+}

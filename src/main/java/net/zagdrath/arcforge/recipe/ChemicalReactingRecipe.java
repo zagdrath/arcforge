@@ -40,7 +40,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
-// Chemical Reactor: up to two items (each with a count) and up to two fluids react into an item, a fluid or both, with
+// Chemical Reactor: up to two items (each with a count) and up to three fluids react into an item, a fluid or both, with
 // an optional byproduct rolled once per operation (Slag, when precipitating). The items are item_input and
 // second_item_input, each drawn from a different input slot; each fluid input from a different input tank. "category"
 // only labels the recipe in JEI: general, leaching or precipitating.
@@ -49,7 +49,7 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
         Optional<FluidStackTemplate> fluidOutput, Optional<ItemStackTemplate> byproduct, float byproductChance, int time,
         Optional<Integer> energyPerTick, String category) implements Recipe<ChemicalReactorInput> {
     public static final int DEFAULT_TIME = 100;
-    public static final int MAX_FLUID_INPUTS = 2;
+    public static final int MAX_FLUID_INPUTS = ChemicalReactorInput.TANKS;
 
     // {"ingredient": ..., "count": 1..64}
     public record ItemInput(Ingredient ingredient, int count) {
@@ -187,24 +187,28 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
         return java.util.stream.Stream.of(itemInput, secondItemInput).flatMap(Optional::stream).toList();
     }
 
-    // Which input tank (0 or 1) supplies each fluid input, each from a different tank, or null if they can't all
-    // be supplied. Tries A then B for the first input, and the other way round.
+    // Which input tank (0, 1 or 2) supplies each fluid input, each from a different tank, or null if they can't all be
+    // supplied. Tanks are tried in order for the first input, then for the next among those left, and so on.
     public int @Nullable [] tanksFor(ChemicalReactorInput input) {
-        return switch (fluidInputs.size()) {
-            case 0 -> new int[0];
-            case 1 -> fluidInputs.get(0).test(input.fluidA(), input.amountA()) ? new int[] { 0 }
-                    : fluidInputs.get(0).test(input.fluidB(), input.amountB()) ? new int[] { 1 } : null;
-            default -> {
-                FluidInput first = fluidInputs.get(0), second = fluidInputs.get(1);
-                if (first.test(input.fluidA(), input.amountA()) && second.test(input.fluidB(), input.amountB())) {
-                    yield new int[] { 0, 1 };
+        int[] tanks = new int[fluidInputs.size()];
+        return assign(input, 0, 0, tanks) ? tanks : null;
+    }
+
+    // Gives fluid input `index` a tank not in `used` (a bit mask), then the rest; backtracks when one can't be supplied.
+    private boolean assign(ChemicalReactorInput input, int index, int used, int[] tanks) {
+        if (index == fluidInputs.size()) {
+            return true;
+        }
+        FluidInput wanted = fluidInputs.get(index);
+        for (int tank = 0; tank < ChemicalReactorInput.TANKS; tank++) {
+            if ((used & 1 << tank) == 0 && wanted.test(input.fluid(tank), input.amount(tank))) {
+                tanks[index] = tank;
+                if (assign(input, index + 1, used | 1 << tank, tanks)) {
+                    return true;
                 }
-                if (first.test(input.fluidB(), input.amountB()) && second.test(input.fluidA(), input.amountA())) {
-                    yield new int[] { 1, 0 };
-                }
-                yield null;
             }
-        };
+        }
+        return false;
     }
 
     // Whether this item could be part of the recipe (ignoring the count), for the input slot.

@@ -25,18 +25,19 @@ import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.ui.IDisplayHelper;
 
 // An Electrolyzer in Jade, while it runs: "Splitting: 42%" and what each operation makes ("→ 200 mB Hydrogen +
-// 100 mB Oxygen"). Its tanks and energy show through Jade's own views. This half gathers the data on the server;
+// 100 mB Oxygen", with a third product on Brine). Its tanks and energy show through Jade's own views. This half gathers the data on the server;
 // Client draws it.
 public enum ElectrolyzerProvider implements StreamServerDataProvider<BlockAccessor, ElectrolyzerProvider.Data> {
     INSTANCE;
 
     public static final Identifier UID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "electrolyzer");
 
-    public record Data(int percent, FluidStack primary, FluidStack secondary) {
+    public record Data(int percent, FluidStack primary, FluidStack secondary, FluidStack tertiary) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Data::percent,
                 FluidStack.OPTIONAL_STREAM_CODEC, Data::primary,
                 FluidStack.OPTIONAL_STREAM_CODEC, Data::secondary,
+                FluidStack.OPTIONAL_STREAM_CODEC, Data::tertiary,
                 Data::new);
     }
 
@@ -48,7 +49,8 @@ public enum ElectrolyzerProvider implements StreamServerDataProvider<BlockAccess
         }
         ElectrolyzingRecipe recipe = electrolyzer.getShownRecipe();
         return new Data((int) (100L * electrolyzer.getSpent() / electrolyzer.getCost()), recipe.primary().create(),
-                recipe.secondary().map(template -> template.create()).orElse(FluidStack.EMPTY));
+                recipe.secondary().map(template -> template.create()).orElse(FluidStack.EMPTY),
+                recipe.tertiary().map(template -> template.create()).orElse(FluidStack.EMPTY));
     }
 
     @Override
@@ -71,6 +73,9 @@ public enum ElectrolyzerProvider implements StreamServerDataProvider<BlockAccess
                 tooltip.add(Component.translatable("jade.arcforge.electrolyzer.progress", data.percent()));
                 if (data.secondary().isEmpty()) {
                     tooltip.add(Component.translatable("jade.arcforge.chemical_reactor.recipe", amount(data.primary())));
+                } else if (!data.tertiary().isEmpty()) {
+                    tooltip.add(Component.translatable("jade.arcforge.electrolyzer.three", amount(data.primary()), amount(data.secondary()),
+                            amount(data.tertiary())));
                 } else {
                     tooltip.add(Component.translatable("jade.arcforge.electrolyzer", amount(data.primary()), amount(data.secondary())));
                 }

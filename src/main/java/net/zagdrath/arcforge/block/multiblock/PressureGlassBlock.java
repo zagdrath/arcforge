@@ -30,10 +30,11 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
+import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
 // Pressure Glass: the windows of the Steam Boiler Array and Steam Turbine Array, the walls and roof of the
-// Greenhouse Array, and a decorative glass on its own. Neighbouring panes merge into one window. When a
+// Greenhouse Array, the windows up the sides of the Thermal Evaporator Array, and a decorative glass on its own. Neighbouring panes merge into one window. When a
 // structure forms around it, FORMED is set and clicking it opens the machine's GUI; glass never does IO.
 public class PressureGlassBlock extends TransparentBlock {
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
@@ -86,6 +87,7 @@ public class PressureGlassBlock extends TransparentBlock {
         if (!oldState.is(this)) {
             level.scheduleTick(pos, this, 1);
             GreenhouseStructure.notifyChanged(level, pos);
+            ThermalEvaporatorStructure.notifyChanged(level, pos);
         }
     }
 
@@ -118,6 +120,7 @@ public class PressureGlassBlock extends TransparentBlock {
         }
         if (!level.getBlockState(pos).is(this)) {
             GreenhouseStructure.notifyChanged(level, pos);
+            ThermalEvaporatorStructure.notifyChanged(level, pos);
         }
     }
 
@@ -129,6 +132,10 @@ public class PressureGlassBlock extends TransparentBlock {
         InteractionResult greenhouse = GreenhouseStructure.useOnPart(level, pos, player);
         if (greenhouse != InteractionResult.PASS) {
             return greenhouse;
+        }
+        InteractionResult evaporator = ThermalEvaporatorStructure.useOnPart(level, pos, player);
+        if (evaporator != InteractionResult.PASS) {
+            return evaporator;
         }
         for (ShellStructure structure : structures()) {
             InteractionResult result = ShellCasingBlock.openMenu(level, pos, player, structure);

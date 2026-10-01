@@ -26,6 +26,7 @@ import net.zagdrath.arcforge.recipe.CrushingRecipe;
 import net.zagdrath.arcforge.recipe.DigestingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
+import net.zagdrath.arcforge.recipe.EvaporatingRecipe;
 import net.zagdrath.arcforge.recipe.FermentingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
@@ -90,6 +91,9 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("cloche")));
     public static final Supplier<RecipeType<DigestingRecipe>> DIGESTING = RECIPE_TYPES.register("digesting",
             () -> RecipeType.simple(id("digesting")));
+    // The Thermal Evaporator Array: what a fluid boils down to with heat (Seawater: Brine; Brine: Salt).
+    public static final Supplier<RecipeType<EvaporatingRecipe>> EVAPORATING = RECIPE_TYPES.register("evaporating",
+            () -> RecipeType.simple(id("evaporating")));
 
     public static final Supplier<RecipeSerializer<CarbonizingRecipe>> CARBONIZING_SERIALIZER = RECIPE_SERIALIZERS.register("carbonizing",
             () -> new RecipeSerializer<>(CarbonizingRecipe.MAP_CODEC, CarbonizingRecipe.STREAM_CODEC));
@@ -129,6 +133,8 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(ClocheRecipe.MAP_CODEC, ClocheRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<DigestingRecipe>> DIGESTING_SERIALIZER = RECIPE_SERIALIZERS.register("digesting",
             () -> new RecipeSerializer<>(DigestingRecipe.MAP_CODEC, DigestingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<EvaporatingRecipe>> EVAPORATING_SERIALIZER = RECIPE_SERIALIZERS.register("evaporating",
+            () -> new RecipeSerializer<>(EvaporatingRecipe.MAP_CODEC, EvaporatingRecipe.STREAM_CODEC));
     // A crafting recipe (vanilla's crafting type) that keeps the contents of what it upgrades.
     public static final Supplier<RecipeSerializer<TierUpgradeRecipe>> TIER_UPGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("tier_upgrade",
             () -> new RecipeSerializer<>(TierUpgradeRecipe.MAP_CODEC, TierUpgradeRecipe.STREAM_CODEC));
@@ -159,7 +165,7 @@ public final class ModRecipes {
 
     private static void syncToClients(OnDatapackSyncEvent event) {
         event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
-                MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(),
+                MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(),
                 RecipeType.SMELTING);
     }
 }

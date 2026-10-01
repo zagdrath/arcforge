@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/thermal_evaporator",
+  "display": {
+    "icon": {
+      "id": "arcforge:brine_bucket"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.brine.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.brine.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "brine": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:brine"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "brine"
+    ]
+  ]
+}

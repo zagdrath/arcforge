@@ -66,6 +66,8 @@
         "arc_melter",
         "chemical_processing",
         "electrolyzer",
+        "chlor_alkali",
+        "thermal_evaporator",
         "fermenter"
       ]
     },
@@ -151,6 +153,7 @@
         "fertilizers",
         "crops",
         "hops",
+        "soybeans",
         "planter_and_harvester",
         "fertilizer_spreader",
         "copper_sprinkler",

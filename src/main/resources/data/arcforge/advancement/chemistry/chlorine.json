@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/brine",
+  "display": {
+    "icon": {
+      "id": "arcforge:lye_bucket"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.chlorine.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.chlorine.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "chlorine": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:chlorine"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "chlorine"
+    ]
+  ]
+}

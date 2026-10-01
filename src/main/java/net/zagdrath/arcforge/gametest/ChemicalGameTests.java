@@ -135,8 +135,8 @@ public final class ChemicalGameTests {
                 .thenSucceed();
     }
 
-    // Water goes to tank A (again and again, never spilling into B), acid to B; lava is refused (no recipe
-    // takes it), and a third fluid is refused while both tanks are in use.
+    // Water goes to tank A (again and again, never spilling into B), acid to B, a third fluid to C; lava is refused (no
+    // recipe takes it), and a fourth fluid is refused while all three tanks are in use.
     static void tankRouting(GameTestHelper helper) {
         ChemicalReactorBlockEntity reactor = reactor(helper, POS);
         ResourceHandler<FluidResource> input = reactor.getFluidHandler(Direction.UP);
@@ -148,7 +148,9 @@ public final class ChemicalGameTests {
         helper.assertTrue(fill(input, ModFluids.SULFURIC_ACID.get(), 500) == 500 && amount(reactor.getInputB(), ModFluids.SULFURIC_ACID.get()) == 500,
                 "Acid didn't go to tank B");
         helper.assertTrue(fill(input, Fluids.LAVA, 1_000) == 0, "Took lava");
-        helper.assertTrue(fill(input, OreSlurry.IRON.fluid(), 100) == 0, "Took a third fluid");
+        helper.assertTrue(fill(input, OreSlurry.IRON.fluid(), 100) == 100 && amount(reactor.getInputC(), OreSlurry.IRON.fluid()) == 100,
+                "A third fluid didn't go to tank C");
+        helper.assertTrue(fill(input, ModFluids.ETHANOL.get(), 100) == 0, "Took a fourth fluid");
         helper.succeed();
     }
 

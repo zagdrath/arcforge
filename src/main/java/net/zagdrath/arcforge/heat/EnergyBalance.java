@@ -87,7 +87,7 @@ public final class EnergyBalance {
 
     // The least FE an operation of this recipe may cost: the safety factor times what its products give back.
     public static int minEnergyFor(ElectrolyzingRecipe recipe) {
-        double recoverable = recoverable(Optional.of(recipe.primary())) + recoverable(recipe.secondary());
+        double recoverable = recoverable(Optional.of(recipe.primary())) + recoverable(recipe.secondary()) + recoverable(recipe.tertiary());
         return ceil(ArcforgeConfig.ELECTROLYZER_BALANCE_SAFETY_FACTOR.getAsDouble() * recoverable);
     }
 

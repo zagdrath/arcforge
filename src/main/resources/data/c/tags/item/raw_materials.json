@@ -5,6 +5,7 @@
     "#c:raw_materials/tungsten",
     "#c:raw_materials/fluorite",
     "#c:raw_materials/bismuth",
-    "#c:raw_materials/arcite"
+    "#c:raw_materials/arcite",
+    "#c:raw_materials/rock_salt"
   ]
 }

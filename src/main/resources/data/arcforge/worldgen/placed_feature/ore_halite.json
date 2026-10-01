@@ -1,0 +1,27 @@
+{
+  "feature": "arcforge:ore_halite",
+  "placement": [
+    {
+      "type": "minecraft:rarity_filter",
+      "chance": 4
+    },
+    {
+      "type": "arcforge:config_count",
+      "ore": "halite",
+      "default": 1
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "halite",
+      "shape": "uniform",
+      "default_min": -32,
+      "default_max": 40
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

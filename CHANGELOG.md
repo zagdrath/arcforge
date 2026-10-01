@@ -20,13 +20,83 @@ number and date.
 
 ## [Unreleased]
 
+### Upgrading
+
+- **Chemical Reactor third input tank** and **Electrolyzer liquid output tank.** Saved machines keep everything in their
+  tanks and slots. A saved Electrolyzer keeps its side settings, so its bottom stays as it was; set it to Output with the
+  Wrench (or in the Sides tab) to pipe Lye out of it. Newly placed ones have the bottom set to Output.
+- **Halite generates only in newly explored chunks.**
+- **New config sections and keys** `multiblocks.thermalEvaporator`, `machines.electricPump.seawaterBiomeTags`,
+  `ores.halite`, `haliteBeds`, `machines.electrolyzer.liquidTankCapacity` and
+  `farming.loamFarmland.legumeNutrientsPerStage` / `rotationMultiplier` get their defaults.
+- **Leaching recipes** in data packs that name `arcforge:sulfuric_acid` still work; the built-in ones now take the tag
+  `#arcforge:leaching_acids` (Sulfuric and Hydrochloric Acid).
+
+### Added
+
+- **Salt and chlor-alkali chemistry.**
+  - **Halite,** a new ore in stone and deepslate. It generates in large, flat underground beds (Y -32 to 40), several
+    layers thick under deserts and oceans. It drops **Rock Salt** (Fortune works; Silk Touch drops the ore); the Arc
+    Crusher grinds one into 2 Salt and the Arc Crushing Array into 4, and a halite ore gives twice that. Rock Salt packs
+    into a **Block of Rock Salt**. Tags `#c:ores/halite`, `#c:raw_materials/rock_salt`, `#c:storage_blocks/raw_rock_salt`.
+  - **Seawater,** a new fluid (`#c:seawater`): an Electric Pump on water in an ocean or beach biome pumps Seawater instead
+    of Water (the biome tags are in the config).
+  - **Thermal Evaporator Array,** a fixed 3×3×9 tower like Mekanism's Thermal Evaporation Plant: a solid 3×3 bottom of
+    **Thermal Evaporator Casings** with the **Thermal Evaporator Controller** in the middle of one side, facing out; seven
+    layers of a ring of 8 round a hollow 1×1 core, where the middle of each side may be **Pressure Glass**, so a window can
+    run up any side; and a solid 3×3 cap. Formed, it keeps its block look with connected textures (outer rims only).
+    Like the steam and gas turbine arrays' windows, each window reaches half a block into the casings round it (the
+    corners, the cap and the base; the controller's side of the base stays solid), and the windows show the inside of
+    the tower, lined, with the liquid rising and falling with the input tank, in that fluid's colour, with a white
+    bed of salt at the bottom while it makes Salt.
+    - It runs on heat (HU), only at 100°C or hotter, and faster the hotter it is: 20% speed at 100°C up to full speed
+      (25 mB/t) at 400°C. Heat buffer 200,000 HU, up to 1,000°C.
+    - 1,000 mB Seawater → 250 mB Brine + 675 mB Water back (6,000 HU); 250 mB Brine → 1 Salt + 200 mB Water back
+      (1,800 HU). Data-driven (`arcforge:evaporating`).
+    - Ports, set with the Wrench like the other arrays: Input (Seawater or Brine), Heat, Brine, Salt and Water. New
+      Side modes `brine`, `salt` and `water` (port-only).
+    - GUI, JEI category, Jade info, a Handbook entry and a build in the multiblock viewer. Tank sizes, throughput,
+      temperatures, the speed curve and the heat buffer are in `multiblocks.thermalEvaporator`.
+  - **Salt** (`#c:dusts/salt`) and **Salt Block**.
+  - **Brine:** 1 Salt + 250 mB water in the Chemical Reactor.
+  - **Electrolyzer:** 100 mB Brine → 50 mB Hydrogen + 50 mB **Chlorine** (a gas) + 100 mB **Lye** (sodium hydroxide
+    solution), 60,000 FE. Electrolyzing recipes can now have a `tertiary` liquid output.
+  - **Hydrochloric Acid:** 50 mB Chlorine + 50 mB Hydrogen in the Chemical Reactor. Every leaching recipe takes it as
+    well as Sulfuric Acid.
+  - **Lye biodiesel:** 100 mB Seed Oil + 25 mB Ethanol + 10 mB Lye make 150 mB Biodiesel, half as much again as the
+    plain recipe, which stays.
+  - Lye and Hydrochloric Acid burn what wades into them, like Sulfuric Acid.
+  - Advancements: Worth Its Salt (Processing, mine Rock Salt), and in the Chemistry branch Salt of the Earth (build a
+    Thermal Evaporator Array), Pickled, Chlor-Alkali and Muriatic.
+- **Soybeans and crop rotation.**
+  - **Soybeans,** a crop that is its own seed. **Wild Soybeans** grow in plains and forests, and grass drops them.
+    The Oil Press gets 150 mB of Seed Oil from one (more than from any other seed), and the Compost Bin takes them.
+  - **Legumes** (`#arcforge:legumes`, holding Soybeans): on Loam Farmland each growth stage adds 1 nutrient instead of
+    using one (up to 15), and they grow at the nutrient speed even on empty Loam.
+  - **Crop rotation:** Loam Farmland remembers whether its last harvested crop was a legume. A non-legume planted after one
+    grows 1.25× as fast until it's harvested. Harvests by hand, Sickle, Scythe or Harvester count. Jade shows it on the
+    farmland and the crop.
+  - In the Glass Cloche, Grow Chamber, Hydroponic Cell and Greenhouse Array, legumes use no fertilizer or Nutrient
+    Solution and grow as fast as if they had it (the Hydroponic Cell grows them on FE alone).
+  - Advancements in the Farming branch: Bean Counter and Rotation.
+  - Every rate, the rotation bonus and the nutrient values are in the config.
+
 ### Changed
 
 - **New banner** in the README and on the mod list's details screen.
 - **Wild crops spawn in more places, and more often.** Each has a biome tag (`#arcforge:wild_crops/flax`, `/rapeseed`,
   `/sorghum`, `/hops`) built on the common `c:` biome tags, so modded biomes such as Biomes O' Plenty's get them too;
   Biomes O' Plenty's grasslands, scrublands and woodlands are listed by name as well. Hops now also grow in taigas and
-  Sorghum on wooded badlands, never in snowy biomes. Patches turn up about twice as often.
+  Sorghum on wooded badlands, never in snowy biomes. Wild Soybeans get the same treatment as the others.
+- **Wild crops are much rarer.** Wild Flax, Rapeseed, Sorghum, Hops and Soybeans patches now generate in about one chunk
+  in 28 instead of one in 10, with 10 tries a patch instead of 24.
+- **Planter, Harvester and Fertilizer Spreader textures:** their wood is now cut from the Treated Planks and Stripped
+  Treated Log textures (real grain and boards) instead of flat brown.
+- **Chemical Reactor: three input tanks.** Recipes can take up to three fluids, and when several recipes match, the one
+  that uses the most inputs wins. The GUI is re-cut to fit the third tank.
+- **Electrolyzer: a liquid output tank** (8,000 mB, for Lye) beside the gas tanks, leaving by Output faces; the bottom is
+  now an Output face by default, with a port on its texture. The second gas face carries Chlorine as well as Oxygen.
+- **Oil Press:** Soybeans are its best seed.
 - **Textures:** plates are shaded softer (no bright centre); the Arcite-Tungsten Composite is a tungsten plate with
   arcite fibres; the Plate, Gear and Rod Dies engrave the new plate, gear and rod shapes; Digestate, the Sickles and
   the Steel Scythe use Cody's own textures.

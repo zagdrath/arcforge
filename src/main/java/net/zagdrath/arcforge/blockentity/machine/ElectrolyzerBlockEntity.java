@@ -60,22 +60,27 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 import com.mojang.serialization.Codec;
 
 // Splits water into Hydrogen and Oxygen with FE (arcforge:electrolyzing recipes): 100 mB of water makes 200 mB of
-// hydrogen and 100 mB of oxygen for 120,000 FE, at 400 FE/t. The recipe's primary output goes into the hydrogen
-// tank and its secondary into the oxygen tank, and both are pushed out of their own faces every tick (they have no
-// other way out). Speed upgrades draw the FE faster; Energy upgrades cut the FE per operation, but never below
-// EnergyBalance.minEnergyFor, so burning the hydrogen always gives back less than it cost.
+// hydrogen and 100 mB of oxygen for 120,000 FE, at 400 FE/t. Brine splits three ways: Hydrogen, Chlorine and Lye. The
+// recipe's primary output goes into the hydrogen tank, its secondary into the oxygen tank (Chlorine, from Brine) and its
+// tertiary, a liquid, into the liquid tank (added after the others; older saves load with it empty). Each is pushed
+// out of its own faces every tick (Hydrogen, Oxygen and Output faces; they have no other way out). Speed upgrades draw
+// the FE faster; Energy upgrades cut the FE per operation, but never below EnergyBalance.minEnergyFor, so burning the
+// hydrogen always gives back less than it cost.
 public class ElectrolyzerBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int MACHINE_SLOTS = 0;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HYDROGEN, SideMode.OXYGEN, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HYDROGEN, SideMode.OXYGEN, SideMode.OUTPUT,
+            SideMode.ENERGY);
 
     private final ConsumerEnergyHandler energy;
     private final FilteredFluidTank water;
     private final FilteredFluidTank hydrogen;
     private final FilteredFluidTank oxygen;
+    private final FilteredFluidTank liquid;
     private final ResourceHandler<FluidResource> waterInput;
     private final ResourceHandler<FluidResource> hydrogenOutput;
     private final ResourceHandler<FluidResource> oxygenOutput;
+    private final ResourceHandler<FluidResource> liquidOutput;
     private final ResourceHandler<FluidResource> fluidAll;
     private final ResourceHandler<FluidResource> fluidInteraction;
     private final ContainerData data;
@@ -95,7 +100,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
 
     public ElectrolyzerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.ELECTROLYZER.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> false, UPGRADES,
-                new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.HYDROGEN, SideMode.OXYGEN, SideMode.ENERGY, SideMode.NONE),
+                new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.HYDROGEN, SideMode.OXYGEN, SideMode.ENERGY, SideMode.NONE),
                 SIDE_MODES);
         this.energy = new ConsumerEnergyHandler(
                 ArcforgeConfig.ELECTROLYZER_ENERGY_CAPACITY.getAsInt(),
@@ -106,12 +111,15 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
                 resource -> MachineRecipes.isElectrolyzerInput(level, resource), this::setChanged);
         this.hydrogen = new FilteredFluidTank(gasCapacity, Gases::isGas, this::setChanged);
         this.oxygen = new FilteredFluidTank(gasCapacity, Gases::isGas, this::setChanged);
+        this.liquid = new FilteredFluidTank(ArcforgeConfig.ELECTROLYZER_LIQUID_CAPACITY.getAsInt(), resource -> !Gases.isGas(resource), this::setChanged);
         this.waterInput = new AutomationResourceHandler<>(water, index -> true, index -> false);
         this.hydrogenOutput = new AutomationResourceHandler<>(hydrogen, index -> false, index -> true);
         this.oxygenOutput = new AutomationResourceHandler<>(oxygen, index -> false, index -> true);
-        this.fluidAll = new CombinedResourceHandler<>(waterInput, hydrogenOutput, oxygenOutput);
-        // Buckets pour water in; Gas Cartridges fill from the hydrogen first, then the oxygen.
-        this.fluidInteraction = new CombinedResourceHandler<>(hydrogenOutput, oxygenOutput, waterInput);
+        this.liquidOutput = new AutomationResourceHandler<>(liquid, index -> false, index -> true);
+        this.fluidAll = new CombinedResourceHandler<>(waterInput, hydrogenOutput, oxygenOutput, liquidOutput);
+        // Buckets pour water (or Brine) in and take the Lye out; Gas Cartridges fill from the hydrogen first, then the
+        // oxygen (or Chlorine).
+        this.fluidInteraction = new CombinedResourceHandler<>(liquidOutput, hydrogenOutput, oxygenOutput, waterInput);
         this.data = new WideIntContainerData(ElectrolyzerMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -138,6 +146,10 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
                     case ElectrolyzerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case ElectrolyzerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
                     case ElectrolyzerMenu.DATA_VENT -> (ventHydrogen ? 1 : 0) | (ventOxygen ? 2 : 0);
+                    case ElectrolyzerMenu.DATA_TERTIARY_FLUID -> fluidId(liquid);
+                    case ElectrolyzerMenu.DATA_TERTIARY -> liquid.getAmount();
+                    case ElectrolyzerMenu.DATA_LIQUID_CAPACITY -> liquid.getCapacity();
+                    case ElectrolyzerMenu.DATA_RECIPE_TERTIARY -> shown != null ? shown.tertiary().map(FluidStackTemplate::amount).orElse(0) : 0;
                     default -> 0;
                 };
             }
@@ -210,10 +222,11 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
         }
         setLit(status == MachineStatus.SPLITTING);
 
-        // The gases' only way out, so this is always on.
+        // The products' only way out, so this is always on.
         int rate = ArcforgeConfig.ELECTROLYZER_GAS_OUTPUT_RATE.getAsInt();
         push(level, pos, SideMode.HYDROGEN, hydrogenOutput, rate);
         push(level, pos, SideMode.OXYGEN, oxygenOutput, rate);
+        push(level, pos, SideMode.OUTPUT, liquidOutput, rate);
     }
 
     // Moves up to max mB out of the faces in this mode (shared across them).
@@ -229,7 +242,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
         }
     }
 
-    // Whether both outputs fit in their tanks right now.
+    // Whether every output fits in its tank right now. The liquid (Lye) can't be vented.
     private boolean fits(ElectrolyzingRecipe recipe) {
         try (Transaction tx = Transaction.openRoot()) {
             FluidStack primary = recipe.primary().create();
@@ -238,7 +251,13 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
             }
             if (recipe.secondary().isPresent() && !ventOxygen) {
                 FluidStack secondary = recipe.secondary().get().create();
-                return oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx) == secondary.getAmount();
+                if (oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx) != secondary.getAmount()) {
+                    return false;
+                }
+            }
+            if (recipe.tertiary().isPresent()) {
+                FluidStack tertiary = recipe.tertiary().get().create();
+                return liquid.insert(0, FluidResource.of(tertiary), tertiary.getAmount(), tx) == tertiary.getAmount();
             }
             return true;
         }
@@ -254,11 +273,17 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
                 FluidStack secondary = recipe.secondary().get().create();
                 vented += secondary.getAmount() - oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
             }
+            if (recipe.tertiary().isPresent()) {
+                FluidStack tertiary = recipe.tertiary().get().create();
+                liquid.insert(0, FluidResource.of(tertiary), tertiary.getAmount(), tx);
+            }
             tx.commit();
         }
         ArcforgeAdvancements.produced(this, net.minecraft.world.item.ItemStack.EMPTY, recipe.primary().create().getFluid(), null);
         recipe.secondary().ifPresent(secondary -> ArcforgeAdvancements.produced(this, net.minecraft.world.item.ItemStack.EMPTY,
                 secondary.create().getFluid(), null));
+        recipe.tertiary().ifPresent(tertiary -> ArcforgeAdvancements.produced(this, net.minecraft.world.item.ItemStack.EMPTY,
+                tertiary.create().getFluid(), null));
         // Whatever didn't fit was vented (only possible with venting on): a puff from the top.
         if (vented > 0) {
             level.sendParticles(net.minecraft.core.particles.ParticleTypes.CLOUD, worldPosition.getX() + 0.5, worldPosition.getY() + 1.05,
@@ -292,9 +317,14 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
         return hydrogen;
     }
 
-    // The secondary output's tank (oxygen, for water).
+    // The secondary output's tank (oxygen, for water; Chlorine, for Brine).
     public FilteredFluidTank getOxygen() {
         return oxygen;
+    }
+
+    // The tertiary (liquid) output's tank: Lye, for Brine.
+    public FilteredFluidTank getLiquid() {
+        return liquid;
     }
 
     public ConsumerEnergyHandler getEnergy() {
@@ -317,7 +347,8 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
 
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---
 
-    // Input faces fill the water tank; Hydrogen and Oxygen faces drain their gas. Unsided, all three (for Jade).
+    // Input faces fill the water tank; Hydrogen and Oxygen faces drain their gas, Output faces the liquid tank. Unsided,
+    // all four (for Jade).
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
         if (mode == null) {
@@ -327,6 +358,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
             case INPUT -> waterInput;
             case HYDROGEN -> hydrogenOutput;
             case OXYGEN -> oxygenOutput;
+            case OUTPUT -> liquidOutput;
             default -> null;
         };
     }
@@ -346,7 +378,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
     public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
         SideMode mode = modeFor(side);
         return switch (type) {
-            case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case GAS -> mode == SideMode.HYDROGEN || mode == SideMode.OXYGEN ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ITEM, THERMAL -> ConnectionMode.NONE;
@@ -385,6 +417,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
         water.deserialize(input.childOrEmpty("water"));
         hydrogen.deserialize(input.childOrEmpty("hydrogen"));
         oxygen.deserialize(input.childOrEmpty("oxygen"));
+        liquid.deserialize(input.childOrEmpty("liquid"));
         spent = input.getIntOr("spent", 0);
         ventHydrogen = input.getBooleanOr("vent_hydrogen", false);
         ventOxygen = input.getBooleanOr("vent_oxygen", false);
@@ -398,6 +431,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
         water.serialize(output.child("water"));
         hydrogen.serialize(output.child("hydrogen"));
         oxygen.serialize(output.child("oxygen"));
+        liquid.serialize(output.child("liquid"));
         output.putInt("spent", spent);
         output.putBoolean("vent_hydrogen", ventHydrogen);
         output.putBoolean("vent_oxygen", ventOxygen);

@@ -56,10 +56,11 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.transfer.item.PairedItemInput;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// Reacts up to two items and up to two fluids with FE (arcforge:chemical_reacting recipes) into an item, a fluid or
+// Reacts up to two items and up to three fluids with FE (arcforge:chemical_reacting recipes) into an item, a fluid or
 // both, plus a chance byproduct: Sulfuric Acid from sulfur and water, ore slurry from raw ore and acid, dust from
-// slurry and water, NPK Fertilizer from Basic Slag, Wood Ash and Ammonia. Two input slots, sorted by PairedItemInput;
-// two input tanks, sorted by InputTankRouter, and one output tank, 8,000 mB each.
+// slurry and water, NPK Fertilizer from Basic Slag, Wood Ash and Ammonia, Brine from Salt and water, Biodiesel from Seed
+// Oil, Ethanol and Lye. Two input slots, sorted by PairedItemInput; three input tanks, sorted by InputTankRouter, and
+// one output tank, 8,000 mB each. The third input tank came later: older saves load with it empty.
 // 60 FE/t unless the recipe says otherwise. Speed upgrades make it faster (drawing FE just as much faster),
 // Energy upgrades cut the FE per operation.
 public class ChemicalReactorBlockEntity extends MachineBlockEntity implements FluidInteractable {
@@ -77,6 +78,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     private final ConsumerEnergyHandler energy;
     private final FilteredFluidTank inputA;
     private final FilteredFluidTank inputB;
+    private final FilteredFluidTank inputC;
     private final FilteredFluidTank output;
     private final InputTankRouter router;
     private final ResourceHandler<FluidResource> fluidInput;
@@ -110,11 +112,12 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         int capacity = ArcforgeConfig.REACTOR_TANK_CAPACITY.getAsInt();
         this.inputA = new FilteredFluidTank(capacity, resource -> MachineRecipes.isReactorFluid(level, resource), this::setChanged);
         this.inputB = new FilteredFluidTank(capacity, resource -> MachineRecipes.isReactorFluid(level, resource), this::setChanged);
+        this.inputC = new FilteredFluidTank(capacity, resource -> MachineRecipes.isReactorFluid(level, resource), this::setChanged);
         this.output = new FilteredFluidTank(capacity, resource -> true, this::setChanged);
-        this.router = new InputTankRouter(inputA, inputB);
+        this.router = new InputTankRouter(inputA, inputB, inputC);
         this.fluidInput = new AutomationResourceHandler<>(router, index -> true, index -> false);
         this.fluidOutput = new AutomationResourceHandler<>(output, index -> false, index -> true);
-        this.fluidAll = new CombinedResourceHandler<>(inputA, inputB, output);
+        this.fluidAll = new CombinedResourceHandler<>(inputA, inputB, inputC, output);
         // Buckets pour into the inputs and fill from the output first, then from the inputs.
         this.fluidInteraction = new CombinedResourceHandler<>(fluidOutput, router);
         this.itemInput = new PairedItemInput(items, SLOT_INPUT, SLOT_INPUT_B);
@@ -135,6 +138,8 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
                     case ChemicalReactorMenu.DATA_AMOUNT_A -> inputA.getAmount();
                     case ChemicalReactorMenu.DATA_FLUID_B -> fluidId(inputB);
                     case ChemicalReactorMenu.DATA_AMOUNT_B -> inputB.getAmount();
+                    case ChemicalReactorMenu.DATA_FLUID_C -> fluidId(inputC);
+                    case ChemicalReactorMenu.DATA_AMOUNT_C -> inputC.getAmount();
                     case ChemicalReactorMenu.DATA_FLUID_OUT -> fluidId(output);
                     case ChemicalReactorMenu.DATA_AMOUNT_OUT -> output.getAmount();
                     case ChemicalReactorMenu.DATA_TANK_CAPACITY -> output.getCapacity();
@@ -179,7 +184,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
 
     private ChemicalReactorInput input() {
         return new ChemicalReactorInput(items.getStack(SLOT_INPUT), items.getStack(SLOT_INPUT_B), inputA.getResource(0), inputA.getAmount(),
-                inputB.getResource(0), inputB.getAmount());
+                inputB.getResource(0), inputB.getAmount(), inputC.getResource(0), inputC.getAmount());
     }
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
@@ -273,7 +278,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         }
         try (Transaction tx = Transaction.openRoot()) {
             for (int i = 0; i < tanks.length; i++) {
-                FilteredFluidTank tank = tanks[i] == 0 ? inputA : inputB;
+                FilteredFluidTank tank = inputTank(tanks[i]);
                 tank.extract(0, tank.getResource(0), recipe.fluidInputs().get(i).amount(), tx);
             }
             recipe.fluidOutput().ifPresent(template -> {
@@ -303,11 +308,24 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         return inputB;
     }
 
+    public FilteredFluidTank getInputC() {
+        return inputC;
+    }
+
+    // Input tank 0, 1 or 2.
+    public FilteredFluidTank inputTank(int tank) {
+        return switch (tank) {
+            case 0 -> inputA;
+            case 1 -> inputB;
+            default -> inputC;
+        };
+    }
+
     public FilteredFluidTank getOutputTank() {
         return output;
     }
 
-    // Both input tanks as one: what input faces, buckets and the GUI fill.
+    // The input tanks as one: what input faces, buckets and the GUI fill.
     public InputTankRouter getRouter() {
         return router;
     }
@@ -349,7 +367,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     }
 
     // Input faces fill the input tanks (sorted by the router); output faces drain the output tank. Unsided,
-    // all three tanks (for Jade).
+    // all four tanks (for Jade).
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
         if (mode == null) {
@@ -393,6 +411,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         energy.deserialize(input.childOrEmpty("energy"));
         inputA.deserialize(input.childOrEmpty("input_a"));
         inputB.deserialize(input.childOrEmpty("input_b"));
+        inputC.deserialize(input.childOrEmpty("input_c"));
         output.deserialize(input.childOrEmpty("output"));
         progress = input.getIntOr("progress", 0);
         current = input.getString("recipe").map(Identifier::tryParse).orElse(null);
@@ -412,6 +431,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         energy.serialize(output.child("energy"));
         inputA.serialize(output.child("input_a"));
         inputB.serialize(output.child("input_b"));
+        inputC.serialize(output.child("input_c"));
         this.output.serialize(output.child("output"));
         output.putInt("progress", progress);
         if (current != null) {

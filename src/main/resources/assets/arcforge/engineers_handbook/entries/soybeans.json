@@ -1,0 +1,18 @@
+{
+  "title": "Soybeans & Crop Rotation",
+  "icon": "arcforge:soybeans",
+  "items": [
+    "arcforge:soybeans",
+    "arcforge:wild_soybeans"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Soybeans grow like potatoes: the beans are their own seed. Find them on wild soybean bushes in plains and forests, or in grass.\n- The Oil Press gets 150 mB of Seed Oil from each, more than from any other seed.\n- The Compost Bin takes them.\n# Legumes\nSoybeans are a legume (#arcforge:legumes). On Loam Farmland a legume adds 1 nutrient per growth stage instead of using one (up to 15), and grows at the nutrient speed even on empty Loam."
+    },
+    {
+      "type": "text",
+      "text": "# Crop rotation\nLoam Farmland remembers whether the last crop harvested from it was a legume. Plant anything else there next and it grows 1.25× as fast until it's harvested, on top of the nutrient speed. Jade shows it on the farmland and on the crop.\nHarvesting by hand, with a Sickle or Scythe, or with a Harvester all count. So: Soybeans, then wheat, then Soybeans again.\n# Automated farms\nIn the Glass Cloche, Grow Chamber, Hydroponic Cell and Greenhouse Array, legumes use no fertilizer or Nutrient Solution and grow as fast as if they had it. The Hydroponic Cell grows them on FE alone."
+    }
+  ]
+}

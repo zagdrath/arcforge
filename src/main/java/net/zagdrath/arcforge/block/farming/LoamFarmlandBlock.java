@@ -30,7 +30,8 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 // only dryingChance as often, so it stays moist about twice as long, and it can't be trampled (FarmingEvents cancels
 // that). It holds NUTRIENTS (0-15), added with fertilizers (FertilizerItem); while it has any, the crop on it grows
 // faster and each growth stage uses some (FarmingEvents). NPK Fertilizer also sets ENRICHED, for a stronger growth bonus
-// until the nutrients run out (LoamGrowth). Dry with nothing growing on it, or covered by a solid block,
+// until the nutrients run out (LoamGrowth). AFTER_LEGUME remembers that the last crop harvested from it was a legume,
+// for crop rotation (CropRotation). Dry with nothing growing on it, or covered by a solid block,
 // it turns back into Loam, and its nutrients go with it.
 // Crops plant and grow on it through #minecraft:supports_crops and #minecraft:grows_crops; like any FarmlandBlock it
 // counts as fertile (the moist-farmland growth rate) while it's moist.
@@ -39,6 +40,8 @@ public class LoamFarmlandBlock extends FarmlandBlock {
     public static final int MAX_NUTRIENTS = 15;
     public static final IntegerProperty NUTRIENTS = IntegerProperty.create("nutrients", 0, MAX_NUTRIENTS);
     public static final BooleanProperty ENRICHED = BooleanProperty.create("enriched");
+    // Crop rotation: the last crop harvested from it was a legume, so the next non-legume grows faster (CropRotation).
+    public static final BooleanProperty AFTER_LEGUME = BooleanProperty.create("after_legume");
     private static final int WET = 7;
 
     private final boolean irrigated;
@@ -47,7 +50,8 @@ public class LoamFarmlandBlock extends FarmlandBlock {
     public LoamFarmlandBlock(Block loam, boolean irrigated, BlockBehaviour.Properties properties) {
         super(loam, properties);
         this.irrigated = irrigated;
-        registerDefaultState(stateDefinition.any().setValue(MOISTURE, irrigated ? WET : 0).setValue(NUTRIENTS, 0).setValue(ENRICHED, false));
+        registerDefaultState(stateDefinition.any().setValue(MOISTURE, irrigated ? WET : 0).setValue(NUTRIENTS, 0).setValue(ENRICHED, false)
+                .setValue(AFTER_LEGUME, false));
     }
 
     public boolean isIrrigated() {
@@ -62,10 +66,14 @@ public class LoamFarmlandBlock extends FarmlandBlock {
         return state.getBlock() instanceof LoamFarmlandBlock && state.getValue(ENRICHED);
     }
 
+    public static boolean isAfterLegume(BlockState state) {
+        return state.getBlock() instanceof LoamFarmlandBlock && state.getValue(AFTER_LEGUME);
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         super.createBlockStateDefinition(builder);
-        builder.add(NUTRIENTS, ENRICHED);
+        builder.add(NUTRIENTS, ENRICHED, AFTER_LEGUME);
     }
 
     @Override

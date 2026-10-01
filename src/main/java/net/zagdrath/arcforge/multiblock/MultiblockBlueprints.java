@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
+import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
 // An example build of every Arcforge multiblock, for the JEI build viewer and the Engineer's Handbook: which block
@@ -72,7 +73,8 @@ public final class MultiblockBlueprints {
                 distillationArray(),
                 solarThermalArray(),
                 biogasDigester(),
-                greenhouse());
+                greenhouse(),
+                thermalEvaporator());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -189,6 +191,31 @@ public final class MultiblockBlueprints {
             }
         }
         return new Blueprint("biogas_digester", placements, new BlockPos(3, 3, 3));
+    }
+
+    // The Thermal Evaporator Array: a 3x3x9 tower of casings round a hollow core, the controller in the middle of the bottom
+    // layer's front, and a Pressure Glass window up the middle of the front (any side's middle may be glass or casing).
+    private static Blueprint thermalEvaporator() {
+        int width = ThermalEvaporatorStructure.WIDTH, height = ThermalEvaporatorStructure.HEIGHT;
+        BlockState casing = ModBlocks.THERMAL_EVAPORATOR_CASING.get().defaultBlockState();
+        BlockState glass = ModBlocks.PRESSURE_GLASS.get().defaultBlockState();
+        BlockState controller = ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get().defaultBlockState()
+                .setValue(ThermalEvaporatorControllerBlock.FACING, Direction.SOUTH);
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < height; y++) {
+            for (int z = 0; z < width; z++) {
+                for (int x = 0; x < width; x++) {
+                    boolean core = x == 1 && z == 1 && y > 0 && y < height - 1;
+                    if (core) {
+                        continue;
+                    }
+                    BlockState state = y == 0 && x == 1 && z == width - 1 ? controller
+                            : y > 0 && y < height - 1 && x == 1 && z == width - 1 ? glass : casing;
+                    placements.add(new Placement(new BlockPos(x, y, z), state));
+                }
+            }
+        }
+        return new Blueprint("thermal_evaporator", placements, new BlockPos(width, height, width));
     }
 
     // The smallest Greenhouse Array, 5x5 and 4 tall (up to 11x11 and 8 tall work): frame edges, glass walls and roof, the

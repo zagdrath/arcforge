@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:ores/halite",
+  "result": {
+    "count": 4,
+    "id": "arcforge:salt"
+  },
+  "time": 200,
+  "ore": true
+}

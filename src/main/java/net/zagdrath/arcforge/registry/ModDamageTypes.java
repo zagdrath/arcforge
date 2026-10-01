@@ -17,6 +17,10 @@ import net.zagdrath.arcforge.Arcforge;
 public final class ModDamageTypes {
     public static final ResourceKey<DamageType> SULFURIC_ACID = ResourceKey.create(Registries.DAMAGE_TYPE,
             Identifier.fromNamespaceAndPath(Arcforge.MODID, "sulfuric_acid"));
+    public static final ResourceKey<DamageType> HYDROCHLORIC_ACID = ResourceKey.create(Registries.DAMAGE_TYPE,
+            Identifier.fromNamespaceAndPath(Arcforge.MODID, "hydrochloric_acid"));
+    public static final ResourceKey<DamageType> LYE = ResourceKey.create(Registries.DAMAGE_TYPE,
+            Identifier.fromNamespaceAndPath(Arcforge.MODID, "lye"));
 
     private ModDamageTypes() {}
 

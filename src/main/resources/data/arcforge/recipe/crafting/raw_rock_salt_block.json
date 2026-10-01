@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:raw_materials/rock_salt"
+  },
+  "result": {
+    "id": "arcforge:raw_rock_salt_block",
+    "count": 1
+  }
+}

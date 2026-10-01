@@ -17,16 +17,16 @@ import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
 
-// Layout follows chemical_reactor_gui_layout.json. All positions are relative to leftPos/topPos. Two input
-// tanks on the left, the two input slots stacked beside them, the output tank on the right; the status sits under the
-// arrow and the outputs.
+// All positions are relative to leftPos/topPos. Three input tanks on the left, the two input slots stacked beside them,
+// the output tank on the right; the status sits under the arrow and the outputs.
 public class ChemicalReactorScreen extends MachineScreen<ChemicalReactorMenu> {
     private static final int ENERGY_X = 9, ENERGY_Y = 19;
-    private static final int[] TANK_X = { 25, 41, 155 };
+    // The three input tanks, then the output tank (ChemicalReactorMenu's tank order).
+    private static final int[] TANK_X = { 25, 40, 55, 155 };
     private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50;
-    private static final int PROGRESS_X = 81, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
-    private static final int LED_X = 81, LED_Y = 58;
-    private static final int STATUS_X = 89, STATUS_Y = 58, STATUS_W = 64;
+    private static final int PROGRESS_X = 90, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
+    private static final int LED_X = 90, LED_Y = 58;
+    private static final int STATUS_X = 98, STATUS_Y = 58, STATUS_W = 55;
 
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier progress = sprite("progress");

@@ -24,6 +24,7 @@ import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.ArcforgeFakePlayer;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
+import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPart;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
@@ -106,6 +107,9 @@ public final class SecurityRules {
             return Optional.of(owned);
         }
         if (PressureGlassBlock.isFormed(state) && GreenhouseStructure.findController(level, pos) instanceof Owned owned) {
+            return Optional.of(owned);
+        }
+        if (PressureGlassBlock.isFormed(state) && ThermalEvaporatorStructure.findController(level, pos) instanceof Owned owned) {
             return Optional.of(owned);
         }
         var blockEntity = level.getBlockEntity(pos);

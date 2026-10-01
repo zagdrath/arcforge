@@ -2,12 +2,13 @@
   "title": "Electric Pump",
   "icon": "arcforge:electric_pump",
   "items": [
-    "arcforge:electric_pump"
+    "arcforge:electric_pump",
+    "arcforge:seawater_bucket"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Pumps the fluid source block directly below it: a bucket every second for 10 FE/t. It pushes up to 1,000 mB/t out of its top.\nIt removes the source it pumps, except water that refills itself (two or more water sources beside it), which it leaves in place: an endless water supply for boilers."
+      "text": "Pumps the fluid source block directly below it: a bucket every second for 10 FE/t. It pushes up to 1,000 mB/t out of its top.\nIt removes the source it pumps, except water that refills itself (two or more water sources beside it), which it leaves in place: an endless water supply for boilers.\nOn water in an ocean or beach biome it pumps Seawater instead, for the Thermal Evaporator Array."
     }
   ]
 }

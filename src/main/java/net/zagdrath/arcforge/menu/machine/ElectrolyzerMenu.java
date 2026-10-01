@@ -42,7 +42,12 @@ public class ElectrolyzerMenu extends MachineMenu {
     public static final int DATA_SIDE_CONFIG = 20;
     // Bit 1: venting hydrogen (the primary tank), bit 2: venting oxygen (the secondary).
     public static final int DATA_VENT = 21;
-    public static final int DATA_VALUES = 22;
+    // The liquid (tertiary) tank and the recipe's tertiary amount, added after the others.
+    public static final int DATA_TERTIARY_FLUID = 22;
+    public static final int DATA_TERTIARY = 23;
+    public static final int DATA_LIQUID_CAPACITY = 24;
+    public static final int DATA_RECIPE_TERTIARY = 25;
+    public static final int DATA_VALUES = 26;
 
     public static final int BUTTON_VENT_HYDROGEN = 200;
     public static final int BUTTON_VENT_OXYGEN = 201;
@@ -145,6 +150,22 @@ public class ElectrolyzerMenu extends MachineMenu {
 
     public int getGasCapacity() {
         return value(DATA_GAS_CAPACITY);
+    }
+
+    public Fluid getTertiaryFluid() {
+        return ElectricPumpMenu.fluid(value(DATA_TERTIARY_FLUID));
+    }
+
+    public int getTertiary() {
+        return value(DATA_TERTIARY);
+    }
+
+    public int getLiquidCapacity() {
+        return value(DATA_LIQUID_CAPACITY);
+    }
+
+    public int getRecipeTertiary() {
+        return value(DATA_RECIPE_TERTIARY);
     }
 
     public int getRecipeInput() {

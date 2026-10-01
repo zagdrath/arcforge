@@ -53,6 +53,7 @@ import net.zagdrath.arcforge.multiblock.BiogasDigesterStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 
 // Connected textures for the steam arrays and Pressure Glass: a formed structure reads as one surface.
 // Formed casings that are ports (see MultiblockPorts) show their port plate on their outer faces.
@@ -75,10 +76,15 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 // and controller (base / beam / roof_nw / roof_ne / roof_sw / roof_se, and front for the controller) and
 // "tray_window" for its tray level casings (base / frame / top / bottom). The Biogas Digester's solid tank uses
 // "digester" (base / beam / top, and front for the controller; see DigesterBaked), and the Greenhouse Array's frame
-// "greenhouse" (the same pieces, joined with the greenhouse's frames and controller instead).
+// "greenhouse" (the same pieces, joined with the greenhouse's frames and controller instead). The Thermal Evaporator Array's
+// tower uses "thermal_evaporator": the same again, joined with its casings, controller and Pressure Glass, drawn as a thin
+// skin like the steam arrays (no faces toward the glass or into the hollow core), with "window" and "lip" textures for
+// window quadrants: each window reaches half a block into the casings round it, as on the steam and gas turbine arrays
+// (see WindowQuadrants.windowedEvaporator). Its renderer draws the inside of that skin.
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
-    private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester", GREENHOUSE = "greenhouse";
+    private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester", GREENHOUSE = "greenhouse",
+            EVAPORATOR = "thermal_evaporator";
     // The tray band's glass: the top 10 px of a side face (the sill and strap are below it).
     private static final int BAND = 10;
     private static final Identifier TRAY_FRAME = Identifier.fromNamespaceAndPath("arcforge", "block/ctm/tray_window_frame");
@@ -108,7 +114,7 @@ public final class ConnectedModel {
         }
 
         public boolean digester() {
-            return connect.equals(DIGESTER) || connect.equals(GREENHOUSE);
+            return connect.equals(DIGESTER) || connect.equals(GREENHOUSE) || connect.equals(EVAPORATOR);
         }
 
         // Anything that bakes this as an ordinary model gets the plain fallback cube.
@@ -134,6 +140,7 @@ public final class ConnectedModel {
                 case COLUMN -> new String[] { "base", "beam", "roof_nw", "roof_ne", "roof_sw", "roof_se" };
                 case TRAY -> new String[] { "base", "frame", "top", "bottom" };
                 case DIGESTER, GREENHOUSE -> new String[] { "base", "beam", "top" };
+                case EVAPORATOR -> new String[] { "base", "beam", "top", "window", "lip" };
                 default -> new String[] { "base", "beam", "lip", "window" };
             };
             for (String required : needed) {
@@ -302,7 +309,8 @@ public final class ConnectedModel {
         // --- Picking the pieces ---
 
         private static boolean isPart(BlockState state) {
-            return ShellCasingBlock.isFormed(state) || PressureGlassBlock.isFormed(state) || GreenhouseStructure.isFormedPart(state);
+            return ShellCasingBlock.isFormed(state) || PressureGlassBlock.isFormed(state) || GreenhouseStructure.isFormedPart(state)
+                    || ThermalEvaporatorStructure.isFormedPart(state);
         }
 
         // Air enclosed by the structure on two axes: the hollow core.
@@ -413,6 +421,13 @@ public final class ConnectedModel {
         private final Material.Baked particle;
         private final Map<Direction, List<BakedQuad>> base = new EnumMap<>(Direction.class);
         private final Map<Direction, List<BakedQuad>> front = new EnumMap<>(Direction.class);
+        // The Thermal Evaporator Array's thin skin with window quadrants (null for the others): each face's base and
+        // window in 8x8 quadrants, and the lips of a window quadrant toward its horizontal / vertical neighbour.
+        private final boolean skin;
+        private final Map<Direction, List<BakedQuad>[]> baseQuads = new EnumMap<>(Direction.class);
+        private final Map<Direction, List<BakedQuad>[]> windowQuads = new EnumMap<>(Direction.class);
+        private final Map<Direction, List<BakedQuad>[]> lipAcross = new EnumMap<>(Direction.class);
+        private final Map<Direction, List<BakedQuad>[]> lipUpDown = new EnumMap<>(Direction.class);
         private final Map<Direction, List<BakedQuad>[]> beams = new EnumMap<>(Direction.class);
         private final PortOverlays ports;
         private final int materialFlags;
@@ -420,13 +435,22 @@ public final class ConnectedModel {
         @SuppressWarnings("unchecked")
         DigesterBaked(ModelBaker baker, JsonModel unbaked, Identifier name) {
             Map<String, Identifier> textures = unbaked.textures();
-            this.part = unbaked.connect().equals(GREENHOUSE) ? GreenhouseStructure::isFormedPart : BiogasDigesterStructure::isFormedPart;
+            this.part = switch (unbaked.connect()) {
+                case GREENHOUSE -> GreenhouseStructure::isFormedPart;
+                // The tower's glass counts as part of it: no faces or beams toward a pane, so its windows run on into
+                // the casings' window quadrants.
+                case EVAPORATOR -> state -> ThermalEvaporatorStructure.isFormedPart(state) || PressureGlassBlock.isFormed(state);
+                default -> BiogasDigesterStructure::isFormedPart;
+            };
+            this.skin = unbaked.connect().equals(EVAPORATOR);
             this.particle = Baked.material(baker, textures.getOrDefault("particle", textures.get("base")), name);
             Material.Baked side = Baked.material(baker, textures.get("base"), name);
             Material.Baked top = Baked.material(baker, textures.get("top"), name);
             Material.Baked bottom = Baked.material(baker, textures.getOrDefault("bottom", textures.get("top")), name);
             Material.Baked beam = Baked.material(baker, textures.get("beam"), name);
             Material.Baked frontTexture = textures.containsKey("front") ? Baked.material(baker, textures.get("front"), name) : null;
+            Material.Baked windowTexture = skin ? Baked.material(baker, textures.get("window"), name) : null;
+            Material.Baked lipTexture = skin ? Baked.material(baker, textures.get("lip"), name) : null;
             this.ports = new PortOverlays(baker, name);
             int flags = ports.materialFlags();
             for (Direction face : Direction.values()) {
@@ -434,6 +458,25 @@ public final class ConnectedModel {
                 base.put(face, List.of(Baked.bake(baker, face, 0, 0, 16, 16, 0, texture, 0, 0, 16, 16, Quadrant.R0)));
                 if (frontTexture != null && face.getAxis().isHorizontal()) {
                     front.put(face, List.of(Baked.bake(baker, face, 0, 0, 16, 16, 0, frontTexture, 0, 0, 16, 16, Quadrant.R0)));
+                }
+                if (windowTexture != null && lipTexture != null) {
+                    List<BakedQuad>[] bases = new List[4];
+                    List<BakedQuad>[] windows = new List[4];
+                    List<BakedQuad>[] across = new List[4];
+                    List<BakedQuad>[] upDown = new List[4];
+                    for (Quad quad : Quad.values()) {
+                        float u0 = quad.u0(), v0 = quad.v0();
+                        bases[quad.ordinal()] = List.of(Baked.bake(baker, face, u0, v0, u0 + 8, v0 + 8, 0, texture, u0, v0, u0 + 8, v0 + 8, Quadrant.R0));
+                        windows[quad.ordinal()] = List.of(Baked.bake(baker, face, u0, v0, u0 + 8, v0 + 8, WINDOW_OFFSET, windowTexture, u0, v0, u0 + 8, v0 + 8, Quadrant.R0));
+                        Side acrossSide = quad.right ? Side.LEFT : Side.RIGHT;
+                        Side upDownSide = quad.top ? Side.BOTTOM : Side.TOP;
+                        across[quad.ordinal()] = List.of(Baked.bake(baker, face, u0, v0, u0 + 8, v0 + 8, offset(LIP_OFFSET, acrossSide), lipTexture, 0, 0, 8, 8, acrossSide.rotation));
+                        upDown[quad.ordinal()] = List.of(Baked.bake(baker, face, u0, v0, u0 + 8, v0 + 8, LIP_OFFSET, lipTexture, 0, 0, 8, 8, upDownSide.rotation));
+                    }
+                    baseQuads.put(face, bases);
+                    windowQuads.put(face, windows);
+                    lipAcross.put(face, across);
+                    lipUpDown.put(face, upDown);
                 }
                 List<BakedQuad>[] sides = new List[4];
                 for (Side edge : Side.values()) {
@@ -448,7 +491,11 @@ public final class ConnectedModel {
                     }
                 }
             }
-            for (List<BakedQuad>[] sides : beams.values()) {
+            List<List<BakedQuad>[]> pieces = new ArrayList<>(beams.values());
+            for (Map<Direction, List<BakedQuad>[]> set : List.of(baseQuads, windowQuads, lipAcross, lipUpDown)) {
+                pieces.addAll(set.values());
+            }
+            for (List<BakedQuad>[] sides : pieces) {
                 for (List<BakedQuad> quads : sides) {
                     for (BakedQuad quad : quads) {
                         flags |= quad.materialInfo().flags();
@@ -465,6 +512,20 @@ public final class ConnectedModel {
             return part.test(state);
         }
 
+        // Air walled in on all four sides by the structure (or its formed Pressure Glass): a hollow core.
+        private boolean isCore(BlockAndTintGetter level, BlockPos pos) {
+            if (!level.getBlockState(pos).isAir()) {
+                return false;
+            }
+            for (Direction side : Direction.Plane.HORIZONTAL) {
+                BlockState wall = level.getBlockState(pos.relative(side));
+                if (!isPart(wall) && !PressureGlassBlock.isFormed(wall)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         @Override
         public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
             QuadCollection.Builder quads = new QuadCollection.Builder();
@@ -474,7 +535,18 @@ public final class ConnectedModel {
                 if (formed && isPart(level.getBlockState(pos.relative(face)))) {
                     continue;
                 }
-                List<BakedQuad> faceQuads = new ArrayList<>(face == facing && front.containsKey(face) ? front.get(face) : base.get(face));
+                // A skin draws nothing into the hollow core: its renderer draws the inside of the walls.
+                if (formed && skin && isCore(level, pos.relative(face))) {
+                    continue;
+                }
+                List<BakedQuad> faceQuads = new ArrayList<>();
+                if (face == facing && front.containsKey(face)) {
+                    faceQuads.addAll(front.get(face));
+                } else if (formed && skin) {
+                    addWindowed(level, pos, face, faceQuads);
+                } else {
+                    faceQuads.addAll(base.get(face));
+                }
                 for (Side edge : Side.values()) {
                     if (!formed || !isPart(level.getBlockState(pos.relative(Baked.sideDirection(face, edge))))) {
                         faceQuads.addAll(beams.get(face)[edge.ordinal()]);
@@ -487,6 +559,25 @@ public final class ConnectedModel {
                 faceQuads.forEach(quad -> quads.addCulledFace(face, quad));
             }
             parts.add(new SimpleModelWrapper(quads.build(), true, particle));
+        }
+
+        // A skin face in quadrants: window wherever Pressure Glass touches that corner of the face, with a lip where a
+        // window quadrant meets a plate quadrant (as Baked does for the steam arrays).
+        private void addWindowed(BlockAndTintGetter level, BlockPos pos, Direction face, List<BakedQuad> out) {
+            boolean[] windowed = new boolean[4];
+            for (Quad quad : Quad.values()) {
+                windowed[quad.ordinal()] = WindowQuadrants.windowedEvaporator(level, pos, face, quad.top, quad.right);
+            }
+            for (Quad quad : Quad.values()) {
+                int i = quad.ordinal();
+                out.addAll(windowed[i] ? windowQuads.get(face)[i] : baseQuads.get(face)[i]);
+                if (windowed[i] && !windowed[quad.horizontalNeighbour().ordinal()]) {
+                    out.addAll(lipAcross.get(face)[i]);
+                }
+                if (windowed[i] && !windowed[quad.verticalNeighbour().ordinal()]) {
+                    out.addAll(lipUpDown.get(face)[i]);
+                }
+            }
         }
 
         @Override
@@ -540,6 +631,7 @@ public final class ConnectedModel {
             Material.Baked baseTexture = Baked.material(baker, textures.get("base"), name);
             Material.Baked edgeTexture = Baked.material(baker, textures.get(tray ? "frame" : "beam"), name);
             Material.Baked frontTexture = textures.containsKey("front") ? Baked.material(baker, textures.get("front"), name) : null;
+            Material.Baked innerTexture = textures.containsKey("inner") ? Baked.material(baker, textures.get("inner"), name) : null;
             Material.Baked frameTexture = frontTexture != null ? Baked.material(baker, textures.getOrDefault("frame", TRAY_FRAME), name) : null;
             Material.Baked sideTexture = textures.containsKey("side") ? Baked.material(baker, textures.get("side"), name) : null;
             this.ports = new PortOverlays(baker, name);

@@ -35,8 +35,14 @@ public enum SideMode implements StringRepresentable {
     HYDROGEN("hydrogen"),
     // A machine's own gas out, whatever it is: the Fermenter's Carbon Dioxide, the Air Separator's Nitrogen, the Haber
     // Reactor's Ammonia, the Biogas Digester's Biogas (their Sides tabs name the gas). Handled by the machine.
-    // SideConfig packs 4 bits per face and this is ordinal 15, the last that fits: another mode means widening it.
-    GAS_OUTPUT("gas_output");
+    // SideConfig packs 4 bits per face and this is ordinal 15, the last that fits there.
+    GAS_OUTPUT("gas_output"),
+    // The Thermal Evaporator Array's ports: Brine (or what its input concentrates into) out, Salt out, and the water it
+    // returns. Ports only (kept by name in PortStore): no single-block machine's SideConfig uses them, so they never
+    // need to fit its 4 bits per face.
+    BRINE("brine"),
+    SALT("salt"),
+    WATER("water");
 
     private final String name;
 
@@ -47,7 +53,7 @@ public enum SideMode implements StringRepresentable {
     // Whether faces in this mode give things out (and push them out with auto-eject).
     public boolean isOutput() {
         return switch (this) {
-            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST -> true;
+            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST, BRINE, SALT, WATER -> true;
             default -> false;
         };
     }

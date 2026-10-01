@@ -33,7 +33,8 @@ public final class AdvancementGameTests {
 
     static final List<String> IDS = List.of("root", "start/wrench", "start/first_power", "start/energy_cell", "steel/carbonizer", "steel/coal_coke",
             "steel/arcforge_furnace", "steel/steel_ingot", "processing/dust", "processing/array", "processing/leached_dust", "steam/boiler",
-            "steam/superheated_steam", "steam/condenser", "chemistry/naphtha", "chemistry/electrolyzer", "chemistry/plastic", "gear/steel_tools",
+            "steam/superheated_steam", "steam/condenser", "chemistry/naphtha", "chemistry/electrolyzer", "chemistry/plastic",
+            "chemistry/thermal_evaporator", "chemistry/brine", "chemistry/chlorine", "chemistry/hydrochloric_acid", "gear/steel_tools",
             "gear/jetpack", "gear/arcforged_arc_drill", "challenge/nine_stage_spin", "challenge/full_throttle", "challenge/white_heat",
             "challenge/array_of_options", "farming/compost_bin", "farming/compost", "farming/loam_farmland", "farming/fertilize",
             "farming/mixed_fertilizer", "farming/irrigated", "farming/new_crop", "farming/linen", "farming/hop_harvest", "farming/every_crop",
@@ -41,7 +42,7 @@ public final class AdvancementGameTests {
             "farming/millstone", "farming/mill", "farming/seed_oil", "farming/dried_hops",
             "farming/air_separator", "farming/ammonia", "farming/npk_fertilizer", "farming/biodiesel", "farming/biogas_digester",
             "farming/glass_cloche", "farming/grow_chamber", "farming/hydroponic_cell",
-            "farming/greenhouse", "farming/greenhouse_night_shift", "farming/greenhouse_fully_fed");
+            "farming/greenhouse", "farming/greenhouse_night_shift", "farming/greenhouse_fully_fed", "farming/soybeans", "farming/crop_rotation", "processing/rock_salt");
 
     @SuppressWarnings("removal")
     private static ServerPlayer player(GameTestHelper helper, BlockPos standRelative) {

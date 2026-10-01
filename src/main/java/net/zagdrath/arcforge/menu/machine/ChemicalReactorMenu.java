@@ -33,13 +33,19 @@ public class ChemicalReactorMenu extends MachineMenu {
     public static final int DATA_STATUS = 12;
     public static final int DATA_REDSTONE_MODE = 13;
     public static final int DATA_SIDE_CONFIG = 14;
-    public static final int DATA_VALUES = 15;
+    // The third input tank (added after the others).
+    public static final int DATA_FLUID_C = 15;
+    public static final int DATA_AMOUNT_C = 16;
+    public static final int DATA_VALUES = 17;
+    // Tanks 0-2 are the inputs, 3 the output.
+    public static final int TANKS = 4;
+    public static final int OUTPUT_TANK = 3;
 
-    // Slot positions from chemical_reactor_gui_layout.json; the two input slots stack at the old input's x.
-    public static final int INPUT_X = 60, INPUT_Y = 25;
-    public static final int INPUT_B_X = 60, INPUT_B_Y = 45;
-    public static final int OUTPUT_X = 108, OUTPUT_Y = 35;
-    public static final int BYPRODUCT_X = 130, BYPRODUCT_Y = 35;
+    // Slot positions: the two input slots stack beside the three input tanks, the outputs sit after the arrow.
+    public static final int INPUT_X = 71, INPUT_Y = 25;
+    public static final int INPUT_B_X = 71, INPUT_B_Y = 45;
+    public static final int OUTPUT_X = 113, OUTPUT_Y = 35;
+    public static final int BYPRODUCT_X = 133, BYPRODUCT_Y = 35;
 
     // Client constructor, called with the block position written by the server.
     public ChemicalReactorMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -90,13 +96,23 @@ public class ChemicalReactorMenu extends MachineMenu {
         return value(DATA_TOTAL);
     }
 
-    // Tank 0 and 1 are the inputs, 2 the output.
+    // Tanks 0, 1 and 2 are the inputs, 3 the output.
     public Fluid getFluid(int tank) {
-        return ElectricPumpMenu.fluid(value(tank == 0 ? DATA_FLUID_A : tank == 1 ? DATA_FLUID_B : DATA_FLUID_OUT));
+        return ElectricPumpMenu.fluid(value(switch (tank) {
+            case 0 -> DATA_FLUID_A;
+            case 1 -> DATA_FLUID_B;
+            case 2 -> DATA_FLUID_C;
+            default -> DATA_FLUID_OUT;
+        }));
     }
 
     public int getFluidAmount(int tank) {
-        return value(tank == 0 ? DATA_AMOUNT_A : tank == 1 ? DATA_AMOUNT_B : DATA_AMOUNT_OUT);
+        return value(switch (tank) {
+            case 0 -> DATA_AMOUNT_A;
+            case 1 -> DATA_AMOUNT_B;
+            case 2 -> DATA_AMOUNT_C;
+            default -> DATA_AMOUNT_OUT;
+        });
     }
 
     public int getTankCapacity() {

@@ -29,5 +29,8 @@ public final class ModBlockTags {
     // Blocks security never protects, even when they have an owner (empty by default; for packs and other mods).
     public static final TagKey<Block> SECURITY_EXEMPT = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Arcforge.MODID, "security_exempt"));
 
+    // Legume crops (Soybeans): see ModItemTags.LEGUMES and CropRotation.
+    public static final TagKey<Block> LEGUMES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Arcforge.MODID, "legumes"));
+
     private ModBlockTags() {}
 }

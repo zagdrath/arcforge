@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:evaporating",
+  "input": {
+    "tag": "c:seawater",
+    "amount": 1000
+  },
+  "fluid_result": {
+    "id": "arcforge:brine",
+    "amount": 250
+  },
+  "water": 675,
+  "heat": 6000
+}

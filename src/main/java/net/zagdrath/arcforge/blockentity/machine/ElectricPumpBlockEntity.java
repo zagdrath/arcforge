@@ -25,6 +25,8 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BucketPickup;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidType;
@@ -36,6 +38,8 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.registry.ModFluids;
+import net.zagdrath.arcforge.machine.ClimateHelper;
 import net.zagdrath.arcforge.machine.BucketSlots;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
@@ -51,7 +55,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Pumps the fluid source block directly below it with FE: a bucket (1,000 mB) every 20 ticks for
 // 10 FE/t. The source is removed, except water that is an infinite source (two or more water sources
-// beside it), which is left in place. Any fluid with a source block works; flowing fluid doesn't. It
+// beside it), which is left in place. Any fluid with a source block works; flowing fluid doesn't. Water in an ocean or
+// beach biome comes up as Seawater. It
 // pushes up to 1,000 mB/t out of its top every tick, and out of output faces with auto-eject; the
 // bucket slots fill empty buckets from the tank. Speed upgrades pump faster (drawing FE just as much
 // faster), Energy upgrades cut the FE per bucket.
@@ -138,7 +143,8 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
         BlockPos below = pos.below();
         FluidState source = level.getFluidState(below);
         boolean hasSource = source.isSource() && level.getBlockState(below).getBlock() instanceof BucketPickup;
-        sourceFluid = hasSource ? BuiltInRegistries.FLUID.getId(source.getType()) : -1;
+        Fluid pumped = hasSource ? pumpedFluid(level, below, source) : null;
+        sourceFluid = pumped != null ? BuiltInRegistries.FLUID.getId(pumped) : -1;
         infiniteSource = hasSource && isInfiniteWater(level, below, source);
         total = cycleTicks();
 
@@ -147,7 +153,7 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
         } else if (!hasSource) {
             status = MachineStatus.NO_SOURCE;
             progress = 0;
-        } else if (!fits(FluidResource.of(source.getType()))) {
+        } else if (!fits(FluidResource.of(pumped))) {
             status = MachineStatus.TANK_FULL;
         } else if (!energy.consume(energyPerTick())) {
             status = MachineStatus.NO_POWER;
@@ -156,7 +162,7 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
             usage = energyPerTick();
             if (++progress >= total) {
                 progress = 0;
-                pump(level, below, source);
+                pump(level, below, source, pumped);
             }
             setChanged();
         }
@@ -174,9 +180,18 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
         return tank.getSpace() >= FluidType.BUCKET_VOLUME && (tank.getAmount() == 0 || tank.getResource(0).equals(fluid));
     }
 
+    // What a bucket of the source below fills the tank with: Seawater from water in ocean and beach biomes
+    // (electricPump.seawaterBiomeTags), otherwise the source's own fluid.
+    public static Fluid pumpedFluid(ServerLevel level, BlockPos pos, FluidState source) {
+        if (source.getType() == Fluids.WATER && ClimateHelper.inAny(level.getBiome(pos), ArcforgeConfig.PUMP_SEAWATER_BIOME_TAGS.get())) {
+            return ModFluids.SEAWATER.get();
+        }
+        return source.getType();
+    }
+
     // Takes a bucket of the source below, leaving an infinite water source in place.
-    private void pump(ServerLevel level, BlockPos below, FluidState source) {
-        FluidResource fluid = FluidResource.of(source.getType());
+    private void pump(ServerLevel level, BlockPos below, FluidState source, Fluid pumped) {
+        FluidResource fluid = FluidResource.of(pumped);
         if (!isInfiniteWater(level, below, source) || !ArcforgeConfig.PUMP_INFINITE_WATER.getAsBoolean()) {
             BlockState state = level.getBlockState(below);
             if (!(state.getBlock() instanceof BucketPickup pickup) || pickup.pickupBlock(null, level, below, state).isEmpty()) {

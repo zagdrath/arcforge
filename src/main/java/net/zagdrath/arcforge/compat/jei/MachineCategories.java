@@ -694,6 +694,7 @@ final class MachineCategories {
             recipe.input().fluids().forEach(fluid -> input.add(fluid, recipe.input().amount()));
             fluid(builder, false, 61, 5, recipe.primary());
             recipe.secondary().ifPresent(secondary -> fluid(builder, false, 81, 5, secondary));
+            recipe.tertiary().ifPresent(tertiary -> fluid(builder, false, 101, 5, tertiary));
         }
 
         @Override
@@ -710,6 +711,53 @@ final class MachineCategories {
                     EnergyBalance.minEnergyFor(recipe));
             text(graphics, Component.translatable("jei.arcforge.electrolyzing.energy", String.format(Locale.ROOT, "%,d", total)), 0, 30);
             text(graphics, Component.translatable("jei.arcforge.electrolyzing.floor", String.format(Locale.ROOT, "%,d", least)), 0, 40);
+        }
+    }
+
+    // --- Thermal Evaporator Array ---
+
+    // The fluid the tower boils down, what it gives (a fluid and/or an item) and the water it returns, with its heat and
+    // the temperature it needs.
+    static final class Evaporating extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.EvaporatingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.EvaporatingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.EVAPORATING.get());
+
+        Evaporating(IGuiHelper gui) {
+            super(TYPE, "evaporating", ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get(), gui, 150, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.EvaporatingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            var input = builder.addInputSlot(1, 5).setStandardSlotBackground()
+                    .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, recipe.input().amount()), false, 16, 16);
+            // A tag lists every fluid in it.
+            recipe.input().fluids().forEach(fluid -> input.add(fluid, recipe.input().amount()));
+            int x = 61;
+            if (recipe.fluidResult().isPresent()) {
+                fluid(builder, false, x, 5, recipe.fluidResult().get());
+                x += 20;
+            }
+            if (recipe.itemResult().isPresent()) {
+                builder.addOutputSlot(x, 5).setStandardSlotBackground().add(recipe.itemResult().get().create());
+                x += 20;
+            }
+            if (recipe.water() > 0) {
+                fluid(builder, false, x, 5, net.minecraft.world.level.material.Fluids.WATER, recipe.water());
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.EvaporatingRecipe> holder, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(26, 5);
+        }
+
+        // The heat an operation takes, and the temperature it needs (full speed from fullSpeedTemperature).
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.EvaporatingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.evaporating.heat", String.format(Locale.ROOT, "%,d", holder.value().heat())), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.evaporating.temperature", ArcforgeConfig.EVAPORATOR_MIN_TEMPERATURE.getAsInt(),
+                    ArcforgeConfig.EVAPORATOR_FULL_SPEED_TEMPERATURE.getAsInt()), 0, 40);
         }
     }
 

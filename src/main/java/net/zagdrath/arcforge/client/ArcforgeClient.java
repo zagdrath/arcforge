@@ -210,6 +210,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.AIR_SEPARATOR.get(), net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen::new);
         event.register(ModMenuTypes.HABER_REACTOR.get(), net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen::new);
         event.register(ModMenuTypes.BIOGAS_DIGESTER.get(), net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen::new);
+        event.register(ModMenuTypes.THERMAL_EVAPORATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.ThermalEvaporatorScreen::new);
         event.register(ModMenuTypes.GLASS_CLOCHE.get(), ClocheScreen::new);
         event.register(ModMenuTypes.GROW_CHAMBER.get(), ClocheScreen::new);
         event.register(ModMenuTypes.HYDROPONIC_CELL.get(), ClocheScreen::new);
@@ -273,6 +274,16 @@ public class ArcforgeClient {
         event.register(liquidModel("nutrient_solution"), ModFluids.NUTRIENT_SOLUTION, ModFluids.FLOWING_NUTRIENT_SOLUTION);
         event.register(liquidModel("biodiesel"), ModFluids.BIODIESEL, ModFluids.FLOWING_BIODIESEL);
         event.register(liquidModel("sulfuric_acid"), ModFluids.SULFURIC_ACID, ModFluids.FLOWING_SULFURIC_ACID);
+        // Seawater is vanilla water's own textures (still, flowing and the overlay seen through glass), tinted a deeper
+        // green-blue than any biome's water so the two can be told apart.
+        event.register(new FluidModel.Unbaked(
+                new Material(Identifier.withDefaultNamespace("block/water_still")),
+                new Material(Identifier.withDefaultNamespace("block/water_flow")),
+                new Material(Identifier.withDefaultNamespace("block/water_overlay")),
+                FluidTintSources.constant(SEAWATER_TINT)), ModFluids.SEAWATER, ModFluids.FLOWING_SEAWATER);
+        event.register(liquidModel("brine"), ModFluids.BRINE, ModFluids.FLOWING_BRINE);
+        event.register(liquidModel("lye"), ModFluids.LYE, ModFluids.FLOWING_LYE);
+        event.register(liquidModel("hydrochloric_acid"), ModFluids.HYDROCHLORIC_ACID, ModFluids.FLOWING_HYDROCHLORIC_ACID);
         // The slurries share one greyscale texture, tinted per metal.
         for (OreSlurry slurry : OreSlurry.values()) {
             ModFluids.Slurry fluids = ModFluids.slurry(slurry);
@@ -295,6 +306,7 @@ public class ArcforgeClient {
         event.register(gasModel(NITROGEN_TINT), ModFluids.NITROGEN, ModFluids.FLOWING_NITROGEN);
         event.register(gasModel(AMMONIA_TINT), ModFluids.AMMONIA, ModFluids.FLOWING_AMMONIA);
         event.register(gasModel(BIOGAS_TINT), ModFluids.BIOGAS, ModFluids.FLOWING_BIOGAS);
+        event.register(gasModel(CHLORINE_TINT), ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -306,6 +318,8 @@ public class ArcforgeClient {
     }
 
     private static final int EXHAUST_STEAM_TINT = 0xFF9EA6AE;
+    // Seawater: vanilla water tinted a deep sea green-blue (vanilla's default water is 0x3F76E4).
+    public static final int SEAWATER_TINT = 0xFF2A8C9E;
     public static final int HYDROGEN_TINT = 0xFFEAF2FA;
     public static final int OXYGEN_TINT = 0xFF9FD4F2;
     // Carbon Dioxide: a cool grey, darker than steam.
@@ -314,6 +328,8 @@ public class ArcforgeClient {
     public static final int NITROGEN_TINT = 0xFFC4C0EC;
     public static final int AMMONIA_TINT = 0xFFE2F0A0;
     public static final int BIOGAS_TINT = 0xFFA8B478;
+    // Chlorine: its own sickly greenish yellow, deeper and greener than Ammonia.
+    public static final int CHLORINE_TINT = 0xFFBCD24A;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(
@@ -357,6 +373,11 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(NITROGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.NITROGEN_TYPE.get());
         event.registerFluidType(liquidFog(AMMONIA_TINT & 0xFFFFFF, 6.0F), ModFluids.AMMONIA_TYPE.get());
         event.registerFluidType(liquidFog(BIOGAS_TINT & 0xFFFFFF, 6.0F), ModFluids.BIOGAS_TYPE.get());
+        event.registerFluidType(liquidFog(CHLORINE_TINT & 0xFFFFFF, 5.0F), ModFluids.CHLORINE_TYPE.get());
+        event.registerFluidType(liquidFog(SEAWATER_TINT & 0xFFFFFF, 12.0F), ModFluids.SEAWATER_TYPE.get());
+        event.registerFluidType(liquidFog(0xC8DCE4, 10.0F), ModFluids.BRINE_TYPE.get());
+        event.registerFluidType(liquidFog(0xE4E6DA, 8.0F), ModFluids.LYE_TYPE.get());
+        event.registerFluidType(liquidFog(0xE2DC9A, 7.0F), ModFluids.HYDROCHLORIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(0x7FB84A, 5.0F), ModFluids.NUTRIENT_SOLUTION_TYPE.get());
         event.registerFluidType(liquidFog(0xD8A838, 4.0F), ModFluids.BIODIESEL_TYPE.get());
         for (OreSlurry slurry : OreSlurry.values()) {
@@ -504,6 +525,9 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARC_QUARRY.get(), ArcQuarryRenderer::new);
+        // The Thermal Evaporator Array draws the fluid column in its core and its salt bed.
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.THERMAL_EVAPORATOR.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.ThermalEvaporatorRenderer::new);
         // The automated farms draw the soil and the plant growing inside.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheRenderer::new);

@@ -136,6 +136,12 @@
     "arcforge:greenhouse_frame",
     "arcforge:greenhouse_controller",
     "arcforge:planting_bed",
-    "arcforge:grow_lamp"
+    "arcforge:grow_lamp",
+    "arcforge:salt_block",
+    "arcforge:halite_ore",
+    "arcforge:deepslate_halite_ore",
+    "arcforge:raw_rock_salt_block",
+    "arcforge:thermal_evaporator_casing",
+    "arcforge:thermal_evaporator_controller"
   ]
 }

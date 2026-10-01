@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/thermal_evaporator/controller_unformed",
+    "particle": "arcforge:block/thermal_evaporator/casing",
+    "south": "arcforge:block/thermal_evaporator/casing",
+    "east": "arcforge:block/thermal_evaporator/casing",
+    "west": "arcforge:block/thermal_evaporator/casing",
+    "up": "arcforge:block/thermal_evaporator/casing_top",
+    "down": "arcforge:block/thermal_evaporator/casing_top"
+  }
+}

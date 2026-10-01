@@ -37,6 +37,10 @@
         {
           "type": "minecraft:item",
           "name": "arcforge:hop_seeds"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:soybeans"
         }
       ]
     }

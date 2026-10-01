@@ -27,16 +27,19 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
-// Electrolyzer: one fluid split into two with FE (100 mB water -> 200 mB hydrogen + 100 mB oxygen). The primary
-// output goes to the Electrolyzer's "hydrogen" tank and the secondary to its "oxygen" tank, whatever they are. The
+// Electrolyzer: one fluid split into two or three with FE (100 mB water -> 200 mB hydrogen + 100 mB oxygen; Brine ->
+// Hydrogen + Chlorine + Lye). The primary output goes to the Electrolyzer's "hydrogen" tank and the secondary to its
+// "oxygen" tank, whatever gases they are; the tertiary (a liquid) to its liquid tank. The
 // FE is energyPerMbInput for each mB of input unless the recipe gives its own "energy"; the Electrolyzer never
 // charges less than EnergyBalance.minEnergyFor, so what it makes can't be burnt for more FE than it cost.
 public record ElectrolyzingRecipe(ChemicalReactingRecipe.FluidInput input, FluidStackTemplate primary,
-        Optional<FluidStackTemplate> secondary, Optional<Integer> energy) implements Recipe<ElectrolyzingRecipe.Input> {
+        Optional<FluidStackTemplate> secondary, Optional<FluidStackTemplate> tertiary, Optional<Integer> energy)
+        implements Recipe<ElectrolyzingRecipe.Input> {
     public static final MapCodec<ElectrolyzingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             ChemicalReactingRecipe.FluidInput.CODEC.fieldOf("input").forGetter(ElectrolyzingRecipe::input),
             FluidStackTemplate.CODEC.fieldOf("primary").forGetter(ElectrolyzingRecipe::primary),
             FluidStackTemplate.CODEC.optionalFieldOf("secondary").forGetter(ElectrolyzingRecipe::secondary),
+            FluidStackTemplate.CODEC.optionalFieldOf("tertiary").forGetter(ElectrolyzingRecipe::tertiary),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("energy").forGetter(ElectrolyzingRecipe::energy))
             .apply(i, ElectrolyzingRecipe::new));
 
@@ -44,6 +47,7 @@ public record ElectrolyzingRecipe(ChemicalReactingRecipe.FluidInput input, Fluid
             ChemicalReactingRecipe.FluidInput.STREAM_CODEC, ElectrolyzingRecipe::input,
             FluidStackTemplate.STREAM_CODEC, ElectrolyzingRecipe::primary,
             ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC), ElectrolyzingRecipe::secondary,
+            ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC), ElectrolyzingRecipe::tertiary,
             ByteBufCodecs.optional(ByteBufCodecs.VAR_INT), ElectrolyzingRecipe::energy,
             ElectrolyzingRecipe::new);
 

@@ -37,6 +37,8 @@
     "arcforge:biogas_digester_controller",
     "arcforge:greenhouse_frame",
     "arcforge:greenhouse_controller",
-    "arcforge:planting_bed"
+    "arcforge:planting_bed",
+    "arcforge:thermal_evaporator_casing",
+    "arcforge:thermal_evaporator_controller"
   ]
 }

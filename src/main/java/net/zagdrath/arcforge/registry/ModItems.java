@@ -263,6 +263,26 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.NUTRIENT_SOLUTION.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> BIODIESEL_BUCKET = ITEMS.registerItem("biodiesel_bucket",
             p -> new BucketItem(ModFluids.BIODIESEL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> BRINE_BUCKET = ITEMS.registerItem("brine_bucket",
+            p -> new BucketItem(ModFluids.BRINE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> LYE_BUCKET = ITEMS.registerItem("lye_bucket",
+            p -> new BucketItem(ModFluids.LYE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> HYDROCHLORIC_ACID_BUCKET = ITEMS.registerItem("hydrochloric_acid_bucket",
+            p -> new BucketItem(ModFluids.HYDROCHLORIC_ACID.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+
+    // --- Salt ---
+
+    public static final DeferredItem<Item> SALT = ITEMS.registerSimpleItem("salt");
+    public static final DeferredItem<BlockItem> SALT_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.SALT_BLOCK);
+    public static final DeferredItem<BlockItem> THERMAL_EVAPORATOR_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.THERMAL_EVAPORATOR_CASING);
+    public static final DeferredItem<BlockItem> THERMAL_EVAPORATOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.THERMAL_EVAPORATOR_CONTROLLER);
+    public static final DeferredItem<BucketItem> SEAWATER_BUCKET = ITEMS.registerItem("seawater_bucket",
+            p -> new BucketItem(ModFluids.SEAWATER.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    // Halite and what it gives: Rock Salt (the Arc Crusher makes Salt of it) and its raw block.
+    public static final DeferredItem<BlockItem> HALITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.HALITE_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_HALITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_HALITE_ORE);
+    public static final DeferredItem<Item> ROCK_SALT = ITEMS.registerSimpleItem("rock_salt");
+    public static final DeferredItem<BlockItem> RAW_ROCK_SALT_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_ROCK_SALT_BLOCK);
 
     private static final Map<OreSlurry, DeferredItem<BucketItem>> SLURRY_BUCKETS = registerSlurryBuckets();
 
@@ -348,6 +368,10 @@ public final class ModItems {
     public static List<DeferredItem<BucketItem>> chemicalBuckets() {
         List<DeferredItem<BucketItem>> buckets = new ArrayList<>();
         buckets.add(SULFURIC_ACID_BUCKET);
+        buckets.add(HYDROCHLORIC_ACID_BUCKET);
+        buckets.add(SEAWATER_BUCKET);
+        buckets.add(BRINE_BUCKET);
+        buckets.add(LYE_BUCKET);
         for (OreSlurry slurry : OreSlurry.values()) {
             buckets.add(slurryBucket(slurry));
         }
@@ -404,6 +428,9 @@ public final class ModItems {
             p -> new BlockItem(ModBlocks.RAPESEED.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
     public static final DeferredItem<BlockItem> SORGHUM_SEEDS = ITEMS.registerItem("sorghum_seeds",
             p -> new BlockItem(ModBlocks.SORGHUM.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
+    // Soybeans are their own seed, like vanilla carrots: the item plants the crop and is named as an item.
+    public static final DeferredItem<BlockItem> SOYBEANS = ITEMS.registerItem("soybeans",
+            p -> new BlockItem(ModBlocks.SOYBEANS.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_MEDIUM)));
     public static final DeferredItem<Item> SORGHUM_STALKS = ITEMS.registerSimpleItem("sorghum_stalks", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     // Hop Seeds are planted by using them on a Trellis (TrellisBlock), so they're a plain item.
     public static final DeferredItem<Item> HOP_SEEDS = ITEMS.registerSimpleItem("hop_seeds", p -> p.compostable(ContextIntProviders.COMPOSTABLE_LOW));
@@ -413,6 +440,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> WILD_RAPESEED = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RAPESEED, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<BlockItem> WILD_SORGHUM = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SORGHUM, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<BlockItem> WILD_HOPS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_HOPS, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<BlockItem> WILD_SOYBEANS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SOYBEANS, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
 
     // Rustic farming machines and tools. Durability is fixed here (it's set before the config loads); the areas are config.
     public static final DeferredItem<BlockItem> PLANTER = ITEMS.registerSimpleBlockItem(ModBlocks.PLANTER);
@@ -583,6 +611,9 @@ public final class ModItems {
         // Removed in 2.0: Steam Boilers and Steam Turbines in inventories become array casings.
         ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler_array_casing"));
         ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine_array_casing"));
+        // Removed with the Evaporation Pond.
+        ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_liner"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_casing"));
+        ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_outlet"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_controller"));
         ITEMS.register(modEventBus);
     }
 }

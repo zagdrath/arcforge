@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:processing/dust",
+  "display": {
+    "icon": {
+      "id": "arcforge:rock_salt"
+    },
+    "title": {
+      "translate": "advancements.arcforge.processing.rock_salt.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.processing.rock_salt.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "rock_salt": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:raw_materials/rock_salt"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "rock_salt"
+    ]
+  ]
+}

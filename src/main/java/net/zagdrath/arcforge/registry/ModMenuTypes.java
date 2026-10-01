@@ -129,6 +129,9 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(HaberReactorMenu::new));
     public static final Supplier<MenuType<BiogasDigesterMenu>> BIOGAS_DIGESTER = MENU_TYPES.register("biogas_digester",
             () -> IMenuTypeExtension.create(BiogasDigesterMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu>> THERMAL_EVAPORATOR =
+            MENU_TYPES.register("thermal_evaporator",
+                    () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu::new));
 
     // Automated farms: one menu class, one type each.
     public static final Supplier<MenuType<ClocheMenu>> GLASS_CLOCHE = MENU_TYPES.register("glass_cloche",

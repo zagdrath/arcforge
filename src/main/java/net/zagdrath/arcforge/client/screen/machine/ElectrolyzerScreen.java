@@ -17,16 +17,16 @@ import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.ElectrolyzerMenu;
 
-// Layout follows electrolyzer_gui_layout.json. All positions are relative to leftPos/topPos. Water on the left,
-// hydrogen and oxygen on the right; between them the recipe's ratio and the FE per mB of hydrogen.
+// All positions are relative to leftPos/topPos. Water (or Brine) on the left; after the arrow the liquid tank (Lye),
+// then hydrogen and oxygen (or Chlorine); between them the recipe's ratio and the FE per mB of hydrogen.
 public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
     private static final int ENERGY_X = 9, ENERGY_Y = 19;
-    private static final int WATER_X = 25, HYDROGEN_X = 139, OXYGEN_X = 155;
+    private static final int WATER_X = 25, LIQUID_X = 123, HYDROGEN_X = 139, OXYGEN_X = 155;
     private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50;
-    private static final int PROGRESS_X = 114, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
-    private static final int TEXT_X = 43, RATIO_Y = 24, COST_Y = 36, TEXT_W = 66;
+    private static final int PROGRESS_X = 98, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
+    private static final int TEXT_X = 43, RATIO_Y = 24, COST_Y = 36, TEXT_W = 52;
     private static final int LED_X = 43, LED_Y = 58;
-    private static final int STATUS_X = 51, STATUS_Y = 58;
+    private static final int STATUS_X = 51, STATUS_Y = 58, STATUS_W = 69;
 
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier progress = sprite("progress");
@@ -44,6 +44,10 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
 
     @Override
     protected Component sideModeName(SideMode mode) {
+        if (mode == SideMode.OXYGEN) {
+            // The second gas: Oxygen from water, Chlorine from Brine.
+            return sideModeName("oxygen_chlorine");
+        }
         return mode == SideMode.ENERGY ? sideModeName("energy_input") : super.sideModeName(mode);
     }
 
@@ -58,6 +62,8 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
                 x, y, HYDROGEN_X, TANK_Y, TANK_W, TANK_H);
         drawFluidTank(graphics, menu.getSecondaryFluid(), menu.getSecondary(), menu.getGasCapacity(), tankGauge, tankGauge,
                 x, y, OXYGEN_X, TANK_Y, TANK_W, TANK_H);
+        drawFluidTank(graphics, menu.getTertiaryFluid(), menu.getTertiary(), menu.getLiquidCapacity(), tankGauge, tankGauge,
+                x, y, LIQUID_X, TANK_Y, TANK_W, TANK_H);
         ArcCrusherScreen.drawProgress(graphics, progress, x + PROGRESS_X, y + PROGRESS_Y, menu.getProgress(), menu.getTotal());
         vent(graphics, x, y, HYDROGEN_X - 1, menu.isVentingHydrogen());
         vent(graphics, x, y, OXYGEN_X - 1, menu.isVentingOxygen());
@@ -100,18 +106,24 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
             graphics.text(font, Component.translatable("gui.arcforge.electrolyzer.cost",
                     ArcforgeGui.grouped(perPrimary(menu.getCost()))), TEXT_X, COST_Y, ArcforgeGui.LABEL, false);
         }
-        graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
     }
 
-    // "1 → 2 + 1": the recipe's input, primary and secondary amounts, reduced. Null without a recipe.
+    // "1 → 2 + 1": the recipe's input, primary and secondary amounts (and tertiary, packed tighter: "2→1+1+2"), reduced.
+    // Null without a recipe.
     private Component ratio() {
         int input = menu.getRecipeInput();
         int primary = menu.getRecipePrimary();
         int secondary = menu.getRecipeSecondary();
+        int tertiary = menu.getRecipeTertiary();
         if (input <= 0 || primary <= 0) {
             return null;
         }
-        int divisor = gcd(gcd(input, primary), secondary);
+        int divisor = gcd(gcd(gcd(input, primary), secondary), tertiary);
+        if (tertiary > 0) {
+            return Component.translatable("gui.arcforge.electrolyzer.ratio3", input / divisor, primary / divisor, secondary / divisor,
+                    tertiary / divisor);
+        }
         if (secondary <= 0) {
             return Component.literal(input / divisor + " → " + primary / divisor);
         }
@@ -154,6 +166,11 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
         }
         if (isHovering(OXYGEN_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getSecondaryFluid(), Component.translatable("fluid_type.arcforge.oxygen"), menu.getSecondary(), menu.getGasCapacity());
+            return;
+        }
+        if (isHovering(LIQUID_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
+            addFluidTooltip(lines, menu.getTertiaryFluid(), Component.translatable("gui.arcforge.electrolyzer.liquid"), menu.getTertiary(),
+                    menu.getLiquidCapacity());
             return;
         }
         if (menu.getRecipePrimary() > 0 && isHovering(TEXT_X, COST_Y - 1, TEXT_W, font.lineHeight + 1, mouseX, mouseY)) {

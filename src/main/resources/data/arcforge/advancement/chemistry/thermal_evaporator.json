@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/naphtha",
+  "display": {
+    "icon": {
+      "id": "arcforge:thermal_evaporator_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.thermal_evaporator.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.thermal_evaporator.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:thermal_evaporator"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

@@ -178,8 +178,8 @@ FE-powered tools that never break, in three tiers: charge them in an Energy Cell
 
 ### Ores
 
-Six ores generate in stone and deepslate (Silver, Nickel, Tungsten as wolframite ore, Fluorite, Bismuth and
-Arcite). Each drops its raw item (Fortune works; Silk Touch drops the ore), and has a raw block and a storage
+Seven ores generate in stone and deepslate (Silver, Nickel, Tungsten as wolframite ore, Fluorite, Bismuth,
+Arcite and Halite). Each drops its raw item (Fortune works; Silk Touch drops the ore), and has a raw block and a storage
 block. Raw items, ores and dusts smelt into the ingot or crystal (twice as fast in a blast furnace, and in the
 Induction Furnace), and the Arc Crusher gives 2 dust per ore (+25%), 1 per raw item (+25%), 9 per raw block
 and 1 per ingot. Arcite needs a diamond pickaxe and glows (ores 5, raw block 9, block 12). Every recipe
@@ -193,6 +193,10 @@ takes the common tags (`c:ingots/silver`, `c:gems/arcite`, ...), so other mods' 
 | Bismuth | 8 | 8 | 0 to 56 | thermocouples |
 | Tungsten | 6 | 6 | -64 to -16 | heating coils, the Arcforged composite |
 | Arcite | 4 | 5 | -64 to -40 | Arcforged conduits and upgrades |
+| Halite | 1 bed in 4 chunks | flat beds, radius 11 | -32 to 40 | Salt (Rock Salt crushes into 2) |
+
+**Halite** is different: it forms wide, flat beds rather than veins, one layer thick, and three layers thick under
+deserts and oceans (`haliteBeds`). It drops Rock Salt, which doesn't smelt; the Arc Crusher grinds it into Salt.
 
 **Invar**: 2 iron dust + 1 nickel dust make 3 invar dust, which smelts into invar ingots. **Plates** (silver,
 nickel, tungsten, invar) come from the Metal Press. **Components**: the Tungsten Heating Coil (Induction
@@ -250,7 +254,8 @@ top slot empties a Gas Cartridge into the cylinder and the bottom one fills it.
 
 **Electric Pump.** Pumps the fluid source directly below it: a bucket every 20 ticks for 10 FE/t. The
 source is removed, except water with two or more water sources beside it, which is infinite. It
-pushes up to 1,000 mB/t out of its top. Takes Speed and Energy upgrades.
+pushes up to 1,000 mB/t out of its top. Takes Speed and Energy upgrades. On water in an ocean or beach
+biome it pumps Seawater instead (for the Thermal Evaporator Array).
 
 **Steam Boiler Array.** Boils water into steam with heat. It is a 3x3 tower, 3 to 7 blocks tall, of
 Steam Boiler Array Casings and Pressure Glass, hollow in the middle.
@@ -401,6 +406,7 @@ Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running a
 
 ```
 100 mB water --[Electrolyzer]--> 200 mB Hydrogen + 100 mB Oxygen   (120,000 FE)
+100 mB Brine --[Electrolyzer]--> 50 mB Hydrogen + 50 mB Chlorine + 100 mB Lye   (60,000 FE)
 100 mB Light Oil + 50 mB Hydrogen --[Chemical Reactor]--> 2 Plastic Sheet
 ```
 
@@ -411,7 +417,9 @@ Cylinders or anything else that takes gas. A Gas Cartridge fills from its hydrog
 has 8,000 mB of water and 16,000 mB of each gas, and takes Speed and Energy upgrades. A full gas tank stops
 it; switch on the vent under that tank in its GUI and the gas that doesn't fit is released instead. Recipes are data-driven
 (`arcforge:electrolyzing`: `input` with `fluid` or `tag` and `amount`, `primary`, optional `secondary` and
-`energy`); the primary output fills the hydrogen tank and the secondary the oxygen tank.
+`energy`, optional liquid `tertiary`); the primary output fills the hydrogen tank, the secondary the oxygen tank (it
+carries Chlorine too) and the tertiary its 8,000 mB liquid tank, which empties through Output faces (the bottom by
+default).
 
 **Hydrogen is a battery, not a power source.** Burnt in a Fuel Burner it gives 60 HU per mB at up to 1,400°C.
 The Electrolyzer never charges less than 1.25× (`balanceSafetyFactor`) the most FE the best heat-to-FE setup
@@ -426,6 +434,38 @@ that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as 
 **Plastic Sheet** (`#c:plastics`) goes into Conduit Filters, Storage Upgrades, the crafted crate and vault
 upgrades, the Settings Card, the Security Terminal, the Fermenter, dyed conduits and the Gas Turbine Array
 Casing.
+
+### Salt and chlor-alkali
+
+```
+Halite --[mine]--> Rock Salt --[Arc Crusher]--> 2 Salt (4 in the Arc Crushing Array)
+ocean water --[Electric Pump]--> Seawater
+1,000 mB Seawater --[Thermal Evaporator Array, heat]--> 250 mB Brine + 675 mB water
+250 mB Brine --[Thermal Evaporator Array, heat]--> 1 Salt + 200 mB water
+1 Salt + 250 mB water --[Chemical Reactor]--> 250 mB Brine
+100 mB Brine --[Electrolyzer]--> 50 mB Hydrogen + 50 mB Chlorine + 100 mB Lye
+50 mB Chlorine + 50 mB Hydrogen --[Chemical Reactor]--> 100 mB Hydrochloric Acid
+100 mB Seed Oil + 25 mB Ethanol + 10 mB Lye --[Chemical Reactor]--> 150 mB Biodiesel
+```
+
+**Thermal Evaporator Array.** A fixed 3×3×9 tower. The bottom layer is a solid 3×3 of **Thermal Evaporator
+Casings** with the **Thermal Evaporator Controller** in the middle of one side, facing out. Layers 2 to 8 are a ring of
+8 round a hollow 1×1 core (keep it empty); the middle block of each side may be **Pressure Glass**, so a window can run
+up any side. The top layer is a solid 3×3 cap. As on the steam and gas turbine arrays, each window reaches half a block
+into the casings round it: into the corners either side, the cap above and the base below (except on the controller's
+side, where the base stays solid round the controller), so a window column is two blocks wide and its edges stop half a
+block in from the tower's corners. It evaporates with heat, only at 100°C or hotter: 20% speed at 100°C,
+rising to full speed (25 mB/t) at 400°C, and holds up to 1,000°C in a 200,000 HU buffer. Seawater boils down to Brine
+and Brine to Salt (see above); most of the evaporated water comes back out. Through the windows you see the inside of the
+tower, lined, with the liquid rising and falling with the input tank (a full tank fills the tower), and a white salt bed while it makes Salt. Ports (Wrench, Port mode): Input,
+Heat, Brine, Salt and Water. Config `multiblocks.thermalEvaporator`; recipes `arcforge:evaporating` (`input`,
+`fluid_result` and/or `item_result`, `water`, `heat`).
+
+**Seawater.** An Electric Pump on water in an ocean or beach biome (`machines.electricPump.seawaterBiomeTags`) pumps
+Seawater instead of Water.
+
+**Hydrochloric Acid** leaches ore exactly as Sulfuric Acid does: every leaching recipe takes `#arcforge:leaching_acids`.
+The Chemical Reactor has three input tanks, so the **Lye biodiesel** fits in one machine.
 
 ### Fermenting
 
@@ -457,6 +497,15 @@ fuel, 320 HU per mB up to 1,000°C).
 seeds, leaves, Press Cake, Compost) and water go in through ports, four items digesting at once, and come out as
 **Biogas** (burns in the Fuel Burner and the Gas Turbine Array) and **Digestate** (+4 nutrients). It only works at 35°C
 or hotter. Recipes are data-driven (`arcforge:air_separating`, `arcforge:synthesizing`, `arcforge:digesting`).
+
+### Soybeans and crop rotation
+
+**Soybeans** are their own seed; Wild Soybeans grow (rarely) in plains and forests, and grass drops them. They press into 150 mB
+of Seed Oil (the most of any seed) and compost. As a legume (`#arcforge:legumes`) they put a nutrient back into Loam
+Farmland every growth stage instead of using one. Loam Farmland remembers whether its last harvested crop was a legume,
+and a non-legume planted after one grows 1.25× as fast until it's harvested (Jade shows it). In the automated farms and
+the Greenhouse Array, legumes need no fertilizer or Nutrient Solution and grow as fast as if they had it. Config
+`farming.loamFarmland`.
 
 ### Automated farms
 

@@ -4,12 +4,13 @@
   "items": [
     "arcforge:oil_press",
     "arcforge:seed_oil_bucket",
-    "arcforge:press_cake"
+    "arcforge:press_cake",
+    "arcforge:soybeans"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "The Oil Press squeezes seeds into Seed Oil and Press Cake, using 16 FE/t.\n| Seed | Seed Oil | Press Cake |\n| Rapeseeds | 125 mB | 1 |\n| Flax Seeds | 80 mB | 1 |\n| Wheat, Beetroot, Melon, Pumpkin, Sorghum or Hop Seeds | 25 mB | 50% |\nThe oil leaves through output faces (or fill a bucket from it); the cake comes out with auto-eject. Speed and Energy upgrades work."
+      "text": "The Oil Press squeezes seeds into Seed Oil and Press Cake, using 16 FE/t.\n| Seed | Seed Oil | Press Cake |\n| Soybeans | 150 mB | 1 |\n| Rapeseeds | 125 mB | 1 |\n| Flax Seeds | 80 mB | 1 |\n| Wheat, Beetroot, Melon, Pumpkin, Sorghum or Hop Seeds | 25 mB | 50% |\nThe oil leaves through output faces (or fill a bucket from it); the cake comes out with auto-eject. Speed and Energy upgrades work."
     },
     {
       "type": "text",
