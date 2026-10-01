@@ -39,6 +39,8 @@ number and date.
 
 ### Fixed
 
+- **Treated Slabs made a vanilla Composter instead of a Compost Bin.** They count as wooden slabs, so vanilla's
+  Composter recipe matched them first; it now takes any wooden slab but Treated Slabs.
 - **Glass Cloche:** its corner bars now reach the planter floor, so there's no gap at the corners inside the tray.
 - **Planting Bed:** the rim's corners were missing, so the rim looked set back from the sides.
 - **Grow Lamp:** its housing and mount had no underside, so from below you saw into it.

@@ -225,6 +225,7 @@ public final class ArcforgeGameTests {
         TESTS.put("throttle_lever_payload_range", AutomationGameTests::throttleLeverPayloadRange);
         TESTS.put("farming_compost_bin_makes_compost", FarmingGameTests::compostBinMakesCompost);
         TESTS.put("farming_compost_bin_by_hand", FarmingGameTests::compostBinByHand);
+        TESTS.put("farming_compost_bin_recipe_wins", FarmingGameTests::compostBinRecipeWins);
         TESTS.put("farming_loam_tills", FarmingGameTests::loamTills);
         TESTS.put("farming_fertilizers_add_nutrients", FarmingGameTests::fertilizersAddNutrients);
         TESTS.put("farming_growth_uses_nutrients", FarmingGameTests::growthUsesNutrients);

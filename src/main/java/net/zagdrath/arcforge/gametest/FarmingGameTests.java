@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.gametest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
@@ -18,12 +19,14 @@ import net.minecraft.util.ProblemReporter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.CropBlock;
@@ -275,6 +278,23 @@ public final class FarmingGameTests {
                 new ItemStack(ModItems.BASIC_SLAG.get())));
         helper.assertTrue(recipe.matches(grid, helper.getLevel()), "Compost, Wood Ash and Basic Slag don't match");
         helper.assertTrue(recipe.assemble(grid).is(ModItems.MIXED_FERTILIZER.get()), "The recipe doesn't make Mixed Fertilizer");
+        helper.succeed();
+    }
+
+    // Treated Slabs in the Composter's U make a Compost Bin, not a Composter: they're #minecraft:wooden_slabs, so the
+    // vanilla recipe (overridden in data/minecraft/recipe/composter.json) leaves them out. Oak slabs still make a Composter.
+    static void compostBinRecipeWins(GameTestHelper helper) {
+        for (Item slab : List.of(ModBlocks.TREATED_SLAB.get().asItem(), Items.OAK_SLAB)) {
+            List<ItemStack> cells = new ArrayList<>();
+            for (String row : List.of("# #", "# #", "###")) {
+                for (char c : row.toCharArray()) cells.add(c == '#' ? new ItemStack(slab) : ItemStack.EMPTY);
+            }
+            CraftingInput grid = CraftingInput.of(3, 3, cells);
+            ItemStack result = helper.getLevel().recipeAccess().getRecipeFor(RecipeType.CRAFTING, grid, helper.getLevel())
+                    .map(holder -> holder.value().assemble(grid)).orElse(ItemStack.EMPTY);
+            Item expected = slab == Items.OAK_SLAB ? Items.COMPOSTER : ModBlocks.COMPOST_BIN.get().asItem();
+            helper.assertTrue(result.is(expected), slab + " slabs made " + result + ", not " + expected);
+        }
         helper.succeed();
     }
 
