@@ -4,12 +4,13 @@
   "items": [
     "arcforge:infuser",
     "arcforge:treated_planks",
-    "arcforge:treated_log"
+    "arcforge:treated_log",
+    "arcforge:pine_resin"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Soaks wood in creosote with FE: any vanilla planks, logs or wood become the treated version, which never catches fire."
+      "text": "Soaks wood in creosote with FE: any vanilla planks, logs or wood become the treated version, which never catches fire.\nPine Resin (from a Resin Tap) goes in its additive slot and does instead of Creosote: one per plank, four per log or wood."
     }
   ]
 }

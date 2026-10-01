@@ -219,7 +219,10 @@ public final class CropGameTests {
                 new Case("savanna", "wild_sorghum", true), new Case("wooded_badlands", "wild_sorghum", true),
                 new Case("forest", "wild_hops", true), new Case("taiga", "wild_hops", true),
                 new Case("snowy_taiga", "wild_hops", false), new Case("grove", "wild_hops", false),
-                new Case("snowy_plains", "wild_flax", false), new Case("desert", "wild_sorghum", false));
+                new Case("snowy_plains", "wild_flax", false), new Case("desert", "wild_sorghum", false),
+                new Case("forest", "wild_soybeans", true), new Case("plains", "wild_soybeans", true),
+                new Case("snowy_plains", "wild_soybeans", false), new Case("meadow", "wild_rubber_dandelion", true),
+                new Case("taiga", "wild_rubber_dandelion", true), new Case("snowy_taiga", "wild_rubber_dandelion", false));
         for (Case c : cases) {
             var biome = biomes.getOrThrow(ResourceKey.create(Registries.BIOME, Identifier.withDefaultNamespace(c.biome())));
             var feature = features.getOrThrow(ResourceKey.create(Registries.PLACED_FEATURE, Identifier.fromNamespaceAndPath(Arcforge.MODID, c.feature())));

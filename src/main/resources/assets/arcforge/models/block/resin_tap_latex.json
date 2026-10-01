@@ -1,0 +1,6 @@
+{
+  "parent": "arcforge:block/resin_tap",
+  "textures": {
+    "c": "arcforge:block/resin_tap_latex"
+  }
+}

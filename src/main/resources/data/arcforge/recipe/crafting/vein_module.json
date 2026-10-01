@@ -7,7 +7,7 @@
     " P "
   ],
   "key": {
-    "P": "arcforge:plastic_sheet",
+    "P": "#arcforge:plastics",
     "R": "#c:dusts/redstone",
     "X": "arcforge:quarry_scanner"
   },

@@ -408,6 +408,9 @@ Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running a
 100 mB water --[Electrolyzer]--> 200 mB Hydrogen + 100 mB Oxygen   (120,000 FE)
 100 mB Brine --[Electrolyzer]--> 50 mB Hydrogen + 50 mB Chlorine + 100 mB Lye   (60,000 FE)
 100 mB Light Oil + 50 mB Hydrogen --[Chemical Reactor]--> 2 Plastic Sheet
+100 mB Ethanol + 5 mB Sulfuric Acid --[Chemical Reactor]--> 60 mB Ethylene + 40 mB Water (by-product tank)
+120 mB Ethylene --[Chemical Reactor]--> 2 Plastic Sheet (bio-polyethylene)
+60 mB Ethylene + 60 mB Chlorine --[Chemical Reactor]--> 2 PVC Sheet
 ```
 
 **Electrolyzer** (Tempered). Splits water into Hydrogen and Oxygen with FE: 1,200 FE per mB of water (600
@@ -431,9 +434,11 @@ exhausting turbine). By default that floor is 354 FE per mB of hydrogen, reached
 that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as fast (config
 `multiblocks.arcforgeFurnace`).
 
-**Plastic Sheet** (`#c:plastics`) goes into Conduit Filters, Storage Upgrades, the crafted crate and vault
-upgrades, the Settings Card, the Security Terminal, the Fermenter, dyed conduits and the Gas Turbine Array
-Casing.
+**Plastic Sheet** and **PVC Sheet** (`#arcforge:plastics`) go into Conduit Filters, Storage Upgrades, the crafted crate
+and vault upgrades, the Settings Card, the Security Terminal, the Fermenter, dyed conduits and the Gas Turbine Array
+Casing. Plastic Sheet comes from Light Oil and Hydrogen, or from Ethylene (bio-plastic); **Ethylene** is a gas, made from
+Ethanol over a little Sulfuric Acid, with its Water going to the reactor's by-product tank (By-product faces). **PVC
+Sheet** (Ethylene and Chlorine) also lines the Hardened and Arcforged Fluid Conduits and Fluid Tanks.
 
 ### Salt and chlor-alkali
 
@@ -506,6 +511,31 @@ Farmland every growth stage instead of using one. Loam Farmland remembers whethe
 and a non-legume planted after one grows 1.25× as fast until it's harvested (Jade shows it). In the automated farms and
 the Greenhouse Array, legumes need no fertilizer or Nutrient Solution and grow as fast as if they had it. Config
 `farming.loamFarmland`.
+
+### Rubber
+
+```
+Rubber Dandelion Roots --[Oil Press]--> 100 mB Latex
+Resin Tap on a living jungle tree --> 25 mB Latex every 10 s
+250 mB Latex --[Grain Dryer, heat]--> Raw Rubber
+2 Raw Rubber + 1 Sulfur Dust --[Vulcanizer, 140°C+]--> 2 Rubber
+4 Rubber --[crafting]--> 8 Rubber Gaskets
+```
+
+**Rubber Dandelion.** A low crop (yellow flowers, then white seed clocks when ripe) that drops Rubber Dandelion Roots and
+seeds. Wild ones grow in meadows, plains and taiga; grass drops the seeds; every automated farm grows it.
+
+**Resin Tap.** Hang it on the side of a log with natural leaves above it (a living tree). Every 10 seconds it drips: on a
+jungle log, 25 mB of Latex into its 1,000 mB tank; on a spruce log, a 50% chance of a Pine Resin; on any other log, a
+15% chance (it holds 16). Buckets, an empty hand, a hopper under it or a conduit empty it. Pine Resin goes in the
+Infuser's additive slot in place of Creosote (one per plank, four per log or wood). Config `farming.resinTap`.
+
+**Vulcanizer.** A single-block heat machine (HU, no FE) that only works at 140°C or hotter: 2 Raw Rubber + 1 Sulfur
+Dust cure into 2 Rubber at 12 HU/t (`arcforge:vulcanizing`). Input on top, output underneath and heat at the back by
+default; Speed and Heat upgrades. Config `farming.vulcanizer`.
+
+**Rubber Gaskets** seal Tempered and better Pressurized Conduits, Pressurized Cylinders and Gas Cartridges, and the
+Jetpacks. Nine Rubber make a Block of Rubber.
 
 ### Automated farms
 

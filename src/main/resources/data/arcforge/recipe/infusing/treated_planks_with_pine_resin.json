@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:infusing",
+  "ingredient": "#arcforge:infusable/planks",
+  "additive": {
+    "ingredient": "arcforge:pine_resin",
+    "count": 1
+  },
+  "result": {
+    "count": 1,
+    "id": "arcforge:treated_planks"
+  },
+  "time": 60
+}

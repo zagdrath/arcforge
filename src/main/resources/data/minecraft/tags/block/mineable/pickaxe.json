@@ -142,6 +142,7 @@
     "arcforge:deepslate_halite_ore",
     "arcforge:raw_rock_salt_block",
     "arcforge:thermal_evaporator_casing",
-    "arcforge:thermal_evaporator_controller"
+    "arcforge:thermal_evaporator_controller",
+    "arcforge:vulcanizer"
   ]
 }

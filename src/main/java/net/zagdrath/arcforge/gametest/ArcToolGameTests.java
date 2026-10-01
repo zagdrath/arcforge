@@ -285,8 +285,9 @@ public final class ArcToolGameTests {
         helper.assertFalse(recipe.matches(new SmithingRecipeInput(new ItemStack(ModItems.STEEL_PLATE.get()), plated,
                 new ItemStack(ModItems.STEEL_CHESTPLATE.get())), helper.getLevel()), "A plated jetpack can be plated again");
 
-        ItemStack hardened = AlloyGameTests.craft(helper, "crafting/hardened_jetpack", new String[] { "PAP", "AXA", "PEP" }, Map.of(
-                'P', new ItemStack(ModItems.PLASTIC_SHEET.get()), 'A', new ItemStack(ModItems.HARDENED_ALLOY.get()), 'X', plated,
+        ItemStack hardened = AlloyGameTests.craft(helper, "crafting/hardened_jetpack", new String[] { "PGP", "AXA", "PEP" }, Map.of(
+                'P', new ItemStack(ModItems.PLASTIC_SHEET.get()), 'G', new ItemStack(ModItems.RUBBER_GASKET.get()),
+                'A', new ItemStack(ModItems.HARDENED_ALLOY.get()), 'X', plated,
                 'E', new ItemStack(ModItems.portable(PortableStorageItem.Kind.GAS_CARTRIDGE, ConduitTier.HARDENED))));
         helper.assertTrue(hardened.is(ModItems.HARDENED_JETPACK.get()), "Didn't make a Hardened Jetpack");
         FluidStack gas = JetpackItem.fluid(hardened);

@@ -38,6 +38,7 @@ import snownee.jade.api.config.IPluginConfig;
 //  - Mill: lanes working ("Milling: 2 / 3 lanes").
 //  - Oil Press and Seed Extractor: progress ("45%").
 //  - Grain Dryer: its temperature against the 60°C it needs.
+//  - Vulcanizer: its temperature against the 140°C it needs, and its progress.
 //  - Fermenter: the Dried Hops still boosting ("Dried Hops: 3 operations left").
 // Then the machine's status. The server builds the lines; Client draws them.
 public enum FarmProcessingProvider implements StreamServerDataProvider<BlockAccessor, List<Component>> {
@@ -79,6 +80,15 @@ public enum FarmProcessingProvider implements StreamServerDataProvider<BlockAcce
                 int needed = GrainDryerBlockEntity.minTemperature();
                 lines.add(Component.translatable("jade.arcforge.grain_dryer.temperature", celsius, needed)
                         .withStyle(celsius > needed ? ChatFormatting.GOLD : ChatFormatting.GRAY));
+            }
+            case net.zagdrath.arcforge.blockentity.machine.VulcanizerBlockEntity vulcanizer -> {
+                int celsius = vulcanizer.getHeat().getTemperature();
+                int needed = net.zagdrath.arcforge.blockentity.machine.VulcanizerBlockEntity.minTemperature();
+                lines.add(Component.translatable("jade.arcforge.vulcanizer.temperature", celsius, needed)
+                        .withStyle(celsius >= needed ? ChatFormatting.GOLD : ChatFormatting.GRAY));
+                if (vulcanizer.getStatus() == MachineStatus.VULCANIZING && vulcanizer.getTotal() > 0) {
+                    lines.add(Component.translatable("gui.arcforge.percent", 100 * vulcanizer.getProgress() / vulcanizer.getTotal()));
+                }
             }
             case FermenterBlockEntity fermenter -> {
                 if (fermenter.getAdditiveLeft() > 0) {

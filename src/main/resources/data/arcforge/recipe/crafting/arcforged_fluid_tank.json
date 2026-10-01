@@ -4,13 +4,14 @@
   "pattern": [
     "ACA",
     "LXL",
-    "ALA"
+    "AVA"
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
     "C": "#c:gems/arcite",
     "L": "#c:glass_blocks",
-    "X": "arcforge:hardened_fluid_tank"
+    "X": "arcforge:hardened_fluid_tank",
+    "V": "arcforge:pvc_sheet"
   },
   "result": {
     "id": "arcforge:arcforged_fluid_tank",

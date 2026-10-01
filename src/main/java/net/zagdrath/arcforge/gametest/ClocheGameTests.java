@@ -180,7 +180,7 @@ public final class ClocheGameTests {
     static void recipes(GameTestHelper helper) {
         var level = helper.getLevel();
         List<RecipeHolder<ClocheRecipe>> all = level.recipeAccess().recipeMap().byType(ModRecipes.CLOCHE.get()).stream().toList();
-        helper.assertTrue(all.size() == 28, all.size() + " cloche recipes, not 28");
+        helper.assertTrue(all.size() == 29, all.size() + " cloche recipes, not 29");
         for (RecipeHolder<ClocheRecipe> holder : all) {
             ClocheRecipe recipe = holder.value();
             helper.assertTrue(recipe.seed().items().findAny().isPresent(), holder.id() + " has no seed");

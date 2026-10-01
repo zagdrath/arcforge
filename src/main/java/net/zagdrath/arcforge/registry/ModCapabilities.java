@@ -225,6 +225,17 @@ public final class ModCapabilities {
                 net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity::getItemHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.GRAIN_DRYER.get(),
                 net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GRAIN_DRYER.get(),
+                net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.VULCANIZER.get(),
+                net.zagdrath.arcforge.blockentity.machine.VulcanizerBlockEntity::getItemHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.VULCANIZER.get(),
+                net.zagdrath.arcforge.blockentity.machine.VulcanizerBlockEntity::getHeatHandler);
+        // The Resin Tap: its Latex and Pine Resin come out of any face.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.RESIN_TAP.get(),
+                net.zagdrath.arcforge.blockentity.farming.ResinTapBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.RESIN_TAP.get(),
+                net.zagdrath.arcforge.blockentity.farming.ResinTapBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
                 ChemicalReactorBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),

@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:infusing",
+  "ingredient": "#arcforge:infusable/stripped_logs",
+  "additive": {
+    "ingredient": "arcforge:pine_resin",
+    "count": 4
+  },
+  "result": {
+    "count": 1,
+    "id": "arcforge:stripped_treated_log"
+  },
+  "time": 120
+}

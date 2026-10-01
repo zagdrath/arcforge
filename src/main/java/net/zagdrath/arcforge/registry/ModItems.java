@@ -226,6 +226,14 @@ public final class ModItems {
     public static final DeferredItem<Item> COPPER_ROD = ITEMS.registerSimpleItem("copper_rod");
     // Light Oil and Hydrogen, reacted in the Chemical Reactor (#c:plastics).
     public static final DeferredItem<Item> PLASTIC_SHEET = ITEMS.registerSimpleItem("plastic_sheet");
+    // Ethylene and Chlorine, reacted in the Chemical Reactor: an acid-proof lining for fluid conduits and tanks.
+    public static final DeferredItem<Item> PVC_SHEET = ITEMS.registerSimpleItem("pvc_sheet");
+    // Rubber: Raw Rubber (Latex dried in the Grain Dryer) cured with Sulfur in the Vulcanizer. Gaskets seal the
+    // pressurized conduits, cylinders, cartridges and jetpacks.
+    public static final DeferredItem<Item> RAW_RUBBER = ITEMS.registerSimpleItem("raw_rubber");
+    public static final DeferredItem<Item> RUBBER = ITEMS.registerSimpleItem("rubber");
+    public static final DeferredItem<BlockItem> RUBBER_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RUBBER_BLOCK);
+    public static final DeferredItem<Item> RUBBER_GASKET = ITEMS.registerSimpleItem("rubber_gasket");
     // Arc Quarry parts.
     public static final DeferredItem<Item> TUNGSTEN_DRILL_HEAD = ITEMS.registerSimpleItem("tungsten_drill_head");
     public static final DeferredItem<Item> QUARRY_SCANNER = ITEMS.registerSimpleItem("quarry_scanner");
@@ -276,6 +284,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> SALT_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.SALT_BLOCK);
     public static final DeferredItem<BlockItem> THERMAL_EVAPORATOR_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.THERMAL_EVAPORATOR_CASING);
     public static final DeferredItem<BlockItem> THERMAL_EVAPORATOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.THERMAL_EVAPORATOR_CONTROLLER);
+    public static final DeferredItem<BucketItem> LATEX_BUCKET = ITEMS.registerItem("latex_bucket",
+            p -> new BucketItem(ModFluids.LATEX.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SEAWATER_BUCKET = ITEMS.registerItem("seawater_bucket",
             p -> new BucketItem(ModFluids.SEAWATER.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     // Halite and what it gives: Rock Salt (the Arc Crusher makes Salt of it) and its raw block.
@@ -431,6 +441,12 @@ public final class ModItems {
     // Soybeans are their own seed, like vanilla carrots: the item plants the crop and is named as an item.
     public static final DeferredItem<BlockItem> SOYBEANS = ITEMS.registerItem("soybeans",
             p -> new BlockItem(ModBlocks.SOYBEANS.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_MEDIUM)));
+    // Rubber Dandelion: seeds plant it; its roots press into Latex.
+    public static final DeferredItem<BlockItem> RUBBER_DANDELION_SEEDS = ITEMS.registerItem("rubber_dandelion_seeds",
+            p -> new BlockItem(ModBlocks.RUBBER_DANDELION.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
+    public static final DeferredItem<Item> RUBBER_DANDELION_ROOTS = ITEMS.registerSimpleItem("rubber_dandelion_roots", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    // Pine Resin, from a Resin Tap on a spruce (or slowly, any) log: the Infuser takes it in place of Creosote.
+    public static final DeferredItem<Item> PINE_RESIN = ITEMS.registerSimpleItem("pine_resin");
     public static final DeferredItem<Item> SORGHUM_STALKS = ITEMS.registerSimpleItem("sorghum_stalks", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     // Hop Seeds are planted by using them on a Trellis (TrellisBlock), so they're a plain item.
     public static final DeferredItem<Item> HOP_SEEDS = ITEMS.registerSimpleItem("hop_seeds", p -> p.compostable(ContextIntProviders.COMPOSTABLE_LOW));
@@ -441,12 +457,15 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> WILD_SORGHUM = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SORGHUM, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<BlockItem> WILD_HOPS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_HOPS, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<BlockItem> WILD_SOYBEANS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SOYBEANS, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<BlockItem> WILD_RUBBER_DANDELION = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RUBBER_DANDELION,
+            p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
 
     // Rustic farming machines and tools. Durability is fixed here (it's set before the config loads); the areas are config.
     public static final DeferredItem<BlockItem> PLANTER = ITEMS.registerSimpleBlockItem(ModBlocks.PLANTER);
     public static final DeferredItem<BlockItem> HARVESTER = ITEMS.registerSimpleBlockItem(ModBlocks.HARVESTER);
     public static final DeferredItem<BlockItem> FERTILIZER_SPREADER = ITEMS.registerSimpleBlockItem(ModBlocks.FERTILIZER_SPREADER);
     public static final DeferredItem<BlockItem> COPPER_SPRINKLER = ITEMS.registerSimpleBlockItem(ModBlocks.COPPER_SPRINKLER);
+    public static final DeferredItem<BlockItem> RESIN_TAP = ITEMS.registerSimpleBlockItem(ModBlocks.RESIN_TAP);
     public static final DeferredItem<DoubleHighBlockItem> SCARECROW = ITEMS.registerItem("scarecrow",
             p -> new DoubleHighBlockItem(ModBlocks.SCARECROW.get(), p), p -> p.useBlockDescriptionPrefix());
     public static final DeferredItem<SickleItem> IRON_SICKLE = ITEMS.registerItem("iron_sickle",
@@ -463,6 +482,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> OIL_PRESS = ITEMS.registerSimpleBlockItem(ModBlocks.OIL_PRESS);
     public static final DeferredItem<BlockItem> SEED_EXTRACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.SEED_EXTRACTOR);
     public static final DeferredItem<BlockItem> GRAIN_DRYER = ITEMS.registerSimpleBlockItem(ModBlocks.GRAIN_DRYER);
+    public static final DeferredItem<BlockItem> VULCANIZER = ITEMS.registerSimpleBlockItem(ModBlocks.VULCANIZER);
     public static final DeferredItem<Item> FLOUR = ITEMS.registerSimpleItem("flour");
     public static final DeferredItem<FertilizerItem> SEED_MEAL = ITEMS.registerItem("seed_meal",
             p -> new FertilizerItem(ArcforgeConfig.SEED_MEAL_NUTRIENTS::getAsInt, p));

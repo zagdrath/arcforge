@@ -55,10 +55,12 @@ import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.block.farming.ArcforgeCropBlock;
 import net.zagdrath.arcforge.block.farming.CompostBinBlock;
 import net.zagdrath.arcforge.block.farming.CopperSprinklerBlock;
+import net.zagdrath.arcforge.block.farming.ResinTapBlock;
 import net.zagdrath.arcforge.block.farming.FarmMachineBlock;
 import net.zagdrath.arcforge.block.farming.FertilizerSpreaderBlock;
 import net.zagdrath.arcforge.block.farming.MillstoneBlock;
 import net.zagdrath.arcforge.block.machine.GrainDryerBlock;
+import net.zagdrath.arcforge.block.machine.VulcanizerBlock;
 import net.zagdrath.arcforge.block.machine.MillBlock;
 import net.zagdrath.arcforge.block.machine.OilPressBlock;
 import net.zagdrath.arcforge.block.machine.SeedExtractorBlock;
@@ -548,6 +550,13 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> SEAWATER = BLOCKS.registerBlock("seawater",
             p -> new LiquidBlock(ModFluids.SEAWATER.get(), p) {},
             p -> liquidProperties(p, MapColor.WATER));
+    // Latex, from the Oil Press and the Resin Tap.
+    public static final DeferredBlock<LiquidBlock> LATEX = BLOCKS.registerBlock("latex",
+            p -> new LiquidBlock(ModFluids.LATEX.get(), p) {},
+            p -> liquidProperties(p, MapColor.SNOW));
+    // Nine Rubber, pressed into a block: soft and quiet underfoot.
+    public static final DeferredBlock<Block> RUBBER_BLOCK = BLOCKS.registerSimpleBlock("rubber_block",
+            p -> p.mapColor(MapColor.COLOR_BLACK).strength(0.8F, 3.0F).sound(SoundType.WOOL));
     // Nine Salt, packed: brittle like calcite, a pickaxe to drop it.
     public static final DeferredBlock<Block> SALT_BLOCK = BLOCKS.registerSimpleBlock("salt_block",
             p -> p.mapColor(MapColor.SNOW).instrument(NoteBlockInstrument.BASEDRUM).strength(1.5F, 3.0F).requiresCorrectToolForDrops()
@@ -627,6 +636,9 @@ public final class ModBlocks {
     // Soybeans: a low bush, one block tall at every age (tallFromAge past the last). A legume (#arcforge:legumes).
     public static final DeferredBlock<ArcforgeCropBlock> SOYBEANS = BLOCKS.registerBlock("soybeans",
             p -> new ArcforgeCropBlock(() -> ModItems.SOYBEANS.get(), 8, p), ModBlocks::cropProperties);
+    // Rubber Dandelion: a low rosette whose fat roots hold latex. One block tall at every age, like Soybeans.
+    public static final DeferredBlock<ArcforgeCropBlock> RUBBER_DANDELION = BLOCKS.registerBlock("rubber_dandelion",
+            p -> new ArcforgeCropBlock(() -> ModItems.RUBBER_DANDELION_SEEDS.get(), 8, p), ModBlocks::cropProperties);
     // Not solid, so farmland under it stays farmland.
     public static final DeferredBlock<TrellisBlock> TRELLIS = BLOCKS.registerBlock("trellis",
             TrellisBlock::new, p -> treatedWood(p).strength(0.6F).noOcclusion().forceSolidOff().randomTicks());
@@ -635,6 +647,8 @@ public final class ModBlocks {
     public static final DeferredBlock<WildCropBlock> WILD_SORGHUM = BLOCKS.registerBlock("wild_sorghum", p -> new WildCropBlock(true, p), ModBlocks::wildCropProperties);
     public static final DeferredBlock<WildCropBlock> WILD_HOPS = BLOCKS.registerBlock("wild_hops", p -> new WildCropBlock(false, p), ModBlocks::wildCropProperties);
     public static final DeferredBlock<WildCropBlock> WILD_SOYBEANS = BLOCKS.registerBlock("wild_soybeans", p -> new WildCropBlock(false, p), ModBlocks::wildCropProperties);
+    public static final DeferredBlock<WildCropBlock> WILD_RUBBER_DANDELION = BLOCKS.registerBlock("wild_rubber_dandelion",
+            p -> new WildCropBlock(false, p), ModBlocks::wildCropProperties);
 
     // Rustic farming machines: unpowered, treated wood with copper and iron fittings.
     public static final DeferredBlock<FarmMachineBlock> PLANTER = BLOCKS.registerBlock("planter",
@@ -645,6 +659,9 @@ public final class ModBlocks {
             FertilizerSpreaderBlock::new, p -> treatedWood(p).strength(1.5F).noOcclusion());
     public static final DeferredBlock<CopperSprinklerBlock> COPPER_SPRINKLER = BLOCKS.registerBlock("copper_sprinkler",
             CopperSprinklerBlock::new, p -> p.mapColor(MapColor.COLOR_ORANGE).strength(2.0F, 6.0F).sound(SoundType.COPPER).noOcclusion());
+    // The Resin Tap: a small spout and cup hung on the side of a log; it breaks with the log under it.
+    public static final DeferredBlock<ResinTapBlock> RESIN_TAP = BLOCKS.registerBlock("resin_tap",
+            ResinTapBlock::new, p -> treatedWood(p).strength(0.8F).noOcclusion().forceSolidOff().pushReaction(PushReaction.POPPED));
     // Not solid, so it can stand on farmland among the crops.
     public static final DeferredBlock<ScarecrowBlock> SCARECROW = BLOCKS.registerBlock("scarecrow",
             ScarecrowBlock::new, p -> treatedWood(p).strength(0.8F).noOcclusion().forceSolidOff().pushReaction(PushReaction.POPPED));
@@ -662,6 +679,9 @@ public final class ModBlocks {
     // The heating element glows while it dries.
     public static final DeferredBlock<GrainDryerBlock> GRAIN_DRYER = BLOCKS.registerBlock("grain_dryer",
             GrainDryerBlock::new, p -> machineProperties(p, 7));
+    // The Vulcanizer cures Raw Rubber with Sulfur in a heated press; its platens glow while it works.
+    public static final DeferredBlock<VulcanizerBlock> VULCANIZER = BLOCKS.registerBlock("vulcanizer",
+            VulcanizerBlock::new, p -> machineProperties(p, 7));
 
     // Farm chemistry. The Air Separator runs on FE; the Haber Reactor on FE and heat (its catalyst bed glows while it
     // runs). The Biogas Digester is a 3x3x3 of Biogas Digester Casings with one controller (see BiogasDigesterStructure).

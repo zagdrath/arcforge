@@ -8,7 +8,7 @@
   ],
   "key": {
     "W": "arcforge:wrought_alloy",
-    "P": "arcforge:plastic_sheet",
+    "P": "#arcforge:plastics",
     "G": "#c:glass_panes",
     "X": "minecraft:comparator",
     "R": "#c:dusts/redstone"

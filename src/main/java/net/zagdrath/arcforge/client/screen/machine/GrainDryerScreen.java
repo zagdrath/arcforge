@@ -19,11 +19,14 @@ import net.zagdrath.arcforge.client.gui.HeatScale;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.GrainDryerMenu;
+import net.zagdrath.arcforge.registry.ModFluids;
 
-// The Fiberizer's layout without the FE gauge: the item, the arrow and the result, the status, the heat bar with a tick
-// at the temperature it needs (60°C), and the heat buffer on the right. Positions are relative to leftPos/topPos.
+// The Fiberizer's layout without the FE gauge: the fluid tank (Latex) on the left, the item, the arrow and the result, the
+// status, the heat bar with a tick at the temperature it needs (60°C), and the heat buffer on the right. Positions are
+// relative to leftPos/topPos.
 public class GrainDryerScreen extends MachineScreen<GrainDryerMenu> {
     private static final int BUFFER_X = 157, BUFFER_Y = 19;
+    private static final int TANK_X = 25, TANK_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int PROGRESS_X = 68, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
     // Two rows higher than the Fiberizer's: the 60°C tick sits under the start of the status text.
     private static final int LED_X = 43, LED_Y = 54;
@@ -34,6 +37,8 @@ public class GrainDryerScreen extends MachineScreen<GrainDryerMenu> {
     private final Identifier heatBuffer = sprite("heat_buffer");
     private final Identifier progress = sprite("progress");
     private final Identifier minTempTick = sprite("min_temp_tick");
+    private final Identifier fluidFill = sprite("fluid_fill");
+    private final Identifier tankGauge = sprite("tank_gauge");
 
     public GrainDryerScreen(GrainDryerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "grain_dryer", List.of(
@@ -51,6 +56,8 @@ public class GrainDryerScreen extends MachineScreen<GrainDryerMenu> {
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         drawGauge(graphics, heatBuffer, x, y, BUFFER_X, BUFFER_Y, menu.getHeat(), menu.getHeatCapacity());
+        drawFluidTank(graphics, menu.getFluid(), menu.getFluidAmount(), menu.getFluidCapacity(), fluidFill, tankGauge,
+                x, y, TANK_X, TANK_Y, TANK_W, TANK_H);
         ArcCrusherScreen.drawProgress(graphics, progress, x + PROGRESS_X, y + PROGRESS_Y, menu.getProgress(), menu.getTotal());
         drawLed(graphics, x, y, LED_X, LED_Y);
         drawHeatBar(graphics, x, y, HEAT_X, HEAT_Y, HEAT_W, menu.getTemperature());
@@ -75,6 +82,8 @@ public class GrainDryerScreen extends MachineScreen<GrainDryerMenu> {
             lines.add(Component.translatable("gui.arcforge.hu_stored", ArcforgeGui.grouped(menu.getHeat()), ArcforgeGui.grouped(menu.getHeatCapacity())));
             lines.add(temperatureLine().withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.arcforge.hu_per_tick_loss", menu.getHeatUsage()).withStyle(ChatFormatting.GOLD));
+        } else if (isHovering(TANK_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
+            addFluidTooltip(lines, menu.getFluid(), ModFluids.LATEX_TYPE.get().getDescription(), menu.getFluidAmount(), menu.getFluidCapacity());
         } else if (isHovering(HEAT_X, TICK_Y, HEAT_W, TICK_H, mouseX, mouseY)) {
             lines.add(temperatureLine());
         } else if (isHovering(PROGRESS_X, PROGRESS_Y, PROGRESS_W, PROGRESS_H, mouseX, mouseY) && menu.getTotal() > 0) {

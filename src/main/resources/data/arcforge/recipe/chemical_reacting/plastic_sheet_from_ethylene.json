@@ -1,0 +1,14 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:ethylene",
+      "amount": 120
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:plastic_sheet",
+    "count": 2
+  },
+  "time": 120
+}

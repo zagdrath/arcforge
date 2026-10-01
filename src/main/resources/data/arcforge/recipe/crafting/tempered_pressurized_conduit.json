@@ -2,16 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "XXX",
+    "XGX",
     "XTX",
     "XXX"
   ],
   "key": {
     "X": "arcforge:wrought_pressurized_conduit",
-    "T": "arcforge:tempered_alloy"
+    "T": "arcforge:tempered_alloy",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:tempered_pressurized_conduit",
-    "count": 8
+    "count": 7
   }
 }

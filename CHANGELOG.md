@@ -31,9 +31,47 @@ number and date.
   `farming.loamFarmland.legumeNutrientsPerStage` / `rotationMultiplier` get their defaults.
 - **Leaching recipes** in data packs that name `arcforge:sulfuric_acid` still work; the built-in ones now take the tag
   `#arcforge:leaching_acids` (Sulfuric and Hydrochloric Acid).
+- **Infuser additive slot** (for Pine Resin). Saved Infusers keep their wood, tank and upgrades: the upgrades move up past
+  the new slot when the world loads.
+- **Chemical Reactor by-product tank** and **Grain Dryer fluid tank** load empty in saved machines. The reactor's output
+  and by-product slots now stack after the arrow (the second output tank sits where the by-product slot was) and its
+  status line moved under the tanks; nothing in the slots moves.
+- **Recipes that now need Rubber Gaskets or PVC Sheet** (see Changed): make some Rubber first, or a data pack can put the
+  old recipes back.
+- **Wild Rubber Dandelions generate only in newly explored chunks.**
+- **New config sections** `farming.vulcanizer` and `farming.resinTap`, and `farming.grainDryer.tankCapacity`, get their
+  defaults.
+- **Data packs:** `arcforge:infusing` recipes may take an `additive` (`{"ingredient", "count"}`) instead of a `fluid`;
+  `arcforge:drying` recipes may take a `fluid` (`{"fluid" or "tag", "amount"}`) instead of an `ingredient`;
+  `arcforge:chemical_reacting` recipes may have a `fluid_byproduct`. Existing recipes load unchanged.
 
 ### Added
 
+- **Rubber.**
+  - **Rubber Dandelion,** a new crop (one block tall): yellow flowers, then white seed clocks when ripe. It drops
+    **Rubber Dandelion Roots** and **Rubber Dandelion Seeds**. **Wild Rubber Dandelions** grow in meadows, plains and taiga
+    (never snowy ones; modded biomes through `#arcforge:wild_crops/rubber_dandelion`), and grass drops the seeds. It grows in the Glass Cloche, Grow Chamber, Hydroponic Cell and Greenhouse Array.
+  - **Latex,** a fluid. The Oil Press presses one root into 100 mB.
+  - **Resin Tap,** a small rustic spout and cup hung on the side of a log with natural leaves above it (a living tree).
+    Every 10 seconds it drips: 25 mB of Latex into its 1,000 mB tank on a jungle log; a 50% chance of a **Pine Resin** on
+    a spruce log; a 15% chance on any other log (up to 16). Buckets, an empty hand, hoppers and conduits empty it. Jade
+    shows what it holds and whether the tree is alive; JEI shows what each log gives.
+  - **Pine Resin:** the Infuser takes it in its new additive slot in place of Creosote (one per plank, four per log or
+    wood), so treated wood needs no Carbonizer.
+  - **Raw Rubber:** the Grain Dryer has a fluid tank now and dries 250 mB of Latex into a sheet.
+  - **Vulcanizer,** a single-block heat machine (HU, no FE) that only works at 140°C or hotter: 2 Raw Rubber + 1 Sulfur
+    Dust make 2 **Rubber** (data-driven, `arcforge:vulcanizing`, with a JEI category). Side configuration, Speed and Heat
+    upgrades, Jade info.
+  - **Rubber** (`#c:rubbers`), the **Block of Rubber** and the **Rubber Gasket** (4 Rubber make 8).
+- **Bio-plastics.**
+  - **Ethylene,** a gas: 100 mB Ethanol + 5 mB Sulfuric Acid (the catalyst) in the Chemical Reactor make 60 mB Ethylene
+    and 40 mB Water. The reactor has a new by-product tank for liquid by-products; it empties through By-product faces.
+  - **Plastic Sheet** from 120 mB Ethylene (bio-polyethylene), beside the Light Oil + Hydrogen recipe, which stays.
+  - **PVC Sheet:** 60 mB Ethylene + 60 mB Chlorine make 2.
+  - Tag `#arcforge:plastics` (Plastic Sheet and PVC Sheet); PVC Sheet joins `#c:plastics`.
+- Advancements: Dandelion Roots, Tapped and Crepe (Farming); Goodyear, Bio-Plastics and Acid-Proof (Chemistry). Handbook
+  entries Rubber Dandelion, Resin Tap, Vulcanizer and Bio-Plastics, and updates to the Infuser, Grain Dryer, Oil Press and
+  Chemical Processing entries. Every rate is in the config.
 - **Salt and chlor-alkali chemistry.**
   - **Halite,** a new ore in stone and deepslate. It generates in large, flat underground beds (Y -32 to 40), several
     layers thick under deserts and oceans. It drops **Rock Salt** (Fortune works; Silk Touch drops the ore); the Arc
@@ -83,6 +121,18 @@ number and date.
 
 ### Changed
 
+- **Rubber Gaskets** go into the recipes of:
+  - Tempered, Hardened and Arcforged Pressurized Conduits (one gasket in the ring: 7, 7 and 6 conduits a craft);
+  - Tempered, Hardened and Arcforged Pressurized Cylinders and Gas Cartridges (two, along the bottom);
+  - the Tempered Jetpack (between its conduit straps) and the Hardened and Arcforged Jetpacks (one, at the top).
+- **PVC Sheet** lines the Hardened and Arcforged Fluid Conduits (one in the ring: 7 and 6 a craft) and the Hardened and
+  Arcforged Fluid Tanks (one, bottom middle).
+- **Every recipe that took Plastic Sheet** (or `#c:plastics`) now takes `#arcforge:plastics`, so PVC Sheet works too:
+  the Crates, Vaults and Storage Upgrades, the Jetpacks, Arc Drills and Arc Saws, the tool modules, the Conduit Filter,
+  Settings Card, Security Terminal, Fermenter and Gas Turbine Array Casing.
+- **Chemical Reactor:** a by-product tank beside the output tank; the output and by-product slots stack after the arrow.
+- **Infuser:** an additive slot under the wood slot; the status moved under the arrow.
+- **Grain Dryer:** a fluid tank (4,000 mB) that takes Latex through input faces, pipes and buckets.
 - **New banner** in the README and on the mod list's details screen.
 - **Wild crops spawn in more places, and more often.** Each has a biome tag (`#arcforge:wild_crops/flax`, `/rapeseed`,
   `/sorghum`, `/hops`) built on the common `c:` biome tags, so modded biomes such as Biomes O' Plenty's get them too;

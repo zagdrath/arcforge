@@ -9,7 +9,7 @@
   "key": {
     "A": "arcforge:hardened_alloy",
     "K": "#c:chests/wooden",
-    "P": "#c:plastics",
+    "P": "#arcforge:plastics",
     "X": "arcforge:tempered_vault"
   },
   "result": {

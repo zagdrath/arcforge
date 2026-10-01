@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:farming/resin_tap",
+  "display": {
+    "icon": {
+      "id": "arcforge:raw_rubber"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.raw_rubber.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.raw_rubber.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "raw_rubber": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:raw_rubber"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "raw_rubber"
+    ]
+  ]
+}

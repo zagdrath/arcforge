@@ -1,0 +1,13 @@
+{
+  "type": "arcforge:infusing",
+  "ingredient": "#arcforge:infusable/logs",
+  "additive": {
+    "ingredient": "arcforge:pine_resin",
+    "count": 4
+  },
+  "result": {
+    "count": 1,
+    "id": "arcforge:treated_log"
+  },
+  "time": 120
+}

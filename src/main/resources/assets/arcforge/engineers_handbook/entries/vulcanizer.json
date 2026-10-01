@@ -1,0 +1,17 @@
+{
+  "title": "Vulcanizer",
+  "icon": "arcforge:vulcanizer",
+  "items": [
+    "arcforge:vulcanizer",
+    "arcforge:raw_rubber",
+    "arcforge:rubber",
+    "arcforge:rubber_block",
+    "arcforge:rubber_gasket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A heated press that cures Raw Rubber with Sulfur into Rubber. It runs on heat (HU), no FE, and only at 140°C or hotter: a Firebox at its back is the simplest start, a Fuel Burner or a hot Heat Cell keeps it hotter.\n- 2 Raw Rubber + 1 Sulfur Dust make 2 Rubber in 10 seconds, at 12 HU/t.\n- Two input slots, each holding one kind of item: hoppers and conduits sort them.\n- Sides: input on top, output underneath and heat at the back by default; change them in the Sides tab.\n- Speed and Heat upgrades."
+    }
+  ]
+}

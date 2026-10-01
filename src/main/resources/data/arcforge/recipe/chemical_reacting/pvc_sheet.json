@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:ethylene",
+      "amount": 60
+    },
+    {
+      "fluid": "arcforge:chlorine",
+      "amount": 60
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:pvc_sheet",
+    "count": 2
+  },
+  "time": 120
+}

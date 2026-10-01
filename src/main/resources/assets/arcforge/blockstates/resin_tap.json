@@ -1,0 +1,49 @@
+{
+  "variants": {
+    "content=empty,facing=north": {
+      "model": "arcforge:block/resin_tap"
+    },
+    "content=latex,facing=north": {
+      "model": "arcforge:block/resin_tap_latex"
+    },
+    "content=resin,facing=north": {
+      "model": "arcforge:block/resin_tap_resin"
+    },
+    "content=empty,facing=east": {
+      "model": "arcforge:block/resin_tap",
+      "y": 90
+    },
+    "content=latex,facing=east": {
+      "model": "arcforge:block/resin_tap_latex",
+      "y": 90
+    },
+    "content=resin,facing=east": {
+      "model": "arcforge:block/resin_tap_resin",
+      "y": 90
+    },
+    "content=empty,facing=south": {
+      "model": "arcforge:block/resin_tap",
+      "y": 180
+    },
+    "content=latex,facing=south": {
+      "model": "arcforge:block/resin_tap_latex",
+      "y": 180
+    },
+    "content=resin,facing=south": {
+      "model": "arcforge:block/resin_tap_resin",
+      "y": 180
+    },
+    "content=empty,facing=west": {
+      "model": "arcforge:block/resin_tap",
+      "y": 270
+    },
+    "content=latex,facing=west": {
+      "model": "arcforge:block/resin_tap_latex",
+      "y": 270
+    },
+    "content=resin,facing=west": {
+      "model": "arcforge:block/resin_tap_resin",
+      "y": 270
+    }
+  }
+}

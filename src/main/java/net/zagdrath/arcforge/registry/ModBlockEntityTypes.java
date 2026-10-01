@@ -18,12 +18,14 @@ import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.ResinTapBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.GreenhouseBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.PlantingBedBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.VulcanizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.HaberReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.MillBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.OilPressBlockEntity;
@@ -140,6 +142,10 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(SeedExtractorBlockEntity::new, ModBlocks.SEED_EXTRACTOR.get()));
     public static final Supplier<BlockEntityType<GrainDryerBlockEntity>> GRAIN_DRYER = BLOCK_ENTITY_TYPES.register("grain_dryer",
             () -> new BlockEntityType<>(GrainDryerBlockEntity::new, ModBlocks.GRAIN_DRYER.get()));
+    public static final Supplier<BlockEntityType<VulcanizerBlockEntity>> VULCANIZER = BLOCK_ENTITY_TYPES.register("vulcanizer",
+            () -> new BlockEntityType<>(VulcanizerBlockEntity::new, ModBlocks.VULCANIZER.get()));
+    public static final Supplier<BlockEntityType<ResinTapBlockEntity>> RESIN_TAP = BLOCK_ENTITY_TYPES.register("resin_tap",
+            () -> new BlockEntityType<>(ResinTapBlockEntity::new, ModBlocks.RESIN_TAP.get()));
     // Farm chemistry.
     public static final Supplier<BlockEntityType<AirSeparatorBlockEntity>> AIR_SEPARATOR = BLOCK_ENTITY_TYPES.register("air_separator",
             () -> new BlockEntityType<>(AirSeparatorBlockEntity::new, ModBlocks.AIR_SEPARATOR.get()));

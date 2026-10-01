@@ -4,13 +4,14 @@
   "pattern": [
     "PCP",
     "AXA",
-    "PAP"
+    "GAG"
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
     "C": "#c:gems/arcite",
     "P": "#c:plates/steel",
-    "X": "arcforge:hardened_pressurized_cylinder"
+    "X": "arcforge:hardened_pressurized_cylinder",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:arcforged_pressurized_cylinder",

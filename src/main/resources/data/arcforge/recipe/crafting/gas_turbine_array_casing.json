@@ -9,7 +9,7 @@
   "key": {
     "H": "arcforge:hardened_alloy",
     "B": "arcforge:turbine_blade_set",
-    "P": "arcforge:plastic_sheet",
+    "P": "#arcforge:plastics",
     "C": "arcforge:combustor"
   },
   "result": {

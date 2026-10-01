@@ -41,13 +41,14 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Chemical Reactor: up to two items (each with a count) and up to three fluids react into an item, a fluid or both, with
-// an optional byproduct rolled once per operation (Slag, when precipitating). The items are item_input and
+// an optional byproduct rolled once per operation (Slag, when precipitating), and an optional fluid_byproduct that always
+// comes (the Water left when Ethanol is dehydrated into Ethylene), into the reactor's by-product tank. The items are item_input and
 // second_item_input, each drawn from a different input slot; each fluid input from a different input tank. "category"
 // only labels the recipe in JEI: general, leaching or precipitating.
 public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<ItemInput> secondItemInput, List<FluidInput> fluidInputs,
         Optional<ItemStackTemplate> itemOutput,
         Optional<FluidStackTemplate> fluidOutput, Optional<ItemStackTemplate> byproduct, float byproductChance, int time,
-        Optional<Integer> energyPerTick, String category) implements Recipe<ChemicalReactorInput> {
+        Optional<Integer> energyPerTick, String category, Optional<FluidStackTemplate> fluidByproduct) implements Recipe<ChemicalReactorInput> {
     public static final int DEFAULT_TIME = 100;
     public static final int MAX_FLUID_INPUTS = ChemicalReactorInput.TANKS;
 
@@ -110,7 +111,8 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
             Codec.floatRange(0.0F, 1.0F).optionalFieldOf("byproduct_chance", 1.0F).forGetter(ChemicalReactingRecipe::byproductChance),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("time", DEFAULT_TIME).forGetter(ChemicalReactingRecipe::time),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("energy_per_tick").forGetter(ChemicalReactingRecipe::energyPerTick),
-            Codec.STRING.optionalFieldOf("category", "general").forGetter(ChemicalReactingRecipe::category))
+            Codec.STRING.optionalFieldOf("category", "general").forGetter(ChemicalReactingRecipe::category),
+            FluidStackTemplate.CODEC.optionalFieldOf("fluid_byproduct").forGetter(ChemicalReactingRecipe::fluidByproduct))
             .apply(i, ChemicalReactingRecipe::new))
             .validate(ChemicalReactingRecipe::validate);
 
@@ -120,7 +122,7 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
     private static final StreamCodec<RegistryFriendlyByteBuf, Optional<FluidStackTemplate>> OPTIONAL_FLUID = ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC);
     private static final StreamCodec<io.netty.buffer.ByteBuf, Optional<Integer>> OPTIONAL_INT = ByteBufCodecs.optional(ByteBufCodecs.VAR_INT);
 
-    // Written out by hand: ten fields.
+    // Written out by hand: eleven fields.
     public static final StreamCodec<RegistryFriendlyByteBuf, ChemicalReactingRecipe> STREAM_CODEC = StreamCodec.of(
             (buf, recipe) -> {
                 OPTIONAL_ITEM.encode(buf, recipe.itemInput());
@@ -133,10 +135,11 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
                 ByteBufCodecs.VAR_INT.encode(buf, recipe.time());
                 OPTIONAL_INT.encode(buf, recipe.energyPerTick());
                 ByteBufCodecs.STRING_UTF8.encode(buf, recipe.category());
+                OPTIONAL_FLUID.encode(buf, recipe.fluidByproduct());
             },
             buf -> new ChemicalReactingRecipe(OPTIONAL_ITEM.decode(buf), OPTIONAL_ITEM.decode(buf), FLUID_INPUTS.decode(buf),
                     OPTIONAL_TEMPLATE.decode(buf), OPTIONAL_FLUID.decode(buf), OPTIONAL_TEMPLATE.decode(buf), buf.readFloat(),
-                    ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INT.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf)));
+                    ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INT.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), OPTIONAL_FLUID.decode(buf)));
 
     // Something goes in and something comes out.
     private static DataResult<ChemicalReactingRecipe> validate(ChemicalReactingRecipe recipe) {

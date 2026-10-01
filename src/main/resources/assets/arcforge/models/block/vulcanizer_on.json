@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/vulcanizer_front_on",
+    "south": "arcforge:block/vulcanizer_back",
+    "east": "arcforge:block/vulcanizer_side",
+    "west": "arcforge:block/vulcanizer_side",
+    "up": "arcforge:block/vulcanizer_top",
+    "down": "arcforge:block/vulcanizer_bottom",
+    "particle": "arcforge:block/vulcanizer_side"
+  }
+}

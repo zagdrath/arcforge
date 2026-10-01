@@ -4,12 +4,13 @@
   "pattern": [
     "XCX",
     "XAX",
-    "XCX"
+    "XGX"
   ],
   "key": {
     "X": "arcforge:hardened_pressurized_conduit",
     "A": "arcforge:arcforged_alloy",
-    "C": "#c:gems/arcite"
+    "C": "#c:gems/arcite",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:arcforged_pressurized_conduit",

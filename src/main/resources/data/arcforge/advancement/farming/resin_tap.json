@@ -1,0 +1,41 @@
+{
+  "parent": "arcforge:farming/rubber_dandelion",
+  "display": {
+    "icon": {
+      "id": "arcforge:resin_tap"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.resin_tap.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.resin_tap.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "latex": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:latex",
+        "recipe_category": "resin_tap"
+      }
+    },
+    "resin": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "item": {
+          "items": "arcforge:pine_resin"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "latex",
+      "resin"
+    ]
+  ]
+}

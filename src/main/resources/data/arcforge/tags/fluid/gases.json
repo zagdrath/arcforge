@@ -5,6 +5,7 @@
     "arcforge:superheated_steam",
     "arcforge:hydrogen",
     "arcforge:oxygen",
-    "arcforge:chlorine"
+    "arcforge:chlorine",
+    "arcforge:ethylene"
   ]
 }

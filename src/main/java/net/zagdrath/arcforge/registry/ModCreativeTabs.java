@@ -104,6 +104,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.RAW_ROCK_SALT_BLOCK.get());
                 output.accept(ModItems.SALT.get());
                 output.accept(ModItems.SALT_BLOCK.get());
+                output.accept(ModItems.RAW_RUBBER.get());
+                output.accept(ModItems.RUBBER.get());
+                output.accept(ModItems.RUBBER_BLOCK.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> COMPONENTS = CREATIVE_MODE_TABS.register("components", () -> CreativeModeTab.builder()
@@ -128,6 +131,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COPPER_GEAR.get());
                 output.accept(ModItems.COPPER_ROD.get());
                 output.accept(ModItems.PLASTIC_SHEET.get());
+                output.accept(ModItems.PVC_SHEET.get());
+                output.accept(ModItems.RUBBER_GASKET.get());
                 output.accept(ModItems.TUNGSTEN_DRILL_HEAD.get());
                 output.accept(ModItems.QUARRY_SCANNER.get());
                 ModItems.oreComponents().forEach(item -> output.accept(item.get()));
@@ -225,6 +230,12 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.WILD_SORGHUM.get());
                 output.accept(ModItems.WILD_HOPS.get());
                 output.accept(ModItems.WILD_SOYBEANS.get());
+                output.accept(ModItems.RUBBER_DANDELION_SEEDS.get());
+                output.accept(ModItems.RUBBER_DANDELION_ROOTS.get());
+                output.accept(ModItems.WILD_RUBBER_DANDELION.get());
+                output.accept(ModItems.RESIN_TAP.get());
+                output.accept(ModItems.PINE_RESIN.get());
+                output.accept(ModItems.LATEX_BUCKET.get());
                 output.accept(ModItems.PLANTER.get());
                 output.accept(ModItems.HARVESTER.get());
                 output.accept(ModItems.FERTILIZER_SPREADER.get());
@@ -238,6 +249,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.OIL_PRESS.get());
                 output.accept(ModItems.SEED_EXTRACTOR.get());
                 output.accept(ModItems.GRAIN_DRYER.get());
+                output.accept(ModItems.VULCANIZER.get());
                 output.accept(ModItems.FLOUR.get());
                 output.accept(ModItems.SEED_MEAL.get());
                 output.accept(ModItems.PRESS_CAKE.get());

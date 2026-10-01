@@ -24,6 +24,10 @@
     {
       "type": "text",
       "text": "The Chemical Reactor reacts up to two items and up to three fluids into an item, a fluid, or both. Three input tanks, one output tank, two item slots in and an item slot out, plus a byproduct slot.\n# Sulfur\n- Crush gunpowder (2 Sulfur Dust each), netherrack (sometimes a Sulfur Dust) or Nether Sulfur Ore, found through the Nether.\n- Sulfur Dust + 500 mB Water makes 500 mB Sulfuric Acid.\n# Leaching (×3)\n- Raw ore + 250 mB Sulfuric Acid (or Hydrochloric Acid) makes 300 mB of that metal's Slurry. An ore block takes 500 mB and makes 600 mB; a raw ore block, 2,250 and 2,700.\n- Works for iron, copper, gold, silver, nickel, tungsten and bismuth. Fluorite and arcite are gems and aren't leached.\n# Precipitating\n- 100 mB Slurry + 100 mB Water makes one dust, with a small chance of Slag.\n- So a raw ore gives 3 dust and an ore block 6, against 2 and 4 from the Arc Crushing Array.\n# Setting up\nFluids go into whichever input tank already holds them, otherwise an empty one; items the same way into the two item slots. Run one reactor for acid, one for leaching and one for precipitating, joined with fluid conduits.\n# Plastic\n- 100 mB Light Oil + 50 mB Hydrogen makes 2 Plastic Sheets.\n# Farm chemistry\nNPK Fertilizer, Nutrient Solution and Biodiesel: see NPK Fertilizer in Farming. Brine, Hydrochloric Acid and the Lye biodiesel: see Salt & Chlor-Alkali."
+    },
+    {
+      "type": "text",
+      "text": "# Liquid by-products\nA recipe can leave a liquid by-product as well as its output: Water, when Ethanol becomes Ethylene (see Bio-Plastics). It fills the reactor's by-product tank, beside the output tank, and leaves by By-product faces (with auto-eject on). Buckets take from it too."
     }
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "#c:plates/steel",
+    "H": "minecraft:heavy_weighted_pressure_plate",
+    "X": "minecraft:smoker",
+    "C": "#c:ingots/copper"
+  },
+  "pattern": [
+    "PHP",
+    "CXC",
+    "PHP"
+  ],
+  "result": {
+    "id": "arcforge:vulcanizer",
+    "count": 1
+  }
+}

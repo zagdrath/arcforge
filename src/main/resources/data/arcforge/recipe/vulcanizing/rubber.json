@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:vulcanizing",
+  "input": {
+    "ingredient": "arcforge:raw_rubber",
+    "count": 2
+  },
+  "second_input": {
+    "ingredient": "#c:dusts/sulfur",
+    "count": 1
+  },
+  "result": {
+    "id": "arcforge:rubber",
+    "count": 2
+  },
+  "time": 200,
+  "hu_per_tick": 12
+}

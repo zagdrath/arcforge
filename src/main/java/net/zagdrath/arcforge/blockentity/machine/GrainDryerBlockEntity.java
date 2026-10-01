@@ -13,6 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,13 +28,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.interaction.FluidInteractable;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -42,6 +46,7 @@ import net.zagdrath.arcforge.recipe.DryingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
+import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
@@ -49,8 +54,10 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // heat and no FE (arcforge:drying recipes). It only works while its heat buffer is above grainDryer.minTemperature
 // (60°C): below that it pauses, keeping its progress. Heat flows in from hotter blocks (a Firebox, a Geothermal Plant, a
 // warm Heat Cell) through heat faces. Speed upgrades make it faster (drawing heat just as much faster), Heat upgrades
-// cut the heat per item.
-public class GrainDryerBlockEntity extends MachineBlockEntity {
+// cut the heat per item. It also dries fluids from its tank (Latex into Raw Rubber sheets): the tank fills from pipes and
+// conduits on input faces, or a held bucket, and when the input slot has nothing to dry, a fluid recipe runs from the
+// tank, taking the recipe's amount when it's done.
+public class GrainDryerBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
     public static final int MACHINE_SLOTS = 2;
@@ -59,6 +66,8 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
 
     private final HeatBuffer heat;
     private final HeatHandler heatInput;
+    private final FilteredFluidTank tank;
+    private final ResourceHandler<FluidResource> fluidInput;
     private final ResourceHandler<ItemResource> itemInput;
     private final ResourceHandler<ItemResource> itemOutput;
     private final ResourceHandler<ItemResource> itemAutomation;
@@ -76,6 +85,9 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
         this.heat = new HeatBuffer(ArcforgeConfig.GRAIN_DRYER_HEAT_CAPACITY.getAsInt(), ArcforgeConfig.GRAIN_DRYER_MAX_TEMPERATURE.getAsInt(),
                 this::setChanged);
         this.heatInput = heat.input(Integer.MAX_VALUE);
+        this.tank = new FilteredFluidTank(ArcforgeConfig.GRAIN_DRYER_TANK_CAPACITY.getAsInt(),
+                resource -> MachineRecipes.isDryerFluid(level, resource), this::setChanged);
+        this.fluidInput = new AutomationResourceHandler<>(tank, index -> true, index -> false);
         this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT);
         this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> slot == SLOT_OUTPUT);
@@ -93,6 +105,9 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
                     case GrainDryerMenu.DATA_STATUS -> status.ordinal();
                     case GrainDryerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case GrainDryerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case GrainDryerMenu.DATA_FLUID -> tank.getAmount() > 0 ? BuiltInRegistries.FLUID.getId(tank.getResource(0).getFluid()) : -1;
+                    case GrainDryerMenu.DATA_FLUID_AMOUNT -> tank.getAmount();
+                    case GrainDryerMenu.DATA_FLUID_CAPACITY -> tank.getCapacity();
                     default -> 0;
                 };
             }
@@ -130,6 +145,14 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
     private MachineStatus work(ServerLevel level) {
         ItemStack input = items.getStack(SLOT_INPUT);
         RecipeHolder<DryingRecipe> holder = input.isEmpty() ? null : MachineRecipes.drying(level, input).orElse(null);
+        // Nothing to dry in the slot: what's in the tank, if there's enough of it.
+        boolean fromTank = false;
+        if (holder == null && tank.getAmount() > 0) {
+            holder = MachineRecipes.dryingFluid(level, tank.getResource(0))
+                    .filter(found -> tank.getAmount() >= found.value().fluid().map(fluid -> fluid.amount()).orElse(Integer.MAX_VALUE))
+                    .orElse(null);
+            fromTank = holder != null;
+        }
         if (holder == null) {
             progress = 0;
             total = 0;
@@ -137,7 +160,7 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
         }
         DryingRecipe recipe = holder.value();
         total = UpgradeType.time(recipe.time(), upgrades(UpgradeType.SPEED));
-        ItemStack result = recipe.assemble(new SingleRecipeInput(input));
+        ItemStack result = recipe.result().create();
         if (!fits(items.getStack(SLOT_OUTPUT), result)) {
             return MachineStatus.OUTPUT_FULL;
         }
@@ -150,7 +173,14 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
         heatUsage = hu;
         progress++;
         if (progress >= total) {
-            items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
+            if (fromTank) {
+                try (Transaction tx = Transaction.openRoot()) {
+                    tank.extract(0, tank.getResource(0), recipe.fluid().get().amount(), tx);
+                    tx.commit();
+                }
+            } else {
+                items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
+            }
             ItemStack current = items.getStack(SLOT_OUTPUT);
             items.setStack(SLOT_OUTPUT, current.isEmpty() ? result : current.copyWithCount(current.getCount() + result.getCount()));
             progress = 0;
@@ -168,6 +198,22 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
 
     public HeatBuffer getHeat() {
         return heat;
+    }
+
+    public FilteredFluidTank getTank() {
+        return tank;
+    }
+
+    // Input faces fill the tank from pipes and fluid conduits; nothing drains it back out. Unsided, the tank (for Jade).
+    public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
+        SideMode mode = modeFor(side);
+        return mode == null || mode == SideMode.INPUT ? fluidInput : null;
+    }
+
+    // Held buckets fill the tank from any face.
+    @Override
+    public ResourceHandler<FluidResource> getInteractionFluidHandler() {
+        return fluidInput;
     }
 
     public int getProgress() {
@@ -204,7 +250,8 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
         return switch (type) {
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case ENERGY, FLUID, GAS -> ConnectionMode.NONE;
+            case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case ENERGY, GAS -> ConnectionMode.NONE;
         };
     }
 
@@ -212,6 +259,7 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         heat.deserialize(input);
+        tank.deserialize(input.childOrEmpty("tank"));
         progress = input.getIntOr("progress", 0);
     }
 
@@ -219,6 +267,7 @@ public class GrainDryerBlockEntity extends MachineBlockEntity {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         heat.serialize(output);
+        tank.serialize(output.child("tank"));
         output.putInt("progress", progress);
     }
 

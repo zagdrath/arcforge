@@ -2,15 +2,16 @@
   "type": "arcforge:tier_upgrade",
   "category": "equipment",
   "pattern": [
-    "PAP",
+    "PGP",
     "AXA",
     "PEP"
   ],
   "key": {
     "A": "arcforge:hardened_alloy",
-    "P": "arcforge:plastic_sheet",
+    "P": "#arcforge:plastics",
     "E": "arcforge:hardened_gas_cartridge",
-    "X": "arcforge:tempered_jetpack"
+    "X": "arcforge:tempered_jetpack",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:hardened_jetpack",

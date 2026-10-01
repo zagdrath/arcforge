@@ -4,12 +4,13 @@
   "pattern": [
     "HLH",
     "LXL",
-    "HLH"
+    "HVH"
   ],
   "key": {
     "X": "arcforge:tempered_fluid_tank",
     "L": "#c:glass_blocks",
-    "H": "arcforge:hardened_alloy"
+    "H": "arcforge:hardened_alloy",
+    "V": "arcforge:pvc_sheet"
   },
   "result": {
     "id": "arcforge:hardened_fluid_tank",

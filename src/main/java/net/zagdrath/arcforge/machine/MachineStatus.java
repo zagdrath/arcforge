@@ -109,7 +109,11 @@ public enum MachineStatus {
     NO_LIGHT("no_light", "led_idle"),
     TOO_HOT("too_hot", "led_blocked"),
     // The Thermal Evaporator Array (TOO_COLD below 100°C, NO_FLUID when its input is empty).
-    EVAPORATING("evaporating", "led_running");
+    EVAPORATING("evaporating", "led_running"),
+    // The Infuser, for a recipe that takes an additive (Pine Resin) it doesn't have.
+    NO_ADDITIVE("no_additive", "led_blocked"),
+    // The Vulcanizer (TOO_COLD below 140°C).
+    VULCANIZING("vulcanizing", "led_running");
 
     private final String name;
     private final String led;

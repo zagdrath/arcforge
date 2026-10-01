@@ -105,6 +105,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.OilPressing(gui),
                 new MachineCategories.SeedExtracting(gui),
                 new MachineCategories.Drying(gui),
+                new MachineCategories.Vulcanizing(gui),
+                new MachineCategories.ResinTap(gui),
                 new MachineCategories.AirSeparating(gui),
                 new MachineCategories.Synthesizing(gui),
                 new MachineCategories.Digesting(gui),
@@ -137,6 +139,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.OilPressing.TYPE, recipes(ModRecipes.OIL_PRESSING.get()));
         registration.addRecipes(MachineCategories.SeedExtracting.TYPE, recipes(ModRecipes.SEED_EXTRACTING.get()));
         registration.addRecipes(MachineCategories.Drying.TYPE, recipes(ModRecipes.DRYING.get()));
+        registration.addRecipes(MachineCategories.Vulcanizing.TYPE, recipes(ModRecipes.VULCANIZING.get()));
+        registration.addRecipes(MachineCategories.ResinTap.TYPE, MachineCategories.ResinTapping.all());
         registration.addRecipes(MachineCategories.AirSeparating.TYPE, recipes(ModRecipes.AIR_SEPARATING.get()));
         registration.addRecipes(MachineCategories.Synthesizing.TYPE, recipes(ModRecipes.SYNTHESIZING.get()));
         registration.addRecipes(MachineCategories.Digesting.TYPE, recipes(ModRecipes.DIGESTING.get()));
@@ -204,6 +208,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.SeedExtractorScreen.class, 67, 35, ARROW_W, ARROW_H,
                 MachineCategories.SeedExtracting.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.GrainDryerScreen.class, 68, 35, ARROW_W, ARROW_H, MachineCategories.Drying.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.VulcanizerScreen.class, 68, 35, ARROW_W, ARROW_H,
+                MachineCategories.Vulcanizing.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen.class, 114, 35, ARROW_W, ARROW_H,
                 MachineCategories.AirSeparating.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen.class, 81, 35, ARROW_W, ARROW_H,
@@ -255,6 +261,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.OilPressing.TYPE, ModBlocks.OIL_PRESS.get());
         registration.addCraftingStation(MachineCategories.SeedExtracting.TYPE, ModBlocks.SEED_EXTRACTOR.get());
         registration.addCraftingStation(MachineCategories.Drying.TYPE, ModBlocks.GRAIN_DRYER.get());
+        registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
+        registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());
         registration.addCraftingStation(MachineCategories.AirSeparating.TYPE, ModBlocks.AIR_SEPARATOR.get());
         registration.addCraftingStation(MachineCategories.Synthesizing.TYPE, ModBlocks.HABER_REACTOR.get());
         registration.addCraftingStation(MachineCategories.Digesting.TYPE, ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get(), ModBlocks.DIGESTER_CASING.get());

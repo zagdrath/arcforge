@@ -15,6 +15,7 @@
     "#c:storage_blocks/arcite",
     "#c:storage_blocks/raw_arcite",
     "#c:storage_blocks/salt",
-    "#c:storage_blocks/raw_rock_salt"
+    "#c:storage_blocks/raw_rock_salt",
+    "#c:storage_blocks/rubber"
   ]
 }

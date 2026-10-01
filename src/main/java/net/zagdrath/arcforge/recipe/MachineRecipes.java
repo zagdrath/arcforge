@@ -65,14 +65,20 @@ public final class MachineRecipes {
         return level.recipeAccess().getRecipeFor(ModRecipes.FIBERIZING.get(), new SingleRecipeInput(input), level);
     }
 
-    // The infusing recipe for this item, preferring one that uses the fluid in the tank. Returns one for
-    // another fluid if that's all there is, so the Infuser can say it has no fluid.
-    public static Optional<RecipeHolder<InfusingRecipe>> infusing(ServerLevel level, ItemStack input, FluidResource fluid) {
+    // The infusing recipe for this item, preferring one that the additive slot can supply, then one that uses the fluid
+    // in the tank. Returns one for another fluid or additive if that's all there is, so the Infuser can say what's missing.
+    public static Optional<RecipeHolder<InfusingRecipe>> infusing(ServerLevel level, ItemStack input, FluidResource fluid, ItemStack additive) {
         List<RecipeHolder<InfusingRecipe>> matches = level.recipeAccess().recipeMap().byType(ModRecipes.INFUSING.get()).stream()
                 .filter(holder -> holder.value().ingredient().test(input))
                 .toList();
-        return matches.stream().filter(holder -> holder.value().usesFluid(fluid)).findFirst()
+        return matches.stream().filter(holder -> holder.value().hasAdditive(additive)).findFirst()
+                .or(() -> matches.stream().filter(holder -> holder.value().usesFluid(fluid)).findFirst())
                 .or(() -> matches.stream().findFirst());
+    }
+
+    // With nothing in the additive slot.
+    public static Optional<RecipeHolder<InfusingRecipe>> infusing(ServerLevel level, ItemStack input, FluidResource fluid) {
+        return infusing(level, input, fluid, ItemStack.EMPTY);
     }
 
     // The pressing recipe this die makes from this input, if there are enough of it.
@@ -170,6 +176,12 @@ public final class MachineRecipes {
                 .anyMatch(holder -> holder.value().ingredient().test(stack));
     }
 
+    // Items some infusing recipe takes as its additive (Pine Resin): what the additive slot takes.
+    public static boolean isInfuserAdditive(@Nullable Level level, ItemStack stack) {
+        return !stack.isEmpty() && recipes(level).byType(ModRecipes.INFUSING.get()).stream()
+                .anyMatch(holder -> holder.value().usesAdditive(stack));
+    }
+
     // Fluids some infusing recipe uses: the only ones the Infuser's tank takes.
     public static boolean isInfuserFluid(@Nullable Level level, FluidResource fluid) {
         return recipes(level).byType(ModRecipes.INFUSING.get()).stream()
@@ -239,12 +251,39 @@ public final class MachineRecipes {
 
     public static Optional<RecipeHolder<DryingRecipe>> drying(@Nullable Level level, ItemStack input) {
         return recipes(level).byType(ModRecipes.DRYING.get()).stream()
-                .filter(holder -> holder.value().ingredient().test(input))
+                .filter(holder -> holder.value().testItem(input))
                 .findFirst();
     }
 
     public static boolean isDryerInput(@Nullable Level level, ItemStack stack) {
         return drying(level, stack).isPresent();
+    }
+
+    // The drying recipe for the fluid in the Grain Dryer's tank (Latex), if any.
+    public static Optional<RecipeHolder<DryingRecipe>> dryingFluid(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.DRYING.get()).stream()
+                .filter(holder -> holder.value().testFluid(fluid))
+                .findFirst();
+    }
+
+    // Fluids some drying recipe takes: the only ones the Grain Dryer's tank takes.
+    public static boolean isDryerFluid(@Nullable Level level, FluidResource fluid) {
+        return !fluid.isEmpty() && dryingFluid(level, fluid).isPresent();
+    }
+
+    // --- Vulcanizer ---
+
+    // The vulcanizing recipe the two input slots can supply (either way round), if any.
+    public static Optional<RecipeHolder<VulcanizingRecipe>> vulcanizing(@Nullable Level level, ItemStack a, ItemStack b) {
+        return recipes(level).byType(ModRecipes.VULCANIZING.get()).stream()
+                .filter(holder -> holder.value().slotsFor(a, b) != null)
+                .findFirst();
+    }
+
+    // Anything some vulcanizing recipe takes: what the Vulcanizer's input slots take.
+    public static boolean isVulcanizerInput(@Nullable Level level, ItemStack stack) {
+        return !stack.isEmpty() && recipes(level).byType(ModRecipes.VULCANIZING.get()).stream()
+                .anyMatch(holder -> holder.value().takes(stack));
     }
 
     // --- Farm chemistry ---

@@ -1,0 +1,33 @@
+{
+  "parent": "arcforge:chemistry/chlorine",
+  "display": {
+    "icon": {
+      "id": "arcforge:pvc_sheet"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.pvc.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.pvc.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "pvc": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "item": {
+          "items": "arcforge:pvc_sheet"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "pvc"
+    ]
+  ]
+}

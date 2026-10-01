@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "R": "#c:rubbers"
+  },
+  "pattern": [
+    " R ",
+    "R R",
+    " R "
+  ],
+  "result": {
+    "id": "arcforge:rubber_gasket",
+    "count": 8
+  }
+}

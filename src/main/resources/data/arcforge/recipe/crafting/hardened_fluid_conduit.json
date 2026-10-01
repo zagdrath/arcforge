@@ -2,16 +2,17 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "pattern": [
-    "XXX",
+    "XVX",
     "XHX",
     "XXX"
   ],
   "key": {
     "X": "arcforge:tempered_fluid_conduit",
-    "H": "arcforge:hardened_alloy"
+    "H": "arcforge:hardened_alloy",
+    "V": "arcforge:pvc_sheet"
   },
   "result": {
     "id": "arcforge:hardened_fluid_conduit",
-    "count": 8
+    "count": 7
   }
 }

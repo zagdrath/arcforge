@@ -8,7 +8,7 @@
   ],
   "key": {
     "T": "arcforge:tempered_alloy",
-    "P": "arcforge:plastic_sheet",
+    "P": "#arcforge:plastics",
     "G": "#c:glass_blocks",
     "X": "minecraft:cauldron",
     "C": "#c:plates/steel"

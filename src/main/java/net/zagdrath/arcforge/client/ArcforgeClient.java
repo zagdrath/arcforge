@@ -85,6 +85,7 @@ import net.zagdrath.arcforge.client.gui.StructureRenderer;
 import net.zagdrath.arcforge.client.handbook.EngineersHandbookScreen;
 import net.zagdrath.arcforge.client.screen.machine.FermenterScreen;
 import net.zagdrath.arcforge.client.screen.machine.GrainDryerScreen;
+import net.zagdrath.arcforge.client.screen.machine.VulcanizerScreen;
 import net.zagdrath.arcforge.client.screen.machine.MillScreen;
 import net.zagdrath.arcforge.client.screen.machine.OilPressScreen;
 import net.zagdrath.arcforge.client.screen.machine.SeedExtractorScreen;
@@ -207,6 +208,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.OIL_PRESS.get(), OilPressScreen::new);
         event.register(ModMenuTypes.SEED_EXTRACTOR.get(), SeedExtractorScreen::new);
         event.register(ModMenuTypes.GRAIN_DRYER.get(), GrainDryerScreen::new);
+        event.register(ModMenuTypes.VULCANIZER.get(), VulcanizerScreen::new);
         event.register(ModMenuTypes.AIR_SEPARATOR.get(), net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen::new);
         event.register(ModMenuTypes.HABER_REACTOR.get(), net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen::new);
         event.register(ModMenuTypes.BIOGAS_DIGESTER.get(), net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen::new);
@@ -282,6 +284,7 @@ public class ArcforgeClient {
                 new Material(Identifier.withDefaultNamespace("block/water_overlay")),
                 FluidTintSources.constant(SEAWATER_TINT)), ModFluids.SEAWATER, ModFluids.FLOWING_SEAWATER);
         event.register(liquidModel("brine"), ModFluids.BRINE, ModFluids.FLOWING_BRINE);
+        event.register(liquidModel("latex"), ModFluids.LATEX, ModFluids.FLOWING_LATEX);
         event.register(liquidModel("lye"), ModFluids.LYE, ModFluids.FLOWING_LYE);
         event.register(liquidModel("hydrochloric_acid"), ModFluids.HYDROCHLORIC_ACID, ModFluids.FLOWING_HYDROCHLORIC_ACID);
         // The slurries share one greyscale texture, tinted per metal.
@@ -307,6 +310,7 @@ public class ArcforgeClient {
         event.register(gasModel(AMMONIA_TINT), ModFluids.AMMONIA, ModFluids.FLOWING_AMMONIA);
         event.register(gasModel(BIOGAS_TINT), ModFluids.BIOGAS, ModFluids.FLOWING_BIOGAS);
         event.register(gasModel(CHLORINE_TINT), ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE);
+        event.register(gasModel(ETHYLENE_TINT), ModFluids.ETHYLENE, ModFluids.FLOWING_ETHYLENE);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -330,6 +334,8 @@ public class ArcforgeClient {
     public static final int BIOGAS_TINT = 0xFFA8B478;
     // Chlorine: its own sickly greenish yellow, deeper and greener than Ammonia.
     public static final int CHLORINE_TINT = 0xFFBCD24A;
+    // Ethylene: colourless, so a faint cool mint, paler than Hydrogen is white and greener than Oxygen.
+    public static final int ETHYLENE_TINT = 0xFFD2EADA;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(
@@ -374,6 +380,8 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(AMMONIA_TINT & 0xFFFFFF, 6.0F), ModFluids.AMMONIA_TYPE.get());
         event.registerFluidType(liquidFog(BIOGAS_TINT & 0xFFFFFF, 6.0F), ModFluids.BIOGAS_TYPE.get());
         event.registerFluidType(liquidFog(CHLORINE_TINT & 0xFFFFFF, 5.0F), ModFluids.CHLORINE_TYPE.get());
+        event.registerFluidType(liquidFog(ETHYLENE_TINT & 0xFFFFFF, 6.0F), ModFluids.ETHYLENE_TYPE.get());
+        event.registerFluidType(liquidFog(0xE8E4D6, 2.0F), ModFluids.LATEX_TYPE.get());
         event.registerFluidType(liquidFog(SEAWATER_TINT & 0xFFFFFF, 12.0F), ModFluids.SEAWATER_TYPE.get());
         event.registerFluidType(liquidFog(0xC8DCE4, 10.0F), ModFluids.BRINE_TYPE.get());
         event.registerFluidType(liquidFog(0xE4E6DA, 8.0F), ModFluids.LYE_TYPE.get());

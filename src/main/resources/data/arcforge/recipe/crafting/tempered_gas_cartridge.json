@@ -4,11 +4,12 @@
   "pattern": [
     " T ",
     "TXT",
-    " T "
+    "GTG"
   ],
   "key": {
     "T": "arcforge:tempered_alloy",
-    "X": "arcforge:wrought_gas_cartridge"
+    "X": "arcforge:wrought_gas_cartridge",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:tempered_gas_cartridge",

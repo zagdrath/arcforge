@@ -10,7 +10,7 @@
     "A": "arcforge:arcforged_alloy",
     "C": "#c:gems/arcite",
     "K": "#c:chests/wooden",
-    "P": "#c:plastics",
+    "P": "#arcforge:plastics",
     "X": "arcforge:hardened_crate"
   },
   "result": {

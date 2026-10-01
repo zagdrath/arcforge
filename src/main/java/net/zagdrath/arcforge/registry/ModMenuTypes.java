@@ -20,6 +20,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
 import net.zagdrath.arcforge.menu.machine.GrainDryerMenu;
+import net.zagdrath.arcforge.menu.machine.VulcanizerMenu;
 import net.zagdrath.arcforge.menu.machine.MillMenu;
 import net.zagdrath.arcforge.menu.machine.OilPressMenu;
 import net.zagdrath.arcforge.menu.machine.SeedExtractorMenu;
@@ -121,6 +122,8 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(SeedExtractorMenu::new));
     public static final Supplier<MenuType<GrainDryerMenu>> GRAIN_DRYER = MENU_TYPES.register("grain_dryer",
             () -> IMenuTypeExtension.create(GrainDryerMenu::new));
+    public static final Supplier<MenuType<VulcanizerMenu>> VULCANIZER = MENU_TYPES.register("vulcanizer",
+            () -> IMenuTypeExtension.create(VulcanizerMenu::new));
 
     // Farm chemistry.
     public static final Supplier<MenuType<AirSeparatorMenu>> AIR_SEPARATOR = MENU_TYPES.register("air_separator",

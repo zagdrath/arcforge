@@ -10,7 +10,7 @@
     "D": "#c:ingots/tungsten",
     "T": "arcforge:tempered_alloy",
     "G": "#c:gears/steel",
-    "P": "arcforge:plastic_sheet",
+    "P": "#arcforge:plastics",
     "B": "arcforge:tempered_battery"
   },
   "result": {

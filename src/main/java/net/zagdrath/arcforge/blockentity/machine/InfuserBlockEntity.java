@@ -52,15 +52,21 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Soaks wood in a fluid under pressure (arcforge:infusing recipes): vanilla planks, logs and wood in
-// creosote become treated wood, at 20 FE/t. The recipe's fluid is taken from the tank when an item is
-// done. The tank fills from buckets in its bucket slot, pipes on input faces, or a held bucket. Speed
-// upgrades make it faster (drawing FE just as much faster), Energy upgrades cut the FE per item.
+// creosote become treated wood, at 20 FE/t. Some recipes take an additive item instead of a fluid (Pine Resin in place of
+// Creosote), from its additive slot. The recipe's fluid or additive is used up when an item is done. The tank fills from
+// buckets in its bucket slot, pipes on input faces, or a held bucket. Speed upgrades make it faster (drawing FE just as
+// much faster), Energy upgrades cut the FE per item. The additive slot came later: older saves move their upgrades up
+// past it.
 public class InfuserBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int SLOT_BUCKET_IN = 0;
     public static final int SLOT_BUCKET_OUT = 1;
     public static final int SLOT_INPUT = 2;
     public static final int SLOT_OUTPUT = 3;
-    public static final int MACHINE_SLOTS = 4;
+    // The additive (Pine Resin), for recipes that take one instead of a fluid.
+    public static final int SLOT_ADDITIVE = 4;
+    public static final int MACHINE_SLOTS = 5;
+    // Saves from before the additive slot (layout 1) had the upgrade slots where it is now.
+    private static final int SLOT_LAYOUT = 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY);
 
@@ -114,7 +120,7 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
     }
 
     private static boolean isInputSlot(int slot) {
-        return slot == SLOT_BUCKET_IN || slot == SLOT_INPUT;
+        return slot == SLOT_BUCKET_IN || slot == SLOT_INPUT || slot == SLOT_ADDITIVE;
     }
 
     private static boolean isOutputSlot(int slot) {
@@ -130,6 +136,7 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
                 yield fluid != null && MachineRecipes.isInfuserFluid(level, fluid);
             }
             case SLOT_INPUT -> MachineRecipes.isInfuserInput(level, resource.toStack(1));
+            case SLOT_ADDITIVE -> MachineRecipes.isInfuserAdditive(level, resource.toStack(1));
             default -> false;
         };
     }
@@ -159,8 +166,9 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
 
     private MachineStatus work(ServerLevel level) {
         ItemStack input = items.getStack(SLOT_INPUT);
+        ItemStack additive = items.getStack(SLOT_ADDITIVE);
         FluidResource fluid = tank.getResource(0);
-        RecipeHolder<InfusingRecipe> holder = input.isEmpty() ? null : MachineRecipes.infusing(level, input, fluid).orElse(null);
+        RecipeHolder<InfusingRecipe> holder = input.isEmpty() ? null : MachineRecipes.infusing(level, input, fluid, additive).orElse(null);
         if (holder == null) {
             progress = 0;
             total = 0;
@@ -172,7 +180,11 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
         if (!fits(items.getStack(SLOT_OUTPUT), result)) {
             return MachineStatus.OUTPUT_FULL;
         }
-        if (!recipe.usesFluid(fluid) || tank.getAmount() < recipe.fluid().amount()) {
+        if (recipe.additive().isPresent()) {
+            if (!recipe.hasAdditive(additive)) {
+                return MachineStatus.NO_ADDITIVE;
+            }
+        } else if (!recipe.usesFluid(fluid) || tank.getAmount() < recipe.fluidAmount()) {
             return MachineStatus.NO_FLUID;
         }
         int fe = energyPerTick();
@@ -182,9 +194,13 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
         usage = fe;
         progress++;
         if (progress >= total) {
-            try (Transaction tx = Transaction.openRoot()) {
-                tank.extract(0, fluid, recipe.fluid().amount(), tx);
-                tx.commit();
+            if (recipe.additive().isPresent()) {
+                items.setStack(SLOT_ADDITIVE, additive.copyWithCount(additive.getCount() - recipe.additive().get().count()));
+            } else {
+                try (Transaction tx = Transaction.openRoot()) {
+                    tank.extract(0, fluid, recipe.fluidAmount(), tx);
+                    tx.commit();
+                }
             }
             items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
             ItemStack current = items.getStack(SLOT_OUTPUT);
@@ -260,6 +276,14 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
         energy.deserialize(input.childOrEmpty("energy"));
         tank.deserialize(input.childOrEmpty("tank"));
         progress = input.getIntOr("progress", 0);
+        if (input.getIntOr("slot_layout", 1) < SLOT_LAYOUT) {
+            // Layout 1 was the four machine slots, then the upgrade slots: move the upgrades up past the additive slot.
+            items.ensureSize(MACHINE_SLOTS + UPGRADE_SLOTS);
+            for (int slot = MACHINE_SLOTS + UPGRADE_SLOTS - 1; slot > SLOT_ADDITIVE; slot--) {
+                items.setStack(slot, items.getStack(slot - 1));
+            }
+            items.setStack(SLOT_ADDITIVE, ItemStack.EMPTY);
+        }
     }
 
     @Override
@@ -268,6 +292,7 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
         energy.serialize(output.child("energy"));
         tank.serialize(output.child("tank"));
         output.putInt("progress", progress);
+        output.putInt("slot_layout", SLOT_LAYOUT);
     }
 
     @Override

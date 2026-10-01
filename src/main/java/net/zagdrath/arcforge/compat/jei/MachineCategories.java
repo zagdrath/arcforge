@@ -153,9 +153,14 @@ final class MachineCategories {
 
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<InfusingRecipe> holder, IFocusGroup focuses) {
-            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
-            fluid(builder, true, 21, 5, holder.value().fluid());
-            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(holder.value().result());
+            InfusingRecipe recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
+            // The fluid, or the additive (Pine Resin) that stands in for it.
+            recipe.fluid().ifPresent(fluid -> fluid(builder, true, 21, 5, fluid));
+            recipe.additive().ifPresent(additive -> builder.addInputSlot(21, 5).setStandardSlotBackground()
+                    .addItemStacks(additive.ingredient().items().map(item -> new ItemStack(item, additive.count())).toList())
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.infusing.additive"))));
+            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(recipe.result());
         }
 
         @Override
@@ -408,8 +413,15 @@ final class MachineCategories {
 
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<DryingRecipe> holder, IFocusGroup focuses) {
-            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
-            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(holder.value().result());
+            DryingRecipe recipe = holder.value();
+            recipe.ingredient().ifPresent(ingredient -> builder.addInputSlot(1, 5).setStandardSlotBackground().add(ingredient));
+            // A fluid from the dryer's tank (Latex): every fluid the input names.
+            recipe.fluid().ifPresent(input -> {
+                var slot = builder.addInputSlot(1, 5).setStandardSlotBackground()
+                        .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, input.amount()), false, 16, 16);
+                input.fluids().forEach(fluid -> slot.add(fluid, input.amount()));
+            });
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(recipe.result());
         }
 
         @Override
@@ -423,6 +435,97 @@ final class MachineCategories {
             DryingRecipe recipe = holder.value();
             text(graphics, Component.translatable("jei.arcforge.drying.cost", recipe.huPerTick(), ArcforgeConfig.GRAIN_DRYER_MIN_TEMPERATURE.getAsInt()), 0, 30);
             textRight(graphics, seconds(recipe.time()), getWidth(), 9);
+        }
+    }
+
+    // --- Vulcanizer ---
+
+    static final class Vulcanizing extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.VulcanizingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.VulcanizingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.VULCANIZING.get());
+
+        Vulcanizing(IGuiHelper gui) {
+            super(TYPE, "vulcanizing", ModBlocks.VULCANIZER.get(), gui, 130, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.VulcanizingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            int x = 1;
+            for (ChemicalReactingRecipe.ItemInput input : List.of(recipe.input(), recipe.secondInput())) {
+                builder.addInputSlot(x, 5).setStandardSlotBackground()
+                        .addItemStacks(input.ingredient().items().map(item -> new ItemStack(item, input.count())).toList());
+                x += 20;
+            }
+            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(recipe.result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.VulcanizingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        // The heat per tick and the temperature it needs, and the time, before upgrades.
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.VulcanizingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            var recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.vulcanizing.cost", recipe.huPerTick(), ArcforgeConfig.VULCANIZER_MIN_TEMPERATURE.getAsInt()), 0, 30);
+            textRight(graphics, seconds(recipe.time()), getWidth(), 25);
+        }
+    }
+
+    // --- Resin Tap: what each kind of log gives (config farming.resinTap) ---
+
+    record ResinTapping(ItemStack log, boolean latex, boolean anyLog) {
+        static List<ResinTapping> all() {
+            return List.of(
+                    new ResinTapping(new ItemStack(net.minecraft.world.item.Items.JUNGLE_LOG), true, false),
+                    new ResinTapping(new ItemStack(net.minecraft.world.item.Items.SPRUCE_LOG), false, false),
+                    new ResinTapping(new ItemStack(net.minecraft.world.item.Items.OAK_LOG), false, true));
+        }
+
+        double chance() {
+            return latex ? 1.0 : anyLog ? ArcforgeConfig.RESIN_TAP_OTHER_CHANCE.getAsDouble() : ArcforgeConfig.RESIN_TAP_SPRUCE_CHANCE.getAsDouble();
+        }
+    }
+
+    static final class ResinTap extends ArcforgeCategory<ResinTapping> {
+        static final IRecipeType<ResinTapping> TYPE = IRecipeType.create(Arcforge.MODID, "resin_tapping", ResinTapping.class);
+
+        ResinTap(IGuiHelper gui) {
+            super(TYPE, "resin_tapping", ModBlocks.RESIN_TAP.get(), gui, 150, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, ResinTapping recipe, IFocusGroup focuses) {
+            var log = builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.log());
+            if (recipe.anyLog()) {
+                log.addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.resin_tapping.any_log")));
+            }
+            builder.addInputSlot(21, 5).setStandardSlotBackground().add(new ItemStack(ModItems.RESIN_TAP.get()));
+            if (recipe.latex()) {
+                fluid(builder, false, 71, 5, ModFluids.LATEX.get(), ArcforgeConfig.RESIN_TAP_LATEX_PER_DRIP.getAsInt());
+            } else {
+                builder.addOutputSlot(71, 5).setStandardSlotBackground().add(new ItemStack(ModItems.PINE_RESIN.get()))
+                        .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                                Math.round(recipe.chance() * 100))));
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, ResinTapping recipe, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(43, 5);
+        }
+
+        // Per drip, every so many seconds, on a living tree.
+        @Override
+        public void draw(ResinTapping recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            Component gain = recipe.latex()
+                    ? Component.translatable("jei.arcforge.resin_tapping.latex", ArcforgeConfig.RESIN_TAP_LATEX_PER_DRIP.getAsInt())
+                    : Component.translatable("jei.arcforge.resin_tapping.resin", Math.round(recipe.chance() * 100));
+            text(graphics, gain, 0, 28);
+            text(graphics, Component.translatable("jei.arcforge.resin_tapping.every",
+                    String.format(Locale.ROOT, "%.0f", ArcforgeConfig.RESIN_TAP_INTERVAL.getAsInt() / 20.0)), 0, 39);
         }
     }
 
@@ -797,6 +900,8 @@ final class MachineCategories {
                     .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
                             Math.round(recipe.byproductChance() * 100)))));
             recipe.fluidOutput().ifPresent(output -> fluid(builder, false, out + 40, 5, output));
+            // The liquid by-product, into the reactor's by-product tank.
+            recipe.fluidByproduct().ifPresent(output -> fluid(builder, false, out + 60, 5, output));
         }
 
         @Override

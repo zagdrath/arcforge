@@ -4,14 +4,15 @@
   "pattern": [
     "PTP",
     "CXC",
-    "R R"
+    "RGR"
   ],
   "key": {
-    "P": "arcforge:plastic_sheet",
+    "P": "#arcforge:plastics",
     "T": "arcforge:tempered_alloy",
     "C": "arcforge:tempered_gas_cartridge",
     "X": "#c:plates/steel",
-    "R": "arcforge:wrought_pressurized_conduit"
+    "R": "arcforge:wrought_pressurized_conduit",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:tempered_jetpack",

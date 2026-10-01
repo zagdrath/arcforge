@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:drying",
+  "fluid": {
+    "fluid": "arcforge:latex",
+    "amount": 250
+  },
+  "result": {
+    "id": "arcforge:raw_rubber"
+  },
+  "time": 300,
+  "hu_per_tick": 4
+}

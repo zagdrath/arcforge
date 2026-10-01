@@ -1,0 +1,18 @@
+{
+  "title": "Bio-Plastics",
+  "icon": "arcforge:pvc_sheet",
+  "items": [
+    "arcforge:plastic_sheet",
+    "arcforge:pvc_sheet"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Plastic without oil, from the Fermenter's Ethanol, all in the Chemical Reactor.\n# Ethylene\n- 100 mB Ethanol + 5 mB Sulfuric Acid (the catalyst) make 60 mB Ethylene (a gas) and 40 mB Water.\n- The Water goes into the reactor's by-product tank and leaves by By-product faces.\n# Plastic Sheet\n- 120 mB Ethylene make 2 Plastic Sheets (bio-polyethylene). The Light Oil + Hydrogen recipe still works."
+    },
+    {
+      "type": "text",
+      "text": "# PVC Sheet\n- 60 mB Ethylene + 60 mB Chlorine make 2 PVC Sheets.\n- Hardened and Arcforged Fluid Conduits and Fluid Tanks take one, an acid-proof lining.\n# #arcforge:plastics\nPlastic Sheet and PVC Sheet are both plastics: every recipe that took Plastic Sheet takes either."
+    }
+  ]
+}

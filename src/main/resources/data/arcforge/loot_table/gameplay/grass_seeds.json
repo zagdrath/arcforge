@@ -41,6 +41,10 @@
         {
           "type": "minecraft:item",
           "name": "arcforge:soybeans"
+        },
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:rubber_dandelion_seeds"
         }
       ]
     }

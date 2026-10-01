@@ -777,7 +777,7 @@ public class ArcforgeConfig {
             .defineInRange("energyPerTick", 60, 1, 100_000);
 
     public static final ModConfigSpec.IntValue REACTOR_TANK_CAPACITY = BUILDER
-            .comment("Size in mB of each of its three tanks (two inputs, one output).")
+            .comment("Size in mB of each of its tanks (three inputs, the output and the liquid by-product).")
             .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
 
     public static final ModConfigSpec.IntValue REACTOR_OUTPUT_RATE = BUILDER
@@ -1856,6 +1856,69 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue GRAIN_DRYER_MIN_TEMPERATURE = BUILDER
             .comment("It only dries while its heat buffer is above this, in °C.")
             .defineInRange("minTemperature", 60, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue GRAIN_DRYER_TANK_CAPACITY = BUILDER
+            .comment("Fluid tank capacity in mB, for what it dries from a fluid (Latex into Raw Rubber).")
+            .defineInRange("tankCapacity", 4_000, 1_000, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Vulcanizer: cures Raw Rubber with Sulfur into Rubber with heat (HU), no FE. Recipes (arcforge:vulcanizing) set",
+                "the inputs, time and HU/t.").push("vulcanizer");
+    }
+
+    public static final ModConfigSpec.IntValue VULCANIZER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 8_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue VULCANIZER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 400, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue VULCANIZER_MIN_TEMPERATURE = BUILDER
+            .comment("It only works at this temperature or hotter, in °C.")
+            .defineInRange("minTemperature", 140, 21, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Resin Tap: hung on the side of a log with leaves above it (a living tree), it fills by itself. On a jungle",
+                "log it drips Latex into its tank; on a spruce log it collects Pine Resin; on any other log, Pine Resin more",
+                "slowly.").push("resinTap");
+    }
+
+    public static final ModConfigSpec.IntValue RESIN_TAP_INTERVAL = BUILDER
+            .comment("Ticks between drips.")
+            .defineInRange("interval", 200, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue RESIN_TAP_LATEX_PER_DRIP = BUILDER
+            .comment("Latex (mB) a tap on a jungle log gains each drip.")
+            .defineInRange("latexPerDrip", 25, 1, 64_000);
+
+    public static final ModConfigSpec.DoubleValue RESIN_TAP_SPRUCE_CHANCE = BUILDER
+            .comment("Chance each drip that a tap on a spruce log gains a Pine Resin.")
+            .defineInRange("spruceResinChance", 0.5, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue RESIN_TAP_OTHER_CHANCE = BUILDER
+            .comment("Chance each drip that a tap on any other log gains a Pine Resin.")
+            .defineInRange("otherResinChance", 0.15, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue RESIN_TAP_TANK_CAPACITY = BUILDER
+            .comment("Latex tank capacity (mB).")
+            .defineInRange("tankCapacity", 1_000, 100, 64_000);
+
+    public static final ModConfigSpec.IntValue RESIN_TAP_MAX_RESIN = BUILDER
+            .comment("Pine Resin it holds before it stops collecting.")
+            .defineInRange("maxResin", 16, 1, 64);
+
+    public static final ModConfigSpec.IntValue RESIN_TAP_LEAF_SEARCH = BUILDER
+            .comment("How far up the trunk (in blocks, from the tapped log) it looks for the tree's leaves.")
+            .defineInRange("leafSearchHeight", 12, 1, 64);
 
     static {
         BUILDER.pop();

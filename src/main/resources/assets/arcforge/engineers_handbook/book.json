@@ -67,6 +67,7 @@
         "chemical_processing",
         "electrolyzer",
         "chlor_alkali",
+        "bio_plastics",
         "thermal_evaporator",
         "fermenter"
       ]
@@ -154,6 +155,8 @@
         "crops",
         "hops",
         "soybeans",
+        "rubber_dandelion",
+        "resin_tap",
         "planter_and_harvester",
         "fertilizer_spreader",
         "copper_sprinkler",
@@ -163,6 +166,7 @@
         "seed_extractor",
         "oil_press",
         "grain_dryer",
+        "vulcanizer",
         "air_separator",
         "haber_reactor",
         "npk_fertilizer",

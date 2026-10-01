@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:ethanol",
+      "amount": 100
+    },
+    {
+      "fluid": "arcforge:sulfuric_acid",
+      "amount": 5
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:ethylene",
+    "amount": 60
+  },
+  "fluid_byproduct": {
+    "id": "minecraft:water",
+    "amount": 40
+  },
+  "time": 60
+}

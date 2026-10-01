@@ -4,12 +4,13 @@
   "pattern": [
     " C ",
     "AXA",
-    " A "
+    "GAG"
   ],
   "key": {
     "C": "#c:gems/arcite",
     "A": "arcforge:arcforged_alloy",
-    "X": "arcforge:hardened_gas_cartridge"
+    "X": "arcforge:hardened_gas_cartridge",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:arcforged_gas_cartridge",

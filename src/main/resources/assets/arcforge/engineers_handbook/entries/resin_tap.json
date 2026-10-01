@@ -1,0 +1,19 @@
+{
+  "title": "Resin Tap",
+  "icon": "arcforge:resin_tap",
+  "items": [
+    "arcforge:resin_tap",
+    "arcforge:pine_resin",
+    "arcforge:latex_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A copper spout and a cup, hung on the side of a log. It only works on a living tree: natural leaves above the log (a log in a wall, or under placed leaves, gives nothing). Every 10 seconds it drips:\n- Jungle log: 25 mB of Latex into its 1,000 mB tank.\n- Spruce log: a 50% chance of a Pine Resin.\n- Any other log: a 15% chance of a Pine Resin.\nIt holds up to 16 Pine Resin. Take the Latex with a bucket and the resin by hand, or let a hopper under it or a conduit empty it."
+    },
+    {
+      "type": "text",
+      "text": "# Pine Resin\nThe Infuser takes Pine Resin in its additive slot in place of Creosote: one per plank, four per log or wood. No Carbonizer needed for treated wood.\n# Latex\nDry it into Raw Rubber in the Grain Dryer. Every rate is in the farming.resinTap config."
+    }
+  ]
+}

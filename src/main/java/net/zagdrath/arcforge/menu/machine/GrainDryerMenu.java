@@ -26,7 +26,11 @@ public class GrainDryerMenu extends MachineMenu {
     public static final int DATA_STATUS = 7;
     public static final int DATA_REDSTONE_MODE = 8;
     public static final int DATA_SIDE_CONFIG = 9;
-    public static final int DATA_VALUES = 10;
+    // The fluid tank (Latex), added later.
+    public static final int DATA_FLUID = 10;
+    public static final int DATA_FLUID_AMOUNT = 11;
+    public static final int DATA_FLUID_CAPACITY = 12;
+    public static final int DATA_VALUES = 13;
 
     // The Fiberizer's layout without its FE gauge.
     public static final int INPUT_X = 44, INPUT_Y = 35;
@@ -85,5 +89,17 @@ public class GrainDryerMenu extends MachineMenu {
 
     public int getHeatUsage() {
         return value(DATA_HEAT_USAGE);
+    }
+
+    public net.minecraft.world.level.material.Fluid getFluid() {
+        return ElectricPumpMenu.fluid(value(DATA_FLUID));
+    }
+
+    public int getFluidAmount() {
+        return value(DATA_FLUID_AMOUNT);
+    }
+
+    public int getFluidCapacity() {
+        return value(DATA_FLUID_CAPACITY);
     }
 }

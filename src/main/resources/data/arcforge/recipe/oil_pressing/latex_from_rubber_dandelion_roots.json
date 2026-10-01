@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:oil_pressing",
+  "ingredient": "#c:crops/rubber_dandelion",
+  "result": {
+    "id": "arcforge:latex",
+    "amount": 100
+  },
+  "time": 100
+}

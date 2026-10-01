@@ -147,8 +147,9 @@ public final class FarmingProviders {
         }
     }
 
-    // Planter, Harvester, Fertilizer Spreader and Copper Sprinkler. kind: 0 Planter/Harvester (a = on redstone, b =
-    // ticks to the next run), 1 Spreader (a = fertilizer held), 2 Sprinkler (a = water, b = capacity).
+    // Planter, Harvester, Fertilizer Spreader, Copper Sprinkler and Resin Tap. kind: 0 Planter/Harvester (a = on redstone,
+    // b = ticks to the next run), 1 Spreader (a = fertilizer held), 2 Sprinkler (a = water, b = capacity), 3 Resin Tap
+    // (a = Latex in mB or Pine Resin held, b = the log's ResinTapBlockEntity.Source ordinal * 2, + 1 on a living tree).
     public enum RusticMachine implements StreamServerDataProvider<BlockAccessor, RusticMachine.Data> {
         INSTANCE;
 
@@ -172,6 +173,12 @@ public final class FarmingProviders {
             }
             if (accessor.getBlockEntity() instanceof CopperSprinklerBlockEntity sprinkler) {
                 return new Data(2, sprinkler.getTank().getAmount(), sprinkler.getTank().getCapacity());
+            }
+            if (accessor.getBlockEntity() instanceof net.zagdrath.arcforge.blockentity.farming.ResinTapBlockEntity tap) {
+                var source = tap.getSource();
+                int held = source == net.zagdrath.arcforge.blockentity.farming.ResinTapBlockEntity.Source.LATEX
+                        ? tap.getTank().getAmount() : tap.getResin().getCount();
+                return new Data(3, held, source.ordinal() * 2 + (tap.isAlive() ? 1 : 0));
             }
             return null;
         }
@@ -204,6 +211,25 @@ public final class FarmingProviders {
                             tooltip.add(data.a() >= ArcforgeConfig.SPRINKLER_WATER_PER_TICK.getAsInt()
                                     ? Component.translatable("jade.arcforge.copper_sprinkler.running").withStyle(ChatFormatting.AQUA)
                                     : Component.translatable("jade.arcforge.copper_sprinkler.dry").withStyle(ChatFormatting.RED));
+                        }
+                        case 3 -> {
+                            var source = net.zagdrath.arcforge.blockentity.farming.ResinTapBlockEntity.Source.values()[data.b() / 2];
+                            boolean alive = data.b() % 2 == 1;
+                            switch (source) {
+                                case LATEX -> tooltip.add(Component.translatable("jade.arcforge.resin_tap.latex", ArcforgeGui.grouped(data.a()),
+                                        ArcforgeGui.grouped(ArcforgeConfig.RESIN_TAP_TANK_CAPACITY.getAsInt())));
+                                case SPRUCE, OTHER -> tooltip.add(Component.translatable("jade.arcforge.resin_tap.resin", data.a(),
+                                        ArcforgeConfig.RESIN_TAP_MAX_RESIN.getAsInt()));
+                                case NONE -> {}
+                            }
+                            tooltip.add(source == net.zagdrath.arcforge.blockentity.farming.ResinTapBlockEntity.Source.NONE
+                                    ? Component.translatable("jade.arcforge.resin_tap.no_log").withStyle(ChatFormatting.RED)
+                                    : alive ? Component.translatable("jade.arcforge.resin_tap." + switch (source) {
+                                        case LATEX -> "dripping_latex";
+                                        case SPRUCE -> "dripping_resin";
+                                        default -> "dripping_slowly";
+                                    }).withStyle(ChatFormatting.GREEN)
+                                    : Component.translatable("jade.arcforge.resin_tap.dead").withStyle(ChatFormatting.GRAY));
                         }
                         default -> {}
                     }

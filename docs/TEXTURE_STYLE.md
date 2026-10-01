@@ -688,6 +688,42 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   arrow at 90 and the outputs at 112 and 132; the Electrolyzer's gains a liquid tank at x 122 (a copy of the gas tank
   frame) with the arrow moved to 98.
 
+## Rubber and bio-plastics
+- **Rubber Dandelion** (no source art) is drawn to match on Cody's greens (`#204C1D #2C5E22 #40712B #5B8838 #779C43`), one
+  block tall, 4 stages over ages 0-7 (0,0,1,1,2,2,2,3):
+  - a rosette of dandelion leaves fanning out low from the crown on both sides: each blade a lit top edge, a body and a
+    shaded underside, its top edge cut into backward-pointing lobes every 3 px (the runcinate teeth), tapering to a tip;
+  - stage 0 is a two-leaf seedling, stage 1 a small rosette, stage 2 the full rosette with two yellow heads on stalks
+    (`#FFE66A #EBC52C #C8961E`: rays out, darker heart), stage 3 (ripe) the same with two white seed clocks
+    (`#FFFFFF #E4E8E0 #B8BEB4`, 5×5 with the corners off, lit top-left), so a ripe field reads at a glance;
+  - Wild Rubber Dandelion is the full rosette with one flower and one seed clock.
+- Items (vanilla outline `#0C0D0F` unless a natural material keeps its own tonal one):
+  - Rubber Dandelion Seeds: three dandelion achenes, each a fan of white pappus rays over a thin beak and a small brown
+    seed, in a tonal `#3A2A1D` outline.
+  - Rubber Dandelion Roots: two fat forked taproots (`#3A2414 → #C09A64`, lit on the left, root hairs), their cut crowns
+    cream with a bead of latex, in their own darkest tone as outline.
+  - Pine Resin: Cody's lump (as for Compost), recoloured by rank onto amber `#4A2406 → #FFF0B8`, with one glint.
+  - Raw Rubber: a crepe sheet (`#6E4C1E #9A7034 #C09650 #DCB670 #F0D494`) with diagonal crepe ribs and a corner turned up.
+  - Rubber: a cured slab on the ingot rule (flat top `#4A4E54` with a `#6A7078` edge and one glint, front `#34373C`, end
+    `#26282C`). Rubber Gasket: a flat O-ring, lit top-left and a step darker bottom-right.
+  - PVC Sheet: the Plastic Sheet recoloured to PVC grey (`#CED8E0 #A8B4BE #8C99A5 #6E7A86`).
+  - Block of Rubber: four pressed 8×8 tiles, each with a 1 px bevel on the rubber tones and one moulded dot.
+- Fluids: Latex is Ethanol's frames recoloured by brightness onto milky cream `#A89E88 → #FFFFFF`. Ethylene is the steam
+  texture tinted a faint mint `#D2EADA`.
+- **Resin Tap** (rustic, see "Rustic farming machines"): a UV-unwrapped element model on one 64×64 sheet. A treated-planks
+  back board against the log and a shelf on two iron brackets, a slatted planks cup with an iron hoop and a dark interior
+  floor, and a copper spout (the Tempered row) driven into the log with its nozzle turned down over the cup. What's in the
+  cup is one face with its own 16×16 texture (`#c`): `resin_tap_empty` (clear, so the floor shows), `resin_tap_latex`
+  (`#ECE8DC` with lit ripples and a glint) or `resin_tap_resin` (`#D08C22` the same way).
+- **Vulcanizer** (single-block casing, see "Farm processing"): input on top, output underneath, heat at the back, vented
+  sides. The front window is a heated press: an upper platen on its ram and a lower platen, each with a heating element
+  (furnace brick `#3A2C23` / `#2B211B` off, the Heat row on), a Raw Rubber sheet with a pinch of sulfur on the lower
+  platen. `_on` is 4 frames (frametime 3): the platen comes down, the elements glow and the sheet cures dark.
+- GUIs (cut from existing backgrounds): the Chemical Reactor's output and by-product slots stack at x 112 (y 24 / 44),
+  with the output tank frame copied to x 136 beside the by-product tank at x 154; the Infuser's wood slot moves to y 24
+  with the additive slot copied under it at y 44; the Grain Dryer gains the Infuser's tank frame at x 24; the Vulcanizer
+  is the Grain Dryer's background with its input slot copied to x 23.
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

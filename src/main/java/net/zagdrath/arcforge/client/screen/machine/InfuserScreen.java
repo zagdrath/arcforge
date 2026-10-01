@@ -24,8 +24,9 @@ public class InfuserScreen extends MachineScreen<InfuserMenu> {
     private static final int ENERGY_X = 9, ENERGY_Y = 19;
     private static final int TANK_X = 25, TANK_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int PROGRESS_X = 96, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
-    private static final int LED_X = 72, LED_Y = 58;
-    private static final int STATUS_X = 80, STATUS_Y = 58;
+    // Under the arrow and the result: the wood and additive slots stack where the status was.
+    private static final int LED_X = 96, LED_Y = 58;
+    private static final int STATUS_X = 104, STATUS_Y = 58;
 
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier fluidFill = sprite("fluid_fill");

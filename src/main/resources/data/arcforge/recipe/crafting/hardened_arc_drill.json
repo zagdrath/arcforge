@@ -8,7 +8,7 @@
   ],
   "key": {
     "A": "arcforge:hardened_alloy",
-    "P": "arcforge:plastic_sheet",
+    "P": "#arcforge:plastics",
     "E": "arcforge:hardened_battery",
     "X": "arcforge:tempered_arc_drill"
   },

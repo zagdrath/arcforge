@@ -194,6 +194,20 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CHLORINE = FLUIDS.register("flowing_chlorine",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.CHLORINE_TYPE, ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE)));
 
+    // Rubber and bio-plastics. Latex: the milky sap of the Rubber Dandelion's roots (the Oil Press) and of jungle trees
+    // (the Resin Tap), thick and slow; the Grain Dryer dries it into Raw Rubber. Ethylene: a gas, from Ethanol dehydrated
+    // over Sulfuric Acid in the Chemical Reactor; it polymerises into Plastic Sheet, and with Chlorine into PVC Sheet.
+    public static final DeferredHolder<FluidType, FluidType> LATEX_TYPE = liquidType("latex", 980, 4_000, 0.016F, 0.6, 0.7);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LATEX = FLUIDS.register("latex",
+            () -> new BaseFlowingFluid.Source(latexProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LATEX = FLUIDS.register("flowing_latex",
+            () -> new BaseFlowingFluid.Flowing(latexProperties()));
+    public static final DeferredHolder<FluidType, FluidType> ETHYLENE_TYPE = gasType("ethylene", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> ETHYLENE = FLUIDS.register("ethylene",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.ETHYLENE_TYPE, ModFluids.ETHYLENE, ModFluids.FLOWING_ETHYLENE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_ETHYLENE = FLUIDS.register("flowing_ethylene",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.ETHYLENE_TYPE, ModFluids.ETHYLENE, ModFluids.FLOWING_ETHYLENE)));
+
     // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
     // so they only exist in tanks, machines and Pressurized Conduits.
     public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = gasType("steam", 373);
@@ -346,6 +360,17 @@ public final class ModFluids {
     }
 
     // Like water: spreads 4 blocks, every 5 ticks.
+    // Thick, like Seed Oil: spreads 3 blocks, every 15 ticks.
+    private static BaseFlowingFluid.Properties latexProperties() {
+        return new BaseFlowingFluid.Properties(LATEX_TYPE, LATEX, FLOWING_LATEX)
+                .bucket(ModItems.LATEX_BUCKET)
+                .block(ModBlocks.LATEX)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(15)
+                .explosionResistance(100.0F);
+    }
+
     private static BaseFlowingFluid.Properties seawaterProperties() {
         return new BaseFlowingFluid.Properties(SEAWATER_TYPE, SEAWATER, FLOWING_SEAWATER)
                 .bucket(ModItems.SEAWATER_BUCKET)

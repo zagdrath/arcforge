@@ -9,7 +9,7 @@
   "key": {
     "A": "arcforge:tempered_alloy",
     "K": "#c:chests/wooden",
-    "P": "#c:plastics",
+    "P": "#arcforge:plastics",
     "X": "arcforge:wrought_crate"
   },
   "result": {

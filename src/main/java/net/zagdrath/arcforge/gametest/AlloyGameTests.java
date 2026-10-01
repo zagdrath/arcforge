@@ -169,8 +169,8 @@ final class AlloyGameTests {
         // Separator, Haber Reactor, Biogas Digester Casing and Biogas Digester Controller), and the automated farms' three
         // (Glass Cloche, Grow Chamber and Hydroponic Cell), and the Greenhouse Array's four (Greenhouse Frame and
         // Controller, Planting Bed and Grow Lamp), and salt's four (Block of Rock Salt both ways, Thermal Evaporator Casing
-        // and Controller).
-        helper.assertTrue(crafting == 215, crafting + " crafting/ recipes, not 215");
+        // and Controller), and rubber's five (Resin Tap, Vulcanizer, Block of Rubber both ways and the Rubber Gasket).
+        helper.assertTrue(crafting == 220, crafting + " crafting/ recipes, not 220");
         // Plus the fluorite-fluxed steel.
         helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

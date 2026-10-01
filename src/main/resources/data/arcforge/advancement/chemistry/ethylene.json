@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/naphtha",
+  "display": {
+    "icon": {
+      "id": "arcforge:plastic_sheet"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.ethylene.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.ethylene.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ethylene": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:ethylene"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ethylene"
+    ]
+  ]
+}

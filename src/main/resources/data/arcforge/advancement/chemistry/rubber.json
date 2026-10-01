@@ -1,0 +1,33 @@
+{
+  "parent": "arcforge:chemistry/naphtha",
+  "display": {
+    "icon": {
+      "id": "arcforge:rubber"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.rubber.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.rubber.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "rubber": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "item": {
+          "items": "arcforge:rubber"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "rubber"
+    ]
+  ]
+}

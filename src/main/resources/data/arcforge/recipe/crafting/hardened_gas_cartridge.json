@@ -4,11 +4,12 @@
   "pattern": [
     " H ",
     "HXH",
-    " H "
+    "GHG"
   ],
   "key": {
     "X": "arcforge:tempered_gas_cartridge",
-    "H": "arcforge:hardened_alloy"
+    "H": "arcforge:hardened_alloy",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:hardened_gas_cartridge",

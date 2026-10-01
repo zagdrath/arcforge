@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "arcforge:rubber_block"
+  ],
+  "result": {
+    "id": "arcforge:rubber",
+    "count": 9
+  }
+}

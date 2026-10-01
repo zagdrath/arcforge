@@ -258,6 +258,13 @@ public final class ArcforgeGameTests {
         TESTS.put("evaporator_pump_draws_seawater", ThermalEvaporatorGameTests::pumpDrawsSeawater);
         TESTS.put("evaporator_halite", ThermalEvaporatorGameTests::halite);
         TESTS.put("evaporator_pond_aliases", ThermalEvaporatorGameTests::pondAliases);
+        TESTS.put("rubber_dandelion", RubberGameTests::dandelion);
+        TESTS.put("rubber_resin_tap", RubberGameTests::resinTap);
+        TESTS.put("rubber_infuser_pine_resin", RubberGameTests::infuserPineResin);
+        TESTS.put("rubber_dryer_latex", RubberGameTests::dryerLatex);
+        TESTS.put("rubber_vulcanizer", RubberGameTests::vulcanizer);
+        TESTS.put("rubber_bio_plastics", RubberGameTests::bioPlastics);
+        TESTS.put("rubber_plastics_tag", RubberGameTests::plastics);
         TESTS.put("salt_recipes", SaltGameTests::recipes);
         TESTS.put("salt_tags", SaltGameTests::saltTags);
         TESTS.put("salt_reactor_makes_brine", SaltGameTests::reactorMakesBrine);

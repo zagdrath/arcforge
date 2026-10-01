@@ -4,12 +4,13 @@
   "pattern": [
     "PTP",
     "TXT",
-    "PTP"
+    "GTG"
   ],
   "key": {
     "T": "arcforge:tempered_alloy",
     "X": "arcforge:wrought_pressurized_cylinder",
-    "P": "#c:plates/steel"
+    "P": "#c:plates/steel",
+    "G": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:tempered_pressurized_cylinder",
