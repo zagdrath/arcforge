@@ -6,7 +6,8 @@
   ],
   "textures": {
     "t": "arcforge:block/planter",
-    "particle": "arcforge:block/treated_planks"
+    "particle": "arcforge:block/treated_planks",
+    "heap": "arcforge:block/compost_bin_compost"
   },
   "elements": [
     {
@@ -1082,12 +1083,12 @@
       ],
       "faces": {
         "up": {
-          "texture": "#t",
+          "texture": "#heap",
           "uv": [
-            8.0,
-            0.0,
-            10.5,
-            2.25
+            3,
+            4,
+            13,
+            13
           ]
         },
         "north": {

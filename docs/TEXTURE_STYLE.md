@@ -539,7 +539,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   a reel (iron end plates, log axle, four slats), a toothed iron cutter bar and a copper outlet at the back.
 - The Planter, Harvester and Fertilizer Spreader sheets and UVs are hand-cut from the treated textures as above.
   `tools/rustic_texture_gen.py` painted the earlier procedural version and would overwrite them: don't re-run it. The
-  Planter's seed tray is the Compost Bin heap texture and the Fertilizer Spreader's top is Loam, tiled.
+  Planter's seed tray is the Compost Bin heap texture and the Fertilizer Spreader's top is Loam: their models
+  point those faces at `compost_bin_compost` and `loam` themselves, not at copies on the sheets.
 - The Sickles are Cody's hook sickle, cleaned (no guard nubs at the handle), with the blade on three tones: iron
   `#E6E6E6 #9A9A9A #5E5E5E`, steel `#C4C9CF #7D8289 #3C3F45`; the handle on the house wood `#291E0B #493615 #684E1E
   #896727` and a `#16181B` end cap.

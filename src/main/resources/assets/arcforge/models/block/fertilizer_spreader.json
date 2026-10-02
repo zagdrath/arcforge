@@ -6,7 +6,8 @@
   ],
   "textures": {
     "t": "arcforge:block/fertilizer_spreader",
-    "particle": "arcforge:block/treated_planks"
+    "particle": "arcforge:block/treated_planks",
+    "loam": "arcforge:block/loam"
   },
   "elements": [
     {
@@ -697,12 +698,12 @@
       ],
       "faces": {
         "up": {
-          "texture": "#t",
+          "texture": "#loam",
           "uv": [
-            7.0,
-            0.0,
-            10.0,
-            3.0
+            2,
+            2,
+            14,
+            14
           ]
         }
       }

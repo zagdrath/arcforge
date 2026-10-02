@@ -192,6 +192,8 @@ number and date.
 
 ### Fixed
 
+- **Planter and Fertilizer Spreader tops:** the Planter's seed tray now uses the Compost Bin's compost texture and the
+  Fertilizer Spreader's top uses Loam, the same textures as those blocks, in place of rough copies.
 - **Treated Slabs made a vanilla Composter instead of a Compost Bin.** They count as wooden slabs, so vanilla's
   Composter recipe matched them first; it now takes any wooden slab but Treated Slabs.
 - **Glass Cloche:** its corner bars now reach the planter floor, so there's no gap at the corners inside the tray.
