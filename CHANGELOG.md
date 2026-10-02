@@ -20,6 +20,8 @@ number and date.
 
 ## [Unreleased]
 
+## [2.3.0] - 2026-10-01
+
 ### Upgrading
 
 - **Chemical Reactor third input tank** and **Electrolyzer liquid output tank.** Saved machines keep everything in their
@@ -835,7 +837,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.2.0...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.3.0...HEAD
+[2.3.0]: https://github.com/zagdrath/arcforge/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/zagdrath/arcforge/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/zagdrath/arcforge/compare/v2.0.0...v2.1.0
 [2.0.0]: https://github.com/zagdrath/arcforge/compare/v1.2.0...v2.0.0
