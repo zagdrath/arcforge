@@ -137,7 +137,10 @@ public final class ExtendedLogisticsGameTests {
         helper.setBlock(tank, ModBlocks.RESERVOIR.get());
         helper.setBlock(drain, ModBlocks.XP_DRAIN.get());
         Vec3 at = helper.absoluteVec(new Vec3(1.5, 2.15, 1.5));
-        helper.getLevel().addFreshEntity(new ExperienceOrb(helper.getLevel(), at.x, at.y, at.z, 7));
+        // A new orb gets a random kick (up to 0.4 up), which can carry it off the grate before the drain sees it.
+        ExperienceOrb orb = new ExperienceOrb(helper.getLevel(), at.x, at.y, at.z, 7);
+        orb.setDeltaMovement(Vec3.ZERO);
+        helper.getLevel().addFreshEntity(orb);
         int twoLevels = LiquidExperience.pointsForLevel(0) + LiquidExperience.pointsForLevel(1);
         ServerPlayer[] player = new ServerPlayer[1];
         helper.startSequence()
