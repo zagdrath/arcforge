@@ -126,6 +126,13 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         // The Solar Thermal Array's casings and collectors show its heat.
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, SolarBlock.class);
         registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, DistillationArrayCasingBlock.class);
+        // Reservoirs, Liquid Experience, the Quantum Tunnel and the Chunk Loader.
+        registration.registerBlockDataProvider(LogisticsProviders.Reservoir.INSTANCE, net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity.class);
+        registration.registerBlockDataProvider(LogisticsProviders.XpDrain.INSTANCE, net.zagdrath.arcforge.blockentity.experience.XpDrainBlockEntity.class);
+        registration.registerBlockDataProvider(LogisticsProviders.Experience.INSTANCE, net.zagdrath.arcforge.blockentity.experience.XpShowerBlockEntity.class);
+        registration.registerBlockDataProvider(LogisticsProviders.Experience.INSTANCE, VacuumCollectorBlockEntity.class);
+        registration.registerBlockDataProvider(LogisticsProviders.QuantumTunnel.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity.class);
+        registration.registerBlockDataProvider(LogisticsProviders.ChunkLoader.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity.class);
     }
 
     @Override
@@ -195,6 +202,12 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 PressureGlassBlock.class)) {
             registration.registerBlockComponent(GreenhouseProvider.Client.INSTANCE, type);
         }
+        registration.registerBlockComponent(LogisticsProviders.Reservoir.Client.INSTANCE, net.zagdrath.arcforge.block.storage.ReservoirBlock.class);
+        registration.registerBlockComponent(LogisticsProviders.XpDrain.Client.INSTANCE, net.zagdrath.arcforge.block.experience.XpDrainBlock.class);
+        registration.registerBlockComponent(LogisticsProviders.Experience.Client.INSTANCE, net.zagdrath.arcforge.block.experience.XpShowerBlock.class);
+        registration.registerBlockComponent(LogisticsProviders.Experience.Client.INSTANCE, VacuumCollectorBlock.class);
+        registration.registerBlockComponent(LogisticsProviders.QuantumTunnel.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.QuantumTunnelBlock.class);
+        registration.registerBlockComponent(LogisticsProviders.ChunkLoader.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.ChunkLoaderBlock.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

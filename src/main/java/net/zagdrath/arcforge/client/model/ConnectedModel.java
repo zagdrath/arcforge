@@ -80,11 +80,13 @@ import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 // tower uses "thermal_evaporator": the same again, joined with its casings, controller and Pressure Glass, drawn as a thin
 // skin like the steam arrays (no faces toward the glass or into the hollow core), with "window" and "lip" textures for
 // window quadrants: each window reaches half a block into the casings round it, as on the steam and gas turbine arrays
-// (see WindowQuadrants.windowedEvaporator). Its renderer draws the inside of that skin.
+// (see WindowQuadrants.windowedEvaporator). Its renderer draws the inside of that skin. Reservoirs use "reservoir" (glass /
+// frame / frame_h / frame_v / frame_corners; see ReservoirModel): touching Reservoirs share one steel frame round their
+// outer edges.
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
     private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester", GREENHOUSE = "greenhouse",
-            EVAPORATOR = "thermal_evaporator";
+            EVAPORATOR = "thermal_evaporator", RESERVOIR = "reservoir";
     // The tray band's glass: the top 10 px of a side face (the sill and strap are below it).
     private static final int BAND = 10;
     private static final Identifier TRAY_FRAME = Identifier.fromNamespaceAndPath("arcforge", "block/ctm/tray_window_frame");
@@ -141,6 +143,7 @@ public final class ConnectedModel {
                 case TRAY -> new String[] { "base", "frame", "top", "bottom" };
                 case DIGESTER, GREENHOUSE -> new String[] { "base", "beam", "top" };
                 case EVAPORATOR -> new String[] { "base", "beam", "top", "window", "lip" };
+                case RESERVOIR -> new String[] { "glass", "frame", "frame_h", "frame_v", "frame_corners" };
                 default -> new String[] { "base", "beam", "lip", "window" };
             };
             for (String required : needed) {
@@ -174,6 +177,9 @@ public final class ConnectedModel {
             ResolvedModel resolved = baker.getModel(model);
             if (!(resolved.wrapped() instanceof JsonModel unbaked)) {
                 throw new IllegalStateException("Model " + model + " is not an arcforge:connected model");
+            }
+            if (unbaked.connect().equals(RESERVOIR)) {
+                return new ReservoirModel(baker, unbaked, model);
             }
             return unbaked.digester() ? new DigesterBaked(baker, unbaked, model)
                     : unbaked.column() ? new ColumnBaked(baker, unbaked, model) : new Baked(baker, unbaked, model);

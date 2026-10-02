@@ -143,6 +143,11 @@
     "arcforge:raw_rock_salt_block",
     "arcforge:thermal_evaporator_casing",
     "arcforge:thermal_evaporator_controller",
-    "arcforge:vulcanizer"
+    "arcforge:vulcanizer",
+    "arcforge:reservoir",
+    "arcforge:xp_drain",
+    "arcforge:xp_shower",
+    "arcforge:quantum_tunnel",
+    "arcforge:chunk_loader"
   ]
 }

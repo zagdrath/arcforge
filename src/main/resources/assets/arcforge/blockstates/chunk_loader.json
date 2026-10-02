@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "active=false,facing=north": {
+      "model": "arcforge:block/chunk_loader"
+    },
+    "active=true,facing=north": {
+      "model": "arcforge:block/chunk_loader_on"
+    },
+    "active=false,facing=east": {
+      "model": "arcforge:block/chunk_loader",
+      "y": 90
+    },
+    "active=true,facing=east": {
+      "model": "arcforge:block/chunk_loader_on",
+      "y": 90
+    },
+    "active=false,facing=south": {
+      "model": "arcforge:block/chunk_loader",
+      "y": 180
+    },
+    "active=true,facing=south": {
+      "model": "arcforge:block/chunk_loader_on",
+      "y": 180
+    },
+    "active=false,facing=west": {
+      "model": "arcforge:block/chunk_loader",
+      "y": 270
+    },
+    "active=true,facing=west": {
+      "model": "arcforge:block/chunk_loader_on",
+      "y": 270
+    }
+  }
+}

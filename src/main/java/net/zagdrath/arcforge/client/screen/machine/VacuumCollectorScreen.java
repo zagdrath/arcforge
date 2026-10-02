@@ -19,11 +19,13 @@ import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.renderer.RangeOutlineRenderer;
+import net.zagdrath.arcforge.experience.LiquidExperience;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
+import net.zagdrath.arcforge.registry.ModFluids;
 
 // Layout follows gui_layouts.json "vacuum_collector" (176x206): the filter slot and status at the top, the range
-// buttons under them, and the 18-slot buffer.
+// buttons under them, the Liquid Experience tank at the right, and the 18-slot buffer.
 public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
     private static final Identifier BUTTON = ArcforgeGui.widget("button");
     private static final Identifier BUTTON_HOVER = ArcforgeGui.widget("button_hover");
@@ -32,6 +34,8 @@ public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
     private static final int STATUS_X = 60, STATUS_Y = 22;
     private static final int MINUS_X = 30, PLUS_X = 96, SHOW_X = 122, BUTTONS_Y = 44, BUTTON_SIZE = 20;
     private static final int RANGE_Y = 50;
+    // The Liquid Experience tank, at the right of the panel.
+    private static final int XP_X = 161, XP_Y = 19, XP_W = 6, XP_H = 50;
 
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier ghostFilter = sprite("ghost_filter");
@@ -61,6 +65,8 @@ public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.getEnergy(), menu.getCapacity());
+        drawFluidTank(graphics, ModFluids.LIQUID_EXPERIENCE.get(), menu.getXp(), menu.getXpCapacity(), sprite("xp_fill"), sprite("xp_gauge"),
+                x, y, XP_X, XP_Y, XP_W, XP_H);
         ghost(graphics, ghostFilter, !menu.getSlot(0).hasItem(), VacuumCollectorMenu.FILTER_X, VacuumCollectorMenu.FILTER_Y);
         drawLed(graphics, x, y, LED_X, LED_Y);
         int hovered = buttonAt(mouseX, mouseY);
@@ -86,7 +92,7 @@ public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
 
     @Override
     protected void drawText(GuiGraphicsExtractor graphics) {
-        graphics.text(font, menu.getStatus().getDescription(), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        graphics.text(font, clipped(menu.getStatus().getDescription(), XP_X - 3 - STATUS_X), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
         Component range = Component.translatable("gui.arcforge.vacuum.range", menu.getRange());
         int centre = (MINUS_X + BUTTON_SIZE + PLUS_X) / 2;
         graphics.text(font, range, centre - font.width(range) / 2, RANGE_Y, ArcforgeGui.TEXT, false);
@@ -115,6 +121,13 @@ public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
         if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getCapacity())).withStyle(ChatFormatting.GRAY));
+            return;
+        }
+        if (isHovering(XP_X - 1, XP_Y - 1, XP_W + 2, XP_H + 2, mouseX, mouseY)) {
+            addFluidTooltip(lines, ModFluids.LIQUID_EXPERIENCE.get(), Component.translatable("fluid_type.arcforge.liquid_experience"),
+                    menu.getXp(), menu.getXpCapacity());
+            lines.add(Component.translatable("gui.arcforge.vacuum.xp_points", ArcforgeGui.grouped(menu.getXp() / LiquidExperience.MB_PER_POINT))
+                    .withStyle(ChatFormatting.GREEN));
             return;
         }
         switch (buttonAt(mouseX, mouseY)) {

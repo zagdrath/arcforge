@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " S ",
+    " R ",
+    "SBS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "R": "#c:rods/copper",
+    "B": "minecraft:iron_bars"
+  },
+  "result": {
+    "id": "arcforge:xp_shower",
+    "count": 1
+  }
+}

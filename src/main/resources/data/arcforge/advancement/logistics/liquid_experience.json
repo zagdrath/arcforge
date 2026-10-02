@@ -1,0 +1,39 @@
+{
+  "parent": "arcforge:logistics/reservoir",
+  "display": {
+    "icon": {
+      "id": "arcforge:xp_drain"
+    },
+    "title": {
+      "translate": "advancements.arcforge.logistics.liquid_experience.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.logistics.liquid_experience.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "arcforge:xp_drain",
+              "arcforge:xp_shower",
+              "arcforge:liquid_experience_bucket"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "item"
+    ]
+  ]
+}

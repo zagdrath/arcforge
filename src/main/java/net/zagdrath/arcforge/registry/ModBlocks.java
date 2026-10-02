@@ -41,10 +41,14 @@ import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.block.experience.XpDrainBlock;
+import net.zagdrath.arcforge.block.experience.XpShowerBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseControllerBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseFrameBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.PlantingBedBlock;
+import net.zagdrath.arcforge.block.logistics.ChunkLoaderBlock;
+import net.zagdrath.arcforge.block.logistics.QuantumTunnelBlock;
 import net.zagdrath.arcforge.block.machine.AirSeparatorBlock;
 import net.zagdrath.arcforge.block.machine.HaberReactorBlock;
 import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
@@ -82,6 +86,7 @@ import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
 import net.zagdrath.arcforge.block.machine.BlockPlacerBlock;
 import net.zagdrath.arcforge.block.machine.BlockBreakerBlock;
 import net.zagdrath.arcforge.block.machine.AssemblerBlock;
+import net.zagdrath.arcforge.block.storage.ReservoirBlock;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
 import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
@@ -212,6 +217,32 @@ public final class ModBlocks {
     public static final DeferredBlock<ChargepadBlock> CHARGEPAD = BLOCKS.registerBlock("chargepad",
             ChargepadBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.METAL).noOcclusion());
+
+    // The Reservoir: glass in a thin steel frame; touching Reservoirs merge into one tank. No tool needed to keep its fluid.
+    public static final DeferredBlock<ReservoirBlock> RESERVOIR = BLOCKS.registerBlock("reservoir",
+            ReservoirBlock::new, p -> p.mapColor(MapColor.NONE).strength(2.0F, 6.0F).sound(SoundType.GLASS).noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false)
+                    .isRedstoneConductor((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos, box) -> false));
+
+    // Liquid Experience: the XP Drain grate laid on a tank, and the XP Shower hung from a ceiling.
+    public static final DeferredBlock<XpDrainBlock> XP_DRAIN = BLOCKS.registerBlock("xp_drain",
+            XpDrainBlock::new, p -> p.mapColor(MapColor.METAL).strength(2.0F, 6.0F).sound(SoundType.METAL).noOcclusion());
+    public static final DeferredBlock<XpShowerBlock> XP_SHOWER = BLOCKS.registerBlock("xp_shower",
+            XpShowerBlock::new, p -> p.mapColor(MapColor.METAL).strength(2.0F, 6.0F).sound(SoundType.METAL).noOcclusion()
+                    .pushReaction(PushReaction.POPPED));
+    public static final DeferredBlock<LiquidBlock> LIQUID_EXPERIENCE = BLOCKS.registerBlock("liquid_experience",
+            p -> new LiquidBlock(ModFluids.LIQUID_EXPERIENCE.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_LIGHT_GREEN).lightLevel(state -> 10));
+
+    // The Quantum Tunnel: a steel frame round a glowing core; the Chunk Loader: a globe on a plinth.
+    public static final DeferredBlock<QuantumTunnelBlock> QUANTUM_TUNNEL = BLOCKS.registerBlock("quantum_tunnel",
+            QuantumTunnelBlock::new, p -> p.mapColor(MapColor.METAL).strength(5.0F, 1_200.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL).noOcclusion().lightLevel(state -> 6));
+    public static final DeferredBlock<ChunkLoaderBlock> CHUNK_LOADER = BLOCKS.registerBlock("chunk_loader",
+            ChunkLoaderBlock::new, p -> p.mapColor(MapColor.METAL).strength(5.0F, 1_200.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL).noOcclusion().lightLevel(state -> state.getValue(ChunkLoaderBlock.ACTIVE) ? 5 : 0));
 
     private static DeferredBlock<MeterBlock> meter(String name, MeterKind kind) {
         return BLOCKS.registerBlock(name, properties -> new MeterBlock(kind, properties),

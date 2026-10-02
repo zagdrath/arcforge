@@ -1,0 +1,21 @@
+{
+  "title": "Quantum Tunnel",
+  "icon": "arcforge:quantum_tunnel",
+  "items": [
+    "arcforge:quantum_tunnel"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Tunnels on the same frequency share one buffer of FE, heat, liquid, gas and items, wherever they are, in any dimension. A tunnel works while its chunk is loaded (a Chunk Loader helps); the buffer itself is kept with the world, not the block.\n- FE 4,000,000, heat 400,000 HU, liquid 64,000 mB, gas 64,000 mB, 9 item slots (config).\n- Each face moves up to an Arcforged conduit's rate per resource."
+    },
+    {
+      "type": "text",
+      "text": "# Frequencies\nType a name and press Set to put the tunnel on it (making it if it's new).\n- Public (open padlock): anyone may use it.\n- Private (closed padlock): you, and players you trust at your Security Terminal.\nClick a frequency in the list to switch; click the one it's on to leave it. The x deletes one you made, and everything in its buffer. Each player may make 32."
+    },
+    {
+      "type": "text",
+      "text": "# Sides\nEvery face starts with a blank port. In the grid, set each face for each resource: None, Input (it takes that into the frequency) or Output (it gives it, pushing into the block it touches). The port shows a blue ring for input, orange for output, both for a face doing each.\n# Security\nThe tunnel belongs to whoever placed it and follows the usual security; on a private frequency its owner must be the frequency's owner or trusted, or it does nothing."
+    }
+  ]
+}

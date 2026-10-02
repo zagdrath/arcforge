@@ -1,0 +1,37 @@
+{
+  "parent": "arcforge:start/first_power",
+  "display": {
+    "icon": {
+      "id": "arcforge:chunk_loader"
+    },
+    "title": {
+      "translate": "advancements.arcforge.logistics.chunk_loader.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.logistics.chunk_loader.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "arcforge:chunk_loader"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "item"
+    ]
+  ]
+}

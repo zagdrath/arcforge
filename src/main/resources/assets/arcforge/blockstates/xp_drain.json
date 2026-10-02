@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "arcforge:block/xp_drain"
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "AGA",
+    "EGE",
+    "AGA"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "G": "#c:gems/arcite",
+    "E": "minecraft:ender_pearl"
+  },
+  "result": {
+    "id": "arcforge:quantum_tunnel",
+    "count": 1
+  }
+}

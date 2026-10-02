@@ -44,9 +44,41 @@ number and date.
 - **Data packs:** `arcforge:infusing` recipes may take an `additive` (`{"ingredient", "count"}`) instead of a `fluid`;
   `arcforge:drying` recipes may take a `fluid` (`{"fluid" or "tag", "amount"}`) instead of an `ingredient`;
   `arcforge:chemical_reacting` recipes may have a `fluid_byproduct`. Existing recipes load unchanged.
+- **Vacuum Collector experience tank.** Saved collectors load with an empty Liquid Experience tank. Fluid conduits
+  touching an Output face of one now connect to it (they find its experience there).
+- **New config sections** `reservoir`, `experience`, `quantumTunnel` and `chunkLoader` get their defaults. Chunk Loaders
+  load chunks for their owner only up to `chunkLoader.chunksPerPlayer` (25); raise it on servers that need more.
 
 ### Added
 
+- **Reservoir:** a 32,000 mB glass tank in a thin steel frame. Reservoirs that touch merge into one tank of any shape and
+  size (like OpenBlocks tanks), sharing one liquid that fills from the bottom up: drawn as one tank, with the frame only
+  round its outer edges and the liquid as one body at its level (glowing for glowing fluids). Any block takes and gives
+  the liquid (buckets, conduits, pipes), a comparator reads the whole tank, and a broken block keeps its share on the item.
+  Tanks of different liquids stay apart. Separate from the tiered Fluid Tanks, which are unchanged.
+- **Liquid Experience,** a glowing pale-green fluid at 20 mB per experience point, in `c:experience` so other mods' liquid
+  experience works with it, with a bucket.
+  - **XP Drain:** a grate placed on top of any fluid container (a Reservoir, a Fluid Tank, another mod's tank). Experience
+    orbs that land on it run into the container below; a player sneaking on it is drained a level at a time.
+  - **XP Shower:** hung under a block, fed Liquid Experience by conduit or from a container above; it gives a player
+    sneaking under it experience a level at a time. A redstone signal turns it off.
+  - **Vacuum Collector:** also collects experience orbs into a 16,000 mB Liquid Experience tank that conduits drain from
+    its Output faces (the GUI shows it at the right).
+  - Rates in the new `experience` config section.
+- **Quantum Tunnel** (late game: Arcforged Alloy, Arcite and Ender Pearls). Every tunnel on a frequency, anywhere and in
+  any dimension, shares one buffer of FE, heat, liquid, gas and items (sizes in the `quantumTunnel` config).
+  - Frequencies are named in its GUI, public (anyone) or private (the owner and the players they trust at their Security
+    Terminal); the maker may delete one. Each face is set for each resource to none, input or output; output faces push
+    into what they touch.
+  - A thin dark frame cube with Arcforged-cyan corner caps, a socketed port on each face (a blank collar until set, then the
+    ring of its mode) and a cyan core spinning in the middle.
+- **Chunk Loader:** keeps its own chunk, or a radius of up to 2 (5×5 chunks), loaded with NeoForge chunk tickets for the
+  player who placed it (security as usual). The GUI maps the chunks and outlines them in the world while it's open. A
+  per-player chunk limit (25), an option to load only while the owner is online, and an optional FE cost per chunk (off)
+  are in the `chunkLoader` config. It stops when broken, turned off with redstone, or out of FE. A globe in a copper
+  cradle on a tall pedestal turns while it works.
+- Handbook pages (Reservoir, Liquid Experience, Quantum Tunnel, Chunk Loader), JEI information, Jade tooltips, and four
+  new advancements (Pooling Resources, Bottled Wisdom, Spooky Action, Never Sleeps).
 - **Rubber.**
   - **Rubber Dandelion,** a new crop (one block tall): yellow flowers, then white seed clocks when ripe. It drops
     **Rubber Dandelion Roots** and **Rubber Dandelion Seeds**. **Wild Rubber Dandelions** grow in meadows, plains and taiga
@@ -121,6 +153,7 @@ number and date.
 
 ### Changed
 
+- **Vacuum Collector:** it gathers experience orbs as well as items (see Added), for the same FE each.
 - **Rubber Gaskets** go into the recipes of:
   - Tempered, Hardened and Arcforged Pressurized Conduits (one gasket in the ring: 7, 7 and 6 conduits a craft);
   - Tempered, Hardened and Arcforged Pressurized Cylinders and Gas Cartridges (two, along the bottom);

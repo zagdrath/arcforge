@@ -18,16 +18,35 @@ public final class FluidBoxes {
 
     public static void box(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
             float x0, float y0, float z0, float x1, float y1, float z1) {
+        box(pose, buffer, sprite, color, light, x0, y0, z0, x1, y1, z1, 0);
+    }
+
+    // The same, leaving out the faces whose bit is set in skip (1 << Direction.get3DDataValue(): down, up, north, south,
+    // west, east), e.g. where the box meets more of the same fluid in the next block.
+    public static void box(PoseStack.Pose pose, VertexConsumer buffer, TextureAtlasSprite sprite, int color, int light,
+            float x0, float y0, float z0, float x1, float y1, float z1, int skip) {
         if (x1 <= x0 || y1 <= y0 || z1 <= z0) {
             return;
         }
         // Vertex order matches vanilla block faces so every face is wound outwards.
-        quad(pose, buffer, sprite, color, light, 0, -1, 0, x0, y0, z1, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, z1, x1, z0);
-        quad(pose, buffer, sprite, color, light, 0, 1, 0, x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, z0, x1, z1);
-        quad(pose, buffer, sprite, color, light, 0, 0, -1, x1, y1, z0, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, x0, y0);
-        quad(pose, buffer, sprite, color, light, 0, 0, 1, x0, y1, z1, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, x1, y0);
-        quad(pose, buffer, sprite, color, light, -1, 0, 0, x0, y1, z0, x0, y0, z0, x0, y0, z1, x0, y1, z1, z0, y1, z1, y0);
-        quad(pose, buffer, sprite, color, light, 1, 0, 0, x1, y1, z1, x1, y0, z1, x1, y0, z0, x1, y1, z0, z1, y1, z0, y0);
+        if ((skip & 1) == 0) {
+            quad(pose, buffer, sprite, color, light, 0, -1, 0, x0, y0, z1, x0, y0, z0, x1, y0, z0, x1, y0, z1, x0, z1, x1, z0);
+        }
+        if ((skip & 2) == 0) {
+            quad(pose, buffer, sprite, color, light, 0, 1, 0, x0, y1, z0, x0, y1, z1, x1, y1, z1, x1, y1, z0, x0, z0, x1, z1);
+        }
+        if ((skip & 4) == 0) {
+            quad(pose, buffer, sprite, color, light, 0, 0, -1, x1, y1, z0, x1, y0, z0, x0, y0, z0, x0, y1, z0, x1, y1, x0, y0);
+        }
+        if ((skip & 8) == 0) {
+            quad(pose, buffer, sprite, color, light, 0, 0, 1, x0, y1, z1, x0, y0, z1, x1, y0, z1, x1, y1, z1, x0, y1, x1, y0);
+        }
+        if ((skip & 16) == 0) {
+            quad(pose, buffer, sprite, color, light, -1, 0, 0, x0, y1, z0, x0, y0, z0, x0, y0, z1, x0, y1, z1, z0, y1, z1, y0);
+        }
+        if ((skip & 32) == 0) {
+            quad(pose, buffer, sprite, color, light, 1, 0, 0, x1, y1, z1, x1, y0, z1, x1, y0, z0, x1, y1, z0, z1, y1, z0, y0);
+        }
     }
 
     // Four corners plus the texture region (u from a to b, v from c to d, in block units mapped onto the sprite).

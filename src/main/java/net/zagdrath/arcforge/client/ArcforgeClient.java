@@ -52,7 +52,12 @@ import net.neoforged.neoforge.client.event.RegisterSelectItemModelPropertyEvent;
 import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
+import net.zagdrath.arcforge.client.renderer.blockentity.ChunkLoaderRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.PlantingBedRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.QuantumTunnelRenderer;
+import net.zagdrath.arcforge.client.renderer.blockentity.ReservoirRenderer;
+import net.zagdrath.arcforge.client.screen.logistics.ChunkLoaderScreen;
+import net.zagdrath.arcforge.client.screen.logistics.QuantumTunnelScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.GreenhouseScreen;
 import net.zagdrath.arcforge.registry.ModParticleTypes;
 import net.zagdrath.arcforge.client.sound.GasTurbineArraySound;
@@ -190,6 +195,8 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.ARC_TOOL.get(), ArcToolScreen::new);
         event.register(ModMenuTypes.SECURITY_TERMINAL.get(), SecurityTerminalScreen::new);
         event.register(ModMenuTypes.METER.get(), net.zagdrath.arcforge.client.screen.logistics.MeterScreen::new);
+        event.register(ModMenuTypes.QUANTUM_TUNNEL.get(), QuantumTunnelScreen::new);
+        event.register(ModMenuTypes.CHUNK_LOADER.get(), ChunkLoaderScreen::new);
         event.register(ModMenuTypes.GEOTHERMAL_PLANT.get(), GeothermalPlantScreen::new);
         event.register(ModMenuTypes.COMBUSTION_PLANT.get(), CombustionPlantScreen::new);
         event.register(ModMenuTypes.FIREBOX.get(), FireboxScreen::new);
@@ -285,6 +292,7 @@ public class ArcforgeClient {
                 FluidTintSources.constant(SEAWATER_TINT)), ModFluids.SEAWATER, ModFluids.FLOWING_SEAWATER);
         event.register(liquidModel("brine"), ModFluids.BRINE, ModFluids.FLOWING_BRINE);
         event.register(liquidModel("latex"), ModFluids.LATEX, ModFluids.FLOWING_LATEX);
+        event.register(liquidModel("liquid_experience"), ModFluids.LIQUID_EXPERIENCE, ModFluids.FLOWING_LIQUID_EXPERIENCE);
         event.register(liquidModel("lye"), ModFluids.LYE, ModFluids.FLOWING_LYE);
         event.register(liquidModel("hydrochloric_acid"), ModFluids.HYDROCHLORIC_ACID, ModFluids.FLOWING_HYDROCHLORIC_ACID);
         // The slurries share one greyscale texture, tinted per metal.
@@ -382,6 +390,7 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(CHLORINE_TINT & 0xFFFFFF, 5.0F), ModFluids.CHLORINE_TYPE.get());
         event.registerFluidType(liquidFog(ETHYLENE_TINT & 0xFFFFFF, 6.0F), ModFluids.ETHYLENE_TYPE.get());
         event.registerFluidType(liquidFog(0xE8E4D6, 2.0F), ModFluids.LATEX_TYPE.get());
+        event.registerFluidType(liquidFog(0xB6F07A, 6.0F), ModFluids.LIQUID_EXPERIENCE_TYPE.get());
         event.registerFluidType(liquidFog(SEAWATER_TINT & 0xFFFFFF, 12.0F), ModFluids.SEAWATER_TYPE.get());
         event.registerFluidType(liquidFog(0xC8DCE4, 10.0F), ModFluids.BRINE_TYPE.get());
         event.registerFluidType(liquidFog(0xE4E6DA, 8.0F), ModFluids.LYE_TYPE.get());
@@ -522,6 +531,9 @@ public class ArcforgeClient {
         // Pressurized conduits keep the plain conduit block entity (they have a lit state) but show their gas.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CONDUIT.get(), ConduitRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FLUID_TANK.get(), FluidTankRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.RESERVOIR.get(), ReservoirRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.CHUNK_LOADER.get(), ChunkLoaderRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.THROTTLE_LEVER.get(), ThrottleLeverRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.VAULT.get(), VaultRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), ArcforgeFurnaceRenderer::new);

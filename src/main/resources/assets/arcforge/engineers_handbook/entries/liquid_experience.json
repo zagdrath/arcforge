@@ -1,0 +1,19 @@
+{
+  "title": "Liquid Experience",
+  "icon": "arcforge:liquid_experience_bucket",
+  "items": [
+    "arcforge:liquid_experience_bucket",
+    "arcforge:xp_drain",
+    "arcforge:xp_shower"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Experience as a glowing pale-green liquid: 20 mB per experience point. It's in the c:experience tag, so other mods' liquid experience works with it, and it fills any tank and bucket.\n# XP Drain\nA thin grate placed on top of a fluid container (a Reservoir, a Fluid Tank, another mod's tank).\n- Experience orbs that land on it run into the container below.\n- Sneak on it to pour your own experience in, a level at a time."
+    },
+    {
+      "type": "text",
+      "text": "# XP Shower\nA fixture hung under a block. Feed it Liquid Experience through its top: a conduit, or a tank right above it, which it draws from.\n- Sneak under it (up to 3 blocks down) to take experience, a level at a time.\n- A redstone signal turns it off.\n# Vacuum Collector\nIt also gathers experience orbs in its range into a 16,000 mB Liquid Experience tank, which fluid conduits drain from its output faces.\nRates are in the experience config."
+    }
+  ]
+}

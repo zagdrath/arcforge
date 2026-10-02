@@ -22,6 +22,8 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -35,11 +37,14 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.experience.LiquidExperience;
 import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
@@ -49,7 +54,9 @@ import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
+import net.zagdrath.arcforge.transfer.SidedResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
+import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
@@ -58,7 +65,9 @@ import com.mojang.serialization.Codec;
 // Pulls dropped items within its range (a cube reaching `range` blocks out from it on every axis) into its
 // 18-slot buffer, for energyPerItem FE per item entity, every scanInterval ticks. Items must have been on the
 // ground for minItemAge ticks. A Conduit Filter in its filter slot limits what it takes (an unset filter takes
-// everything; the filter's direction doesn't matter). Output faces send the buffer on.
+// everything; the filter's direction doesn't matter). Output faces send the buffer on. It also takes experience orbs
+// in its range (the same FE per orb) into a Liquid Experience tank (experience.vacuumXpTank, 20 mB a point), which
+// fluid conduits drain from its output faces (and auto-eject pushes out of them).
 public class VacuumCollectorBlockEntity extends MachineBlockEntity {
     public static final int SLOT_FILTER = 0;
     public static final int FIRST_BUFFER = 1;
@@ -74,6 +83,8 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
 
     private final ConsumerEnergyHandler energy;
     private final ResourceHandler<ItemResource> itemOutput;
+    private final FilteredFluidTank xpTank;
+    private final ResourceHandler<FluidResource> xpOutput;
     private final ContainerData data;
 
     private int range = ArcforgeConfig.VACUUM_DEFAULT_RANGE.getAsInt();
@@ -91,6 +102,8 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
                 ArcforgeConfig.VACUUM_MAX_INPUT.getAsInt(),
                 this::setChanged);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot >= FIRST_BUFFER && slot < MACHINE_SLOTS);
+        this.xpTank = new FilteredFluidTank(ArcforgeConfig.VACUUM_XP_TANK.getAsInt(), LiquidExperience::is, this::setChanged);
+        this.xpOutput = new SidedResourceHandler<>(xpTank, false, true, ArcforgeConfig.VACUUM_XP_OUTPUT_RATE.getAsInt());
         this.data = new WideIntContainerData(VacuumCollectorMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -102,6 +115,8 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
                     case VacuumCollectorMenu.DATA_STATUS -> status.ordinal();
                     case VacuumCollectorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case VacuumCollectorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case VacuumCollectorMenu.DATA_XP -> xpTank.getAmount();
+                    case VacuumCollectorMenu.DATA_XP_CAPACITY -> xpTank.getCapacity();
                     default -> 0;
                 };
             }
@@ -172,6 +187,9 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
         }
         setLit(status == MachineStatus.COLLECTING);
         autoEject(level, itemOutput);
+        if (isAutoEject() && xpTank.getAmount() > 0) {
+            outputs.pushFluid(level, pos, getFacing(), sideConfig, xpOutput, ArcforgeConfig.VACUUM_XP_OUTPUT_RATE.getAsInt(), null);
+        }
     }
 
     private MachineStatus scan(ServerLevel level, BlockPos pos) {
@@ -203,10 +221,39 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
             lastCollected = level.getGameTime();
             setChanged();
         }
+        if (xpTank.getCapacity() > 0) {
+            for (ExperienceOrb orb : level.getEntitiesOfClass(ExperienceOrb.class, area(pos, range), Entity::isAlive)) {
+                int cost = energyPerItem();
+                if (energy.getAmountAsInt() < cost) {
+                    return MachineStatus.NO_POWER;
+                }
+                int amount = LiquidExperience.points(level, orb) * LiquidExperience.MB_PER_POINT;
+                if (amount > xpTank.getSpace()) {
+                    full = true;
+                    continue;
+                }
+                try (Transaction transaction = Transaction.openRoot()) {
+                    if (xpTank.insert(0, LiquidExperience.resource(), amount, transaction) != amount) {
+                        full = true;
+                        continue;
+                    }
+                    transaction.commit();
+                }
+                energy.consume(cost);
+                level.sendParticles(ParticleTypes.PORTAL, orb.getX(), orb.getY() + 0.1, orb.getZ(), 4, 0.1, 0.1, 0.1, 0.2);
+                orb.discard();
+                lastCollected = level.getGameTime();
+                setChanged();
+            }
+        }
         if (level.getGameTime() - lastCollected < COLLECTING_TICKS) {
             return MachineStatus.COLLECTING;
         }
         return full ? MachineStatus.OUTPUT_FULL : MachineStatus.IDLE;
+    }
+
+    public FilteredFluidTank getXpTank() {
+        return xpTank;
     }
 
     // Puts as much of the stack as fits into the buffer; returns how many.
@@ -278,6 +325,12 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
         return mode == null || mode == SideMode.OUTPUT ? itemOutput : null;
     }
 
+    // Its Liquid Experience, drained from output faces.
+    public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
+        SideMode mode = modeFor(side);
+        return mode == null || mode == SideMode.OUTPUT ? xpOutput : null;
+    }
+
     public @Nullable EnergyHandler getEnergyHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
         return mode == null || mode == SideMode.ENERGY ? energy : null;
@@ -287,9 +340,9 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
     public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
         SideMode mode = modeFor(side);
         return switch (type) {
-            case ITEM -> mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case ITEM, FLUID -> mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
+            case GAS, THERMAL -> ConnectionMode.NONE;
         };
     }
 
@@ -336,6 +389,7 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         energy.deserialize(input.childOrEmpty("energy"));
+        xpTank.deserialize(input.childOrEmpty("xp_tank"));
         range = Math.max(1, Math.min(maxRange(), input.getIntOr("range", ArcforgeConfig.VACUUM_DEFAULT_RANGE.getAsInt())));
     }
 
@@ -343,6 +397,7 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         energy.serialize(output.child("energy"));
+        xpTank.serialize(output.child("xp_tank"));
         output.putInt("range", range);
     }
 

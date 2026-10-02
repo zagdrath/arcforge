@@ -123,9 +123,13 @@
         "conduit_covers",
         "crates_and_vaults",
         "fluid_tanks",
+        "reservoir",
+        "liquid_experience",
         "energy_cells",
         "meters",
         "chargepad",
+        "quantum_tunnel",
+        "chunk_loader",
         "portable_storage"
       ]
     },

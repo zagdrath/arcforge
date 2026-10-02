@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "BBB",
+    "RHR"
+  ],
+  "key": {
+    "B": "minecraft:iron_bars",
+    "R": "#c:rods/steel",
+    "H": "minecraft:hopper"
+  },
+  "result": {
+    "id": "arcforge:xp_drain",
+    "count": 1
+  }
+}

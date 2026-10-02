@@ -724,6 +724,50 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   with the additive slot copied under it at y 44; the Grain Dryer gains the Infuser's tank frame at x 24; the Vulcanizer
   is the Grain Dryer's background with its input slot copied to x 23.
 
+## Reservoir, Liquid Experience, Quantum Tunnel, Chunk Loader
+- **Reservoir** (`block/reservoir/`): clear glass (alpha 0) with small glints like vanilla glass (a 3 px `#DCE8EE` streak
+  and a 2 px `#A9BCC6` one beside it near the top left, a 2 px `#A9BCC6` one near the bottom right), inside a 2 px
+  machine-steel frame round the face's edges, kept light so the corners don't go black: `#959DA6` then `#727982` on the top
+  and left, `#575D65` then `#474C53` on the bottom and right, `#727982` where lit meets shaded. Connected like the other
+  CTM blocks, by quadrant (ConnectedModel "reservoir", ReservoirModel): each 8×8 quadrant of a face comes from one of five
+  textures by which of its two edges carry the frame: `frame` (both: an outer corner), `frame_h` (top or bottom only),
+  `frame_v` (left or right only), `glass` (neither) or `frame_corners` (neither, but the frame turns there: the 2×2 corner
+  of `frame`, closing an inner corner). An edge where two Reservoirs join drops its frame; a concave edge keeps it. Faces
+  between Reservoirs aren't drawn. The liquid is ReservoirRenderer's: one body at the shared level, run to the block edge
+  toward a neighbour with the same liquid, full-bright for glowing fluids. Nothing is painted into the glass.
+- **Liquid Experience**: Ethanol's frames recoloured by brightness onto a pale XP green
+  `#5E9A2C #7DBA3C #9CD24E #BDE86C #DCF89A #F4FFD2`, more opaque than Ethanol; it glows (light 10), fog `#B6F07A`. The
+  Vacuum Collector's GUI gains the steam turbines' slim tank frame at x 160 for it (fallback fill recoloured the same).
+- **XP Drain**: a UV-unwrapped grate 2 px tall: a 2 px steel rail round the edge and five 1 px bars over a spine, the
+  bars' tops lit (`#727982` / `#575D65`), their sides `#2B2F34`, so it reads dark between the bars.
+- **XP Shower**: a UV-unwrapped ceiling fixture: a 10×10 mounting plate whose top (against the ceiling, where conduits
+  meet it) carries the 8×8 input port, a collar, a copper riser (the Tempered row), a collar, and a 10×10 shower head with
+  a 1 px nozzle grid in `#16181B` on its underside.
+- **Quantum Tunnel** (`block/quantum_tunnel`, one 64×64 sheet): a thin dark frame cube with colour only on its corners.
+  The 8 corners are 3 px caps in the Arcforged tier palette, since it's made from Arcforged Alloy (`#2E96B6` face, a step
+  darker `#1E6A88` right of 62%, `#6AD2EE` lit top/left, `#1E6A88` bottom/right with a `#0A2A38` outer corner) with a
+  single `#B4F2FF` stud in the middle of each face. The 12 edge beams between them are 2 px dark steel (a `#40454C` lit
+  row over a `#2B2F34` shaded row). On every face an 8×8 port sits on a hollow
+  steel socket 2 px deep to the block edge, held by four 2×2 steel braces. A port's plate is the 8×8 plate (rows/columns
+  0,1,2,3,6,7,8,9 of the 10×10) with its coloured ring in steel (`#575D65` lit side, `#2B2F34` shaded side) and its 4×4
+  bore open through to the core, so an unconfigured face is a blank collar. QuantumTunnelRenderer lays the ring of the
+  face's mode over it (`block/quantum_tunnel/ring_input`, blue; `ring_output`, orange; `ring_mixed`, the input ring's top
+  and left halves with the output ring's bottom and right, for a face doing both) and draws the core: a 4 px cube
+  (`block/quantum_tunnel/core`, a 4×4 face lit top-left in `#B4F2FF #B8F2EA #6AD2EE #5FD4C4 #40B6D8 #2E96B6 #1E6A88`),
+  full-bright, turning slowly on two axes, greyed while the tunnel isn't on a frequency. The item model holds the core
+  still at 45°.
+- **Chunk Loader** (`block/chunk_loader`, `chunk_loader_on`): a slim, tall pedestal like a crystal ball stand: a 12×12
+  footing 1 px tall, an 8×8 body 6 px tall, a 10×10 capital and a 3×3 stem, then a copper cradle (the Tempered row): a
+  ring the globe sits in and four claws rising round it on the sides. The body's front is a recessed status screen (x 1..6,
+  rows 1..4: a `#16181B` top/left lip and a `#727982` right/bottom lip round a 4×2 readout, dark teal `#2F6E68` off, a
+  checker of status-cyan cells with one `#B8F2EA` on). The globe is ChunkLoaderRenderer's: a voxel ball 6 cells across,
+  centred 12.5 px up, whose every outer face takes one texel of `block/chunk_loader/globe` (a 32×16 longitude × latitude
+  map in flat tones: oceans `#3E6EC8`, land `#5A9E3C` and `#C8AE72`, poles `#F2F4F6`), its axis tilted 22.5°, turning only
+  while the loader is active. The item model carries the globe still.
+- **GUIs**: the Quantum Tunnel (176×230) and Chunk Loader (176×122) screens are the Security Terminal's panel stretched,
+  with house recesses: the tunnel's name field, frequency list, buffer row (five `#0E0E0E` 28×4 bar tracks) and face grid
+  (the side-config `face_none` / `face_input` / `face_output` tiles at 12×12); the loader's 5×5 chunk map and FE row.
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

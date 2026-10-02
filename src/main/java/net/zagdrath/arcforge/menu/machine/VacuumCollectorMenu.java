@@ -24,7 +24,9 @@ public class VacuumCollectorMenu extends MachineMenu {
     public static final int DATA_STATUS = 4;
     public static final int DATA_REDSTONE_MODE = 5;
     public static final int DATA_SIDE_CONFIG = 6;
-    public static final int DATA_VALUES = 7;
+    public static final int DATA_XP = 7;
+    public static final int DATA_XP_CAPACITY = 8;
+    public static final int DATA_VALUES = 9;
 
     // Range buttons. Show/hide (202) only changes the outline on this client, so it's never sent.
     public static final int BUTTON_RANGE_MINUS = 200;
@@ -92,5 +94,13 @@ public class VacuumCollectorMenu extends MachineMenu {
 
     public int getMaxRange() {
         return value(DATA_MAX_RANGE);
+    }
+
+    public int getXp() {
+        return value(DATA_XP);
+    }
+
+    public int getXpCapacity() {
+        return value(DATA_XP_CAPACITY);
     }
 }

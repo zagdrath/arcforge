@@ -21,6 +21,7 @@ import net.minecraft.world.item.DoubleHighBlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
 import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
@@ -34,6 +35,7 @@ import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.storage.ReservoirItem;
 import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
 import net.zagdrath.arcforge.item.farming.FertilizerItem;
@@ -89,6 +91,12 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> BLOCK_BREAKER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_BREAKER);
     public static final DeferredItem<BlockItem> BLOCK_PLACER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_PLACER);
     public static final DeferredItem<BlockItem> VACUUM_COLLECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.VACUUM_COLLECTOR);
+    public static final DeferredItem<ReservoirItem> RESERVOIR = ITEMS.registerItem("reservoir",
+            p -> new ReservoirItem(ModBlocks.RESERVOIR.get(), p), p -> p.useBlockDescriptionPrefix());
+    public static final DeferredItem<BlockItem> XP_DRAIN = ITEMS.registerSimpleBlockItem(ModBlocks.XP_DRAIN);
+    public static final DeferredItem<BlockItem> XP_SHOWER = ITEMS.registerSimpleBlockItem(ModBlocks.XP_SHOWER);
+    public static final DeferredItem<BlockItem> QUANTUM_TUNNEL = ITEMS.registerSimpleBlockItem(ModBlocks.QUANTUM_TUNNEL, p -> p.rarity(Rarity.EPIC));
+    public static final DeferredItem<BlockItem> CHUNK_LOADER = ITEMS.registerSimpleBlockItem(ModBlocks.CHUNK_LOADER, p -> p.rarity(Rarity.RARE));
     // Places a whole 3x3x3 (see ArcQuarryItem). The bounding parts have no item.
     public static final DeferredItem<ArcQuarryItem> ARC_QUARRY = ITEMS.registerItem("arc_quarry",
             p -> new ArcQuarryItem(ModBlocks.ARC_QUARRY.get(), p), p -> p.useBlockDescriptionPrefix());
@@ -288,6 +296,8 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.LATEX.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SEAWATER_BUCKET = ITEMS.registerItem("seawater_bucket",
             p -> new BucketItem(ModFluids.SEAWATER.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> LIQUID_EXPERIENCE_BUCKET = ITEMS.registerItem("liquid_experience_bucket",
+            p -> new BucketItem(ModFluids.LIQUID_EXPERIENCE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     // Halite and what it gives: Rock Salt (the Arc Crusher makes Salt of it) and its raw block.
     public static final DeferredItem<BlockItem> HALITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.HALITE_ORE);
     public static final DeferredItem<BlockItem> DEEPSLATE_HALITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_HALITE_ORE);

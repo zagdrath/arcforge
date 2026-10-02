@@ -35,5 +35,7 @@ public final class ArcforgeNetwork {
         registrar.playToClient(SecurityProfilePayload.TYPE, SecurityProfilePayload.STREAM_CODEC, SecurityProfilePayload::handle);
         registrar.playToServer(SecurityEditPayload.TYPE, SecurityEditPayload.STREAM_CODEC, SecurityEditPayload::handle);
         registrar.playToServer(ThrottleLeverPayload.TYPE, ThrottleLeverPayload.STREAM_CODEC, ThrottleLeverPayload::handle);
+        registrar.playToServer(QuantumFrequencyPayload.TYPE, QuantumFrequencyPayload.STREAM_CODEC, QuantumFrequencyPayload::handle);
+        registrar.playToClient(QuantumStatePayload.TYPE, QuantumStatePayload.STREAM_CODEC, QuantumStatePayload::handle);
     }
 }

@@ -208,6 +208,31 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_ETHYLENE = FLUIDS.register("flowing_ethylene",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.ETHYLENE_TYPE, ModFluids.ETHYLENE, ModFluids.FLOWING_ETHYLENE)));
 
+    // Liquid Experience: experience as a fluid, 20 mB per point (the c:experience convention, so other mods' liquid
+    // experience works with it). Pale green and glowing like experience orbs; it runs like water. The XP Drain and the
+    // Vacuum Collector make it, the XP Shower gives it back to players.
+    public static final DeferredHolder<FluidType, FluidType> LIQUID_EXPERIENCE_TYPE = FLUID_TYPES.register("liquid_experience",
+            () -> new LiquidType(FluidType.Properties.create()
+                    .descriptionId("fluid_type.arcforge.liquid_experience")
+                    .density(800)
+                    .viscosity(800)
+                    .temperature(300)
+                    .lightLevel(10)
+                    .motionScale(0.007)
+                    .canSwim(true)
+                    .canDrown(true)
+                    .canPushEntity(true)
+                    .canExtinguish(false)
+                    .canConvertToSource(false)
+                    .supportsBoating(false)
+                    .fallDistanceModifier(0.0F)
+                    .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL)
+                    .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY), 0.02F, 0.8, 0.8));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LIQUID_EXPERIENCE = FLUIDS.register("liquid_experience",
+            () -> new BaseFlowingFluid.Source(liquidExperienceProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LIQUID_EXPERIENCE = FLUIDS.register("flowing_liquid_experience",
+            () -> new BaseFlowingFluid.Flowing(liquidExperienceProperties()));
+
     // Steam in three grades (see SteamGrade). Gases: lighter than air, with no world block and no bucket,
     // so they only exist in tanks, machines and Pressurized Conduits.
     public static final DeferredHolder<FluidType, FluidType> STEAM_TYPE = gasType("steam", 373);
@@ -375,6 +400,17 @@ public final class ModFluids {
         return new BaseFlowingFluid.Properties(SEAWATER_TYPE, SEAWATER, FLOWING_SEAWATER)
                 .bucket(ModItems.SEAWATER_BUCKET)
                 .block(ModBlocks.SEAWATER)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // Like water: spreads 4 blocks, every 5 ticks.
+    private static BaseFlowingFluid.Properties liquidExperienceProperties() {
+        return new BaseFlowingFluid.Properties(LIQUID_EXPERIENCE_TYPE, LIQUID_EXPERIENCE, FLOWING_LIQUID_EXPERIENCE)
+                .bucket(ModItems.LIQUID_EXPERIENCE_BUCKET)
+                .block(ModBlocks.LIQUID_EXPERIENCE)
                 .slopeFindDistance(4)
                 .levelDecreasePerBlock(1)
                 .tickRate(5)

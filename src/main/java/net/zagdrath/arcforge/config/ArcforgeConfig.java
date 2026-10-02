@@ -1560,6 +1560,120 @@ public class ArcforgeConfig {
         BUILDER.pop();
     }
 
+    // --- Reservoir, Liquid Experience, Quantum Tunnel, Chunk Loader ---
+
+    static {
+        BUILDER.comment("Reservoir: a 32,000 mB tank block; touching Reservoirs merge into one tank of any shape that fills from the",
+                "bottom up.").push("reservoir");
+    }
+
+    public static final ModConfigSpec.IntValue RESERVOIR_MAX_BLOCKS = BUILDER
+            .comment("Most Reservoir blocks that join into one tank. Blocks past this form a tank of their own.")
+            .defineInRange("maxBlocks", 4_096, 1, 65_536);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Liquid Experience (20 mB per experience point), the XP Drain, the XP Shower and the Vacuum Collector's",
+                "experience tank.").push("experience");
+    }
+
+    public static final ModConfigSpec.IntValue XP_DRAIN_ORB_POINTS_PER_TICK = BUILDER
+            .comment("Most experience points of orbs an XP Drain takes in per tick.")
+            .defineInRange("drainOrbPointsPerTick", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue XP_DRAIN_LEVEL_INTERVAL = BUILDER
+            .comment("Ticks between levels an XP Drain takes from a player sneaking on it.")
+            .defineInRange("drainLevelInterval", 5, 1, 200);
+
+    public static final ModConfigSpec.IntValue XP_SHOWER_LEVEL_INTERVAL = BUILDER
+            .comment("Ticks between levels an XP Shower gives a player sneaking under it.")
+            .defineInRange("showerLevelInterval", 5, 1, 200);
+
+    public static final ModConfigSpec.IntValue XP_SHOWER_REACH = BUILDER
+            .comment("How many blocks below the XP Shower a player may stand.")
+            .defineInRange("showerReach", 3, 1, 8);
+
+    public static final ModConfigSpec.IntValue XP_SHOWER_TANK = BUILDER
+            .comment("The XP Shower's tank (mB).")
+            .defineInRange("showerTank", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue XP_SHOWER_PULL_RATE = BUILDER
+            .comment("Most Liquid Experience (mB) an XP Shower draws per tick from the container above it.")
+            .defineInRange("showerPullRate", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue VACUUM_XP_TANK = BUILDER
+            .comment("The Vacuum Collector's Liquid Experience tank (mB). It collects experience orbs in its range into it.")
+            .defineInRange("vacuumXpTank", 16_000, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue VACUUM_XP_OUTPUT_RATE = BUILDER
+            .comment("Most Liquid Experience (mB) per tick that conduits can drain from a Vacuum Collector.")
+            .defineInRange("vacuumXpOutputRate", 1_000, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Quantum Tunnel: every tunnel on a frequency shares one buffer of FE, heat, fluid, gas and items, across",
+                "dimensions.").push("quantumTunnel");
+    }
+
+    public static final ModConfigSpec.IntValue QUANTUM_ENERGY_BUFFER = BUILDER
+            .comment("FE a frequency holds.")
+            .defineInRange("energyBuffer", 4_000_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue QUANTUM_HEAT_BUFFER = BUILDER
+            .comment("HU a frequency holds.")
+            .defineInRange("heatBuffer", 400_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue QUANTUM_FLUID_BUFFER = BUILDER
+            .comment("Liquid (mB) a frequency holds.")
+            .defineInRange("fluidBuffer", 64_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue QUANTUM_GAS_BUFFER = BUILDER
+            .comment("Gas (mB) a frequency holds.")
+            .defineInRange("gasBuffer", 64_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue QUANTUM_ITEM_SLOTS = BUILDER
+            .comment("Item slots a frequency holds.")
+            .defineInRange("itemSlots", 9, 1, 54);
+
+    public static final ModConfigSpec.IntValue QUANTUM_FREQUENCIES_PER_PLAYER = BUILDER
+            .comment("Most frequencies one player may create.")
+            .defineInRange("frequenciesPerPlayer", 32, 1, 1_024);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Chunk Loader: keeps chunks round it loaded with NeoForge chunk tickets, for the player who placed it.")
+                .push("chunkLoader");
+    }
+
+    public static final ModConfigSpec.IntValue CHUNK_LOADER_PLAYER_LIMIT = BUILDER
+            .comment("Most chunks one player's Chunk Loaders may keep loaded in all.")
+            .defineInRange("chunksPerPlayer", 25, 0, 1_024);
+
+    public static final ModConfigSpec.BooleanValue CHUNK_LOADER_REQUIRE_ONLINE = BUILDER
+            .comment("Stop loading while the owner is offline (the loaders start again when they log in).")
+            .define("requireOwnerOnline", false);
+
+    public static final ModConfigSpec.IntValue CHUNK_LOADER_ENERGY_PER_CHUNK = BUILDER
+            .comment("FE per tick per loaded chunk. 0 (the default) needs no FE.")
+            .defineInRange("energyPerChunk", 0, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue CHUNK_LOADER_ENERGY_CAPACITY = BUILDER
+            .comment("FE buffer size (only used when energyPerChunk is above 0).")
+            .defineInRange("energyCapacity", 100_000, 1_000, Integer.MAX_VALUE);
+
+    static {
+        BUILDER.pop();
+    }
+
     // --- Farming ---
 
     static {

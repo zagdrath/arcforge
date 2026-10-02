@@ -3,12 +3,13 @@
   "icon": "arcforge:vacuum_collector",
   "items": [
     "arcforge:vacuum_collector",
-    "arcforge:conduit_filter"
+    "arcforge:conduit_filter",
+    "arcforge:liquid_experience_bucket"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Pulls dropped items within its range into an 18-slot buffer with FE and sends them out through its Output faces (Tempered tier).\n- Range is a cube 5 blocks out in each direction; set 1 to 9 with the − and + buttons. The range shows as an outline while you hold a Vacuum Collector, or with the eye button in its GUI.\n- Put a Conduit Filter in its filter slot to pick only certain items (set the filter up on a conduit first). Without one, it takes everything.\n- Takes Speed and Energy upgrades."
+      "text": "Pulls dropped items within its range into an 18-slot buffer with FE and sends them out through its Output faces (Tempered tier).\n- Range is a cube 5 blocks out in each direction; set 1 to 9 with the − and + buttons. The range shows as an outline while you hold a Vacuum Collector, or with the eye button in its GUI.\n- Put a Conduit Filter in its filter slot to pick only certain items (set the filter up on a conduit first). Without one, it takes everything.\n- Takes Speed and Energy upgrades.\n- It also gathers experience orbs into a Liquid Experience tank (16,000 mB) that fluid conduits drain from its Output faces.\n- It also gathers experience orbs into a Liquid Experience tank (16,000 mB) that fluid conduits drain from its Output faces."
     }
   ]
 }

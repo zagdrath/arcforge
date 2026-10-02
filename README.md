@@ -607,6 +607,7 @@ placement per redstone pulse.
 - A Conduit Filter in its filter slot limits what it takes. An unset filter takes everything, and the filter's
   direction is ignored.
 - The range shows as an outline while you hold a Vacuum Collector, or with the eye button in its GUI.
+- It also gathers experience orbs into a Liquid Experience tank that fluid conduits drain from its Output faces.
 
 All four take Speed and Energy upgrades. Config: `machines.assembler`, `machines.blockBreaker`,
 `machines.blockPlacer` and `machines.vacuumCollector`.
@@ -693,6 +694,47 @@ A slim glass tank that shows the liquid inside, and glows with lava or any other
   a bucket) and drops the tank empty. A comparator reads how full it is.
 - Sides: fill from every side and drain from the bottom by default. Output faces push fluid into
   the block beside them, so stacked tanks drain downwards into the lowest one.
+
+### Reservoir
+
+A 32,000 mB glass tank in a thin steel frame. Reservoirs that touch merge into one tank of any shape and size,
+drawn as one: the frame runs only round its outer edges and the liquid is one body at its level.
+
+- The tank shares one liquid and fills from the bottom up: the lowest layer first, spread evenly.
+- Any block takes and gives the liquid (buckets, conduits, pipes, an XP Drain on top), and a comparator on any
+  block reads the whole tank.
+- A broken block keeps its share of the liquid on the item and rejoins whatever it's placed against.
+- Tanks of different liquids stay apart. Up to `reservoir.maxBlocks` (4,096) blocks make one tank.
+
+### Liquid Experience
+
+Experience as a glowing liquid, 20 mB per point, in `c:experience` (other mods' liquid experience works with it).
+
+- **XP Drain:** a grate on top of any fluid container. Orbs that land on it run into the container; a player
+  sneaking on it is drained a level at a time.
+- **XP Shower:** hung under a block and fed by conduit or from a tank above it. A player sneaking under it (up
+  to 3 blocks down) gains experience a level at a time; a redstone signal turns it off.
+- The **Vacuum Collector** also gathers orbs into a 16,000 mB Liquid Experience tank.
+
+### Quantum Tunnel
+
+Every tunnel on a frequency, in any dimension, shares one buffer: 4,000,000 FE, 400,000 HU, 64,000 mB of
+liquid, 64,000 mB of gas and 9 item slots (config `quantumTunnel`).
+
+- Name frequencies in its GUI: public (anyone) or private (you and the players you trust at a Security
+  Terminal). Up to 32 per player; the maker may delete one (and its contents).
+- Each face is set per resource (FE, heat, liquid, gas, items) to none, input or output. Output faces push
+  into what they touch at an Arcforged conduit's rate. A face's port shows its mode's ring.
+
+### Chunk Loader
+
+Keeps chunks loaded for the player who placed it: its own, 3x3 or 5x5 (radius 0 to 2, set in the GUI, which
+maps them and outlines them in the world).
+
+- Each player may keep 25 chunks loaded in all (`chunkLoader.chunksPerPlayer`).
+- Optional: only while its owner is online (`requireOwnerOnline`), and FE per chunk per tick (`energyPerChunk`,
+  0 by default).
+- It stops when broken, when a redstone signal turns it off, or when it runs out of FE.
 
 ### Energy Cells
 

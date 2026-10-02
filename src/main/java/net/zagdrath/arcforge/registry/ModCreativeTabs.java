@@ -71,6 +71,11 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.SOLAR_THERMAL_ARRAY_CASING.get());
                 output.accept(ModItems.SOLAR_COLLECTOR.get());
                 ModItems.allStorage().forEach(item -> output.accept(item.get()));
+                output.accept(ModItems.RESERVOIR.get());
+                output.accept(ModItems.XP_DRAIN.get());
+                output.accept(ModItems.XP_SHOWER.get());
+                output.accept(ModItems.QUANTUM_TUNNEL.get());
+                output.accept(ModItems.CHUNK_LOADER.get());
                 output.accept(ModItems.ENERGY_METER.get());
                 output.accept(ModItems.HEAT_METER.get());
                 output.accept(ModItems.FLUID_METER.get());
@@ -160,6 +165,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ETHANOL_BUCKET.get());
                 output.accept(ModItems.LIGHT_OIL_BUCKET.get());
                 output.accept(ModItems.HEAVY_OIL_BUCKET.get());
+                output.accept(ModItems.LIQUID_EXPERIENCE_BUCKET.get());
                 ModItems.chemicalBuckets().forEach(item -> output.accept(item.get()));
             }).build());
 

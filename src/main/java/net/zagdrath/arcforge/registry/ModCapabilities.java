@@ -16,7 +16,10 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import net.zagdrath.arcforge.blockentity.experience.XpShowerBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.GreenhouseBlockEntity;
+import net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity;
+import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
@@ -282,6 +285,8 @@ public final class ModCapabilities {
                 VacuumCollectorBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.VACUUM_COLLECTOR.get(),
                 VacuumCollectorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.VACUUM_COLLECTOR.get(),
+                VacuumCollectorBlockEntity::getFluidHandler);
         // The Arc Quarry acts as one 3x3x3 block: only the outer faces of its parts expose it (the main block is the
         // centre, so its own faces are all inside).
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ARC_QUARRY.get(),
@@ -327,6 +332,19 @@ public final class ModCapabilities {
                 ThermoelectricPlantBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FLUID_TANK.get(),
                 FluidTankBlockEntity::getFluidHandler);
+        // A Reservoir: the whole tank it's part of, from every face.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.RESERVOIR.get(),
+                (reservoir, side) -> reservoir.getFluidHandler());
+        // The XP Shower fills from any face.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.XP_SHOWER.get(),
+                XpShowerBlockEntity::getFluidHandler);
+        // The Quantum Tunnel: each face offers what it's set to take or give.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelBlockEntity::getItemHandler);
+        // The Chunk Loader takes FE only when chunkLoader.energyPerChunk is above 0.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHUNK_LOADER.get(), ChunkLoaderBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(),
                 PressurizedCylinderBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(),

@@ -12,6 +12,8 @@ import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.menu.logistics.ChunkLoaderMenu;
+import net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu;
 import net.zagdrath.arcforge.menu.machine.AirSeparatorMenu;
 import net.zagdrath.arcforge.menu.machine.HaberReactorMenu;
 import net.zagdrath.arcforge.menu.multiblock.BiogasDigesterMenu;
@@ -106,6 +108,10 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(SecurityTerminalMenu::new));
 
     public static final Supplier<MenuType<MeterMenu>> METER = MENU_TYPES.register("meter", () -> IMenuTypeExtension.create(MeterMenu::new));
+    public static final Supplier<MenuType<QuantumTunnelMenu>> QUANTUM_TUNNEL = MENU_TYPES.register("quantum_tunnel",
+            () -> IMenuTypeExtension.create(QuantumTunnelMenu::new));
+    public static final Supplier<MenuType<ChunkLoaderMenu>> CHUNK_LOADER = MENU_TYPES.register("chunk_loader",
+            () -> IMenuTypeExtension.create(ChunkLoaderMenu::new));
 
     public static final Supplier<MenuType<ArcMelterMenu>> ARC_MELTER = MENU_TYPES.register("arc_melter",
             () -> IMenuTypeExtension.create(ArcMelterMenu::new));

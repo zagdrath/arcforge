@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SES",
+    "RCR",
+    "SSS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "E": "minecraft:ender_eye",
+    "R": "#c:dusts/redstone",
+    "C": "minecraft:compass"
+  },
+  "result": {
+    "id": "arcforge:chunk_loader",
+    "count": 1
+  }
+}

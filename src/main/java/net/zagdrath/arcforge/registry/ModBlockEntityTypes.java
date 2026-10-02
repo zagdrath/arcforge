@@ -16,6 +16,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.blockentity.experience.XpDrainBlockEntity;
+import net.zagdrath.arcforge.blockentity.experience.XpShowerBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.ResinTapBlockEntity;
@@ -23,6 +25,8 @@ import net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.GreenhouseBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.PlantingBedBlockEntity;
+import net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity;
+import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VulcanizerBlockEntity;
@@ -76,6 +80,7 @@ import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.CrateBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.VaultBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -244,6 +249,17 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<FluidTankBlockEntity>> FLUID_TANK = BLOCK_ENTITY_TYPES.register("fluid_tank",
             () -> new BlockEntityType<>(FluidTankBlockEntity::new, tierBlocks(ModBlocks::fluidTank)));
+
+    public static final Supplier<BlockEntityType<ReservoirBlockEntity>> RESERVOIR = BLOCK_ENTITY_TYPES.register("reservoir",
+            () -> new BlockEntityType<>(ReservoirBlockEntity::new, ModBlocks.RESERVOIR.get()));
+    public static final Supplier<BlockEntityType<XpDrainBlockEntity>> XP_DRAIN = BLOCK_ENTITY_TYPES.register("xp_drain",
+            () -> new BlockEntityType<>(XpDrainBlockEntity::new, ModBlocks.XP_DRAIN.get()));
+    public static final Supplier<BlockEntityType<XpShowerBlockEntity>> XP_SHOWER = BLOCK_ENTITY_TYPES.register("xp_shower",
+            () -> new BlockEntityType<>(XpShowerBlockEntity::new, ModBlocks.XP_SHOWER.get()));
+    public static final Supplier<BlockEntityType<QuantumTunnelBlockEntity>> QUANTUM_TUNNEL = BLOCK_ENTITY_TYPES.register("quantum_tunnel",
+            () -> new BlockEntityType<>(QuantumTunnelBlockEntity::new, ModBlocks.QUANTUM_TUNNEL.get()));
+    public static final Supplier<BlockEntityType<ChunkLoaderBlockEntity>> CHUNK_LOADER = BLOCK_ENTITY_TYPES.register("chunk_loader",
+            () -> new BlockEntityType<>(ChunkLoaderBlockEntity::new, ModBlocks.CHUNK_LOADER.get()));
 
     public static final Supplier<BlockEntityType<PressurizedCylinderBlockEntity>> PRESSURIZED_CYLINDER = BLOCK_ENTITY_TYPES.register("pressurized_cylinder",
             () -> new BlockEntityType<>(PressurizedCylinderBlockEntity::new, tierBlocks(ModBlocks::pressurizedCylinder)));

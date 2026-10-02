@@ -1,0 +1,37 @@
+{
+  "parent": "arcforge:start/wrench",
+  "display": {
+    "icon": {
+      "id": "arcforge:reservoir"
+    },
+    "title": {
+      "translate": "advancements.arcforge.logistics.reservoir.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.logistics.reservoir.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "arcforge:reservoir"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "item"
+    ]
+  ]
+}

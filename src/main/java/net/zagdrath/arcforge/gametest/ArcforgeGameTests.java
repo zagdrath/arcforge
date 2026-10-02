@@ -265,6 +265,12 @@ public final class ArcforgeGameTests {
         TESTS.put("rubber_vulcanizer", RubberGameTests::vulcanizer);
         TESTS.put("rubber_bio_plastics", RubberGameTests::bioPlastics);
         TESTS.put("rubber_plastics_tag", RubberGameTests::plastics);
+        TESTS.put("reservoir_one_tank", ExtendedLogisticsGameTests::reservoir);
+        TESTS.put("xp_drain", ExtendedLogisticsGameTests::xpDrain);
+        TESTS.put("xp_shower", ExtendedLogisticsGameTests::xpShower);
+        TESTS.put("vacuum_experience", ExtendedLogisticsGameTests::vacuumExperience);
+        TESTS.put("quantum_tunnel", ExtendedLogisticsGameTests::quantumTunnel);
+        TESTS.put("chunk_loader", ExtendedLogisticsGameTests::chunkLoader);
         TESTS.put("salt_recipes", SaltGameTests::recipes);
         TESTS.put("salt_tags", SaltGameTests::saltTags);
         TESTS.put("salt_reactor_makes_brine", SaltGameTests::reactorMakesBrine);

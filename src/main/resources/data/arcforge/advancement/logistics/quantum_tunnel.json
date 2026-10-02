@@ -1,0 +1,37 @@
+{
+  "parent": "arcforge:logistics/reservoir",
+  "display": {
+    "icon": {
+      "id": "arcforge:quantum_tunnel"
+    },
+    "title": {
+      "translate": "advancements.arcforge.logistics.quantum_tunnel.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.logistics.quantum_tunnel.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "arcforge:quantum_tunnel"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "item"
+    ]
+  ]
+}

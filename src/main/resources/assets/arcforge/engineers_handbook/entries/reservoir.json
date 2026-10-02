@@ -1,0 +1,17 @@
+{
+  "title": "Reservoir",
+  "icon": "arcforge:reservoir",
+  "items": [
+    "arcforge:reservoir"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A glass tank in a thin steel frame that holds 32,000 mB of any liquid (gases go in Pressurized Cylinders).\n# One big tank\nReservoirs that touch merge into one tank of any shape and size: a tower, a wall, a pool, an L. The frame runs only round its outer edges.\n- It shares one liquid, filling from the bottom up: the lowest layer fills first, then the next.\n- Every block of it takes and gives the liquid: buckets, conduits, pipes, an XP Drain on top.\n- A comparator on any block reads the whole tank."
+    },
+    {
+      "type": "text",
+      "text": "# Breaking one\nA broken Reservoir keeps its share of the liquid on the item (a full block from the bottom, an empty one from the top); the rest settles down again. Place it back, or on another tank of the same liquid, and it joins in.\n# Different liquids\nTanks holding different liquids stay apart even when they touch; an empty one joins whichever it meets.\nIt's separate from the tiered Fluid Tanks, which stay single blocks."
+    }
+  ]
+}
