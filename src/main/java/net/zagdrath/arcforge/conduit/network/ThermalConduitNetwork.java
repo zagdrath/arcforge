@@ -50,7 +50,7 @@ public class ThermalConduitNetwork extends ActiveConduitNetwork<HeatHandler> {
         pulledThisTick = false;
         int before = temperature;
         // Heat at ambient can't flow anywhere, so a network full of it would never draw hotter heat in. It's lost.
-        if (temperature <= HeatBuffer.AMBIENT_CELSIUS) {
+        if (temperature <= HeatBuffer.AMBIENT_CELSIUS || isStale()) {
             clear();
         }
         super.tick(gameTime);
@@ -60,6 +60,32 @@ public class ThermalConduitNetwork extends ActiveConduitNetwork<HeatHandler> {
         if (temperature != before) {
             saveTemperature();
         }
+    }
+
+    // Heat too cool for every input (drawn while its source was cooling) can't be handed on, and while it fills the
+    // conduits they draw nothing in. It's stale once a source has hotter heat that an input could take: losing it lets
+    // that heat through. A network with nothing to feed keeps what it holds.
+    private boolean isStale() {
+        if (getStored() == 0) {
+            return false;
+        }
+        int coldest = Integer.MAX_VALUE;
+        for (Endpoint<HeatHandler> sink : sinks) {
+            HeatHandler handler = sink.handler();
+            if (handler != null) {
+                coldest = Math.min(coldest, handler.getTemperature());
+            }
+        }
+        if (coldest == Integer.MAX_VALUE || coldest < temperature) {
+            return false;
+        }
+        for (Endpoint<HeatHandler> source : sources) {
+            HeatHandler handler = source.handler();
+            if (handler != null && handler.getTemperature() > coldest && handler.extractHeat(1, true) > 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void saveTemperature() {

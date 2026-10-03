@@ -147,6 +147,10 @@ number and date.
   Superheater and the rest) spread across chunks, a conduit at one of its ports could check before the array's
   controller had loaded, find nothing there, and keep that answer; Thermodynamic Conduits then filled up and stopped.
   Conduits now look again until they find the machine. The same fix covers every conduit type.
+- **Thermodynamic Conduits stuck full of lukewarm heat.** When a heat source cooled (its fuel ran out), the conduits
+  filled with heat too cool for the machine they feed, such as a Steam Boiler Array at 100°C; being full, they then drew
+  nothing once the source was hot again, until a conduit was broken. Heat no input can take is now let go as soon as a
+  source has hotter heat an input could use. Conduits with nothing to feed keep what they hold.
 - **"Missing model" warnings for every liquid block** (`arcforge:creosote[level=0]` and so on): each liquid now has a
   blockstate.
 - **The Chemical Reactor and Distillation Array couldn't be built.** Both need a Hardened Fluid Tank, which needed a PVC

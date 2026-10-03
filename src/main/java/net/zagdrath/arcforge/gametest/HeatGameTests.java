@@ -362,4 +362,44 @@ public final class HeatGameTests {
                 })
                 .thenSucceed();
     }
+
+    // A conduit network that filled with lukewarm heat (its source was cooling) can't give it to a hotter machine, and
+    // being full it can't draw more either. Once the source is hot again, that stale heat mustn't keep the hot heat out.
+    static void thermalConduitClearsStaleHeat(GameTestHelper helper) {
+        BlockPos boilerMin = new BlockPos(0, 1, 0);
+        BlockPos port = new BlockPos(2, 2, 1);
+        BlockPos conduitPos = new BlockPos(3, 2, 1);
+        BlockPos fireboxPos = new BlockPos(4, 2, 1);
+        SteamGameTests.boilerArray(helper, boilerMin);
+        helper.setBlock(conduitPos, ModBlocks.conduit(ConduitType.THERMAL, ConduitTier.WROUGHT).get());
+        helper.setBlock(fireboxPos, ModBlocks.FIREBOX.get().defaultBlockState());
+        FireboxBlockEntity firebox = helper.getBlockEntity(fireboxPos, FireboxBlockEntity.class);
+        // North-facing, so its right is the west face, toward the conduit.
+        firebox.setSideMode(RelativeSide.RIGHT, SideMode.HEAT);
+        heatTo(firebox.getHeat(), 60);
+        int[] heatBefore = new int[1];
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.isMaster(), "The boiler did not form");
+                    MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(port), SideMode.HEAT, Direction.EAST);
+                    ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(conduitPos));
+                    // Dry, so it stays at 150°C: hotter than the Firebox's heat.
+                    heatTo(boiler.getHeat(), 150);
+                })
+                .thenIdle(20)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    heatBefore[0] = boiler.getHeat().getStored();
+                    heatTo(firebox.getHeat(), 1_000);
+                })
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.getHeat().getStored() > heatBefore[0], "The hot Firebox's heat never reached the boiler (it holds "
+                            + boiler.getHeat().getStored() + " HU at " + boiler.getHeat().getTemperature() + "°C)");
+                })
+                .thenSucceed();
+    }
 }
