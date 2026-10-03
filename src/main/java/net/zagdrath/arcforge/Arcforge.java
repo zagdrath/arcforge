@@ -63,8 +63,20 @@ public class Arcforge {
         ArcforgeGameTests.register(modEventBus);
         TestFixtures.register(modEventBus);
 
-        modContainer.registerConfig(ModConfig.Type.COMMON, ArcforgeConfig.SPEC);
+        // The file name is fixed so it stays arcforge-common.toml whichever name the type has.
+        modContainer.registerConfig(localConfigType(), ArcforgeConfig.SPEC, MODID + "-common.toml");
 
         LOGGER.info("Arcforge initialized");
+    }
+
+    // FML 12.0.8 (NeoForge 26.3.0.37-beta) renamed ModConfig.Type.COMMON to LOCAL. Looked up by name, as
+    // naming either constant would stop the jar loading on the other side of the rename.
+    private static ModConfig.Type localConfigType() {
+        for (ModConfig.Type type : ModConfig.Type.values()) {
+            if (type.name().equals("LOCAL") || type.name().equals("COMMON")) {
+                return type;
+            }
+        }
+        throw new IllegalStateException("ModConfig.Type has neither LOCAL nor COMMON");
     }
 }

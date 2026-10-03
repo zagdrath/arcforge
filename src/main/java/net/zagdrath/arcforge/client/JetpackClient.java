@@ -8,8 +8,7 @@ package net.zagdrath.arcforge.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.lwjgl.glfw.GLFW;
-
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -51,7 +50,7 @@ import net.zagdrath.arcforge.registry.ModFluids;
 @EventBusSubscriber(modid = Arcforge.MODID, value = Dist.CLIENT)
 public final class JetpackClient {
     public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(Identifier.fromNamespaceAndPath(Arcforge.MODID, "arcforge"));
-    public static final KeyMapping MODE_KEY = new KeyMapping("key.arcforge.jetpack_mode", GLFW.GLFW_KEY_H, CATEGORY);
+    public static final KeyMapping MODE_KEY = new KeyMapping("key.arcforge.jetpack_mode", InputConstants.KEY_H, CATEGORY);
 
     private static final Identifier GAUGE = sprite("gauge");
     private static final Identifier FILL_EMPTY = sprite("fill_empty");

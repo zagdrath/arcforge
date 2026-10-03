@@ -20,6 +20,24 @@ number and date.
 
 ## [Unreleased]
 
+### Changed
+
+- **Runs on every NeoForge 26.3 beta,** from 26.3.0.0-beta up; it used to need 26.3.0.23-beta or later.
+
+### Fixed
+
+- **Arcforge failed to load on NeoForge 26.3.0.37-beta and later** (`NoSuchFieldError: ModConfig$Type COMMON`).
+  NeoForge renamed the COMMON config type to LOCAL; Arcforge now picks whichever one the running NeoForge has. The
+  config file is still `arcforge-common.toml`, so settings carry over.
+- **Blurry blocks at a distance with Arcforge installed.** The Induction Furnace Array's chamber window (30×30) and the
+  Arc Crushing Array's rollers and Metal Pressing Array's press window (24×24) cut mipmapping for the whole block
+  atlas, every mod's blocks included. They're now 32×32, so the windows look exactly as before.
+- **The Jetpack Mode key defaulted to Pause instead of H.** Minecraft 26.3 numbers keys differently from earlier
+  versions. Controls you've already saved keep their binding, so if Jetpack Mode shows Pause, set it to H (or any key)
+  in Options → Controls → Key Binds.
+- **"Missing model" warnings for every liquid block** (`arcforge:creosote[level=0]` and so on): each liquid now has a
+  blockstate.
+
 ## [2.3.0] - 2026-10-01
 
 ### Upgrading
