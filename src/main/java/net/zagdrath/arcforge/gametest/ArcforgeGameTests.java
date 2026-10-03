@@ -290,6 +290,7 @@ public final class ArcforgeGameTests {
         TESTS.put("renewable_coal_recipes", RenewableCoalGameTests::recipes);
         TESTS.put("hydrothermal_makes_bio_coal", RenewableCoalGameTests::hydrothermalMakesBioCoal);
         TESTS.put("tree_cutter_plants_and_fells", RenewableCoalGameTests::treeCutterPlantsAndFells);
+        TESTS.put("tree_cutter_takes_whole_crown", RenewableCoalGameTests::treeCutterTakesWholeCrown);
         TESTS.put("carbon_capture_recipes", CarbonCaptureGameTests::recipes);
         TESTS.put("carbon_reclaimer_balance", CarbonCaptureGameTests::reclaimerBalance);
         TESTS.put("flue_gas", CarbonCaptureGameTests::flueGas);

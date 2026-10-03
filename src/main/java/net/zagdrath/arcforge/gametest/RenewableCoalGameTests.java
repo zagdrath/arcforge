@@ -59,6 +59,13 @@ public final class RenewableCoalGameTests {
                 && coke.get().value().byproduct().get().amount() == coalCoke.get().value().byproduct().map(out -> out.amount()).orElse(-1),
                 "Bio-Coal carbonizes differently from coal");
         helper.assertTrue(MachineRecipes.carbonizing(level, bioBlock).isPresent(), "A Block of Bio-Coal doesn't carbonize");
+        for (Item log : new Item[] { Items.OAK_LOG, Items.SPRUCE_LOG, Items.STRIPPED_BIRCH_LOG, Items.OAK_WOOD }) {
+            var charcoal = MachineRecipes.carbonizing(level, new ItemStack(log));
+            helper.assertTrue(charcoal.isPresent() && charcoal.get().value().result().create().is(Items.CHARCOAL)
+                    && charcoal.get().value().byproduct().map(out -> out.fluid().value() == ModFluids.CREOSOTE.get()).orElse(false),
+                    log + " doesn't carbonize into Charcoal and Creosote");
+        }
+        helper.assertTrue(MachineRecipes.carbonizing(level, new ItemStack(Items.CRIMSON_STEM)).isEmpty(), "A nether stem carbonizes");
         var dust = MachineRecipes.crushing(level, bioCoal);
         helper.assertTrue(dust.isPresent() && dust.get().value().result().map(r -> r.create().is(ModItems.CARBON_DUST.get())).orElse(false),
                 "Bio-Coal doesn't crush into Carbon Dust");
@@ -188,5 +195,38 @@ public final class RenewableCoalGameTests {
                     }
                 })
                 .thenSucceed();
+    }
+
+    // A full crown (far more leaves per log than a small test tree), with stale leaf distances as a freshly grown tree can
+    // have, is found whole, so nothing is left to decay into saplings, sticks and apples. A neighbouring trunk keeps the
+    // leaves within reach of it.
+    static void treeCutterTakesWholeCrown(GameTestHelper helper) {
+        BlockPos base = new BlockPos(5, 1, 5);
+        int placed = 0;
+        for (int dy = 2; dy <= 5; dy++) {
+            int r = dy >= 4 ? 1 : 2;
+            for (int dx = -r; dx <= r; dx++) {
+                for (int dz = -r; dz <= r; dz++) {
+                    if (dx == 0 && dz == 0 && dy <= 3) {
+                        continue;
+                    }
+                    helper.setBlock(base.offset(dx, dy, dz), Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.DISTANCE, 1));
+                    placed++;
+                }
+            }
+        }
+        for (int y = 0; y < 4; y++) {
+            helper.setBlock(base.above(y), Blocks.OAK_LOG);
+        }
+        var level = helper.getLevel();
+        TreeCutterBlockEntity.Tree tree = TreeCutterBlockEntity.findTree(level, helper.absolutePos(base), 2, helper.absolutePos(base));
+        helper.assertTrue(tree != null && tree.logs().size() == 4, "Tree not found whole: " + (tree == null ? "none" : tree.logs().size() + " logs"));
+        helper.assertTrue(tree.leaves().size() == placed, tree.leaves().size() + " of " + placed + " leaves found");
+        // A second trunk touching the crown's edge: the leaves it holds are no longer this tree's.
+        helper.setBlock(base.offset(3, 2, 0), Blocks.OAK_LOG);
+        TreeCutterBlockEntity.Tree shared = TreeCutterBlockEntity.findTree(level, helper.absolutePos(base), 2, helper.absolutePos(base));
+        helper.assertTrue(shared != null && shared.leaves().size() < placed, "The neighbour's leaves were taken too");
+        helper.assertFalse(shared.leaves().contains(helper.absolutePos(base.offset(2, 2, 0))), "A leaf touching the neighbour was taken");
+        helper.succeed();
     }
 }

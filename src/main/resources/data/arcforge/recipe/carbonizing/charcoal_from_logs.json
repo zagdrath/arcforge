@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:carbonizing",
+  "ingredient": "#minecraft:logs_that_burn",
+  "result": {
+    "id": "minecraft:charcoal"
+  },
+  "byproduct": {
+    "id": "arcforge:creosote",
+    "amount": 100
+  },
+  "time": 400
+}

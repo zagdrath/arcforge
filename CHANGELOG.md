@@ -163,6 +163,8 @@ number and date.
 
 ### Changed
 
+- **Carbonizer bakes logs into charcoal:** any log that burns (`#minecraft:logs_that_burn`) gives a Charcoal and 100 mB of
+  Creosote in 400 ticks, so a Tree Cutter's logs can go straight in.
 - **Loam grows saplings twice as fast** (`farming.loam.saplingGrowthMultiplier`, 2.0), and a tree grown on Loam leaves
   the Loam under its trunk instead of turning it to dirt, so a Tree Cutter's area can be laid in Loam.
 - **Gas Turbine Array exhaust:** "Venting to air" now says how much is vented ("Venting 2,420 HU/t to air"), in the
@@ -191,6 +193,9 @@ number and date.
 
 ### Fixed
 
+- **Tree Cutter fells the whole crown.** It took at most 12 leaves per log and trusted the leaves' stored distance,
+  which lags behind a freshly grown tree, so most of an oak's crown was left floating to decay into saplings, sticks
+  and apples. It now takes every natural leaf joined to the tree that no other log holds, as vanilla leaf decay counts.
 - **Item conduits no longer pull out items their filters reject.** With nowhere to send an item, a network stored it
   in the conduit to wait for room, even when every destination's filter refused it, so a filtered line emptied the
   machine of everything else (a Tree Cutter's saplings, leaves and sticks). Those items now stay in the machine;

@@ -106,6 +106,7 @@ it does nothing in the Nether or the End. Everything is configurable (`power.sol
 ```
 coal        --[Carbonizer]--> coal coke + 250 mB creosote   (600 ticks)
 carbon dust --[Carbonizer]--> coal coke                     (300 ticks, no creosote)
+log         --[Carbonizer]--> charcoal + 100 mB creosote    (400 ticks; any log that burns)
 metal + additive(s) + coal coke --[Arcforge Furnace]--> result + slag
 ```
 

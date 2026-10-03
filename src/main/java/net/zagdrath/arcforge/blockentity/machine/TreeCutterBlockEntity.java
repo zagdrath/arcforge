@@ -84,7 +84,10 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY);
     private static final ItemStack AXE = new ItemStack(Items.NETHERITE_AXE);
     // How many leaves a tree may have for each of its logs (a cap on the search, well above any vanilla tree).
-    private static final int LEAVES_PER_LOG = 12;
+    // Leaves keep a log within this many steps (through leaves) or decay, as vanilla's LeavesBlock.DISTANCE counts them.
+    private static final int LEAF_REACH = 6;
+    // Most leaves it takes from one tree: a safety cap well above any vanilla tree's crown.
+    private static final int MAX_LEAVES = 8_192;
 
     private final ConsumerEnergyHandler energy;
     private final ResourceHandler<ItemResource> itemInput;
@@ -271,9 +274,11 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
 
     // The tree whose trunk stands at base, or null if it isn't a grown tree (no natural leaves: a log post or a house) or
     // has more than maxLogsPerTree logs. Logs are joined on any side or diagonal, above the area's level, within the tree's
-    // reach of the area; leaves are the natural leaves joined (on a side) to them or to each other, up to 7 steps out,
-    // that are nearest to this tree: a leaf s steps out is only taken if its vanilla leaf distance is s, so leaves closer
-    // to a neighbouring trunk stay on the neighbour (which would otherwise be left a bare post that never counts as a tree).
+    // reach of the area. Its leaves are every natural leaf joined (on a side) to its logs or to each other that would decay
+    // once those logs are gone: the ones no other log keeps within LEAF_REACH steps, as vanilla leaf decay counts. So the
+    // whole crown comes down with the tree and nothing is left to rot into saplings, sticks and apples, while leaves a
+    // neighbouring trunk still holds stay on the neighbour (which would otherwise be left a bare post that never counts as
+    // a tree). It works from the blocks themselves, not the leaves' stored distance, which lags behind a freshly grown tree.
     public static @Nullable Tree findTree(Level level, BlockPos base, int radius, BlockPos centre) {
         int maxLogs = ArcforgeConfig.TREE_CUTTER_MAX_LOGS.getAsInt();
         int top = base.getY() + ArcforgeConfig.TREE_CUTTER_MAX_HEIGHT.getAsInt();
@@ -306,32 +311,57 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
                 queue.add(found);
             }
         }
-        // Natural leaves round the logs, by distance.
-        Set<BlockPos> leaves = new LinkedHashSet<>();
+        // The crown: natural leaves joined to the logs. Any other log met on the way holds leaves of its own.
+        Set<BlockPos> crown = new LinkedHashSet<>();
+        Set<BlockPos> otherLogs = new LinkedHashSet<>();
         ArrayDeque<BlockPos> frontier = new ArrayDeque<>(logs);
-        int maxLeaves = logs.size() * LEAVES_PER_LOG;
-        search:
-        for (int step = 0; step < 7 && !frontier.isEmpty(); step++) {
+        // It looks LEAF_REACH further out than it takes leaves from, so it finds the logs holding the leaves at its edge.
+        int crownTop = top + 2 * LEAF_REACH;
+        int search = reach + 2 * LEAF_REACH;
+        while (!frontier.isEmpty()) {
+            BlockPos pos = frontier.poll();
+            for (Direction direction : Direction.values()) {
+                BlockPos at = pos.relative(direction);
+                if (at.getY() < base.getY() || crown.contains(at) || logs.contains(at) || !level.isLoaded(at)) {
+                    continue;
+                }
+                BlockState state = level.getBlockState(at);
+                if (state.is(BlockTags.LOGS)) {
+                    otherLogs.add(at.immutable());
+                } else if (isNaturalLeaves(state) && at.getY() <= crownTop && Math.abs(at.getX() - centre.getX()) <= search
+                        && Math.abs(at.getZ() - centre.getZ()) <= search) {
+                    crown.add(at.immutable());
+                    if (crown.size() > MAX_LEAVES) {
+                        return null;
+                    }
+                    frontier.add(at.immutable());
+                }
+            }
+        }
+        // What the other logs keep alive: crown leaves within LEAF_REACH steps of them, through the crown.
+        Set<BlockPos> held = new HashSet<>();
+        ArrayDeque<BlockPos> reachable = new ArrayDeque<>(otherLogs);
+        for (int step = 0; step < LEAF_REACH && !reachable.isEmpty(); step++) {
             ArrayDeque<BlockPos> next = new ArrayDeque<>();
-            for (BlockPos pos : frontier) {
+            for (BlockPos pos : reachable) {
                 for (Direction direction : Direction.values()) {
                     BlockPos at = pos.relative(direction);
-                    if (at.getY() < base.getY() || at.getY() > top + 8 || leaves.contains(at) || logs.contains(at) || !level.isLoaded(at)) {
-                        continue;
-                    }
-                    BlockState state = level.getBlockState(at);
-                    if (isNaturalLeaves(state) && (!state.hasProperty(LeavesBlock.DISTANCE) || state.getValue(LeavesBlock.DISTANCE) == step + 1)) {
-                        leaves.add(at);
+                    if (crown.contains(at) && held.add(at)) {
                         next.add(at);
-                        if (leaves.size() >= maxLeaves) {
-                            break search;
-                        }
                     }
                 }
             }
-            frontier = next;
+            reachable = next;
         }
-        return leaves.isEmpty() ? null : new Tree(new ArrayList<>(logs), new ArrayList<>(leaves));
+        List<BlockPos> leaves = new ArrayList<>();
+        int take = reach + LEAF_REACH;
+        for (BlockPos pos : crown) {
+            if (!held.contains(pos) && pos.getY() <= top + LEAF_REACH && Math.abs(pos.getX() - centre.getX()) <= take
+                    && Math.abs(pos.getZ() - centre.getZ()) <= take) {
+                leaves.add(pos);
+            }
+        }
+        return leaves.isEmpty() ? null : new Tree(new ArrayList<>(logs), leaves);
     }
 
     // Whether two ground-level logs side by side or corner to corner belong to one 2x2 trunk.
