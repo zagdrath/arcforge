@@ -127,7 +127,8 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     private int fePerTick;
     private int exhaustHu;
     private int exhaustCelsius;
-    private boolean venting;
+    // Exhaust vented last tick (HU): what nothing took.
+    private int ventedHu;
     private float syncedRpm;
     private float syncedLoad;
     private boolean syncedVenting;
@@ -176,7 +177,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
                             ? net.minecraft.core.registries.BuiltInRegistries.FLUID.getId(lubricant.getResource(0).getFluid()) : -1;
                     case GasTurbineArrayMenu.DATA_EXHAUST_HU -> exhaustHu;
                     case GasTurbineArrayMenu.DATA_EXHAUST_CELSIUS -> exhaustCelsius;
-                    case GasTurbineArrayMenu.DATA_VENTING -> venting ? 1 : 0;
+                    case GasTurbineArrayMenu.DATA_VENTED_HU -> ventedHu;
                     case GasTurbineArrayMenu.DATA_FE_PER_MB_X10 -> (int) Math.round(fePerMb(BurnerFuel.of(fuel.getResource(0))) * 10.0);
                     default -> 0;
                 };
@@ -411,9 +412,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         }
         // Exhaust nothing took since last tick is vented. Heat ports push it out in pushHeat, but Thermodynamic
         // Conduits pull it on their own tick, after this one, so it has to wait a tick for them.
-        int vented = exhaust.getStored();
-        venting = vented > 0;
-        exhaust.remove(vented);
+        ventedHu = exhaust.remove(exhaust.getStored());
         fePerTick = 0;
         exhaustHu = 0;
         if (burnedHu > 0 && burning != null) {
@@ -437,12 +436,12 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
         status = status(allowed, hasFuel, target);
         pushEnergy(level);
-        boolean changed = Math.abs(rpm - syncedRpm) >= 1.0 || venting != syncedVenting || Math.abs(load() - syncedLoad) >= 0.01F
+        boolean changed = Math.abs(rpm - syncedRpm) >= 1.0 || isVenting() != syncedVenting || Math.abs(load() - syncedLoad) >= 0.01F
                 || exhaustHu != syncedExhaustHu;
         if (changed && time - lastSync >= SYNC_INTERVAL || (rpm == 0 && syncedRpm != 0)) {
             syncedRpm = (float) rpm;
             syncedLoad = load();
-            syncedVenting = venting;
+            syncedVenting = isVenting();
             syncedExhaustHu = exhaustHu;
             lastSync = time;
             sync();
@@ -614,7 +613,11 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     }
 
     public boolean isVenting() {
-        return venting;
+        return ventedHu > 0;
+    }
+
+    public int getVentedHu() {
+        return ventedHu;
     }
 
     // --- Client side ---
@@ -723,8 +726,8 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         rpm = input.getDoubleOr("rpm", 0.0);
         syncedRpm = (float) rpm;
         syncedLoad = input.getFloatOr("load", 0.0F);
-        venting = input.getBooleanOr("venting", false);
-        syncedVenting = venting;
+        ventedHu = input.getIntOr("vented_hu", 0);
+        syncedVenting = isVenting();
         exhaustHu = input.getIntOr("exhaust_hu", 0);
         syncedExhaustHu = exhaustHu;
         targetsDirty = true;
@@ -745,7 +748,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         output.putDouble("lubricant_used", lubricantUsed);
         output.putDouble("rpm", rpm);
         output.putFloat("load", load());
-        output.putBoolean("venting", venting);
+        output.putInt("vented_hu", ventedHu);
         output.putInt("exhaust_hu", exhaustHu);
     }
 

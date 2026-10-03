@@ -19,6 +19,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -30,7 +31,8 @@ import snownee.jade.api.StreamServerDataProvider;
 import snownee.jade.api.config.IPluginConfig;
 import snownee.jade.api.ui.IDisplayHelper;
 
-// The steam cycle in Jade, looking at any casing: a Superheater Array's "Steam → Superheated · 200 mB/t" (or
+// The steam cycle in Jade, looking at any casing: a Steam Boiler Array's "Heat use 3,200 / 3,200 HU/t" (gold at its
+// limit, so an undersized boiler behind a heat source shows), a Superheater Array's "Steam → Superheated · 200 mB/t" (or
 // "Passing through (420 °C)"), a Condenser Array's "Condensing 287 mB/t", and a Steam Turbine Array's exhaust
 // ("Exhaust: 1,200 mB", "Vacuum bonus +10%"). Their tanks and heat show through Jade's own views. This half
 // gathers the data on the server; Client draws it.
@@ -39,10 +41,11 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
 
     public static final Identifier UID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_cycle");
 
-    public enum Kind { SUPERHEATER, CONDENSER, TURBINE }
+    public enum Kind { SUPERHEATER, CONDENSER, TURBINE, BOILER }
 
     // Superheater: a = the input grade (-1 none), b = the grade made (-1 passing through), c = mB/t, d = °C.
     // Condenser: c = mB/t condensed. Turbine: a = 1 with an Exhaust port, b = 1 with the vacuum bonus, c = mB of exhaust.
+    // Boiler: c = HU/t it boiled with last tick, d = the most HU/t it boils with.
     public record Data(int kind, int a, int b, int c, int d) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Data::kind,
@@ -67,6 +70,10 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
         CondenserArrayBlockEntity condenser = CondenserArrayCasingBlock.STRUCTURE.findController(level, accessor.getPosition());
         if (condenser != null) {
             return new Data(Kind.CONDENSER.ordinal(), 0, 0, condenser.getCondensed(), 0);
+        }
+        var boilerMaster = blockEntity instanceof SteamBoilerArrayBlockEntity casing ? casing.getMaster() : WindowProviders.master(level, accessor.getPosition());
+        if (boilerMaster instanceof SteamBoilerArrayBlockEntity boiler) {
+            return new Data(Kind.BOILER.ordinal(), 0, 0, boiler.getCore().getHeatUsed(), boiler.maxHeatPerTick());
         }
         var turbineMaster = blockEntity instanceof SteamTurbineArrayBlockEntity casing ? casing.getMaster() : WindowProviders.master(level, accessor.getPosition());
         if (turbineMaster instanceof SteamTurbineArrayBlockEntity turbine) {
@@ -107,6 +114,8 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
                             tooltip.add(Component.translatable("jade.arcforge.superheater.passing", data.d()).withStyle(ChatFormatting.GRAY));
                         }
                     }
+                    case BOILER -> tooltip.add(Component.translatable("jade.arcforge.boiler.heat_use", display.humanReadableNumber(data.c(), "", false),
+                            display.humanReadableNumber(data.d(), "", false)).withStyle(data.c() >= data.d() ? ChatFormatting.GOLD : ChatFormatting.GRAY));
                     case CONDENSER -> tooltip.add(Component.translatable("jade.arcforge.condenser", display.humanReadableNumber(data.c(), "", false)));
                     case TURBINE -> {
                         if (data.a() == 0) {

@@ -40,7 +40,7 @@ public class GasTurbineArrayMenu extends MachineMenu {
     public static final int DATA_LUBRICANT_CAPACITY = 15;
     public static final int DATA_EXHAUST_HU = 16;
     public static final int DATA_EXHAUST_CELSIUS = 17;
-    public static final int DATA_VENTING = 18;
+    public static final int DATA_VENTED_HU = 18;
     // The tank's fuel in tenths of an FE per mB.
     public static final int DATA_FE_PER_MB_X10 = 19;
     // The lubricant in the tank (a fluid id), for the gauge and its tooltip.
@@ -144,7 +144,12 @@ public class GasTurbineArrayMenu extends MachineMenu {
     }
 
     public boolean isVenting() {
-        return value(DATA_VENTING) != 0;
+        return getVentedHu() > 0;
+    }
+
+    // Exhaust vented last tick, in HU.
+    public int getVentedHu() {
+        return value(DATA_VENTED_HU);
     }
 
     public double getFePerMb() {

@@ -33,14 +33,14 @@ public enum GasTurbineProvider implements StreamServerDataProvider<BlockAccessor
     public static final Identifier UID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "gas_turbine");
 
     // throttle: % in Throttle mode, else -1.
-    public record Data(int rpm, int fePerTick, int throttle, int exhaustHu, int exhaustCelsius, boolean venting, int status) {
+    public record Data(int rpm, int fePerTick, int throttle, int exhaustHu, int exhaustCelsius, int ventedHu, int status) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Data::rpm,
                 ByteBufCodecs.VAR_INT, Data::fePerTick,
                 ByteBufCodecs.VAR_INT, Data::throttle,
                 ByteBufCodecs.VAR_INT, Data::exhaustHu,
                 ByteBufCodecs.VAR_INT, Data::exhaustCelsius,
-                ByteBufCodecs.BOOL, Data::venting,
+                ByteBufCodecs.VAR_INT, Data::ventedHu,
                 ByteBufCodecs.VAR_INT, Data::status,
                 Data::new);
     }
@@ -55,7 +55,7 @@ public enum GasTurbineProvider implements StreamServerDataProvider<BlockAccessor
         }
         int throttle = turbine.getRedstoneMode() == RedstoneMode.THROTTLE ? (int) Math.round(turbine.throttle() * 100.0) : -1;
         return new Data((int) Math.round(turbine.getRpm()), turbine.getFePerTick(), throttle, turbine.getExhaustHu(), turbine.getExhaustCelsius(),
-                turbine.isVenting(), turbine.getStatus().ordinal());
+                turbine.getVentedHu(), turbine.getStatus().ordinal());
     }
 
     @Override
@@ -84,8 +84,9 @@ public enum GasTurbineProvider implements StreamServerDataProvider<BlockAccessor
                 if (data.exhaustHu() > 0) {
                     tooltip.add(Component.translatable("gui.arcforge.gas_turbine.exhaust_tooltip",
                             display.humanReadableNumber(data.exhaustHu(), "", false), data.exhaustCelsius()));
-                    if (data.venting()) {
-                        tooltip.add(Component.translatable("gui.arcforge.gas_turbine.exhaust_venting").withStyle(ChatFormatting.GOLD));
+                    if (data.ventedHu() > 0) {
+                        tooltip.add(Component.translatable("gui.arcforge.gas_turbine.exhaust_venting",
+                                display.humanReadableNumber(data.ventedHu(), "", false)).withStyle(ChatFormatting.GOLD));
                     }
                 }
                 tooltip.add(MachineStatus.byId(data.status()).getDescription().copy().withStyle(ChatFormatting.GRAY));

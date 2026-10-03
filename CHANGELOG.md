@@ -112,6 +112,10 @@ number and date.
 
 ### Changed
 
+- **Gas Turbine Array exhaust:** "Venting to air" now says how much is vented ("Venting 2,420 HU/t to air"), in the
+  GUI and in Jade, so a partly undersized heat sink shows how far short it falls.
+- **Steam Boiler Array in Jade:** shows the heat it boils with against its maximum ("Heat use 3.2k / 3.2k HU/t"), in
+  gold when it is at its limit, so a boiler too small for the heat fed to it is easy to spot.
 - **Steam Boiler Array:** boil rate, heat buffer and tanks scale by footprint area and height: 600 HU/t, 100,000 HU and
   16,000 mB per section (width × depth ÷ 9 × height), so a 7×9×12 boils up to 50,400 HU/t. A 3×3 tower is unchanged.
 - **Steam Turbine Array:** FE per mB raised to 20 / 36 / 56 (Steam / High-Pressure / Superheated), from 10 / 18 / 28.

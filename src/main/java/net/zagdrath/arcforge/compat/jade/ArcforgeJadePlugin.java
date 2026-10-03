@@ -78,6 +78,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SuperheaterArrayBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, CondenserArrayBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SteamTurbineArrayBlockEntity.class);
+        registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity.class);
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, GasTurbineArrayBlockEntity.class);
         registration.registerBlockDataProvider(MeterProviders.Meter.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity.class);
         registration.registerBlockDataProvider(MeterProviders.Chargepad.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.ChargepadBlockEntity.class);
@@ -166,6 +167,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SuperheaterArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, CondenserArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SteamTurbineArrayCasingBlock.class);
+        registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock.class);
         registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, GasTurbineArrayCasingBlock.class);
         registration.registerBlockComponent(MeterProviders.Meter.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.MeterBlock.class);
         registration.registerBlockComponent(MeterProviders.Chargepad.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.ChargepadBlock.class);

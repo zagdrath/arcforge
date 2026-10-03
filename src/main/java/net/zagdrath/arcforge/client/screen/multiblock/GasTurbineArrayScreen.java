@@ -122,7 +122,7 @@ public class GasTurbineArrayScreen extends MachineScreen<GasTurbineArrayMenu> {
         if (menu.getExhaustHu() > 0 && isHovering(RPM_CENTER_X - EXHAUST_MAX_W / 2, EXHAUST_Y - 1, EXHAUST_MAX_W, font.lineHeight + 1, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.gas_turbine.exhaust_tooltip", ArcforgeGui.grouped(menu.getExhaustHu()), menu.getExhaustCelsius()));
             if (menu.isVenting()) {
-                lines.add(Component.translatable("gui.arcforge.gas_turbine.exhaust_venting").withStyle(ChatFormatting.GOLD));
+                lines.add(Component.translatable("gui.arcforge.gas_turbine.exhaust_venting", ArcforgeGui.grouped(menu.getVentedHu())).withStyle(ChatFormatting.GOLD));
             }
             return;
         }
