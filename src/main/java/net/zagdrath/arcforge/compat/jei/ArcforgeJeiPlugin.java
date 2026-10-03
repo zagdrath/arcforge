@@ -239,8 +239,6 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipeClickArea(ArcforgeFurnaceScreen.class, 84, 24, ARROW_W, ARROW_H, MachineCategories.ArcforgeSmelting.TYPE);
         registration.addRecipeClickArea(CarbonizerScreen.class, 52, 24, ARROW_W, ARROW_H, MachineCategories.Carbonizing.TYPE);
         registration.addRecipeClickArea(FuelBurnerScreen.class, 127, 52, 14, 14, MachineCategories.BurnerFuels.TYPE);
-        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.BatteryArrayScreen.class, 8, 17, 16, 72,
-                MachineCategories.BatteryComponents.TYPE);
         for (int lane = 0; lane < 3; lane++) {
             int y = 20 + lane * 18;
             registration.addRecipeClickArea(ArcCrushingArrayScreen.class, 52, y, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);

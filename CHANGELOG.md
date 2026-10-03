@@ -134,6 +134,9 @@ number and date.
 
 ### Fixed
 
+- **Battery Array screen:** hovering the FE gauge shows the FE stored and the fill percentage again, like the Energy
+  Cell, instead of JEI's "Show all recipes" (the battery components stay listed under the controller and casing in JEI),
+  and the status LED next to the status line no longer shows a missing texture.
 - **Arcforge failed to load on NeoForge 26.3.0.37-beta and later** (`NoSuchFieldError: ModConfig$Type COMMON`).
   NeoForge renamed the COMMON config type to LOCAL; Arcforge now picks whichever one the running NeoForge has. The
   config file is still `arcforge-common.toml`, so settings carry over.
