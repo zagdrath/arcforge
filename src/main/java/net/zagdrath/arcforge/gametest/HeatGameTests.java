@@ -22,15 +22,19 @@ import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
 import net.zagdrath.arcforge.block.storage.HeatCellBlock;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
 // Power and heat: the burners, the Geothermal Plant, the Thermoelectric Plant and moving heat between them.
@@ -313,5 +317,49 @@ public final class HeatGameTests {
         placed.applyComponentsFromItemStack(item);
         helper.assertTrue(placed.getHeat().getStored() == 123_456, "Placed cell has " + placed.getHeat().getStored() + " HU");
         helper.succeed();
+    }
+
+    // A conduit's network asks each machine for its heat handler once and keeps the answer until the machine says it
+    // changed. A Steam Boiler Array casing has none while its master is missing (still loading in another chunk when the
+    // world opens), and the master turning up later doesn't tell the conduit: it still has to find the boiler and heat it.
+    static void thermalConduitFindsLateBoiler(GameTestHelper helper) {
+        BlockPos boilerMin = new BlockPos(0, 1, 0);
+        BlockPos port = new BlockPos(2, 2, 1);
+        BlockPos conduitPos = new BlockPos(3, 2, 1);
+        BlockPos fireboxPos = new BlockPos(4, 2, 1);
+        SteamGameTests.boilerArray(helper, boilerMin);
+        helper.setBlock(conduitPos, ModBlocks.conduit(ConduitType.THERMAL, ConduitTier.WROUGHT).get());
+        helper.setBlock(fireboxPos, ModBlocks.FIREBOX.get().defaultBlockState());
+        FireboxBlockEntity firebox = helper.getBlockEntity(fireboxPos, FireboxBlockEntity.class);
+        // North-facing, so its right is the west face, toward the conduit.
+        firebox.setSideMode(RelativeSide.RIGHT, SideMode.HEAT);
+        firebox.getHeat().add(firebox.getHeat().getCapacity());
+        ShellStructure.Shell[] shell = new ShellStructure.Shell[1];
+        int[] heatBefore = new int[1];
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.isMaster(), "The boiler did not form");
+                    MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(port), SideMode.HEAT, Direction.EAST);
+                    ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(conduitPos));
+                    // The master goes missing, and the network is rebuilt (and, holding heat, tries the boiler) while it is.
+                    shell[0] = boiler.getShell();
+                    boiler.setShell(null);
+                    ConduitNetworkManager.get(helper.getLevel()).markDirty(helper.absolutePos(conduitPos));
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    boiler.setShell(shell[0]);
+                    heatBefore[0] = boiler.getHeat().getStored();
+                })
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
+                    helper.assertTrue(boiler.getHeat().getStored() > heatBefore[0],
+                            "No heat reached the boiler through the conduit (it holds " + boiler.getHeat().getStored() + " HU)");
+                })
+                .thenSucceed();
     }
 }

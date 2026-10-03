@@ -45,8 +45,7 @@ public abstract class ConduitNetwork<H> {
             for (Direction side : Direction.values()) {
                 ConnectionMode mode = ConduitBlock.mode(state, side);
                 if (mode.isPort()) {
-                    var cache = BlockCapabilityCache.create(capability, level, pos.relative(side), side.getOpposite());
-                    (mode == ConnectionMode.OUTPUT ? sources : sinks).add(new Endpoint<>(pos, side, cache));
+                    (mode == ConnectionMode.OUTPUT ? sources : sinks).add(new Endpoint<>(pos, side, capability, level));
                 }
             }
         }
@@ -114,13 +113,48 @@ public abstract class ConduitNetwork<H> {
     }
 
     // A conduit side configured as input or output, and the machine behind it.
-    public record Endpoint<H>(BlockPos conduit, Direction side, BlockCapabilityCache<H, @Nullable Direction> cache) {
+    public static final class Endpoint<H> {
+        private final BlockPos conduit;
+        private final Direction side;
+        private final BlockCapability<H, @Nullable Direction> capability;
+        private BlockCapabilityCache<H, @Nullable Direction> cache;
+
+        Endpoint(BlockPos conduit, Direction side, BlockCapability<H, @Nullable Direction> capability, ServerLevel level) {
+            this.conduit = conduit;
+            this.side = side;
+            this.capability = capability;
+            this.cache = BlockCapabilityCache.create(capability, level, machine(), side.getOpposite());
+        }
+
+        public BlockPos conduit() {
+            return conduit;
+        }
+
+        public Direction side() {
+            return side;
+        }
+
         public BlockPos machine() {
             return conduit.relative(side);
         }
 
+        // The cache keeps a missing handler until the machine invalidates its capabilities, and a multiblock casing
+        // whose master turns up later (loaded after it, in another chunk) never does: ask again while it's missing,
+        // and once there's an answer go back to a cache that holds it.
         public @Nullable H handler() {
-            return cache.getCapability();
+            H handler = cache.getCapability();
+            if (handler != null) {
+                return handler;
+            }
+            ServerLevel level = cache.level();
+            if (!level.isLoaded(machine())) {
+                return null;
+            }
+            handler = level.getCapability(capability, machine(), side.getOpposite());
+            if (handler != null) {
+                cache = BlockCapabilityCache.create(capability, level, machine(), side.getOpposite());
+            }
+            return handler;
         }
     }
 }

@@ -102,6 +102,10 @@ number and date.
 - **The Jetpack Mode key defaulted to Pause instead of H.** Minecraft 26.3 numbers keys differently from earlier
   versions. Controls you've already saved keep their binding, so if Jetpack Mode shows Pause, set it to H (or any key)
   in Options → Controls → Key Binds.
+- **Conduits stopped feeding a multiblock until broken and replaced.** When a world loaded with an array (Steam Boiler,
+  Superheater and the rest) spread across chunks, a conduit at one of its ports could check before the array's
+  controller had loaded, find nothing there, and keep that answer; Thermodynamic Conduits then filled up and stopped.
+  Conduits now look again until they find the machine. The same fix covers every conduit type.
 - **"Missing model" warnings for every liquid block** (`arcforge:creosote[level=0]` and so on): each liquid now has a
   blockstate.
 

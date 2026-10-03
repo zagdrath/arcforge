@@ -108,6 +108,7 @@ public final class ArcforgeGameTests {
         TESTS.put("heat_flows_hot_to_cold", HeatGameTests::heatFlowsHotToCold);
         TESTS.put("thermal_conduit_carries_heat", HeatGameTests::thermalConduitCarriesHeat);
         TESTS.put("thermal_conduit_keeps_temperature", HeatGameTests::thermalConduitKeepsTemperature);
+        TESTS.put("thermal_conduit_finds_late_boiler", HeatGameTests::thermalConduitFindsLateBoiler);
         TESTS.put("heat_cell_fills", HeatGameTests::heatCellFills);
         TESTS.put("heat_cell_leaks", HeatGameTests::heatCellLeaks);
         TESTS.put("heat_cell_outputs", HeatGameTests::heatCellOutputs);
