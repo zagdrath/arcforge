@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "arcforge:bio_coal_block",
+  "result": {
+    "count": 9,
+    "id": "arcforge:carbon_dust"
+  },
+  "time": 200,
+  "ore": false
+}

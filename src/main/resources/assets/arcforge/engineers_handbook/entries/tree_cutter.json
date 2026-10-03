@@ -1,0 +1,18 @@
+{
+  "title": "Tree Cutter",
+  "icon": "arcforge:tree_cutter",
+  "items": [
+    "arcforge:tree_cutter",
+    "arcforge:range_upgrade"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Plants and fells a tree farm with FE. Its area is 5x5 blocks on its own level, starting one block in front of it; put it on the ground facing a patch of dirt or grass.\n- Saplings go in its three sapling slots. It plants them in 2x2 patches with a one-block gap, so spruce, jungle and dark oak grow into big 2x2 trees and neighbours don't grow together.\n- Bone Meal in its fertilizer slot goes onto the saplings, one every 2 seconds.\n- Every 2 seconds it fells one fully grown tree in the area (or plants one sapling if none is grown)."
+    },
+    {
+      "type": "text",
+      "text": "- It takes the whole tree: every log, the leaves and what they drop (saplings, sticks, apples). Saplings refill its sapling slots first, so it replants on its own; the rest goes to its 9 output slots.\n- Felling costs 200 FE per log, planting 20 FE. A tree needs natural leaves, so it leaves your log buildings alone, and trees over 256 logs are left standing.\n- Sides: input on top, output underneath and energy at the back by default.\n- Speed, Energy and Range upgrades. Each Range upgrade widens the area by a block on each side (8 make it 21x21)."
+    }
+  ]
+}

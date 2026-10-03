@@ -42,7 +42,7 @@ public final class AdvancementGameTests {
             "farming/hands_free", "farming/sprinkler", "farming/scythe",
             "farming/millstone", "farming/mill", "farming/seed_oil", "farming/dried_hops",
             "farming/air_separator", "farming/ammonia", "farming/npk_fertilizer", "farming/biodiesel", "farming/biogas_digester",
-            "farming/glass_cloche", "farming/grow_chamber", "farming/hydroponic_cell",
+            "farming/glass_cloche", "farming/grow_chamber", "farming/hydroponic_cell", "farming/tree_cutter", "farming/bio_coal",
             "farming/greenhouse", "farming/greenhouse_night_shift", "farming/greenhouse_fully_fed", "farming/soybeans", "farming/crop_rotation", "processing/rock_salt",
             "farming/rubber_dandelion", "farming/resin_tap", "farming/raw_rubber", "chemistry/rubber", "chemistry/ethylene", "chemistry/pvc",
             "logistics/reservoir", "logistics/liquid_experience", "logistics/quantum_tunnel", "logistics/chunk_loader");
@@ -64,7 +64,7 @@ public final class AdvancementGameTests {
         return player.getAdvancements().getOrStartProgress(advancement).isDone();
     }
 
-    // All 52 advancements of the tab load.
+    // Every advancement of the tab loads.
     static void treeLoads(GameTestHelper helper) {
         List<String> missing = new ArrayList<>();
         for (String id : IDS) {

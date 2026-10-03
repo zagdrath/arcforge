@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/hydrothermal_carbonizer_front_on",
+    "south": "arcforge:block/hydrothermal_carbonizer_back",
+    "east": "arcforge:block/hydrothermal_carbonizer_side",
+    "west": "arcforge:block/hydrothermal_carbonizer_side",
+    "up": "arcforge:block/hydrothermal_carbonizer_top",
+    "down": "arcforge:block/hydrothermal_carbonizer_bottom",
+    "particle": "arcforge:block/hydrothermal_carbonizer_side"
+  }
+}

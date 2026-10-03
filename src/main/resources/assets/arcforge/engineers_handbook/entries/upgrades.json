@@ -5,12 +5,13 @@
     "arcforge:speed_upgrade",
     "arcforge:energy_upgrade",
     "arcforge:heat_upgrade",
-    "arcforge:insulation_upgrade"
+    "arcforge:insulation_upgrade",
+    "arcforge:range_upgrade"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Most machines have an Upgrades tab with four slots. Each slot holds up to 8 of one kind of upgrade.\n- Speed: works up to 16x faster at 8, using power or fuel just as much faster.\n- Energy: FE per operation x 0.8 for each (down to 17% at 8).\n- Heat: more heat from each fuel, or more FE from each HU.\n- Insulation: goes in a Heat Cell to slow its heat leak.\nOnly the upgrades a machine can use fit in its slots."
+      "text": "Most machines have an Upgrades tab with four slots. Each slot holds up to 8 of one kind of upgrade.\n- Speed: works up to 16x faster at 8, using power or fuel just as much faster.\n- Energy: FE per operation x 0.8 for each (down to 17% at 8).\n- Heat: more heat from each fuel, or more FE from each HU.\n- Range: widens the Tree Cutter's area by a block on each side.\n- Insulation: goes in a Heat Cell to slow its heat leak.\nOnly the upgrades a machine can use fit in its slots."
     }
   ]
 }

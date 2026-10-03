@@ -164,6 +164,9 @@
     "arcforge:wrought_power_regulator",
     "arcforge:tempered_power_regulator",
     "arcforge:hardened_power_regulator",
-    "arcforge:arcforged_power_regulator"
+    "arcforge:arcforged_power_regulator",
+    "arcforge:bio_coal_block",
+    "arcforge:tree_cutter",
+    "arcforge:hydrothermal_carbonizer"
   ]
 }

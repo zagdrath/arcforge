@@ -83,6 +83,8 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("seed_extracting")));
     public static final Supplier<RecipeType<DryingRecipe>> DRYING = RECIPE_TYPES.register("drying",
             () -> RecipeType.simple(id("drying")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe>> HYDROTHERMAL_CARBONIZING =
+            RECIPE_TYPES.register("hydrothermal_carbonizing", () -> RecipeType.simple(id("hydrothermal_carbonizing")));
     // Farm chemistry: the Air Separator, the Haber Reactor and the Biogas Digester.
     public static final Supplier<RecipeType<AirSeparatingRecipe>> AIR_SEPARATING = RECIPE_TYPES.register("air_separating",
             () -> RecipeType.simple(id("air_separating")));
@@ -129,6 +131,9 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(SeedExtractingRecipe.MAP_CODEC, SeedExtractingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<DryingRecipe>> DRYING_SERIALIZER = RECIPE_SERIALIZERS.register("drying",
             () -> new RecipeSerializer<>(DryingRecipe.MAP_CODEC, DryingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe>> HYDROTHERMAL_CARBONIZING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("hydrothermal_carbonizing", () -> new RecipeSerializer<>(
+                    net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<AirSeparatingRecipe>> AIR_SEPARATING_SERIALIZER = RECIPE_SERIALIZERS.register("air_separating",
             () -> new RecipeSerializer<>(AirSeparatingRecipe.MAP_CODEC, AirSeparatingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<SynthesizingRecipe>> SYNTHESIZING_SERIALIZER = RECIPE_SERIALIZERS.register("synthesizing",
@@ -172,6 +177,7 @@ public final class ModRecipes {
     private static void syncToClients(OnDatapackSyncEvent event) {
         event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
                 MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(), VULCANIZING.get(),
+                HYDROTHERMAL_CARBONIZING.get(),
                 RecipeType.SMELTING);
     }
 }

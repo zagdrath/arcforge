@@ -50,5 +50,9 @@ public final class ModItemTags {
     // Nutrient Solution in the automated farms (CropRotation). The seeds; ModBlockTags.LEGUMES holds the crops.
     public static final TagKey<Item> LEGUMES = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "legumes"));
 
+    // Biomass: what the Hydrothermal Carbonizer cooks into Bio-Coal (crops, seeds, leaves, saplings, sticks, vines, kelp,
+    // Press Cake, Compost).
+    public static final TagKey<Item> BIOMASS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "biomass"));
+
     private ModItemTags() {}
 }

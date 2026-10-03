@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/tree_cutter_front_on",
+    "south": "arcforge:block/tree_cutter_back",
+    "east": "arcforge:block/tree_cutter_side",
+    "west": "arcforge:block/tree_cutter_side",
+    "up": "arcforge:block/tree_cutter_top",
+    "down": "arcforge:block/tree_cutter_bottom",
+    "particle": "arcforge:block/tree_cutter_side"
+  }
+}

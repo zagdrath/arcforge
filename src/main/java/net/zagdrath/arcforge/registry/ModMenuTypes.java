@@ -164,6 +164,11 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(AssemblerMenu::new));
     public static final Supplier<MenuType<BlockBreakerMenu>> BLOCK_BREAKER = MENU_TYPES.register("block_breaker",
             () -> IMenuTypeExtension.create(BlockBreakerMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.TreeCutterMenu>> TREE_CUTTER = MENU_TYPES.register("tree_cutter",
+            () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.TreeCutterMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.HydrothermalCarbonizerMenu>> HYDROTHERMAL_CARBONIZER =
+            MENU_TYPES.register("hydrothermal_carbonizer",
+                    () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.HydrothermalCarbonizerMenu::new));
     public static final Supplier<MenuType<BlockPlacerMenu>> BLOCK_PLACER = MENU_TYPES.register("block_placer",
             () -> IMenuTypeExtension.create(BlockPlacerMenu::new));
     public static final Supplier<MenuType<VacuumCollectorMenu>> VACUUM_COLLECTOR = MENU_TYPES.register("vacuum_collector",

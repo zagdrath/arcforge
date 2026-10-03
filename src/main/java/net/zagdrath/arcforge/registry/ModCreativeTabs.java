@@ -50,6 +50,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.THERMAL_EVAPORATOR_CASING.get());
                 output.accept(ModItems.ASSEMBLER.get());
                 output.accept(ModItems.BLOCK_BREAKER.get());
+                output.accept(ModItems.TREE_CUTTER.get());
                 output.accept(ModItems.BLOCK_PLACER.get());
                 output.accept(ModItems.VACUUM_COLLECTOR.get());
                 output.accept(ModItems.ARC_QUARRY.get());
@@ -96,6 +97,8 @@ public final class ModCreativeTabs {
                 ModItems.alloys().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.COAL_COKE.get());
                 output.accept(ModItems.COAL_COKE_BLOCK.get());
+                output.accept(ModItems.BIO_COAL.get());
+                output.accept(ModItems.BIO_COAL_BLOCK.get());
                 output.accept(ModItems.SLAG.get());
                 output.accept(ModItems.PITCH.get());
                 output.accept(ModItems.IRON_DUST.get());
@@ -221,6 +224,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.HEAT_UPGRADE.get());
                 output.accept(ModItems.INSULATION_UPGRADE.get());
                 output.accept(ModItems.THERMOELECTRIC_UPGRADE.get());
+                output.accept(ModItems.RANGE_UPGRADE.get());
                 // Portable storage: Batteries, Canisters, Gas Cartridges and Thermal Capsules, empty.
                 ModItems.allPortables().forEach(item -> output.accept(item.get()));
             }).build());
@@ -272,6 +276,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.SEED_EXTRACTOR.get());
                 output.accept(ModItems.GRAIN_DRYER.get());
                 output.accept(ModItems.VULCANIZER.get());
+                output.accept(ModItems.HYDROTHERMAL_CARBONIZER.get());
                 output.accept(ModItems.FLOUR.get());
                 output.accept(ModItems.SEED_MEAL.get());
                 output.accept(ModItems.PRESS_CAKE.get());

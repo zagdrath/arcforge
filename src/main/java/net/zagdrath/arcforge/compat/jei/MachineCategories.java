@@ -439,6 +439,85 @@ final class MachineCategories {
         }
     }
 
+    // --- Hydrothermal Carbonizer ---
+
+    // The biomass (with its count) and the water in, the arrow, the Bio-Coal and the water given back; the heat, the
+    // temperature it needs and the time below, before upgrades.
+    static final class HydrothermalCarbonizing extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe> TYPE =
+                IRecipeHolderType.create(ModRecipes.HYDROTHERMAL_CARBONIZING.get());
+
+        HydrothermalCarbonizing(IGuiHelper gui) {
+            super(TYPE, "hydrothermal_carbonizing", ModBlocks.HYDROTHERMAL_CARBONIZER.get(), gui, 140, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe> holder,
+                IFocusGroup focuses) {
+            var recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground()
+                    .addItemStacks(recipe.ingredient().items().map(item -> new ItemStack(item, recipe.inputCount())).toList());
+            if (recipe.water() > 0) {
+                fluid(builder, true, 21, 5, net.minecraft.world.level.material.Fluids.WATER, recipe.water());
+            }
+            builder.addOutputSlot(71, 5).setStandardSlotBackground().add(recipe.result());
+            if (recipe.waterReturn() > 0) {
+                fluid(builder, false, 91, 5, net.minecraft.world.level.material.Fluids.WATER, recipe.waterReturn());
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe> holder,
+                IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().ticks()).setPosition(44, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe> holder, IRecipeSlotsView slots,
+                GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            var recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.hydrothermal_carbonizing.heat", String.format(Locale.ROOT, "%,d", recipe.heatPerOperation()),
+                    ArcforgeConfig.HYDROTHERMAL_MIN_TEMPERATURE.getAsInt()), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.hydrothermal_carbonizing.time", seconds(recipe.ticks())), 0, 40);
+        }
+    }
+
+    // --- Tree Cutter ---
+
+    // A sapling the Tree Cutter plants (with Bone Meal to speed it), and the log and leaves of its tree.
+    record TreeCuttingRecipe(net.minecraft.world.item.Item sapling, ItemStack log, ItemStack leaves) {}
+
+    static final class TreeCutting extends ArcforgeCategory<TreeCuttingRecipe> {
+        static final IRecipeType<TreeCuttingRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "tree_cutting", TreeCuttingRecipe.class);
+
+        TreeCutting(IGuiHelper gui) {
+            super(TYPE, "tree_cutting", ModBlocks.TREE_CUTTER.get(), gui, 140, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, TreeCuttingRecipe recipe, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(new ItemStack(recipe.sapling()));
+            builder.addInputSlot(21, 5).setStandardSlotBackground().add(new ItemStack(net.minecraft.world.item.Items.BONE_MEAL));
+            int x = 71;
+            for (ItemStack out : List.of(recipe.log(), recipe.leaves(), new ItemStack(recipe.sapling()))) {
+                if (!out.isEmpty()) {
+                    builder.addOutputSlot(x, 5).setStandardSlotBackground().add(out);
+                    x += 20;
+                }
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, TreeCuttingRecipe recipe, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(44, 5);
+        }
+
+        @Override
+        public void draw(TreeCuttingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.tree_cutting.cost", ArcforgeConfig.TREE_CUTTER_ENERGY_PER_LOG.getAsInt()), 0, 30);
+        }
+    }
+
     // --- Vulcanizer ---
 
     static final class Vulcanizing extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.VulcanizingRecipe>> {

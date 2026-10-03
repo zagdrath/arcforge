@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:hydrothermal_carbonizing",
+  "ingredient": "#arcforge:biomass",
+  "result": {
+    "id": "arcforge:bio_coal"
+  },
+  "water": 500,
+  "water_return": 300
+}

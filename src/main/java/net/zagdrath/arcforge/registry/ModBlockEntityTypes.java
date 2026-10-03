@@ -149,6 +149,9 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(GrainDryerBlockEntity::new, ModBlocks.GRAIN_DRYER.get()));
     public static final Supplier<BlockEntityType<VulcanizerBlockEntity>> VULCANIZER = BLOCK_ENTITY_TYPES.register("vulcanizer",
             () -> new BlockEntityType<>(VulcanizerBlockEntity::new, ModBlocks.VULCANIZER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.HydrothermalCarbonizerBlockEntity>> HYDROTHERMAL_CARBONIZER =
+            BLOCK_ENTITY_TYPES.register("hydrothermal_carbonizer", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.HydrothermalCarbonizerBlockEntity::new, ModBlocks.HYDROTHERMAL_CARBONIZER.get()));
     public static final Supplier<BlockEntityType<ResinTapBlockEntity>> RESIN_TAP = BLOCK_ENTITY_TYPES.register("resin_tap",
             () -> new BlockEntityType<>(ResinTapBlockEntity::new, ModBlocks.RESIN_TAP.get()));
     // Farm chemistry.
@@ -212,6 +215,9 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(AssemblerBlockEntity::new, ModBlocks.ASSEMBLER.get()));
     public static final Supplier<BlockEntityType<BlockBreakerBlockEntity>> BLOCK_BREAKER = BLOCK_ENTITY_TYPES.register("block_breaker",
             () -> new BlockEntityType<>(BlockBreakerBlockEntity::new, ModBlocks.BLOCK_BREAKER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.TreeCutterBlockEntity>> TREE_CUTTER =
+            BLOCK_ENTITY_TYPES.register("tree_cutter", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.TreeCutterBlockEntity::new, ModBlocks.TREE_CUTTER.get()));
     public static final Supplier<BlockEntityType<BlockPlacerBlockEntity>> BLOCK_PLACER = BLOCK_ENTITY_TYPES.register("block_placer",
             () -> new BlockEntityType<>(BlockPlacerBlockEntity::new, ModBlocks.BLOCK_PLACER.get()));
     public static final Supplier<BlockEntityType<VacuumCollectorBlockEntity>> VACUUM_COLLECTOR = BLOCK_ENTITY_TYPES.register("vacuum_collector",

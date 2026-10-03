@@ -105,6 +105,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.OilPressing(gui),
                 new MachineCategories.SeedExtracting(gui),
                 new MachineCategories.Drying(gui),
+                new MachineCategories.HydrothermalCarbonizing(gui),
+                new MachineCategories.TreeCutting(gui),
                 new MachineCategories.Vulcanizing(gui),
                 new MachineCategories.ResinTap(gui),
                 new MachineCategories.AirSeparating(gui),
@@ -140,6 +142,19 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.OilPressing.TYPE, recipes(ModRecipes.OIL_PRESSING.get()));
         registration.addRecipes(MachineCategories.SeedExtracting.TYPE, recipes(ModRecipes.SEED_EXTRACTING.get()));
         registration.addRecipes(MachineCategories.Drying.TYPE, recipes(ModRecipes.DRYING.get()));
+        registration.addRecipes(MachineCategories.HydrothermalCarbonizing.TYPE, recipes(ModRecipes.HYDROTHERMAL_CARBONIZING.get()));
+        // Every sapling; its log and leaves found by name (oak_sapling: oak_log, oak_leaves), where they exist.
+        List<MachineCategories.TreeCuttingRecipe> trees = new ArrayList<>();
+        BuiltInRegistries.ITEM.listElements().forEach(holder -> {
+            Item sapling = holder.value();
+            if (!new ItemStack(sapling).is(net.minecraft.tags.ItemTags.SAPLINGS)) {
+                return;
+            }
+            Identifier id = holder.key().identifier();
+            String stem = id.getPath().endsWith("_sapling") ? id.getPath().substring(0, id.getPath().length() - "_sapling".length()) : id.getPath();
+            trees.add(new MachineCategories.TreeCuttingRecipe(sapling, named(id.getNamespace(), stem + "_log"), named(id.getNamespace(), stem + "_leaves")));
+        });
+        registration.addRecipes(MachineCategories.TreeCutting.TYPE, trees);
         registration.addRecipes(MachineCategories.Vulcanizing.TYPE, recipes(ModRecipes.VULCANIZING.get()));
         registration.addRecipes(MachineCategories.ResinTap.TYPE, MachineCategories.ResinTapping.all());
         registration.addRecipes(MachineCategories.AirSeparating.TYPE, recipes(ModRecipes.AIR_SEPARATING.get()));
@@ -189,6 +204,11 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         }
     }
 
+    // The item with this id, or EMPTY.
+    private static ItemStack named(String namespace, String path) {
+        return BuiltInRegistries.ITEM.getOptional(Identifier.fromNamespaceAndPath(namespace, path)).map(ItemStack::new).orElse(ItemStack.EMPTY);
+    }
+
     // The recipes of a type the server sent.
     private static <I extends RecipeInput, R extends Recipe<I>> List<RecipeHolder<R>> recipes(RecipeType<R> type) {
         return List.copyOf(MachineRecipes.clientRecipes().byType(type));
@@ -217,6 +237,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.SeedExtractorScreen.class, 67, 35, ARROW_W, ARROW_H,
                 MachineCategories.SeedExtracting.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.GrainDryerScreen.class, 68, 35, ARROW_W, ARROW_H, MachineCategories.Drying.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.HydrothermalCarbonizerScreen.class, 68, 35, ARROW_W, ARROW_H,
+                MachineCategories.HydrothermalCarbonizing.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.VulcanizerScreen.class, 68, 35, ARROW_W, ARROW_H,
                 MachineCategories.Vulcanizing.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen.class, 114, 35, ARROW_W, ARROW_H,
@@ -270,6 +292,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.OilPressing.TYPE, ModBlocks.OIL_PRESS.get());
         registration.addCraftingStation(MachineCategories.SeedExtracting.TYPE, ModBlocks.SEED_EXTRACTOR.get());
         registration.addCraftingStation(MachineCategories.Drying.TYPE, ModBlocks.GRAIN_DRYER.get());
+        registration.addCraftingStation(MachineCategories.HydrothermalCarbonizing.TYPE, ModBlocks.HYDROTHERMAL_CARBONIZER.get());
+        registration.addCraftingStation(MachineCategories.TreeCutting.TYPE, ModBlocks.TREE_CUTTER.get());
         registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
         registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());
         registration.addCraftingStation(MachineCategories.AirSeparating.TYPE, ModBlocks.AIR_SEPARATOR.get());

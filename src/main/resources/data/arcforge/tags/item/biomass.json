@@ -1,0 +1,15 @@
+{
+  "values": [
+    "#c:crops",
+    "#c:seeds",
+    "#minecraft:leaves",
+    "#minecraft:saplings",
+    "minecraft:stick",
+    "minecraft:vine",
+    "minecraft:glow_lichen",
+    "minecraft:kelp",
+    "minecraft:dried_kelp",
+    "arcforge:press_cake",
+    "arcforge:compost"
+  ]
+}

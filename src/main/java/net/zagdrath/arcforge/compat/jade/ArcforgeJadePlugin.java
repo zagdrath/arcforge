@@ -122,6 +122,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, PressureGlassBlock.class);
+        // Renewable coal: the Tree Cutter and the Hydrothermal Carbonizer.
+        registration.registerBlockDataProvider(RenewableCoalProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.TreeCutterBlockEntity.class);
+        registration.registerBlockDataProvider(RenewableCoalProvider.INSTANCE,
+                net.zagdrath.arcforge.blockentity.machine.HydrothermalCarbonizerBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GlassClocheBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GrowChamberBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.HydroponicCellBlockEntity.class);
@@ -202,6 +206,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(ClocheProvider.Client.INSTANCE, net.zagdrath.arcforge.block.farming.ClocheBlock.class);
+        registration.registerBlockComponent(RenewableCoalProvider.Client.INSTANCE, net.zagdrath.arcforge.block.machine.TreeCutterBlock.class);
+        registration.registerBlockComponent(RenewableCoalProvider.Client.INSTANCE, net.zagdrath.arcforge.block.machine.HydrothermalCarbonizerBlock.class);
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.BatteryArrayControllerBlock.class,
                 net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class, net.zagdrath.arcforge.block.multiblock.LithiumCellBlock.class,
                 net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock.class, PressureGlassBlock.class)) {

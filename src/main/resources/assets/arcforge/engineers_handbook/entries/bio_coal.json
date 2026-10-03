@@ -1,0 +1,19 @@
+{
+  "title": "Bio-Coal",
+  "icon": "arcforge:bio_coal",
+  "items": [
+    "arcforge:hydrothermal_carbonizer",
+    "arcforge:bio_coal",
+    "arcforge:bio_coal_block"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Renewable coal. The Hydrothermal Carbonizer cooks biomass in hot water into Bio-Coal, with heat (HU, no FE), and only at 200°C or hotter.\n- 8 biomass + 500 mB Water make 1 Bio-Coal in 10 seconds, using 6,000 HU. 300 mB of the water comes back out into its second tank.\n- Biomass (#arcforge:biomass): crops, seeds, leaves, saplings, sticks, vines, kelp, Press Cake and Compost. A Tree Cutter's leaves and sticks are a steady supply.\n- Sides: input on top (items and Water), output underneath (Bio-Coal and returned water), heat at the back.\n- Speed and Heat upgrades."
+    },
+    {
+      "type": "text",
+      "text": "Bio-Coal works as coal everywhere:\n- It burns as long as coal in furnaces and every Arcforge burner; a Block of Bio-Coal as long as a block of coal.\n- The Carbonizer bakes it into Coal Coke and Creosote, like coal.\n- The Arc Crusher grinds it into Carbon Dust.\nNine make a Block of Bio-Coal."
+    }
+  ]
+}

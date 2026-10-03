@@ -285,6 +285,9 @@ public final class ArcforgeGameTests {
         TESTS.put("lithium_evaporator_byproduct", LithiumGameTests::evaporatorLithiumBrine);
         TESTS.put("battery_array_forms", LithiumGameTests::batteryArrayForms);
         TESTS.put("battery_array_charges", LithiumGameTests::batteryArrayCharges);
+        TESTS.put("renewable_coal_recipes", RenewableCoalGameTests::recipes);
+        TESTS.put("hydrothermal_makes_bio_coal", RenewableCoalGameTests::hydrothermalMakesBioCoal);
+        TESTS.put("tree_cutter_plants_and_fells", RenewableCoalGameTests::treeCutterPlantsAndFells);
         TESTS.put("salt_recipes", SaltGameTests::recipes);
         TESTS.put("salt_tags", SaltGameTests::saltTags);
         TESTS.put("salt_reactor_makes_brine", SaltGameTests::reactorMakesBrine);

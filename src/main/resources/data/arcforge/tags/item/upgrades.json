@@ -3,6 +3,7 @@
     "arcforge:speed_upgrade",
     "arcforge:energy_upgrade",
     "arcforge:heat_upgrade",
-    "arcforge:insulation_upgrade"
+    "arcforge:insulation_upgrade",
+    "arcforge:range_upgrade"
   ]
 }

@@ -293,6 +293,10 @@ public final class ModBlocks {
     public static final DeferredBlock<BlockBreakerBlock> BLOCK_BREAKER = BLOCKS.registerBlock("block_breaker",
             BlockBreakerBlock::new, p -> machineProperties(p, 0));
 
+    // The Tree Cutter plants and fells trees in front of it (see TreeCutterBlockEntity).
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.TreeCutterBlock> TREE_CUTTER = BLOCKS.registerBlock("tree_cutter",
+            net.zagdrath.arcforge.block.machine.TreeCutterBlock::new, p -> machineProperties(p, 0));
+
     public static final DeferredBlock<BlockPlacerBlock> BLOCK_PLACER = BLOCKS.registerBlock("block_placer",
             BlockPlacerBlock::new, p -> machineProperties(p, 0));
 
@@ -415,6 +419,12 @@ public final class ModBlocks {
     public static final DeferredBlock<ArcforgeFurnacePortBlock> ARCFORGE_FURNACE_PORT = BLOCKS.registerBlock("arcforge_furnace_port",
             ArcforgeFurnacePortBlock::new,
             p -> furnaceBrickProperties(p).lightLevel(state -> state.getValue(ArcforgeFurnacePortBlock.LIT) ? 9 : 0));
+
+    public static final DeferredBlock<Block> BIO_COAL_BLOCK = BLOCKS.registerSimpleBlock("bio_coal_block",
+            p -> p.mapColor(MapColor.COLOR_BLACK)
+                    .instrument(NoteBlockInstrument.BASEDRUM)
+                    .strength(5.0F, 6.0F)
+                    .requiresCorrectToolForDrops());
 
     public static final DeferredBlock<Block> COAL_COKE_BLOCK = BLOCKS.registerSimpleBlock("coal_coke_block",
             p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY)
@@ -739,6 +749,10 @@ public final class ModBlocks {
     // The Vulcanizer cures Raw Rubber with Sulfur in a heated press; its platens glow while it works.
     public static final DeferredBlock<VulcanizerBlock> VULCANIZER = BLOCKS.registerBlock("vulcanizer",
             VulcanizerBlock::new, p -> machineProperties(p, 7));
+    // The Hydrothermal Carbonizer cooks biomass in hot water into Bio-Coal; its pressure vessel glows while it works.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.HydrothermalCarbonizerBlock> HYDROTHERMAL_CARBONIZER =
+            BLOCKS.registerBlock("hydrothermal_carbonizer", net.zagdrath.arcforge.block.machine.HydrothermalCarbonizerBlock::new,
+                    p -> machineProperties(p, 7));
 
     // Farm chemistry. The Air Separator runs on FE; the Haber Reactor on FE and heat (its catalyst bed glows while it
     // runs). The Biogas Digester is a 3x3x3 of Biogas Digester Casings with one controller (see BiogasDigesterStructure).

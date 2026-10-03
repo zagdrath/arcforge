@@ -18,6 +18,7 @@
     "#c:storage_blocks/raw_rock_salt",
     "#c:storage_blocks/rubber",
     "#c:storage_blocks/raw_spodumene",
-    "#c:storage_blocks/graphite"
+    "#c:storage_blocks/graphite",
+    "#c:storage_blocks/bio_coal"
   ]
 }

@@ -20,7 +20,9 @@ public enum UpgradeType {
     ENERGY("energy"),
     HEAT("heat"),
     INSULATION("insulation"),
-    THERMOELECTRIC("thermoelectric");
+    THERMOELECTRIC("thermoelectric"),
+    // Machines that work an area (the Tree Cutter): each widens it by treeCutter.rangePerUpgrade blocks on every side.
+    RANGE("range");
 
     public static final int MAX_PER_MACHINE = 8;
 

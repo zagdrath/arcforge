@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "arcforge:bio_coal"
+  },
+  "result": {
+    "id": "arcforge:bio_coal_block",
+    "count": 1
+  }
+}

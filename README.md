@@ -40,7 +40,7 @@ It only ever flows from a hotter machine into a colder one.
 | Thermoelectric Plant | FE from heat | 20,000 HU + 50,000 FE | 1,100°C | Takes up to 80 HU/t |
 
 - **Fuel** for the Combustion Plant and Firebox is `#arcforge:combustion_fuel` (coal,
-  charcoal, blocks of coal). Both pause while their buffer is full, keeping the rest of the burning item.
+  charcoal, blocks of coal, Bio-Coal and its block). Both pause while their buffer is full, keeping the rest of the burning item.
 - **Geothermal Plant:** fill its 8,000 mB lava tank with lava buckets in the slot, by right-clicking
   with a bucket, or by piping lava into an input face. Touching lava source blocks add 40 HU/t each and
   magma blocks 16 HU/t each (all six sides count), even with an empty tank; they're never used up. It makes
@@ -611,6 +611,38 @@ default; Speed and Heat upgrades. Config `farming.vulcanizer`.
 **Rubber Gaskets** seal Tempered and better Pressurized Conduits, Pressurized Cylinders and Gas Cartridges, the Hardened
 Fluid Tank, and the Jetpacks. Nine Rubber make a Block of Rubber.
 
+### Renewable coal
+
+```
+Tree Cutter --> logs, leaves, saplings, sticks, apples (replants itself)
+8 biomass + 500 mB Water --[Hydrothermal Carbonizer, 200°C+, 6,000 HU]--> 1 Bio-Coal + 300 mB Water back
+Bio-Coal --> fuel like coal / [Carbonizer] Coal Coke + 250 mB Creosote / [Arc Crusher] Carbon Dust
+```
+
+**Tree Cutter** (Wrought). Plants saplings from its three sapling slots in a 5×5 area in front of it (on its own level,
+starting one block out) and fells every fully grown tree there with FE.
+
+- Saplings go in 2×2 patches with a one-block gap, so spruce, jungle and dark oak grow into big trees and neighbours
+  don't merge.
+- It takes the whole tree: every log, the leaves (`collectLeaves`) and what they drop. Saplings refill its sapling slots
+  first, so it replants; the rest goes to 9 output slots.
+- One action every 2 seconds: fell one grown tree (200 FE per log) or plant one sapling (20 FE). Bone Meal in its
+  fertilizer slot goes onto a sapling every 2 seconds.
+- A tree needs natural leaves (log buildings are safe); one over `maxLogsPerTree` (256) logs is left standing. It fells
+  as a fake player, so protection mods can refuse.
+- Input on top, output underneath, energy at the back by default. Speed, Energy and Range upgrades. Config
+  `machines.treeCutter`.
+
+**Hydrothermal Carbonizer.** A single-block heat machine (HU, no FE) that only works at 200°C or hotter: biomass and
+Water cook into Bio-Coal, and some of the water comes back into a second tank (`arcforge:hydrothermal_carbonizing`;
+the biomass count, heat and time default to `biomassPerBioCoal`, `heatPerOperation` and `time` in
+`machines.hydrothermalCarbonizer`). Input (items and Water) on top, output (Bio-Coal and returned water) underneath, heat
+at the back by default; Speed and Heat upgrades (Heat: HU per operation x 0.8^n).
+
+**Biomass** is `#arcforge:biomass`: crops, seeds, leaves, saplings, sticks, vines, glow lichen, kelp, Press Cake and
+Compost. **Bio-Coal** works as coal everywhere: furnace and combustion fuel for as long as coal, Coal Coke and Creosote
+in the Carbonizer, Carbon Dust in the Arc Crusher. Nine make a Block of Bio-Coal.
+
 ### Automated farms
 
 Single blocks that grow one crop over and over, drawn growing inside behind the glass. The seed and soil stay; each
@@ -707,14 +739,15 @@ tall; the parts around the centre all act as the Quarry (using, breaking, the Wr
 
 ### Upgrades
 
-Speed, Energy, Heat and Thermoelectric Efficiency upgrade cards go in a machine's Upgrades tab, up to 8 of each.
+Speed, Energy, Heat, Thermoelectric Efficiency and Range upgrade cards go in a machine's Upgrades tab, up to 8 of each.
 
 | Upgrade | Effect (n installed) | Machines |
 |---|---|---|
 | Speed | Works 2^(n/2) times as fast (16x at 8), using power or fuel just as fast, so the cost per operation doesn't change | All with an Upgrades tab |
-| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Metal Press, Metal Pressing Array, Electric Pump, Combustion Plant |
+| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Metal Press, Metal Pressing Array, Electric Pump, Combustion Plant, Tree Cutter |
 | Heat | Heat per fuel or lava (and from nearby lava and magma) x (1 + n/8); Thermoelectric Plant: efficiency / 0.8^n, up to 100% | Firebox, Geothermal Plant, Thermoelectric Plant |
 | Thermoelectric Efficiency | FE per HU x (1 + 0.0625 n) (+50% at 8), on top of Heat upgrades | Thermoelectric Plant |
+| Range | Area radius + n (5×5 becomes 21×21 at 8) | Tree Cutter |
 
 ## Logistics
 

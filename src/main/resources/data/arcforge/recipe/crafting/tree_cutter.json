@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PAP",
+    "SMS",
+    "PCP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "A": "minecraft:iron_axe",
+    "S": "#minecraft:saplings",
+    "M": "arcforge:block_breaker",
+    "C": "arcforge:wrought_alloy"
+  },
+  "result": {
+    "id": "arcforge:tree_cutter",
+    "count": 1
+  }
+}

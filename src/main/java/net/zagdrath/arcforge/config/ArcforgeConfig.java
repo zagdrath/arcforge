@@ -1012,6 +1012,104 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Tree Cutter: plants saplings from its inventory in an area in front of it and fells every fully grown tree",
+                "there (logs, leaves and what they drop), replanting. Speed upgrades make it work more often, Energy upgrades cut the",
+                "FE per log, Range upgrades widen the area.").push("treeCutter");
+    }
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_PER_LOG = BUILDER
+            .comment("FE per log it fells, before Energy upgrades.")
+            .defineInRange("energyPerLog", 200, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_PER_PLANT = BUILDER
+            .comment("FE per sapling it plants, before Energy upgrades.")
+            .defineInRange("energyPerPlant", 20, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_INTERVAL = BUILDER
+            .comment("Ticks between its actions (felling one tree, or planting one sapling), before Speed upgrades.")
+            .defineInRange("interval", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_FERTILIZE_INTERVAL = BUILDER
+            .comment("Ticks between bone meal uses on a sapling (one Bone Meal each), before Speed upgrades.")
+            .defineInRange("fertilizeInterval", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_RADIUS = BUILDER
+            .comment("Blocks from the middle of its area to its edge without Range upgrades (2: a 5x5 area).")
+            .defineInRange("areaRadius", 2, 0, 16);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_RANGE_PER_UPGRADE = BUILDER
+            .comment("Blocks each Range upgrade adds to the radius (1: eight make a 21x21 area).")
+            .defineInRange("rangePerUpgrade", 1, 0, 8);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_LOGS = BUILDER
+            .comment("Most logs it takes from one tree; a bigger one is left standing.")
+            .defineInRange("maxLogsPerTree", 256, 1, 4_096);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_HEIGHT = BUILDER
+            .comment("How far above its area it looks for a tree's logs and leaves, in blocks.")
+            .defineInRange("maxTreeHeight", 32, 4, 256);
+
+    public static final ModConfigSpec.BooleanValue TREE_CUTTER_COLLECT_LEAVES = BUILDER
+            .comment("Whether it keeps the leaf blocks too (biomass for the Hydrothermal Carbonizer), as well as what the leaves",
+                    "drop (saplings, sticks, apples).")
+            .define("collectLeaves", true);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Hydrothermal Carbonizer: cooks biomass (#arcforge:biomass) in water with heat (HU) into Bio-Coal, giving back",
+                "some of the water. It only works at minTemperature or hotter. Recipes (arcforge:hydrothermal_carbonizing) set the",
+                "water; the biomass per Bio-Coal, heat and time below apply to every recipe that doesn't set its own.")
+                .push("hydrothermalCarbonizer");
+    }
+
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 600, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_MIN_TEMPERATURE = BUILDER
+            .comment("It only works at this temperature or hotter, in °C.")
+            .defineInRange("minTemperature", 200, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_BIOMASS_PER_BIO_COAL = BUILDER
+            .comment("Biomass items per Bio-Coal.")
+            .defineInRange("biomassPerBioCoal", 8, 1, 64);
+
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_HEAT_PER_OPERATION = BUILDER
+            .comment("HU per Bio-Coal, before Heat upgrades (spread over the operation's time).")
+            .defineInRange("heatPerOperation", 6_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_TIME = BUILDER
+            .comment("Ticks per Bio-Coal, before Speed upgrades.")
+            .defineInRange("time", 200, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_TANK_CAPACITY = BUILDER
+            .comment("Water tank and returned-water tank size, in mB each.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of returned water it pushes out of its Output faces (shared across them).")
+            .defineInRange("fluidOutputRate", 100, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Block Placer: places blocks from its inventory in front of it, with FE.").push("blockPlacer");
     }
 

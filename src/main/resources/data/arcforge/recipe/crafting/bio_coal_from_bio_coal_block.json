@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "arcforge:bio_coal_block"
+  ],
+  "result": {
+    "id": "arcforge:bio_coal",
+    "count": 9
+  }
+}

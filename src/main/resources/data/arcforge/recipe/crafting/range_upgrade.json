@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "geg",
+    "dPd",
+    "geg"
+  ],
+  "key": {
+    "g": "#c:glass_panes/colorless",
+    "e": "minecraft:spyglass",
+    "d": "#c:dusts/redstone",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:range_upgrade",
+    "count": 1
+  }
+}

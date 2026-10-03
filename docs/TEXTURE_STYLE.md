@@ -845,6 +845,36 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   (`byproduct_fill`: flat mint `#CEE6DC` / `#8CB8A8` / `#4E7C70`). The Chemical Reactor's two input slots become three
   touching slots at y 16/34/52.
 
+## Renewable coal
+- **Bio-Coal:** Cody's coke lump (as Coal Coke) recoloured by rank onto a warm brown-black hydrochar ramp
+  `#140E0A #22180F #2F2116 #3E2C1D #4D3726 #5E4430 #70523A #866448` (the ramp's top tone `#9C785A` left out so it stays
+  dark and coal-like); the **Block of Bio-Coal** is the Coal Coke Block mapped tone for tone onto
+  `#140E0A #22180F #2F2116 #4D3726`. Brown against coal's black and coke's grey.
+- **Range Upgrade:** the upgrade card (Speed's) with its accent strip recoloured lime (`#2F6E2A #7CD45F #D4F7C2` for
+  Speed's `#1F6E66 #5FD4C4 #B8F2EA`) and the glyph cleared to the card body and redrawn as four corner brackets
+  (x4..11, y5..11, lit `#D4F7C2` on the top-left pixels) round a 2 px dot.
+- **Tree Cutter** (single-block casing; input on top, output underneath, energy at the back): the Vulcanizer's top and
+  bottom, the Block Breaker's energy back and side. The front is a 12×12 recess (x2..13, y2..13: `#16181B` top and left
+  edge, `#727982` bottom and right, `#383C42` corners) holding a circular saw: a hub (r 1.2, `#383C42`, Heat-row orange
+  `#F26A16` when on) in a rivet ring, a steel disc (r 3.6, `#9AA0A8` lit top-left / `#7E848C`) and 8 teeth to r 4.9
+  (`#B4BAC0` / `#959DA6`), over a hazard stripe on row 12 (`#E0B020` / `#1A1A1A` in pairs). `_on` is 4 frames
+  (frametime 1) with the blade turned 22.5° each (a tooth pitch is 45°, so it loops) and the hub lit.
+- **Hydrothermal Carbonizer** (single-block casing; input on top, output underneath, heat at the back: all the
+  Vulcanizer's faces). The front is a riveted pressure-vessel window (frame x2..13, y1..10, `#575D65` lit edge, `#2B2F34` shade,
+  four rivets) holding water (`#7FB3F0` surface row, `#4A8FE0` body, `#3A76C0` right column) over a two-row biomass bed
+  (`#3E2C1D` / `#2F2116` cold), and a 4×3 gauge recess (x6..9, y11..13, `#16181B`) with a white pivot and a needle.
+  `_on` is 4 frames (frametime 5): the bed glows in the Heat row (`#C73A0E` / `#7A1B0A`, shifting a column a frame), two
+  bubbles `#DCE8EE` rise through the water, and the needle swings up and turns orange.
+- GUIs (cut from existing backgrounds):
+  - **Tree Cutter:** the Block Breaker's with its progress track painted out, three touching blue input slots (the
+    Chemical Reactor's slot frame) at (29,17), (47,17), (65,17) for saplings and one at (29,39) for Bone Meal; the 3×3
+    output grid and energy gauge stay. Its sprites are the Block Breaker's (`energy_bar`, LEDs) plus two ghosts drawn
+    like the others (white, alpha 0x37 body / 0x69 edge): `ghost_sapling` (a sapling's crown on a stem) and
+    `ghost_bone_meal` (a heap).
+  - **Hydrothermal Carbonizer:** the Grain Dryer's with its tank frame copied to x 138 for the returned water and the
+    heat track cut short of it; the heat buffer, tank, heat bar, min-temperature tick and LED sprites are the Grain
+    Dryer's.
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

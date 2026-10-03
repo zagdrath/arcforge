@@ -230,6 +230,8 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
         event.register(ModMenuTypes.ASSEMBLER.get(), AssemblerScreen::new);
         event.register(ModMenuTypes.BLOCK_BREAKER.get(), BlockBreakerScreen::new);
+        event.register(ModMenuTypes.TREE_CUTTER.get(), net.zagdrath.arcforge.client.screen.machine.TreeCutterScreen::new);
+        event.register(ModMenuTypes.HYDROTHERMAL_CARBONIZER.get(), net.zagdrath.arcforge.client.screen.machine.HydrothermalCarbonizerScreen::new);
         event.register(ModMenuTypes.BLOCK_PLACER.get(), BlockPlacerScreen::new);
         event.register(ModMenuTypes.VACUUM_COLLECTOR.get(), VacuumCollectorScreen::new);
         event.register(ModMenuTypes.ARC_QUARRY.get(), ArcQuarryScreen::new);

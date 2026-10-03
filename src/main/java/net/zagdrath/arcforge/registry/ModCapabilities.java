@@ -277,6 +277,18 @@ public final class ModCapabilities {
                 BlockBreakerBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.BLOCK_BREAKER.get(),
                 BlockBreakerBlockEntity::getEnergyHandler);
+        // The Tree Cutter: saplings and bone meal in, the trees out, FE in.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.TREE_CUTTER.get(),
+                net.zagdrath.arcforge.blockentity.machine.TreeCutterBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.TREE_CUTTER.get(),
+                net.zagdrath.arcforge.blockentity.machine.TreeCutterBlockEntity::getEnergyHandler);
+        // The Hydrothermal Carbonizer: biomass in, Bio-Coal out, water in and back out, heat in.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.HYDROTHERMAL_CARBONIZER.get(),
+                net.zagdrath.arcforge.blockentity.machine.HydrothermalCarbonizerBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.HYDROTHERMAL_CARBONIZER.get(),
+                net.zagdrath.arcforge.blockentity.machine.HydrothermalCarbonizerBlockEntity::getFluidHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.HYDROTHERMAL_CARBONIZER.get(),
+                net.zagdrath.arcforge.blockentity.machine.HydrothermalCarbonizerBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.BLOCK_PLACER.get(),
                 BlockPlacerBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.BLOCK_PLACER.get(),

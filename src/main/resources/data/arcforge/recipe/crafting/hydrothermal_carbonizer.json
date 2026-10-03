@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "GXG",
+    "PCP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "B": "minecraft:bucket",
+    "G": "arcforge:rubber_gasket",
+    "X": "arcforge:grain_dryer",
+    "C": "#c:ingots/copper"
+  },
+  "result": {
+    "id": "arcforge:hydrothermal_carbonizer",
+    "count": 1
+  }
+}

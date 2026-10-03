@@ -52,6 +52,8 @@ number and date.
   `ores.spodumene`, `ores.spodumenePegmatite` and `multiblocks.thermalEvaporator.byproductCapacity` get their defaults.
 - **Data packs:** `arcforge:chemical_reacting` recipes may take a `third_item_input` (it needs a `second_item_input`);
   `arcforge:evaporating` recipes may have a `byproduct` fluid. Existing recipes load unchanged.
+- **New config sections** `machines.treeCutter` and `machines.hydrothermalCarbonizer` get their defaults.
+- **New upgrade type, Range** (Tree Cutter only). Existing machines' upgrade slots are unchanged.
 
 ### Added
 
@@ -67,6 +69,25 @@ number and date.
   - Ports like the other arrays: Input (fuel), Oxygen and Heat (out, as fast as it burns).
   - Its own GUI, Handbook page, JEI build view and information, Jade tooltip, GameTests, and two advancements (Stoke the
     Fires; the challenge Roaring Inferno for a 7×5×9). All its values are in the new `power.fireboxArray` config.
+- **Renewable coal:**
+  - **Tree Cutter,** an FE machine that plants saplings from its three sapling slots in a 5×5 area in front of it (in 2×2
+    patches with gaps, so spruce, jungle and dark oak grow into big trees) and fells every fully grown tree there: all its
+    logs, its leaves and what they drop (saplings, sticks, apples), 2×2 trees included. Saplings refill its sapling slots
+    so it replants; the rest goes to 9 output slots. Bone Meal in its fertilizer slot grows the saplings faster. 200 FE
+    per log, 20 per sapling; a tree needs natural leaves (so log buildings are safe) and one over 256 logs is left
+    standing. Side configuration; Speed, Energy and the new **Range Upgrade** (a block wider on each side per card).
+  - **Bio-Coal** and the **Block of Bio-Coal.** Bio-Coal works as coal everywhere: it's `#arcforge:combustion_fuel`,
+    burns as long as coal in vanilla furnaces too (the block as long as a coal block), bakes into Coal Coke and Creosote
+    in the Carbonizer and crushes into Carbon Dust in the Arc Crusher.
+  - **Hydrothermal Carbonizer,** a heat (HU) machine that only runs at 200°C or hotter: 8 biomass + 500 mB Water make
+    1 Bio-Coal in 10 seconds for 6,000 HU, and 300 mB of the water comes back out of a second tank. Side configuration;
+    Speed and Heat upgrades. New recipe type `arcforge:hydrothermal_carbonizing` (`ingredient`, optional `count`,
+    `result`, `water`, `water_return`, optional `heat` and `time`; the counts, heat and time default to the config).
+  - **New tag `#arcforge:biomass`:** crops, seeds, leaves, saplings, sticks, vines, glow lichen, kelp, Press Cake and
+    Compost.
+  - Handbook pages (Tree Cutter, Bio-Coal), JEI categories (Tree Cutting, Hydrothermal Carbonizing), Jade tooltips,
+    GameTests and two advancements (Timber!, Coal That Grows). Values in the new `machines.treeCutter` and
+    `machines.hydrothermalCarbonizer` config.
 - **Bigger, rectangular steam arrays:**
   - **Steam Boiler Array:** a footprint 3 to 7 by 3 to 9 in any combination, 3 to 12 tall.
   - **Steam Turbine Array:** a cross-section 3 to 7 wide and 3 to 9 tall in any combination, 3 to 15 long, along either

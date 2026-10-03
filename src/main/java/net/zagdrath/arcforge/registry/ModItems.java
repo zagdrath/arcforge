@@ -94,6 +94,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ELECTROLYZER = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTROLYZER);
     public static final DeferredItem<BlockItem> ASSEMBLER = ITEMS.registerSimpleBlockItem(ModBlocks.ASSEMBLER);
     public static final DeferredItem<BlockItem> BLOCK_BREAKER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_BREAKER);
+    public static final DeferredItem<BlockItem> TREE_CUTTER = ITEMS.registerSimpleBlockItem(ModBlocks.TREE_CUTTER);
     public static final DeferredItem<BlockItem> BLOCK_PLACER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_PLACER);
     public static final DeferredItem<BlockItem> VACUUM_COLLECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.VACUUM_COLLECTOR);
     public static final DeferredItem<ReservoirItem> RESERVOIR = ITEMS.registerItem("reservoir",
@@ -197,6 +198,9 @@ public final class ModItems {
     // Furnace burn times, data-driven like vanilla's (data/arcforge/context_int_provider/cooking/).
     private static final ResourceKey<ContextIntProvider> COAL_COKE_BURN_TIME = cookingTime("time_coal_coke");
     private static final ResourceKey<ContextIntProvider> COAL_COKE_BLOCK_BURN_TIME = cookingTime("time_coal_coke_block");
+    // Bio-Coal burns as long as coal (1,600 ticks), its block as a coal block (16,000).
+    private static final ResourceKey<ContextIntProvider> BIO_COAL_BURN_TIME = cookingTime("time_bio_coal");
+    private static final ResourceKey<ContextIntProvider> BIO_COAL_BLOCK_BURN_TIME = cookingTime("time_bio_coal_block");
 
     public static final DeferredItem<BlockItem> CARBONIZER = ITEMS.registerSimpleBlockItem(ModBlocks.CARBONIZER);
     public static final DeferredItem<BlockItem> ARCFORGE_FURNACE_PORT = ITEMS.registerSimpleBlockItem(ModBlocks.ARCFORGE_FURNACE_PORT);
@@ -209,6 +213,10 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> COAL_COKE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.COAL_COKE_BLOCK,
             p -> p.cookingFuel(COAL_COKE_BLOCK_BURN_TIME));
     public static final DeferredItem<Item> SLAG = ITEMS.registerSimpleItem("slag");
+    // Renewable coal: biomass cooked in water under heat (the Hydrothermal Carbonizer). It works as coal everywhere.
+    public static final DeferredItem<Item> BIO_COAL = ITEMS.registerSimpleItem("bio_coal", p -> p.cookingFuel(BIO_COAL_BURN_TIME));
+    public static final DeferredItem<BlockItem> BIO_COAL_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.BIO_COAL_BLOCK,
+            p -> p.cookingFuel(BIO_COAL_BLOCK_BURN_TIME));
 
     // --- Crushing ---
 
@@ -265,6 +273,7 @@ public final class ModItems {
     public static final DeferredItem<UpgradeItem> HEAT_UPGRADE = ITEMS.registerItem("heat_upgrade", p -> new UpgradeItem(UpgradeType.HEAT, p));
     public static final DeferredItem<UpgradeItem> INSULATION_UPGRADE = ITEMS.registerItem("insulation_upgrade", p -> new UpgradeItem(UpgradeType.INSULATION, p));
     public static final DeferredItem<UpgradeItem> THERMOELECTRIC_UPGRADE = ITEMS.registerItem("thermoelectric_upgrade", p -> new UpgradeItem(UpgradeType.THERMOELECTRIC, p));
+    public static final DeferredItem<UpgradeItem> RANGE_UPGRADE = ITEMS.registerItem("range_upgrade", p -> new UpgradeItem(UpgradeType.RANGE, p));
 
     public static final DeferredItem<BucketItem> CREOSOTE_BUCKET = ITEMS.registerItem("creosote_bucket",
             p -> new BucketItem(ModFluids.CREOSOTE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
@@ -514,6 +523,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> SEED_EXTRACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.SEED_EXTRACTOR);
     public static final DeferredItem<BlockItem> GRAIN_DRYER = ITEMS.registerSimpleBlockItem(ModBlocks.GRAIN_DRYER);
     public static final DeferredItem<BlockItem> VULCANIZER = ITEMS.registerSimpleBlockItem(ModBlocks.VULCANIZER);
+    public static final DeferredItem<BlockItem> HYDROTHERMAL_CARBONIZER = ITEMS.registerSimpleBlockItem(ModBlocks.HYDROTHERMAL_CARBONIZER);
     public static final DeferredItem<Item> FLOUR = ITEMS.registerSimpleItem("flour");
     public static final DeferredItem<FertilizerItem> SEED_MEAL = ITEMS.registerItem("seed_meal",
             p -> new FertilizerItem(ArcforgeConfig.SEED_MEAL_NUTRIENTS::getAsInt, p));

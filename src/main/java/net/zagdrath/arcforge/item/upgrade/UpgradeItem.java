@@ -15,7 +15,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// A Speed, Energy, Heat or Insulation upgrade card, placed in a machine's (or Heat Cell's) Upgrades tab.
+// A Speed, Energy, Heat, Insulation, Thermoelectric or Range upgrade card, placed in a machine's (or Heat Cell's) Upgrades tab.
 public class UpgradeItem extends Item {
     private final UpgradeType type;
 

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=north,lit=false": {
+      "model": "arcforge:block/tree_cutter"
+    },
+    "facing=north,lit=true": {
+      "model": "arcforge:block/tree_cutter_on"
+    },
+    "facing=east,lit=false": {
+      "model": "arcforge:block/tree_cutter",
+      "y": 90
+    },
+    "facing=east,lit=true": {
+      "model": "arcforge:block/tree_cutter_on",
+      "y": 90
+    },
+    "facing=south,lit=false": {
+      "model": "arcforge:block/tree_cutter",
+      "y": 180
+    },
+    "facing=south,lit=true": {
+      "model": "arcforge:block/tree_cutter_on",
+      "y": 180
+    },
+    "facing=west,lit=false": {
+      "model": "arcforge:block/tree_cutter",
+      "y": 270
+    },
+    "facing=west,lit=true": {
+      "model": "arcforge:block/tree_cutter_on",
+      "y": 270
+    }
+  }
+}

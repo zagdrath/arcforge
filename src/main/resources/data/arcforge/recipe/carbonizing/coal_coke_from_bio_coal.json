@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:carbonizing",
+  "ingredient": "arcforge:bio_coal",
+  "result": {
+    "id": "arcforge:coal_coke"
+  },
+  "byproduct": {
+    "id": "arcforge:creosote",
+    "amount": 250
+  },
+  "time": 600
+}

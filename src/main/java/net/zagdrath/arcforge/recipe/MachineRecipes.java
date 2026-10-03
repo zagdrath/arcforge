@@ -271,6 +271,18 @@ public final class MachineRecipes {
         return !fluid.isEmpty() && dryingFluid(level, fluid).isPresent();
     }
 
+    // --- Hydrothermal Carbonizer ---
+
+    public static Optional<RecipeHolder<HydrothermalCarbonizingRecipe>> hydrothermalCarbonizing(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.HYDROTHERMAL_CARBONIZING.get()).stream()
+                .filter(holder -> holder.value().test(input))
+                .findFirst();
+    }
+
+    public static boolean isHydrothermalInput(@Nullable Level level, ItemStack stack) {
+        return !stack.isEmpty() && hydrothermalCarbonizing(level, stack).isPresent();
+    }
+
     // --- Vulcanizer ---
 
     // The vulcanizing recipe the two input slots can supply (either way round), if any.

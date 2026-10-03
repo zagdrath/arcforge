@@ -116,7 +116,14 @@ public enum MachineStatus {
     VULCANIZING("vulcanizing", "led_running"),
     // The Battery Array: taking in more than it gives out, or giving out more (FULL, IDLE and DISABLED otherwise).
     CHARGING("charging", "led_running"),
-    DISCHARGING("discharging", "led_running");
+    DISCHARGING("discharging", "led_running"),
+    // The Hydrothermal Carbonizer (TOO_COLD below 200°C, NO_WATER without water).
+    CARBONIZING("carbonizing", "led_running"),
+    // The Tree Cutter: felling a tree, planting a sapling, or waiting with nothing grown and no sapling to plant.
+    FELLING("felling", "led_running"),
+    PLANTING("planting", "led_running"),
+    GROWING_TREES("growing_trees", "led_idle"),
+    NO_SAPLINGS("no_saplings", "led_idle");
 
     private final String name;
     private final String led;

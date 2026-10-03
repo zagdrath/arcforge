@@ -172,8 +172,9 @@ final class AlloyGameTests {
         // and Controller), and rubber's five (Resin Tap, Vulcanizer, Block of Rubber both ways and the Rubber Gasket), and
         // logistics' five (Reservoir, XP Drain, XP Shower, Quantum Tunnel and Chunk Loader), and the Firebox Array's two
         // (Casing and Controller), and lithium's fifteen (Battery Array Casing and Controller, four Lithium Cells and four
-        // Power Regulators, the Cell Separator, and Block of Raw Spodumene and Block of Graphite both ways).
-        helper.assertTrue(crafting == 242, crafting + " crafting/ recipes, not 242");
+        // Power Regulators, the Cell Separator, and Block of Raw Spodumene and Block of Graphite both ways), and renewable
+        // coal's five (Tree Cutter, Hydrothermal Carbonizer, Range Upgrade, and Block of Bio-Coal both ways).
+        helper.assertTrue(crafting == 247, crafting + " crafting/ recipes, not 247");
         // Plus the fluorite-fluxed steel, and Graphite from Coal Coke and from Carbon Dust.
         helper.assertTrue(smelting == 8, smelting + " arcforge_smelting/ recipes, not 8");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

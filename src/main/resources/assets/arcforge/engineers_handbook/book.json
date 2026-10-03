@@ -81,6 +81,7 @@
         "assembler",
         "block_breaker",
         "block_placer",
+        "tree_cutter",
         "vacuum_collector",
         "arc_quarry",
         "throttle_lever"
@@ -178,6 +179,7 @@
         "haber_reactor",
         "npk_fertilizer",
         "biogas_digester",
+        "bio_coal",
         "glass_cloche",
         "grow_chamber",
         "hydroponic_cell",
