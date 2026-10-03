@@ -8,5 +8,9 @@
     "id": "arcforge:salt"
   },
   "water": 200,
-  "heat": 1800
+  "heat": 1800,
+  "byproduct": {
+    "id": "arcforge:lithium_brine",
+    "amount": 25
+  }
 }

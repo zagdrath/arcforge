@@ -216,14 +216,15 @@ public final class RubberGameTests {
         TagKey<Item> rubbers = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "rubbers"));
         helper.assertTrue(new ItemStack(ModItems.RUBBER.get()).is(rubbers), "Rubber isn't #c:rubbers");
         helper.assertTrue(MachineRecipes.isReactorFluid(helper.getLevel(), FluidResource.of(ModFluids.LIGHT_OIL.get())), "The Light Oil plastic recipe is gone");
-        // Gaskets in the Pressurized Cylinder, PVC in the Fluid Tank (both keep their contents as tier upgrades).
+        // Gaskets in the Pressurized Cylinder and the Hardened Fluid Tank (both keep their contents as tier upgrades). The
+        // tank takes a gasket, not PVC: the Chemical Reactor that makes PVC needs a Hardened Fluid Tank itself.
         ItemStack hardenedAlloy = new ItemStack(ModItems.HARDENED_ALLOY.get());
         ItemStack cylinder = AlloyGameTests.craft(helper, "crafting/hardened_pressurized_cylinder", new String[] { "PHP", "HXH", "GHG" }, java.util.Map.of(
                 'P', new ItemStack(ModItems.STEEL_PLATE.get()), 'H', hardenedAlloy, 'G', new ItemStack(ModItems.RUBBER_GASKET.get()),
                 'X', new ItemStack(ModBlocks.pressurizedCylinder(net.zagdrath.arcforge.conduit.ConduitTier.TEMPERED).get())));
         helper.assertTrue(cylinder.is(ModBlocks.pressurizedCylinder(net.zagdrath.arcforge.conduit.ConduitTier.HARDENED).get().asItem()), "Made " + cylinder);
         ItemStack tank = AlloyGameTests.craft(helper, "crafting/hardened_fluid_tank", new String[] { "HLH", "LXL", "HVH" }, java.util.Map.of(
-                'H', hardenedAlloy, 'L', new ItemStack(Items.GLASS), 'V', new ItemStack(ModItems.PVC_SHEET.get()),
+                'H', hardenedAlloy, 'L', new ItemStack(Items.GLASS), 'V', new ItemStack(ModItems.RUBBER_GASKET.get()),
                 'X', new ItemStack(ModBlocks.fluidTank(net.zagdrath.arcforge.conduit.ConduitTier.TEMPERED).get())));
         helper.assertTrue(tank.is(ModBlocks.fluidTank(net.zagdrath.arcforge.conduit.ConduitTier.HARDENED).get().asItem()), "Made " + tank);
         helper.succeed();

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#arcforge:plastics",
+    "#arcforge:plastics"
+  ],
+  "result": {
+    "id": "arcforge:cell_separator",
+    "count": 2
+  }
+}

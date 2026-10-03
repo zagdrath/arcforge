@@ -42,7 +42,12 @@ public enum SideMode implements StringRepresentable {
     // need to fit its 4 bits per face.
     BRINE("brine"),
     SALT("salt"),
-    WATER("water");
+    WATER("water"),
+    // The Thermal Evaporator Array's by-product out (Lithium Brine, left when Brine boils down to Salt). Ports only.
+    LITHIUM_BRINE("lithium_brine"),
+    // The Battery Array's energy ports: FE in, and FE out (pushed into what touches them). Ports only.
+    ENERGY_INPUT("energy_input"),
+    ENERGY_OUTPUT("energy_output");
 
     private final String name;
 
@@ -53,7 +58,7 @@ public enum SideMode implements StringRepresentable {
     // Whether faces in this mode give things out (and push them out with auto-eject).
     public boolean isOutput() {
         return switch (this) {
-            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST, BRINE, SALT, WATER -> true;
+            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST, BRINE, SALT, WATER, LITHIUM_BRINE -> true;
             default -> false;
         };
     }

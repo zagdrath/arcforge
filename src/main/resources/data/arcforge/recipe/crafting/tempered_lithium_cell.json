@@ -1,0 +1,21 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "TCT",
+    "PXP",
+    "TAT"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "C": "arcforge:lfp_cathode",
+    "P": "arcforge:cell_separator",
+    "A": "arcforge:graphite_anode",
+    "X": "arcforge:wrought_lithium_cell"
+  },
+  "result": {
+    "id": "arcforge:tempered_lithium_cell",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

@@ -7,7 +7,8 @@
     "arcforge:pressure_glass",
     "arcforge:seawater_bucket",
     "arcforge:brine_bucket",
-    "arcforge:salt"
+    "arcforge:salt",
+    "arcforge:lithium_brine_bucket"
   ],
   "pages": [
     {
@@ -16,7 +17,7 @@
     },
     {
       "type": "text",
-      "text": "# Heat\nIt runs on heat (HU) and only at 100°C or hotter. The hotter it is, the faster: 20% speed at 100°C, full speed (25 mB/t) at 400°C. It holds up to 1,000°C.\n| Input | Output | Water back | Heat |\n| 1,000 mB Seawater | 250 mB Brine | 675 mB | 6,000 HU |\n| 250 mB Brine | 1 Salt | 200 mB | 1,800 HU |\nAt full speed that's 150 HU/t on Seawater and 180 HU/t on Brine; with less heat it simply runs slower.\n# Ports\nA new tower has no ports: set them on any casing with the Wrench in Port mode.\n- Input: Seawater or Brine in.\n- Heat: heat in.\n- Brine: Brine out.\n- Salt: Salt out.\n- Water: condensed Water out."
+      "text": "# Heat\nIt runs on heat (HU) and only at 100°C or hotter. The hotter it is, the faster: 20% speed at 100°C, full speed (25 mB/t) at 400°C. It holds up to 1,000°C.\n| Input | Output | Water back | Heat |\n| 1,000 mB Seawater | 250 mB Brine | 675 mB | 6,000 HU |\n| 250 mB Brine | 1 Salt + 25 mB Lithium Brine | 200 mB | 1,800 HU |\nAt full speed that's 150 HU/t on Seawater and 180 HU/t on Brine; with less heat it simply runs slower.\n# Ports\nA new tower has no ports: set them on any casing with the Wrench in Port mode.\n- Input: Seawater or Brine in.\n- Heat: heat in.\n- Brine: Brine out.\n- Salt: Salt out.\n- Water: condensed Water out.\n- Lithium Brine: the Lithium Brine left when Brine dries to Salt (a slim bar under the rate in the GUI). What doesn't fit its tank is lost, so a tower without this port keeps making Salt."
     },
     {
       "type": "text",

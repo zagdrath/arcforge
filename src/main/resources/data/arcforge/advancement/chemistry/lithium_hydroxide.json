@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:chemistry/lithium_brine",
+  "display": {
+    "icon": {
+      "id": "arcforge:lithium_hydroxide"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.lithium_hydroxide.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.lithium_hydroxide.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:lithium_hydroxide"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

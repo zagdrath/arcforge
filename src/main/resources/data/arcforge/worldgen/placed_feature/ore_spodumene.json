@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_spodumene",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "spodumene",
+      "default": 3
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "spodumene",
+      "shape": "trapezoid",
+      "default_min": -48,
+      "default_max": 48
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

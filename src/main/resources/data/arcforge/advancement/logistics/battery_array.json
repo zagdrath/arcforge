@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:start/energy_cell",
+  "display": {
+    "icon": {
+      "id": "arcforge:battery_array_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.logistics.battery_array.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.logistics.battery_array.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:battery_array"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

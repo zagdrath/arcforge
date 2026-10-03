@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/battery_array/controller_unformed",
+    "particle": "arcforge:block/battery_array/casing",
+    "south": "arcforge:block/battery_array/casing",
+    "east": "arcforge:block/battery_array/casing",
+    "west": "arcforge:block/battery_array/casing",
+    "up": "arcforge:block/battery_array/casing_top",
+    "down": "arcforge:block/battery_array/casing_top"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WSW",
+    "CPA",
+    "WSW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "S": "#c:plates/steel",
+    "C": "arcforge:lfp_cathode",
+    "P": "arcforge:cell_separator",
+    "A": "arcforge:graphite_anode"
+  },
+  "result": {
+    "id": "arcforge:wrought_lithium_cell",
+    "count": 1
+  }
+}

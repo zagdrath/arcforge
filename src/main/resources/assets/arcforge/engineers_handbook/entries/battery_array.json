@@ -1,0 +1,35 @@
+{
+  "title": "Battery Array",
+  "icon": "arcforge:battery_array_controller",
+  "items": [
+    "arcforge:battery_array_controller",
+    "arcforge:battery_array_casing",
+    "arcforge:pressure_glass",
+    "arcforge:wrought_lithium_cell",
+    "arcforge:tempered_lithium_cell",
+    "arcforge:hardened_lithium_cell",
+    "arcforge:arcforged_lithium_cell",
+    "arcforge:wrought_power_regulator",
+    "arcforge:tempered_power_regulator",
+    "arcforge:hardened_power_regulator",
+    "arcforge:arcforged_power_regulator"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A huge energy store, for whole bases.\n# Building\n- A box 3 to 5 blocks along each side (it needn't be a cube).\n- Its twelve edges are Battery Array Casings. Its faces are casings or Pressure Glass.\n- One Battery Array Controller sits in a side face (not on an edge), facing out. Right-click it to open its GUI, or wrench it to check the build.\n- The inside (1 to 27 blocks) is filled entirely with Lithium Cells and Power Regulators, in any mix, with at least one cell.\nBreaking any block of it un-forms it."
+    },
+    {
+      "type": "text",
+      "text": "# Cells and regulators\n| Tier | Lithium Cell | Power Regulator |\n| Wrought | 64M FE | 65,536 FE/t |\n| Tempered | 512M FE | 262,144 FE/t |\n| Hardened | 4G FE | 1,048,576 FE/t |\n| Arcforged | 32G FE | 4,194,304 FE/t |\nThe cells add up to its capacity, the regulators to how much it takes in and gives out each tick (each way). With no regulators it still moves 16,384 FE/t.\nIts energy is shared between the cells: a cell broken out of it keeps its share on the item, and a new array starts with what its cells hold."
+    },
+    {
+      "type": "text",
+      "text": "# Ports and control\nA new array has no ports: set Energy Input and Energy Output ports on any casing (or the controller) with the Wrench in Port mode. Output ports push into whatever touches them.\n- Through the glass the cells' windows light up level by level as it fills, and the controller glows brighter the fuller it is.\n- A comparator on the controller reads how full it is.\n- Redstone control pauses the output (it still charges)."
+    },
+    {
+      "type": "multiblock",
+      "structure": "battery_array"
+    }
+  ]
+}

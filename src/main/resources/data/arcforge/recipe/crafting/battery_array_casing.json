@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "PRP",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "arcforge:plastic_sheet",
+    "R": "#c:dusts/redstone"
+  },
+  "result": {
+    "id": "arcforge:battery_array_casing",
+    "count": 4
+  }
+}

@@ -111,6 +111,14 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.RAW_ROCK_SALT_BLOCK.get());
                 output.accept(ModItems.SALT.get());
                 output.accept(ModItems.SALT_BLOCK.get());
+                output.accept(ModItems.SPODUMENE_ORE.get());
+                output.accept(ModItems.DEEPSLATE_SPODUMENE_ORE.get());
+                output.accept(ModItems.RAW_SPODUMENE.get());
+                output.accept(ModItems.RAW_SPODUMENE_BLOCK.get());
+                output.accept(ModItems.SPODUMENE_DUST.get());
+                output.accept(ModItems.LITHIUM_HYDROXIDE.get());
+                output.accept(ModItems.GRAPHITE.get());
+                output.accept(ModItems.GRAPHITE_BLOCK.get());
                 output.accept(ModItems.RAW_RUBBER.get());
                 output.accept(ModItems.RUBBER.get());
                 output.accept(ModItems.RUBBER_BLOCK.get());
@@ -139,6 +147,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COPPER_ROD.get());
                 output.accept(ModItems.PLASTIC_SHEET.get());
                 output.accept(ModItems.PVC_SHEET.get());
+                output.accept(ModItems.LFP_CATHODE.get());
+                output.accept(ModItems.GRAPHITE_ANODE.get());
+                output.accept(ModItems.CELL_SEPARATOR.get());
                 output.accept(ModItems.RUBBER_GASKET.get());
                 output.accept(ModItems.TUNGSTEN_DRILL_HEAD.get());
                 output.accept(ModItems.QUARRY_SCANNER.get());
@@ -179,6 +190,9 @@ public final class ModCreativeTabs {
                 ModItems.allConduits().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.CONDUIT_FILTER.get());
                 output.accept(ModItems.CONDUIT_COVER.get());
+                output.accept(ModItems.BATTERY_ARRAY_CONTROLLER.get());
+                output.accept(ModItems.BATTERY_ARRAY_CASING.get());
+                ModItems.batteryParts().forEach(item -> output.accept(item.get()));
                 ModItems.allCratesAndVaults().forEach(item -> output.accept(item.get()));
                 ModItems.storageUpgrades().forEach(item -> output.accept(item.get()));
             }).build());

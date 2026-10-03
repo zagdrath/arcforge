@@ -820,8 +820,8 @@ final class MachineCategories {
 
     // --- Thermal Evaporator Array ---
 
-    // The fluid the tower boils down, what it gives (a fluid and/or an item) and the water it returns, with its heat and
-    // the temperature it needs.
+    // The fluid the tower boils down, what it gives (a fluid and/or an item), the water it returns and its by-product, with
+    // its heat and the temperature it needs.
     static final class Evaporating extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.EvaporatingRecipe>> {
         static final IRecipeHolderType<net.zagdrath.arcforge.recipe.EvaporatingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.EVAPORATING.get());
 
@@ -847,6 +847,11 @@ final class MachineCategories {
             }
             if (recipe.water() > 0) {
                 fluid(builder, false, x, 5, net.minecraft.world.level.material.Fluids.WATER, recipe.water());
+                x += 20;
+            }
+            // The by-product (Lithium Brine from Brine), into its own tank.
+            if (recipe.byproduct().isPresent()) {
+                fluid(builder, false, x, 5, recipe.byproduct().get());
             }
         }
 
@@ -1177,6 +1182,38 @@ final class MachineCategories {
                     fuel.burnTemperature(ArcforgeConfig.FUEL_BURNER_MAX_TEMPERATURE.getAsInt())), 24, 27);
             if (!fuel.gasTurbine()) {
                 text(graphics, Component.translatable("jei.arcforge.gas_turbine.not_accepted"), 24, 38);
+            }
+        }
+    }
+
+    // --- Battery Array components ---
+
+    // A Lithium Cell (what it stores) or a Power Regulator (the transfer it adds), by tier.
+    record BatteryComponentRecipe(net.minecraft.world.item.Item item, net.zagdrath.arcforge.conduit.ConduitTier tier, boolean cell) {}
+
+    static final class BatteryComponents extends ArcforgeCategory<BatteryComponentRecipe> {
+        static final IRecipeType<BatteryComponentRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "battery_component", BatteryComponentRecipe.class);
+
+        BatteryComponents(IGuiHelper gui) {
+            super(TYPE, "battery_component", ModBlocks.BATTERY_ARRAY_CONTROLLER.get(), gui, 150, 30);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, BatteryComponentRecipe recipe, IFocusGroup focuses) {
+            builder.addInputSlot(1, 6).setStandardSlotBackground().add(new ItemStack(recipe.item()));
+        }
+
+        @Override
+        public void draw(BatteryComponentRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            if (recipe.cell()) {
+                text(graphics, Component.translatable("jei.arcforge.battery_component.capacity",
+                        String.format(Locale.ROOT, "%,d", ArcforgeConfig.lithiumCellCapacity(recipe.tier()))), 24, 5);
+                text(graphics, Component.translatable("jei.arcforge.battery_component.cell_hint"), 24, 16);
+            } else {
+                text(graphics, Component.translatable("jei.arcforge.battery_component.transfer",
+                        String.format(Locale.ROOT, "%,d", ArcforgeConfig.powerRegulatorTransfer(recipe.tier()))), 24, 5);
+                text(graphics, Component.translatable("jei.arcforge.battery_component.regulator_hint",
+                        String.format(Locale.ROOT, "%,d", ArcforgeConfig.BATTERY_BASE_TRANSFER.getAsInt())), 24, 16);
             }
         }
     }

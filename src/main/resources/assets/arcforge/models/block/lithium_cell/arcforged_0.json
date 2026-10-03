@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "arcforge:block/lithium_cell/arcforged_0",
+    "end": "arcforge:block/lithium_cell/arcforged_top"
+  }
+}

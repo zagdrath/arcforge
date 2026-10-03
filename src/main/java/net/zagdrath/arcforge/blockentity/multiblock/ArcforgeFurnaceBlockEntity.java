@@ -185,15 +185,18 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         return slot == SLOT_METAL || slot == SLOT_ADDITIVE || slot == SLOT_ADDITIVE_2 || slot == SLOT_COKE;
     }
 
-    // Where an item put in through an input port goes: a recipe metal to the metal slot, coal coke to the coke
-    // slot, and an additive to the additive slot already holding it, else the first empty one. -1: nowhere.
+    // Where an item put in through an input port goes: coal coke to the coke slot, a recipe metal to the metal slot, and
+    // an additive to the additive slot already holding it, else the first empty one. -1: nowhere. Coal Coke is a metal
+    // too (it bakes into Graphite): it fills the coke slot first, and only what doesn't fit there goes on to the metal
+    // slot, and only while that already holds Coal Coke (see RoutedInput). So steel lines keep feeding their fuel, and a
+    // Graphite line, started by putting one coke in the metal slot by hand, keeps its fuel topped up too.
     private int routeSlot(ItemResource resource) {
         ItemStack stack = resource.toStack(1);
-        if (MachineRecipes.isArcforgeMetal(level, stack)) {
-            return SLOT_METAL;
-        }
         if (isFuel(stack)) {
             return SLOT_COKE;
+        }
+        if (MachineRecipes.isArcforgeMetal(level, stack)) {
+            return SLOT_METAL;
         }
         if (!MachineRecipes.isArcforgeAdditive(level, stack)) {
             return -1;
@@ -220,8 +223,23 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         @Override
         public int insert(ItemResource resource, int amount, TransactionContext transaction) {
             int slot = routeSlot(resource);
-            return slot < 0 ? 0 : insert(slot, resource, amount, transaction);
+            if (slot < 0) {
+                return 0;
+            }
+            int inserted = insert(slot, resource, amount, transaction);
+            // Coal Coke that doesn't fit the coke slot tops up a metal slot already baking it into Graphite.
+            if (slot == SLOT_COKE && inserted < amount && metalSlotTakes(resource)) {
+                inserted += insert(SLOT_METAL, resource, amount - inserted, transaction);
+            }
+            return inserted;
         }
+    }
+
+    // Whether fuel that doesn't fit the coke slot may go on to the metal slot: it's a recipe metal (Coal Coke) and the
+    // metal slot already holds it.
+    public boolean metalSlotTakes(ItemResource resource) {
+        ItemStack stack = resource.toStack(1);
+        return MachineRecipes.isArcforgeMetal(level, stack) && ItemStack.isSameItemSameComponents(items.getStack(SLOT_METAL), stack);
     }
 
     public static boolean isFuel(ItemStack stack) {

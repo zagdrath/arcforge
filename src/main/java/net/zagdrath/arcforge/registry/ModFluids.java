@@ -178,6 +178,13 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(brineProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BRINE = FLUIDS.register("flowing_brine",
             () -> new BaseFlowingFluid.Flowing(brineProperties()));
+    // Lithium Brine: lithium salts in water, from Spodumene Dust leached in Sulfuric Acid or left over when the Thermal
+    // Evaporator Array boils Brine down to Salt. Runs like Brine; Lye turns it into Lithium Hydroxide.
+    public static final DeferredHolder<FluidType, FluidType> LITHIUM_BRINE_TYPE = liquidType("lithium_brine", 1_250, 1_150, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LITHIUM_BRINE = FLUIDS.register("lithium_brine",
+            () -> new BaseFlowingFluid.Source(lithiumBrineProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LITHIUM_BRINE = FLUIDS.register("flowing_lithium_brine",
+            () -> new BaseFlowingFluid.Flowing(lithiumBrineProperties()));
     public static final DeferredHolder<FluidType, FluidType> LYE_TYPE = liquidType("lye", 1_300, 1_500, 0.02F, 0.75, 0.8);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LYE = FLUIDS.register("lye",
             () -> new BaseFlowingFluid.Source(lyeProperties()));
@@ -422,6 +429,17 @@ public final class ModFluids {
         return new BaseFlowingFluid.Properties(BRINE_TYPE, BRINE, FLOWING_BRINE)
                 .bucket(ModItems.BRINE_BUCKET)
                 .block(ModBlocks.BRINE)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // Like Brine.
+    private static BaseFlowingFluid.Properties lithiumBrineProperties() {
+        return new BaseFlowingFluid.Properties(LITHIUM_BRINE_TYPE, LITHIUM_BRINE, FLOWING_LITHIUM_BRINE)
+                .bucket(ModItems.LITHIUM_BRINE_BUCKET)
+                .block(ModBlocks.LITHIUM_BRINE)
                 .slopeFindDistance(4)
                 .levelDecreasePerBlock(1)
                 .tickRate(5)

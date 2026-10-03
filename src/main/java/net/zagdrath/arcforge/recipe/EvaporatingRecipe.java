@@ -28,15 +28,19 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Thermal Evaporator Array (arcforge:evaporating): a fluid boiled down with heat. Every input.amount mB the tower
 // evaporates gives fluid_result (Seawater -> Brine) and/or item_result (Brine -> Salt), returns water mB of the steam as
-// Water, and takes heat HU. How fast it works is the tower's own (its throughput and temperature), not the recipe's.
+// Water, and takes heat HU. byproduct (optional) is a second liquid left behind with it, kept apart from the brine (Brine
+// -> Salt leaves a little Lithium Brine). How fast it works is the tower's own (its throughput and temperature), not the
+// recipe's.
 public record EvaporatingRecipe(ChemicalReactingRecipe.FluidInput input, Optional<FluidStackTemplate> fluidResult,
-        Optional<ItemStackTemplate> itemResult, int water, int heat) implements Recipe<EvaporatingRecipe.Input> {
+        Optional<ItemStackTemplate> itemResult, int water, int heat, Optional<FluidStackTemplate> byproduct)
+        implements Recipe<EvaporatingRecipe.Input> {
     public static final MapCodec<EvaporatingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(
             ChemicalReactingRecipe.FluidInput.CODEC.fieldOf("input").forGetter(EvaporatingRecipe::input),
             FluidStackTemplate.CODEC.optionalFieldOf("fluid_result").forGetter(EvaporatingRecipe::fluidResult),
             ItemStackTemplate.CODEC.optionalFieldOf("item_result").forGetter(EvaporatingRecipe::itemResult),
             ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("water", 0).forGetter(EvaporatingRecipe::water),
-            ExtraCodecs.POSITIVE_INT.fieldOf("heat").forGetter(EvaporatingRecipe::heat))
+            ExtraCodecs.POSITIVE_INT.fieldOf("heat").forGetter(EvaporatingRecipe::heat),
+            FluidStackTemplate.CODEC.optionalFieldOf("byproduct").forGetter(EvaporatingRecipe::byproduct))
             .apply(i, EvaporatingRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, EvaporatingRecipe> STREAM_CODEC = StreamCodec.composite(
@@ -45,6 +49,7 @@ public record EvaporatingRecipe(ChemicalReactingRecipe.FluidInput input, Optiona
             ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), EvaporatingRecipe::itemResult,
             ByteBufCodecs.VAR_INT, EvaporatingRecipe::water,
             ByteBufCodecs.VAR_INT, EvaporatingRecipe::heat,
+            ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC), EvaporatingRecipe::byproduct,
             EvaporatingRecipe::new);
 
     // HU per mB of input.

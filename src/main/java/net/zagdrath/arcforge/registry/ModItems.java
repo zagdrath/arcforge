@@ -45,6 +45,7 @@ import net.zagdrath.arcforge.item.machine.ArcQuarryItem;
 import net.zagdrath.arcforge.item.storage.CrateBlockItem;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.storage.StorageBlockItem;
+import net.zagdrath.arcforge.item.storage.BatteryPartItem;
 import net.zagdrath.arcforge.item.storage.StorageUpgradeItem;
 import net.zagdrath.arcforge.item.storage.VaultBlockItem;
 import net.minecraft.world.item.equipment.ArmorType;
@@ -70,6 +71,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> FIREBOX = ITEMS.registerSimpleBlockItem(ModBlocks.FIREBOX);
     public static final DeferredItem<BlockItem> FIREBOX_ARRAY_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.FIREBOX_ARRAY_CONTROLLER);
     public static final DeferredItem<BlockItem> FIREBOX_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.FIREBOX_ARRAY_CASING);
+    public static final DeferredItem<BlockItem> BATTERY_ARRAY_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.BATTERY_ARRAY_CONTROLLER);
+    public static final DeferredItem<BlockItem> BATTERY_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.BATTERY_ARRAY_CASING);
     public static final DeferredItem<BlockItem> THERMOELECTRIC_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.THERMOELECTRIC_PLANT);
     public static final DeferredItem<BlockItem> ARC_CRUSHER = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHER);
     public static final DeferredItem<BlockItem> ARC_CRUSHING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHING_ARRAY_CASING);
@@ -283,6 +286,8 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.BIODIESEL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> BRINE_BUCKET = ITEMS.registerItem("brine_bucket",
             p -> new BucketItem(ModFluids.BRINE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> LITHIUM_BRINE_BUCKET = ITEMS.registerItem("lithium_brine_bucket",
+            p -> new BucketItem(ModFluids.LITHIUM_BRINE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> LYE_BUCKET = ITEMS.registerItem("lye_bucket",
             p -> new BucketItem(ModFluids.LYE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> HYDROCHLORIC_ACID_BUCKET = ITEMS.registerItem("hydrochloric_acid_bucket",
@@ -305,6 +310,19 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> DEEPSLATE_HALITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_HALITE_ORE);
     public static final DeferredItem<Item> ROCK_SALT = ITEMS.registerSimpleItem("rock_salt");
     public static final DeferredItem<BlockItem> RAW_ROCK_SALT_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_ROCK_SALT_BLOCK);
+
+    // Spodumene (the lithium ore) and what it gives, and the lithium chemistry and battery parts.
+    public static final DeferredItem<BlockItem> SPODUMENE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.SPODUMENE_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_SPODUMENE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_SPODUMENE_ORE);
+    public static final DeferredItem<Item> RAW_SPODUMENE = ITEMS.registerSimpleItem("raw_spodumene");
+    public static final DeferredItem<BlockItem> RAW_SPODUMENE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_SPODUMENE_BLOCK);
+    public static final DeferredItem<Item> SPODUMENE_DUST = ITEMS.registerSimpleItem("spodumene_dust");
+    public static final DeferredItem<Item> LITHIUM_HYDROXIDE = ITEMS.registerSimpleItem("lithium_hydroxide");
+    public static final DeferredItem<Item> GRAPHITE = ITEMS.registerSimpleItem("graphite");
+    public static final DeferredItem<BlockItem> GRAPHITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.GRAPHITE_BLOCK);
+    public static final DeferredItem<Item> LFP_CATHODE = ITEMS.registerSimpleItem("lfp_cathode");
+    public static final DeferredItem<Item> GRAPHITE_ANODE = ITEMS.registerSimpleItem("graphite_anode");
+    public static final DeferredItem<Item> CELL_SEPARATOR = ITEMS.registerSimpleItem("cell_separator");
 
     private static final Map<OreSlurry, DeferredItem<BucketItem>> SLURRY_BUCKETS = registerSlurryBuckets();
 
@@ -394,6 +412,7 @@ public final class ModItems {
         buckets.add(SEAWATER_BUCKET);
         buckets.add(BRINE_BUCKET);
         buckets.add(LYE_BUCKET);
+        buckets.add(LITHIUM_BRINE_BUCKET);
         for (OreSlurry slurry : OreSlurry.values()) {
             buckets.add(slurryBucket(slurry));
         }
@@ -586,6 +605,24 @@ public final class ModItems {
                         p -> new StorageUpgradeItem(tier, p), p -> p.stacksTo(16)));
             }
         }
+    }
+
+    // Lithium Cells then Power Regulators, by tier.
+    private static final List<DeferredItem<BatteryPartItem>> BATTERY_PARTS = new ArrayList<>();
+
+    static {
+        for (ConduitTier tier : ConduitTier.values()) {
+            BATTERY_PARTS.add(ITEMS.registerItem(tier.getSerializedName() + "_lithium_cell",
+                    p -> new BatteryPartItem(ModBlocks.lithiumCell(tier).get(), p), p -> p.useBlockDescriptionPrefix()));
+        }
+        for (ConduitTier tier : ConduitTier.values()) {
+            BATTERY_PARTS.add(ITEMS.registerItem(tier.getSerializedName() + "_power_regulator",
+                    p -> new BatteryPartItem(ModBlocks.powerRegulator(tier).get(), p), p -> p.useBlockDescriptionPrefix()));
+        }
+    }
+
+    public static List<DeferredItem<BatteryPartItem>> batteryParts() {
+        return BATTERY_PARTS;
     }
 
     // Batteries, Canisters, Gas Cartridges and Thermal Capsules, ordered by kind then tier.

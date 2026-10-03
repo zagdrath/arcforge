@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WSW",
+    "APC",
+    "WRW"
+  ],
+  "key": {
+    "W": "arcforge:wrought_alloy",
+    "S": "#c:plates/steel",
+    "C": "arcforge:lfp_cathode",
+    "P": "arcforge:cell_separator",
+    "A": "arcforge:graphite_anode",
+    "R": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:wrought_power_regulator",
+    "count": 1
+  }
+}

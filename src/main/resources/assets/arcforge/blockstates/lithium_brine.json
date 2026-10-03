@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "arcforge:block/lithium_brine"
+    }
+  }
+}

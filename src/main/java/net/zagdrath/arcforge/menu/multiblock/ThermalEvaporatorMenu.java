@@ -40,7 +40,11 @@ public class ThermalEvaporatorMenu extends MachineMenu {
     public static final int DATA_STATUS = 16;
     public static final int DATA_REDSTONE_MODE = 17;
     public static final int DATA_SIDE_CONFIG = 18;
-    public static final int DATA_VALUES = 19;
+    // The by-product tank (Lithium Brine): its fluid (-1 for none), amount and capacity.
+    public static final int DATA_BYPRODUCT_FLUID = 19;
+    public static final int DATA_BYPRODUCT = 20;
+    public static final int DATA_BYPRODUCT_CAPACITY = 21;
+    public static final int DATA_VALUES = 22;
 
     public static final int SALT_X = 54, SALT_Y = 26;
 
@@ -73,6 +77,18 @@ public class ThermalEvaporatorMenu extends MachineMenu {
 
     public Fluid getInputFluid() {
         return ElectricPumpMenu.fluid(value(DATA_INPUT_FLUID));
+    }
+
+    public Fluid getByproductFluid() {
+        return ElectricPumpMenu.fluid(value(DATA_BYPRODUCT_FLUID));
+    }
+
+    public int getByproduct() {
+        return value(DATA_BYPRODUCT);
+    }
+
+    public int getByproductCapacity() {
+        return value(DATA_BYPRODUCT_CAPACITY);
     }
 
     public int getInput() {

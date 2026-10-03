@@ -1,0 +1,32 @@
+{
+  "parent": "arcforge:logistics/battery_array",
+  "display": {
+    "icon": {
+      "id": "arcforge:arcforged_lithium_cell"
+    },
+    "title": {
+      "translate": "advancements.arcforge.challenge.power_bank.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.challenge.power_bank.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:battery_array",
+        "min_length": 125
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

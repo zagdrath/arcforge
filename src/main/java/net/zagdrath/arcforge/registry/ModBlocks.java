@@ -161,6 +161,13 @@ public final class ModBlocks {
             BLOCKS.registerBlock("firebox_array_controller", net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock::new,
                     p -> columnProperties(p).lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.LIT) ? 13 : 0));
 
+    // The Battery Array: a box of casings (see BatteryArrayStructure) round Lithium Cells and Power Regulators.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock> BATTERY_ARRAY_CASING = BLOCKS.registerBlock(
+            "battery_array_casing", net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock::new, ModBlocks::columnProperties);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.BatteryArrayControllerBlock> BATTERY_ARRAY_CONTROLLER =
+            BLOCKS.registerBlock("battery_array_controller", net.zagdrath.arcforge.block.multiblock.BatteryArrayControllerBlock::new,
+                    ModBlocks::columnProperties);
+
     public static final DeferredBlock<ThermoelectricPlantBlock> THERMOELECTRIC_PLANT = BLOCKS.registerBlock("thermoelectric_plant",
             ThermoelectricPlantBlock::new, p -> machineProperties(p, 7));
 
@@ -462,6 +469,15 @@ public final class ModBlocks {
     public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_HALITE_ORE = ore("deepslate_halite_ore", UniformInt.of(0, 1), true, 0, null);
     public static final DeferredBlock<Block> RAW_ROCK_SALT_BLOCK = BLOCKS.registerSimpleBlock("raw_rock_salt_block",
             p -> storageProperties(p, SoundType.CALCITE, MapColor.TERRACOTTA_WHITE, 0));
+    // Spodumene: the lithium ore, in stone and deepslate, with richer pegmatite veins under mountains and badlands. Needs a
+    // stone pickaxe, like lapis.
+    public static final DeferredBlock<DropExperienceBlock> SPODUMENE_ORE = ore("spodumene_ore", UniformInt.of(0, 2), false, 0, null);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_SPODUMENE_ORE = ore("deepslate_spodumene_ore", UniformInt.of(0, 2), true, 0, null);
+    public static final DeferredBlock<Block> RAW_SPODUMENE_BLOCK = BLOCKS.registerSimpleBlock("raw_spodumene_block",
+            p -> storageProperties(p, SoundType.STONE, MapColor.COLOR_LIGHT_GREEN, 0));
+    // Graphite, baked from Coal Coke or Carbon Dust in the Arcforge Furnace, for Graphite Anodes.
+    public static final DeferredBlock<Block> GRAPHITE_BLOCK = BLOCKS.registerSimpleBlock("graphite_block",
+            p -> storageProperties(p, SoundType.STONE, MapColor.COLOR_BLACK, 0));
     public static final DeferredBlock<DropExperienceBlock> NETHER_SULFUR_ORE = BLOCKS.registerBlock("nether_sulfur_ore",
             p -> new DropExperienceBlock(UniformInt.of(1, 3), p), p -> p
                     .mapColor(MapColor.NETHER)
@@ -571,6 +587,9 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> BRINE = BLOCKS.registerBlock("brine",
             p -> new LiquidBlock(ModFluids.BRINE.get(), p) {},
             p -> liquidProperties(p, MapColor.COLOR_LIGHT_BLUE));
+    public static final DeferredBlock<LiquidBlock> LITHIUM_BRINE = BLOCKS.registerBlock("lithium_brine",
+            p -> new LiquidBlock(ModFluids.LITHIUM_BRINE.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_LIGHT_GREEN));
     public static final DeferredBlock<LiquidBlock> LYE = BLOCKS.registerBlock("lye",
             p -> new SulfuricAcidBlock(ModFluids.LYE.get(), ModDamageTypes.LYE, p),
             p -> liquidProperties(p, MapColor.SNOW));
@@ -952,6 +971,31 @@ public final class ModBlocks {
 
     public static DeferredBlock<FluidTankBlock> fluidTank(ConduitTier tier) {
         return FLUID_TANKS.get(tier);
+    }
+
+    // arcforge:<tier>_lithium_cell and arcforge:<tier>_power_regulator: what fills a Battery Array.
+    private static final Map<ConduitTier, DeferredBlock<net.zagdrath.arcforge.block.multiblock.LithiumCellBlock>> LITHIUM_CELLS =
+            new EnumMap<>(ConduitTier.class);
+    private static final Map<ConduitTier, DeferredBlock<net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock>> POWER_REGULATORS =
+            new EnumMap<>(ConduitTier.class);
+
+    static {
+        for (ConduitTier tier : ConduitTier.values()) {
+            LITHIUM_CELLS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_lithium_cell",
+                    p -> new net.zagdrath.arcforge.block.multiblock.LithiumCellBlock(p, tier),
+                    p -> p.mapColor(MapColor.METAL).strength(3.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
+            POWER_REGULATORS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_power_regulator",
+                    p -> new net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock(p, tier),
+                    p -> p.mapColor(MapColor.METAL).strength(3.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
+        }
+    }
+
+    public static DeferredBlock<net.zagdrath.arcforge.block.multiblock.LithiumCellBlock> lithiumCell(ConduitTier tier) {
+        return LITHIUM_CELLS.get(tier);
+    }
+
+    public static DeferredBlock<net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock> powerRegulator(ConduitTier tier) {
+        return POWER_REGULATORS.get(tier);
     }
 
     public static DeferredBlock<EnergyCellBlock> energyCell(ConduitTier tier) {

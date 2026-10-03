@@ -1,0 +1,20 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:lithium_hydroxide",
+    "count": 1
+  },
+  "second_item_input": {
+    "ingredient": "#c:dusts/iron",
+    "count": 1
+  },
+  "third_item_input": {
+    "ingredient": "arcforge:basic_slag",
+    "count": 1
+  },
+  "item_output": {
+    "id": "arcforge:lfp_cathode",
+    "count": 1
+  },
+  "time": 200
+}

@@ -45,9 +45,10 @@ public class ChemicalReactorMenu extends MachineMenu {
     public static final int OUTPUT_TANK = 3;
     public static final int BYPRODUCT_TANK = 4;
 
-    // Slot positions: the two input slots stack beside the three input tanks, the outputs sit after the arrow.
-    public static final int INPUT_X = 71, INPUT_Y = 25;
-    public static final int INPUT_B_X = 71, INPUT_B_Y = 45;
+    // Slot positions: the three input slots stack (touching) beside the three input tanks, the outputs sit after the arrow.
+    public static final int INPUT_X = 71, INPUT_Y = 17;
+    public static final int INPUT_B_X = 71, INPUT_B_Y = 35;
+    public static final int INPUT_C_X = 71, INPUT_C_Y = 53;
     // The output and by-product slots stack after the arrow, like the inputs, leaving room for the two output tanks.
     public static final int OUTPUT_X = 113, OUTPUT_Y = 25;
     public static final int BYPRODUCT_X = 113, BYPRODUCT_Y = 45;
@@ -61,6 +62,7 @@ public class ChemicalReactorMenu extends MachineMenu {
         super(ModMenuTypes.CHEMICAL_REACTOR.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.CHEMICAL_REACTOR.get());
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_INPUT_B, INPUT_B_X, INPUT_B_Y);
+        addMachineSlot(ChemicalReactorBlockEntity.SLOT_INPUT_C, INPUT_C_X, INPUT_C_Y);
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y);
         addMachineSlot(ChemicalReactorBlockEntity.SLOT_BYPRODUCT, BYPRODUCT_X, BYPRODUCT_Y);
         finish(inventory);

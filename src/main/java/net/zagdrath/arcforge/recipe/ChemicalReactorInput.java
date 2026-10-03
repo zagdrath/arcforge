@@ -9,10 +9,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 
-// What a Chemical Reactor holds: its two input slots and its three input tanks (fluid and mB each).
+// What a Chemical Reactor holds: its three input slots (the third, itemC, came last) and its three input tanks (fluid and
+// mB each).
 public record ChemicalReactorInput(ItemStack item, ItemStack itemB, FluidResource fluidA, int amountA, FluidResource fluidB, int amountB,
-        FluidResource fluidC, int amountC) implements RecipeInput {
+        FluidResource fluidC, int amountC, ItemStack itemC) implements RecipeInput {
     public static final int TANKS = 3;
+    public static final int SLOTS = 3;
+
+    // Two input slots (the third empty), as the reactor had before it gained its third.
+    public ChemicalReactorInput(ItemStack item, ItemStack itemB, FluidResource fluidA, int amountA, FluidResource fluidB, int amountB,
+            FluidResource fluidC, int amountC) {
+        this(item, itemB, fluidA, amountA, fluidB, amountB, fluidC, amountC, ItemStack.EMPTY);
+    }
 
     // Two input tanks (the third empty), as the reactor had before it gained its third.
     public ChemicalReactorInput(ItemStack item, ItemStack itemB, FluidResource fluidA, int amountA, FluidResource fluidB, int amountB) {
@@ -40,18 +48,22 @@ public record ChemicalReactorInput(ItemStack item, ItemStack itemB, FluidResourc
         };
     }
 
-    // Input slot 0 or 1.
+    // Input slot 0, 1 or 2.
     public ItemStack slot(int slot) {
-        return slot == 0 ? item : itemB;
+        return switch (slot) {
+            case 0 -> item;
+            case 1 -> itemB;
+            default -> itemC;
+        };
     }
 
     @Override
     public ItemStack getItem(int index) {
-        return index == 0 ? item : index == 1 ? itemB : ItemStack.EMPTY;
+        return index >= 0 && index < SLOTS ? slot(index) : ItemStack.EMPTY;
     }
 
     @Override
     public int size() {
-        return 2;
+        return SLOTS;
     }
 }

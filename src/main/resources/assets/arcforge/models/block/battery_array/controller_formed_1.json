@@ -1,0 +1,13 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "battery_array",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "arcforge:block/battery_array/plate",
+    "base": "arcforge:block/battery_array/plate",
+    "top": "arcforge:block/battery_array/top",
+    "beam": "arcforge:block/ctm/column_beam",
+    "front": "arcforge:block/battery_array/controller_1"
+  },
+  "fallback": "arcforge:block/battery_array/controller"
+}

@@ -40,15 +40,16 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
-// Chemical Reactor: up to two items (each with a count) and up to three fluids react into an item, a fluid or both, with
+// Chemical Reactor: up to three items (each with a count) and up to three fluids react into an item, a fluid or both, with
 // an optional byproduct rolled once per operation (Slag, when precipitating), and an optional fluid_byproduct that always
-// comes (the Water left when Ethanol is dehydrated into Ethylene), into the reactor's by-product tank. The items are item_input and
-// second_item_input, each drawn from a different input slot; each fluid input from a different input tank. "category"
-// only labels the recipe in JEI: general, leaching or precipitating.
+// comes (the Water left when Ethanol is dehydrated into Ethylene), into the reactor's by-product tank. The items are
+// item_input, second_item_input and third_item_input, each drawn from a different input slot; each fluid input from a
+// different input tank. "category" only labels the recipe in JEI: general, leaching or precipitating.
 public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<ItemInput> secondItemInput, List<FluidInput> fluidInputs,
         Optional<ItemStackTemplate> itemOutput,
         Optional<FluidStackTemplate> fluidOutput, Optional<ItemStackTemplate> byproduct, float byproductChance, int time,
-        Optional<Integer> energyPerTick, String category, Optional<FluidStackTemplate> fluidByproduct) implements Recipe<ChemicalReactorInput> {
+        Optional<Integer> energyPerTick, String category, Optional<FluidStackTemplate> fluidByproduct, Optional<ItemInput> thirdItemInput)
+        implements Recipe<ChemicalReactorInput> {
     public static final int DEFAULT_TIME = 100;
     public static final int MAX_FLUID_INPUTS = ChemicalReactorInput.TANKS;
 
@@ -112,7 +113,8 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("time", DEFAULT_TIME).forGetter(ChemicalReactingRecipe::time),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("energy_per_tick").forGetter(ChemicalReactingRecipe::energyPerTick),
             Codec.STRING.optionalFieldOf("category", "general").forGetter(ChemicalReactingRecipe::category),
-            FluidStackTemplate.CODEC.optionalFieldOf("fluid_byproduct").forGetter(ChemicalReactingRecipe::fluidByproduct))
+            FluidStackTemplate.CODEC.optionalFieldOf("fluid_byproduct").forGetter(ChemicalReactingRecipe::fluidByproduct),
+            ItemInput.CODEC.optionalFieldOf("third_item_input").forGetter(ChemicalReactingRecipe::thirdItemInput))
             .apply(i, ChemicalReactingRecipe::new))
             .validate(ChemicalReactingRecipe::validate);
 
@@ -122,7 +124,7 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
     private static final StreamCodec<RegistryFriendlyByteBuf, Optional<FluidStackTemplate>> OPTIONAL_FLUID = ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC);
     private static final StreamCodec<io.netty.buffer.ByteBuf, Optional<Integer>> OPTIONAL_INT = ByteBufCodecs.optional(ByteBufCodecs.VAR_INT);
 
-    // Written out by hand: eleven fields.
+    // Written out by hand: twelve fields.
     public static final StreamCodec<RegistryFriendlyByteBuf, ChemicalReactingRecipe> STREAM_CODEC = StreamCodec.of(
             (buf, recipe) -> {
                 OPTIONAL_ITEM.encode(buf, recipe.itemInput());
@@ -136,10 +138,12 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
                 OPTIONAL_INT.encode(buf, recipe.energyPerTick());
                 ByteBufCodecs.STRING_UTF8.encode(buf, recipe.category());
                 OPTIONAL_FLUID.encode(buf, recipe.fluidByproduct());
+                OPTIONAL_ITEM.encode(buf, recipe.thirdItemInput());
             },
             buf -> new ChemicalReactingRecipe(OPTIONAL_ITEM.decode(buf), OPTIONAL_ITEM.decode(buf), FLUID_INPUTS.decode(buf),
                     OPTIONAL_TEMPLATE.decode(buf), OPTIONAL_FLUID.decode(buf), OPTIONAL_TEMPLATE.decode(buf), buf.readFloat(),
-                    ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INT.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), OPTIONAL_FLUID.decode(buf)));
+                    ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INT.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), OPTIONAL_FLUID.decode(buf),
+                    OPTIONAL_ITEM.decode(buf)));
 
     // Something goes in and something comes out.
     private static DataResult<ChemicalReactingRecipe> validate(ChemicalReactingRecipe recipe) {
@@ -148,6 +152,9 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
         }
         if (recipe.secondItemInput.isPresent() && recipe.itemInput.isEmpty()) {
             return DataResult.error(() -> "A chemical_reacting recipe with a second_item_input needs an item_input");
+        }
+        if (recipe.thirdItemInput.isPresent() && recipe.secondItemInput.isEmpty()) {
+            return DataResult.error(() -> "A chemical_reacting recipe with a third_item_input needs a second_item_input");
         }
         if (recipe.itemOutput.isEmpty() && recipe.fluidOutput.isEmpty()) {
             return DataResult.error(() -> "A chemical_reacting recipe needs an item_output or a fluid_output");
@@ -165,29 +172,33 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
         return slotsFor(input) != null && tanksFor(input) != null;
     }
 
-    // Which input slot (0 or 1) supplies each item input (item_input, then second_item_input), each from a different
-    // slot, or null if they can't all be supplied. A recipe with one item takes it from either slot.
+    // Which input slot (0, 1 or 2) supplies each item input (item_input, second_item_input, then third_item_input), each
+    // from a different slot, or null if they can't all be supplied. Any item may come from any slot: the slots are tried
+    // in order for the first input, then for the next among those left, backtracking like the tanks.
     public int @Nullable [] slotsFor(ChemicalReactorInput input) {
-        if (itemInput.isEmpty()) {
-            return new int[0];
-        }
-        ItemInput first = itemInput.get();
-        if (secondItemInput.isEmpty()) {
-            return first.test(input.item()) ? new int[] { 0 } : first.test(input.itemB()) ? new int[] { 1 } : null;
-        }
-        ItemInput second = secondItemInput.get();
-        if (first.test(input.item()) && second.test(input.itemB())) {
-            return new int[] { 0, 1 };
-        }
-        if (first.test(input.itemB()) && second.test(input.item())) {
-            return new int[] { 1, 0 };
-        }
-        return null;
+        List<ItemInput> wanted = itemInputs();
+        int[] slots = new int[wanted.size()];
+        return assignSlots(input, wanted, 0, 0, slots) ? slots : null;
     }
 
-    // The item inputs in order (none, one or two).
+    private static boolean assignSlots(ChemicalReactorInput input, List<ItemInput> wanted, int index, int used, int[] slots) {
+        if (index == wanted.size()) {
+            return true;
+        }
+        for (int slot = 0; slot < ChemicalReactorInput.SLOTS; slot++) {
+            if ((used & 1 << slot) == 0 && wanted.get(index).test(input.slot(slot))) {
+                slots[index] = slot;
+                if (assignSlots(input, wanted, index + 1, used | 1 << slot, slots)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // The item inputs in order (none to three).
     public List<ItemInput> itemInputs() {
-        return java.util.stream.Stream.of(itemInput, secondItemInput).flatMap(Optional::stream).toList();
+        return java.util.stream.Stream.of(itemInput, secondItemInput, thirdItemInput).flatMap(Optional::stream).toList();
     }
 
     // Which input tank (0, 1 or 2) supplies each fluid input, each from a different tank, or null if they can't all be

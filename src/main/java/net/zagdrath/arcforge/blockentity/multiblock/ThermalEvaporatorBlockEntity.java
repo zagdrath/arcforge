@@ -80,15 +80,17 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 //  - Every recipe input.amount mB evaporated gives the recipe's fluid result (into the output tank) and item result
 //    (into the Salt slot), and its water (into the Water tank; what doesn't fit is lost as steam). It stops while the
 //    output tank or Salt slot can't take the next result.
+//  - A recipe's by-product (Brine -> Salt leaves a little Lithium Brine) goes into its own tank; what doesn't fit is lost,
+//    like the water, so a tower without a Lithium Brine port keeps making Salt.
 // It does IO only through its ports: Seawater or Brine in (Input), heat in (Heat), the fluid result out (Brine), Salt out
-// (Salt) and Water out (Water); the outputs are pushed with auto-eject. Clients get the input tank and whether it's
+// (Salt), Water out (Water) and the by-product out (Lithium Brine); the outputs are pushed with auto-eject. Clients get the input tank and whether it's
 // making Salt, for the renderer's fluid column and salt bed.
 public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements MultiblockController {
     public static final int SLOT_SALT = 0;
     public static final int MACHINE_SLOTS = 1;
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT, SideMode.BRINE, SideMode.SALT,
-            SideMode.WATER);
+            SideMode.WATER, SideMode.LITHIUM_BRINE);
     private static final int REDSTONE_CHECK_INTERVAL = 10;
     // Clients hear about the input tank when it moves by a step of this many (of its capacity).
     private static final int LEVEL_STEPS = 64;
@@ -107,9 +109,11 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
     private final FilteredFluidTank input;
     private final FilteredFluidTank output;
     private final FilteredFluidTank water;
+    private final FilteredFluidTank byproduct;
     private final ResourceHandler<FluidResource> inputHandler;
     private final ResourceHandler<FluidResource> outputHandler;
     private final ResourceHandler<FluidResource> waterHandler;
+    private final ResourceHandler<FluidResource> byproductHandler;
     private final ResourceHandler<FluidResource> fluidAutomation;
     private final ResourceHandler<ItemResource> saltOutput;
     private final ContainerData data;
@@ -142,10 +146,13 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
                 this::setChanged);
         this.water = new FilteredFluidTank(ArcforgeConfig.EVAPORATOR_WATER_CAPACITY.getAsInt(),
                 resource -> resource.getFluid() == Fluids.WATER, this::setChanged);
+        this.byproduct = new FilteredFluidTank(ArcforgeConfig.EVAPORATOR_BYPRODUCT_CAPACITY.getAsInt(), resource -> !Gases.isGas(resource),
+                this::setChanged);
         this.inputHandler = new AutomationResourceHandler<>(input, index -> true, index -> false);
         this.outputHandler = new AutomationResourceHandler<>(output, index -> false, index -> true);
         this.waterHandler = new AutomationResourceHandler<>(water, index -> false, index -> true);
-        this.fluidAutomation = new CombinedResourceHandler<>(inputHandler, outputHandler, waterHandler);
+        this.byproductHandler = new AutomationResourceHandler<>(byproduct, index -> false, index -> true);
+        this.fluidAutomation = new CombinedResourceHandler<>(inputHandler, outputHandler, waterHandler, byproductHandler);
         this.saltOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_SALT);
         this.data = new WideIntContainerData(ThermalEvaporatorMenu.DATA_VALUES) {
             @Override
@@ -167,6 +174,9 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
                     case ThermalEvaporatorMenu.DATA_RATE -> (int) Math.round(rate * 100);
                     case ThermalEvaporatorMenu.DATA_PROGRESS -> (int) progress;
                     case ThermalEvaporatorMenu.DATA_TOTAL -> currentInputAmount();
+                    case ThermalEvaporatorMenu.DATA_BYPRODUCT_FLUID -> fluidId(byproduct);
+                    case ThermalEvaporatorMenu.DATA_BYPRODUCT -> byproduct.getAmount();
+                    case ThermalEvaporatorMenu.DATA_BYPRODUCT_CAPACITY -> byproduct.getCapacity();
                     case ThermalEvaporatorMenu.DATA_STATUS -> status.ordinal();
                     case ThermalEvaporatorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case ThermalEvaporatorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
@@ -399,6 +409,21 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
                 tx.commit();
             }
         }
+        recipe.byproduct().ifPresent(template -> {
+            // The by-product that doesn't fit (a full tank, or another liquid in it) is lost.
+            FluidStack made = template.create();
+            FluidResource resource = FluidResource.of(made);
+            if (byproduct.getAmount() == 0 || byproduct.getResource(0).equals(resource)) {
+                int fits = Math.min(made.getAmount(), byproduct.getSpace());
+                if (fits > 0) {
+                    try (Transaction tx = Transaction.openRoot()) {
+                        byproduct.insert(0, resource, fits, tx);
+                        tx.commit();
+                    }
+                    ArcforgeAdvancements.produced(this, ItemStack.EMPTY, made.getFluid(), "evaporating");
+                }
+            }
+        });
     }
 
     private boolean isPowered(ServerLevel level) {
@@ -438,6 +463,10 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
 
     public FilteredFluidTank getWater() {
         return water;
+    }
+
+    public FilteredFluidTank getByproduct() {
+        return byproduct;
     }
 
     public ItemStack getSalt() {
@@ -533,6 +562,7 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
             case INPUT -> inputHandler;
             case BRINE -> outputHandler;
             case WATER -> waterHandler;
+            case LITHIUM_BRINE -> byproductHandler;
             default -> null;
         };
     }
@@ -549,7 +579,8 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
         return switch (type) {
             case ITEM -> mode == SideMode.SALT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT
-                    : mode == SideMode.BRINE || mode == SideMode.WATER ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+                    : mode == SideMode.BRINE || mode == SideMode.WATER || mode == SideMode.LITHIUM_BRINE ? ConnectionMode.OUTPUT
+                    : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case GAS, ENERGY -> ConnectionMode.NONE;
         };
@@ -580,6 +611,7 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
         input.deserialize(in.childOrEmpty("input"));
         output.deserialize(in.childOrEmpty("output"));
         water.deserialize(in.childOrEmpty("water"));
+        byproduct.deserialize(in.childOrEmpty("byproduct"));
         pending = in.getDoubleOr("pending", 0.0);
         progress = in.getDoubleOr("progress", 0.0);
         running = in.getBooleanOr("running", false);
@@ -598,6 +630,7 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
         input.serialize(out.child("input"));
         output.serialize(out.child("output"));
         water.serialize(out.child("water"));
+        byproduct.serialize(out.child("byproduct"));
         out.putDouble("pending", pending);
         out.putDouble("progress", progress);
         out.putBoolean("running", running);

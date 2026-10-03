@@ -113,7 +113,10 @@ public enum MachineStatus {
     // The Infuser, for a recipe that takes an additive (Pine Resin) it doesn't have.
     NO_ADDITIVE("no_additive", "led_blocked"),
     // The Vulcanizer (TOO_COLD below 140°C).
-    VULCANIZING("vulcanizing", "led_running");
+    VULCANIZING("vulcanizing", "led_running"),
+    // The Battery Array: taking in more than it gives out, or giving out more (FULL, IDLE and DISABLED otherwise).
+    CHARGING("charging", "led_running"),
+    DISCHARGING("discharging", "led_running");
 
     private final String name;
     private final String led;

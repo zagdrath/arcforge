@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:plate_die",
+  "ingredient": "arcforge:graphite",
+  "count": 1,
+  "result": {
+    "id": "arcforge:graphite_anode",
+    "count": 1
+  },
+  "time": 100
+}

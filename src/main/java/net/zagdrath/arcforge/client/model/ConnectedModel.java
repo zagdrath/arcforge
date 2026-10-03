@@ -54,6 +54,7 @@ import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.multiblock.BiogasDigesterStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
+import net.zagdrath.arcforge.multiblock.BatteryArrayStructure;
 import net.zagdrath.arcforge.multiblock.FireboxArrayStructure;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
@@ -89,13 +90,16 @@ import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 // "firebox_array", the same skin, joined with its casings, controller and Pressure Glass; each wall casing leaves out the
 // face toward the inside of the box (FireboxArrayPart.INWARD), where its renderer draws the firebrick lining. A
 // Superheater or Condenser Array larger than 3x3x3 uses "cube_box": the digester's solid skin, joined only with casings
-// of the same block in a formed box (box=true). Reservoirs use "reservoir" (glass /
+// of the same block in a formed box (box=true). The Battery Array uses "battery_array": the digester's solid skin, joined
+// with its casings, controller, cells and regulators; its Pressure Glass counts them as part of it (no beam against them),
+// while the casings keep their faces and beams toward the glass, as the Greenhouse Array's frames do. Reservoirs use "reservoir" (glass /
 // frame / frame_h / frame_v / frame_corners; see ReservoirModel): touching Reservoirs share one steel frame round their
 // outer edges.
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
     private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester", GREENHOUSE = "greenhouse",
-            EVAPORATOR = "thermal_evaporator", RESERVOIR = "reservoir", CUBE_BOX = "cube_box", FIREBOX_ARRAY = "firebox_array";
+            EVAPORATOR = "thermal_evaporator", RESERVOIR = "reservoir", CUBE_BOX = "cube_box", FIREBOX_ARRAY = "firebox_array",
+            BATTERY_ARRAY = "battery_array";
     // The tray band's glass: the top 10 px of a side face (the sill and strap are below it).
     private static final int BAND = 10;
     private static final Identifier TRAY_FRAME = Identifier.fromNamespaceAndPath("arcforge", "block/ctm/tray_window_frame");
@@ -126,7 +130,7 @@ public final class ConnectedModel {
 
         public boolean digester() {
             return connect.equals(DIGESTER) || connect.equals(GREENHOUSE) || connect.equals(EVAPORATOR) || connect.equals(CUBE_BOX)
-                    || connect.equals(FIREBOX_ARRAY);
+                    || connect.equals(FIREBOX_ARRAY) || connect.equals(BATTERY_ARRAY);
         }
 
         // Anything that bakes this as an ordinary model gets the plain fallback cube.
@@ -151,7 +155,7 @@ public final class ConnectedModel {
                 case "glass" -> new String[] { "base", "beam", "lip" };
                 case COLUMN -> new String[] { "base", "beam", "roof_nw", "roof_ne", "roof_sw", "roof_se" };
                 case TRAY -> new String[] { "base", "frame", "top", "bottom" };
-                case DIGESTER, GREENHOUSE, CUBE_BOX -> new String[] { "base", "beam", "top" };
+                case DIGESTER, GREENHOUSE, CUBE_BOX, BATTERY_ARRAY -> new String[] { "base", "beam", "top" };
                 case EVAPORATOR, FIREBOX_ARRAY -> new String[] { "base", "beam", "top", "window", "lip" };
                 case RESERVOIR -> new String[] { "glass", "frame", "frame_h", "frame_v", "frame_corners" };
                 default -> new String[] { "base", "beam", "lip", "window" };
@@ -326,7 +330,7 @@ public final class ConnectedModel {
 
         private static boolean isPart(BlockState state) {
             return ShellCasingBlock.isFormed(state) || PressureGlassBlock.isFormed(state) || GreenhouseStructure.isFormedPart(state)
-                    || ThermalEvaporatorStructure.isFormedPart(state);
+                    || ThermalEvaporatorStructure.isFormedPart(state) || BatteryArrayStructure.isFormedPart(state);
         }
 
         // Air enclosed by the structure on two axes: the hollow core.
@@ -484,6 +488,9 @@ public final class ConnectedModel {
                 case GREENHOUSE -> GreenhouseStructure::isFormedPart;
                 case CUBE_BOX -> CubeCasingBlock::isBox;
                 case FIREBOX_ARRAY -> state -> FireboxArrayStructure.isFormedPart(state) || PressureGlassBlock.isFormed(state);
+                // A solid box: it joins its casings, controller, cells and regulators, and draws its faces toward its
+                // windows (with a beam round each), so the glass shows the cells inside, never the inside of a casing.
+                case BATTERY_ARRAY -> BatteryArrayStructure::isFormedPart;
                 // The tower's glass counts as part of it: no faces or beams toward a pane, so its windows run on into
                 // the casings' window quadrants.
                 case EVAPORATOR -> state -> ThermalEvaporatorStructure.isFormedPart(state) || PressureGlassBlock.isFormed(state);

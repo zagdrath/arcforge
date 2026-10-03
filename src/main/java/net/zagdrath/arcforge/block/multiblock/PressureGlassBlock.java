@@ -34,7 +34,8 @@ import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
 // Pressure Glass: the windows of the Steam Boiler Array and Steam Turbine Array, the walls and roof of the
-// Greenhouse Array, the windows up the sides of the Thermal Evaporator Array, and a decorative glass on its own. Neighbouring panes merge into one window. When a
+// Greenhouse Array, the windows up the sides of the Thermal Evaporator Array, the faces of the Firebox and Battery Arrays,
+// and a decorative glass on its own. Neighbouring panes merge into one window. When a
 // structure forms around it, FORMED is set and clicking it opens the machine's GUI; glass never does IO.
 public class PressureGlassBlock extends TransparentBlock {
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
@@ -89,6 +90,7 @@ public class PressureGlassBlock extends TransparentBlock {
             GreenhouseStructure.notifyChanged(level, pos);
             ThermalEvaporatorStructure.notifyChanged(level, pos);
             net.zagdrath.arcforge.multiblock.FireboxArrayStructure.notifyChanged(level, pos);
+            net.zagdrath.arcforge.multiblock.BatteryArrayStructure.notifyChanged(level, pos);
         }
     }
 
@@ -123,6 +125,7 @@ public class PressureGlassBlock extends TransparentBlock {
             GreenhouseStructure.notifyChanged(level, pos);
             ThermalEvaporatorStructure.notifyChanged(level, pos);
             net.zagdrath.arcforge.multiblock.FireboxArrayStructure.notifyChanged(level, pos);
+            net.zagdrath.arcforge.multiblock.BatteryArrayStructure.notifyChanged(level, pos);
         }
     }
 
@@ -138,6 +141,14 @@ public class PressureGlassBlock extends TransparentBlock {
         InteractionResult evaporator = ThermalEvaporatorStructure.useOnPart(level, pos, player);
         if (evaporator != InteractionResult.PASS) {
             return evaporator;
+        }
+        InteractionResult firebox = net.zagdrath.arcforge.multiblock.FireboxArrayStructure.useOnPart(level, pos, player);
+        if (firebox != InteractionResult.PASS) {
+            return firebox;
+        }
+        InteractionResult battery = net.zagdrath.arcforge.multiblock.BatteryArrayStructure.useOnPart(level, pos, player);
+        if (battery != InteractionResult.PASS) {
+            return battery;
         }
         for (ShellStructure structure : structures()) {
             InteractionResult result = ShellCasingBlock.openMenu(level, pos, player, structure);

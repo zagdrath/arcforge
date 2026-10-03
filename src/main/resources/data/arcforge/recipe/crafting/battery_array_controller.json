@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "RBR",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "arcforge:battery_array_casing",
+    "R": "#c:dusts/redstone",
+    "B": "arcforge:wrought_energy_cell"
+  },
+  "result": {
+    "id": "arcforge:battery_array_controller",
+    "count": 1
+  }
+}

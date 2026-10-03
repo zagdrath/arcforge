@@ -1,0 +1,16 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#minecraft:is_mountain",
+  "features": "arcforge:ore_spodumene_pegmatite",
+  "step": "underground_ores",
+  "neoforge:conditions": [
+    {
+      "type": "arcforge:ore_enabled",
+      "ore": "spodumene"
+    },
+    {
+      "type": "arcforge:ore_enabled",
+      "ore": "spodumenePegmatite"
+    }
+  ]
+}

@@ -115,6 +115,12 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity.class);
         registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class);
         registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, PressureGlassBlock.class);
+        // The Battery Array: its energy, rates and parts from any block of it; a loose cell's own energy.
+        registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity.class);
+        registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity.class);
+        registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class);
+        registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock.class);
+        registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GlassClocheBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GrowChamberBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.HydroponicCellBlockEntity.class);
@@ -194,6 +200,11 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(ClocheProvider.Client.INSTANCE, net.zagdrath.arcforge.block.farming.ClocheBlock.class);
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.BatteryArrayControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class, net.zagdrath.arcforge.block.multiblock.LithiumCellBlock.class,
+                net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock.class, PressureGlassBlock.class)) {
+            registration.registerBlockComponent(BatteryArrayProvider.Client.INSTANCE, type);
+        }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.class,
                 net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class, PressureGlassBlock.class)) {
             registration.registerBlockComponent(FireboxArrayProvider.Client.INSTANCE, type);

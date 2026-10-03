@@ -153,6 +153,17 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu implements Secure
     // The metal, additive or coke slot this item belongs in, or -1. An additive goes to the additive slot
     // already holding it, else the first empty one (as through an input port).
     private int inputSlotFor(Player player, ItemResource resource) {
+        // Fuel (Coal Coke, which also bakes into Graphite) goes to the coke slot; on to the metal slot only once the coke
+        // slot is full and the metal slot already holds it, as through a port.
+        ItemStack fuel = resource.toStack(1);
+        if (ArcforgeFurnaceBlockEntity.isFuel(fuel)) {
+            ItemStack coke = slots.get(ArcforgeFurnaceBlockEntity.SLOT_COKE).getItem();
+            boolean cokeFull = !coke.isEmpty() && (!resource.matches(coke) || coke.getCount() >= coke.getMaxStackSize());
+            ItemStack metal = slots.get(ArcforgeFurnaceBlockEntity.SLOT_METAL).getItem();
+            return cokeFull && resource.matches(metal)
+                    && ArcforgeFurnaceBlockEntity.isItemValid(player.level(), ArcforgeFurnaceBlockEntity.SLOT_METAL, resource)
+                    ? ArcforgeFurnaceBlockEntity.SLOT_METAL : ArcforgeFurnaceBlockEntity.SLOT_COKE;
+        }
         for (int slot : new int[] { ArcforgeFurnaceBlockEntity.SLOT_METAL, ArcforgeFurnaceBlockEntity.SLOT_COKE }) {
             if (ArcforgeFurnaceBlockEntity.isItemValid(player.level(), slot, resource)) {
                 return slot;

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/power_regulator/tempered"
+    },
+    "formed=true": {
+      "model": "arcforge:block/power_regulator/tempered_on"
+    }
+  }
+}

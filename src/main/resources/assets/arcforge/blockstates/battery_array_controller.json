@@ -1,0 +1,159 @@
+{
+  "variants": {
+    "charge=0,facing=north,formed=false": {
+      "model": "arcforge:block/battery_array/controller"
+    },
+    "charge=0,facing=north,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_0"
+    },
+    "charge=1,facing=north,formed=false": {
+      "model": "arcforge:block/battery_array/controller"
+    },
+    "charge=1,facing=north,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_1"
+    },
+    "charge=2,facing=north,formed=false": {
+      "model": "arcforge:block/battery_array/controller"
+    },
+    "charge=2,facing=north,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_2"
+    },
+    "charge=3,facing=north,formed=false": {
+      "model": "arcforge:block/battery_array/controller"
+    },
+    "charge=3,facing=north,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_3"
+    },
+    "charge=4,facing=north,formed=false": {
+      "model": "arcforge:block/battery_array/controller"
+    },
+    "charge=4,facing=north,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_4"
+    },
+    "charge=0,facing=east,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 90
+    },
+    "charge=0,facing=east,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_0"
+    },
+    "charge=1,facing=east,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 90
+    },
+    "charge=1,facing=east,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_1"
+    },
+    "charge=2,facing=east,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 90
+    },
+    "charge=2,facing=east,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_2"
+    },
+    "charge=3,facing=east,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 90
+    },
+    "charge=3,facing=east,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_3"
+    },
+    "charge=4,facing=east,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 90
+    },
+    "charge=4,facing=east,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_4"
+    },
+    "charge=0,facing=south,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 180
+    },
+    "charge=0,facing=south,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_0"
+    },
+    "charge=1,facing=south,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 180
+    },
+    "charge=1,facing=south,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_1"
+    },
+    "charge=2,facing=south,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 180
+    },
+    "charge=2,facing=south,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_2"
+    },
+    "charge=3,facing=south,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 180
+    },
+    "charge=3,facing=south,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_3"
+    },
+    "charge=4,facing=south,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 180
+    },
+    "charge=4,facing=south,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_4"
+    },
+    "charge=0,facing=west,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 270
+    },
+    "charge=0,facing=west,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_0"
+    },
+    "charge=1,facing=west,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 270
+    },
+    "charge=1,facing=west,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_1"
+    },
+    "charge=2,facing=west,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 270
+    },
+    "charge=2,facing=west,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_2"
+    },
+    "charge=3,facing=west,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 270
+    },
+    "charge=3,facing=west,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_3"
+    },
+    "charge=4,facing=west,formed=false": {
+      "model": "arcforge:block/battery_array/controller",
+      "y": 270
+    },
+    "charge=4,facing=west,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/controller_formed_4"
+    }
+  }
+}

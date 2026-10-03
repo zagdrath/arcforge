@@ -221,6 +221,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.BIOGAS_DIGESTER.get(), net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen::new);
         event.register(ModMenuTypes.THERMAL_EVAPORATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.ThermalEvaporatorScreen::new);
         event.register(ModMenuTypes.FIREBOX_ARRAY.get(), net.zagdrath.arcforge.client.screen.multiblock.FireboxArrayScreen::new);
+        event.register(ModMenuTypes.BATTERY_ARRAY.get(), net.zagdrath.arcforge.client.screen.multiblock.BatteryArrayScreen::new);
         event.register(ModMenuTypes.GLASS_CLOCHE.get(), ClocheScreen::new);
         event.register(ModMenuTypes.GROW_CHAMBER.get(), ClocheScreen::new);
         event.register(ModMenuTypes.HYDROPONIC_CELL.get(), ClocheScreen::new);
@@ -292,6 +293,7 @@ public class ArcforgeClient {
                 new Material(Identifier.withDefaultNamespace("block/water_overlay")),
                 FluidTintSources.constant(SEAWATER_TINT)), ModFluids.SEAWATER, ModFluids.FLOWING_SEAWATER);
         event.register(liquidModel("brine"), ModFluids.BRINE, ModFluids.FLOWING_BRINE);
+        event.register(liquidModel("lithium_brine"), ModFluids.LITHIUM_BRINE, ModFluids.FLOWING_LITHIUM_BRINE);
         event.register(liquidModel("latex"), ModFluids.LATEX, ModFluids.FLOWING_LATEX);
         event.register(liquidModel("liquid_experience"), ModFluids.LIQUID_EXPERIENCE, ModFluids.FLOWING_LIQUID_EXPERIENCE);
         event.register(liquidModel("lye"), ModFluids.LYE, ModFluids.FLOWING_LYE);
@@ -394,6 +396,7 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xB6F07A, 6.0F), ModFluids.LIQUID_EXPERIENCE_TYPE.get());
         event.registerFluidType(liquidFog(SEAWATER_TINT & 0xFFFFFF, 12.0F), ModFluids.SEAWATER_TYPE.get());
         event.registerFluidType(liquidFog(0xC8DCE4, 10.0F), ModFluids.BRINE_TYPE.get());
+        event.registerFluidType(liquidFog(0xB8DCCC, 10.0F), ModFluids.LITHIUM_BRINE_TYPE.get());
         event.registerFluidType(liquidFog(0xE4E6DA, 8.0F), ModFluids.LYE_TYPE.get());
         event.registerFluidType(liquidFog(0xE2DC9A, 7.0F), ModFluids.HYDROCHLORIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(0x7FB84A, 5.0F), ModFluids.NUTRIENT_SOLUTION_TYPE.get());

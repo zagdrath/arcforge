@@ -41,6 +41,20 @@
     "arcforge:thermal_evaporator_casing",
     "arcforge:thermal_evaporator_controller",
     "arcforge:firebox_array_casing",
-    "arcforge:firebox_array_controller"
+    "arcforge:firebox_array_controller",
+    "arcforge:spodumene_ore",
+    "arcforge:deepslate_spodumene_ore",
+    "arcforge:raw_spodumene_block",
+    "arcforge:graphite_block",
+    "arcforge:battery_array_casing",
+    "arcforge:battery_array_controller",
+    "arcforge:wrought_lithium_cell",
+    "arcforge:tempered_lithium_cell",
+    "arcforge:hardened_lithium_cell",
+    "arcforge:arcforged_lithium_cell",
+    "arcforge:wrought_power_regulator",
+    "arcforge:tempered_power_regulator",
+    "arcforge:hardened_power_regulator",
+    "arcforge:arcforged_power_regulator"
   ]
 }

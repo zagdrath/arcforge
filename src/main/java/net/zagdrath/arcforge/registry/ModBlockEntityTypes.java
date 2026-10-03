@@ -164,6 +164,15 @@ public final class ModBlockEntityTypes {
             BLOCK_ENTITY_TYPES.register("firebox_array", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity::new, ModBlocks.FIREBOX_ARRAY_CONTROLLER.get()));
 
+    // The Battery Array, on its controller; casings, panes and regulators are plain blocks that find it, and each Lithium
+    // Cell holds its share of the energy.
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity>> BATTERY_ARRAY =
+            BLOCK_ENTITY_TYPES.register("battery_array", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity::new, ModBlocks.BATTERY_ARRAY_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity>> LITHIUM_CELL =
+            BLOCK_ENTITY_TYPES.register("lithium_cell", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity::new, tierBlocks(ModBlocks::lithiumCell)));
+
     // The Thermal Evaporator Array, on its controller; casings and panes are plain blocks that find it.
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity>> THERMAL_EVAPORATOR =
             BLOCK_ENTITY_TYPES.register("thermal_evaporator", () -> new BlockEntityType<>(

@@ -64,6 +64,10 @@ public enum MultiblockNameProvider implements IBlockComponentProvider {
                 // A window in a Firebox Array.
                 controller = net.zagdrath.arcforge.multiblock.FireboxArrayStructure.findController(level, pos);
             }
+            if (controller == null) {
+                // A window in a Battery Array.
+                controller = net.zagdrath.arcforge.multiblock.BatteryArrayStructure.findController(level, pos);
+            }
         }
         return controller != null && controller.isFormed() && controller instanceof MenuProvider menu ? menu.getDisplayName() : null;
     }

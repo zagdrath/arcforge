@@ -236,6 +236,70 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Battery Array: a box of Battery Array Casings 3 to 5 blocks each way (the faces may be Pressure Glass) filled",
+                "with Lithium Cells and Power Regulators. The cells set how much FE it stores, the regulators how much it takes in and",
+                "gives out each tick (each way). The energy is shared between the cells, and each keeps its share when broken.")
+                .push("batteryArray");
+    }
+
+    public static final ModConfigSpec.IntValue BATTERY_BASE_TRANSFER = BUILDER
+            .comment("FE/t it takes in and gives out (each) with no Power Regulators.")
+            .defineInRange("baseTransfer", 16_384, 1, Integer.MAX_VALUE);
+
+    static {
+        BUILDER.comment("FE each Lithium Cell stores, per tier.").push("lithiumCellCapacity");
+    }
+
+    public static final ModConfigSpec.LongValue LITHIUM_CELL_WROUGHT = BUILDER.defineInRange("wrought", 64_000_000L, 1L, 1_000_000_000_000L);
+    public static final ModConfigSpec.LongValue LITHIUM_CELL_TEMPERED = BUILDER.defineInRange("tempered", 512_000_000L, 1L, 1_000_000_000_000L);
+    public static final ModConfigSpec.LongValue LITHIUM_CELL_HARDENED = BUILDER.defineInRange("hardened", 4_000_000_000L, 1L, 1_000_000_000_000L);
+    public static final ModConfigSpec.LongValue LITHIUM_CELL_ARCFORGED = BUILDER.defineInRange("arcforged", 32_000_000_000L, 1L, 1_000_000_000_000L);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("FE/t each Power Regulator adds to what it takes in and gives out (each), per tier. With any regulators the",
+                "transfer rate is their sum (baseTransfer only counts with none).").push("powerRegulatorTransfer");
+    }
+
+    public static final ModConfigSpec.IntValue POWER_REGULATOR_WROUGHT = BUILDER.defineInRange("wrought", 65_536, 1, 100_000_000);
+    public static final ModConfigSpec.IntValue POWER_REGULATOR_TEMPERED = BUILDER.defineInRange("tempered", 262_144, 1, 100_000_000);
+    public static final ModConfigSpec.IntValue POWER_REGULATOR_HARDENED = BUILDER.defineInRange("hardened", 1_048_576, 1, 100_000_000);
+    public static final ModConfigSpec.IntValue POWER_REGULATOR_ARCFORGED = BUILDER.defineInRange("arcforged", 4_194_304, 1, 100_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    public static final ModConfigSpec.IntValue BATTERY_SHARE_INTERVAL = BUILDER
+            .comment("How often (ticks) the stored energy is written back into the Lithium Cells' shares while it changes. It is always",
+                    "written when the array breaks or a cell is taken out.")
+            .defineInRange("shareInterval", 100, 1, 72_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    // The tier's Lithium Cell capacity (FE).
+    public static long lithiumCellCapacity(net.zagdrath.arcforge.conduit.ConduitTier tier) {
+        return switch (tier) {
+            case WROUGHT -> LITHIUM_CELL_WROUGHT.getAsLong();
+            case TEMPERED -> LITHIUM_CELL_TEMPERED.getAsLong();
+            case HARDENED -> LITHIUM_CELL_HARDENED.getAsLong();
+            case ARCFORGED -> LITHIUM_CELL_ARCFORGED.getAsLong();
+        };
+    }
+
+    // The tier's Power Regulator transfer (FE/t).
+    public static int powerRegulatorTransfer(net.zagdrath.arcforge.conduit.ConduitTier tier) {
+        return switch (tier) {
+            case WROUGHT -> POWER_REGULATOR_WROUGHT.getAsInt();
+            case TEMPERED -> POWER_REGULATOR_TEMPERED.getAsInt();
+            case HARDENED -> POWER_REGULATOR_HARDENED.getAsInt();
+            case ARCFORGED -> POWER_REGULATOR_ARCFORGED.getAsInt();
+        };
+    }
+
+    static {
         BUILDER.comment("Thermoelectric Plant: turns heat (HU) into FE. The hotter it runs, the more FE each HU gives.")
                 .push("thermoelectricPlant");
     }
@@ -1341,6 +1405,11 @@ public class ArcforgeConfig {
                     "carries on.")
             .defineInRange("waterCapacity", 16_000, 1_000, 100_000_000);
 
+    public static final ModConfigSpec.IntValue EVAPORATOR_BYPRODUCT_CAPACITY = BUILDER
+            .comment("Lithium Brine (by-product) tank size in mB. When it's full, the by-product that doesn't fit is lost and",
+                    "evaporating carries on.")
+            .defineInRange("byproductCapacity", 8_000, 1_000, 100_000_000);
+
     static {
         BUILDER.pop();
     }
@@ -1535,6 +1604,9 @@ public class ArcforgeConfig {
         ore("sulfur", "Nether Sulfur Ore: common through the Nether's netherrack; drops Sulfur Dust.", true, 12, 10, 10, 117, 0.0);
         ore("halite", "Halite: large flat beds of Rock Salt (veinsPerChunk: beds tried in 1 chunk in 4; veinSize: each small vein of a bed).",
                 true, 1, 12, -32, 40, 0.0);
+        ore("spodumene", "Spodumene: uncommon, everywhere in stone and deepslate.", true, 3, 7, -48, 48, 0.0);
+        ore("spodumenePegmatite", "Spodumene pegmatites: extra, bigger veins under mountains and badlands (only while ores.spodumene is on too).",
+                true, 6, 10, 0, 160, 0.0);
         BUILDER.pop();
     }
 

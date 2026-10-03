@@ -59,7 +59,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // Reacts up to two items and up to three fluids with FE (arcforge:chemical_reacting recipes) into an item, a fluid or
 // both, plus a chance byproduct: Sulfuric Acid from sulfur and water, ore slurry from raw ore and acid, dust from
 // slurry and water, NPK Fertilizer from Basic Slag, Wood Ash and Ammonia, Brine from Salt and water, Biodiesel from Seed
-// Oil, Ethanol and Lye, Ethylene (and Water) from Ethanol, Plastic and PVC Sheet from Ethylene. Two input slots, sorted by
+// Oil, Ethanol and Lye, Ethylene (and Water) from Ethanol, Plastic and PVC Sheet from Ethylene, Lithium Brine from Spodumene Dust and Sulfuric Acid,
+// Lithium Hydroxide from Lithium Brine and Lye, LFP Cathodes from three items. Three input slots, sorted by
 // PairedItemInput; three input tanks, sorted by InputTankRouter; one output tank and one by-product tank (for a recipe's
 // fluid_byproduct, leaving by By-product faces), 8,000 mB each. The third input tank and the by-product tank came later:
 // older saves load with them empty.
@@ -69,11 +70,15 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
     public static final int SLOT_BYPRODUCT = 2;
-    // The second input slot, for recipes with two items (added after the others, so saves keep their slots).
+    // The second and third input slots, for recipes with two or three items (each added after the others, so saves keep
+    // their slots).
     public static final int SLOT_INPUT_B = 3;
-    public static final int MACHINE_SLOTS = 4;
-    // Saves from before the second input slot (layout 1) had the upgrade slots where it is now.
-    private static final int SLOT_LAYOUT = 2;
+    public static final int SLOT_INPUT_C = 4;
+    public static final int MACHINE_SLOTS = 5;
+    private static final int[] INPUT_SLOTS = { SLOT_INPUT, SLOT_INPUT_B, SLOT_INPUT_C };
+    // Saves from before the second input slot (layout 1) had the upgrade slots where it is now; saves from before the
+    // third (layout 2) had them where that one is.
+    private static final int SLOT_LAYOUT = 3;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT, SideMode.ENERGY);
 
@@ -126,11 +131,11 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         this.fluidAll = new CombinedResourceHandler<>(inputA, inputB, inputC, output, byproductTank);
         // Buckets pour into the inputs and fill from the output first, then the by-product tank, then the inputs.
         this.fluidInteraction = new CombinedResourceHandler<>(fluidOutput, fluidByproduct, router);
-        this.itemInput = new PairedItemInput(items, SLOT_INPUT, SLOT_INPUT_B);
+        this.itemInput = new PairedItemInput(items, INPUT_SLOTS, slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT);
         this.itemByproduct = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_BYPRODUCT);
         this.itemEject = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT || slot == SLOT_BYPRODUCT);
-        this.itemAutomation = new PairedItemInput(items, SLOT_INPUT, SLOT_INPUT_B, slot -> slot == SLOT_OUTPUT || slot == SLOT_BYPRODUCT);
+        this.itemAutomation = new PairedItemInput(items, INPUT_SLOTS, slot -> slot == SLOT_OUTPUT || slot == SLOT_BYPRODUCT);
         this.data = new WideIntContainerData(ChemicalReactorMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -167,7 +172,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     // The input slots take anything some recipe reacts. The client passes a null level and checks against the
     // recipes the server synced.
     public static boolean isItemValid(@Nullable Level level, int slot, ItemResource resource) {
-        return (slot == SLOT_INPUT || slot == SLOT_INPUT_B) && MachineRecipes.isReactorItem(level, resource.toStack(1));
+        return (slot == SLOT_INPUT || slot == SLOT_INPUT_B || slot == SLOT_INPUT_C) && MachineRecipes.isReactorItem(level, resource.toStack(1));
     }
 
     // A client-side copy of the slots, for the menu.
@@ -192,7 +197,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
 
     private ChemicalReactorInput input() {
         return new ChemicalReactorInput(items.getStack(SLOT_INPUT), items.getStack(SLOT_INPUT_B), inputA.getResource(0), inputA.getAmount(),
-                inputB.getResource(0), inputB.getAmount(), inputC.getResource(0), inputC.getAmount());
+                inputB.getResource(0), inputB.getAmount(), inputC.getResource(0), inputC.getAmount(), items.getStack(SLOT_INPUT_C));
     }
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
@@ -222,10 +227,12 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             status = MachineStatus.DISABLED;
         } else if (holder == null) {
             // Something to react but not the fluids (or the other item) for it.
-            ItemStack item = items.getStack(SLOT_INPUT);
-            ItemStack itemB = items.getStack(SLOT_INPUT_B);
-            status = !item.isEmpty() && MachineRecipes.isReactorItem(level, item) || !itemB.isEmpty() && MachineRecipes.isReactorItem(level, itemB)
-                    ? MachineStatus.MISSING_FLUID : MachineStatus.IDLE;
+            boolean reactive = false;
+            for (int slot : INPUT_SLOTS) {
+                ItemStack item = items.getStack(slot);
+                reactive |= !item.isEmpty() && MachineRecipes.isReactorItem(level, item);
+            }
+            status = reactive ? MachineStatus.MISSING_FLUID : MachineStatus.IDLE;
         } else if (!fits(holder.value())) {
             status = MachineStatus.OUTPUT_FULL;
         } else if (!energy.consume(energyPerTick(holder.value()))) {
@@ -302,7 +309,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         }
         List<ChemicalReactingRecipe.ItemInput> needed = recipe.itemInputs();
         for (int i = 0; i < slots.length; i++) {
-            int slot = slots[i] == 0 ? SLOT_INPUT : SLOT_INPUT_B;
+            int slot = INPUT_SLOTS[slots[i]];
             ItemStack stack = items.getStack(slot);
             items.setStack(slot, stack.copyWithCount(stack.getCount() - needed.get(i).count()));
         }
@@ -457,13 +464,19 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         byproductTank.deserialize(input.childOrEmpty("byproduct_tank"));
         progress = input.getIntOr("progress", 0);
         current = input.getString("recipe").map(Identifier::tryParse).orElse(null);
-        if (input.getIntOr("slot_layout", 1) < SLOT_LAYOUT) {
-            // Layout 1 was input, output, byproduct, then the upgrade slots: move the upgrades up past the new input slot.
+        int layout = input.getIntOr("slot_layout", 1);
+        if (layout < SLOT_LAYOUT) {
+            // Layout 1 was input, output, byproduct, then the upgrade slots; layout 2 added the second input slot before the
+            // upgrades. Move the upgrades up past each input slot added since.
             items.ensureSize(MACHINE_SLOTS + UPGRADE_SLOTS);
-            for (int slot = MACHINE_SLOTS + UPGRADE_SLOTS - 1; slot > SLOT_INPUT_B; slot--) {
-                items.setStack(slot, items.getStack(slot - 1));
+            int first = layout < 2 ? SLOT_INPUT_B : SLOT_INPUT_C;
+            int shift = MACHINE_SLOTS - first;
+            for (int slot = MACHINE_SLOTS + UPGRADE_SLOTS - 1; slot >= MACHINE_SLOTS; slot--) {
+                items.setStack(slot, items.getStack(slot - shift));
             }
-            items.setStack(SLOT_INPUT_B, ItemStack.EMPTY);
+            for (int slot = first; slot < MACHINE_SLOTS; slot++) {
+                items.setStack(slot, ItemStack.EMPTY);
+            }
         }
     }
 

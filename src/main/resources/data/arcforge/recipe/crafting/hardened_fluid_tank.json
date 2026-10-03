@@ -10,7 +10,7 @@
     "X": "arcforge:tempered_fluid_tank",
     "L": "#c:glass_blocks",
     "H": "arcforge:hardened_alloy",
-    "V": "arcforge:pvc_sheet"
+    "V": "arcforge:rubber_gasket"
   },
   "result": {
     "id": "arcforge:hardened_fluid_tank",

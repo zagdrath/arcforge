@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "charge=0,formed=false": {
+      "model": "arcforge:block/lithium_cell/arcforged_0"
+    },
+    "charge=0,formed=true": {
+      "model": "arcforge:block/lithium_cell/arcforged_0"
+    },
+    "charge=1,formed=false": {
+      "model": "arcforge:block/lithium_cell/arcforged_1"
+    },
+    "charge=1,formed=true": {
+      "model": "arcforge:block/lithium_cell/arcforged_1"
+    },
+    "charge=2,formed=false": {
+      "model": "arcforge:block/lithium_cell/arcforged_2"
+    },
+    "charge=2,formed=true": {
+      "model": "arcforge:block/lithium_cell/arcforged_2"
+    },
+    "charge=3,formed=false": {
+      "model": "arcforge:block/lithium_cell/arcforged_3"
+    },
+    "charge=3,formed=true": {
+      "model": "arcforge:block/lithium_cell/arcforged_3"
+    },
+    "charge=4,formed=false": {
+      "model": "arcforge:block/lithium_cell/arcforged_4"
+    },
+    "charge=4,formed=true": {
+      "model": "arcforge:block/lithium_cell/arcforged_4"
+    }
+  }
+}

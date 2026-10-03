@@ -171,10 +171,11 @@ final class AlloyGameTests {
         // Controller, Planting Bed and Grow Lamp), and salt's four (Block of Rock Salt both ways, Thermal Evaporator Casing
         // and Controller), and rubber's five (Resin Tap, Vulcanizer, Block of Rubber both ways and the Rubber Gasket), and
         // logistics' five (Reservoir, XP Drain, XP Shower, Quantum Tunnel and Chunk Loader), and the Firebox Array's two
-        // (Casing and Controller).
-        helper.assertTrue(crafting == 227, crafting + " crafting/ recipes, not 227");
-        // Plus the fluorite-fluxed steel.
-        helper.assertTrue(smelting == 6, smelting + " arcforge_smelting/ recipes, not 6");
+        // (Casing and Controller), and lithium's fifteen (Battery Array Casing and Controller, four Lithium Cells and four
+        // Power Regulators, the Cell Separator, and Block of Raw Spodumene and Block of Graphite both ways).
+        helper.assertTrue(crafting == 242, crafting + " crafting/ recipes, not 242");
+        // Plus the fluorite-fluxed steel, and Graphite from Coal Coke and from Carbon Dust.
+        helper.assertTrue(smelting == 8, smelting + " arcforge_smelting/ recipes, not 8");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
             helper.assertTrue(recipe(helper, old) == null, "Old recipe " + old + " is still there");
         }

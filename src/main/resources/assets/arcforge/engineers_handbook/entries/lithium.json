@@ -1,0 +1,26 @@
+{
+  "title": "Lithium & Batteries",
+  "icon": "arcforge:lithium_hydroxide",
+  "items": [
+    "arcforge:spodumene_ore",
+    "arcforge:raw_spodumene",
+    "arcforge:spodumene_dust",
+    "arcforge:lithium_brine_bucket",
+    "arcforge:lithium_hydroxide",
+    "arcforge:graphite",
+    "arcforge:graphite_block",
+    "arcforge:lfp_cathode",
+    "arcforge:graphite_anode",
+    "arcforge:cell_separator"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Lithium comes from Spodumene, a pale green ore found everywhere underground (Y -48 to 48) and in bigger pegmatite veins up to Y 160 under mountains and badlands.\n# Lithium Brine\n- Crush Spodumene into Spodumene Dust (2 per ore, 4 in the Arc Crushing Array).\n- Spodumene Dust + 250 mB Sulfuric Acid in the Chemical Reactor gives 250 mB Lithium Brine.\n- A Thermal Evaporator Array drying Brine into Salt also leaves 25 mB Lithium Brine per Salt, out of a Lithium Brine port.\n# Lithium Hydroxide\n250 mB Lithium Brine + 100 mB Lye in the Chemical Reactor gives 1 Lithium Hydroxide and 100 mB Brine back."
+    },
+    {
+      "type": "text",
+      "text": "# Battery parts\n- LFP Cathode: Lithium Hydroxide + iron dust + Basic Slag (its phosphate) in the Chemical Reactor, one in each item slot.\n- Graphite: Coal Coke, or 2 Carbon Dust, baked at 1,500°C in the Arcforge Furnace. A Graphite Anode is Graphite pressed in the Metal Press with the Plate Die.\n- Cell Separator: 2 Plastic Sheets make 2.\nWith Steel Plates and a tier alloy they make Lithium Cells and Power Regulators for the Battery Array; each tier upgrades into the next at a crafting table, keeping its charge."
+    }
+  ]
+}

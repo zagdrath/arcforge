@@ -12,7 +12,7 @@
     },
     {
       "type": "text",
-      "text": "# PVC Sheet\n- 60 mB Ethylene + 60 mB Chlorine make 2 PVC Sheets.\n- Hardened and Arcforged Fluid Conduits and Fluid Tanks take one, an acid-proof lining.\n# #arcforge:plastics\nPlastic Sheet and PVC Sheet are both plastics: every recipe that took Plastic Sheet takes either."
+      "text": "# PVC Sheet\n- 60 mB Ethylene + 60 mB Chlorine make 2 PVC Sheets.\n- Hardened and Arcforged Fluid Conduits and the Arcforged Fluid Tank take one, an acid-proof lining.\n# #arcforge:plastics\nPlastic Sheet and PVC Sheet are both plastics: every recipe that took Plastic Sheet takes either."
     }
   ]
 }

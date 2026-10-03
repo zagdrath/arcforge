@@ -26,7 +26,7 @@ import net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu;
 
 // The input tank (Seawater or Brine) on the left, an arrow to the Salt slot, and the evaporation rate; the status and the
 // heat bar, with a tick at the temperature it needs (100°C), under them; the Brine tank, the heat buffer and the Water
-// tank on the right. All positions are relative to leftPos/topPos (the background is cut from the Biogas Digester's).
+// tank on the right. Under the rate, a slim bar shows the by-product tank (Lithium Brine). All positions are relative to leftPos/topPos (the background is cut from the Biogas Digester's).
 public class ThermalEvaporatorScreen extends MachineScreen<ThermalEvaporatorMenu> {
     private static final int INPUT_X = 9, OUTPUT_X = 123, WATER_X = 155, TANK_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int BUFFER_X = 139, BUFFER_Y = 19;
@@ -36,11 +36,14 @@ public class ThermalEvaporatorScreen extends MachineScreen<ThermalEvaporatorMenu
     private static final int STATUS_X = 35, STATUS_Y = 54, STATUS_W = 84;
     private static final int HEAT_X = 27, HEAT_Y = 66, HEAT_W = 92;
     private static final int TICK_Y = 63, TICK_W = 3, TICK_H = 7;
+    // The by-product bar: a 43×4 fill on the baked #0E0E0E track under the rate.
+    private static final int BYPRODUCT_X = 76, BYPRODUCT_Y = 46, BYPRODUCT_W = 43, BYPRODUCT_H = 4;
 
     private final Identifier heatBuffer = sprite("heat_buffer");
     private final Identifier progress = sprite("progress");
     private final Identifier tankGauge = sprite("tank_gauge");
     private final Identifier minTempTick = sprite("min_temp_tick");
+    private final Identifier byproductFill = sprite("byproduct_fill");
 
     public ThermalEvaporatorScreen(ThermalEvaporatorMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "thermal_evaporator", List.of(new HeatTab(menu::getHeat,
@@ -71,6 +74,11 @@ public class ThermalEvaporatorScreen extends MachineScreen<ThermalEvaporatorMenu
         // White tick at the temperature it needs to work.
         int tickX = HEAT_X + HeatScale.fillWidth(HEAT_W, menu.getMinTemperature()) - 1;
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, minTempTick, x + tickX, y + TICK_Y, TICK_W, TICK_H);
+        int fill = scaled(menu.getByproduct(), menu.getByproductCapacity(), BYPRODUCT_W);
+        if (fill > 0) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, byproductFill, BYPRODUCT_W, BYPRODUCT_H, 0, 0, x + BYPRODUCT_X, y + BYPRODUCT_Y, fill,
+                    BYPRODUCT_H);
+        }
     }
 
     @Override
@@ -96,6 +104,10 @@ public class ThermalEvaporatorScreen extends MachineScreen<ThermalEvaporatorMenu
         } else if (isHovering(WATER_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, Fluids.WATER, Component.translatable("gui.arcforge.empty"), menu.getWater(), menu.getWaterCapacity());
             lines.add(Component.translatable("gui.arcforge.thermal_evaporator.water_hint").withStyle(ChatFormatting.GRAY));
+        } else if (isHovering(BYPRODUCT_X - 1, BYPRODUCT_Y - 1, BYPRODUCT_W + 2, BYPRODUCT_H + 2, mouseX, mouseY)) {
+            addFluidTooltip(lines, menu.getByproductFluid(), Component.translatable("fluid_type.arcforge.lithium_brine"), menu.getByproduct(),
+                    menu.getByproductCapacity());
+            lines.add(Component.translatable("gui.arcforge.thermal_evaporator.byproduct_hint").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(BUFFER_X - 1, BUFFER_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.hu_stored", ArcforgeGui.grouped(menu.getHeat()), ArcforgeGui.grouped(menu.getHeatCapacity())));
             lines.add(temperatureLine().withStyle(ChatFormatting.GRAY));

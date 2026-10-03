@@ -39,6 +39,13 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ENERGY =
             DATA_COMPONENTS.registerComponentType("energy", b -> b.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));
 
+    // FE held by a Lithium Cell: its share of a Battery Array's energy, which can pass the int limit.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> STORED_ENERGY =
+            DATA_COMPONENTS.registerComponentType("stored_energy", b -> b.persistent(com.mojang.serialization.Codec.LONG
+                    .validate(value -> value >= 0 ? com.mojang.serialization.DataResult.success(value)
+                            : com.mojang.serialization.DataResult.error(() -> "Stored energy can't be negative: " + value)))
+                    .networkSynchronized(ByteBufCodecs.VAR_LONG));
+
     // HU held by a heat cell.
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> HEAT =
             DATA_COMPONENTS.registerComponentType("heat", b -> b.persistent(ExtraCodecs.NON_NEGATIVE_INT).networkSynchronized(ByteBufCodecs.VAR_INT));

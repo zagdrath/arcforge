@@ -1,0 +1,20 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "TST",
+    "RXR",
+    "TST"
+  ],
+  "key": {
+    "T": "arcforge:hardened_alloy",
+    "S": "#c:plates/steel",
+    "R": "#c:storage_blocks/redstone",
+    "X": "arcforge:tempered_power_regulator"
+  },
+  "result": {
+    "id": "arcforge:hardened_power_regulator",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

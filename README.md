@@ -200,8 +200,8 @@ FE-powered tools that never break, in three tiers: charge them in an Energy Cell
 
 ### Ores
 
-Seven ores generate in stone and deepslate (Silver, Nickel, Tungsten as wolframite ore, Fluorite, Bismuth,
-Arcite and Halite). Each drops its raw item (Fortune works; Silk Touch drops the ore), and has a raw block and a storage
+Eight ores generate in stone and deepslate (Silver, Nickel, Tungsten as wolframite ore, Fluorite, Bismuth,
+Arcite, Halite and Spodumene). Each drops its raw item (Fortune works; Silk Touch drops the ore), and has a raw block and a storage
 block. Raw items, ores and dusts smelt into the ingot or crystal (twice as fast in a blast furnace, and in the
 Induction Furnace), and the Arc Crusher gives 2 dust per ore (+25%), 1 per raw item (+25%), 9 per raw block
 and 1 per ingot. Arcite needs a diamond pickaxe and glows (ores 5, raw block 9, block 12). Every recipe
@@ -216,6 +216,10 @@ takes the common tags (`c:ingots/silver`, `c:gems/arcite`, ...), so other mods' 
 | Tungsten | 6 | 6 | -64 to -16 | heating coils, the Arcforged composite |
 | Arcite | 4 | 5 | -64 to -40 | Arcforged conduits and upgrades |
 | Halite | 1 bed in 4 chunks | flat beds, radius 11 | -32 to 40 | Salt (Rock Salt crushes into 2) |
+| Spodumene | 3 (+6 pegmatite veins of 10 under mountains and badlands, Y 0 to 160) | 7 | -48 to 48 | lithium, for the Battery Array |
+
+**Spodumene** (lithium) doesn't smelt: the Arc Crusher grinds it into Spodumene Dust for the Chemical Reactor (see
+Lithium and batteries). A stone pickaxe mines it.
 
 **Halite** is different: it forms wide, flat beds rather than veins, one layer thick, and three layers thick under
 deserts and oceans (`haliteBeds`). It drops Rock Salt, which doesn't smelt; the Arc Crusher grinds it into Salt.
@@ -465,11 +469,15 @@ Energy upgrades don't lower it.
 that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as fast (config
 `multiblocks.arcforgeFurnace`).
 
+**Graphite** is baked in the Arcforge Furnace too, from 1,500°C: 1 Coal Coke (or 2 Carbon Dust) in the metal slot gives 1
+Graphite. Coal Coke coming in through a port goes to the fuel slot unless the metal slot already holds Coal Coke, so a
+Graphite line starts with one coke put in the metal slot by hand.
+
 **Plastic Sheet** and **PVC Sheet** (`#arcforge:plastics`) go into Conduit Filters, Storage Upgrades, the crafted crate
 and vault upgrades, the Settings Card, the Security Terminal, the Fermenter, dyed conduits and the Gas Turbine Array
 Casing. Plastic Sheet comes from Light Oil and Hydrogen, or from Ethylene (bio-plastic); **Ethylene** is a gas, made from
 Ethanol over a little Sulfuric Acid, with its Water going to the reactor's by-product tank (By-product faces). **PVC
-Sheet** (Ethylene and Chlorine) also lines the Hardened and Arcforged Fluid Conduits and Fluid Tanks.
+Sheet** (Ethylene and Chlorine) also lines the Hardened and Arcforged Fluid Conduits and the Arcforged Fluid Tank.
 
 ### Salt and chlor-alkali
 
@@ -492,9 +500,9 @@ into the casings round it: into the corners either side, the cap above and the b
 side, where the base stays solid round the controller), so a window column is two blocks wide and its edges stop half a
 block in from the tower's corners. It evaporates with heat, only at 100°C or hotter: 20% speed at 100°C,
 rising to full speed (25 mB/t) at 400°C, and holds up to 1,000°C in a 200,000 HU buffer. Seawater boils down to Brine
-and Brine to Salt (see above); most of the evaporated water comes back out. Through the windows you see the inside of the
+and Brine to Salt (see above), leaving a little Lithium Brine in a by-product tank; most of the evaporated water comes back out. Through the windows you see the inside of the
 tower, lined, with the liquid rising and falling with the input tank (a full tank fills the tower), and a white salt bed while it makes Salt. Ports (Wrench, Port mode): Input,
-Heat, Brine, Salt and Water. Config `multiblocks.thermalEvaporator`; recipes `arcforge:evaporating` (`input`,
+Heat, Brine, Salt, Water and Lithium Brine. Config `multiblocks.thermalEvaporator`; recipes `arcforge:evaporating` (`input`,
 `fluid_result` and/or `item_result`, `water`, `heat`).
 
 **Seawater.** An Electric Pump on water in an ocean or beach biome (`machines.electricPump.seawaterBiomeTags`) pumps
@@ -502,6 +510,41 @@ Seawater instead of Water.
 
 **Hydrochloric Acid** leaches ore exactly as Sulfuric Acid does: every leaching recipe takes `#arcforge:leaching_acids`.
 The Chemical Reactor has three input tanks, so the **Lye biodiesel** fits in one machine.
+
+### Lithium and batteries
+
+```
+Spodumene --[mine]--> Raw Spodumene --[Arc Crusher]--> Spodumene Dust (2 per ore, 4 in the Arc Crushing Array)
+1 Spodumene Dust + 250 mB Sulfuric Acid --[Chemical Reactor]--> 250 mB Lithium Brine
+250 mB Brine --[Thermal Evaporator Array]--> 1 Salt + 200 mB water + 25 mB Lithium Brine (Lithium Brine port)
+250 mB Lithium Brine + 100 mB Lye --[Chemical Reactor]--> 1 Lithium Hydroxide + 100 mB Brine
+1 Lithium Hydroxide + 1 iron dust + 1 Basic Slag --[Chemical Reactor, three item slots]--> 1 LFP Cathode
+1 Coal Coke (or 2 Carbon Dust) --[Arcforge Furnace, 1,500°C]--> 1 Graphite
+1 Graphite --[Metal Press, Plate Die]--> 1 Graphite Anode
+2 Plastic Sheet --[crafting]--> 2 Cell Separators
+```
+
+**Battery Array.** A box of **Battery Array Casings** 3 to 5 blocks along each side (any mix, so it needn't be a cube)
+with one **Battery Array Controller** in a side face (not on an edge), facing out. The twelve edges are casings; the faces
+are casings or **Pressure Glass**. The inside (1 to 27 blocks) is filled entirely with **Lithium Cells** and **Power
+Regulators** in any mix, with at least one cell.
+
+| Tier | Lithium Cell | Power Regulator |
+|---|---|---|
+| Wrought | 64,000,000 FE | 65,536 FE/t |
+| Tempered | 512,000,000 FE | 262,144 FE/t |
+| Hardened | 4,000,000,000 FE | 1,048,576 FE/t |
+| Arcforged | 32,000,000,000 FE | 4,194,304 FE/t |
+
+The cells add up to its capacity (held as a long, so it can pass 2.1 billion FE); the regulators add up to how much it
+takes in and gives out each tick, each way (16,384 FE/t with none). Each tick it takes FE in through its **Energy Input**
+ports and pushes it out of its **Energy Output** ports (Wrench, Port mode). The energy is shared between the cells in
+proportion to their capacity: a cell broken out keeps its share on the item, and a new array starts from what its cells
+hold. Breaking any block un-forms it. Through the glass the cells' windows light up level by level at the array's fill;
+the controller's display shows it too and glows brighter the fuller it is, and a comparator on the controller reads it.
+Redstone control pauses the output. Cells are crafted from an LFP Cathode, a Cell Separator, a Graphite Anode, Steel
+Plates and Wrought Alloy, regulators the same with a block of redstone; each tier upgrades into the next keeping its
+charge. Config `power.batteryArray`.
 
 ### Fermenting
 
@@ -524,7 +567,7 @@ full, that gas goes back into the air.
 **Haber Reactor** (FE and heat). 60 mB of Hydrogen and 20 mB of Nitrogen make 40 mB of **Ammonia** every second at
 60 FE/t and 10 HU/t, only at 450°C or hotter (heat through its heat face, e.g. from a Fuel Burner).
 
-The **Chemical Reactor** (now with two item slots) makes **NPK Fertilizer** (Basic Slag, Wood Ash and 100 mB of Ammonia
+The **Chemical Reactor** (now with three item slots) makes **NPK Fertilizer** (Basic Slag, Wood Ash and 100 mB of Ammonia
 make two; +15 nutrients, and crops on the enriched Loam Farmland grow twice as fast until those run out), **Nutrient
 Solution** (NPK Fertilizer in water, for the Hydroponic Cell) and **Biodiesel** (Seed Oil and Ethanol; a Fuel Burner
 fuel, 320 HU per mB up to 1,000°C).
@@ -565,8 +608,8 @@ Infuser's additive slot in place of Creosote (one per plank, four per log or woo
 Dust cure into 2 Rubber at 12 HU/t (`arcforge:vulcanizing`). Input on top, output underneath and heat at the back by
 default; Speed and Heat upgrades. Config `farming.vulcanizer`.
 
-**Rubber Gaskets** seal Tempered and better Pressurized Conduits, Pressurized Cylinders and Gas Cartridges, and the
-Jetpacks. Nine Rubber make a Block of Rubber.
+**Rubber Gaskets** seal Tempered and better Pressurized Conduits, Pressurized Cylinders and Gas Cartridges, the Hardened
+Fluid Tank, and the Jetpacks. Nine Rubber make a Block of Rubber.
 
 ### Automated farms
 

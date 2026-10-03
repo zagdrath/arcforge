@@ -138,7 +138,8 @@ public final class FarmChemistryGameTests {
         var input = reactor.getItemHandler(null);
         helper.assertTrue(FiberGameTests.insert(input, ModItems.BASIC_SLAG.get(), 4) == 4, "The reactor refused Basic Slag");
         helper.assertTrue(FiberGameTests.insert(input, ModItems.WOOD_ASH.get(), 4) == 4, "The reactor refused Wood Ash");
-        helper.assertTrue(FiberGameTests.insert(input, ModItems.SULFUR_DUST.get(), 1) == 0, "A third item went in while both slots were in use");
+        helper.assertTrue(FiberGameTests.insert(input, ModItems.SULFUR_DUST.get(), 1) == 1, "A third item didn't go into the third slot");
+        helper.assertTrue(FiberGameTests.insert(input, ModItems.SALT.get(), 1) == 0, "A fourth item went in while all three slots were in use");
         ItemStack a = reactor.getItems().getStack(ChemicalReactorBlockEntity.SLOT_INPUT);
         ItemStack b = reactor.getItems().getStack(ChemicalReactorBlockEntity.SLOT_INPUT_B);
         helper.assertTrue(a.is(ModItems.BASIC_SLAG.get()) && b.is(ModItems.WOOD_ASH.get()), "The slots hold " + a + " and " + b);

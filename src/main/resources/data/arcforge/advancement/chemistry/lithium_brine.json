@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/brine",
+  "display": {
+    "icon": {
+      "id": "arcforge:lithium_brine_bucket"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.lithium_brine.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.lithium_brine.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:lithium_brine"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#c:dusts/spodumene",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:sulfuric_acid",
+      "amount": 250
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:lithium_brine",
+    "amount": 250
+  },
+  "time": 160
+}

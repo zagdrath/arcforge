@@ -140,6 +140,8 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(BiogasDigesterMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.FireboxArrayMenu>> FIREBOX_ARRAY =
             MENU_TYPES.register("firebox_array", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.FireboxArrayMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.BatteryArrayMenu>> BATTERY_ARRAY =
+            MENU_TYPES.register("battery_array", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.BatteryArrayMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu>> THERMAL_EVAPORATOR =
             MENU_TYPES.register("thermal_evaporator",
                     () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu::new));

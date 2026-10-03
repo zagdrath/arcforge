@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:processing/dust",
+  "display": {
+    "icon": {
+      "id": "arcforge:raw_spodumene"
+    },
+    "title": {
+      "translate": "advancements.arcforge.processing.spodumene.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.processing.spodumene.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:raw_materials/spodumene"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

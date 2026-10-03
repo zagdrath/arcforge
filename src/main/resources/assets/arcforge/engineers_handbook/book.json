@@ -127,6 +127,7 @@
         "reservoir",
         "liquid_experience",
         "energy_cells",
+        "battery_array",
         "meters",
         "chargepad",
         "quantum_tunnel",
@@ -142,6 +143,7 @@
       "entries": [
         "ores",
         "dusts",
+        "lithium",
         "parts",
         "mineral_wool",
         "treated_wood",

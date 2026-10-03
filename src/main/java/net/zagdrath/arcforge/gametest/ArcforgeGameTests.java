@@ -279,6 +279,11 @@ public final class ArcforgeGameTests {
         TESTS.put("rectangular_steam_arrays", BigArrayGameTests::rectangularSteamArrays);
         TESTS.put("superheater_condenser_boxes", BigArrayGameTests::boxArrays);
         TESTS.put("power_multiplier", BigArrayGameTests::powerMultiplier);
+        TESTS.put("lithium_recipes", LithiumGameTests::recipes);
+        TESTS.put("lithium_reactor_third_slot", LithiumGameTests::reactorThirdSlot);
+        TESTS.put("lithium_evaporator_byproduct", LithiumGameTests::evaporatorLithiumBrine);
+        TESTS.put("battery_array_forms", LithiumGameTests::batteryArrayForms);
+        TESTS.put("battery_array_charges", LithiumGameTests::batteryArrayCharges);
         TESTS.put("salt_recipes", SaltGameTests::recipes);
         TESTS.put("salt_tags", SaltGameTests::saltTags);
         TESTS.put("salt_reactor_makes_brine", SaltGameTests::reactorMakesBrine);

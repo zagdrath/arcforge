@@ -1,0 +1,21 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "misc",
+  "pattern": [
+    "TCT",
+    "PXP",
+    "TAT"
+  ],
+  "key": {
+    "T": "arcforge:arcforged_alloy",
+    "C": "arcforge:lfp_cathode",
+    "P": "arcforge:cell_separator",
+    "A": "arcforge:graphite_anode",
+    "X": "arcforge:hardened_lithium_cell"
+  },
+  "result": {
+    "id": "arcforge:arcforged_lithium_cell",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

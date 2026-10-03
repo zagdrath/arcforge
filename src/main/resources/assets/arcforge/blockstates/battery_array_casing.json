@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/battery_array/casing"
+    },
+    "formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/battery_array/casing_formed"
+    }
+  }
+}

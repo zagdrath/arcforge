@@ -324,15 +324,16 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - Mineral pixels are recoloured by brightness onto the ore's ramp. Bevels are kept on stone and
     darkened for deepslate.
   - Sources: silverish → silver and arcite; cream → nickel and tungsten (wolframite); green → fluorite
-    (alternate clusters purple and green); iridescent → bismuth (rainbow ramp); cream → halite (pinkish rock salt).
+    (alternate clusters purple and green) and spodumene (mint); iridescent → bismuth (rainbow ramp); cream → halite
+    (pinkish rock salt).
   - Use the same method for any future ore.
 - **Raw items:** Cody's own raw item textures, recoloured per ore by brightness onto the ore's 7-tone ramp,
   keeping every pixel and his outline shading.
   - Sources: blue → silver and arcite; light → nickel and bismuth (rainbow ramp); dark → tungsten
-    (wolframite); green → fluorite (purple, with the lower-right lobe green).
+    (wolframite); green → fluorite (purple, with the lower-right lobe green) and spodumene (mint).
   - Use the same method for any future raw item.
 - **Raw blocks:** Cody's own raw-block textures, recoloured per ore by brightness onto the ore's 7-tone ramp,
-  keeping every pixel, lump and crease of his art. Sources: bluegrey → silver, grey → nickel and tungsten,
+  keeping every pixel, lump and crease of his art. Sources: bluegrey → silver, grey → nickel and tungsten, green → spodumene,
   green → fluorite, teal → bismuth (rainbow ramp) and arcite (dimmed cyan). Use the same method for any
   future raw block.
 - **Crystals and crystal blocks:** Cody's own crystal item and crystal block textures, recoloured per ore by
@@ -800,6 +801,49 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - **Bigger Steam Boiler and Turbine Arrays** use the existing shell textures; nothing new is painted. A wall casing leaves
   out its face toward the hollow inside however big the shell is, so the liner and reveal (`ctm/shell_liner`,
   `ctm/shell_jamb`) still line the inside. The turbine's rotor model is scaled to the cross-section's shorter side.
+
+## Lithium and the Battery Array
+- **Spodumene** follows the ore method: Cody's green ore (as for fluorite, without the alternate purple clusters), his green
+  raw item and green raw block, and his dust, all mapped by brightness onto a pale mint "hiddenite" ramp
+  `#3E5A48 #76A088 #B4D8C0 #EEFFF4`, so it reads apart from fluorite (purple) and halite (pinkish). Spodumene Ore and
+  Deepslate Spodumene Ore are overlays on vanilla stone and deepslate.
+- **Lithium Brine:** Ethanol's frames recoloured by brightness onto a pale mint-teal `#4E7C70 → #EAF6F0`, a little more
+  opaque (as Brine); fog `#B8DCCC`.
+- **Lithium Hydroxide:** the dust texture recoloured onto a lavender-tinted white `#6E6880 #A29CB4 #CAC6D8 #E8E6F0 #FFFFFF`
+  (cooler than Salt). **Graphite:** Cody's coke lump recoloured by rank onto graphite grey `#0C0D0F → #BCC2CA`; the
+  **Block of Graphite** is the Coal Coke Block mapped tone for tone onto `#2A2D33 #3A3E46 #4E535C #666C76`.
+  **Cell Separator:** the Plastic Sheet recoloured onto a milky white `#8A96A2 → #FFFFFF`.
+- **LFP Cathode / Graphite Anode:** an electrode sheet (x3..12, y4..14) with a bare-foil top row and a tab (x5..8) up to
+  y1, in a `#0C0D0F` outline: the coating lit on its top row and left column, a step darker right of x9, a shade bottom
+  row and right column, one glint. Cathode: slate LFP `#7A8496 #566074 #465064 #2E3646` on an aluminium tab; anode:
+  graphite `#6A707A #3E434C #30343B #1E2126` on a copper tab (the Tempered row).
+- **Battery Array** (`block/battery_array/`), connected (ConnectedModel "battery_array": the digester's solid skin, rims on
+  the outer edges only with the Distillation `ctm/column_beam`). It's solid, not a skin: casings keep their faces and
+  beams toward their windows, so the glass shows the cells inside and never the inside of a casing; the formed Pressure
+  Glass counts the array as its structure and draws no beam against it.
+  - `plate` / `casing`: the Firebox Array's wall plate and loose casing with the firebrick band re-tiled as an insulated FE
+    band (`#8E231C` face row, `#5A1712` shade row, a `#3A100C` joint every 4 px). `top` / `casing_top`: the Firebox
+    Array's lids.
+  - `controller_0`…`controller_4`: the plate with a recessed charge display (x3..12, y2..11, `#3A100C` floor) of four
+    bars lit from the bottom like the Energy Cell's (`#FF8577` first column, `#E5483C`; unlit `#8E231C` / `#5A1712`);
+    picked by the controller's CHARGE. `controller_unformed`: the same display, dark, in the loose casing.
+- **Lithium Cells** (`block/lithium_cell/<tier>_<0-4>`, `<tier>_top`): the single-block casing with a 2-row tier band (top /
+  front tones, rim highlight at the left end) on rows 2–3, two side rivets, and a recessed window (x5..10, y5..13) of
+  four bars lit from the bottom as above, all a formed array's cells showing its fill. The top is a tier plate with two
+  3×3 terminals, FE red (+) and steel (−).
+- **Power Regulators** (`block/power_regulator/<tier>`, `_on`, `_top`): the casing with a 3-slat vent recess (x3..12,
+  y2..9), a 2×2 status lamp under it (dark teal `#2F6E68` loose, status cyan `#B8F2EA` / `#5FD4C4` in a formed array)
+  and the tier band on rows 12–13; the top is a riveted casing with a 6×6 tier plate.
+- Ports `block/port/energy_input` (the input plate) and `energy_output` (the output plate) carry the FE chip
+  (`#E5483C` / `#8E231C`); `lithium_brine` is the output plate with a mint chip (`#B4D8C0` / `#5E8C78`).
+- Ports-tab face icons (`widget/arcforge/face_<mode>`, as `face_gas_output`): the output frame (`#F5B574` lit /
+  `#9E5A1C` dark) or the input frame (`#7FB3F0` / `#2A5A99`) round the resource's colour: Energy Input (input frame, FE
+  red), Energy Output (output frame, FE red), Lithium Brine (mint), and Brine, Salt and Water, which had none.
+- GUIs: the Battery Array's is the Energy Cell's panel stretched to 186 tall (the inventory 20 px lower), a 16×72 gauge
+  recess at (8,17) holding the Energy Cell's FE bars (`container/battery_array/energy_fill`, 14×70) and the house screen
+  recess (30,17)–(168,89). The Thermal Evaporator's gains a 43×4 `#0E0E0E` track at (76,46) for its by-product bar
+  (`byproduct_fill`: flat mint `#CEE6DC` / `#8CB8A8` / `#4E7C70`). The Chemical Reactor's two input slots become three
+  touching slots at y 16/34/52.
 
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with

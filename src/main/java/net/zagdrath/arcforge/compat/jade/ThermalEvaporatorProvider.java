@@ -56,6 +56,7 @@ public enum ThermalEvaporatorProvider implements StreamServerDataProvider<BlockA
             addTank(lines, "jade.arcforge.thermal_evaporator.input", evaporator.getInput());
             addTank(lines, "jade.arcforge.thermal_evaporator.output", evaporator.getOutput());
             addTank(lines, "jade.arcforge.thermal_evaporator.water", evaporator.getWater());
+            addTank(lines, "jade.arcforge.thermal_evaporator.byproduct", evaporator.getByproduct());
             ItemStack salt = evaporator.getSalt();
             if (!salt.isEmpty()) {
                 lines.add(Component.translatable("jade.arcforge.thermal_evaporator.salt", salt.getCount(), salt.getHoverName()));

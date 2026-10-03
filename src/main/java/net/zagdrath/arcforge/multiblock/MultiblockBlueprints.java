@@ -75,7 +75,8 @@ public final class MultiblockBlueprints {
                 biogasDigester(),
                 greenhouse(),
                 thermalEvaporator(),
-                fireboxArray());
+                fireboxArray(),
+                batteryArray());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -319,6 +320,34 @@ public final class MultiblockBlueprints {
             placements.add(new Placement(at, state));
         }
         return new Blueprint("firebox_array", sorted(placements), size);
+    }
+
+    // A Battery Array 4 wide, 3 tall and 4 deep (3 to 5 each way work): casings on the edges, the controller in the front
+    // face facing south, a window in the east face, and inside three Wrought Lithium Cells and a Wrought Power Regulator
+    // (any mix works).
+    private static Blueprint batteryArray() {
+        BlockPos size = new BlockPos(4, 3, 4);
+        BlockState casing = ModBlocks.BATTERY_ARRAY_CASING.get().defaultBlockState();
+        BlockState glass = ModBlocks.PRESSURE_GLASS.get().defaultBlockState();
+        BlockState controller = ModBlocks.BATTERY_ARRAY_CONTROLLER.get().defaultBlockState()
+                .setValue(net.zagdrath.arcforge.block.multiblock.BatteryArrayControllerBlock.FACING, Direction.SOUTH);
+        BlockState cell = ModBlocks.lithiumCell(net.zagdrath.arcforge.conduit.ConduitTier.WROUGHT).get().defaultBlockState();
+        BlockState regulator = ModBlocks.powerRegulator(net.zagdrath.arcforge.conduit.ConduitTier.WROUGHT).get().defaultBlockState();
+        List<Placement> placements = new ArrayList<>();
+        for (BlockPos pos : BlockPos.betweenClosed(BlockPos.ZERO, size.offset(-1, -1, -1))) {
+            BlockPos at = pos.immutable();
+            int boundaries = boundaries(at, size);
+            BlockState state;
+            if (boundaries == 0) {
+                state = at.equals(new BlockPos(2, 1, 2)) ? regulator : cell;
+            } else if (at.equals(new BlockPos(1, 1, 3))) {
+                state = controller;
+            } else {
+                state = boundaries == 1 && at.getX() == 3 ? glass : casing;
+            }
+            placements.add(new Placement(at, state));
+        }
+        return new Blueprint("battery_array", sorted(placements), size);
     }
 
     // 3x3, 5 long along X (3 to 9 work), with a window along the front.

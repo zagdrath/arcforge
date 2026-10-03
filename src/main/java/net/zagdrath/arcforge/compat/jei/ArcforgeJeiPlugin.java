@@ -123,6 +123,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Condensing(gui),
                 new MachineCategories.BurnerFuels(gui),
                 new MachineCategories.GasTurbineFuels(gui),
+                new MachineCategories.BatteryComponents(gui),
                 new MultiblockCategory(gui));
     }
 
@@ -167,6 +168,14 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         });
         registration.addRecipes(MachineCategories.BurnerFuels.TYPE, fuels);
         registration.addRecipes(MachineCategories.GasTurbineFuels.TYPE, fuels.stream().filter(fuel -> fuel.fuel().gasTurbine()).toList());
+        List<MachineCategories.BatteryComponentRecipe> batteryParts = new ArrayList<>();
+        for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.values()) {
+            batteryParts.add(new MachineCategories.BatteryComponentRecipe(ModBlocks.lithiumCell(tier).get().asItem(), tier, true));
+        }
+        for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.values()) {
+            batteryParts.add(new MachineCategories.BatteryComponentRecipe(ModBlocks.powerRegulator(tier).get().asItem(), tier, false));
+        }
+        registration.addRecipes(MachineCategories.BatteryComponents.TYPE, batteryParts);
 
         registration.addRecipes(MultiblockCategory.TYPE, MultiblockBlueprints.all().stream().map(MultiblockCategory.Build::new).toList());
 
@@ -230,6 +239,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipeClickArea(ArcforgeFurnaceScreen.class, 84, 24, ARROW_W, ARROW_H, MachineCategories.ArcforgeSmelting.TYPE);
         registration.addRecipeClickArea(CarbonizerScreen.class, 52, 24, ARROW_W, ARROW_H, MachineCategories.Carbonizing.TYPE);
         registration.addRecipeClickArea(FuelBurnerScreen.class, 127, 52, 14, 14, MachineCategories.BurnerFuels.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.BatteryArrayScreen.class, 8, 17, 16, 72,
+                MachineCategories.BatteryComponents.TYPE);
         for (int lane = 0; lane < 3; lane++) {
             int y = 20 + lane * 18;
             registration.addRecipeClickArea(ArcCrushingArrayScreen.class, 52, y, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);
@@ -281,6 +292,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Condensing.TYPE, ModBlocks.CONDENSER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.BurnerFuels.TYPE, ModBlocks.FUEL_BURNER.get(), ModBlocks.FIREBOX_ARRAY_CONTROLLER.get());
         registration.addCraftingStation(MachineCategories.GasTurbineFuels.TYPE, ModBlocks.GAS_TURBINE_ARRAY_CASING.get());
+        registration.addCraftingStation(MachineCategories.BatteryComponents.TYPE, ModBlocks.BATTERY_ARRAY_CONTROLLER.get(), ModBlocks.BATTERY_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.Distilling.TYPE, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(),
                 ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get());
         registration.addCraftingStation(RecipeTypes.SMELTING, ModBlocks.INDUCTION_FURNACE.get(), ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get());

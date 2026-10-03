@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "arcforge:block/power_regulator/wrought",
+    "end": "arcforge:block/power_regulator/wrought_top"
+  }
+}

@@ -41,6 +41,17 @@ number and date.
 - **Built arrays keep working.** Saved 3×3 Steam Boiler, Steam Turbine and Gas Turbine Arrays and 3×3×3 Superheater and
   Condenser Arrays load as they were. A Steam or Gas Turbine Array's FE buffer is resized to its new size when the world
   loads (it keeps the FE it held).
+- **Chemical Reactor third item slot.** Saved Chemical Reactors keep their items, tanks and upgrades: the upgrades move up
+  past the new slot when the world loads. The three input slots are re-stacked in the GUI (y 17/35/53).
+- **Thermal Evaporator Array by-product tank** loads empty in saved towers. Towers without a Lithium Brine port keep
+  making Salt (the Lithium Brine that doesn't fit is lost).
+- **Arcforge Furnace routing:** Coal Coke put in through a port now goes to the fuel slot unless the metal slot already
+  holds Coal Coke (it's a Graphite "metal" now). Steel lines are unaffected.
+- **Spodumene generates only in newly explored chunks.**
+- **New config sections and keys** `power.batteryArray` (with `lithiumCellCapacity` and `powerRegulatorTransfer`),
+  `ores.spodumene`, `ores.spodumenePegmatite` and `multiblocks.thermalEvaporator.byproductCapacity` get their defaults.
+- **Data packs:** `arcforge:chemical_reacting` recipes may take a `third_item_input` (it needs a `second_item_input`);
+  `arcforge:evaporating` recipes may have a `byproduct` fluid. Existing recipes load unchanged.
 
 ### Added
 
@@ -68,6 +79,36 @@ number and date.
   generator (Combustion Plant, Thermoelectric Plant, Steam Turbine Array, Gas Turbine Array), at the point of generation.
   Heat (HU) and steam aren't multiplied, so the heat → steam → FE chain is multiplied once. GUIs, Jade, JEI and the
   Handbook show the multiplied values; generators' output caps and FE buffers grow with it.
+- **Lithium,** for batteries:
+  - **Spodumene Ore** (and Deepslate), in stone and deepslate everywhere (Y -48 to 48), with richer pegmatite veins up to
+    Y 160 under mountains and badlands; a stone pickaxe mines it. Raw Spodumene, a raw block and Spodumene Dust (2 per
+    ore from the Arc Crusher, doubled in the Arc Crushing Array; it doesn't smelt). Generation in `ores.spodumene` and
+    `ores.spodumenePegmatite`.
+  - **Lithium Brine** (a fluid, with a bucket): Spodumene Dust + 250 mB Sulfuric Acid in the Chemical Reactor gives 250 mB;
+    the Thermal Evaporator Array drying Brine into Salt also leaves 25 mB per Salt, out of a new Lithium Brine port.
+  - **Lithium Hydroxide:** 250 mB Lithium Brine + 100 mB Lye in the Chemical Reactor, giving back 100 mB Brine.
+  - **Graphite** (and its block): Coal Coke, or 2 Carbon Dust, baked at 1,500°C in the Arcforge Furnace.
+  - Battery parts: the **LFP Cathode** (Lithium Hydroxide + iron dust + Basic Slag in the Chemical Reactor), the
+    **Graphite Anode** (Graphite in the Metal Press with the Plate Die) and the **Cell Separator** (from Plastic Sheet).
+- **Chemical Reactor third item slot,** for recipes with three items (the LFP Cathode). Items put in through an input
+  face sort into the three slots one kind each.
+- **Battery Array,** a multiblock energy store: a box of Battery Array Casings 3 to 5 blocks each way (it needn't be a
+  cube) with one Battery Array Controller; the edges are casings, the faces may be Pressure Glass. The inside (1 to 27
+  blocks) is filled with Lithium Cells and Power Regulators in any mix, at least one cell.
+  - **Lithium Cells** set its capacity (Wrought 64M, Tempered 512M, Hardened 4G, Arcforged 32G FE), **Power Regulators**
+    its transfer each way (65,536 / 262,144 / 1,048,576 / 4,194,304 FE/t); with no regulators it moves 16,384 FE/t. Both
+    come in four tiers, made from the battery parts, Steel Plates and the tier's alloy, each upgrading into the next and
+    keeping its charge.
+  - The energy is held as a long (past the int limit). It takes in and gives out up to its transfer rate each tick
+    through Energy Input and Energy Output ports (set with the Wrench); redstone control pauses the output.
+  - The energy is shared between the cells; a broken cell keeps its share on the item, and an array starts from what its
+    cells hold. Breaking any block of it un-forms it.
+  - Through the glass the cells' windows light up level by level at the array's fill, the controller's display does the
+    same and it glows brighter the fuller it is; a comparator on the controller reads it.
+  - GUI (stored, capacity, live input and output, transfer limit, cells and regulators), Handbook pages (Lithium &
+    Batteries, Battery Array), a JEI build view and a Battery Array Components category, Jade tooltips, GameTests, and
+    advancements (Light Metal, Salt of the Earth, Battery Grade, Grid Scale, and the challenge Power Bank for a 5×5×5).
+    All its values are in the new `power.batteryArray` config.
 
 ### Changed
 
@@ -108,6 +149,13 @@ number and date.
   Conduits now look again until they find the machine. The same fix covers every conduit type.
 - **"Missing model" warnings for every liquid block** (`arcforge:creosote[level=0]` and so on): each liquid now has a
   blockstate.
+- **The Chemical Reactor and Distillation Array couldn't be built.** Both need a Hardened Fluid Tank, which needed a PVC
+  Sheet, and only the Chemical Reactor makes PVC. The Hardened Fluid Tank now takes a Rubber Gasket in its place (from the
+  Vulcanizer, no Chemical Reactor needed); the Arcforged Fluid Tank and the Hardened and Arcforged Fluid Conduits still
+  take PVC. Every recipe in the mod has been checked to be reachable from a new world.
+- **Firebox Array windows** didn't open its GUI when right-clicked; they do now, like its casings.
+- **Ports tab icons for the Thermal Evaporator Array's Brine, Salt and Water ports** were missing (a missing-texture
+  square); they now have their own.
 
 ## [2.3.0] - 2026-10-01
 

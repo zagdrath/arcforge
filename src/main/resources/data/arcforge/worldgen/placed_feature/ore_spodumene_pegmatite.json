@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_spodumene_pegmatite",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "spodumenePegmatite",
+      "default": 6
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "spodumenePegmatite",
+      "shape": "trapezoid",
+      "default_min": 0,
+      "default_max": 160
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

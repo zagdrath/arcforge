@@ -1,0 +1,14 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "#c:coal_coke",
+    "count": 1
+  },
+  "coke": 0,
+  "result": {
+    "id": "arcforge:graphite",
+    "count": 1
+  },
+  "time": 400,
+  "min_temp": 1500
+}
