@@ -20,8 +20,75 @@ number and date.
 
 ## [Unreleased]
 
+### Upgrading
+
+- **Steam and power config values reset to their new defaults.** Keys whose meaning or default changed were renamed, so
+  old values are not carried over; set them again if you had changed them:
+  - `steam.steamBoilerArray`: `heatCapacityPerHeight`, `maxHeatPerTickPerHeight`, `tankCapacityPerHeight` become
+    `heatCapacityPerSection`, `maxHeatPerTickPerSection`, `tankCapacityPerSection` (per 3×3 of footprint per block of
+    height; same defaults).
+  - `steam.steamTurbineArray`: `maxFlowPerLength`, `tankCapacityPerLength`, `exhaustTankCapacityPerLength` become
+    `maxFlowPerSection`, `tankCapacityPerSection`, `exhaustTankCapacityPerSection` (per 3×3 of cross-section per block of
+    length; same defaults); `energyCapacity` and `maxEnergyOutput` are replaced by `energyBufferTicks` (400).
+  - `steam.gasTurbineArray`: `maxFuelHuPerLength` (560) becomes `maxFuelHeatPerLength` (2,500), `fuelTankPerLength`
+    (8,000) becomes `fuelTankCapacityPerLength` (32,000); `energyCapacity` and `maxEnergyOutput` are replaced by
+    `energyBufferTicks` (400).
+  - `steam.superheaterArray`: `heatCapacity`, `maxHeatPerTick`, `tankCapacity`, `maxFlow` become
+    `heatCapacityPerCube`, `maxHeatPerTickPerCube`, `tankCapacityPerCube`, `maxFlowPerCube` (per 27 blocks; same defaults).
+  - `steam.condenserArray`: `tankCapacity`, `baseRate`, `maxRate` become `tankCapacityPerCube`, `baseRatePerCube`,
+    `maxRatePerCube` (per 27 blocks; same defaults).
+  - New: `power.generationMultiplier` (1.0) and the `power.fireboxArray` section.
+- **Built arrays keep working.** Saved 3×3 Steam Boiler, Steam Turbine and Gas Turbine Arrays and 3×3×3 Superheater and
+  Condenser Arrays load as they were. A Steam or Gas Turbine Array's FE buffer is resized to its new size when the world
+  loads (it keeps the FE it held).
+
+### Added
+
+- **Firebox Array,** a large heat source: a hollow box of Firebox Array Casings with one Firebox Array Controller, 3 to 7
+  by 3 to 9 across (in any combination, so it needn't be square) and 3 to 5 tall. Its edges are casings; its walls, floor
+  and roof may be Pressure Glass, through which you see the fire burning on its firebrick-lined floor.
+  - It makes 160 HU/t per block of its volume (a 3×3×3 makes 4,320 HU/t, a 7×5×9 50,400 HU/t, all the biggest Steam
+    Boiler Array can take), with a heat buffer, fuel tank and oxygen tank that scale with it.
+  - It burns solid fuels (`#arcforge:combustion_fuel`, at a Firebox's heat per item and 1,100°C; Coal Coke at 1.5× a
+    coal's heat and 1,300°C) and any liquid or gas in `arcforge:burner_fuels` (at the Fuel Burner's HU per mB and the
+    fuel's own temperature). Oxy-fuel through an Oxygen port adds 300°C, as on the Firebox. It pauses while it's as hot
+    as its fuel burns.
+  - Ports like the other arrays: Input (fuel), Oxygen and Heat (out, as fast as it burns).
+  - Its own GUI, Handbook page, JEI build view and information, Jade tooltip, GameTests, and two advancements (Stoke the
+    Fires; the challenge Roaring Inferno for a 7×5×9). All its values are in the new `power.fireboxArray` config.
+- **Bigger, rectangular steam arrays:**
+  - **Steam Boiler Array:** a footprint 3 to 7 by 3 to 9 in any combination, 3 to 12 tall.
+  - **Steam Turbine Array:** a cross-section 3 to 7 wide and 3 to 9 tall in any combination, 3 to 15 long, along either
+    horizontal axis. Its rotor and blades are sized to the cross-section's shorter side.
+  - **Superheater and Condenser Arrays:** any solid box 3 to 7 blocks each way. A 3×3×3 is drawn as before; a bigger box
+    is one connected casing with its own textures.
+  - Beyond a 3×3 cross-section the twelve edges must be casings; the rest of the walls can be Pressure Glass. Existing 3×3
+    structures keep working unchanged.
+- **Global power multiplier,** `power.generationMultiplier` (default 1.0, 0.1 to 100): multiplies the FE made by every
+  generator (Combustion Plant, Thermoelectric Plant, Steam Turbine Array, Gas Turbine Array), at the point of generation.
+  Heat (HU) and steam aren't multiplied, so the heat → steam → FE chain is multiplied once. GUIs, Jade, JEI and the
+  Handbook show the multiplied values; generators' output caps and FE buffers grow with it.
+
 ### Changed
 
+- **Steam Boiler Array:** boil rate, heat buffer and tanks scale by footprint area and height: 600 HU/t, 100,000 HU and
+  16,000 mB per section (width × depth ÷ 9 × height), so a 7×9×12 boils up to 50,400 HU/t. A 3×3 tower is unchanged.
+- **Steam Turbine Array:** FE per mB raised to 20 / 36 / 56 (Steam / High-Pressure / Superheated), from 10 / 18 / 28.
+  Steam flow and tanks scale by cross-section and length: 40 mB/t and 32,000 mB per section (width × height ÷ 9 × length).
+  Its maximum output is no longer a fixed 16,384 FE/t: it is a full flow of lubricated, exhausting Superheated Steam
+  (7,930 FE/t for a 3×3×3, 277,536 FE/t for a 7×9×15), shared across its energy ports, with an FE buffer of 400 ticks of
+  that (was 1,000,000 FE). Lubricant use scales by sections.
+- **Gas Turbine Array:** fuel heat per block of length raised from 560 to 2,500 HU/t (a 9-long array burns 22,500 HU/t,
+  about 34,000 FE/t on Naphtha). Its output cap (was 16,384 FE/t) is its full-throttle lubricated output, its FE buffer
+  (was 1,000,000 FE) 400 ticks of that, and its fuel tank 32,000 mB per block of length (was 8,000).
+- **Superheater Array:** flow (1,000 mB/t), heat use (2,000 HU/t), heat buffer (200,000 HU) and tanks (16,000 mB) are per 27
+  blocks of its size; a 7×7×7 moves 12,700 mB/t.
+- **Condenser Array:** open-air rate (120 mB/t), cap (400 mB/t) and tanks (16,000 mB) are per 27 blocks of its size; a
+  7×7×7 condenses up to 5,081 mB/t.
+- **Electrolyzer:** its energy-balance floor follows the turbine's higher FE per mB (and the power multiplier): splitting
+  100 mB of water now costs at least 141,600 FE (was 70,800 with eight Energy upgrades), above the recipe's 120,000, so
+  Energy upgrades no longer lower it. Brine still costs its recipe's 60,000 FE, down to a floor of 35,400.
+- **Pressure Glass** windows also fit the Firebox Array.
 - **Runs on every NeoForge 26.3 beta,** from 26.3.0.0-beta up; it used to need 26.3.0.23-beta or later.
 
 ### Fixed

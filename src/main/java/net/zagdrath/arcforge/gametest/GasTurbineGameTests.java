@@ -29,7 +29,7 @@ import net.zagdrath.arcforge.registry.ModFluids;
 
 // The Gas Turbine Array: which fuels it takes, the throttle, flameout and restart, its exhaust heat, a blocked
 // intake, and the rotor spooling up and coasting down. Every turbine here is 5 long along X, so it burns up
-// to 2,800 HU/t (7 mB/t of Naphtha for 4,200 FE/t).
+// to 12,500 HU/t (31.25 mB/t of Naphtha for 18,750 FE/t).
 public final class GasTurbineGameTests {
     private GasTurbineGameTests() {}
 
@@ -50,7 +50,7 @@ public final class GasTurbineGameTests {
     }
 
     // Naphtha, Light Oil, Ethanol and Hydrogen burn in it; Heavy Oil, Creosote and water don't. Both ends are
-    // open, so the intake is the negative (west) end; the tank holds 8,000 mB per block of length.
+    // open, so the intake is the negative (west) end; the tank holds 32,000 mB per block of length.
     static void fuelAcceptance(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
         build(helper, min);
@@ -62,7 +62,7 @@ public final class GasTurbineGameTests {
                     helper.assertTrue(end(helper, new BlockPos(0, 2, 1)) == GasTurbineArrayCasingBlock.End.INTAKE, "No intake at the west end");
                     helper.assertTrue(end(helper, new BlockPos(4, 2, 1)) == GasTurbineArrayCasingBlock.End.EXHAUST, "No exhaust at the east end");
                     helper.assertTrue(end(helper, new BlockPos(2, 1, 1)) == GasTurbineArrayCasingBlock.End.NONE, "A side casing is marked as an end");
-                    helper.assertTrue(turbine.getFuel().getCapacity() == 40_000, "The fuel tank holds " + turbine.getFuel().getCapacity());
+                    helper.assertTrue(turbine.getFuel().getCapacity() == 160_000, "The fuel tank holds " + turbine.getFuel().getCapacity());
                     for (Fluid fuel : new Fluid[] { ModFluids.NAPHTHA.get(), ModFluids.LIGHT_OIL.get(), ModFluids.ETHANOL.get(), ModFluids.HYDROGEN.get() }) {
                         helper.assertTrue(GasTurbineArrayBlockEntity.isFuel(FluidResource.of(fuel)), fuel + " is not a Gas Turbine fuel");
                     }
@@ -75,8 +75,8 @@ public final class GasTurbineGameTests {
                 .thenSucceed();
     }
 
-    // In Throttle mode the signal sets the fuel burned: signal 15 (a redstone block) burns 7 mB/t of Naphtha for
-    // 4,200 FE/t; signal 5 (a comparator reading a chest a third full) a third of that, 1,400 FE/t.
+    // In Throttle mode the signal sets the fuel burned: signal 15 (a redstone block) burns 31.25 mB/t of Naphtha (12,500
+    // HU/t) for 18,750 FE/t; signal 5 (a comparator reading a chest a third full) a third of that, 6,250 FE/t.
     static void throttle(GameTestHelper helper) {
         BlockPos full = new BlockPos(0, 1, 0);
         BlockPos third = new BlockPos(0, 1, 5);
@@ -106,17 +106,18 @@ public final class GasTurbineGameTests {
                 })
                 .thenIdle(320)
                 .thenExecute(() -> fuelBefore[0] = turbine(helper, full).getFuel().getAmount())
-                .thenIdle(1)
+                .thenIdle(4)
                 .thenExecute(() -> {
                     GasTurbineArrayBlockEntity fullTurbine = turbine(helper, full);
                     GasTurbineArrayBlockEntity thirdTurbine = turbine(helper, third);
                     helper.assertTrue(Math.abs(fullTurbine.throttle() - 1.0) < 1e-9, "Signal 15 throttles to " + fullTurbine.throttle());
                     helper.assertTrue(Math.abs(thirdTurbine.throttle() - 5.0 / 15.0) < 1e-9, "Signal 5 throttles to " + thirdTurbine.throttle());
-                    helper.assertTrue(fullTurbine.getFePerTick() == 4_200, "Full throttle makes " + fullTurbine.getFePerTick() + " FE/t");
-                    helper.assertTrue(thirdTurbine.getFePerTick() == 1_400, "A third throttle makes " + thirdTurbine.getFePerTick() + " FE/t");
+                    helper.assertTrue(fullTurbine.getFePerTick() == 18_750, "Full throttle makes " + fullTurbine.getFePerTick() + " FE/t");
+                    helper.assertTrue(thirdTurbine.getFePerTick() == 6_250, "A third throttle makes " + thirdTurbine.getFePerTick() + " FE/t");
                     int burned = fuelBefore[0] - fullTurbine.getFuel().getAmount();
-                    helper.assertTrue(burned == 7, "Full throttle burned " + burned + " mB in a tick");
-                    helper.assertTrue(Math.abs(fullTurbine.fuelPerTick() - 7.0) < 1e-9, "Full throttle reports " + fullTurbine.fuelPerTick() + " mB/t");
+                    // Whole mB are drained as the burn needs them, so four ticks take 125 mB, give or take one.
+                    helper.assertTrue(Math.abs(burned - 125) <= 1, "Full throttle burned " + burned + " mB in four ticks");
+                    helper.assertTrue(Math.abs(fullTurbine.fuelPerTick() - 31.25) < 1e-9, "Full throttle reports " + fullTurbine.fuelPerTick() + " mB/t");
                 })
                 .thenSucceed();
     }
@@ -149,14 +150,14 @@ public final class GasTurbineGameTests {
                 .thenSucceed();
     }
 
-    // A quarter of the fuel heat leaves the exhaust at half the burn temperature (Naphtha: 700 HU/t at 600°C).
-    // A Heat port in the middle of the exhaust end feeds a Steam Boiler Array's Heat port, which
-    // boils with it; nothing is vented.
+    // A quarter of the fuel heat leaves the exhaust at half the burn temperature (Naphtha: 3,125 HU/t at 600°C).
+    // A Heat port in the middle of the exhaust end feeds a 6-tall Steam Boiler Array's Heat port, which boils with
+    // all of it (up to 3,600 HU/t); nothing is vented.
     static void exhaustToBoiler(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
         BlockPos boilerMin = new BlockPos(5, 1, 0);
         build(helper, min);
-        SteamGameTests.buildShell(helper, boilerMin, Direction.Axis.Y, 3, ModBlocks.STEAM_BOILER_ARRAY_CASING.get());
+        SteamGameTests.buildShell(helper, boilerMin, Direction.Axis.Y, 6, ModBlocks.STEAM_BOILER_ARRAY_CASING.get());
         helper.startSequence()
                 .thenIdle(3)
                 .thenExecute(() -> {
@@ -165,14 +166,14 @@ public final class GasTurbineGameTests {
                     helper.assertTrue(turbine.isMaster() && boiler.isMaster(), "Something did not form");
                     MultiblockPorts.set(helper.getLevel(), turbine, helper.absolutePos(new BlockPos(4, 2, 1)), SideMode.HEAT, Direction.EAST);
                     MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(new BlockPos(5, 2, 1)), SideMode.HEAT, Direction.WEST);
-                    SteamGameTests.fill(boiler.getWater(), FluidResource.of(Fluids.WATER), 40_000);
+                    SteamGameTests.fill(boiler.getWater(), FluidResource.of(Fluids.WATER), 90_000);
                     fill(turbine, ModFluids.NAPHTHA.get(), 20_000);
                 })
                 .thenIdle(200)
                 .thenExecute(() -> {
                     GasTurbineArrayBlockEntity turbine = turbine(helper, min);
                     SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
-                    helper.assertTrue(turbine.getExhaustHu() == 700 && turbine.getExhaustCelsius() == 600,
+                    helper.assertTrue(turbine.getExhaustHu() == 3_125 && turbine.getExhaustCelsius() == 600,
                             "Exhaust is " + turbine.getExhaustHu() + " HU/t at " + turbine.getExhaustCelsius() + "°C");
                     helper.assertFalse(turbine.isVenting(), "The exhaust vents with a boiler on its Heat port");
                     helper.assertTrue(boiler.getHeat().getStored() > 0 || boiler.getSteam().getAmount() > 0, "The boiler got no heat");
@@ -181,8 +182,8 @@ public final class GasTurbineGameTests {
                 .thenSucceed();
     }
 
-    // A Throttle Lever sets the throttle directly: at 15 the turbine burns at full throttle (4,200 FE/t), at 1 a
-    // fifteenth of that (280 FE/t). The lever hangs on a stone block beside the turbine, which it powers.
+    // A Throttle Lever sets the throttle directly: at 15 the turbine burns at full throttle (18,750 FE/t), at 1 a
+    // fifteenth of that (1,250 FE/t). The lever hangs on a stone block beside the turbine, which it powers.
     static void throttleLeverDrivesTurbine(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
         BlockPos stone = new BlockPos(2, 1, 3);
@@ -206,14 +207,14 @@ public final class GasTurbineGameTests {
                 .thenIdle(320)
                 .thenExecute(() -> {
                     GasTurbineArrayBlockEntity turbine = turbine(helper, min);
-                    helper.assertTrue(turbine.getFePerTick() == 4_200, "A lever at 15 makes " + turbine.getFePerTick() + " FE/t");
+                    helper.assertTrue(turbine.getFePerTick() == 18_750, "A lever at 15 makes " + turbine.getFePerTick() + " FE/t");
                     setOne.run();
                 })
                 .thenIdle(40)
                 .thenExecute(() -> {
                     GasTurbineArrayBlockEntity turbine = turbine(helper, min);
                     helper.assertTrue(Math.abs(turbine.throttle() - 1.0 / 15.0) < 1e-9, "A lever at 1 throttles to " + turbine.throttle());
-                    helper.assertTrue(turbine.getFePerTick() == 280, "A lever at 1 makes " + turbine.getFePerTick() + " FE/t");
+                    helper.assertTrue(turbine.getFePerTick() == 1_250, "A lever at 1 makes " + turbine.getFePerTick() + " FE/t");
                 })
                 .thenSucceed();
     }

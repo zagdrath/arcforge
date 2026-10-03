@@ -1,12 +1,12 @@
 {
   "variants": {
-    "facing=north,lit=false,part=none": {
+    "facing=north,lit=false,part=none,box=false": {
       "model": "arcforge:block/condenser_array/casing"
     },
-    "facing=north,lit=false,part=center": {
+    "facing=north,lit=false,part=center,box=false": {
       "model": "arcforge:block/condenser_array/formed"
     },
-    "facing=north,lit=false,part=other": {
+    "facing=north,lit=false,part=other,box=false": {
       "type": "arcforge:port_nozzle",
       "model": "arcforge:block/condenser_array/hidden",
       "kind": "cube",
@@ -14,13 +14,13 @@
         "formed": "arcforge:block/condenser_array/formed"
       }
     },
-    "facing=north,lit=true,part=none": {
+    "facing=north,lit=true,part=none,box=false": {
       "model": "arcforge:block/condenser_array/casing"
     },
-    "facing=north,lit=true,part=center": {
+    "facing=north,lit=true,part=center,box=false": {
       "model": "arcforge:block/condenser_array/formed_active"
     },
-    "facing=north,lit=true,part=other": {
+    "facing=north,lit=true,part=other,box=false": {
       "type": "arcforge:port_nozzle",
       "model": "arcforge:block/condenser_array/hidden",
       "kind": "cube",
@@ -28,14 +28,14 @@
         "formed": "arcforge:block/condenser_array/formed"
       }
     },
-    "facing=east,lit=false,part=none": {
+    "facing=east,lit=false,part=none,box=false": {
       "model": "arcforge:block/condenser_array/casing"
     },
-    "facing=east,lit=false,part=center": {
+    "facing=east,lit=false,part=center,box=false": {
       "model": "arcforge:block/condenser_array/formed",
       "y": 90
     },
-    "facing=east,lit=false,part=other": {
+    "facing=east,lit=false,part=other,box=false": {
       "type": "arcforge:port_nozzle",
       "model": "arcforge:block/condenser_array/hidden",
       "kind": "cube",
@@ -43,14 +43,14 @@
         "formed": "arcforge:block/condenser_array/formed"
       }
     },
-    "facing=east,lit=true,part=none": {
+    "facing=east,lit=true,part=none,box=false": {
       "model": "arcforge:block/condenser_array/casing"
     },
-    "facing=east,lit=true,part=center": {
+    "facing=east,lit=true,part=center,box=false": {
       "model": "arcforge:block/condenser_array/formed_active",
       "y": 90
     },
-    "facing=east,lit=true,part=other": {
+    "facing=east,lit=true,part=other,box=false": {
       "type": "arcforge:port_nozzle",
       "model": "arcforge:block/condenser_array/hidden",
       "kind": "cube",
@@ -58,14 +58,14 @@
         "formed": "arcforge:block/condenser_array/formed"
       }
     },
-    "facing=south,lit=false,part=none": {
+    "facing=south,lit=false,part=none,box=false": {
       "model": "arcforge:block/condenser_array/casing"
     },
-    "facing=south,lit=false,part=center": {
+    "facing=south,lit=false,part=center,box=false": {
       "model": "arcforge:block/condenser_array/formed",
       "y": 180
     },
-    "facing=south,lit=false,part=other": {
+    "facing=south,lit=false,part=other,box=false": {
       "type": "arcforge:port_nozzle",
       "model": "arcforge:block/condenser_array/hidden",
       "kind": "cube",
@@ -73,14 +73,14 @@
         "formed": "arcforge:block/condenser_array/formed"
       }
     },
-    "facing=south,lit=true,part=none": {
+    "facing=south,lit=true,part=none,box=false": {
       "model": "arcforge:block/condenser_array/casing"
     },
-    "facing=south,lit=true,part=center": {
+    "facing=south,lit=true,part=center,box=false": {
       "model": "arcforge:block/condenser_array/formed_active",
       "y": 180
     },
-    "facing=south,lit=true,part=other": {
+    "facing=south,lit=true,part=other,box=false": {
       "type": "arcforge:port_nozzle",
       "model": "arcforge:block/condenser_array/hidden",
       "kind": "cube",
@@ -88,14 +88,14 @@
         "formed": "arcforge:block/condenser_array/formed"
       }
     },
-    "facing=west,lit=false,part=none": {
+    "facing=west,lit=false,part=none,box=false": {
       "model": "arcforge:block/condenser_array/casing"
     },
-    "facing=west,lit=false,part=center": {
+    "facing=west,lit=false,part=center,box=false": {
       "model": "arcforge:block/condenser_array/formed",
       "y": 270
     },
-    "facing=west,lit=false,part=other": {
+    "facing=west,lit=false,part=other,box=false": {
       "type": "arcforge:port_nozzle",
       "model": "arcforge:block/condenser_array/hidden",
       "kind": "cube",
@@ -103,20 +103,116 @@
         "formed": "arcforge:block/condenser_array/formed"
       }
     },
-    "facing=west,lit=true,part=none": {
+    "facing=west,lit=true,part=none,box=false": {
       "model": "arcforge:block/condenser_array/casing"
     },
-    "facing=west,lit=true,part=center": {
+    "facing=west,lit=true,part=center,box=false": {
       "model": "arcforge:block/condenser_array/formed_active",
       "y": 270
     },
-    "facing=west,lit=true,part=other": {
+    "facing=west,lit=true,part=other,box=false": {
       "type": "arcforge:port_nozzle",
       "model": "arcforge:block/condenser_array/hidden",
       "kind": "cube",
       "shapes": {
         "formed": "arcforge:block/condenser_array/formed"
       }
+    },
+    "facing=north,lit=false,part=none,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=north,lit=false,part=center,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=north,lit=false,part=other,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=north,lit=true,part=none,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=north,lit=true,part=center,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=north,lit=true,part=other,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=east,lit=false,part=none,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=east,lit=false,part=center,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=east,lit=false,part=other,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=east,lit=true,part=none,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=east,lit=true,part=center,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=east,lit=true,part=other,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=south,lit=false,part=none,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=south,lit=false,part=center,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=south,lit=false,part=other,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=south,lit=true,part=none,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=south,lit=true,part=center,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=south,lit=true,part=other,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=west,lit=false,part=none,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=west,lit=false,part=center,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=west,lit=false,part=other,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=west,lit=true,part=none,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=west,lit=true,part=center,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
+    },
+    "facing=west,lit=true,part=other,box=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/condenser_array/box"
     }
   }
 }

@@ -43,6 +43,7 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -60,8 +61,11 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The Steam Turbine Array (see ShellMultiblockBlockEntity): a turbine L blocks long with a rotor of L - 2
-// blade sets. It takes up to 40 x L mB/t of steam at the array's FE per mB (Steam 10, High-Pressure 18,
-// Superheated 28; a 9-long array on Superheated makes 10,080 FE/t). The rotor spins up toward a speed set
+// blade sets, sized to its cross-section's shorter side. It grows with its sections s = width x height / 9 x L (a
+// 3x3x3 is 3, a 7x9x15 is 105): it takes up to 40 x s mB/t of steam at the array's FE per mB (Steam 20, High-Pressure
+// 36, Superheated 56, times power.generationMultiplier; a 7x9x15 on Superheated makes 235,200 FE/t, more with its
+// bonuses). Its output cap is a full flow of Superheated Steam with both bonuses, its FE buffer energyBufferTicks of
+// that, and its energy ports share the cap. The rotor spins up toward a speed set
 // by the power in the steam, flow times FE per mB, so a higher grade spins it faster (full speed is a full
 // flow of Superheated); it takes about 5 s to get there and coasts down (about 10 s) when the steam stops; the output is
 // scaled by how close the rotor is to that speed, so opening the valve gives a rising output over a few
@@ -69,7 +73,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // generator end (positive along the axis) is on its left or right. A new turbine's ports are an energy port
 // on the generator end's cap and a steam port on the bearing end's. Heavy Oil in its lubricant tank (fed
 // through lubricant ports) adds 8% to its output and doubles how fast the rotor spins up while it
-// generates, using 1 mB every 20 ticks for every 3 blocks of length. Spent steam vents, unless the turbine
+// generates, using 1 mB every 20 ticks for every 3 sections. Spent steam vents, unless the turbine
 // has an Exhaust port: then it goes into an exhaust tank as Exhaust Steam, pushed out of the Exhaust ports
 // every tick, and while that tank has room the turbine makes 10% more (added to the lubricant bonus). A full
 // exhaust tank vents the rest and loses the bonus, so the turbine never stalls.
@@ -84,7 +88,8 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     // The rotor speed is sent to clients at most this often (and when it changes noticeably).
     private static final int SYNC_INTERVAL = 5;
 
-    private final GeneratorEnergyHandler energy;
+    // Replaced (keeping what it holds) when the structure's size changes, since its size and rate follow it.
+    private GeneratorEnergyHandler energy;
     private final FilteredFluidTank steam;
     private final ResourceHandler<FluidResource> steamInput;
     private final FilteredFluidTank lubricant;
@@ -119,15 +124,12 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         super(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), pos, state, 0, (slot, resource) -> false, UPGRADES,
                 new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.NONE, SideMode.NONE),
                 SIDE_MODES);
-        this.energy = new GeneratorEnergyHandler(
-                ArcforgeConfig.TURBINE_ARRAY_ENERGY_CAPACITY.getAsInt(),
-                ArcforgeConfig.TURBINE_ARRAY_MAX_OUTPUT.getAsInt(),
-                this::setChanged);
-        this.steam = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_LENGTH.getAsInt() * 3, BoilerCore::isSteam, this::setChanged);
+        this.energy = newEnergy(3.0);
+        this.steam = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_SECTION.getAsInt() * 3, BoilerCore::isSteam, this::setChanged);
         this.steamInput = new AutomationResourceHandler<>(steam, index -> true, index -> false);
         this.lubricant = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_LUBRICANT_CAPACITY.getAsInt(), Lubricant::isLubricant, this::setChanged);
         this.lubricantInput = new AutomationResourceHandler<>(lubricant, index -> true, index -> false);
-        this.exhaust = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_EXHAUST_PER_LENGTH.getAsInt() * 3,
+        this.exhaust = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_EXHAUST_PER_SECTION.getAsInt() * 3,
                 resource -> resource.is(ModFluids.EXHAUST_STEAM.get()), this::setChanged);
         this.exhaustOutput = new AutomationResourceHandler<>(exhaust, index -> false, index -> true);
         this.fluidAutomation = new CombinedResourceHandler<>(steamInput, lubricantInput, exhaustOutput);
@@ -166,8 +168,50 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         return shell != null ? shell.length() : 3;
     }
 
+    // How many 3x3 one-block-long sections it is: width x height / 9 x length (3 for a 3x3x3).
+    public double getSections() {
+        ShellStructure.Shell shell = getShell();
+        return shell != null ? SteamBoilerArrayBlockEntity.sections(shell) : 3.0;
+    }
+
     public int maxFlow() {
-        return ArcforgeConfig.TURBINE_ARRAY_FLOW_PER_LENGTH.getAsInt() * getLength();
+        return SteamBoilerArrayBlockEntity.scaled(ArcforgeConfig.TURBINE_ARRAY_FLOW_PER_SECTION.getAsInt(), getSections());
+    }
+
+    // The most FE/t it can make: a full flow of Superheated Steam with lubricant and the vacuum bonus, times the power
+    // multiplier. Also the most its energy ports push out a tick.
+    public static int maxOutput(double sections) {
+        int flow = SteamBoilerArrayBlockEntity.scaled(ArcforgeConfig.TURBINE_ARRAY_FLOW_PER_SECTION.getAsInt(), sections);
+        return PowerGeneration.cap(flow * SteamGrade.SUPERHEATED.arrayFePerMb() * (Lubricant.bonus() + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble()));
+    }
+
+    public int maxOutput() {
+        return maxOutput(getSections());
+    }
+
+    private GeneratorEnergyHandler newEnergy(double sections) {
+        int output = maxOutput(sections);
+        long capacity = (long) output * ArcforgeConfig.TURBINE_ARRAY_ENERGY_BUFFER_TICKS.getAsInt();
+        return new GeneratorEnergyHandler((int) Math.min(Integer.MAX_VALUE, capacity), output, this::setChanged);
+    }
+
+    // A new buffer for the current size, keeping the FE it held (as much as fits).
+    private void resizeEnergy() {
+        GeneratorEnergyHandler resized = newEnergy(getSections());
+        if (resized.getCapacityAsInt() != energy.getCapacityAsInt()) {
+            resized.generate(energy.getAmountAsInt());
+            energy = resized;
+        }
+    }
+
+    // "W×H×L" (width across, height, length) for names and tooltips.
+    public String sizeText() {
+        ShellStructure.Shell shell = getShell();
+        if (shell == null) {
+            return "3×3×3";
+        }
+        int width = shell.size(shell.axis() == Direction.Axis.X ? Direction.Axis.Z : Direction.Axis.X);
+        return width + "×" + shell.size(Direction.Axis.Y) + "×" + shell.length();
     }
 
     public static int maxRpm() {
@@ -183,10 +227,16 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     public void setShell(ShellStructure.@Nullable Shell shell) {
         super.setShell(shell);
         if (shell != null) {
-            steam.setCapacity(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_LENGTH.getAsInt() * shell.length());
-            exhaust.setCapacity(ArcforgeConfig.TURBINE_ARRAY_EXHAUST_PER_LENGTH.getAsInt() * shell.length());
+            resizeTanks();
+            resizeEnergy();
         }
         targetsDirty = true;
+    }
+
+    private void resizeTanks() {
+        double sections = getSections();
+        steam.setCapacity(SteamBoilerArrayBlockEntity.scaled(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_SECTION.getAsInt(), sections));
+        exhaust.setCapacity(SteamBoilerArrayBlockEntity.scaled(ArcforgeConfig.TURBINE_ARRAY_EXHAUST_PER_SECTION.getAsInt(), sections));
     }
 
     @Override
@@ -222,7 +272,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         if (level == null) {
             return 0;
         }
-        int face = side.getAxisDirection() == Direction.AxisDirection.POSITIVE ? ShellStructure.WIDTH - 1 : 0;
+        int face = side.getAxisDirection() == Direction.AxisDirection.POSITIVE ? shell.size(side.getAxis()) - 1 : 0;
         int count = 0;
         for (BlockPos pos : shell.positions()) {
             if (shell.offset(pos, side.getAxis()) == face && level.getBlockState(pos).getBlock() instanceof PressureGlassBlock) {
@@ -284,7 +334,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         if (flow > 0 && grade != null) {
             double spun = Mth.clamp(rpm / Math.max(target, 1.0), 0.0, 1.0);
             double bonus = 1.0 + (lubricated ? Lubricant.bonus() - 1.0 : 0.0) + (vacuum ? ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() : 0.0);
-            fePerTick = energy.generate((int) Math.round(flow * grade.arrayFePerMb() * spun * bonus));
+            fePerTick = energy.generate(PowerGeneration.fe(flow * grade.arrayFePerMb() * spun * bonus));
             if (lubricated) {
                 useLubricant();
             }
@@ -314,9 +364,9 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         }
     }
 
-    // 1 mB every lubricantInterval ticks for every 3 blocks of length.
+    // 1 mB every lubricantInterval ticks for every 3 sections.
     private void useLubricant() {
-        lubricantUsed += getLength() / 3.0 / ArcforgeConfig.TURBINE_ARRAY_LUBRICANT_INTERVAL.getAsInt();
+        lubricantUsed += getSections() / 3.0 / ArcforgeConfig.TURBINE_ARRAY_LUBRICANT_INTERVAL.getAsInt();
         int whole = (int) Math.min(Math.floor(lubricantUsed), lubricant.getAmount());
         if (whole > 0) {
             lubricantUsed -= whole;
@@ -352,7 +402,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         if (targetsDirty) {
             refreshTargets(level);
         }
-        int budget = Math.min(energy.getAmountAsInt(), ArcforgeConfig.TURBINE_ARRAY_MAX_OUTPUT.getAsInt());
+        int budget = Math.min(energy.getAmountAsInt(), maxOutput());
         for (BlockCapabilityCache<EnergyHandler, @Nullable Direction> target : energyTargets) {
             if (budget <= 0) {
                 break;
@@ -489,8 +539,8 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        steam.setCapacity(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_LENGTH.getAsInt() * getLength());
-        exhaust.setCapacity(ArcforgeConfig.TURBINE_ARRAY_EXHAUST_PER_LENGTH.getAsInt() * getLength());
+        resizeTanks();
+        energy = newEnergy(getSections());
         energy.deserialize(input.childOrEmpty("energy"));
         steam.deserialize(input.childOrEmpty("steam"));
         lubricant.deserialize(input.childOrEmpty("lubricant"));
@@ -519,7 +569,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("container.arcforge.steam_turbine_array.sized", getLength());
+        return Component.translatable("container.arcforge.steam_turbine_array.sized", sizeText());
     }
 
     @Override

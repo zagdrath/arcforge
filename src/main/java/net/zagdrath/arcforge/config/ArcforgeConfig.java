@@ -21,6 +21,13 @@ public class ArcforgeConfig {
         BUILDER.comment("Heat sources, heat transfer and the machines that turn heat into FE.").push("power");
     }
 
+    public static final ModConfigSpec.DoubleValue POWER_GENERATION_MULTIPLIER = BUILDER
+            .comment("Multiplies the FE every generator makes (the Combustion Plant, Thermoelectric Plant, Steam Turbine Array and",
+                    "Gas Turbine Array), where it makes it. Heat (HU) and steam aren't multiplied, so the heat -> steam -> FE chain",
+                    "is only multiplied once. Output caps and FE buffers grow with it, and the Electrolyzer's energy floor follows",
+                    "it, so hydrogen still never makes free power.")
+            .defineInRange("generationMultiplier", 1.0, 0.1, 100.0);
+
     static {
         BUILDER.comment("Heat (HU) shared by every heat machine. A machine's temperature rises from 20°C when its heat",
                 "buffer is empty to its maximum temperature when full, and heat only flows from hotter to colder.").push("heat");
@@ -181,6 +188,54 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Firebox Array: a hollow box 3 to 7 by 3 to 9 across and 3 to 5 tall that burns solid fuels",
+                "(#arcforge:combustion_fuel, and Coal Coke) and Fuel Burner fuels (arcforge:burner_fuels) into heat (HU). Each item",
+                "or mB gives the heat it gives in a Firebox or Fuel Burner (without upgrades); values marked per block scale with",
+                "the box's whole volume (a 3x3x3 is 27 blocks, a 7x5x9 is 315). It pauses while its buffer is as hot as the fuel",
+                "burns. Fed oxygen through an Oxygen port it burns on oxy-fuel (see oxyFuel).").push("fireboxArray");
+    }
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_PER_BLOCK = BUILDER
+            .comment("HU/t it makes while burning, per block of its volume (160: a 3x3x3 makes 4,320 HU/t, a 7x5x9 50,400).")
+            .defineInRange("heatPerTickPerBlock", 160, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_CAPACITY_PER_BLOCK = BUILDER
+            .comment("Heat buffer size in HU, per block of its volume.")
+            .defineInRange("heatCapacityPerBlock", 10_000, 100, 10_000_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C. Each fuel burns no hotter than its own temperature.")
+            .defineInRange("maxTemperature", 1_400, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_SOLID_TEMPERATURE = BUILDER
+            .comment("How hot solid fuels (#arcforge:combustion_fuel) burn, in °C.")
+            .defineInRange("solidFuelTemperature", 1_100, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_COKE_TEMPERATURE = BUILDER
+            .comment("How hot Coal Coke burns, in °C.")
+            .defineInRange("cokeTemperature", 1_300, 21, 10_000);
+
+    public static final ModConfigSpec.DoubleValue FIREBOX_ARRAY_COKE_HEAT = BUILDER
+            .comment("Heat from Coal Coke (and its block), as a multiple of the heat from coal (and a coal block).")
+            .defineInRange("cokeHeatMultiplier", 1.5, 0.1, 100.0);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_TANK_PER_BLOCK = BUILDER
+            .comment("Liquid and gas fuel tank size in mB, per block of its volume.")
+            .defineInRange("fuelTankCapacityPerBlock", 1_000, 10, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_OXYGEN_TANK_PER_BLOCK = BUILDER
+            .comment("Oxygen tank size in mB, per block of its volume.")
+            .defineInRange("oxygenTankCapacityPerBlock", 200, 10, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue FIREBOX_ARRAY_OXYGEN_PER_THOUSAND_HU = BUILDER
+            .comment("mB of oxygen burnt for every 1,000 HU made on oxy-fuel (3.125: a Firebox's 0.25 mB for its 80 HU).")
+            .defineInRange("oxygenPerThousandHeat", 3.125, 0.001, 1_000.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Thermoelectric Plant: turns heat (HU) into FE. The hotter it runs, the more FE each HU gives.")
                 .push("thermoelectricPlant");
     }
@@ -310,24 +365,26 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Steam Boiler Array: a 3x3 boiler 3 to 7 blocks tall. Values are per block of height.").push("steamBoilerArray");
+        BUILDER.comment("Steam Boiler Array: a boiler on a footprint 3 to 7 by 3 to 9, 3 to 12 blocks tall. Values are per",
+                "section: a 3x3 footprint's worth of area, one block tall, so they scale with width x depth / 9 x height",
+                "(a 3x3x3 is 3 sections, a 7x9x12 is 84).").push("steamBoilerArray");
     }
 
     public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_TEMPERATURE = BUILDER
             .comment("Temperature of a full heat buffer, in °C.")
             .defineInRange("maxTemperature", 1_400, 200, 10_000);
 
-    public static final ModConfigSpec.IntValue BOILER_ARRAY_HEAT_PER_HEIGHT = BUILDER
-            .comment("Heat buffer size in HU, per block of height.")
-            .defineInRange("heatCapacityPerHeight", 100_000, 1_000, 100_000_000);
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_HEAT_PER_SECTION = BUILDER
+            .comment("Heat buffer size in HU, per section.")
+            .defineInRange("heatCapacityPerSection", 100_000, 1_000, 100_000_000);
 
-    public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_HEAT_PER_HEIGHT = BUILDER
-            .comment("Most HU/t it boils with, per block of height.")
-            .defineInRange("maxHeatPerTickPerHeight", 600, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_HEAT_PER_SECTION = BUILDER
+            .comment("Most HU/t it boils with, per section (600: a 7x9x12 boils with up to 50,400 HU/t).")
+            .defineInRange("maxHeatPerTickPerSection", 600, 1, 1_000_000);
 
-    public static final ModConfigSpec.IntValue BOILER_ARRAY_TANK_PER_HEIGHT = BUILDER
-            .comment("Water and steam tank sizes in mB, per block of height.")
-            .defineInRange("tankCapacityPerHeight", 16_000, 1_000, 100_000_000);
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_TANK_PER_SECTION = BUILDER
+            .comment("Water and steam tank sizes in mB, per section.")
+            .defineInRange("tankCapacityPerSection", 16_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.DoubleValue BOILER_ARRAY_HEAT_COST = BUILDER
             .comment("Multiplier on the heat per mB of steam (0.8: 8 / 12 / 16 HU per mB of Steam / High-Pressure / Superheated).")
@@ -338,25 +395,24 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Steam Turbine Array: a 3x3 turbine 3 to 9 blocks long, whose rotor spins up and coasts down.",
-                "Values are per block of length.").push("steamTurbineArray");
+        BUILDER.comment("Steam Turbine Array: a turbine 3 to 15 blocks long with a cross-section 3 to 7 wide and 3 to 9 tall, whose",
+                "rotor spins up and coasts down. Values are per section: a 3x3 cross-section's worth of area, one block long, so",
+                "they scale with width x height / 9 x length (a 3x3x3 is 3 sections, a 7x9x15 is 105). It makes 20 / 36 / 56 FE",
+                "per mB of Steam / High-Pressure / Superheated Steam (times power.generationMultiplier); its output cap is a full",
+                "flow of lubricated Superheated Steam with the vacuum bonus.").push("steamTurbineArray");
     }
 
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_FLOW_PER_LENGTH = BUILDER
-            .comment("Most steam it uses in mB/t, per block of length.")
-            .defineInRange("maxFlowPerLength", 40, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_FLOW_PER_SECTION = BUILDER
+            .comment("Most steam it uses in mB/t, per section (40: a 7x9x15 takes up to 4,200 mB/t).")
+            .defineInRange("maxFlowPerSection", 40, 1, 1_000_000);
 
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_TANK_PER_LENGTH = BUILDER
-            .comment("Steam tank size in mB, per block of length.")
-            .defineInRange("tankCapacityPerLength", 32_000, 1_000, 100_000_000);
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_TANK_PER_SECTION = BUILDER
+            .comment("Steam tank size in mB, per section.")
+            .defineInRange("tankCapacityPerSection", 32_000, 1_000, 100_000_000);
 
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 1_000_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_OUTPUT = BUILDER
-            .comment("Most FE/t pushed out of its energy faces.")
-            .defineInRange("maxEnergyOutput", 16_384, 1, 1_000_000_000);
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_ENERGY_BUFFER_TICKS = BUILDER
+            .comment("Internal FE buffer size, in ticks of its output cap (400: a 3x3x3 holds about 3.2 million FE).")
+            .defineInRange("energyBufferTicks", 400, 1, 72_000);
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_RPM = BUILDER
             .comment("Rotor speed at a full flow of Superheated Steam (it spins in proportion to the power in the steam).")
@@ -367,12 +423,12 @@ public class ArcforgeConfig {
             .defineInRange("lubricantCapacity", 4_000, 100, 1_000_000);
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_LUBRICANT_INTERVAL = BUILDER
-            .comment("Ticks of generating per mB of lubricant used, for every 3 blocks of length.")
+            .comment("Ticks of generating per mB of lubricant used, for every 3 sections.")
             .defineInRange("lubricantInterval", 20, 1, 100_000);
 
-    public static final ModConfigSpec.IntValue TURBINE_ARRAY_EXHAUST_PER_LENGTH = BUILDER
-            .comment("Exhaust Steam tank size in mB, per block of length (used only with an Exhaust port).")
-            .defineInRange("exhaustTankCapacityPerLength", 32_000, 1_000, 100_000_000);
+    public static final ModConfigSpec.IntValue TURBINE_ARRAY_EXHAUST_PER_SECTION = BUILDER
+            .comment("Exhaust Steam tank size in mB, per section (used only with an Exhaust port).")
+            .defineInRange("exhaustTankCapacityPerSection", 32_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.DoubleValue TURBINE_ARRAY_VACUUM_BONUS = BUILDER
             .comment("Extra FE while an Exhaust port drains its spent steam (0.10 = +10%), on top of the lubricant bonus.")
@@ -388,8 +444,9 @@ public class ArcforgeConfig {
     }
 
     public static final ModConfigSpec.IntValue GAS_TURBINE_MAX_HU_PER_LENGTH = BUILDER
-            .comment("Most fuel heat it burns in HU/t, per block of length (the limit is heat, not mB, so thin fuels aren't punished).")
-            .defineInRange("maxFuelHuPerLength", 560, 1, 1_000_000);
+            .comment("Most fuel heat it burns in HU/t, per block of length (the limit is heat, not mB, so thin fuels aren't punished).",
+                    "2,500: a 9-long array burns 22,500 HU/t, about 34,000 FE/t.")
+            .defineInRange("maxFuelHeatPerLength", 2_500, 1, 1_000_000);
 
     public static final ModConfigSpec.DoubleValue GAS_TURBINE_SIMPLE_CYCLE_FACTOR = BUILDER
             .comment("FE per HU of fuel burned, at or above the reference temperature.")
@@ -438,15 +495,12 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue GAS_TURBINE_TANK_PER_LENGTH = BUILDER
             .comment("Fuel tank size in mB, per block of length.")
-            .defineInRange("fuelTankPerLength", 8_000, 1_000, 100_000_000);
+            .defineInRange("fuelTankCapacityPerLength", 32_000, 1_000, 100_000_000);
 
-    public static final ModConfigSpec.IntValue GAS_TURBINE_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 1_000_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue GAS_TURBINE_MAX_OUTPUT = BUILDER
-            .comment("Most FE/t pushed out of its energy faces.")
-            .defineInRange("maxEnergyOutput", 16_384, 1, 1_000_000_000);
+    public static final ModConfigSpec.IntValue GAS_TURBINE_ENERGY_BUFFER_TICKS = BUILDER
+            .comment("Internal FE buffer size, in ticks of its output cap (its full-throttle, lubricated output; 400: about 14.6",
+                    "million FE for a 9-long array).")
+            .defineInRange("energyBufferTicks", 400, 1, 72_000);
 
     public static final ModConfigSpec.IntValue GAS_TURBINE_INTAKE_CHECK_INTERVAL = BUILDER
             .comment("Ticks between checks that the intake has air in front of it.")
@@ -457,29 +511,30 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Superheater Array: a 3x3x3 cube that upgrades steam one or two grades with heat, once it is at least as hot",
-                "as the grade it makes.").push("superheaterArray");
+        BUILDER.comment("Superheater Array: a solid box 3 to 7 blocks each way that upgrades steam one or two grades with heat, once",
+                "it is at least as hot as the grade it makes. Values are per cube: 27 blocks of its volume, so they scale with",
+                "width x height x depth / 27 (a 3x3x3 is 1 cube, a 7x7x7 is 12.7).").push("superheaterArray");
     }
 
-    public static final ModConfigSpec.IntValue SUPERHEATER_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size in HU (a full buffer is at the maximum temperature).")
-            .defineInRange("heatCapacity", 200_000, 1_000, 1_000_000_000);
+    public static final ModConfigSpec.IntValue SUPERHEATER_HEAT_PER_CUBE = BUILDER
+            .comment("Heat buffer size in HU, per cube (a full buffer is at the maximum temperature).")
+            .defineInRange("heatCapacityPerCube", 200_000, 1_000, 1_000_000_000);
 
     public static final ModConfigSpec.IntValue SUPERHEATER_MAX_TEMPERATURE = BUILDER
             .comment("Temperature of a full heat buffer, in °C.")
             .defineInRange("maxTemperature", 1_400, 200, 10_000);
 
-    public static final ModConfigSpec.IntValue SUPERHEATER_MAX_HEAT_PER_TICK = BUILDER
-            .comment("Most HU/t it takes in, and most it uses.")
-            .defineInRange("maxHeatPerTick", 2_000, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue SUPERHEATER_MAX_HEAT_PER_CUBE = BUILDER
+            .comment("Most HU/t it takes in, and most it uses, per cube (2,000: a 7x7x7 takes up to 25,400 HU/t).")
+            .defineInRange("maxHeatPerTickPerCube", 2_000, 1, 1_000_000);
 
-    public static final ModConfigSpec.IntValue SUPERHEATER_TANK_CAPACITY = BUILDER
-            .comment("Steam-in and steam-out tank sizes in mB (each).")
-            .defineInRange("tankCapacity", 16_000, 1_000, 100_000_000);
+    public static final ModConfigSpec.IntValue SUPERHEATER_TANK_PER_CUBE = BUILDER
+            .comment("Steam-in and steam-out tank sizes in mB (each), per cube.")
+            .defineInRange("tankCapacityPerCube", 16_000, 1_000, 100_000_000);
 
-    public static final ModConfigSpec.IntValue SUPERHEATER_MAX_FLOW = BUILDER
-            .comment("Most steam it upgrades or passes through, in mB/t.")
-            .defineInRange("maxFlow", 1_000, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue SUPERHEATER_MAX_FLOW_PER_CUBE = BUILDER
+            .comment("Most steam it upgrades or passes through, in mB/t, per cube.")
+            .defineInRange("maxFlowPerCube", 1_000, 1, 1_000_000);
 
     public static final ModConfigSpec.DoubleValue SUPERHEATER_HEAT_COST = BUILDER
             .comment("Multiplier on the heat per mB (the difference in HU/mB between the grades: 5 Steam to High-Pressure,",
@@ -493,17 +548,19 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Condenser Array: a 3x3x3 cube that turns Exhaust Steam back into water, 1:1, faster with water and ice around",
-                "it and in cold biomes.").push("condenserArray");
+        BUILDER.comment("Condenser Array: a solid box 3 to 7 blocks each way that turns Exhaust Steam back into water, 1:1, faster",
+                "with water and ice around it and in cold biomes. Values marked per cube scale with width x height x depth / 27",
+                "(a 3x3x3 is 1 cube, a 7x7x7 is 12.7); a bigger one also has more outer faces for water and ice to touch.")
+                .push("condenserArray");
     }
 
-    public static final ModConfigSpec.IntValue CONDENSER_TANK_CAPACITY = BUILDER
-            .comment("Exhaust-in and water-out tank sizes in mB (each).")
-            .defineInRange("tankCapacity", 16_000, 1_000, 100_000_000);
+    public static final ModConfigSpec.IntValue CONDENSER_TANK_PER_CUBE = BUILDER
+            .comment("Exhaust-in and water-out tank sizes in mB (each), per cube.")
+            .defineInRange("tankCapacityPerCube", 16_000, 1_000, 100_000_000);
 
-    public static final ModConfigSpec.IntValue CONDENSER_BASE_RATE = BUILDER
-            .comment("mB/t it condenses in open air.")
-            .defineInRange("baseRate", 120, 0, 1_000_000);
+    public static final ModConfigSpec.IntValue CONDENSER_BASE_RATE_PER_CUBE = BUILDER
+            .comment("mB/t it condenses in open air, per cube.")
+            .defineInRange("baseRatePerCube", 120, 0, 1_000_000);
 
     public static final ModConfigSpec.IntValue CONDENSER_WATER_BONUS = BUILDER
             .comment("mB/t added by each water source touching its outer faces.")
@@ -529,9 +586,9 @@ public class ArcforgeConfig {
             .comment("Multiplier where water evaporates (the Nether).")
             .defineInRange("netherMultiplier", 0.5, 0.0, 10.0);
 
-    public static final ModConfigSpec.IntValue CONDENSER_MAX_RATE = BUILDER
-            .comment("Most mB/t it condenses, whatever cools it.")
-            .defineInRange("maxRate", 400, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue CONDENSER_MAX_RATE_PER_CUBE = BUILDER
+            .comment("Most mB/t it condenses, whatever cools it, per cube (400: a 7x7x7 condenses up to 5,081 mB/t).")
+            .defineInRange("maxRatePerCube", 400, 1, 1_000_000);
 
     public static final ModConfigSpec.ConfigValue<List<? extends String>> CONDENSER_COLD_BIOME_TAGS = BUILDER
             .comment("Biome tags counted as cold.")

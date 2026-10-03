@@ -111,6 +111,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);
+        // The Firebox Array: its fire, fuel and heat from any part.
+        registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity.class);
+        registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class);
+        registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GlassClocheBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GrowChamberBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.HydroponicCellBlockEntity.class);
@@ -190,6 +194,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(ClocheProvider.Client.INSTANCE, net.zagdrath.arcforge.block.farming.ClocheBlock.class);
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class, PressureGlassBlock.class)) {
+            registration.registerBlockComponent(FireboxArrayProvider.Client.INSTANCE, type);
+        }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock.class,
                 net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class, PressureGlassBlock.class)) {
             registration.registerBlockComponent(ThermalEvaporatorProvider.Client.INSTANCE, type);

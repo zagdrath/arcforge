@@ -21,6 +21,7 @@ Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Ma
 ```
 coal / charcoal / coal block --[Combustion Plant]--> FE      (simple, least FE per coal)
 coal / charcoal / coal block --[Firebox]--> heat (HU)            (up to 1,100°C)
+coal, Coal Coke, burner fuels --[Firebox Array]--> heat (HU)     (160 HU/t per block, up to 1,300°C; 1,400°C on Hydrogen)
 lava (tank, pipes, nearby blocks) --[Geothermal Plant]--> heat   (up to 1,400°C)
 heat --[Thermoelectric Plant]--> FE                              (hotter heat = more FE)
 ```
@@ -54,6 +55,27 @@ It only ever flows from a hotter machine into a colder one.
   per coal), while a Geothermal Plant at 1,400°C drives it past 100%, up to 115%.
   It takes a few minutes to warm up.
 - The Combustion and Thermoelectric Plants push up to 200 FE/t out of their energy faces.
+- **Power multiplier.** `power.generationMultiplier` (default 1.0, 0.1 to 100) multiplies the FE every generator makes,
+  where it makes it: the Combustion Plant, Thermoelectric Plant, Steam Turbine Array and Gas Turbine Array. Heat and
+  steam aren't multiplied, so a heat → steam → FE chain is multiplied once. Output caps and FE buffers grow with it, the
+  GUIs, Jade and the Handbook show the multiplied numbers, and the Electrolyzer's energy floor follows it (hydrogen
+  never becomes free power).
+
+**Firebox Array.** A hollow box of Firebox Array Casings with one Firebox Array Controller in a side wall (not on an
+edge), facing out: 3 to 7 by 3 to 9 across (either way round) and 3 to 5 tall. The twelve edges are casings; the
+walls, floor and roof may be Pressure Glass, and through them you see the fire on its firebrick-lined floor.
+
+- It makes 160 HU/t per block of its whole volume: 4,320 HU/t for a 3×3×3, 50,400 HU/t for a 7×5×9 (all a 7×9×12
+  Steam Boiler Array takes). Its heat buffer (10,000 HU per block, full at 1,400°C), fuel tank (1,000 mB per block)
+  and oxygen tank (200 mB per block) scale with it.
+- Solid fuels (`#arcforge:combustion_fuel`) give a Firebox's heat per item (64,000 HU a coal) at 1,100°C; Coal Coke
+  gives 1.5× a coal's (its block 1.5× a coal block's) at 1,300°C. Liquid and gas fuels (`arcforge:burner_fuels`) give
+  the Fuel Burner's HU per mB at their own burn temperature.
+- It finishes the item it started, then burns its tank before the next item, and pauses while it's as hot as its fuel
+  burns. Oxygen through an Oxygen port gives oxy-fuel: +300°C (up to 1,600°C), 1.25× heat per fuel, 3.125 mB of oxygen
+  per 1,000 HU.
+- Ports (set with the Wrench): Input (fuel items, liquids and gases), Oxygen, Heat (out, as fast as it burns). A held
+  bucket of fuel fills it through the controller.
 
 **Solar Thermal Array** (Tempered tier). A 2x2 tower exactly 4 tall: three layers of Solar Thermal Array
 Casings with one controller in the bottom layer, facing out of the tower, and four Solar Collectors on
@@ -257,18 +279,20 @@ source is removed, except water with two or more water sources beside it, which 
 pushes up to 1,000 mB/t out of its top. Takes Speed and Energy upgrades. On water in an ocean or beach
 biome it pumps Seawater instead (for the Thermal Evaporator Array).
 
-**Steam Boiler Array.** Boils water into steam with heat. It is a 3x3 tower, 3 to 7 blocks tall, of
-Steam Boiler Array Casings and Pressure Glass, hollow in the middle.
+**Steam Boiler Array.** Boils water into steam with heat. It is a hollow box of Steam Boiler Array Casings
+and Pressure Glass on a footprint 3 to 7 by 3 to 9 (either way round), 3 to 12 blocks tall.
 
-- Only the 8 corners must be casings, so whole walls can be windows, and the water and steam show
-  through them.
+- In a 3×3 tower only the 8 corners must be casings, so whole walls can be windows; in a bigger one all
+  twelve edges must be casings. The water and steam show through the glass.
+- It forms from the casings and glass joined to the block you place last, so keep other loose casings and
+  glass from touching it (or it forms only as a 3×3, if it can).
 - The steam grade depends on its temperature:
   - Steam from 100°C (8 HU/mB);
   - High-Pressure from 500°C (12 HU/mB);
   - Superheated from 900°C (16 HU/mB).
-- Per block of height it holds 100,000 HU, uses up to 600 HU/t, and has 16,000 mB tanks.
-- A full-height (7) boiler boils up to 4,200 HU/t. That is about 350 mB/t of High-Pressure Steam,
-  enough for a full-length Steam Turbine Array.
+- Per section (width × depth ÷ 9 × height: 3 for a 3×3×3, 84 for a 7×9×12) it holds 100,000 HU, uses up to
+  600 HU/t, and has 16,000 mB tanks.
+- A 7×9×12 boiler boils up to 50,400 HU/t: 6,300 mB/t of Steam or 3,150 mB/t of Superheated Steam.
 
 Its **pressure** (a tab in its GUI) picks the grade:
 - **Auto** boils all the heat above 100°C. Fed more heat than it uses, it climbs toward its heat
@@ -280,13 +304,16 @@ Its **pressure** (a tab in its GUI) picks the grade:
 
 Cooling into a lower grade turns the steam it holds into that grade.
 
-**Steam Turbine Array.** A 3x3 tube 3 to 9 long along either horizontal axis, built the same way. It
-takes up to 40 mB/t per block of length at 10 / 18 / 28 FE per mB (a 9-long array on Superheated makes
-10,080 FE/t). Its rotor spins up over a few seconds when steam flows, and output rises with it; it
+**Steam Turbine Array.** A hollow tube along either horizontal axis, built the same way: 3 to 15 long, its
+cross-section 3 to 7 wide and 3 to 9 tall. It takes up to 40 mB/t per section (width × height ÷ 9 × length:
+3 for a 3×3×3, 105 for a 7×9×15) at 20 / 36 / 56 FE per mB (a 7×9×15 on Superheated makes 235,200 FE/t
+before its bonuses). Its output cap is a full flow of Superheated Steam with both bonuses (no fixed cap), its
+FE buffer 400 ticks of that, and its energy ports share the cap. The rotor is sized to the cross-section's
+shorter side; with an even side the ends have no middle block, so no generator or bearing is marked. Its rotor spins up over a few seconds when steam flows, and output rises with it; it
 coasts down when the steam stops. Its speed follows the power in the steam (flow times FE per mB), so a
 higher grade spins it faster: full speed is a full flow of Superheated Steam. A new one has an energy port on its generator end and a steam port on
 its bearing end. Heavy Oil in its 4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
-blocks of length.
+sections (width × height ÷ 9 × length).
 
 Spent steam vents, unless you give it an **Exhaust** port with the Wrench. With an Exhaust port, spent
 steam leaves as **Exhaust Steam**, a gas only a Condenser Array can use. While the exhaust drains (its
@@ -300,17 +327,17 @@ straight to FE.
   both are open); the other is the exhaust. Block the intake and it shuts down. The intake's middle can't
   hold a port.
 - **Fuel.** Any `arcforge:burner_fuels` fuel not marked `"gas_turbine": false`: Naphtha, Light Oil, Ethanol
-  and Hydrogen (Heavy Oil and Creosote are refused). 8,000 mB of tank per block of length, one fuel at a time;
+  and Hydrogen (Heavy Oil and Creosote are refused). 32,000 mB of tank per block of length, one fuel at a time;
   liquids through fluid conduits, Hydrogen through Pressurized Conduits.
-- **Output.** It burns up to 560 HU/t per block of length, at 1.5 FE per HU times the fuel's burn temperature
-  over 1,200°C (at most 1):
+- **Output.** It burns up to 2,500 HU/t per block of length, at 1.5 FE per HU times the fuel's burn temperature
+  over 1,200°C (at most 1). Its output cap is its full-throttle lubricated output, and its FE buffer 400 ticks of that:
 
   | Fuel | FE/mB | 9-long max FE/t | mB/t (9-long) |
   |---|---|---|---|
-  | Naphtha | 600 | 7,560 | 12.6 |
-  | Light Oil | 312.5 | 6,300 | 20.2 |
-  | Ethanol | 337.5 | 5,670 | 16.8 |
-  | Hydrogen | 90 | 7,560 | 84 |
+  | Naphtha | 600 | 33,750 | 56.3 |
+  | Light Oil | 312.5 | 28,125 | 90 |
+  | Ethanol | 337.5 | 25,313 | 75 |
+  | Hydrogen | 90 | 33,750 | 375 |
 
 - **Throttle.** In the **Throttle** redstone mode the signal strength sets the fuel burned (signal 5 burns a
   third); the other modes run it flat out.
@@ -323,8 +350,9 @@ straight to FE.
 - A new one has an energy port on the bottom-left block of the intake end, a heat port in the middle of the
   exhaust end, and a fuel port under the middle of its length.
 
-**Superheater Array.** A solid 3x3x3 cube of Superheater Array Casings (Hardened tier). It forms like
-the Arc Crushing Array.
+**Superheater Array.** A solid box of Superheater Array Casings (Hardened tier), 3 to 7 blocks each way. A
+3×3×3 forms like the Arc Crushing Array; a bigger box forms as one connected casing, run from its minimum corner.
+Its flow, heat and tanks scale with its volume ÷ 27.
 
 - It takes steam and heat in, and sends the next grade out.
 - **Cost per mB:**
@@ -339,19 +367,20 @@ the Arc Crushing Array.
 - **Pressure tab:**
   - **Auto** makes the best grade its heat allows.
   - **High-Pressure** and **Superheated** make only that grade.
-- It uses up to 2,000 HU/t and has separate 16,000 mB tanks for steam in and steam out.
+- Per 27 blocks it moves up to 1,000 mB/t, uses up to 2,000 HU/t, holds 200,000 HU and has separate 16,000 mB
+  tanks for steam in and steam out (a 7×7×7: 12,700 mB/t, enough for the biggest turbine).
 - A new one has a steam-in, a steam-out and a heat port.
 
-**Condenser Array.** A solid 3x3x3 cube of Condenser Array Casings (Tempered tier). It turns Exhaust
-Steam back into water, 1:1.
+**Condenser Array.** A solid box of Condenser Array Casings (Tempered tier), 3 to 7 blocks each way, formed
+like the Superheater Array. It turns Exhaust Steam back into water, 1:1.
 
-- It condenses 120 mB/t in open air.
+- It condenses 120 mB/t in open air per 27 blocks of its volume, with 16,000 mB tanks per 27 blocks.
 - Blocks touching its outer faces add to that:
   - each water source: 20;
   - each ice: 30;
   - each packed ice: 40;
   - each blue ice: 60.
-- Cold biomes condense ×1.25 and the Nether ×0.5, up to 400 mB/t.
+- Cold biomes condense ×1.25 and the Nether ×0.5, up to 400 mB/t per 27 blocks (a 7×7×7: 5,081 mB/t).
 - A new one has an exhaust-in and a water-out port.
 - Boiler → turbine → condenser → back to the boiler's water port is a closed loop. The ports push on
   their own, so it runs without a pump.
@@ -413,8 +442,8 @@ Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running a
 60 mB Ethylene + 60 mB Chlorine --[Chemical Reactor]--> 2 PVC Sheet
 ```
 
-**Electrolyzer** (Tempered). Splits water into Hydrogen and Oxygen with FE: 1,200 FE per mB of water (600
-per mB of hydrogen) at 400 FE/t. Water goes in through Input faces (the top by default); Hydrogen and Oxygen
+**Electrolyzer** (Tempered). Splits water into Hydrogen and Oxygen with FE: by default 1,416 FE per mB of water
+(the energy-balance floor below; the recipe asks 1,200) at 400 FE/t. Water goes in through Input faces (the top by default); Hydrogen and Oxygen
 leave through their own face modes (left and right by default), pushed every tick into Pressurized Conduits,
 Cylinders or anything else that takes gas. A Gas Cartridge fills from its hydrogen first, then its oxygen. It
 has 8,000 mB of water and 16,000 mB of each gas, and takes Speed and Energy upgrades. A full gas tank stops
@@ -428,7 +457,9 @@ default).
 The Electrolyzer never charges less than 1.25× (`balanceSafetyFactor`) the most FE the best heat-to-FE setup
 could get back from what it makes, worked out from the live config and data maps (every Heat upgrade in the
 burner, then the better of a fully carded Thermoelectric Plant and a Superheated boiler into a lubricated,
-exhausting turbine). By default that floor is 354 FE per mB of hydrogen, reached at the fourth Energy upgrade.
+exhausting turbine, times `power.generationMultiplier`). By default that floor is 708 FE per mB of hydrogen
+(141,600 FE per 100 mB of water), above the water recipe's 1,200 FE per mB, so splitting water costs the floor and
+Energy upgrades don't lower it.
 
 **Oxygen** (from the Electrolyzer or the Air Separator) speeds up the Arcforge Furnace: give it an Oxygen port with the Wrench and pipe oxygen in. A smelt
 that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as fast (config

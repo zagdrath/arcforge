@@ -143,6 +143,8 @@
     "arcforge:raw_rock_salt_block",
     "arcforge:thermal_evaporator_casing",
     "arcforge:thermal_evaporator_controller",
+    "arcforge:firebox_array_casing",
+    "arcforge:firebox_array_controller",
     "arcforge:vulcanizer",
     "arcforge:reservoir",
     "arcforge:xp_drain",

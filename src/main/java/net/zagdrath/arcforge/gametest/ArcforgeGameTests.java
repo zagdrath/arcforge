@@ -271,6 +271,13 @@ public final class ArcforgeGameTests {
         TESTS.put("vacuum_experience", ExtendedLogisticsGameTests::vacuumExperience);
         TESTS.put("quantum_tunnel", ExtendedLogisticsGameTests::quantumTunnel);
         TESTS.put("chunk_loader", ExtendedLogisticsGameTests::chunkLoader);
+        TESTS.put("firebox_array_forms", BigArrayGameTests::fireboxArrayForms);
+        TESTS.put("firebox_array_burns_coal", BigArrayGameTests::fireboxArrayBurnsCoal);
+        TESTS.put("firebox_array_burns_naphtha", BigArrayGameTests::fireboxArrayBurnsNaphtha);
+        TESTS.put("firebox_array_heat_port", BigArrayGameTests::fireboxArrayHeatPort);
+        TESTS.put("rectangular_steam_arrays", BigArrayGameTests::rectangularSteamArrays);
+        TESTS.put("superheater_condenser_boxes", BigArrayGameTests::boxArrays);
+        TESTS.put("power_multiplier", BigArrayGameTests::powerMultiplier);
         TESTS.put("salt_recipes", SaltGameTests::recipes);
         TESTS.put("salt_tags", SaltGameTests::saltTags);
         TESTS.put("salt_reactor_makes_brine", SaltGameTests::reactorMakesBrine);

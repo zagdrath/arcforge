@@ -238,7 +238,8 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
         shell = input.getInt("shell_length").map(length -> new ShellStructure.Shell(
                 BlockPos.of(input.getLongOr("shell_min", 0L)),
                 Direction.Axis.byName(input.getStringOr("shell_axis", "y")),
-                length)).orElse(null);
+                // Shells saved before cross-sections could vary are 3x3.
+                length, input.getIntOr("shell_a", ShellStructure.WIDTH), input.getIntOr("shell_b", ShellStructure.WIDTH))).orElse(null);
         facing = Direction.from2DDataValue(input.getIntOr("facing", Direction.NORTH.get2DDataValue()));
         if (!Objects.equals(previous, shell)) {
             windowQuads = null;
@@ -255,6 +256,8 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
             output.putLong("shell_min", shell.min().asLong());
             output.putString("shell_axis", shell.axis().getSerializedName());
             output.putInt("shell_length", shell.length());
+            output.putInt("shell_a", shell.a());
+            output.putInt("shell_b", shell.b());
         }
         output.putInt("facing", facing.get2DDataValue());
         output.putBoolean("formed_before", formedBefore);

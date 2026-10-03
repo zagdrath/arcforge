@@ -1,0 +1,28 @@
+{
+  "title": "Firebox Array",
+  "icon": "arcforge:firebox_array_controller",
+  "items": [
+    "arcforge:firebox_array_controller",
+    "arcforge:firebox_array_casing",
+    "arcforge:pressure_glass",
+    "arcforge:coal_coke"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A big firebox: a hollow box that burns fuel into heat, enough to run the biggest Steam Boiler Array.\n# Building\n- A box 3 to 7 by 3 to 9 across (either way round, so it needn't be square) and 3 to 5 tall, hollow inside.\n- Its twelve edges are Firebox Array Casings. Walls, floor and roof are casings or Pressure Glass: through a window you can see the fire.\n- One Firebox Array Controller sits in a side wall (not on an edge), facing out. Right-click it to open its GUI, or wrench it to check the build.\n- It is lined with firebrick inside."
+    },
+    {
+      "type": "text",
+      "text": "# Heat\nIt makes 160 HU/t for every block of its size, walls and inside: a 3×3×3 makes 4,320 HU/t, a 7×5×9 50,400 HU/t. Its heat buffer grows the same way.\n- Solid fuels (coal, charcoal, coal blocks) give what they give in a Firebox (64,000 HU a coal) and burn at 1,100°C.\n- Coal Coke gives 1.5× a coal's heat (a Coal Coke Block 1.5× a coal block's) and burns at 1,300°C.\n- Liquid and gas fuels give what they give in a Fuel Burner (Naphtha 400 HU per mB) at their own temperature (Hydrogen 1,400°C).\nIt finishes the item it started, then takes its tank's fuel before the next item. It pauses while it's as hot as its fuel burns, so no fuel is wasted.\n# Oxy-fuel\nFeed it oxygen through an Oxygen port: 300°C hotter (up to 1,600°C) and 25% more heat from each fuel, for about 3 mB of oxygen per 1,000 HU."
+    },
+    {
+      "type": "text",
+      "text": "# Ports\nA new array has none: set them on any casing (or the controller) with the Wrench in Port mode.\n- Input: solid fuel, and liquid or gas fuel (a held bucket also fills it through the controller).\n- Oxygen: oxygen for oxy-fuel.\n- Heat: heat out. A Heat port pushes as fast as the array burns into whatever touches it, such as a Steam Boiler Array's heat port, or into Thermodynamic Conduits."
+    },
+    {
+      "type": "multiblock",
+      "structure": "firebox_array"
+    }
+  ]
+}

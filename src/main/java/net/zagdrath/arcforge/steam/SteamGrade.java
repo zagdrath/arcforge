@@ -19,9 +19,9 @@ import net.zagdrath.arcforge.registry.ModFluids;
 // networks never mix them.
 public enum SteamGrade {
     //                  from °C  HU/mB  FE/mB single, array  tint         GUI colour
-    STEAM("steam", 100, 10, 8, 10, 0xFFF4F7F9, 0xFFD8E0E6, ModFluids.STEAM),
-    HIGH_PRESSURE("high_pressure_steam", 500, 15, 14, 18, 0xFFCFE6FF, 0xFF8CC8FF, ModFluids.HIGH_PRESSURE_STEAM),
-    SUPERHEATED("superheated_steam", 900, 20, 22, 28, 0xFFFFE2C4, 0xFFFFBE78, ModFluids.SUPERHEATED_STEAM);
+    STEAM("steam", 100, 10, 8, 20, 0xFFF4F7F9, 0xFFD8E0E6, ModFluids.STEAM),
+    HIGH_PRESSURE("high_pressure_steam", 500, 15, 14, 36, 0xFFCFE6FF, 0xFF8CC8FF, ModFluids.HIGH_PRESSURE_STEAM),
+    SUPERHEATED("superheated_steam", 900, 20, 22, 56, 0xFFFFE2C4, 0xFFFFBE78, ModFluids.SUPERHEATED_STEAM);
 
     private final String name;
     private final int minCelsius;
@@ -61,7 +61,7 @@ public enum SteamGrade {
         return fePerMb;
     }
 
-    // FE a Steam Turbine Array makes from each mB.
+    // FE a Steam Turbine Array makes from each mB (before power.generationMultiplier; see PowerGeneration).
     public int arrayFePerMb() {
         return arrayFePerMb;
     }

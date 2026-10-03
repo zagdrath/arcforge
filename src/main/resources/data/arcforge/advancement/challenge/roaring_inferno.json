@@ -1,0 +1,32 @@
+{
+  "parent": "arcforge:steam/firebox_array",
+  "display": {
+    "icon": {
+      "id": "arcforge:firebox_array_casing"
+    },
+    "title": {
+      "translate": "advancements.arcforge.challenge.roaring_inferno.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.challenge.roaring_inferno.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:firebox_array",
+        "min_length": 315
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

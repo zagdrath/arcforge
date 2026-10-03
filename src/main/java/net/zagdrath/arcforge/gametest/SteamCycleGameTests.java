@@ -96,7 +96,7 @@ public final class SteamCycleGameTests {
         boolean[] started = { false };
         helper.onEachTick(() -> {
             if (started[0]) {
-                helper.assertTrue(superheater(helper, steamMin).getHeatUsed() <= ArcforgeConfig.SUPERHEATER_MAX_HEAT_PER_TICK.getAsInt(),
+                helper.assertTrue(superheater(helper, steamMin).getHeatUsed() <= ArcforgeConfig.SUPERHEATER_MAX_HEAT_PER_CUBE.getAsInt(),
                         "Used " + superheater(helper, steamMin).getHeatUsed() + " HU in a tick");
             }
         });
@@ -282,7 +282,7 @@ public final class SteamCycleGameTests {
                             }
                         }
                     }
-                    helper.assertTrue(CondenserArrayBlockEntity.cooling(helper.getLevel(), centre).rate() == ArcforgeConfig.CONDENSER_MAX_RATE.getAsInt(),
+                    helper.assertTrue(CondenserArrayBlockEntity.cooling(helper.getLevel(), centre).rate() == ArcforgeConfig.CONDENSER_MAX_RATE_PER_CUBE.getAsInt(),
                             "Packed in blue ice it isn't capped: " + CondenserArrayBlockEntity.cooling(helper.getLevel(), centre).rate());
                     SteamGameTests.fill(condenser(helper, MIN).getExhaustIn(), FluidResource.of(ModFluids.EXHAUST_STEAM.get()), 1_000);
                 })

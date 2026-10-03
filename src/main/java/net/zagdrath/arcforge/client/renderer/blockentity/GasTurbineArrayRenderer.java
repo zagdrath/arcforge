@@ -172,7 +172,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
         float noise = (Mth.murmurHash3Mixer((int) tick * 31 + turbine.getBlockPos().hashCode()) & 0xFFFF) / 65535.0F;
         state.glow = Mth.clamp(glow * (1.0F - FLICKER + 2.0F * FLICKER * noise), 0.0F, 1.0F);
         if (turbine.getLevel() != null) {
-            state.light = LightCoordsUtil.getLightCoords(turbine.getLevel(), shell.min().offset(1, 1, 1).relative(shell.axis(), shell.length() / 2 - 1));
+            state.light = LightCoordsUtil.getLightCoords(turbine.getLevel(), shell.centre());
             state.intakeLight = endLight(turbine, shell, turbine.getIntakeEnd());
             state.exhaustLight = endLight(turbine, shell, turbine.getIntakeEnd().opposite());
         } else {

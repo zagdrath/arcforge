@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "side": "arcforge:block/firebox_array/casing",
+    "end": "arcforge:block/firebox_array/casing_top"
+  }
+}

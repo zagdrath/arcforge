@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:steam/boiler",
+  "display": {
+    "icon": {
+      "id": "arcforge:firebox_array_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.steam.firebox_array.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.steam.firebox_array.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:firebox_array"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

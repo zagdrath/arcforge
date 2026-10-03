@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Burns coal, charcoal and coal blocks straight into FE: 40 FE/t, 32,000 FE per coal. It pauses while its FE buffer is full.\nSimple and cheap, but a Firebox with a Thermoelectric Plant gets about twice as much from each coal.\nEnergy upgrades raise the FE per fuel; Speed upgrades burn faster.\nCharcoal leaves Wood Ash in the ash slot half the time: take it out by hand or through an Output face."
+      "text": "Burns coal, charcoal and coal blocks straight into FE: {fe:40} FE/t, {fe:32000} FE per coal. It pauses while its FE buffer is full.\nSimple and cheap, but a Firebox with a Thermoelectric Plant gets about twice as much from each coal.\nEnergy upgrades raise the FE per fuel; Speed upgrades burn faster.\nCharcoal leaves Wood Ash in the ash slot half the time: take it out by hand or through an Output face."
     }
   ]
 }

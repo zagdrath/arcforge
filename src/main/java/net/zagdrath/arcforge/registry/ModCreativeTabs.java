@@ -31,6 +31,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.GEOTHERMAL_PLANT.get());
                 output.accept(ModItems.COMBUSTION_PLANT.get());
                 output.accept(ModItems.FIREBOX.get());
+                output.accept(ModItems.FIREBOX_ARRAY_CONTROLLER.get());
+                output.accept(ModItems.FIREBOX_ARRAY_CASING.get());
                 output.accept(ModItems.FUEL_BURNER.get());
                 output.accept(ModItems.THERMOELECTRIC_PLANT.get());
                 output.accept(ModItems.ARC_CRUSHER.get());

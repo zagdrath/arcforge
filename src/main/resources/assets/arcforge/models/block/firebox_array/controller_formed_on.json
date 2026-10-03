@@ -1,0 +1,15 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "firebox_array",
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "particle": "arcforge:block/firebox_array/plate",
+    "base": "arcforge:block/firebox_array/plate",
+    "top": "arcforge:block/firebox_array/top",
+    "beam": "arcforge:block/ctm/column_beam",
+    "window": "arcforge:block/ctm/pressure_glass_base",
+    "lip": "arcforge:block/ctm/window_lip",
+    "front": "arcforge:block/firebox_array/controller_on"
+  },
+  "fallback": "arcforge:block/firebox_array/controller"
+}

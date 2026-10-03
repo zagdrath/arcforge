@@ -38,6 +38,8 @@ import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MenuReach;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
+import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -298,7 +300,7 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
-    // FE per mB by grade is the array's: Steam 10, High-Pressure 18, Superheated 28. Three 3-long turbines at
+    // FE per mB by grade is the array's: Steam 20, High-Pressure 36, Superheated 56. Three 3-long turbines at
     // full flow (120 mB/t) spin up at the same pace (each rotor's target follows its own grade), so at any
     // moment their output is flow x FE per mB x the same spin share.
     static void turbineOutput(GameTestHelper helper) {
@@ -351,14 +353,12 @@ public final class SteamGameTests {
         }
     }
 
-    // 3x3x4 forms (with a wall window), the master is the minimum corner; 3x3x8 is too tall; glass on a
-    // corner doesn't form; breaking a pane breaks it.
+    // 3x3x4 forms (with a wall window), the master is the minimum corner; 3x3x13 is too tall (by the size rule);
+    // glass on a corner doesn't form; breaking a pane breaks it.
     static void boilerArrayForms(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
         BlockPos pane = new BlockPos(1, 2, 0);
         buildShell(helper, min, Direction.Axis.Y, 4, ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), pane, new BlockPos(1, 3, 0));
-        BlockPos tallMin = new BlockPos(4, 1, 0);
-        buildShell(helper, tallMin, Direction.Axis.Y, 8, ModBlocks.STEAM_BOILER_ARRAY_CASING.get());
         BlockPos cornerMin = new BlockPos(0, 1, 4);
         buildShell(helper, cornerMin, Direction.Axis.Y, 3, ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), new BlockPos(2, 3, 6));
         helper.startSequence()
@@ -368,7 +368,12 @@ public final class SteamGameTests {
                     helper.assertTrue(boiler.isMaster() && boiler.getHeight() == 4, "Boiler array: master " + boiler.isMaster() + ", height " + boiler.getHeight());
                     helper.assertTrue(PressureGlassBlock.isFormed(helper.getBlockState(pane)), "The window is not part of it");
                     helper.assertTrue(boiler.getWater().getCapacity() == 64_000, "Water tank holds " + boiler.getWater().getCapacity());
-                    helper.assertTrue(!ShellCasingBlock.isFormed(helper.getBlockState(tallMin)), "A 3x3x8 boiler formed");
+                    helper.assertTrue(!SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 13)),
+                            "A 3x3x13 boiler is allowed");
+                    helper.assertTrue(SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 12, 7, 9))
+                            && SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 3, 9, 7))
+                            && !SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 3, 8, 8)),
+                            "The boiler's footprint rule is wrong");
                     helper.assertTrue(!ShellCasingBlock.isFormed(helper.getBlockState(cornerMin)), "A boiler with glass on a corner formed");
                     // Water goes in through an input port on the left (east) face.
                     MultiblockPorts.set(helper.getLevel(), boiler, helper.absolutePos(new BlockPos(2, 2, 1)), SideMode.INPUT, Direction.EAST);
@@ -450,7 +455,7 @@ public final class SteamGameTests {
                     early[0] = turbine.getRpm();
                     helper.assertTrue(turbine.getStatus() == MachineStatus.SPINNING_UP, "Turbine is " + turbine.getStatus());
                     helper.assertTrue(early[0] > 100 && early[0] < 1_000, "After a second the rotor is at " + early[0] + " RPM");
-                    helper.assertTrue(turbine.getFePerTick() > 0 && turbine.getFePerTick() < 200 * 28, "Output while spinning up: " + turbine.getFePerTick());
+                    helper.assertTrue(turbine.getFePerTick() > 0 && turbine.getFePerTick() < 200 * 56, "Output while spinning up: " + turbine.getFePerTick());
                 })
                 .thenIdle(60)
                 .thenExecute(() -> {

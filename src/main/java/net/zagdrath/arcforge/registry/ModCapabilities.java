@@ -423,6 +423,20 @@ public final class ModCapabilities {
             var digester = net.zagdrath.arcforge.multiblock.BiogasDigesterStructure.findController(level, pos);
             return digester != null ? digester.heatHandlerAt(pos, side) : null;
         }, digesterParts);
+        // The Firebox Array: fuel items, liquids and gases in, oxygen in, heat out, through its ports.
+        Block[] fireboxArrayParts = { ModBlocks.FIREBOX_ARRAY_CONTROLLER.get(), ModBlocks.FIREBOX_ARRAY_CASING.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var array = net.zagdrath.arcforge.multiblock.FireboxArrayStructure.findController(level, pos);
+            return array != null ? array.itemHandlerAt(pos, side) : null;
+        }, fireboxArrayParts);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var array = net.zagdrath.arcforge.multiblock.FireboxArrayStructure.findController(level, pos);
+            return array != null ? array.fluidHandlerAt(pos, side) : null;
+        }, fireboxArrayParts);
+        event.registerBlock(HEAT, (level, pos, state, blockEntity, side) -> {
+            var array = net.zagdrath.arcforge.multiblock.FireboxArrayStructure.findController(level, pos);
+            return array != null ? array.heatHandlerAt(pos, side) : null;
+        }, fireboxArrayParts);
         // The Thermal Evaporator Array: Seawater or Brine in, heat in, Brine, Salt and Water out, through its ports.
         Block[] evaporatorParts = { ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get(), ModBlocks.THERMAL_EVAPORATOR_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {

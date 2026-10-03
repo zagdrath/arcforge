@@ -1,0 +1,12 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "cube_box",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "arcforge:block/condenser_array/box_side",
+    "base": "arcforge:block/condenser_array/box_side",
+    "top": "arcforge:block/condenser_array/box_top",
+    "beam": "arcforge:block/ctm/column_beam"
+  },
+  "fallback": "arcforge:block/condenser_array/casing"
+}

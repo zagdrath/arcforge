@@ -220,6 +220,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.HABER_REACTOR.get(), net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen::new);
         event.register(ModMenuTypes.BIOGAS_DIGESTER.get(), net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen::new);
         event.register(ModMenuTypes.THERMAL_EVAPORATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.ThermalEvaporatorScreen::new);
+        event.register(ModMenuTypes.FIREBOX_ARRAY.get(), net.zagdrath.arcforge.client.screen.multiblock.FireboxArrayScreen::new);
         event.register(ModMenuTypes.GLASS_CLOCHE.get(), ClocheScreen::new);
         event.register(ModMenuTypes.GROW_CHAMBER.get(), ClocheScreen::new);
         event.register(ModMenuTypes.HYDROPONIC_CELL.get(), ClocheScreen::new);
@@ -545,6 +546,9 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.ARC_QUARRY.get(), ArcQuarryRenderer::new);
+        // The Firebox Array draws its firebrick lining and the fire on its floor.
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.FIREBOX_ARRAY.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.FireboxArrayRenderer::new);
         // The Thermal Evaporator Array draws the fluid column in its core and its salt bed.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.THERMAL_EVAPORATOR.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.ThermalEvaporatorRenderer::new);

@@ -48,7 +48,7 @@ public class GasTurbineArrayCasingBlock extends ShellCasingBlock {
 
     public static final EnumProperty<End> END = EnumProperty.create("end", End.class);
     public static final ShellStructure STRUCTURE = new ShellStructure(block -> block instanceof GasTurbineArrayCasingBlock,
-            EnumSet.of(Direction.Axis.X, Direction.Axis.Z), 5, 9, true);
+            EnumSet.of(Direction.Axis.X, Direction.Axis.Z), ShellStructure.narrow(5, 9), true);
 
     public GasTurbineArrayCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);

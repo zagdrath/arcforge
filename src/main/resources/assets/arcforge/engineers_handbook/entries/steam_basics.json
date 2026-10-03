@@ -9,7 +9,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Boil water with heat, then turn the steam into FE in a Steam Turbine Array. It beats the Thermoelectric Plant once you run it hot.\n# Grades\n- Steam: from 100°C. 10 HU per mB.\n- High-Pressure Steam: from 500°C. 15 HU per mB.\n- Superheated Steam: from 900°C. 20 HU per mB.\nBetter grades cost more heat but give a turbine much more FE per mB.\nSteam is a gas: it travels in Pressurized Conduits and is stored in Pressurized Cylinders, never in fluid tanks or pipes."
+      "text": "Boil water with heat, then turn the steam into FE in a Steam Turbine Array. It beats the Thermoelectric Plant once you run it hot.\n# Grades\n- Steam: from 100°C. 10 HU per mB.\n- High-Pressure Steam: from 500°C. 15 HU per mB.\n- Superheated Steam: from 900°C. 20 HU per mB.\nBetter grades cost more heat but give a turbine much more FE per mB.\nSteam is a gas: it travels in Pressurized Conduits and is stored in Pressurized Cylinders, never in fluid tanks or pipes.\n# Scale\nThe boiler, turbine, superheater and condenser all come in sizes, and grow with them. The Firebox Array is the heat source to match: a 7×5×9 makes 50,400 HU/t, all a 7×9×12 boiler can take.\nThe config's power.generationMultiplier scales the FE every generator makes (not the heat or steam); the numbers in this book already include it."
     }
   ]
 }

@@ -116,7 +116,7 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
 
         // Lit by the middle of the structure, not by the corner the master sits in.
         state.light = boiler.getLevel() != null
-                ? LightCoordsUtil.getLightCoords(boiler.getLevel(), shell.min().offset(1, shell.length() / 2, 1))
+                ? LightCoordsUtil.getLightCoords(boiler.getLevel(), shell.centre())
                 : state.lightCoords;
     }
 

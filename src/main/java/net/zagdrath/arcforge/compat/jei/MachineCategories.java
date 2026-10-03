@@ -22,6 +22,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.heat.BurnerFuel;
+import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.recipe.AirSeparatingRecipe;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
@@ -1027,7 +1028,9 @@ final class MachineCategories {
             // What the Steam Boiler Array pays per mB (after its heat cost multiplier) and the Steam Turbine Array makes.
             String huPerMb = String.format(Locale.ROOT, "%.0f", grade.huPerMb() * ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble());
             text(graphics, Component.translatable("jei.arcforge.steam.boil", grade.minCelsius(), huPerMb), 0, 30);
-            text(graphics, Component.translatable("jei.arcforge.steam.turbine", grade.arrayFePerMb()), 0, 40);
+            // Times the power multiplier, as the turbine makes it.
+            String fePerMb = String.format(Locale.ROOT, "%.1f", grade.arrayFePerMb() * PowerGeneration.multiplier()).replaceAll("\\.0$", "");
+            text(graphics, Component.translatable("jei.arcforge.steam.turbine", fePerMb), 0, 40);
         }
     }
 
@@ -1091,8 +1094,8 @@ final class MachineCategories {
         // From open air up to the most any cooling gives.
         @Override
         public void draw(CondensingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
-            text(graphics, Component.translatable("jei.arcforge.condensing.rate", ArcforgeConfig.CONDENSER_BASE_RATE.getAsInt(),
-                    ArcforgeConfig.CONDENSER_MAX_RATE.getAsInt()), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.condensing.rate", ArcforgeConfig.CONDENSER_BASE_RATE_PER_CUBE.getAsInt(),
+                    ArcforgeConfig.CONDENSER_MAX_RATE_PER_CUBE.getAsInt()), 0, 30);
         }
     }
 

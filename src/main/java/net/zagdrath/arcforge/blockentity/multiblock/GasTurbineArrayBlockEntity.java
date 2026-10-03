@@ -49,6 +49,7 @@ import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineOutputs;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -66,10 +67,11 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The Gas Turbine Array (see ShellMultiblockBlockEntity): a turbine 5 to 9 blocks long that burns Fuel Burner
-// fuels straight to FE. It burns up to maxFuelHuPerLength x L HU/t of fuel (the limit is heat, so Hydrogen's
+// fuels straight to FE. It burns up to maxFuelHeatPerLength x L HU/t of fuel (2,500 x L: about 34,000 FE/t at 9 long) (the limit is heat, so Hydrogen's
 // thin HU/mB isn't punished), scaled by the throttle: full in the standard redstone modes, signal / 15 in
 // THROTTLE. Each HU makes simpleCycleFactor FE (1.5), less for fuels burning cooler than the reference
-// temperature, scaled by how close the rotor is to its speed, and +8% with lubricant. A quarter of the heat
+// temperature, scaled by how close the rotor is to its speed, +8% with lubricant, and times power.generationMultiplier.
+// Its output cap is its full-throttle lubricated output, and its FE buffer energyBufferTicks of that. A quarter of the heat
 // leaves as exhaust at half the burn temperature, pushed out of Heat ports (a Steam Boiler Array takes it)
 // or vented. One end is the intake, which needs air in front of it; the other is the exhaust. Starting takes
 // 20 ticks of ignition; running dry is a flameout, and it waits 20 ticks before it can ignite again.
@@ -94,7 +96,8 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         }
     }
 
-    private final GeneratorEnergyHandler energy;
+    // Replaced (keeping what it holds) when the length changes, since its size and rate follow it.
+    private GeneratorEnergyHandler energy;
     private final FilteredFluidTank fuel;
     private final ResourceHandler<FluidResource> fuelInput;
     private final FilteredFluidTank lubricant;
@@ -139,10 +142,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         super(ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), pos, state, 0, (slot, resource) -> false, UPGRADES,
                 new SideConfig(SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE),
                 SIDE_MODES);
-        this.energy = new GeneratorEnergyHandler(
-                ArcforgeConfig.GAS_TURBINE_ENERGY_CAPACITY.getAsInt(),
-                ArcforgeConfig.GAS_TURBINE_MAX_OUTPUT.getAsInt(),
-                this::setChanged);
+        this.energy = newEnergy(5);
         this.fuel = new FilteredFluidTank(ArcforgeConfig.GAS_TURBINE_TANK_PER_LENGTH.getAsInt() * 5, GasTurbineArrayBlockEntity::isFuel, this::setChanged);
         this.fuelInput = new AutomationResourceHandler<>(fuel, index -> true, index -> false);
         this.lubricant = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_LUBRICANT_CAPACITY.getAsInt(), Lubricant::isLubricant, this::setChanged);
@@ -201,13 +201,14 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         return Math.min(1.0, celsius / (double) ArcforgeConfig.GAS_TURBINE_REFERENCE_TEMPERATURE.getAsInt());
     }
 
-    // FE per HU burned, at full rotor speed and without lubricant.
+    // FE per HU burned, at full rotor speed, without lubricant and before the power multiplier.
     public static double fePerHu(int celsius) {
         return ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * efficiency(celsius);
     }
 
+    // FE per mB of this fuel as GUIs and JEI show it: at full rotor speed, without lubricant, times the power multiplier.
     public static double fePerMb(@Nullable BurnerFuel fuel) {
-        return fuel == null ? 0.0 : fuel.huPerMb() * fePerHu(burnTemperature(fuel));
+        return fuel == null ? 0.0 : fuel.huPerMb() * fePerHu(burnTemperature(fuel)) * PowerGeneration.multiplier();
     }
 
     public static int exhaustCelsius(BurnerFuel fuel) {
@@ -221,6 +222,23 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     public int maxHuPerTick() {
         return ArcforgeConfig.GAS_TURBINE_MAX_HU_PER_LENGTH.getAsInt() * getLength();
+    }
+
+    // The most FE/t it makes at this length: full throttle on a fuel at the reference temperature, lubricated, times
+    // the power multiplier. Also the most its energy ports push out a tick.
+    public static int maxOutput(int length) {
+        return PowerGeneration.cap((double) ArcforgeConfig.GAS_TURBINE_MAX_HU_PER_LENGTH.getAsInt() * length
+                * ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * Lubricant.bonus());
+    }
+
+    public int maxOutput() {
+        return maxOutput(getLength());
+    }
+
+    private GeneratorEnergyHandler newEnergy(int length) {
+        int output = maxOutput(length);
+        long capacity = (long) output * ArcforgeConfig.GAS_TURBINE_ENERGY_BUFFER_TICKS.getAsInt();
+        return new GeneratorEnergyHandler((int) Math.min(Integer.MAX_VALUE, capacity), output, this::setChanged);
     }
 
     public static int maxRpm() {
@@ -253,6 +271,11 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         super.setShell(shell);
         if (shell != null) {
             fuel.setCapacity(ArcforgeConfig.GAS_TURBINE_TANK_PER_LENGTH.getAsInt() * shell.length());
+            GeneratorEnergyHandler resized = newEnergy(shell.length());
+            if (resized.getCapacityAsInt() != energy.getCapacityAsInt()) {
+                resized.generate(energy.getAmountAsInt());
+                energy = resized;
+            }
         }
         targetsDirty = true;
     }
@@ -397,7 +420,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
             int celsius = burnTemperature(burning);
             double spun = Mth.clamp(rpm / Math.max(target, 1.0), 0.0, 1.0);
             double bonus = 1.0 + (lubricated ? Lubricant.bonus() - 1.0 : 0.0);
-            fePerTick = energy.generate((int) Math.round(burnedHu * fePerHu(celsius) * spun * bonus));
+            fePerTick = energy.generate(PowerGeneration.fe(burnedHu * fePerHu(celsius) * spun * bonus));
             if (lubricated) {
                 useLubricant();
             }
@@ -525,7 +548,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         if (targetsDirty) {
             refreshTargets(level);
         }
-        int budget = Math.min(energy.getAmountAsInt(), ArcforgeConfig.GAS_TURBINE_MAX_OUTPUT.getAsInt());
+        int budget = Math.min(energy.getAmountAsInt(), maxOutput());
         for (BlockCapabilityCache<EnergyHandler, @Nullable Direction> target : energyTargets) {
             if (budget <= 0) {
                 break;
@@ -686,6 +709,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         fuel.setCapacity(ArcforgeConfig.GAS_TURBINE_TANK_PER_LENGTH.getAsInt() * getLength());
+        energy = newEnergy(getLength());
         energy.deserialize(input.childOrEmpty("energy"));
         fuel.deserialize(input.childOrEmpty("fuel"));
         lubricant.deserialize(input.childOrEmpty("lubricant"));

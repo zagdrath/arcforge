@@ -60,6 +60,10 @@ public enum MultiblockNameProvider implements IBlockComponentProvider {
                 // A window up a Thermal Evaporator Array.
                 controller = ThermalEvaporatorStructure.findController(level, pos);
             }
+            if (controller == null) {
+                // A window in a Firebox Array.
+                controller = net.zagdrath.arcforge.multiblock.FireboxArrayStructure.findController(level, pos);
+            }
         }
         return controller != null && controller.isFormed() && controller instanceof MenuProvider menu ? menu.getDisplayName() : null;
     }

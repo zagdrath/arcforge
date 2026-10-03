@@ -49,10 +49,11 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// The Condenser Array (see CubeMultiblockBlockEntity): a solid 3x3x3 cube that turns Exhaust Steam from a
-// Steam Turbine Array's Exhaust ports back into water, 1 mB for 1 mB. It condenses 120 mB/t in open air;
-// water sources and ice touching its outer faces add to that (20 each, ice 30, packed ice 40, blue ice 60),
-// a cold biome multiplies it by 1.25 and the Nether by 0.5, up to 400 mB/t. It looks around every 40 ticks.
+// The Condenser Array (see CubeMultiblockBlockEntity): a solid box, 3x3x3 up to 7x7x7, that turns Exhaust Steam from a
+// Steam Turbine Array's Exhaust ports back into water, 1 mB for 1 mB. It condenses 120 mB/t per cube (27 blocks of its
+// volume) in open air; water sources and ice touching its outer faces add to that (20 each, ice 30, packed ice 40, blue
+// ice 60), a cold biome multiplies it by 1.25 and the Nether by 0.5, up to 400 mB/t per cube (a 7x7x7: 5,081). Its
+// tanks hold 16,000 mB per cube. It looks around every 40 ticks.
 // Its ports push the water out on their own.
 public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
@@ -79,7 +80,7 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
         super(ModBlockEntityTypes.CONDENSER_ARRAY.get(), pos, state, 0, (level, slot, resource) -> false, UPGRADES,
                 new SideConfig(SideMode.NONE, SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.NONE, SideMode.NONE),
                 SIDE_MODES, false, 0, 0, new int[0], slot -> false);
-        int tank = ArcforgeConfig.CONDENSER_TANK_CAPACITY.getAsInt();
+        int tank = ArcforgeConfig.CONDENSER_TANK_PER_CUBE.getAsInt();
         this.exhaustIn = new FilteredFluidTank(tank, resource -> resource.is(ModFluids.EXHAUST_STEAM.get()), this::setChanged);
         this.waterOut = new FilteredFluidTank(tank, BoilerCore::isWater, this::setChanged);
         this.exhaustInput = new AutomationResourceHandler<>(exhaustIn, index -> true, index -> false);
@@ -117,18 +118,46 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
         return CondenserArrayCasingBlock.STRUCTURE;
     }
 
-    // What cools a cube centred here: the 54 blocks touching its outer faces, and the climate at the centre.
+    // The cube grew into a box: its exhaust and water go to the box's master.
+    @Override
+    public void moveContentsTo(CubeMultiblockBlockEntity master) {
+        if (master instanceof CondenserArrayBlockEntity to) {
+            SuperheaterArrayBlockEntity.moveTank(exhaustIn, to.exhaustIn);
+            SuperheaterArrayBlockEntity.moveTank(waterOut, to.waterOut);
+            setChanged();
+            to.setChanged();
+        }
+    }
+
+    // The tanks follow the size; what they hold carries over.
+    @Override
+    protected void onSizeChanged() {
+        int tank = perCube(ArcforgeConfig.CONDENSER_TANK_PER_CUBE.getAsInt());
+        exhaustIn.setCapacity(tank);
+        waterOut.setCapacity(tank);
+        scanDue = true;
+    }
+
+    // What cools a 3x3x3 cube centred here: the 54 blocks touching its outer faces, and the climate at the centre.
     public static Cooling cooling(Level level, BlockPos center) {
+        return cooling(level, center.offset(-1, -1, -1), center.offset(1, 1, 1));
+    }
+
+    // What cools the box from min to max: the blocks touching its outer faces, and the climate at its middle. Its
+    // open-air rate and cap are per cube.
+    public static Cooling cooling(Level level, BlockPos min, BlockPos max) {
         int water = 0, ice = 0;
-        for (int dx = -2; dx <= 2; dx++) {
-            for (int dy = -2; dy <= 2; dy++) {
-                for (int dz = -2; dz <= 2; dz++) {
+        BlockPos center = new BlockPos((min.getX() + max.getX()) / 2, (min.getY() + max.getY()) / 2, (min.getZ() + max.getZ()) / 2);
+        for (int x = min.getX() - 1; x <= max.getX() + 1; x++) {
+            for (int y = min.getY() - 1; y <= max.getY() + 1; y++) {
+                for (int z = min.getZ() - 1; z <= max.getZ() + 1; z++) {
                     // Exactly one coordinate on the outside, the other two over the face.
-                    int outside = (Math.abs(dx) == 2 ? 1 : 0) + (Math.abs(dy) == 2 ? 1 : 0) + (Math.abs(dz) == 2 ? 1 : 0);
+                    int outside = (x < min.getX() || x > max.getX() ? 1 : 0) + (y < min.getY() || y > max.getY() ? 1 : 0)
+                            + (z < min.getZ() || z > max.getZ() ? 1 : 0);
                     if (outside != 1) {
                         continue;
                     }
-                    BlockPos pos = center.offset(dx, dy, dz);
+                    BlockPos pos = new BlockPos(x, y, z);
                     BlockState state = level.getBlockState(pos);
                     if (state.is(Blocks.BLUE_ICE)) {
                         ice += ArcforgeConfig.CONDENSER_BLUE_ICE_BONUS.getAsInt();
@@ -145,12 +174,19 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
         double multiplier = ClimateHelper.waterEvaporates(level, center) ? ArcforgeConfig.CONDENSER_NETHER_MULTIPLIER.getAsDouble()
                 : ClimateHelper.isCold(level, center, ArcforgeConfig.CONDENSER_COLD_BIOME_TAGS.get()) ? ArcforgeConfig.CONDENSER_COLD_MULTIPLIER.getAsDouble()
                 : 1.0;
-        return cooling(ArcforgeConfig.CONDENSER_BASE_RATE.getAsInt(), water, ice, multiplier);
+        double cubes = (max.getX() - min.getX() + 1) * (max.getY() - min.getY() + 1) * (max.getZ() - min.getZ() + 1) / 27.0;
+        return cooling((int) Math.round(ArcforgeConfig.CONDENSER_BASE_RATE_PER_CUBE.getAsInt() * cubes), water, ice, multiplier, cubes);
     }
 
-    // The rate from its parts: (air + water + ice) x climate, rounded down, at most maxRate.
+    // The rate from its parts for a 3x3x3: (air + water + ice) x climate, rounded down, at most maxRatePerCube.
     public static Cooling cooling(int air, int water, int ice, double multiplier) {
-        int rate = Math.min(ArcforgeConfig.CONDENSER_MAX_RATE.getAsInt(), (int) Math.floor((air + water + ice) * multiplier));
+        return cooling(air, water, ice, multiplier, 1.0);
+    }
+
+    // As above, for a structure this many cubes big (the cap scales with it).
+    public static Cooling cooling(int air, int water, int ice, double multiplier, double cubes) {
+        int cap = (int) Math.round(ArcforgeConfig.CONDENSER_MAX_RATE_PER_CUBE.getAsInt() * cubes);
+        int rate = Math.min(cap, (int) Math.floor((air + water + ice) * multiplier));
         return new Cooling(air, water, ice, (int) Math.round(multiplier * 100), rate);
     }
 
@@ -170,7 +206,7 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
         if (scanDue || level.getGameTime() - lastScan >= ArcforgeConfig.CONDENSER_SCAN_INTERVAL.getAsInt()) {
             scanDue = false;
             lastScan = level.getGameTime();
-            cooling = cooling(level, pos);
+            cooling = cooling(level, getMinCorner(), getMaxCorner());
         }
         condensed = 0;
         if (!redstoneMode.canRun(isPowered(level))) {
@@ -262,7 +298,8 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("container.arcforge.condenser_array");
+        return getBox() != null ? Component.translatable("container.arcforge.condenser_array.sized", sizeText())
+                : Component.translatable("container.arcforge.condenser_array");
     }
 
     @Override

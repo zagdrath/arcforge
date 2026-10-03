@@ -154,6 +154,13 @@ public final class ModBlocks {
     public static final DeferredBlock<FireboxBlock> FIREBOX = BLOCKS.registerBlock("firebox",
             FireboxBlock::new, p -> machineProperties(p, 13));
 
+    // The Firebox Array: a hollow box of casings round a fire (see FireboxArrayStructure), like the other arrays' casings.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock> FIREBOX_ARRAY_CASING = BLOCKS.registerBlock(
+            "firebox_array_casing", net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock::new, ModBlocks::columnProperties);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock> FIREBOX_ARRAY_CONTROLLER =
+            BLOCKS.registerBlock("firebox_array_controller", net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock::new,
+                    p -> columnProperties(p).lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.LIT) ? 13 : 0));
+
     public static final DeferredBlock<ThermoelectricPlantBlock> THERMOELECTRIC_PLANT = BLOCKS.registerBlock("thermoelectric_plant",
             ThermoelectricPlantBlock::new, p -> machineProperties(p, 7));
 

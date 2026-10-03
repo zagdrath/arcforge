@@ -88,6 +88,7 @@ public class PressureGlassBlock extends TransparentBlock {
             level.scheduleTick(pos, this, 1);
             GreenhouseStructure.notifyChanged(level, pos);
             ThermalEvaporatorStructure.notifyChanged(level, pos);
+            net.zagdrath.arcforge.multiblock.FireboxArrayStructure.notifyChanged(level, pos);
         }
     }
 
@@ -121,6 +122,7 @@ public class PressureGlassBlock extends TransparentBlock {
         if (!level.getBlockState(pos).is(this)) {
             GreenhouseStructure.notifyChanged(level, pos);
             ThermalEvaporatorStructure.notifyChanged(level, pos);
+            net.zagdrath.arcforge.multiblock.FireboxArrayStructure.notifyChanged(level, pos);
         }
     }
 

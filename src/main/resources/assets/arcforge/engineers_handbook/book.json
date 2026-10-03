@@ -101,9 +101,10 @@
       "id": "steam",
       "title": "Steam",
       "icon": "arcforge:steam_boiler_array_casing",
-      "description": "Boiler, turbine, superheater and condenser arrays.",
+      "description": "Big fireboxes, boiler, turbine, superheater and condenser arrays.",
       "entries": [
         "steam_basics",
+        "firebox_array",
         "steam_boiler_array",
         "steam_turbine_array",
         "superheater_array",

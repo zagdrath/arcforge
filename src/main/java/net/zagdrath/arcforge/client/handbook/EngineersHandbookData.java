@@ -31,7 +31,8 @@ import net.zagdrath.arcforge.multiblock.MultiblockBlueprints;
 // (with their entries in order), and each entry is engineers_handbook/entries/<id>.json with its title, icon,
 // featured items and pages. Pages are "text" (paragraphs; a line starting "# " is a heading, "- " a bullet)
 // or "multiblock" (a build viewer for one of MultiblockBlueprints). Read fresh each time the book opens,
-// so resource packs can change it.
+// so resource packs can change it. In text, {fe:N} is an amount of FE a generator makes: it shows as N times
+// power.generationMultiplier (see PowerGeneration), so the book agrees with the GUIs and Jade.
 public final class EngineersHandbookData {
     public record Book(List<Chapter> chapters) {}
 
@@ -93,7 +94,7 @@ public final class EngineersHandbookData {
                             .ifPresentOrElse(blueprint -> pages.add(new MultiblockPage(blueprint)),
                                     () -> Arcforge.LOGGER.warn("Handbook entry {} names unknown multiblock {}", id, structure));
                 }
-                default -> pages.add(new TextPage(GsonHelper.getAsString(page, "text")));
+                default -> pages.add(new TextPage(withPower(GsonHelper.getAsString(page, "text"))));
             }
         }
         return new Entry(id, Component.literal(GsonHelper.getAsString(json, "title")),
@@ -117,5 +118,22 @@ public final class EngineersHandbookData {
             Arcforge.LOGGER.error("Couldn't read handbook file {}", path, e);
             return null;
         }
+    }
+
+    private static final java.util.regex.Pattern FE_TOKEN = java.util.regex.Pattern.compile("\\{fe:([0-9]+(?:\\.[0-9]+)?)\\}");
+
+    // Replaces each {fe:N} with N times the power multiplier: whole numbers grouped (1,234), others to one decimal.
+    static String withPower(String text) {
+        double multiplier = net.zagdrath.arcforge.machine.PowerGeneration.multiplier();
+        java.util.regex.Matcher matcher = FE_TOKEN.matcher(text);
+        StringBuilder out = new StringBuilder();
+        while (matcher.find()) {
+            double value = Double.parseDouble(matcher.group(1)) * multiplier;
+            String shown = Math.abs(value - Math.rint(value)) < 0.05 ? net.zagdrath.arcforge.client.gui.ArcforgeGui.grouped(Math.round(value))
+                    : String.format(java.util.Locale.ROOT, "%.1f", value);
+            matcher.appendReplacement(out, java.util.regex.Matcher.quoteReplacement(shown));
+        }
+        matcher.appendTail(out);
+        return out.toString();
     }
 }

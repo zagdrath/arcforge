@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "FCF",
+    "PQP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:glass_blocks",
+    "F": "arcforge:firebox",
+    "C": "arcforge:firebox_array_casing",
+    "Q": "minecraft:comparator"
+  },
+  "result": {
+    "id": "arcforge:firebox_array_controller",
+    "count": 1
+  }
+}

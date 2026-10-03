@@ -159,6 +159,11 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<BiogasDigesterBlockEntity>> BIOGAS_DIGESTER = BLOCK_ENTITY_TYPES.register("biogas_digester",
             () -> new BlockEntityType<>(BiogasDigesterBlockEntity::new, ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get()));
 
+    // The Firebox Array, on its controller; casings and panes are plain blocks that find it.
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity>> FIREBOX_ARRAY =
+            BLOCK_ENTITY_TYPES.register("firebox_array", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity::new, ModBlocks.FIREBOX_ARRAY_CONTROLLER.get()));
+
     // The Thermal Evaporator Array, on its controller; casings and panes are plain blocks that find it.
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity>> THERMAL_EVAPORATOR =
             BLOCK_ENTITY_TYPES.register("thermal_evaporator", () -> new BlockEntityType<>(

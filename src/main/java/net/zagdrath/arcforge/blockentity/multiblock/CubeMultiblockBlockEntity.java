@@ -57,6 +57,8 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
     private final ResourceHandler<ItemResource> itemAutomation;
     // FE/t drawn last tick, for the GUI.
     protected int usage;
+    // The larger box this casing is part of (see CubeMultiblockStructure), or null for a 3x3x3 or loose casing.
+    private CubeMultiblockStructure.@Nullable Box box;
 
     // inputSlots: each lane's input slot, in lane order. productSlot: the slots output faces give from.
     protected CubeMultiblockBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots, LevelSlotFilter filter,
@@ -177,6 +179,50 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
 
     // --- Structure (MultiblockController) ---
 
+    public CubeMultiblockStructure.@Nullable Box getBox() {
+        return box;
+    }
+
+    // Set on every casing when a larger box forms round it (null when it breaks or forms as a 3x3x3).
+    public void setBox(CubeMultiblockStructure.@Nullable Box box) {
+        if (!java.util.Objects.equals(this.box, box)) {
+            this.box = box;
+            setChanged();
+            onSizeChanged();
+            if (level != null && !level.isClientSide()) {
+                level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+            }
+        }
+    }
+
+    // How many blocks the structure is (27 for the cube).
+    public int volume() {
+        return box != null ? box.volume() : 27;
+    }
+
+    // Its size in 3x3x3 cubes: volume / 27 (1 for the cube). Per-cube config values scale with it.
+    public double cubes() {
+        return volume() / 27.0;
+    }
+
+    // A per-cube value times the cubes, rounded and kept in range.
+    protected int perCube(int value) {
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(value * cubes()));
+    }
+
+    // "W×H×D" for names and tooltips.
+    public String sizeText() {
+        return box == null ? "3×3×3"
+                : box.size(Direction.Axis.X) + "×" + box.size(Direction.Axis.Y) + "×" + box.size(Direction.Axis.Z);
+    }
+
+    // The structure's size changed: tanks and buffers that scale with it resize.
+    protected void onSizeChanged() {}
+
+    // A cube grew into a box, so its master moved from the cube's centre (this) to the box's corner: hand over the
+    // contents that would otherwise be stranded in a casing that no longer runs.
+    public void moveContentsTo(CubeMultiblockBlockEntity master) {}
+
     @Override
     public boolean isFormed() {
         return getBlockState().getValue(CubeCasingBlock.PART) == CubeCasingBlock.Part.CENTER;
@@ -189,12 +235,12 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
 
     @Override
     public BlockPos getMinCorner() {
-        return worldPosition.offset(-1, -1, -1);
+        return box != null ? box.min() : worldPosition.offset(-1, -1, -1);
     }
 
     @Override
     public BlockPos getMaxCorner() {
-        return worldPosition.offset(1, 1, 1);
+        return box != null ? box.max() : worldPosition.offset(1, 1, 1);
     }
 
     @Override
@@ -252,6 +298,12 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
         super.loadAdditional(input);
         energy.deserialize(input.childOrEmpty("energy"));
         portDefaults.load(input);
+        CubeMultiblockStructure.Box loaded = input.getLong("box_min").flatMap(min -> input.getLong("box_max")
+                .map(max -> new CubeMultiblockStructure.Box(BlockPos.of(min), BlockPos.of(max)))).orElse(null);
+        if (!java.util.Objects.equals(box, loaded)) {
+            box = loaded;
+            onSizeChanged();
+        }
     }
 
     @Override
@@ -259,5 +311,21 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
         super.saveAdditional(output);
         energy.serialize(output.child("energy"));
         portDefaults.save(output);
+        if (box != null) {
+            output.putLong("box_min", box.min().asLong());
+            output.putLong("box_max", box.max().asLong());
+        }
+    }
+
+    // Clients get the saved state (with the box, so any casing of one finds its master, for GUIs and Jade) when the chunk
+    // loads and when the box changes.
+    @Override
+    public net.minecraft.nbt.CompoundTag getUpdateTag(net.minecraft.core.HolderLookup.Provider registries) {
+        return saveCustomOnly(registries);
+    }
+
+    @Override
+    public net.minecraft.network.protocol.@Nullable Packet<net.minecraft.network.protocol.game.ClientGamePacketListener> getUpdatePacket() {
+        return net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket.create(this);
     }
 }

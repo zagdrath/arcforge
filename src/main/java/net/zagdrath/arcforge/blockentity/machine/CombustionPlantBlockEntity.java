@@ -25,6 +25,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
@@ -46,8 +47,8 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
                 new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.ENERGY, SideMode.NONE),
                 SIDE_MODES);
         this.energy = new GeneratorEnergyHandler(
-                ArcforgeConfig.COMBUSTION_PLANT_ENERGY_CAPACITY.getAsInt(),
-                ArcforgeConfig.COMBUSTION_PLANT_MAX_OUTPUT.getAsInt(),
+                PowerGeneration.cap(ArcforgeConfig.COMBUSTION_PLANT_ENERGY_CAPACITY.getAsInt()),
+                PowerGeneration.cap(ArcforgeConfig.COMBUSTION_PLANT_MAX_OUTPUT.getAsInt()),
                 this::setChanged);
     }
 
@@ -62,9 +63,10 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
         return energy.generate(energyPerTick());
     }
 
-    // FE/t while burning: faster with Speed upgrades, more per fuel item with Energy upgrades.
+    // FE/t while burning: faster with Speed upgrades, more per fuel item with Energy upgrades, times the power
+    // multiplier (see PowerGeneration).
     private int energyPerTick() {
-        return (int) Math.round(ArcforgeConfig.COMBUSTION_PLANT_ENERGY_PER_TICK.getAsInt() * speedMultiplier()
+        return PowerGeneration.fe(ArcforgeConfig.COMBUSTION_PLANT_ENERGY_PER_TICK.getAsInt() * speedMultiplier()
                 * UpgradeType.outputMultiplier(upgrades(UpgradeType.ENERGY)));
     }
 
@@ -75,7 +77,7 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
 
     @Override
     protected void pushOutput(ServerLevel level, BlockPos pos, Direction facing) {
-        outputs.pushEnergy(level, pos, facing, sideConfig, energy, ArcforgeConfig.COMBUSTION_PLANT_MAX_OUTPUT.getAsInt());
+        outputs.pushEnergy(level, pos, facing, sideConfig, energy, PowerGeneration.cap(ArcforgeConfig.COMBUSTION_PLANT_MAX_OUTPUT.getAsInt()));
     }
 
     @Override

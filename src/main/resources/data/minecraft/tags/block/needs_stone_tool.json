@@ -39,6 +39,8 @@
     "arcforge:greenhouse_controller",
     "arcforge:planting_bed",
     "arcforge:thermal_evaporator_casing",
-    "arcforge:thermal_evaporator_controller"
+    "arcforge:thermal_evaporator_controller",
+    "arcforge:firebox_array_casing",
+    "arcforge:firebox_array_controller"
   ]
 }

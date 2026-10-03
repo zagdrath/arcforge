@@ -10,6 +10,7 @@ import java.util.Optional;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
@@ -19,7 +20,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 //
 // If another way to turn heat into FE is ever added, add it to bestFePerHu() (and to the hydrogen_net_negative
 // GameTest), or hydrogen could become a free power source. The Gas Turbine Array burns fuel straight to FE, so
-// recoverableFePerMb also counts it (gasTurbineFePerHu).
+// recoverableFePerMb also counts it (gasTurbineFePerHu). Every route counts power.generationMultiplier (see
+// PowerGeneration), so turning it up raises the Electrolyzer's floor with it and hydrogen still never makes free power.
 public final class EnergyBalance {
     private EnergyBalance() {}
 
@@ -31,7 +33,7 @@ public final class EnergyBalance {
     // A Thermoelectric Plant at its bonus temperature with every efficiency card.
     public static double thermoelectricFePerHu() {
         return ArcforgeConfig.THERMOELECTRIC_BONUS_EFFICIENCY.getAsDouble()
-                * (1.0 + ArcforgeConfig.THERMOELECTRIC_UPGRADE_EFFICIENCY.getAsDouble() * UpgradeType.MAX_PER_MACHINE);
+                * (1.0 + ArcforgeConfig.THERMOELECTRIC_UPGRADE_EFFICIENCY.getAsDouble() * UpgradeType.MAX_PER_MACHINE) * PowerGeneration.multiplier();
     }
 
     // Steam Boiler Array into a lubricated Steam Turbine Array with its exhaust draining, over every grade, boiled
@@ -53,7 +55,7 @@ public final class EnergyBalance {
         double hu = boiled.huPerMb() * ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble()
                 + (made.huPerMb() - boiled.huPerMb()) * ArcforgeConfig.SUPERHEATER_HEAT_COST.getAsDouble();
         double fe = made.arrayFePerMb() * (1.0 + ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble()
-                + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble());
+                + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble()) * PowerGeneration.multiplier();
         return fe / hu;
     }
 
@@ -82,7 +84,7 @@ public final class EnergyBalance {
     public static double gasTurbineFePerHu(int celsius) {
         double efficiency = Math.min(1.0, celsius / (double) ArcforgeConfig.GAS_TURBINE_REFERENCE_TEMPERATURE.getAsInt());
         return ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * efficiency * (1.0 + ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble())
-                + ArcforgeConfig.GAS_TURBINE_EXHAUST_FRACTION.getAsDouble() * bestSteamFePerHu();
+                * PowerGeneration.multiplier() + ArcforgeConfig.GAS_TURBINE_EXHAUST_FRACTION.getAsDouble() * bestSteamFePerHu();
     }
 
     // The least FE an operation of this recipe may cost: the safety factor times what its products give back.

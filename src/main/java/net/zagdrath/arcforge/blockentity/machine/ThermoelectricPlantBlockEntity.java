@@ -31,6 +31,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -70,8 +71,8 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
                 ArcforgeConfig.THERMOELECTRIC_MAX_TEMPERATURE.getAsInt(),
                 this::setChanged);
         this.energy = new GeneratorEnergyHandler(
-                ArcforgeConfig.THERMOELECTRIC_ENERGY_CAPACITY.getAsInt(),
-                ArcforgeConfig.THERMOELECTRIC_MAX_OUTPUT.getAsInt(),
+                PowerGeneration.cap(ArcforgeConfig.THERMOELECTRIC_ENERGY_CAPACITY.getAsInt()),
+                PowerGeneration.cap(ArcforgeConfig.THERMOELECTRIC_MAX_OUTPUT.getAsInt()),
                 this::setChanged);
         HeatHandler buffered = heat.input(Integer.MAX_VALUE);
         this.heatInput = new HeatHandler() {
@@ -177,7 +178,8 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
         heatPerTick = 0;
         fePerTick = 0;
         if (enabled && !energy.isFull() && heat.getStored() > 0) {
-            float efficiency = upgradedEfficiency();
+            // FE per HU, times the power multiplier (see PowerGeneration).
+            float efficiency = upgradedEfficiency() * (float) PowerGeneration.multiplier();
             int throughput = throughput();
             // Heat flows through in proportion to the temperature above ambient (the cold side).
             int wanted = (int) Math.ceil((double) throughput * heat.getStored() / heat.getCapacity());
@@ -191,7 +193,7 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
             heatPerTick = heat.remove(wanted);
             fePerTick = energy.generate(Math.min(wantedFe, (int) (heatPerTick * efficiency)));
         }
-        outputs.pushEnergy(level, pos, getFacing(), sideConfig, energy, ArcforgeConfig.THERMOELECTRIC_MAX_OUTPUT.getAsInt());
+        outputs.pushEnergy(level, pos, getFacing(), sideConfig, energy, PowerGeneration.cap(ArcforgeConfig.THERMOELECTRIC_MAX_OUTPUT.getAsInt()));
 
         if (!enabled) {
             status = MachineStatus.DISABLED;

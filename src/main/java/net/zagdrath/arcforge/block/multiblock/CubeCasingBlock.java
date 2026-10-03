@@ -64,6 +64,8 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
     public static final EnumProperty<Part> PART = EnumProperty.create("part", Part.class);
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
+    // Casings that can form a larger box (see CubeMultiblockStructure) have this too: set while they are part of one.
+    public static final BooleanProperty BOX = BooleanProperty.create("box");
 
     protected CubeCasingBlock(BlockBehaviour.Properties properties) {
         super(properties);
@@ -72,6 +74,15 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
 
     public static boolean isFormed(BlockState state) {
         return state.getValue(PART) != Part.NONE;
+    }
+
+    // Whether this casing is part of a formed box larger than 3x3x3.
+    public static boolean isBox(BlockState state) {
+        return state.hasProperty(BOX) && state.getValue(BOX);
+    }
+
+    public static BlockState withoutBox(BlockState state) {
+        return state.hasProperty(BOX) ? state.setValue(BOX, false) : state;
     }
 
     // The structure these casings build.

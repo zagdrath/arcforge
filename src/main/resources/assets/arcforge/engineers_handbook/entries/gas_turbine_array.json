@@ -14,7 +14,7 @@
     },
     {
       "type": "text",
-      "text": "# Output\nEach mB of fuel gives about 1.5× the FE a Fuel Burner and Thermoelectric Plant would make from it, scaled by how hot the fuel burns.\n| Fuel | FE per mB |\n| Naphtha | 600 |\n| Light Oil | 313 |\n| Ethanol | 338 |\n| Hydrogen | 90 |\n| Biogas | 62 |\nA 9-long array handles 5,040 HU of fuel per tick: about 7,560 FE/t on Naphtha. Heavy Oil or Seed Oil in a lubricant port adds 8% and spools it up faster."
+      "text": "# Output\nEach mB of fuel gives about 1.5× the FE a Fuel Burner and Thermoelectric Plant would make from it, scaled by how hot the fuel burns.\n| Fuel | FE per mB |\n| Naphtha | {fe:600} |\n| Light Oil | {fe:313} |\n| Ethanol | {fe:338} |\n| Hydrogen | {fe:90} |\n| Biogas | {fe:62} |\nIt burns up to 2,500 HU of fuel per tick per block of length: a 9-long array handles 22,500 HU/t, about {fe:33750} FE/t on Naphtha. Heavy Oil or Seed Oil in a lubricant port adds 8% and spools it up faster. Its output cap is its full-throttle lubricated output, and it holds 400 ticks of that."
     },
     {
       "type": "text",

@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "A solid 3×3×3 cube of Condenser Array Casings. It turns Exhaust Steam back into water, 1 mB for 1 mB.\n# Cooling\n- 120 mB/t in open air.\n- Each water source touching its outside adds 20 mB/t; ice 30, packed ice 40, blue ice 60.\n- Cold biomes condense ×1.25, the Nether only ×0.5. Never more than 400 mB/t.\n# Closing the loop\nBoiler → Turbine (Exhaust port) → Condenser → back to the Boiler's water port. The ports push on their own, so the loop runs without a pump."
+      "text": "A solid box of Condenser Array Casings, 3 to 7 blocks each way. It turns Exhaust Steam back into water, 1 mB for 1 mB.\n# Cooling\n- 120 mB/t in open air per 27 blocks of its size.\n- Each water source touching its outside adds 20 mB/t; ice 30, packed ice 40, blue ice 60. A bigger box has more outside to touch.\n- Cold biomes condense ×1.25, the Nether only ×0.5. Never more than 400 mB/t per 27 blocks: a 7×7×7 tops out at 5,081 mB/t, enough for the biggest turbine.\n- Its tanks hold 16,000 mB per 27 blocks.\n# Closing the loop\nBoiler → Turbine (Exhaust port) → Condenser → back to the Boiler's water port. The ports push on their own, so the loop runs without a pump."
     },
     {
       "type": "multiblock",

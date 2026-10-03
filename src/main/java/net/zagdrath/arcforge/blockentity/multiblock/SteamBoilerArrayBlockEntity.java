@@ -52,10 +52,11 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 import com.mojang.serialization.Codec;
 
-// The Steam Boiler Array (see ShellMultiblockBlockEntity): boils water into steam with heat, and grows with
-// its height h. It holds 100,000 x h HU and boils with up to 600 x h HU/t; each mB costs 8 / 12 / 16 HU for
-// Steam / High-Pressure / Superheated (Superheated from a 7-tall array: up to 262 mB/t). Water and steam
-// tanks hold 16,000 x h mB. The grade and pressure rules are in BoilerCore.
+// The Steam Boiler Array (see ShellMultiblockBlockEntity): boils water into steam with heat, and grows with its
+// sections s = width x depth / 9 x height (a 3x3x3 is 3, a 7x9x12 is 84). It holds 100,000 x s HU and boils with up
+// to 600 x s HU/t; each mB costs 8 / 12 / 16 HU for Steam / High-Pressure / Superheated (a 7x9x12 boils up to 50,400
+// HU/t: 6,300 mB/t of Steam, 3,150 of Superheated). Water and steam tanks hold 16,000 x s mB. The grade and pressure
+// rules are in BoilerCore.
 public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity implements Boiler {
     // Water buckets go in the input slot and are poured into the tank; the empty buckets come out below.
     public static final int SLOT_BUCKET_IN = 0;
@@ -87,14 +88,14 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
         super(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), pos, state, MACHINE_SLOTS, SteamBoilerArrayBlockEntity::isItemValid, UPGRADES,
                 new SideConfig(SideMode.OUTPUT, SideMode.NONE, SideMode.INPUT, SideMode.NONE, SideMode.HEAT, SideMode.NONE),
                 SIDE_MODES);
-        int tank = ArcforgeConfig.BOILER_ARRAY_TANK_PER_HEIGHT.getAsInt() * 3;
+        int tank = ArcforgeConfig.BOILER_ARRAY_TANK_PER_SECTION.getAsInt() * 3;
         this.water = new FilteredFluidTank(tank, BoilerCore::isWater, this::onFluidChanged);
         this.steam = new FilteredFluidTank(tank, BoilerCore::isSteam, this::onFluidChanged);
         this.waterInput = new AutomationResourceHandler<>(water, index -> true, index -> false);
         this.steamOutput = new AutomationResourceHandler<>(steam, index -> false, index -> true);
         this.fluidAutomation = new CombinedResourceHandler<>(waterInput, steamOutput);
         this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_BUCKET_IN, slot -> slot == SLOT_BUCKET_OUT);
-        resize(3);
+        resize(3.0);
         this.data = new WideIntContainerData(SteamBoilerMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -114,16 +115,16 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
         return new MachineItemHandler(MACHINE_SLOTS, SteamBoilerArrayBlockEntity::isItemValid, UPGRADES, () -> {});
     }
 
-    // The heat buffer and tanks scale with the height. Stored heat and fluid carry over (clamped).
-    private void resize(int height) {
+    // The heat buffer and tanks scale with the sections. Stored heat and fluid carry over (clamped).
+    private void resize(double sections) {
         int stored = heat != null ? heat.getStored() : 0;
         heat = new HeatBuffer(
-                ArcforgeConfig.BOILER_ARRAY_HEAT_PER_HEIGHT.getAsInt() * height,
+                scaled(ArcforgeConfig.BOILER_ARRAY_HEAT_PER_SECTION.getAsInt(), sections),
                 ArcforgeConfig.BOILER_ARRAY_MAX_TEMPERATURE.getAsInt(),
                 this::setChanged);
         heat.add(stored);
         heatInput = heat.input(Integer.MAX_VALUE);
-        int tank = ArcforgeConfig.BOILER_ARRAY_TANK_PER_HEIGHT.getAsInt() * height;
+        int tank = scaled(ArcforgeConfig.BOILER_ARRAY_TANK_PER_SECTION.getAsInt(), sections);
         water.setCapacity(tank);
         steam.setCapacity(tank);
         BoilerPressure pressure = core != null ? core.getPressure() : BoilerPressure.AUTO;
@@ -134,6 +135,32 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     public int getHeight() {
         ShellStructure.Shell shell = getShell();
         return shell != null ? shell.length() : 3;
+    }
+
+    // How many 3x3 one-block-tall sections it is: width x depth / 9 x height (3 for a 3x3x3).
+    public double getSections() {
+        ShellStructure.Shell shell = getShell();
+        return shell != null ? sections(shell) : 3.0;
+    }
+
+    public static double sections(ShellStructure.Shell shell) {
+        return shell.a() * shell.b() / 9.0 * shell.length();
+    }
+
+    // A per-section value times the sections, rounded and kept in range.
+    public static int scaled(int perSection, double sections) {
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(perSection * sections));
+    }
+
+    // Most HU/t it boils with.
+    public int maxHeatPerTick() {
+        return scaled(ArcforgeConfig.BOILER_ARRAY_MAX_HEAT_PER_SECTION.getAsInt(), getSections());
+    }
+
+    // "W×D×H" for names and tooltips.
+    public String sizeText() {
+        ShellStructure.Shell shell = getShell();
+        return shell == null ? "3×3×3" : shell.a() + "×" + shell.b() + "×" + shell.length();
     }
 
     private void onFluidChanged() {
@@ -150,7 +177,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     public void setShell(ShellStructure.@Nullable Shell shell) {
         super.setShell(shell);
         if (shell != null) {
-            resize(shell.length());
+            resize(sections(shell));
         }
     }
 
@@ -162,8 +189,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
             status = MachineStatus.DISABLED;
             boiling = false;
         } else {
-            int height = getHeight();
-            status = switch (core.tick(ArcforgeConfig.BOILER_ARRAY_MAX_HEAT_PER_HEIGHT.getAsInt() * height,
+            status = switch (core.tick(maxHeatPerTick(),
                     ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble())) {
                 case BOILING -> MachineStatus.BOILING;
                 case HEATING -> MachineStatus.HEATING;
@@ -283,7 +309,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
-        resize(getHeight());
+        resize(getSections());
         heat.deserialize(input);
         water.deserialize(input.childOrEmpty("water"));
         steam.deserialize(input.childOrEmpty("steam"));
@@ -303,7 +329,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("container.arcforge.steam_boiler_array.sized", getHeight());
+        return Component.translatable("container.arcforge.steam_boiler_array.sized", sizeText());
     }
 
     @Override

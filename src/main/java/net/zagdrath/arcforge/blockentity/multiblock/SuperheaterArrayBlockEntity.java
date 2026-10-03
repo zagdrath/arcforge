@@ -53,10 +53,11 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 import com.mojang.serialization.Codec;
 
-// The Superheater Array (see CubeMultiblockBlockEntity): a solid 3x3x3 cube that upgrades steam with heat.
+// The Superheater Array (see CubeMultiblockBlockEntity): a solid box, 3x3x3 up to 7x7x7, that upgrades steam with heat.
 // Steam comes in through input ports and heat through heat ports; the next grade goes out of output ports.
 // Each mB costs the difference in HU/mB between the grades (5 Steam to High-Pressure, 5 High-Pressure to
-// Superheated, 10 Steam to Superheated), up to 2,000 HU/t, and only once the array is at least as hot as the
+// Superheated, 10 Steam to Superheated), up to 2,000 HU/t per cube (27 blocks of its volume; its buffer, tanks and flow
+// scale the same way, so a 7x7x7 takes up to 25,400 HU/t and 12,700 mB/t), and only once the array is at least as hot as the
 // grade it makes (500 / 900°C). It only spends the heat above that temperature, so it never cools itself
 // below it. Colder, or with steam already at or above its target, steam passes through unchanged. Its
 // pressure setting picks the target: Auto (the best its heat allows), High-Pressure or Superheated.
@@ -65,8 +66,9 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
     public static final List<BoilerPressure> PRESSURES = List.of(BoilerPressure.AUTO, BoilerPressure.HIGH_PRESSURE, BoilerPressure.SUPERHEATED);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.HEAT);
 
-    private final HeatBuffer heat;
-    private final HeatHandler heatInput;
+    // Replaced (keeping what they hold) when the structure's size changes.
+    private HeatBuffer heat;
+    private HeatHandler heatInput;
     private final FilteredFluidTank steamIn;
     private final FilteredFluidTank steamOut;
     private final ResourceHandler<FluidResource> steamInput;
@@ -83,9 +85,9 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
         super(ModBlockEntityTypes.SUPERHEATER_ARRAY.get(), pos, state, 0, (level, slot, resource) -> false, UPGRADES,
                 new SideConfig(SideMode.NONE, SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.HEAT, SideMode.NONE),
                 SIDE_MODES, false, 0, 0, new int[0], slot -> false);
-        this.heat = new HeatBuffer(ArcforgeConfig.SUPERHEATER_HEAT_CAPACITY.getAsInt(), ArcforgeConfig.SUPERHEATER_MAX_TEMPERATURE.getAsInt(), this::setChanged);
-        this.heatInput = heat.input(ArcforgeConfig.SUPERHEATER_MAX_HEAT_PER_TICK.getAsInt());
-        int tank = ArcforgeConfig.SUPERHEATER_TANK_CAPACITY.getAsInt();
+        this.heat = new HeatBuffer(ArcforgeConfig.SUPERHEATER_HEAT_PER_CUBE.getAsInt(), ArcforgeConfig.SUPERHEATER_MAX_TEMPERATURE.getAsInt(), this::setChanged);
+        this.heatInput = heat.input(ArcforgeConfig.SUPERHEATER_MAX_HEAT_PER_CUBE.getAsInt());
+        int tank = ArcforgeConfig.SUPERHEATER_TANK_PER_CUBE.getAsInt();
         // Any grade goes in, so nothing clogs: a grade already at or above the target passes through.
         this.steamIn = new FilteredFluidTank(tank, resource -> SteamGrade.of(resource) != null, this::setChanged);
         this.steamOut = new FilteredFluidTank(tank, resource -> SteamGrade.of(resource) != null, this::setChanged);
@@ -131,6 +133,56 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
         return SuperheaterArrayCasingBlock.STRUCTURE;
     }
 
+    // Most HU/t it takes in and uses, and most mB/t it moves: per cube, times its cubes.
+    public int maxHeatPerTick() {
+        return perCube(ArcforgeConfig.SUPERHEATER_MAX_HEAT_PER_CUBE.getAsInt());
+    }
+
+    public int maxFlow() {
+        return perCube(ArcforgeConfig.SUPERHEATER_MAX_FLOW_PER_CUBE.getAsInt());
+    }
+
+    // The cube grew into a box: its heat and steam go to the box's master.
+    @Override
+    public void moveContentsTo(CubeMultiblockBlockEntity master) {
+        if (master instanceof SuperheaterArrayBlockEntity to) {
+            heat.remove(to.heat.add(heat.getStored()));
+            moveTank(steamIn, to.steamIn);
+            moveTank(steamOut, to.steamOut);
+            to.pressure = pressure;
+            setChanged();
+            to.setChanged();
+        }
+    }
+
+    static void moveTank(FilteredFluidTank from, FilteredFluidTank to) {
+        if (from.getAmount() <= 0) {
+            return;
+        }
+        try (Transaction tx = Transaction.openRoot()) {
+            int moved = to.insert(0, from.getResource(0), from.getAmount(), tx);
+            from.extract(0, from.getResource(0), moved, tx);
+            tx.commit();
+        }
+    }
+
+    // The heat buffer and tanks follow the size; stored heat and steam carry over. A box that breaks keeps its size until it
+    // forms again, so breaking a casing loses nothing.
+    @Override
+    protected void onSizeChanged() {
+        if (getBox() == null && heat.getCapacity() > ArcforgeConfig.SUPERHEATER_HEAT_PER_CUBE.getAsInt()) {
+            return;
+        }
+        int stored = heat.getStored();
+        heat = new HeatBuffer(perCube(ArcforgeConfig.SUPERHEATER_HEAT_PER_CUBE.getAsInt()), ArcforgeConfig.SUPERHEATER_MAX_TEMPERATURE.getAsInt(),
+                this::setChanged);
+        heat.add(stored);
+        heatInput = heat.input(maxHeatPerTick());
+        int tank = perCube(ArcforgeConfig.SUPERHEATER_TANK_PER_CUBE.getAsInt());
+        steamIn.setCapacity(tank);
+        steamOut.setCapacity(tank);
+    }
+
     // The grade steam of this grade becomes at this temperature under this pressure setting, or null to pass it
     // through: Auto makes the best grade above the input the heat allows; High-Pressure only turns Steam into
     // High-Pressure; Superheated makes only Superheated.
@@ -173,11 +225,11 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
             target = target(in, pressure, heat.getTemperature());
             SteamGrade out = target != null ? target : in;
             int space = steamOut.getAmount() == 0 || SteamGrade.of(steamOut.getResource(0)) == out ? steamOut.getSpace() : 0;
-            int n = Math.min(Math.min(steamIn.getAmount(), space), ArcforgeConfig.SUPERHEATER_MAX_FLOW.getAsInt());
+            int n = Math.min(Math.min(steamIn.getAmount(), space), maxFlow());
             if (target != null) {
                 double cost = cost(in, target);
                 // Only the heat above the target's temperature, so it never cools itself below it.
-                int available = Math.min(heat.getStored() - heat.minStoredAt(target.minCelsius()), ArcforgeConfig.SUPERHEATER_MAX_HEAT_PER_TICK.getAsInt());
+                int available = Math.min(heat.getStored() - heat.minStoredAt(target.minCelsius()), maxHeatPerTick());
                 n = Math.min(n, cost > 0 ? (int) Math.floor(Math.max(0, available) / cost) : n);
             }
             if (n > 0) {
@@ -326,7 +378,8 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("container.arcforge.superheater_array");
+        return getBox() != null ? Component.translatable("container.arcforge.superheater_array.sized", sizeText())
+                : Component.translatable("container.arcforge.superheater_array");
     }
 
     @Override

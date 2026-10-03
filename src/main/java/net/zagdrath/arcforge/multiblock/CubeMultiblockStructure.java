@@ -27,16 +27,31 @@ import net.zagdrath.arcforge.blockentity.multiblock.CubeMultiblockBlockEntity;
 // formed, the centre block becomes part=center and draws the whole machine (and its block entity runs
 // it); the other 26 become part=other and draw nothing. The front faces the player who completed it.
 // Casings of different machines never join.
+//
+// A structure with a larger maxSize (the Superheater and Condenser Arrays) also forms as any solid box 3 to maxSize
+// blocks each way. A box that isn't 3x3x3 is drawn as one connected skin (box=true on every casing; see ConnectedModel,
+// "cube_box"): its master is the casing at the minimum corner (part=center, which runs it), and every casing's block
+// entity remembers the box (see CubeMultiblockBlockEntity.getBox). A 3x3x3 forms exactly as before.
 public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> {
     public static final int SIZE = 3;
     private static final int BLOCKS = SIZE * SIZE * SIZE;
 
     private final Class<? extends CubeCasingBlock> casing;
     private final Class<T> controller;
+    private final int maxSize;
 
     public CubeMultiblockStructure(Class<? extends CubeCasingBlock> casing, Class<T> controller) {
+        this(casing, controller, SIZE);
+    }
+
+    public CubeMultiblockStructure(Class<? extends CubeCasingBlock> casing, Class<T> controller, int maxSize) {
         this.casing = casing;
         this.controller = controller;
+        this.maxSize = Math.max(SIZE, maxSize);
+    }
+
+    public int maxSize() {
+        return maxSize;
     }
 
     private boolean isCasing(BlockState state) {
@@ -51,6 +66,17 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
         }
         if (state.getValue(CubeCasingBlock.PART) == Part.CENTER) {
             return pos;
+        }
+        // A casing of a larger box knows its master.
+        if (CubeCasingBlock.isBox(state)) {
+            BlockPos master = level.getBlockEntity(pos) instanceof CubeMultiblockBlockEntity part && part.getBox() != null ? part.getBox().min() : null;
+            if (master != null) {
+                BlockState masterState = level.getBlockState(master);
+                if (isCasing(masterState) && masterState.getValue(CubeCasingBlock.PART) == Part.CENTER && CubeCasingBlock.isBox(masterState)) {
+                    return master;
+                }
+            }
+            return null;
         }
         for (BlockPos candidate : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
             BlockState other = level.getBlockState(candidate);
@@ -74,8 +100,24 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
         }
     }
 
-    // After a casing is removed: re-evaluates everything that touched it.
+    // After a casing is removed: re-evaluates everything that touched it. A larger box first breaks as a whole, so its
+    // casings beyond the removed block's neighbours don't keep the box.
     public void rebuildAround(ServerLevel level, BlockPos removed) {
+        for (BlockPos pos : BlockPos.betweenClosed(removed.offset(-1, -1, -1), removed.offset(1, 1, 1))) {
+            BlockState state = level.getBlockState(pos);
+            if (isCasing(state) && CubeCasingBlock.isBox(state) && level.getBlockEntity(pos) instanceof CubeMultiblockBlockEntity part
+                    && part.getBox() != null) {
+                Box box = part.getBox();
+                Set<BlockPos> all = new HashSet<>();
+                for (BlockPos inside : BlockPos.betweenClosed(box.min(), box.max())) {
+                    if (isCasing(level.getBlockState(inside))) {
+                        all.add(inside.immutable());
+                    }
+                }
+                unform(level, all);
+                break;
+            }
+        }
         Set<BlockPos> done = new HashSet<>();
         for (BlockPos pos : BlockPos.betweenClosed(removed.offset(-1, -1, -1), removed.offset(1, 1, 1))) {
             if (!done.contains(pos) && isCasing(level.getBlockState(pos))) {
@@ -91,7 +133,8 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
         found.add(origin);
         queue.add(origin);
-        while (!queue.isEmpty() && found.size() <= BLOCKS) {
+        int limit = maxSize * maxSize * maxSize;
+        while (!queue.isEmpty() && found.size() <= limit) {
             BlockPos pos = queue.poll();
             for (Direction direction : Direction.values()) {
                 BlockPos next = pos.relative(direction);
@@ -104,12 +147,100 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
         return found;
     }
 
-    private static void apply(ServerLevel level, Set<BlockPos> blocks, @Nullable Vec3 viewer) {
+    // A formed box of any size: its inclusive corners.
+    public record Box(BlockPos min, BlockPos max) {
+        public int size(Direction.Axis axis) {
+            return max.get(axis) - min.get(axis) + 1;
+        }
+
+        public int volume() {
+            return size(Direction.Axis.X) * size(Direction.Axis.Y) * size(Direction.Axis.Z);
+        }
+
+        public boolean isCube() {
+            return volume() == BLOCKS;
+        }
+
+        public boolean contains(BlockPos pos) {
+            return pos.getX() >= min.getX() && pos.getX() <= max.getX() && pos.getY() >= min.getY() && pos.getY() <= max.getY()
+                    && pos.getZ() >= min.getZ() && pos.getZ() <= max.getZ();
+        }
+    }
+
+    private void apply(ServerLevel level, Set<BlockPos> blocks, @Nullable Vec3 viewer) {
         BlockPos center = centerOf(blocks);
+        Box box = center == null && maxSize > SIZE ? boxOf(blocks) : null;
         if (center != null) {
             form(level, blocks, center, viewer);
+        } else if (box != null) {
+            formBox(level, blocks, box, viewer);
         } else {
             unform(level, blocks);
+        }
+    }
+
+    // The box the set fills, if it is a solid box 3 to maxSize each way (and not 3x3x3).
+    private @Nullable Box boxOf(Set<BlockPos> blocks) {
+        if (blocks.isEmpty()) {
+            return null;
+        }
+        BlockPos min = null, max = null;
+        for (BlockPos pos : blocks) {
+            min = min == null ? pos : BlockPos.min(min, pos);
+            max = max == null ? pos : BlockPos.max(max, pos);
+        }
+        Box box = new Box(min.immutable(), max.immutable());
+        for (Direction.Axis axis : Direction.Axis.values()) {
+            if (box.size(axis) < SIZE || box.size(axis) > maxSize) {
+                return null;
+            }
+        }
+        return box.volume() == blocks.size() && !box.isCube() ? box : null;
+    }
+
+    private static void formBox(ServerLevel level, Set<BlockPos> blocks, Box box, @Nullable Vec3 viewer) {
+        BlockPos master = box.min();
+        // A cube's centre, if a 3x3x3 is growing into this box: its contents move to the box's master.
+        BlockPos oldCentre = null;
+        for (BlockPos pos : blocks) {
+            BlockState state = level.getBlockState(pos);
+            if (!pos.equals(master) && state.getValue(CubeCasingBlock.PART) == Part.CENTER) {
+                oldCentre = pos;
+                break;
+            }
+        }
+        BlockState masterState = level.getBlockState(master);
+        boolean wasFormed = masterState.getValue(CubeCasingBlock.PART) == Part.CENTER && CubeCasingBlock.isBox(masterState)
+                && level.getBlockEntity(master) instanceof CubeMultiblockBlockEntity before && box.equals(before.getBox());
+        Vec3 middle = new Vec3((box.min().getX() + box.max().getX() + 1) / 2.0, 0.0, (box.min().getZ() + box.max().getZ() + 1) / 2.0);
+        Direction facing = viewer != null ? Direction.getApproximateNearest(viewer.x - middle.x, 0.0, viewer.z - middle.z)
+                : masterState.getValue(CubeCasingBlock.PART) == Part.CENTER ? masterState.getValue(CubeCasingBlock.FACING) : Direction.NORTH;
+        if (facing.getAxis().isVertical()) {
+            facing = Direction.NORTH;
+        }
+        for (BlockPos pos : blocks) {
+            BlockState state = level.getBlockState(pos);
+            BlockState formed = (pos.equals(master)
+                    ? state.setValue(CubeCasingBlock.PART, Part.CENTER).setValue(CubeCasingBlock.FACING, facing)
+                    : state.setValue(CubeCasingBlock.PART, Part.OTHER).setValue(CubeCasingBlock.LIT, false))
+                    .setValue(CubeCasingBlock.BOX, true);
+            if (formed != state) {
+                level.setBlock(pos, formed, Block.UPDATE_ALL);
+            }
+            if (level.getBlockEntity(pos) instanceof CubeMultiblockBlockEntity part) {
+                part.setBox(box);
+            }
+        }
+        if (oldCentre != null && level.getBlockEntity(oldCentre) instanceof CubeMultiblockBlockEntity from
+                && level.getBlockEntity(master) instanceof CubeMultiblockBlockEntity to) {
+            from.moveContentsTo(to);
+        }
+        MultiblockAutomation.refresh(level, box.min(), box.max());
+        if (!wasFormed) {
+            MultiblockEffects.formed(level, box.min(), box.max());
+            if (level.getBlockEntity(master) instanceof MultiblockController controller) {
+                ArcforgeAdvancements.formed(level, controller, null);
+            }
         }
     }
 
@@ -137,7 +268,7 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
 
     private static void form(ServerLevel level, Set<BlockPos> blocks, BlockPos center, @Nullable Vec3 viewer) {
         BlockState centerState = level.getBlockState(center);
-        boolean wasFormed = centerState.getValue(CubeCasingBlock.PART) == Part.CENTER;
+        boolean wasFormed = centerState.getValue(CubeCasingBlock.PART) == Part.CENTER && !CubeCasingBlock.isBox(centerState);
         Direction facing = viewer != null
                 ? Direction.getApproximateNearest(viewer.x - (center.getX() + 0.5), 0.0, viewer.z - (center.getZ() + 0.5))
                 : wasFormed ? centerState.getValue(CubeCasingBlock.FACING) : Direction.NORTH;
@@ -147,9 +278,12 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
         boolean changed = !wasFormed;
         for (BlockPos pos : blocks) {
             BlockState state = level.getBlockState(pos);
-            BlockState formed = pos.equals(center)
+            BlockState formed = CubeCasingBlock.withoutBox(pos.equals(center)
                     ? state.setValue(CubeCasingBlock.PART, Part.CENTER).setValue(CubeCasingBlock.FACING, facing)
-                    : state.setValue(CubeCasingBlock.PART, Part.OTHER).setValue(CubeCasingBlock.LIT, false);
+                    : state.setValue(CubeCasingBlock.PART, Part.OTHER).setValue(CubeCasingBlock.LIT, false));
+            if (level.getBlockEntity(pos) instanceof CubeMultiblockBlockEntity part) {
+                part.setBox(null);
+            }
             if (formed != state) {
                 level.setBlock(pos, formed, Block.UPDATE_ALL);
                 changed |= pos.equals(center) || state.getValue(CubeCasingBlock.PART) == Part.NONE;
@@ -171,7 +305,10 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
         BlockPos max = null;
         for (BlockPos pos : blocks) {
             BlockState state = level.getBlockState(pos);
-            BlockState loose = state.setValue(CubeCasingBlock.PART, Part.NONE).setValue(CubeCasingBlock.LIT, false);
+            BlockState loose = CubeCasingBlock.withoutBox(state.setValue(CubeCasingBlock.PART, Part.NONE).setValue(CubeCasingBlock.LIT, false));
+            if (level.getBlockEntity(pos) instanceof CubeMultiblockBlockEntity part) {
+                part.setBox(null);
+            }
             if (loose != state) {
                 level.setBlock(pos, loose, Block.UPDATE_ALL);
                 min = min == null ? pos : BlockPos.min(min, pos);

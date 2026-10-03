@@ -769,6 +769,38 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   with house recesses: the tunnel's name field, frequency list, buffer row (five `#0E0E0E` 28×4 bar tracks) and face grid
   (the side-config `face_none` / `face_input` / `face_output` tiles at 12×12); the loader's 5×5 chunk map and FE row.
 
+## Firebox Array and the bigger steam arrays
+- **Firebox Array** (`block/firebox_array/`), connected like the Thermal Evaporator Array (ConnectedModel
+  "firebox_array": a thin skin with window quadrants and the Distillation `ctm/column_beam` on the outer edges only).
+  - `plate` (walls): the wall plate (split face, two top rivets, the riveted strap on rows 13–15) with a firebrick band set
+    into rows 5–6: a `#16181B` lip on row 4, the furnace brick tones (`#553F34` face row, `#3A2C23` shade row) with a
+    `#2B211B` mortar joint every 4 px, offset row to row, and a `#727982` lit lip on row 7. Across a formed wall the bands
+    join into one brick course per block.
+  - `top`: the plain lid, split face with four rivets. `casing` / `casing_top`: the same with the single-block bevel, for
+    loose casings.
+  - `controller`: the plate with a recessed fire door (x3..12, y2..11): steel, lit on its left and top, two `#383C42`
+    hinge pins, a `#959DA6` handle and a 4×2 sight slot in `#16181B`. `controller_on` is 4 frames (frametime 4) with the
+    slot glowing in the Heat row (`#FFB02E #F26A16 #C73A0E`), flickering.
+  - Each wall casing leaves out its face toward the inside (the `inward` state); FireboxArrayRenderer draws the inside:
+    `lining` (16×16 firebrick, 4 px courses, 7×3 bricks: `#2B211B` mortar, `#553F34` face, `#3A2C23` bottom row), a coal
+    bed (`coals`: steel-dark lumps on `#16181B`; `coals_lit`: Heat-row lumps on `#7A1B0A`, each a 3×2 block with a lit top
+    row, no loose pixels) and, while it burns, a flame over every floor block (`flame`, 16×16, 8 frames, frametime 2: three
+    flat tongues, `#C73A0E` edges, `#F26A16` body, `#FFB02E` core, on a `#7A1B0A` base row), full-bright, as two crossed
+    planes.
+  - GUI: the Fuel Burner's frame (tank at x 9, the screen recess, the heat buffer at x 157) with the bucket column
+    replaced by one input-blue fuel slot at (31,19) and the Firebox's flame under it at (32,44).
+- **Superheater and Condenser boxes** (bigger than 3×3×3): one connected skin (ConnectedModel "cube_box": the digester's
+  solid skin, joined only with the same block's formed box casings, `ctm/column_beam` on the outer edges).
+  - `superheater_array/box_side`: the wall plate (two rivets, strap) with a vent recess (x3..12, y3..11) whose floor is the
+    dim coil `#7A1B0A` behind two `#575D65` slats with `#16181B` shadows.
+  - `condenser_array/box_side`: the wall plate with a recess holding three Tempered-copper tubes (`#E0A062` lit column,
+    `#AE6632` shade column) over the `#2B2F34` floor.
+  - `box_top` (both): the lid with four rivets and a panel seam across rows 7–8 (`#2B2F34` / `#575D65`).
+  - The 3×3×3 keeps its 48 px model.
+- **Bigger Steam Boiler and Turbine Arrays** use the existing shell textures; nothing new is painted. A wall casing leaves
+  out its face toward the hollow inside however big the shell is, so the liner and reveal (`ctm/shell_liner`,
+  `ctm/shell_jamb`) still line the inside. The turbine's rotor model is scaled to the cross-section's shorter side.
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

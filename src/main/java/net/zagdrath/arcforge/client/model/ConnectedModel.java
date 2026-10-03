@@ -45,14 +45,19 @@ import net.neoforged.neoforge.client.model.DynamicBlockStateModel;
 import net.neoforged.neoforge.client.model.UnbakedModelLoader;
 import net.neoforged.neoforge.client.model.block.CustomUnbakedBlockStateModel;
 import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
+import net.zagdrath.arcforge.block.multiblock.CubeCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.FireboxArrayPart;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
+import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.multiblock.BiogasDigesterStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
+import net.zagdrath.arcforge.multiblock.FireboxArrayStructure;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 
 // Connected textures for the steam arrays and Pressure Glass: a formed structure reads as one surface.
@@ -80,13 +85,17 @@ import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 // tower uses "thermal_evaporator": the same again, joined with its casings, controller and Pressure Glass, drawn as a thin
 // skin like the steam arrays (no faces toward the glass or into the hollow core), with "window" and "lip" textures for
 // window quadrants: each window reaches half a block into the casings round it, as on the steam and gas turbine arrays
-// (see WindowQuadrants.windowedEvaporator). Its renderer draws the inside of that skin. Reservoirs use "reservoir" (glass /
+// (see WindowQuadrants.windowedEvaporator). Its renderer draws the inside of that skin. The Firebox Array uses
+// "firebox_array", the same skin, joined with its casings, controller and Pressure Glass; each wall casing leaves out the
+// face toward the inside of the box (FireboxArrayPart.INWARD), where its renderer draws the firebrick lining. A
+// Superheater or Condenser Array larger than 3x3x3 uses "cube_box": the digester's solid skin, joined only with casings
+// of the same block in a formed box (box=true). Reservoirs use "reservoir" (glass /
 // frame / frame_h / frame_v / frame_corners; see ReservoirModel): touching Reservoirs share one steel frame round their
 // outer edges.
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
     private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester", GREENHOUSE = "greenhouse",
-            EVAPORATOR = "thermal_evaporator", RESERVOIR = "reservoir";
+            EVAPORATOR = "thermal_evaporator", RESERVOIR = "reservoir", CUBE_BOX = "cube_box", FIREBOX_ARRAY = "firebox_array";
     // The tray band's glass: the top 10 px of a side face (the sill and strap are below it).
     private static final int BAND = 10;
     private static final Identifier TRAY_FRAME = Identifier.fromNamespaceAndPath("arcforge", "block/ctm/tray_window_frame");
@@ -116,7 +125,8 @@ public final class ConnectedModel {
         }
 
         public boolean digester() {
-            return connect.equals(DIGESTER) || connect.equals(GREENHOUSE) || connect.equals(EVAPORATOR);
+            return connect.equals(DIGESTER) || connect.equals(GREENHOUSE) || connect.equals(EVAPORATOR) || connect.equals(CUBE_BOX)
+                    || connect.equals(FIREBOX_ARRAY);
         }
 
         // Anything that bakes this as an ordinary model gets the plain fallback cube.
@@ -141,8 +151,8 @@ public final class ConnectedModel {
                 case "glass" -> new String[] { "base", "beam", "lip" };
                 case COLUMN -> new String[] { "base", "beam", "roof_nw", "roof_ne", "roof_sw", "roof_se" };
                 case TRAY -> new String[] { "base", "frame", "top", "bottom" };
-                case DIGESTER, GREENHOUSE -> new String[] { "base", "beam", "top" };
-                case EVAPORATOR -> new String[] { "base", "beam", "top", "window", "lip" };
+                case DIGESTER, GREENHOUSE, CUBE_BOX -> new String[] { "base", "beam", "top" };
+                case EVAPORATOR, FIREBOX_ARRAY -> new String[] { "base", "beam", "top", "window", "lip" };
                 case RESERVOIR -> new String[] { "glass", "frame", "frame_h", "frame_v", "frame_corners" };
                 default -> new String[] { "base", "beam", "lip", "window" };
             };
@@ -334,6 +344,31 @@ public final class ConnectedModel {
             return enclosed >= 2;
         }
 
+        // The shell the casing or pane at pos is part of: a casing's own, or for a pane the first casing found by walking out
+        // across the panes beside it (a window can fill a wall). Null if none is found (or it hasn't reached the client).
+        private static ShellStructure.@Nullable Shell shellAt(BlockAndTintGetter level, BlockPos pos) {
+            if (level.getBlockEntity(pos) instanceof ShellMultiblockBlockEntity part) {
+                return part.getShell();
+            }
+            for (Direction direction : Direction.values()) {
+                BlockPos.MutableBlockPos at = pos.mutable();
+                for (int step = 0; step < 16; step++) {
+                    at.move(direction);
+                    if (level.getBlockEntity(at) instanceof ShellMultiblockBlockEntity part) {
+                        ShellStructure.Shell shell = part.getShell();
+                        if (shell != null && shell.contains(pos)) {
+                            return shell;
+                        }
+                        break;
+                    }
+                    if (!PressureGlassBlock.isFormed(level.getBlockState(at))) {
+                        break;
+                    }
+                }
+            }
+            return null;
+        }
+
         private static Direction sideDirection(Direction face, Side side) {
             return switch (side) {
                 case TOP -> WindowQuadrants.up(face);
@@ -347,6 +382,8 @@ public final class ConnectedModel {
         public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
             QuadCollection.Builder quads = new QuadCollection.Builder();
             boolean formed = isPart(state);
+            // A casing knows its shell, so it leaves out every face into the hollow inside, however big the shell is.
+            ShellStructure.Shell shell = formed ? shellAt(level, pos) : null;
             for (Direction face : Direction.values()) {
                 if (!formed) {
                     // A loose pane: its base and a lip all round, culled like glass.
@@ -359,7 +396,7 @@ public final class ConnectedModel {
                     continue;
                 }
                 BlockPos across = pos.relative(face);
-                if (isPart(level.getBlockState(across)) || isCore(level, across)) {
+                if (isPart(level.getBlockState(across)) || isCore(level, across) || shell != null && shell.isCore(across)) {
                     continue;
                 }
                 List<BakedQuad> faceQuads = new ArrayList<>();
@@ -441,14 +478,18 @@ public final class ConnectedModel {
         @SuppressWarnings("unchecked")
         DigesterBaked(ModelBaker baker, JsonModel unbaked, Identifier name) {
             Map<String, Identifier> textures = unbaked.textures();
+            this.sameBlock = unbaked.connect().equals(CUBE_BOX);
+            this.firebox = unbaked.connect().equals(FIREBOX_ARRAY);
             this.part = switch (unbaked.connect()) {
                 case GREENHOUSE -> GreenhouseStructure::isFormedPart;
+                case CUBE_BOX -> CubeCasingBlock::isBox;
+                case FIREBOX_ARRAY -> state -> FireboxArrayStructure.isFormedPart(state) || PressureGlassBlock.isFormed(state);
                 // The tower's glass counts as part of it: no faces or beams toward a pane, so its windows run on into
                 // the casings' window quadrants.
                 case EVAPORATOR -> state -> ThermalEvaporatorStructure.isFormedPart(state) || PressureGlassBlock.isFormed(state);
                 default -> BiogasDigesterStructure::isFormedPart;
             };
-            this.skin = unbaked.connect().equals(EVAPORATOR);
+            this.skin = unbaked.connect().equals(EVAPORATOR) || firebox;
             this.particle = Baked.material(baker, textures.getOrDefault("particle", textures.get("base")), name);
             Material.Baked side = Baked.material(baker, textures.get("base"), name);
             Material.Baked top = Baked.material(baker, textures.get("top"), name);
@@ -513,6 +554,14 @@ public final class ConnectedModel {
 
         // Which blocks count as the same structure: the digester's parts, or the greenhouse's frames and controller.
         private final Predicate<BlockState> part;
+        // A box joins only casings of its own block (a Superheater box beside a Condenser box keeps its edges).
+        private final boolean sameBlock;
+        // The Firebox Array: windows by WindowQuadrants.windowed, and no face toward the inside of the box.
+        private final boolean firebox;
+
+        private boolean joins(BlockState self, BlockState other) {
+            return isPart(other) && (!sameBlock || other.getBlock() == self.getBlock());
+        }
 
         private boolean isPart(BlockState state) {
             return part.test(state);
@@ -537,12 +586,13 @@ public final class ConnectedModel {
             QuadCollection.Builder quads = new QuadCollection.Builder();
             boolean formed = isPart(state);
             Direction facing = state.hasProperty(BiogasDigesterControllerBlock.FACING) ? state.getValue(BiogasDigesterControllerBlock.FACING) : null;
+            Direction inward = formed && firebox ? FireboxArrayPart.inward(state) : null;
             for (Direction face : Direction.values()) {
-                if (formed && isPart(level.getBlockState(pos.relative(face)))) {
+                if (formed && joins(state, level.getBlockState(pos.relative(face)))) {
                     continue;
                 }
                 // A skin draws nothing into the hollow core: its renderer draws the inside of the walls.
-                if (formed && skin && isCore(level, pos.relative(face))) {
+                if (formed && skin && (face == inward || isCore(level, pos.relative(face)))) {
                     continue;
                 }
                 List<BakedQuad> faceQuads = new ArrayList<>();
@@ -554,7 +604,7 @@ public final class ConnectedModel {
                     faceQuads.addAll(base.get(face));
                 }
                 for (Side edge : Side.values()) {
-                    if (!formed || !isPart(level.getBlockState(pos.relative(Baked.sideDirection(face, edge))))) {
+                    if (!formed || !joins(state, level.getBlockState(pos.relative(Baked.sideDirection(face, edge))))) {
                         faceQuads.addAll(beams.get(face)[edge.ordinal()]);
                     }
                 }
@@ -572,7 +622,8 @@ public final class ConnectedModel {
         private void addWindowed(BlockAndTintGetter level, BlockPos pos, Direction face, List<BakedQuad> out) {
             boolean[] windowed = new boolean[4];
             for (Quad quad : Quad.values()) {
-                windowed[quad.ordinal()] = WindowQuadrants.windowedEvaporator(level, pos, face, quad.top, quad.right);
+                windowed[quad.ordinal()] = firebox ? WindowQuadrants.windowed(level, pos, face, quad.top, quad.right)
+                        : WindowQuadrants.windowedEvaporator(level, pos, face, quad.top, quad.right);
             }
             for (Quad quad : Quad.values()) {
                 int i = quad.ordinal();

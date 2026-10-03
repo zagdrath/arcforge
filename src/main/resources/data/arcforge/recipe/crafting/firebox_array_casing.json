@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "BFB",
+    "PBP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "B": "minecraft:nether_bricks",
+    "F": "arcforge:firebox"
+  },
+  "result": {
+    "id": "arcforge:firebox_array_casing",
+    "count": 8
+  }
+}

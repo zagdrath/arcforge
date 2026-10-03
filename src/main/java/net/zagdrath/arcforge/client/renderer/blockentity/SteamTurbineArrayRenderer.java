@@ -39,7 +39,7 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 // Draws the inside of a formed Steam Turbine Array, seen through its windows: a ribbed lining just inside
 // the walls' outer skin (only its inward faces, so the near wall never hides the far one; cut away behind
 // the windows, with a reveal round each opening, so opposite windows see through; see TiledBoxes.lining),
-// then the rotor: the shaft
+// then the rotor, sized to the cross-section's shorter side (a 3x3's rotor scaled up) and centred in it: the shaft
 // through every block from bearing to generator (stopping just short of the end caps' faces), and a set of blades in each block between them, each
 // set turned 22.5° further so they look staggered; and the steam around it, thicker the faster it flows. The rotor turns at up to 36° a tick (see SteamTurbineArrayBlockEntity.advanceAngle).
 public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
@@ -67,6 +67,8 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         // The lining tiles behind windows (see TiledBoxes.windowKey), which are left out.
         public Set<Long> windows = Set.of();
         public float angle;
+        // The rotor's size against a 3x3 cross-section's (it fits the cross-section's shorter side).
+        public float rotorScale = 1.0F;
         public @Nullable TextureAtlasSprite liner, jamb;
         public @Nullable TextureAtlasSprite steamSprite;
         public int steamColor;
@@ -94,6 +96,7 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         state.sizeX = shell.size(Direction.Axis.X);
         state.sizeY = shell.size(Direction.Axis.Y);
         state.sizeZ = shell.size(Direction.Axis.Z);
+        state.rotorScale = shell.narrowSide() / (float) ShellStructure.WIDTH;
         state.liner = SteamBoilerArrayRenderer.sprite(SteamBoilerArrayRenderer.LINER);
         state.jamb = SteamBoilerArrayRenderer.sprite(SteamBoilerArrayRenderer.JAMB);
         state.windows = turbine.windowQuads(found -> SteamBoilerArrayRenderer.findWindowQuads(turbine.getLevel(), found));
@@ -111,7 +114,7 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         double time = turbine.getLevel() != null ? turbine.getLevel().getGameTime() + partialTicks : 0.0;
         state.angle = turbine.advanceAngle(time);
         state.light = turbine.getLevel() != null
-                ? LightCoordsUtil.getLightCoords(turbine.getLevel(), shell.min().offset(1, 1, 1).relative(shell.axis(), shell.length() / 2 - 1))
+                ? LightCoordsUtil.getLightCoords(turbine.getLevel(), shell.centre())
                 : state.lightCoords;
     }
 
@@ -170,17 +173,18 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
                         STEAM_INSET, STEAM_INSET, STEAM_INSET, state.sizeX - STEAM_INSET, state.sizeY - STEAM_INSET, state.sizeZ - STEAM_INSET, false));
     }
 
-    // Places a rotor model (built along Z, one block long) in block i along the axis, in the centre of
-    // the cross-section, turned to the given angle about the axis.
+    // Places a rotor model (built along Z, one block long, for a 3x3 cross-section) in block i along the axis, in
+    // the centre of the cross-section, sized to its shorter side and turned to the given angle about the axis.
     private static void rotorPose(PoseStack poseStack, State state, int i, float angle) {
         poseStack.translate(
-                state.axis == Direction.Axis.X ? i + 0.5 : 1.5,
-                1.5,
-                state.axis == Direction.Axis.Z ? i + 0.5 : 1.5);
+                state.axis == Direction.Axis.X ? i + 0.5 : state.sizeX / 2.0,
+                state.sizeY / 2.0,
+                state.axis == Direction.Axis.Z ? i + 0.5 : state.sizeZ / 2.0);
         if (state.axis == Direction.Axis.X) {
             poseStack.rotate(Axis.YP.rotationDegrees(90.0F));
         }
         poseStack.rotate(Axis.ZP.rotationDegrees(angle));
+        poseStack.scale(state.rotorScale, state.rotorScale, 1.0F);
         poseStack.translate(-0.5, -0.5, -0.5);
     }
 

@@ -74,7 +74,8 @@ public final class MultiblockBlueprints {
                 solarThermalArray(),
                 biogasDigester(),
                 greenhouse(),
-                thermalEvaporator());
+                thermalEvaporator(),
+                fireboxArray());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -271,9 +272,53 @@ public final class MultiblockBlueprints {
 
     // 3x3, 5 tall (3 to 7 work), with a window up the front.
     private static Blueprint steamBoilerArray() {
-        BlockPos size = new BlockPos(3, 5, 3);
-        List<BlockPos> glass = List.of(new BlockPos(1, 1, 2), new BlockPos(1, 2, 2), new BlockPos(1, 3, 2));
-        return new Blueprint("steam_boiler_array", shell(size, Direction.Axis.Y, ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), glass), size);
+        BlockPos size = new BlockPos(4, 4, 5);
+        List<BlockPos> glass = List.of(new BlockPos(1, 1, 4), new BlockPos(2, 1, 4), new BlockPos(1, 2, 4), new BlockPos(2, 2, 4));
+        List<Placement> placements = new ArrayList<>();
+        for (BlockPos pos : BlockPos.betweenClosed(BlockPos.ZERO, size.offset(-1, -1, -1))) {
+            BlockPos at = pos.immutable();
+            if (boundaries(at, size) > 0) {
+                placements.add(new Placement(at, glass.contains(at) ? ModBlocks.PRESSURE_GLASS.get().defaultBlockState()
+                        : ModBlocks.STEAM_BOILER_ARRAY_CASING.get().defaultBlockState()));
+            }
+        }
+        return new Blueprint("steam_boiler_array", sorted(placements), size);
+    }
+
+    // On how many axes pos lies on the boundary of a box of this size from the origin.
+    private static int boundaries(BlockPos pos, BlockPos size) {
+        return (pos.getX() == 0 || pos.getX() == size.getX() - 1 ? 1 : 0) + (pos.getY() == 0 || pos.getY() == size.getY() - 1 ? 1 : 0)
+                + (pos.getZ() == 0 || pos.getZ() == size.getZ() - 1 ? 1 : 0);
+    }
+
+    // Bottom layer first, then by row, as the other blueprints are built.
+    private static List<Placement> sorted(List<Placement> placements) {
+        List<Placement> sorted = new ArrayList<>(placements);
+        sorted.sort(java.util.Comparator.<Placement>comparingInt(p -> p.pos().getY()).thenComparingInt(p -> p.pos().getZ())
+                .thenComparingInt(p -> p.pos().getX()));
+        return sorted;
+    }
+
+    // A Firebox Array 4 wide, 3 tall and 5 deep (3 to 7 by 3 to 9 across and 3 to 5 tall work): casings on the edges, the
+    // controller in the middle of the front wall facing south, and a window in the east wall.
+    private static Blueprint fireboxArray() {
+        BlockPos size = new BlockPos(4, 3, 5);
+        BlockState casing = ModBlocks.FIREBOX_ARRAY_CASING.get().defaultBlockState();
+        BlockState glass = ModBlocks.PRESSURE_GLASS.get().defaultBlockState();
+        BlockState controller = ModBlocks.FIREBOX_ARRAY_CONTROLLER.get().defaultBlockState()
+                .setValue(net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.FACING, Direction.SOUTH);
+        List<Placement> placements = new ArrayList<>();
+        for (BlockPos pos : BlockPos.betweenClosed(BlockPos.ZERO, size.offset(-1, -1, -1))) {
+            BlockPos at = pos.immutable();
+            int boundaries = boundaries(at, size);
+            if (boundaries == 0) {
+                continue;
+            }
+            BlockState state = at.equals(new BlockPos(2, 1, 4)) ? controller
+                    : boundaries == 1 && at.getX() == 3 && at.getY() == 1 ? glass : casing;
+            placements.add(new Placement(at, state));
+        }
+        return new Blueprint("firebox_array", sorted(placements), size);
     }
 
     // 3x3, 5 long along X (3 to 9 work), with a window along the front.

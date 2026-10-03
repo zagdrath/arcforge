@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/firebox_array/controller_unformed",
+    "particle": "arcforge:block/firebox_array/casing",
+    "south": "arcforge:block/firebox_array/casing",
+    "east": "arcforge:block/firebox_array/casing",
+    "west": "arcforge:block/firebox_array/casing",
+    "up": "arcforge:block/firebox_array/casing_top",
+    "down": "arcforge:block/firebox_array/casing_top"
+  }
+}

@@ -68,6 +68,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> GEOTHERMAL_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.GEOTHERMAL_PLANT);
     public static final DeferredItem<BlockItem> COMBUSTION_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.COMBUSTION_PLANT);
     public static final DeferredItem<BlockItem> FIREBOX = ITEMS.registerSimpleBlockItem(ModBlocks.FIREBOX);
+    public static final DeferredItem<BlockItem> FIREBOX_ARRAY_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.FIREBOX_ARRAY_CONTROLLER);
+    public static final DeferredItem<BlockItem> FIREBOX_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.FIREBOX_ARRAY_CASING);
     public static final DeferredItem<BlockItem> THERMOELECTRIC_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.THERMOELECTRIC_PLANT);
     public static final DeferredItem<BlockItem> ARC_CRUSHER = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHER);
     public static final DeferredItem<BlockItem> ARC_CRUSHING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHING_ARRAY_CASING);

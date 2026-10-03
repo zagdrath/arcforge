@@ -33,10 +33,10 @@ public final class AdvancementGameTests {
 
     static final List<String> IDS = List.of("root", "start/wrench", "start/first_power", "start/energy_cell", "steel/carbonizer", "steel/coal_coke",
             "steel/arcforge_furnace", "steel/steel_ingot", "processing/dust", "processing/array", "processing/leached_dust", "steam/boiler",
-            "steam/superheated_steam", "steam/condenser", "chemistry/naphtha", "chemistry/electrolyzer", "chemistry/plastic",
+            "steam/superheated_steam", "steam/condenser", "steam/firebox_array", "chemistry/naphtha", "chemistry/electrolyzer", "chemistry/plastic",
             "chemistry/thermal_evaporator", "chemistry/brine", "chemistry/chlorine", "chemistry/hydrochloric_acid", "gear/steel_tools",
             "gear/jetpack", "gear/arcforged_arc_drill", "challenge/nine_stage_spin", "challenge/full_throttle", "challenge/white_heat",
-            "challenge/array_of_options", "farming/compost_bin", "farming/compost", "farming/loam_farmland", "farming/fertilize",
+            "challenge/array_of_options", "challenge/roaring_inferno", "farming/compost_bin", "farming/compost", "farming/loam_farmland", "farming/fertilize",
             "farming/mixed_fertilizer", "farming/irrigated", "farming/new_crop", "farming/linen", "farming/hop_harvest", "farming/every_crop",
             "farming/hands_free", "farming/sprinkler", "farming/scythe",
             "farming/millstone", "farming/mill", "farming/seed_oil", "farming/dried_hops",
