@@ -1,0 +1,42 @@
+{
+  "type": "arcforge:sifting",
+  "ingredient": "minecraft:gravel",
+  "outputs": [
+    {
+      "item": {
+        "id": "minecraft:flint"
+      },
+      "chance": 0.25
+    },
+    {
+      "item": {
+        "id": "arcforge:iron_dust"
+      },
+      "chance": 0.08
+    },
+    {
+      "item": {
+        "id": "arcforge:copper_dust"
+      },
+      "chance": 0.1
+    },
+    {
+      "item": {
+        "id": "arcforge:gold_dust"
+      },
+      "chance": 0.02
+    },
+    {
+      "item": {
+        "id": "arcforge:silver_dust"
+      },
+      "chance": 0.025
+    },
+    {
+      "item": {
+        "id": "arcforge:nickel_dust"
+      },
+      "chance": 0.03
+    }
+  ]
+}

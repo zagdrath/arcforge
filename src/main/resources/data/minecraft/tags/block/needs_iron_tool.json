@@ -23,6 +23,7 @@
     "arcforge:raw_arcite_block",
     "arcforge:arcite_block",
     "arcforge:arc_quarry",
-    "arcforge:arc_quarry_bounding"
+    "arcforge:arc_quarry_bounding",
+    "arcforge:diamond_press"
   ]
 }

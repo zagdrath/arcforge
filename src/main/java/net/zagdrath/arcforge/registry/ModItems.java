@@ -92,6 +92,16 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> FERMENTER = ITEMS.registerSimpleBlockItem(ModBlocks.FERMENTER);
     public static final DeferredItem<BlockItem> CHEMICAL_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.CHEMICAL_REACTOR);
     public static final DeferredItem<BlockItem> ELECTROLYZER = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTROLYZER);
+    public static final DeferredItem<BlockItem> SIFTER = ITEMS.registerSimpleBlockItem(ModBlocks.SIFTER);
+    public static final DeferredItem<BlockItem> DIAMOND_PRESS = ITEMS.registerSimpleBlockItem(ModBlocks.DIAMOND_PRESS);
+    public static final DeferredItem<BlockItem> DEEPSLATE_GRAVEL = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_GRAVEL);
+    // Sifter Meshes, by tier (see SifterMeshItem): they wear out.
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> STEEL_MESH = ITEMS.registerItem("steel_mesh",
+            p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.STEEL, p));
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> INVAR_MESH = ITEMS.registerItem("invar_mesh",
+            p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.INVAR, p));
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> TUNGSTEN_MESH = ITEMS.registerItem("tungsten_mesh",
+            p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.TUNGSTEN, p));
     public static final DeferredItem<BlockItem> CARBON_RECLAIMER = ITEMS.registerSimpleBlockItem(ModBlocks.CARBON_RECLAIMER);
     public static final DeferredItem<BlockItem> GASIFIER = ITEMS.registerSimpleBlockItem(ModBlocks.GASIFIER);
     public static final DeferredItem<BlockItem> FISCHER_TROPSCH_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.FISCHER_TROPSCH_REACTOR);

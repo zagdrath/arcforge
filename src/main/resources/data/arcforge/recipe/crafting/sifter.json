@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PHP",
+    "GMG",
+    "PCP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "H": "minecraft:hopper",
+    "G": "#c:gears/steel",
+    "M": "arcforge:steel_mesh",
+    "C": "arcforge:wrought_alloy"
+  },
+  "result": {
+    "id": "arcforge:sifter",
+    "count": 1
+  }
+}

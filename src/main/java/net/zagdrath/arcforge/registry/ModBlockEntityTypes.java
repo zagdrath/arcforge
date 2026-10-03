@@ -211,6 +211,12 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(ChemicalReactorBlockEntity::new, ModBlocks.CHEMICAL_REACTOR.get()));
     public static final Supplier<BlockEntityType<ElectrolyzerBlockEntity>> ELECTROLYZER = BLOCK_ENTITY_TYPES.register("electrolyzer",
             () -> new BlockEntityType<>(ElectrolyzerBlockEntity::new, ModBlocks.ELECTROLYZER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.SifterBlockEntity>> SIFTER =
+            BLOCK_ENTITY_TYPES.register("sifter", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.SifterBlockEntity::new, ModBlocks.SIFTER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity>> DIAMOND_PRESS =
+            BLOCK_ENTITY_TYPES.register("diamond_press", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity::new, ModBlocks.DIAMOND_PRESS.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity>> CARBON_RECLAIMER =
             BLOCK_ENTITY_TYPES.register("carbon_reclaimer", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity::new, ModBlocks.CARBON_RECLAIMER.get()));

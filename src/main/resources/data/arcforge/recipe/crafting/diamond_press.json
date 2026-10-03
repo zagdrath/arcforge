@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "HPH",
+    "GXG",
+    "HPH"
+  ],
+  "key": {
+    "H": "arcforge:hardened_alloy",
+    "P": "#c:plates/tungsten",
+    "G": "#c:gears/tungsten",
+    "X": "arcforge:metal_press"
+  },
+  "result": {
+    "id": "arcforge:diamond_press",
+    "count": 1
+  }
+}

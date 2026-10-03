@@ -2,6 +2,7 @@
   "values": [
     "arcforge:loam",
     "arcforge:loam_farmland",
-    "arcforge:irrigated_loam_farmland"
+    "arcforge:irrigated_loam_farmland",
+    "arcforge:deepslate_gravel"
   ]
 }

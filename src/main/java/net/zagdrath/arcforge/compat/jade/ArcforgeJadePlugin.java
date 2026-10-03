@@ -122,6 +122,9 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, PressureGlassBlock.class);
+        // The Sifter and the Diamond Press.
+        registration.registerBlockDataProvider(MineralsProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.SifterBlockEntity.class);
+        registration.registerBlockDataProvider(MineralsProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity.class);
         // Carbon capture: the three machines, and the burners' flue gas.
         for (Class<? extends net.minecraft.world.level.block.entity.BlockEntity> type : List.of(
                 net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity.class,
@@ -219,6 +222,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(ClocheProvider.Client.INSTANCE, net.zagdrath.arcforge.block.farming.ClocheBlock.class);
+        registration.registerBlockComponent(MineralsProvider.Client.INSTANCE, net.zagdrath.arcforge.block.machine.SifterBlock.class);
+        registration.registerBlockComponent(MineralsProvider.Client.INSTANCE, net.zagdrath.arcforge.block.machine.DiamondPressBlock.class);
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.machine.CarbonReclaimerBlock.class,
                 net.zagdrath.arcforge.block.machine.GasifierBlock.class, net.zagdrath.arcforge.block.machine.FischerTropschReactorBlock.class,
                 net.zagdrath.arcforge.block.machine.CombustionPlantBlock.class, net.zagdrath.arcforge.block.machine.FireboxBlock.class,

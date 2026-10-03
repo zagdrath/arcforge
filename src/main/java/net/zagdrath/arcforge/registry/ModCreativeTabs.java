@@ -36,10 +36,15 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.FUEL_BURNER.get());
                 output.accept(ModItems.THERMOELECTRIC_PLANT.get());
                 output.accept(ModItems.ARC_CRUSHER.get());
+                output.accept(ModItems.SIFTER.get());
+                output.accept(ModItems.STEEL_MESH.get());
+                output.accept(ModItems.INVAR_MESH.get());
+                output.accept(ModItems.TUNGSTEN_MESH.get());
                 output.accept(ModItems.ARC_CRUSHING_ARRAY_CASING.get());
                 output.accept(ModItems.INDUCTION_FURNACE.get());
                 output.accept(ModItems.INDUCTION_FURNACE_ARRAY_CASING.get());
                 output.accept(ModItems.METAL_PRESS.get());
+                output.accept(ModItems.DIAMOND_PRESS.get());
                 output.accept(ModItems.METAL_PRESSING_ARRAY_CASING.get());
                 output.accept(ModItems.ELECTRIC_PUMP.get());
                 output.accept(ModItems.ARC_MELTER.get());
@@ -125,6 +130,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.LITHIUM_HYDROXIDE.get());
                 output.accept(ModItems.GRAPHITE.get());
                 output.accept(ModItems.GRAPHITE_BLOCK.get());
+                output.accept(ModItems.DEEPSLATE_GRAVEL.get());
                 output.accept(ModItems.RAW_RUBBER.get());
                 output.accept(ModItems.RUBBER.get());
                 output.accept(ModItems.RUBBER_BLOCK.get());

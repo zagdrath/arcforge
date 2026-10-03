@@ -1,0 +1,33 @@
+{
+  "type": "arcforge:sifting",
+  "ingredient": [
+    "minecraft:sand",
+    "minecraft:red_sand"
+  ],
+  "outputs": [
+    {
+      "item": {
+        "id": "arcforge:gold_dust"
+      },
+      "chance": 0.02
+    },
+    {
+      "item": {
+        "id": "minecraft:quartz"
+      },
+      "chance": 0.05
+    },
+    {
+      "item": {
+        "id": "arcforge:fluorite_dust"
+      },
+      "chance": 0.03
+    },
+    {
+      "item": {
+        "id": "arcforge:bismuth_dust"
+      },
+      "chance": 0.02
+    }
+  ]
+}

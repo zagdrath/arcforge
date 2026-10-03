@@ -64,6 +64,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.recipe.DigestingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModRecipes;
 import net.zagdrath.arcforge.steam.Gases;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
@@ -78,13 +79,16 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // digestion needs warmth: it only works at biogasDigester.minTemperature (35°C) or hotter, using heatPerTick HU/t while
 // any lane is busy, and pauses (keeping each lane's progress) when it cools. It does IO only through its ports: plant
 // matter and water in (Input), Biogas out (Gas Output, pushed every tick), Digestate out (By-product, with auto-eject)
-// and heat in (Heat).
+// and heat in (Heat). It scrubs its Biogas as it makes it: biogasDigester.sulfurPerThousandMb Sulfur Dust for every 1,000
+// mB, collected in its sulfur slot (a stack at most; more is lost) and given out of Sulfur ports (with auto-eject).
 public class BiogasDigesterBlockEntity extends MachineBlockEntity implements MultiblockController {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_DIGESTATE = 1;
-    public static final int MACHINE_SLOTS = 2;
+    public static final int SLOT_SULFUR = 2;
+    public static final int MACHINE_SLOTS = 3;
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.GAS_OUTPUT, SideMode.BYPRODUCT, SideMode.HEAT);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.GAS_OUTPUT, SideMode.BYPRODUCT, SideMode.HEAT,
+            SideMode.SULFUR);
     private static final int REDSTONE_CHECK_INTERVAL = 10;
 
     private BiogasDigesterStructure.@Nullable Tank tank;
@@ -100,6 +104,7 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
     private final ResourceHandler<FluidResource> fluidAutomation;
     private final ResourceHandler<ItemResource> itemInput;
     private final ResourceHandler<ItemResource> digestateOutput;
+    private final ResourceHandler<ItemResource> sulfurOutput;
     private final ResourceHandler<ItemResource> itemAutomation;
     private final ContainerData data;
 
@@ -109,6 +114,8 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
     private int[] laneTotal;
     private int heatUsage;
     private boolean running;
+    // Sulfur Dust owed below a whole one, carried to the next batch of Biogas.
+    private double sulfurOwed;
     // Gives the structure its first ports (see MultiblockPorts.Defaults).
     private final MultiblockPorts.Defaults portDefaults = new MultiblockPorts.Defaults();
 
@@ -127,7 +134,8 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
         this.fluidAutomation = new CombinedResourceHandler<>(waterInput, gasOutput);
         this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> false);
         this.digestateOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_DIGESTATE);
-        this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> slot == SLOT_DIGESTATE);
+        this.sulfurOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_SULFUR);
+        this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> slot == SLOT_DIGESTATE || slot == SLOT_SULFUR);
         resizeLanes(ArcforgeConfig.DIGESTER_LANES.getAsInt());
         this.data = new WideIntContainerData(BiogasDigesterMenu.DATA_VALUES) {
             @Override
@@ -415,7 +423,33 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
                 items.setStack(SLOT_DIGESTATE, slot.copyWithCount(Math.min(slot.getMaxStackSize(), slot.getCount() + made.getCount())));
             }
         }
+        scrub(gas.getAmount());
         ArcforgeAdvancements.produced(this, ItemStack.EMPTY, gas.getFluid(), null);
+    }
+
+    // The sulfur scrubbed out of this much Biogas, into the sulfur slot (what doesn't fit is lost).
+    // Public for the GameTests.
+    public void scrub(int biogasMb) {
+        sulfurOwed += biogasMb / 1_000.0 * ArcforgeConfig.DIGESTER_SULFUR_PER_THOUSAND_MB.getAsDouble();
+        int whole = (int) sulfurOwed;
+        if (whole <= 0) {
+            return;
+        }
+        sulfurOwed -= whole;
+        ItemStack slot = items.getStack(SLOT_SULFUR);
+        ItemStack sulfur = new ItemStack(ModItems.SULFUR_DUST.get());
+        if (slot.isEmpty()) {
+            items.setStack(SLOT_SULFUR, sulfur.copyWithCount(Math.min(whole, sulfur.getMaxStackSize())));
+        } else if (ItemStack.isSameItemSameComponents(slot, sulfur) && slot.getCount() < slot.getMaxStackSize()) {
+            items.setStack(SLOT_SULFUR, slot.copyWithCount(Math.min(slot.getMaxStackSize(), slot.getCount() + whole)));
+        } else {
+            return;
+        }
+        ArcforgeAdvancements.produced(this, sulfur, null, "biogas_sulfur");
+    }
+
+    public ItemStack getSulfur() {
+        return items.getStack(SLOT_SULFUR);
     }
 
     // Biogas has no other way out: it's pushed out of every Gas Output port each tick, up to outputRate mB in all.
@@ -492,6 +526,7 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
         return switch (mode) {
             case INPUT -> itemInput;
             case BYPRODUCT -> digestateOutput;
+            case SULFUR -> sulfurOutput;
             default -> null;
         };
     }
@@ -518,7 +553,8 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
     @Override
     public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
         return switch (type) {
-            case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.BYPRODUCT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT
+                    : mode == SideMode.BYPRODUCT || mode == SideMode.SULFUR ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case GAS -> mode == SideMode.GAS_OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.INPUT : ConnectionMode.NONE;
@@ -561,6 +597,9 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
             laneTotal[lane] = saved.getIntOr("total", 0);
         }
         running = input.getBooleanOr("running", false);
+        sulfurOwed = input.getDoubleOr("sulfur_owed", 0.0);
+        // Saves from before the sulfur slot had one slot fewer (and no upgrades, so nothing moves).
+        items.ensureSize(MACHINE_SLOTS + UPGRADE_SLOTS);
         portDefaults.load(input);
     }
 
@@ -583,6 +622,7 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
             }
         }
         output.putBoolean("running", running);
+        output.putDouble("sulfur_owed", sulfurOwed);
         portDefaults.save(output);
     }
 

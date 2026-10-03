@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:processing/sifter",
+  "display": {
+    "icon": {
+      "id": "minecraft:diamond"
+    },
+    "title": {
+      "translate": "advancements.arcforge.processing.diamond.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.processing.diamond.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "diamond_pressing"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

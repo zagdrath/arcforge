@@ -250,6 +250,20 @@ It does IO through its ports (see Multiblock ports): a new one has an input in t
 an output in the middle of the bottom and energy in the middle of the back; input ports feed the lane
 holding the fewest items. Breaking any casing reverts it to loose casings; the contents stay in the centre casing.
 
+### Sifting
+
+```
+Gravel --[Sifter + mesh]--> flint 25%, iron dust 8%, copper dust 10%, gold dust 2%, silver dust 2.5%, nickel dust 3%
+Sand / red sand --[Sifter]--> gold dust 2%, Nether Quartz 5%, fluorite dust 3%, bismuth dust 2%
+Cobbled deepslate --[Arc Crusher]--> Deepslate Gravel --[Sifter]--> tungsten dust 5%, iron 3%, gold 1.5%, silver 1.5%
+```
+
+**Sifter** (Wrought). Sieves a block every 5 seconds at 20 FE/t (`machines.sifter`), rolling each find on its own
+(`arcforge:sifting`: `ingredient`, `outputs` of `item` and `chance`, optional `time` and `energy_per_tick`). It needs a
+**Sifter Mesh** in its mesh slot: Steel (base), Invar (chances x1.25, 1.5x as fast) or Tungsten (x1.5, 2x as fast), worn a
+point a block (`meshWearChance`) until it breaks after 256, 512 or 1,024 blocks. Arcite never sifts. Blocks and meshes in
+on top, finds out underneath (six slots), FE at the back; Speed and Energy upgrades.
+
 ### Pressing
 
 **Dies.** A Plate Die, Gear Die or Rod Die goes in a press's die slot and decides what it makes. Dies
@@ -267,6 +281,11 @@ the Arc Crushing Array. Three lanes press in parallel, each with its own die, so
 can run side by side. Each lane is twice as fast as the Metal Press and uses 60% less FE an operation
 (16 FE/t per working lane). It stores 100,000 FE and takes up to 1,000 FE/t. Input faces feed a lane
 whose die presses the item (the one holding the fewest first) and refuse anything no lane can use.
+
+**Diamond Press** (Hardened). Presses 4 Graphite into a Diamond (`arcforge:diamond_pressing`) for 2,000,000 FE and
+240,000 HU over 60 seconds, and only at 1,400°C or hotter, so its heat has to come from something hotter still (oxy-fuel,
+or a Firebox Array burning Coal Coke with oxygen). All of it is in `machines.diamondPress`. Graphite in on top, Diamonds
+out underneath, heat into the left, FE into the back; Speed, Energy and Heat upgrades.
 
 ### Steam
 
@@ -611,7 +630,9 @@ fuel, 320 HU per mB up to 1,000°C).
 **Biogas Digester.** A solid 3×3×3 of Biogas Digester Casings with a controller in the middle of one side. Plant matter (crops,
 seeds, leaves, Press Cake, Compost) and water go in through ports, four items digesting at once, and come out as
 **Biogas** (burns in the Fuel Burner and the Gas Turbine Array) and **Digestate** (+4 nutrients). It only works at 35°C
-or hotter. Recipes are data-driven (`arcforge:air_separating`, `arcforge:synthesizing`, `arcforge:digesting`).
+or hotter. It also scrubs its Biogas: `sulfurPerThousandMb` (0.5) Sulfur Dust for every 1,000 mB, into a sulfur slot
+(a stack at most) given out of **Sulfur** ports. Recipes are data-driven (`arcforge:air_separating`,
+`arcforge:synthesizing`, `arcforge:digesting`).
 
 ### Soybeans and crop rotation
 

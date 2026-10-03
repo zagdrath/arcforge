@@ -170,6 +170,8 @@
     "arcforge:hydrothermal_carbonizer",
     "arcforge:carbon_reclaimer",
     "arcforge:gasifier",
-    "arcforge:fischer_tropsch_reactor"
+    "arcforge:fischer_tropsch_reactor",
+    "arcforge:sifter",
+    "arcforge:diamond_press"
   ]
 }

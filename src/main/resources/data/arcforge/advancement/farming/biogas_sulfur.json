@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:farming/biogas_digester",
+  "display": {
+    "icon": {
+      "id": "arcforge:sulfur_dust"
+    },
+    "title": {
+      "translate": "advancements.arcforge.farming.biogas_sulfur.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.farming.biogas_sulfur.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "biogas_sulfur"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

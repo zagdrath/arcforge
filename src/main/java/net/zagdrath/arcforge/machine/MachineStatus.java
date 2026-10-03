@@ -129,7 +129,10 @@ public enum MachineStatus {
     // TOO_COLD under 200°C and TOO_HOT over 350°C).
     RECLAIMING("reclaiming", "led_running"),
     GASIFYING("gasifying", "led_running"),
-    NO_CATALYST("no_catalyst", "led_blocked");
+    NO_CATALYST("no_catalyst", "led_blocked"),
+    // The Sifter at work, and without a mesh. (The Diamond Press shows PRESSING, TOO_COLD under 1,400°C.)
+    SIFTING("sifting", "led_running"),
+    NO_MESH("no_mesh", "led_blocked");
 
     private final String name;
     private final String led;

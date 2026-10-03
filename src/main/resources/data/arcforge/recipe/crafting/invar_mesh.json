@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RRR",
+    "R R",
+    "RRR"
+  ],
+  "key": {
+    "R": "#c:rods/invar"
+  },
+  "result": {
+    "id": "arcforge:invar_mesh",
+    "count": 1
+  }
+}

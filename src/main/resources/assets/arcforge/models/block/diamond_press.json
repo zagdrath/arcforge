@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/diamond_press_front",
+    "south": "arcforge:block/diamond_press_back",
+    "east": "arcforge:block/diamond_press_left",
+    "west": "arcforge:block/diamond_press_right",
+    "up": "arcforge:block/diamond_press_top",
+    "down": "arcforge:block/diamond_press_bottom",
+    "particle": "arcforge:block/diamond_press_back"
+  }
+}

@@ -61,6 +61,11 @@ number and date.
   nothing until a face is set to it, so existing setups run exactly as before.
 - **Data packs:** new recipe types `arcforge:carbon_reclaiming`, `arcforge:gasifying` and `arcforge:fischer_tropsch`, new
   tags `#arcforge:carbon_fuels` (items and fluids) and a new `arcforge:burner_fuels` entry for Syngas.
+- **New config sections and keys** `machines.sifter`, `machines.diamondPress` and
+  `farming.biogasDigester.sulfurPerThousandMb` get their defaults.
+- **Biogas Digester sulfur slot.** Saved digesters keep their items; the slot list grows by one on load (the digester
+  has no upgrades, so nothing moves). New port mode Sulfur (set with the Wrench).
+- **Data packs:** new recipe types `arcforge:sifting` and `arcforge:diamond_pressing`.
 
 ### Added
 
@@ -118,6 +123,23 @@ number and date.
   - Handbook pages (Carbon Capture, Syngas, and a line on each burner), JEI categories (Carbon Reclaiming, Gasifying,
     Fischer-Tropsch), Jade tooltips (the three machines and every burner's flue), GameTests and three advancements (Town
     Gas, Gas to Liquids, Carbon Neutral). All rates, ratios and temperatures are in the new config sections.
+- **Sifter,** an FE machine that sieves gravel, sand, red sand and Deepslate Gravel for chances of ore dusts and minerals
+  (`arcforge:sifting`, each output with its own chance; a block waits until all its finds would fit). Gravel: flint and
+  iron, copper, gold, silver and nickel dust; sand and red sand: gold dust, Nether Quartz, fluorite and bismuth dust;
+  Deepslate Gravel: tungsten dust and rarer iron, gold and silver. Arcite never sifts, and every block gives well under
+  half a dust even with the best mesh. Side configuration; Speed and Energy upgrades.
+  - **Sifter Meshes** (eight rods in a ring) go in its mesh slot; it won't run without one. Steel (base), Invar (chances
+    x1.25, 1.5x as fast) and Tungsten (x1.5, 2x as fast); they wear a point a block (256 / 512 / 1,024).
+  - **Deepslate Gravel**, a new falling block: the Arc Crusher crushes cobbled deepslate into it.
+- **Diamond Press** (Hardened), with FE and heat, only at 1,400°C or hotter: 4 Graphite → a Diamond for 2,000,000 FE and
+  240,000 HU over a minute (all in `machines.diamondPress`, set high as a late-game sink). Built round a Metal Press with
+  tungsten gears and plates for its anvils. Speed, Energy and Heat upgrades. (Graphite already exists: Coal Coke or
+  Carbon Dust baked at 1,500°C in the Arcforge Furnace, and its block.)
+- **Sulfur from biogas:** the Biogas Digester scrubs its Biogas, 0.5 Sulfur Dust per 1,000 mB by default
+  (`sulfurPerThousandMb`), into a new sulfur slot, given out of the new **Sulfur** port mode.
+- Handbook pages (Sifter, Diamond Press, a line on the Biogas Digester), JEI categories (Sifting with each find's chance,
+  Diamond Pressing), Jade tooltips (mesh wear, temperature, the digester's sulfur), GameTests and three advancements
+  (Panning for Ore, Pressure Makes Diamonds, Scrubbed).
 - **Bigger, rectangular steam arrays:**
   - **Steam Boiler Array:** a footprint 3 to 7 by 3 to 9 in any combination, 3 to 12 tall.
   - **Steam Turbine Array:** a cross-section 3 to 7 wide and 3 to 9 tall in any combination, 3 to 15 long, along either

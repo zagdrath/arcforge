@@ -1,0 +1,30 @@
+{
+  "type": "arcforge:sifting",
+  "ingredient": "arcforge:deepslate_gravel",
+  "outputs": [
+    {
+      "item": {
+        "id": "arcforge:tungsten_dust"
+      },
+      "chance": 0.05
+    },
+    {
+      "item": {
+        "id": "arcforge:iron_dust"
+      },
+      "chance": 0.03
+    },
+    {
+      "item": {
+        "id": "arcforge:gold_dust"
+      },
+      "chance": 0.015
+    },
+    {
+      "item": {
+        "id": "arcforge:silver_dust"
+      },
+      "chance": 0.015
+    }
+  ]
+}

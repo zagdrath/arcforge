@@ -483,6 +483,84 @@ final class MachineCategories {
         }
     }
 
+    // --- Sifter and Diamond Press ---
+
+    // The block sifted, the arrow, and every possible find with its chance (with a Steel and with a Tungsten Mesh); the
+    // time and FE below, before the mesh and upgrades.
+    static final class Sifting extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.SiftingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.SiftingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.SIFTING.get());
+
+        Sifting(IGuiHelper gui) {
+            super(TYPE, "sifting", ModBlocks.SIFTER.get(), gui, 140, 56);
+        }
+
+        private static String percent(double chance) {
+            return String.format(Locale.ROOT, "%.1f", chance * 100).replaceAll("\\.0$", "");
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.SiftingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            builder.addInputSlot(1, 10).setStandardSlotBackground().add(recipe.ingredient());
+            var outputs = recipe.outputs();
+            for (int i = 0; i < outputs.size(); i++) {
+                var output = outputs.get(i);
+                double steel = Math.min(1.0, output.chance() * ArcforgeConfig.SIFTER_STEEL_CHANCE.getAsDouble());
+                double tungsten = Math.min(1.0, output.chance() * ArcforgeConfig.SIFTER_TUNGSTEN_CHANCE.getAsDouble());
+                builder.addOutputSlot(51 + i % 4 * 18, 1 + i / 4 * 18).setStandardSlotBackground().add(output.item())
+                        .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.sifting.chance", percent(steel),
+                                percent(tungsten)).withStyle(ChatFormatting.GRAY)));
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.SiftingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().ticks()).setPosition(24, 10);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.SiftingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            var recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.ticks()),
+                    String.format(Locale.ROOT, "%,d", recipe.ticks() * recipe.baseEnergyPerTick())), 0, 40);
+        }
+    }
+
+    // The Graphite (with its count), the arrow and the Diamond; the FE, the heat, the temperature it needs and the time
+    // below, before upgrades.
+    static final class DiamondPressing extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.DiamondPressingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.DiamondPressingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.DIAMOND_PRESSING.get());
+
+        DiamondPressing(IGuiHelper gui) {
+            super(TYPE, "diamond_pressing", ModBlocks.DIAMOND_PRESS.get(), gui, 140, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.DiamondPressingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground()
+                    .addItemStacks(recipe.ingredient().items().map(item -> new ItemStack(item, recipe.inputCount())).toList());
+            builder.addOutputSlot(71, 5).setStandardSlotBackground().add(recipe.result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.DiamondPressingRecipe> holder,
+                IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().ticks()).setPosition(44, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.DiamondPressingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            var recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.diamond_pressing.cost", String.format(Locale.ROOT, "%,d", recipe.energyPerOperation()),
+                    String.format(Locale.ROOT, "%,d", recipe.heatPerOperation())), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.diamond_pressing.heat", String.format(Locale.ROOT, "%,d", recipe.minTemperatureOrDefault()),
+                    seconds(recipe.ticks())), 0, 40);
+        }
+    }
+
     // --- Carbon capture ---
 
     // Carbon Dioxide and Hydrogen in, the arrow, the Carbon Dust and the Water out; the FE below (before Energy upgrades;

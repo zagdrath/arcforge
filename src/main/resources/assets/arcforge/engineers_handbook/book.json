@@ -57,8 +57,10 @@
       "description": "FE machines that crush, smelt, press, spin and soak.",
       "entries": [
         "arc_crusher",
+        "sifter",
         "induction_furnace",
         "metal_press",
+        "diamond_press",
         "fiberizer",
         "infuser",
         "distillation_array",

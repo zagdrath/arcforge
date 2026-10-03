@@ -22,7 +22,8 @@ import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.BiogasDigesterMenu;
 
-// The water tank on the left; plant matter -> arrow -> Digestate, and how many lanes are busy; the status and the heat
+// The water tank on the left; plant matter -> arrow -> Digestate, how many lanes are busy, and the scrubbed Sulfur under
+// them; the status and the heat
 // bar with a tick at the temperature it needs (35°C) under them; the heat buffer and the Biogas tank on the right. All
 // positions are relative to leftPos/topPos.
 public class BiogasDigesterScreen extends MachineScreen<BiogasDigesterMenu> {
@@ -31,7 +32,7 @@ public class BiogasDigesterScreen extends MachineScreen<BiogasDigesterMenu> {
     private static final int PROGRESS_X = 52, PROGRESS_Y = 27, PROGRESS_W = 21, PROGRESS_H = 15;
     private static final int LANES_X = 100, LANES_Y = 24, BUSY_Y = 34, LANES_W = 36;
     private static final int LED_X = 27, LED_Y = 54;
-    private static final int STATUS_X = 35, STATUS_Y = 54, STATUS_W = 100;
+    private static final int STATUS_X = 35, STATUS_Y = 54, STATUS_W = 80;
     private static final int HEAT_X = 27, HEAT_Y = 66, HEAT_W = 105;
     private static final int TICK_Y = 63, TICK_W = 3, TICK_H = 7;
 
@@ -55,6 +56,7 @@ public class BiogasDigesterScreen extends MachineScreen<BiogasDigesterMenu> {
             case HEAT -> sideModeName("heat_input");
             case GAS_OUTPUT -> sideModeName("biogas");
             case BYPRODUCT -> sideModeName("digestate");
+            case SULFUR -> sideModeName("sulfur");
             default -> super.sideModeName(mode);
         };
     }
@@ -88,6 +90,10 @@ public class BiogasDigesterScreen extends MachineScreen<BiogasDigesterMenu> {
 
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
+        if (isHovering(BiogasDigesterMenu.SULFUR_X, BiogasDigesterMenu.SULFUR_Y, 16, 16, mouseX, mouseY) && !menu.getSlot(2).hasItem()) {
+            lines.add(Component.translatable("gui.arcforge.biogas_digester.sulfur_hint"));
+            return;
+        }
         if (isHovering(WATER_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, net.minecraft.world.level.material.Fluids.WATER, Component.translatable("gui.arcforge.empty"),
                     menu.getWater(), menu.getWaterCapacity());

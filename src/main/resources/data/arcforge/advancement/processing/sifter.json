@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:processing/dust",
+  "display": {
+    "icon": {
+      "id": "arcforge:sifter"
+    },
+    "title": {
+      "translate": "advancements.arcforge.processing.sifter.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.processing.sifter.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "sifting"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

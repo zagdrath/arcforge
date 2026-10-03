@@ -43,7 +43,8 @@ public final class AdvancementGameTests {
             "farming/millstone", "farming/mill", "farming/seed_oil", "farming/dried_hops",
             "farming/air_separator", "farming/ammonia", "farming/npk_fertilizer", "farming/biodiesel", "farming/biogas_digester",
             "farming/glass_cloche", "farming/grow_chamber", "farming/hydroponic_cell", "farming/tree_cutter", "farming/bio_coal",
-            "chemistry/syngas", "chemistry/fischer_tropsch", "chemistry/carbon_reclaimer",
+            "chemistry/syngas", "chemistry/fischer_tropsch", "chemistry/carbon_reclaimer", "processing/sifter", "processing/diamond",
+            "farming/biogas_sulfur",
             "farming/greenhouse", "farming/greenhouse_night_shift", "farming/greenhouse_fully_fed", "farming/soybeans", "farming/crop_rotation", "processing/rock_salt",
             "farming/rubber_dandelion", "farming/resin_tap", "farming/raw_rubber", "chemistry/rubber", "chemistry/ethylene", "chemistry/pvc",
             "logistics/reservoir", "logistics/liquid_experience", "logistics/quantum_tunnel", "logistics/chunk_loader");

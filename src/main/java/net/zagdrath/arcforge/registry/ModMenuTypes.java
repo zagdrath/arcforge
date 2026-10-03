@@ -160,6 +160,10 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));
     public static final Supplier<MenuType<ElectrolyzerMenu>> ELECTROLYZER = MENU_TYPES.register("electrolyzer",
             () -> IMenuTypeExtension.create(ElectrolyzerMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.SifterMenu>> SIFTER =
+            MENU_TYPES.register("sifter", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.SifterMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.DiamondPressMenu>> DIAMOND_PRESS =
+            MENU_TYPES.register("diamond_press", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.DiamondPressMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.CarbonReclaimerMenu>> CARBON_RECLAIMER =
             MENU_TYPES.register("carbon_reclaimer", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.CarbonReclaimerMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.GasifierMenu>> GASIFIER =

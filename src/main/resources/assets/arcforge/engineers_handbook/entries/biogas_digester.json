@@ -13,7 +13,7 @@
     },
     {
       "type": "text",
-      "text": "# What it takes\nIt digests 4 items at once. Each takes water when it starts.\n| Item | Water | Biogas | Digestate | Time |\n| Crops | 100 | 60 | 50% | 10 s |\n| Seeds | 25 | 15 | 10% | 5 s |\n| Leaves | 50 | 20 | 25% | 8 s |\n| Press Cake | 50 | 80 | 50% | 10 s |\n| Compost | 100 | 40 | always | 12 s |\n# What it makes\n- Biogas burns in the Fuel Burner (45 HU/t, up to 1,100°C) and the Gas Turbine Array (about 62 FE per mB).\n- Digestate is a fertilizer: +4 nutrients."
+      "text": "# What it takes\nIt digests 4 items at once. Each takes water when it starts.\n| Item | Water | Biogas | Digestate | Time |\n| Crops | 100 | 60 | 50% | 10 s |\n| Seeds | 25 | 15 | 10% | 5 s |\n| Leaves | 50 | 20 | 25% | 8 s |\n| Press Cake | 50 | 80 | 50% | 10 s |\n| Compost | 100 | 40 | always | 12 s |\n# What it makes\n- Biogas burns in the Fuel Burner (45 HU/t, up to 1,100°C) and the Gas Turbine Array (about 62 FE per mB).\n- Digestate is a fertilizer: +4 nutrients.\nIt scrubs its Biogas: about one Sulfur Dust for every 2,000 mB, collected in its sulfur slot and given out of Sulfur ports."
     },
     {
       "type": "multiblock",

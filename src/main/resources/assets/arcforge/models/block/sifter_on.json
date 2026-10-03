@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/sifter_front_on",
+    "south": "arcforge:block/sifter_back",
+    "east": "arcforge:block/sifter_side",
+    "west": "arcforge:block/sifter_side",
+    "up": "arcforge:block/sifter_top",
+    "down": "arcforge:block/sifter_bottom",
+    "particle": "arcforge:block/sifter_side"
+  }
+}

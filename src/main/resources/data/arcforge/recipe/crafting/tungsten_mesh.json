@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RRR",
+    "R R",
+    "RRR"
+  ],
+  "key": {
+    "R": "#c:rods/tungsten"
+  },
+  "result": {
+    "id": "arcforge:tungsten_mesh",
+    "count": 1
+  }
+}

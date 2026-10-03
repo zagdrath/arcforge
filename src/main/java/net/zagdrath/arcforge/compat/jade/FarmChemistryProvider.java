@@ -82,6 +82,9 @@ public enum FarmChemistryProvider implements StreamServerDataProvider<BlockAcces
             lines.add(Component.translatable("jade.arcforge.biogas_digester.temperature", celsius, needed)
                     .withStyle(celsius >= needed ? ChatFormatting.GOLD : ChatFormatting.GRAY));
             lines.add(Component.translatable("jade.arcforge.biogas_digester.lanes", digester.busyLanes(), digester.getLanes()));
+            if (!digester.getSulfur().isEmpty()) {
+                lines.add(Component.translatable("jade.arcforge.biogas_digester.sulfur", digester.getSulfur().getCount()).withStyle(ChatFormatting.YELLOW));
+            }
         }
         lines.add(digester.getStatus().getDescription());
     }

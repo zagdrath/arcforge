@@ -228,6 +228,8 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.GREENHOUSE.get(), GreenhouseScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
+        event.register(ModMenuTypes.SIFTER.get(), net.zagdrath.arcforge.client.screen.machine.SifterScreen::new);
+        event.register(ModMenuTypes.DIAMOND_PRESS.get(), net.zagdrath.arcforge.client.screen.machine.DiamondPressScreen::new);
         event.register(ModMenuTypes.CARBON_RECLAIMER.get(), net.zagdrath.arcforge.client.screen.machine.CarbonReclaimerScreen::new);
         event.register(ModMenuTypes.GASIFIER.get(), net.zagdrath.arcforge.client.screen.machine.GasifierScreen::new);
         event.register(ModMenuTypes.FISCHER_TROPSCH_REACTOR.get(), net.zagdrath.arcforge.client.screen.machine.FischerTropschReactorScreen::new);

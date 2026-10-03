@@ -1170,6 +1170,106 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Sifter: sieves gravel, sand, red sand and Deepslate Gravel for chances of ore dusts and minerals, with FE.",
+                "Recipes are data-driven (arcforge:sifting, each output with its own chance); time and FE/t follow these unless a",
+                "recipe sets them. It needs a Sifter Mesh: better meshes raise the chances and the speed, and wear out slowly.").push("sifter");
+    }
+
+    public static final ModConfigSpec.IntValue SIFTER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue SIFTER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue SIFTER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while sifting, before Speed and Energy upgrades.")
+            .defineInRange("energyPerTick", 20, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue SIFTER_TIME = BUILDER
+            .comment("Ticks per block sifted, before the mesh and Speed upgrades.")
+            .defineInRange("time", 100, 1, 72_000);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_STEEL_CHANCE = BUILDER
+            .comment("Chance multiplier of a Steel Mesh (the base mesh).")
+            .defineInRange("steelMeshChance", 1.0, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_INVAR_CHANCE = BUILDER
+            .comment("Chance multiplier of an Invar Mesh.")
+            .defineInRange("invarMeshChance", 1.25, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_TUNGSTEN_CHANCE = BUILDER
+            .comment("Chance multiplier of a Tungsten Mesh.")
+            .defineInRange("tungstenMeshChance", 1.5, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_STEEL_SPEED = BUILDER
+            .comment("Speed multiplier of a Steel Mesh.")
+            .defineInRange("steelMeshSpeed", 1.0, 0.1, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_INVAR_SPEED = BUILDER
+            .comment("Speed multiplier of an Invar Mesh.")
+            .defineInRange("invarMeshSpeed", 1.5, 0.1, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_TUNGSTEN_SPEED = BUILDER
+            .comment("Speed multiplier of a Tungsten Mesh.")
+            .defineInRange("tungstenMeshSpeed", 2.0, 0.1, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_MESH_WEAR_CHANCE = BUILDER
+            .comment("Chance each block sifted wears the mesh by one point (Steel lasts 256 points, Invar 512, Tungsten 1,024).")
+            .defineInRange("meshWearChance", 1.0, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Diamond Press (Hardened): presses Graphite into Diamonds with a lot of FE and heat, only at minTemperature or",
+                "hotter. Recipes are data-driven (arcforge:diamond_pressing); the Graphite per diamond, FE, heat, time and temperature",
+                "follow these unless a recipe sets them. Set high on purpose: it's a late-game sink.").push("diamondPress");
+    }
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 2_000_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 64_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_ENERGY_PER_DIAMOND = BUILDER
+            .comment("FE per Diamond, before Energy upgrades, spread over the time.")
+            .defineInRange("energyPerDiamond", 2_000_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_HEAT_PER_DIAMOND = BUILDER
+            .comment("HU per Diamond, before Heat upgrades, spread over the time.")
+            .defineInRange("heatPerDiamond", 240_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_GRAPHITE_PER_DIAMOND = BUILDER
+            .comment("Graphite per Diamond.")
+            .defineInRange("graphitePerDiamond", 4, 1, 64);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_TIME = BUILDER
+            .comment("Ticks per Diamond, before Speed upgrades.")
+            .defineInRange("time", 1_200, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MIN_TEMPERATURE = BUILDER
+            .comment("It only works at this °C or hotter.")
+            .defineInRange("minTemperature", 1_400, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 200_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full buffer.")
+            .defineInRange("maxTemperature", 2_000, 100, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Assembler: crafts any crafting recipe set in its 3x3 pattern from the ingredients in its buffer, with FE.")
                 .push("assembler");
     }
@@ -2596,6 +2696,11 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue DIGESTER_OUTPUT_RATE = BUILDER
             .comment("Most mB/t of Biogas it pushes out of its Gas Output ports (shared across them).")
             .defineInRange("outputRate", 400, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue DIGESTER_SULFUR_PER_THOUSAND_MB = BUILDER
+            .comment("Sulfur Dust scrubbed out of every 1,000 mB of Biogas it makes (0.5: one dust per 2,000 mB). It collects in the",
+                    "controller (a stack at most; more is lost) and leaves through Sulfur ports. 0 turns it off.")
+            .defineInRange("sulfurPerThousandMb", 0.5, 0.0, 64.0);
 
     static {
         BUILDER.pop();

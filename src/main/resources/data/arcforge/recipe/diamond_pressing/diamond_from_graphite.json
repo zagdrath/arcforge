@@ -1,0 +1,7 @@
+{
+  "type": "arcforge:diamond_pressing",
+  "ingredient": "arcforge:graphite",
+  "result": {
+    "id": "minecraft:diamond"
+  }
+}

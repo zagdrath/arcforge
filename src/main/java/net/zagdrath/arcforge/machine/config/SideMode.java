@@ -47,7 +47,9 @@ public enum SideMode implements StringRepresentable {
     LITHIUM_BRINE("lithium_brine"),
     // The Battery Array's energy ports: FE in, and FE out (pushed into what touches them). Ports only.
     ENERGY_INPUT("energy_input"),
-    ENERGY_OUTPUT("energy_output");
+    ENERGY_OUTPUT("energy_output"),
+    // The Biogas Digester's Sulfur Dust out (scrubbed from its Biogas). Ports only.
+    SULFUR("sulfur");
 
     private final String name;
 
@@ -58,7 +60,7 @@ public enum SideMode implements StringRepresentable {
     // Whether faces in this mode give things out (and push them out with auto-eject).
     public boolean isOutput() {
         return switch (this) {
-            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST, BRINE, SALT, WATER, LITHIUM_BRINE -> true;
+            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST, BRINE, SALT, WATER, LITHIUM_BRINE, SULFUR -> true;
             default -> false;
         };
     }

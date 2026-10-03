@@ -285,6 +285,15 @@ public final class ModBlocks {
     // The cell's status LED glows while it splits water.
     public static final DeferredBlock<ElectrolyzerBlock> ELECTROLYZER = BLOCKS.registerBlock("electrolyzer",
             ElectrolyzerBlock::new, p -> machineProperties(p, 4));
+    // The Sifter and the Diamond Press (Hardened).
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.SifterBlock> SIFTER = BLOCKS.registerBlock("sifter",
+            net.zagdrath.arcforge.block.machine.SifterBlock::new, p -> machineProperties(p, 4));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.DiamondPressBlock> DIAMOND_PRESS = BLOCKS.registerBlock("diamond_press",
+            net.zagdrath.arcforge.block.machine.DiamondPressBlock::new, p -> machineProperties(p, 9));
+    // Deepslate Gravel: crushed cobbled deepslate (the Arc Crusher), a falling block like gravel, for the Sifter.
+    public static final DeferredBlock<net.minecraft.world.level.block.ColoredFallingBlock> DEEPSLATE_GRAVEL = BLOCKS.registerBlock("deepslate_gravel",
+            p -> new net.minecraft.world.level.block.ColoredFallingBlock(new net.minecraft.util.ColorRGBA(0xFF46464E), p),
+            p -> p.mapColor(MapColor.DEEPSLATE).instrument(NoteBlockInstrument.SNARE).strength(0.8F).sound(SoundType.GRAVEL));
     // Carbon capture: Carbon Dioxide back into Carbon Dust, coal and biomass into Syngas, and Syngas into oils.
     public static final DeferredBlock<net.zagdrath.arcforge.block.machine.CarbonReclaimerBlock> CARBON_RECLAIMER = BLOCKS.registerBlock("carbon_reclaimer",
             net.zagdrath.arcforge.block.machine.CarbonReclaimerBlock::new, p -> machineProperties(p, 4));

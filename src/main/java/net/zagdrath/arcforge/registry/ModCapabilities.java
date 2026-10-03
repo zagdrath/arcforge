@@ -250,6 +250,17 @@ public final class ModCapabilities {
                 ChemicalReactorBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
                 ElectrolyzerBlockEntity::getFluidHandler);
+        // The Sifter's items and FE; the Diamond Press's items, FE and heat.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.SIFTER.get(),
+                net.zagdrath.arcforge.blockentity.machine.SifterBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.SIFTER.get(),
+                net.zagdrath.arcforge.blockentity.machine.SifterBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.DIAMOND_PRESS.get(),
+                net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.DIAMOND_PRESS.get(),
+                net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.DIAMOND_PRESS.get(),
+                net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity::getHeatHandler);
         // Carbon capture: the Carbon Reclaimer's gases, Water, Carbon Dust and FE; the Gasifier's fuel, steam, Syngas, ash and
         // heat; the Fischer-Tropsch Reactor's Syngas, products, catalyst, FE and heat.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CARBON_RECLAIMER.get(),

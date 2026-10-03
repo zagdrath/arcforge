@@ -92,6 +92,11 @@ public final class ModRecipes {
             RECIPE_TYPES.register("gasifying", () -> RecipeType.simple(id("gasifying")));
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.FischerTropschRecipe>> FISCHER_TROPSCH =
             RECIPE_TYPES.register("fischer_tropsch", () -> RecipeType.simple(id("fischer_tropsch")));
+    // The Sifter and the Diamond Press.
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.SiftingRecipe>> SIFTING =
+            RECIPE_TYPES.register("sifting", () -> RecipeType.simple(id("sifting")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.DiamondPressingRecipe>> DIAMOND_PRESSING =
+            RECIPE_TYPES.register("diamond_pressing", () -> RecipeType.simple(id("diamond_pressing")));
     // Farm chemistry: the Air Separator, the Haber Reactor and the Biogas Digester.
     public static final Supplier<RecipeType<AirSeparatingRecipe>> AIR_SEPARATING = RECIPE_TYPES.register("air_separating",
             () -> RecipeType.simple(id("air_separating")));
@@ -150,6 +155,12 @@ public final class ModRecipes {
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.FischerTropschRecipe>> FISCHER_TROPSCH_SERIALIZER =
             RECIPE_SERIALIZERS.register("fischer_tropsch", () -> new RecipeSerializer<>(
                     net.zagdrath.arcforge.recipe.FischerTropschRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.FischerTropschRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.SiftingRecipe>> SIFTING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("sifting", () -> new RecipeSerializer<>(
+                    net.zagdrath.arcforge.recipe.SiftingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.SiftingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.DiamondPressingRecipe>> DIAMOND_PRESSING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("diamond_pressing", () -> new RecipeSerializer<>(
+                    net.zagdrath.arcforge.recipe.DiamondPressingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.DiamondPressingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<AirSeparatingRecipe>> AIR_SEPARATING_SERIALIZER = RECIPE_SERIALIZERS.register("air_separating",
             () -> new RecipeSerializer<>(AirSeparatingRecipe.MAP_CODEC, AirSeparatingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<SynthesizingRecipe>> SYNTHESIZING_SERIALIZER = RECIPE_SERIALIZERS.register("synthesizing",
@@ -194,6 +205,7 @@ public final class ModRecipes {
         event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
                 MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(), VULCANIZING.get(),
                 HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
+                SIFTING.get(), DIAMOND_PRESSING.get(),
                 RecipeType.SMELTING);
     }
 }

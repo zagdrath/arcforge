@@ -1,0 +1,21 @@
+{
+  "title": "Sifter",
+  "icon": "arcforge:sifter",
+  "items": [
+    "arcforge:sifter",
+    "arcforge:steel_mesh",
+    "arcforge:invar_mesh",
+    "arcforge:tungsten_mesh",
+    "arcforge:deepslate_gravel"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Sieves loose ground for a chance at ore dusts and minerals, with FE: 20 FE/t for 5 seconds a block. Every possible find is rolled on its own; mining is still far richer.\n- Gravel: flint, iron, copper, gold, silver and nickel dust.\n- Sand and red sand: gold dust, Nether Quartz, fluorite and bismuth dust.\n- Deepslate Gravel (cobbled deepslate in the Arc Crusher): tungsten dust, and rarer iron, gold and silver.\nArcite never turns up in a sieve."
+    },
+    {
+      "type": "text",
+      "text": "It needs a Sifter Mesh in its mesh slot (eight rods in a ring):\n- Steel Mesh: the base chances and speed, 256 blocks.\n- Invar Mesh: chances x1.25, 1.5x as fast, 512 blocks.\n- Tungsten Mesh: chances x1.5, twice as fast, 1,024 blocks.\nBlocks and meshes go in on top (each to its own slot), finds come out underneath, FE at the back. Six output slots; a block waits until all its finds would fit. Speed and Energy upgrades."
+    }
+  ]
+}

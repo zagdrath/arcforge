@@ -41,6 +41,7 @@ public class BiogasDigesterMenu extends MachineMenu {
 
     public static final int INPUT_X = 30, INPUT_Y = 26;
     public static final int DIGESTATE_X = 78, DIGESTATE_Y = 26;
+    public static final int SULFUR_X = 118, SULFUR_Y = 44;
 
     // Client constructor, called with the block position written by the server.
     public BiogasDigesterMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -51,6 +52,7 @@ public class BiogasDigesterMenu extends MachineMenu {
         super(ModMenuTypes.BIOGAS_DIGESTER.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.BIOGAS_DIGESTER_CONTROLLER.get());
         addMachineSlot(BiogasDigesterBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(BiogasDigesterBlockEntity.SLOT_DIGESTATE, DIGESTATE_X, DIGESTATE_Y);
+        addMachineSlot(BiogasDigesterBlockEntity.SLOT_SULFUR, SULFUR_X, SULFUR_Y);
         finish(inventory);
     }
 

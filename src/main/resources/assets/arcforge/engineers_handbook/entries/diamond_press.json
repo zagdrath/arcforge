@@ -1,0 +1,15 @@
+{
+  "title": "Diamond Press",
+  "icon": "arcforge:diamond_press",
+  "items": [
+    "arcforge:diamond_press",
+    "arcforge:graphite",
+    "arcforge:graphite_block"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A Hardened machine that crushes Graphite into Diamonds between tungsten anvils.\n- 4 Graphite make a Diamond, for 2,000,000 FE and 240,000 HU over a minute.\n- It only works at 1,400°C or hotter, and heat only flows from something hotter: a Fuel Burner or Firebox on oxy-fuel, or a Firebox Array burning Coal Coke with oxygen.\n- Graphite comes from Coal Coke (or 2 Carbon Dust) baked at 1,500°C in the Arcforge Furnace.\n- Graphite in on top, Diamonds out underneath, heat into the left, FE into the back. Speed, Energy and Heat upgrades."
+    }
+  ]
+}

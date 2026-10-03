@@ -911,6 +911,36 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     at (9,88) with ticks at both ends of the window. `ghost_dust`: a heap, drawn like the other ghosts (white, alpha 0x37
     body / 0x69 edge).
 
+## Sifter, Diamond Press and biogas sulfur
+- **Faces** are built like the carbon-capture machines' (casing + 8×8 port plates at the default modes, chips in the
+  resource's tones): gravel `#9A948E #6E6A66 #45423F`, dust `#C9C4BE #8E8984 #5C5854`, Graphite `#7E858F #4E535C #2A2D33`,
+  diamond `#D4FFF8 #6AD2EE #2E96B6`. Plain sides are the Vulcanizer's vented side; the Diamond Press's heat face (left) is
+  the Vulcanizer's heat back.
+- **Sifter** (top input, bottom output, back FE): a recess (x2..13, y2..12) holding a vibrating screen: a gravel bed of
+  2 px pebbles in the three gravel tones (rows 4–6) riding on a steel rail with wire knots every other pixel (row 7,
+  `#959DA6` / `#575D65`), and a dust tray on a lit lip (row 11) with two small heaps of finds (dust greys, a copper
+  `#C98244` fleck). `_on` is 4 frames (frametime 2): the bed and the rail shake a pixel right, back, left, and dust
+  falls through the mesh.
+- **Diamond Press** (Hardened; top input, bottom output, left heat, back FE): a recess (x2..13, y2..11) with a tungsten
+  ram (a shank and a wide head, `#1C1F24 → #B4BBC2`) over a Graphite puck and a bed anvil (face, waist, foot); under the
+  recess the Hardened tier band (row 12 `#A476DA` with a `#CEAAF2` end, row 13 `#7042A4`). `_on` is 4 frames (frametime
+  4): the ram comes down a pixel, both anvil faces glow in the Heat row while it presses, and the puck comes out as a
+  diamond glint.
+- **Sifter Meshes** (items, `#0C0D0F` outline): a 2 px square frame (lit top/left, dark bottom/right, lit corner rivets)
+  round a wire grid every 3 px (x/y 5, 8, 11) with lit crossings and open (transparent) gaps, in the metal's ramp:
+  Steel the Steel Rod's `#212427 → #A8AFB6`, Invar the Invar Ingot's `#343731 → #BCC2B4`, Tungsten metal
+  `#1C1F24 → #B4BBC2`.
+- **Deepslate Gravel** (natural, vanilla texture language): wrap-around pebbles (a seeded Voronoi of 18 stones), each a
+  flat tone of the deepslate ramp `#1C1C22 #29292F #35353C #42424A #505058 #5E5E67 #6E6E78` with a lit top/left rim two
+  steps up and a bottom/right rim a step down, and dark `#1C1C22` gaps between stones. It tiles seamlessly.
+- **Sulfur port** (`block/port/sulfur`) and Ports-tab icon (`face_sulfur`): the Salt ones with a sulfur chip
+  (`#F2E46A` / `#D2BE3A`; the icon's fill `#E6D24E`).
+- GUIs: the **Sifter** is the Metal Press's background with its result frame swapped for two rows of the Block Breaker's
+  output grid at (101,25) (the die frame holds the mesh); ghosts `ghost_mesh` (a framed grid) and `ghost_gravel` (a heap).
+  The **Diamond Press** is the Hydrothermal Carbonizer's with the Haber Reactor's FE gauge in place of the left tank and
+  the right tank painted out; `ghost_graphite`. The **Biogas Digester** gains a sulfur slot (its Digestate frame) at
+  (117,43).
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

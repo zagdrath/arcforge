@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RRR",
+    "R R",
+    "RRR"
+  ],
+  "key": {
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:steel_mesh",
+    "count": 1
+  }
+}

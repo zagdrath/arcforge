@@ -320,6 +320,28 @@ public final class MachineRecipes {
                 .anyMatch(holder -> holder.value().takes(fluid));
     }
 
+    // --- Sifter and Diamond Press ---
+
+    public static Optional<RecipeHolder<SiftingRecipe>> sifting(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.SIFTING.get()).stream()
+                .filter(holder -> holder.value().test(input))
+                .findFirst();
+    }
+
+    public static boolean isSifterInput(@Nullable Level level, ItemStack stack) {
+        return !stack.isEmpty() && sifting(level, stack).isPresent();
+    }
+
+    public static Optional<RecipeHolder<DiamondPressingRecipe>> diamondPressing(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.DIAMOND_PRESSING.get()).stream()
+                .filter(holder -> holder.value().test(input))
+                .findFirst();
+    }
+
+    public static boolean isDiamondPressInput(@Nullable Level level, ItemStack stack) {
+        return !stack.isEmpty() && diamondPressing(level, stack).isPresent();
+    }
+
     // --- Vulcanizer ---
 
     // The vulcanizing recipe the two input slots can supply (either way round), if any.
