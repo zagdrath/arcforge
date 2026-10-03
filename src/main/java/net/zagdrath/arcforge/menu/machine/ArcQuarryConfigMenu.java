@@ -20,6 +20,7 @@ import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.machine.quarry.BlockFilter;
 import net.zagdrath.arcforge.machine.quarry.QuarrySettings;
+import net.zagdrath.arcforge.menu.GhostSlotMenu;
 import net.zagdrath.arcforge.menu.common.MenuReach;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
@@ -28,7 +29,7 @@ import net.zagdrath.arcforge.registry.ModMenuTypes;
 // synced to the client; every change is a menu button or a payload (ArcQuarryAreaPayload, ArcQuarryTagPayload)
 // the server applies to the quarry, which clamps it and syncs it back. The player's inventory is here so items
 // can be picked up to set filter cells.
-public class ArcQuarryConfigMenu extends AbstractContainerMenu {
+public class ArcQuarryConfigMenu extends AbstractContainerMenu implements GhostSlotMenu {
     // Filter cell i: 300 + i sets it from the carried block (or clears it with an empty hand); 320 + i and 340 + i
     // step its tag chip forward and back.
     public static final int BUTTON_CELL = 300;
@@ -85,6 +86,30 @@ public class ArcQuarryConfigMenu extends AbstractContainerMenu {
         }
         UnaryOperator<QuarrySettings> change = change(buttonId, getCarried());
         if (change == null) {
+            return false;
+        }
+        quarry.setSettings(change.apply(quarry.getSettings()));
+        return true;
+    }
+
+    // --- Filter cells dragged from JEI (GhostSlotPayload): the same as clicking with the block ---
+
+    @Override
+    public int ghostSlotCount() {
+        return QuarrySettings.FILTER_SIZE;
+    }
+
+    // Blocks only, as a click takes.
+    @Override
+    public boolean acceptsGhostItem(int slot, ItemStack stack) {
+        return !stack.isEmpty() && BlockFilter.of(stack) != null;
+    }
+
+    @Override
+    public boolean setGhostItem(Player player, int slot, ItemStack stack) {
+        ArcQuarryBlockEntity quarry = quarry(player);
+        UnaryOperator<QuarrySettings> change = stack.isEmpty() ? null : change(BUTTON_CELL + slot, stack);
+        if (quarry == null || change == null) {
             return false;
         }
         quarry.setSettings(change.apply(quarry.getSettings()));

@@ -20,6 +20,7 @@ import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
@@ -30,6 +31,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.screen.GhostSlotScreen;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.quarry.BlockFilter;
@@ -42,7 +44,7 @@ import net.zagdrath.arcforge.network.ArcQuarryTagPayload;
 // (ghost cells, each with a tag chip), a tag box with suggestions, the switches, and the last scan. Everything
 // shown comes from the quarry as synced; changes go to the server (menu buttons and payloads), which clamps them
 // and syncs them back. While it's open the area outline shows in the world (see RangeOutlineRenderer).
-public class ArcQuarryConfigScreen extends AbstractContainerScreen<ArcQuarryConfigMenu> {
+public class ArcQuarryConfigScreen extends AbstractContainerScreen<ArcQuarryConfigMenu> implements GhostSlotScreen {
     private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/arc_quarry_config.png");
     private static final Identifier BUTTON = ArcforgeGui.widget("button");
     private static final Identifier BUTTON_HOVER = ArcforgeGui.widget("button_hover");
@@ -184,6 +186,11 @@ public class ArcQuarryConfigScreen extends AbstractContainerScreen<ArcQuarryConf
 
     private static int cellY(int cell) {
         return GRID_Y + (cell / COLUMNS) * PITCH;
+    }
+
+    @Override
+    public Rect2i ghostSlotArea(int cell) {
+        return new Rect2i(leftPos + cellX(cell), topPos + cellY(cell), 16, 16);
     }
 
     private int cellAt(double mouseX, double mouseY) {

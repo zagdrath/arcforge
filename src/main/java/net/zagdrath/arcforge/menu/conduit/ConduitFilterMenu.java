@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.menu.conduit;
 
+import java.util.function.Function;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -28,6 +30,7 @@ import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
+import net.zagdrath.arcforge.menu.GhostSlotMenu;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.steam.Gases;
@@ -36,7 +39,7 @@ import net.zagdrath.arcforge.steam.Gases;
 // are ghost slots set by clicking with an item (never used up). Every change is a menu button (see the ids
 // below), applied on the server to the installed filter's settings component; the block entity then syncs the
 // filter to clients, which is what the screen draws.
-public class ConduitFilterMenu extends AbstractContainerMenu {
+public class ConduitFilterMenu extends AbstractContainerMenu implements GhostSlotMenu {
     // Button ids: 0-8 set or clear a ghost slot from the carried item; 10+i and 20+i step slot i's match to the
     // next or previous tag; then the three toggles.
     public static final int CHIP_NEXT = 10;
@@ -94,14 +97,54 @@ public class ConduitFilterMenu extends AbstractContainerMenu {
         if (conduit == null || !conduit.hasFilter(side)) {
             return false;
         }
+        return change(conduit, settings -> apply(settings, buttonId));
+    }
+
+    // Applies a change to the installed filter's settings and saves it if it changed. Returns false if the change was
+    // null (not one of ours, or nothing to set).
+    private boolean change(ConduitBlockEntity conduit, Function<FilterSettings, @Nullable FilterSettings> change) {
         FilterSettings settings = FilterSettings.of(conduit.getFilter(side));
-        FilterSettings updated = apply(settings, buttonId);
+        FilterSettings updated = change.apply(settings);
         if (updated != null && !updated.equals(settings)) {
             ItemStack filter = conduit.getFilter(side).copy();
             filter.set(ModDataComponents.CONDUIT_FILTER.get(), updated);
             conduit.setFilter(side, filter);
         }
         return updated != null;
+    }
+
+    // --- Ghost slots dragged from JEI (GhostSlotPayload): the same as clicking with the item ---
+
+    @Override
+    public int ghostSlotCount() {
+        return FilterSettings.SIZE;
+    }
+
+    // An item conduit takes any item; a fluid or pressurized conduit one holding a fluid or gas of its kind.
+    @Override
+    public boolean acceptsGhostItem(int slot, ItemStack stack) {
+        return !stack.isEmpty() && entryFromCarried(stack) != null;
+    }
+
+    // A fluid conduit takes fluids, a pressurized conduit gases.
+    @Override
+    public boolean acceptsGhostFluid(int slot, Fluid fluid) {
+        ConduitType type = getConduitType();
+        return type != ConduitType.ITEM && fluid != Fluids.EMPTY && Gases.isGas(fluid) == (type == ConduitType.GAS);
+    }
+
+    @Override
+    public boolean setGhostItem(Player player, int slot, ItemStack stack) {
+        ConduitBlockEntity conduit = conduit();
+        FilterSettings.Entry entry = stack.isEmpty() ? null : entryFromCarried(stack);
+        return conduit != null && conduit.hasFilter(side) && entry != null && change(conduit, settings -> settings.withEntry(slot, entry));
+    }
+
+    @Override
+    public boolean setGhostFluid(Player player, int slot, Fluid fluid) {
+        ConduitBlockEntity conduit = conduit();
+        return conduit != null && conduit.hasFilter(side) && acceptsGhostFluid(slot, fluid)
+                && change(conduit, settings -> settings.withEntry(slot, FilterSettings.Entry.of(fluid)));
     }
 
     private @Nullable FilterSettings apply(FilterSettings settings, int buttonId) {

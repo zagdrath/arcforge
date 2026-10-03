@@ -5,28 +5,34 @@
 
 package net.zagdrath.arcforge.client.screen.machine;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
+import net.zagdrath.arcforge.client.screen.GhostSlotScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.AssemblerMenu;
+import net.zagdrath.arcforge.network.AssemblerPatternPayload;
 
 // Layout follows gui_layouts.json "assembler" (176x206): the ghost pattern on the left, progress, the output with
 // the result ghost and the two remainder slots, then the 18-slot buffer. Clicking a pattern cell sets or clears it
-// (see AssemblerMenu); nothing is picked up.
-public class AssemblerScreen extends MachineScreen<AssemblerMenu> {
+// (see AssemblerMenu); nothing is picked up. An item dragged from JEI onto a cell sets it too, through the same
+// AssemblerPatternPayload as JEI's + (the whole pattern, with that cell changed).
+public class AssemblerScreen extends MachineScreen<AssemblerMenu> implements GhostSlotScreen {
     private static final int ENERGY_X = 9, ENERGY_Y = 19;
     private static final int PROGRESS_X = 88, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
     // Under the arrow, clear of the output and leftover slots, and clipped short of the panel's edge (and the tabs).
@@ -41,6 +47,33 @@ public class AssemblerScreen extends MachineScreen<AssemblerMenu> {
     public AssemblerScreen(AssemblerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "assembler", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)), true, 206);
         enableAutoEject();
+    }
+
+    // --- Pattern cells dragged from JEI ---
+
+    @Override
+    public int ghostSlotCount() {
+        return AssemblerBlockEntity.PATTERN_SIZE;
+    }
+
+    @Override
+    public Rect2i ghostSlotArea(int cell) {
+        return new Rect2i(leftPos + AssemblerMenu.PATTERN_X + (cell % 3) * 18, topPos + AssemblerMenu.PATTERN_Y + (cell / 3) * 18, 16, 16);
+    }
+
+    // Any item, as clicking a cell with it takes.
+    @Override
+    public boolean acceptsGhostItem(int cell, ItemStack stack) {
+        return !stack.isEmpty();
+    }
+
+    @Override
+    public void setGhostItem(int cell, ItemStack stack) {
+        List<ItemStack> cells = new ArrayList<>(AssemblerBlockEntity.PATTERN_SIZE);
+        for (int i = 0; i < AssemblerBlockEntity.PATTERN_SIZE; i++) {
+            cells.add(i == cell ? stack.copyWithCount(1) : menu.getPatternCell(i).copy());
+        }
+        ClientPacketDistributor.sendToServer(new AssemblerPatternPayload(menu.containerId, cells));
     }
 
     @Override

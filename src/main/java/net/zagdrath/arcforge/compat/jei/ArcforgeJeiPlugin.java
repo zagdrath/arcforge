@@ -240,6 +240,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
     // are 21x15). The three-lane arrays get one per lane, and the Fuel Burner's flame shows its fuels.
     @Override
     public void registerGuiHandlers(IGuiHandlerRegistration registration) {
+        // Drag-and-drop from JEI onto ghost slots.
+        registration.addGhostIngredientHandler(net.zagdrath.arcforge.client.screen.conduit.ConduitFilterScreen.class, new GhostSlotHandler<>());
+        registration.addGhostIngredientHandler(net.zagdrath.arcforge.client.screen.machine.ArcQuarryConfigScreen.class, new GhostSlotHandler<>());
+        registration.addGhostIngredientHandler(AssemblerScreen.class, new GhostSlotHandler<>());
         registration.addRecipeClickArea(ArcCrusherScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);
         registration.addRecipeClickArea(ArcMelterScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Melting.TYPE);
         registration.addRecipeClickArea(FermenterScreen.class, 66, 35, ARROW_W, ARROW_H, MachineCategories.Fermenting.TYPE);

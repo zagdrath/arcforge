@@ -66,6 +66,7 @@ public final class ArcforgeGameTests {
         TESTS.put("wrench_conduit", ConduitGameTests::wrenchConduit);
         TESTS.put("wrench_machine", ConduitGameTests::wrenchMachine);
         TESTS.put("conduit_filter_allowlist", ConduitGameTests::filterAllowlist);
+        TESTS.put("conduit_filter_ghost_slot_drag", ConduitGameTests::filterGhostSlotDrag);
         TESTS.put("conduit_filter_rejected_stays_in_source", ConduitGameTests::filterRejectedStaysInSource);
         TESTS.put("conduit_filter_denylist", ConduitGameTests::filterDenylist);
         TESTS.put("conduit_filter_tag_match", ConduitGameTests::filterTagMatch);
@@ -366,6 +367,7 @@ public final class ArcforgeGameTests {
         TESTS.put("quarry_needs_room", ArcQuarryGameTests::needsRoom);
         TESTS.put("quarry_shape_follows_model", ArcQuarryGameTests::shapeFollowsModel);
         TESTS.put("quarry_tag_allowlist", ArcQuarryGameTests::tagAllowlist);
+        TESTS.put("quarry_ghost_slot_drag", ArcQuarryGameTests::ghostSlotDrag);
         TESTS.put("quarry_denylist", ArcQuarryGameTests::denylist);
         TESTS.put("quarry_replace_mode", ArcQuarryGameTests::replaceMode);
         TESTS.put("quarry_silk_touch", ArcQuarryGameTests::silkTouch);

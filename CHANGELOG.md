@@ -69,6 +69,9 @@ number and date.
 
 ### Added
 
+- **JEI drag-and-drop onto ghost slots:** drag an item from JEI onto a Conduit Filter entry, an Arc Quarry filter cell
+  or an Assembler pattern cell to set it, as clicking with the item does. Fluid and pressurized conduits' filter entries
+  also take dragged fluids and gases (and items holding one). Only the slots that take what's being dragged light up.
 - **Firebox Array,** a large heat source: a hollow box of Firebox Array Casings with one Firebox Array Controller, 3 to 7
   by 3 to 9 across (in any combination, so it needn't be square) and 3 to 5 tall. Its edges are casings; its walls, floor
   and roof may be Pressure Glass, through which you see the fire burning on its firebrick-lined floor.

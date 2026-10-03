@@ -14,12 +14,14 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.screen.GhostSlotScreen;
 import net.zagdrath.arcforge.conduit.filter.FilterSettings;
 import net.zagdrath.arcforge.item.conduit.ConduitFilterItem;
 import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
@@ -28,7 +30,7 @@ import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 // buttons for allowlist/denylist, components (item conduits only) and direction, with a summary beside them.
 // Everything drawn comes from the installed filter as synced; every click is a menu button (see ConduitFilterMenu).
 // Positions are relative to leftPos/topPos.
-public class ConduitFilterScreen extends AbstractContainerScreen<ConduitFilterMenu> {
+public class ConduitFilterScreen extends AbstractContainerScreen<ConduitFilterMenu> implements GhostSlotScreen {
     private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/conduit_filter.png");
     private static final Identifier BUTTON = ArcforgeGui.widget("button");
     private static final Identifier BUTTON_HOVER = ArcforgeGui.widget("button_hover");
@@ -59,6 +61,11 @@ public class ConduitFilterScreen extends AbstractContainerScreen<ConduitFilterMe
 
     private static int slotX(int slot) {
         return SLOT_X + slot * SLOT_PITCH;
+    }
+
+    @Override
+    public Rect2i ghostSlotArea(int slot) {
+        return new Rect2i(leftPos + slotX(slot), topPos + SLOT_Y, 16, 16);
     }
 
     private static int chipX(int slot) {

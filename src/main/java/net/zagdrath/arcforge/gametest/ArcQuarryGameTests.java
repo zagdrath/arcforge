@@ -35,6 +35,8 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.quarry.BlockFilter;
 import net.zagdrath.arcforge.machine.quarry.QuarrySettings;
+import net.zagdrath.arcforge.menu.machine.ArcQuarryConfigMenu;
+import net.zagdrath.arcforge.network.GhostSlotPayload;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModItems;
 
@@ -423,5 +425,28 @@ public final class ArcQuarryGameTests {
                     helper.assertTrue(quarry.getMinedCount() == 2, quarry.getMinedCount() + " mined");
                 })
                 .thenSucceed();
+    }
+
+    // A block dragged from JEI onto a filter cell (GhostSlotPayload) sets it as clicking with it would; a non-block
+    // item is refused, as a click refuses it.
+    static void ghostSlotDrag(GameTestHelper helper) {
+        clear(helper);
+        helper.assertTrue(place(helper).consumesAction(), "The quarry wasn't placed");
+        ArcQuarryBlockEntity quarry = helper.getBlockEntity(MAIN, ArcQuarryBlockEntity.class);
+        net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        BlockPos absolute = helper.absolutePos(MAIN);
+        player.snapTo(absolute.getX() + 0.5, absolute.getY() + 1, absolute.getZ() + 0.5);
+        ArcQuarryConfigMenu menu = new ArcQuarryConfigMenu(7, player.getInventory(), absolute);
+        player.containerMenu = menu;
+        helper.assertTrue(GhostSlotPayload.apply(player, GhostSlotPayload.item(menu.containerId, 2, new ItemStack(Items.GRANITE))),
+                "A dragged block wasn't set");
+        helper.assertTrue(quarry.getSettings().entry(2).item().map(item -> item.item().value() == Items.GRANITE).orElse(false),
+                "Cell 2 holds " + quarry.getSettings().entry(2));
+        helper.assertFalse(GhostSlotPayload.apply(player, GhostSlotPayload.item(menu.containerId, 3, new ItemStack(Items.STICK))),
+                "A stick was set as a block filter");
+        helper.assertFalse(GhostSlotPayload.apply(player, GhostSlotPayload.item(menu.containerId + 1, 3, new ItemStack(Items.STONE))),
+                "A payload for another menu was applied");
+        helper.assertFalse(menu.acceptsGhostFluid(0, net.minecraft.world.level.material.Fluids.WATER), "A fluid lights up a block filter cell");
+        helper.succeed();
     }
 }

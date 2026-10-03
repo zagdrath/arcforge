@@ -5,11 +5,14 @@
 
 package net.zagdrath.arcforge.gametest;
 
+import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EntityTypes;
@@ -42,8 +45,11 @@ import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
+import net.zagdrath.arcforge.network.GhostSlotPayload;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 
@@ -749,5 +755,52 @@ final class ConduitGameTests {
         var context = new UseOnContext(player, InteractionHand.MAIN_HAND,
                 new BlockHitResult(Vec3.atCenterOf(absolute).add(offsetFromCentre), Direction.UP, absolute, false));
         player.getMainHandItem().useOn(context);
+    }
+
+    // Items and fluids dragged from JEI onto Conduit Filter entries (GhostSlotPayload) set them as clicking with the item
+    // would: an item filter takes items, a fluid filter fluids (or an item holding one), a pressurized filter gases, and
+    // each refuses the other kinds, as only the matching entries light up while dragging.
+    static void filterGhostSlotDrag(GameTestHelper helper) {
+        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        BlockPos near = helper.absolutePos(new BlockPos(2, 1, 0));
+        player.snapTo(near.getX() + 0.5, near.getY() + 1, near.getZ() + 0.5);
+        int id = 40;
+        for (ConduitType type : List.of(ConduitType.ITEM, ConduitType.FLUID, ConduitType.GAS)) {
+            BlockPos pos = new BlockPos(1 + type.ordinal() * 2, 1, 2);
+            helper.setBlock(pos, ModBlocks.conduit(type, ConduitTier.ARCFORGED).get());
+            ConduitBlockEntity conduit = helper.getBlockEntity(pos, ConduitBlockEntity.class);
+            conduit.setFilter(Direction.NORTH, new ItemStack(ModItems.CONDUIT_FILTER.get()));
+            ConduitFilterMenu menu = new ConduitFilterMenu(++id, player.getInventory(), helper.absolutePos(pos), Direction.NORTH);
+            player.containerMenu = menu;
+            boolean item = GhostSlotPayload.apply(player, GhostSlotPayload.item(id, 0, new ItemStack(Items.IRON_INGOT)));
+            boolean water = GhostSlotPayload.apply(player, GhostSlotPayload.fluid(id, 1, Fluids.WATER));
+            boolean bucket = GhostSlotPayload.apply(player, GhostSlotPayload.item(id, 2, new ItemStack(Items.LAVA_BUCKET)));
+            boolean gas = GhostSlotPayload.apply(player, GhostSlotPayload.fluid(id, 3, ModFluids.HYDROGEN.get()));
+            FilterSettings settings = FilterSettings.of(conduit.getFilter(Direction.NORTH));
+            switch (type) {
+                case ITEM -> {
+                    helper.assertTrue(item && settings.entry(0).item().isPresent(), "The item filter didn't take a dragged item");
+                    helper.assertTrue(bucket && settings.entry(2).item().isPresent(), "The item filter didn't take a bucket as an item");
+                    helper.assertFalse(water || gas, "The item filter took a fluid");
+                }
+                case FLUID -> {
+                    helper.assertTrue(water && settings.entry(1).fluid().filter(f -> f.isSame(Fluids.WATER)).isPresent(),
+                            "The fluid filter didn't take dragged Water");
+                    helper.assertTrue(bucket && settings.entry(2).fluid().filter(f -> f.isSame(Fluids.LAVA)).isPresent(),
+                            "The fluid filter didn't take a Lava Bucket as Lava");
+                    helper.assertFalse(item || gas, "The fluid filter took an item or a gas");
+                }
+                default -> {
+                    helper.assertTrue(gas && settings.entry(3).fluid().filter(f -> f.isSame(ModFluids.HYDROGEN.get())).isPresent(),
+                            "The gas filter didn't take dragged Hydrogen");
+                    helper.assertFalse(item || water || bucket, "The gas filter took an item or a liquid");
+                }
+            }
+            helper.assertFalse(GhostSlotPayload.apply(player, GhostSlotPayload.item(id + 100, 4, new ItemStack(Items.STONE))),
+                    "A payload for another menu was applied");
+            helper.assertFalse(GhostSlotPayload.apply(player, GhostSlotPayload.item(id, FilterSettings.SIZE, new ItemStack(Items.STONE))),
+                    "A payload for a slot past the filter was applied");
+        }
+        helper.succeed();
     }
 }
