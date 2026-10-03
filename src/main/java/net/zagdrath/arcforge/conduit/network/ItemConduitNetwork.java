@@ -31,8 +31,9 @@ import net.zagdrath.arcforge.conduit.item.ItemPacket;
 
 // Every few ticks (per tier) pulls one stack from an output side and sends it as a packet towards an
 // input side that will accept it. Packets travel conduit by conduit along precomputed routes.
-// When nothing will take the items they are pulled into the source conduit's storage anyway (up to
-// ConduitTier.ITEM_STORAGE_SLOTS stacks) and sent on once a destination has room. A destination that
+// When nothing has room for the items they are pulled into the source conduit's storage anyway (up to
+// ConduitTier.ITEM_STORAGE_SLOTS stacks) and sent on once a destination has room, but only if some destination's filter
+// lets them through (or there is no destination yet): items every destination's filter rejects stay in the machine. A destination that
 // refuses a packet makes it reroute, and if nothing can take it the items are stored where they are.
 // Conduit Filters are checked live: a destination whose filter rejects the items is skipped (the rest keep
 // their round-robin turns), and a source's extract filter leaves what it rejects in the machine.
@@ -124,7 +125,10 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
             }
             Target target = findTarget(resource, available, source.conduit(), source.machine());
             if (target == null) {
-                // Nowhere to send it: keep it in the conduit until somewhere has room.
+                // Nowhere has room: keep it in the conduit until somewhere does, unless no destination would ever take it.
+                if (!anySinkAllows(resource, source.conduit(), source.machine())) {
+                    continue;
+                }
                 int space = Math.min(available, conduit.storageSpaceFor(resource.toStack(1)));
                 if (space > 0 && extractInto(handler, index, resource, space, conduit)) {
                     return true;
@@ -187,6 +191,24 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
                 return;
             }
         }
+    }
+
+    // Whether a sink reachable from `from` (other than excludeMachine) has a filter that lets these items through, or
+    // there is no such sink at all yet (the items wait in the conduits for one to be connected).
+    private boolean anySinkAllows(ItemResource resource, BlockPos from, @Nullable BlockPos excludeMachine) {
+        ItemStack stack = resource.toStack(1);
+        boolean reachable = false;
+        for (Endpoint<ResourceHandler<ItemResource>> sink : sinks) {
+            Map<BlockPos, Direction> route = routes.get(new SinkKey(sink.conduit(), sink.side()));
+            if (sink.machine().equals(excludeMachine) || route == null || !route.containsKey(from)) {
+                continue;
+            }
+            reachable = true;
+            if (filterAllows(sink, stack, true)) {
+                return true;
+            }
+        }
+        return !reachable;
     }
 
     private record Target(SinkKey key, Map<BlockPos, Direction> route, int accepted) {}

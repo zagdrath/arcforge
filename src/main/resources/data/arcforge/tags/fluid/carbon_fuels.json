@@ -1,0 +1,12 @@
+{
+  "values": [
+    "arcforge:creosote",
+    "arcforge:naphtha",
+    "arcforge:light_oil",
+    "arcforge:heavy_oil",
+    "arcforge:ethanol",
+    "arcforge:biodiesel",
+    "arcforge:biogas",
+    "arcforge:syngas"
+  ]
+}

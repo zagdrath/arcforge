@@ -59,6 +59,7 @@ public class GasTurbineArrayScreen extends MachineScreen<GasTurbineArrayMenu> {
             case ENERGY -> sideModeName("energy_output");
             case LUBRICANT -> sideModeName("lubricant_input");
             case HEAT -> sideModeName("heat_output");
+            case GAS_OUTPUT -> sideModeName("flue_gas");
             default -> super.sideModeName(mode);
         };
     }

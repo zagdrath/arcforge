@@ -1,0 +1,17 @@
+{
+  "title": "Carbon Capture",
+  "icon": "arcforge:carbon_reclaimer",
+  "items": [
+    "arcforge:carbon_reclaimer"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Burners can give off their Carbon Dioxide instead of losing it. Set a face of a Combustion Plant, Firebox or Fuel Burner to Flue Gas (on a Firebox Array or Gas Turbine Array, a Gas Output port): while it burns a carbon fuel, Carbon Dioxide comes out of it.\n- About 4 mB for every 1,000 HU of heat (256 mB from a coal in a Firebox).\n- Carbon fuels: coal, charcoal, Bio-Coal, Coal Coke, Carbon Dust, the oils, Creosote, Ethanol, Biodiesel, Biogas and Syngas. Hydrogen gives none.\n- What isn't taken away is vented; without a Flue Gas face the burner works as before."
+    },
+    {
+      "type": "text",
+      "text": "The Carbon Reclaimer turns it back into carbon: 250 mB Carbon Dioxide + 500 mB Hydrogen make a Carbon Dust and 250 mB Water, for 800,000 FE or more.\n- It always costs more FE than the Carbon Dust could give back, burnt, baked into Coal Coke or gasified, in the best setup (a safety factor over that), so it renews carbon, never energy.\n- Gases in on top, Carbon Dust and Water out underneath, FE at the back by default.\n- Speed and Energy upgrades (Energy never takes it under that floor)."
+    }
+  ]
+}

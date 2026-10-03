@@ -160,6 +160,13 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(ChemicalReactorMenu::new));
     public static final Supplier<MenuType<ElectrolyzerMenu>> ELECTROLYZER = MENU_TYPES.register("electrolyzer",
             () -> IMenuTypeExtension.create(ElectrolyzerMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.CarbonReclaimerMenu>> CARBON_RECLAIMER =
+            MENU_TYPES.register("carbon_reclaimer", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.CarbonReclaimerMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.GasifierMenu>> GASIFIER =
+            MENU_TYPES.register("gasifier", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.GasifierMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.FischerTropschReactorMenu>> FISCHER_TROPSCH_REACTOR =
+            MENU_TYPES.register("fischer_tropsch_reactor",
+                    () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.FischerTropschReactorMenu::new));
     public static final Supplier<MenuType<AssemblerMenu>> ASSEMBLER = MENU_TYPES.register("assembler",
             () -> IMenuTypeExtension.create(AssemblerMenu::new));
     public static final Supplier<MenuType<BlockBreakerMenu>> BLOCK_BREAKER = MENU_TYPES.register("block_breaker",

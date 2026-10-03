@@ -42,6 +42,11 @@
       "hu_per_mb": 45,
       "mb_per_tick": 1.0,
       "burn_temperature": 1100
+    },
+    "arcforge:syngas": {
+      "hu_per_mb": 50,
+      "mb_per_tick": 1.0,
+      "burn_temperature": 1150
     }
   }
 }

@@ -7,11 +7,20 @@ package net.zagdrath.arcforge.heat;
 
 import java.util.Optional;
 
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStackTemplate;
+import net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.machine.CombustionFuel;
 import net.zagdrath.arcforge.machine.PowerGeneration;
+import net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe;
+import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
+import net.zagdrath.arcforge.recipe.GasifyingRecipe;
+import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
@@ -91,6 +100,56 @@ public final class EnergyBalance {
     public static int minEnergyFor(ElectrolyzingRecipe recipe) {
         double recoverable = recoverable(Optional.of(recipe.primary())) + recoverable(recipe.secondary()) + recoverable(recipe.tertiary());
         return ceil(ArcforgeConfig.ELECTROLYZER_BALANCE_SAFETY_FACTOR.getAsDouble() * recoverable);
+    }
+
+    // The least FE a Carbon Reclaimer operation may cost: the safety factor times the most FE its product can give back
+    // (see recoverableFePerItem). The level and machine resolve burn times, as a furnace would.
+    public static int minEnergyFor(CarbonReclaimingRecipe recipe, ServerLevel level, BlockEntity machine) {
+        ItemStack result = recipe.result().create();
+        double recoverable = result.getCount() * recoverableFePerItem(level, machine, result);
+        return ceil(ArcforgeConfig.RECLAIMER_BALANCE_SAFETY_FACTOR.getAsDouble() * recoverable);
+    }
+
+    // The most FE one of this item can give back, over every route that burns it: a Combustion Plant with every Energy
+    // upgrade; a Firebox with every Heat upgrade on oxy-fuel, its heat turned into FE by the best route; a Firebox Array on
+    // oxy-fuel (which also burns Coal Coke); or first baked in the Carbonizer (counting its Creosote) or gasified in the
+    // Gasifier into Syngas, and burnt from there. 0 if nothing burns it.
+    public static double recoverableFePerItem(ServerLevel level, BlockEntity machine, ItemStack stack) {
+        return recoverableFePerItem(level, machine, stack, 3);
+    }
+
+    private static double recoverableFePerItem(ServerLevel level, BlockEntity machine, ItemStack stack, int depth) {
+        if (stack.isEmpty()) {
+            return 0.0;
+        }
+        ItemStack one = stack.copyWithCount(1);
+        double best = 0.0;
+        if (CombustionFuel.isFuel(one)) {
+            int ticks = CombustionFuel.vanillaBurnTicks(level, machine, one);
+            double plant = ticks / ArcforgeConfig.COMBUSTION_PLANT_BURN_SPEED.getAsDouble() * ArcforgeConfig.COMBUSTION_PLANT_ENERGY_PER_TICK.getAsInt()
+                    * UpgradeType.outputMultiplier(UpgradeType.MAX_PER_MACHINE) * PowerGeneration.multiplier();
+            double firebox = FireboxArrayBlockEntity.fireboxHeat(ticks) * maxHeatMultiplier() * OxyFuel.heatMultiplier() * bestFePerHu();
+            best = Math.max(plant, firebox);
+        }
+        if (FireboxArrayBlockEntity.isSolidFuel(one)) {
+            best = Math.max(best, FireboxArrayBlockEntity.solidHeat(level, machine, one) * OxyFuel.heatMultiplier() * bestFePerHu());
+        }
+        if (depth > 0) {
+            CarbonizingRecipe baked = MachineRecipes.carbonizing(level, one).map(holder -> holder.value()).orElse(null);
+            if (baked != null) {
+                ItemStack result = baked.result().create();
+                double fe = result.getCount() * recoverableFePerItem(level, machine, result, depth - 1)
+                        + baked.byproduct().map(out -> out.amount() * recoverableFePerMb(out.fluid().value())).orElse(0.0);
+                best = Math.max(best, fe);
+            }
+            GasifyingRecipe gasified = MachineRecipes.gasifying(level, one).map(holder -> holder.value()).orElse(null);
+            if (gasified != null) {
+                // Counting oxy-fuel's extra heat too (recoverableFePerMb leaves it out), to stay on the safe side.
+                best = Math.max(best, gasified.result().amount() * recoverableFePerMb(gasified.result().fluid().value()) * OxyFuel.heatMultiplier()
+                        / gasified.count());
+            }
+        }
+        return best;
     }
 
     // Rounds up, ignoring floating-point noise (61,950.000000001 is 61,950).

@@ -152,6 +152,28 @@ public final class FarmingGameTests {
         helper.succeed();
     }
 
+    // A sapling on Loam grows from the Loam's own random ticks (its extra growth), and the tree leaves the Loam under it.
+    // Glowstone lights the sapling whatever the time of day.
+    static void loamGrowsSaplings(GameTestHelper helper) {
+        BlockPos soil = new BlockPos(2, 1, 2);
+        helper.setBlock(soil, ModBlocks.LOAM.get());
+        helper.setBlock(soil.above(), Blocks.BIRCH_SAPLING);
+        helper.setBlock(soil.offset(1, 1, 0), Blocks.GLOWSTONE);
+        RandomSource random = RandomSource.create(11);
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    var level = helper.getLevel();
+                    BlockPos absolute = helper.absolutePos(soil);
+                    for (int i = 0; i < 400 && !helper.getBlockState(soil.above()).is(Blocks.BIRCH_LOG); i++) {
+                        level.getBlockState(absolute).randomTick(level, absolute, random);
+                    }
+                    helper.assertBlockPresent(Blocks.BIRCH_LOG, soil.above());
+                    helper.assertBlockPresent(ModBlocks.LOAM.get(), soil);
+                })
+                .thenSucceed();
+    }
+
     // Fertilizers add their nutrients up to 15 (on the farmland or on the crop above it); at 15 they're refused.
     static void fertilizersAddNutrients(GameTestHelper helper) {
         BlockPos soil = new BlockPos(1, 1, 1);

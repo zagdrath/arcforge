@@ -52,8 +52,15 @@ number and date.
   `ores.spodumene`, `ores.spodumenePegmatite` and `multiblocks.thermalEvaporator.byproductCapacity` get their defaults.
 - **Data packs:** `arcforge:chemical_reacting` recipes may take a `third_item_input` (it needs a `second_item_input`);
   `arcforge:evaporating` recipes may have a `byproduct` fluid. Existing recipes load unchanged.
-- **New config sections** `machines.treeCutter` and `machines.hydrothermalCarbonizer` get their defaults.
+- **New config sections** `machines.treeCutter`, `machines.hydrothermalCarbonizer` and `farming.loam` get their defaults.
 - **New upgrade type, Range** (Tree Cutter only). Existing machines' upgrade slots are unchanged.
+- **New config sections** `power.flueGas`, `machines.carbonReclaimer`, `machines.gasifier` and
+  `machines.fischerTropschReactor` get their defaults.
+- **Flue gas is opt-in.** The Combustion Plant, Firebox, Fuel Burner, Firebox Array and Gas Turbine Array gain the Gas
+  Output side mode / port (named Flue Gas in their Sides and Ports tabs). Saved burners keep their sides and give off
+  nothing until a face is set to it, so existing setups run exactly as before.
+- **Data packs:** new recipe types `arcforge:carbon_reclaiming`, `arcforge:gasifying` and `arcforge:fischer_tropsch`, new
+  tags `#arcforge:carbon_fuels` (items and fluids) and a new `arcforge:burner_fuels` entry for Syngas.
 
 ### Added
 
@@ -88,6 +95,29 @@ number and date.
   - Handbook pages (Tree Cutter, Bio-Coal), JEI categories (Tree Cutting, Hydrothermal Carbonizing), Jade tooltips,
     GameTests and two advancements (Timber!, Coal That Grows). Values in the new `machines.treeCutter` and
     `machines.hydrothermalCarbonizer` config.
+- **Carbon capture:**
+  - **Flue gas:** set a face of a Combustion Plant, Firebox or Fuel Burner to Flue Gas (a Gas Output port on the Firebox
+    Array and Gas Turbine Array) and, while it burns a carbon fuel (`#arcforge:carbon_fuels`: coal, charcoal, Bio-Coal,
+    Coal Coke, Carbon Dust, the oils, Creosote, Ethanol, Biodiesel, Biogas, Syngas), it gives off Carbon Dioxide through it
+    in proportion to the heat it makes (4 mB per 1,000 HU; the Combustion Plant counts 2 HU per FE). Hydrogen gives none;
+    what isn't taken away is vented.
+  - **Carbon Reclaimer,** an FE machine: 250 mB Carbon Dioxide + 500 mB Hydrogen → Carbon Dust + 250 mB Water. It never
+    costs less than 1.25× the most FE its Carbon Dust could give back (burnt, baked into Coal Coke or gasified, in the best
+    setup, worked out like the Electrolyzer's energy balance), so it renews carbon, never energy; by default 800,000 FE
+    or that floor. Speed and Energy upgrades (never below the floor).
+  - **Gasifier,** a heat (HU) machine that only runs at 800°C or hotter: coal, charcoal or Bio-Coal + 500 mB Steam →
+    1,000 mB Syngas, Coal Coke → 1,500 mB, 4 biomass → 250 mB, for 16,000 HU each, with a 25% chance of Wood Ash. Side
+    configuration (Syngas out of its Gas Output faces); Speed and Heat upgrades.
+  - **Syngas,** a new gas and fuel: in `arcforge:burner_fuels` at 50 HU per mB, burning at 1,150°C (Fuel Burner, Firebox
+    Array, Gas Turbine Array).
+  - **Fischer-Tropsch Reactor,** with FE and heat, running only between 200°C and 350°C (with the thermostat on, as by
+    default, its heat faces take heat only up to 350°C; overheated, it stops and cools): 1,000 mB Syngas → 30 mB Naphtha,
+    50 mB Light Oil, 50 mB Heavy Oil and 200 mB Water. Iron Dust in its catalyst slot lasts 16 batches, Nickel Dust 32.
+    Each output has its own side mode (Naphtha, Light Oil, Heavy Oil, By-product for Water) and Output faces give out all
+    four. Speed and Energy upgrades.
+  - Handbook pages (Carbon Capture, Syngas, and a line on each burner), JEI categories (Carbon Reclaiming, Gasifying,
+    Fischer-Tropsch), Jade tooltips (the three machines and every burner's flue), GameTests and three advancements (Town
+    Gas, Gas to Liquids, Carbon Neutral). All rates, ratios and temperatures are in the new config sections.
 - **Bigger, rectangular steam arrays:**
   - **Steam Boiler Array:** a footprint 3 to 7 by 3 to 9 in any combination, 3 to 12 tall.
   - **Steam Turbine Array:** a cross-section 3 to 7 wide and 3 to 9 tall in any combination, 3 to 15 long, along either
@@ -133,6 +163,8 @@ number and date.
 
 ### Changed
 
+- **Loam grows saplings twice as fast** (`farming.loam.saplingGrowthMultiplier`, 2.0), and a tree grown on Loam leaves
+  the Loam under its trunk instead of turning it to dirt, so a Tree Cutter's area can be laid in Loam.
 - **Gas Turbine Array exhaust:** "Venting to air" now says how much is vented ("Venting 2,420 HU/t to air"), in the
   GUI and in Jade, so a partly undersized heat sink shows how far short it falls.
 - **Steam Boiler Array in Jade:** shows the heat it boils with against its maximum ("Heat use 3.2k / 3.2k HU/t"), in
@@ -159,6 +191,10 @@ number and date.
 
 ### Fixed
 
+- **Item conduits no longer pull out items their filters reject.** With nowhere to send an item, a network stored it
+  in the conduit to wait for room, even when every destination's filter refused it, so a filtered line emptied the
+  machine of everything else (a Tree Cutter's saplings, leaves and sticks). Those items now stay in the machine;
+  items with no destination connected yet are still held as before.
 - **Battery Array screen:** hovering the FE gauge shows the FE stored and the fill percentage again, like the Energy
   Cell, instead of JEI's "Show all recipes" (the battery components stay listed under the controller and casing in JEI),
   and the status LED next to the status line no longer shows a missing texture.

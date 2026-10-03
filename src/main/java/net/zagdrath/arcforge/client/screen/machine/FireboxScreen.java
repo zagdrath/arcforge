@@ -41,7 +41,11 @@ public class FireboxScreen extends MachineScreen<BurnerMenu> {
 
     @Override
     protected Component sideModeName(SideMode mode) {
-        return mode == SideMode.HEAT ? sideModeName("heat_output") : super.sideModeName(mode);
+        return switch (mode) {
+            case HEAT -> sideModeName("heat_output");
+            case GAS_OUTPUT -> sideModeName("flue_gas");
+            default -> super.sideModeName(mode);
+        };
     }
 
     @Override

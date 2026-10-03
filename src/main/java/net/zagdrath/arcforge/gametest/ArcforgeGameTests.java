@@ -66,6 +66,7 @@ public final class ArcforgeGameTests {
         TESTS.put("wrench_conduit", ConduitGameTests::wrenchConduit);
         TESTS.put("wrench_machine", ConduitGameTests::wrenchMachine);
         TESTS.put("conduit_filter_allowlist", ConduitGameTests::filterAllowlist);
+        TESTS.put("conduit_filter_rejected_stays_in_source", ConduitGameTests::filterRejectedStaysInSource);
         TESTS.put("conduit_filter_denylist", ConduitGameTests::filterDenylist);
         TESTS.put("conduit_filter_tag_match", ConduitGameTests::filterTagMatch);
         TESTS.put("conduit_filter_ignore_components", ConduitGameTests::filterIgnoreComponents);
@@ -229,6 +230,7 @@ public final class ArcforgeGameTests {
         TESTS.put("farming_compost_bin_by_hand", FarmingGameTests::compostBinByHand);
         TESTS.put("farming_compost_bin_recipe_wins", FarmingGameTests::compostBinRecipeWins);
         TESTS.put("farming_loam_tills", FarmingGameTests::loamTills);
+        TESTS.put("farming_loam_grows_saplings", FarmingGameTests::loamGrowsSaplings);
         TESTS.put("farming_fertilizers_add_nutrients", FarmingGameTests::fertilizersAddNutrients);
         TESTS.put("farming_growth_uses_nutrients", FarmingGameTests::growthUsesNutrients);
         TESTS.put("farming_irrigation_and_drying", FarmingGameTests::irrigationAndDrying);
@@ -288,6 +290,10 @@ public final class ArcforgeGameTests {
         TESTS.put("renewable_coal_recipes", RenewableCoalGameTests::recipes);
         TESTS.put("hydrothermal_makes_bio_coal", RenewableCoalGameTests::hydrothermalMakesBioCoal);
         TESTS.put("tree_cutter_plants_and_fells", RenewableCoalGameTests::treeCutterPlantsAndFells);
+        TESTS.put("carbon_capture_recipes", CarbonCaptureGameTests::recipes);
+        TESTS.put("carbon_reclaimer_balance", CarbonCaptureGameTests::reclaimerBalance);
+        TESTS.put("flue_gas", CarbonCaptureGameTests::flueGas);
+        TESTS.put("gasifier_makes_syngas", CarbonCaptureGameTests::gasifierMakesSyngas);
         TESTS.put("salt_recipes", SaltGameTests::recipes);
         TESTS.put("salt_tags", SaltGameTests::saltTags);
         TESTS.put("salt_reactor_makes_brine", SaltGameTests::reactorMakesBrine);
@@ -398,6 +404,7 @@ public final class ArcforgeGameTests {
         TESTS.put("carbonizer_big_forms", MultiblockGameTests::carbonizerBigForms);
         TESTS.put("carbonizer_mixed_sizes", MultiblockGameTests::carbonizerMixedSizes);
         LONG_TESTS.put("carbonizer_processes", MultiblockGameTests::carbonizerProcesses);
+        LONG_TESTS.put("fischer_tropsch_window", CarbonCaptureGameTests::fischerTropschWindow);
         LONG_TESTS.put("melter_magma_block", MeltingGameTests::magmaBlock);
         LONG_TESTS.put("fermenter_makes_ethanol", FermenterGameTests::makesEthanol);
         LONG_TESTS.put("closed_steam_loop", SteamCycleGameTests::closedSteamLoop);

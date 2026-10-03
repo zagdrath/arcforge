@@ -228,6 +228,9 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.GREENHOUSE.get(), GreenhouseScreen::new);
         event.register(ModMenuTypes.CHEMICAL_REACTOR.get(), ChemicalReactorScreen::new);
         event.register(ModMenuTypes.ELECTROLYZER.get(), ElectrolyzerScreen::new);
+        event.register(ModMenuTypes.CARBON_RECLAIMER.get(), net.zagdrath.arcforge.client.screen.machine.CarbonReclaimerScreen::new);
+        event.register(ModMenuTypes.GASIFIER.get(), net.zagdrath.arcforge.client.screen.machine.GasifierScreen::new);
+        event.register(ModMenuTypes.FISCHER_TROPSCH_REACTOR.get(), net.zagdrath.arcforge.client.screen.machine.FischerTropschReactorScreen::new);
         event.register(ModMenuTypes.ASSEMBLER.get(), AssemblerScreen::new);
         event.register(ModMenuTypes.BLOCK_BREAKER.get(), BlockBreakerScreen::new);
         event.register(ModMenuTypes.TREE_CUTTER.get(), net.zagdrath.arcforge.client.screen.machine.TreeCutterScreen::new);
@@ -324,6 +327,7 @@ public class ArcforgeClient {
         event.register(gasModel(BIOGAS_TINT), ModFluids.BIOGAS, ModFluids.FLOWING_BIOGAS);
         event.register(gasModel(CHLORINE_TINT), ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE);
         event.register(gasModel(ETHYLENE_TINT), ModFluids.ETHYLENE, ModFluids.FLOWING_ETHYLENE);
+        event.register(gasModel(SYNGAS_TINT), ModFluids.SYNGAS, ModFluids.FLOWING_SYNGAS);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -349,6 +353,8 @@ public class ArcforgeClient {
     public static final int CHLORINE_TINT = 0xFFBCD24A;
     // Ethylene: colourless, so a faint cool mint, paler than Hydrogen is white and greener than Oxygen.
     public static final int ETHYLENE_TINT = 0xFFD2EADA;
+    // Syngas: colourless too, so a warm pale tan, set apart from the cool gases and Biogas's olive.
+    public static final int SYNGAS_TINT = 0xFFE2CCA4;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(
@@ -394,6 +400,7 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(BIOGAS_TINT & 0xFFFFFF, 6.0F), ModFluids.BIOGAS_TYPE.get());
         event.registerFluidType(liquidFog(CHLORINE_TINT & 0xFFFFFF, 5.0F), ModFluids.CHLORINE_TYPE.get());
         event.registerFluidType(liquidFog(ETHYLENE_TINT & 0xFFFFFF, 6.0F), ModFluids.ETHYLENE_TYPE.get());
+        event.registerFluidType(liquidFog(SYNGAS_TINT & 0xFFFFFF, 6.0F), ModFluids.SYNGAS_TYPE.get());
         event.registerFluidType(liquidFog(0xE8E4D6, 2.0F), ModFluids.LATEX_TYPE.get());
         event.registerFluidType(liquidFog(0xB6F07A, 6.0F), ModFluids.LIQUID_EXPERIENCE_TYPE.get());
         event.registerFluidType(liquidFog(SEAWATER_TINT & 0xFFFFFF, 12.0F), ModFluids.SEAWATER_TYPE.get());

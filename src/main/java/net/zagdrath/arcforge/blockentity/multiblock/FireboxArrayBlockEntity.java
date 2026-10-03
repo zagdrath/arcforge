@@ -38,6 +38,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
@@ -66,6 +67,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModCapabilities;
+import net.zagdrath.arcforge.heat.FlueGas;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
@@ -83,13 +85,15 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 //  - It pauses while its buffer is as hot as the fuel burns (the Fuel Burner's rule), so heat isn't wasted.
 //  - Fed oxygen through an Oxygen port it burns on oxy-fuel (see OxyFuel): 300°C hotter (up to 1,600°C) and 1.25 times
 //    the heat from each item or mB, using oxygenPerThousandHeat mB for every 1,000 HU.
+//  - With a Gas Output port (named Flue Gas) it gives off Carbon Dioxide through it while burning carbon fuels, in
+//    proportion to the heat made (see FlueGas); with none, nothing changes.
 // It does IO only through its ports: fuel items, liquids and gases in (Input), oxygen in (Oxygen), heat out (Heat). The
 // controller also takes fuel from a held bucket. Clients get the box and whether it burns, for the renderer's fire.
 public class FireboxArrayBlockEntity extends MachineBlockEntity implements MultiblockController, FluidInteractable {
     public static final int SLOT_FUEL = 0;
     public static final int MACHINE_SLOTS = 1;
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OXYGEN, SideMode.HEAT);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OXYGEN, SideMode.HEAT, SideMode.GAS_OUTPUT);
     private static final int REDSTONE_CHECK_INTERVAL = 10;
     // How often it rechecks its box anyway (something placed inside it breaks it).
     private static final int STRUCTURE_CHECK_INTERVAL = 40;
@@ -114,6 +118,8 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
     private final OxyFuel oxy;
     private final ContainerData data;
     private final List<BlockCapabilityCache<HeatHandler, @Nullable Direction>> heatTargets = new ArrayList<>();
+    private final List<BlockCapabilityCache<ResourceHandler<FluidResource>, @Nullable Direction>> flueTargets = new ArrayList<>();
+    private final FlueGas flue;
     private boolean targetsDirty = true;
 
     // The solid fuel burning: its heat left (unmultiplied HU), its whole heat, its temperature and the item.
@@ -145,6 +151,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         this.fuelInput = new AutomationResourceHandler<>(tank, index -> true, index -> false);
         this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_FUEL, slot -> false);
         this.oxy = new OxyFuel(ArcforgeConfig.FIREBOX_ARRAY_OXYGEN_TANK_PER_BLOCK.getAsInt() * volume, () -> oxygenRate, this::setChanged);
+        this.flue = new FlueGas(ArcforgeConfig.FLUE_GAS_ARRAY_TANK_CAPACITY.getAsInt(), this::setChanged);
         this.data = new WideIntContainerData(FireboxArrayMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -373,7 +380,11 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
             heat.setProducing(false);
             oxy.idle();
         }
+        if (heatPerTick <= 0) {
+            flue.idle();
+        }
         pushHeat(level);
+        flue.pushTo(flueTargets);
         setRunning(heatPerTick > 0);
         if (oxy.isActive() && level.getGameTime() % 20 == 0) {
             ArcforgeAdvancements.oxyFuel(this, heat.getTemperature());
@@ -419,6 +430,8 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         oxygenRate = want / 1000.0 * ArcforgeConfig.FIREBOX_ARRAY_OXYGEN_PER_THOUSAND_HU.getAsDouble();
         double multiplier = oxyReady && oxy.burn() ? OxyFuel.heatMultiplier() : 1.0;
         int made;
+        // Whether what burns this tick is a carbon fuel, for the flue (the item before it can burn out).
+        boolean carbon = solid || liquid == null ? FlueGas.isCarbonFuel(burning) : FlueGas.isCarbonFuel(tank.getResource(0).getFluid());
         if (solid || liquid == null) {
             made = (int) Math.min(want, Math.floor(solidLeft * multiplier));
             if (made <= 0 && solidLeft > 0) {
@@ -447,6 +460,11 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
             made = (int) Math.min(want, Math.round(burnt * liquid.huPerMb() * multiplier));
         }
         heatPerTick = heat.add(made);
+        if (heatPerTick > 0 && !flueTargets.isEmpty()) {
+            flue.emit(heatPerTick, carbon);
+        } else {
+            flue.idle();
+        }
         setChanged();
         return heatPerTick <= 0 ? MachineStatus.NO_FUEL : oxy.isActive() ? MachineStatus.OXY_FUEL : MachineStatus.BURNING;
     }
@@ -489,6 +507,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
     private void refreshTargets(ServerLevel level) {
         targetsDirty = false;
         heatTargets.clear();
+        flueTargets.clear();
         if (box == null) {
             return;
         }
@@ -499,6 +518,8 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
             for (Direction side : Direction.values()) {
                 if (faceMode(pos, side) == SideMode.HEAT) {
                     heatTargets.add(BlockCapabilityCache.create(ModCapabilities.HEAT, level, pos.relative(side).immutable(), side.getOpposite()));
+                } else if (faceMode(pos, side) == SideMode.GAS_OUTPUT) {
+                    flueTargets.add(BlockCapabilityCache.create(Capabilities.Fluid.BLOCK, level, pos.relative(side).immutable(), side.getOpposite()));
                 }
             }
         }
@@ -537,6 +558,10 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
 
     public OxyFuel getOxyFuel() {
         return oxy;
+    }
+
+    public FlueGas getFlue() {
+        return flue;
     }
 
     public int getHeatPerTick() {
@@ -600,6 +625,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         return switch (mode) {
             case INPUT -> fuelInput;
             case OXYGEN -> oxy.getInput();
+            case GAS_OUTPUT -> flue.getOutput();
             default -> null;
         };
     }
@@ -622,7 +648,8 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         return switch (type) {
             case ITEM, FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             // Pressurized Conduits bring gas fuels to Input ports and oxygen to Oxygen ports.
-            case GAS -> mode == SideMode.INPUT || mode == SideMode.OXYGEN ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case GAS -> mode == SideMode.INPUT || mode == SideMode.OXYGEN ? ConnectionMode.INPUT
+                    : mode == SideMode.GAS_OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> ConnectionMode.NONE;
         };
@@ -653,6 +680,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         heat.deserialize(in);
         tank.deserialize(in.childOrEmpty("tank"));
         oxy.load(in);
+        flue.load(in);
         solidLeft = in.getDoubleOr("solid_left", 0.0);
         solidTotal = in.getIntOr("solid_total", 0);
         solidCelsius = in.getIntOr("solid_celsius", 0);
@@ -675,6 +703,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         heat.serialize(out);
         tank.serialize(out.child("tank"));
         oxy.save(out);
+        flue.save(out);
         out.putDouble("solid_left", solidLeft);
         out.putInt("solid_total", solidTotal);
         out.putInt("solid_celsius", solidCelsius);

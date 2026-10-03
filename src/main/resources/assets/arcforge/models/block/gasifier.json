@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/gasifier_front",
+    "south": "arcforge:block/gasifier_back",
+    "east": "arcforge:block/gasifier_left",
+    "west": "arcforge:block/gasifier_right",
+    "up": "arcforge:block/gasifier_top",
+    "down": "arcforge:block/gasifier_bottom",
+    "particle": "arcforge:block/gasifier_back"
+  }
+}

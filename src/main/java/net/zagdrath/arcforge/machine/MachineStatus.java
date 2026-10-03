@@ -123,7 +123,13 @@ public enum MachineStatus {
     FELLING("felling", "led_running"),
     PLANTING("planting", "led_running"),
     GROWING_TREES("growing_trees", "led_idle"),
-    NO_SAPLINGS("no_saplings", "led_idle");
+    NO_SAPLINGS("no_saplings", "led_idle"),
+    // Carbon capture: the Carbon Reclaimer at work, the Gasifier at work (NO_STEAM without steam, TOO_COLD under 800°C),
+    // and the Fischer-Tropsch Reactor without iron or nickel dust in its catalyst slot (it shows SYNTHESIZING at work,
+    // TOO_COLD under 200°C and TOO_HOT over 350°C).
+    RECLAIMING("reclaiming", "led_running"),
+    GASIFYING("gasifying", "led_running"),
+    NO_CATALYST("no_catalyst", "led_blocked");
 
     private final String name;
     private final String led;

@@ -40,7 +40,8 @@ It only ever flows from a hotter machine into a colder one.
 | Thermoelectric Plant | FE from heat | 20,000 HU + 50,000 FE | 1,100°C | Takes up to 80 HU/t |
 
 - **Fuel** for the Combustion Plant and Firebox is `#arcforge:combustion_fuel` (coal,
-  charcoal, blocks of coal, Bio-Coal and its block). Both pause while their buffer is full, keeping the rest of the burning item.
+  charcoal, blocks of coal, Bio-Coal and its block). A Flue Gas face collects their Carbon Dioxide (see Carbon
+  capture). Both pause while their buffer is full, keeping the rest of the burning item.
 - **Geothermal Plant:** fill its 8,000 mB lava tank with lava buckets in the slot, by right-clicking
   with a bucket, or by piping lava into an input face. Touching lava source blocks add 40 HU/t each and
   magma blocks 16 HU/t each (all six sides count), even with an empty tank; they're never used up. It makes
@@ -479,6 +480,40 @@ Casing. Plastic Sheet comes from Light Oil and Hydrogen, or from Ethylene (bio-p
 Ethanol over a little Sulfuric Acid, with its Water going to the reactor's by-product tank (By-product faces). **PVC
 Sheet** (Ethylene and Chlorine) also lines the Hardened and Arcforged Fluid Conduits and the Arcforged Fluid Tank.
 
+### Carbon capture and Syngas
+
+```
+burner + Flue Gas face --> 4 mB Carbon Dioxide per 1,000 HU from carbon fuels (none from Hydrogen)
+250 mB Carbon Dioxide + 500 mB Hydrogen --[Carbon Reclaimer, 800,000 FE or more]--> Carbon Dust + 250 mB Water
+coal / charcoal / Bio-Coal + 500 mB Steam --[Gasifier, 800°C+, 16,000 HU]--> 1,000 mB Syngas (+ Wood Ash 25%)
+Coal Coke --> 1,500 mB Syngas; 4 biomass --> 250 mB Syngas
+1,000 mB Syngas --[Fischer-Tropsch Reactor, 200-350°C, iron/nickel catalyst]--> 30 Naphtha + 50 Light Oil + 50 Heavy Oil + 200 Water (mB)
+```
+
+**Flue gas.** The Combustion Plant, Firebox and Fuel Burner have a Flue Gas side mode (the Gas Output mode), and the
+Firebox Array and Gas Turbine Array a Gas Output port. While one is set and the burner burns a carbon fuel
+(`#arcforge:carbon_fuels`, items and fluids), Carbon Dioxide comes out of it in proportion to the heat made
+(`power.flueGas.carbonDioxidePerThousandHu`, 4; the Combustion Plant counts `combustionPlantHuPerFe`, 2, HU per FE).
+What nothing takes is vented, and with no such face the burner works as it always did.
+
+**Carbon Reclaimer.** Carbon Dioxide and Hydrogen back into Carbon Dust and Water with FE (`arcforge:carbon_reclaiming`;
+amounts and energy default to `machines.carbonReclaimer`). Like the Electrolyzer it never charges less than
+`balanceSafetyFactor` (1.25) times the most FE what it makes could give back: the Carbon Dust burnt in a fully upgraded
+burner on oxy-fuel, or baked into Coal Coke, or gasified into Syngas, and that turned into FE by the best route. It renews
+carbon, never energy. Gases in on top, dust and Water out underneath, FE at the back; Speed and Energy upgrades.
+
+**Gasifier.** A single-block heat machine (HU, no FE), only at 800°C or hotter: a fuel and Steam into Syngas, with a
+chance of Wood Ash (`arcforge:gasifying`; steam, heat, time and ash chance default to `machines.gasifier`). Fuel and
+Steam in on top, ash out underneath, Syngas out of the right, heat at the back; Speed and Heat upgrades. **Syngas** burns
+in the Fuel Burner, Firebox Array and Gas Turbine Array: 50 HU per mB, up to 1,150°C.
+
+**Fischer-Tropsch Reactor.** Syngas into Naphtha, Light Oil, Heavy Oil and Water with FE and heat
+(`arcforge:fischer_tropsch`), only between `minTemperature` (200°C) and `maxOperatingTemperature` (350°C). With
+`thermostat` on its heat faces stop taking heat at 350°C; hotter, it stops and sheds `coolingPerTick` HU/t until it's
+back in its window. Iron Dust in the catalyst slot lasts `ironCatalystOperations` (16) batches, Nickel Dust
+`nickelCatalystOperations` (32). Syngas and the catalyst in on top, heat underneath, every product out of the left, FE at
+the back; each product also has its own side mode. Speed and Energy upgrades.
+
 ### Salt and chlor-alkali
 
 ```
@@ -744,7 +779,7 @@ Speed, Energy, Heat, Thermoelectric Efficiency and Range upgrade cards go in a m
 | Upgrade | Effect (n installed) | Machines |
 |---|---|---|
 | Speed | Works 2^(n/2) times as fast (16x at 8), using power or fuel just as fast, so the cost per operation doesn't change | All with an Upgrades tab |
-| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Metal Press, Metal Pressing Array, Electric Pump, Combustion Plant, Tree Cutter |
+| Energy | FE per operation x 0.8^n (17% at 8); Combustion Plant: FE per fuel x (1 + n/8) | Arc Crusher, Arc Crushing Array, Metal Press, Metal Pressing Array, Electric Pump, Combustion Plant, Tree Cutter, Carbon Reclaimer, Fischer-Tropsch Reactor |
 | Heat | Heat per fuel or lava (and from nearby lava and magma) x (1 + n/8); Thermoelectric Plant: efficiency / 0.8^n, up to 100% | Firebox, Geothermal Plant, Thermoelectric Plant |
 | Thermoelectric Efficiency | FE per HU x (1 + 0.0625 n) (+50% at 8), on top of Heat upgrades | Thermoelectric Plant |
 | Range | Area radius + n (5×5 becomes 21×21 at 8) | Tree Cutter |

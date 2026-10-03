@@ -18,7 +18,7 @@
     },
     {
       "type": "text",
-      "text": "# Combined cycle\nSet a heat port on the exhaust end. It gives off a quarter of the fuel's heat at half its burn temperature (Naphtha: 600°C). Put a Steam Boiler Array against it and run the steam through a Steam Turbine Array: together they make about 2× what a Fuel Burner would.\nUnused exhaust vents into the air.\n# Throttle\nSet the Redstone tab to Throttle: signal 1–15 runs fuel flow from 7% to 100%. Throttle mode reads the signal strength; a Throttle Lever sets it directly. If the fuel runs out it flames out, then relights 1 second after fuel returns."
+      "text": "# Combined cycle\nSet a heat port on the exhaust end. It gives off a quarter of the fuel's heat at half its burn temperature (Naphtha: 600°C). Put a Steam Boiler Array against it and run the steam through a Steam Turbine Array: together they make about 2× what a Fuel Burner would.\nUnused exhaust vents into the air.\n# Throttle\nSet the Redstone tab to Throttle: signal 1–15 runs fuel flow from 7% to 100%. Throttle mode reads the signal strength; a Throttle Lever sets it directly. If the fuel runs out it flames out, then relights 1 second after fuel returns.\nA Gas Output port (named Flue Gas) gives off Carbon Dioxide while it burns carbon fuels: see Carbon Capture."
     },
     {
       "type": "multiblock",

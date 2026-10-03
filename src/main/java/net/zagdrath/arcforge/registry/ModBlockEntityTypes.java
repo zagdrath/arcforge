@@ -211,6 +211,15 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(ChemicalReactorBlockEntity::new, ModBlocks.CHEMICAL_REACTOR.get()));
     public static final Supplier<BlockEntityType<ElectrolyzerBlockEntity>> ELECTROLYZER = BLOCK_ENTITY_TYPES.register("electrolyzer",
             () -> new BlockEntityType<>(ElectrolyzerBlockEntity::new, ModBlocks.ELECTROLYZER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity>> CARBON_RECLAIMER =
+            BLOCK_ENTITY_TYPES.register("carbon_reclaimer", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity::new, ModBlocks.CARBON_RECLAIMER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.GasifierBlockEntity>> GASIFIER =
+            BLOCK_ENTITY_TYPES.register("gasifier", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.GasifierBlockEntity::new, ModBlocks.GASIFIER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity>> FISCHER_TROPSCH_REACTOR =
+            BLOCK_ENTITY_TYPES.register("fischer_tropsch_reactor", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity::new, ModBlocks.FISCHER_TROPSCH_REACTOR.get()));
     public static final Supplier<BlockEntityType<AssemblerBlockEntity>> ASSEMBLER = BLOCK_ENTITY_TYPES.register("assembler",
             () -> new BlockEntityType<>(AssemblerBlockEntity::new, ModBlocks.ASSEMBLER.get()));
     public static final Supplier<BlockEntityType<BlockBreakerBlockEntity>> BLOCK_BREAKER = BLOCK_ENTITY_TYPES.register("block_breaker",

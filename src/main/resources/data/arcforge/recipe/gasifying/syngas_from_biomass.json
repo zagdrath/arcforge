@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:gasifying",
+  "ingredient": "#arcforge:biomass",
+  "count": 4,
+  "result": {
+    "id": "arcforge:syngas",
+    "amount": 250
+  },
+  "ash": {
+    "id": "arcforge:wood_ash"
+  }
+}

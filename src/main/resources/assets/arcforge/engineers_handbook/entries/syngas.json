@@ -1,0 +1,18 @@
+{
+  "title": "Syngas",
+  "icon": "arcforge:gasifier",
+  "items": [
+    "arcforge:gasifier",
+    "arcforge:fischer_tropsch_reactor"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The Gasifier turns solid carbon and Steam into Syngas, with heat (HU, no FE), and only at 800°C or hotter.\n- A coal, charcoal or Bio-Coal + 500 mB Steam make 1,000 mB Syngas; Coal Coke 1,500 mB; 4 biomass 250 mB. Each takes 16,000 HU over 10 seconds and leaves Wood Ash a quarter of the time.\n- Fuel and Steam in on top, ash out underneath, Syngas out of the right, heat at the back.\n- Syngas burns in the Fuel Burner, Firebox Array and Gas Turbine Array (50 HU per mB, up to 1,150°C)."
+    },
+    {
+      "type": "text",
+      "text": "The Fischer-Tropsch Reactor builds Syngas up into liquid fuels with FE and heat: 1,000 mB Syngas make 30 mB Naphtha, 50 mB Light Oil, 50 mB Heavy Oil and 200 mB Water.\n- It only works between 200°C and 350°C. Its heat faces take heat only up to 350°C (a thermostat, in the config).\n- A catalyst goes in its catalyst slot: Iron Dust lasts 16 batches, Nickel Dust 32.\n- Each product has its own face mode (Naphtha, Light Oil, Heavy Oil, Water); Output faces give out all four.\n- Speed and Energy upgrades."
+    }
+  ]
+}

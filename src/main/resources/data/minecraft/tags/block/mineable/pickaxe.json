@@ -167,6 +167,9 @@
     "arcforge:arcforged_power_regulator",
     "arcforge:bio_coal_block",
     "arcforge:tree_cutter",
-    "arcforge:hydrothermal_carbonizer"
+    "arcforge:hydrothermal_carbonizer",
+    "arcforge:carbon_reclaimer",
+    "arcforge:gasifier",
+    "arcforge:fischer_tropsch_reactor"
   ]
 }

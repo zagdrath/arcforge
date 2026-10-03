@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NKN",
+    "TWT",
+    "NEN"
+  ],
+  "key": {
+    "N": "#c:plates/nickel",
+    "K": "arcforge:thermocouple",
+    "T": "arcforge:wrought_fluid_tank",
+    "W": "arcforge:wrought_pressurized_cylinder",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:fischer_tropsch_reactor",
+    "count": 1
+  }
+}

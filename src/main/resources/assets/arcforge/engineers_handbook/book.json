@@ -66,6 +66,8 @@
         "arc_melter",
         "chemical_processing",
         "electrolyzer",
+        "carbon_capture",
+        "syngas",
         "chlor_alkali",
         "bio_plastics",
         "thermal_evaporator",

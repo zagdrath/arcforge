@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:gasifying",
+  "ingredient": "arcforge:coal_coke",
+  "result": {
+    "id": "arcforge:syngas",
+    "amount": 1500
+  },
+  "ash": {
+    "id": "arcforge:wood_ash"
+  }
+}

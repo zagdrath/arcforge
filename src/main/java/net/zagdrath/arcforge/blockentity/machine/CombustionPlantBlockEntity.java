@@ -21,7 +21,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -38,7 +40,7 @@ import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 // coal that a Firebox feeding a hot Thermoelectric Plant gets. Fuel burns at twice furnace speed.
 public class CombustionPlantBlockEntity extends BurnerBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.GAS_OUTPUT);
 
     private final GeneratorEnergyHandler energy;
 
@@ -70,6 +72,13 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
                 * UpgradeType.outputMultiplier(upgrades(UpgradeType.ENERGY)));
     }
 
+    // It makes FE, not heat: each FE counts as flueGas.combustionPlantHuPerFe HU (2: a coal gives the same Carbon Dioxide
+    // as in a Firebox).
+    @Override
+    protected double flueHeat(int produced) {
+        return produced * ArcforgeConfig.FLUE_GAS_COMBUSTION_PLANT_HU_PER_FE.getAsDouble();
+    }
+
     @Override
     protected boolean isBufferFull() {
         return energy.isFull();
@@ -96,13 +105,20 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
         return mode == null || mode == SideMode.ENERGY ? energy : null;
     }
 
+    // Flue Gas faces (and unsided queries) give out the flue gas; nothing else is a fluid.
+    public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
+        SideMode mode = modeFor(side);
+        return mode == null ? flue.getOutput() : flueHandler(mode);
+    }
+
     @Override
     public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
         SideMode mode = modeFor(side);
         return switch (type) {
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
+            case GAS -> mode == SideMode.GAS_OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case FLUID, THERMAL -> ConnectionMode.NONE;
         };
     }
 

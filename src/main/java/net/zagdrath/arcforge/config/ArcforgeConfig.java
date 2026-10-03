@@ -188,6 +188,39 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Flue gas: the Combustion Plant, Firebox, Fuel Burner, Firebox Array and Gas Turbine Array give off Carbon Dioxide",
+                "through a Flue Gas face (or port) while they burn carbon fuels (#arcforge:carbon_fuels, items and fluids), in",
+                "proportion to the heat they make. Hydrogen gives none. With no Flue Gas face set, nothing changes. What isn't",
+                "taken away when the flue tank is full is vented.").push("flueGas");
+    }
+
+    public static final ModConfigSpec.DoubleValue FLUE_GAS_PER_THOUSAND_HU = BUILDER
+            .comment("mB of Carbon Dioxide per 1,000 HU made from a carbon fuel (4: a coal in a Firebox gives 256 mB).")
+            .defineInRange("carbonDioxidePerThousandHu", 4.0, 0.0, 1_000.0);
+
+    public static final ModConfigSpec.DoubleValue FLUE_GAS_COMBUSTION_PLANT_HU_PER_FE = BUILDER
+            .comment("The Combustion Plant makes FE, not heat: each FE counts as this much heat (2: a coal gives the same",
+                    "Carbon Dioxide as in a Firebox).")
+            .defineInRange("combustionPlantHuPerFe", 2.0, 0.0, 100.0);
+
+    public static final ModConfigSpec.IntValue FLUE_GAS_TANK_CAPACITY = BUILDER
+            .comment("Flue gas tank size in mB on the single-block burners.")
+            .defineInRange("tankCapacity", 4_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FLUE_GAS_ARRAY_TANK_CAPACITY = BUILDER
+            .comment("Flue gas tank size in mB on the Firebox Array and Gas Turbine Array.")
+            .defineInRange("arrayTankCapacity", 32_000, 100, 10_000_000);
+
+    public static final ModConfigSpec.IntValue FLUE_GAS_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t a single-block burner pushes out of its Flue Gas faces (shared across them). The arrays push",
+                    "out what they hold.")
+            .defineInRange("outputRate", 400, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Firebox Array: a hollow box 3 to 7 by 3 to 9 across and 3 to 5 tall that burns solid fuels",
                 "(#arcforge:combustion_fuel, and Coal Coke) and Fuel Burner fuels (arcforge:burner_fuels) into heat (HU). Each item",
                 "or mB gives the heat it gives in a Firebox or Fuel Burner (without upgrades); values marked per block scale with",
@@ -952,6 +985,185 @@ public class ArcforgeConfig {
             .comment("Least FE an operation costs, as a multiple of the most FE its products can give back when burnt in the",
                     "best setup (1.25: always at least 25% more). Never below 1.0.")
             .defineInRange("balanceSafetyFactor", 1.25, 1.0, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Carbon Reclaimer: Carbon Dioxide + Hydrogen -> Carbon Dust + Water, with FE. Recipes are data-driven",
+                "(arcforge:carbon_reclaiming); a recipe may set its own amounts and energy, otherwise these apply. Whatever the",
+                "settings, an operation never costs less than balanceSafetyFactor times the most FE its Carbon Dust can give back",
+                "(burnt, or carbonized or gasified first; see EnergyBalance), so it renews carbon, never energy.").push("carbonReclaimer");
+    }
+
+    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 400_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue RECLAIMER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in. Keep it at 16x energyPerTick or more, so 8 Speed upgrades can run flat out.")
+            .defineInRange("maxEnergyInput", 64_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while working, before Speed upgrades. With the FE per operation this sets the time.")
+            .defineInRange("energyPerTick", 4_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_PER_OPERATION = BUILDER
+            .comment("FE per Carbon Dust, before Energy upgrades (raised to the balance floor if lower: a Carbon Dust bakes into Coal",
+                    "Coke, which gasifies into Syngas, so the floor is high).")
+            .defineInRange("energyPerOperation", 800_000, 1, 100_000_000);
+
+    public static final ModConfigSpec.IntValue RECLAIMER_CARBON_DIOXIDE = BUILDER
+            .comment("mB of Carbon Dioxide per operation.")
+            .defineInRange("carbonDioxidePerOperation", 250, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue RECLAIMER_HYDROGEN = BUILDER
+            .comment("mB of Hydrogen per operation.")
+            .defineInRange("hydrogenPerOperation", 500, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue RECLAIMER_WATER = BUILDER
+            .comment("mB of Water made per operation.")
+            .defineInRange("waterPerOperation", 250, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue RECLAIMER_TANK_CAPACITY = BUILDER
+            .comment("Carbon Dioxide, Hydrogen and Water tank sizes in mB (each).")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue RECLAIMER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of Water it pushes out of its Output faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue RECLAIMER_BALANCE_SAFETY_FACTOR = BUILDER
+            .comment("Least FE an operation costs, as a multiple of the most FE its Carbon Dust can give back in the best",
+                    "setup (1.25: always at least 25% more). Never below 1.0.")
+            .defineInRange("balanceSafetyFactor", 1.25, 1.0, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Gasifier: biomass, Bio-Coal, coal, charcoal or Coal Coke + Steam -> Syngas + Wood Ash, with heat. Recipes",
+                "are data-driven (arcforge:gasifying: the input, how many, and the Syngas made); steam, heat and time follow",
+                "these unless a recipe sets them.").push("gasifier");
+    }
+
+    public static final ModConfigSpec.IntValue GASIFIER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 60_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue GASIFIER_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full buffer.")
+            .defineInRange("maxTemperature", 1_400, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue GASIFIER_MIN_TEMPERATURE = BUILDER
+            .comment("It only works at this °C or hotter.")
+            .defineInRange("minTemperature", 800, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue GASIFIER_HEAT_PER_OPERATION = BUILDER
+            .comment("HU per operation, before Heat upgrades.")
+            .defineInRange("heatPerOperation", 16_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue GASIFIER_TIME = BUILDER
+            .comment("Ticks per operation, before Speed upgrades.")
+            .defineInRange("time", 200, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue GASIFIER_STEAM = BUILDER
+            .comment("mB of Steam per operation.")
+            .defineInRange("steamPerOperation", 500, 0, 100_000);
+
+    public static final ModConfigSpec.DoubleValue GASIFIER_ASH_CHANCE = BUILDER
+            .comment("Chance of a Wood Ash per operation.")
+            .defineInRange("ashChance", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue GASIFIER_STEAM_CAPACITY = BUILDER
+            .comment("Steam tank size in mB.")
+            .defineInRange("steamTankCapacity", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GASIFIER_SYNGAS_CAPACITY = BUILDER
+            .comment("Syngas tank size in mB.")
+            .defineInRange("syngasTankCapacity", 16_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GASIFIER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of Syngas it pushes out of its Gas Output faces.")
+            .defineInRange("gasOutputRate", 1_000, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Fischer-Tropsch Reactor: Syngas -> Naphtha, Light Oil and Heavy Oil, plus Water, with FE and heat, between",
+                "minTemperature and maxOperatingTemperature (too hot or too cold, it stops). Recipes are data-driven",
+                "(arcforge:fischer_tropsch: the Syngas used and the products); FE, heat and time follow these unless a recipe sets",
+                "them. A catalyst dust in its catalyst slot is used up one every so many operations.").push("fischerTropschReactor");
+    }
+
+    public static final ModConfigSpec.IntValue FT_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue FT_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 4_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue FT_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while working, before Speed and Energy upgrades.")
+            .defineInRange("energyPerTick", 80, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FT_HEAT_PER_TICK = BUILDER
+            .comment("HU/t while working, before Speed upgrades.")
+            .defineInRange("heatPerTick", 20, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FT_TIME = BUILDER
+            .comment("Ticks per operation, before Speed upgrades.")
+            .defineInRange("time", 200, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue FT_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 20_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue FT_BUFFER_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full buffer (it can be heated past the operating window, and then stops).")
+            .defineInRange("bufferMaxTemperature", 600, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue FT_MIN_TEMPERATURE = BUILDER
+            .comment("It only works at this °C or hotter.")
+            .defineInRange("minTemperature", 200, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue FT_MAX_TEMPERATURE = BUILDER
+            .comment("It stops above this °C.")
+            .defineInRange("maxOperatingTemperature", 350, 21, 10_000);
+
+    public static final ModConfigSpec.BooleanValue FT_THERMOSTAT = BUILDER
+            .comment("Whether its heat faces take heat only up to maxOperatingTemperature, so it can't be overheated. Set false",
+                    "to let hotter sources push it past its window: then it stops until it has cooled back into it.")
+            .define("thermostat", true);
+
+    public static final ModConfigSpec.IntValue FT_COOLING_PER_TICK = BUILDER
+            .comment("HU/t it sheds while hotter than maxOperatingTemperature.")
+            .defineInRange("coolingPerTick", 40, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FT_IRON_CATALYST_OPERATIONS = BUILDER
+            .comment("Operations one Iron Dust lasts as the catalyst.")
+            .defineInRange("ironCatalystOperations", 16, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue FT_NICKEL_CATALYST_OPERATIONS = BUILDER
+            .comment("Operations one Nickel Dust lasts as the catalyst (twice the iron by default).")
+            .defineInRange("nickelCatalystOperations", 32, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue FT_SYNGAS_CAPACITY = BUILDER
+            .comment("Syngas tank size in mB.")
+            .defineInRange("syngasTankCapacity", 16_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FT_PRODUCT_CAPACITY = BUILDER
+            .comment("Naphtha, Light Oil, Heavy Oil and Water tank sizes in mB (each).")
+            .defineInRange("productTankCapacity", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FT_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each product it pushes out of its faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
 
     static {
         BUILDER.pop();
@@ -1964,6 +2176,19 @@ public class ArcforgeConfig {
             .comment("Chance that burning one item of #arcforge:leaves_wood_ash (charcoal) in a Firebox or Combustion Plant",
                     "leaves a Wood Ash in its ash slot. A full ash slot loses it.")
             .defineInRange("woodAshChance", 0.5, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Loam (untilled).").push("loam");
+    }
+
+    public static final ModConfigSpec.DoubleValue LOAM_SAPLING_GROWTH_MULTIPLIER = BUILDER
+            .comment("How much faster a sapling grows on Loam (2.0 = twice as fast; 1.0 = no faster). Each random tick the Loam",
+                    "gets gives the sapling (multiplier - 1) more: whole units for sure, the rest as a chance.")
+            .defineInRange("saplingGrowthMultiplier", 2.0, 1.0, 5.0);
 
     static {
         BUILDER.pop();

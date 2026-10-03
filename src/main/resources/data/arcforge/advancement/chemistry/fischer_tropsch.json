@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/syngas",
+  "display": {
+    "icon": {
+      "id": "arcforge:fischer_tropsch_reactor"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.fischer_tropsch.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.fischer_tropsch.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "fischer_tropsch"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

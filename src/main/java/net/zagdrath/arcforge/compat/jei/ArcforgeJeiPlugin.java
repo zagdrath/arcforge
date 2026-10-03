@@ -107,6 +107,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Drying(gui),
                 new MachineCategories.HydrothermalCarbonizing(gui),
                 new MachineCategories.TreeCutting(gui),
+                new MachineCategories.CarbonReclaiming(gui),
+                new MachineCategories.Gasifying(gui),
+                new MachineCategories.FischerTropsch(gui),
                 new MachineCategories.Vulcanizing(gui),
                 new MachineCategories.ResinTap(gui),
                 new MachineCategories.AirSeparating(gui),
@@ -143,6 +146,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.SeedExtracting.TYPE, recipes(ModRecipes.SEED_EXTRACTING.get()));
         registration.addRecipes(MachineCategories.Drying.TYPE, recipes(ModRecipes.DRYING.get()));
         registration.addRecipes(MachineCategories.HydrothermalCarbonizing.TYPE, recipes(ModRecipes.HYDROTHERMAL_CARBONIZING.get()));
+        registration.addRecipes(MachineCategories.CarbonReclaiming.TYPE, recipes(ModRecipes.CARBON_RECLAIMING.get()));
+        registration.addRecipes(MachineCategories.Gasifying.TYPE, recipes(ModRecipes.GASIFYING.get()));
+        registration.addRecipes(MachineCategories.FischerTropsch.TYPE, recipes(ModRecipes.FISCHER_TROPSCH.get()));
         // Every sapling; its log and leaves found by name (oak_sapling: oak_log, oak_leaves), where they exist.
         List<MachineCategories.TreeCuttingRecipe> trees = new ArrayList<>();
         BuiltInRegistries.ITEM.listElements().forEach(holder -> {
@@ -241,6 +247,12 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 MachineCategories.HydrothermalCarbonizing.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.VulcanizerScreen.class, 68, 35, ARROW_W, ARROW_H,
                 MachineCategories.Vulcanizing.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.CarbonReclaimerScreen.class, 68, 35, ARROW_W, ARROW_H,
+                MachineCategories.CarbonReclaiming.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.GasifierScreen.class, 68, 35, ARROW_W, ARROW_H,
+                MachineCategories.Gasifying.TYPE);
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.FischerTropschReactorScreen.class, 64, 35, ARROW_W, ARROW_H,
+                MachineCategories.FischerTropsch.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen.class, 114, 35, ARROW_W, ARROW_H,
                 MachineCategories.AirSeparating.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen.class, 81, 35, ARROW_W, ARROW_H,
@@ -294,6 +306,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Drying.TYPE, ModBlocks.GRAIN_DRYER.get());
         registration.addCraftingStation(MachineCategories.HydrothermalCarbonizing.TYPE, ModBlocks.HYDROTHERMAL_CARBONIZER.get());
         registration.addCraftingStation(MachineCategories.TreeCutting.TYPE, ModBlocks.TREE_CUTTER.get());
+        registration.addCraftingStation(MachineCategories.CarbonReclaiming.TYPE, ModBlocks.CARBON_RECLAIMER.get());
+        registration.addCraftingStation(MachineCategories.Gasifying.TYPE, ModBlocks.GASIFIER.get());
+        registration.addCraftingStation(MachineCategories.FischerTropsch.TYPE, ModBlocks.FISCHER_TROPSCH_REACTOR.get());
         registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
         registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());
         registration.addCraftingStation(MachineCategories.AirSeparating.TYPE, ModBlocks.AIR_SEPARATOR.get());

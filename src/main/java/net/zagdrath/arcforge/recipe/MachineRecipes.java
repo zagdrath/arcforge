@@ -283,6 +283,43 @@ public final class MachineRecipes {
         return !stack.isEmpty() && hydrothermalCarbonizing(level, stack).isPresent();
     }
 
+    // --- Carbon capture ---
+
+    // The first Carbon Reclaimer recipe the two gas tanks (mB of Carbon Dioxide and Hydrogen) can supply.
+    public static Optional<RecipeHolder<CarbonReclaimingRecipe>> carbonReclaiming(@Nullable Level level, CarbonReclaimingRecipe.Input input) {
+        return recipes(level).byType(ModRecipes.CARBON_RECLAIMING.get()).stream()
+                .filter(holder -> holder.value().matches(input, level))
+                .findFirst();
+    }
+
+    // The first Carbon Reclaimer recipe, whether or not the tanks can supply it (for the GUI's floor while idle).
+    public static Optional<RecipeHolder<CarbonReclaimingRecipe>> anyCarbonReclaiming(@Nullable Level level) {
+        return recipes(level).byType(ModRecipes.CARBON_RECLAIMING.get()).stream().findFirst();
+    }
+
+    public static Optional<RecipeHolder<GasifyingRecipe>> gasifying(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.GASIFYING.get()).stream()
+                .filter(holder -> holder.value().test(input))
+                .findFirst();
+    }
+
+    public static boolean isGasifierInput(@Nullable Level level, ItemStack stack) {
+        return !stack.isEmpty() && gasifying(level, stack).isPresent();
+    }
+
+    // The Fischer-Tropsch recipe the Syngas tank can supply, if any.
+    public static Optional<RecipeHolder<FischerTropschRecipe>> fischerTropsch(@Nullable Level level, FischerTropschRecipe.Input input) {
+        return recipes(level).byType(ModRecipes.FISCHER_TROPSCH.get()).stream()
+                .filter(holder -> holder.value().matches(input, level))
+                .findFirst();
+    }
+
+    // Fluids some Fischer-Tropsch recipe takes: what the reactor's Syngas tank takes.
+    public static boolean isFischerTropschInput(@Nullable Level level, FluidResource fluid) {
+        return !fluid.isEmpty() && recipes(level).byType(ModRecipes.FISCHER_TROPSCH.get()).stream()
+                .anyMatch(holder -> holder.value().takes(fluid));
+    }
+
     // --- Vulcanizer ---
 
     // The vulcanizing recipe the two input slots can supply (either way round), if any.

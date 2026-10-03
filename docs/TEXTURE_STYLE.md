@@ -875,6 +875,42 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     heat track cut short of it; the heat buffer, tank, heat bar, min-temperature tick and LED sprites are the Grain
     Dryer's.
 
+## Carbon capture
+- **Faces from parts.** The three machines' plain and port faces are built, not hand-painted: the single-block casing (split
+  face, 1 px bevels, four rivets with their inward shadows) with the 8×8 port plate cut from `block/port/<mode>` (rows and
+  columns 0,1,2,3,6,7,8,9 of the 10×10) at x/y 4..11 on each face the default side configuration gives a mode, its 2×2
+  chip in the resource's tones (lit top-left, mid, mid, dark): Carbon Dioxide `#DCE2E8 #B4BCC4 #7E868E`, Carbon Dust
+  `#5A5E64 #3A3D42 #1E2023`, fuel (the item input brown) `#8A7A64 #4E3018 #2B1A0E`, ash `#B3AEA7 #86817C #55524E`, Syngas
+  `#F4E6CC #E2CCA4 #A8916A`, oils `#F2D27A #C8902A #7A5214`, FE `#FF8577 #E5483C #8E231C`. Plain sides are the Vulcanizer's
+  vented side; heat backs and bottoms are the Vulcanizer's and the Haber Reactor's heat faces.
+- **Carbon Reclaimer** (top input, bottom output, back FE, both sides vented): the front is a reaction window (recess
+  x3..12, y2..11) of Carbon Dioxide haze (`#7E868E` top two rows, `#6E767E` below) with a zig-zag heating coil across rows
+  5–6 (cold `#2B2F34` / `#16181B`) over a carbon bed (`#4A4E54` lit row, `#2A2C30` body, two `#1E2023` pits). `_on` is
+  4 frames (frametime 4): the coil in the Heat row (`#F26A16`, a `#FFB02E` glint stepping along) and two motes of carbon
+  falling onto the bed.
+- **Gasifier** (top input, bottom output, right Syngas, back heat, left vented): a gauge recess (x5..10, y2..5) over a
+  grated firebox door (recess x3..12, y6..12): furnace brick inside (`#2B211B` / `#3A2C23`), a cold fuel bed
+  (`#3E3A36` / `#2B2826`) on its bottom two rows, and two `#2B2F34` grate bars at x6 and x9. `_on` is 4 frames
+  (frametime 3): the box glows (`#7A1B0A` / `#C73A0E`), the bed burns (`#F26A16` with a `#FFB02E` ember stepping along),
+  three flame tips rise and fall between the bars, and the gauge needle turns orange.
+- **Fischer-Tropsch Reactor** (top input, bottom heat, left output, back FE, right vented): a tall window (recess x3..12,
+  y2..12) of warm Syngas haze (`#8A7E68` / `#76694F`) over three strata (Naphtha `#E8D68A`, Light Oil `#C8902A`, Heavy
+  Oil `#5A3A18`), with three 1 px catalyst tubes (x5, 8, 11) from a `#727982` cap down into them (`#959DA6` above the
+  strata, `#575D65` in them). `_on` is 4 frames (frametime 4): the tubes a step lighter and two Syngas bubbles
+  (`#F4E6CC`) rising between them.
+- **Syngas** is a gas: the steam texture tinted a warm pale tan `#E2CCA4` (fog the same), set apart from the cool gases and
+  Biogas's olive. No new item textures.
+- GUIs (cut from existing backgrounds):
+  - **Carbon Reclaimer:** the Hydrothermal Carbonizer's arrow and result frame, with the Haber Reactor's FE gauge and two
+    tanks on the left and its last tank on the right; the heat track painted out.
+  - **Gasifier:** the Hydrothermal Carbonizer's background as it is (steam tank, fuel slot, arrow, ash frame, Syngas tank,
+    heat buffer, heat track). Sprites the Hydrothermal Carbonizer's, plus the Combustion Plant's ghost coal.
+  - **Fischer-Tropsch Reactor:** 176×186 (inventory 104 down): the Haber Reactor's with its inventory moved 20 down and a
+    plain row added; FE gauge and Syngas tank on the left, the catalyst slot (the Chemical Reactor's blue frame) at
+    (43,34), the arrow at (63,34), four tank frames at x 88/104/120/136, the buffer frame at 156, and a 158 px heat track
+    at (9,88) with ticks at both ends of the window. `ghost_dust`: a heap, drawn like the other ghosts (white, alpha 0x37
+    body / 0x69 edge).
+
 ## Plates, gears and rods
 - Every plate and gear (steel, copper, silver, nickel, tungsten, invar) is Cody's plate or gear, with
   every pixel kept. His screenshots were sampled on their pixel grids (the plate a clean 24x, the gear a resampled ~7x),

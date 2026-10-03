@@ -122,6 +122,19 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, PressureGlassBlock.class);
+        // Carbon capture: the three machines, and the burners' flue gas.
+        for (Class<? extends net.minecraft.world.level.block.entity.BlockEntity> type : List.of(
+                net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.GasifierBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity.class,
+                net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity.class,
+                GasTurbineArrayBlockEntity.class)) {
+            registration.registerBlockDataProvider(CarbonCaptureProvider.INSTANCE, type);
+        }
+        registration.registerBlockDataProvider(CarbonCaptureProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class);
         // Renewable coal: the Tree Cutter and the Hydrothermal Carbonizer.
         registration.registerBlockDataProvider(RenewableCoalProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.TreeCutterBlockEntity.class);
         registration.registerBlockDataProvider(RenewableCoalProvider.INSTANCE,
@@ -206,6 +219,13 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockComponent(FarmChemistryProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(ClocheProvider.Client.INSTANCE, net.zagdrath.arcforge.block.farming.ClocheBlock.class);
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.machine.CarbonReclaimerBlock.class,
+                net.zagdrath.arcforge.block.machine.GasifierBlock.class, net.zagdrath.arcforge.block.machine.FischerTropschReactorBlock.class,
+                net.zagdrath.arcforge.block.machine.CombustionPlantBlock.class, net.zagdrath.arcforge.block.machine.FireboxBlock.class,
+                net.zagdrath.arcforge.block.machine.FuelBurnerBlock.class, net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class, GasTurbineArrayCasingBlock.class)) {
+            registration.registerBlockComponent(CarbonCaptureProvider.Client.INSTANCE, type);
+        }
         registration.registerBlockComponent(RenewableCoalProvider.Client.INSTANCE, net.zagdrath.arcforge.block.machine.TreeCutterBlock.class);
         registration.registerBlockComponent(RenewableCoalProvider.Client.INSTANCE, net.zagdrath.arcforge.block.machine.HydrothermalCarbonizerBlock.class);
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.BatteryArrayControllerBlock.class,

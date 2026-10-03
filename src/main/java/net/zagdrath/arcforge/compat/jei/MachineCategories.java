@@ -10,6 +10,7 @@ import java.util.Locale;
 
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -479,6 +480,138 @@ final class MachineCategories {
             text(graphics, Component.translatable("jei.arcforge.hydrothermal_carbonizing.heat", String.format(Locale.ROOT, "%,d", recipe.heatPerOperation()),
                     ArcforgeConfig.HYDROTHERMAL_MIN_TEMPERATURE.getAsInt()), 0, 30);
             text(graphics, Component.translatable("jei.arcforge.hydrothermal_carbonizing.time", seconds(recipe.ticks())), 0, 40);
+        }
+    }
+
+    // --- Carbon capture ---
+
+    // Carbon Dioxide and Hydrogen in, the arrow, the Carbon Dust and the Water out; the FE below (before Energy upgrades;
+    // never less than the balance floor).
+    static final class CarbonReclaiming extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.CARBON_RECLAIMING.get());
+
+        CarbonReclaiming(IGuiHelper gui) {
+            super(TYPE, "carbon_reclaiming", ModBlocks.CARBON_RECLAIMER.get(), gui, 130, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            fluid(builder, true, 1, 5, net.zagdrath.arcforge.registry.ModFluids.CARBON_DIOXIDE.get(), recipe.carbonDioxideAmount());
+            if (recipe.hydrogenAmount() > 0) {
+                fluid(builder, true, 21, 5, net.zagdrath.arcforge.registry.ModFluids.HYDROGEN.get(), recipe.hydrogenAmount());
+            }
+            builder.addOutputSlot(71, 5).setStandardSlotBackground().add(recipe.result());
+            if (recipe.waterAmount() > 0) {
+                fluid(builder, false, 91, 5, net.minecraft.world.level.material.Fluids.WATER, recipe.waterAmount());
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe> holder,
+                IFocusGroup focuses) {
+            int ticks = Math.max(1, holder.value().totalEnergy() / Math.max(1, ArcforgeConfig.RECLAIMER_ENERGY_PER_TICK.getAsInt()));
+            builder.addAnimatedRecipeArrowWidget(ticks).setPosition(44, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.carbon_reclaiming.energy", String.format(Locale.ROOT, "%,d", holder.value().totalEnergy())), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.carbon_reclaiming.floor"), 0, 40);
+        }
+    }
+
+    // The fuel (with its count) and the Steam in, the arrow, the Syngas and a chance of ash out; the heat, the temperature
+    // it needs and the time below, before upgrades.
+    static final class Gasifying extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.GasifyingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.GasifyingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.GASIFYING.get());
+
+        Gasifying(IGuiHelper gui) {
+            super(TYPE, "gasifying", ModBlocks.GASIFIER.get(), gui, 140, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.GasifyingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground()
+                    .addItemStacks(recipe.ingredient().items().map(item -> new ItemStack(item, recipe.count())).toList());
+            if (recipe.steamAmount() > 0) {
+                fluid(builder, true, 21, 5, net.zagdrath.arcforge.registry.ModFluids.STEAM.get(), recipe.steamAmount());
+            }
+            fluid(builder, false, 71, 5, recipe.result());
+            double chance = recipe.ashChanceOrDefault();
+            if (chance > 0) {
+                builder.addOutputSlot(91, 5).setStandardSlotBackground()
+                        .add(recipe.ash().map(ash -> ash.create()).orElseGet(() -> new ItemStack(net.zagdrath.arcforge.registry.ModItems.WOOD_ASH.get())))
+                        .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.chance",
+                                Math.round(chance * 100)).withStyle(ChatFormatting.GRAY)));
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.GasifyingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().ticks()).setPosition(44, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.GasifyingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            var recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.gasifying.heat", String.format(Locale.ROOT, "%,d", recipe.heatPerOperation()),
+                    String.format(Locale.ROOT, "%,d", ArcforgeConfig.GASIFIER_MIN_TEMPERATURE.getAsInt())), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.gasifying.time", seconds(recipe.ticks())), 0, 40);
+        }
+    }
+
+    // Syngas and a catalyst (Iron or Nickel Dust, worn down slowly) in, the arrow, the four products out; the FE, heat and
+    // temperature window below, before upgrades.
+    static final class FischerTropsch extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.FischerTropschRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.FischerTropschRecipe> TYPE = IRecipeHolderType.create(ModRecipes.FISCHER_TROPSCH.get());
+
+        FischerTropsch(IGuiHelper gui) {
+            super(TYPE, "fischer_tropsch", ModBlocks.FISCHER_TROPSCH_REACTOR.get(), gui, 150, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.FischerTropschRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            ChemicalReactingRecipe.FluidInput input = recipe.input();
+            var slot = builder.addInputSlot(1, 5).setStandardSlotBackground()
+                    .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, input.amount()), false, 16, 16);
+            input.fluids().forEach(fluid -> slot.add(fluid, input.amount()));
+            builder.addInputSlot(21, 5).setStandardSlotBackground()
+                    .addItemStacks(List.of(new ItemStack(net.zagdrath.arcforge.registry.ModItems.IRON_DUST.get()),
+                            new ItemStack(net.zagdrath.arcforge.registry.ModItems.NICKEL_DUST.get())))
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.fischer_tropsch.catalyst",
+                            ArcforgeConfig.FT_IRON_CATALYST_OPERATIONS.getAsInt(), ArcforgeConfig.FT_NICKEL_CATALYST_OPERATIONS.getAsInt())
+                            .withStyle(ChatFormatting.GRAY)));
+            net.minecraft.world.level.material.Fluid[] fluids = { net.zagdrath.arcforge.registry.ModFluids.NAPHTHA.get(),
+                    net.zagdrath.arcforge.registry.ModFluids.LIGHT_OIL.get(), net.zagdrath.arcforge.registry.ModFluids.HEAVY_OIL.get(),
+                    net.minecraft.world.level.material.Fluids.WATER };
+            int[] amounts = recipe.products();
+            int x = 71;
+            for (int i = 0; i < fluids.length; i++) {
+                if (amounts[i] > 0) {
+                    fluid(builder, false, x, 5, fluids[i], amounts[i]);
+                    x += 20;
+                }
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.FischerTropschRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().ticks()).setPosition(44, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.FischerTropschRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            var recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.ticks()),
+                    String.format(Locale.ROOT, "%,d", recipe.ticks() * recipe.baseEnergyPerTick())), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.fischer_tropsch.heat", recipe.baseHeatPerTick(),
+                    ArcforgeConfig.FT_MIN_TEMPERATURE.getAsInt(), ArcforgeConfig.FT_MAX_TEMPERATURE.getAsInt()), 0, 40);
         }
     }
 

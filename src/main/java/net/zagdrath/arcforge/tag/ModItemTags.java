@@ -54,5 +54,13 @@ public final class ModItemTags {
     // Press Cake, Compost).
     public static final TagKey<Item> BIOMASS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "biomass"));
 
+    // Solid fuels with carbon in them: burning them gives off Carbon Dioxide through a Flue Gas face (see FlueGas). Coal,
+    // charcoal, Bio-Coal, Coal Coke, Carbon Dust and their blocks.
+    public static final TagKey<Item> CARBON_FUELS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "carbon_fuels"));
+
+    // Fischer-Tropsch Reactor catalysts: iron dust, and nickel dust (which lasts twice as long by default).
+    public static final TagKey<Item> IRON_DUSTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "dusts/iron"));
+    public static final TagKey<Item> NICKEL_DUSTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "dusts/nickel"));
+
     private ModItemTags() {}
 }

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/fischer_tropsch_reactor_front",
+    "south": "arcforge:block/fischer_tropsch_reactor_back",
+    "east": "arcforge:block/fischer_tropsch_reactor_left",
+    "west": "arcforge:block/fischer_tropsch_reactor_right",
+    "up": "arcforge:block/fischer_tropsch_reactor_top",
+    "down": "arcforge:block/fischer_tropsch_reactor_bottom",
+    "particle": "arcforge:block/fischer_tropsch_reactor_back"
+  }
+}

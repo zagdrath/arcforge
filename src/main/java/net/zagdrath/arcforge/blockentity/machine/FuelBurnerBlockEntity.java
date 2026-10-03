@@ -30,6 +30,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.heat.FlueGas;
 import net.zagdrath.arcforge.heat.OxyFuel;
 import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.heat.BurnerFuel;
@@ -55,13 +56,14 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // its heat is drawn off). Speed upgrades burn fuel (and make heat) faster, Heat upgrades get more heat
 // from each mB. Fed oxygen through an Oxygen face it burns on oxy-fuel (see OxyFuel): each fuel 300°C hotter, up
 // to 1,600°C, with more heat per mB. The Oxygen face is separate from the fuel's Input face, which still takes
-// hydrogen as a fuel.
+// hydrogen as a fuel. With a Flue Gas face (the Gas Output side mode) set, carbon fuels (#arcforge:carbon_fuels) give off
+// Carbon Dioxide through it in proportion to the heat made (see FlueGas); Hydrogen gives none.
 public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int SLOT_BUCKET_IN = 0;
     public static final int SLOT_BUCKET_OUT = 1;
     public static final int MACHINE_SLOTS = 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT, SideMode.OXYGEN);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT, SideMode.OXYGEN, SideMode.GAS_OUTPUT);
 
     private final HeatBuffer heat;
     private final HeatHandler heatOutput;
@@ -69,6 +71,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
     private final ResourceHandler<FluidResource> fluidInput;
     private final ResourceHandler<ItemResource> itemAutomation;
     private final OxyFuel oxy;
+    private final FlueGas flue;
     private final ContainerData data;
 
     // Fuel taken from the tank (in whole mB) but not burnt yet.
@@ -94,6 +97,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_BUCKET_IN, slot -> slot == SLOT_BUCKET_OUT);
         this.oxy = new OxyFuel(ArcforgeConfig.FUEL_BURNER_OXYGEN_TANK_CAPACITY.getAsInt(), ArcforgeConfig.FUEL_BURNER_OXYGEN_PER_TICK::getAsDouble,
                 this::setChanged);
+        this.flue = new FlueGas(ArcforgeConfig.FLUE_GAS_TANK_CAPACITY.getAsInt(), this::setChanged);
         this.data = new WideIntContainerData(FuelBurnerMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -145,10 +149,17 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         }
         heat.setCeiling(oxyReady ? burnCelsius : heat.getMaxCelsius());
         boolean hotEnough = heat.getStored() >= heat.storedAt(burnCelsius);
+        boolean carbon = FlueGas.isCarbonFuel(tank.getResource(0).getFluid());
         if (enabled && !heat.isFull() && !hotEnough && fuel != null) {
             boolean onOxy = oxyReady && oxy.burn();
             burn(fuel, heat.storedAt(burnCelsius) - heat.getStored(), onOxy ? OxyFuel.heatMultiplier() : 1.0);
         }
+        if (heatPerTick > 0 && FlueGas.hasFlueFace(sideConfig, getFacing())) {
+            flue.emit(heatPerTick, carbon);
+        } else {
+            flue.idle();
+        }
+        flue.push(level, pos, getFacing(), sideConfig, outputs);
         if (heatPerTick <= 0) {
             oxy.idle();
         }
@@ -209,6 +220,10 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         return oxy;
     }
 
+    public FlueGas getFlue() {
+        return flue;
+    }
+
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---
 
     // Input faces take full buckets and give back the empty ones.
@@ -222,6 +237,9 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         SideMode mode = modeFor(side);
         if (mode == SideMode.OXYGEN) {
             return oxy.getInput();
+        }
+        if (mode == SideMode.GAS_OUTPUT) {
+            return flue.getOutput();
         }
         return mode == null || mode == SideMode.INPUT ? fluidInput : null;
     }
@@ -244,7 +262,8 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         return switch (type) {
             // Pressurized Conduits too, for gas fuels such as hydrogen, and oxygen on Oxygen faces.
             case ITEM, FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case GAS -> mode == SideMode.INPUT || mode == SideMode.OXYGEN ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case GAS -> mode == SideMode.INPUT || mode == SideMode.OXYGEN ? ConnectionMode.INPUT
+                    : mode == SideMode.GAS_OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> ConnectionMode.NONE;
         };
@@ -257,6 +276,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         heat.deserialize(input);
         fuelTaken = input.getDoubleOr("fuel_taken", 0.0);
         oxy.load(input);
+        flue.load(input);
     }
 
     @Override
@@ -266,6 +286,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         heat.serialize(output);
         output.putDouble("fuel_taken", fuelTaken);
         oxy.save(output);
+        flue.save(output);
     }
 
     @Override

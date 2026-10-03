@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TCT",
+    "GWG",
+    "TET"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "C": "arcforge:tungsten_heating_coil",
+    "G": "#c:glass_blocks",
+    "W": "arcforge:wrought_pressurized_cylinder",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:carbon_reclaimer",
+    "count": 1
+  }
+}

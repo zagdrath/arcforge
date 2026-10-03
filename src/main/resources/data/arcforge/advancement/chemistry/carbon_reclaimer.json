@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/electrolyzer",
+  "display": {
+    "icon": {
+      "id": "arcforge:carbon_reclaimer"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.carbon_reclaimer.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.carbon_reclaimer.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "carbon_reclaiming"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

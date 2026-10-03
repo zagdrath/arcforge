@@ -45,6 +45,7 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.BurnerFuel;
+import net.zagdrath.arcforge.heat.FlueGas;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineOutputs;
@@ -74,13 +75,15 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // Its output cap is its full-throttle lubricated output, and its FE buffer energyBufferTicks of that. A quarter of the heat
 // leaves as exhaust at half the burn temperature, pushed out of Heat ports (a Steam Boiler Array takes it)
 // or vented. One end is the intake, which needs air in front of it; the other is the exhaust. Starting takes
-// 20 ticks of ignition; running dry is a flameout, and it waits 20 ticks before it can ignite again.
+// 20 ticks of ignition; running dry is a flameout, and it waits 20 ticks before it can ignite again. With a Gas Output
+// port (named Flue Gas) it gives off Carbon Dioxide through it while burning carbon fuels, in proportion to the fuel's
+// heat (see FlueGas); Hydrogen gives none, and with no such port nothing changes.
 public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     // Eight blades look the same every 45°, so a turn of more than 22.5° a tick would look like it went
     // backwards; the stagger hides most of that, and full speed turns 60° a tick.
     private static final double MAX_DEGREES_PER_TICK = 60.0;
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.LUBRICANT, SideMode.HEAT);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.LUBRICANT, SideMode.HEAT, SideMode.GAS_OUTPUT);
     private static final int SYNC_INTERVAL = 5;
     private static final int SIGNAL_CHECK_INTERVAL = 10;
     // The hottest exhaust (Hydrogen, 1,400°C x 0.5, with room above).
@@ -108,6 +111,8 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     private final ContainerData data;
     private final List<BlockCapabilityCache<EnergyHandler, @Nullable Direction>> energyTargets = new ArrayList<>();
     private final List<BlockCapabilityCache<HeatHandler, @Nullable Direction>> heatTargets = new ArrayList<>();
+    private final List<BlockCapabilityCache<ResourceHandler<FluidResource>, @Nullable Direction>> flueTargets = new ArrayList<>();
+    private final FlueGas flue;
     private boolean targetsDirty = true;
 
     private Phase phase = Phase.OFF;
@@ -153,6 +158,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         this.exhaust = new HeatBuffer((int) Math.ceil(20 * ArcforgeConfig.GAS_TURBINE_MAX_HU_PER_LENGTH.getAsInt() * MAX_LENGTH
                 * ArcforgeConfig.GAS_TURBINE_EXHAUST_FRACTION.getAsDouble()), EXHAUST_MAX_CELSIUS, this::setChanged);
         this.exhaustOutput = exhaust.output();
+        this.flue = new FlueGas(ArcforgeConfig.FLUE_GAS_ARRAY_TANK_CAPACITY.getAsInt(), this::setChanged);
         this.data = new WideIntContainerData(GasTurbineArrayMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -356,6 +362,8 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         }
         boolean allowed = redstoneMode == RedstoneMode.THROTTLE ? signal > 0 : redstoneMode.canRun(isPowered());
         BurnerFuel burning = BurnerFuel.of(fuel.getResource(0));
+        // Read before burning can empty the tank.
+        boolean carbon = FlueGas.isCarbonFuel(fuel.getResource(0).getFluid());
         boolean hasFuel = burning != null && burning.gasTurbine() && fuel.getAmount() > 0;
         boolean canRun = allowed && intakeOpen && !energy.isFull();
         if (reignitionDelay > 0) {
@@ -427,10 +435,20 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
             exhaustCelsius = exhaustCelsius(burning);
             exhaust.setProducingAt(exhaustCelsius);
             exhaust.add(exhaustHu);
+            if (!flueTargets.isEmpty()) {
+                flue.emit(burnedHu, carbon);
+            } else {
+                flue.idle();
+            }
             setChanged();
         } else {
             exhaust.setProducing(false);
+            flue.idle();
         }
+        if (targetsDirty) {
+            refreshTargets(level);
+        }
+        flue.pushTo(flueTargets);
         // Exhaust heat goes out of the Heat ports; whatever nothing takes by next tick is vented (above).
         pushHeat(level);
 
@@ -533,12 +551,15 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         targetsDirty = false;
         energyTargets.clear();
         heatTargets.clear();
+        flueTargets.clear();
         for (MultiblockPorts.Port port : MultiblockPorts.list(level, this)) {
             BlockPos target = port.pos().relative(port.face()).immutable();
             if (port.mode() == SideMode.ENERGY) {
                 energyTargets.add(BlockCapabilityCache.create(Capabilities.Energy.BLOCK, level, target, port.face().getOpposite()));
             } else if (port.mode() == SideMode.HEAT) {
                 heatTargets.add(BlockCapabilityCache.create(ModCapabilities.HEAT, level, target, port.face().getOpposite()));
+            } else if (port.mode() == SideMode.GAS_OUTPUT) {
+                flueTargets.add(BlockCapabilityCache.create(Capabilities.Fluid.BLOCK, level, target, port.face().getOpposite()));
             }
         }
     }
@@ -586,6 +607,10 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     public FilteredFluidTank getLubricant() {
         return lubricant;
+    }
+
+    public FlueGas getFlue() {
+        return flue;
     }
 
     public Phase getPhase() {
@@ -675,6 +700,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         return switch (mode) {
             case INPUT -> fuelInput;
             case LUBRICANT -> lubricantInput;
+            case GAS_OUTPUT -> flue.getOutput();
             default -> null;
         };
     }
@@ -698,7 +724,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     @Override
     public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
         return switch (type) {
-            case GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.GAS_OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case FLUID -> mode == SideMode.INPUT || mode == SideMode.LUBRICANT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
@@ -716,6 +742,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         energy.deserialize(input.childOrEmpty("energy"));
         fuel.deserialize(input.childOrEmpty("fuel"));
         lubricant.deserialize(input.childOrEmpty("lubricant"));
+        flue.load(input);
         phase = Phase.byId(input.getIntOr("phase", 0));
         ignitionLeft = input.getIntOr("ignition_left", 0);
         reignitionDelay = input.getIntOr("reignition_delay", 0);
@@ -739,6 +766,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         energy.serialize(output.child("energy"));
         fuel.serialize(output.child("fuel"));
         lubricant.serialize(output.child("lubricant"));
+        flue.save(output);
         output.putInt("phase", phase.ordinal());
         output.putInt("ignition_left", ignitionLeft);
         output.putInt("reignition_delay", reignitionDelay);

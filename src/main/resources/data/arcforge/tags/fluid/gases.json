@@ -6,6 +6,7 @@
     "arcforge:hydrogen",
     "arcforge:oxygen",
     "arcforge:chlorine",
-    "arcforge:ethylene"
+    "arcforge:ethylene",
+    "arcforge:syngas"
   ]
 }

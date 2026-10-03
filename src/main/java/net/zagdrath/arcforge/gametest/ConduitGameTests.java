@@ -509,6 +509,29 @@ final class ConduitGameTests {
                 .thenSucceed();
     }
 
+    // Both sinks allow only iron: the gold no filter lets through stays in the source instead of being pulled into the
+    // conduits' storage to wait for a destination that will never take it.
+    static void filterRejectedStaysInSource(GameTestHelper helper) {
+        filterLayout(helper, 3);
+        var iron = filter(list(false, FilterSettings.Entry.of(new ItemStack(Items.IRON_INGOT))));
+        helper.getBlockEntity(new BlockPos(2, 1, 0), ConduitBlockEntity.class).setFilter(Direction.SOUTH, iron);
+        helper.getBlockEntity(new BlockPos(3, 1, 0), ConduitBlockEntity.class).setFilter(Direction.EAST, iron.copy());
+        Container source = container(helper, FILTER_SOURCE);
+        fillSingles(source, Items.IRON_INGOT, 4);
+        fillSingles(source, Items.GOLD_INGOT, 4);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(count(source, Items.IRON_INGOT) == 0, "Iron left in the source"))
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    helper.assertTrue(count(source, Items.GOLD_INGOT) == 4, count(source, Items.GOLD_INGOT) + " gold left in the source, not 4");
+                    for (int x = 1; x <= 3; x++) {
+                        helper.assertTrue(helper.getBlockEntity(new BlockPos(x, 1, 0), ConduitBlockEntity.class).getStoredItems().isEmpty(),
+                                "Conduit " + x + " stored items no filter allows");
+                    }
+                })
+                .thenSucceed();
+    }
+
     // A denylist of gold on A: A never gets gold; the iron is shared between A and B.
     static void filterDenylist(GameTestHelper helper) {
         filterLayout(helper, 3);

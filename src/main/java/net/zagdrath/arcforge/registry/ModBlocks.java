@@ -285,6 +285,14 @@ public final class ModBlocks {
     // The cell's status LED glows while it splits water.
     public static final DeferredBlock<ElectrolyzerBlock> ELECTROLYZER = BLOCKS.registerBlock("electrolyzer",
             ElectrolyzerBlock::new, p -> machineProperties(p, 4));
+    // Carbon capture: Carbon Dioxide back into Carbon Dust, coal and biomass into Syngas, and Syngas into oils.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.CarbonReclaimerBlock> CARBON_RECLAIMER = BLOCKS.registerBlock("carbon_reclaimer",
+            net.zagdrath.arcforge.block.machine.CarbonReclaimerBlock::new, p -> machineProperties(p, 4));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.GasifierBlock> GASIFIER = BLOCKS.registerBlock("gasifier",
+            net.zagdrath.arcforge.block.machine.GasifierBlock::new, p -> machineProperties(p, 9));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.FischerTropschReactorBlock> FISCHER_TROPSCH_REACTOR =
+            BLOCKS.registerBlock("fischer_tropsch_reactor", net.zagdrath.arcforge.block.machine.FischerTropschReactorBlock::new,
+                    p -> machineProperties(p, 4));
 
     // Automation: crafting, breaking, placing and collecting.
     public static final DeferredBlock<AssemblerBlock> ASSEMBLER = BLOCKS.registerBlock("assembler",
@@ -685,9 +693,10 @@ public final class ModBlocks {
     // The Compost Bin: treated wood like the rest of the building set, so an axe breaks it and fire doesn't take it.
     public static final DeferredBlock<CompostBinBlock> COMPOST_BIN = BLOCKS.registerBlock("compost_bin",
             CompostBinBlock::new, p -> treatedWood(p).strength(0.6F).noOcclusion());
-    // Loam: dirt worked with compost. A hoe tills it into Loam Farmland (FarmingEvents).
-    public static final DeferredBlock<Block> LOAM = BLOCKS.registerSimpleBlock("loam",
-            p -> p.mapColor(MapColor.DIRT).strength(0.5F).sound(SoundType.ROOTED_DIRT));
+    // Loam: dirt worked with compost. A hoe tills it into Loam Farmland (FarmingEvents); saplings grow faster on it.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.farming.LoamBlock> LOAM = BLOCKS.registerBlock("loam",
+            net.zagdrath.arcforge.block.farming.LoamBlock::new, p -> p.mapColor(MapColor.DIRT).strength(0.5F).sound(SoundType.ROOTED_DIRT)
+                    .randomTicks());
     public static final DeferredBlock<LoamFarmlandBlock> LOAM_FARMLAND = BLOCKS.registerBlock("loam_farmland",
             p -> new LoamFarmlandBlock(LOAM.get(), false, p), ModBlocks::farmlandProperties);
     public static final DeferredBlock<LoamFarmlandBlock> IRRIGATED_LOAM_FARMLAND = BLOCKS.registerBlock("irrigated_loam_farmland",

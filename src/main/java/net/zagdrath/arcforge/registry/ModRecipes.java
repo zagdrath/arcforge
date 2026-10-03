@@ -85,6 +85,13 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("drying")));
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe>> HYDROTHERMAL_CARBONIZING =
             RECIPE_TYPES.register("hydrothermal_carbonizing", () -> RecipeType.simple(id("hydrothermal_carbonizing")));
+    // Carbon capture: the Carbon Reclaimer, the Gasifier and the Fischer-Tropsch Reactor.
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe>> CARBON_RECLAIMING =
+            RECIPE_TYPES.register("carbon_reclaiming", () -> RecipeType.simple(id("carbon_reclaiming")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.GasifyingRecipe>> GASIFYING =
+            RECIPE_TYPES.register("gasifying", () -> RecipeType.simple(id("gasifying")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.FischerTropschRecipe>> FISCHER_TROPSCH =
+            RECIPE_TYPES.register("fischer_tropsch", () -> RecipeType.simple(id("fischer_tropsch")));
     // Farm chemistry: the Air Separator, the Haber Reactor and the Biogas Digester.
     public static final Supplier<RecipeType<AirSeparatingRecipe>> AIR_SEPARATING = RECIPE_TYPES.register("air_separating",
             () -> RecipeType.simple(id("air_separating")));
@@ -134,6 +141,15 @@ public final class ModRecipes {
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe>> HYDROTHERMAL_CARBONIZING_SERIALIZER =
             RECIPE_SERIALIZERS.register("hydrothermal_carbonizing", () -> new RecipeSerializer<>(
                     net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.HydrothermalCarbonizingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe>> CARBON_RECLAIMING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("carbon_reclaiming", () -> new RecipeSerializer<>(
+                    net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.GasifyingRecipe>> GASIFYING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("gasifying", () -> new RecipeSerializer<>(
+                    net.zagdrath.arcforge.recipe.GasifyingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.GasifyingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.FischerTropschRecipe>> FISCHER_TROPSCH_SERIALIZER =
+            RECIPE_SERIALIZERS.register("fischer_tropsch", () -> new RecipeSerializer<>(
+                    net.zagdrath.arcforge.recipe.FischerTropschRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.FischerTropschRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<AirSeparatingRecipe>> AIR_SEPARATING_SERIALIZER = RECIPE_SERIALIZERS.register("air_separating",
             () -> new RecipeSerializer<>(AirSeparatingRecipe.MAP_CODEC, AirSeparatingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<SynthesizingRecipe>> SYNTHESIZING_SERIALIZER = RECIPE_SERIALIZERS.register("synthesizing",
@@ -177,7 +193,7 @@ public final class ModRecipes {
     private static void syncToClients(OnDatapackSyncEvent event) {
         event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
                 MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(), VULCANIZING.get(),
-                HYDROTHERMAL_CARBONIZING.get(),
+                HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
                 RecipeType.SMELTING);
     }
 }

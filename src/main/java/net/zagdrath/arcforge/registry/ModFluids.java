@@ -215,6 +215,14 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_ETHYLENE = FLUIDS.register("flowing_ethylene",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.ETHYLENE_TYPE, ModFluids.ETHYLENE, ModFluids.FLOWING_ETHYLENE)));
 
+    // Syngas: Carbon Monoxide and Hydrogen, from the Gasifier (biomass or coal with Steam, hot). A fuel (the
+    // arcforge:burner_fuels data map) and the Fischer-Tropsch Reactor's feed.
+    public static final DeferredHolder<FluidType, FluidType> SYNGAS_TYPE = gasType("syngas", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SYNGAS = FLUIDS.register("syngas",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.SYNGAS_TYPE, ModFluids.SYNGAS, ModFluids.FLOWING_SYNGAS)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SYNGAS = FLUIDS.register("flowing_syngas",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.SYNGAS_TYPE, ModFluids.SYNGAS, ModFluids.FLOWING_SYNGAS)));
+
     // Liquid Experience: experience as a fluid, 20 mB per point (the c:experience convention, so other mods' liquid
     // experience works with it). Pale green and glowing like experience orbs; it runs like water. The XP Drain and the
     // Vacuum Collector make it, the XP Shower gives it back to players.

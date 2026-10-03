@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/carbon_reclaimer_front_on",
+    "south": "arcforge:block/carbon_reclaimer_back",
+    "east": "arcforge:block/carbon_reclaimer_side",
+    "west": "arcforge:block/carbon_reclaimer_side",
+    "up": "arcforge:block/carbon_reclaimer_top",
+    "down": "arcforge:block/carbon_reclaimer_bottom",
+    "particle": "arcforge:block/carbon_reclaimer_side"
+  }
+}

@@ -15,6 +15,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.Item;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 
 // Layout follows combustion_plant_gui_layout.json. All positions are relative to leftPos/topPos.
@@ -34,6 +35,11 @@ public class CombustionPlantScreen extends MachineScreen<BurnerMenu> {
 
     public CombustionPlantScreen(BurnerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "combustion_plant", List.of(new EnergyTab(menu::getStored, menu::getOutputPerTick)));
+    }
+
+    @Override
+    protected Component sideModeName(SideMode mode) {
+        return mode == SideMode.GAS_OUTPUT ? sideModeName("flue_gas") : super.sideModeName(mode);
     }
 
     @Override

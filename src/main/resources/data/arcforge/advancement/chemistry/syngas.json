@@ -1,0 +1,32 @@
+{
+  "parent": "arcforge:chemistry/naphtha",
+  "display": {
+    "icon": {
+      "id": "arcforge:gasifier"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.syngas.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.syngas.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:syngas",
+        "recipe_category": "gasifying"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

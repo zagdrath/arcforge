@@ -18,7 +18,7 @@
     },
     {
       "type": "text",
-      "text": "# Ports\nA new array has none: set them on any casing (or the controller) with the Wrench in Port mode.\n- Input: solid fuel, and liquid or gas fuel (a held bucket also fills it through the controller).\n- Oxygen: oxygen for oxy-fuel.\n- Heat: heat out. A Heat port pushes as fast as the array burns into whatever touches it, such as a Steam Boiler Array's heat port, or into Thermodynamic Conduits."
+      "text": "# Ports\nA new array has none: set them on any casing (or the controller) with the Wrench in Port mode.\n- Input: solid fuel, and liquid or gas fuel (a held bucket also fills it through the controller).\n- Oxygen: oxygen for oxy-fuel.\n- Heat: heat out. A Heat port pushes as fast as the array burns into whatever touches it, such as a Steam Boiler Array's heat port, or into Thermodynamic Conduits.\nA Gas Output port (named Flue Gas) gives off Carbon Dioxide while it burns carbon fuels: see Carbon Capture."
     },
     {
       "type": "multiblock",

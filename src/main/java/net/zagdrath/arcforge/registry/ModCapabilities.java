@@ -102,11 +102,14 @@ public final class ModCapabilities {
                 CombustionPlantBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.COMBUSTION_PLANT.get(),
                 CombustionPlantBlockEntity::getItemHandler);
+        // Flue Gas faces give out Carbon Dioxide.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.COMBUSTION_PLANT.get(),
+                CombustionPlantBlockEntity::getFluidHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.FIREBOX.get(),
                 FireboxBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FIREBOX.get(),
                 FireboxBlockEntity::getItemHandler);
-        // Oxygen faces take oxygen for oxy-fuel.
+        // Oxygen faces take oxygen for oxy-fuel; Flue Gas faces give out Carbon Dioxide.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FIREBOX.get(),
                 FireboxBlockEntity::getFluidHandler);
         // Meters: in on their left, out on their right; the Chargepad takes FE through its back.
@@ -247,6 +250,28 @@ public final class ModCapabilities {
                 ChemicalReactorBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
                 ElectrolyzerBlockEntity::getFluidHandler);
+        // Carbon capture: the Carbon Reclaimer's gases, Water, Carbon Dust and FE; the Gasifier's fuel, steam, Syngas, ash and
+        // heat; the Fischer-Tropsch Reactor's Syngas, products, catalyst, FE and heat.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CARBON_RECLAIMER.get(),
+                net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CARBON_RECLAIMER.get(),
+                net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CARBON_RECLAIMER.get(),
+                net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.GASIFIER.get(),
+                net.zagdrath.arcforge.blockentity.machine.GasifierBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GASIFIER.get(),
+                net.zagdrath.arcforge.blockentity.machine.GasifierBlockEntity::getFluidHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.GASIFIER.get(),
+                net.zagdrath.arcforge.blockentity.machine.GasifierBlockEntity::getHeatHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FISCHER_TROPSCH_REACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FISCHER_TROPSCH_REACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.FISCHER_TROPSCH_REACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.FISCHER_TROPSCH_REACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity::getHeatHandler);
         // Farm chemistry: the Air Separator's gases and FE; the Haber Reactor's gases, FE and heat.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.AIR_SEPARATOR.get(),
                 net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity::getFluidHandler);

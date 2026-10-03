@@ -23,8 +23,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.heat.FlueGas;
 import net.zagdrath.arcforge.machine.CombustionFuel;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
@@ -41,6 +43,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // buffer each tick it burns. While the buffer is full it pauses, keeping what's left of the burning item.
 // Each item of #arcforge:leaves_wood_ash (charcoal) that burns out leaves a Wood Ash in the ash slot with
 // farming.fertilizers.woodAshChance; the ash comes out through Output faces, and a full ash slot loses it.
+// With a Flue Gas face (the Gas Output side mode) set, burning a carbon fuel gives off Carbon Dioxide through it in
+// proportion to the heat made (see FlueGas, flueHeat); with none, nothing changes.
 public abstract class BurnerBlockEntity extends MachineBlockEntity {
     public static final int SLOT_FUEL = 0;
     public static final int SLOT_ASH = 1;
@@ -52,6 +56,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
     private final ResourceHandler<ItemResource> ashOutput;
     private final ResourceHandler<ItemResource> automation;
     private final ContainerData data;
+    protected final FlueGas flue;
 
     private int burnTime;
     private int burnTotal;
@@ -64,6 +69,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         this.fuelInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_FUEL, slot -> false);
         this.ashOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_ASH);
         this.automation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_FUEL, slot -> slot == SLOT_ASH);
+        this.flue = new FlueGas(ArcforgeConfig.FLUE_GAS_TANK_CAPACITY.getAsInt(), this::setChanged);
         this.data = new WideIntContainerData(BurnerMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -128,6 +134,20 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         return 0;
     }
 
+    // The heat (HU) behind what it made this tick, for the flue: HU as they are for heat burners.
+    protected double flueHeat(int produced) {
+        return produced;
+    }
+
+    public FlueGas getFlue() {
+        return flue;
+    }
+
+    // Flue Gas faces give out the flue's Carbon Dioxide.
+    protected @Nullable ResourceHandler<FluidResource> flueHandler(@Nullable SideMode mode) {
+        return mode == SideMode.GAS_OUTPUT ? flue.getOutput() : null;
+    }
+
     // Oxy-fuel (the Firebox): the oxygen held, and whether it's burning with it. None here.
     protected int oxygenAmount() {
         return 0;
@@ -154,11 +174,13 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         // A redstone-disabled burner holds its fire where it is.
         boolean enabled = redstoneMode.canRun(level.hasNeighborSignal(pos));
         int produced = 0;
+        boolean carbon = false;
         if (enabled) {
             if (burnTime <= 0 && !isBufferFull()) {
                 startBurn(level);
             }
             if (burnTime > 0) {
+                carbon = FlueGas.isCarbonFuel(burning);
                 produced = produce();
                 if (produced > 0) {
                     burnTime--;
@@ -170,6 +192,12 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
             }
         }
         outputPerTick = produced;
+        if (produced > 0 && FlueGas.hasFlueFace(sideConfig, getFacing())) {
+            flue.emit(flueHeat(produced), carbon);
+        } else {
+            flue.idle();
+        }
+        flue.push(level, pos, getFacing(), sideConfig, outputs);
         pushOutput(level, pos, getFacing());
         autoEject(level, ashOutput);
 
@@ -257,6 +285,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
             }
             items.setStack(SLOT_ASH, ItemStack.EMPTY);
         }
+        flue.load(input);
         burnTime = input.getIntOr("burn_time", 0);
         burnTotal = input.getIntOr("burn_total", 0);
         burning = input.getString("burning")
@@ -269,6 +298,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         output.putInt("slot_layout", SLOT_LAYOUT);
+        flue.save(output);
         output.putInt("burn_time", burnTime);
         output.putInt("burn_total", burnTotal);
         if (burning != null) {

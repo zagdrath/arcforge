@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:fischer_tropsch",
+  "input": {
+    "fluid": "arcforge:syngas",
+    "amount": 1000
+  },
+  "naphtha": 30,
+  "light_oil": 50,
+  "heavy_oil": 50,
+  "water": 200
+}

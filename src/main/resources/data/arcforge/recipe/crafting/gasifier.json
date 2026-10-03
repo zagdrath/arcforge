@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "KFK",
+    "PBP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "arcforge:rubber_gasket",
+    "K": "arcforge:thermocouple",
+    "F": "arcforge:firebox",
+    "B": "minecraft:blast_furnace"
+  },
+  "result": {
+    "id": "arcforge:gasifier",
+    "count": 1
+  }
+}

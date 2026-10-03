@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:gasifying",
+  "ingredient": [
+    "minecraft:coal",
+    "minecraft:charcoal",
+    "arcforge:bio_coal"
+  ],
+  "result": {
+    "id": "arcforge:syngas",
+    "amount": 1000
+  },
+  "ash": {
+    "id": "arcforge:wood_ash"
+  }
+}

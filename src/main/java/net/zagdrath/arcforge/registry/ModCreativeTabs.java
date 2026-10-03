@@ -46,6 +46,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.FERMENTER.get());
                 output.accept(ModItems.CHEMICAL_REACTOR.get());
                 output.accept(ModItems.ELECTROLYZER.get());
+                output.accept(ModItems.CARBON_RECLAIMER.get());
+                output.accept(ModItems.GASIFIER.get());
+                output.accept(ModItems.FISCHER_TROPSCH_REACTOR.get());
                 output.accept(ModItems.THERMAL_EVAPORATOR_CONTROLLER.get());
                 output.accept(ModItems.THERMAL_EVAPORATOR_CASING.get());
                 output.accept(ModItems.ASSEMBLER.get());

@@ -92,6 +92,9 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> FERMENTER = ITEMS.registerSimpleBlockItem(ModBlocks.FERMENTER);
     public static final DeferredItem<BlockItem> CHEMICAL_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.CHEMICAL_REACTOR);
     public static final DeferredItem<BlockItem> ELECTROLYZER = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTROLYZER);
+    public static final DeferredItem<BlockItem> CARBON_RECLAIMER = ITEMS.registerSimpleBlockItem(ModBlocks.CARBON_RECLAIMER);
+    public static final DeferredItem<BlockItem> GASIFIER = ITEMS.registerSimpleBlockItem(ModBlocks.GASIFIER);
+    public static final DeferredItem<BlockItem> FISCHER_TROPSCH_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.FISCHER_TROPSCH_REACTOR);
     public static final DeferredItem<BlockItem> ASSEMBLER = ITEMS.registerSimpleBlockItem(ModBlocks.ASSEMBLER);
     public static final DeferredItem<BlockItem> BLOCK_BREAKER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_BREAKER);
     public static final DeferredItem<BlockItem> TREE_CUTTER = ITEMS.registerSimpleBlockItem(ModBlocks.TREE_CUTTER);
