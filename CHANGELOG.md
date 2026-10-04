@@ -254,7 +254,11 @@ number and date.
   picked-up item. They now only stay in the item.
 - **Tree Cutter fells the whole crown.** It took at most 12 leaves per log and trusted the leaves' stored distance,
   which lags behind a freshly grown tree, so most of an oak's crown was left floating to decay into saplings, sticks
-  and apples. It now takes every natural leaf joined to the tree that no other log holds, as vanilla leaf decay counts.
+  and apples. It now takes the natural leaves within 6 steps of the tree's logs that no other log holds, as vanilla leaf
+  decay counts (so in a forest it stops at the tree, not the whole joined canopy).
+- **Tree Cutter stuck on "Output full" with empty outputs:** a tree whose drops couldn't fit even in empty output slots
+  was retried for ever. It now keeps what the leaves drop without the leaf blocks when those don't fit, and if even that
+  is too much for empty outputs, fells it anyway (saplings and logs first) and pops the rest on top of the machine.
 - **Item conduits no longer pull out items their filters reject.** With nowhere to send an item, a network stored it
   in the conduit to wait for room, even when every destination's filter refused it, so a filtered line emptied the
   machine of everything else (a Tree Cutter's saplings, leaves and sticks). Those items now stay in the machine;

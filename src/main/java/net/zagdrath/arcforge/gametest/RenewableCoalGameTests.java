@@ -255,4 +255,50 @@ public final class RenewableCoalGameTests {
                         machine.getReturned().getAmount() + " mB of returned water kept while discarding"))
                 .thenSucceed();
     }
+
+    // A tree whose leaf blocks alone need more than its nine output slots (12 logs, over 600 leaves) is still felled, not
+    // left on Output full for ever: it keeps the logs and what the leaves drop, without the leaf blocks.
+    static void treeCutterFellsHugeCrown(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(2, 1, 0);
+        for (int x = 0; x <= 4; x++) {
+            for (int z = 1; z <= 5; z++) {
+                helper.setBlock(new BlockPos(x, 0, z), Blocks.DIRT);
+            }
+        }
+        helper.setBlock(pos, ModBlocks.TREE_CUTTER.get().defaultBlockState().setValue(MachineBlock.FACING, Direction.SOUTH));
+        TreeCutterBlockEntity cutter = helper.getBlockEntity(pos, TreeCutterBlockEntity.class);
+        CrushingGameTests.charge(cutter.getEnergy(), 50_000);
+        BlockPos base = new BlockPos(4, 1, 5);
+        int leaves = 0;
+        for (int dy = 2; dy <= 14; dy++) {
+            for (int dx = -3; dx <= 3; dx++) {
+                for (int dz = -3; dz <= 3; dz++) {
+                    if (dx == 0 && dz == 0 && dy < 12) {
+                        continue;
+                    }
+                    helper.setBlock(base.offset(dx, dy, dz), Blocks.OAK_LEAVES.defaultBlockState().setValue(LeavesBlock.DISTANCE, 1));
+                    leaves++;
+                }
+            }
+        }
+        for (int y = 0; y < 12; y++) {
+            helper.setBlock(base.above(y), Blocks.OAK_LOG);
+        }
+        helper.assertTrue(leaves > TreeCutterBlockEntity.OUTPUT_SLOTS * 64, "The crown isn't big enough to test: " + leaves);
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(cutter.getFelled() >= 1, "Not felled: " + cutter.getStatus()))
+                .thenExecute(() -> {
+                    int logs = 0;
+                    int leafBlocks = 0;
+                    for (int i = 0; i < TreeCutterBlockEntity.OUTPUT_SLOTS; i++) {
+                        ItemStack stack = cutter.getItems().getStack(TreeCutterBlockEntity.FIRST_OUTPUT + i);
+                        logs += stack.is(Items.OAK_LOG) ? stack.getCount() : 0;
+                        leafBlocks += stack.is(Items.OAK_LEAVES) ? stack.getCount() : 0;
+                    }
+                    helper.assertTrue(logs == 12, logs + " logs collected, not 12");
+                    helper.assertTrue(leafBlocks == 0, leafBlocks + " leaf blocks kept when they couldn't all fit");
+                    helper.assertTrue(!helper.getBlockState(base.offset(3, 11, 3)).is(BlockTags.LEAVES), "A leaf six steps from the trunk was left");
+                })
+                .thenSucceed();
+    }
 }

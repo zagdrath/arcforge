@@ -311,34 +311,39 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
                 queue.add(found);
             }
         }
-        // The crown: natural leaves joined to the logs. Any other log met on the way holds leaves of its own.
+        // The crown: natural leaves within LEAF_REACH steps of the logs (through leaves), as far as a vanilla tree's leaves
+        // ever reach; anything further is decaying already, and in a forest it would be the neighbours' canopy. The search
+        // carries on LEAF_REACH steps past it (`near`) to find the other logs holding leaves at the crown's edge.
         Set<BlockPos> crown = new LinkedHashSet<>();
+        Set<BlockPos> near = new HashSet<>();
         Set<BlockPos> otherLogs = new LinkedHashSet<>();
         ArrayDeque<BlockPos> frontier = new ArrayDeque<>(logs);
-        // It looks LEAF_REACH further out than it takes leaves from, so it finds the logs holding the leaves at its edge.
-        int crownTop = top + 2 * LEAF_REACH;
-        int search = reach + 2 * LEAF_REACH;
-        while (!frontier.isEmpty()) {
-            BlockPos pos = frontier.poll();
-            for (Direction direction : Direction.values()) {
-                BlockPos at = pos.relative(direction);
-                if (at.getY() < base.getY() || crown.contains(at) || logs.contains(at) || !level.isLoaded(at)) {
-                    continue;
-                }
-                BlockState state = level.getBlockState(at);
-                if (state.is(BlockTags.LOGS)) {
-                    otherLogs.add(at.immutable());
-                } else if (isNaturalLeaves(state) && at.getY() <= crownTop && Math.abs(at.getX() - centre.getX()) <= search
-                        && Math.abs(at.getZ() - centre.getZ()) <= search) {
-                    crown.add(at.immutable());
-                    if (crown.size() > MAX_LEAVES) {
-                        return null;
+        for (int step = 1; step <= 2 * LEAF_REACH && !frontier.isEmpty(); step++) {
+            ArrayDeque<BlockPos> next = new ArrayDeque<>();
+            for (BlockPos pos : frontier) {
+                for (Direction direction : Direction.values()) {
+                    BlockPos at = pos.relative(direction);
+                    if (at.getY() < base.getY() || near.contains(at) || logs.contains(at) || otherLogs.contains(at) || !level.isLoaded(at)) {
+                        continue;
                     }
-                    frontier.add(at.immutable());
+                    BlockState state = level.getBlockState(at);
+                    if (state.is(BlockTags.LOGS)) {
+                        otherLogs.add(at.immutable());
+                    } else if (isNaturalLeaves(state)) {
+                        near.add(at.immutable());
+                        if (step <= LEAF_REACH) {
+                            crown.add(at.immutable());
+                            if (crown.size() > MAX_LEAVES) {
+                                return null;
+                            }
+                        }
+                        next.add(at.immutable());
+                    }
                 }
             }
+            frontier = next;
         }
-        // What the other logs keep alive: crown leaves within LEAF_REACH steps of them, through the crown.
+        // What the other logs keep alive: leaves within LEAF_REACH steps of them, through the leaves found.
         Set<BlockPos> held = new HashSet<>();
         ArrayDeque<BlockPos> reachable = new ArrayDeque<>(otherLogs);
         for (int step = 0; step < LEAF_REACH && !reachable.isEmpty(); step++) {
@@ -346,7 +351,7 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
             for (BlockPos pos : reachable) {
                 for (Direction direction : Direction.values()) {
                     BlockPos at = pos.relative(direction);
-                    if (crown.contains(at) && held.add(at)) {
+                    if (near.contains(at) && held.add(at)) {
                         next.add(at);
                     }
                 }
@@ -354,10 +359,8 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
             reachable = next;
         }
         List<BlockPos> leaves = new ArrayList<>();
-        int take = reach + LEAF_REACH;
         for (BlockPos pos : crown) {
-            if (!held.contains(pos) && pos.getY() <= top + LEAF_REACH && Math.abs(pos.getX() - centre.getX()) <= take
-                    && Math.abs(pos.getZ() - centre.getZ()) <= take) {
+            if (!held.contains(pos)) {
                 leaves.add(pos);
             }
         }
@@ -369,7 +372,8 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         return Math.abs(a.getX() - b.getX()) <= 1 && Math.abs(a.getZ() - b.getZ()) <= 1;
     }
 
-    // Fells the tree if it can pay for it and hold everything it drops.
+    // Fells the tree if it can pay for it and hold everything it drops (or, when even empty outputs couldn't, keeps what
+    // fits and pops out the rest).
     private MachineStatus fell(ServerLevel level, BlockPos base, Tree tree) {
         // Never more than a full buffer, so a tree bigger than the buffer pays (see maxLogsPerTree) still falls once it's full.
         int cost = Math.min(energyForLogs(tree.logs().size()), energy.getCapacityAsInt());
@@ -378,11 +382,14 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         }
         FakePlayer player = ArcforgeFakePlayer.at(level, worldPosition, getFacing(), AXE.copy());
         List<ItemStack> drops = new ArrayList<>();
+        List<ItemStack> leafBlocks = new ArrayList<>();
         for (BlockPos pos : tree.leaves()) {
             BlockState state = level.getBlockState(pos);
             drops.addAll(Block.getDrops(state, level, pos, null));
             if (ArcforgeConfig.TREE_CUTTER_COLLECT_LEAVES.getAsBoolean()) {
-                drops.add(new ItemStack(state.getBlock().asItem()));
+                ItemStack leaf = new ItemStack(state.getBlock().asItem());
+                drops.add(leaf);
+                leafBlocks.add(leaf);
             }
         }
         for (BlockPos pos : tree.logs()) {
@@ -391,8 +398,32 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         }
         drops.removeIf(ItemStack::isEmpty);
         ItemStack[] slots = simulate(drops);
+        List<ItemStack> spill = List.of();
+        if (slots == null && !leafBlocks.isEmpty()) {
+            // Too much with the leaf blocks themselves: keep what the leaves drop, not the blocks.
+            drops.removeAll(leafBlocks);
+            slots = simulate(drops);
+        }
         if (slots == null) {
-            return MachineStatus.OUTPUT_FULL;
+            if (!outputsEmpty()) {
+                return MachineStatus.OUTPUT_FULL;
+            }
+            // Even empty outputs can't take it all, so waiting would never help: saplings and logs first, and what's
+            // left over pops out on top of the machine.
+            drops.sort(java.util.Comparator.comparingInt(stack -> isSapling(stack) ? 0 : stack.is(net.minecraft.tags.ItemTags.LOGS) ? 1 : 2));
+            List<ItemStack> kept = new ArrayList<>();
+            List<ItemStack> over = new ArrayList<>();
+            for (ItemStack drop : drops) {
+                List<ItemStack> attempt = new ArrayList<>(kept);
+                attempt.add(drop);
+                if (simulate(attempt) != null) {
+                    kept.add(drop);
+                } else {
+                    over.add(drop);
+                }
+            }
+            slots = simulate(kept);
+            spill = over;
         }
         BlockState baseState = level.getBlockState(base);
         if (NeoForge.EVENT_BUS.post(new BreakBlockEvent(level, base, baseState, player)).isCanceled()) {
@@ -417,11 +448,24 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
                 items.setStack(i, slots[i]);
             }
         }
+        for (ItemStack extra : spill) {
+            Block.popResource(level, worldPosition.above(), extra);
+        }
         lastLogs = tree.logs().size();
         felled++;
         ArcforgeAdvancements.produced(this, new ItemStack(baseState.getBlock().asItem()), null, "tree_cutting");
         setChanged();
         return MachineStatus.FELLING;
+    }
+
+    // Whether every output slot is empty (so nothing taken out of it would ever make more room).
+    private boolean outputsEmpty() {
+        for (int i = FIRST_OUTPUT; i < MACHINE_SLOTS; i++) {
+            if (!items.getStack(i).isEmpty()) {
+                return false;
+            }
+        }
+        return true;
     }
 
     // Where the drops would go: saplings into the sapling slots first (to replant), then everything into the outputs.
