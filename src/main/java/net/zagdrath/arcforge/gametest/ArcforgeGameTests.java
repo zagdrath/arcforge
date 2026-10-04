@@ -214,6 +214,9 @@ public final class ArcforgeGameTests {
         TESTS.put("settings_card_refuses_mismatch", SettingsCardGameTests::refusesMismatch);
         TESTS.put("settings_card_conduit_filter", SettingsCardGameTests::conduitFilter);
         TESTS.put("ethanol_burns_in_fuel_burner", FermenterGameTests::burnsInFuelBurner);
+        TESTS.put("slime_ball_recipes", FermenterGameTests::slimeBallRecipes);
+        TESTS.put("fermenter_grows_slime_balls", FermenterGameTests::growsSlimeBalls);
+        TESTS.put("fermenter_second_input_migration", FermenterGameTests::secondInputMigration);
         TESTS.put("foundry_damage_reduction", FoundryGameTests::damageReduction);
         TESTS.put("foundry_lava_timer_and_cooldown", FoundryGameTests::lavaTimerAndCooldown);
         TESTS.put("dyed_conduits_connect_by_colour", DyedConduitGameTests::connectByColour);

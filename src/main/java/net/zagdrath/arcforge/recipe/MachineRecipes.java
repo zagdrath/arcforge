@@ -134,6 +134,23 @@ public final class MachineRecipes {
         return fermenting(level, stack).isPresent();
     }
 
+    // The Fermenter culture its two input slots and additive slot make, if any. Works on the client too (null level).
+    public static Optional<RecipeHolder<CulturingRecipe>> culturing(@Nullable Level level, ItemStack first, ItemStack second, ItemStack culture) {
+        return recipes(level).byType(ModRecipes.CULTURING.get()).stream()
+                .filter(holder -> holder.value().culture().test(culture) && holder.value().slotsFor(first, second) != null)
+                .findFirst();
+    }
+
+    // Whether an item feeds some culture (it goes in either Fermenter input slot).
+    public static boolean isCultureIngredient(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.CULTURING.get()).stream().anyMatch(holder -> holder.value().usesIngredient(stack));
+    }
+
+    // Whether an item is a starter culture (it goes in the Fermenter's additive slot).
+    public static boolean isCultureStarter(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.CULTURING.get()).stream().anyMatch(holder -> holder.value().culture().test(stack));
+    }
+
     // The electrolyzing recipe for this fluid, if any. Works on the client too (null level), for the GUI.
     public static Optional<RecipeHolder<ElectrolyzingRecipe>> electrolyzing(@Nullable Level level, FluidResource fluid) {
         return recipes(level).byType(ModRecipes.ELECTROLYZING.get()).stream()

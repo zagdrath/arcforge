@@ -101,6 +101,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Carbonizing(gui),
                 new MachineCategories.Melting(gui),
                 new MachineCategories.Fermenting(gui),
+                new MachineCategories.Culturing(gui),
                 new MachineCategories.Milling(gui),
                 new MachineCategories.OilPressing(gui),
                 new MachineCategories.SeedExtracting(gui),
@@ -143,6 +144,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Carbonizing.TYPE, recipes(ModRecipes.CARBONIZING.get()));
         registration.addRecipes(MachineCategories.Melting.TYPE, recipes(ModRecipes.MELTING.get()));
         registration.addRecipes(MachineCategories.Fermenting.TYPE, recipes(ModRecipes.FERMENTING.get()));
+        registration.addRecipes(MachineCategories.Culturing.TYPE, recipes(ModRecipes.CULTURING.get()));
         registration.addRecipes(MachineCategories.Milling.TYPE, recipes(ModRecipes.MILLING.get()));
         registration.addRecipes(MachineCategories.OilPressing.TYPE, recipes(ModRecipes.OIL_PRESSING.get()));
         registration.addRecipes(MachineCategories.SeedExtracting.TYPE, recipes(ModRecipes.SEED_EXTRACTING.get()));
@@ -204,6 +206,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
 
         registration.addRecipes(MultiblockCategory.TYPE, MultiblockBlueprints.all().stream().map(MultiblockCategory.Build::new).toList());
 
+        // Slimeballs are vanilla, so their page names the ways Arcforge makes them.
+        registration.addItemStackInfo(new ItemStack(net.minecraft.world.item.Items.SLIME_BALL), Component.translatable("jei.arcforge.info.slime_ball"));
+
         // Every item's description as its information page.
         for (Item item : BuiltInRegistries.ITEM) {
             Identifier id = BuiltInRegistries.ITEM.getKey(item);
@@ -246,7 +251,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addGhostIngredientHandler(AssemblerScreen.class, new GhostSlotHandler<>());
         registration.addRecipeClickArea(ArcCrusherScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Crushing.TYPE);
         registration.addRecipeClickArea(ArcMelterScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.Melting.TYPE);
-        registration.addRecipeClickArea(FermenterScreen.class, 66, 35, ARROW_W, ARROW_H, MachineCategories.Fermenting.TYPE);
+        registration.addRecipeClickArea(FermenterScreen.class, 66, 35, ARROW_W, ARROW_H, MachineCategories.Fermenting.TYPE,
+                MachineCategories.Culturing.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.OilPressScreen.class, 67, 35, ARROW_W, ARROW_H, MachineCategories.OilPressing.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.SeedExtractorScreen.class, 67, 35, ARROW_W, ARROW_H,
                 MachineCategories.SeedExtracting.TYPE);
@@ -312,6 +318,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Carbonizing.TYPE, ModBlocks.CARBONIZER.get());
         registration.addCraftingStation(MachineCategories.Melting.TYPE, ModBlocks.ARC_MELTER.get());
         registration.addCraftingStation(MachineCategories.Fermenting.TYPE, ModBlocks.FERMENTER.get());
+        registration.addCraftingStation(MachineCategories.Culturing.TYPE, ModBlocks.FERMENTER.get());
         registration.addCraftingStation(MachineCategories.Milling.TYPE, ModBlocks.MILLSTONE.get(), ModBlocks.MILL.get());
         registration.addCraftingStation(MachineCategories.OilPressing.TYPE, ModBlocks.OIL_PRESS.get());
         registration.addCraftingStation(MachineCategories.SeedExtracting.TYPE, ModBlocks.SEED_EXTRACTOR.get());

@@ -22,6 +22,10 @@ number and date.
 
 ### Upgrading
 
+- **Fermenter second input slot** (for slime cultures). Saved Fermenters keep their crops, additive, output and
+  upgrades: the upgrades move up past the new slot when the world loads. Its input, second input and additive slots
+  now stack on the left of the arrow.
+- **Data packs:** new recipe type `arcforge:culturing` (Fermenter cultures).
 - **Steam and power config values reset to their new defaults.** Keys whose meaning or default changed were renamed, so
   old values are not carried over; set them again if you had changed them:
   - `steam.steamBoilerArray`: `heatCapacityPerHeight`, `maxHeatPerTickPerHeight`, `tankCapacityPerHeight` become
@@ -69,6 +73,15 @@ number and date.
 
 ### Added
 
+- **Three ways to make Slimeballs:**
+  - Crafting: 2 Pine Resin + 1 Kelp (shapeless) make a Slimeball.
+  - Chemical Reactor: 250 mB of Latex + 1 Lime Dye make 2 Slimeballs.
+  - **Slime culture** in the Fermenter: a Slimeball in the additive slot as the starter culture (never used up), Sugar
+    and Kelp in its two input slots (either way round) and 250 mB of water grow a new Slimeball into the output slot in
+    60 s (Ethanol takes 10 s). No Ethanol or Carbon Dioxide comes of it, and Dried Hops don't change it. The Fermenter
+    gains a second input slot for it. New recipe type `arcforge:culturing`; the amounts and time are in the recipe.
+  - A JEI category (Slime Culture) and a Slimeball information page, Handbook lines under Pine Resin, Latex and the
+    Fermenter, and GameTests.
 - **JEI drag-and-drop onto ghost slots:** drag an item from JEI onto a Conduit Filter entry, an Arc Quarry filter cell
   or an Assembler pattern cell to set it, as clicking with the item does. Fluid and pressurized conduits' filter entries
   also take dragged fluids and gases (and items holding one). Only the slots that take what's being dragged light up.

@@ -44,6 +44,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.interaction.FluidInteractable;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.FermenterMenu;
+import net.zagdrath.arcforge.recipe.CulturingRecipe;
 import net.zagdrath.arcforge.recipe.FermentingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -63,14 +64,21 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // more Ethanol (+20%), and one lasts additiveOperations operations.
 // Carbon Dioxide: each operation gives off carbonDioxidePerEthanol mB per mB of Ethanol into its gas tank, pushed out of
 // Gas Output faces; what doesn't fit goes into the air, so it never stops the Fermenter.
+// Cultures (arcforge:culturing): with a starter culture in the additive slot (a Slimeball), the items in its two input
+// slots (Sugar and Kelp, either way round) and water grow the result (a Slimeball) into the output slot, slowly. The
+// starter is never used up; there's no Ethanol or Carbon Dioxide, and Dried Hops don't come into it. A culture that
+// matches goes before fermenting.
 // Speed upgrades make it faster (drawing FE just as much faster), Energy upgrades cut the FE per operation.
 public class FermenterBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_BYPRODUCT = 1;
     public static final int SLOT_ADDITIVE = 2;
-    public static final int MACHINE_SLOTS = 3;
-    // Saves before the additive slot (layout 1) had the upgrade slots straight after the byproduct slot.
-    private static final int SLOT_LAYOUT = 2;
+    // The second input, for cultures (crops for Ethanol only go in the first).
+    public static final int SLOT_INPUT_2 = 3;
+    public static final int MACHINE_SLOTS = 4;
+    // Saves before the additive slot (layout 1) had the upgrade slots straight after the byproduct slot, and saves before
+    // the second input slot (layout 2) straight after the additive slot.
+    private static final int SLOT_LAYOUT = 3;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.GAS_OUTPUT);
 
@@ -92,6 +100,8 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
     private int usage;
     // Operations the Dried Hops already taken from the additive slot still boost.
     private int additiveLeft;
+    // Whether the batch in progress is a culture (switching to or from one starts the batch over).
+    private boolean culturing;
 
     public FermenterBlockEntity(BlockPos pos, BlockState state) {
         // Defaults: top input, bottom output, back energy.
@@ -109,7 +119,8 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
                 this::setChanged);
         this.carbonDioxideOutput = new AutomationResourceHandler<>(carbonDioxide, index -> false, index -> true);
         this.fluidAutomation = new CombinedResourceHandler<>(ethanolOutput, waterInput, carbonDioxideOutput);
-        this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT || slot == SLOT_ADDITIVE, slot -> false);
+        this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT || slot == SLOT_INPUT_2 || slot == SLOT_ADDITIVE,
+                slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_BYPRODUCT);
         this.data = new WideIntContainerData(FermenterMenu.DATA_VALUES) {
             @Override
@@ -137,12 +148,15 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         };
     }
 
-    // The input slot takes any fermenting ingredient and the additive slot Dried Hops; nothing goes into the byproduct
-    // slot. The client passes a null level and checks against the recipes the server synced.
+    // The first input slot takes any fermenting or culture ingredient, the second culture ingredients only, and the
+    // additive slot Dried Hops or a starter culture; nothing goes into the output slot. The client passes a null level
+    // and checks against the recipes the server synced.
     public static boolean isItemValid(@Nullable Level level, int slot, ItemResource resource) {
+        ItemStack stack = resource.toStack(1);
         return switch (slot) {
-            case SLOT_INPUT -> MachineRecipes.isFermenterInput(level, resource.toStack(1));
-            case SLOT_ADDITIVE -> isAdditive(resource.toStack(1));
+            case SLOT_INPUT -> MachineRecipes.isFermenterInput(level, stack) || MachineRecipes.isCultureIngredient(level, stack);
+            case SLOT_INPUT_2 -> MachineRecipes.isCultureIngredient(level, stack);
+            case SLOT_ADDITIVE -> isAdditive(stack) || MachineRecipes.isCultureStarter(level, stack);
             default -> false;
         };
     }
@@ -176,8 +190,91 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         return UpgradeType.time(recipe.time(), upgrades(UpgradeType.SPEED));
     }
 
+    public int energyPerTick(CulturingRecipe recipe) {
+        double base = (double) recipe.totalEnergy() / recipe.time();
+        return (int) Math.ceil(base * speedMultiplier() * UpgradeType.energyCostMultiplier(upgrades(UpgradeType.ENERGY)));
+    }
+
+    public int ticksFor(CulturingRecipe recipe) {
+        return UpgradeType.time(recipe.time(), upgrades(UpgradeType.SPEED));
+    }
+
+    // The culture its slots make now, if any.
+    public Optional<RecipeHolder<CulturingRecipe>> culture(@Nullable Level level) {
+        return MachineRecipes.culturing(level, items.getStack(SLOT_INPUT), items.getStack(SLOT_INPUT_2), items.getStack(SLOT_ADDITIVE));
+    }
+
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
+        Optional<RecipeHolder<CulturingRecipe>> culture = culture(level);
+        if (culture.isPresent()) {
+            cultureTick(level, pos, culture.get().value());
+        } else {
+            fermentTick(level, pos);
+        }
+        setLit(status == MachineStatus.FERMENTING);
+
+        outputs.pushFluid(level, pos, getFacing(), sideConfig, ethanolOutput, ArcforgeConfig.MELTER_OUTPUT_RATE.getAsInt(), null);
+        pushGas(level, pos);
+        autoEject(level, itemOutput);
+    }
+
+    private void cultureTick(ServerLevel level, BlockPos pos, CulturingRecipe recipe) {
+        // Switching between cultures and fermenting starts the batch over.
+        if (!culturing) {
+            culturing = true;
+            progress = 0;
+        }
+        total = ticksFor(recipe);
+        ItemStack result = recipe.result().create();
+        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
+            status = MachineStatus.DISABLED;
+        } else if (water.getAmount() < recipe.fluidInput().amount()) {
+            status = MachineStatus.NO_WATER;
+        } else if (!fitsOutput(result)) {
+            status = MachineStatus.OUTPUT_FULL;
+        } else if (!energy.consume(energyPerTick(recipe))) {
+            status = MachineStatus.NO_POWER;
+        } else {
+            status = MachineStatus.FERMENTING;
+            usage = energyPerTick(recipe);
+            if (++progress >= total) {
+                progress = 0;
+                grow(recipe, result);
+            }
+            setChanged();
+        }
+    }
+
+    // Takes the ingredients and the water, keeps the starter, and puts the grown result in the output slot.
+    private void grow(CulturingRecipe recipe, ItemStack result) {
+        int[] slots = recipe.slotsFor(items.getStack(SLOT_INPUT), items.getStack(SLOT_INPUT_2));
+        if (slots == null) {
+            return;
+        }
+        for (int i = 0; i < slots.length; i++) {
+            int slot = slots[i] == 0 ? SLOT_INPUT : SLOT_INPUT_2;
+            ItemStack held = items.getStack(slot);
+            items.setStack(slot, held.copyWithCount(held.getCount() - recipe.ingredients().get(i).count()));
+        }
+        try (Transaction tx = Transaction.openRoot()) {
+            water.extract(0, water.getResource(0), recipe.fluidInput().amount(), tx);
+            tx.commit();
+        }
+        ItemStack held = items.getStack(SLOT_BYPRODUCT);
+        items.setStack(SLOT_BYPRODUCT, held.isEmpty() ? result : held.copyWithCount(held.getCount() + result.getCount()));
+    }
+
+    private boolean fitsOutput(ItemStack stack) {
+        ItemStack held = items.getStack(SLOT_BYPRODUCT);
+        return held.isEmpty() || (ItemStack.isSameItemSameComponents(held, stack) && held.getCount() + stack.getCount() <= held.getMaxStackSize());
+    }
+
+    private void fermentTick(ServerLevel level, BlockPos pos) {
+        if (culturing) {
+            culturing = false;
+            progress = 0;
+        }
         ItemStack input = items.getStack(SLOT_INPUT);
         Optional<RecipeHolder<FermentingRecipe>> recipe = input.isEmpty() ? Optional.empty() : MachineRecipes.fermenting(level, input);
         total = recipe.map(holder -> ticksFor(holder.value())).orElse(0);
@@ -205,11 +302,6 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
             }
             setChanged();
         }
-        setLit(status == MachineStatus.FERMENTING);
-
-        outputs.pushFluid(level, pos, getFacing(), sideConfig, ethanolOutput, ArcforgeConfig.MELTER_OUTPUT_RATE.getAsInt(), null);
-        pushGas(level, pos);
-        autoEject(level, itemOutput);
     }
 
     // Carbon Dioxide out of Gas Output faces, up to gasOutputRate mB/t shared across them.
@@ -234,12 +326,7 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
                 return false;
             }
         }
-        if (recipe.byproduct().isEmpty() || recipe.byproductChance() <= 0) {
-            return true;
-        }
-        ItemStack byproduct = recipe.byproduct().get().create();
-        ItemStack held = items.getStack(SLOT_BYPRODUCT);
-        return held.isEmpty() || (ItemStack.isSameItemSameComponents(held, byproduct) && held.getCount() + byproduct.getCount() <= held.getMaxStackSize());
+        return recipe.byproduct().isEmpty() || recipe.byproductChance() <= 0 || fitsOutput(recipe.byproduct().get().create());
     }
 
     private void ferment(ServerLevel level, FermentingRecipe recipe) {
@@ -354,13 +441,15 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         carbonDioxide.deserialize(input.childOrEmpty("carbon_dioxide"));
         progress = input.getIntOr("progress", 0);
         additiveLeft = input.getIntOr("additive_left", 0);
-        if (input.getIntOr("slot_layout", 1) < SLOT_LAYOUT) {
+        culturing = input.getBooleanOr("culturing", false);
+        int layout = input.getIntOr("slot_layout", 1);
+        if (layout < 2) {
             // Layout 1 was input, byproduct, then the upgrade slots: move the upgrades up past the new additive slot.
-            items.ensureSize(MACHINE_SLOTS + UPGRADE_SLOTS);
-            for (int slot = MACHINE_SLOTS + UPGRADE_SLOTS - 1; slot > SLOT_ADDITIVE; slot--) {
-                items.setStack(slot, items.getStack(slot - 1));
-            }
-            items.setStack(SLOT_ADDITIVE, ItemStack.EMPTY);
+            insertSlot(SLOT_ADDITIVE);
+        }
+        if (layout < 3) {
+            // Layout 2 was input, byproduct, additive, then the upgrade slots: move them up past the second input slot.
+            insertSlot(SLOT_INPUT_2);
         }
     }
 
@@ -374,6 +463,16 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         output.putInt("progress", progress);
         output.putInt("additive_left", additiveLeft);
         output.putInt("slot_layout", SLOT_LAYOUT);
+        output.putBoolean("culturing", culturing);
+    }
+
+    // An old save's slots from `slot` on move up one, leaving it empty.
+    private void insertSlot(int slot) {
+        items.ensureSize(MACHINE_SLOTS + UPGRADE_SLOTS);
+        for (int i = MACHINE_SLOTS + UPGRADE_SLOTS - 1; i > slot; i--) {
+            items.setStack(i, items.getStack(i - 1));
+        }
+        items.setStack(slot, ItemStack.EMPTY);
     }
 
     @Override

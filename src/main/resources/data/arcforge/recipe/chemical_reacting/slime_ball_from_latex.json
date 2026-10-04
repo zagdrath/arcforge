@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "minecraft:lime_dye",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:latex",
+      "amount": 250
+    }
+  ],
+  "item_output": {
+    "id": "minecraft:slime_ball",
+    "count": 2
+  },
+  "time": 100
+}

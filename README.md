@@ -613,6 +613,14 @@ Dried Hops (from the Grain Dryer) in its additive slot add 20% Ethanol, one last
 and Dried Sorghum ferment in half the time. Fermenting gives off **Carbon Dioxide** (a gas, 1 mB per mB of Ethanol)
 out of any face set to Gas Output; with none, or with its 4,000 mB tank full, it goes into the air.
 
+**Slime culture.** With a Slimeball in the additive slot as a starter culture, a Sugar and a Kelp (in its two input slots,
+either way round) and 250 mB of water grow a new Slimeball into the output slot in 60 seconds, six times as long as a
+batch of Ethanol (`arcforge:culturing`: `ingredients`, `fluid_input`, `culture`, `result`, `time`, optional `energy`).
+The starter is never used up; a culture makes no Ethanol or Carbon Dioxide, and Dried Hops don't change it.
+
+**Slimeballs** also come from 2 Pine Resin and a Kelp at a crafting table, and from 250 mB of Latex and a Lime Dye in
+the Chemical Reactor (2 Slimeballs).
+
 ### Farm chemistry
 
 **Air Separator** (FE). Separates the air round it into 80 mB of **Nitrogen** and 20 mB of Oxygen every 2 seconds at

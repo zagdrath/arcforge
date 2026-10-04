@@ -27,6 +27,7 @@ import net.zagdrath.arcforge.recipe.DigestingRecipe;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.ElectrolyzingRecipe;
 import net.zagdrath.arcforge.recipe.EvaporatingRecipe;
+import net.zagdrath.arcforge.recipe.CulturingRecipe;
 import net.zagdrath.arcforge.recipe.FermentingRecipe;
 import net.zagdrath.arcforge.recipe.FiberizingRecipe;
 import net.zagdrath.arcforge.recipe.InfusingRecipe;
@@ -72,6 +73,8 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("melting")));
     public static final Supplier<RecipeType<FermentingRecipe>> FERMENTING = RECIPE_TYPES.register("fermenting",
             () -> RecipeType.simple(id("fermenting")));
+    public static final Supplier<RecipeType<CulturingRecipe>> CULTURING = RECIPE_TYPES.register("culturing",
+            () -> RecipeType.simple(id("culturing")));
     public static final Supplier<RecipeType<PressingRecipe>> PRESSING = RECIPE_TYPES.register("pressing",
             () -> RecipeType.simple(id("pressing")));
     // Farm processing: the Millstone and Mill, the Oil Press, the Seed Extractor and the Grain Dryer.
@@ -133,6 +136,8 @@ public final class ModRecipes {
             () -> new RecipeSerializer<>(MeltingRecipe.MAP_CODEC, MeltingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<FermentingRecipe>> FERMENTING_SERIALIZER = RECIPE_SERIALIZERS.register("fermenting",
             () -> new RecipeSerializer<>(FermentingRecipe.MAP_CODEC, FermentingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<CulturingRecipe>> CULTURING_SERIALIZER = RECIPE_SERIALIZERS.register("culturing",
+            () -> new RecipeSerializer<>(CulturingRecipe.MAP_CODEC, CulturingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<PressingRecipe>> PRESSING_SERIALIZER = RECIPE_SERIALIZERS.register("pressing",
             () -> new RecipeSerializer<>(PressingRecipe.MAP_CODEC, PressingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<MillingRecipe>> MILLING_SERIALIZER = RECIPE_SERIALIZERS.register("milling",
@@ -202,7 +207,7 @@ public final class ModRecipes {
     }
 
     private static void syncToClients(OnDatapackSyncEvent event) {
-        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
+        event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), CULTURING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
                 MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(), VULCANIZING.get(),
                 HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
                 SIFTING.get(), DIAMOND_PRESSING.get(),

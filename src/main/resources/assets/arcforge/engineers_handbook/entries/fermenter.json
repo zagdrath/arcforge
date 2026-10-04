@@ -5,12 +5,17 @@
     "arcforge:fermenter",
     "arcforge:ethanol_bucket",
     "arcforge:sorghum_stalks",
-    "arcforge:dried_hops"
+    "arcforge:dried_hops",
+    "minecraft:slime_ball"
   ],
   "pages": [
     {
       "type": "text",
       "text": "The Fermenter turns crops and water into Ethanol, using a little power.\n| Crop | Ethanol |\n| Sorghum Stalks, Dried Sorghum | 80 mB |\n| Wheat, Dried Grain, Potato, Carrot, Beetroot | 50 mB |\n| Sugar Cane | 60 mB |\n| Sweet Berries | 25 mB |\n| Melon Slice | 20 mB |\nEach takes 100 mB of water and 10 s (Dried Grain and Dried Sorghum 5 s), and has a 10% chance to leave Bone Meal. Speed and Energy upgrades work.\n# Dried Hops\nDried Hops in the additive slot (under the crop) raise the Ethanol of each operation by 20%. One lasts 4 operations.\n# Carbon Dioxide\nFermenting gives off Carbon Dioxide, 1 mB for each mB of Ethanol. Set a face to Gas Output to pipe it away through Pressurized Conduits; with no Gas Output face, or once its tank is full, it goes into the air. It never stops the Fermenter.\n# Ethanol\nA light fuel: 300 HU per mB at up to 900°C in the Fuel Burner (Naphtha is 400 HU at 1,200°C). It also runs the Gas Turbine Array."
+    },
+    {
+      "type": "text",
+      "text": "# Slime Culture\nPut a Slimeball in the additive slot as a starter culture, Sugar and Kelp in the two input slots (either way round), and give it water. Each batch takes a Sugar, a Kelp and 250 mB of water and grows a new Slimeball into the output slot in 60 s, six times as long as Ethanol. The starter is never used up.\nA culture makes no Ethanol or Carbon Dioxide, and Dried Hops don't change it. While the inputs and starter make a culture, it grows that before fermenting anything.\n# Other Slimeballs\n- Crafting: 2 Pine Resin and a Kelp make a Slimeball.\n- Chemical Reactor: 250 mB of Latex and a Lime Dye make 2."
     }
   ]
 }

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "arcforge:pine_resin",
+    "arcforge:pine_resin",
+    "minecraft:kelp"
+  ],
+  "result": {
+    "id": "minecraft:slime_ball",
+    "count": 1
+  }
+}

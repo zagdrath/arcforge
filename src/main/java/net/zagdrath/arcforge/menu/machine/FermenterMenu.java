@@ -36,12 +36,15 @@ public class FermenterMenu extends MachineMenu {
     public static final int DATA_ADDITIVE_LEFT = 15;
     public static final int DATA_VALUES = 16;
 
-    // Slot positions: the crop over the additive, left of the arrow; the byproduct after it; the tanks on the right.
-    public static final int INPUT_X = 44, INPUT_Y = 25;
-    public static final int ADDITIVE_X = 44, ADDITIVE_Y = 45;
+    // Slot positions: the two inputs over the additive, left of the arrow; the output after it; the tanks on the right.
+    public static final int INPUT_X = 44, INPUT_Y = 17;
+    public static final int INPUT_2_X = 44, INPUT_2_Y = 35;
+    public static final int ADDITIVE_X = 44, ADDITIVE_Y = 53;
     public static final int BYPRODUCT_X = 94, BYPRODUCT_Y = 35;
     // The additive slot's index among the menu's slots (added third).
     public static final int ADDITIVE_SLOT_INDEX = 2;
+    // The second input slot's index among the menu's slots (added fourth).
+    public static final int INPUT_2_SLOT_INDEX = 3;
 
     // Client constructor, called with the block position written by the server.
     public FermenterMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -53,6 +56,7 @@ public class FermenterMenu extends MachineMenu {
         addMachineSlot(FermenterBlockEntity.SLOT_INPUT, INPUT_X, INPUT_Y);
         addMachineSlot(FermenterBlockEntity.SLOT_BYPRODUCT, BYPRODUCT_X, BYPRODUCT_Y);
         addMachineSlot(FermenterBlockEntity.SLOT_ADDITIVE, ADDITIVE_X, ADDITIVE_Y);
+        addMachineSlot(FermenterBlockEntity.SLOT_INPUT_2, INPUT_2_X, INPUT_2_Y);
         finish(inventory);
     }
 

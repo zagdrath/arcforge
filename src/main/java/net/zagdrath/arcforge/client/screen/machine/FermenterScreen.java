@@ -87,6 +87,11 @@ public class FermenterScreen extends MachineScreen<FermenterMenu> {
             if (menu.getAdditiveLeft() > 0) {
                 lines.add(Component.translatable("gui.arcforge.fermenter.additive_left", menu.getAdditiveLeft()).withStyle(ChatFormatting.GOLD));
             }
+            lines.add(Component.translatable("gui.arcforge.fermenter.culture_hint").withStyle(ChatFormatting.GRAY));
+        } else if (isHovering(FermenterMenu.INPUT_2_X - 1, FermenterMenu.INPUT_2_Y - 1, 18, 18, mouseX, mouseY)
+                && menu.getSlot(FermenterMenu.INPUT_2_SLOT_INDEX).getItem().isEmpty()) {
+            lines.add(Component.translatable("gui.arcforge.fermenter.second_input"));
+            lines.add(Component.translatable("gui.arcforge.fermenter.second_input_hint").withStyle(ChatFormatting.GRAY));
         } else if (isHovering(STATUS_X, STATUS_Y - 1, STATUS_W, 10, mouseX, mouseY)) {
             lines.add(menu.getStatus().getDescription());
         } else if (isHovering(PROGRESS_X, PROGRESS_Y, PROGRESS_W, PROGRESS_H, mouseX, mouseY) && menu.getTotal() > 0) {

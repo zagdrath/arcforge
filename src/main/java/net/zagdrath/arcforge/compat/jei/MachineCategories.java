@@ -27,6 +27,7 @@ import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.recipe.AirSeparatingRecipe;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
+import net.zagdrath.arcforge.recipe.CulturingRecipe;
 import net.zagdrath.arcforge.recipe.ChemicalReactingRecipe;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.recipe.DigestingRecipe;
@@ -299,6 +300,44 @@ final class MachineCategories {
             FermentingRecipe recipe = holder.value();
             text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
                     String.format(Locale.ROOT, "%,d", recipe.totalEnergy())), 0, 30);
+        }
+    }
+
+    // --- Fermenter cultures (Slimeballs) ---
+
+    static final class Culturing extends ArcforgeCategory<RecipeHolder<CulturingRecipe>> {
+        static final IRecipeHolderType<CulturingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.CULTURING.get());
+
+        Culturing(IGuiHelper gui) {
+            super(TYPE, "culturing", ModBlocks.FERMENTER.get(), gui, 130, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<CulturingRecipe> holder, IFocusGroup focuses) {
+            CulturingRecipe recipe = holder.value();
+            for (int i = 0; i < recipe.ingredients().size(); i++) {
+                var input = recipe.ingredients().get(i);
+                builder.addInputSlot(1 + i * 18, 5).setStandardSlotBackground()
+                        .addItemStacks(input.ingredient().items().map(item -> new ItemStack(item, input.count())).toList());
+            }
+            fluid(builder, true, 37, 5, recipe.fluidInput().fluid(), recipe.fluidInput().amount());
+            // The starter culture, in the additive slot: never used up.
+            builder.addInputSlot(19, 23).setStandardSlotBackground().add(recipe.culture())
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.culturing.starter")));
+            builder.addOutputSlot(95, 5).setStandardSlotBackground().add(recipe.result().create());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<CulturingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(62, 5);
+        }
+
+        // Time and FE at the configured rates, before upgrades.
+        @Override
+        public void draw(RecipeHolder<CulturingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            CulturingRecipe recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.time()),
+                    String.format(Locale.ROOT, "%,d", recipe.totalEnergy())), 41, 28);
         }
     }
 

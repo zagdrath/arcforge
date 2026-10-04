@@ -1,0 +1,23 @@
+{
+  "type": "arcforge:culturing",
+  "ingredients": [
+    {
+      "ingredient": "minecraft:sugar",
+      "count": 1
+    },
+    {
+      "ingredient": "minecraft:kelp",
+      "count": 1
+    }
+  ],
+  "fluid_input": {
+    "fluid": "minecraft:water",
+    "amount": 250
+  },
+  "culture": "minecraft:slime_ball",
+  "result": {
+    "id": "minecraft:slime_ball",
+    "count": 1
+  },
+  "time": 1200
+}
