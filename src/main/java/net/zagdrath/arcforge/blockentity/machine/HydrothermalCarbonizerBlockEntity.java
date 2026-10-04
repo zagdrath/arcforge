@@ -69,6 +69,8 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
     private final HeatHandler heatInput;
     private final FilteredFluidTank water;
     private final FilteredFluidTank returned;
+    // Set in the GUI: the water each batch gives back is thrown away instead of kept, and the tank is kept empty.
+    private boolean discardWater;
     private final ResourceHandler<FluidResource> waterInput;
     private final ResourceHandler<FluidResource> waterOutput;
     private final ResourceHandler<FluidResource> fluidAutomation;
@@ -117,6 +119,7 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
                     case HydrothermalCarbonizerMenu.DATA_WATER -> water.getAmount();
                     case HydrothermalCarbonizerMenu.DATA_RETURNED -> returned.getAmount();
                     case HydrothermalCarbonizerMenu.DATA_TANK_CAPACITY -> water.getCapacity();
+                    case HydrothermalCarbonizerMenu.DATA_DISCARD -> discardWater ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -146,6 +149,9 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         heatUsage = 0;
+        if (discardWater && returned.getAmount() > 0) {
+            returned.set(0, FluidResource.EMPTY, 0);
+        }
         if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
             status = MachineStatus.DISABLED;
         } else {
@@ -192,8 +198,8 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
             items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - recipe.inputCount()));
             try (Transaction tx = Transaction.openRoot()) {
                 water.extract(0, FluidResource.of(Fluids.WATER), recipe.water(), tx);
-                // Water that doesn't fit is lost as steam.
-                int back = Math.min(recipe.waterReturn(), returned.getSpace());
+                // Water that doesn't fit is lost as steam, and all of it while discarding.
+                int back = discardWater ? 0 : Math.min(recipe.waterReturn(), returned.getSpace());
                 if (back > 0) {
                     returned.insert(0, FluidResource.of(Fluids.WATER), back, tx);
                 }
@@ -297,6 +303,7 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
         returned.deserialize(input.childOrEmpty("returned"));
         progress = input.getIntOr("progress", 0);
         heatOwed = input.getDoubleOr("heat_owed", 0.0);
+        discardWater = input.getBooleanOr("discard_water", false);
     }
 
     @Override
@@ -307,6 +314,16 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
         returned.serialize(output.child("returned"));
         output.putInt("progress", progress);
         output.putDouble("heat_owed", heatOwed);
+        output.putBoolean("discard_water", discardWater);
+    }
+
+    public boolean isDiscardingWater() {
+        return discardWater;
+    }
+
+    public void setDiscardingWater(boolean on) {
+        discardWater = on;
+        setChanged();
     }
 
     @Override

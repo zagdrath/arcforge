@@ -32,11 +32,17 @@ public class HydrothermalCarbonizerScreen extends MachineScreen<HydrothermalCarb
     private static final int STATUS_X = 51, STATUS_Y = 54, STATUS_W = 84;
     private static final int HEAT_X = 43, HEAT_Y = 66, HEAT_W = 92;
     private static final int TICK_Y = 63, TICK_W = 3, TICK_H = 7;
+    // The discard toggle under the returned-water tank, in the gap above the inventory (as the Electrolyzer's vents).
+    private static final int DISCARD_X = RETURNED_X - 1, DISCARD_Y = 71, DISCARD_W = 14, DISCARD_H = 12;
+    private static final int HOVER = 0x30FFFFFF;
 
     private final Identifier heatBuffer = sprite("heat_buffer");
     private final Identifier progress = sprite("progress");
     private final Identifier minTempTick = sprite("min_temp_tick");
     private final Identifier tankGauge = sprite("tank_gauge");
+    private final Identifier discardOn = sprite("vent_on");
+    private final Identifier discardOff = sprite("vent_off");
+    private int mouseX, mouseY;
 
     public HydrothermalCarbonizerScreen(HydrothermalCarbonizerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "hydrothermal_carbonizer", List.of(
@@ -62,6 +68,29 @@ public class HydrothermalCarbonizerScreen extends MachineScreen<HydrothermalCarb
         // White tick at the temperature it needs to work.
         int tickX = HEAT_X + HeatScale.fillWidth(HEAT_W, menu.getMinTemperature()) - 1;
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, minTempTick, x + tickX, y + TICK_Y, TICK_W, TICK_H);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, menu.isDiscardingWater() ? discardOn : discardOff, x + DISCARD_X, y + DISCARD_Y,
+                DISCARD_W, DISCARD_H);
+        if (isHovering(DISCARD_X, DISCARD_Y, DISCARD_W, DISCARD_H, mouseX, mouseY)) {
+            graphics.fill(x + DISCARD_X, y + DISCARD_Y, x + DISCARD_X + DISCARD_W, y + DISCARD_Y + DISCARD_H, HOVER);
+        }
+    }
+
+    @Override
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
+        this.mouseX = mouseX;
+        this.mouseY = mouseY;
+        super.extractBackground(graphics, mouseX, mouseY, partialTick);
+    }
+
+    @Override
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == com.mojang.blaze3d.platform.InputConstants.MOUSE_BUTTON_LEFT && minecraft.gameMode != null
+                && isHovering(DISCARD_X, DISCARD_Y, DISCARD_W, DISCARD_H, event.x(), event.y())) {
+            minecraft.gameMode.handleInventoryButtonClick(menu.containerId, HydrothermalCarbonizerMenu.BUTTON_DISCARD);
+            ArcforgeGui.playClickSound();
+            return true;
+        }
+        return super.mouseClicked(event, doubleClick);
     }
 
     @Override
@@ -76,6 +105,12 @@ public class HydrothermalCarbonizerScreen extends MachineScreen<HydrothermalCarb
 
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
+        if (isHovering(DISCARD_X, DISCARD_Y, DISCARD_W, DISCARD_H, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.hydrothermal_carbonizer.discard"));
+            lines.add(Component.translatable(menu.isDiscardingWater() ? "gui.arcforge.hydrothermal_carbonizer.discard_on"
+                    : "gui.arcforge.hydrothermal_carbonizer.discard_off").withStyle(ChatFormatting.GRAY));
+            return;
+        }
         if (isHovering(BUFFER_X - 1, BUFFER_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.hu_stored", ArcforgeGui.grouped(menu.getHeat()), ArcforgeGui.grouped(menu.getHeatCapacity())));
             lines.add(temperatureLine().withStyle(ChatFormatting.GRAY));

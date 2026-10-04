@@ -96,8 +96,10 @@ number and date.
     in the Carbonizer and crushes into Carbon Dust in the Arc Crusher.
   - **Hydrothermal Carbonizer,** a heat (HU) machine that only runs at 200°C or hotter: 8 biomass + 500 mB Water make
     1 Bio-Coal in 10 seconds for 6,000 HU, and 300 mB of the water comes back out of a second tank. Side configuration;
-    Speed and Heat upgrades. New recipe type `arcforge:hydrothermal_carbonizing` (`ingredient`, optional `count`,
-    `result`, `water`, `water_return`, optional `heat` and `time`; the counts, heat and time default to the config).
+    Speed and Heat upgrades. A **Discard returned Water** toggle under the returned tank throws that water away
+    instead (and keeps the tank empty) when you don't want to pipe it. New recipe type
+    `arcforge:hydrothermal_carbonizing` (`ingredient`, optional `count`, `result`, `water`, `water_return`, optional
+    `heat` and `time`; the counts, heat and time default to the config).
   - **New tag `#arcforge:biomass`:** crops, seeds, leaves, saplings, sticks, vines, glow lichen, kelp, Press Cake and
     Compost.
   - Handbook pages (Tree Cutter, Bio-Coal), JEI categories (Tree Cutting, Hydrothermal Carbonizing), Jade tooltips,

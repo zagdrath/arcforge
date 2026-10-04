@@ -30,7 +30,10 @@ public class HydrothermalCarbonizerMenu extends MachineMenu {
     public static final int DATA_WATER = 10;
     public static final int DATA_RETURNED = 11;
     public static final int DATA_TANK_CAPACITY = 12;
-    public static final int DATA_VALUES = 13;
+    // 1 while the returned water is being discarded.
+    public static final int DATA_DISCARD = 13;
+    public static final int DATA_VALUES = 14;
+    public static final int BUTTON_DISCARD = 200;
 
     // The Grain Dryer's layout, with a second tank for the returned water.
     public static final int INPUT_X = 44, INPUT_Y = 35;
@@ -99,6 +102,23 @@ public class HydrothermalCarbonizerMenu extends MachineMenu {
 
     public int getReturned() {
         return value(DATA_RETURNED);
+    }
+
+    public boolean isDiscardingWater() {
+        return value(DATA_DISCARD) != 0;
+    }
+
+    @Override
+    public boolean clickMenuButton(net.minecraft.world.entity.player.Player player, int buttonId) {
+        if (buttonId == BUTTON_DISCARD) {
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof net.zagdrath.arcforge.blockentity.machine.HydrothermalCarbonizerBlockEntity carbonizer) {
+                    carbonizer.setDiscardingWater(!carbonizer.isDiscardingWater());
+                }
+            });
+            return true;
+        }
+        return super.clickMenuButton(player, buttonId);
     }
 
     public int getTankCapacity() {

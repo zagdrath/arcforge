@@ -229,4 +229,30 @@ public final class RenewableCoalGameTests {
         helper.assertFalse(shared.leaves().contains(helper.absolutePos(base.offset(2, 2, 0))), "A leaf touching the neighbour was taken");
         helper.succeed();
     }
+
+    // With Discard returned Water on, a batch gives back no water, and water already in the returned tank is emptied.
+    // The setting survives a save and load.
+    static void hydrothermalDiscardsWater(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(0, 1, 0);
+        helper.setBlock(pos, ModBlocks.HYDROTHERMAL_CARBONIZER.get());
+        HydrothermalCarbonizerBlockEntity machine = helper.getBlockEntity(pos, HydrothermalCarbonizerBlockEntity.class);
+        var recipe = MachineRecipes.hydrothermalCarbonizing(helper.getLevel(), new ItemStack(Items.STICK)).orElseThrow().value();
+        CrushingGameTests.insert(machine.getItemHandler(Direction.UP), Items.STICK, recipe.inputCount());
+        fill(machine, recipe.water());
+        try (var tx = net.neoforged.neoforge.transfer.transaction.Transaction.openRoot()) {
+            machine.getReturned().insert(0, net.neoforged.neoforge.transfer.fluid.FluidResource.of(net.minecraft.world.level.material.Fluids.WATER), 1_000, tx);
+            tx.commit();
+        }
+        machine.setDiscardingWater(true);
+        var registries = helper.getLevel().registryAccess();
+        var saved = machine.saveCustomOnly(registries);
+        helper.assertTrue(saved.getBooleanOr("discard_water", false), "Discarding wasn't saved");
+        machine.getHeat().add(machine.getHeat().getCapacity());
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(machine.getItems().getStack(HydrothermalCarbonizerBlockEntity.SLOT_OUTPUT).is(ModItems.BIO_COAL.get()),
+                        "No Bio-Coal yet"))
+                .thenExecute(() -> helper.assertTrue(machine.getReturned().getAmount() == 0,
+                        machine.getReturned().getAmount() + " mB of returned water kept while discarding"))
+                .thenSucceed();
+    }
 }
