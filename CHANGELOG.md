@@ -20,6 +20,8 @@ number and date.
 
 ## [Unreleased]
 
+## [2.4.0] - 2026-10-04
+
 ### Upgrading
 
 - **The config is regrouped into eight categories with subcategories** (Heat & Power, Machines, Multiblocks, Farming,
@@ -1110,7 +1112,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.3.0...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.4.0...HEAD
+[2.4.0]: https://github.com/zagdrath/arcforge/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/zagdrath/arcforge/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/zagdrath/arcforge/compare/v2.1.0...v2.2.0
 [2.1.0]: https://github.com/zagdrath/arcforge/compare/v2.0.0...v2.1.0
