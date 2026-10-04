@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
 
 // Compost, Wood Ash, Basic Slag, Mixed Fertilizer, Seed Meal, Digestate and NPK Fertilizer: used on Loam Farmland (or on
-// the crop growing on it), one adds its nutrients (config farming.fertilizers), up to 15. They do nothing on anything
+// the crop growing on it), one adds its nutrients (config farming.growing.fertilizers), up to 15. They do nothing on anything
 // else. NPK Fertilizer also enriches the farmland (LoamFarmlandBlock.ENRICHED): until its nutrients run out, the crop on
 // it grows at loamFarmland.npkGrowthMultiplier instead of growthMultiplier.
 public class FertilizerItem extends Item {

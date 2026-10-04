@@ -28,7 +28,7 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Fischer-Tropsch Reactor (arcforge:fischer_tropsch): the input (Syngas, with its amount) becomes `naphtha`, `light_oil`,
 // `heavy_oil` and `water` mB of those four (each optional, 0 when left out), over `time` ticks at `energy_per_tick` FE/t and
-// `heat_per_tick` HU/t, between machines.fischerTropschReactor.minTemperature and maxOperatingTemperature. time,
+// `heat_per_tick` HU/t, between machines.chemistry.fischerTropschReactor.minTemperature and maxOperatingTemperature. time,
 // energy_per_tick and heat_per_tick follow that config when left out.
 public record FischerTropschRecipe(ChemicalReactingRecipe.FluidInput input, int naphtha, int lightOil, int heavyOil, int water,
         Optional<Integer> energyPerTick, Optional<Integer> heatPerTick, Optional<Integer> time) implements Recipe<FischerTropschRecipe.Input> {

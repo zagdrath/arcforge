@@ -27,7 +27,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.experience.LiquidExperience;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-// Every tick the drain takes the experience orbs resting on it (up to experience.drainOrbPointsPerTick points) into the
+// Every tick the drain takes the experience orbs resting on it (up to logistics.experience.drainOrbPointsPerTick points) into the
 // container below as Liquid Experience, an orb at a time and only whole orbs; every drainLevelInterval ticks it drains a
 // player sneaking on it by one level (or what's left of their current one), as much as the container takes. It holds
 // nothing itself.

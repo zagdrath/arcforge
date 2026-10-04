@@ -17,7 +17,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu;
 
 // Quantum Tunnel screens get their frequency list when they open and while they stay open; with
-// chunkLoader.requireOwnerOnline, a player's Chunk Loaders let their chunks go when they log out and start again
+// logistics.chunkLoader.requireOwnerOnline, a player's Chunk Loaders let their chunks go when they log out and start again
 // when they log back in.
 @EventBusSubscriber(modid = Arcforge.MODID)
 public final class LogisticsEvents {

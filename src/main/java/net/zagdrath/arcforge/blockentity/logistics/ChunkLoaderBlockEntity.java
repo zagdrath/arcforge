@@ -50,7 +50,7 @@ import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
 
 // A Chunk Loader keeps the chunks round it loaded with chunk tickets (ModChunkLoading.LOADER) for the player who placed
 // it: its own chunk at radius 0, up to 5x5 chunks at radius 2. It stops, and lets them go, when a redstone signal turns
-// it off, when its owner would go over chunkLoader.chunksPerPlayer, while its owner is offline (with
+// it off, when its owner would go over logistics.chunkLoader.chunksPerPlayer, while its owner is offline (with
 // requireOwnerOnline), when it can't pay energyPerChunk FE per chunk per tick (if that's above 0), and when it's broken.
 // Its tickets and owner are kept in ChunkLoaders, so they survive restarts and count toward the owner's limit.
 public class ChunkLoaderBlockEntity extends BlockEntity implements Owned, MenuProvider {

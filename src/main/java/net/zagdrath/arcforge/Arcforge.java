@@ -16,6 +16,7 @@ import net.neoforged.fml.config.ModConfig;
 import net.zagdrath.arcforge.registry.ModParticleTypes;
 import net.zagdrath.arcforge.registry.ModTriggers;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.config.ConfigMigration;
 import net.zagdrath.arcforge.gametest.ArcforgeGameTests;
 import net.zagdrath.arcforge.gametest.TestFixtures;
 import net.zagdrath.arcforge.item.tool.FoundrySuit;
@@ -63,8 +64,12 @@ public class Arcforge {
         ArcforgeGameTests.register(modEventBus);
         TestFixtures.register(modEventBus);
 
-        // The file name is fixed so it stays arcforge-common.toml whichever name the type has.
+        // The file name is fixed so it stays arcforge-common.toml whichever name the type has. Settings saved before the
+        // sections were grouped move to their new places first.
+        ConfigMigration.migrate(net.neoforged.fml.loading.FMLPaths.CONFIGDIR.get().resolve(MODID + "-common.toml"));
         modContainer.registerConfig(localConfigType(), ArcforgeConfig.SPEC, MODID + "-common.toml");
+        // Each player's own settings (toasts); only loaded on a client.
+        modContainer.registerConfig(ModConfig.Type.CLIENT, net.zagdrath.arcforge.config.ArcforgeClientConfig.SPEC, MODID + "-client.toml");
 
         LOGGER.info("Arcforge initialized");
     }

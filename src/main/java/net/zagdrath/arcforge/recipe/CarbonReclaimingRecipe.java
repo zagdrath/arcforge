@@ -28,7 +28,7 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Carbon Reclaimer (arcforge:carbon_reclaiming): `carbon_dioxide` mB of Carbon Dioxide and `hydrogen` mB of Hydrogen
 // become the result (Carbon Dust) and `water` mB of Water, for `energy` FE. Every field but the result is optional and
-// follows the machines.carbonReclaimer config when left out, so the built-in recipe is tuned there. Whatever the energy,
+// follows the machines.chemistry.carbonReclaimer config when left out, so the built-in recipe is tuned there. Whatever the energy,
 // the machine never charges less than EnergyBalance.minEnergyFor (the most FE the result could give back, with a safety
 // factor), so it renews carbon, never energy.
 public record CarbonReclaimingRecipe(Optional<Integer> carbonDioxide, Optional<Integer> hydrogen, ItemStackTemplate result,

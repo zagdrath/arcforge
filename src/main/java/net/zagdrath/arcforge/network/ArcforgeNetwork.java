@@ -31,6 +31,7 @@ public final class ArcforgeNetwork {
         registrar.playToServer(JetpackInputPayload.TYPE, JetpackInputPayload.STREAM_CODEC, JetpackInputPayload::handle);
         registrar.playToServer(JetpackModePayload.TYPE, JetpackModePayload.STREAM_CODEC, JetpackModePayload::handle);
         registrar.playToClient(JetpackStatePayload.TYPE, JetpackStatePayload.STREAM_CODEC, JetpackStatePayload::handle);
+        registrar.playToClient(ArcQuarryFinishedPayload.TYPE, ArcQuarryFinishedPayload.STREAM_CODEC, ArcQuarryFinishedPayload::handle);
         registrar.playToServer(ToolModuleScrollPayload.TYPE, ToolModuleScrollPayload.STREAM_CODEC, ToolModuleScrollPayload::handle);
         registrar.playToClient(SecuritySyncPayload.TYPE, SecuritySyncPayload.STREAM_CODEC, SecuritySyncPayload::handle);
         registrar.playToClient(SecurityProfilePayload.TYPE, SecurityProfilePayload.STREAM_CODEC, SecurityProfilePayload::handle);

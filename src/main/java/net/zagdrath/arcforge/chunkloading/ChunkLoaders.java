@@ -30,7 +30,7 @@ import net.zagdrath.arcforge.registry.ModChunkLoading;
 // Every Chunk Loader on the server, by dimension and position: its owner and the chunks it has forced (as chunk
 // tickets of ModChunkLoading.LOADER held in its name). This is what the per-player limit counts, what the ticket
 // check at level load keeps tickets for, and what lets a returning owner's loaders start again while their chunks are
-// unloaded (with chunkLoader.requireOwnerOnline).
+// unloaded (with logistics.chunkLoader.requireOwnerOnline).
 public class ChunkLoaders extends SavedData {
     public record Entry(GlobalPos pos, UUID owner, List<Long> chunks) {
         public static final Codec<Entry> CODEC = RecordCodecBuilder.create(i -> i.group(

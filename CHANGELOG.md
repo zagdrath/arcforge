@@ -22,26 +22,34 @@ number and date.
 
 ### Upgrading
 
+- **The config is regrouped into eight categories with subcategories** (Heat & Power, Machines, Multiblocks, Farming,
+  Logistics, World Generation, Equipment, Security), so many paths in `arcforge-common.toml` changed: Steam is now
+  under `power.steam`, the machines under `machines.processing` / `chemistry` / `automation`, the farming pages under
+  `farming.growing` / `cropProcessing` / `farmChemistry` / `automatedFarms`, and `meters`, `chargepad`, `reservoir`,
+  `experience`, `quantumTunnel` and `chunkLoader` under `logistics`, `ores` and `haliteBeds` under `world`, and `tools`
+  and `foundrySuit` under `equipment`. **Your settings carry over**: the first time it loads, the file's old sections
+  are moved to their new places before it's read. A server's config does the same.
+- **New client config** `arcforge-client.toml` for each player's own settings.
 - **Fermenter second input slot** (for slime cultures). Saved Fermenters keep their crops, additive, output and
   upgrades: the upgrades move up past the new slot when the world loads. Its input, second input and additive slots
   now stack on the left of the arrow.
 - **Data packs:** new recipe type `arcforge:culturing` (Fermenter cultures).
 - **Steam and power config values reset to their new defaults.** Keys whose meaning or default changed were renamed, so
   old values are not carried over; set them again if you had changed them:
-  - `steam.steamBoilerArray`: `heatCapacityPerHeight`, `maxHeatPerTickPerHeight`, `tankCapacityPerHeight` become
+  - `power.steam.steamBoilerArray`: `heatCapacityPerHeight`, `maxHeatPerTickPerHeight`, `tankCapacityPerHeight` become
     `heatCapacityPerSection`, `maxHeatPerTickPerSection`, `tankCapacityPerSection` (per 3×3 of footprint per block of
     height; same defaults).
-  - `steam.steamTurbineArray`: `maxFlowPerLength`, `tankCapacityPerLength`, `exhaustTankCapacityPerLength` become
+  - `power.steam.steamTurbineArray`: `maxFlowPerLength`, `tankCapacityPerLength`, `exhaustTankCapacityPerLength` become
     `maxFlowPerSection`, `tankCapacityPerSection`, `exhaustTankCapacityPerSection` (per 3×3 of cross-section per block of
     length; same defaults); `energyCapacity` and `maxEnergyOutput` are replaced by `energyBufferTicks` (400).
-  - `steam.gasTurbineArray`: `maxFuelHuPerLength` (560) becomes `maxFuelHeatPerLength` (2,500), `fuelTankPerLength`
+  - `power.steam.gasTurbineArray`: `maxFuelHuPerLength` (560) becomes `maxFuelHeatPerLength` (2,500), `fuelTankPerLength`
     (8,000) becomes `fuelTankCapacityPerLength` (32,000); `energyCapacity` and `maxEnergyOutput` are replaced by
     `energyBufferTicks` (400).
-  - `steam.superheaterArray`: `heatCapacity`, `maxHeatPerTick`, `tankCapacity`, `maxFlow` become
+  - `power.steam.superheaterArray`: `heatCapacity`, `maxHeatPerTick`, `tankCapacity`, `maxFlow` become
     `heatCapacityPerCube`, `maxHeatPerTickPerCube`, `tankCapacityPerCube`, `maxFlowPerCube` (per 27 blocks; same defaults).
-  - `steam.condenserArray`: `tankCapacity`, `baseRate`, `maxRate` become `tankCapacityPerCube`, `baseRatePerCube`,
+  - `power.steam.condenserArray`: `tankCapacity`, `baseRate`, `maxRate` become `tankCapacityPerCube`, `baseRatePerCube`,
     `maxRatePerCube` (per 27 blocks; same defaults).
-  - New: `power.generationMultiplier` (1.0) and the `power.fireboxArray` section.
+  - New: `power.generationMultiplier` (1.0) and the `power.burners.fireboxArray` section.
 - **Built arrays keep working.** Saved 3×3 Steam Boiler, Steam Turbine and Gas Turbine Arrays and 3×3×3 Superheater and
   Condenser Arrays load as they were. A Steam or Gas Turbine Array's FE buffer is resized to its new size when the world
   loads (it keeps the FE it held).
@@ -56,23 +64,25 @@ number and date.
   `ores.spodumene`, `ores.spodumenePegmatite` and `multiblocks.thermalEvaporator.byproductCapacity` get their defaults.
 - **Data packs:** `arcforge:chemical_reacting` recipes may take a `third_item_input` (it needs a `second_item_input`);
   `arcforge:evaporating` recipes may have a `byproduct` fluid. Existing recipes load unchanged.
-- **New config sections** `machines.treeCutter`, `machines.hydrothermalCarbonizer` and `farming.loam` get their defaults.
+- **New config sections** `machines.automation.treeCutter`, `machines.chemistry.hydrothermalCarbonizer` and `farming.growing.loam` get their defaults.
 - **New upgrade type, Range** (Tree Cutter only). Existing machines' upgrade slots are unchanged.
-- **New config sections** `power.flueGas`, `machines.carbonReclaimer`, `machines.gasifier` and
-  `machines.fischerTropschReactor` get their defaults.
+- **New config sections** `power.burners.flueGas`, `machines.chemistry.carbonReclaimer`, `machines.chemistry.gasifier` and
+  `machines.chemistry.fischerTropschReactor` get their defaults.
 - **Flue gas is opt-in.** The Combustion Plant, Firebox, Fuel Burner, Firebox Array and Gas Turbine Array gain the Gas
   Output side mode / port (named Flue Gas in their Sides and Ports tabs). Saved burners keep their sides and give off
   nothing until a face is set to it, so existing setups run exactly as before.
 - **Data packs:** new recipe types `arcforge:carbon_reclaiming`, `arcforge:gasifying` and `arcforge:fischer_tropsch`, new
   tags `#arcforge:carbon_fuels` (items and fluids) and a new `arcforge:burner_fuels` entry for Syngas.
-- **New config sections and keys** `machines.sifter`, `machines.diamondPress` and
-  `farming.biogasDigester.sulfurPerThousandMb` get their defaults.
+- **New config sections and keys** `machines.processing.sifter`, `machines.processing.diamondPress` and
+  `farming.farmChemistry.biogasDigester.sulfurPerThousandMb` get their defaults.
 - **Biogas Digester sulfur slot.** Saved digesters keep their items; the slot list grows by one on load (the digester
   has no upgrades, so nothing moves). New port mode Sulfur (set with the Wrench).
 - **Data packs:** new recipe types `arcforge:sifting` and `arcforge:diamond_pressing`.
 
 ### Added
 
+- **Arc Quarry finished toast:** when an Arc Quarry finishes, the player who placed it gets a toast (with the blocks
+  mined and where), if they're online. Turn it off in the new client config (Arcforge Client → Notifications).
 - **Three ways to make Slimeballs:**
   - Crafting: 2 Pine Resin + 1 Kelp (shapeless) make a Slimeball.
   - Chemical Reactor: 250 mB of Latex + 1 Lime Dye make 2 Slimeballs.
@@ -96,7 +106,7 @@ number and date.
     as its fuel burns.
   - Ports like the other arrays: Input (fuel), Oxygen and Heat (out, as fast as it burns).
   - Its own GUI, Handbook page, JEI build view and information, Jade tooltip, GameTests, and two advancements (Stoke the
-    Fires; the challenge Roaring Inferno for a 7×5×9). All its values are in the new `power.fireboxArray` config.
+    Fires; the challenge Roaring Inferno for a 7×5×9). All its values are in the new `power.burners.fireboxArray` config.
 - **Renewable coal:**
   - **Tree Cutter,** an FE machine that plants saplings from its three sapling slots in a 5×5 area in front of it (in 2×2
     patches with gaps, so spruce, jungle and dark oak grow into big trees) and fells every fully grown tree there: all its
@@ -116,8 +126,8 @@ number and date.
   - **New tag `#arcforge:biomass`:** crops, seeds, leaves, saplings, sticks, vines, glow lichen, kelp, Press Cake and
     Compost.
   - Handbook pages (Tree Cutter, Bio-Coal), JEI categories (Tree Cutting, Hydrothermal Carbonizing), Jade tooltips,
-    GameTests and two advancements (Timber!, Coal That Grows). Values in the new `machines.treeCutter` and
-    `machines.hydrothermalCarbonizer` config.
+    GameTests and two advancements (Timber!, Coal That Grows). Values in the new `machines.automation.treeCutter` and
+    `machines.chemistry.hydrothermalCarbonizer` config.
 - **Carbon capture:**
   - **Flue gas:** set a face of a Combustion Plant, Firebox or Fuel Burner to Flue Gas (a Gas Output port on the Firebox
     Array and Gas Turbine Array) and, while it burns a carbon fuel (`#arcforge:carbon_fuels`: coal, charcoal, Bio-Coal,
@@ -150,7 +160,7 @@ number and date.
     x1.25, 1.5x as fast) and Tungsten (x1.5, 2x as fast); they wear a point a block (256 / 512 / 1,024).
   - **Deepslate Gravel**, a new falling block: the Arc Crusher crushes cobbled deepslate into it.
 - **Diamond Press** (Hardened), with FE and heat, only at 1,400°C or hotter: 4 Graphite → a Diamond for 2,000,000 FE and
-  240,000 HU over a minute (all in `machines.diamondPress`, set high as a late-game sink). Built round a Metal Press with
+  240,000 HU over a minute (all in `machines.processing.diamondPress`, set high as a late-game sink). Built round a Metal Press with
   tungsten gears and plates for its anvils. Speed, Energy and Heat upgrades. (Graphite already exists: Coal Coke or
   Carbon Dust baked at 1,500°C in the Arcforge Furnace, and its block.)
 - **Sulfur from biogas:** the Biogas Digester scrubs its Biogas, 0.5 Sulfur Dust per 1,000 mB by default
@@ -210,7 +220,7 @@ number and date.
   machine drops its upgrades as before.
 - **Carbonizer bakes logs into charcoal:** any log that burns (`#minecraft:logs_that_burn`) gives a Charcoal and 100 mB of
   Creosote in 400 ticks, so a Tree Cutter's logs can go straight in.
-- **Loam grows saplings twice as fast** (`farming.loam.saplingGrowthMultiplier`, 2.0), and a tree grown on Loam leaves
+- **Loam grows saplings twice as fast** (`farming.growing.loam.saplingGrowthMultiplier`, 2.0), and a tree grown on Loam leaves
   the Loam under its trunk instead of turning it to dirt, so a Tree Cutter's area can be laid in Loam.
 - **Gas Turbine Array exhaust:** "Venting to air" now says how much is vented ("Venting 2,420 HU/t to air"), in the
   GUI and in Jade, so a partly undersized heat sink shows how far short it falls.
@@ -238,6 +248,8 @@ number and date.
 
 ### Fixed
 
+- **Config screen names:** Oxy-Fuel, Gas Turbine Array, Fermenter, Security, Foundry Suit, Meters, Chargepad and Loam,
+  and 33 settings in them, showed their raw translation keys (`arcforge.configuration.security`). They all have names.
 - **Dismantling a Heat Cell duplicated its Insulation Upgrades:** they dropped beside it and also stayed in the
   picked-up item. They now only stay in the item.
 - **Tree Cutter fells the whole crown.** It took at most 12 leaves per log and trusted the leaves' stored distance,

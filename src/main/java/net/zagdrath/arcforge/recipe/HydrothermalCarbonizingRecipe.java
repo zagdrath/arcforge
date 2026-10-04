@@ -30,7 +30,7 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Hydrothermal Carbonizer (arcforge:hydrothermal_carbonizing): `count` of an ingredient (#arcforge:biomass) cooked in
 // `water` mB of Water with `heat` HU over `time` ticks into the result (Bio-Coal), giving `water_return` mB of the water
-// back. count, heat and time are optional: left out, they follow the machines.hydrothermalCarbonizer config
+// back. count, heat and time are optional: left out, they follow the machines.chemistry.hydrothermalCarbonizer config
 // (biomassPerBioCoal, heatPerOperation, time), so the built-in recipe is tuned there.
 public record HydrothermalCarbonizingRecipe(Ingredient ingredient, Optional<Integer> count, ItemStackTemplate result, int water, int waterReturn,
         Optional<Integer> heat, Optional<Integer> time) implements Recipe<SingleRecipeInput> {

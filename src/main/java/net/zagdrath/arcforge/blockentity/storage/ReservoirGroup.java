@@ -33,7 +33,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 // share one level. After the group changes shape (a block placed, broken, loaded or unloaded) the fluid is settled into
 // that order again on the next tick (never inside a transaction).
 //
-// A group is built lazily from any of its blocks (a flood fill, up to reservoir.maxBlocks) and shared by all of them;
+// A group is built lazily from any of its blocks (a flood fill, up to logistics.reservoir.maxBlocks) and shared by all of them;
 // placing a block simply builds a new group that takes in its neighbours, and removing or unloading one invalidates the
 // group it was in, so the rest rebuild. Blocks holding a different fluid next to the group stay separate tanks.
 public final class ReservoirGroup {

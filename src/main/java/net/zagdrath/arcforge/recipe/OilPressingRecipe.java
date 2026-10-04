@@ -30,7 +30,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Oil Press (arcforge:oil_pressing): one seed pressed into oil (a fluid) and a cake, over `time` ticks. The cake comes
-// with byproduct_chance (1 = always). FE per item is time x farming.oilPress.energyPerTick unless the recipe sets its
+// with byproduct_chance (1 = always). FE per item is time x farming.cropProcessing.oilPress.energyPerTick unless the recipe sets its
 // own `energy`.
 public record OilPressingRecipe(Ingredient ingredient, FluidStackTemplate result, Optional<ItemStackTemplate> byproduct, float byproductChance,
         int time, Optional<Integer> energy) implements Recipe<SingleRecipeInput> {

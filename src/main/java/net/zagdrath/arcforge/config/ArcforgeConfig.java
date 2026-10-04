@@ -28,6 +28,26 @@ public class ArcforgeConfig {
                     "it, so hydrogen still never makes free power.")
             .defineInRange("generationMultiplier", 1.0, 0.1, 100.0);
 
+    // The tier's Lithium Cell capacity (FE).
+    public static long lithiumCellCapacity(net.zagdrath.arcforge.conduit.ConduitTier tier) {
+        return switch (tier) {
+            case WROUGHT -> LITHIUM_CELL_WROUGHT.getAsLong();
+            case TEMPERED -> LITHIUM_CELL_TEMPERED.getAsLong();
+            case HARDENED -> LITHIUM_CELL_HARDENED.getAsLong();
+            case ARCFORGED -> LITHIUM_CELL_ARCFORGED.getAsLong();
+        };
+    }
+
+    // The tier's Power Regulator transfer (FE/t).
+    public static int powerRegulatorTransfer(net.zagdrath.arcforge.conduit.ConduitTier tier) {
+        return switch (tier) {
+            case WROUGHT -> POWER_REGULATOR_WROUGHT.getAsInt();
+            case TEMPERED -> POWER_REGULATOR_TEMPERED.getAsInt();
+            case HARDENED -> POWER_REGULATOR_HARDENED.getAsInt();
+            case ARCFORGED -> POWER_REGULATOR_ARCFORGED.getAsInt();
+        };
+    }
+
     static {
         BUILDER.comment("Heat (HU) shared by every heat machine. A machine's temperature rises from 20°C when its heat",
                 "buffer is empty to its maximum temperature when full, and heat only flows from hotter to colder.").push("heat");
@@ -42,40 +62,7 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Geothermal Plant: turns lava into heat (HU). It makes no FE; feed its heat to a Thermoelectric Plant.")
-                .push("geothermalPlant");
-    }
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size, in HU.")
-            .defineInRange("heatCapacity", 60_000, 100, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 1_400, 21, 10_000);
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_TANK_CAPACITY = BUILDER
-            .comment("Internal lava tank capacity in mB.")
-            .defineInRange("lavaTankCapacity", 8_000, 1_000, 1_000_000);
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_HEAT = BUILDER
-            .comment("HU/t made while lava drains from the tank (at 1 mB/t).")
-            .defineInRange("lavaHeat", 80, 0, 10_000);
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_PER_BURN = BUILDER
-            .comment("mB of lava taken from the tank at a time; it then drains at 1 mB/t (the GUI flame shows what's left).")
-            .defineInRange("lavaPerBurn", 100, 1, 1_000);
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_SOURCE_HEAT = BUILDER
-            .comment("Passive HU/t from each touching lava source block (all 6 sides count; blocks are never consumed).")
-            .defineInRange("lavaSourceHeat", 40, 0, 10_000);
-
-    public static final ModConfigSpec.IntValue GEOTHERMAL_MAGMA_HEAT = BUILDER
-            .comment("Passive HU/t from each touching magma block (never consumed).")
-            .defineInRange("magmaHeat", 16, 0, 10_000);
-
-    static {
-        BUILDER.pop();
+        BUILDER.comment("Machines and arrays that burn fuel for heat or FE, and the options they share.").push("burners");
     }
 
     static {
@@ -167,6 +154,54 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Firebox Array: a hollow box 3 to 7 by 3 to 9 across and 3 to 5 tall that burns solid fuels",
+                "(#arcforge:combustion_fuel, and Coal Coke) and Fuel Burner fuels (arcforge:burner_fuels) into heat (HU). Each item",
+                "or mB gives the heat it gives in a Firebox or Fuel Burner (without upgrades); values marked per block scale with",
+                "the box's whole volume (a 3x3x3 is 27 blocks, a 7x5x9 is 315). It pauses while its buffer is as hot as the fuel",
+                "burns. Fed oxygen through an Oxygen port it burns on oxy-fuel (see oxyFuel).").push("fireboxArray");
+    }
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_PER_BLOCK = BUILDER
+            .comment("HU/t it makes while burning, per block of its volume (160: a 3x3x3 makes 4,320 HU/t, a 7x5x9 50,400).")
+            .defineInRange("heatPerTickPerBlock", 160, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_CAPACITY_PER_BLOCK = BUILDER
+            .comment("Heat buffer size in HU, per block of its volume.")
+            .defineInRange("heatCapacityPerBlock", 10_000, 100, 10_000_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C. Each fuel burns no hotter than its own temperature.")
+            .defineInRange("maxTemperature", 1_400, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_SOLID_TEMPERATURE = BUILDER
+            .comment("How hot solid fuels (#arcforge:combustion_fuel) burn, in °C.")
+            .defineInRange("solidFuelTemperature", 1_100, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_COKE_TEMPERATURE = BUILDER
+            .comment("How hot Coal Coke burns, in °C.")
+            .defineInRange("cokeTemperature", 1_300, 21, 10_000);
+
+    public static final ModConfigSpec.DoubleValue FIREBOX_ARRAY_COKE_HEAT = BUILDER
+            .comment("Heat from Coal Coke (and its block), as a multiple of the heat from coal (and a coal block).")
+            .defineInRange("cokeHeatMultiplier", 1.5, 0.1, 100.0);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_TANK_PER_BLOCK = BUILDER
+            .comment("Liquid and gas fuel tank size in mB, per block of its volume.")
+            .defineInRange("fuelTankCapacityPerBlock", 1_000, 10, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_OXYGEN_TANK_PER_BLOCK = BUILDER
+            .comment("Oxygen tank size in mB, per block of its volume.")
+            .defineInRange("oxygenTankCapacityPerBlock", 200, 10, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue FIREBOX_ARRAY_OXYGEN_PER_THOUSAND_HU = BUILDER
+            .comment("mB of oxygen burnt for every 1,000 HU made on oxy-fuel (3.125: a Firebox's 0.25 mB for its 80 HU).")
+            .defineInRange("oxygenPerThousandHeat", 3.125, 0.001, 1_000.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Oxy-fuel: a Firebox or Fuel Burner fed oxygen through an Oxygen face burns hotter and makes more heat",
                 "per fuel while the oxygen lasts. Without oxygen they run as normal.").push("oxyFuel");
     }
@@ -221,165 +256,45 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Firebox Array: a hollow box 3 to 7 by 3 to 9 across and 3 to 5 tall that burns solid fuels",
-                "(#arcforge:combustion_fuel, and Coal Coke) and Fuel Burner fuels (arcforge:burner_fuels) into heat (HU). Each item",
-                "or mB gives the heat it gives in a Firebox or Fuel Burner (without upgrades); values marked per block scale with",
-                "the box's whole volume (a 3x3x3 is 27 blocks, a 7x5x9 is 315). It pauses while its buffer is as hot as the fuel",
-                "burns. Fed oxygen through an Oxygen port it burns on oxy-fuel (see oxyFuel).").push("fireboxArray");
-    }
-
-    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_PER_BLOCK = BUILDER
-            .comment("HU/t it makes while burning, per block of its volume (160: a 3x3x3 makes 4,320 HU/t, a 7x5x9 50,400).")
-            .defineInRange("heatPerTickPerBlock", 160, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_CAPACITY_PER_BLOCK = BUILDER
-            .comment("Heat buffer size in HU, per block of its volume.")
-            .defineInRange("heatCapacityPerBlock", 10_000, 100, 10_000_000);
-
-    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C. Each fuel burns no hotter than its own temperature.")
-            .defineInRange("maxTemperature", 1_400, 21, 10_000);
-
-    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_SOLID_TEMPERATURE = BUILDER
-            .comment("How hot solid fuels (#arcforge:combustion_fuel) burn, in °C.")
-            .defineInRange("solidFuelTemperature", 1_100, 21, 10_000);
-
-    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_COKE_TEMPERATURE = BUILDER
-            .comment("How hot Coal Coke burns, in °C.")
-            .defineInRange("cokeTemperature", 1_300, 21, 10_000);
-
-    public static final ModConfigSpec.DoubleValue FIREBOX_ARRAY_COKE_HEAT = BUILDER
-            .comment("Heat from Coal Coke (and its block), as a multiple of the heat from coal (and a coal block).")
-            .defineInRange("cokeHeatMultiplier", 1.5, 0.1, 100.0);
-
-    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_TANK_PER_BLOCK = BUILDER
-            .comment("Liquid and gas fuel tank size in mB, per block of its volume.")
-            .defineInRange("fuelTankCapacityPerBlock", 1_000, 10, 1_000_000);
-
-    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_OXYGEN_TANK_PER_BLOCK = BUILDER
-            .comment("Oxygen tank size in mB, per block of its volume.")
-            .defineInRange("oxygenTankCapacityPerBlock", 200, 10, 1_000_000);
-
-    public static final ModConfigSpec.DoubleValue FIREBOX_ARRAY_OXYGEN_PER_THOUSAND_HU = BUILDER
-            .comment("mB of oxygen burnt for every 1,000 HU made on oxy-fuel (3.125: a Firebox's 0.25 mB for its 80 HU).")
-            .defineInRange("oxygenPerThousandHeat", 3.125, 0.001, 1_000.0);
-
-    static {
         BUILDER.pop();
     }
 
     static {
-        BUILDER.comment("Battery Array: a box of Battery Array Casings 3 to 5 blocks each way (the faces may be Pressure Glass) filled",
-                "with Lithium Cells and Power Regulators. The cells set how much FE it stores, the regulators how much it takes in and",
-                "gives out each tick (each way). The energy is shared between the cells, and each keeps its share when broken.")
-                .push("batteryArray");
-    }
-
-    public static final ModConfigSpec.IntValue BATTERY_BASE_TRANSFER = BUILDER
-            .comment("FE/t it takes in and gives out (each) with no Power Regulators.")
-            .defineInRange("baseTransfer", 16_384, 1, Integer.MAX_VALUE);
-
-    static {
-        BUILDER.comment("FE each Lithium Cell stores, per tier.").push("lithiumCellCapacity");
-    }
-
-    public static final ModConfigSpec.LongValue LITHIUM_CELL_WROUGHT = BUILDER.defineInRange("wrought", 64_000_000L, 1L, 1_000_000_000_000L);
-    public static final ModConfigSpec.LongValue LITHIUM_CELL_TEMPERED = BUILDER.defineInRange("tempered", 512_000_000L, 1L, 1_000_000_000_000L);
-    public static final ModConfigSpec.LongValue LITHIUM_CELL_HARDENED = BUILDER.defineInRange("hardened", 4_000_000_000L, 1L, 1_000_000_000_000L);
-    public static final ModConfigSpec.LongValue LITHIUM_CELL_ARCFORGED = BUILDER.defineInRange("arcforged", 32_000_000_000L, 1L, 1_000_000_000_000L);
-
-    static {
-        BUILDER.pop();
-        BUILDER.comment("FE/t each Power Regulator adds to what it takes in and gives out (each), per tier. With any regulators the",
-                "transfer rate is their sum (baseTransfer only counts with none).").push("powerRegulatorTransfer");
-    }
-
-    public static final ModConfigSpec.IntValue POWER_REGULATOR_WROUGHT = BUILDER.defineInRange("wrought", 65_536, 1, 100_000_000);
-    public static final ModConfigSpec.IntValue POWER_REGULATOR_TEMPERED = BUILDER.defineInRange("tempered", 262_144, 1, 100_000_000);
-    public static final ModConfigSpec.IntValue POWER_REGULATOR_HARDENED = BUILDER.defineInRange("hardened", 1_048_576, 1, 100_000_000);
-    public static final ModConfigSpec.IntValue POWER_REGULATOR_ARCFORGED = BUILDER.defineInRange("arcforged", 4_194_304, 1, 100_000_000);
-
-    static {
-        BUILDER.pop();
-    }
-
-    public static final ModConfigSpec.IntValue BATTERY_SHARE_INTERVAL = BUILDER
-            .comment("How often (ticks) the stored energy is written back into the Lithium Cells' shares while it changes. It is always",
-                    "written when the array breaks or a cell is taken out.")
-            .defineInRange("shareInterval", 100, 1, 72_000);
-
-    static {
-        BUILDER.pop();
-    }
-
-    // The tier's Lithium Cell capacity (FE).
-    public static long lithiumCellCapacity(net.zagdrath.arcforge.conduit.ConduitTier tier) {
-        return switch (tier) {
-            case WROUGHT -> LITHIUM_CELL_WROUGHT.getAsLong();
-            case TEMPERED -> LITHIUM_CELL_TEMPERED.getAsLong();
-            case HARDENED -> LITHIUM_CELL_HARDENED.getAsLong();
-            case ARCFORGED -> LITHIUM_CELL_ARCFORGED.getAsLong();
-        };
-    }
-
-    // The tier's Power Regulator transfer (FE/t).
-    public static int powerRegulatorTransfer(net.zagdrath.arcforge.conduit.ConduitTier tier) {
-        return switch (tier) {
-            case WROUGHT -> POWER_REGULATOR_WROUGHT.getAsInt();
-            case TEMPERED -> POWER_REGULATOR_TEMPERED.getAsInt();
-            case HARDENED -> POWER_REGULATOR_HARDENED.getAsInt();
-            case ARCFORGED -> POWER_REGULATOR_ARCFORGED.getAsInt();
-        };
+        BUILDER.comment("Machines that make heat from the world, or FE from heat.").push("generators");
     }
 
     static {
-        BUILDER.comment("Thermoelectric Plant: turns heat (HU) into FE. The hotter it runs, the more FE each HU gives.")
-                .push("thermoelectricPlant");
+        BUILDER.comment("Geothermal Plant: turns lava into heat (HU). It makes no FE; feed its heat to a Thermoelectric Plant.")
+                .push("geothermalPlant");
     }
 
-    public static final ModConfigSpec.IntValue THERMOELECTRIC_HEAT_CAPACITY = BUILDER
+    public static final ModConfigSpec.IntValue GEOTHERMAL_HEAT_CAPACITY = BUILDER
             .comment("Heat buffer size, in HU.")
-            .defineInRange("heatCapacity", 20_000, 100, 1_000_000_000);
+            .defineInRange("heatCapacity", 60_000, 100, 1_000_000_000);
 
-    public static final ModConfigSpec.IntValue THERMOELECTRIC_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C. Above the 100% efficiency temperature it runs",
-                    "no faster, but each HU gives more FE (see bonusEfficiency).")
+    public static final ModConfigSpec.IntValue GEOTHERMAL_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
             .defineInRange("maxTemperature", 1_400, 21, 10_000);
 
-    public static final ModConfigSpec.IntValue THERMOELECTRIC_HEAT_THROUGHPUT = BUILDER
-            .comment("HU/t it converts at the 100% efficiency temperature. It converts in proportion to its temperature",
-                    "above 20°C, so it has to warm up, and hotter heat passes faster: when full (at maxTemperature) it",
-                    "takes in and converts heatThroughput x (maxTemperature - 20) / (fullEfficiencyTemperature - 20).")
-            .defineInRange("heatThroughput", 80, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_TANK_CAPACITY = BUILDER
+            .comment("Internal lava tank capacity in mB.")
+            .defineInRange("lavaTankCapacity", 8_000, 1_000, 1_000_000);
 
-    public static final ModConfigSpec.IntValue THERMOELECTRIC_MIN_TEMPERATURE = BUILDER
-            .comment("Temperature at which efficiency is 0%, in °C.")
-            .defineInRange("zeroEfficiencyTemperature", 100, 0, 10_000);
+    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_HEAT = BUILDER
+            .comment("HU/t made while lava drains from the tank (at 1 mB/t).")
+            .defineInRange("lavaHeat", 80, 0, 10_000);
 
-    public static final ModConfigSpec.IntValue THERMOELECTRIC_FULL_TEMPERATURE = BUILDER
-            .comment("Temperature at which efficiency reaches 100% (1 FE per HU), in °C.")
-            .defineInRange("fullEfficiencyTemperature", 1_100, 1, 10_000);
+    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_PER_BURN = BUILDER
+            .comment("mB of lava taken from the tank at a time; it then drains at 1 mB/t (the GUI flame shows what's left).")
+            .defineInRange("lavaPerBurn", 100, 1, 1_000);
 
-    public static final ModConfigSpec.DoubleValue THERMOELECTRIC_BONUS_EFFICIENCY = BUILDER
-            .comment("Efficiency reached at the bonus temperature (1.15 = 115%). It rises linearly from 100% at the",
-                    "100% efficiency temperature, and goes no higher.")
-            .defineInRange("bonusEfficiency", 1.15, 1.0, 10.0);
+    public static final ModConfigSpec.IntValue GEOTHERMAL_LAVA_SOURCE_HEAT = BUILDER
+            .comment("Passive HU/t from each touching lava source block (all 6 sides count; blocks are never consumed).")
+            .defineInRange("lavaSourceHeat", 40, 0, 10_000);
 
-    public static final ModConfigSpec.DoubleValue THERMOELECTRIC_UPGRADE_EFFICIENCY = BUILDER
-            .comment("Extra FE per HU each Thermoelectric Efficiency Upgrade adds (0.0625: 8 cards give +50%).")
-            .defineInRange("upgradeEfficiencyPerCard", 0.0625, 0.0, 1.0);
-
-    public static final ModConfigSpec.IntValue THERMOELECTRIC_BONUS_TEMPERATURE = BUILDER
-            .comment("Temperature at which the bonus efficiency is reached, in °C.")
-            .defineInRange("bonusEfficiencyTemperature", 1_400, 1, 10_000);
-
-    public static final ModConfigSpec.IntValue THERMOELECTRIC_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue THERMOELECTRIC_MAX_OUTPUT = BUILDER
-            .comment("Most FE/t pushed out of energy faces (shared across them).")
-            .defineInRange("maxEnergyOutput", 200, 1, 1_000_000_000);
+    public static final ModConfigSpec.IntValue GEOTHERMAL_MAGMA_HEAT = BUILDER
+            .comment("Passive HU/t from each touching magma block (never consumed).")
+            .defineInRange("magmaHeat", 16, 0, 10_000);
 
     static {
         BUILDER.pop();
@@ -452,6 +367,103 @@ public class ArcforgeConfig {
     static {
         BUILDER.pop();
     }
+
+    static {
+        BUILDER.comment("Thermoelectric Plant: turns heat (HU) into FE. The hotter it runs, the more FE each HU gives.")
+                .push("thermoelectricPlant");
+    }
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 20_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C. Above the 100% efficiency temperature it runs",
+                    "no faster, but each HU gives more FE (see bonusEfficiency).")
+            .defineInRange("maxTemperature", 1_400, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_HEAT_THROUGHPUT = BUILDER
+            .comment("HU/t it converts at the 100% efficiency temperature. It converts in proportion to its temperature",
+                    "above 20°C, so it has to warm up, and hotter heat passes faster: when full (at maxTemperature) it",
+                    "takes in and converts heatThroughput x (maxTemperature - 20) / (fullEfficiencyTemperature - 20).")
+            .defineInRange("heatThroughput", 80, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_MIN_TEMPERATURE = BUILDER
+            .comment("Temperature at which efficiency is 0%, in °C.")
+            .defineInRange("zeroEfficiencyTemperature", 100, 0, 10_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_FULL_TEMPERATURE = BUILDER
+            .comment("Temperature at which efficiency reaches 100% (1 FE per HU), in °C.")
+            .defineInRange("fullEfficiencyTemperature", 1_100, 1, 10_000);
+
+    public static final ModConfigSpec.DoubleValue THERMOELECTRIC_BONUS_EFFICIENCY = BUILDER
+            .comment("Efficiency reached at the bonus temperature (1.15 = 115%). It rises linearly from 100% at the",
+                    "100% efficiency temperature, and goes no higher.")
+            .defineInRange("bonusEfficiency", 1.15, 1.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue THERMOELECTRIC_UPGRADE_EFFICIENCY = BUILDER
+            .comment("Extra FE per HU each Thermoelectric Efficiency Upgrade adds (0.0625: 8 cards give +50%).")
+            .defineInRange("upgradeEfficiencyPerCard", 0.0625, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_BONUS_TEMPERATURE = BUILDER
+            .comment("Temperature at which the bonus efficiency is reached, in °C.")
+            .defineInRange("bonusEfficiencyTemperature", 1_400, 1, 10_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue THERMOELECTRIC_MAX_OUTPUT = BUILDER
+            .comment("Most FE/t pushed out of energy faces (shared across them).")
+            .defineInRange("maxEnergyOutput", 200, 1, 1_000_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Battery Array: a box of Battery Array Casings 3 to 5 blocks each way (the faces may be Pressure Glass) filled",
+                "with Lithium Cells and Power Regulators. The cells set how much FE it stores, the regulators how much it takes in and",
+                "gives out each tick (each way). The energy is shared between the cells, and each keeps its share when broken.")
+                .push("batteryArray");
+    }
+
+    public static final ModConfigSpec.IntValue BATTERY_BASE_TRANSFER = BUILDER
+            .comment("FE/t it takes in and gives out (each) with no Power Regulators.")
+            .defineInRange("baseTransfer", 16_384, 1, Integer.MAX_VALUE);
+
+    static {
+        BUILDER.comment("FE each Lithium Cell stores, per tier.").push("lithiumCellCapacity");
+    }
+
+    public static final ModConfigSpec.LongValue LITHIUM_CELL_WROUGHT = BUILDER.defineInRange("wrought", 64_000_000L, 1L, 1_000_000_000_000L);
+    public static final ModConfigSpec.LongValue LITHIUM_CELL_TEMPERED = BUILDER.defineInRange("tempered", 512_000_000L, 1L, 1_000_000_000_000L);
+    public static final ModConfigSpec.LongValue LITHIUM_CELL_HARDENED = BUILDER.defineInRange("hardened", 4_000_000_000L, 1L, 1_000_000_000_000L);
+    public static final ModConfigSpec.LongValue LITHIUM_CELL_ARCFORGED = BUILDER.defineInRange("arcforged", 32_000_000_000L, 1L, 1_000_000_000_000L);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("FE/t each Power Regulator adds to what it takes in and gives out (each), per tier. With any regulators the",
+                "transfer rate is their sum (baseTransfer only counts with none).").push("powerRegulatorTransfer");
+    }
+
+    public static final ModConfigSpec.IntValue POWER_REGULATOR_WROUGHT = BUILDER.defineInRange("wrought", 65_536, 1, 100_000_000);
+    public static final ModConfigSpec.IntValue POWER_REGULATOR_TEMPERED = BUILDER.defineInRange("tempered", 262_144, 1, 100_000_000);
+    public static final ModConfigSpec.IntValue POWER_REGULATOR_HARDENED = BUILDER.defineInRange("hardened", 1_048_576, 1, 100_000_000);
+    public static final ModConfigSpec.IntValue POWER_REGULATOR_ARCFORGED = BUILDER.defineInRange("arcforged", 4_194_304, 1, 100_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    public static final ModConfigSpec.IntValue BATTERY_SHARE_INTERVAL = BUILDER
+            .comment("How often (ticks) the stored energy is written back into the Lithium Cells' shares while it changes. It is always",
+                    "written when the array breaks or a cell is taken out.")
+            .defineInRange("shareInterval", 100, 1, 72_000);
 
     static {
         BUILDER.pop();
@@ -720,7 +732,15 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Single-block processing machines.").push("machines");
+    }
+
+    static {
+        BUILDER.comment("Machines that crush, smelt, press, sift and shape materials.").push("processing");
     }
 
     static {
@@ -790,47 +810,6 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Electric Pump: pumps the fluid source block directly below it using FE.").push("electricPump");
-    }
-
-    public static final ModConfigSpec.IntValue PUMP_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PUMP_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PUMP_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t while pumping, before upgrades.")
-            .defineInRange("energyPerTick", 10, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue PUMP_CYCLE_TICKS = BUILDER
-            .comment("Ticks to pump one bucket (1,000 mB), before Speed upgrades.")
-            .defineInRange("cycleTicks", 20, 1, 1_200);
-
-    public static final ModConfigSpec.IntValue PUMP_TANK_CAPACITY = BUILDER
-            .comment("Internal tank size in mB.")
-            .defineInRange("tankCapacity", 16_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue PUMP_OUTPUT_RATE = BUILDER
-            .comment("Most mB/t it pushes up out of its top face (and out of output faces with auto-eject).")
-            .defineInRange("outputRate", 1_000, 1, 1_000_000);
-
-    public static final ModConfigSpec.BooleanValue PUMP_INFINITE_WATER = BUILDER
-            .comment("Leave water in place when it is an infinite source (2+ water sources beside it), like a bucket would refill.")
-            .define("pumpInfiniteWater", true);
-
-    public static final ModConfigSpec.ConfigValue<List<? extends String>> PUMP_SEAWATER_BIOME_TAGS = BUILDER
-            .comment("Biome tags where water pumps up as Seawater (ocean and beach biomes).")
-            .defineListAllowEmpty("seawaterBiomeTags", List.of("minecraft:is_ocean", "minecraft:is_beach"), () -> "minecraft:is_ocean",
-                    value -> value instanceof String);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
         BUILDER.comment("Arc Melter: melts rock into lava with FE. Recipes are data-driven (arcforge:melting).").push("arcMelter");
     }
 
@@ -861,6 +840,164 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Sifter: sieves gravel, sand, red sand and Deepslate Gravel for chances of ore dusts and minerals, with FE.",
+                "Recipes are data-driven (arcforge:sifting, each output with its own chance); time and FE/t follow these unless a",
+                "recipe sets them. It needs a Sifter Mesh: better meshes raise the chances and the speed, and wear out slowly.").push("sifter");
+    }
+
+    public static final ModConfigSpec.IntValue SIFTER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue SIFTER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue SIFTER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while sifting, before Speed and Energy upgrades.")
+            .defineInRange("energyPerTick", 20, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue SIFTER_TIME = BUILDER
+            .comment("Ticks per block sifted, before the mesh and Speed upgrades.")
+            .defineInRange("time", 100, 1, 72_000);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_STEEL_CHANCE = BUILDER
+            .comment("Chance multiplier of a Steel Mesh (the base mesh).")
+            .defineInRange("steelMeshChance", 1.0, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_INVAR_CHANCE = BUILDER
+            .comment("Chance multiplier of an Invar Mesh.")
+            .defineInRange("invarMeshChance", 1.25, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_TUNGSTEN_CHANCE = BUILDER
+            .comment("Chance multiplier of a Tungsten Mesh.")
+            .defineInRange("tungstenMeshChance", 1.5, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_STEEL_SPEED = BUILDER
+            .comment("Speed multiplier of a Steel Mesh.")
+            .defineInRange("steelMeshSpeed", 1.0, 0.1, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_INVAR_SPEED = BUILDER
+            .comment("Speed multiplier of an Invar Mesh.")
+            .defineInRange("invarMeshSpeed", 1.5, 0.1, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_TUNGSTEN_SPEED = BUILDER
+            .comment("Speed multiplier of a Tungsten Mesh.")
+            .defineInRange("tungstenMeshSpeed", 2.0, 0.1, 10.0);
+
+    public static final ModConfigSpec.DoubleValue SIFTER_MESH_WEAR_CHANCE = BUILDER
+            .comment("Chance each block sifted wears the mesh by one point (Steel lasts 256 points, Invar 512, Tungsten 1,024).")
+            .defineInRange("meshWearChance", 1.0, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Diamond Press (Hardened): presses Graphite into Diamonds with a lot of FE and heat, only at minTemperature or",
+                "hotter. Recipes are data-driven (arcforge:diamond_pressing); the Graphite per diamond, FE, heat, time and temperature",
+                "follow these unless a recipe sets them. Set high on purpose: it's a late-game sink.").push("diamondPress");
+    }
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 2_000_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 64_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_ENERGY_PER_DIAMOND = BUILDER
+            .comment("FE per Diamond, before Energy upgrades, spread over the time.")
+            .defineInRange("energyPerDiamond", 2_000_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_HEAT_PER_DIAMOND = BUILDER
+            .comment("HU per Diamond, before Heat upgrades, spread over the time.")
+            .defineInRange("heatPerDiamond", 240_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_GRAPHITE_PER_DIAMOND = BUILDER
+            .comment("Graphite per Diamond.")
+            .defineInRange("graphitePerDiamond", 4, 1, 64);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_TIME = BUILDER
+            .comment("Ticks per Diamond, before Speed upgrades.")
+            .defineInRange("time", 1_200, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MIN_TEMPERATURE = BUILDER
+            .comment("It only works at this °C or hotter.")
+            .defineInRange("minTemperature", 1_400, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 200_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full buffer.")
+            .defineInRange("maxTemperature", 2_000, 100, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
+                "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
+    }
+
+    public static final ModConfigSpec.IntValue FIBERIZER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FIBERIZER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FIBERIZER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 10_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue FIBERIZER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_100, 21, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Infuser: soaks vanilla wood in creosote with FE, making treated wood. Recipes are data-driven",
+                "(arcforge:infusing) and set the fluid used.").push("infuser");
+    }
+
+    public static final ModConfigSpec.IntValue INFUSER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INFUSER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue INFUSER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while infusing, before upgrades.")
+            .defineInRange("energyPerTick", 20, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue INFUSER_TANK_CAPACITY = BUILDER
+            .comment("Fluid tank capacity in mB.")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Machines that ferment, react, split and convert fluids and gases.").push("chemistry");
     }
 
     static {
@@ -991,53 +1128,43 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Carbon Reclaimer: Carbon Dioxide + Hydrogen -> Carbon Dust + Water, with FE. Recipes are data-driven",
-                "(arcforge:carbon_reclaiming); a recipe may set its own amounts and energy, otherwise these apply. Whatever the",
-                "settings, an operation never costs less than balanceSafetyFactor times the most FE its Carbon Dust can give back",
-                "(burnt, or carbonized or gasified first; see EnergyBalance), so it renews carbon, never energy.").push("carbonReclaimer");
+        BUILDER.comment("Hydrothermal Carbonizer: cooks biomass (#arcforge:biomass) in water with heat (HU) into Bio-Coal, giving back",
+                "some of the water. It only works at minTemperature or hotter. Recipes (arcforge:hydrothermal_carbonizing) set the",
+                "water; the biomass per Bio-Coal, heat and time below apply to every recipe that doesn't set its own.")
+                .push("hydrothermalCarbonizer");
     }
 
-    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 400_000, 1_000, 100_000_000);
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
 
-    public static final ModConfigSpec.IntValue RECLAIMER_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in. Keep it at 16x energyPerTick or more, so 8 Speed upgrades can run flat out.")
-            .defineInRange("maxEnergyInput", 64_000, 1, 10_000_000);
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 600, 21, 10_000);
 
-    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t while working, before Speed upgrades. With the FE per operation this sets the time.")
-            .defineInRange("energyPerTick", 4_000, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_MIN_TEMPERATURE = BUILDER
+            .comment("It only works at this temperature or hotter, in °C.")
+            .defineInRange("minTemperature", 200, 21, 10_000);
 
-    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_PER_OPERATION = BUILDER
-            .comment("FE per Carbon Dust, before Energy upgrades (raised to the balance floor if lower: a Carbon Dust bakes into Coal",
-                    "Coke, which gasifies into Syngas, so the floor is high).")
-            .defineInRange("energyPerOperation", 800_000, 1, 100_000_000);
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_BIOMASS_PER_BIO_COAL = BUILDER
+            .comment("Biomass items per Bio-Coal.")
+            .defineInRange("biomassPerBioCoal", 8, 1, 64);
 
-    public static final ModConfigSpec.IntValue RECLAIMER_CARBON_DIOXIDE = BUILDER
-            .comment("mB of Carbon Dioxide per operation.")
-            .defineInRange("carbonDioxidePerOperation", 250, 1, 100_000);
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_HEAT_PER_OPERATION = BUILDER
+            .comment("HU per Bio-Coal, before Heat upgrades (spread over the operation's time).")
+            .defineInRange("heatPerOperation", 6_000, 1, 10_000_000);
 
-    public static final ModConfigSpec.IntValue RECLAIMER_HYDROGEN = BUILDER
-            .comment("mB of Hydrogen per operation.")
-            .defineInRange("hydrogenPerOperation", 500, 0, 100_000);
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_TIME = BUILDER
+            .comment("Ticks per Bio-Coal, before Speed upgrades.")
+            .defineInRange("time", 200, 1, 72_000);
 
-    public static final ModConfigSpec.IntValue RECLAIMER_WATER = BUILDER
-            .comment("mB of Water made per operation.")
-            .defineInRange("waterPerOperation", 250, 0, 100_000);
-
-    public static final ModConfigSpec.IntValue RECLAIMER_TANK_CAPACITY = BUILDER
-            .comment("Carbon Dioxide, Hydrogen and Water tank sizes in mB (each).")
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_TANK_CAPACITY = BUILDER
+            .comment("Water tank and returned-water tank size, in mB each.")
             .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
 
-    public static final ModConfigSpec.IntValue RECLAIMER_OUTPUT_RATE = BUILDER
-            .comment("Most mB/t of Water it pushes out of its Output faces.")
-            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
-
-    public static final ModConfigSpec.DoubleValue RECLAIMER_BALANCE_SAFETY_FACTOR = BUILDER
-            .comment("Least FE an operation costs, as a multiple of the most FE its Carbon Dust can give back in the best",
-                    "setup (1.25: always at least 25% more). Never below 1.0.")
-            .defineInRange("balanceSafetyFactor", 1.25, 1.0, 10.0);
+    public static final ModConfigSpec.IntValue HYDROTHERMAL_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of returned water it pushes out of its Output faces (shared across them).")
+            .defineInRange("fluidOutputRate", 100, 1, 1_000_000);
 
     static {
         BUILDER.pop();
@@ -1170,103 +1297,64 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Sifter: sieves gravel, sand, red sand and Deepslate Gravel for chances of ore dusts and minerals, with FE.",
-                "Recipes are data-driven (arcforge:sifting, each output with its own chance); time and FE/t follow these unless a",
-                "recipe sets them. It needs a Sifter Mesh: better meshes raise the chances and the speed, and wear out slowly.").push("sifter");
+        BUILDER.comment("Carbon Reclaimer: Carbon Dioxide + Hydrogen -> Carbon Dust + Water, with FE. Recipes are data-driven",
+                "(arcforge:carbon_reclaiming); a recipe may set its own amounts and energy, otherwise these apply. Whatever the",
+                "settings, an operation never costs less than balanceSafetyFactor times the most FE its Carbon Dust can give back",
+                "(burnt, or carbonized or gasified first; see EnergyBalance), so it renews carbon, never energy.").push("carbonReclaimer");
     }
 
-    public static final ModConfigSpec.IntValue SIFTER_ENERGY_CAPACITY = BUILDER
+    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_CAPACITY = BUILDER
             .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 20_000, 1_000, 10_000_000);
+            .defineInRange("energyCapacity", 400_000, 1_000, 100_000_000);
 
-    public static final ModConfigSpec.IntValue SIFTER_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue SIFTER_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t while sifting, before Speed and Energy upgrades.")
-            .defineInRange("energyPerTick", 20, 0, 1_000_000);
-
-    public static final ModConfigSpec.IntValue SIFTER_TIME = BUILDER
-            .comment("Ticks per block sifted, before the mesh and Speed upgrades.")
-            .defineInRange("time", 100, 1, 72_000);
-
-    public static final ModConfigSpec.DoubleValue SIFTER_STEEL_CHANCE = BUILDER
-            .comment("Chance multiplier of a Steel Mesh (the base mesh).")
-            .defineInRange("steelMeshChance", 1.0, 0.0, 10.0);
-
-    public static final ModConfigSpec.DoubleValue SIFTER_INVAR_CHANCE = BUILDER
-            .comment("Chance multiplier of an Invar Mesh.")
-            .defineInRange("invarMeshChance", 1.25, 0.0, 10.0);
-
-    public static final ModConfigSpec.DoubleValue SIFTER_TUNGSTEN_CHANCE = BUILDER
-            .comment("Chance multiplier of a Tungsten Mesh.")
-            .defineInRange("tungstenMeshChance", 1.5, 0.0, 10.0);
-
-    public static final ModConfigSpec.DoubleValue SIFTER_STEEL_SPEED = BUILDER
-            .comment("Speed multiplier of a Steel Mesh.")
-            .defineInRange("steelMeshSpeed", 1.0, 0.1, 10.0);
-
-    public static final ModConfigSpec.DoubleValue SIFTER_INVAR_SPEED = BUILDER
-            .comment("Speed multiplier of an Invar Mesh.")
-            .defineInRange("invarMeshSpeed", 1.5, 0.1, 10.0);
-
-    public static final ModConfigSpec.DoubleValue SIFTER_TUNGSTEN_SPEED = BUILDER
-            .comment("Speed multiplier of a Tungsten Mesh.")
-            .defineInRange("tungstenMeshSpeed", 2.0, 0.1, 10.0);
-
-    public static final ModConfigSpec.DoubleValue SIFTER_MESH_WEAR_CHANCE = BUILDER
-            .comment("Chance each block sifted wears the mesh by one point (Steel lasts 256 points, Invar 512, Tungsten 1,024).")
-            .defineInRange("meshWearChance", 1.0, 0.0, 1.0);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Diamond Press (Hardened): presses Graphite into Diamonds with a lot of FE and heat, only at minTemperature or",
-                "hotter. Recipes are data-driven (arcforge:diamond_pressing); the Graphite per diamond, FE, heat, time and temperature",
-                "follow these unless a recipe sets them. Set high on purpose: it's a late-game sink.").push("diamondPress");
-    }
-
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 2_000_000, 1_000, 100_000_000);
-
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
+    public static final ModConfigSpec.IntValue RECLAIMER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in. Keep it at 16x energyPerTick or more, so 8 Speed upgrades can run flat out.")
             .defineInRange("maxEnergyInput", 64_000, 1, 10_000_000);
 
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_ENERGY_PER_DIAMOND = BUILDER
-            .comment("FE per Diamond, before Energy upgrades, spread over the time.")
-            .defineInRange("energyPerDiamond", 2_000_000, 1, 1_000_000_000);
+    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while working, before Speed upgrades. With the FE per operation this sets the time.")
+            .defineInRange("energyPerTick", 4_000, 1, 1_000_000);
 
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_HEAT_PER_DIAMOND = BUILDER
-            .comment("HU per Diamond, before Heat upgrades, spread over the time.")
-            .defineInRange("heatPerDiamond", 240_000, 1, 1_000_000_000);
+    public static final ModConfigSpec.IntValue RECLAIMER_ENERGY_PER_OPERATION = BUILDER
+            .comment("FE per Carbon Dust, before Energy upgrades (raised to the balance floor if lower: a Carbon Dust bakes into Coal",
+                    "Coke, which gasifies into Syngas, so the floor is high).")
+            .defineInRange("energyPerOperation", 800_000, 1, 100_000_000);
 
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_GRAPHITE_PER_DIAMOND = BUILDER
-            .comment("Graphite per Diamond.")
-            .defineInRange("graphitePerDiamond", 4, 1, 64);
+    public static final ModConfigSpec.IntValue RECLAIMER_CARBON_DIOXIDE = BUILDER
+            .comment("mB of Carbon Dioxide per operation.")
+            .defineInRange("carbonDioxidePerOperation", 250, 1, 100_000);
 
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_TIME = BUILDER
-            .comment("Ticks per Diamond, before Speed upgrades.")
-            .defineInRange("time", 1_200, 1, 72_000);
+    public static final ModConfigSpec.IntValue RECLAIMER_HYDROGEN = BUILDER
+            .comment("mB of Hydrogen per operation.")
+            .defineInRange("hydrogenPerOperation", 500, 0, 100_000);
 
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MIN_TEMPERATURE = BUILDER
-            .comment("It only works at this °C or hotter.")
-            .defineInRange("minTemperature", 1_400, 21, 10_000);
+    public static final ModConfigSpec.IntValue RECLAIMER_WATER = BUILDER
+            .comment("mB of Water made per operation.")
+            .defineInRange("waterPerOperation", 250, 0, 100_000);
 
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size in HU.")
-            .defineInRange("heatCapacity", 200_000, 1_000, 100_000_000);
+    public static final ModConfigSpec.IntValue RECLAIMER_TANK_CAPACITY = BUILDER
+            .comment("Carbon Dioxide, Hydrogen and Water tank sizes in mB (each).")
+            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
 
-    public static final ModConfigSpec.IntValue DIAMOND_PRESS_MAX_TEMPERATURE = BUILDER
-            .comment("°C of a full buffer.")
-            .defineInRange("maxTemperature", 2_000, 100, 10_000);
+    public static final ModConfigSpec.IntValue RECLAIMER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of Water it pushes out of its Output faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue RECLAIMER_BALANCE_SAFETY_FACTOR = BUILDER
+            .comment("Least FE an operation costs, as a multiple of the most FE its Carbon Dust can give back in the best",
+                    "setup (1.25: always at least 25% more). Never below 1.0.")
+            .defineInRange("balanceSafetyFactor", 1.25, 1.0, 10.0);
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Machines that work in the world or on recipes for you.").push("automation");
     }
 
     static {
@@ -1318,104 +1406,6 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue BREAKER_MIN_TICKS = BUILDER
             .comment("Fewest ticks a break takes, before Speed upgrades.")
             .defineInRange("minBreakTicks", 4, 1, 1_000);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Tree Cutter: plants saplings from its inventory in an area in front of it and fells every fully grown tree",
-                "there (logs, leaves and what they drop), replanting. Speed upgrades make it work more often, Energy upgrades cut the",
-                "FE per log, Range upgrades widen the area.").push("treeCutter");
-    }
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 100_000, 1_000, 10_000_000);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_PER_LOG = BUILDER
-            .comment("FE per log it fells, before Energy upgrades.")
-            .defineInRange("energyPerLog", 200, 0, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_PER_PLANT = BUILDER
-            .comment("FE per sapling it plants, before Energy upgrades.")
-            .defineInRange("energyPerPlant", 20, 0, 1_000_000);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_INTERVAL = BUILDER
-            .comment("Ticks between its actions (felling one tree, or planting one sapling), before Speed upgrades.")
-            .defineInRange("interval", 40, 1, 72_000);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_FERTILIZE_INTERVAL = BUILDER
-            .comment("Ticks between bone meal uses on a sapling (one Bone Meal each), before Speed upgrades.")
-            .defineInRange("fertilizeInterval", 40, 1, 72_000);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_RADIUS = BUILDER
-            .comment("Blocks from the middle of its area to its edge without Range upgrades (2: a 5x5 area).")
-            .defineInRange("areaRadius", 2, 0, 16);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_RANGE_PER_UPGRADE = BUILDER
-            .comment("Blocks each Range upgrade adds to the radius (1: eight make a 21x21 area).")
-            .defineInRange("rangePerUpgrade", 1, 0, 8);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_LOGS = BUILDER
-            .comment("Most logs it takes from one tree; a bigger one is left standing.")
-            .defineInRange("maxLogsPerTree", 256, 1, 4_096);
-
-    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_HEIGHT = BUILDER
-            .comment("How far above its area it looks for a tree's logs and leaves, in blocks.")
-            .defineInRange("maxTreeHeight", 32, 4, 256);
-
-    public static final ModConfigSpec.BooleanValue TREE_CUTTER_COLLECT_LEAVES = BUILDER
-            .comment("Whether it keeps the leaf blocks too (biomass for the Hydrothermal Carbonizer), as well as what the leaves",
-                    "drop (saplings, sticks, apples).")
-            .define("collectLeaves", true);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Hydrothermal Carbonizer: cooks biomass (#arcforge:biomass) in water with heat (HU) into Bio-Coal, giving back",
-                "some of the water. It only works at minTemperature or hotter. Recipes (arcforge:hydrothermal_carbonizing) set the",
-                "water; the biomass per Bio-Coal, heat and time below apply to every recipe that doesn't set its own.")
-                .push("hydrothermalCarbonizer");
-    }
-
-    public static final ModConfigSpec.IntValue HYDROTHERMAL_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size, in HU.")
-            .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue HYDROTHERMAL_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 600, 21, 10_000);
-
-    public static final ModConfigSpec.IntValue HYDROTHERMAL_MIN_TEMPERATURE = BUILDER
-            .comment("It only works at this temperature or hotter, in °C.")
-            .defineInRange("minTemperature", 200, 21, 10_000);
-
-    public static final ModConfigSpec.IntValue HYDROTHERMAL_BIOMASS_PER_BIO_COAL = BUILDER
-            .comment("Biomass items per Bio-Coal.")
-            .defineInRange("biomassPerBioCoal", 8, 1, 64);
-
-    public static final ModConfigSpec.IntValue HYDROTHERMAL_HEAT_PER_OPERATION = BUILDER
-            .comment("HU per Bio-Coal, before Heat upgrades (spread over the operation's time).")
-            .defineInRange("heatPerOperation", 6_000, 1, 10_000_000);
-
-    public static final ModConfigSpec.IntValue HYDROTHERMAL_TIME = BUILDER
-            .comment("Ticks per Bio-Coal, before Speed upgrades.")
-            .defineInRange("time", 200, 1, 72_000);
-
-    public static final ModConfigSpec.IntValue HYDROTHERMAL_TANK_CAPACITY = BUILDER
-            .comment("Water tank and returned-water tank size, in mB each.")
-            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
-
-    public static final ModConfigSpec.IntValue HYDROTHERMAL_OUTPUT_RATE = BUILDER
-            .comment("Most mB/t of returned water it pushes out of its Output faces (shared across them).")
-            .defineInRange("fluidOutputRate", 100, 1, 1_000_000);
 
     static {
         BUILDER.pop();
@@ -1482,6 +1472,102 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Tree Cutter: plants saplings from its inventory in an area in front of it and fells every fully grown tree",
+                "there (logs, leaves and what they drop), replanting. Speed upgrades make it work more often, Energy upgrades cut the",
+                "FE per log, Range upgrades widen the area.").push("treeCutter");
+    }
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_PER_LOG = BUILDER
+            .comment("FE per log it fells, before Energy upgrades.")
+            .defineInRange("energyPerLog", 200, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_ENERGY_PER_PLANT = BUILDER
+            .comment("FE per sapling it plants, before Energy upgrades.")
+            .defineInRange("energyPerPlant", 20, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_INTERVAL = BUILDER
+            .comment("Ticks between its actions (felling one tree, or planting one sapling), before Speed upgrades.")
+            .defineInRange("interval", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_FERTILIZE_INTERVAL = BUILDER
+            .comment("Ticks between bone meal uses on a sapling (one Bone Meal each), before Speed upgrades.")
+            .defineInRange("fertilizeInterval", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_RADIUS = BUILDER
+            .comment("Blocks from the middle of its area to its edge without Range upgrades (2: a 5x5 area).")
+            .defineInRange("areaRadius", 2, 0, 16);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_RANGE_PER_UPGRADE = BUILDER
+            .comment("Blocks each Range upgrade adds to the radius (1: eight make a 21x21 area).")
+            .defineInRange("rangePerUpgrade", 1, 0, 8);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_LOGS = BUILDER
+            .comment("Most logs it takes from one tree; a bigger one is left standing.")
+            .defineInRange("maxLogsPerTree", 256, 1, 4_096);
+
+    public static final ModConfigSpec.IntValue TREE_CUTTER_MAX_HEIGHT = BUILDER
+            .comment("How far above its area it looks for a tree's logs and leaves, in blocks.")
+            .defineInRange("maxTreeHeight", 32, 4, 256);
+
+    public static final ModConfigSpec.BooleanValue TREE_CUTTER_COLLECT_LEAVES = BUILDER
+            .comment("Whether it keeps the leaf blocks too (biomass for the Hydrothermal Carbonizer), as well as what the leaves",
+                    "drop (saplings, sticks, apples).")
+            .define("collectLeaves", true);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Electric Pump: pumps the fluid source block directly below it using FE.").push("electricPump");
+    }
+
+    public static final ModConfigSpec.IntValue PUMP_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while pumping, before upgrades.")
+            .defineInRange("energyPerTick", 10, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_CYCLE_TICKS = BUILDER
+            .comment("Ticks to pump one bucket (1,000 mB), before Speed upgrades.")
+            .defineInRange("cycleTicks", 20, 1, 1_200);
+
+    public static final ModConfigSpec.IntValue PUMP_TANK_CAPACITY = BUILDER
+            .comment("Internal tank size in mB.")
+            .defineInRange("tankCapacity", 16_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue PUMP_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t it pushes up out of its top face (and out of output faces with auto-eject).")
+            .defineInRange("outputRate", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.BooleanValue PUMP_INFINITE_WATER = BUILDER
+            .comment("Leave water in place when it is an infinite source (2+ water sources beside it), like a bucket would refill.")
+            .define("pumpInfiniteWater", true);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> PUMP_SEAWATER_BIOME_TAGS = BUILDER
+            .comment("Biome tags where water pumps up as Seawater (ocean and beach biomes).")
+            .defineListAllowEmpty("seawaterBiomeTags", List.of("minecraft:is_ocean", "minecraft:is_beach"), () -> "minecraft:is_ocean",
+                    value -> value instanceof String);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Arc Quarry: a 3x3x3 digital miner that mines a square area top-down, keeping only the blocks its filter picks.")
                 .push("arcQuarry");
     }
@@ -1533,52 +1619,6 @@ public class ArcforgeConfig {
     static {
         BUILDER.pop();
     }
-
-    static {
-        BUILDER.comment("Fiberizer: spins slag and basalt into mineral wool using FE and heat. Recipes are data-driven",
-                "(arcforge:fiberizing) and set the FE/t, HU/t and minimum temperature.").push("fiberizer");
-    }
-
-    public static final ModConfigSpec.IntValue FIBERIZER_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue FIBERIZER_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue FIBERIZER_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size, in HU.")
-            .defineInRange("heatCapacity", 10_000, 100, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue FIBERIZER_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 1_100, 21, 10_000);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Infuser: soaks vanilla wood in creosote with FE, making treated wood. Recipes are data-driven",
-                "(arcforge:infusing) and set the fluid used.").push("infuser");
-    }
-
-    public static final ModConfigSpec.IntValue INFUSER_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
-            .defineInRange("energyCapacity", 20_000, 1_000, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue INFUSER_MAX_INPUT = BUILDER
-            .comment("Most FE/t it takes in.")
-            .defineInRange("maxEnergyInput", 200, 1, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue INFUSER_ENERGY_PER_TICK = BUILDER
-            .comment("FE/t while infusing, before upgrades.")
-            .defineInRange("energyPerTick", 20, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue INFUSER_TANK_CAPACITY = BUILDER
-            .comment("Fluid tank capacity in mB.")
-            .defineInRange("tankCapacity", 8_000, 1_000, 1_000_000);
 
     static {
         BUILDER.pop();
@@ -1828,395 +1868,14 @@ public class ArcforgeConfig {
         BUILDER.pop();
     }
 
-    // --- Machine security ---
-
-    static {
-        BUILDER.comment("Who may use, configure and break machines. Every machine, multiblock and storage block records the player",
-                "who placed it; its owner's Security Terminal profile (or the block's own override) decides who else may use it.",
-                "Conduits, hoppers and other automation always work.").push("security");
-    }
-
-    public static final ModConfigSpec.BooleanValue SECURITY_ENABLED = BUILDER
-            .comment("Whether security is enforced. Off, anyone may use anything (owners are still recorded).")
-            .define("enabled", true);
-
-    public static final ModConfigSpec.BooleanValue SECURITY_OPS_BYPASS = BUILDER
-            .comment("Whether operators (permission level 2) may use and edit everything.")
-            .define("opsBypass", true);
-
-    public static final ModConfigSpec.EnumValue<net.zagdrath.arcforge.security.SecurityMode> SECURITY_DEFAULT_MODE = BUILDER
-            .comment("The mode of a player who never set one at a Security Terminal.")
-            .defineEnum("defaultMode", net.zagdrath.arcforge.security.SecurityMode.PUBLIC);
-
-    static {
-        BUILDER.pop();
-    }
-
-    // --- The Foundry Suit ---
-
-    static {
-        BUILDER.comment("Foundry Suit: fire-resistant armour. Fire and hot-block damage is #arcforge:foundry_resists.").push("foundrySuit");
-    }
-
-    public static final ModConfigSpec.DoubleValue FOUNDRY_FIRE_REDUCTION = BUILDER
-            .comment("Share of fire and hot-block damage each piece cuts (the full set stops it all).")
-            .defineInRange("fireReductionPerPiece", 0.25, 0.0, 1.0);
-
-    public static final ModConfigSpec.IntValue FOUNDRY_LAVA_SHIELD_TICKS = BUILDER
-            .comment("Ticks in lava the full set protects from lava damage.")
-            .defineInRange("lavaShieldTicks", 160, 0, 72_000);
-
-    public static final ModConfigSpec.IntValue FOUNDRY_LAVA_COOLDOWN_TICKS = BUILDER
-            .comment("Ticks out of lava before the shield refills.")
-            .defineInRange("lavaCooldownTicks", 1_200, 1, 72_000);
-
-    static {
-        BUILDER.pop();
-    }
-
-    // --- Tools: the Jetpack, Arc Drill and Arc Saw ---
-
-    static {
-        BUILDER.comment("Jetpacks, Arc Drills and Arc Saws. Per-tier values are listed Tempered, Hardened, Arcforged.").push("tools");
-    }
-
-    public static final ModConfigSpec.BooleanValue ENABLE_JETPACKS = BUILDER
-            .comment("Whether jetpacks fly. Off, they can still be worn and filled.")
-            .define("enableJetpacks", true);
-
-    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> JETPACK_TANK = BUILDER
-            .comment("Jetpack tank size in mB, per tier.")
-            .defineList("jetpackTank", List.of(16_000, 64_000, 256_000), () -> 16_000, value -> value instanceof Integer i && i > 0);
-
-    public static final ModConfigSpec.ConfigValue<List<? extends Double>> JETPACK_MAX_RISE = BUILDER
-            .comment("Fastest a jetpack climbs, in blocks per tick, per tier.")
-            .defineList("jetpackMaxRise", List.of(0.5, 0.65, 0.8), () -> 0.5, value -> value instanceof Double d && d > 0);
-
-    public static final ModConfigSpec.ConfigValue<List<? extends Double>> JETPACK_AIR_SPEED = BUILDER
-            .comment("Horizontal push while thrusting, in blocks per tick per tick, per tier.")
-            .defineList("jetpackAirSpeed", List.of(0.03, 0.035, 0.04), () -> 0.03, value -> value instanceof Double d && d >= 0);
-
-    public static final ModConfigSpec.DoubleValue JETPACK_HOVER_FUEL_MULTIPLIER = BUILDER
-            .comment("Fuel used per tick in Hover mode, as a multiple of the fuel's normal rate.")
-            .defineInRange("hoverFuelMultiplier", 1.5, 0.0, 100.0);
-
-    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ARC_TOOL_CAPACITY = BUILDER
-            .comment("Arc Drill and Arc Saw FE capacity, per tier.")
-            .defineList("arcToolCapacity", List.of(100_000, 400_000, 1_600_000), () -> 100_000, value -> value instanceof Integer i && i > 0);
-
-    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ARC_TOOL_RECEIVE = BUILDER
-            .comment("Arc Drill and Arc Saw charge rate in FE/t, per tier.")
-            .defineList("arcToolReceive", List.of(2_000, 8_000, 32_000), () -> 2_000, value -> value instanceof Integer i && i > 0);
-
-    public static final ModConfigSpec.ConfigValue<List<? extends Double>> ARC_TOOL_SPEED = BUILDER
-            .comment("Arc Drill and Arc Saw mining speed, per tier (a diamond pickaxe is 8, netherite 9).")
-            .defineList("arcToolSpeed", List.of(8.0, 10.0, 14.0), () -> 8.0, value -> value instanceof Double d && d > 0);
-
-    public static final ModConfigSpec.IntValue ARC_TOOL_BASE_FE = BUILDER
-            .comment("FE per block before hardness and modules: cost = base x (1 + hardnessFactor x hardness) x (1 + module factors).")
-            .defineInRange("baseFePerBlock", 50, 0, 1_000_000);
-
-    public static final ModConfigSpec.DoubleValue ARC_TOOL_HARDNESS_FACTOR = BUILDER
-            .comment("How much each point of block hardness adds to the FE per block.")
-            .defineInRange("hardnessFactor", 0.25, 0.0, 100.0);
-
-    public static final ModConfigSpec.DoubleValue MODULE_AREA_FE = BUILDER
-            .comment("Extra FE per block with the Area module on, as a fraction of the base.")
-            .defineInRange("areaModuleFe", 0.25, 0.0, 100.0);
-
-    public static final ModConfigSpec.DoubleValue MODULE_SILK_FE = BUILDER
-            .comment("Extra FE per block with the Silk Touch module on.")
-            .defineInRange("silkTouchModuleFe", 1.0, 0.0, 100.0);
-
-    public static final ModConfigSpec.DoubleValue MODULE_FORTUNE_FE = BUILDER
-            .comment("Extra FE per block per Fortune level with a Fortune module on.")
-            .defineInRange("fortuneModuleFe", 0.5, 0.0, 100.0);
-
-    public static final ModConfigSpec.DoubleValue MODULE_VEIN_FE = BUILDER
-            .comment("Extra FE per block with the Vein Mining module on.")
-            .defineInRange("veinModuleFe", 0.25, 0.0, 100.0);
-
-    public static final ModConfigSpec.DoubleValue MODULE_SPEED_FE = BUILDER
-            .comment("Extra FE per block with the Speed module on.")
-            .defineInRange("speedModuleFe", 0.5, 0.0, 100.0);
-
-    public static final ModConfigSpec.DoubleValue SPEED_MODULE_MULTIPLIER = BUILDER
-            .comment("Mining speed multiplier with the Speed module on.")
-            .defineInRange("speedModuleMultiplier", 1.5, 1.0, 100.0);
-
-    public static final ModConfigSpec.IntValue VEIN_LIMIT = BUILDER
-            .comment("Most blocks the Vein Mining module breaks at once on an Arc Drill, the first included.")
-            .defineInRange("veinLimit", 64, 1, 4_096);
-
-    public static final ModConfigSpec.IntValue FELLING_LIMIT = BUILDER
-            .comment("Most logs an Arc Saw fells at once.")
-            .defineInRange("fellingLimit", 32, 1, 4_096);
-
-    public static final ModConfigSpec.IntValue FELLING_VEIN_LIMIT = BUILDER
-            .comment("Most logs an Arc Saw fells at once with the Vein Mining module on.")
-            .defineInRange("fellingVeinLimit", 256, 1, 4_096);
-
-    public static final ModConfigSpec.DoubleValue FELLING_FE_MULTIPLIER = BUILDER
-            .comment("Multiplier on the FE for each log felled after the first.")
-            .defineInRange("fellingFeMultiplier", 1.0, 0.0, 100.0);
-
-    static {
-        BUILDER.pop();
-    }
-
-    // A per-tier list value (Tempered, Hardened, Arcforged); a short list repeats its last entry.
-    public static int perTier(ModConfigSpec.ConfigValue<List<? extends Integer>> value, int tierIndex) {
-        List<? extends Integer> list = value.get();
-        return list.get(Math.min(tierIndex, list.size() - 1));
-    }
-
-    public static double perTierDouble(ModConfigSpec.ConfigValue<List<? extends Double>> value, int tierIndex) {
-        List<? extends Double> list = value.get();
-        return list.get(Math.min(tierIndex, list.size() - 1));
-    }
-
-    static {
-        BUILDER.comment("Ore generation, per ore. Read when a world loads; changes apply to chunks generated after a restart.",
-                "Turning an ore off only stops it generating: its items and recipes stay (other mods' ores tagged",
-                "the same still work). Arcite can't be turned off.").push("ores");
-    }
-
-    // One ore's generation settings (enabled is null for arcite, which is always on).
-    public record OreSettings(ModConfigSpec.@Nullable BooleanValue enabled, ModConfigSpec.IntValue veinsPerChunk,
-            ModConfigSpec.IntValue veinSize, ModConfigSpec.IntValue minY, ModConfigSpec.IntValue maxY,
-            ModConfigSpec.DoubleValue airExposureDiscard) {
-        public boolean isEnabled() {
-            return enabled == null || enabled.getAsBoolean();
-        }
-    }
-
-    public static final Map<String, OreSettings> ORES = new LinkedHashMap<>();
-
-    private static void ore(String key, String description, boolean toggle, int veins, int size, int minY, int maxY, double discard) {
-        BUILDER.comment(description).push(key);
-        ModConfigSpec.BooleanValue enabled = toggle ? BUILDER.comment("Whether it generates.").define("enabled", true) : null;
-        ORES.put(key, new OreSettings(enabled,
-                BUILDER.comment("Veins per chunk.").defineInRange("veinsPerChunk", veins, 0, 256),
-                BUILDER.comment("Blocks per vein, at most.").defineInRange("veinSize", size, 1, 64),
-                BUILDER.comment("Lowest Y it generates at.").defineInRange("minY", minY, -2_032, 2_031),
-                BUILDER.comment("Highest Y it generates at.").defineInRange("maxY", maxY, -2_032, 2_031),
-                BUILDER.comment("Chance an ore block touching air is left out (0 to 1).").defineInRange("airExposureDiscard", discard, 0.0, 1.0)));
-        BUILDER.pop();
-    }
-
-    static {
-        ore("silver", "Silver: common, mid-depth.", true, 8, 9, -32, 64, 0.0);
-        ore("nickel", "Nickel: deep, near iron's lower band.", true, 6, 8, -64, 16, 0.0);
-        ore("fluorite", "Fluorite: fairly common, mid-depth.", true, 8, 8, -16, 48, 0.0);
-        ore("bismuth", "Bismuth: fairly common, mid-depth.", true, 8, 8, 0, 56, 0.0);
-        ore("tungsten", "Tungsten (wolframite ore): uncommon and deep.", true, 6, 6, -64, -16, 0.0);
-        ore("arcite", "Arcite: rare, the deepest; needs a diamond pickaxe.", false, 4, 5, -64, -40, 0.2);
-        ore("sulfur", "Nether Sulfur Ore: common through the Nether's netherrack; drops Sulfur Dust.", true, 12, 10, 10, 117, 0.0);
-        ore("halite", "Halite: large flat beds of Rock Salt (veinsPerChunk: beds tried in 1 chunk in 4; veinSize: each small vein of a bed).",
-                true, 1, 12, -32, 40, 0.0);
-        ore("spodumene", "Spodumene: uncommon, everywhere in stone and deepslate.", true, 3, 7, -48, 48, 0.0);
-        ore("spodumenePegmatite", "Spodumene pegmatites: extra, bigger veins under mountains and badlands (only while ores.spodumene is on too).",
-                true, 6, 10, 0, 160, 0.0);
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Halite beds: how the ore's flat beds are laid (see ores.halite for whether, how often and how deep).")
-                .push("haliteBeds");
-    }
-
-    public static final ModConfigSpec.IntValue HALITE_BED_RADIUS = BUILDER
-            .comment("Largest radius of a bed, in blocks (each bed is an oval between 60% and 100% of it each way).")
-            .defineInRange("radius", 11, 3, 14);
-
-    public static final ModConfigSpec.IntValue HALITE_BED_LAYERS = BUILDER
-            .comment("How many vein layers a bed is laid in (each about 2 blocks thick).")
-            .defineInRange("layers", 1, 1, 8);
-
-    public static final ModConfigSpec.IntValue HALITE_THICK_BED_LAYERS = BUILDER
-            .comment("Layers under thickBiomeTags (deserts and oceans, where the old seas dried).")
-            .defineInRange("thickLayers", 3, 1, 8);
-
-    public static final ModConfigSpec.ConfigValue<List<? extends String>> HALITE_THICK_BIOME_TAGS = BUILDER
-            .comment("Biome tags (at the bed's centre) whose beds use thickLayers.")
-            .defineListAllowEmpty("thickBiomeTags", List.of("c:is_desert", "minecraft:is_ocean", "minecraft:is_deep_ocean"), () -> "c:is_desert",
-                    value -> value instanceof String);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Energy, Heat, Fluid and Gas Meters: pass flow from their left side to their right, up to a cap per tick, and",
-                "report the rate. The caps default to the Arcforged conduit rates.").push("meters");
-    }
-
-    public static final ModConfigSpec.IntValue METER_ENERGY_CAP = BUILDER
-            .comment("Most FE an Energy Meter passes per tick.")
-            .defineInRange("energyRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.energyPerTick(), 1, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue METER_HEAT_CAP = BUILDER
-            .comment("Most HU a Heat Meter passes per tick.")
-            .defineInRange("heatRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.heatPerTick(), 1, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue METER_FLUID_CAP = BUILDER
-            .comment("Most mB of liquid a Fluid Meter passes per tick.")
-            .defineInRange("fluidRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.fluidPerTick(), 1, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue METER_GAS_CAP = BUILDER
-            .comment("Most mB of gas a Gas Meter passes per tick.")
-            .defineInRange("gasRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.gasPerTick(), 1, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue METER_SMOOTHING_TICKS = BUILDER
-            .comment("The rate shown is the average over this many ticks.")
-            .defineInRange("smoothingTicks", 20, 1, 1_200);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Chargepad: charges the FE items of players standing on it, from FE fed into its back.").push("chargepad");
-    }
-
-    public static final ModConfigSpec.IntValue CHARGEPAD_CAPACITY = BUILDER
-            .comment("FE buffer size.")
-            .defineInRange("energyCapacity", 500_000, 1_000, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue CHARGEPAD_MAX_INPUT = BUILDER
-            .comment("Most FE it takes in per tick.")
-            .defineInRange("maxInput", 8_192, 1, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue CHARGEPAD_RATE_PER_ITEM = BUILDER
-            .comment("Most FE it gives one item per tick.")
-            .defineInRange("chargeRatePerItem", 2_048, 1, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue CHARGEPAD_MAX_TRANSFER = BUILDER
-            .comment("Most FE it gives out per tick in all.")
-            .defineInRange("maxTransferPerTick", 8_192, 1, Integer.MAX_VALUE);
-
-    static {
-        BUILDER.pop();
-    }
-
-    // --- Reservoir, Liquid Experience, Quantum Tunnel, Chunk Loader ---
-
-    static {
-        BUILDER.comment("Reservoir: a 32,000 mB tank block; touching Reservoirs merge into one tank of any shape that fills from the",
-                "bottom up.").push("reservoir");
-    }
-
-    public static final ModConfigSpec.IntValue RESERVOIR_MAX_BLOCKS = BUILDER
-            .comment("Most Reservoir blocks that join into one tank. Blocks past this form a tank of their own.")
-            .defineInRange("maxBlocks", 4_096, 1, 65_536);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Liquid Experience (20 mB per experience point), the XP Drain, the XP Shower and the Vacuum Collector's",
-                "experience tank.").push("experience");
-    }
-
-    public static final ModConfigSpec.IntValue XP_DRAIN_ORB_POINTS_PER_TICK = BUILDER
-            .comment("Most experience points of orbs an XP Drain takes in per tick.")
-            .defineInRange("drainOrbPointsPerTick", 1_000, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue XP_DRAIN_LEVEL_INTERVAL = BUILDER
-            .comment("Ticks between levels an XP Drain takes from a player sneaking on it.")
-            .defineInRange("drainLevelInterval", 5, 1, 200);
-
-    public static final ModConfigSpec.IntValue XP_SHOWER_LEVEL_INTERVAL = BUILDER
-            .comment("Ticks between levels an XP Shower gives a player sneaking under it.")
-            .defineInRange("showerLevelInterval", 5, 1, 200);
-
-    public static final ModConfigSpec.IntValue XP_SHOWER_REACH = BUILDER
-            .comment("How many blocks below the XP Shower a player may stand.")
-            .defineInRange("showerReach", 3, 1, 8);
-
-    public static final ModConfigSpec.IntValue XP_SHOWER_TANK = BUILDER
-            .comment("The XP Shower's tank (mB).")
-            .defineInRange("showerTank", 8_000, 100, 1_000_000);
-
-    public static final ModConfigSpec.IntValue XP_SHOWER_PULL_RATE = BUILDER
-            .comment("Most Liquid Experience (mB) an XP Shower draws per tick from the container above it.")
-            .defineInRange("showerPullRate", 1_000, 1, 1_000_000);
-
-    public static final ModConfigSpec.IntValue VACUUM_XP_TANK = BUILDER
-            .comment("The Vacuum Collector's Liquid Experience tank (mB). It collects experience orbs in its range into it.")
-            .defineInRange("vacuumXpTank", 16_000, 0, 1_000_000);
-
-    public static final ModConfigSpec.IntValue VACUUM_XP_OUTPUT_RATE = BUILDER
-            .comment("Most Liquid Experience (mB) per tick that conduits can drain from a Vacuum Collector.")
-            .defineInRange("vacuumXpOutputRate", 1_000, 1, 1_000_000);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Quantum Tunnel: every tunnel on a frequency shares one buffer of FE, heat, fluid, gas and items, across",
-                "dimensions.").push("quantumTunnel");
-    }
-
-    public static final ModConfigSpec.IntValue QUANTUM_ENERGY_BUFFER = BUILDER
-            .comment("FE a frequency holds.")
-            .defineInRange("energyBuffer", 4_000_000, 1_000, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue QUANTUM_HEAT_BUFFER = BUILDER
-            .comment("HU a frequency holds.")
-            .defineInRange("heatBuffer", 400_000, 1_000, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue QUANTUM_FLUID_BUFFER = BUILDER
-            .comment("Liquid (mB) a frequency holds.")
-            .defineInRange("fluidBuffer", 64_000, 1_000, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue QUANTUM_GAS_BUFFER = BUILDER
-            .comment("Gas (mB) a frequency holds.")
-            .defineInRange("gasBuffer", 64_000, 1_000, Integer.MAX_VALUE);
-
-    public static final ModConfigSpec.IntValue QUANTUM_ITEM_SLOTS = BUILDER
-            .comment("Item slots a frequency holds.")
-            .defineInRange("itemSlots", 9, 1, 54);
-
-    public static final ModConfigSpec.IntValue QUANTUM_FREQUENCIES_PER_PLAYER = BUILDER
-            .comment("Most frequencies one player may create.")
-            .defineInRange("frequenciesPerPlayer", 32, 1, 1_024);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
-        BUILDER.comment("Chunk Loader: keeps chunks round it loaded with NeoForge chunk tickets, for the player who placed it.")
-                .push("chunkLoader");
-    }
-
-    public static final ModConfigSpec.IntValue CHUNK_LOADER_PLAYER_LIMIT = BUILDER
-            .comment("Most chunks one player's Chunk Loaders may keep loaded in all.")
-            .defineInRange("chunksPerPlayer", 25, 0, 1_024);
-
-    public static final ModConfigSpec.BooleanValue CHUNK_LOADER_REQUIRE_ONLINE = BUILDER
-            .comment("Stop loading while the owner is offline (the loaders start again when they log in).")
-            .define("requireOwnerOnline", false);
-
-    public static final ModConfigSpec.IntValue CHUNK_LOADER_ENERGY_PER_CHUNK = BUILDER
-            .comment("FE per tick per loaded chunk. 0 (the default) needs no FE.")
-            .defineInRange("energyPerChunk", 0, 0, 100_000);
-
-    public static final ModConfigSpec.IntValue CHUNK_LOADER_ENERGY_CAPACITY = BUILDER
-            .comment("FE buffer size (only used when energyPerChunk is above 0).")
-            .defineInRange("energyCapacity", 100_000, 1_000, Integer.MAX_VALUE);
-
-    static {
-        BUILDER.pop();
-    }
-
     // --- Farming ---
 
     static {
         BUILDER.comment("Farming: the Compost Bin, fertilizers, Loam and Loam Farmland, and the crops.").push("farming");
+    }
+
+    static {
+        BUILDER.comment("Soil, fertilizers and crops.").push("growing");
     }
 
     static {
@@ -2349,6 +2008,14 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Machines that process crops, and the rustic hand-worked ones.").push("cropProcessing");
     }
 
     static {
@@ -2532,27 +2199,6 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Vulcanizer: cures Raw Rubber with Sulfur into Rubber with heat (HU), no FE. Recipes (arcforge:vulcanizing) set",
-                "the inputs, time and HU/t.").push("vulcanizer");
-    }
-
-    public static final ModConfigSpec.IntValue VULCANIZER_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size, in HU.")
-            .defineInRange("heatCapacity", 8_000, 100, 1_000_000_000);
-
-    public static final ModConfigSpec.IntValue VULCANIZER_MAX_TEMPERATURE = BUILDER
-            .comment("Temperature of a full heat buffer, in °C.")
-            .defineInRange("maxTemperature", 400, 21, 10_000);
-
-    public static final ModConfigSpec.IntValue VULCANIZER_MIN_TEMPERATURE = BUILDER
-            .comment("It only works at this temperature or hotter, in °C.")
-            .defineInRange("minTemperature", 140, 21, 10_000);
-
-    static {
-        BUILDER.pop();
-    }
-
-    static {
         BUILDER.comment("Resin Tap: hung on the side of a log with leaves above it (a living tree), it fills by itself. On a jungle",
                 "log it drips Latex into its tank; on a spruce log it collects Pine Resin; on any other log, Pine Resin more",
                 "slowly.").push("resinTap");
@@ -2588,6 +2234,35 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Vulcanizer: cures Raw Rubber with Sulfur into Rubber with heat (HU), no FE. Recipes (arcforge:vulcanizing) set",
+                "the inputs, time and HU/t.").push("vulcanizer");
+    }
+
+    public static final ModConfigSpec.IntValue VULCANIZER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU.")
+            .defineInRange("heatCapacity", 8_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue VULCANIZER_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 400, 21, 10_000);
+
+    public static final ModConfigSpec.IntValue VULCANIZER_MIN_TEMPERATURE = BUILDER
+            .comment("It only works at this temperature or hotter, in °C.")
+            .defineInRange("minTemperature", 140, 21, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Fertilizer chemistry: nitrogen, ammonia and biogas.").push("farmChemistry");
     }
 
     static {
@@ -2704,6 +2379,14 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Blocks that grow crops for you.").push("automatedFarms");
     }
 
     static {
@@ -2954,6 +2637,419 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Moving, measuring and storing things, and keeping chunks loaded.").push("logistics");
+    }
+
+    static {
+        BUILDER.comment("Energy, Heat, Fluid and Gas Meters: pass flow from their left side to their right, up to a cap per tick, and",
+                "report the rate. The caps default to the Arcforged conduit rates.").push("meters");
+    }
+
+    public static final ModConfigSpec.IntValue METER_ENERGY_CAP = BUILDER
+            .comment("Most FE an Energy Meter passes per tick.")
+            .defineInRange("energyRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.energyPerTick(), 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue METER_HEAT_CAP = BUILDER
+            .comment("Most HU a Heat Meter passes per tick.")
+            .defineInRange("heatRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.heatPerTick(), 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue METER_FLUID_CAP = BUILDER
+            .comment("Most mB of liquid a Fluid Meter passes per tick.")
+            .defineInRange("fluidRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.fluidPerTick(), 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue METER_GAS_CAP = BUILDER
+            .comment("Most mB of gas a Gas Meter passes per tick.")
+            .defineInRange("gasRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.gasPerTick(), 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue METER_SMOOTHING_TICKS = BUILDER
+            .comment("The rate shown is the average over this many ticks.")
+            .defineInRange("smoothingTicks", 20, 1, 1_200);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Chargepad: charges the FE items of players standing on it, from FE fed into its back.").push("chargepad");
+    }
+
+    public static final ModConfigSpec.IntValue CHARGEPAD_CAPACITY = BUILDER
+            .comment("FE buffer size.")
+            .defineInRange("energyCapacity", 500_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue CHARGEPAD_MAX_INPUT = BUILDER
+            .comment("Most FE it takes in per tick.")
+            .defineInRange("maxInput", 8_192, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue CHARGEPAD_RATE_PER_ITEM = BUILDER
+            .comment("Most FE it gives one item per tick.")
+            .defineInRange("chargeRatePerItem", 2_048, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue CHARGEPAD_MAX_TRANSFER = BUILDER
+            .comment("Most FE it gives out per tick in all.")
+            .defineInRange("maxTransferPerTick", 8_192, 1, Integer.MAX_VALUE);
+
+    static {
+        BUILDER.pop();
+    }
+
+    // --- Reservoir, Liquid Experience, Quantum Tunnel, Chunk Loader ---
+
+    static {
+        BUILDER.comment("Reservoir: a 32,000 mB tank block; touching Reservoirs merge into one tank of any shape that fills from the",
+                "bottom up.").push("reservoir");
+    }
+
+    public static final ModConfigSpec.IntValue RESERVOIR_MAX_BLOCKS = BUILDER
+            .comment("Most Reservoir blocks that join into one tank. Blocks past this form a tank of their own.")
+            .defineInRange("maxBlocks", 4_096, 1, 65_536);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Liquid Experience (20 mB per experience point), the XP Drain, the XP Shower and the Vacuum Collector's",
+                "experience tank.").push("experience");
+    }
+
+    public static final ModConfigSpec.IntValue XP_DRAIN_ORB_POINTS_PER_TICK = BUILDER
+            .comment("Most experience points of orbs an XP Drain takes in per tick.")
+            .defineInRange("drainOrbPointsPerTick", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue XP_DRAIN_LEVEL_INTERVAL = BUILDER
+            .comment("Ticks between levels an XP Drain takes from a player sneaking on it.")
+            .defineInRange("drainLevelInterval", 5, 1, 200);
+
+    public static final ModConfigSpec.IntValue XP_SHOWER_LEVEL_INTERVAL = BUILDER
+            .comment("Ticks between levels an XP Shower gives a player sneaking under it.")
+            .defineInRange("showerLevelInterval", 5, 1, 200);
+
+    public static final ModConfigSpec.IntValue XP_SHOWER_REACH = BUILDER
+            .comment("How many blocks below the XP Shower a player may stand.")
+            .defineInRange("showerReach", 3, 1, 8);
+
+    public static final ModConfigSpec.IntValue XP_SHOWER_TANK = BUILDER
+            .comment("The XP Shower's tank (mB).")
+            .defineInRange("showerTank", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue XP_SHOWER_PULL_RATE = BUILDER
+            .comment("Most Liquid Experience (mB) an XP Shower draws per tick from the container above it.")
+            .defineInRange("showerPullRate", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue VACUUM_XP_TANK = BUILDER
+            .comment("The Vacuum Collector's Liquid Experience tank (mB). It collects experience orbs in its range into it.")
+            .defineInRange("vacuumXpTank", 16_000, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue VACUUM_XP_OUTPUT_RATE = BUILDER
+            .comment("Most Liquid Experience (mB) per tick that conduits can drain from a Vacuum Collector.")
+            .defineInRange("vacuumXpOutputRate", 1_000, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Quantum Tunnel: every tunnel on a frequency shares one buffer of FE, heat, fluid, gas and items, across",
+                "dimensions.").push("quantumTunnel");
+    }
+
+    public static final ModConfigSpec.IntValue QUANTUM_ENERGY_BUFFER = BUILDER
+            .comment("FE a frequency holds.")
+            .defineInRange("energyBuffer", 4_000_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue QUANTUM_HEAT_BUFFER = BUILDER
+            .comment("HU a frequency holds.")
+            .defineInRange("heatBuffer", 400_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue QUANTUM_FLUID_BUFFER = BUILDER
+            .comment("Liquid (mB) a frequency holds.")
+            .defineInRange("fluidBuffer", 64_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue QUANTUM_GAS_BUFFER = BUILDER
+            .comment("Gas (mB) a frequency holds.")
+            .defineInRange("gasBuffer", 64_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue QUANTUM_ITEM_SLOTS = BUILDER
+            .comment("Item slots a frequency holds.")
+            .defineInRange("itemSlots", 9, 1, 54);
+
+    public static final ModConfigSpec.IntValue QUANTUM_FREQUENCIES_PER_PLAYER = BUILDER
+            .comment("Most frequencies one player may create.")
+            .defineInRange("frequenciesPerPlayer", 32, 1, 1_024);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Chunk Loader: keeps chunks round it loaded with NeoForge chunk tickets, for the player who placed it.")
+                .push("chunkLoader");
+    }
+
+    public static final ModConfigSpec.IntValue CHUNK_LOADER_PLAYER_LIMIT = BUILDER
+            .comment("Most chunks one player's Chunk Loaders may keep loaded in all.")
+            .defineInRange("chunksPerPlayer", 25, 0, 1_024);
+
+    public static final ModConfigSpec.BooleanValue CHUNK_LOADER_REQUIRE_ONLINE = BUILDER
+            .comment("Stop loading while the owner is offline (the loaders start again when they log in).")
+            .define("requireOwnerOnline", false);
+
+    public static final ModConfigSpec.IntValue CHUNK_LOADER_ENERGY_PER_CHUNK = BUILDER
+            .comment("FE per tick per loaded chunk. 0 (the default) needs no FE.")
+            .defineInRange("energyPerChunk", 0, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue CHUNK_LOADER_ENERGY_CAPACITY = BUILDER
+            .comment("FE buffer size (only used when energyPerChunk is above 0).")
+            .defineInRange("energyCapacity", 100_000, 1_000, Integer.MAX_VALUE);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("What generates in the world.").push("world");
+    }
+
+    static {
+        BUILDER.comment("Ore generation, per ore. Read when a world loads; changes apply to chunks generated after a restart.",
+                "Turning an ore off only stops it generating: its items and recipes stay (other mods' ores tagged",
+                "the same still work). Arcite can't be turned off.").push("ores");
+    }
+
+    // One ore's generation settings (enabled is null for arcite, which is always on).
+    public record OreSettings(ModConfigSpec.@Nullable BooleanValue enabled, ModConfigSpec.IntValue veinsPerChunk,
+            ModConfigSpec.IntValue veinSize, ModConfigSpec.IntValue minY, ModConfigSpec.IntValue maxY,
+            ModConfigSpec.DoubleValue airExposureDiscard) {
+        public boolean isEnabled() {
+            return enabled == null || enabled.getAsBoolean();
+        }
+    }
+
+    public static final Map<String, OreSettings> ORES = new LinkedHashMap<>();
+
+    private static void ore(String key, String description, boolean toggle, int veins, int size, int minY, int maxY, double discard) {
+        BUILDER.comment(description).push(key);
+        ModConfigSpec.BooleanValue enabled = toggle ? BUILDER.comment("Whether it generates.").define("enabled", true) : null;
+        ORES.put(key, new OreSettings(enabled,
+                BUILDER.comment("Veins per chunk.").defineInRange("veinsPerChunk", veins, 0, 256),
+                BUILDER.comment("Blocks per vein, at most.").defineInRange("veinSize", size, 1, 64),
+                BUILDER.comment("Lowest Y it generates at.").defineInRange("minY", minY, -2_032, 2_031),
+                BUILDER.comment("Highest Y it generates at.").defineInRange("maxY", maxY, -2_032, 2_031),
+                BUILDER.comment("Chance an ore block touching air is left out (0 to 1).").defineInRange("airExposureDiscard", discard, 0.0, 1.0)));
+        BUILDER.pop();
+    }
+
+    static {
+        ore("silver", "Silver: common, mid-depth.", true, 8, 9, -32, 64, 0.0);
+        ore("nickel", "Nickel: deep, near iron's lower band.", true, 6, 8, -64, 16, 0.0);
+        ore("fluorite", "Fluorite: fairly common, mid-depth.", true, 8, 8, -16, 48, 0.0);
+        ore("bismuth", "Bismuth: fairly common, mid-depth.", true, 8, 8, 0, 56, 0.0);
+        ore("tungsten", "Tungsten (wolframite ore): uncommon and deep.", true, 6, 6, -64, -16, 0.0);
+        ore("arcite", "Arcite: rare, the deepest; needs a diamond pickaxe.", false, 4, 5, -64, -40, 0.2);
+        ore("sulfur", "Nether Sulfur Ore: common through the Nether's netherrack; drops Sulfur Dust.", true, 12, 10, 10, 117, 0.0);
+        ore("halite", "Halite: large flat beds of Rock Salt (veinsPerChunk: beds tried in 1 chunk in 4; veinSize: each small vein of a bed).",
+                true, 1, 12, -32, 40, 0.0);
+        ore("spodumene", "Spodumene: uncommon, everywhere in stone and deepslate.", true, 3, 7, -48, 48, 0.0);
+        ore("spodumenePegmatite", "Spodumene pegmatites: extra, bigger veins under mountains and badlands (only while ores.spodumene is on too).",
+                true, 6, 10, 0, 160, 0.0);
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Halite beds: how the ore's flat beds are laid (see ores.halite for whether, how often and how deep).")
+                .push("haliteBeds");
+    }
+
+    public static final ModConfigSpec.IntValue HALITE_BED_RADIUS = BUILDER
+            .comment("Largest radius of a bed, in blocks (each bed is an oval between 60% and 100% of it each way).")
+            .defineInRange("radius", 11, 3, 14);
+
+    public static final ModConfigSpec.IntValue HALITE_BED_LAYERS = BUILDER
+            .comment("How many vein layers a bed is laid in (each about 2 blocks thick).")
+            .defineInRange("layers", 1, 1, 8);
+
+    public static final ModConfigSpec.IntValue HALITE_THICK_BED_LAYERS = BUILDER
+            .comment("Layers under thickBiomeTags (deserts and oceans, where the old seas dried).")
+            .defineInRange("thickLayers", 3, 1, 8);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> HALITE_THICK_BIOME_TAGS = BUILDER
+            .comment("Biome tags (at the bed's centre) whose beds use thickLayers.")
+            .defineListAllowEmpty("thickBiomeTags", List.of("c:is_desert", "minecraft:is_ocean", "minecraft:is_deep_ocean"), () -> "c:is_desert",
+                    value -> value instanceof String);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Tools, jetpacks and armor.").push("equipment");
+    }
+
+    // --- Tools: the Jetpack, Arc Drill and Arc Saw ---
+
+    static {
+        BUILDER.comment("Jetpacks, Arc Drills and Arc Saws. Per-tier values are listed Tempered, Hardened, Arcforged.").push("tools");
+    }
+
+    public static final ModConfigSpec.BooleanValue ENABLE_JETPACKS = BUILDER
+            .comment("Whether jetpacks fly. Off, they can still be worn and filled.")
+            .define("enableJetpacks", true);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> JETPACK_TANK = BUILDER
+            .comment("Jetpack tank size in mB, per tier.")
+            .defineList("jetpackTank", List.of(16_000, 64_000, 256_000), () -> 16_000, value -> value instanceof Integer i && i > 0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Double>> JETPACK_MAX_RISE = BUILDER
+            .comment("Fastest a jetpack climbs, in blocks per tick, per tier.")
+            .defineList("jetpackMaxRise", List.of(0.5, 0.65, 0.8), () -> 0.5, value -> value instanceof Double d && d > 0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Double>> JETPACK_AIR_SPEED = BUILDER
+            .comment("Horizontal push while thrusting, in blocks per tick per tick, per tier.")
+            .defineList("jetpackAirSpeed", List.of(0.03, 0.035, 0.04), () -> 0.03, value -> value instanceof Double d && d >= 0);
+
+    public static final ModConfigSpec.DoubleValue JETPACK_HOVER_FUEL_MULTIPLIER = BUILDER
+            .comment("Fuel used per tick in Hover mode, as a multiple of the fuel's normal rate.")
+            .defineInRange("hoverFuelMultiplier", 1.5, 0.0, 100.0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ARC_TOOL_CAPACITY = BUILDER
+            .comment("Arc Drill and Arc Saw FE capacity, per tier.")
+            .defineList("arcToolCapacity", List.of(100_000, 400_000, 1_600_000), () -> 100_000, value -> value instanceof Integer i && i > 0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ARC_TOOL_RECEIVE = BUILDER
+            .comment("Arc Drill and Arc Saw charge rate in FE/t, per tier.")
+            .defineList("arcToolReceive", List.of(2_000, 8_000, 32_000), () -> 2_000, value -> value instanceof Integer i && i > 0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends Double>> ARC_TOOL_SPEED = BUILDER
+            .comment("Arc Drill and Arc Saw mining speed, per tier (a diamond pickaxe is 8, netherite 9).")
+            .defineList("arcToolSpeed", List.of(8.0, 10.0, 14.0), () -> 8.0, value -> value instanceof Double d && d > 0);
+
+    public static final ModConfigSpec.IntValue ARC_TOOL_BASE_FE = BUILDER
+            .comment("FE per block before hardness and modules: cost = base x (1 + hardnessFactor x hardness) x (1 + module factors).")
+            .defineInRange("baseFePerBlock", 50, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue ARC_TOOL_HARDNESS_FACTOR = BUILDER
+            .comment("How much each point of block hardness adds to the FE per block.")
+            .defineInRange("hardnessFactor", 0.25, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_AREA_FE = BUILDER
+            .comment("Extra FE per block with the Area module on, as a fraction of the base.")
+            .defineInRange("areaModuleFe", 0.25, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_SILK_FE = BUILDER
+            .comment("Extra FE per block with the Silk Touch module on.")
+            .defineInRange("silkTouchModuleFe", 1.0, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_FORTUNE_FE = BUILDER
+            .comment("Extra FE per block per Fortune level with a Fortune module on.")
+            .defineInRange("fortuneModuleFe", 0.5, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_VEIN_FE = BUILDER
+            .comment("Extra FE per block with the Vein Mining module on.")
+            .defineInRange("veinModuleFe", 0.25, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue MODULE_SPEED_FE = BUILDER
+            .comment("Extra FE per block with the Speed module on.")
+            .defineInRange("speedModuleFe", 0.5, 0.0, 100.0);
+
+    public static final ModConfigSpec.DoubleValue SPEED_MODULE_MULTIPLIER = BUILDER
+            .comment("Mining speed multiplier with the Speed module on.")
+            .defineInRange("speedModuleMultiplier", 1.5, 1.0, 100.0);
+
+    public static final ModConfigSpec.IntValue VEIN_LIMIT = BUILDER
+            .comment("Most blocks the Vein Mining module breaks at once on an Arc Drill, the first included.")
+            .defineInRange("veinLimit", 64, 1, 4_096);
+
+    public static final ModConfigSpec.IntValue FELLING_LIMIT = BUILDER
+            .comment("Most logs an Arc Saw fells at once.")
+            .defineInRange("fellingLimit", 32, 1, 4_096);
+
+    public static final ModConfigSpec.IntValue FELLING_VEIN_LIMIT = BUILDER
+            .comment("Most logs an Arc Saw fells at once with the Vein Mining module on.")
+            .defineInRange("fellingVeinLimit", 256, 1, 4_096);
+
+    public static final ModConfigSpec.DoubleValue FELLING_FE_MULTIPLIER = BUILDER
+            .comment("Multiplier on the FE for each log felled after the first.")
+            .defineInRange("fellingFeMultiplier", 1.0, 0.0, 100.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    // --- The Foundry Suit ---
+
+    static {
+        BUILDER.comment("Foundry Suit: fire-resistant armour. Fire and hot-block damage is #arcforge:foundry_resists.").push("foundrySuit");
+    }
+
+    public static final ModConfigSpec.DoubleValue FOUNDRY_FIRE_REDUCTION = BUILDER
+            .comment("Share of fire and hot-block damage each piece cuts (the full set stops it all).")
+            .defineInRange("fireReductionPerPiece", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue FOUNDRY_LAVA_SHIELD_TICKS = BUILDER
+            .comment("Ticks in lava the full set protects from lava damage.")
+            .defineInRange("lavaShieldTicks", 160, 0, 72_000);
+
+    public static final ModConfigSpec.IntValue FOUNDRY_LAVA_COOLDOWN_TICKS = BUILDER
+            .comment("Ticks out of lava before the shield refills.")
+            .defineInRange("lavaCooldownTicks", 1_200, 1, 72_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.pop();
+    }
+
+    // --- Machine security ---
+
+    static {
+        BUILDER.comment("Who may use, configure and break machines. Every machine, multiblock and storage block records the player",
+                "who placed it; its owner's Security Terminal profile (or the block's own override) decides who else may use it.",
+                "Conduits, hoppers and other automation always work.").push("security");
+    }
+
+    public static final ModConfigSpec.BooleanValue SECURITY_ENABLED = BUILDER
+            .comment("Whether security is enforced. Off, anyone may use anything (owners are still recorded).")
+            .define("enabled", true);
+
+    public static final ModConfigSpec.BooleanValue SECURITY_OPS_BYPASS = BUILDER
+            .comment("Whether operators (permission level 2) may use and edit everything.")
+            .define("opsBypass", true);
+
+    public static final ModConfigSpec.EnumValue<net.zagdrath.arcforge.security.SecurityMode> SECURITY_DEFAULT_MODE = BUILDER
+            .comment("The mode of a player who never set one at a Security Terminal.")
+            .defineEnum("defaultMode", net.zagdrath.arcforge.security.SecurityMode.PUBLIC);
+
+    static {
+        BUILDER.pop();
+    }
+
+    // A per-tier list value (Tempered, Hardened, Arcforged); a short list repeats its last entry.
+    public static int perTier(ModConfigSpec.ConfigValue<List<? extends Integer>> value, int tierIndex) {
+        List<? extends Integer> list = value.get();
+        return list.get(Math.min(tierIndex, list.size() - 1));
+    }
+
+    public static double perTierDouble(ModConfigSpec.ConfigValue<List<? extends Double>> value, int tierIndex) {
+        List<? extends Double> list = value.get();
+        return list.get(Math.min(tierIndex, list.size() - 1));
     }
 
     public static final ModConfigSpec SPEC = BUILDER.build();

@@ -391,7 +391,7 @@ public final class ModCapabilities {
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelBlockEntity::getItemHandler);
-        // The Chunk Loader takes FE only when chunkLoader.energyPerChunk is above 0.
+        // The Chunk Loader takes FE only when logistics.chunkLoader.energyPerChunk is above 0.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHUNK_LOADER.get(), ChunkLoaderBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(),
                 PressurizedCylinderBlockEntity::getFluidHandler);

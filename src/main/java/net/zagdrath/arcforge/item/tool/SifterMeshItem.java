@@ -19,7 +19,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 
 // A Sifter Mesh: goes in the Sifter's mesh slot, which won't run without one. Each tier multiplies every output's
-// chance and the speed (machines.sifter.<tier>MeshChance / <tier>MeshSpeed), and wears by a point a block sifted
+// chance and the speed (machines.processing.sifter.<tier>MeshChance / <tier>MeshSpeed), and wears by a point a block sifted
 // (with meshWearChance) until it breaks: Steel 256, Invar 512, Tungsten 1,024 points.
 public class SifterMeshItem extends Item {
     public enum Tier {

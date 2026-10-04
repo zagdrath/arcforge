@@ -30,8 +30,8 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Gasifier (arcforge:gasifying): `count` (default 1) of an ingredient and `steam` mB of Steam, with `heat` HU over `time`
-// ticks at machines.gasifier.minTemperature or hotter, make the result (Syngas, with its amount) and, with `ash_chance`,
-// the ash (Wood Ash). steam, heat, time and ash_chance follow the machines.gasifier config when left out.
+// ticks at machines.chemistry.gasifier.minTemperature or hotter, make the result (Syngas, with its amount) and, with `ash_chance`,
+// the ash (Wood Ash). steam, heat, time and ash_chance follow the machines.chemistry.gasifier config when left out.
 public record GasifyingRecipe(Ingredient ingredient, int count, FluidStackTemplate result, Optional<ItemStackTemplate> ash,
         Optional<Float> ashChance, Optional<Integer> steam, Optional<Integer> heat, Optional<Integer> time) implements Recipe<SingleRecipeInput> {
     public static final MapCodec<GasifyingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(

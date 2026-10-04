@@ -66,7 +66,7 @@ import com.mojang.serialization.Codec;
 // 18-slot buffer, for energyPerItem FE per item entity, every scanInterval ticks. Items must have been on the
 // ground for minItemAge ticks. A Conduit Filter in its filter slot limits what it takes (an unset filter takes
 // everything; the filter's direction doesn't matter). Output faces send the buffer on. It also takes experience orbs
-// in its range (the same FE per orb) into a Liquid Experience tank (experience.vacuumXpTank, 20 mB a point), which
+// in its range (the same FE per orb) into a Liquid Experience tank (logistics.experience.vacuumXpTank, 20 mB a point), which
 // fluid conduits drain from its output faces (and auto-eject pushes out of them).
 public class VacuumCollectorBlockEntity extends MachineBlockEntity {
     public static final int SLOT_FILTER = 0;

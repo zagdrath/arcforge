@@ -38,8 +38,8 @@ import net.zagdrath.arcforge.machine.ClimateHelper;
 //   feature arcforge:config_ore             an ore vein ("targets", "size", "discard_chance_on_air_exposure" as
 //                                           minecraft:ore, plus "ore"), its size and air discard from the config
 //   feature arcforge:config_bed             a large flat bed of ore (Halite), the same fields: small veins laid on a
-//                                           3-block grid over an oval (haliteBeds.radius), in one or more layers
-//                                           (haliteBeds.layers, thickLayers under thickBiomeTags)
+//                                           3-block grid over an oval (world.haliteBeds.radius), in one or more layers
+//                                           (world.haliteBeds.layers, thickLayers under thickBiomeTags)
 //   placement arcforge:config_count         "ore", "default": veins per chunk from the config
 //   placement arcforge:config_height        "ore", "shape" (uniform or trapezoid), "default_min", "default_max":
 //                                           a height between the config's minY and maxY

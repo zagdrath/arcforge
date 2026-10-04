@@ -389,6 +389,9 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
             stale = false;
             targetIndex = 0;
             quarryState = mineAfterScan ? (targets.isEmpty() ? State.FINISHED : State.MINING) : State.IDLE;
+            if (quarryState == State.FINISHED) {
+                tellOwnerFinished(level);
+            }
             aimAtNext();
             if (quarryState != State.MINING) {
                 releaseChunks();
@@ -396,6 +399,15 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
             changed(true);
         } else if (level.getGameTime() % SCAN_SYNC_INTERVAL == 0) {
             changed(true);
+        }
+    }
+
+    // The player who placed it gets a toast (if they're online and haven't turned it off).
+    private void tellOwnerFinished(ServerLevel level) {
+        java.util.UUID owner = ownership().owner();
+        net.minecraft.server.level.ServerPlayer player = owner == null ? null : level.getServer().getPlayerList().getPlayer(owner);
+        if (player != null) {
+            net.neoforged.neoforge.network.PacketDistributor.sendToPlayer(player, new net.zagdrath.arcforge.network.ArcQuarryFinishedPayload(worldPosition, minedCount));
         }
     }
 
@@ -436,6 +448,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
             status = MachineStatus.FINISHED;
             releaseChunks();
             changed(true);
+            tellOwnerFinished(level);
             return;
         }
         BlockPos target = BlockPos.of(targets.getLong(targetIndex));

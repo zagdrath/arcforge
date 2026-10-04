@@ -37,7 +37,7 @@ import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.transfer.SidedResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
-// The XP Shower's tank of Liquid Experience (experience.showerTank). Every tick it draws up to showerPullRate mB from the
+// The XP Shower's tank of Liquid Experience (logistics.experience.showerTank). Every tick it draws up to showerPullRate mB from the
 // container above it; conduits and buckets fill it from any face. Every showerLevelInterval ticks, unless a redstone
 // signal turns it off, it gives each player sneaking under it (up to showerReach blocks down) what takes them to their
 // next level, or as much as the tank holds. Breaking it keeps what's in the tank on the item.

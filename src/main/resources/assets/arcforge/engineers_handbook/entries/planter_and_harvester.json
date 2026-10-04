@@ -16,7 +16,7 @@
     },
     {
       "type": "text",
-      "text": "Harvester: harvests every ripe crop in front of it into its 18 slots and replants each one with a seed from its own harvest. A Trellis bearing Hop Cones has them picked and keeps its vine. Use it with an empty hand to take the harvest, or pull it out with a hopper or conduit. A crop whose harvest won't fit is left standing.\nAreas and the timer are in the config (farming.rusticMachines)."
+      "text": "Harvester: harvests every ripe crop in front of it into its 18 slots and replants each one with a seed from its own harvest. A Trellis bearing Hop Cones has them picked and keeps its vine. Use it with an empty hand to take the harvest, or pull it out with a hopper or conduit. A crop whose harvest won't fit is left standing.\nAreas and the timer are in the config (farming.cropProcessing.rusticMachines)."
     }
   ]
 }

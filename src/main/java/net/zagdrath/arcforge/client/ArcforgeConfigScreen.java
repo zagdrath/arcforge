@@ -36,10 +36,12 @@ public final class ArcforgeConfigScreen {
         return new ConfigurationScreen(container, parent, (screen, type, modConfig, title) -> new TopPage(screen, type, modConfig, title));
     }
 
-    // Sets every value in the config back to its default and saves it.
-    static void resetAll() {
-        resetAll(ArcforgeConfig.SPEC.getValues());
-        ArcforgeConfig.SPEC.save();
+    // Sets every value in this config file (the common rules, or the client's own settings) back to its default and
+    // saves it.
+    static void resetAll(ModConfig modConfig) {
+        ModConfigSpec spec = modConfig.getSpec() instanceof ModConfigSpec own ? own : ArcforgeConfig.SPEC;
+        resetAll(spec.getValues());
+        spec.save();
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -55,8 +57,11 @@ public final class ArcforgeConfigScreen {
     }
 
     private static final class TopPage extends ConfigurationScreen.ConfigurationSectionScreen {
+        private final ModConfig modConfig;
+
         TopPage(Screen parent, ModConfig.Type type, ModConfig modConfig, Component title) {
             super(parent, type, modConfig, title);
+            this.modConfig = modConfig;
         }
 
         @Override
@@ -73,7 +78,7 @@ public final class ArcforgeConfigScreen {
         private void confirm() {
             minecraft.gui.setScreen(new ConfirmScreen(yes -> {
                 if (yes) {
-                    resetAll();
+                    resetAll(modConfig);
                     // The pages below were built with the old values.
                     sectionCache.clear();
                     rebuild();

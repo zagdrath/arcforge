@@ -99,7 +99,7 @@ tops out at about 780°C, too cool to superheat.
 It holds 16,000 HU and gives heat out of its heat ports (a new tower has one on the bottom block behind
 the controller), at its whole output even into a touching machine. A boiler it feeds only gets to 500°C
 set to High-Pressure (see the Steam Boiler Array), since one array gives less heat than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
-it does nothing in the Nether or the End. Everything is configurable (`power.solarThermalArray`).
+it does nothing in the Nether or the End. Everything is configurable (`power.generators.solarThermalArray`).
 
 ### Steelmaking and alloys
 
@@ -258,7 +258,7 @@ Sand / red sand --[Sifter]--> gold dust 2%, Nether Quartz 5%, fluorite dust 3%, 
 Cobbled deepslate --[Arc Crusher]--> Deepslate Gravel --[Sifter]--> tungsten dust 5%, iron 3%, gold 1.5%, silver 1.5%
 ```
 
-**Sifter** (Wrought). Sieves a block every 5 seconds at 20 FE/t (`machines.sifter`), rolling each find on its own
+**Sifter** (Wrought). Sieves a block every 5 seconds at 20 FE/t (`machines.processing.sifter`), rolling each find on its own
 (`arcforge:sifting`: `ingredient`, `outputs` of `item` and `chance`, optional `time` and `energy_per_tick`). It needs a
 **Sifter Mesh** in its mesh slot: Steel (base), Invar (chances x1.25, 1.5x as fast) or Tungsten (x1.5, 2x as fast), worn a
 point a block (`meshWearChance`) until it breaks after 256, 512 or 1,024 blocks. Arcite never sifts. Blocks and meshes in
@@ -284,7 +284,7 @@ whose die presses the item (the one holding the fewest first) and refuse anythin
 
 **Diamond Press** (Hardened). Presses 4 Graphite into a Diamond (`arcforge:diamond_pressing`) for 2,000,000 FE and
 240,000 HU over 60 seconds, and only at 1,400°C or hotter, so its heat has to come from something hotter still (oxy-fuel,
-or a Firebox Array burning Coal Coke with oxygen). All of it is in `machines.diamondPress`. Graphite in on top, Diamonds
+or a Firebox Array burning Coal Coke with oxygen). All of it is in `machines.processing.diamondPress`. Graphite in on top, Diamonds
 out underneath, heat into the left, FE into the back; Speed, Energy and Heat upgrades.
 
 ### Steam
@@ -513,17 +513,17 @@ Coal Coke --> 1,500 mB Syngas; 4 biomass --> 250 mB Syngas
 **Flue gas.** The Combustion Plant, Firebox and Fuel Burner have a Flue Gas side mode (the Gas Output mode), and the
 Firebox Array and Gas Turbine Array a Gas Output port. While one is set and the burner burns a carbon fuel
 (`#arcforge:carbon_fuels`, items and fluids), Carbon Dioxide comes out of it in proportion to the heat made
-(`power.flueGas.carbonDioxidePerThousandHu`, 4; the Combustion Plant counts `combustionPlantHuPerFe`, 2, HU per FE).
+(`power.burners.flueGas.carbonDioxidePerThousandHu`, 4; the Combustion Plant counts `combustionPlantHuPerFe`, 2, HU per FE).
 What nothing takes is vented, and with no such face the burner works as it always did.
 
 **Carbon Reclaimer.** Carbon Dioxide and Hydrogen back into Carbon Dust and Water with FE (`arcforge:carbon_reclaiming`;
-amounts and energy default to `machines.carbonReclaimer`). Like the Electrolyzer it never charges less than
+amounts and energy default to `machines.chemistry.carbonReclaimer`). Like the Electrolyzer it never charges less than
 `balanceSafetyFactor` (1.25) times the most FE what it makes could give back: the Carbon Dust burnt in a fully upgraded
 burner on oxy-fuel, or baked into Coal Coke, or gasified into Syngas, and that turned into FE by the best route. It renews
 carbon, never energy. Gases in on top, dust and Water out underneath, FE at the back; Speed and Energy upgrades.
 
 **Gasifier.** A single-block heat machine (HU, no FE), only at 800°C or hotter: a fuel and Steam into Syngas, with a
-chance of Wood Ash (`arcforge:gasifying`; steam, heat, time and ash chance default to `machines.gasifier`). Fuel and
+chance of Wood Ash (`arcforge:gasifying`; steam, heat, time and ash chance default to `machines.chemistry.gasifier`). Fuel and
 Steam in on top, ash out underneath, Syngas out of the right, heat at the back; Speed and Heat upgrades. **Syngas** burns
 in the Fuel Burner, Firebox Array and Gas Turbine Array: 50 HU per mB, up to 1,150°C.
 
@@ -560,7 +560,7 @@ tower, lined, with the liquid rising and falling with the input tank (a full tan
 Heat, Brine, Salt, Water and Lithium Brine. Config `multiblocks.thermalEvaporator`; recipes `arcforge:evaporating` (`input`,
 `fluid_result` and/or `item_result`, `water`, `heat`).
 
-**Seawater.** An Electric Pump on water in an ocean or beach biome (`machines.electricPump.seawaterBiomeTags`) pumps
+**Seawater.** An Electric Pump on water in an ocean or beach biome (`machines.automation.electricPump.seawaterBiomeTags`) pumps
 Seawater instead of Water.
 
 **Hydrochloric Acid** leaches ore exactly as Sulfuric Acid does: every leaching recipe takes `#arcforge:leaching_acids`.
@@ -649,7 +649,7 @@ of Seed Oil (the most of any seed) and compost. As a legume (`#arcforge:legumes`
 Farmland every growth stage instead of using one. Loam Farmland remembers whether its last harvested crop was a legume,
 and a non-legume planted after one grows 1.25× as fast until it's harvested (Jade shows it). In the automated farms and
 the Greenhouse Array, legumes need no fertilizer or Nutrient Solution and grow as fast as if they had it. Config
-`farming.loamFarmland`.
+`farming.growing.loamFarmland`.
 
 ### Rubber
 
@@ -667,11 +667,11 @@ seeds. Wild ones grow in meadows, plains and taiga; grass drops the seeds; every
 **Resin Tap.** Hang it on the side of a log with natural leaves above it (a living tree). Every 10 seconds it drips: on a
 jungle log, 25 mB of Latex into its 1,000 mB tank; on a spruce log, a 50% chance of a Pine Resin; on any other log, a
 15% chance (it holds 16). Buckets, an empty hand, a hopper under it or a conduit empty it. Pine Resin goes in the
-Infuser's additive slot in place of Creosote (one per plank, four per log or wood). Config `farming.resinTap`.
+Infuser's additive slot in place of Creosote (one per plank, four per log or wood). Config `farming.cropProcessing.resinTap`.
 
 **Vulcanizer.** A single-block heat machine (HU, no FE) that only works at 140°C or hotter: 2 Raw Rubber + 1 Sulfur
 Dust cure into 2 Rubber at 12 HU/t (`arcforge:vulcanizing`). Input on top, output underneath and heat at the back by
-default; Speed and Heat upgrades. Config `farming.vulcanizer`.
+default; Speed and Heat upgrades. Config `farming.cropProcessing.vulcanizer`.
 
 **Rubber Gaskets** seal Tempered and better Pressurized Conduits, Pressurized Cylinders and Gas Cartridges, the Hardened
 Fluid Tank, and the Jetpacks. Nine Rubber make a Block of Rubber.
@@ -696,12 +696,12 @@ starting one block out) and fells every fully grown tree there with FE.
 - A tree needs natural leaves (log buildings are safe); one over `maxLogsPerTree` (256) logs is left standing. It fells
   as a fake player, so protection mods can refuse.
 - Input on top, output underneath, energy at the back by default. Speed, Energy and Range upgrades. Config
-  `machines.treeCutter`.
+  `machines.automation.treeCutter`.
 
 **Hydrothermal Carbonizer.** A single-block heat machine (HU, no FE) that only works at 200°C or hotter: biomass and
 Water cook into Bio-Coal, and some of the water comes back into a second tank (`arcforge:hydrothermal_carbonizing`;
 the biomass count, heat and time default to `biomassPerBioCoal`, `heatPerOperation` and `time` in
-`machines.hydrothermalCarbonizer`). Input (items and Water) on top, output (Bio-Coal and returned water) underneath, heat
+`machines.chemistry.hydrothermalCarbonizer`). Input (items and Water) on top, output (Bio-Coal and returned water) underneath, heat
 at the back by default; Speed and Heat upgrades (Heat: HU per operation x 0.8^n).
 
 **Biomass** is `#arcforge:biomass`: crops, seeds, leaves, saplings, sticks, vines, glow lichen, kelp, Press Cake and
@@ -780,8 +780,8 @@ placement per redstone pulse.
 - The range shows as an outline while you hold a Vacuum Collector, or with the eye button in its GUI.
 - It also gathers experience orbs into a Liquid Experience tank that fluid conduits drain from its Output faces.
 
-All four take Speed and Energy upgrades. Config: `machines.assembler`, `machines.blockBreaker`,
-`machines.blockPlacer` and `machines.vacuumCollector`.
+All four take Speed and Energy upgrades. Config: `machines.automation.assembler`, `machines.automation.blockBreaker`,
+`machines.automation.blockPlacer` and `machines.automation.vacuumCollector`.
 
 **Arc Quarry** (Hardened). A 3×3×3 digital miner. Its item places the whole machine in a clear 3×3 space, 3 blocks
 tall; the parts around the centre all act as the Quarry (using, breaking, the Wrench, conduits on any outer face).
@@ -799,7 +799,7 @@ tall; the parts around the centre all act as the Quarry (using, breaking, the Wr
 - Drops go to a 27-slot buffer and out of the cube's Output faces. It pauses, saying why, when full, out of power,
   out of replace blocks, or (without chunk loading) waiting for an unloaded chunk.
 - Its area shows as an outline while you hold a Quarry, while its settings are open, or always with its eye button.
-- Config `machines.arcQuarry`, including `chunkLoading` (off by default), which keeps its own chunk and the one
+- Config `machines.automation.arcQuarry`, including `chunkLoading` (off by default), which keeps its own chunk and the one
   it's working in loaded.
 
 ### Upgrades
@@ -876,7 +876,7 @@ drawn as one: the frame runs only round its outer edges and the liquid is one bo
 - Any block takes and gives the liquid (buckets, conduits, pipes, an XP Drain on top), and a comparator on any
   block reads the whole tank.
 - A broken block keeps its share of the liquid on the item and rejoins whatever it's placed against.
-- Tanks of different liquids stay apart. Up to `reservoir.maxBlocks` (4,096) blocks make one tank.
+- Tanks of different liquids stay apart. Up to `logistics.reservoir.maxBlocks` (4,096) blocks make one tank.
 
 ### Liquid Experience
 
@@ -903,7 +903,7 @@ liquid, 64,000 mB of gas and 9 item slots (config `quantumTunnel`).
 Keeps chunks loaded for the player who placed it: its own, 3x3 or 5x5 (radius 0 to 2, set in the GUI, which
 maps them and outlines them in the world).
 
-- Each player may keep 25 chunks loaded in all (`chunkLoader.chunksPerPlayer`).
+- Each player may keep 25 chunks loaded in all (`logistics.chunkLoader.chunksPerPlayer`).
 - Optional: only while its owner is online (`requireOwnerOnline`), and FE per chunk per tick (`energyPerChunk`,
   0 by default).
 - It stops when broken, when a redstone signal turns it off, or when it runs out of FE.
@@ -1039,10 +1039,24 @@ bypass it; Jade shows the owner. Blocks placed before security was added have no
 ## Configuration
 
 All balance values (heat and FE rates, buffer sizes, temperatures, burn speeds, efficiency, output rates)
-can be changed in `config/arcforge-common.toml`, or in game from the Mods screen. They're grouped into
-**Heat & Power** (`power`), **Steam** (`steam`), **Machines** (`machines`), **Multiblocks** (`multiblocks`) and
-**Ore Generation** (`ores`), each with a page per machine. **Reset All**, at the bottom of the first page, puts
-every value back to its default.
+can be changed in `config/arcforge-common.toml`, or in game from the Mods screen. They're grouped into eight
+categories, most with subcategories and a page per machine:
+
+| Category | Inside |
+|---|---|
+| **Heat & Power** (`power`) | Heat, Burners, Generators, Battery Array, Steam |
+| **Machines** (`machines`) | Processing, Chemistry, Automation |
+| **Multiblocks** (`multiblocks`) | one page per array |
+| **Farming** (`farming`) | Soil & Crops, Crop Processing, Farm Chemistry, Automated Farms |
+| **Logistics** (`logistics`) | Meters, Chargepad, Reservoir, Liquid Experience, Quantum Tunnel, Chunk Loader |
+| **World Generation** (`world`) | Ores, Halite Beds |
+| **Equipment** (`equipment`) | Tools, Foundry Suit |
+| **Security** (`security`) | |
+
+**Reset All**, at the bottom of the first page, puts every value back to its default.
+
+Each player's own settings are in `config/arcforge-client.toml` (**Arcforge Client** on the same screen): for now
+`notifications.arcQuarryFinished`, the toast an Arc Quarry's owner gets when it finishes (on by default).
 
 ## Changelog
 

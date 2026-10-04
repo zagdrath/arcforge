@@ -31,7 +31,7 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Sifter (arcforge:sifting): one of the ingredient (gravel, sand, Deepslate Gravel) is sieved over `time` ticks at
 // `energy_per_tick` FE/t into its outputs, each rolled on its own with its `chance` (0-1), raised by the mesh in the
-// Sifter. time and energy_per_tick follow machines.sifter when left out.
+// Sifter. time and energy_per_tick follow machines.processing.sifter when left out.
 public record SiftingRecipe(Ingredient ingredient, List<Output> outputs, Optional<Integer> time, Optional<Integer> energyPerTick)
         implements Recipe<SingleRecipeInput> {
     // As many as the Sifter has output slots, since a block waits until all its finds would fit at once.

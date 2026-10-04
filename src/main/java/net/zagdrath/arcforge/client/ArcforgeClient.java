@@ -168,6 +168,7 @@ public class ArcforgeClient {
         GasTurbineArrayBlockEntity.clientHook = GasTurbineArraySound::clientTick;
         MachineSounds.clientHook = MachineLoopSound::keepPlaying;
         JetpackStatePayload.clientHandler = JetpackClient::onState;
+        net.zagdrath.arcforge.network.ArcQuarryFinishedPayload.clientHandler = ArcQuarryToast::show;
         // Re-mesh blocks whose ports changed, and forget the ports on leaving a world.
         // (The ports aren't block state, so the section is marked dirty itself: marking the block would skip it,
         // as its model hasn't changed.)

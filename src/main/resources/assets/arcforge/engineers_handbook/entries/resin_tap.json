@@ -13,7 +13,7 @@
     },
     {
       "type": "text",
-      "text": "# Pine Resin\nThe Infuser takes Pine Resin in its additive slot in place of Creosote: one per plank, four per log or wood. No Carbonizer needed for treated wood. Two Pine Resin and a Kelp craft into a Slimeball.\n# Latex\nDry it into Raw Rubber in the Grain Dryer, or react 250 mB with a Lime Dye in the Chemical Reactor for 2 Slimeballs. Every rate is in the farming.resinTap config."
+      "text": "# Pine Resin\nThe Infuser takes Pine Resin in its additive slot in place of Creosote: one per plank, four per log or wood. No Carbonizer needed for treated wood. Two Pine Resin and a Kelp craft into a Slimeball.\n# Latex\nDry it into Raw Rubber in the Grain Dryer, or react 250 mB with a Lime Dye in the Chemical Reactor for 2 Slimeballs. Every rate is in the farming.cropProcessing.resinTap config."
     }
   ]
 }

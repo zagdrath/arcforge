@@ -30,7 +30,7 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Diamond Press (arcforge:diamond_pressing): `count` of the ingredient (Graphite) pressed into the result (a Diamond)
 // with `energy` FE and `heat` HU over `time` ticks, at `min_temperature` °C or hotter. Every field but the ingredient and
-// result is optional and follows machines.diamondPress when left out, so the built-in recipe is tuned there.
+// result is optional and follows machines.processing.diamondPress when left out, so the built-in recipe is tuned there.
 public record DiamondPressingRecipe(Ingredient ingredient, Optional<Integer> count, ItemStackTemplate result, Optional<Integer> energy,
         Optional<Integer> heat, Optional<Integer> time, Optional<Integer> minTemperature) implements Recipe<SingleRecipeInput> {
     public static final MapCodec<DiamondPressingRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i.group(

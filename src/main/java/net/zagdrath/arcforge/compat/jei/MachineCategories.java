@@ -804,7 +804,7 @@ final class MachineCategories {
         }
     }
 
-    // --- Resin Tap: what each kind of log gives (config farming.resinTap) ---
+    // --- Resin Tap: what each kind of log gives (config farming.cropProcessing.resinTap) ---
 
     record ResinTapping(ItemStack log, boolean latex, boolean anyLog) {
         static List<ResinTapping> all() {

@@ -32,7 +32,7 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Grain Dryer (arcforge:drying): one item, or an amount of a fluid from its tank (Latex), dried into an item over `time`
 // ticks, using hu_per_tick heat while it works. A recipe takes an ingredient or a fluid, never both. The dryer only works
-// above farming.grainDryer.minTemperature.
+// above farming.cropProcessing.grainDryer.minTemperature.
 public record DryingRecipe(Optional<Ingredient> ingredient, Optional<ChemicalReactingRecipe.FluidInput> fluid, ItemStackTemplate result,
         int time, int huPerTick) implements Recipe<SingleRecipeInput> {
     public static final int DEFAULT_TIME = 200;

@@ -471,7 +471,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> COMPOST_BIN = ITEMS.registerSimpleBlockItem(ModBlocks.COMPOST_BIN);
     public static final DeferredItem<BlockItem> LOAM = ITEMS.registerSimpleBlockItem(ModBlocks.LOAM);
     public static final DeferredItem<BlockItem> IRRIGATED_LOAM_FARMLAND = ITEMS.registerSimpleBlockItem(ModBlocks.IRRIGATED_LOAM_FARMLAND);
-    // Fertilizers: each adds its nutrients (config farming.fertilizers) to Loam Farmland.
+    // Fertilizers: each adds its nutrients (config farming.growing.fertilizers) to Loam Farmland.
     public static final DeferredItem<FertilizerItem> COMPOST = ITEMS.registerItem("compost",
             p -> new FertilizerItem(ArcforgeConfig.COMPOST_NUTRIENTS::getAsInt, p));
     public static final DeferredItem<FertilizerItem> WOOD_ASH = ITEMS.registerItem("wood_ash",

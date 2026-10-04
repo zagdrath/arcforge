@@ -27,7 +27,7 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // Vulcanizer (arcforge:vulcanizing): two items (each with a count, one from each input slot, either way round) cured
 // into a result over `time` ticks, using hu_per_tick heat while it works: Raw Rubber + Sulfur -> Rubber. The Vulcanizer
-// only works at farming.vulcanizer.minTemperature or hotter.
+// only works at farming.cropProcessing.vulcanizer.minTemperature or hotter.
 public record VulcanizingRecipe(ChemicalReactingRecipe.ItemInput input, ChemicalReactingRecipe.ItemInput secondInput, ItemStackTemplate result,
         int time, int huPerTick) implements Recipe<VulcanizingRecipe.Input> {
     public static final int DEFAULT_TIME = 200;

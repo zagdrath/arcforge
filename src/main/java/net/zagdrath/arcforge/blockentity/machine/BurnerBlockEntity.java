@@ -42,7 +42,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // A machine that burns #arcforge:combustion_fuel from one slot, making something (FE or heat) into a
 // buffer each tick it burns. While the buffer is full it pauses, keeping what's left of the burning item.
 // Each item of #arcforge:leaves_wood_ash (charcoal) that burns out leaves a Wood Ash in the ash slot with
-// farming.fertilizers.woodAshChance; the ash comes out through Output faces, and a full ash slot loses it.
+// farming.growing.fertilizers.woodAshChance; the ash comes out through Output faces, and a full ash slot loses it.
 // With a Flue Gas face (the Gas Output side mode) set, burning a carbon fuel gives off Carbon Dioxide through it in
 // proportion to the heat made (see FlueGas, flueHeat); with none, nothing changes.
 public abstract class BurnerBlockEntity extends MachineBlockEntity {
