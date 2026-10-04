@@ -68,6 +68,8 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected RedstoneMode redstoneMode = RedstoneMode.IGNORE;
     // PULSE: the signal last tick, and whether a rising edge is still waiting for its operation (at most one).
     private boolean lastPowered;
+    // Set just before the wrench picks it up: its upgrades go with the item instead of dropping.
+    private boolean dismantled;
     private int pendingPulses;
     protected MachineStatus status = MachineStatus.NO_FUEL;
 
@@ -280,15 +282,33 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         return lines;
     }
 
-    // Slot items drop however the machine is removed, including with the wrench.
+    // Slot items drop however the machine is removed, except that upgrades stay in a machine dismantled with the wrench
+    // (saveKeptItems puts them in the dropped item).
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
         if (level != null) {
             for (int slot = 0; slot < items.size(); slot++) {
-                Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), items.getStack(slot));
+                if (!(dismantled && items.isUpgradeSlot(slot))) {
+                    Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), items.getStack(slot));
+                }
             }
         }
+    }
+
+    @Override
+    public void markDismantled() {
+        dismantled = true;
+    }
+
+    // The dismantled item's "items" list: the upgrade slots only, in place, so placing it back reinstalls them.
+    @Override
+    public void saveKeptItems(ValueOutput output) {
+        FilteredItemHandler kept = new FilteredItemHandler(items.size(), (slot, resource) -> true, () -> {});
+        for (int slot = items.getFirstUpgradeSlot(); slot < items.size(); slot++) {
+            kept.setStack(slot, items.getStack(slot).copy());
+        }
+        kept.serialize(output.child("items"));
     }
 
     @Override

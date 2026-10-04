@@ -65,6 +65,7 @@ public final class ArcforgeGameTests {
         TESTS.put("conduit_item_storage", ConduitGameTests::itemStorage);
         TESTS.put("wrench_conduit", ConduitGameTests::wrenchConduit);
         TESTS.put("wrench_machine", ConduitGameTests::wrenchMachine);
+        TESTS.put("wrench_keeps_upgrades", ConduitGameTests::wrenchKeepsUpgrades);
         TESTS.put("conduit_filter_allowlist", ConduitGameTests::filterAllowlist);
         TESTS.put("conduit_filter_ghost_slot_drag", ConduitGameTests::filterGhostSlotDrag);
         TESTS.put("conduit_filter_rejected_stays_in_source", ConduitGameTests::filterRejectedStaysInSource);

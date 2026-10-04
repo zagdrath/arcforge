@@ -190,6 +190,9 @@ number and date.
 
 ### Changed
 
+- **Machines keep their upgrades when dismantled with the Wrench.** The upgrades travel in the picked-up item and are
+  back in their slots when it's placed; the machine's other slots still drop beside it. Broken any other way, a
+  machine drops its upgrades as before.
 - **Carbonizer bakes logs into charcoal:** any log that burns (`#minecraft:logs_that_burn`) gives a Charcoal and 100 mB of
   Creosote in 400 ticks, so a Tree Cutter's logs can go straight in.
 - **Loam grows saplings twice as fast** (`farming.loam.saplingGrowthMultiplier`, 2.0), and a tree grown on Loam leaves
@@ -220,6 +223,8 @@ number and date.
 
 ### Fixed
 
+- **Dismantling a Heat Cell duplicated its Insulation Upgrades:** they dropped beside it and also stayed in the
+  picked-up item. They now only stay in the item.
 - **Tree Cutter fells the whole crown.** It took at most 12 leaves per log and trusted the leaves' stored distance,
   which lags behind a freshly grown tree, so most of an oak's crown was left floating to decay into saplings, sticks
   and apples. It now takes every natural leaf joined to the tree that no other log holds, as vanilla leaf decay counts.

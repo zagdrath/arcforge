@@ -331,8 +331,11 @@ public class WrenchItem extends Item {
                 TagValueOutput output = TagValueOutput.createWithContext(reporter, level.registryAccess());
                 blockEntity.saveCustomOnly(output);
                 blockEntity.removeComponentsFromTag(output);
-                // Slot items drop into the world when the block is removed (see Dismantleable).
+                // Slot items drop into the world when the block is removed, except upgrades (see Dismantleable).
                 output.discard("items");
+                if (blockEntity instanceof Dismantleable dismantleable) {
+                    dismantleable.saveKeptItems(output);
+                }
                 BlockItem.setBlockEntityData(drop, blockEntity.getType(), output);
             }
             drop.applyComponents(blockEntity.collectComponents());

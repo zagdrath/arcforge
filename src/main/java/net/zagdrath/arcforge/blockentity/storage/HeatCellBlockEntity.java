@@ -388,11 +388,12 @@ public class HeatCellBlockEntity extends StorageBlockEntity {
         output.discard("heat");
     }
 
-    // Insulation Upgrades stay in the block and drop when it's broken or picked up; only the heat travels on the item.
+    // Insulation Upgrades drop when it's broken; picked up with the wrench they stay in it, travelling in the item's saved
+    // data (the "upgrades" list) with its settings. The heat never travels on the item.
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
-        if (level != null) {
+        if (level != null && !isDismantled()) {
             for (int slot = 0; slot < upgrades.size(); slot++) {
                 Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), upgrades.getStack(slot));
             }

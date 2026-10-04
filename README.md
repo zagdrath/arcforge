@@ -970,8 +970,8 @@ by the colour of its grip). Where a mode does nothing with a block, the click go
 - **Rotate**: use on a machine to turn it clockwise, sneak-use to turn it back.
 - **Port**: use on a multiblock's block or a machine's face to see its port or side mode, sneak-use to
   cycle it. Conduits work as in Configure.
-- **Dismantle**: sneak-use to pick up a machine (its fluid, energy and settings kept; items in its
-  slots drop beside it), a conduit, or a block of a multiblock.
+- **Dismantle**: sneak-use to pick up a machine (its fluid, energy, settings and upgrades kept; the other items
+  in its slots drop beside it), a conduit, or a block of a multiblock.
 
 ### Multiblock ports
 

@@ -438,6 +438,52 @@ final class ConduitGameTests {
         helper.succeed();
     }
 
+    // A machine dismantled with the wrench keeps its upgrades: they travel in the dropped item (not into the world) and
+    // are back when it's placed, while its other slots still drop. Broken any other way, it drops them as before.
+    static void wrenchKeepsUpgrades(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.ARC_CRUSHER.get());
+        var crusher = helper.getBlockEntity(pos, net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity.class);
+        CrushingGameTests.install(crusher.getItems(), ModItems.SPEED_UPGRADE.get(), 3);
+        crusher.getItems().setStack(0, new ItemStack(Items.COBBLESTONE, 5));
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setShiftKeyDown(true);
+        useWrench(helper, player, pos, new Vec3(0, 0.5, 0), WrenchMode.DISMANTLE);
+        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        helper.assertTrue(drops.stream().noneMatch(drop -> drop.getItem().is(ModItems.SPEED_UPGRADE.get())), "The upgrades dropped");
+        helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().is(Items.COBBLESTONE)), "The input slot's cobblestone didn't drop");
+        ItemStack dropped = drops.stream().filter(drop -> drop.getItem().is(ModBlocks.ARC_CRUSHER.get().asItem())).findFirst().orElseThrow().getItem();
+        drops.forEach(net.minecraft.world.entity.Entity::discard);
+
+        helper.setBlock(pos, ModBlocks.ARC_CRUSHER.get());
+        BlockItem.updateCustomBlockEntityTag(helper.getLevel(), player, helper.absolutePos(pos), dropped);
+        var restored = helper.getBlockEntity(pos, net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity.class);
+        helper.assertTrue(restored.upgrades(net.zagdrath.arcforge.upgrade.UpgradeType.SPEED) == 3,
+                "The placed machine has " + restored.upgrades(net.zagdrath.arcforge.upgrade.UpgradeType.SPEED) + " Speed Upgrades, not 3");
+        helper.assertTrue(restored.getItems().getStack(0).isEmpty(), "The placed machine got its cobblestone back (duplicated)");
+
+        // Broken without the wrench, the upgrades drop.
+        helper.getLevel().destroyBlock(helper.absolutePos(pos), true);
+        helper.assertTrue(helper.getEntities(EntityTypes.ITEM, pos, 2.0).stream().anyMatch(drop -> drop.getItem().is(ModItems.SPEED_UPGRADE.get())),
+                "A broken machine didn't drop its upgrades");
+
+        // A Heat Cell's Insulation Upgrades stay in it too, and aren't also dropped (which duplicated them).
+        BlockPos cellPos = new BlockPos(3, 1, 1);
+        helper.setBlock(cellPos, ModBlocks.heatCell(ConduitTier.WROUGHT).get());
+        var cell = helper.getBlockEntity(cellPos, net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity.class);
+        cell.getUpgrades().setStack(0, new ItemStack(ModItems.INSULATION_UPGRADE.get(), 2));
+        useWrench(helper, player, cellPos, new Vec3(0, 0.5, 0), WrenchMode.DISMANTLE);
+        var cellDrops = helper.getEntities(EntityTypes.ITEM, cellPos, 0.9);
+        helper.assertTrue(cellDrops.stream().noneMatch(drop -> drop.getItem().is(ModItems.INSULATION_UPGRADE.get())), "The Heat Cell's upgrades dropped");
+        ItemStack cellItem = cellDrops.stream().filter(drop -> drop.getItem().is(ModBlocks.heatCell(ConduitTier.WROUGHT).get().asItem())).findFirst()
+                .orElseThrow().getItem();
+        helper.setBlock(cellPos, ModBlocks.heatCell(ConduitTier.WROUGHT).get());
+        BlockItem.updateCustomBlockEntityTag(helper.getLevel(), player, helper.absolutePos(cellPos), cellItem);
+        helper.assertTrue(helper.getBlockEntity(cellPos, net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity.class).getUpgrades().getStack(0)
+                .getCount() == 2, "The placed Heat Cell doesn't have its 2 Insulation Upgrades");
+        helper.succeed();
+    }
+
     // --- Conduit Filters ---
     // Item layouts: a source barrel at x=0 feeding an item conduit run along +X, sink A south of conduit 2 and
     // sink B at the east end. Barrels, not chests, so neighbouring sinks never join up.
