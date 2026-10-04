@@ -350,8 +350,12 @@ public class QuantumTunnelScreen extends AbstractContainerScreen<QuantumTunnelMe
                     menu.value(QuantumTunnelMenu.DATA_FLUID_CAPACITY), "gui.arcforge.quantum_tunnel.resource.fluid");
             case 3 -> fluidLines(lines, menu.value(QuantumTunnelMenu.DATA_GAS_ID), menu.value(QuantumTunnelMenu.DATA_GAS),
                     menu.value(QuantumTunnelMenu.DATA_GAS_CAPACITY), "gui.arcforge.quantum_tunnel.resource.gas");
-            default -> lines.add(Component.translatable("gui.arcforge.quantum_tunnel.slots_used", menu.value(QuantumTunnelMenu.DATA_ITEMS),
-                    menu.value(QuantumTunnelMenu.DATA_ITEM_SLOTS)));
+            default -> {
+                lines.add(Component.translatable("gui.arcforge.quantum_tunnel.slots_used", menu.value(QuantumTunnelMenu.DATA_ITEMS),
+                        menu.value(QuantumTunnelMenu.DATA_ITEM_SLOTS)));
+                lines.add(Component.translatable("gui.arcforge.quantum_tunnel.items_held", ArcforgeGui.grouped(menu.value(QuantumTunnelMenu.DATA_ITEM_COUNT)),
+                        ArcforgeGui.grouped(menu.value(QuantumTunnelMenu.DATA_ITEM_CAPACITY))).withStyle(ChatFormatting.GRAY));
+            }
         }
     }
 

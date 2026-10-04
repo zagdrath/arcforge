@@ -209,6 +209,31 @@ public final class ExtendedLogisticsGameTests {
 
     // Two tunnels on one frequency: FE, water and iron put into one come out of the other's output faces; a face left
     // at NONE offers nothing; a private frequency works only for its owner and the players they trust.
+    // The GUI's item counts: slots holding anything, the items across them, and what they could hold (a stack of what
+    // each holds, 64 for an empty slot).
+    static void quantumTunnelItemCounts(GameTestHelper helper) {
+        MinecraftServer server = helper.getLevel().getServer();
+        Frequency.Key key = Frequency.Key.ofPublic("gametest-" + UUID.randomUUID());
+        QuantumFrequencies.get(server).create(key, UUID.randomUUID(), "tester");
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.QUANTUM_TUNNEL.get());
+        QuantumTunnelBlockEntity tunnel = helper.getBlockEntity(pos, QuantumTunnelBlockEntity.class);
+        tunnel.setKey(key);
+        var items = tunnel.frequency().items();
+        items.setStack(0, new ItemStack(Items.COBBLESTONE, 3));
+        items.setStack(1, new ItemStack(Items.ENDER_PEARL, 10));
+        var menu = (net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu) tunnel.createMenu(9, helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL).getInventory(),
+                helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL));
+        int slots = items.size();
+        helper.assertTrue(menu.value(net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu.DATA_ITEMS) == 2, "Used slots aren't 2");
+        helper.assertTrue(menu.value(net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu.DATA_ITEM_COUNT) == 13,
+                menu.value(net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu.DATA_ITEM_COUNT) + " items, not 13");
+        int capacity = 64 + 16 + (slots - 2) * 64;
+        helper.assertTrue(menu.value(net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu.DATA_ITEM_CAPACITY) == capacity,
+                "Capacity " + menu.value(net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu.DATA_ITEM_CAPACITY) + ", not " + capacity);
+        helper.succeed();
+    }
+
     static void quantumTunnel(GameTestHelper helper) {
         MinecraftServer server = helper.getLevel().getServer();
         QuantumFrequencies frequencies = QuantumFrequencies.get(server);

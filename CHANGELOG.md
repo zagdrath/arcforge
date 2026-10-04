@@ -203,6 +203,8 @@ number and date.
 
 ### Changed
 
+- **Quantum Tunnel item tooltip** shows the items held as well as the slots used ("9 / 9 slots used", then
+  "412 / 576 items"), so a full buffer can be told from one with a few items in every slot.
 - **Machines keep their upgrades when dismantled with the Wrench.** The upgrades travel in the picked-up item and are
   back in their slots when it's placed; the machine's other slots still drop beside it. Broken any other way, a
   machine drops its upgrades as before.

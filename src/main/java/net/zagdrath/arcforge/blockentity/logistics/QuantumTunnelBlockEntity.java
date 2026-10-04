@@ -25,6 +25,8 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -119,6 +121,8 @@ public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, Menu
                     case QuantumTunnelMenu.DATA_GAS_ID -> fluidId(frequency.gas().getResource(0), frequency.gas().getAmount());
                     case QuantumTunnelMenu.DATA_ITEMS -> usedSlots(frequency);
                     case QuantumTunnelMenu.DATA_ITEM_SLOTS -> frequency.items().size();
+                    case QuantumTunnelMenu.DATA_ITEM_COUNT -> itemCount(frequency);
+                    case QuantumTunnelMenu.DATA_ITEM_CAPACITY -> itemCapacity(frequency);
                     default -> 0;
                 };
             }
@@ -127,6 +131,24 @@ public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, Menu
 
     private static int fluidId(FluidResource resource, int amount) {
         return amount > 0 ? BuiltInRegistries.FLUID.getId(resource.getFluid()) : -1;
+    }
+
+    private static int itemCount(Frequency frequency) {
+        int count = 0;
+        for (int slot = 0; slot < frequency.items().size(); slot++) {
+            count += frequency.items().getAmountAsInt(slot);
+        }
+        return count;
+    }
+
+    // A stack of whatever each slot holds (16 ender pearls, 1 tool), or a full 64 for an empty slot.
+    private static int itemCapacity(Frequency frequency) {
+        int capacity = 0;
+        for (int slot = 0; slot < frequency.items().size(); slot++) {
+            ItemStack stack = frequency.items().getStack(slot);
+            capacity += stack.isEmpty() ? Item.DEFAULT_MAX_STACK_SIZE : stack.getMaxStackSize();
+        }
+        return capacity;
     }
 
     private static int usedSlots(Frequency frequency) {

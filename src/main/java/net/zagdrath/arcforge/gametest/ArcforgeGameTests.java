@@ -279,6 +279,7 @@ public final class ArcforgeGameTests {
         TESTS.put("xp_shower", ExtendedLogisticsGameTests::xpShower);
         TESTS.put("vacuum_experience", ExtendedLogisticsGameTests::vacuumExperience);
         TESTS.put("quantum_tunnel", ExtendedLogisticsGameTests::quantumTunnel);
+        TESTS.put("quantum_tunnel_item_counts", ExtendedLogisticsGameTests::quantumTunnelItemCounts);
         TESTS.put("chunk_loader", ExtendedLogisticsGameTests::chunkLoader);
         TESTS.put("firebox_array_forms", BigArrayGameTests::fireboxArrayForms);
         TESTS.put("firebox_array_burns_coal", BigArrayGameTests::fireboxArrayBurnsCoal);

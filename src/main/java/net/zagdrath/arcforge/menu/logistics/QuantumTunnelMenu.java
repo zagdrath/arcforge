@@ -53,7 +53,9 @@ public class QuantumTunnelMenu extends AbstractContainerMenu implements SecuredM
     public static final int DATA_GAS = 9, DATA_GAS_CAPACITY = 10, DATA_GAS_ID = 11;
     public static final int DATA_ITEMS = 12, DATA_ITEM_SLOTS = 13;
     public static final int DATA_FACES_LOW = 14, DATA_FACES_HIGH = 15;
-    public static final int DATA_VALUES = 16;
+    // Items held across the slots, and what they could hold (each slot a stack of what's in it; 64 when empty).
+    public static final int DATA_ITEM_COUNT = 16, DATA_ITEM_CAPACITY = 17;
+    public static final int DATA_VALUES = 18;
 
     public static final int FACE_BUTTON = 0;
     private static final int STATE_INTERVAL = 20;

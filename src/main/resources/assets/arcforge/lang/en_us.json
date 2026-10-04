@@ -2130,6 +2130,7 @@
   "gui.arcforge.quantum_tunnel.delete.tooltip": "Everything in its buffer is lost",
   "gui.arcforge.quantum_tunnel.not_linked": "Not on a frequency",
   "gui.arcforge.quantum_tunnel.slots_used": "%s / %s slots used",
+  "gui.arcforge.quantum_tunnel.items_held": "%s / %s items",
   "gui.arcforge.quantum_tunnel.cell": "%s, %s face",
   "gui.arcforge.quantum_tunnel.mode.none": "None: click for Input",
   "gui.arcforge.quantum_tunnel.mode.input": "Input: takes it into the frequency. Click for Output",
