@@ -367,9 +367,9 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
             powered = isPowered(level);
         }
-        if (!redstoneMode.canRun(powered)) {
+        if (!controlState.isEnabled() || !redstoneMode.canRun(powered)) {
             // Disabled, it makes nothing but still gives away the heat it holds.
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
             oxy.idle();
         } else {
             status = burn(level);
@@ -428,7 +428,9 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
             return MachineStatus.NO_FUEL;
         }
         oxygenRate = want / 1000.0 * ArcforgeConfig.FIREBOX_ARRAY_OXYGEN_PER_THOUSAND_HU.getAsDouble();
+        int oxygenBefore = oxy.getTank().getAmount();
         double multiplier = oxyReady && oxy.burn() ? OxyFuel.heatMultiplier() : 1.0;
+        controlState.consumedFluid(oxygenBefore - oxy.getTank().getAmount());
         int made;
         // Whether what burns this tick is a carbon fuel, for the flue (the item before it can burn out).
         boolean carbon = solid || liquid == null ? FlueGas.isCarbonFuel(burning) : FlueGas.isCarbonFuel(tank.getResource(0).getFluid());
@@ -450,8 +452,10 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
                 int take = Math.min(tank.getAmount(), (int) Math.ceil(neededMb - fuelTaken - 1.0E-9));
                 if (take > 0) {
                     try (Transaction tx = Transaction.openRoot()) {
-                        fuelTaken += tank.extract(0, tank.getResource(0), take, tx);
+                        int taken = tank.extract(0, tank.getResource(0), take, tx);
                         tx.commit();
+                        fuelTaken += taken;
+                        controlState.consumedFluid(taken);
                     }
                 }
             }
@@ -461,7 +465,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         }
         heatPerTick = heat.add(made);
         if (heatPerTick > 0 && !flueTargets.isEmpty()) {
-            flue.emit(heatPerTick, carbon);
+            controlState.producedFluid(flue.emit(heatPerTick, carbon));
         } else {
             flue.idle();
         }
@@ -483,6 +487,8 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         solidTotal = (int) Math.min(Integer.MAX_VALUE, Math.round(heatIn));
         solidCelsius = solidTemperature(stack);
         items.setStack(SLOT_FUEL, stack.copyWithCount(stack.getCount() - 1));
+        // Each solid fuel item lit counts as one operation.
+        controlState.completed(ItemStack.EMPTY, 1);
         return true;
     }
 
@@ -566,6 +572,15 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
 
     public int getHeatPerTick() {
         return heatPerTick;
+    }
+
+    // The burning solid fuel item's heat left (unmultiplied HU) and its whole heat.
+    public double getSolidLeft() {
+        return solidLeft;
+    }
+
+    public int getSolidTotal() {
+        return solidTotal;
     }
 
     // The temperature of the fuel burning (with oxy-fuel), or 0.

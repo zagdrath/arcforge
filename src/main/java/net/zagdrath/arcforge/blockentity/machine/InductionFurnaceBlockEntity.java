@@ -112,12 +112,13 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             SmeltingLane.Settings settings = new SmeltingLane.Settings(
                     ArcforgeConfig.INDUCTION_TIME_MULTIPLIER.getAsDouble() / speedMultiplier(), energyPerTick());
-            SmeltingLane.State laneState = lane.tick(level, items, energy, experience, settings);
+            SmeltingLane.State laneState = lane.tick(level, items, energy, experience, settings,
+                    (produced, used) -> controlState.completed(produced, List.of(), used, 0));
             status = switch (laneState) {
                 case WORKING -> MachineStatus.SMELTING;
                 case IDLE -> MachineStatus.IDLE;
@@ -146,6 +147,10 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
 
     public StoredExperience getExperience() {
         return experience;
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

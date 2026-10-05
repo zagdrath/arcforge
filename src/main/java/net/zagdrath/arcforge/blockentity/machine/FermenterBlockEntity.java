@@ -227,8 +227,8 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         }
         total = ticksFor(recipe);
         ItemStack result = recipe.result().create();
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (water.getAmount() < recipe.fluidInput().amount()) {
             status = MachineStatus.NO_WATER;
         } else if (!fitsOutput(result)) {
@@ -252,17 +252,21 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         if (slots == null) {
             return;
         }
+        int itemsUsed = 0;
         for (int i = 0; i < slots.length; i++) {
             int slot = slots[i] == 0 ? SLOT_INPUT : SLOT_INPUT_2;
             ItemStack held = items.getStack(slot);
             items.setStack(slot, held.copyWithCount(held.getCount() - recipe.ingredients().get(i).count()));
+            itemsUsed += recipe.ingredients().get(i).count();
         }
+        int waterUsed;
         try (Transaction tx = Transaction.openRoot()) {
-            water.extract(0, water.getResource(0), recipe.fluidInput().amount(), tx);
+            waterUsed = water.extract(0, water.getResource(0), recipe.fluidInput().amount(), tx);
             tx.commit();
         }
         ItemStack held = items.getStack(SLOT_BYPRODUCT);
-        items.setStack(SLOT_BYPRODUCT, held.isEmpty() ? result : held.copyWithCount(held.getCount() + result.getCount()));
+        items.setStack(SLOT_BYPRODUCT, held.isEmpty() ? result.copy() : held.copyWithCount(held.getCount() + result.getCount()));
+        controlState.completed(List.of(result), List.of(), itemsUsed, waterUsed);
     }
 
     private boolean fitsOutput(ItemStack stack) {
@@ -283,8 +287,8 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
             setChanged();
         }
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (recipe.isEmpty()) {
             status = MachineStatus.IDLE;
         } else if (water.getAmount() < recipe.get().value().fluidInput().amount()) {
@@ -332,31 +336,44 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
     private void ferment(ServerLevel level, FermentingRecipe recipe) {
         FluidStack result = recipe.result().create();
         int amount = ethanolFor(recipe);
+        int itemsUsed = 1;
         if (additiveLeft <= 0 && isAdditive(items.getStack(SLOT_ADDITIVE))) {
             ItemStack additive = items.getStack(SLOT_ADDITIVE);
             items.setStack(SLOT_ADDITIVE, additive.copyWithCount(additive.getCount() - 1));
             additiveLeft = ArcforgeConfig.FERMENTER_ADDITIVE_OPERATIONS.getAsInt();
+            itemsUsed++;
         }
         if (additiveLeft > 0) {
             additiveLeft--;
         }
+        int waterUsed;
+        List<FluidStack> made = new java.util.ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
-            water.extract(0, water.getResource(0), recipe.fluidInput().amount(), tx);
-            ethanol.insert(0, FluidResource.of(result), amount, tx);
+            waterUsed = water.extract(0, water.getResource(0), recipe.fluidInput().amount(), tx);
+            made.add(result.copyWithAmount(ethanol.insert(0, FluidResource.of(result), amount, tx)));
             // The gas that doesn't fit goes into the air.
-            int gas = (int) Math.round(amount * ArcforgeConfig.FERMENTER_CO2_PER_ETHANOL.getAsDouble());
+            int gas = carbonDioxideFor(amount);
             if (gas > 0) {
-                carbonDioxide.insert(0, FluidResource.of(ModFluids.CARBON_DIOXIDE.get()), gas, tx);
+                made.add(new FluidStack(ModFluids.CARBON_DIOXIDE.get(),
+                        carbonDioxide.insert(0, FluidResource.of(ModFluids.CARBON_DIOXIDE.get()), gas, tx)));
             }
             tx.commit();
         }
         ItemStack input = items.getStack(SLOT_INPUT);
         items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
+        List<ItemStack> madeItems = List.of();
         if (recipe.byproduct().isPresent() && level.getRandom().nextFloat() < recipe.byproductChance()) {
             ItemStack byproduct = recipe.byproduct().get().create();
+            madeItems = List.of(byproduct.copy());
             ItemStack held = items.getStack(SLOT_BYPRODUCT);
             items.setStack(SLOT_BYPRODUCT, held.isEmpty() ? byproduct : held.copyWithCount(held.getCount() + byproduct.getCount()));
         }
+        controlState.completed(madeItems, made, itemsUsed, waterUsed);
+    }
+
+    // The Carbon Dioxide given off with this much Ethanol.
+    public static int carbonDioxideFor(int ethanol) {
+        return (int) Math.round(ethanol * ArcforgeConfig.FERMENTER_CO2_PER_ETHANOL.getAsDouble());
     }
 
     public FilteredFluidTank getWater() {
@@ -385,6 +402,11 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
 
     public int getTotal() {
         return total;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
     }
 
     // --- Capabilities. A null side is an internal/unsided query and sees everything. ---

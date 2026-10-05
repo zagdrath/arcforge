@@ -198,8 +198,8 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
                 : MachineRecipes.electrolyzing(level, FluidResource.of(Fluids.WATER)).map(RecipeHolder::value).orElse(null);
         cost = holder != null ? costFor(holder.value()) : 0;
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (holder == null || water.getAmount() < holder.value().input().amount()) {
             status = MachineStatus.IDLE;
         } else if (!fits(holder.value())) {
@@ -265,20 +265,28 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
 
     private void finish(ServerLevel level, ElectrolyzingRecipe recipe) {
         int vented = 0;
+        int used;
+        // What went into the tanks (not what was vented), for the statistics.
+        List<FluidStack> kept = new java.util.ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
-            water.extract(0, water.getResource(0), recipe.input().amount(), tx);
+            used = water.extract(0, water.getResource(0), recipe.input().amount(), tx);
             FluidStack primary = recipe.primary().create();
-            vented += primary.getAmount() - hydrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx);
+            int primaryKept = hydrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx);
+            vented += primary.getAmount() - primaryKept;
+            kept.add(primary.copyWithAmount(primaryKept));
             if (recipe.secondary().isPresent()) {
                 FluidStack secondary = recipe.secondary().get().create();
-                vented += secondary.getAmount() - oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
+                int secondaryKept = oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
+                vented += secondary.getAmount() - secondaryKept;
+                kept.add(secondary.copyWithAmount(secondaryKept));
             }
             if (recipe.tertiary().isPresent()) {
                 FluidStack tertiary = recipe.tertiary().get().create();
-                liquid.insert(0, FluidResource.of(tertiary), tertiary.getAmount(), tx);
+                kept.add(tertiary.copyWithAmount(liquid.insert(0, FluidResource.of(tertiary), tertiary.getAmount(), tx)));
             }
             tx.commit();
         }
+        controlState.completed(List.of(), kept, 0, used);
         ArcforgeAdvancements.produced(this, net.minecraft.world.item.ItemStack.EMPTY, recipe.primary().create().getFluid(), null);
         recipe.secondary().ifPresent(secondary -> ArcforgeAdvancements.produced(this, net.minecraft.world.item.ItemStack.EMPTY,
                 secondary.create().getFluid(), null));
@@ -338,6 +346,11 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
 
     public int getCost() {
         return cost;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
     }
 
     // The recipe for what the water tank holds, or for water while it's empty; null if there is none.

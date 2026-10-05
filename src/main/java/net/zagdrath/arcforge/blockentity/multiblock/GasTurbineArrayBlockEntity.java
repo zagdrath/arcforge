@@ -360,7 +360,8 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         if (signal < 0 || time % SIGNAL_CHECK_INTERVAL == 0) {
             signal = readSignal(level);
         }
-        boolean allowed = redstoneMode == RedstoneMode.THROTTLE ? signal > 0 : redstoneMode.canRun(isPowered());
+        // Switched off through the machine control API it stops as if the throttle were at zero (or the signal said stop).
+        boolean allowed = isControlEnabled() && (redstoneMode == RedstoneMode.THROTTLE ? signal > 0 : redstoneMode.canRun(isPowered()));
         BurnerFuel burning = BurnerFuel.of(fuel.getResource(0));
         // Read before burning can empty the tank.
         boolean carbon = FlueGas.isCarbonFuel(fuel.getResource(0).getFluid());
@@ -436,7 +437,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
             exhaust.setProducingAt(exhaustCelsius);
             exhaust.add(exhaustHu);
             if (!flueTargets.isEmpty()) {
-                flue.emit(burnedHu, carbon);
+                controlState.producedFluid(flue.emit(burnedHu, carbon));
             } else {
                 flue.idle();
             }
@@ -477,8 +478,10 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
             int drain = (int) Math.min(Math.ceil(needMb - fuelBuffered - 1.0E-9), fuel.getAmount());
             if (drain > 0) {
                 try (Transaction tx = Transaction.openRoot()) {
-                    fuelBuffered += fuel.extract(0, fuel.getResource(0), drain, tx);
+                    int drained = fuel.extract(0, fuel.getResource(0), drain, tx);
                     tx.commit();
+                    fuelBuffered += drained;
+                    controlState.consumedFluid(drained);
                 }
             }
         }
@@ -491,6 +494,9 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     }
 
     private MachineStatus status(boolean allowed, boolean hasFuel, double target) {
+        if (!isControlEnabled()) {
+            return stoppedStatus();
+        }
         if (!allowed) {
             return redstoneMode == RedstoneMode.THROTTLE ? MachineStatus.NO_SIGNAL : MachineStatus.DISABLED;
         }
@@ -543,6 +549,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
                 lubricant.extract(0, lubricant.getResource(0), whole, tx);
                 tx.commit();
             }
+            controlState.consumedFluid(whole);
         }
     }
 
@@ -627,6 +634,10 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     public double getBurnedHu() {
         return burnedHu;
+    }
+
+    public HeatBuffer getExhaust() {
+        return exhaust;
     }
 
     public int getExhaustHu() {

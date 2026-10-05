@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.blockentity.machine;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -154,8 +155,8 @@ public class AirSeparatorBlockEntity extends MachineBlockEntity implements Fluid
         shown = holder != null ? holder.value() : null;
         total = holder != null ? ticksFor(holder.value()) : 0;
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (holder == null) {
             status = MachineStatus.NO_AIR;
         } else if (!hasRoom(holder.value())) {
@@ -208,15 +209,22 @@ public class AirSeparatorBlockEntity extends MachineBlockEntity implements Fluid
 
     private void finish(ServerLevel level, AirSeparatingRecipe recipe) {
         int vented = 0;
+        // What went into the tanks (not back into the air), for the statistics.
+        List<FluidStack> kept = new ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
             FluidStack primary = recipe.primary().create();
-            vented += primary.getAmount() - nitrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx);
+            int primaryKept = nitrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx);
+            vented += primary.getAmount() - primaryKept;
+            kept.add(primary.copyWithAmount(primaryKept));
             if (recipe.secondary().isPresent()) {
                 FluidStack secondary = recipe.secondary().get().create();
-                vented += secondary.getAmount() - oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
+                int secondaryKept = oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
+                vented += secondary.getAmount() - secondaryKept;
+                kept.add(secondary.copyWithAmount(secondaryKept));
             }
             tx.commit();
         }
+        controlState.completed(List.of(), kept, 0, 0);
         ArcforgeAdvancements.produced(this, ItemStack.EMPTY, recipe.primary().create().getFluid(), null);
         recipe.secondary().ifPresent(secondary -> ArcforgeAdvancements.produced(this, ItemStack.EMPTY, secondary.create().getFluid(), null));
         // Whatever didn't fit went back into the air: a puff from the top.
@@ -246,6 +254,11 @@ public class AirSeparatorBlockEntity extends MachineBlockEntity implements Fluid
 
     public int getTotal() {
         return total;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
     }
 
     // The recipe for where it stands, or null (the End).

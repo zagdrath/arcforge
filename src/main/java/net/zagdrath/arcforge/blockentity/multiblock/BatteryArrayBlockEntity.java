@@ -476,13 +476,15 @@ public class BatteryArrayBlockEntity extends MachineBlockEntity implements Multi
         if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
             powered = isPowered(level);
         }
-        boolean output = redstoneMode.canRun(powered);
-        energy.setBudgets(transfer, output ? transfer : 0);
+        // Redstone pauses the output only; switched off through the machine control API it neither charges nor discharges.
+        boolean enabled = controlState.isEnabled();
+        boolean output = enabled && redstoneMode.canRun(powered);
+        energy.setBudgets(enabled ? transfer : 0, output ? transfer : 0);
         if (output) {
             pushEnergy(level);
         }
         if (!output) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (lastInput > 0 && lastInput >= lastOutput) {
             status = MachineStatus.CHARGING;
         } else if (lastOutput > 0) {

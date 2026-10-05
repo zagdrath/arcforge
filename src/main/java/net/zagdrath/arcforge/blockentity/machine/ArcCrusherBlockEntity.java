@@ -109,11 +109,12 @@ public class ArcCrusherBlockEntity extends MachineBlockEntity {
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             CrushingLane.Settings settings = new CrushingLane.Settings(1.0 / speedMultiplier(), energyPerTick(), 1);
-            CrushingLane.State state1 = lane.tick(level, items, energy, settings);
+            CrushingLane.State state1 = lane.tick(level, items, energy, settings,
+                    (produced, used) -> controlState.completed(produced, List.of(), used, 0));
             status = switch (state1) {
                 case WORKING -> MachineStatus.CRUSHING;
                 case IDLE -> MachineStatus.IDLE;
@@ -131,6 +132,10 @@ public class ArcCrusherBlockEntity extends MachineBlockEntity {
 
     public CrushingLane getLane() {
         return lane;
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

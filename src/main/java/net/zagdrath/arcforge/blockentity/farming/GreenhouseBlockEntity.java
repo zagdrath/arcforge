@@ -437,8 +437,8 @@ public class GreenhouseBlockEntity extends MachineBlockEntity implements Multibl
             updateSunlight(level);
         }
         updateClimate(level);
-        if (!redstoneMode.canRun(level.hasNeighborSignal(worldPosition))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
             setLamps(level, false);
         } else {
             status = grow(level);
@@ -509,10 +509,15 @@ public class GreenhouseBlockEntity extends MachineBlockEntity implements Multibl
                     noWater = true;
                     continue;
                 }
+                int fluidsBefore = water.getAmount() + nutrients.getAmount() + co2.getAmount();
+                int fertilizerBefore = items.getStack(SLOT_FERTILIZER).getCount();
                 drain(water, per);
                 // Legumes need no Nutrient Solution or fertilizer, and grow as if they had Nutrient Solution (CropRotation).
                 double nutrientBonus = CropRotation.isLegumeSeed(bed.getSeed()) ? ArcforgeConfig.GREENHOUSE_NUTRIENT_BONUS.getAsDouble() : nutrientBonus(true);
                 bed.startCycle((float) (nutrientBonus * co2Bonus(true)));
+                // What a harvest takes as it starts (its harvest is counted as the operation when it comes out).
+                controlState.consumedFluid(fluidsBefore - water.getAmount() - nutrients.getAmount() - co2.getAmount());
+                controlState.consumedItems(fertilizerBefore - items.getStack(SLOT_FERTILIZER).getCount());
             }
             if (!bed.isGrown()) {
                 if (!sunlit.contains(pos) && !(lit && lampLit.contains(pos))) {
@@ -639,6 +644,7 @@ public class GreenhouseBlockEntity extends MachineBlockEntity implements Multibl
         for (int i = 0; i < OUTPUT_SLOTS; i++) {
             items.setStack(SLOT_OUTPUT_FIRST + i, slots.get(i));
         }
+        controlState.completed(harvest.stream().map(ItemStack::copy).toList(), List.of(), 0, 0);
         if (!harvest.isEmpty()) {
             ItemStack first = harvest.getFirst();
             ArcforgeAdvancements.produced(this, first, null, null);
@@ -715,6 +721,14 @@ public class GreenhouseBlockEntity extends MachineBlockEntity implements Multibl
 
     public int getGrowing() {
         return growing;
+    }
+
+    public int getEnergyUsage() {
+        return energyUsage;
+    }
+
+    public int getHeatUsage() {
+        return heatUsage;
     }
 
     public boolean areLampsOn() {

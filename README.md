@@ -10,7 +10,8 @@
 
 Arcforge adds machines that generate and use Forge Energy (FE). All machines expose energy, fluids
 and items through NeoForge's standard capabilities, so they connect to cables, pipes and machines
-from any other NeoForge mod that uses FE.
+from any other NeoForge mod that uses FE. Other mods can also monitor and control Arcforge machines through
+its machine control API; see [docs/API.md](docs/API.md).
 
 Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Machines** creative tab.
 

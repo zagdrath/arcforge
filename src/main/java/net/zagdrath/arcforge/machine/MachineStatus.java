@@ -132,7 +132,9 @@ public enum MachineStatus {
     NO_CATALYST("no_catalyst", "led_blocked"),
     // The Sifter at work, and without a mesh. (The Diamond Press shows PRESSING, TOO_COLD under 1,400°C.)
     SIFTING("sifting", "led_running"),
-    NO_MESH("no_mesh", "led_blocked");
+    NO_MESH("no_mesh", "led_blocked"),
+    // Switched off through the machine control API (docs/API.md), whatever its redstone mode.
+    SWITCHED_OFF("switched_off", "led_off");
 
     private final String name;
     private final String led;

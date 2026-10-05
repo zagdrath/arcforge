@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.blockentity.multiblock;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
@@ -315,7 +316,7 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
         if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
             powered = isPowered(level);
         }
-        status = redstoneMode.canRun(powered) ? evaporate(level) : MachineStatus.DISABLED;
+        status = controlState.isEnabled() && redstoneMode.canRun(powered) ? evaporate(level) : stoppedStatus();
         setRunning(status == MachineStatus.EVAPORATING);
         if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
             MultiblockAutomation.pushOutputs(level, this);
@@ -388,25 +389,32 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
     }
 
     private void finish(EvaporatingRecipe recipe) {
+        List<ItemStack> madeItems = new ArrayList<>();
+        List<FluidStack> madeFluids = new ArrayList<>();
         recipe.fluidResult().ifPresent(template -> {
             FluidStack made = template.create();
             try (Transaction tx = Transaction.openRoot()) {
                 output.insert(0, FluidResource.of(made), made.getAmount(), tx);
                 tx.commit();
             }
+            madeFluids.add(made.copy());
             ArcforgeAdvancements.produced(this, ItemStack.EMPTY, made.getFluid(), "evaporating");
         });
         recipe.itemResult().ifPresent(template -> {
             ItemStack made = template.create();
             ItemStack slot = items.getStack(SLOT_SALT);
+            madeItems.add(made.copy());
             items.setStack(SLOT_SALT, slot.isEmpty() ? made : slot.copyWithCount(slot.getCount() + made.getCount()));
             ArcforgeAdvancements.produced(this, made, null, "evaporating");
         });
         if (recipe.water() > 0) {
             // Water that doesn't fit is lost as steam.
             try (Transaction tx = Transaction.openRoot()) {
-                water.insert(0, FluidResource.of(Fluids.WATER), Math.min(recipe.water(), water.getSpace()), tx);
+                int kept = water.insert(0, FluidResource.of(Fluids.WATER), Math.min(recipe.water(), water.getSpace()), tx);
                 tx.commit();
+                if (kept > 0) {
+                    madeFluids.add(new FluidStack(Fluids.WATER, kept));
+                }
             }
         }
         recipe.byproduct().ifPresent(template -> {
@@ -420,10 +428,12 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
                         byproduct.insert(0, resource, fits, tx);
                         tx.commit();
                     }
+                    madeFluids.add(made.copyWithAmount(fits));
                     ArcforgeAdvancements.produced(this, ItemStack.EMPTY, made.getFluid(), "evaporating");
                 }
             }
         });
+        controlState.completed(madeItems, madeFluids, 0, recipe.input().amount());
     }
 
     private boolean isPowered(ServerLevel level) {
@@ -480,6 +490,21 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
 
     public int getHeatUsage() {
         return heatUsage;
+    }
+
+    // mB evaporated towards the next result, and the mB each result takes (0 with no recipe).
+    public double getProgress() {
+        return progress;
+    }
+
+    public int getTotal() {
+        return currentInputAmount();
+    }
+
+    // The recipe for the input tank's fluid, if any.
+    public Optional<EvaporatingRecipe> getCurrentRecipe() {
+        return level != null && input.getAmount() > 0 ? MachineRecipes.evaporating(level, input.getResource(0)).map(RecipeHolder::value)
+                : Optional.empty();
     }
 
     public boolean isRunning() {

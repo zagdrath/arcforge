@@ -164,7 +164,7 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
         } else {
             total = UpgradeType.time(baseTicks(level, target, targetState), upgrades(UpgradeType.SPEED));
             if (!allowed) {
-                status = redstoneMode == RedstoneMode.PULSE ? MachineStatus.WAITING_PULSE : MachineStatus.DISABLED;
+                status = redstoneMode == RedstoneMode.PULSE && isControlEnabled() ? MachineStatus.WAITING_PULSE : stoppedStatus();
             } else {
                 work(level, target, targetState);
             }
@@ -198,6 +198,7 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
             targetState.spawnAfterBreak(level, target, tool, true);
             level.destroyBlock(target, false, player);
             drops.forEach(this::insert);
+            controlState.completed(drops, List.of(), 0, 0);
             progress = 0;
             breaking = null;
             breaks++;
@@ -292,6 +293,10 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
 
     public int getTotal() {
         return total;
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     // Blocks broken since it was loaded, for tests.

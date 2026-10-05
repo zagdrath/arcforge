@@ -174,7 +174,7 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
     }
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
-        boolean enabled = redstoneMode.canRun(level.hasNeighborSignal(pos));
+        boolean enabled = canRun(level);
         heatPerTick = 0;
         fePerTick = 0;
         if (enabled && !energy.isFull() && heat.getStored() > 0) {
@@ -196,7 +196,7 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
         outputs.pushEnergy(level, pos, getFacing(), sideConfig, energy, PowerGeneration.cap(ArcforgeConfig.THERMOELECTRIC_MAX_OUTPUT.getAsInt()));
 
         if (!enabled) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (energy.isFull()) {
             status = MachineStatus.FULL;
         } else if (heatPerTick > 0) {
@@ -213,6 +213,14 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
 
     public int getFePerTick() {
         return fePerTick;
+    }
+
+    public int getHeatPerTick() {
+        return heatPerTick;
+    }
+
+    public GeneratorEnergyHandler getEnergy() {
+        return energy;
     }
 
     // --- Capabilities ---

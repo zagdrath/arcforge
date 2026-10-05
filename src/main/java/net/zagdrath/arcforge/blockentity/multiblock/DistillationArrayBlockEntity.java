@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.blockentity.multiblock;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -38,6 +39,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -299,8 +301,8 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
             powered = isPowered(level);
         }
         heatPerTick = 0;
-        if (!redstoneMode.canRun(powered)) {
-            status = MachineStatus.DISABLED;
+        if (!controlState.isEnabled() || !redstoneMode.canRun(powered)) {
+            status = stoppedStatus();
         } else {
             status = distil(level);
         }
@@ -442,6 +444,10 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
             }
             tx.commit();
         }
+        // The steam counts as used now (the batch keeps only its bonus); the feed when the batch is done.
+        if (stripping) {
+            controlState.consumedFluid(recipe.steamPerBatch());
+        }
         batchFeed = resource.getFluid();
         batchBonus = bonus;
         progress = 0;
@@ -464,11 +470,13 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
 
     private void finishBatch(DistillingRecipe recipe) {
         int height = getHeight();
+        List<FluidStack> madeFluids = new ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
             for (Map.Entry<Fluid, Integer> entry : recipe.outputs(height, batchBonus).entrySet()) {
                 FilteredFluidTank tank = tankFor(entry.getKey());
                 if (tank != null) {
-                    tank.insert(0, FluidResource.of(entry.getKey()), entry.getValue(), tx);
+                    int inserted = tank.insert(0, FluidResource.of(entry.getKey()), entry.getValue(), tx);
+                    madeFluids.add(new FluidStack(entry.getKey(), inserted));
                 }
             }
             tx.commit();
@@ -477,15 +485,20 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
             ArcforgeAdvancements.produced(this, ItemStack.EMPTY, made, null);
         }
         int count = recipe.items(height);
+        List<ItemStack> madeItems = new ArrayList<>();
         if (count > 0) {
             ItemStack slot = items(SLOT_PITCH);
             ItemStack made = new ItemStack(recipe.itemOutput(), count);
             if (slot.isEmpty()) {
                 items.setStack(SLOT_PITCH, made);
+                madeItems.add(made.copy());
             } else if (ItemStack.isSameItemSameComponents(slot, made)) {
-                items.setStack(SLOT_PITCH, slot.copyWithCount(Math.min(slot.getMaxStackSize(), slot.getCount() + count)));
+                int total = Math.min(slot.getMaxStackSize(), slot.getCount() + count);
+                items.setStack(SLOT_PITCH, slot.copyWithCount(total));
+                madeItems.add(made.copyWithCount(total - slot.getCount()));
             }
         }
+        controlState.completed(madeItems, madeFluids, 0, recipe.amount());
         batchFeed = null;
         batchBonus = 0;
         progress = 0;
@@ -551,6 +564,24 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
 
     public boolean isRunning() {
         return running;
+    }
+
+    public int getHeatPerTick() {
+        return heatPerTick;
+    }
+
+    // mB of the batch gone through the column.
+    public double getProgress() {
+        return progress;
+    }
+
+    // The batch's recipe (null with no batch) and the steam stripping bonus it got.
+    public @Nullable DistillingRecipe getBatchRecipe() {
+        return recipeFor(level, batchFeed);
+    }
+
+    public float getBatchBonus() {
+        return batchBonus;
     }
 
     // --- Capabilities (MultiblockController) ---

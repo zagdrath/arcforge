@@ -53,10 +53,14 @@ import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.security.Owned;
 import net.zagdrath.arcforge.security.Ownership;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
+import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.control.ControlStateHolder;
+import net.zagdrath.arcforge.machine.control.MachineControlState;
+import net.zagdrath.arcforge.machine.control.MachineControlTracker;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
@@ -83,9 +87,11 @@ import com.mojang.serialization.Codec;
 // coke when needed, which are burned and used before anything else in the slot. Oxygen piped into an Oxygen port
 // speeds smelts up: one that starts with oxygenPerSmelt in the tank uses it and runs oxygenSpeedMultiplier times as
 // fast.
-public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController, Owned, SettingsCopyable {
+public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController, Owned, SettingsCopyable, ControlStateHolder {
     // Who placed it and its security override (see SecurityRules).
     protected final Ownership ownership = new Ownership(this::setChanged);
+    // The machine control API's enable switch and statistics (see docs/API.md).
+    protected final MachineControlState controlState = new MachineControlState(this::setChanged);
 
     public static final int SLOT_METAL = 0;
     public static final int SLOT_ADDITIVE = 1;
@@ -135,6 +141,9 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     // Whether the current (or next) smelt has paid for its oxygen boost. It stays paid for if the smelt is
     // interrupted, until one finishes.
     private boolean boosted;
+    // What it did last tick, and the smelt it was on (null when none), for the machine control API.
+    private MachineStatus status = MachineStatus.NOT_FORMED;
+    private @Nullable ArcforgeSmeltingRecipe smelting;
 
     public ArcforgeFurnaceBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.ARCFORGE_FURNACE.get(), pos, state);
@@ -358,7 +367,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
             powered = isPowered(level);
         }
 
-        boolean enabled = formed && redstoneMode.canRun(powered);
+        boolean enabled = formed && controlState.isEnabled() && redstoneMode.canRun(powered);
         ArcforgeSmeltingRecipe recipe = enabled ? currentRecipe(level) : null;
         boolean canSmelt = recipe != null && productsFit(recipe) && fuelAndReagentCount() >= recipe.coke();
         if (recipe != null) {
@@ -392,6 +401,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         } else {
             progress = 0;
         }
+        smelting = canSmelt ? recipe : null;
+        status = statusNow(enabled, recipe, canSmelt);
 
         boolean lit = formed && burnTime > 0;
         if (state.getValue(ArcforgeFurnacePortBlock.LIT) != lit) {
@@ -404,6 +415,27 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         if (heat != previousHeat || burnTime > 0 || progress > 0) {
             setChanged();
         }
+    }
+
+    // Why it is or isn't smelting this tick (after the tick's burn and smelt).
+    private MachineStatus statusNow(boolean enabled, @Nullable ArcforgeSmeltingRecipe recipe, boolean canSmelt) {
+        if (!formed) {
+            return MachineStatus.NOT_FORMED;
+        }
+        if (!enabled) {
+            return controlState.isEnabled() ? MachineStatus.DISABLED : MachineStatus.SWITCHED_OFF;
+        }
+        if (recipe == null) {
+            // Metal without the additives some recipe wants is waiting on items.
+            return items.getStack(SLOT_METAL).isEmpty() ? MachineStatus.IDLE : MachineStatus.MISSING_ITEMS;
+        }
+        if (!canSmelt) {
+            return productsFit(recipe) ? MachineStatus.NO_FUEL : MachineStatus.OUTPUT_FULL;
+        }
+        if (heat < recipe.minHeat()) {
+            return burnTime > 0 ? MachineStatus.HEATING : MachineStatus.NO_FUEL;
+        }
+        return MachineStatus.SMELTING;
     }
 
     // Pays for the starting smelt's boost, if there's enough oxygen.
@@ -448,6 +480,15 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         return heat;
     }
 
+    public MachineStatus getStatus() {
+        return status;
+    }
+
+    // The recipe it was smelting last tick (null when it couldn't).
+    public @Nullable ArcforgeSmeltingRecipe getCurrentRecipe() {
+        return smelting;
+    }
+
     // For tests: skip the warm-up.
     public void setHeat(int celsius) {
         heat = Math.max(AMBIENT_HEAT, Math.min(ArcforgeConfig.FURNACE_MAX_HEAT.getAsInt(), celsius));
@@ -490,6 +531,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
             return;
         }
         takeFuelOrReagent();
+        controlState.consumedItems(1);
         burnTime = ArcforgeConfig.FURNACE_FUEL_BURN_TICKS.getAsInt();
         burnTotal = burnTime;
     }
@@ -504,8 +546,18 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         for (int i = 0; i < recipe.coke(); i++) {
             takeFuelOrReagent();
         }
-        addTo(SLOT_OUTPUT, recipe.result().create());
-        recipe.byproduct().ifPresent(byproduct -> addTo(SLOT_BYPRODUCT, byproduct.create()));
+        ItemStack result = recipe.result().create();
+        List<ItemStack> made = new ArrayList<>(List.of(result.copy()));
+        addTo(SLOT_OUTPUT, result);
+        recipe.byproduct().ifPresent(byproduct -> {
+            ItemStack slag = byproduct.create();
+            made.add(slag.copy());
+            addTo(SLOT_BYPRODUCT, slag);
+        });
+        int used = recipe.metal().count() + recipe.additive().map(additive -> additive.count()).orElse(0)
+                + recipe.additive2().map(additive -> additive.count()).orElse(0) + recipe.coke();
+        // A boosted smelt used its oxygen when it started.
+        controlState.completed(made, List.of(), used, boosted ? ArcforgeConfig.FURNACE_OXYGEN_PER_SMELT.getAsInt() : 0);
     }
 
     private void take(int slot, int count) {
@@ -556,9 +608,19 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     }
 
     @Override
+    public RedstoneMode getRedstoneMode() {
+        return redstoneMode;
+    }
+
+    @Override
     public void setRedstoneMode(RedstoneMode mode) {
         redstoneMode = mode;
         setChanged();
+    }
+
+    @Override
+    public MachineControlState machineControlState() {
+        return controlState;
     }
 
     private void onSideConfigChanged() {
@@ -605,7 +667,25 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         };
     }
 
-    // --- Removal ---
+    // --- Loading and removal ---
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        MachineControlTracker.add(this);
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        MachineControlTracker.remove(this);
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        MachineControlTracker.remove(this);
+    }
 
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
@@ -675,6 +755,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         ownership.load(input);
+        controlState.load(input);
         portDefaults.load(input);
         int layout = input.getIntOr("slot_layout", 1);
         if (layout >= SLOT_LAYOUT) {
@@ -708,6 +789,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ownership.save(output);
+        controlState.save(output);
         portDefaults.save(output);
         items.serialize(output.child("items"));
         output.putInt("slot_layout", SLOT_LAYOUT);

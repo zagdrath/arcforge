@@ -209,8 +209,8 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
             cooling = cooling(level, getMinCorner(), getMaxCorner());
         }
         condensed = 0;
-        if (!redstoneMode.canRun(isPowered(level))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (exhaustIn.getAmount() == 0) {
             status = MachineStatus.NO_STEAM;
         } else if (waterOut.getSpace() == 0) {
@@ -224,6 +224,8 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
                     tx.commit();
                 }
                 condensed = n;
+                controlState.consumedFluid(n);
+                controlState.producedFluid(n);
                 setChanged();
             }
             status = n > 0 ? MachineStatus.CONDENSING : MachineStatus.IDLE;

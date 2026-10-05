@@ -29,6 +29,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
@@ -148,8 +149,8 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
         infiniteSource = hasSource && isInfiniteWater(level, below, source);
         total = cycleTicks();
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (!hasSource) {
             status = MachineStatus.NO_SOURCE;
             progress = 0;
@@ -198,10 +199,13 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
                 return;
             }
         }
+        int pumpedAmount;
         try (Transaction tx = Transaction.openRoot()) {
-            tank.insert(0, fluid, FluidType.BUCKET_VOLUME, tx);
+            pumpedAmount = tank.insert(0, fluid, FluidType.BUCKET_VOLUME, tx);
             tx.commit();
         }
+        // One bucket is one operation.
+        controlState.completed(List.of(), List.of(new FluidStack(pumped, pumpedAmount)), 0, 0);
     }
 
     // Water with two or more water sources beside it refills itself, as with a bucket.
@@ -221,6 +225,24 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
 
     public FilteredFluidTank getTank() {
         return tank;
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
+    }
+
+    // What a bucket of the source below fills the tank with, or null for none (as of the last tick).
+    public @Nullable Fluid getSourceFluid() {
+        return sourceFluid < 0 ? null : BuiltInRegistries.FLUID.byId(sourceFluid);
     }
 
     public ConsumerEnergyHandler getEnergy() {

@@ -254,7 +254,7 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
                 tower.northSouth(), Integer.bitCount(skyMask), hasSky), settings());
         stowed = result.stowed();
         receiverTemperature = result.temperature();
-        boolean enabled = redstoneMode.canRun(powered);
+        boolean enabled = controlState.isEnabled() && redstoneMode.canRun(powered);
         heatPerTick = enabled ? result.heatPerTick() : 0;
 
         // Heat goes in up to what the buffer holds at the receiver's temperature; any more than that bleeds away.
@@ -272,7 +272,7 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
         pushHeat(level);
 
         if (!enabled) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (!hasSky || skyMask == 0) {
             status = MachineStatus.NO_SKY;
         } else if (SolarModel.isNight(level.getDefaultClockTime())) {

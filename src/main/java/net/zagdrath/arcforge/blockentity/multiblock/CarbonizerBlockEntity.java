@@ -51,10 +51,14 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.item.tool.SettingsCardData;
 import net.zagdrath.arcforge.item.tool.SettingsCopyable;
+import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.control.ControlStateHolder;
+import net.zagdrath.arcforge.machine.control.MachineControlState;
+import net.zagdrath.arcforge.machine.control.MachineControlTracker;
 import net.zagdrath.arcforge.machine.interaction.FluidInteractable;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
@@ -80,9 +84,12 @@ import com.mojang.serialization.Codec;
 //
 // The master's contents stay with that block when the structure breaks and come back when it re-forms.
 // If a different block becomes master, the old one hands everything over (see absorb).
-public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, MultiblockController, Owned, SettingsCopyable {
+public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, MultiblockController, Owned, SettingsCopyable,
+        ControlStateHolder {
     // Who placed it and its security override (see SecurityRules).
     protected final Ownership ownership = new Ownership(this::setChanged);
+    // The machine control API's enable switch and statistics (see docs/API.md); only the master's is used.
+    protected final MachineControlState controlState = new MachineControlState(this::setChanged);
 
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
@@ -114,6 +121,8 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     private boolean powered;
     // Whether this block holds a structure's contents (it is, or was, a master).
     private boolean holdsContents;
+    // What the master did last tick, for the machine control API.
+    private MachineStatus status = MachineStatus.IDLE;
 
     // Client only: how far the slice door on this block is open (0 = shut, 1 = open), animated
     // towards the LIT state by clientTick and drawn by CarbonizerDoorRenderer.
@@ -193,7 +202,12 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
 
     private boolean isWorking(int chamber) {
         return formation != null && chamber < formation.slices() && !chamberInput[chamber].isEmpty()
-                && chamberProgress[chamber] < chamberTime[chamber] && redstoneMode.canRun(powered);
+                && chamberProgress[chamber] < chamberTime[chamber] && canRun();
+    }
+
+    // Whether it may work: switched on (the machine control API), and its redstone mode allows it.
+    private boolean canRun() {
+        return controlState.isEnabled() && redstoneMode.canRun(powered);
     }
 
     // --- Structure ---
@@ -236,6 +250,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         if (!holdsContents) {
             sideConfig.load(other.sideConfig.pack());
             redstoneMode = other.redstoneMode;
+            controlState.setEnabled(other.controlState.isEnabled());
         }
         other.releaseChambers(0);
         for (int slot = 0; slot < SLOT_COUNT; slot++) {
@@ -305,6 +320,46 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     public boolean isFormed() {
         return formation != null && CarbonizerBlock.isFormed(getBlockState());
+    }
+
+    // Whether this block is the machine the control API sees: a formed structure's master, or a loose block still
+    // holding the contents of one it was master of.
+    public boolean isMaster() {
+        return masterPos != null ? masterPos.equals(worldPosition) : holdsContents;
+    }
+
+    public MachineStatus getStatus() {
+        return status;
+    }
+
+    // The most advanced busy chamber's progress and time (0 with every chamber idle).
+    public int getLeadProgress() {
+        int lead = leadChamber();
+        return lead >= 0 ? chamberProgress[lead] : 0;
+    }
+
+    public int getLeadTime() {
+        int lead = leadChamber();
+        return lead >= 0 ? chamberTime[lead] : 0;
+    }
+
+    private int leadChamber() {
+        int lead = -1;
+        for (int chamber = 0; chamber < getSlices(); chamber++) {
+            if (!chamberInput[chamber].isEmpty() && chamberTime[chamber] > 0 && (lead < 0
+                    || (long) chamberProgress[chamber] * chamberTime[lead] > (long) chamberProgress[lead] * chamberTime[chamber])) {
+                lead = chamber;
+            }
+        }
+        return lead;
+    }
+
+    public FilteredItemHandler getItems() {
+        return items;
+    }
+
+    public FilteredFluidTank getTank() {
+        return tank;
     }
 
     public int getSlices() {
@@ -392,7 +447,9 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         tank.setCapacity(capacityFor(formed));
         fillContainer();
 
-        boolean enabled = redstoneMode.canRun(powered);
+        boolean enabled = canRun();
+        boolean anyWorking = false;
+        boolean anyStalled = false;
         for (int chamber = 0; chamber < formed.slices(); chamber++) {
             if (enabled && chamberInput[chamber].isEmpty()) {
                 startChamber(level, chamber, batchSize(formed));
@@ -407,9 +464,21 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
                 if (chamberProgress[chamber] >= chamberTime[chamber]) {
                     // Stalls, door closed, until the output and the tank have room.
                     working &= finishChamber(level, chamber);
+                    anyStalled |= !chamberInput[chamber].isEmpty();
                 }
             }
+            anyWorking |= working;
             setSliceLit(level, formed, chamber, working);
+        }
+        if (!enabled) {
+            status = controlState.isEnabled() ? MachineStatus.DISABLED : MachineStatus.SWITCHED_OFF;
+        } else if (anyWorking) {
+            status = MachineStatus.CARBONIZING;
+        } else if (anyStalled || !items.getStack(SLOT_INPUT).isEmpty()) {
+            // A finished batch waiting for room, or input (the slot takes only recipe inputs) that couldn't start for want of it.
+            status = MachineStatus.OUTPUT_FULL;
+        } else {
+            status = MachineStatus.IDLE;
         }
 
         if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
@@ -466,13 +535,17 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         ItemStack result = value.result().create();
         result.setCount(result.getCount() * count);
         ItemStack output = items.getStack(SLOT_OUTPUT);
+        ItemStack made = result.copy();
         items.setStack(SLOT_OUTPUT, output.isEmpty() ? result : output.copyWithCount(output.getCount() + result.getCount()));
+        List<FluidStack> madeFluids = new ArrayList<>();
         value.byproduct().ifPresent(fluid -> {
             try (Transaction tx = Transaction.openRoot()) {
-                tank.insert(0, FluidResource.of(fluid.create()), fluid.amount() * count, tx);
+                int inserted = tank.insert(0, FluidResource.of(fluid.create()), fluid.amount() * count, tx);
                 tx.commit();
+                madeFluids.add(fluid.create().copyWithAmount(inserted));
             }
         });
+        controlState.completed(List.of(made), madeFluids, count, 0);
         chamberInput[chamber] = ItemStack.EMPTY;
         chamberProgress[chamber] = 0;
         chamberTime[chamber] = 0;
@@ -586,9 +659,19 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     @Override
+    public RedstoneMode getRedstoneMode() {
+        return redstoneMode;
+    }
+
+    @Override
     public void setRedstoneMode(RedstoneMode mode) {
         redstoneMode = mode;
         setChanged();
+    }
+
+    @Override
+    public MachineControlState machineControlState() {
+        return controlState;
     }
 
     private void onSideConfigChanged() {
@@ -644,7 +727,25 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         return (master != null ? master : this).fluidOutput;
     }
 
-    // --- Removal: the contents drop only when the block holding them is broken ---
+    // --- Loading and removal: the contents drop only when the block holding them is broken ---
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        MachineControlTracker.add(this);
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        MachineControlTracker.remove(this);
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        MachineControlTracker.remove(this);
+    }
 
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
@@ -709,6 +810,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         ownership.load(input);
+        controlState.load(input);
         portDefaults.load(input);
         masterPos = input.read("master", BlockPos.CODEC).orElse(null);
         formation = input.read("formation", CarbonizerStructure.Formation.CODEC).orElse(null);
@@ -737,6 +839,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ownership.save(output);
+        controlState.save(output);
         portDefaults.save(output);
         output.storeNullable("master", BlockPos.CODEC, masterPos);
         output.storeNullable("formation", CarbonizerStructure.Formation.CODEC, formation);

@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.blockentity.machine;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -135,8 +136,8 @@ public class SifterBlockEntity extends MachineBlockEntity {
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             status = work(level, pos);
         }
@@ -215,16 +216,19 @@ public class SifterBlockEntity extends MachineBlockEntity {
         for (int i = 0; i < OUTPUT_SLOTS; i++) {
             slots[i] = items.getStack(FIRST_OUTPUT + i).copy();
         }
+        List<ItemStack> finds = new ArrayList<>();
         for (SiftingRecipe.Output output : recipe.outputs()) {
             if (level.getRandom().nextDouble() < chance(output, mesh)) {
                 ItemStack found = output.item().create();
                 put(slots, found);
                 ArcforgeAdvancements.produced(this, found, null, "sifting");
+                finds.add(found.copy());
             }
         }
         for (int i = 0; i < OUTPUT_SLOTS; i++) {
             items.setStack(FIRST_OUTPUT + i, slots[i]);
         }
+        controlState.completed(finds, List.of(), 1, 0);
         // The mesh wears.
         ItemStack meshStack = items.getStack(SLOT_MESH);
         if (level.getRandom().nextDouble() < ArcforgeConfig.SIFTER_MESH_WEAR_CHANCE.getAsDouble()) {
@@ -237,6 +241,10 @@ public class SifterBlockEntity extends MachineBlockEntity {
                 items.setStack(SLOT_MESH, worn);
             }
         }
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

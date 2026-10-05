@@ -21,6 +21,7 @@ import net.zagdrath.arcforge.gametest.ArcforgeGameTests;
 import net.zagdrath.arcforge.gametest.TestFixtures;
 import net.zagdrath.arcforge.item.tool.FoundrySuit;
 import net.zagdrath.arcforge.multiblock.PortStore;
+import net.zagdrath.arcforge.machine.control.MachineControls;
 import net.zagdrath.arcforge.network.ArcforgeNetwork;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -56,6 +57,7 @@ public class Arcforge {
         FoundrySuit.register(modEventBus);
         ModDataComponents.register(modEventBus);
         ModCapabilities.register(modEventBus);
+        MachineControls.register(modEventBus);
         ModDataMaps.register(modEventBus);
         ModTriggers.register(modEventBus);
         ModChunkLoading.register(modEventBus);

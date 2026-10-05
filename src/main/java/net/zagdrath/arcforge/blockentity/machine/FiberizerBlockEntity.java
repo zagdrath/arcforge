@@ -137,8 +137,8 @@ public class FiberizerBlockEntity extends MachineBlockEntity {
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         feUsage = 0;
         heatUsage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             status = work(level);
         }
@@ -179,6 +179,7 @@ public class FiberizerBlockEntity extends MachineBlockEntity {
             items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
             ItemStack current = items.getStack(SLOT_OUTPUT);
             items.setStack(SLOT_OUTPUT, current.isEmpty() ? result : current.copyWithCount(current.getCount() + result.getCount()));
+            controlState.completed(result.copy(), 1);
             progress = 0;
         }
         setChanged();
@@ -190,6 +191,18 @@ public class FiberizerBlockEntity extends MachineBlockEntity {
             return true;
         }
         return ItemStack.isSameItemSameComponents(slot, result) && slot.getCount() + result.getCount() <= slot.getMaxStackSize();
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public int getUsage() {
+        return feUsage;
+    }
+
+    public int getHeatUsage() {
+        return heatUsage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

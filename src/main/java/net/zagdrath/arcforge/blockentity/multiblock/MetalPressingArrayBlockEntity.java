@@ -147,8 +147,8 @@ public class MetalPressingArrayBlockEntity extends CubeMultiblockBlockEntity {
         }
         usage = 0;
         pressing = 0;
-        if (!redstoneMode.canRun(isPowered(level))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             PressingLane.Settings settings = new PressingLane.Settings(
                     ArcforgeConfig.PRESSING_ARRAY_TIME_MULTIPLIER.getAsDouble() / speedMultiplier(),
@@ -156,8 +156,12 @@ public class MetalPressingArrayBlockEntity extends CubeMultiblockBlockEntity {
             boolean full = false;
             boolean noPower = false;
             int noDie = 0;
-            for (PressingLane lane : lanes) {
-                switch (lane.tick(level, items, energy, settings)) {
+            for (int index = 0; index < LANES; index++) {
+                int[] slots = { inputSlot(index), outputSlot(index) };
+                int[] before = laneCounts(slots);
+                PressingLane.State laneState = lanes[index].tick(level, items, energy, settings);
+                recordLane(slots, before);
+                switch (laneState) {
                     case WORKING -> {
                         pressing++;
                         usage += settings.energyPerTick();

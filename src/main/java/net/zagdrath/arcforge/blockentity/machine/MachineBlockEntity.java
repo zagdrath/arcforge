@@ -41,6 +41,9 @@ import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.control.ControlStateHolder;
+import net.zagdrath.arcforge.machine.control.MachineControlState;
+import net.zagdrath.arcforge.machine.control.MachineControlTracker;
 import net.zagdrath.arcforge.machine.interaction.Dismantleable;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.security.Owned;
@@ -54,9 +57,11 @@ import com.mojang.serialization.Codec;
 // What every single-block machine shares: its item slots (the machine's own, then four upgrade slots),
 // the side configuration and redstone mode set from its GUI, pushing output into touching blocks,
 // and dropping its items when removed.
-public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider, Dismantleable, ConduitConnectable, ConfigurableMachine, Owned, SettingsCopyable {
+public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider, Dismantleable, ConduitConnectable, ConfigurableMachine, Owned, SettingsCopyable, ControlStateHolder {
     // Who placed it and its security override (see SecurityRules).
     protected final Ownership ownership = new Ownership(this::setChanged);
+    // The machine control API's enable switch and statistics (see docs/API.md).
+    protected final MachineControlState controlState = new MachineControlState(this::setChanged);
 
     public static final int UPGRADE_SLOTS = MachineItemHandler.UPGRADE_SLOTS;
 
@@ -133,6 +138,27 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     }
 
     @Override
+    public MachineControlState machineControlState() {
+        return controlState;
+    }
+
+    // Whether the machine control API has it switched on (it is unless switched off remotely).
+    public boolean isControlEnabled() {
+        return controlState.isEnabled();
+    }
+
+    // Whether it may work this tick: switched on, and its redstone mode allows it. For machines without PULSE (those
+    // use redstoneAllows).
+    protected boolean canRun(Level level) {
+        return controlState.isEnabled() && redstoneMode.canRun(level.hasNeighborSignal(worldPosition));
+    }
+
+    // The status to show when canRun or redstoneAllows says no.
+    protected MachineStatus stoppedStatus() {
+        return controlState.isEnabled() ? MachineStatus.DISABLED : MachineStatus.SWITCHED_OFF;
+    }
+
+    @Override
     public void setRedstoneMode(RedstoneMode mode) {
         if (mode != redstoneMode) {
             pendingPulses = 0;
@@ -141,8 +167,8 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         setChanged();
     }
 
-    // Whether the redstone setting lets it work this tick. Call it once a tick. In PULSE mode a rising edge
-    // allows one operation, until consumePulse().
+    // Whether the redstone setting (and the machine control API's switch) lets it work this tick. Call it once a tick.
+    // In PULSE mode a rising edge allows one operation, until consumePulse(); a pulse while switched off waits.
     protected boolean redstoneAllows(Level level) {
         boolean powered = level.hasNeighborSignal(worldPosition);
         if (redstoneMode == RedstoneMode.PULSE) {
@@ -151,10 +177,10 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
                 setChanged();
             }
             lastPowered = powered;
-            return pendingPulses > 0;
+            return controlState.isEnabled() && pendingPulses > 0;
         }
         lastPowered = powered;
-        return redstoneMode.canRun(powered);
+        return controlState.isEnabled() && redstoneMode.canRun(powered);
     }
 
     // After the single operation a pulse allowed.
@@ -317,9 +343,28 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     }
 
     @Override
+    public void onLoad() {
+        super.onLoad();
+        MachineControlTracker.add(this);
+    }
+
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        MachineControlTracker.remove(this);
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        super.onChunkUnloaded();
+        MachineControlTracker.remove(this);
+    }
+
+    @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         ownership.load(input);
+        controlState.load(input);
         items.deserialize(input.childOrEmpty("items"));
         sideConfig.deserialize(input);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", 0));
@@ -331,6 +376,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ownership.save(output);
+        controlState.save(output);
         items.serialize(output.child("items"));
         sideConfig.serialize(output);
         output.putInt("redstone_mode", redstoneMode.ordinal());

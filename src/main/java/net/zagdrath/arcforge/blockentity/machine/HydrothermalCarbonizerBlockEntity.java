@@ -26,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -152,8 +153,8 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
         if (discardWater && returned.getAmount() > 0) {
             returned.set(0, FluidResource.EMPTY, 0);
         }
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             status = work(level);
         }
@@ -196,17 +197,20 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
         progress++;
         if (progress >= total) {
             items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - recipe.inputCount()));
+            int used;
+            int kept = 0;
             try (Transaction tx = Transaction.openRoot()) {
-                water.extract(0, FluidResource.of(Fluids.WATER), recipe.water(), tx);
+                used = water.extract(0, FluidResource.of(Fluids.WATER), recipe.water(), tx);
                 // Water that doesn't fit is lost as steam, and all of it while discarding.
                 int back = discardWater ? 0 : Math.min(recipe.waterReturn(), returned.getSpace());
                 if (back > 0) {
-                    returned.insert(0, FluidResource.of(Fluids.WATER), back, tx);
+                    kept = returned.insert(0, FluidResource.of(Fluids.WATER), back, tx);
                 }
                 tx.commit();
             }
             ItemStack current = items.getStack(SLOT_OUTPUT);
-            items.setStack(SLOT_OUTPUT, current.isEmpty() ? result : current.copyWithCount(current.getCount() + result.getCount()));
+            items.setStack(SLOT_OUTPUT, current.isEmpty() ? result.copy() : current.copyWithCount(current.getCount() + result.getCount()));
+            controlState.completed(List.of(result), kept > 0 ? List.of(new FluidStack(Fluids.WATER, kept)) : List.of(), recipe.inputCount(), used);
             ArcforgeAdvancements.produced(this, result, null, "hydrothermal_carbonizing");
             progress = 0;
             heatOwed = 0;

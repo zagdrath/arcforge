@@ -128,6 +128,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
     private int minedCount;
     private Map<Block, Integer> scanCounts = new LinkedHashMap<>();
     private int cooldown;
+    private int usage;
     private long lastMined = Long.MIN_VALUE / 2;
     private @Nullable BlockPos lastTarget;
     private Block lastReplace = net.minecraft.world.level.block.Blocks.COBBLESTONE;
@@ -252,6 +253,16 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
         return energy;
     }
 
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
+    }
+
+    // Ticks until it may mine the next block.
+    public int getCooldown() {
+        return cooldown;
+    }
+
     public int scanPercent() {
         if (level != null && level.isClientSide()) {
             return clientScanPercent;
@@ -322,6 +333,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
     // --- Ticking ---
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
+        usage = 0;
         switch (quarryState) {
             case SCANNING -> {
                 scan(level);
@@ -329,7 +341,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
             }
             case MINING -> {
                 if (!redstoneAllows(level)) {
-                    status = MachineStatus.DISABLED;
+                    status = stoppedStatus();
                 } else if (cooldown > 0) {
                     cooldown--;
                 } else {
@@ -488,15 +500,19 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
             return;
         }
         energy.consume(cost);
+        usage = cost;
         state.spawnAfterBreak(level, target, tool, true);
         level.removeBlock(target, false);
         level.levelEvent(2001, target, Block.getId(state));
+        int replaced = 0;
         if (settings.replace() && replace.getItem() instanceof BlockItem blockItem) {
             lastReplace = blockItem.getBlock();
             level.setBlock(target, blockItem.getBlock().defaultBlockState(), Block.UPDATE_ALL);
             items.setStack(SLOT_REPLACE, replace.copyWithCount(replace.getCount() - 1));
+            replaced = 1;
         }
         drops.forEach(this::insert);
+        controlState.completed(drops, List.of(), replaced, 0);
         minedCount++;
         targetIndex++;
         aimAtNext();

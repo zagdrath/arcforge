@@ -20,6 +20,28 @@ number and date.
 
 ## [Unreleased]
 
+Suggested version: **2.5.0** (minor: a new feature; worlds and configs carry over).
+
+### Added
+
+- **Machine control API for other mods** (first used by Encoded Logistics). A new block capability,
+  `arcforge:machine_control`, is on every Arcforge machine and on every block of a formed multiblock (resolving to its
+  controller). Through it, other mods can:
+  - read a machine's status, progress, current outputs and energy, items, fluids and heat;
+  - insert into its input, fuel and catalyst slots and extract from its outputs, always through the machine's own
+    rules;
+  - change its redstone mode, sides or ports, auto-eject and machine-specific options;
+  - read its statistics and listen for status changes, finished operations and faults.
+
+  The API is published separately as `net.zagdrath.arcforge:arcforge-api:1.0.0` (interfaces only, with its own semantic
+  version). See [docs/API.md](docs/API.md). GameTests check it on every machine and every multiblock.
+- **Machines can be switched off remotely.** A mod using the API can switch any machine or multiblock off. It then
+  stops as if its redstone mode stopped it, keeps its contents, and its GUI shows the new status **Switched off
+  remotely**. Machines are on unless switched off this way, and the switch is saved with the machine.
+- **Machine statistics.** Every machine now counts the operations it completes, the items and fluid it produces and
+  consumes, and how long it has spent running and loaded. The totals are saved with the machine. For now, other mods
+  read them through the API; the GUIs don't show them.
+
 ## [2.4.0] - 2026-10-04
 
 ### Upgrading

@@ -120,8 +120,8 @@ public class VulcanizerBlockEntity extends MachineBlockEntity {
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         heatUsage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             status = work(level);
         }
@@ -164,6 +164,7 @@ public class VulcanizerBlockEntity extends MachineBlockEntity {
                 ItemStack current = items.getStack(SLOT_OUTPUT);
                 items.setStack(SLOT_OUTPUT, current.isEmpty() ? result : current.copyWithCount(current.getCount() + result.getCount()));
                 ArcforgeAdvancements.produced(this, result, null, "vulcanizing");
+                controlState.completed(result.copy(), recipe.input().count() + recipe.secondInput().count());
             }
             progress = 0;
         }

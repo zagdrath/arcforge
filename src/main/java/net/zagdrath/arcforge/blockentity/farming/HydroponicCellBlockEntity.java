@@ -82,6 +82,7 @@ public class HydroponicCellBlockEntity extends ClocheBlockEntity {
             co2.extract(0, co2.getResource(0), needed, tx);
             tx.commit();
         }
+        controlState.consumedFluid(needed);
         return ArcforgeConfig.HYDROPONIC_CELL_CO2_BONUS.getAsDouble();
     }
 

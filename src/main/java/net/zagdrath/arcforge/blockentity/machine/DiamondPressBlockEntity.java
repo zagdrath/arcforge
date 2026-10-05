@@ -138,8 +138,8 @@ public class DiamondPressBlockEntity extends MachineBlockEntity {
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
         heatUsage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             status = work(level);
         }
@@ -189,12 +189,21 @@ public class DiamondPressBlockEntity extends MachineBlockEntity {
             items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - recipe.inputCount()));
             items.setStack(SLOT_OUTPUT, slot.isEmpty() ? result : slot.copyWithCount(slot.getCount() + result.getCount()));
             ArcforgeAdvancements.produced(this, result, null, "diamond_pressing");
+            controlState.completed(result.copy(), recipe.inputCount());
             progress = 0;
             energyOwed = 0;
             heatOwed = 0;
         }
         setChanged();
         return MachineStatus.PRESSING;
+    }
+
+    public int getUsage() {
+        return usage;
+    }
+
+    public int getHeatUsage() {
+        return heatUsage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

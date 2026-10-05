@@ -217,8 +217,8 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
         heatUsed = 0;
         target = null;
         SteamGrade in = SteamGrade.of(steamIn.getResource(0));
-        if (!redstoneMode.canRun(isPowered(level))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (in == null || steamIn.getAmount() == 0) {
             status = MachineStatus.NO_STEAM;
         } else {
@@ -237,6 +237,9 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
                 flow = n;
                 if (target != null) {
                     heatUsed = heat.remove((int) Math.ceil(n * cost(in, target)));
+                    // Only upgraded steam counts as made; steam passing through unchanged doesn't.
+                    controlState.consumedFluid(n);
+                    controlState.producedFluid(n);
                 }
                 setChanged();
             }

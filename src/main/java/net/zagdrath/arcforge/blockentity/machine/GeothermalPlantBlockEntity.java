@@ -140,7 +140,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
         drainLavaBucket();
 
         // A redstone-disabled plant makes nothing but still gives away the heat it holds.
-        boolean enabled = redstoneMode.canRun(level.hasNeighborSignal(pos));
+        boolean enabled = canRun(level);
         heatPerTick = 0;
         boolean drained = false;
         if (enabled && !heat.isFull()) {
@@ -162,7 +162,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
         outputs.pushHeat(level, pos, getFacing(), sideConfig, heat, ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt());
 
         if (!enabled) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (heat.isFull()) {
             status = MachineStatus.FULL;
         } else if (heatPerTick > 0) {
@@ -185,6 +185,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
         try (Transaction tx = Transaction.openRoot()) {
             int taken = lavaTank.extract(0, LAVA, amount, tx);
             tx.commit();
+            controlState.consumedFluid(taken);
             lavaBurning = taken;
             lavaBurnTotal = taken;
         }
@@ -215,6 +216,28 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
 
     public HeatBuffer getHeat() {
         return heat;
+    }
+
+    public FilteredFluidTank getLavaTank() {
+        return lavaTank;
+    }
+
+    public int getHeatPerTick() {
+        return heatPerTick;
+    }
+
+    // mB of the lava taken from the tank still to drain, out of what was taken.
+    public double getLavaBurning() {
+        return lavaBurning;
+    }
+
+    public int getLavaBurnTotal() {
+        return lavaBurnTotal;
+    }
+
+    // Ticks of drain left in that lava, at the current Speed upgrades.
+    public int getLavaTicksLeft() {
+        return (int) Math.ceil(lavaBurning / speedMultiplier());
     }
 
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---

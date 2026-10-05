@@ -253,7 +253,8 @@ public abstract class ClocheBlockEntity extends MachineBlockEntity implements Fl
         usage = 0;
         rate = 0;
         if (!redstoneAllows(level)) {
-            status = redstoneMode == net.zagdrath.arcforge.machine.config.RedstoneMode.PULSE ? MachineStatus.WAITING_PULSE : MachineStatus.DISABLED;
+            status = redstoneMode == net.zagdrath.arcforge.machine.config.RedstoneMode.PULSE && isControlEnabled()
+                    ? MachineStatus.WAITING_PULSE : stoppedStatus();
         } else {
             status = work(level);
         }
@@ -295,6 +296,7 @@ public abstract class ClocheBlockEntity extends MachineBlockEntity implements Fl
                     tank.extract(0, tank.getResource(0), needed, tx);
                     tx.commit();
                 }
+                controlState.consumedFluid(needed);
             }
             cycleBonus = legume ? (float) ArcforgeConfig.CLOCHE_FERTILIZER_BONUS.getAsDouble() : takeFertilizer();
             cycling = true;
@@ -336,6 +338,7 @@ public abstract class ClocheBlockEntity extends MachineBlockEntity implements Fl
             fertilizer = points;
             enriched = stack.getItem() instanceof FertilizerItem fertilizerItem && fertilizerItem.enriches();
             items.setStack(SLOT_FERTILIZER, stack.copyWithCount(stack.getCount() - 1));
+            controlState.consumedItems(1);
         }
         fertilizer--;
         return (float) (enriched ? ArcforgeConfig.CLOCHE_ENRICHED_BONUS.getAsDouble() : ArcforgeConfig.CLOCHE_FERTILIZER_BONUS.getAsDouble());
@@ -380,6 +383,8 @@ public abstract class ClocheBlockEntity extends MachineBlockEntity implements Fl
         for (int i = 0; i < OUTPUT_SLOTS; i++) {
             items.setStack(SLOT_OUTPUT_FIRST + i, slots.get(i));
         }
+        // The water and fertilizer were counted when the harvest began.
+        controlState.completed(harvest, List.of(), 0, 0);
         return true;
     }
 
@@ -431,6 +436,20 @@ public abstract class ClocheBlockEntity extends MachineBlockEntity implements Fl
 
     public boolean isEnriched() {
         return enriched && fertilizer > 0;
+    }
+
+    // Growth so far, in ticks at speed 1, towards getTotal().
+    public double getProgress() {
+        return progress;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
     }
 
     // Growth per tick last tick (0 when not growing).

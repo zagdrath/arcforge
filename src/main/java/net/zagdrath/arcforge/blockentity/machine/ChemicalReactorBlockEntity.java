@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.blockentity.machine;
 
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -223,8 +224,8 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             makingFluid = recipe.fluidOutput().map(template -> template.create()).orElse(FluidStack.EMPTY);
         }
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (holder == null) {
             // Something to react but not the fluids (or the other item) for it.
             boolean reactive = false;
@@ -308,30 +309,44 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             return;
         }
         List<ChemicalReactingRecipe.ItemInput> needed = recipe.itemInputs();
+        int itemsUsed = 0;
         for (int i = 0; i < slots.length; i++) {
             int slot = INPUT_SLOTS[slots[i]];
             ItemStack stack = items.getStack(slot);
             items.setStack(slot, stack.copyWithCount(stack.getCount() - needed.get(i).count()));
+            itemsUsed += needed.get(i).count();
         }
+        int fluidUsed = 0;
+        List<FluidStack> madeFluids = new ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
             for (int i = 0; i < tanks.length; i++) {
                 FilteredFluidTank tank = inputTank(tanks[i]);
-                tank.extract(0, tank.getResource(0), recipe.fluidInputs().get(i).amount(), tx);
+                fluidUsed += tank.extract(0, tank.getResource(0), recipe.fluidInputs().get(i).amount(), tx);
             }
             recipe.fluidOutput().ifPresent(template -> {
                 FluidStack fluid = template.create();
                 output.insert(0, FluidResource.of(fluid), fluid.getAmount(), tx);
+                madeFluids.add(fluid);
             });
             recipe.fluidByproduct().ifPresent(template -> {
                 FluidStack fluid = template.create();
                 byproductTank.insert(0, FluidResource.of(fluid), fluid.getAmount(), tx);
+                madeFluids.add(fluid);
             });
             tx.commit();
         }
-        recipe.itemOutput().ifPresent(template -> add(SLOT_OUTPUT, template.create()));
+        List<ItemStack> madeItems = new ArrayList<>();
+        recipe.itemOutput().ifPresent(template -> {
+            ItemStack product = template.create();
+            madeItems.add(product.copy());
+            add(SLOT_OUTPUT, product);
+        });
         if (recipe.byproduct().isPresent() && level.getRandom().nextFloat() < recipe.byproductChance()) {
-            add(SLOT_BYPRODUCT, recipe.byproduct().get().create());
+            ItemStack byproduct = recipe.byproduct().get().create();
+            madeItems.add(byproduct.copy());
+            add(SLOT_BYPRODUCT, byproduct);
         }
+        controlState.completed(madeItems, madeFluids, itemsUsed, fluidUsed);
         ArcforgeAdvancements.produced(this, recipe.itemOutput().map(template -> template.create()).orElse(ItemStack.EMPTY),
                 recipe.fluidOutput().map(template -> template.create().getFluid()).orElse(null), recipe.category());
     }
@@ -386,6 +401,11 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
 
     public int getTotal() {
         return total;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
     }
 
     // What the running recipe makes (either may be empty), for Jade.

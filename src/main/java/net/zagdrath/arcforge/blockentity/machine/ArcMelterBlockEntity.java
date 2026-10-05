@@ -151,8 +151,8 @@ public class ArcMelterBlockEntity extends MachineBlockEntity implements FluidInt
             total = ticksFor(value);
         }
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (recipe.isEmpty()) {
             status = MachineStatus.IDLE;
         } else if (!fits(recipe.get().value().result().create())) {
@@ -188,10 +188,15 @@ public class ArcMelterBlockEntity extends MachineBlockEntity implements FluidInt
         }
         ItemStack input = items.getStack(SLOT_INPUT);
         items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
+        controlState.completed(List.of(), List.of(result.copy()), 1, 0);
     }
 
     public FilteredFluidTank getTank() {
         return tank;
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

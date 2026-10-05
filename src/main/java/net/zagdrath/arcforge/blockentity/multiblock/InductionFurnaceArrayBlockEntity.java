@@ -135,15 +135,19 @@ public class InductionFurnaceArrayBlockEntity extends CubeMultiblockBlockEntity 
         }
         usage = 0;
         boolean working = false;
-        if (!redstoneMode.canRun(isPowered(level))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             SmeltingLane.Settings settings = new SmeltingLane.Settings(
                     ArcforgeConfig.INDUCTION_ARRAY_TIME_MULTIPLIER.getAsDouble() / speedMultiplier(), energyPerTick());
             boolean full = false;
             boolean noPower = false;
-            for (SmeltingLane lane : lanes) {
-                switch (lane.tick(level, items, energy, experience, settings)) {
+            for (int index = 0; index < LANES; index++) {
+                int[] slots = { inputSlot(index), outputSlot(index) };
+                int[] before = laneCounts(slots);
+                SmeltingLane.State laneState = lanes[index].tick(level, items, energy, experience, settings);
+                recordLane(slots, before);
+                switch (laneState) {
                     case WORKING -> {
                         working = true;
                         usage += settings.energyPerTick();

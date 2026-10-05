@@ -129,8 +129,8 @@ public class ArcCrushingArrayBlockEntity extends CubeMultiblockBlockEntity {
         }
         usage = 0;
         boolean working = false;
-        if (!redstoneMode.canRun(isPowered(level))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             CrushingLane.Settings settings = new CrushingLane.Settings(
                     ArcforgeConfig.ARRAY_TIME_MULTIPLIER.getAsDouble() / speedMultiplier(),
@@ -138,8 +138,12 @@ public class ArcCrushingArrayBlockEntity extends CubeMultiblockBlockEntity {
                     ArcforgeConfig.ARRAY_ORE_YIELD.getAsInt());
             boolean full = false;
             boolean noPower = false;
-            for (CrushingLane lane : lanes) {
-                switch (lane.tick(level, items, energy, settings)) {
+            for (int index = 0; index < LANES; index++) {
+                int[] slots = { inputSlot(index), outputSlot(index), bonusSlot(index) };
+                int[] before = laneCounts(slots);
+                CrushingLane.State laneState = lanes[index].tick(level, items, energy, settings);
+                recordLane(slots, before);
+                switch (laneState) {
                     case WORKING -> {
                         working = true;
                         usage += settings.energyPerTick();

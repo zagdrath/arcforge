@@ -230,7 +230,7 @@ public class AssemblerBlockEntity extends MachineBlockEntity {
             resolveRecipe(level);
         }
         if (!redstoneAllows(level)) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (recipe == null) {
             status = MachineStatus.NO_PATTERN;
             progress = 0;
@@ -323,6 +323,9 @@ public class AssemblerBlockEntity extends MachineBlockEntity {
         items.setStack(FIRST_REMAINDER, remainders[0]);
         items.setStack(FIRST_REMAINDER + 1, remainders[1]);
         crafts++;
+        List<ItemStack> produced = new ArrayList<>(leftovers);
+        produced.addFirst(result);
+        controlState.completed(produced, List.of(), taken.taken().stream().filter(stack -> !stack.isEmpty()).count(), 0);
         return MachineStatus.CRAFTING;
     }
 
@@ -360,6 +363,10 @@ public class AssemblerBlockEntity extends MachineBlockEntity {
 
     public int getProgress() {
         return progress;
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     // Crafts since it was loaded, for tests.

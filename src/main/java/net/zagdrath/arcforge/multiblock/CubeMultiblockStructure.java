@@ -234,6 +234,9 @@ public final class CubeMultiblockStructure<T extends CubeMultiblockBlockEntity> 
         if (oldCentre != null && level.getBlockEntity(oldCentre) instanceof CubeMultiblockBlockEntity from
                 && level.getBlockEntity(master) instanceof CubeMultiblockBlockEntity to) {
             from.moveContentsTo(to);
+            if (from != to) {
+                to.machineControlState().takeOver(from.machineControlState());
+            }
         }
         MultiblockAutomation.refresh(level, box.min(), box.max());
         if (!wasFormed) {

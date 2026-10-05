@@ -306,19 +306,20 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         fePerTick = 0;
         SteamGrade grade = SteamGrade.of(steam.getResource(0));
         int maxFlow = maxFlow();
-        boolean running = redstoneMode.canRun(isPowered());
+        boolean running = canRun(level);
         if (running && grade != null && steam.getAmount() > 0 && !energy.isFull()) {
             try (Transaction tx = Transaction.openRoot()) {
                 flow = steam.extract(0, steam.getResource(0), Math.min(steam.getAmount(), maxFlow), tx);
                 tx.commit();
             }
+            controlState.consumedFluid(flow);
         }
         // With an Exhaust port the spent steam is kept as Exhaust Steam; while there was room for it, the
         // turbine gets the vacuum bonus. Whatever doesn't fit vents, as it all does without one.
         vacuum = hasExhaust && exhaust.getAmount() < exhaust.getCapacity();
         if (hasExhaust && flow > 0) {
             try (Transaction tx = Transaction.openRoot()) {
-                exhaust.insert(0, FluidResource.of(ModFluids.EXHAUST_STEAM.get()), flow, tx);
+                controlState.producedFluid(exhaust.insert(0, FluidResource.of(ModFluids.EXHAUST_STEAM.get()), flow, tx));
                 tx.commit();
             }
         }
@@ -342,7 +343,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         }
 
         if (!running) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (energy.isFull()) {
             status = MachineStatus.FULL;
         } else if (flow > 0) {
@@ -374,6 +375,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
                 lubricant.extract(0, lubricant.getResource(0), whole, tx);
                 tx.commit();
             }
+            controlState.consumedFluid(whole);
         }
     }
 

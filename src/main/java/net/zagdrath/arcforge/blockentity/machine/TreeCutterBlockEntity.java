@@ -206,8 +206,8 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
             setLit(false);
             autoEject(level, itemOutput);
             return;
@@ -453,6 +453,8 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         }
         lastLogs = tree.logs().size();
         felled++;
+        // A felled tree is one operation: everything it dropped, kept or spilled (drops are never changed in place).
+        controlState.completed(drops, List.of(), 0, 0);
         ArcforgeAdvancements.produced(this, new ItemStack(baseState.getBlock().asItem()), null, "tree_cutting");
         setChanged();
         return MachineStatus.FELLING;
@@ -539,6 +541,7 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
             level.setBlock(pos, sapling, Block.UPDATE_ALL);
             level.playSound(null, pos, net.minecraft.world.level.block.SoundType.GRASS.getPlaceSound(), net.minecraft.sounds.SoundSource.BLOCKS, 0.7F, 1.0F);
             items.setStack(slot, stack.copyWithCount(stack.getCount() - 1));
+            controlState.consumedItems(1);
             setChanged();
             return MachineStatus.PLANTING;
         }
@@ -564,6 +567,7 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
                 }
                 level.levelEvent(1505, pos, 15);
                 items.setStack(SLOT_FERTILIZER, meal.copyWithCount(meal.getCount() - 1));
+                controlState.consumedItems(1);
                 fertilizeCursor = index + 1;
                 setChanged();
                 return;

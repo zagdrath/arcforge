@@ -184,8 +184,8 @@ public class HaberReactorBlockEntity extends MachineBlockEntity implements Fluid
         making = holder != null ? holder.value().output().create() : FluidStack.EMPTY;
         needed = holder != null ? holder.value().minTemperatureOrDefault() : ArcforgeConfig.HABER_MIN_TEMPERATURE.getAsInt();
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (holder == null) {
             // Gas in but not the other one it needs (or not enough).
             status = inputA.getAmount() > 0 || inputB.getAmount() > 0 ? MachineStatus.MISSING_FLUID : MachineStatus.IDLE;
@@ -232,14 +232,16 @@ public class HaberReactorBlockEntity extends MachineBlockEntity implements Fluid
             return;
         }
         FluidStack made = recipe.output().create();
+        int used = 0;
         try (Transaction tx = Transaction.openRoot()) {
             for (int i = 0; i < tanks.length; i++) {
                 FilteredFluidTank tank = tanks[i] == 0 ? inputA : inputB;
-                tank.extract(0, tank.getResource(0), recipe.inputs().get(i).amount(), tx);
+                used += tank.extract(0, tank.getResource(0), recipe.inputs().get(i).amount(), tx);
             }
             output.insert(0, FluidResource.of(made), made.getAmount(), tx);
             tx.commit();
         }
+        controlState.completed(List.of(), List.of(made.copy()), 0, used);
         ArcforgeAdvancements.produced(this, ItemStack.EMPTY, made.getFluid(), null);
     }
 
@@ -274,6 +276,15 @@ public class HaberReactorBlockEntity extends MachineBlockEntity implements Fluid
 
     public int getTotal() {
         return total;
+    }
+
+    // FE and HU used last tick.
+    public int getUsage() {
+        return usage;
+    }
+
+    public int getHeatUsage() {
+        return heatUsage;
     }
 
     // What the running recipe makes (empty without one), for Jade.

@@ -172,7 +172,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         // A redstone-disabled burner holds its fire where it is.
-        boolean enabled = redstoneMode.canRun(level.hasNeighborSignal(pos));
+        boolean enabled = canRun(level);
         int produced = 0;
         boolean carbon = false;
         if (enabled) {
@@ -185,7 +185,8 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
                 if (produced > 0) {
                     burnTime--;
                     if (burnTime == 0) {
-                        leaveAsh(level, burning);
+                        // One fuel item burnt out: an operation for the machine control API.
+                        controlState.completed(leaveAsh(level, burning), 1);
                         burning = null;
                     }
                 }
@@ -193,7 +194,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         }
         outputPerTick = produced;
         if (produced > 0 && FlueGas.hasFlueFace(sideConfig, getFacing())) {
-            flue.emit(flueHeat(produced), carbon);
+            controlState.producedFluid(flue.emit(flueHeat(produced), carbon));
         } else {
             flue.idle();
         }
@@ -202,7 +203,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         autoEject(level, ashOutput);
 
         if (!enabled) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (produced > 0) {
             status = runningStatus();
         } else if (isBufferFull()) {
@@ -235,11 +236,16 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         return burnTime;
     }
 
-    // What a burnt-out item leaves: Wood Ash, now and then, from charcoal.
-    private void leaveAsh(ServerLevel level, @Nullable Item burnt) {
+    public int getBurnTotal() {
+        return burnTotal;
+    }
+
+    // What a burnt-out item leaves: Wood Ash, now and then, from charcoal. Returns the ash that went in the slot.
+    private ItemStack leaveAsh(ServerLevel level, @Nullable Item burnt) {
         if (burnt != null && leavesAsh(burnt.getDefaultInstance()) && level.getRandom().nextDouble() < ArcforgeConfig.WOOD_ASH_CHANCE.getAsDouble()) {
-            addAsh(1);
+            return new ItemStack(ModItems.WOOD_ASH.get(), addAsh(1));
         }
+        return ItemStack.EMPTY;
     }
 
     public static boolean leavesAsh(ItemStack stack) {

@@ -99,6 +99,10 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
         return energy.getCapacityAsInt();
     }
 
+    public GeneratorEnergyHandler getEnergy() {
+        return energy;
+    }
+
     // FE comes out of energy faces (and unsided queries); nothing can put FE in.
     public @Nullable EnergyHandler getEnergyHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);

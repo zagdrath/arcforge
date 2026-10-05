@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.blockentity.multiblock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.List;
@@ -299,8 +300,8 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
         if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
             powered = isPowered(level);
         }
-        if (!redstoneMode.canRun(powered)) {
-            status = MachineStatus.DISABLED;
+        if (!controlState.isEnabled() || !redstoneMode.canRun(powered)) {
+            status = stoppedStatus();
         } else {
             status = digest(level);
         }
@@ -414,38 +415,49 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
             biogas.insert(0, FluidResource.of(gas), gas.getAmount(), tx);
             tx.commit();
         }
+        List<ItemStack> produced = new ArrayList<>();
         if (recipe.byproduct().isPresent() && level.getRandom().nextFloat() < recipe.byproductChance()) {
             ItemStack made = recipe.byproduct().get().create();
             ItemStack slot = items.getStack(SLOT_DIGESTATE);
             if (slot.isEmpty()) {
                 items.setStack(SLOT_DIGESTATE, made);
+                produced.add(made.copy());
             } else if (ItemStack.isSameItemSameComponents(slot, made)) {
-                items.setStack(SLOT_DIGESTATE, slot.copyWithCount(Math.min(slot.getMaxStackSize(), slot.getCount() + made.getCount())));
+                int count = Math.min(slot.getMaxStackSize(), slot.getCount() + made.getCount());
+                items.setStack(SLOT_DIGESTATE, slot.copyWithCount(count));
+                produced.add(made.copyWithCount(count - slot.getCount()));
             }
         }
-        scrub(gas.getAmount());
+        produced.add(scrub(gas.getAmount()));
+        // One item and the water it took when the lane started.
+        controlState.completed(produced, List.of(gas.copy()), 1, recipe.water());
         ArcforgeAdvancements.produced(this, ItemStack.EMPTY, gas.getFluid(), null);
     }
 
-    // The sulfur scrubbed out of this much Biogas, into the sulfur slot (what doesn't fit is lost).
-    // Public for the GameTests.
-    public void scrub(int biogasMb) {
+    // The sulfur scrubbed out of this much Biogas, into the sulfur slot (what doesn't fit is lost). Returns the Sulfur
+    // Dust added (maybe none). Public for the GameTests.
+    public ItemStack scrub(int biogasMb) {
         sulfurOwed += biogasMb / 1_000.0 * ArcforgeConfig.DIGESTER_SULFUR_PER_THOUSAND_MB.getAsDouble();
         int whole = (int) sulfurOwed;
         if (whole <= 0) {
-            return;
+            return ItemStack.EMPTY;
         }
         sulfurOwed -= whole;
         ItemStack slot = items.getStack(SLOT_SULFUR);
         ItemStack sulfur = new ItemStack(ModItems.SULFUR_DUST.get());
+        int added;
         if (slot.isEmpty()) {
-            items.setStack(SLOT_SULFUR, sulfur.copyWithCount(Math.min(whole, sulfur.getMaxStackSize())));
+            added = Math.min(whole, sulfur.getMaxStackSize());
+            items.setStack(SLOT_SULFUR, sulfur.copyWithCount(added));
         } else if (ItemStack.isSameItemSameComponents(slot, sulfur) && slot.getCount() < slot.getMaxStackSize()) {
-            items.setStack(SLOT_SULFUR, slot.copyWithCount(Math.min(slot.getMaxStackSize(), slot.getCount() + whole)));
+            int count = Math.min(slot.getMaxStackSize(), slot.getCount() + whole);
+            added = count - slot.getCount();
+            items.setStack(SLOT_SULFUR, slot.copyWithCount(count));
         } else {
-            return;
+            return ItemStack.EMPTY;
         }
         ArcforgeAdvancements.produced(this, sulfur, null, "biogas_sulfur");
+        return sulfur.copyWithCount(added);
     }
 
     public ItemStack getSulfur() {
@@ -510,6 +522,25 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
 
     public int getLanes() {
         return laneRecipe.length;
+    }
+
+    public int getHeatUsage() {
+        return heatUsage;
+    }
+
+    // The lead lane's progress and length (0 with every lane idle).
+    public int getProgress() {
+        return leadLane() >= 0 ? laneProgress[leadLane()] : 0;
+    }
+
+    public int getTotal() {
+        return leadLane() >= 0 ? laneTotal[leadLane()] : 0;
+    }
+
+    // The lead lane's recipe, on the server (null with every lane idle).
+    public @Nullable DigestingRecipe getLeadRecipe() {
+        int lead = leadLane();
+        return lead >= 0 && level instanceof ServerLevel serverLevel ? recipe(serverLevel, laneRecipe[lead]) : null;
     }
 
     public boolean isRunning() {

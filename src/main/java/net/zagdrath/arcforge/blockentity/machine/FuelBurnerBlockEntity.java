@@ -137,7 +137,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         BucketSlots.pour(items, SLOT_BUCKET_IN, SLOT_BUCKET_OUT, tank);
 
         // A redstone-disabled burner makes nothing but still gives away the heat it holds.
-        boolean enabled = redstoneMode.canRun(level.hasNeighborSignal(pos));
+        boolean enabled = canRun(level);
         heatPerTick = 0;
         burnedPerTick = 0;
         BurnerFuel fuel = BurnerFuel.of(tank.getResource(0));
@@ -151,11 +151,13 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         boolean hotEnough = heat.getStored() >= heat.storedAt(burnCelsius);
         boolean carbon = FlueGas.isCarbonFuel(tank.getResource(0).getFluid());
         if (enabled && !heat.isFull() && !hotEnough && fuel != null) {
+            int oxygen = oxy.getTank().getAmount();
             boolean onOxy = oxyReady && oxy.burn();
+            controlState.consumedFluid(oxygen - oxy.getTank().getAmount());
             burn(fuel, heat.storedAt(burnCelsius) - heat.getStored(), onOxy ? OxyFuel.heatMultiplier() : 1.0);
         }
         if (heatPerTick > 0 && FlueGas.hasFlueFace(sideConfig, getFacing())) {
-            flue.emit(heatPerTick, carbon);
+            controlState.producedFluid(flue.emit(heatPerTick, carbon));
         } else {
             flue.idle();
         }
@@ -172,7 +174,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         outputs.pushHeat(level, pos, getFacing(), sideConfig, heat, ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt());
 
         if (!enabled) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (heat.isFull() || hotEnough && fuel != null) {
             status = MachineStatus.FULL;
         } else if (heatPerTick > 0) {
@@ -193,8 +195,10 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
         if (fuelTaken < wanted) {
             int take = Math.min(tank.getAmount(), (int) Math.ceil(wanted - fuelTaken));
             try (Transaction tx = Transaction.openRoot()) {
-                fuelTaken += tank.extract(0, tank.getResource(0), take, tx);
+                int taken = tank.extract(0, tank.getResource(0), take, tx);
                 tx.commit();
+                fuelTaken += taken;
+                controlState.consumedFluid(taken);
             }
         }
         burnedPerTick = Math.min(wanted, fuelTaken);

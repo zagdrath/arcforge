@@ -136,8 +136,8 @@ public class OilPressBlockEntity extends MachineBlockEntity implements FluidInte
             setChanged();
         }
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (recipe.isEmpty()) {
             status = MachineStatus.IDLE;
         } else if (!fits(recipe.get().value())) {
@@ -183,15 +183,22 @@ public class OilPressBlockEntity extends MachineBlockEntity implements FluidInte
         }
         ItemStack input = items.getStack(SLOT_INPUT);
         items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
+        List<ItemStack> made = List.of();
         if (recipe.byproduct().isPresent() && level.getRandom().nextFloat() < recipe.byproductChance()) {
             ItemStack cake = recipe.byproduct().get().create();
+            made = List.of(cake.copy());
             ItemStack held = items.getStack(SLOT_CAKE);
             items.setStack(SLOT_CAKE, held.isEmpty() ? cake : held.copyWithCount(held.getCount() + cake.getCount()));
         }
+        controlState.completed(made, List.of(result.copy()), 1, 0);
     }
 
     public FilteredFluidTank getOil() {
         return oil;
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

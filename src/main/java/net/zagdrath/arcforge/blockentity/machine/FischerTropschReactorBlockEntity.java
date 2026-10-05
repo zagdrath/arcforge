@@ -30,6 +30,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
@@ -265,8 +266,8 @@ public class FischerTropschReactorBlockEntity extends MachineBlockEntity impleme
         }
         total = holder != null ? ticksFor(holder.value()) : 0;
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (holder == null) {
             status = syngas.getAmount() > 0 ? MachineStatus.MISSING_FLUID : MachineStatus.IDLE;
         } else if (catalystLeft() <= 0) {
@@ -305,28 +306,35 @@ public class FischerTropschReactorBlockEntity extends MachineBlockEntity impleme
 
     private void finish(FischerTropschRecipe recipe) {
         int[] made = recipe.products();
+        int used;
+        List<FluidStack> madeFluids = new java.util.ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
-            syngas.extract(0, syngas.getResource(0), recipe.input().amount(), tx);
+            used = syngas.extract(0, syngas.getResource(0), recipe.input().amount(), tx);
             for (int i = 0; i < 4; i++) {
                 if (made[i] > 0) {
                     products[i].insert(0, FluidResource.of(fluidOf(i)), made[i], tx);
+                    madeFluids.add(new FluidStack(fluidOf(i), made[i]));
                 }
             }
             tx.commit();
         }
         // The catalyst wears: one dust is used up every so many operations.
         ItemStack catalyst = items.getStack(SLOT_CATALYST);
+        int itemsUsed = 0;
         if (++catalystUsed >= catalystLife(catalyst)) {
             catalystUsed = 0;
             items.setStack(SLOT_CATALYST, catalyst.copyWithCount(catalyst.getCount() - 1));
+            itemsUsed = 1;
             if (catalyst.getCount() <= 1) {
                 catalystItem = null;
             }
         }
+        controlState.completed(List.of(), madeFluids, itemsUsed, used);
         ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.LIGHT_OIL.get(), "fischer_tropsch");
     }
 
-    private static Fluid fluidOf(int product) {
+    // The fluid of product tank TANK_NAPHTHA, TANK_LIGHT_OIL, TANK_HEAVY_OIL or TANK_WATER.
+    public static Fluid fluidOf(int product) {
         return switch (product) {
             case TANK_NAPHTHA -> ModFluids.NAPHTHA.get();
             case TANK_LIGHT_OIL -> ModFluids.LIGHT_OIL.get();
@@ -378,6 +386,15 @@ public class FischerTropschReactorBlockEntity extends MachineBlockEntity impleme
 
     public int getTotal() {
         return total;
+    }
+
+    // FE and HU used last tick.
+    public int getUsage() {
+        return usage;
+    }
+
+    public int getHeatUsage() {
+        return heatUsage;
     }
 
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---

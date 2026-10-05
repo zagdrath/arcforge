@@ -5,6 +5,9 @@
 
 package net.zagdrath.arcforge.machine;
 
+import java.util.List;
+import java.util.function.ObjIntConsumer;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -50,6 +53,12 @@ public class PressingLane {
     }
 
     public State tick(ServerLevel level, FilteredItemHandler items, ConsumerEnergyHandler energy, Settings settings) {
+        return tick(level, items, energy, settings, (produced, used) -> {});
+    }
+
+    // finished: told about each finished operation, with what it made (a fresh stack) and how many items it used.
+    public State tick(ServerLevel level, FilteredItemHandler items, ConsumerEnergyHandler energy, Settings settings,
+            ObjIntConsumer<List<ItemStack>> finished) {
         ItemStack dieStack = items.getStack(dieSlot);
         if (!dieStack.is(die)) {
             die = dieStack.getItem();
@@ -79,7 +88,8 @@ public class PressingLane {
         if (progress >= total) {
             items.setStack(inputSlot, input.copyWithCount(input.getCount() - recipe.count()));
             ItemStack current = items.getStack(outputSlot);
-            items.setStack(outputSlot, current.isEmpty() ? result : current.copyWithCount(current.getCount() + result.getCount()));
+            items.setStack(outputSlot, current.isEmpty() ? result.copy() : current.copyWithCount(current.getCount() + result.getCount()));
+            finished.accept(List.of(result), recipe.count());
             progress = 0;
         }
         return State.WORKING;

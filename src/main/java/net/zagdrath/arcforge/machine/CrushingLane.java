@@ -5,6 +5,10 @@
 
 package net.zagdrath.arcforge.machine;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.ObjIntConsumer;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -45,6 +49,12 @@ public class CrushingLane {
     }
 
     public State tick(ServerLevel level, FilteredItemHandler items, ConsumerEnergyHandler energy, Settings settings) {
+        return tick(level, items, energy, settings, (produced, used) -> {});
+    }
+
+    // finished: told about each finished operation, with what it made (fresh stacks) and how many items it used.
+    public State tick(ServerLevel level, FilteredItemHandler items, ConsumerEnergyHandler energy, Settings settings,
+            ObjIntConsumer<List<ItemStack>> finished) {
         ItemStack input = items.getStack(inputSlot);
         RecipeHolder<CrushingRecipe> holder = input.isEmpty() ? null : MachineRecipes.crushing(level, input).orElse(null);
         if (holder == null) {
@@ -63,7 +73,7 @@ public class CrushingLane {
         }
         progress++;
         if (progress >= total) {
-            finish(level, items, recipe, yield);
+            finished.accept(finish(level, items, recipe, yield), 1);
             progress = 0;
         }
         return State.WORKING;
@@ -87,17 +97,22 @@ public class CrushingLane {
         return ItemStack.isSameItemSameComponents(slot, product) && slot.getCount() + count <= slot.getMaxStackSize();
     }
 
-    private void finish(ServerLevel level, FilteredItemHandler items, CrushingRecipe recipe, int yield) {
+    // Returns copies of what it made.
+    private List<ItemStack> finish(ServerLevel level, FilteredItemHandler items, CrushingRecipe recipe, int yield) {
         ItemStack input = items.getStack(inputSlot);
         items.setStack(inputSlot, input.copyWithCount(input.getCount() - 1));
+        List<ItemStack> made = new ArrayList<>(2);
         recipe.result().ifPresent(template -> {
             ItemStack result = template.create();
+            made.add(result.copyWithCount(result.getCount() * yield));
             add(items, outputSlot, result, result.getCount() * yield);
         });
         if (recipe.bonus().isPresent() && level.getRandom().nextFloat() < recipe.bonusChance()) {
             ItemStack bonus = recipe.bonus().get().create();
+            made.add(bonus.copy());
             add(items, bonusSlot, bonus, bonus.getCount());
         }
+        return made;
     }
 
     private static void add(FilteredItemHandler items, int slot, ItemStack product, int count) {

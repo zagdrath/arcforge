@@ -185,12 +185,17 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     protected void tickMaster(ServerLevel level) {
         BucketSlots.pour(items, SLOT_BUCKET_IN, SLOT_BUCKET_OUT, water);
         boolean wasBoiling = boiling;
-        if (!redstoneMode.canRun(isPowered())) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
             boiling = false;
         } else {
-            status = switch (core.tick(maxHeatPerTick(),
-                    ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble())) {
+            // Only boiling moves water to steam during the core's tick, so the tanks' changes are what it boiled.
+            int waterBefore = water.getAmount();
+            int steamBefore = steam.getAmount();
+            BoilerCore.State boiled = core.tick(maxHeatPerTick(), ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble());
+            controlState.consumedFluid(Math.max(0, waterBefore - water.getAmount()));
+            controlState.producedFluid(Math.max(0, steam.getAmount() - steamBefore));
+            status = switch (boiled) {
                 case BOILING -> MachineStatus.BOILING;
                 case HEATING -> MachineStatus.HEATING;
                 case NO_WATER -> MachineStatus.NO_WATER;

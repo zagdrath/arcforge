@@ -116,11 +116,12 @@ public class MetalPressBlockEntity extends MachineBlockEntity {
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             PressingLane.Settings settings = new PressingLane.Settings(1.0 / speedMultiplier(), energyPerTick());
-            PressingLane.State laneState = lane.tick(level, items, energy, settings);
+            PressingLane.State laneState = lane.tick(level, items, energy, settings,
+                    (produced, used) -> controlState.completed(produced, List.of(), used, 0));
             status = switch (laneState) {
                 case WORKING -> MachineStatus.PRESSING;
                 case IDLE -> MachineStatus.IDLE;
@@ -139,6 +140,10 @@ public class MetalPressBlockEntity extends MachineBlockEntity {
 
     public PressingLane getLane() {
         return lane;
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.blockentity.multiblock;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
@@ -16,6 +17,8 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -143,7 +146,7 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
         MultiblockAutomation.pushOutputs(level, this);
     }
 
-    protected boolean isPowered(ServerLevel level) {
+    protected boolean isPowered(Level level) {
         for (BlockPos pos : BlockPos.betweenClosed(getMinCorner(), getMaxCorner())) {
             if (level.hasNeighborSignal(pos)) {
                 return true;
@@ -152,8 +155,47 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
         return false;
     }
 
+    // A signal into any casing counts, not just the centre's.
+    @Override
+    protected boolean canRun(Level level) {
+        return controlState.isEnabled() && redstoneMode.canRun(isPowered(level));
+    }
+
     public ConsumerEnergyHandler getEnergy() {
         return energy;
+    }
+
+    // FE/t drawn last tick.
+    public int getUsage() {
+        return usage;
+    }
+
+    // --- Lane statistics (the machine control API) ---
+
+    // The counts in a lane's slots (its input first, then its products), taken just before its tick.
+    protected int[] laneCounts(int... slots) {
+        int[] counts = new int[slots.length];
+        for (int i = 0; i < slots.length; i++) {
+            counts[i] = items.getStack(slots[i]).getCount();
+        }
+        return counts;
+    }
+
+    // After the lane's tick: only a finished operation takes from its input slot, and nothing else touches its slots
+    // during the tick, so a drop in the input is one operation and what the product slots gained is what it made.
+    protected void recordLane(int[] slots, int[] before) {
+        int used = before[0] - items.getStack(slots[0]).getCount();
+        if (used <= 0) {
+            return;
+        }
+        List<ItemStack> made = new ArrayList<>();
+        for (int i = 1; i < slots.length; i++) {
+            ItemStack now = items.getStack(slots[i]);
+            if (now.getCount() > before[i]) {
+                made.add(now.copyWithCount(now.getCount() - before[i]));
+            }
+        }
+        controlState.completed(made, List.of(), used, 0);
     }
 
     // The facing turned or the side configuration changed: every face of the cube may be different now.

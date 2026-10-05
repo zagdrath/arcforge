@@ -133,8 +133,8 @@ public class GrainDryerBlockEntity extends MachineBlockEntity implements FluidIn
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         heatUsage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             status = work(level);
         }
@@ -183,6 +183,11 @@ public class GrainDryerBlockEntity extends MachineBlockEntity implements FluidIn
             }
             ItemStack current = items.getStack(SLOT_OUTPUT);
             items.setStack(SLOT_OUTPUT, current.isEmpty() ? result : current.copyWithCount(current.getCount() + result.getCount()));
+            if (fromTank) {
+                controlState.completed(List.of(result.copy()), List.of(), 0, recipe.fluid().get().amount());
+            } else {
+                controlState.completed(result.copy(), 1);
+            }
             progress = 0;
         }
         setChanged();
@@ -194,6 +199,10 @@ public class GrainDryerBlockEntity extends MachineBlockEntity implements FluidIn
             return true;
         }
         return ItemStack.isSameItemSameComponents(slot, result) && slot.getCount() + result.getCount() <= slot.getMaxStackSize();
+    }
+
+    public int getHeatUsage() {
+        return heatUsage;
     }
 
     public HeatBuffer getHeat() {

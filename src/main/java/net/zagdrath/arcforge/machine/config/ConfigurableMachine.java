@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.machine.config;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 // A block entity whose sides (and optionally redstone mode) players configure from its GUI tabs.
 public interface ConfigurableMachine {
     SideMode getSideMode(RelativeSide side);
@@ -18,6 +20,11 @@ public interface ConfigurableMachine {
     // The modes the side-config tab cycles through, in order.
     default List<SideMode> getAllowedSideModes() {
         return List.of(SideMode.values());
+    }
+
+    // The current redstone mode, or null for a block without one.
+    default @Nullable RedstoneMode getRedstoneMode() {
+        return null;
     }
 
     default void setRedstoneMode(RedstoneMode mode) {}

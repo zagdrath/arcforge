@@ -5,8 +5,11 @@
 
 package net.zagdrath.arcforge.machine;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.function.ObjIntConsumer;
 
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
@@ -47,6 +50,12 @@ public class ItemLane {
 
     public State tick(ServerLevel level, FilteredItemHandler items, ConsumerEnergyHandler energy, Settings settings,
             Function<ItemStack, Optional<? extends ItemProcessingRecipe>> lookup) {
+        return tick(level, items, energy, settings, lookup, (produced, used) -> {});
+    }
+
+    // finished: told about each finished item, with what it made (fresh stacks) and how many items it used.
+    public State tick(ServerLevel level, FilteredItemHandler items, ConsumerEnergyHandler energy, Settings settings,
+            Function<ItemStack, Optional<? extends ItemProcessingRecipe>> lookup, ObjIntConsumer<List<ItemStack>> finished) {
         ItemStack input = items.getStack(inputSlot);
         ItemProcessingRecipe recipe = input.isEmpty() ? null : lookup.apply(input).orElse(null);
         if (recipe == null) {
@@ -63,7 +72,7 @@ public class ItemLane {
         }
         progress++;
         if (progress >= total) {
-            finish(level, items, inputSlot, outputSlot, bonusSlot, recipe);
+            finished.accept(finish(level, items, inputSlot, outputSlot, bonusSlot, recipe), 1);
             progress = 0;
         }
         return State.WORKING;
@@ -85,14 +94,20 @@ public class ItemLane {
         return ItemStack.isSameItemSameComponents(slot, product) && slot.getCount() + product.getCount() <= slot.getMaxStackSize();
     }
 
-    // Uses one input and makes the result, rolling the bonus once.
-    public static void finish(ServerLevel level, FilteredItemHandler items, int inputSlot, int outputSlot, int bonusSlot, ItemProcessingRecipe recipe) {
+    // Uses one input and makes the result, rolling the bonus once. Returns copies of what it made.
+    public static List<ItemStack> finish(ServerLevel level, FilteredItemHandler items, int inputSlot, int outputSlot, int bonusSlot, ItemProcessingRecipe recipe) {
         ItemStack input = items.getStack(inputSlot);
         items.setStack(inputSlot, input.copyWithCount(input.getCount() - 1));
-        add(items, outputSlot, recipe.result().create());
+        List<ItemStack> made = new ArrayList<>(2);
+        ItemStack result = recipe.result().create();
+        made.add(result.copy());
+        add(items, outputSlot, result);
         if (recipe.bonus().isPresent() && level.getRandom().nextFloat() < recipe.bonusChance()) {
-            add(items, bonusSlot, recipe.bonus().get().create());
+            ItemStack bonus = recipe.bonus().get().create();
+            made.add(bonus.copy());
+            add(items, bonusSlot, bonus);
         }
+        return made;
     }
 
     private static void add(FilteredItemHandler items, int slot, ItemStack product) {

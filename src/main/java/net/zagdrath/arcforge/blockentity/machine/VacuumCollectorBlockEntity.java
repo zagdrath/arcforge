@@ -35,6 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -91,6 +92,7 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
     private int scanTimer;
     private long lastCollected = Long.MIN_VALUE / 2;
     private int collected;
+    private int usage;
 
     public VacuumCollectorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.VACUUM_COLLECTOR.get(), pos, state, MACHINE_SLOTS, VacuumCollectorBlockEntity::isItemValid, UPGRADES,
@@ -179,8 +181,9 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
     }
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
+        usage = 0;
         if (!redstoneAllows(level)) {
-            status = MachineStatus.DISABLED;
+            status = stoppedStatus();
         } else if (--scanTimer <= 0) {
             scanTimer = UpgradeType.time(ArcforgeConfig.VACUUM_SCAN_INTERVAL.getAsInt(), upgrades(UpgradeType.SPEED));
             status = scan(level, pos);
@@ -211,6 +214,9 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
                 continue;
             }
             energy.consume(cost);
+            usage += cost;
+            // Each item entity taken counts as one operation.
+            controlState.completed(stack.copyWithCount(taken), 0);
             level.sendParticles(ParticleTypes.PORTAL, entity.getX(), entity.getY() + 0.2, entity.getZ(), 6, 0.1, 0.1, 0.1, 0.2);
             if (taken >= stack.getCount()) {
                 entity.discard();
@@ -240,6 +246,8 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
                     transaction.commit();
                 }
                 energy.consume(cost);
+                usage += cost;
+                controlState.completed(List.of(), List.of(new FluidStack(LiquidExperience.resource().getFluid(), amount)), 0, 0);
                 level.sendParticles(ParticleTypes.PORTAL, orb.getX(), orb.getY() + 0.1, orb.getZ(), 4, 0.1, 0.1, 0.1, 0.2);
                 orb.discard();
                 lastCollected = level.getGameTime();
@@ -281,6 +289,11 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
 
     public ConsumerEnergyHandler getEnergy() {
         return energy;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
     }
 
     // Item entities taken since it was loaded, for tests.

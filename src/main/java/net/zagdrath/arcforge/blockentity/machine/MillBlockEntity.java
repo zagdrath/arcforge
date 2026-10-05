@@ -131,14 +131,15 @@ public class MillBlockEntity extends MachineBlockEntity {
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             ItemLane.Settings settings = new ItemLane.Settings(ArcforgeConfig.MILL_TIME_MULTIPLIER.getAsDouble() / speedMultiplier(), energyPerTick());
             boolean working = false, blocked = false, unpowered = false;
             for (ItemLane lane : lanes) {
                 ItemLane.State laneState = lane.tick(level, items, energy, settings,
-                        stack -> MachineRecipes.milling(level, stack).map(RecipeHolder::value));
+                        stack -> MachineRecipes.milling(level, stack).map(RecipeHolder::value),
+                        (produced, used) -> controlState.completed(produced, List.of(), used, 0));
                 switch (laneState) {
                     case WORKING -> {
                         working = true;
@@ -160,6 +161,10 @@ public class MillBlockEntity extends MachineBlockEntity {
 
     public ItemLane getLane(int lane) {
         return lanes[lane];
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

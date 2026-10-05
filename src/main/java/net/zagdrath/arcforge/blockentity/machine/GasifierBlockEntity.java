@@ -157,8 +157,8 @@ public class GasifierBlockEntity extends MachineBlockEntity implements FluidInte
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         heatUsage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             status = work(level);
         }
@@ -210,16 +210,19 @@ public class GasifierBlockEntity extends MachineBlockEntity implements FluidInte
         progress++;
         if (progress >= total) {
             items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - recipe.count()));
+            int steamUsed = 0;
             try (Transaction tx = Transaction.openRoot()) {
                 if (recipe.steamAmount() > 0) {
-                    steam.extract(0, steam.getResource(0), recipe.steamAmount(), tx);
+                    steamUsed = steam.extract(0, steam.getResource(0), recipe.steamAmount(), tx);
                 }
                 syngas.insert(0, FluidResource.of(made), made.getAmount(), tx);
                 tx.commit();
             }
+            ItemStack ash = ItemStack.EMPTY;
             if (level.getRandom().nextDouble() < recipe.ashChanceOrDefault()) {
-                addAsh(recipe.ash().map(ash -> ash.create()).orElseGet(() -> new ItemStack(ModItems.WOOD_ASH.get())));
+                ash = addAsh(recipe.ash().map(template -> template.create()).orElseGet(() -> new ItemStack(ModItems.WOOD_ASH.get())));
             }
+            controlState.completed(ash.isEmpty() ? List.of() : List.of(ash), List.of(made.copy()), recipe.count(), steamUsed);
             ArcforgeAdvancements.produced(this, ItemStack.EMPTY, made.getFluid(), "gasifying");
             progress = 0;
             heatOwed = 0;
@@ -234,14 +237,18 @@ public class GasifierBlockEntity extends MachineBlockEntity implements FluidInte
         }
     }
 
-    // Into the ash slot, up to a stack; what doesn't fit is lost.
-    private void addAsh(ItemStack ash) {
+    // Into the ash slot, up to a stack; what doesn't fit is lost. Returns what went in.
+    private ItemStack addAsh(ItemStack ash) {
         ItemStack slot = items.getStack(SLOT_ASH);
         if (slot.isEmpty()) {
-            items.setStack(SLOT_ASH, ash);
+            items.setStack(SLOT_ASH, ash.copy());
+            return ash;
         } else if (ItemStack.isSameItemSameComponents(slot, ash)) {
-            items.setStack(SLOT_ASH, slot.copyWithCount(Math.min(slot.getMaxStackSize(), slot.getCount() + ash.getCount())));
+            int count = Math.min(slot.getMaxStackSize(), slot.getCount() + ash.getCount());
+            items.setStack(SLOT_ASH, slot.copyWithCount(count));
+            return ash.copyWithCount(count - slot.getCount());
         }
+        return ItemStack.EMPTY;
     }
 
     public HeatBuffer getHeat() {

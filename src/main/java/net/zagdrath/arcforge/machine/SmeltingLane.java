@@ -5,6 +5,9 @@
 
 package net.zagdrath.arcforge.machine;
 
+import java.util.List;
+import java.util.function.ObjIntConsumer;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
@@ -44,6 +47,12 @@ public class SmeltingLane {
     }
 
     public State tick(ServerLevel level, FilteredItemHandler items, ConsumerEnergyHandler energy, StoredExperience experience, Settings settings) {
+        return tick(level, items, energy, experience, settings, (produced, used) -> {});
+    }
+
+    // finished: told about each finished item, with what it made (a fresh stack) and how many items it used.
+    public State tick(ServerLevel level, FilteredItemHandler items, ConsumerEnergyHandler energy, StoredExperience experience, Settings settings,
+            ObjIntConsumer<List<ItemStack>> finished) {
         ItemStack input = items.getStack(inputSlot);
         RecipeHolder<SmeltingRecipe> holder = input.isEmpty() ? null : MachineRecipes.smelting(level, input).orElse(null);
         if (holder == null) {
@@ -64,8 +73,9 @@ public class SmeltingLane {
         if (progress >= total) {
             items.setStack(inputSlot, input.copyWithCount(input.getCount() - 1));
             ItemStack current = items.getStack(outputSlot);
-            items.setStack(outputSlot, current.isEmpty() ? result : current.copyWithCount(current.getCount() + result.getCount()));
+            items.setStack(outputSlot, current.isEmpty() ? result.copy() : current.copyWithCount(current.getCount() + result.getCount()));
             experience.add(recipe.experience());
+            finished.accept(List.of(result), 1);
             progress = 0;
         }
         return State.WORKING;

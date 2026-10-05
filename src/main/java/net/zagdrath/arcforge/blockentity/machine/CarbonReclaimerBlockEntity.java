@@ -29,6 +29,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
@@ -181,8 +182,8 @@ public class CarbonReclaimerBlockEntity extends MachineBlockEntity implements Fl
         RecipeHolder<CarbonReclaimingRecipe> shown = holder != null ? holder : MachineRecipes.anyCarbonReclaiming(level).orElse(null);
         cost = shown != null ? costFor(level, shown) : 0;
 
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else if (holder == null) {
             status = carbonDioxide.getAmount() > 0 || hydrogen.getAmount() > 0 ? MachineStatus.MISSING_FLUID : MachineStatus.IDLE;
         } else if (!fits(holder.value())) {
@@ -228,7 +229,9 @@ public class CarbonReclaimerBlockEntity extends MachineBlockEntity implements Fl
             tx.commit();
         }
         ItemStack slot = items.getStack(SLOT_OUTPUT);
-        items.setStack(SLOT_OUTPUT, slot.isEmpty() ? result : slot.copyWithCount(slot.getCount() + result.getCount()));
+        items.setStack(SLOT_OUTPUT, slot.isEmpty() ? result.copy() : slot.copyWithCount(slot.getCount() + result.getCount()));
+        controlState.completed(List.of(result), recipe.waterAmount() > 0 ? List.of(new FluidStack(Fluids.WATER, recipe.waterAmount())) : List.of(), 0,
+                recipe.carbonDioxideAmount() + recipe.hydrogenAmount());
         ArcforgeAdvancements.produced(this, result, null, "carbon_reclaiming");
     }
 
@@ -259,6 +262,11 @@ public class CarbonReclaimerBlockEntity extends MachineBlockEntity implements Fl
 
     public int getCost() {
         return cost;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
     }
 
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---

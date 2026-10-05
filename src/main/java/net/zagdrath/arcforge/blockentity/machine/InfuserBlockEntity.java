@@ -155,8 +155,8 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         BucketSlots.pour(items, SLOT_BUCKET_IN, SLOT_BUCKET_OUT, tank);
         usage = 0;
-        if (!redstoneMode.canRun(level.hasNeighborSignal(pos))) {
-            status = MachineStatus.DISABLED;
+        if (!canRun(level)) {
+            status = stoppedStatus();
         } else {
             status = work(level);
         }
@@ -205,6 +205,9 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
             items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
             ItemStack current = items.getStack(SLOT_OUTPUT);
             items.setStack(SLOT_OUTPUT, current.isEmpty() ? result : current.copyWithCount(current.getCount() + result.getCount()));
+            boolean additiveUsed = recipe.additive().isPresent();
+            controlState.completed(List.of(result.copy()), List.of(), 1 + (additiveUsed ? recipe.additive().get().count() : 0),
+                    additiveUsed ? 0 : recipe.fluidAmount());
             progress = 0;
         }
         setChanged();
@@ -216,6 +219,18 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
             return true;
         }
         return ItemStack.isSameItemSameComponents(slot, result) && slot.getCount() + result.getCount() <= slot.getMaxStackSize();
+    }
+
+    public int getProgress() {
+        return progress;
+    }
+
+    public int getTotal() {
+        return total;
+    }
+
+    public int getUsage() {
+        return usage;
     }
 
     public ConsumerEnergyHandler getEnergy() {

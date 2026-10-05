@@ -68,6 +68,7 @@ public class BlockPlacerBlockEntity extends MachineBlockEntity {
     private int cooldown;
     private long lastPlaced = Long.MIN_VALUE / 2;
     private int placements;
+    private int usage;
 
     public BlockPlacerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.BLOCK_PLACER.get(), pos, state, SLOTS, (slot, resource) -> slot < SLOTS, UPGRADES,
@@ -116,13 +117,14 @@ public class BlockPlacerBlockEntity extends MachineBlockEntity {
     }
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
+        usage = 0;
         boolean allowed = redstoneAllows(level);
         boolean pulse = redstoneMode == RedstoneMode.PULSE;
         if (cooldown > 0) {
             cooldown--;
         }
         if (!allowed) {
-            status = pulse ? MachineStatus.WAITING_PULSE : MachineStatus.DISABLED;
+            status = pulse && isControlEnabled() ? MachineStatus.WAITING_PULSE : stoppedStatus();
         } else if (pulse || cooldown <= 0) {
             cooldown = interval();
             status = tryPlace(level, pos);
@@ -164,6 +166,9 @@ public class BlockPlacerBlockEntity extends MachineBlockEntity {
                 }
                 items.setStack(slot, stack.copyWithCount(stack.getCount() - 1));
                 energy.consume(cost);
+                usage = cost;
+                // A placement makes no item: one block item used.
+                controlState.completed(List.of(), List.of(), 1, 0);
                 lastPlaced = level.getGameTime();
                 placements++;
                 setChanged();
@@ -189,6 +194,11 @@ public class BlockPlacerBlockEntity extends MachineBlockEntity {
 
     public ConsumerEnergyHandler getEnergy() {
         return energy;
+    }
+
+    // FE used last tick.
+    public int getUsage() {
+        return usage;
     }
 
     // Blocks placed since it was loaded, for tests.

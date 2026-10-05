@@ -87,9 +87,11 @@ public class FireboxBlockEntity extends BurnerBlockEntity {
             return 0;
         }
         double made = ArcforgeConfig.FIREBOX_HEAT_PER_TICK.getAsInt() * speedMultiplier() * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT));
+        int oxygen = oxy.getTank().getAmount();
         if (oxy.burn()) {
             made *= OxyFuel.heatMultiplier();
         }
+        controlState.consumedFluid(oxygen - oxy.getTank().getAmount());
         return heat.add((int) Math.round(made));
     }
 
