@@ -33,8 +33,21 @@ Suggested version: **2.5.0** (minor: a new feature; worlds and configs carry ove
   - change its redstone mode, sides or ports, auto-eject and machine-specific options;
   - read its statistics and listen for status changes, finished operations and faults.
 
-  The API is published separately as `net.zagdrath.arcforge:arcforge-api:1.0.0` (interfaces only, with its own semantic
-  version). See [docs/API.md](docs/API.md). GameTests check it on every machine and every multiblock.
+  The API is published separately as `net.zagdrath.arcforge:arcforge-api` (interfaces only, with its own semantic
+  version; this release ships 1.1.0). See [docs/API.md](docs/API.md). GameTests check it on every machine and every
+  multiblock.
+- **Gas API for other mods** (API 1.1.0). Other mods can now store and move Arcforge gases without sorting them from
+  liquids:
+  - a gas identity (`Gas`), with its id, name, colour, temperature in kelvin and steam grade, and a lookup of every gas,
+    other mods' gases included, for search and display;
+  - a gas handler block capability, `arcforge:gas_handler`. It is on every machine with a gas tank, on every block of
+    such a formed multiblock, and on Pressurized Cylinders. It lists the gas tanks with their gas, amount and capacity,
+    and inserts and extracts by gas and amount through each tank's own rules;
+  - the same capability on Gas Cartridges and Jetpacks, so another mod's GUI can fill and empty them.
+
+  Amounts are in mB, as for fluids. Gas colours come from a new synced data map, `arcforge:gas_properties`, which packs
+  and other mods can add their own gases' colours to. GameTests check the registry, a Pressurized Cylinder, the Haber
+  Reactor and Electrolyzer, the gas items, and that every machine a pipe can feed gas into has a gas handler.
 - **Machines can be switched off remotely.** A mod using the API can switch any machine or multiblock off. It then
   stops as if its redstone mode stopped it, keeps its contents, and its GUI shows the new status **Switched off
   remotely**. Machines are on unless switched off this way, and the switch is saved with the machine.

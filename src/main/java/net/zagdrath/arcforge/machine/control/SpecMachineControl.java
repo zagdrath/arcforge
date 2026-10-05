@@ -32,6 +32,7 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
+import net.zagdrath.arcforge.api.gas.GasHandler;
 import net.zagdrath.arcforge.api.machine.resource.EnergyRole;
 import net.zagdrath.arcforge.api.machine.resource.HeatRole;
 import net.zagdrath.arcforge.api.machine.settings.InstalledUpgrade;
@@ -55,6 +56,7 @@ import net.zagdrath.arcforge.api.machine.settings.SideModes;
 import net.zagdrath.arcforge.api.machine.resource.SlotRole;
 import net.zagdrath.arcforge.api.machine.StructureSize;
 import net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity;
+import net.zagdrath.arcforge.gas.FluidGasHandler;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.item.tool.MachineSettings.Frame;
 import net.zagdrath.arcforge.machine.config.ConfigurableMachine;
@@ -63,6 +65,7 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.security.Owned;
+import net.zagdrath.arcforge.transfer.Transactions;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
@@ -79,6 +82,8 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
     private final @Nullable MachineHeat heat;
     private final MachineSettings settings = new Settings();
     private final MachineStatistics statistics = new Statistics();
+    private @Nullable GasHandler gases;
+    private boolean gasesResolved;
 
     SpecMachineControl(MachineControlSpec<T> spec, T machine, MachineControlState state) {
         this.spec = spec;
@@ -237,6 +242,20 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
     @Override
     public Optional<MachineFluids> fluids() {
         return Optional.ofNullable(fluids);
+    }
+
+    // The gas API's view (GasCapabilities.BLOCK): the tanks whose own filter takes some gas (bar liquid tanks), with their roles, through
+    // the same role-checked tanks as fluids(). Worked out on first use; null if the machine has no gas tank.
+    @Nullable GasHandler gases() {
+        if (!gasesResolved) {
+            gasesResolved = true;
+            gases = fluids == null ? null : FluidGasHandler.of(fluids.handler(),
+                    tank -> !spec.tanks.get(tank).liquid()
+                            && FluidGasHandler.holdsGas(spec.tanks.get(tank).handler().apply(machine), spec.tanks.get(tank).index()),
+                    tank -> spec.tanks.get(tank).role().insertable(),
+                    tank -> spec.tanks.get(tank).role().extractable());
+        }
+        return gases;
     }
 
     @Override
@@ -412,7 +431,7 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
             }
             ResourceHandler<ItemResource> handler = handler();
             ItemResource resource = ItemResource.of(stack);
-            int inserted = RoleGatedHandler.transact(simulate, tx -> handler.insert(slot, resource, stack.getCount(), tx));
+            int inserted = Transactions.transact(simulate, tx -> handler.insert(slot, resource, stack.getCount(), tx));
             return stack.copyWithCount(stack.getCount() - inserted);
         }
 
@@ -423,7 +442,7 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
             }
             ResourceHandler<ItemResource> handler = handler();
             ItemResource resource = ItemResource.of(stack);
-            int inserted = RoleGatedHandler.transact(simulate, tx -> handler.insert(resource, stack.getCount(), tx));
+            int inserted = Transactions.transact(simulate, tx -> handler.insert(resource, stack.getCount(), tx));
             return stack.copyWithCount(stack.getCount() - inserted);
         }
 
@@ -437,7 +456,7 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
             if (resource.isEmpty()) {
                 return ItemStack.EMPTY;
             }
-            int extracted = RoleGatedHandler.transact(simulate, tx -> handler.extract(slot, resource, amount, tx));
+            int extracted = Transactions.transact(simulate, tx -> handler.extract(slot, resource, amount, tx));
             return extracted == 0 ? ItemStack.EMPTY : resource.toStack(extracted);
         }
     }
@@ -491,7 +510,7 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
             }
             Tanks tanks = new Tanks();
             FluidResource resource = FluidResource.of(fluid);
-            return RoleGatedHandler.transact(simulate, tx -> tanks.insert(index, resource, fluid.getAmount(), tx));
+            return Transactions.transact(simulate, tx -> tanks.insert(index, resource, fluid.getAmount(), tx));
         }
 
         @Override
@@ -501,7 +520,7 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
             }
             Tanks tanks = new Tanks();
             FluidResource resource = FluidResource.of(fluid);
-            return RoleGatedHandler.transact(simulate, tx -> tanks.insert(resource, fluid.getAmount(), tx));
+            return Transactions.transact(simulate, tx -> tanks.insert(resource, fluid.getAmount(), tx));
         }
 
         @Override
@@ -514,7 +533,7 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
             if (resource.isEmpty()) {
                 return FluidStack.EMPTY;
             }
-            int extracted = RoleGatedHandler.transact(simulate, tx -> tanks.extract(index, resource, amount, tx));
+            int extracted = Transactions.transact(simulate, tx -> tanks.extract(index, resource, amount, tx));
             return extracted == 0 ? FluidStack.EMPTY : resource.toStack(extracted);
         }
 

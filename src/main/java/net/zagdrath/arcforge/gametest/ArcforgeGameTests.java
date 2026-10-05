@@ -482,6 +482,11 @@ public final class ArcforgeGameTests {
         TESTS.put("machine_control_box_takes_over", MachineControlGameTests::boxTakesOver);
         TESTS.put("machine_control_single_block_roles", MachineControlGameTests::singleBlockRoles);
         TESTS.put("machine_control_array_roles", MachineControlGameTests::multiblockRoles);
+        TESTS.put("gas_api_registry", GasApiGameTests::registry);
+        TESTS.put("gas_api_cylinder_tank", GasApiGameTests::cylinderTank);
+        TESTS.put("gas_api_machine_tanks", GasApiGameTests::machineTanks);
+        TESTS.put("gas_api_machine_coverage", GasApiGameTests::machineCoverage);
+        TESTS.put("gas_api_items", GasApiGameTests::items);
         SOLAR_TESTS.put("solar_zero_at_night", SolarGameTests::zeroAtNight);
         SOLAR_TESTS.put("solar_controller_rebuild", SolarGameTests::controllerRebuild);
         SOLAR_TESTS.put("solar_peak_at_noon", SolarGameTests::peakAtNoon);

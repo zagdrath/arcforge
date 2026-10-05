@@ -22,13 +22,13 @@ public final class ArcforgeApi {
     public static final String MOD_ID = "arcforge";
 
     /** The full API version, {@code MAJOR.MINOR.PATCH}. This is also the version of the published API jar. */
-    public static final String API_VERSION = "1.0.0";
+    public static final String API_VERSION = "1.1.0";
 
     /** The major part of {@link #API_VERSION}. */
     public static final int API_VERSION_MAJOR = 1;
 
     /** The minor part of {@link #API_VERSION}. */
-    public static final int API_VERSION_MINOR = 0;
+    public static final int API_VERSION_MINOR = 1;
 
     /** The patch part of {@link #API_VERSION}. */
     public static final int API_VERSION_PATCH = 0;

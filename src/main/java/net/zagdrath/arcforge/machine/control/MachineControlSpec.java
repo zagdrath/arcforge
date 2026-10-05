@@ -56,7 +56,9 @@ public final class MachineControlSpec<T extends BlockEntity> {
     record Items<T>(Function<T, ResourceHandler<ItemResource>> contents, @Nullable Function<T, ResourceHandler<ItemResource>> automation,
             Map<Integer, SlotRole> roles, SlotRole otherwise) {}
 
-    record Tank<T>(SlotRole role, Function<T, ResourceHandler<FluidResource>> handler, int index) {}
+    // liquid: never holds a gas, though its filter doesn't say so (an output tank that takes anything), so the gas API
+    // leaves it out.
+    record Tank<T>(SlotRole role, Function<T, ResourceHandler<FluidResource>> handler, int index, boolean liquid) {}
 
     record Heat<T>(HeatRole role, ToLongFunction<T> stored, ToLongFunction<T> capacity, ToIntFunction<T> temperature,
             ToIntFunction<T> maxTemperature, ToLongFunction<T> perTick, @Nullable Function<T, @Nullable HeatHandler> io) {}
@@ -194,7 +196,15 @@ public final class MachineControlSpec<T extends BlockEntity> {
 
         @SuppressWarnings("unchecked")
         public Builder<T> tank(SlotRole role, Function<T, ? extends ResourceHandler<FluidResource>> handler, int index) {
-            tanks.add(new Tank<>(role, (Function<T, ResourceHandler<FluidResource>>) handler, index));
+            tanks.add(new Tank<>(role, (Function<T, ResourceHandler<FluidResource>>) handler, index, false));
+            return this;
+        }
+
+        // A tank that only ever holds liquids although its filter takes anything (a pump's, a melter's output), so the gas
+        // API doesn't list it as a gas tank.
+        @SuppressWarnings("unchecked")
+        public Builder<T> liquidTank(SlotRole role, Function<T, ? extends ResourceHandler<FluidResource>> handler) {
+            tanks.add(new Tank<>(role, (Function<T, ResourceHandler<FluidResource>>) handler, 0, true));
             return this;
         }
 

@@ -153,7 +153,7 @@ public final class ProcessingMachineSpecs {
                 .slot(OilPressBlockEntity.SLOT_INPUT, SlotRole.INPUT)
                 .slot(OilPressBlockEntity.SLOT_CAKE, SlotRole.OUTPUT)
                 .items(OilPressBlockEntity::getItems, null)
-                .tank(SlotRole.OUTPUT, OilPressBlockEntity::getOil)
+                .liquidTank(SlotRole.OUTPUT, OilPressBlockEntity::getOil)
                 .fluidAutomation(be -> be.getFluidHandler(null))
                 .progress(OilPressBlockEntity::getProgress, OilPressBlockEntity::getTotal)
                 .fluidOutputs(be -> currentFluid(be, be.getProgress(), level -> MachineRecipes
@@ -210,7 +210,7 @@ public final class ProcessingMachineSpecs {
                 .energy(EnergyRole.CONSUMER, ArcMelterBlockEntity::getEnergy, ArcMelterBlockEntity::getUsage)
                 .slot(ArcMelterBlockEntity.SLOT_INPUT, SlotRole.INPUT)
                 .items(ArcMelterBlockEntity::getItems, be -> be.getItemHandler(null))
-                .tank(SlotRole.OUTPUT, ArcMelterBlockEntity::getTank)
+                .liquidTank(SlotRole.OUTPUT, ArcMelterBlockEntity::getTank)
                 .fluidAutomation(be -> be.getFluidHandler(null))
                 .progress(ArcMelterBlockEntity::getProgress, ArcMelterBlockEntity::getTotal)
                 .fluidOutputs(be -> currentFluid(be, be.getProgress(), level -> MachineRecipes

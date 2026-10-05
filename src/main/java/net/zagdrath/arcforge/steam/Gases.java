@@ -5,24 +5,22 @@
 
 package net.zagdrath.arcforge.steam;
 
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
-import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.api.gas.GasRegistry;
 
 // Gases are fluids that are lighter than air (a negative FluidType density), or tagged #arcforge:gases so
 // other mods' gases can join in. Pressurized Conduits and Pressurized Cylinders carry only gases; Fluid
-// Conduits and Fluid Tanks carry everything else.
+// Conduits and Fluid Tanks carry everything else. The gas API's GasRegistry is the definition; these are shorthands.
 public final class Gases {
-    public static final TagKey<Fluid> TAG = TagKey.create(Registries.FLUID, Identifier.fromNamespaceAndPath(Arcforge.MODID, "gases"));
+    public static final TagKey<Fluid> TAG = GasRegistry.TAG;
 
     private Gases() {}
 
     public static boolean isGas(Fluid fluid) {
-        return fluid.getFluidType().getDensity() < 0 || fluid.defaultFluidState().is(TAG);
+        return GasRegistry.isGas(fluid);
     }
 
     public static boolean isGas(FluidResource resource) {

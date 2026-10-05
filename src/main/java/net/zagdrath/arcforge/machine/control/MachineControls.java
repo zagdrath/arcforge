@@ -21,6 +21,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.api.gas.GasHandler;
 import net.zagdrath.arcforge.api.machine.MachineCapabilities;
 import net.zagdrath.arcforge.api.machine.MachineControl;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
@@ -79,7 +80,7 @@ public final class MachineControls {
     }
 
     // The block entity of the machine the block at pos belongs to (itself, for a machine), or null.
-    private static @Nullable BlockEntity resolve(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
+    public static @Nullable BlockEntity resolve(Level level, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) {
         if (blockEntity != null && isPrimary(blockEntity)) {
             return blockEntity;
         }
@@ -148,6 +149,11 @@ public final class MachineControls {
         MachineControl control = create(spec, blockEntity, state);
         state.setControl(control);
         return control;
+    }
+
+    // A machine's gas tanks for the gas API (GasCapabilities.BLOCK), from its own block entity; null if it has none.
+    public static @Nullable GasHandler gases(BlockEntity machine) {
+        return of(machine) instanceof SpecMachineControl<?> control ? control.gases() : null;
     }
 
     private static <T extends BlockEntity> MachineControl create(MachineControlSpec<T> spec, BlockEntity blockEntity, MachineControlState state) {

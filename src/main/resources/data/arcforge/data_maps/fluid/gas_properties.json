@@ -1,0 +1,43 @@
+{
+  "values": {
+    "arcforge:steam": {
+      "color": "#F4F7F9"
+    },
+    "arcforge:high_pressure_steam": {
+      "color": "#CFE6FF"
+    },
+    "arcforge:superheated_steam": {
+      "color": "#FFE2C4"
+    },
+    "arcforge:exhaust_steam": {
+      "color": "#9EA6AE"
+    },
+    "arcforge:hydrogen": {
+      "color": "#EAF2FA"
+    },
+    "arcforge:oxygen": {
+      "color": "#9FD4F2"
+    },
+    "arcforge:carbon_dioxide": {
+      "color": "#B4BCC4"
+    },
+    "arcforge:nitrogen": {
+      "color": "#C4C0EC"
+    },
+    "arcforge:ammonia": {
+      "color": "#E2F0A0"
+    },
+    "arcforge:biogas": {
+      "color": "#A8B478"
+    },
+    "arcforge:chlorine": {
+      "color": "#BCD24A"
+    },
+    "arcforge:ethylene": {
+      "color": "#D2EADA"
+    },
+    "arcforge:syngas": {
+      "color": "#E2CCA4"
+    }
+  }
+}

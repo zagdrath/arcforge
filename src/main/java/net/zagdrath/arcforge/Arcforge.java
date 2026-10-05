@@ -21,6 +21,7 @@ import net.zagdrath.arcforge.gametest.ArcforgeGameTests;
 import net.zagdrath.arcforge.gametest.TestFixtures;
 import net.zagdrath.arcforge.item.tool.FoundrySuit;
 import net.zagdrath.arcforge.multiblock.PortStore;
+import net.zagdrath.arcforge.gas.GasHandlers;
 import net.zagdrath.arcforge.machine.control.MachineControls;
 import net.zagdrath.arcforge.network.ArcforgeNetwork;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -58,6 +59,7 @@ public class Arcforge {
         ModDataComponents.register(modEventBus);
         ModCapabilities.register(modEventBus);
         MachineControls.register(modEventBus);
+        GasHandlers.register(modEventBus);
         ModDataMaps.register(modEventBus);
         ModTriggers.register(modEventBus);
         ModChunkLoading.register(modEventBus);

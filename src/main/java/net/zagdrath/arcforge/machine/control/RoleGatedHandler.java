@@ -6,11 +6,9 @@
 package net.zagdrath.arcforge.machine.control;
 
 import java.util.function.IntFunction;
-import java.util.function.ToIntFunction;
 
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.resource.Resource;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import net.zagdrath.arcforge.api.machine.resource.SlotRole;
 
@@ -101,19 +99,5 @@ final class RoleGatedHandler<T extends Resource> implements ResourceHandler<T> {
             extracted += extract(index, resource, amount - extracted, transaction);
         }
         return extracted;
-    }
-
-    // Runs a transfer in its own transaction (nested in the caller's, if one is open), committing it unless simulating.
-    // getCurrentOpenedTransaction is meant for exactly this: a method with no transaction parameter.
-    @SuppressWarnings("deprecation")
-    static int transact(boolean simulate, ToIntFunction<TransactionContext> transfer) {
-        TransactionContext outer = Transaction.getLifecycle() == Transaction.Lifecycle.OPEN ? Transaction.getCurrentOpenedTransaction() : null;
-        try (Transaction transaction = Transaction.open(outer)) {
-            int moved = transfer.applyAsInt(transaction);
-            if (!simulate) {
-                transaction.commit();
-            }
-            return moved;
-        }
     }
 }

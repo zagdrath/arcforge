@@ -152,6 +152,7 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
+import net.zagdrath.arcforge.steam.GasTints;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.client.renderer.blockentity.ClocheRenderer;
 import net.zagdrath.arcforge.client.screen.machine.ClocheScreen;
@@ -341,23 +342,19 @@ public class ArcforgeClient {
                 null);
     }
 
-    private static final int EXHAUST_STEAM_TINT = 0xFF9EA6AE;
+    // The gases' tints are in GasTints, shared with the gas API's colours.
+    private static final int EXHAUST_STEAM_TINT = GasTints.EXHAUST_STEAM;
     // Seawater: vanilla water tinted a deep sea green-blue (vanilla's default water is 0x3F76E4).
     public static final int SEAWATER_TINT = 0xFF2A8C9E;
-    public static final int HYDROGEN_TINT = 0xFFEAF2FA;
-    public static final int OXYGEN_TINT = 0xFF9FD4F2;
-    // Carbon Dioxide: a cool grey, darker than steam.
-    public static final int CARBON_DIOXIDE_TINT = 0xFFB4BCC4;
-    // Farm chemistry: Nitrogen a cold lilac, Ammonia a pale sharp yellow-green, Biogas a murky olive.
-    public static final int NITROGEN_TINT = 0xFFC4C0EC;
-    public static final int AMMONIA_TINT = 0xFFE2F0A0;
-    public static final int BIOGAS_TINT = 0xFFA8B478;
-    // Chlorine: its own sickly greenish yellow, deeper and greener than Ammonia.
-    public static final int CHLORINE_TINT = 0xFFBCD24A;
-    // Ethylene: colourless, so a faint cool mint, paler than Hydrogen is white and greener than Oxygen.
-    public static final int ETHYLENE_TINT = 0xFFD2EADA;
-    // Syngas: colourless too, so a warm pale tan, set apart from the cool gases and Biogas's olive.
-    public static final int SYNGAS_TINT = 0xFFE2CCA4;
+    public static final int HYDROGEN_TINT = GasTints.HYDROGEN;
+    public static final int OXYGEN_TINT = GasTints.OXYGEN;
+    public static final int CARBON_DIOXIDE_TINT = GasTints.CARBON_DIOXIDE;
+    public static final int NITROGEN_TINT = GasTints.NITROGEN;
+    public static final int AMMONIA_TINT = GasTints.AMMONIA;
+    public static final int BIOGAS_TINT = GasTints.BIOGAS;
+    public static final int CHLORINE_TINT = GasTints.CHLORINE;
+    public static final int ETHYLENE_TINT = GasTints.ETHYLENE;
+    public static final int SYNGAS_TINT = GasTints.SYNGAS;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(

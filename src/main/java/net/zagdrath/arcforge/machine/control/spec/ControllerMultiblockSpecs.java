@@ -185,7 +185,7 @@ public final class ControllerMultiblockSpecs {
                 .slot(CarbonizerBlockEntity.SLOT_BUCKET_IN, SlotRole.INPUT)
                 .slot(CarbonizerBlockEntity.SLOT_BUCKET_OUT, SlotRole.OUTPUT)
                 .items(CarbonizerBlockEntity::getItems, be -> be.getItemHandler(null))
-                .tank(SlotRole.OUTPUT, CarbonizerBlockEntity::getTank)
+                .liquidTank(SlotRole.OUTPUT, CarbonizerBlockEntity::getTank)
                 .progress(CarbonizerBlockEntity::getLeadProgress, CarbonizerBlockEntity::getLeadTime)
                 .build());
 

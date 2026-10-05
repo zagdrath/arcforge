@@ -13,6 +13,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.datamaps.DataMapType;
 import net.neoforged.neoforge.registries.datamaps.RegisterDataMapTypesEvent;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.api.gas.GasRegistry;
 import net.zagdrath.arcforge.farming.ClocheSoil;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.item.tool.JetpackFuel;
@@ -45,6 +46,8 @@ public final class ModDataMaps {
             event.register(BURNER_FUELS);
             event.register(JETPACK_FUELS);
             event.register(CLOCHE_SOILS);
+            // The gas API's gas colours (its own type, declared in GasRegistry).
+            event.register(GasRegistry.PROPERTIES);
         });
     }
 }

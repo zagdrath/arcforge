@@ -2,9 +2,10 @@
 
 Other mods can use this API to monitor and control Arcforge machines and multiblocks: read their status, progress,
 energy, items, fluids and heat; move items and fluids through the slots the machine allows; change their settings; read
-their statistics; and listen for events instead of polling. Encoded Logistics is the first consumer.
+their statistics; and listen for events instead of polling. They can also store and move Arcforge gases in machines,
+Pressurized Cylinders and gas items. Encoded Logistics is the first consumer.
 
-- **Artifact:** `net.zagdrath.arcforge:arcforge-api:1.0.0`. Compile against it only; Arcforge provides it at runtime.
+- **Artifact:** `net.zagdrath.arcforge:arcforge-api:1.1.0`. Compile against it only; Arcforge provides it at runtime.
 - **Packages** (all under `net.zagdrath.arcforge.api`):
 
   | Package | Contents |
@@ -14,7 +15,9 @@ their statistics; and listen for events instead of polling. Encoded Logistics is
   | `api.machine.status` | `MachineStatus`, `MachineStatistics`, `MachineListener`, `CompletedOperation` |
   | `api.machine.resource` | `MachineEnergy`, `MachineItems`, `MachineFluids`, `MachineHeat`, `SlotRole`, `EnergyRole`, `HeatRole` |
   | `api.machine.settings` | `MachineSettings`, `SettingResult`, `RedstoneMode`, `MachineSide`, `SideModes`, `MachinePort`, `MachineOption`, `OptionType`, `InstalledUpgrade` |
-- **Entry point:** the block capability `MachineCapabilities.MACHINE_CONTROL`.
+  | `api.gas` | `GasCapabilities` (the gas entry point), `GasHandler`, `GasTank`, `Gas`, `GasRegistry`, `GasProperties`, `SteamGrade` (since 1.1.0) |
+- **Entry points:** the block capability `MachineCapabilities.MACHINE_CONTROL`; for gases, the block and item
+  capabilities `GasCapabilities.BLOCK` and `GasCapabilities.ITEM`.
 - **Requires:** Arcforge 2.5.0 or later, on NeoForge 26.3.
 
 The API jar holds only interfaces, enums, records and constants. It never refers to Arcforge internals, and nothing in it
@@ -26,6 +29,7 @@ changes Arcforge's behaviour. Arcforge's own jar contains the same classes, so a
 - [Rules](#rules)
 - [Looking a machine up](#looking-a-machine-up)
 - [The interfaces](#the-interfaces)
+- [Gases](#gases)
 - [Version policy](#version-policy)
 - [Example consumer](#example-consumer)
 - [Coverage](#coverage)
@@ -43,7 +47,7 @@ repositories {
 
 dependencies {
     // The API only, at compile time. Players install Arcforge itself, which contains the API classes.
-    compileOnly "net.zagdrath.arcforge:arcforge-api:1.0.0"
+    compileOnly "net.zagdrath.arcforge:arcforge-api:1.1.0"
     // Optional: run Arcforge in your dev client to test against it.
     // localRuntime files("libs/arcforge-2.5.0+26.3.jar")
 }
@@ -127,7 +131,7 @@ Each heading names the type's package (under `net.zagdrath.arcforge.api`), and e
 | Constant | Meaning |
 |---|---|
 | `MOD_ID` | `"arcforge"` |
-| `API_VERSION` | `"1.0.0"`, also the published jar's version |
+| `API_VERSION` | `"1.1.0"`, also the published jar's version |
 | `API_VERSION_MAJOR`, `_MINOR`, `_PATCH` | The parts of `API_VERSION`, as ints |
 
 ### `MachineCapabilities` (`api.machine`)
@@ -214,7 +218,8 @@ transaction you can also use `handler()`.
 
 `tankCount()`, `role(tank)`, `fluid(tank)`, `capacity(tank)`, `insert(tank, fluid, simulate)`, `insert(fluid, simulate)`,
 `extract(tank, amount, simulate)` and `handler()`. These follow the same role rules as items. Each tank accepts only the
-fluids its machine uses. A fill without a tank index is routed as a pipe's would be.
+fluids its machine uses. A fill without a tank index is routed as a pipe's would be. To work with a machine's gases
+alone, by `Gas` rather than `FluidStack`, use its [gas handler](#gases).
 
 ### `MachineHeat` (`api.machine.resource`): HU and °C
 
@@ -292,6 +297,191 @@ public interface MachineListener {
 - **Listeners aren't saved.** When the machine unloads (`isValid()` becomes false), look it up again and add your
   listener to the new instance.
 
+## Gases
+
+Since API 1.1.0, other mods can store and move Arcforge gases. They can read a block's or an item's gas tanks, fill
+and empty them by gas and amount, and look up every gas for search and display. The types are in `api.gas`.
+
+### How Arcforge stores gas
+
+Arcforge has no separate gas system. **A gas is a NeoForge fluid** that is lighter than air (its `FluidType` has a
+negative density) or is tagged `#arcforge:gases`. Gases are kept in ordinary fluid tanks. Pressurized Conduits and
+Pressurized Cylinders carry only gases, and Fluid Conduits and Fluid Tanks carry only liquids. Other mods' gases count
+too, if they are lighter than air or tagged.
+
+- **Unit:** gas amounts are in **millibuckets (mB)**, the NeoForge fluid unit, as `int`. So 1,000 mB of Hydrogen in a
+  gas tank is 1,000 mB of the fluid `arcforge:hydrogen`.
+- **Temperature** is in kelvin, from the fluid type: 293 K for most gases, 308 K for Biogas, 373 K for Steam and Exhaust
+  Steam, 773 K for High-Pressure Steam and 1,173 K for Superheated Steam.
+- **Pressure:** Arcforge has no pressure value. The three steam grades stand for it, and the hotter grades are at
+  higher pressure. `Gas.steamGrade()` says which grade a steam is.
+
+The gas API is a gas-only view of those fluid tanks. Because gases are fluids, anything the gas API does can also be
+done through NeoForge's fluid capabilities or `MachineFluids`. The gas API adds three things: a gas identity, tank
+lists without the liquid tanks, and an item capability. With them, a mod with its own gas storage doesn't have to sort
+gases from liquids.
+
+### `Gas` (`api.gas`): one gas
+
+`Gas` is a record that wraps the gas's source fluid. Two `Gas` values for the same gas are equal, so a `Gas` can be a
+map key. `new Gas(fluid)` also takes a gas's flowing form. It throws `IllegalArgumentException` for a fluid that isn't
+a gas.
+
+| Member | Returns |
+|---|---|
+| `fluid()` | The source `Fluid` |
+| `id()` | Its fluid id, e.g. `arcforge:hydrogen`. Store this, or use `CODEC` |
+| `displayName()` | The translatable name Arcforge's GUIs show, e.g. "Hydrogen" |
+| `color()` | `0xAARRGGBB`, the colour Arcforge draws the gas in. A gas with no colour gets `DEFAULT_COLOR` (opaque white) |
+| `temperature()` | Kelvin |
+| `steamGrade()` | `Optional<SteamGrade>`: `STEAM`, `HIGH_PRESSURE` or `SUPERHEATED`. Empty for every other gas, including Exhaust Steam |
+| `toResource()`, `toStack(amount)` | The gas as a NeoForge `FluidResource` or `FluidStack`, for NeoForge's fluid capabilities |
+| `CODEC` | Saves a gas as its id string. Decoding fails for an id that isn't a gas |
+| `STREAM_CODEC` | Sends a gas to the client, for example to draw your GUI's gauges |
+
+`Gas` and `GasRegistry` read the fluid registry, its tags and a synced data map. They work on **both sides** once a
+world is loaded, so a client GUI can show gas names and colours.
+
+### `GasRegistry` (`api.gas`): every gas
+
+| Member | Meaning |
+|---|---|
+| `all()` | Every gas, Arcforge's and other mods', sorted by id. Each call builds a new list, so keep the list rather than calling `all()` every tick. Filter it by `displayName()` or `id()` to search |
+| `get(id)` | `Optional<Gas>` by fluid id |
+| `of(fluid)` | `Optional<Gas>` for a fluid, source or flowing |
+| `isGas(fluid)` | Whether a fluid is a gas |
+| `TAG` | `#arcforge:gases` |
+| `PROPERTIES` | The data map `arcforge:gas_properties` (see below) |
+
+Arcforge's gases are Steam, High-Pressure Steam, Superheated Steam, Exhaust Steam, Hydrogen, Oxygen, Carbon Dioxide,
+Nitrogen, Ammonia, Biogas, Chlorine, Ethylene and Syngas. Use `all()` rather than hard-coding them.
+
+**Colours** come from the data map `arcforge:gas_properties`, keyed by fluid and synced to clients. Arcforge ships an
+entry for each of its gases. A datapack or another mod can add one for its own gas, in
+`data/<namespace>/data_maps/fluid/gas_properties.json`:
+
+```json
+{ "values": { "examplemod:argon": { "color": "#C8A2E8" } } }
+```
+
+### `GasCapabilities` (`api.gas`): the entry points
+
+| Member | Meaning |
+|---|---|
+| `BLOCK` | `BlockCapability<GasHandler, @Nullable Void>`. Query it with a `null` context |
+| `ITEM` | `ItemCapability<GasHandler, ItemAccess>`. Query it through an `ItemAccess` |
+| `ID` | `arcforge:gas_handler`, the id of both |
+
+```java
+GasHandler tanks = serverLevel.getCapability(GasCapabilities.BLOCK, pos, null);
+GasHandler cartridge = ItemAccess.forPlayerSlot(player, slot).getCapability(GasCapabilities.ITEM);
+```
+
+**Which blocks provide `BLOCK`.** It is provided on the server only, and only by blocks with at least one tank that can
+hold a gas:
+
+- **Single-block machines:** the Air Separator, Carbon Reclaimer, Chemical Reactor, Combustion Plant, Electrolyzer,
+  Fermenter, Firebox, Fischer-Tropsch Reactor, Fuel Burner, Gasifier, Haber Reactor and Hydroponic Cell.
+- **Multiblocks:** the Arcforge Furnace, Biogas Digester, Condenser Array, Distillation Array, Firebox Array, Gas
+  Turbine Array, Greenhouse, Steam Boiler Array, Steam Turbine Array and Superheater Array. Every block of a formed
+  multiblock gives its controller's tanks, as `MACHINE_CONTROL` does.
+- **Storage:** Pressurized Cylinders of every tier.
+
+Machines that hold only liquids don't provide it, nor do Fluid Tanks or Reservoirs. Neither do conduits, Meters or the
+Quantum Tunnel: they move gas but hold none of their own. Reach them on a face through NeoForge's
+`Capabilities.Fluid.BLOCK`, as a pipe would.
+
+**The block capability has no side.** Like `MACHINE_CONTROL` and `MachineFluids`, it is the whole block's view, and it
+ignores side and port configuration. For what one face offers a pipe, query `Capabilities.Fluid.BLOCK` on that face,
+which carries gases as fluids.
+
+**Which items provide `ITEM`:** Gas Cartridges of every tier, and Jetpacks. Jetpacks take only jetpack fuels: the three
+steams and Hydrogen. Canisters hold liquids and don't provide it. Neither does a Pressurized Cylinder held as an item;
+place it to fill or empty it. The handler writes the item's new contents back through the `ItemAccess`. Make changes on
+the server, for example in your menu's server-side logic, and let the slot sync to the client.
+
+### `GasHandler` and `GasTank` (`api.gas`)
+
+| Method | Meaning |
+|---|---|
+| `tankCount()` | The number of gas tanks (at least 1) |
+| `tank(i)` | A `GasTank` snapshot, or `GasTank.NONE` for an index out of range |
+| `tanks()` | A snapshot of every tank, in index order |
+| `accepts(i, gas)` | Whether the tank takes that gas from outside at all, whatever it holds now |
+| `insert(i, gas, amount, simulate)` | Fill one tank. Returns the mB filled |
+| `insert(gas, amount, simulate)` | Fill whichever tanks take the gas, routed as a pipe's fill would be |
+| `extract(i, gas, amount, simulate)` | Drain that gas from one tank. Returns the mB drained |
+| `extract(gas, amount, simulate)` | Drain that gas from whichever tanks give it, in index order |
+
+`GasTank` is a record with `gas()` (an `Optional<Gas>`), `amount()`, `capacity()`, `canInsert()` and `canExtract()`,
+plus `isEmpty()` and `space()`. A snapshot doesn't change with the tank, so read the tank again for fresh values.
+
+The rules:
+
+- **Only gas tanks are listed.** A machine's water, oil and other liquid tanks are left out, so gas tank indices are
+  **not** `MachineFluids` indices. The list of tanks is fixed for the life of the handler.
+- **Each tank's own rules apply, as for a pipe.** Nothing is forced, and a refused transfer returns 0.
+  - A machine's input tanks (`canInsert`) take only the gases its recipes use, and never give them back.
+  - A machine's output tanks (`canExtract`) only give.
+  - A Haber Reactor keeps one gas to a tank, so Hydrogen already in one input tank is refused by the other.
+  - A Pressurized Cylinder and a Gas Cartridge hold one gas at a time, and move at most their tier's rate per call.
+  - A Jetpack takes only jetpack fuels.
+- **A tank that takes liquids as well as gases** (a Chemical Reactor's) reads as empty while it holds a liquid, and
+  takes no gas.
+- **`simulate`** only reports what would move. Otherwise each call runs in its own NeoForge transfer transaction and
+  commits it. If you have a transaction open, the call nests in yours and is undone if you abort it, so several
+  transfers can be made all-or-nothing.
+- **Server thread only**, as for the rest of the API. A handler belongs to one block entity. Keep it in a
+  `BlockCapabilityCache`, as for `MACHINE_CONTROL`, which drops the handler when the block changes.
+
+### Example: moving gas between a machine and your storage
+
+```java
+import org.jspecify.annotations.Nullable;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.zagdrath.arcforge.api.gas.Gas;
+import net.zagdrath.arcforge.api.gas.GasCapabilities;
+import net.zagdrath.arcforge.api.gas.GasHandler;
+import net.zagdrath.arcforge.api.gas.GasTank;
+
+// Loaded only when Arcforge is installed.
+public final class ArcforgeGasLink {
+    private final BlockCapabilityCache<GasHandler, @Nullable Void> cache;
+
+    public ArcforgeGasLink(ServerLevel level, BlockPos pos) {
+        this.cache = BlockCapabilityCache.create(GasCapabilities.BLOCK, level, pos, null);
+    }
+
+    // Called from your storage's server tick. GasStorage is your own: how much of each gas it holds and has room for.
+    public void tick(GasStorage storage) {
+        GasHandler tanks = cache.getCapability();
+        if (tanks == null) {
+            return;
+        }
+        for (int i = 0; i < tanks.tankCount(); i++) {
+            GasTank tank = tanks.tank(i);
+            if (tank.canExtract() && !tank.isEmpty()) {
+                // Pull products (an Electrolyzer's Hydrogen, a Haber Reactor's Ammonia) into storage.
+                Gas gas = tank.gas().orElseThrow();
+                int moved = tanks.extract(i, gas, Math.min(storage.space(gas), tank.amount()), false);
+                storage.add(gas, moved);
+            } else if (tank.canInsert()) {
+                // Feed inputs: offer each stored gas the tank takes. It keeps what fits and refuses the rest.
+                for (Gas gas : storage.gases()) {
+                    if (tanks.accepts(i, gas)) {
+                        int moved = tanks.insert(i, gas, storage.amount(gas), false);
+                        storage.remove(gas, moved);
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
 ## Version policy
 
 The API follows [semantic versioning](https://semver.org/), separately from the mod's version:
@@ -300,6 +490,8 @@ The API follows [semantic versioning](https://semver.org/), separately from the 
 - **Minor** (1.x.0): additions that keep old consumers working, such as new types, new methods, new enum constants or new
   `SideModes` ids. Consumers should handle enum values they don't know, for example with a `default` branch.
 - **Major** (x.0.0): changing or removing a type or method.
+
+History: **1.0.0** added machine control, and **1.1.0** added gases (`api.gas`).
 
 `ArcforgeApi.API_VERSION` holds the current version, and the published jar has the same version. To check at runtime,
 compare `ArcforgeApi.API_VERSION_MAJOR` with the major version you built against, and `API_VERSION_MINOR` with the minor
@@ -439,9 +631,9 @@ The API lives in the `api` source set at `src/api/java`. Its classes are packed 
 
 | Task | Result |
 |---|---|
-| `./gradlew apiJar` | `build/libs/arcforge-api-1.0.0.jar` (also built by `assemble` and `build`) |
+| `./gradlew apiJar` | `build/libs/arcforge-api-1.1.0.jar` (also built by `assemble` and `build`) |
 | `./gradlew apiJavadoc` | The API's Javadoc. A missing or broken doc comment fails it, and it runs as part of `check`. |
-| `./gradlew publishApiPublicationToMavenLocal` | The API jar with `-sources` and `-javadoc` jars, in `~/.m2/repository/net/zagdrath/arcforge/arcforge-api/1.0.0/` |
+| `./gradlew publishApiPublicationToMavenLocal` | The API jar with `-sources` and `-javadoc` jars, in `~/.m2/repository/net/zagdrath/arcforge/arcforge-api/1.1.0/` |
 | `./gradlew publishToMavenLocal` | The same, plus the mod jar's own publication |
 
 The jar's version is read from `ArcforgeApi.API_VERSION`. Bump that constant, and its `MAJOR`/`MINOR`/`PATCH` parts, to

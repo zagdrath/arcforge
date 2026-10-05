@@ -22,6 +22,8 @@ import net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.api.gas.GasCapabilities;
+import net.zagdrath.arcforge.gas.FluidGasHandler;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
@@ -417,8 +419,13 @@ public final class ModCapabilities {
             switch (item.kind()) {
                 case BATTERY -> event.registerItem(Capabilities.Energy.ITEM,
                         (stack, access) -> new ItemAccessEnergyHandler(access, ModDataComponents.ENERGY.get(), item.capacity(), item.rate()), item);
-                case CANISTER, GAS_CARTRIDGE -> event.registerItem(Capabilities.Fluid.ITEM,
+                case CANISTER -> event.registerItem(Capabilities.Fluid.ITEM,
                         (stack, access) -> new PortableFluidHandler(access, item), item);
+                // A Gas Cartridge is also a gas tank for the gas API: the same handler, gases only.
+                case GAS_CARTRIDGE -> {
+                    event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new PortableFluidHandler(access, item), item);
+                    event.registerItem(GasCapabilities.ITEM, (stack, access) -> FluidGasHandler.of(new PortableFluidHandler(access, item)), item);
+                }
                 case THERMAL_CAPSULE -> {
                 }
             }
@@ -428,6 +435,7 @@ public final class ModCapabilities {
         for (DeferredItem<JetpackItem> holder : ModItems.jetpacks()) {
             JetpackItem item = holder.get();
             event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new JetpackFluidHandler(access, item), item);
+            event.registerItem(GasCapabilities.ITEM, (stack, access) -> FluidGasHandler.of(new JetpackFluidHandler(access, item)), item);
         }
         for (DeferredItem<ArcToolItem> holder : ModItems.arcTools()) {
             ArcToolItem item = holder.get();

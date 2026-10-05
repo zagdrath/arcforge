@@ -147,7 +147,7 @@ public final class ChemicalMachineSpecs {
                 .slot(FermenterBlockEntity.SLOT_ADDITIVE, SlotRole.CATALYST)
                 .items(FermenterBlockEntity::getItems, null)
                 .tank(SlotRole.INPUT, FermenterBlockEntity::getWater)
-                .tank(SlotRole.OUTPUT, FermenterBlockEntity::getEthanol)
+                .liquidTank(SlotRole.OUTPUT, FermenterBlockEntity::getEthanol)
                 .tank(SlotRole.OUTPUT, FermenterBlockEntity::getCarbonDioxide)
                 .fluidAutomation(be -> be.getFluidHandler(null))
                 .progress(FermenterBlockEntity::getProgress, FermenterBlockEntity::getTotal)
@@ -261,7 +261,7 @@ public final class ChemicalMachineSpecs {
                 .slot(ElectricPumpBlockEntity.SLOT_BUCKET_IN, SlotRole.INPUT)
                 .slot(ElectricPumpBlockEntity.SLOT_BUCKET_OUT, SlotRole.OUTPUT)
                 .items(ElectricPumpBlockEntity::getItems, be -> be.getItemHandler(null))
-                .tank(SlotRole.OUTPUT, ElectricPumpBlockEntity::getTank)
+                .liquidTank(SlotRole.OUTPUT, ElectricPumpBlockEntity::getTank)
                 .progress(ElectricPumpBlockEntity::getProgress, ElectricPumpBlockEntity::getTotal)
                 .fluidOutputs(be -> {
                     Fluid source = be.getSourceFluid();
