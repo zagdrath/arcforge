@@ -1,9 +1,12 @@
 name: Release
 
-# Pushing a version tag (git tag -a v2.6.0 -m "Arcforge 2.6.0" && git push origin v2.6.0) builds that commit, checks
-# it, publishes a GitHub Release with the mod jar, the API jar and that version's changelog section, then uploads the
-# mod jar and notes to CurseForge (project 1714407). The API jar isn't uploaded to CurseForge.
-# A tag with a pre-release part (v2.6.0-beta.1) is published as a pre-release. See docs/RELEASING.md.
+# Pushing a version tag, v<mod_version>+<minecraft_version> (git tag -a v2.6.0+26.3 -m "Arcforge 2.6.0 for Minecraft
+# 26.3" && git push origin v2.6.0+26.3), builds that commit, checks it, publishes a GitHub Release with the mod jar,
+# the API jar and that version's changelog section, then uploads the mod jar and notes to CurseForge (project
+# 1714407). The API jar isn't uploaded to CurseForge.
+# Each Minecraft version has its own branch (main for the newest, mc/<major.minor> for the others), and its tags are
+# cut from it. A tag with a pre-release part (v2.6.0-beta.1+26.3) is published as a pre-release. See
+# docs/RELEASING.md.
 on:
   push:
     tags:
@@ -38,28 +41,30 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x ./gradlew
 
-      # The tag must match mod_version, so v2.6.0 can't ship a jar built as 2.5.0. The API jar's version is
-      # ArcforgeApi.API_VERSION, read the same way build.gradle reads it.
-      - name: Check the tag matches mod_version
+      # The tag must be v<mod_version>+<minecraft_version>, so v2.6.0+26.3 can't ship a jar built as 2.5.0, or one built
+      # from another Minecraft version's branch. The API jar's version is ArcforgeApi.API_VERSION plus the Minecraft
+      # version (1.1.0+26.3), read the same way build.gradle reads it.
+      - name: Check the tag matches mod_version and minecraft_version
         id: version
         run: |
-          tag_version="${GITHUB_REF_NAME#v}"
           mod_version="$(grep -E '^mod_version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')"
           minecraft_version="$(grep -E '^minecraft_version=' gradle.properties | cut -d= -f2 | tr -d '[:space:]')"
           api_version="$(grep -oE 'API_VERSION = "[^"]+"' src/api/java/net/zagdrath/arcforge/api/ArcforgeApi.java \
             | head -n1 | cut -d'"' -f2)"
-          echo "Tag: ${GITHUB_REF_NAME}, mod_version: ${mod_version}, API_VERSION: ${api_version}"
-          if [ "${tag_version}" != "${mod_version}" ]; then
-            echo "::error::Tag ${GITHUB_REF_NAME} doesn't match mod_version=${mod_version} in gradle.properties"
+          expected="v${mod_version}+${minecraft_version}"
+          echo "Tag: ${GITHUB_REF_NAME}, expected: ${expected}, API_VERSION: ${api_version}"
+          if [ "${GITHUB_REF_NAME}" != "${expected}" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} doesn't match ${expected} (mod_version and minecraft_version in gradle.properties)"
             exit 1
           fi
           if [ -z "${api_version}" ]; then
             echo "::error::Couldn't read API_VERSION from ArcforgeApi.java"
             exit 1
           fi
+          echo "MINECRAFT=${minecraft_version}" >> "$GITHUB_ENV"
           echo "VERSION=${mod_version}" >> "$GITHUB_ENV"
           echo "JAR=build/libs/arcforge-${mod_version}+${minecraft_version}.jar" >> "$GITHUB_ENV"
-          echo "API_JAR=build/libs/arcforge-api-${api_version}.jar" >> "$GITHUB_ENV"
+          echo "API_JAR=build/libs/arcforge-api-${api_version}+${minecraft_version}.jar" >> "$GITHUB_ENV"
           echo "version=${mod_version}" >> "$GITHUB_OUTPUT"
           echo "minecraft=${minecraft_version}" >> "$GITHUB_OUTPUT"
           echo "jar=arcforge-${mod_version}+${minecraft_version}.jar" >> "$GITHUB_OUTPUT"
@@ -68,7 +73,7 @@ jobs:
       # "Suggested version" line, with an Unreleased section above it and with its compare links.
       - name: Check CHANGELOG.md and extract release notes
         run: |
-          bash .github/scripts/release-notes.sh "${VERSION}" CHANGELOG.md release-notes.md
+          bash .github/scripts/release-notes.sh "${VERSION}" "${MINECRAFT}" CHANGELOG.md release-notes.md
           cat release-notes.md
 
       - name: Build
@@ -107,11 +112,14 @@ jobs:
           } > github-notes.md
           prerelease=()
           case "${VERSION}" in *-*) prerelease=(--prerelease) ;; esac
+          # Only main's full releases (the newest Minecraft version) are marked latest, not backports or pre-releases.
+          latest=(--latest=false)
+          if [ "${#prerelease[@]}" -eq 0 ] && git merge-base --is-ancestor "${GITHUB_SHA}" origin/main; then latest=(--latest); fi
           gh release create "${GITHUB_REF_NAME}" "${JAR}" "${API_JAR}" \
-            --title "Arcforge ${VERSION}" \
+            --title "Arcforge ${VERSION} for Minecraft ${MINECRAFT}" \
             --notes-file github-notes.md \
             --verify-tag \
-            "${prerelease[@]}"
+            "${prerelease[@]}" "${latest[@]}"
 
       # The mod jar and notes the curseforge job uploads, so it sends exactly what the GitHub Release has (the API
       # jar stays on GitHub only).
@@ -142,7 +150,7 @@ jobs:
           name: release-files
           path: release-files
 
-      # Pre-release versions (2.6.0-beta.1) go up as beta files. The token is the CURSEFORGE_TOKEN repository secret.
+      # Pre-release versions (2.6.0-beta.1+26.3) go up as beta files. The token is the CURSEFORGE_TOKEN repository secret.
       - name: Upload to CurseForge
         env:
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}

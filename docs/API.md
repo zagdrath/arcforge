@@ -5,7 +5,9 @@ energy, items, fluids and heat; move items and fluids through the slots the mach
 their statistics; and listen for events instead of polling. They can also store and move Arcforge gases in machines,
 Pressurized Cylinders and gas items. Encoded Logistics is the first consumer.
 
-- **Artifact:** `net.zagdrath.arcforge:arcforge-api:1.1.0`. Compile against it only; Arcforge provides it at runtime.
+- **Artifact:** `net.zagdrath.arcforge:arcforge-api:1.1.0+26.3`: API version 1.1.0, built for Minecraft 26.3. Each
+  Minecraft version Arcforge supports has its own build of the same API version (`1.1.0+26.1.2` for 26.1.2), so pick
+  the one for your Minecraft version. Compile against it only; Arcforge provides it at runtime.
 - **Packages** (all under `net.zagdrath.arcforge.api`):
 
   | Package | Contents |
@@ -47,7 +49,7 @@ repositories {
 
 dependencies {
     // The API only, at compile time. Players install Arcforge itself, which contains the API classes.
-    compileOnly "net.zagdrath.arcforge:arcforge-api:1.1.0"
+    compileOnly "net.zagdrath.arcforge:arcforge-api:1.1.0+26.3"
     // Optional: run Arcforge in your dev client to test against it.
     // localRuntime files("libs/arcforge-2.5.0+26.3.jar")
 }
@@ -131,7 +133,7 @@ Each heading names the type's package (under `net.zagdrath.arcforge.api`), and e
 | Constant | Meaning |
 |---|---|
 | `MOD_ID` | `"arcforge"` |
-| `API_VERSION` | `"1.1.0"`, also the published jar's version |
+| `API_VERSION` | `"1.1.0"`; the published jar's version is this plus the Minecraft version, e.g. `1.1.0+26.3` |
 | `API_VERSION_MAJOR`, `_MINOR`, `_PATCH` | The parts of `API_VERSION`, as ints |
 
 ### `MachineCapabilities` (`api.machine`)
@@ -493,7 +495,8 @@ The API follows [semantic versioning](https://semver.org/), separately from the 
 
 History: **1.0.0** added machine control, and **1.1.0** added gases (`api.gas`).
 
-`ArcforgeApi.API_VERSION` holds the current version, and the published jar has the same version. To check at runtime,
+`ArcforgeApi.API_VERSION` holds the current version, and the published jar has the same version followed by the
+Minecraft version it's built for (`+26.3`). To check at runtime,
 compare `ArcforgeApi.API_VERSION_MAJOR` with the major version you built against, and `API_VERSION_MINOR` with the minor
 version that added what you use. Arcforge's CHANGELOG records each API change under the release that ships it.
 
@@ -631,10 +634,10 @@ The API lives in the `api` source set at `src/api/java`. Its classes are packed 
 
 | Task | Result |
 |---|---|
-| `./gradlew apiJar` | `build/libs/arcforge-api-1.1.0.jar` (also built by `assemble` and `build`) |
+| `./gradlew apiJar` | `build/libs/arcforge-api-1.1.0+26.3.jar` (also built by `assemble` and `build`) |
 | `./gradlew apiJavadoc` | The API's Javadoc. A missing or broken doc comment fails it, and it runs as part of `check`. |
-| `./gradlew publishApiPublicationToMavenLocal` | The API jar with `-sources` and `-javadoc` jars, in `~/.m2/repository/net/zagdrath/arcforge/arcforge-api/1.1.0/` |
+| `./gradlew publishApiPublicationToMavenLocal` | The API jar with `-sources` and `-javadoc` jars, in `~/.m2/repository/net/zagdrath/arcforge/arcforge-api/1.1.0+26.3/` |
 | `./gradlew publishToMavenLocal` | The same, plus the mod jar's own publication |
 
-The jar's version is read from `ArcforgeApi.API_VERSION`. Bump that constant, and its `MAJOR`/`MINOR`/`PATCH` parts, to
+The jar's version is `ArcforgeApi.API_VERSION` plus `+` and `minecraft_version` from `gradle.properties`. Bump that constant, and its `MAJOR`/`MINOR`/`PATCH` parts, to
 release a new API version.

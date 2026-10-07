@@ -93,7 +93,7 @@ def main():
     parser.add_argument("--jar", required=True)
     parser.add_argument("--notes", required=True, help="Markdown changelog for the file")
     parser.add_argument("--version", required=True, help="mod_version, e.g. 1.0.0 or 1.1.0-beta.1")
-    parser.add_argument("--minecraft", required=True, help="minecraft_version, e.g. 26.3")
+    parser.add_argument("--minecraft", required=True, help="minecraft_version, e.g. 26.3 or 26.1.2")
     parser.add_argument("--java", required=True, help="Java version, e.g. 25")
     parser.add_argument("--name", default="Arcforge", help="display name before the version")
     parser.add_argument("--optional", default="", help="comma-separated CurseForge slugs of optional dependencies")
@@ -113,7 +113,7 @@ def main():
     metadata = {
         "changelog": notes,
         "changelogType": "markdown",
-        "displayName": f"{args.name} {args.version}",
+        "displayName": f"{args.name} {args.version}+{args.minecraft}",
         "gameVersions": game_version_ids(token, args.minecraft, args.java),
         "releaseType": release_type(args.version),
         "relations": {"projects": [{"slug": slug.strip(), "type": "optionalDependency"}

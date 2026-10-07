@@ -1,18 +1,43 @@
 # Releasing
 
-A release is a pushed `vX.Y.Z` tag. `.github/workflows/release.yml` builds that commit, runs the game tests and
-publishes a GitHub Release with two jars and the version's section of `CHANGELOG.md` as its notes. Its `curseforge`
-job then uploads the mod jar and the same notes to
+A release is a pushed `vX.Y.Z+MC` tag, where `X.Y.Z` is `mod_version` and `MC` is `minecraft_version` in
+`gradle.properties` (for example `v2.6.0+26.3`). `.github/workflows/release.yml` builds that commit, runs the game
+tests and publishes a GitHub Release, "Arcforge X.Y.Z for Minecraft MC", with two jars and the version's section of
+`CHANGELOG.md` as its notes. Its `curseforge` job then uploads the mod jar and the same notes to
 [CurseForge](https://www.curseforge.com/minecraft/mc-mods/arcforge) (project 1714407). `build.yml` runs the same
 build and game tests on every push, so a release shouldn't be the first place a failure shows up.
 
+Releases up to 2.5.0 for Minecraft 26.3 (tags `v2.1.0` to `v2.5.0`, and the older ones) were tagged `vX.Y.Z`,
+before tags carried the Minecraft version.
+
+## Minecraft versions
+
+Each supported Minecraft version has its own branch, and releases for it are tagged from that branch:
+
+| Branch | Minecraft | Tags |
+|---|---|---|
+| `main` | 26.3 (the newest) | `vX.Y.Z+26.3` |
+| `mc/26.1` | 26.1.2 | `vX.Y.Z+26.1.2` |
+
+- `main` is always the newest Minecraft version; every other supported version has a branch `mc/<major.minor>`.
+- Each branch has its own `gradle.properties` (Minecraft, NeoForge, JEI and Jade versions), its own `CHANGELOG.md`
+  and its own code for whatever the Minecraft versions do differently.
+- A version number means the same changes on every Minecraft version: 2.6.0 for 26.1.2 has what 2.6.0 for 26.3 has.
+  A version that only ships on some branches simply isn't released on the others. Support for another Minecraft
+  version isn't a change of its own in the changelog; that version's changelog states its requirements.
+- Make a change on the branch it's for (usually `main`), then carry it to the others with `git cherry-pick`, fixing
+  whatever the other Minecraft version needs. Keep code that differs between versions small and in one place, so
+  cherry-picks apply cleanly.
+- Only `main`'s full releases are marked "Latest" on GitHub; releases from other branches and pre-releases aren't.
+
 ## The two jars
 
-- `arcforge-X.Y.Z+26.3.jar` is the mod, versioned by `mod_version` in `gradle.properties`. Players install it. It
+- `arcforge-X.Y.Z+MC.jar` is the mod, versioned by `mod_version` in `gradle.properties`. Players install it. It
   goes on the GitHub Release and on CurseForge.
-- `arcforge-api-A.B.C.jar` is the API on its own (see [API.md](API.md)), versioned by `ArcforgeApi.API_VERSION`. Mod
-  developers compile against it; players don't install it, since the mod jar already contains its classes. It goes
-  on the GitHub Release only, never on CurseForge.
+- `arcforge-api-A.B.C+MC.jar` is the API on its own (see [API.md](API.md)), versioned by `ArcforgeApi.API_VERSION`
+  plus the Minecraft version. The API uses Minecraft and NeoForge types, so each branch builds its own jar of the same
+  API version. Mod developers compile against the one for their Minecraft version; players don't install it, since the
+  mod jar already contains its classes. It goes on the GitHub Release only, never on CurseForge.
 
 The GitHub Release's notes end with a line saying which jar is which. If the API changed, raise `API_VERSION` (and
 its `MAJOR` / `MINOR` / `PATCH` parts) before the release, following the API's own semantic versioning; if it didn't,
@@ -20,41 +45,45 @@ the release attaches the same API version as the last one.
 
 ## Cutting a release
 
+Do this on the branch for the Minecraft version you're releasing.
+
 1. Pick the version from the rules at the top of `CHANGELOG.md` (the Unreleased section suggests one).
 2. In `CHANGELOG.md`:
    - rename `## [Unreleased]` to `## [X.Y.Z] - YYYY-MM-DD` and delete its "Suggested version" line;
    - add a new, empty `## [Unreleased]` above it;
-   - at the bottom, point `[Unreleased]` at `https://github.com/zagdrath/arcforge/compare/vX.Y.Z...HEAD`, and add
-     `[X.Y.Z]: https://github.com/zagdrath/arcforge/compare/vPREVIOUS...vX.Y.Z`.
+   - at the bottom, point `[Unreleased]` at `https://github.com/zagdrath/arcforge/compare/vX.Y.Z+MC...HEAD`, and add
+     `[X.Y.Z]: https://github.com/zagdrath/arcforge/compare/vPREVIOUS...vX.Y.Z+MC`, where `vPREVIOUS` is the previous
+     tag on this branch (`v2.5.0` for main's first `+26.3` release; for a branch's first release,
+     `[X.Y.Z]: https://github.com/zagdrath/arcforge/commits/vX.Y.Z+MC`).
 3. Set `mod_version=X.Y.Z` in `gradle.properties`.
 4. Check it all before tagging:
 
    ```sh
-   bash .github/scripts/release-notes.sh X.Y.Z      # the same checks release.yml runs; writes release-notes.md
+   bash .github/scripts/release-notes.sh X.Y.Z MC   # the same checks release.yml runs; writes release-notes.md
    ./gradlew build runGameTestServer
    ```
 
-   `build/libs` should then have `arcforge-X.Y.Z+26.3.jar` and `arcforge-api-A.B.C.jar`.
+   `build/libs` should then have `arcforge-X.Y.Z+MC.jar` and `arcforge-api-A.B.C+MC.jar`.
 
-5. Commit ("Release X.Y.Z: ..."), then tag and push:
+5. Commit ("Release X.Y.Z for Minecraft MC: ..."), then tag and push the branch and the tag:
 
    ```sh
-   git tag -a vX.Y.Z -m "Arcforge X.Y.Z"
-   git push origin main vX.Y.Z
+   git tag -a vX.Y.Z+MC -m "Arcforge X.Y.Z for Minecraft MC"
+   git push origin <branch> vX.Y.Z+MC
    ```
 
 6. Watch the Release run on the Actions tab. When it's green, the release is on the Releases page with both jars,
    and the mod jar is on CurseForge (it shows there once CurseForge has approved it, usually within minutes).
 
-A tag with a pre-release part (`v2.6.0-beta.1`, with `mod_version=2.6.0-beta.1`) is published as a pre-release.
+A tag with a pre-release part (`v2.6.0-beta.1+26.3`, with `mod_version=2.6.0-beta.1`) is published as a pre-release.
 
 ## CurseForge
 
 The upload is `.github/scripts/curseforge_upload.py`. It sends:
 
 - the mod jar and the version's changelog section, as Markdown (without the GitHub Release's line about the jars);
-- the display name "Arcforge X.Y.Z";
-- the game versions Minecraft 26.3, NeoForge, Java 25, Client and Server;
+- the display name "Arcforge X.Y.Z+MC";
+- the game versions: the branch's Minecraft version, NeoForge, Java 25, Client and Server;
 - `jei` and `jade` as optional dependencies;
 - the file type: release, or beta / alpha for a pre-release version.
 
@@ -76,7 +105,7 @@ upload, with the jar and notes the `release` job kept.
 Otherwise the tag is already pushed but no release exists. Fix the problem, commit, then move the tag:
 
 ```sh
-git push origin :refs/tags/vX.Y.Z
-git tag -f -a vX.Y.Z -m "Arcforge X.Y.Z"
-git push origin vX.Y.Z
+git push origin :refs/tags/vX.Y.Z+MC
+git tag -f -a vX.Y.Z+MC -m "Arcforge X.Y.Z for Minecraft MC"
+git push origin vX.Y.Z+MC
 ```
