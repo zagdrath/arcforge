@@ -5,73 +5,84 @@
 
 package net.zagdrath.arcforge.client.renderer.blockentity;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.geometry.BakedQuad;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.PortFaces;
+import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
-import net.zagdrath.arcforge.steam.SteamGrade;
+import net.zagdrath.arcforge.steam.TurbineLayout;
 
-// Draws the inside of a formed Steam Turbine Array, seen through its windows: a ribbed lining just inside
-// the walls' outer skin (only its inward faces, so the near wall never hides the far one; cut away behind
-// the windows, with a reveal round each opening, so opposite windows see through; see TiledBoxes.lining),
-// then the rotor, sized to the cross-section's shorter side (a 3x3's rotor scaled up) and centred in it: the shaft
-// through every block from bearing to generator (stopping just short of the end caps' faces), and a set of blades in each block between them, each
-// set turned 22.5° further so they look staggered; and the steam around it, thicker the faster it flows. The rotor turns at up to 36° a tick (see SteamTurbineArrayBlockEntity.advanceAngle).
+// Draws a formed Steam Turbine Array as one turbine-generator set along its axis (its blocks draw nothing but their port
+// plates): the plinth, the casings, pedestals, crossover and generator from its TurbineLayout, built by TurbineMesh on
+// the model sheet block/steam_turbine_array/turbine, with a nozzle from the model out to each port. The still parts are
+// built once and again when the ports change (checked every second); the rotor (shaft, couplings and the blades seen
+// through each casing's windows) is built each frame at the rotor's angle, so the spin-up and coast-down show on it.
+// The rotor turns at up to 36° a tick (see SteamTurbineArrayBlockEntity.advanceAngle).
 public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
-    public static final StandaloneModelKey<QuadCollection> ROTOR_SHAFT = new StandaloneModelKey<>(() -> Arcforge.MODID + ":rotor_shaft");
-    public static final StandaloneModelKey<QuadCollection> ROTOR_BLADES = new StandaloneModelKey<>(() -> Arcforge.MODID + ":rotor_blades");
-    public static final Identifier ROTOR_SHAFT_MODEL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/rotor_shaft");
-    public static final Identifier ROTOR_BLADES_MODEL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/rotor_blades");
-    // The lining sits just inside the structure's outer skin (see TiledBoxes.lining).
-    private static final float LINER_INSET = SteamBoilerArrayRenderer.LINER_INSET;
-    // The steam fills the chamber just inside the lining, around the rotor.
-    private static final float STEAM_INSET = 2.5F / 16.0F;
-    // Steam is this see-through with steam in the tank but none flowing, and this thick at full flow.
-    private static final float STEAM_IDLE_ALPHA = 0.1F, STEAM_FULL_ALPHA = 0.8F;
-    // Share of the gap to the synced flow closed each frame.
-    private static final float EASE = 0.05F;
-    private static final float STAGGER = 22.5F;
-    // In the end blocks the shaft stops this far inside the outer face, clear of the end lining.
-    private static final float SHAFT_END_INSET = 1.5F / 16.0F;
+    public static final Identifier SHEET = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/turbine");
+    // How often (ticks) the ports are looked at again.
+    private static final int PORT_SCAN_INTERVAL = 20;
+    private static final float[] EMPTY = new float[0];
+
+    // The built model of each turbine, kept until its shape, front or ports change.
+    private final Map<SteamTurbineArrayBlockEntity, Built> built = new WeakHashMap<>();
+
+    private static final class Built {
+        final ShellStructure.Shell shell;
+        final Direction front;
+        final TurbineMesh mesh;
+        List<TurbineMesh.Port> ports;
+        float[] solid = EMPTY, glass = EMPTY;
+        long scanned;
+
+        Built(ShellStructure.Shell shell, Direction front, List<TurbineMesh.Port> ports) {
+            this.shell = shell;
+            this.front = front;
+            this.mesh = new TurbineMesh(TurbineLayout.of(shell, front), shell.axis() == Direction.Axis.X);
+            this.ports = ports;
+            rebuild();
+        }
+
+        void rebuild() {
+            float[][] parts = mesh.buildStatic(ports);
+            solid = parts[0];
+            glass = parts[1];
+        }
+    }
 
     public static class State extends BlockEntityRenderState {
         public boolean formed;
-        public Direction.Axis axis = Direction.Axis.Z;
-        public int length;
-        public float sizeX, sizeY, sizeZ;
-        // The lining tiles behind windows (see TiledBoxes.windowKey), which are left out.
-        public Set<Long> windows = Set.of();
-        public float angle;
-        // The rotor's size against a 3x3 cross-section's (it fits the cross-section's shorter side).
-        public float rotorScale = 1.0F;
-        public @Nullable TextureAtlasSprite liner, jamb;
-        public @Nullable TextureAtlasSprite steamSprite;
-        public int steamColor;
+        public float[] solid = EMPTY, glass = EMPTY, rotor = EMPTY;
+        public @Nullable TextureAtlasSprite sheet;
         public int light;
     }
 
@@ -87,105 +98,91 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(turbine, state, partialTicks, cameraPosition, breakProgress);
         ShellStructure.Shell shell = turbine.getShell();
-        state.formed = turbine.isMaster() && shell != null;
-        if (!state.formed) {
+        Level level = turbine.getLevel();
+        state.formed = turbine.isMaster() && shell != null && level != null;
+        if (!state.formed || shell == null || level == null) {
+            built.remove(turbine);
             return;
         }
-        state.axis = shell.axis();
-        state.length = shell.length();
-        state.sizeX = shell.size(Direction.Axis.X);
-        state.sizeY = shell.size(Direction.Axis.Y);
-        state.sizeZ = shell.size(Direction.Axis.Z);
-        state.rotorScale = shell.narrowSide() / (float) ShellStructure.WIDTH;
-        state.liner = SteamBoilerArrayRenderer.sprite(SteamBoilerArrayRenderer.LINER);
-        state.jamb = SteamBoilerArrayRenderer.sprite(SteamBoilerArrayRenderer.JAMB);
-        state.windows = turbine.windowQuads(found -> SteamBoilerArrayRenderer.findWindowQuads(turbine.getLevel(), found));
-        // The faster steam goes through, the thicker it looks.
-        float flow = turbine.easeSteamDensity(EASE);
-        SteamGrade grade = SteamGrade.of(turbine.getSteam().getResource(0));
-        boolean hasSteam = turbine.getSteam().getAmount() > 0 && grade != null;
-        float density = hasSteam || flow > 0.01F ? STEAM_IDLE_ALPHA + (STEAM_FULL_ALPHA - STEAM_IDLE_ALPHA) * flow : 0.0F;
-        state.steamSprite = null;
-        if (density > 0.0F) {
-            SteamGrade shown = grade != null ? grade : SteamGrade.STEAM;
-            state.steamSprite = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(shown.fluid().defaultFluidState()).stillMaterial().sprite();
-            state.steamColor = (shown.tint() & 0x00FFFFFF) | ((int) (255 * density) << 24);
+        Direction front = turbine.getFacing();
+        Built model = built.get(turbine);
+        long time = level.getGameTime();
+        if (model == null || !model.shell.equals(shell) || model.front != front) {
+            model = new Built(shell, front, ports(level, shell));
+            model.scanned = time;
+            built.put(turbine, model);
+        } else if (Math.abs(time - model.scanned) >= PORT_SCAN_INTERVAL) {
+            model.scanned = time;
+            List<TurbineMesh.Port> ports = ports(level, shell);
+            if (!ports.equals(model.ports)) {
+                model.ports = ports;
+                model.rebuild();
+            }
         }
-        double time = turbine.getLevel() != null ? turbine.getLevel().getGameTime() + partialTicks : 0.0;
-        state.angle = turbine.advanceAngle(time);
-        state.light = turbine.getLevel() != null
-                ? LightCoordsUtil.getLightCoords(turbine.getLevel(), shell.centre())
-                : state.lightCoords;
+        state.solid = model.solid;
+        state.glass = model.glass;
+        state.rotor = model.mesh.buildRotor(turbine.advanceAngle(time + partialTicks));
+        state.sheet = SteamBoilerArrayRenderer.sprite(SHEET);
+        state.light = LightCoordsUtil.getLightCoords(level, shell.centre());
+    }
+
+    // The ports on the shell's outer faces, in the turbine's frame.
+    private static List<TurbineMesh.Port> ports(Level level, ShellStructure.Shell shell) {
+        List<TurbineMesh.Port> ports = new ArrayList<>();
+        boolean alongX = shell.axis() == Direction.Axis.X;
+        for (BlockPos pos : shell.positions()) {
+            if (shell.boundaries(pos) == 0) {
+                continue;
+            }
+            PortFaces faces = MultiblockPorts.faces(level, pos);
+            if (faces.isEmpty()) {
+                continue;
+            }
+            // Only blocks that hold ports (a port left on a casing since replaced by glass doesn't count).
+            BlockState state = level.getBlockState(pos);
+            if (!(state.getBlock() instanceof PortHolder holder) || !holder.holdsPorts(state)) {
+                continue;
+            }
+            for (Direction face : Direction.values()) {
+                if (faces.get(face) == SideMode.NONE || shell.contains(pos.relative(face))) {
+                    continue;
+                }
+                int nx = alongX ? -face.getStepZ() : face.getStepX();
+                int nu = alongX ? face.getStepX() : face.getStepZ();
+                ports.add(new TurbineMesh.Port(TurbineLayout.blockU(shell, pos), shell.offset(pos, Direction.Axis.Y), TurbineLayout.blockX(shell, pos),
+                        nx, face.getStepY(), nu));
+            }
+        }
+        return ports;
     }
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        if (!state.formed || state.liner == null || state.jamb == null) {
+        TextureAtlasSprite sheet = state.sheet;
+        if (!state.formed || sheet == null) {
             return;
         }
-        TextureAtlasSprite liner = state.liner;
-        TextureAtlasSprite jamb = state.jamb;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(liner.atlasLocation()),
-                (pose, buffer) -> TiledBoxes.lining(pose, buffer, liner, jamb, -1, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows));
-
-        var models = Minecraft.getInstance().getModelManager();
-        QuadCollection shaft = models.getStandaloneModel(ROTOR_SHAFT);
-        QuadCollection blades = models.getStandaloneModel(ROTOR_BLADES);
-        if (shaft == null || blades == null) {
-            return;
+        float[] solid = state.solid, rotor = state.rotor, glass = state.glass;
+        int light = state.light;
+        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> {
+            emit(pose, buffer, solid, sheet, light);
+            emit(pose, buffer, rotor, sheet, light);
+        });
+        if (glass.length > 0) {
+            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, glass, sheet, light));
         }
-        List<BakedQuad> shaftQuads = shaft.getAll();
-        List<BakedQuad> bladeQuads = blades.getAll();
-        RenderType cutout = RenderTypes.entityCutout(liner.atlasLocation());
-        for (int i = 0; i < state.length; i++) {
-            // The shaft turns as one piece, so every block's segment is at the same angle.
-            poseStack.pushPose();
-            rotorPose(poseStack, state, i, state.angle);
-            // The model runs along its Z from the bearing end (block 0) toward the generator end.
-            if (i == 0) {
-                poseStack.translate(0.0F, 0.0F, SHAFT_END_INSET);
-                poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
-            } else if (i == state.length - 1) {
-                poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
-            }
-            collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, shaftQuads, -1, state.light));
-            poseStack.popPose();
-
-            // Each blade set is turned a little further than the last, so they look staggered.
-            if (i > 0 && i < state.length - 1) {
-                poseStack.pushPose();
-                rotorPose(poseStack, state, i, state.angle + i * STAGGER);
-                collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, bladeQuads, -1, state.light));
-                poseStack.popPose();
-            }
-        }
-        submitSteam(state, poseStack, collector);
     }
 
-    // Steam filling the chamber around the rotor, drawn after it so the rotor shows through.
-    private static void submitSteam(State state, PoseStack poseStack, SubmitNodeCollector collector) {
-        TextureAtlasSprite steam = state.steamSprite;
-        if (steam == null) {
-            return;
+    // TurbineMesh's vertices (x, y, z, u, v across the sheet, normal), the sheet's UVs mapped into the atlas.
+    private static void emit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet, int light) {
+        for (int i = 0; i + 7 < data.length; i += 8) {
+            buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
+                    .setColor(-1)
+                    .setUv(sheet.getU(data[i + 3]), sheet.getV(data[i + 4]))
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setLight(light)
+                    .setNormal(pose, data[i + 5], data[i + 6], data[i + 7]);
         }
-        collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(steam.atlasLocation()),
-                (pose, buffer) -> TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light,
-                        STEAM_INSET, STEAM_INSET, STEAM_INSET, state.sizeX - STEAM_INSET, state.sizeY - STEAM_INSET, state.sizeZ - STEAM_INSET, false));
-    }
-
-    // Places a rotor model (built along Z, one block long, for a 3x3 cross-section) in block i along the axis, in
-    // the centre of the cross-section, sized to its shorter side and turned to the given angle about the axis.
-    private static void rotorPose(PoseStack poseStack, State state, int i, float angle) {
-        poseStack.translate(
-                state.axis == Direction.Axis.X ? i + 0.5 : state.sizeX / 2.0,
-                state.sizeY / 2.0,
-                state.axis == Direction.Axis.Z ? i + 0.5 : state.sizeZ / 2.0);
-        if (state.axis == Direction.Axis.X) {
-            poseStack.rotate(Axis.YP.rotationDegrees(90.0F));
-        }
-        poseStack.rotate(Axis.ZP.rotationDegrees(angle));
-        poseStack.scale(state.rotorScale, state.rotorScale, 1.0F);
-        poseStack.translate(-0.5, -0.5, -0.5);
     }
 
     // The whole structure, so it isn't culled when the master corner is off screen.

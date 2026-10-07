@@ -23,7 +23,9 @@ import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.SteamGrade;
+import net.zagdrath.arcforge.steam.TurbineLayout;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
@@ -34,8 +36,9 @@ import snownee.jade.api.ui.IDisplayHelper;
 // The steam cycle in Jade, looking at any casing: a Steam Boiler Array's "Heat use 3,200 / 3,200 HU/t" (gold at its
 // limit, so an undersized boiler behind a heat source shows), a Superheater Array's "Steam → Superheated · 200 mB/t" (or
 // "Passing through (420 °C)"), a Condenser Array's "Condensing 287 mB/t", and a Steam Turbine Array's exhaust
-// ("Exhaust: 1,200 mB", "Vacuum bonus +10%"). Their tanks and heat show through Jade's own views. This half
-// gathers the data on the server; Client draws it.
+// ("Exhaust: 1,200 mB", "Vacuum bonus +10%"), with the part of the turbine-generator set the casing is in ("Section:
+// Low-pressure casing") and, on a fitted spot, the port that fits there ("Exhaust neck: fits an Exhaust port"). Their
+// tanks and heat show through Jade's own views. This half gathers the data on the server; Client draws it.
 public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor, SteamCycleProvider.Data> {
     INSTANCE;
 
@@ -44,7 +47,8 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
     public enum Kind { SUPERHEATER, CONDENSER, TURBINE, BOILER }
 
     // Superheater: a = the input grade (-1 none), b = the grade made (-1 passing through), c = mB/t, d = °C.
-    // Condenser: c = mB/t condensed. Turbine: a = 1 with an Exhaust port, b = 1 with the vacuum bonus, c = mB of exhaust.
+    // Condenser: c = mB/t condensed. Turbine: a = 1 with an Exhaust port, b = 1 with the vacuum bonus, c = mB of exhaust,
+    // d = the TurbineLayout.Part the block is in, plus 1 (0 unknown), and its TurbineLayout.Spot times 16.
     // Boiler: c = HU/t it boiled with last tick, d = the most HU/t it boils with.
     public record Data(int kind, int a, int b, int c, int d) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
@@ -77,7 +81,14 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
         }
         var turbineMaster = blockEntity instanceof SteamTurbineArrayBlockEntity casing ? casing.getMaster() : WindowProviders.master(level, accessor.getPosition());
         if (turbineMaster instanceof SteamTurbineArrayBlockEntity turbine) {
-            return new Data(Kind.TURBINE.ordinal(), turbine.hasExhaust() ? 1 : 0, turbine.isVacuum() ? 1 : 0, turbine.getExhaust().getAmount(), 0);
+            int where = 0;
+            ShellStructure.Shell shell = turbine.getShell();
+            if (shell != null && shell.contains(accessor.getPosition())) {
+                TurbineLayout layout = TurbineLayout.of(shell, turbine.getFacing());
+                where = layout.partAt(TurbineLayout.blockU(shell, accessor.getPosition())).ordinal() + 1
+                        | layout.spotAt(shell, accessor.getPosition()).ordinal() << 4;
+            }
+            return new Data(Kind.TURBINE.ordinal(), turbine.hasExhaust() ? 1 : 0, turbine.isVacuum() ? 1 : 0, turbine.getExhaust().getAmount(), where);
         }
         return null;
     }
@@ -118,6 +129,15 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
                             display.humanReadableNumber(data.d(), "", false)).withStyle(data.c() >= data.d() ? ChatFormatting.GOLD : ChatFormatting.GRAY));
                     case CONDENSER -> tooltip.add(Component.translatable("jade.arcforge.condenser", display.humanReadableNumber(data.c(), "", false)));
                     case TURBINE -> {
+                        int part = (data.d() & 15) - 1;
+                        if (part >= 0 && part < TurbineLayout.Part.values().length) {
+                            tooltip.add(Component.translatable("jade.arcforge.turbine.section",
+                                    Component.translatable(TurbineLayout.Part.values()[part].translationKey())).withStyle(ChatFormatting.GRAY));
+                        }
+                        int spot = data.d() >> 4;
+                        if (spot > 0 && spot < TurbineLayout.Spot.values().length) {
+                            tooltip.add(Component.translatable(TurbineLayout.Spot.values()[spot].translationKey()).withStyle(ChatFormatting.GRAY));
+                        }
                         if (data.a() == 0) {
                             return;
                         }

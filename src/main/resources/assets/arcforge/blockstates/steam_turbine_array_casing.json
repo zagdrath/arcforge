@@ -4,22 +4,22 @@
       "model": "arcforge:block/steam_turbine_array/casing"
     },
     "end=none,formed=true": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/steam_turbine_array/casing_formed"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/steam_turbine_array/hidden"
     },
     "end=generator,formed=false": {
       "model": "arcforge:block/steam_turbine_array/casing"
     },
     "end=generator,formed=true": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/steam_turbine_array/casing_formed"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/steam_turbine_array/hidden"
     },
     "end=bearing,formed=false": {
       "model": "arcforge:block/steam_turbine_array/casing"
     },
     "end=bearing,formed=true": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/steam_turbine_array/casing_formed"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/steam_turbine_array/hidden"
     }
   }
 }

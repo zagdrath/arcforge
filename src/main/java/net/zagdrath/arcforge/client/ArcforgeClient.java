@@ -497,14 +497,12 @@ public class ArcforgeClient {
         event.registerModel(ConduitDyeModel.ID, ConduitDyeModel.Unbaked.MAP_CODEC);
     }
 
-    // The Steam Turbine and Gas Turbine Arrays' rotor pieces and the Solar Thermal Array's trough, receiver and control panel,
+    // The Gas Turbine Array's rotor pieces and the Solar Thermal Array's trough, receiver and control panel,
     // drawn by their renderers; the Conduit Filter sleeves, added to the conduit models.
     @SubscribeEvent
     static void registerStandaloneModels(ModelEvent.RegisterStandalone event) {
-        event.register(SteamTurbineArrayRenderer.ROTOR_SHAFT, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_SHAFT_MODEL));
         event.register(ThrottleLeverRenderer.ARM, SimpleUnbakedStandaloneModel.quadCollection(ThrottleLeverRenderer.ARM_MODEL));
         event.register(ArcQuarryRenderer.EMITTER, SimpleUnbakedStandaloneModel.quadCollection(ArcQuarryRenderer.EMITTER_MODEL));
-        event.register(SteamTurbineArrayRenderer.ROTOR_BLADES, SimpleUnbakedStandaloneModel.quadCollection(SteamTurbineArrayRenderer.ROTOR_BLADES_MODEL));
         event.register(SolarThermalArrayRenderer.MIRROR, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.MIRROR_MODEL));
         event.register(SolarThermalArrayRenderer.RECEIVER, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.RECEIVER_MODEL));
         event.register(SolarThermalArrayRenderer.PANEL, SimpleUnbakedStandaloneModel.quadCollection(SolarThermalArrayRenderer.PANEL_MODEL));

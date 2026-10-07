@@ -96,8 +96,9 @@ public interface MultiblockController extends ConfigurableMachine {
         return MultiblockPorts.faceCentre(level, this, side);
     }
 
-    // The ports a structure gets the first time it forms (see MultiblockPorts.Defaults): none. New
-    // structures start without ports; the player places them with the Wrench in Port mode. (Saves from
+    // The ports a structure gets the first time it forms (see MultiblockPorts.Defaults): none, unless it overrides
+    // this (the Steam Turbine Array does). New structures start without ports; the player places them with the Wrench
+    // in Port mode. (Saves from
     // before ports still get ports from their side configuration once, in MultiblockPorts.Defaults.)
     default Map<BlockPos, MultiblockPorts.DefaultPort> defaultPorts(Level level) {
         return Map.of();

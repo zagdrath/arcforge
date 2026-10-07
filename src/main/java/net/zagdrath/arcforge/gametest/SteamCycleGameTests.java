@@ -172,7 +172,11 @@ public final class SteamCycleGameTests {
         SteamGameTests.buildShell(helper, MIN, Direction.Axis.X, 3, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         helper.startSequence()
                 .thenIdle(3)
-                .thenExecute(() -> helper.getBlockEntity(MIN, SteamTurbineArrayBlockEntity.class).getSteam().set(0, SteamGrade.HIGH_PRESSURE.resource(), 60_000))
+                .thenExecute(() -> {
+                    SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(MIN, SteamTurbineArrayBlockEntity.class);
+                    SteamGameTests.clearPorts(helper, turbine);
+                    turbine.getSteam().set(0, SteamGrade.HIGH_PRESSURE.resource(), 60_000);
+                })
                 .thenIdle(30)
                 .thenExecute(() -> {
                     SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(MIN, SteamTurbineArrayBlockEntity.class);

@@ -52,6 +52,7 @@ import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.ShellCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.BiogasDigesterStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.BatteryArrayStructure;
@@ -76,7 +77,8 @@ import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 // along each side that is on the structure's outer edge. A formed block draws only its faces on the
 // outside of the structure (not toward other parts, nor into the hollow core), so the whole thing is a
 // thin skin the machine's renderer can be seen through. Loose casings use their plain model; a loose pane
-// shows its base with a lip on all four sides.
+// shows its base with a lip on all four sides. A formed pane of a Steam Turbine Array draws nothing: that array hides its
+// blocks and its renderer draws the whole turbine-generator set.
 //
 // The Distillation Array's solid column uses two more modes (see ColumnBaked): "column_2x2" for its casings
 // and controller (base / beam / roof_nw / roof_ne / roof_sw / roof_se, and front for the controller) and
@@ -373,6 +375,28 @@ public final class ConnectedModel {
             return null;
         }
 
+        // Whether the formed pane at pos is a window of a Steam Turbine Array, which hides its blocks (its renderer draws
+        // the whole turbine-generator set, windows and all): the first casing found walking out across the panes beside it.
+        private static boolean inSteamTurbine(BlockAndTintGetter level, BlockPos pos) {
+            for (Direction direction : Direction.values()) {
+                BlockPos.MutableBlockPos at = pos.mutable();
+                for (int step = 0; step < 16; step++) {
+                    at.move(direction);
+                    if (level.getBlockEntity(at) instanceof ShellMultiblockBlockEntity part) {
+                        ShellStructure.Shell shell = part.getShell();
+                        if (shell != null && shell.contains(pos)) {
+                            return part instanceof SteamTurbineArrayBlockEntity;
+                        }
+                        break;
+                    }
+                    if (!PressureGlassBlock.isFormed(level.getBlockState(at))) {
+                        break;
+                    }
+                }
+            }
+            return false;
+        }
+
         private static Direction sideDirection(Direction face, Side side) {
             return switch (side) {
                 case TOP -> WindowQuadrants.up(face);
@@ -386,6 +410,9 @@ public final class ConnectedModel {
         public void collectParts(BlockAndTintGetter level, BlockPos pos, BlockState state, RandomSource random, List<BlockStateModelPart> parts) {
             QuadCollection.Builder quads = new QuadCollection.Builder();
             boolean formed = isPart(state);
+            if (glass && formed && inSteamTurbine(level, pos)) {
+                return;
+            }
             // A casing knows its shell, so it leaves out every face into the hollow inside, however big the shell is.
             ShellStructure.Shell shell = formed ? shellAt(level, pos) : null;
             for (Direction face : Direction.values()) {

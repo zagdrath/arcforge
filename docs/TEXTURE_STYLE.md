@@ -227,7 +227,8 @@ The controller is a screen pane inside that band, not a boxed bezel.
 - **Multiblocks: 10×10 (`block/port/<mode>`).**
   - Collar at x3..12, bore 6×6 (x5..10), chip 4×4.
   - Drawn by PortOverlays on the faces set with the Wrench.
-  - New structures start with **no ports**.
+  - New structures start with **no ports**, except the Steam Turbine Array, which gets steam, energy and Exhaust ports
+    on its model's fitted spots.
   - Nozzles use the same 10 px collar.
 - **Single-block machines: 8×8, perfectly centred at x/y 4..11.**
   - This is the 10×10 plate with its chip shrunk to 2×2: rows and columns 0,1,2,3,6,7,8,9 of the 10×10.
@@ -310,6 +311,13 @@ The controller is a screen pane inside that band, not a boxed bezel.
   overlap under the neighbour) and draw no edge faces.
 - **Parts tinted in code** (for example glowing receivers) use neutral greys so the tint multiplies
   cleanly.
+- **Models whose size follows their structure** (the Steam Turbine Array) can't have a fixed unwrap. Their sheet holds
+  panels cut into columns and rows: fixed ones (bevels, rivet corners, seam bands) are drawn at 1 texel per px on every
+  face, and only bands of one tone stretch, sharing the rest of the face by weight (so a split face keeps its lit / shade
+  split at about 10/16). Faces too small for a panel use its plain form, then a flat tone; riveted panels need 9 px.
+  Round parts are banded like the 16 px cylinders: each facet gets one band tone (or a banded plate strip) for how it
+  faces the light from the top left, stepping round the part, never blended; the game's face shading adds to it. Caps
+  are flat concentric rings. A repeating surface (a grating, a strap, a louvre) is a small tile laid at 1:1.
 
 ### Natural materials: ores, raw items, raw blocks, crystals (VANILLA texture language)
 
@@ -798,9 +806,31 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     `#AE6632` shade column) over the `#2B2F34` floor.
   - `box_top` (both): the lid with four rivets and a panel seam across rows 7–8 (`#2B2F34` / `#575D65`).
   - The 3×3×3 keeps its 48 px model.
-- **Bigger Steam Boiler and Turbine Arrays** use the existing shell textures; nothing new is painted. A wall casing leaves
+- **Bigger Steam Boiler Arrays** use the existing shell textures; nothing new is painted. A wall casing leaves
   out its face toward the hollow inside however big the shell is, so the liner and reveal (`ctm/shell_liner`,
-  `ctm/shell_jamb`) still line the inside. The turbine's rotor model is scaled to the cross-section's shorter side.
+  `ctm/shell_jamb`) still line the inside. The Steam Turbine Array is a model of its own now (see "Steam Turbine Array
+  model").
+
+## Steam Turbine Array model
+- Formed, the array's casings and Pressure Glass draw nothing (`steam_turbine_array/hidden`, with the port plates);
+  SteamTurbineArrayRenderer draws one turbine-generator set from TurbineLayout, built by TurbineMesh on one sheet,
+  `block/steam_turbine_array/turbine` (128×48, positions in TurbineMesh.Paint, painted by its art script):
+  - Row 0–3: 4×4 flat tones (the machine steel ramp, the generator steel `#3E444B #4E545C #646A72 #7E848C`, FE red, the
+    blade steel `#9AA0A8`). Row 4: tiles: the grating (`#575D65` bar, `#40454C`, two `#16181B` gap rows), the riveted
+    strap (4×3: `#575D65` / `#474C53` with a `#959DA6` rivet / `#2B2F34`) and a louvre (`#7E848C` lip, `#646A72` slat,
+    `#3E444B` shadow, `#16181B` gap).
+  - 16×16 panels in the single-block casing grammar (2 px bevel, split face at x 10, rivets with inward shadows):
+    PLATE, PLAIN, GEN_PLATE / GEN_PLAIN (the generator steel lit half, `#474C53` shade half), FOOTING (`#383C42`),
+    DECK (a deck plate with a recessed panel inset 4: `#2B2F34` top/left, `#575D65` lip bottom/right, `#40454C` floor),
+    FE_BAND (`#E5483C`, `#FF8577` / `#8E231C` edges) and GLASS (12×12: clear, 1 px frame, the two glints in its 5 px
+    corner).
+  - CASING_0…5 (8×12 each): the casings' shell plates in the band tones `#2B2F34 #383C42 #40454C #474C53 #575D65 #727982`,
+    a seam band at each end (`#16181B` seam, a lip one band lighter / darker, a rivet on the facet's centre column with
+    its shadow), so each shell section reads as riveted plates meeting at seams; the window frames sit in those seams.
+  - Pipes, hoops, gland bosses and valve bodies use the band tones per facet; flanges `#575D65` on top, `#383C42` under,
+    bolt heads `#959DA6`; a bolt circle on each casing end ring; elbows PLATE; the deck slab's edge the strap; louvred
+    vents on both generator ends; the window cavity `#2B2F34` with `#16181B` end walls.
+  - Port nozzles are PLAIN collars 10 px across (the port plate's collar) from the model to the face.
 
 ## Lithium and the Battery Array
 - **Spodumene** follows the ore method: Cody's green ore (as for fluorite, without the alternate purple clusters), his green

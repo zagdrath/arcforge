@@ -7,7 +7,9 @@ package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
@@ -23,6 +25,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -55,6 +58,7 @@ import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.steam.BoilerCore;
 import net.zagdrath.arcforge.steam.Lubricant;
 import net.zagdrath.arcforge.steam.SteamGrade;
+import net.zagdrath.arcforge.steam.TurbineLayout;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
@@ -70,8 +74,9 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // flow of Superheated); it takes about 5 s to get there and coasts down (about 10 s) when the steam stops; the output is
 // scaled by how close the rotor is to that speed, so opening the valve gives a rising output over a few
 // seconds. Steam is used either way. Its front is a long side (the window, see chooseFront), so the
-// generator end (positive along the axis) is on its left or right. A new turbine's ports are an energy port
-// on the generator end's cap and a steam port on the bearing end's. Heavy Oil in its lubricant tank (fed
+// generator end (positive along the axis) is on its left or right. Formed, it's drawn as a turbine-generator set
+// (see TurbineLayout and SteamTurbineArrayRenderer) with fitted spots for its steam, energy and Exhaust ports, and a
+// new turbine gets a port on each (see defaultPorts). Heavy Oil in its lubricant tank (fed
 // through lubricant ports) adds 8% to its output and doubles how fast the rotor spins up while it
 // generates, using 1 mB every 20 ticks for every 3 sections. Spent steam vents, unless the turbine
 // has an Exhaust port: then it goes into an exhaust tank as Exhaust Steam, pushed out of the Exhaust ports
@@ -113,8 +118,6 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     private float syncedRpm;
     private int syncedFlow;
     private long lastSync;
-    // Client side: how thick the steam in the rotor chamber looks (0-1), easing toward the synced flow.
-    private float shownSteam = -1;
 
     // Client side: the rotor angle, advanced as frames are drawn.
     private float clientAngle;
@@ -255,6 +258,23 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     public void onPortsChanged() {
         targetsDirty = true;
         hasExhaust = level != null && MultiblockPorts.list(level, this).stream().anyMatch(port -> port.mode() == SideMode.EXHAUST);
+    }
+
+    // A new turbine's ports, on the model's fitted spots: steam on top over the steam chest, energy on the generator
+    // end, and Exhaust underneath the exhaust neck (a full exhaust tank only vents, so it never stalls the turbine).
+    @Override
+    public Map<BlockPos, MultiblockPorts.DefaultPort> defaultPorts(Level level) {
+        ShellStructure.Shell shell = getShell();
+        if (shell == null) {
+            return Map.of();
+        }
+        TurbineLayout layout = TurbineLayout.of(shell, getFacing());
+        // One port a block: if two spots ever share a block, the first listed keeps it.
+        Map<BlockPos, MultiblockPorts.DefaultPort> ports = new LinkedHashMap<>();
+        ports.putIfAbsent(layout.steamSpot(shell), new MultiblockPorts.DefaultPort(SideMode.INPUT, Direction.UP));
+        ports.putIfAbsent(layout.energySpot(shell), new MultiblockPorts.DefaultPort(SideMode.ENERGY, TurbineLayout.energyFace(shell)));
+        ports.putIfAbsent(layout.exhaustSpot(shell), new MultiblockPorts.DefaultPort(SideMode.EXHAUST, Direction.DOWN));
+        return ports;
     }
 
     // The front is one of the two long horizontal sides: the one with more Pressure Glass, else the one
@@ -479,13 +499,6 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     // Client side: the last synced rotor speed.
     public float getSyncedRpm() {
         return syncedRpm;
-    }
-
-    // Client side: the steam density to draw, easing toward the share of the maximum flow going through.
-    public float easeSteamDensity(float share) {
-        float target = Math.min(1.0F, (float) syncedFlow / Math.max(1, maxFlow()));
-        shownSteam = shownSteam < 0 ? target : shownSteam + (target - shownSteam) * share;
-        return shownSteam;
     }
 
     // Client side: the rotor angle in degrees at this moment, at the last synced speed. It turns at up to

@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.gametest;
 
+import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
@@ -246,8 +248,8 @@ public final class PortGameTests {
                 .thenSucceed();
     }
 
-    // A new turbine starts with no ports, even on its end caps; an energy port set on the generator end
-    // cap gives energy.
+    // A new turbine starts with its steam, energy and Exhaust ports; with them cleared, the generator end gives no
+    // energy until an energy port is set on it.
     static void turbinePorts(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
         SteamGameTests.buildShell(helper, min, Direction.Axis.X, 4, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get(), new BlockPos(1, 2, 0));
@@ -259,7 +261,15 @@ public final class PortGameTests {
                     helper.assertTrue(turbine.isFormed(), "Turbine did not form");
                     helper.assertTrue(helper.getBlockState(generator).getValue(SteamTurbineArrayCasingBlock.END) == SteamTurbineArrayCasingBlock.End.GENERATOR,
                             "Generator cap is not at +X");
-                    helper.assertTrue(MultiblockPorts.list(helper.getLevel(), turbine).isEmpty(), "New turbine has ports");
+                    // A new turbine gets steam, energy and Exhaust ports on its fitted spots (see TurbineModelGameTests).
+                    List<MultiblockPorts.Port> ports = MultiblockPorts.list(helper.getLevel(), turbine);
+                    helper.assertTrue(ports.stream().map(MultiblockPorts.Port::mode).sorted().toList()
+                            .equals(List.of(SideMode.INPUT, SideMode.ENERGY, SideMode.EXHAUST).stream().sorted().toList()),
+                            "New turbine's ports: " + ports);
+                    for (MultiblockPorts.Port port : ports) {
+                        MultiblockPorts.set(helper.getLevel(), turbine, port.pos(), SideMode.NONE, port.face());
+                    }
+                    helper.assertTrue(MultiblockPorts.list(helper.getLevel(), turbine).isEmpty(), "Cleared turbine still has ports");
                     helper.assertTrue(helper.getLevel().getCapability(Capabilities.Energy.BLOCK, helper.absolutePos(generator), Direction.EAST) == null,
                             "Generator end gives energy without a port");
                     MultiblockPorts.set(helper.getLevel(), turbine, helper.absolutePos(generator), SideMode.ENERGY, Direction.EAST);

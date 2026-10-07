@@ -332,6 +332,13 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
+    // Clears every port of a formed structure: for tests of a Steam Turbine Array without the ports it starts with.
+    static void clearPorts(GameTestHelper helper, SteamTurbineArrayBlockEntity turbine) {
+        for (MultiblockPorts.Port port : MultiblockPorts.list(helper.getLevel(), turbine)) {
+            MultiblockPorts.set(helper.getLevel(), turbine, port.pos(), SideMode.NONE, port.face());
+        }
+    }
+
     // A 3x3 tube of casings along an axis, with glass at the given (non-corner) positions.
     static void buildShell(GameTestHelper helper, BlockPos min, Direction.Axis axis, int length,
             net.minecraft.world.level.block.Block casing, BlockPos... glass) {

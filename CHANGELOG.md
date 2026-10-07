@@ -55,6 +55,28 @@ Suggested version: **2.5.0** (minor: a new feature; worlds and configs carry ove
   consumes, and how long it has spent running and loaded. The totals are saved with the machine. For now, other mods
   read them through the API; the GUIs don't show them.
 
+### Changed
+
+- **Steam Turbine Array: a real turbine-generator set.** Formed, the array hides its casings and glass and is drawn as
+  one machine along its axis, from the steam end to the generator end: a steel plinth (a deck on stepped footings, or
+  stepped columns when the structure is taller than the turbine needs); turbine casings on one shaft, each a round
+  casing split along the middle by a bolted flange line, growing from high to low pressure (3 to 5 long one turbine
+  casing; 6 to 9 high and low pressure; 10 to 15 high, intermediate and a double-flow low-pressure casing with a
+  flanged crossover pipe from the intermediate casing's top into the middle of the low-pressure casing); bearing
+  pedestals with the shaft and couplings between the casings; a steam chest, stop-valve housings and inlet pipes on the
+  high-pressure casing; the low-pressure exhaust neck pointing down; and the generator (lighter steel, cooling ribs, a
+  terminal box with FE-red bushings, an FE-red band). Casing diameters follow the cross-section's shorter side (the
+  low-pressure casing nearly fills it, the high-pressure about half) and the sections share the length (about 15 / 20 /
+  30 / 25%, the rest bearings and couplings); a cross-section wider than tall gets a walkway with railings along its
+  front. Every casing has an inspection window on both sides with its bladed rotor behind it (more and longer blade rows
+  as the pressure drops), turning with the rotor, so spin-up and coast-down show; the generator's coupling turns too.
+  Ports get a nozzle from the machine out to their face; the fitted spots are on top over the steam chest (steam), the
+  generator end (energy) and underneath the exhaust neck (Exhaust, where a Condenser Array can connect). Jade names the
+  section you look at ("Section: Low-pressure casing") and the fitted spots. A new turbine now starts with a steam, an
+  energy and an Exhaust port on those spots (move or clear them with the Wrench; turbines already built keep their
+  ports). Unformed casings, the GUI and how the turbine runs are unchanged. The old see-through rotor, lining and steam view are
+  gone.
+
 ### Fixed
 
 - **Nether generation crashed with BetterNether** (with WorldWeaver) installed: `Feature order cycle found` between

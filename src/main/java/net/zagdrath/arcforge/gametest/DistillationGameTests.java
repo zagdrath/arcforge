@@ -210,6 +210,8 @@ final class DistillationGameTests {
                 .thenExecute(() -> {
                     SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(min, SteamTurbineArrayBlockEntity.class);
                     helper.assertTrue(turbine.isMaster(), "Turbine did not form");
+                    // Without the Exhaust port it starts with, so no vacuum bonus on top of lubricant.
+                    SteamGameTests.clearPorts(helper, turbine);
                     helper.assertTrue(SteamGameTests.fill(turbine.getFluidHandler(null), CREOSOTE, 100) == 0, "The turbine took creosote");
                     helper.assertTrue(SteamGameTests.fill(turbine.getFluidHandler(null), HEAVY_OIL, 100) == 100, "The turbine didn't take heavy oil");
                     turbine.getSteam().set(0, SteamGrade.SUPERHEATED.resource(), 60_000);

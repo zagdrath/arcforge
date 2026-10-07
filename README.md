@@ -334,16 +334,26 @@ Cooling into a lower grade turns the steam it holds into that grade.
 cross-section 3 to 7 wide and 3 to 9 tall. It takes up to 40 mB/t per section (width × height ÷ 9 × length:
 3 for a 3×3×3, 105 for a 7×9×15) at 20 / 36 / 56 FE per mB (a 7×9×15 on Superheated makes 235,200 FE/t
 before its bonuses). Its output cap is a full flow of Superheated Steam with both bonuses (no fixed cap), its
-FE buffer 400 ticks of that, and its energy ports share the cap. The rotor is sized to the cross-section's
-shorter side; with an even side the ends have no middle block, so no generator or bearing is marked. Its rotor spins up over a few seconds when steam flows, and output rises with it; it
+FE buffer 400 ticks of that, and its energy ports share the cap. Its rotor spins up over a few seconds when steam flows, and output rises with it; it
 coasts down when the steam stops. Its speed follows the power in the steam (flow times FE per mB), so a
-higher grade spins it faster: full speed is a full flow of Superheated Steam. A new one has an energy port on its generator end and a steam port on
-its bearing end. Heavy Oil in its 4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
+higher grade spins it faster: full speed is a full flow of Superheated Steam. A new one starts with a steam, an energy and an Exhaust port on its fitted spots (below); move or clear them with the Wrench. Heavy Oil in its 4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
 sections (width × height ÷ 9 × length).
 
-Spent steam vents, unless you give it an **Exhaust** port with the Wrench. With an Exhaust port, spent
+Spent steam vents, unless it has an **Exhaust** port (a new one does; clear it with the Wrench to vent). With an Exhaust port, spent
 steam leaves as **Exhaust Steam**, a gas only a Condenser Array can use. While the exhaust drains (its
 tank isn't full), the turbine makes 10% more FE, on top of the lubricant bonus.
+
+Formed, the turbine hides its blocks and is drawn as one **turbine-generator set** along its axis, on a steel plinth
+with stepped footings (columns when the structure is taller than it needs): from the steam end, turbine casings on
+one shaft (each split along the middle by a bolted flange, with bearing pedestals and couplings between them), then
+the generator (cooling ribs, terminal box, FE-red accents) at the positive end. 3 to 5 long it has one turbine casing,
+6 to 9 a small high-pressure and a large low-pressure casing, 10 to 15 high-, intermediate- and a double-flow
+low-pressure casing with a crossover pipe. Casings fill the cross-section's shorter side; a cross-section wider than
+tall gets a walkway with railings along its front. A window on each side of every casing shows its blades turning
+with the rotor. Ports fit best on top over the high-pressure steam chest (steam), on the generator end (energy) and
+underneath the low-pressure exhaust neck (Exhaust, where a Condenser Array can sit), and a new turbine starts with a
+port on each; a port anywhere else gets a pipe
+from the machine out to it. Jade names the section and these spots.
 
 **Gas Turbine Array** (Hardened). A 3x3 tube 5 to 9 long along either horizontal axis, built like the Steam
 Turbine Array (Pressure Glass windows allowed, but the middle of each end must be a casing). It burns fuel

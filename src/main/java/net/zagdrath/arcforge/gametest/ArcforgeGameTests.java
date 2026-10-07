@@ -309,6 +309,8 @@ public final class ArcforgeGameTests {
         TESTS.put("sifter_sifts", MineralsGameTests::sifterSifts);
         TESTS.put("diamond_press_presses", MineralsGameTests::diamondPress);
         TESTS.put("biogas_sulfur", MineralsGameTests::biogasSulfur);
+        TESTS.put("steam_turbine_model_layout", TurbineModelGameTests::layoutSizes);
+        TESTS.put("steam_turbine_model_spots", TurbineModelGameTests::formedSpots);
         TESTS.put("salt_recipes", SaltGameTests::recipes);
         TESTS.put("salt_tags", SaltGameTests::saltTags);
         TESTS.put("salt_reactor_makes_brine", SaltGameTests::reactorMakesBrine);
