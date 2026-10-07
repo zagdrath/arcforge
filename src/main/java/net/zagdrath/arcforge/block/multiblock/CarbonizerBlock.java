@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -49,6 +51,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // structure; ROW/HALF/DEPTH record where each block sits so the models can draw one continuous casing
 // with a door per slice, and TALL picks the 3-tall front and door art. See CarbonizerStructure for formation and CarbonizerBlockEntity for processing.
 public class CarbonizerBlock extends BaseEntityBlock implements MultiblockPart, PortHolder {
+    private static final MapCodec<CarbonizerBlock> CODEC = simpleCodec(CarbonizerBlock::new);
+
+    @Override
+    protected MapCodec<CarbonizerBlock> codec() {
+        return CODEC;
+    }
+
     // Position along the row of slices. NONE = not part of a formed structure.
     public enum Row implements StringRepresentable {
         NONE("none"), SINGLE("single"), LEFT("left"), MIDDLE("middle"), RIGHT("right");

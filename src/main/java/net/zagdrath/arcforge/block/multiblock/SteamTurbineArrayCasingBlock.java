@@ -9,6 +9,8 @@ import java.util.EnumSet;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -31,6 +33,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // rotor's bearings: END marks the generator end (positive along the axis, with the FE port) and the plain bearing
 // end (a cross-section with an even side has no middle block, so its ends stay plain).
 public class SteamTurbineArrayCasingBlock extends ShellCasingBlock {
+    private static final MapCodec<SteamTurbineArrayCasingBlock> CODEC = simpleCodec(SteamTurbineArrayCasingBlock::new);
+
+    @Override
+    protected MapCodec<SteamTurbineArrayCasingBlock> codec() {
+        return CODEC;
+    }
+
     public enum End implements StringRepresentable {
         NONE("none"), GENERATOR("generator"), BEARING("bearing");
 

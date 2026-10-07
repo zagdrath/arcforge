@@ -19,25 +19,22 @@
     "till": {
       "trigger": "minecraft:item_used_on_block",
       "conditions": {
-        "location": {
-          "type": "minecraft:all_of",
-          "terms": [
-            {
-              "type": "minecraft:location_check",
-              "predicate": {
-                "block": {
-                  "blocks": "arcforge:loam_farmland"
-                }
-              }
-            },
-            {
-              "type": "minecraft:match_tool",
-              "predicate": {
-                "items": "#minecraft:hoes"
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "arcforge:loam_farmland"
               }
             }
-          ]
-        }
+          },
+          {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "#minecraft:hoes"
+            }
+          }
+        ]
       }
     }
   },

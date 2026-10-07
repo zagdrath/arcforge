@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -42,6 +44,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Biogas Digester's controller, in the middle of one of the tank's sides: its sight glass and gauge face out of the
 // tank (FACING), and its block entity runs the digester and holds its contents. LIT while it digests.
 public class BiogasDigesterControllerBlock extends BaseEntityBlock implements DigesterPart, PortHolder {
+    private static final MapCodec<BiogasDigesterControllerBlock> CODEC = simpleCodec(BiogasDigesterControllerBlock::new);
+
+    @Override
+    protected MapCodec<BiogasDigesterControllerBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 

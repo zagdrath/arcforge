@@ -10,6 +10,7 @@ import org.jspecify.annotations.Nullable;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -22,7 +23,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -116,7 +116,7 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
 
         // Lit by the middle of the structure, not by the corner the master sits in.
         state.light = boiler.getLevel() != null
-                ? LightCoordsUtil.getLightCoords(boiler.getLevel(), shell.centre())
+                ? LevelRenderer.getLightCoords(boiler.getLevel(), shell.centre())
                 : state.lightCoords;
     }
 

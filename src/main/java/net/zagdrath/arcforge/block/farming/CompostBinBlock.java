@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.farming;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -36,6 +38,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Compost Bin: an open treated-wood box, shaped like a vanilla composter, whose LEVEL (0-7 filling, 8 ready) is
 // shown by the heap inside. See CompostBinBlockEntity for how it fills and makes Compost.
 public class CompostBinBlock extends BaseEntityBlock {
+    private static final MapCodec<CompostBinBlock> CODEC = simpleCodec(CompostBinBlock::new);
+
+    @Override
+    protected MapCodec<CompostBinBlock> codec() {
+        return CODEC;
+    }
+
     public static final int FULL = 7, READY = 8;
     public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, READY);
     // A 2 px floor and 2 px walls round an open top.

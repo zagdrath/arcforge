@@ -19,14 +19,16 @@
     "oil_press": {
       "trigger": "minecraft:placed_block",
       "conditions": {
-        "location": {
-          "type": "minecraft:location_check",
-          "predicate": {
-            "block": {
-              "blocks": "arcforge:oil_press"
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "arcforge:oil_press"
+              }
             }
           }
-        }
+        ]
       }
     }
   },

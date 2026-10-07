@@ -140,7 +140,7 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
             poseStack.pushPose();
             poseStack.translate(item.position().x, item.position().y, item.position().z);
             poseStack.scale(ITEM_SCALE, ITEM_SCALE, ITEM_SCALE);
-            poseStack.rotateDegrees(Axis.YP, item.spin());
+            poseStack.mulPose(Axis.YP.rotationDegrees(item.spin()));
             item.state().submit(poseStack, collector, state.lightCoords, OverlayTexture.NO_OVERLAY, 0);
             poseStack.popPose();
         }

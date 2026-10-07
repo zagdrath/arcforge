@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -42,6 +44,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Thermal Evaporator Array's controller, in the middle of one side of the tower's bottom layer: its gauge panel faces
 // out of the tower (FACING), and its block entity runs the evaporator and holds its contents. LIT while it evaporates.
 public class ThermalEvaporatorControllerBlock extends BaseEntityBlock implements ThermalEvaporatorPart, PortHolder {
+    private static final MapCodec<ThermalEvaporatorControllerBlock> CODEC = simpleCodec(ThermalEvaporatorControllerBlock::new);
+
+    @Override
+    protected MapCodec<ThermalEvaporatorControllerBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 

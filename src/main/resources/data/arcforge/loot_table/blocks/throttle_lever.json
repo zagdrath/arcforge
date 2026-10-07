@@ -3,8 +3,17 @@
   "pools": [
     {
       "rolls": 1,
-      "entries": [{ "type": "minecraft:item", "name": "arcforge:throttle_lever" }],
-      "conditions": [{ "condition": "minecraft:survives_explosion" }]
+      "entries": [
+        {
+          "type": "minecraft:item",
+          "name": "arcforge:throttle_lever"
+        }
+      ],
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
     }
   ],
   "random_sequence": "arcforge:blocks/throttle_lever"

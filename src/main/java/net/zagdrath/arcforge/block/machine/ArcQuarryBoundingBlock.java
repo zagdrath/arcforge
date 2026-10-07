@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -35,6 +37,13 @@ import net.zagdrath.arcforge.registry.ModItems;
 // item drops once, from the main block), and its outer faces are the quarry's faces. It never drops anything
 // itself, and removes itself if its main block has gone (a broken edit).
 public class ArcQuarryBoundingBlock extends BaseEntityBlock {
+    private static final MapCodec<ArcQuarryBoundingBlock> CODEC = simpleCodec(ArcQuarryBoundingBlock::new);
+
+    @Override
+    protected MapCodec<ArcQuarryBoundingBlock> codec() {
+        return CODEC;
+    }
+
     public ArcQuarryBoundingBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

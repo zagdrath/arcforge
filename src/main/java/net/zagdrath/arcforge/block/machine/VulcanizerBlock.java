@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -23,6 +25,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Vulcanizer (see VulcanizerBlockEntity): a heated press that cures Raw Rubber with Sulfur, lit while it works.
 public class VulcanizerBlock extends MachineBlock {
+    private static final MapCodec<VulcanizerBlock> CODEC = simpleCodec(VulcanizerBlock::new);
+
+    @Override
+    protected MapCodec<VulcanizerBlock> codec() {
+        return CODEC;
+    }
+
     public VulcanizerBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

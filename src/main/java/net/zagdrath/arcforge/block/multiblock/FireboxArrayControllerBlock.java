@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -42,6 +44,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Firebox Array's controller, in a side wall of the box (not on an edge): its fire-door panel faces out of the box
 // (FACING), and its block entity runs the array and holds its contents. LIT while it burns.
 public class FireboxArrayControllerBlock extends BaseEntityBlock implements FireboxArrayPart, PortHolder {
+    private static final MapCodec<FireboxArrayControllerBlock> CODEC = simpleCodec(FireboxArrayControllerBlock::new);
+
+    @Override
+    protected MapCodec<FireboxArrayControllerBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 

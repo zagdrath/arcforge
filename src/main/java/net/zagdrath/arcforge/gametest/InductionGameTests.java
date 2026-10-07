@@ -7,7 +7,7 @@ package net.zagdrath.arcforge.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -161,7 +161,7 @@ public final class InductionGameTests {
         for (BlockPos pos : BlockPos.betweenClosed(new BlockPos(1, 2, 1), new BlockPos(3, 3, 3))) {
             helper.setBlock(pos.immutable(), ModBlocks.CREOSOTE.get());
         }
-        ArmorStand stand = helper.spawn(EntityTypes.ARMOR_STAND, new Vec3(1.5, 3.2, 2.5));
+        ArmorStand stand = helper.spawn(EntityType.ARMOR_STAND, new Vec3(1.5, 3.2, 2.5));
         Vec3 start = stand.position();
         stand.setDeltaMovement(0.3, 0.0, 0.0);
         helper.startSequence()

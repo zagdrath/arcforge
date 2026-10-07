@@ -9,9 +9,11 @@
           "name": "arcforge:fertilizer_spreader"
         }
       ],
-      "condition": {
-        "type": "minecraft:survives_explosion"
-      }
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ]
     }
   ],
   "random_sequence": "arcforge:blocks/fertilizer_spreader"

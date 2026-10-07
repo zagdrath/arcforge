@@ -34,8 +34,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.component.BlockTransformers;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.component.Tool;
 import net.minecraft.world.item.component.TooltipDisplay;
@@ -83,7 +83,7 @@ public class ArcToolItem extends Item {
         this.kind = kind;
     }
 
-    // The tool component, attack attributes and path making or stripping for a tier and kind.
+    // The tool component and attack attributes for a tier and kind.
     public static Item.Properties properties(Item.Properties properties, ConduitTier tier, Kind kind) {
         int index = JetpackItem.tierIndex(tier);
         HolderGetter<Block> blocks = BuiltInRegistries.acquireBootstrapRegistrationLookup(BuiltInRegistries.BLOCK);
@@ -91,7 +91,7 @@ public class ArcToolItem extends Item {
         TagKey<Block> mineable = kind == Kind.DRILL ? ModBlockTags.ARC_DRILL_MINEABLE : ModBlockTags.ARC_SAW_MINEABLE;
         float attack = (kind == Kind.DRILL ? DRILL_ATTACK : SAW_ATTACK)[index];
         float attackSpeed = kind == Kind.DRILL ? -2.8F : -3.0F;
-        properties.stacksTo(1)
+        return properties.stacksTo(1)
                 .component(DataComponents.TOOL, new Tool(List.of(Tool.Rule.deniesDrops(blocks.getOrThrow(incorrect)),
                         Tool.Rule.minesAndDrops(blocks.getOrThrow(mineable), BASE_SPEED[index])), 1.0F, 0, true))
                 .attributes(ItemAttributeModifiers.builder()
@@ -100,9 +100,6 @@ public class ArcToolItem extends Item {
                         .add(Attributes.ATTACK_SPEED, new AttributeModifier(Item.BASE_ATTACK_SPEED_ID, attackSpeed, AttributeModifier.Operation.ADD_VALUE),
                                 EquipmentSlotGroup.MAINHAND)
                         .build());
-        return kind == Kind.DRILL
-                ? properties.delayedComponent(DataComponents.BLOCK_TRANSFORMER, context -> context.getOrThrow(BlockTransformers.SHOVEL))
-                : properties.delayedComponent(DataComponents.BLOCK_TRANSFORMER, context -> context.getOrThrow(BlockTransformers.AXE));
     }
 
     public ConduitTier tier() {
@@ -203,7 +200,9 @@ public class ArcToolItem extends Item {
         if (!free && energy(stack) < USE_COST) {
             return InteractionResult.PASS;
         }
-        InteractionResult result = super.useOn(context);
+        // Path making and dousing (the Drill) or stripping, scraping and waxing off (the Saw), as the shovel's and axe's
+        // own useOn do it; canPerformAction gives the tool their abilities.
+        InteractionResult result = (kind == Kind.DRILL ? Items.IRON_SHOVEL : Items.IRON_AXE).useOn(context);
         if (result.consumesAction() && !context.getLevel().isClientSide() && !free) {
             spend(stack, USE_COST);
         }
@@ -238,10 +237,11 @@ public class ArcToolItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    // Like a shovel, the Drill puts out campfires. (Stripping and path making are the BLOCK_TRANSFORMER component.)
+    // The Drill does what a shovel does to blocks (paths, putting out campfires), the Saw what an axe does.
     @Override
     public boolean canPerformAction(ItemInstance stack, ItemAbility ability) {
-        return (kind == Kind.DRILL && ability == ItemAbilities.SHOVEL_DOUSE) || super.canPerformAction(stack, ability);
+        return (kind == Kind.DRILL ? ItemAbilities.DEFAULT_SHOVEL_ACTIONS : ItemAbilities.DEFAULT_AXE_ACTIONS).contains(ability)
+                || super.canPerformAction(stack, ability);
     }
 
     // --- Silk Touch and Fortune modules: enchantments the tool reports while they're on ---

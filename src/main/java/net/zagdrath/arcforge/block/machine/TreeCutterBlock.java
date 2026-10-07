@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Tree Cutter (see TreeCutterBlockEntity): plants and fells trees in the area in front of it. Its saw guard faces the
 // area; LIT while it fells or plants.
 public class TreeCutterBlock extends MachineBlock {
+    private static final MapCodec<TreeCutterBlock> CODEC = simpleCodec(TreeCutterBlock::new);
+
+    @Override
+    protected MapCodec<TreeCutterBlock> codec() {
+        return CODEC;
+    }
+
     public TreeCutterBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

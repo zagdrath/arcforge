@@ -13,6 +13,7 @@ import org.jspecify.annotations.Nullable;
 import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -24,7 +25,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -103,7 +103,7 @@ public class ThermalEvaporatorRenderer implements BlockEntityRenderer<ThermalEva
         }
         // Lit by the middle of the core, not by the controller at the foot of the tower.
         state.light = evaporator.getLevel() != null
-                ? LightCoordsUtil.getLightCoords(evaporator.getLevel(), tower.coreBottom().above(ThermalEvaporatorStructure.HEIGHT / 2 - 1))
+                ? LevelRenderer.getLightCoords(evaporator.getLevel(), tower.coreBottom().above(ThermalEvaporatorStructure.HEIGHT / 2 - 1))
                 : state.lightCoords;
     }
 

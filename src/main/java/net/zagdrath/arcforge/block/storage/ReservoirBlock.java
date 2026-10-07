@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.storage;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -41,6 +43,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // pipes) and a comparator reads the whole tank. Breaking a block keeps its share of the fluid on the item.
 // The block glows with its fluid's light level (LIGHT is kept in sync by the block entity).
 public class ReservoirBlock extends BaseEntityBlock {
+    private static final MapCodec<ReservoirBlock> CODEC = simpleCodec(ReservoirBlock::new);
+
+    @Override
+    protected MapCodec<ReservoirBlock> codec() {
+        return CODEC;
+    }
+
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, 15);
 
     public ReservoirBlock(BlockBehaviour.Properties properties) {

@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,6 +26,13 @@ import net.zagdrath.arcforge.blockentity.machine.FiberizerBlockEntity;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 public class FiberizerBlock extends MachineBlock {
+    private static final MapCodec<FiberizerBlock> CODEC = simpleCodec(FiberizerBlock::new);
+
+    @Override
+    protected MapCodec<FiberizerBlock> codec() {
+        return CODEC;
+    }
+
     public FiberizerBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

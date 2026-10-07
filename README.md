@@ -3,7 +3,7 @@
 </p>
 
 <p align="center">
-  A Forge Energy technology mod for Minecraft 26.3 on NeoForge.
+  A Forge Energy technology mod for Minecraft 26.1.2 on NeoForge.
 </p>
 
 ## About
@@ -14,6 +14,13 @@ from any other NeoForge mod that uses FE. Other mods can also monitor and contro
 store and move its gases, through its API; see [docs/API.md](docs/API.md).
 
 Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Machines** creative tab.
+
+## Requirements
+
+- Minecraft 26.1.2
+- NeoForge 26.1.2.114 or later
+
+Optional: [JEI](https://modrinth.com/mod/jei) and [Jade](https://modrinth.com/mod/jade).
 
 ## Machines
 

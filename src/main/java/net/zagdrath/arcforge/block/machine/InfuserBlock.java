@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,6 +26,13 @@ import net.zagdrath.arcforge.blockentity.machine.InfuserBlockEntity;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 public class InfuserBlock extends MachineBlock {
+    private static final MapCodec<InfuserBlock> CODEC = simpleCodec(InfuserBlock::new);
+
+    @Override
+    protected MapCodec<InfuserBlock> codec() {
+        return CODEC;
+    }
+
     public InfuserBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

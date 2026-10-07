@@ -5,11 +5,12 @@
 
 package net.zagdrath.arcforge.block.farming.greenhouse;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Prediction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -30,6 +31,13 @@ import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 // Loam, sand, soul sand: the arcforge:cloche_soils), then a seed; sneak-right-click with an empty hand to take the seed
 // back, then the soil.
 public class PlantingBedBlock extends BaseEntityBlock implements GreenhousePart {
+    private static final MapCodec<PlantingBedBlock> CODEC = simpleCodec(PlantingBedBlock::new);
+
+    @Override
+    protected MapCodec<PlantingBedBlock> codec() {
+        return CODEC;
+    }
+
     public PlantingBedBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }
@@ -79,7 +87,7 @@ public class PlantingBedBlock extends BaseEntityBlock implements GreenhousePart 
                     bed.setSoil(ItemStack.EMPTY);
                 }
                 if (!player.getInventory().add(taken)) {
-                    player.drop(taken, false, Prediction.SERVER_ONLY);
+                    player.drop(taken, false);
                 }
                 level.playSound(null, pos, SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.4F, 1.0F);
             }

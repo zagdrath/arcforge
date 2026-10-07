@@ -13,7 +13,7 @@ tasks.named('wrapper', Wrapper).configure {
     distributionType = Wrapper.DistributionType.BIN
 }
 
-// Full version is <mod_version>+<minecraft_version>, e.g. 1.0.0+26.3 (SemVer build metadata).
+// Full version is <mod_version>+<minecraft_version>, e.g. 1.0.0+26.1.2 (SemVer build metadata).
 version = "${mod_version}+${minecraft_version}"
 group = mod_group_id
 
@@ -31,7 +31,7 @@ sourceSets {
 
 def apiVersion = (file('src/api/java/net/zagdrath/arcforge/api/ArcforgeApi.java').getText('UTF-8') =~ /API_VERSION = "([^"]+)"/)[0][1]
 // The API uses Minecraft and NeoForge types, so each Minecraft version's branch builds its own jar of the same API
-// version: arcforge-api-1.1.0+26.3.jar here. The Minecraft version is SemVer build metadata, as in the mod's version.
+// version: arcforge-api-1.1.0+26.1.2.jar here. The Minecraft version is SemVer build metadata, as in the mod's version.
 def apiArtifactVersion = "${apiVersion}+${minecraft_version}"
 
 sourceSets.main.resources {
@@ -65,7 +65,7 @@ base {
     archivesName = mod_id
 }
 
-// Mojang ships Java 25 to end users in 26.3, so mods should target Java 25.
+// Mojang ships Java 25 to end users in 26.1, so mods should target Java 25.
 java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 // Default run configurations.

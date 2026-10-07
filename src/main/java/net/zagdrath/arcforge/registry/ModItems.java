@@ -11,9 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.BucketItem;
@@ -23,8 +21,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.Rarity;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProvider;
-import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -208,12 +204,8 @@ public final class ModItems {
 
     // --- Steelmaking ---
 
-    // Furnace burn times, data-driven like vanilla's (data/arcforge/context_int_provider/cooking/).
-    private static final ResourceKey<ContextIntProvider> COAL_COKE_BURN_TIME = cookingTime("time_coal_coke");
-    private static final ResourceKey<ContextIntProvider> COAL_COKE_BLOCK_BURN_TIME = cookingTime("time_coal_coke_block");
+    // Furnace burn times are in NeoForge's furnace_fuels data map (data/neoforge/data_maps/item/furnace_fuels.json);
     // Bio-Coal burns as long as coal (1,600 ticks), its block as a coal block (16,000).
-    private static final ResourceKey<ContextIntProvider> BIO_COAL_BURN_TIME = cookingTime("time_bio_coal");
-    private static final ResourceKey<ContextIntProvider> BIO_COAL_BLOCK_BURN_TIME = cookingTime("time_bio_coal_block");
 
     public static final DeferredItem<BlockItem> CARBONIZER = ITEMS.registerSimpleBlockItem(ModBlocks.CARBONIZER);
     public static final DeferredItem<BlockItem> ARCFORGE_FURNACE_PORT = ITEMS.registerSimpleBlockItem(ModBlocks.ARCFORGE_FURNACE_PORT);
@@ -222,24 +214,20 @@ public final class ModItems {
 
     public static final DeferredItem<Item> STEEL_INGOT = ITEMS.registerSimpleItem("steel_ingot");
     public static final DeferredItem<BlockItem> STEEL_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.STEEL_BLOCK);
-    public static final DeferredItem<Item> COAL_COKE = ITEMS.registerSimpleItem("coal_coke", p -> p.cookingFuel(COAL_COKE_BURN_TIME));
-    public static final DeferredItem<BlockItem> COAL_COKE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.COAL_COKE_BLOCK,
-            p -> p.cookingFuel(COAL_COKE_BLOCK_BURN_TIME));
+    public static final DeferredItem<Item> COAL_COKE = ITEMS.registerSimpleItem("coal_coke");
+    public static final DeferredItem<BlockItem> COAL_COKE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.COAL_COKE_BLOCK);
     public static final DeferredItem<Item> SLAG = ITEMS.registerSimpleItem("slag");
     // Renewable coal: biomass cooked in water under heat (the Hydrothermal Carbonizer). It works as coal everywhere.
-    public static final DeferredItem<Item> BIO_COAL = ITEMS.registerSimpleItem("bio_coal", p -> p.cookingFuel(BIO_COAL_BURN_TIME));
-    public static final DeferredItem<BlockItem> BIO_COAL_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.BIO_COAL_BLOCK,
-            p -> p.cookingFuel(BIO_COAL_BLOCK_BURN_TIME));
+    public static final DeferredItem<Item> BIO_COAL = ITEMS.registerSimpleItem("bio_coal");
+    public static final DeferredItem<BlockItem> BIO_COAL_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.BIO_COAL_BLOCK);
 
     // --- Crushing ---
-
-    private static final ResourceKey<ContextIntProvider> CARBON_DUST_BURN_TIME = cookingTime("time_carbon_dust");
 
     public static final DeferredItem<Item> IRON_DUST = ITEMS.registerSimpleItem("iron_dust");
     public static final DeferredItem<Item> COPPER_DUST = ITEMS.registerSimpleItem("copper_dust");
     public static final DeferredItem<Item> GOLD_DUST = ITEMS.registerSimpleItem("gold_dust");
     public static final DeferredItem<Item> ANCIENT_DEBRIS_DUST = ITEMS.registerSimpleItem("ancient_debris_dust");
-    public static final DeferredItem<Item> CARBON_DUST = ITEMS.registerSimpleItem("carbon_dust", p -> p.cookingFuel(CARBON_DUST_BURN_TIME));
+    public static final DeferredItem<Item> CARBON_DUST = ITEMS.registerSimpleItem("carbon_dust");
     public static final DeferredItem<Item> NETHER_QUARTZ_DUST = ITEMS.registerSimpleItem("nether_quartz_dust");
     public static final DeferredItem<Item> SULFUR_DUST = ITEMS.registerSimpleItem("sulfur_dust");
 
@@ -452,12 +440,10 @@ public final class ModItems {
 
     // --- Distillation ---
 
-    private static final ResourceKey<ContextIntProvider> PITCH_BURN_TIME = cookingTime("time_pitch");
-
     public static final DeferredItem<BlockItem> DISTILLATION_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.DISTILLATION_ARRAY_CASING);
     public static final DeferredItem<BlockItem> TRAY_LEVEL_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.TRAY_LEVEL_CASING);
     public static final DeferredItem<BlockItem> DISTILLATION_ARRAY_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.DISTILLATION_ARRAY_CONTROLLER);
-    public static final DeferredItem<Item> PITCH = ITEMS.registerSimpleItem("pitch", p -> p.cookingFuel(PITCH_BURN_TIME));
+    public static final DeferredItem<Item> PITCH = ITEMS.registerSimpleItem("pitch");
     public static final DeferredItem<Item> CARBON_FIBER = ITEMS.registerSimpleItem("carbon_fiber");
 
     // --- Gas Turbine Array parts ---
@@ -482,36 +468,35 @@ public final class ModItems {
             p -> new FertilizerItem(ArcforgeConfig.MIXED_FERTILIZER_NUTRIENTS::getAsInt, p));
 
     // Crops. Seeds that plant a crop are block items named as items ("Flax Seeds", not the crop). Compost Bins take them
-    // at vanilla's chances: 30% for seeds, 65% for the harvest.
+    // at vanilla's chances: 30% for seeds, 65% for the harvest (data/neoforge/data_maps/item/compostables.json).
     public static final DeferredItem<BlockItem> FLAX_SEEDS = ITEMS.registerItem("flax_seeds",
-            p -> new BlockItem(ModBlocks.FLAX.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
-    public static final DeferredItem<Item> FLAX_FIBRE = ITEMS.registerSimpleItem("flax_fibre", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+            p -> new BlockItem(ModBlocks.FLAX.get(), p.useItemDescriptionPrefix()));
+    public static final DeferredItem<Item> FLAX_FIBRE = ITEMS.registerSimpleItem("flax_fibre");
     public static final DeferredItem<Item> LINEN = ITEMS.registerSimpleItem("linen");
     public static final DeferredItem<BlockItem> RAPESEEDS = ITEMS.registerItem("rapeseeds",
-            p -> new BlockItem(ModBlocks.RAPESEED.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
+            p -> new BlockItem(ModBlocks.RAPESEED.get(), p.useItemDescriptionPrefix()));
     public static final DeferredItem<BlockItem> SORGHUM_SEEDS = ITEMS.registerItem("sorghum_seeds",
-            p -> new BlockItem(ModBlocks.SORGHUM.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
+            p -> new BlockItem(ModBlocks.SORGHUM.get(), p.useItemDescriptionPrefix()));
     // Soybeans are their own seed, like vanilla carrots: the item plants the crop and is named as an item.
     public static final DeferredItem<BlockItem> SOYBEANS = ITEMS.registerItem("soybeans",
-            p -> new BlockItem(ModBlocks.SOYBEANS.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_MEDIUM)));
+            p -> new BlockItem(ModBlocks.SOYBEANS.get(), p.useItemDescriptionPrefix()));
     // Rubber Dandelion: seeds plant it; its roots press into Latex.
     public static final DeferredItem<BlockItem> RUBBER_DANDELION_SEEDS = ITEMS.registerItem("rubber_dandelion_seeds",
-            p -> new BlockItem(ModBlocks.RUBBER_DANDELION.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
-    public static final DeferredItem<Item> RUBBER_DANDELION_ROOTS = ITEMS.registerSimpleItem("rubber_dandelion_roots", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+            p -> new BlockItem(ModBlocks.RUBBER_DANDELION.get(), p.useItemDescriptionPrefix()));
+    public static final DeferredItem<Item> RUBBER_DANDELION_ROOTS = ITEMS.registerSimpleItem("rubber_dandelion_roots");
     // Pine Resin, from a Resin Tap on a spruce (or slowly, any) log: the Infuser takes it in place of Creosote.
     public static final DeferredItem<Item> PINE_RESIN = ITEMS.registerSimpleItem("pine_resin");
-    public static final DeferredItem<Item> SORGHUM_STALKS = ITEMS.registerSimpleItem("sorghum_stalks", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<Item> SORGHUM_STALKS = ITEMS.registerSimpleItem("sorghum_stalks");
     // Hop Seeds are planted by using them on a Trellis (TrellisBlock), so they're a plain item.
-    public static final DeferredItem<Item> HOP_SEEDS = ITEMS.registerSimpleItem("hop_seeds", p -> p.compostable(ContextIntProviders.COMPOSTABLE_LOW));
-    public static final DeferredItem<Item> HOP_CONES = ITEMS.registerSimpleItem("hop_cones", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<Item> HOP_SEEDS = ITEMS.registerSimpleItem("hop_seeds");
+    public static final DeferredItem<Item> HOP_CONES = ITEMS.registerSimpleItem("hop_cones");
     public static final DeferredItem<BlockItem> TRELLIS = ITEMS.registerSimpleBlockItem(ModBlocks.TRELLIS);
-    public static final DeferredItem<BlockItem> WILD_FLAX = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_FLAX, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
-    public static final DeferredItem<BlockItem> WILD_RAPESEED = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RAPESEED, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
-    public static final DeferredItem<BlockItem> WILD_SORGHUM = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SORGHUM, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
-    public static final DeferredItem<BlockItem> WILD_HOPS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_HOPS, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
-    public static final DeferredItem<BlockItem> WILD_SOYBEANS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SOYBEANS, p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
-    public static final DeferredItem<BlockItem> WILD_RUBBER_DANDELION = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RUBBER_DANDELION,
-            p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<BlockItem> WILD_FLAX = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_FLAX);
+    public static final DeferredItem<BlockItem> WILD_RAPESEED = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RAPESEED);
+    public static final DeferredItem<BlockItem> WILD_SORGHUM = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SORGHUM);
+    public static final DeferredItem<BlockItem> WILD_HOPS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_HOPS);
+    public static final DeferredItem<BlockItem> WILD_SOYBEANS = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_SOYBEANS);
+    public static final DeferredItem<BlockItem> WILD_RUBBER_DANDELION = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RUBBER_DANDELION);
 
     // Rustic farming machines and tools. Durability is fixed here (it's set before the config loads); the areas are config.
     public static final DeferredItem<BlockItem> PLANTER = ITEMS.registerSimpleBlockItem(ModBlocks.PLANTER);
@@ -540,10 +525,10 @@ public final class ModItems {
     public static final DeferredItem<Item> FLOUR = ITEMS.registerSimpleItem("flour");
     public static final DeferredItem<FertilizerItem> SEED_MEAL = ITEMS.registerItem("seed_meal",
             p -> new FertilizerItem(ArcforgeConfig.SEED_MEAL_NUTRIENTS::getAsInt, p));
-    public static final DeferredItem<Item> PRESS_CAKE = ITEMS.registerSimpleItem("press_cake", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
-    public static final DeferredItem<Item> DRIED_HOPS = ITEMS.registerSimpleItem("dried_hops", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
-    public static final DeferredItem<Item> DRIED_GRAIN = ITEMS.registerSimpleItem("dried_grain", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
-    public static final DeferredItem<Item> DRIED_SORGHUM = ITEMS.registerSimpleItem("dried_sorghum", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
+    public static final DeferredItem<Item> PRESS_CAKE = ITEMS.registerSimpleItem("press_cake");
+    public static final DeferredItem<Item> DRIED_HOPS = ITEMS.registerSimpleItem("dried_hops");
+    public static final DeferredItem<Item> DRIED_GRAIN = ITEMS.registerSimpleItem("dried_grain");
+    public static final DeferredItem<Item> DRIED_SORGHUM = ITEMS.registerSimpleItem("dried_sorghum");
 
     // Farm chemistry: the machines, and the fertilizers they lead to. NPK Fertilizer fills Loam Farmland and enriches it
     // (crops on it grow faster than on any other fertilizer); Digestate, the Biogas Digester's by-product, is a middling one.
@@ -672,10 +657,6 @@ public final class ModItems {
 
     public static PortableStorageItem portable(PortableStorageItem.Kind kind, ConduitTier tier) {
         return PORTABLES.get(kind.ordinal() * ConduitTier.values().length + tier.ordinal()).get();
-    }
-
-    private static ResourceKey<ContextIntProvider> cookingTime(String name) {
-        return ResourceKey.create(Registries.CONTEXT_INT_PROVIDER, Identifier.fromNamespaceAndPath(Arcforge.MODID, "cooking/" + name));
     }
 
     // In the order of the Building Blocks tab.

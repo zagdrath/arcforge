@@ -38,7 +38,7 @@ public record VaultContents(Optional<ItemStackTemplate> item, int amount, boolea
             VaultContents::new);
 
     public static VaultContents of(ItemStack template, int amount, boolean locked, boolean voidMode) {
-        return new VaultContents(template.isEmpty() ? Optional.empty() : Optional.of(ItemStackTemplate.fromNonEmptyStack(template, 1)),
+        return new VaultContents(template.isEmpty() ? Optional.empty() : Optional.of(ItemStackTemplate.fromNonEmptyStack(template.copyWithCount(1))),
                 amount, locked, voidMode);
     }
 

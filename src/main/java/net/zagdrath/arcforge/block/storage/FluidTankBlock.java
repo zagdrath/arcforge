@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.storage;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
@@ -34,6 +36,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // A slim glass tank. The liquid inside is drawn by FluidTankRenderer; the block glows with the
 // fluid's light level (LIGHT is kept in sync by the block entity).
 public class FluidTankBlock extends StorageBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<FluidTankBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, 15);
     private static final VoxelShape SHAPE = Block.box(3, 0, 3, 13, 16, 13);
 

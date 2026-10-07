@@ -108,7 +108,7 @@ public record FilterSettings(List<Entry> entries, boolean deny, boolean ignoreCo
 
         // The item alone (count 1, components kept), matched exactly.
         public static Entry of(ItemStack stack) {
-            return stack.isEmpty() ? EMPTY : new Entry(Optional.of(ItemStackTemplate.fromNonEmptyStack(stack, 1)), Optional.empty(), Optional.empty());
+            return stack.isEmpty() ? EMPTY : new Entry(Optional.of(ItemStackTemplate.fromNonEmptyStack(stack.copyWithCount(1))), Optional.empty(), Optional.empty());
         }
 
         public static Entry of(Fluid fluid) {

@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.logistics;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -40,6 +42,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // crystal ball stand. The globe (ChunkLoaderRenderer) turns while it loads chunks (ACTIVE, which also lights the screen)
 // and stops when it doesn't.
 public class ChunkLoaderBlock extends BaseEntityBlock {
+    private static final MapCodec<ChunkLoaderBlock> CODEC = simpleCodec(ChunkLoaderBlock::new);
+
+    @Override
+    protected MapCodec<ChunkLoaderBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty ACTIVE = BooleanProperty.create("active");
     private static final VoxelShape SHAPE = Shapes.or(

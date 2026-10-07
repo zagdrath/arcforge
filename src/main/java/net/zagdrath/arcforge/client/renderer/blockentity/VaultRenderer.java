@@ -11,6 +11,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -67,7 +68,7 @@ public class VaultRenderer implements BlockEntityRenderer<VaultBlockEntity, Vaul
         BlockEntityRenderer.super.extractRenderState(vault, state, partialTicks, cameraPosition, breakProgress);
         state.facing = vault.getBlockState().getValue(VaultBlock.FACING);
         state.frontLight = vault.getLevel() != null
-                ? LightCoordsUtil.getLightCoords(vault.getLevel(), vault.getBlockPos().relative(state.facing))
+                ? LevelRenderer.getLightCoords(vault.getLevel(), vault.getBlockPos().relative(state.facing))
                 : LightCoordsUtil.FULL_BRIGHT;
         ItemStack template = vault.getTemplate();
         int amount = vault.getAmount();
@@ -94,7 +95,7 @@ public class VaultRenderer implements BlockEntityRenderer<VaultBlockEntity, Vaul
         poseStack.pushPose();
         // +Z out of the front, the face plane at z = 0 of this pose; x right and y up as seen from the front.
         poseStack.translate(0.5F, 0.5F, 0.5F);
-        poseStack.rotateDegrees(Axis.YP, -state.facing.toYRot());
+        poseStack.mulPose(Axis.YP.rotationDegrees(-state.facing.toYRot()));
         poseStack.translate(0.0F, 0.0F, FACE_OFFSET);
 
         if (state.hasItem) {

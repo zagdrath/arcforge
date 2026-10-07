@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.logistics;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -29,6 +31,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Quantum Tunnel: a steel frame cube with a socketed port on every face and a cyan core spinning in the middle
 // (QuantumTunnelRenderer). Tunnels on one frequency share its FE, heat, liquid, gas and items, across dimensions.
 public class QuantumTunnelBlock extends BaseEntityBlock {
+    private static final MapCodec<QuantumTunnelBlock> CODEC = simpleCodec(QuantumTunnelBlock::new);
+
+    @Override
+    protected MapCodec<QuantumTunnelBlock> codec() {
+        return CODEC;
+    }
+
     public QuantumTunnelBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

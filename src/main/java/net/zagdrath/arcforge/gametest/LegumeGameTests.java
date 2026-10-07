@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +20,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
 import net.zagdrath.arcforge.blockentity.farming.ClocheBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.HydroponicCellBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.farming.CropHarvest;
@@ -54,7 +54,7 @@ public final class LegumeGameTests {
         helper.assertTrue(CropRotation.isLegume(ModBlocks.SOYBEANS.get().defaultBlockState()), "The soybean crop isn't a legume");
         helper.assertTrue(!CropRotation.isLegume(Blocks.WHEAT.defaultBlockState()) && !new ItemStack(Items.WHEAT_SEEDS).is(ModItemTags.LEGUMES),
                 "Wheat is a legume");
-        helper.assertTrue(beans.has(DataComponents.COMPOSTABLE), "Soybeans don't compost");
+        helper.assertTrue(CompostBinBlockEntity.compostable(beans), "Soybeans don't compost");
         helper.assertTrue(ModBlocks.SOYBEANS.get().asItem() == ModItems.SOYBEANS.get(), "The crop's item isn't Soybeans");
         List<ItemStack> grown = Block.getDrops(ModBlocks.SOYBEANS.get().getStateForAge(7), helper.getLevel(), helper.absolutePos(SOIL.above()), null);
         int count = grown.stream().filter(stack -> stack.is(ModItems.SOYBEANS.get())).mapToInt(ItemStack::getCount).sum();

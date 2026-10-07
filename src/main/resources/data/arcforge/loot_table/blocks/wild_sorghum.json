@@ -7,9 +7,9 @@
         {
           "type": "minecraft:item",
           "name": "arcforge:sorghum_seeds",
-          "modifier": [
+          "functions": [
             {
-              "type": "minecraft:set_count",
+              "function": "minecraft:set_count",
               "count": {
                 "type": "minecraft:uniform",
                 "min": 1,
@@ -22,10 +22,12 @@
     },
     {
       "rolls": 1,
-      "condition": {
-        "type": "minecraft:random_chance",
-        "chance": 0.5
-      },
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.5
+        }
+      ],
       "entries": [
         {
           "type": "minecraft:item",

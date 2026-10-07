@@ -9,6 +9,8 @@ import java.util.EnumSet;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
@@ -31,6 +33,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // intake (which needs air in front of it, and can't hold a port) and the exhaust. The master picks which is
 // which when the structure forms (see GasTurbineArrayBlockEntity.onFormed).
 public class GasTurbineArrayCasingBlock extends ShellCasingBlock {
+    private static final MapCodec<GasTurbineArrayCasingBlock> CODEC = simpleCodec(GasTurbineArrayCasingBlock::new);
+
+    @Override
+    protected MapCodec<GasTurbineArrayCasingBlock> codec() {
+        return CODEC;
+    }
+
     public enum End implements StringRepresentable {
         NONE("none"), INTAKE("intake"), EXHAUST("exhaust");
 

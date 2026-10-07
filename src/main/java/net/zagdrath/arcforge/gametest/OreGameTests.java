@@ -351,9 +351,9 @@ public final class OreGameTests {
             helper.setBlock(pos.immutable(), Blocks.STONE);
         }
         ServerLevel level = helper.getLevel();
-        var feature = level.registryAccess().lookupOrThrow(Registries.FEATURE)
-                .getOrThrow(ResourceKey.create(Registries.FEATURE, Identifier.fromNamespaceAndPath(Arcforge.MODID, "ore_silver")));
-        helper.assertTrue(feature.value() instanceof ModWorldgen.ConfigOre, "ore_silver isn't a config ore feature");
+        var feature = level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE)
+                .getOrThrow(ResourceKey.create(Registries.CONFIGURED_FEATURE, Identifier.fromNamespaceAndPath(Arcforge.MODID, "ore_silver")));
+        helper.assertTrue(feature.value().config() instanceof ModWorldgen.ConfigOre, "ore_silver isn't a config ore feature");
         boolean placed = false;
         for (int attempt = 0; attempt < 5 && !placed; attempt++) {
             placed = feature.value().place(level, level.getChunkSource().getGenerator(), level.getRandom(), helper.absolutePos(new BlockPos(3, 4, 3)));

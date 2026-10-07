@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -43,6 +45,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // control panel is drawn on that side of the tower's base; if it sits at the bottom layer's minimum corner
 // it draws the base itself (BASE). LIT while the receiver takes heat.
 public class SolarThermalArrayControllerBlock extends BaseEntityBlock implements SolarPart, PortHolder {
+    private static final MapCodec<SolarThermalArrayControllerBlock> CODEC = simpleCodec(SolarThermalArrayControllerBlock::new);
+
+    @Override
+    protected MapCodec<SolarThermalArrayControllerBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
     public static final BooleanProperty BASE = BooleanProperty.create("base");

@@ -44,7 +44,7 @@ public final class ArcQuarryToast implements Toast {
         }
         Component message = Component.translatable("toast.arcforge.arc_quarry_finished.message", ArcforgeGui.grouped(payload.mined()),
                 payload.pos().getX(), payload.pos().getY(), payload.pos().getZ());
-        Minecraft.getInstance().gui.toastManager().addToast(new ArcQuarryToast(Component.translatable("toast.arcforge.arc_quarry_finished"), message));
+        Minecraft.getInstance().getToastManager().addToast(new ArcQuarryToast(Component.translatable("toast.arcforge.arc_quarry_finished"), message));
     }
 
     @Override

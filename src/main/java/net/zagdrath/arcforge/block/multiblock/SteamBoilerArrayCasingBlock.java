@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import java.util.EnumSet;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,6 +26,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // A casing of the Steam Boiler Array: a tower on a footprint 3 to 7 by 3 to 9 (either way round), 3 to 12 blocks
 // tall, with Pressure Glass windows.
 public class SteamBoilerArrayCasingBlock extends ShellCasingBlock {
+    private static final MapCodec<SteamBoilerArrayCasingBlock> CODEC = simpleCodec(SteamBoilerArrayCasingBlock::new);
+
+    @Override
+    protected MapCodec<SteamBoilerArrayCasingBlock> codec() {
+        return CODEC;
+    }
+
     public static final int MIN_SIZE = 3, MAX_WIDTH = 7, MAX_DEPTH = 9, MAX_HEIGHT = 12;
     public static final ShellStructure STRUCTURE = new ShellStructure(block -> block instanceof SteamBoilerArrayCasingBlock,
             EnumSet.of(Direction.Axis.Y), (axis, x, y, z) -> fits(x, z, MAX_WIDTH, MAX_DEPTH) && y >= MIN_SIZE && y <= MAX_HEIGHT);

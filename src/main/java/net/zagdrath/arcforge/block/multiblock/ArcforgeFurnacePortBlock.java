@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -44,6 +46,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Arcforge Furnace's front-bottom block, with a small window onto the fire. Its facing is the
 // furnace's front, and its block entity runs the furnace and holds the inventory.
 public class ArcforgeFurnacePortBlock extends BaseEntityBlock implements MultiblockPart {
+    private static final MapCodec<ArcforgeFurnacePortBlock> CODEC = simpleCodec(ArcforgeFurnacePortBlock::new);
+
+    @Override
+    protected MapCodec<ArcforgeFurnacePortBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 

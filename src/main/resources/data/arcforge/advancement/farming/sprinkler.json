@@ -19,14 +19,16 @@
     "sprinkler": {
       "trigger": "minecraft:placed_block",
       "conditions": {
-        "location": {
-          "type": "minecraft:location_check",
-          "predicate": {
-            "block": {
-              "blocks": "arcforge:copper_sprinkler"
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "arcforge:copper_sprinkler"
+              }
             }
           }
-        }
+        ]
       }
     }
   },

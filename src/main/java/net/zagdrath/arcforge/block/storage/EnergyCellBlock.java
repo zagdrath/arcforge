@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.storage;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -25,6 +27,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // A full-block FE store. CHARGE (0-4) picks the model: 0 is fully dark, then 1-4 lit segments.
 // It also sets the light level, so a charged cell glows at night.
 public class EnergyCellBlock extends StorageBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<EnergyCellBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final IntegerProperty CHARGE = IntegerProperty.create("charge", 0, 4);
     private static final int[] LIGHT_BY_CHARGE = { 0, 3, 5, 7, 9 };
 

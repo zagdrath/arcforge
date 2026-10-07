@@ -9,13 +9,11 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.Compostable;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LevelEvent;
@@ -23,11 +21,8 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.registries.datamaps.builtin.Compostable;
+import net.neoforged.neoforge.registries.datamaps.builtin.NeoForgeDataMaps;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.block.farming.CompostBinBlock;
@@ -41,7 +36,7 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 
 // The Compost Bin. Its fill level is the block's LEVEL (0-7, 8 = ready), as on a vanilla composter, and each plant
-// item raises it by the layers its minecraft:compostable component rolls, as in a vanilla composter. Players drop items straight in; hoppers
+// item raises it by one layer at its chance in NeoForge's compostables data map, as in a vanilla composter. Players drop items straight in; hoppers
 // and conduits fill the input slot, which it works through one item every itemInterval ticks. readyDelay ticks after
 // it's full, compostPerBatch Compost goes into the output slot and the bin reads "ready" until that's taken, by hand
 // (use it) or pulled out by a hopper or conduit; then it starts again from empty.
@@ -55,13 +50,13 @@ public class CompostBinBlockEntity extends BlockEntity implements ConduitConnect
 
     public CompostBinBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.COMPOST_BIN.get(), pos, state);
-        this.items = new FilteredItemHandler(SLOTS, (slot, resource) -> slot == SLOT_INPUT && resource.getComponents().has(DataComponents.COMPOSTABLE), this::setChanged);
+        this.items = new FilteredItemHandler(SLOTS, (slot, resource) -> slot == SLOT_INPUT && resource.getItem().builtInRegistryHolder().getData(NeoForgeDataMaps.COMPOSTABLES) != null, this::setChanged);
         this.automation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> slot == SLOT_OUTPUT);
     }
 
     // Whether it's plant matter the bin takes.
     public static boolean compostable(ItemStack stack) {
-        return stack.has(DataComponents.COMPOSTABLE);
+        return stack.getData(NeoForgeDataMaps.COMPOSTABLES) != null;
     }
 
     public FilteredItemHandler getItems() {
@@ -89,7 +84,7 @@ public class CompostBinBlockEntity extends BlockEntity implements ConduitConnect
     // A player drops one item straight in. Returns whether it was taken (the level may or may not have risen).
     public boolean insertByHand(ServerLevel level, ItemStack stack) {
         int fill = getLevelValue();
-        Compostable compostable = stack.get(DataComponents.COMPOSTABLE);
+        Compostable compostable = stack.getData(NeoForgeDataMaps.COMPOSTABLES);
         if (fill >= CompostBinBlock.FULL || compostable == null) {
             return false;
         }
@@ -138,7 +133,7 @@ public class CompostBinBlockEntity extends BlockEntity implements ConduitConnect
         }
         if (++itemTimer >= ArcforgeConfig.COMPOST_BIN_ITEM_INTERVAL.getAsInt()) {
             itemTimer = 0;
-            Compostable compostable = input.get(DataComponents.COMPOSTABLE);
+            Compostable compostable = input.getData(NeoForgeDataMaps.COMPOSTABLES);
             items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - 1));
             if (compostable != null) {
                 compost(level, compostable);
@@ -147,14 +142,10 @@ public class CompostBinBlockEntity extends BlockEntity implements ConduitConnect
         setChanged();
     }
 
-    // One item into the heap: the level rises by the layers the item's component rolls (ComposterBlock.addLayer).
+    // One item into the heap: the level rises by a layer at the item's chance (ComposterBlock.addItem).
     private void compost(ServerLevel level, Compostable compostable) {
         int fill = getLevelValue();
-        LootContext context = new LootContext.Builder(new LootParams.Builder(level)
-                .withParameter(LootContextParams.BLOCK_STATE, getBlockState())
-                .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(worldPosition))
-                .create(LootContextParamSets.BLOCK_INTERACT)).create(java.util.Optional.empty());
-        int layers = compostable.layers().get(context, 0);
+        int layers = level.getRandom().nextFloat() < compostable.chance() ? 1 : 0;
         boolean rose = layers > 0;
         if (rose) {
             setFill(level, Math.min(CompostBinBlock.FULL, fill + layers));

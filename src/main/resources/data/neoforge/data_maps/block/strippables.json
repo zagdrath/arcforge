@@ -1,0 +1,10 @@
+{
+  "values": {
+    "arcforge:treated_log": {
+      "stripped_block": "arcforge:stripped_treated_log"
+    },
+    "arcforge:treated_wood": {
+      "stripped_block": "arcforge:stripped_treated_wood"
+    }
+  }
+}

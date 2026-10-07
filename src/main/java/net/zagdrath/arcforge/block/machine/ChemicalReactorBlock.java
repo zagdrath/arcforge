@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.sound.MachineSounds;
 
 // The front's flask bubbles while it runs (an animated texture); the sound is its running loop, see MachineLoopSound.
 public class ChemicalReactorBlock extends MachineBlock {
+    private static final MapCodec<ChemicalReactorBlock> CODEC = simpleCodec(ChemicalReactorBlock::new);
+
+    @Override
+    protected MapCodec<ChemicalReactorBlock> codec() {
+        return CODEC;
+    }
+
     public ChemicalReactorBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

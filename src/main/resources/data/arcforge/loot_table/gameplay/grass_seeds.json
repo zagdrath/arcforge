@@ -3,24 +3,21 @@
   "pools": [
     {
       "rolls": 1,
-      "condition": {
-        "type": "minecraft:all_of",
-        "terms": [
-          {
-            "type": "minecraft:random_chance",
-            "chance": 0.06
-          },
-          {
-            "type": "minecraft:inverted",
-            "term": {
-              "type": "minecraft:match_tool",
-              "predicate": {
-                "items": "minecraft:shears"
-              }
+      "conditions": [
+        {
+          "condition": "minecraft:random_chance",
+          "chance": 0.06
+        },
+        {
+          "condition": "minecraft:inverted",
+          "term": {
+            "condition": "minecraft:match_tool",
+            "predicate": {
+              "items": "minecraft:shears"
             }
           }
-        ]
-      },
+        }
+      ],
       "entries": [
         {
           "type": "minecraft:item",

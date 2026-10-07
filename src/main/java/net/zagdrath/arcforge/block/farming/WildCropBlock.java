@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.block.farming;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
@@ -22,6 +24,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 // and modifiers load in parallel, so two sharing a tag (say #c:is_snowy) can crash the registry load. Breaking one gives
 // its seeds (and now and then the crop), from its loot table.
 public class WildCropBlock extends VegetationBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<WildCropBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     private static final VoxelShape SHAPE = Block.box(2, 0, 2, 14, 13, 14);
     // Flax, Rapeseed and Sorghum stand two blocks tall (they use the grown crop's model): the outline covers it.
     private static final VoxelShape TALL_SHAPE = Block.box(1, 0, 1, 15, 30, 15);

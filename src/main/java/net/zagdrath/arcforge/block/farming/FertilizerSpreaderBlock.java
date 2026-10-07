@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.farming;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -35,6 +37,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Fertilizer Spreader (see FertilizerSpreaderBlockEntity). Use it holding fertilizer to put the stack in; sneak-use
 // with an empty hand to take it all back.
 public class FertilizerSpreaderBlock extends BaseEntityBlock {
+    private static final MapCodec<FertilizerSpreaderBlock> CODEC = simpleCodec(FertilizerSpreaderBlock::new);
+
+    @Override
+    protected MapCodec<FertilizerSpreaderBlock> codec() {
+        return CODEC;
+    }
+
     // The hopper (y 10-16) and its throat over four legs, and the spinner disc.
     private static final VoxelShape SHAPE = Shapes.or(
             Block.box(0, 10, 0, 16, 16, 16),

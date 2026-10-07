@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -25,6 +27,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Oil Press (see OilPressBlockEntity). Its front shows the press plate coming down on the seeds.
 public class OilPressBlock extends MachineBlock {
+    private static final MapCodec<OilPressBlock> CODEC = simpleCodec(OilPressBlock::new);
+
+    @Override
+    protected MapCodec<OilPressBlock> codec() {
+        return CODEC;
+    }
+
     public OilPressBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

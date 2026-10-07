@@ -1,0 +1,64 @@
+{
+  "values": {
+    "arcforge:dried_grain": {
+      "chance": 0.65
+    },
+    "arcforge:dried_hops": {
+      "chance": 0.65
+    },
+    "arcforge:dried_sorghum": {
+      "chance": 0.65
+    },
+    "arcforge:flax_fibre": {
+      "chance": 0.65
+    },
+    "arcforge:flax_seeds": {
+      "chance": 0.3
+    },
+    "arcforge:hop_cones": {
+      "chance": 0.65
+    },
+    "arcforge:hop_seeds": {
+      "chance": 0.3
+    },
+    "arcforge:press_cake": {
+      "chance": 0.65
+    },
+    "arcforge:rapeseeds": {
+      "chance": 0.3
+    },
+    "arcforge:rubber_dandelion_roots": {
+      "chance": 0.65
+    },
+    "arcforge:rubber_dandelion_seeds": {
+      "chance": 0.3
+    },
+    "arcforge:sorghum_seeds": {
+      "chance": 0.3
+    },
+    "arcforge:sorghum_stalks": {
+      "chance": 0.65
+    },
+    "arcforge:soybeans": {
+      "chance": 0.65
+    },
+    "arcforge:wild_flax": {
+      "chance": 0.65
+    },
+    "arcforge:wild_hops": {
+      "chance": 0.65
+    },
+    "arcforge:wild_rapeseed": {
+      "chance": 0.65
+    },
+    "arcforge:wild_rubber_dandelion": {
+      "chance": 0.65
+    },
+    "arcforge:wild_sorghum": {
+      "chance": 0.65
+    },
+    "arcforge:wild_soybeans": {
+      "chance": 0.65
+    }
+  }
+}

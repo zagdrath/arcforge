@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.storage;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
@@ -29,6 +31,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // A stainless gas cylinder: holds one gas. It has no window; LEVEL (0-4) only moves the needle of its
 // pressure gauge: 0 empty, then under 25%, 50%, 75%, and 75% or more.
 public class PressurizedCylinderBlock extends StorageBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<PressurizedCylinderBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 4);
     private static final VoxelShape SHAPE = Shapes.or(Block.box(3, 0, 3, 13, 13, 13), Block.box(4, 13, 4, 12, 16, 12));
 

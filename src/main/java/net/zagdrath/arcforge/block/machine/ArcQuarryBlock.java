@@ -13,6 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -35,6 +37,13 @@ import net.zagdrath.arcforge.sound.MachineSounds;
 // The Arc Quarry's main block: the centre of its 3x3x3, which draws the whole machine (the model spans -16..32). The
 // other 26 positions are ArcQuarryBoundingBlocks that forward everything here. See ArcQuarryItem for placing it.
 public class ArcQuarryBlock extends MachineBlock {
+    private static final MapCodec<ArcQuarryBlock> CODEC = simpleCodec(ArcQuarryBlock::new);
+
+    @Override
+    protected MapCodec<ArcQuarryBlock> codec() {
+        return CODEC;
+    }
+
     // The model's boxes (block/arc_quarry/model.json, in pixels from the main block's corner, facing north), and the
     // arc emitter's reach as it spins. The whole machine's shape is built from these, so it can be hit and stood on
     // like the model rather than as a 3x3x3 cube.

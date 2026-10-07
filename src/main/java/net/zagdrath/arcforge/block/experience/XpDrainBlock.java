@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.experience;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -30,6 +32,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // Experience orbs that land on it, and the experience of a player sneaking on it, run into the container as Liquid
 // Experience (see XpDrainBlockEntity). It can only be placed on something that takes fluid from above.
 public class XpDrainBlock extends BaseEntityBlock {
+    private static final MapCodec<XpDrainBlock> CODEC = simpleCodec(XpDrainBlock::new);
+
+    @Override
+    protected MapCodec<XpDrainBlock> codec() {
+        return CODEC;
+    }
+
     private static final VoxelShape SHAPE = Block.box(0, 0, 0, 16, 2, 16);
 
     public XpDrainBlock(BlockBehaviour.Properties properties) {

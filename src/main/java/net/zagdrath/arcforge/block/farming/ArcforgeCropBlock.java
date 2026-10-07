@@ -15,7 +15,6 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
@@ -67,8 +66,8 @@ public class ArcforgeCropBlock extends CropBlock {
     }
 
     @Override
-    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state, BonemealSource source) {
-        return super.isValidBonemealTarget(level, pos, state, source) && hasRoomToGrow(level, pos, state);
+    public boolean isValidBonemealTarget(LevelReader level, BlockPos pos, BlockState state) {
+        return super.isValidBonemealTarget(level, pos, state) && hasRoomToGrow(level, pos, state);
     }
 
     // Bone meal can jump several stages; it stops below the tall stages when the space above is taken.

@@ -3,9 +3,11 @@
   "pools": [
     {
       "rolls": 1,
-      "condition": {
-        "type": "minecraft:survives_explosion"
-      },
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
       "entries": [
         {
           "type": "minecraft:item",
@@ -15,16 +17,18 @@
     },
     {
       "rolls": 1,
-      "condition": {
-        "type": "minecraft:match_block",
-        "blocks": "arcforge:trellis",
-        "state": {
-          "age": {
-            "min": "1",
-            "max": "4"
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "arcforge:trellis",
+          "properties": {
+            "age": {
+              "min": "1",
+              "max": "4"
+            }
           }
         }
-      },
+      ],
       "entries": [
         {
           "type": "minecraft:item",
@@ -34,20 +38,22 @@
     },
     {
       "rolls": 1,
-      "condition": {
-        "type": "minecraft:match_block",
-        "blocks": "arcforge:trellis",
-        "state": {
-          "age": "4"
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "arcforge:trellis",
+          "properties": {
+            "age": "4"
+          }
         }
-      },
+      ],
       "entries": [
         {
           "type": "minecraft:item",
           "name": "arcforge:hop_cones",
-          "modifier": [
+          "functions": [
             {
-              "type": "minecraft:set_count",
+              "function": "minecraft:set_count",
               "count": {
                 "type": "minecraft:uniform",
                 "min": 1,

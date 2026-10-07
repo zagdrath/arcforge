@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -22,6 +24,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Air Separator (see AirSeparatorBlockEntity): a compressor and cold box that draws air in through its top grille.
 public class AirSeparatorBlock extends MachineBlock {
+    private static final MapCodec<AirSeparatorBlock> CODEC = simpleCodec(AirSeparatorBlock::new);
+
+    @Override
+    protected MapCodec<AirSeparatorBlock> codec() {
+        return CODEC;
+    }
+
     public AirSeparatorBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

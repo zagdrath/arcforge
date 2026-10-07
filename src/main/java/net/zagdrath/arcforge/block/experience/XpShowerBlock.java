@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.experience;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -40,6 +42,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // Experience through its top, by conduit or from a container above it, and gives a player sneaking under it a level at a
 // time (see XpShowerBlockEntity). A redstone signal turns it off.
 public class XpShowerBlock extends BaseEntityBlock {
+    private static final MapCodec<XpShowerBlock> CODEC = simpleCodec(XpShowerBlock::new);
+
+    @Override
+    protected MapCodec<XpShowerBlock> codec() {
+        return CODEC;
+    }
+
     private static final VoxelShape SHAPE = Shapes.or(
             Block.box(4, 14, 4, 12, 16, 12),
             Block.box(6.5, 9, 6.5, 9.5, 14, 9.5),

@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockModelResolver;
 import net.minecraft.client.renderer.block.model.BlockDisplayContext;
@@ -61,7 +62,7 @@ public class PlantingBedRenderer implements BlockEntityRenderer<PlantingBedBlock
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(bed, state, partialTicks, cameraPosition, breakProgress);
         // Lit by the air above the bed (the bed itself is solid).
-        state.light = bed.getLevel() != null ? LightCoordsUtil.getLightCoords(bed.getLevel(), bed.getBlockPos().above()) : LightCoordsUtil.FULL_BRIGHT;
+        state.light = bed.getLevel() != null ? LevelRenderer.getLightCoords(bed.getLevel(), bed.getBlockPos().above()) : LightCoordsUtil.FULL_BRIGHT;
         ClocheSoil soil = ClocheSoil.of(bed.getSoil());
         state.soil.clear();
         if (soil != null) {

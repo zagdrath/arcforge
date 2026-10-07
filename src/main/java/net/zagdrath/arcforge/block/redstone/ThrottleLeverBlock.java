@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.block.redstone;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -48,6 +50,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 // directly. The housing (with its LED gauge) comes from the blockstate model; the arm pivots on the quadrant's axle,
 // drawn by ThrottleLeverRenderer.
 public class ThrottleLeverBlock extends FaceAttachedHorizontalDirectionalBlock implements EntityBlock {
+    private static final MapCodec<ThrottleLeverBlock> CODEC = simpleCodec(ThrottleLeverBlock::new);
+
+    @Override
+    protected MapCodec<ThrottleLeverBlock> codec() {
+        return CODEC;
+    }
+
     public static final IntegerProperty POWER = BlockStateProperties.POWER;
 
     private final Function<BlockState, VoxelShape> shapes;
@@ -131,7 +140,7 @@ public class ThrottleLeverBlock extends FaceAttachedHorizontalDirectionalBlock i
     }
 
     @Override
-    protected int ownSignal(BlockState state, BlockGetter level, BlockPos pos) {
+    protected int getSignal(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
         return state.getValue(POWER);
     }
 

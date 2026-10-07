@@ -5,10 +5,10 @@ All notable changes to Arcforge are listed here, newest first. The format follow
 
 ## Versioning
 
-Versions are `MAJOR.MINOR.PATCH+MINECRAFT` (for example `1.2.0+26.3`), set by `mod_version` and
-`minecraft_version` in `gradle.properties`, and each is released as the tag `vMAJOR.MINOR.PATCH+MINECRAFT` (releases up
-to 2.5.0 were tagged `vMAJOR.MINOR.PATCH`). Each Minecraft version has its own branch and its own changelog; this one
-is Minecraft 26.3's (`main`). The same version number on two Minecraft versions has the same changes.
+Versions are `MAJOR.MINOR.PATCH+MINECRAFT` (for example `1.2.0+26.1.2`), set by `mod_version` and
+`minecraft_version` in `gradle.properties`, and each is released as the tag `vMAJOR.MINOR.PATCH+MINECRAFT`. Each
+Minecraft version has its own branch and its own changelog; this one is Minecraft 26.1.2's (`mc/26.1`). The same version
+number on two Minecraft versions has the same changes. The versions before 2.5.0 were released for Minecraft 26.3 only.
 
 - **PATCH** (1.2.0 → 1.2.1): bug fixes and small tweaks. No new content, and worlds and configs carry
   over untouched.
@@ -22,16 +22,11 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.5.1** (patch: no gameplay changes; the API jar is renamed, the API itself is unchanged).
-
-### Changed
-
-- **The API jar carries the Minecraft version.** The API is now published as `arcforge-api-1.1.0+26.3.jar` (Maven
-  `net.zagdrath.arcforge:arcforge-api:1.1.0+26.3`) rather than `arcforge-api-1.1.0.jar`, since each Minecraft version
-  Arcforge supports builds its own. The API itself is unchanged. Releases are now tagged `vX.Y.Z+26.3` and named
-  "Arcforge X.Y.Z for Minecraft 26.3", and CurseForge files "Arcforge X.Y.Z+26.3".
-
 ## [2.5.0] - 2026-10-07
+
+The first release for Minecraft 26.1.2. It has everything Arcforge has added up to 2.5.0 (the earlier versions were
+released for Minecraft 26.3 only). Needs Minecraft 26.1.2 and NeoForge 26.1.2.114 or later; JEI and Jade are optional.
+The API jar is `arcforge-api-1.1.0+26.1.2.jar`.
 
 ### Added
 
@@ -1188,8 +1183,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.5.0...HEAD
-[2.5.0]: https://github.com/zagdrath/arcforge/compare/v2.4.0...v2.5.0
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.5.0+26.1.2...HEAD
+[2.5.0]: https://github.com/zagdrath/arcforge/commits/v2.5.0+26.1.2
 [2.4.0]: https://github.com/zagdrath/arcforge/compare/v2.3.0...v2.4.0
 [2.3.0]: https://github.com/zagdrath/arcforge/compare/v2.2.0...v2.3.0
 [2.2.0]: https://github.com/zagdrath/arcforge/compare/v2.1.0...v2.2.0

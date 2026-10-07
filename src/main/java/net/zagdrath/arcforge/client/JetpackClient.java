@@ -111,7 +111,7 @@ public final class JetpackClient {
             }
         }
         boolean worn = !JetpackFlight.worn(player).isEmpty();
-        JetpackInputPayload input = worn && minecraft.gui.screen() == null
+        JetpackInputPayload input = worn && minecraft.screen == null
                 ? new JetpackInputPayload(minecraft.options.keyJump.isDown(), minecraft.options.keyShift.isDown())
                 : new JetpackInputPayload(false, false);
         sinceSent++;
@@ -191,7 +191,7 @@ public final class JetpackClient {
     private static void drawHud(GuiGraphicsExtractor graphics, net.minecraft.client.DeltaTracker deltaTracker) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
-        if (player == null || minecraft.gui.hud.isHidden()) {
+        if (player == null || minecraft.options.hideGui) {
             return;
         }
         ItemStack stack = JetpackFlight.worn(player);

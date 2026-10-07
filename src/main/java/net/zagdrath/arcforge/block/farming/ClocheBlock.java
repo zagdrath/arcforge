@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -35,6 +37,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Glass Cloche (a glass bell on a treated-wood planter), the Grow Chamber and the Hydroponic Cell (steel frames
 // glazed with Pressure Glass). The plant growing inside is drawn by ClocheRenderer.
 public class ClocheBlock extends MachineBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<ClocheBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     private static final Map<Direction, VoxelShape> CLOCHE_SHAPES = Shapes.rotateHorizontal(Shapes.or(
             Block.box(1, 0, 1, 15, 4, 15),
             Block.box(2.25, 4, 2.25, 13.75, 14.5, 13.75),

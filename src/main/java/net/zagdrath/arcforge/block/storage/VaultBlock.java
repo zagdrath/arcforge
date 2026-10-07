@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.storage;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -41,6 +43,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // MachineInteractionEvents). Sneaking with an empty hand on the front, or using any other face, opens the GUI;
 // the Wrench in Configure mode on the front toggles the lock. LOCKED and VOID light the front's status lights.
 public class VaultBlock extends StorageBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<VaultBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LOCKED = BooleanProperty.create("locked");
     public static final BooleanProperty VOID = BooleanProperty.create("void");

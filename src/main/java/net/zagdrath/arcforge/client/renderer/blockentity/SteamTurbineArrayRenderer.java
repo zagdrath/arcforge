@@ -15,6 +15,7 @@ import org.jspecify.annotations.Nullable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -27,7 +28,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -123,7 +123,7 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
         state.glass = model.glass;
         state.rotor = model.mesh.buildRotor(turbine.advanceAngle(time + partialTicks));
         state.sheet = SteamBoilerArrayRenderer.sprite(SHEET);
-        state.light = LightCoordsUtil.getLightCoords(level, shell.centre());
+        state.light = LevelRenderer.getLightCoords(level, shell.centre());
     }
 
     // The ports on the shell's outer faces, in the turbine's frame.

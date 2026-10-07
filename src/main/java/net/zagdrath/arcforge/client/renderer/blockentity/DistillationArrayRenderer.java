@@ -14,6 +14,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -26,7 +27,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
@@ -171,7 +171,7 @@ public class DistillationArrayRenderer implements BlockEntityRenderer<Distillati
             }
             // Tray blocks are lit by the air outside their glass (inside a block there's no light of its own).
             BlockPos lightAt = glass != null ? glass : column.getBlockPos().relative(column.getFacing());
-            state.layers.add(new Layer(y, fraction, poolTop, poolSprite, poolColor, walls, ceiling, LightCoordsUtil.getLightCoords(level, lightAt)));
+            state.layers.add(new Layer(y, fraction, poolTop, poolSprite, poolColor, walls, ceiling, LevelRenderer.getLightCoords(level, lightAt)));
         }
     }
 

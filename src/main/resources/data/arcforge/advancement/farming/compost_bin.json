@@ -19,14 +19,16 @@
     "compost_bin": {
       "trigger": "minecraft:placed_block",
       "conditions": {
-        "location": {
-          "type": "minecraft:location_check",
-          "predicate": {
-            "block": {
-              "blocks": "arcforge:compost_bin"
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "arcforge:compost_bin"
+              }
             }
           }
-        }
+        ]
       }
     }
   },

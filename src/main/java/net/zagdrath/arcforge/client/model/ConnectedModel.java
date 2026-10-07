@@ -325,7 +325,7 @@ public final class ConnectedModel {
                 case EAST -> { from.set(16 + offset, 16 - v1, 16 - u1); to.set(16 + offset, 16 - v0, 16 - u0); }
             }
             CuboidFace cuboidFace = new CuboidFace(null, CuboidFace.NO_TINT, "", new CuboidFace.UVs(tu0, tv0, tu1, tv1), rotation);
-            return FaceBakery.bakeQuad(baker, from, to, cuboidFace, texture, face, BlockModelRotation.IDENTITY, null, null, 0);
+            return FaceBakery.bakeQuad(baker, from, to, cuboidFace, texture, face, BlockModelRotation.IDENTITY, null, true, 0);
         }
 
         // --- Picking the pieces ---

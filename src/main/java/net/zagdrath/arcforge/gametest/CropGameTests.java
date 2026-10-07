@@ -154,7 +154,7 @@ public final class CropGameTests {
         helper.assertTrue(helper.getBlockState(bottom).getValue(TrellisBlock.AGE) == TrellisBlock.SHOOT && seeds.getCount() == 1, "Hops didn't plant");
         TrellisBlock block = ModBlocks.TRELLIS.get();
         for (int i = 0; i < 3; i++) {
-            block.performBonemeal(level, level.getRandom(), helper.absolutePos(bottom), helper.getBlockState(bottom), net.minecraft.world.level.block.BonemealSource.INTERACTION);
+            block.performBonemeal(level, level.getRandom(), helper.absolutePos(bottom), helper.getBlockState(bottom));
         }
         helper.assertTrue(helper.getBlockState(bottom).getValue(TrellisBlock.AGE) == TrellisBlock.BEARING, "The bottom vine isn't bearing");
         helper.assertTrue(helper.getBlockState(top).getValue(TrellisBlock.AGE) >= TrellisBlock.SHOOT, "The vine didn't climb");

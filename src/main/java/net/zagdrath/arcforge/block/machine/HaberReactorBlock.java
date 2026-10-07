@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,6 +26,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Haber Reactor (see HaberReactorBlockEntity): a pressure vessel round a hot iron catalyst bed, lit (the bed glows
 // through its sight glass) while it synthesizes.
 public class HaberReactorBlock extends MachineBlock {
+    private static final MapCodec<HaberReactorBlock> CODEC = simpleCodec(HaberReactorBlock::new);
+
+    @Override
+    protected MapCodec<HaberReactorBlock> codec() {
+        return CODEC;
+    }
+
     public HaberReactorBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

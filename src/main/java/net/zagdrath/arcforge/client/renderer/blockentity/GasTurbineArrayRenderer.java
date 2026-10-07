@@ -16,6 +16,7 @@ import com.mojang.math.Axis;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.builders.UVPair;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -172,7 +173,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
         float noise = (Mth.murmurHash3Mixer((int) tick * 31 + turbine.getBlockPos().hashCode()) & 0xFFFF) / 65535.0F;
         state.glow = Mth.clamp(glow * (1.0F - FLICKER + 2.0F * FLICKER * noise), 0.0F, 1.0F);
         if (turbine.getLevel() != null) {
-            state.light = LightCoordsUtil.getLightCoords(turbine.getLevel(), shell.centre());
+            state.light = LevelRenderer.getLightCoords(turbine.getLevel(), shell.centre());
             state.intakeLight = endLight(turbine, shell, turbine.getIntakeEnd());
             state.exhaustLight = endLight(turbine, shell, turbine.getIntakeEnd().opposite());
         } else {
@@ -191,7 +192,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
         int dz = out.getAxis() == Direction.Axis.Z ? 0 : 1;
         int light = 0;
         for (BlockPos pos : BlockPos.betweenClosed(outside.offset(-dx, -dy, -dz), outside.offset(dx, dy, dz))) {
-            light = LightCoordsUtil.max(light, LightCoordsUtil.getLightCoords(turbine.getLevel(), pos));
+            light = LightCoordsUtil.max(light, LevelRenderer.getLightCoords(turbine.getLevel(), pos));
         }
         return light;
     }
@@ -272,7 +273,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
                 scaleSum += scale;
                 poseStack.pushPose();
                 axisPose(poseStack, state, i, blading.centres[k] / 16.0F - 0.5F);
-                poseStack.rotate(Axis.ZP.rotationDegrees(state.angle + (stage % 2) * 180.0F / blading.blades));
+                poseStack.mulPose(Axis.ZP.rotationDegrees(state.angle + (stage % 2) * 180.0F / blading.blades));
                 poseStack.scale(scale, scale, 1.0F);
                 collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.vertices(pose, buffer, ring, -1, state.light));
                 poseStack.popPose();
@@ -281,7 +282,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
             float drumScale = scaleSum / perBlock;
             poseStack.pushPose();
             axisPose(poseStack, state, i, 0.0F);
-            poseStack.rotate(Axis.ZP.rotationDegrees(state.angle));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(state.angle));
             poseStack.scale(drumScale, drumScale, 1.0F);
             poseStack.translate(-0.5, -0.5, -0.5);
             collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, drumQuads, -1, state.light));
@@ -305,7 +306,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
             rotorPose(poseStack, state, i, 0.0F);
             if (i != 0) {
                 poseStack.translate(0.5, 0.5, 0.5);
-                poseStack.rotate(Axis.YP.rotationDegrees(180.0F));
+                poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
                 poseStack.translate(-0.5, -0.5, -0.5);
             }
             collector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> TiledBoxes.quads(pose, buffer, quads, -1, state.light));
@@ -327,7 +328,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
                 state.axis == Direction.Axis.X ? along + 0.5 : 1.5,
                 1.5,
                 state.axis == Direction.Axis.Z ? along + 0.5 : 1.5);
-        poseStack.rotate(Axis.YP.rotationDegrees(yaw));
+        poseStack.mulPose(Axis.YP.rotationDegrees(yaw));
         poseStack.translate(-0.5, -0.5, -0.5);
         collector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> TiledBoxes.quads(pose, buffer, quads, -1, light));
         poseStack.popPose();
@@ -337,7 +338,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
     // cross-section, turned to the given angle about the axis.
     private static void rotorPose(PoseStack poseStack, State state, int i, float angle) {
         axisPose(poseStack, state, i, 0.0F);
-        poseStack.rotate(Axis.ZP.rotationDegrees(angle));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(angle));
         poseStack.translate(-0.5, -0.5, -0.5);
     }
 
@@ -348,7 +349,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
                 1.5,
                 state.axis == Direction.Axis.Z ? i + 0.5 : 1.5);
         if (state.axis == Direction.Axis.X) {
-            poseStack.rotate(Axis.YP.rotationDegrees(90.0F));
+            poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
         }
         poseStack.translate(0.0F, 0.0F, offset);
     }

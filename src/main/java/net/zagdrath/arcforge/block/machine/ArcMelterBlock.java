@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -23,6 +25,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.sound.MachineSounds;
 
 public class ArcMelterBlock extends MachineBlock {
+    private static final MapCodec<ArcMelterBlock> CODEC = simpleCodec(ArcMelterBlock::new);
+
+    @Override
+    protected MapCodec<ArcMelterBlock> codec() {
+        return CODEC;
+    }
+
     public ArcMelterBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

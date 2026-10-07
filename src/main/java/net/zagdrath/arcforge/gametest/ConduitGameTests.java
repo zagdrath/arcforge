@@ -15,7 +15,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
@@ -181,7 +181,7 @@ final class ConduitGameTests {
                     helper.assertTrue(countItem(to, Items.COBBLESTONE) == 100 && countItem(to, Items.DIRT) == 5,
                             "Sink has " + countItem(to, Items.COBBLESTONE) + " cobblestone, " + countItem(to, Items.DIRT) + " dirt");
                 })
-                .thenExecute(() -> helper.assertTrue(helper.getEntities(EntityTypes.ITEM).isEmpty(), "Items were dropped into the world"))
+                .thenExecute(() -> helper.assertTrue(helper.getEntities(EntityType.ITEM).isEmpty(), "Items were dropped into the world"))
                 .thenSucceed();
     }
 
@@ -380,7 +380,7 @@ final class ConduitGameTests {
                             "Sink has " + countItem(to, Items.COBBLESTONE) + " cobblestone, " + countItem(to, Items.DIRT) + " dirt");
                 })
                 .thenExecute(() -> helper.assertTrue(storedItemCount(helper, 3) == 0, "Conduits still store items"))
-                .thenExecute(() -> helper.assertTrue(helper.getEntities(EntityTypes.ITEM).isEmpty(), "Items were dropped into the world"))
+                .thenExecute(() -> helper.assertTrue(helper.getEntities(EntityType.ITEM).isEmpty(), "Items were dropped into the world"))
                 .thenSucceed();
     }
 
@@ -422,7 +422,7 @@ final class ConduitGameTests {
         useWrench(helper, player, pos, new Vec3(0, 0.5, 0), WrenchMode.DISMANTLE);
         helper.assertBlockNotPresent(ModBlocks.GEOTHERMAL_PLANT.get(), pos);
         // The plant drops as an item carrying its lava, and the lava bucket in its slot drops beside it.
-        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        var drops = helper.getEntities(EntityType.ITEM, pos, 2.0);
         helper.assertTrue(drops.size() == 2, "Expected the plant and its lava bucket, got " + drops.size() + " drops");
         helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().is(Items.LAVA_BUCKET)), "Lava bucket in the slot did not drop");
         ItemStack dropped = drops.stream().filter(drop -> drop.getItem().is(ModBlocks.GEOTHERMAL_PLANT.get().asItem())).findFirst().orElseThrow().getItem();
@@ -449,7 +449,7 @@ final class ConduitGameTests {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setShiftKeyDown(true);
         useWrench(helper, player, pos, new Vec3(0, 0.5, 0), WrenchMode.DISMANTLE);
-        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        var drops = helper.getEntities(EntityType.ITEM, pos, 2.0);
         helper.assertTrue(drops.stream().noneMatch(drop -> drop.getItem().is(ModItems.SPEED_UPGRADE.get())), "The upgrades dropped");
         helper.assertTrue(drops.stream().anyMatch(drop -> drop.getItem().is(Items.COBBLESTONE)), "The input slot's cobblestone didn't drop");
         ItemStack dropped = drops.stream().filter(drop -> drop.getItem().is(ModBlocks.ARC_CRUSHER.get().asItem())).findFirst().orElseThrow().getItem();
@@ -464,7 +464,7 @@ final class ConduitGameTests {
 
         // Broken without the wrench, the upgrades drop.
         helper.getLevel().destroyBlock(helper.absolutePos(pos), true);
-        helper.assertTrue(helper.getEntities(EntityTypes.ITEM, pos, 2.0).stream().anyMatch(drop -> drop.getItem().is(ModItems.SPEED_UPGRADE.get())),
+        helper.assertTrue(helper.getEntities(EntityType.ITEM, pos, 2.0).stream().anyMatch(drop -> drop.getItem().is(ModItems.SPEED_UPGRADE.get())),
                 "A broken machine didn't drop its upgrades");
 
         // A Heat Cell's Insulation Upgrades stay in it too, and aren't also dropped (which duplicated them).
@@ -473,7 +473,7 @@ final class ConduitGameTests {
         var cell = helper.getBlockEntity(cellPos, net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity.class);
         cell.getUpgrades().setStack(0, new ItemStack(ModItems.INSULATION_UPGRADE.get(), 2));
         useWrench(helper, player, cellPos, new Vec3(0, 0.5, 0), WrenchMode.DISMANTLE);
-        var cellDrops = helper.getEntities(EntityTypes.ITEM, cellPos, 0.9);
+        var cellDrops = helper.getEntities(EntityType.ITEM, cellPos, 0.9);
         helper.assertTrue(cellDrops.stream().noneMatch(drop -> drop.getItem().is(ModItems.INSULATION_UPGRADE.get())), "The Heat Cell's upgrades dropped");
         ItemStack cellItem = cellDrops.stream().filter(drop -> drop.getItem().is(ModBlocks.heatCell(ConduitTier.WROUGHT).get().asItem())).findFirst()
                 .orElseThrow().getItem();
@@ -752,7 +752,7 @@ final class ConduitGameTests {
         useWrench(helper, player, pos, new Vec3(0, 0, 0.4), WrenchMode.DISMANTLE);
         helper.assertTrue(helper.getBlockState(pos).getBlock() instanceof ConduitBlock, "Removing the filter broke the conduit");
         helper.assertFalse(helper.getBlockEntity(pos, ConduitBlockEntity.class).hasFilter(Direction.SOUTH), "Filter still installed");
-        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        var drops = helper.getEntities(EntityType.ITEM, pos, 2.0);
         helper.assertTrue(drops.size() == 1 && drops.getFirst().getItem().is(ModItems.CONDUIT_FILTER.get()), "Expected the filter to drop, got " + drops.size() + " drops");
         helper.assertTrue(settings.equals(drops.getFirst().getItem().get(ModDataComponents.CONDUIT_FILTER.get())), "Dropped filter lost its settings");
 
@@ -790,7 +790,7 @@ final class ConduitGameTests {
                 .thenIdle(2)
                 .thenExecute(() -> {
                     helper.assertFalse(conduit.hasFilter(Direction.SOUTH), "Filter stayed on a bare pipe");
-                    helper.assertTrue(helper.getEntities(EntityTypes.ITEM, pos, 2.0).stream().anyMatch(drop -> drop.getItem().is(ModItems.CONDUIT_FILTER.get())),
+                    helper.assertTrue(helper.getEntities(EntityType.ITEM, pos, 2.0).stream().anyMatch(drop -> drop.getItem().is(ModItems.CONDUIT_FILTER.get())),
                             "The unhooked filter didn't drop");
                 })
                 .thenSucceed();

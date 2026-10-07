@@ -1,0 +1,28 @@
+{
+  "type": "arcforge:config_ore",
+  "config": {
+    "ore": "spodumenePegmatite",
+    "size": 10,
+    "discard_chance_on_air_exposure": 0,
+    "targets": [
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:stone_ore_replaceables"
+        },
+        "state": {
+          "Name": "arcforge:spodumene_ore"
+        }
+      },
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:deepslate_ore_replaceables"
+        },
+        "state": {
+          "Name": "arcforge:deepslate_spodumene_ore"
+        }
+      }
+    ]
+  }
+}

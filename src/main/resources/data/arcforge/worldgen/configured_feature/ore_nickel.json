@@ -1,0 +1,28 @@
+{
+  "type": "arcforge:config_ore",
+  "config": {
+    "ore": "nickel",
+    "size": 8,
+    "discard_chance_on_air_exposure": 0,
+    "targets": [
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:stone_ore_replaceables"
+        },
+        "state": {
+          "Name": "arcforge:nickel_ore"
+        }
+      },
+      {
+        "target": {
+          "predicate_type": "minecraft:tag_match",
+          "tag": "minecraft:deepslate_ore_replaceables"
+        },
+        "state": {
+          "Name": "arcforge:deepslate_nickel_ore"
+        }
+      }
+    ]
+  }
+}

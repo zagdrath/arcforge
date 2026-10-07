@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.block.multiblock;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.core.BlockPos;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // up to 7x7x7, drawn as one connected skin (box=true). The cube's coils glow while it upgrades steam (the formed model's
 // lit texture).
 public class SuperheaterArrayCasingBlock extends CubeCasingBlock {
+    private static final MapCodec<SuperheaterArrayCasingBlock> CODEC = simpleCodec(SuperheaterArrayCasingBlock::new);
+
+    @Override
+    protected MapCodec<SuperheaterArrayCasingBlock> codec() {
+        return CODEC;
+    }
+
     // The largest box, each way.
     public static final int MAX_SIZE = 7;
     public static final CubeMultiblockStructure<SuperheaterArrayBlockEntity> STRUCTURE =

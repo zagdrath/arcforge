@@ -30,7 +30,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BonemealSource;
 import net.minecraft.world.level.block.BonemealableBlock;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -561,9 +560,9 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
             BlockPos pos = area.get(index);
             BlockState state = level.getBlockState(pos);
             if (state.is(BlockTags.SAPLINGS) && state.getBlock() instanceof BonemealableBlock grower && isPatchPlanted(level, pos)
-                    && grower.isValidBonemealTarget(level, pos, state, BonemealSource.INTERACTION)) {
-                if (grower.isBonemealSuccess(level, level.getRandom(), pos, state, BonemealSource.INTERACTION)) {
-                    grower.performBonemeal(level, level.getRandom(), pos, state, BonemealSource.INTERACTION);
+                    && grower.isValidBonemealTarget(level, pos, state)) {
+                if (grower.isBonemealSuccess(level, level.getRandom(), pos, state)) {
+                    grower.performBonemeal(level, level.getRandom(), pos, state);
                 }
                 level.levelEvent(1505, pos, 15);
                 items.setStack(SLOT_FERTILIZER, meal.copyWithCount(meal.getCount() - 1));

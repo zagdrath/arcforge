@@ -23,6 +23,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.gameevent.GameEvent;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
@@ -44,11 +45,13 @@ public class LoamFarmlandBlock extends FarmlandBlock {
     public static final BooleanProperty AFTER_LEGUME = BooleanProperty.create("after_legume");
     private static final int WET = 7;
 
+    private final Block loam;
     private final boolean irrigated;
 
-    // loam is what it turns back into (FarmlandBlock's base block).
+    // loam is what it turns back into (26.1's FarmlandBlock always turns into dirt, so this block does it itself).
     public LoamFarmlandBlock(Block loam, boolean irrigated, BlockBehaviour.Properties properties) {
-        super(loam, properties);
+        super(properties);
+        this.loam = loam;
         this.irrigated = irrigated;
         registerDefaultState(stateDefinition.any().setValue(MOISTURE, irrigated ? WET : 0).setValue(NUTRIENTS, 0).setValue(ENRICHED, false)
                 .setValue(AFTER_LEGUME, false));
@@ -122,11 +125,19 @@ public class LoamFarmlandBlock extends FarmlandBlock {
         return false;
     }
 
-    // Irrigated farmland never turns back, whatever asks (trampling is cancelled in FarmingEvents anyway).
+    // It can't be trampled: only the fall damage, never FarmlandBlock's trampling into dirt. (On 26.1 the trample event
+    // carries the dirt it would become, so FarmingEvents can't tell Loam Farmland from other farmland.)
     @Override
+    public void fallOn(Level level, BlockState state, BlockPos pos, Entity entity, double fallDistance) {
+        entity.causeFallDamage(fallDistance, 1.0F, entity.damageSources().fall());
+    }
+
+    // Back into its loam. Irrigated farmland never turns back.
     public void turnToBaseBlock(@Nullable Entity sourceEntity, BlockState state, Level level, BlockPos pos) {
         if (!irrigated) {
-            super.turnToBaseBlock(sourceEntity, state, level, pos);
+            BlockState newState = pushEntitiesUp(state, loam.defaultBlockState(), level, pos);
+            level.setBlockAndUpdate(pos, newState);
+            level.gameEvent(GameEvent.BLOCK_CHANGE, pos, GameEvent.Context.of(sourceEntity, newState));
         }
     }
 }

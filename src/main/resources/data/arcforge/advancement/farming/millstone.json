@@ -19,14 +19,16 @@
     "millstone": {
       "trigger": "minecraft:placed_block",
       "conditions": {
-        "location": {
-          "type": "minecraft:location_check",
-          "predicate": {
-            "block": {
-              "blocks": "arcforge:millstone"
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "arcforge:millstone"
+              }
             }
           }
-        }
+        ]
       }
     }
   },

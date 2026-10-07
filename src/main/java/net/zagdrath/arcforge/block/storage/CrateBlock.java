@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.block.storage;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -24,6 +26,13 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 // are set to input, output or nothing like the other storage blocks. Broken, it spills its items like a chest;
 // picked up with the Wrench, it keeps them.
 public class CrateBlock extends StorageBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<CrateBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     public CrateBlock(BlockBehaviour.Properties properties, ConduitTier tier) {

@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.block.multiblock;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // A casing of the Induction Furnace Array; 27 in a 3x3x3 cube form the machine (see CubeCasingBlock).
 public class InductionFurnaceArrayCasingBlock extends CubeCasingBlock {
+    private static final MapCodec<InductionFurnaceArrayCasingBlock> CODEC = simpleCodec(InductionFurnaceArrayCasingBlock::new);
+
+    @Override
+    protected MapCodec<InductionFurnaceArrayCasingBlock> codec() {
+        return CODEC;
+    }
+
     public static final CubeMultiblockStructure<InductionFurnaceArrayBlockEntity> STRUCTURE =
             new CubeMultiblockStructure<>(InductionFurnaceArrayCasingBlock.class, InductionFurnaceArrayBlockEntity.class);
 

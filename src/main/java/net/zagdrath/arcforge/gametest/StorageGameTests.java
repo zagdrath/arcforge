@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -78,7 +78,7 @@ final class StorageGameTests {
         fillTank(helper.getBlockEntity(pos, FluidTankBlockEntity.class), Fluids.WATER, 12_400);
         helper.getLevel().destroyBlock(helper.absolutePos(pos), true);
 
-        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        var drops = helper.getEntities(EntityType.ITEM, pos, 2.0);
         helper.assertTrue(drops.size() == 1, "Expected one drop, got " + drops.size());
         helper.assertTrue(!drops.getFirst().getItem().has(ModDataComponents.FLUID_CONTENTS.get()), "Broken tank still carries its fluid");
         helper.startSequence()
@@ -101,7 +101,7 @@ final class StorageGameTests {
         wrench.getItem().onItemUseFirst(wrench, new UseOnContext(player, InteractionHand.MAIN_HAND,
                 new BlockHitResult(Vec3.atCenterOf(absolute), Direction.UP, absolute, false)));
 
-        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        var drops = helper.getEntities(EntityType.ITEM, pos, 2.0);
         helper.assertTrue(drops.size() == 1, "Expected one drop, got " + drops.size());
         ItemStack dropped = drops.getFirst().getItem();
         var content = dropped.get(ModDataComponents.FLUID_CONTENTS.get());
@@ -167,7 +167,7 @@ final class StorageGameTests {
         }
 
         java.util.Map<net.minecraft.world.item.Item, Integer> counts = new java.util.HashMap<>();
-        for (var entity : helper.getEntities(EntityTypes.ITEM, new BlockPos(2, 1, 0), 6.0)) {
+        for (var entity : helper.getEntities(EntityType.ITEM, new BlockPos(2, 1, 0), 6.0)) {
             counts.merge(entity.getItem().getItem(), entity.getItem().getCount(), Integer::sum);
         }
         helper.assertTrue(counts.getOrDefault(Items.LAVA_BUCKET, 0) == 1, "Plant dropped " + counts.getOrDefault(Items.LAVA_BUCKET, 0) + " lava buckets; drops " + counts);
@@ -206,7 +206,7 @@ final class StorageGameTests {
                 .thenWaitUntil(() -> helper.assertTrue(helper.getBlockState(pos).getValue(EnergyCellBlock.CHARGE) == 4, "Full cell does not light all segments"))
                 .thenExecute(() -> {
                     helper.getLevel().destroyBlock(helper.absolutePos(pos), true);
-                    var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+                    var drops = helper.getEntities(EntityType.ITEM, pos, 2.0);
                     helper.assertTrue(drops.size() == 1, "Expected one drop, got " + drops.size());
                     Integer stored = drops.getFirst().getItem().get(ModDataComponents.ENERGY.get());
                     helper.assertTrue(stored != null && stored == ConduitTier.WROUGHT.cellCapacity(), "Dropped cell carries " + stored + " FE");

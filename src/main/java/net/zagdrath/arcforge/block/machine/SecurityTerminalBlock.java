@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import java.util.Map;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -36,6 +38,13 @@ import net.zagdrath.arcforge.menu.machine.SecurityTerminalMenu;
 // A desk console where a player sets their own security profile: the mode their blocks default to, and who they
 // trust. Anyone may use any terminal; it only ever edits the user's own profile.
 public class SecurityTerminalBlock extends BaseEntityBlock {
+    private static final MapCodec<SecurityTerminalBlock> CODEC = simpleCodec(SecurityTerminalBlock::new);
+
+    @Override
+    protected MapCodec<SecurityTerminalBlock> codec() {
+        return CODEC;
+    }
+
     public static final net.minecraft.world.level.block.state.properties.EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     // The plinth, cabinet, desk and (upright, for the shape) monitor, facing north.
     private static final Map<Direction, VoxelShape> SHAPES = Shapes.rotateHorizontal(Shapes.or(

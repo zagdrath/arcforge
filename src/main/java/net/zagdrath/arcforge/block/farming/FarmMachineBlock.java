@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.farming;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -42,6 +44,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 //  - Harvester: use it with an empty hand to take the harvest.
 // See FarmMachineBlockEntity for when it runs.
 public class FarmMachineBlock extends BaseEntityBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<FarmMachineBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public enum Kind { PLANTER, HARVESTER }
 
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;

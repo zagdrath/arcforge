@@ -125,10 +125,10 @@ public class ChunkLoaderRenderer implements BlockEntityRenderer<ChunkLoaderBlock
         poseStack.pushPose();
         // Turned with the block (the model faces north at FACING north), then to the globe's centre, tilted, and spun.
         poseStack.translate(0.5F, 0.0F, 0.5F);
-        poseStack.rotate(Axis.YP.rotationDegrees(180.0F - state.facing));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F - state.facing));
         poseStack.translate(CENTRE_X - 0.5F, CENTRE_Y, CENTRE_Z - 0.5F);
-        poseStack.rotate(Axis.ZP.rotationDegrees(-TILT));
-        poseStack.rotate(Axis.YP.rotationDegrees(state.spin));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(-TILT));
+        poseStack.mulPose(Axis.YP.rotationDegrees(state.spin));
         poseStack.scale(1.0F / 16.0F, 1.0F / 16.0F, 1.0F / 16.0F);
         collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sprite.atlasLocation()), (pose, buffer) -> {
             for (float[] f : FACES) {

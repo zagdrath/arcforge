@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.block.multiblock;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // A casing of the Arc Crushing Array; 27 in a 3x3x3 cube form the machine (see CubeCasingBlock).
 public class ArcCrushingArrayCasingBlock extends CubeCasingBlock {
+    private static final MapCodec<ArcCrushingArrayCasingBlock> CODEC = simpleCodec(ArcCrushingArrayCasingBlock::new);
+
+    @Override
+    protected MapCodec<ArcCrushingArrayCasingBlock> codec() {
+        return CODEC;
+    }
+
     public static final CubeMultiblockStructure<ArcCrushingArrayBlockEntity> STRUCTURE =
             new CubeMultiblockStructure<>(ArcCrushingArrayCasingBlock.class, ArcCrushingArrayBlockEntity.class);
 

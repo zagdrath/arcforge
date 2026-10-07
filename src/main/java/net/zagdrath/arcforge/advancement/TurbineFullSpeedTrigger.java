@@ -10,11 +10,11 @@ import java.util.Optional;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
-import net.minecraft.core.Holder;
+import net.minecraft.advancements.criterion.ContextAwarePredicate;
+import net.minecraft.advancements.criterion.EntityPredicate;
+import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 // arcforge:turbine_full_speed: a turbine array is at full speed. {multiblock: id, min_length?: int, min_signal?: int}
 public class TurbineFullSpeedTrigger extends SimpleCriterionTrigger<TurbineFullSpeedTrigger.TriggerInstance> {
@@ -27,10 +27,10 @@ public class TurbineFullSpeedTrigger extends SimpleCriterionTrigger<TurbineFullS
         trigger(player, instance -> instance.matches(multiblock, length, signal));
     }
 
-    public record TriggerInstance(Optional<Holder<LootItemCondition>> player, Identifier multiblock, Optional<Integer> minLength,
+    public record TriggerInstance(Optional<ContextAwarePredicate> player, Identifier multiblock, Optional<Integer> minLength,
             Optional<Integer> minSignal) implements SimpleCriterionTrigger.SimpleInstance {
         public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(i -> i.group(
-                LootItemCondition.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
+                EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
                 Identifier.CODEC.fieldOf("multiblock").forGetter(TriggerInstance::multiblock),
                 Codec.INT.optionalFieldOf("min_length").forGetter(TriggerInstance::minLength),
                 Codec.INT.optionalFieldOf("min_signal").forGetter(TriggerInstance::minSignal))

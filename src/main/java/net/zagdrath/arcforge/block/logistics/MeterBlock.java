@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.logistics;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -40,6 +42,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // An Energy, Heat, Fluid or Gas Meter (see MeterBlockEntity). It faces whoever places it; the Wrench turns it. While
 // its rate meets its threshold it's POWERED: a signal of 15 on every side, and a lit LED on its front.
 public class MeterBlock extends BaseEntityBlock implements WrenchableMachine {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<MeterBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 

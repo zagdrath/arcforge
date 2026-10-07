@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Carbon Reclaimer (see CarbonReclaimerBlockEntity): Carbon Dioxide and Hydrogen back into Carbon Dust and Water, with
 // FE. LIT while it works.
 public class CarbonReclaimerBlock extends MachineBlock {
+    private static final MapCodec<CarbonReclaimerBlock> CODEC = simpleCodec(CarbonReclaimerBlock::new);
+
+    @Override
+    protected MapCodec<CarbonReclaimerBlock> codec() {
+        return CODEC;
+    }
+
     public CarbonReclaimerBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -31,6 +33,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // A slim pump column: an intake foot, the body, a cap with the fluid-out flange on top, and the FE
 // connector out of the back.
 public class ElectricPumpBlock extends MachineBlock {
+    private static final MapCodec<ElectricPumpBlock> CODEC = simpleCodec(ElectricPumpBlock::new);
+
+    @Override
+    protected MapCodec<ElectricPumpBlock> codec() {
+        return CODEC;
+    }
+
     private static final Map<Direction, VoxelShape> SHAPES = Shapes.rotateHorizontal(Shapes.or(
             Block.box(2, 0, 2, 14, 2, 14),
             Block.box(3, 2, 3, 13, 13, 13),

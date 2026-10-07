@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockModelResolver;
 import net.minecraft.client.renderer.block.model.BlockDisplayContext;
@@ -61,7 +62,7 @@ public class ClocheRenderer implements BlockEntityRenderer<ClocheBlockEntity, Cl
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(farm, state, partialTicks, cameraPosition, breakProgress);
         state.kind = farm.kind();
-        state.light = farm.getLevel() != null ? LightCoordsUtil.getLightCoords(farm.getLevel(), farm.getBlockPos()) : LightCoordsUtil.FULL_BRIGHT;
+        state.light = farm.getLevel() != null ? LevelRenderer.getLightCoords(farm.getLevel(), farm.getBlockPos()) : LightCoordsUtil.FULL_BRIGHT;
         ClocheSoil soil = state.kind.hydroponic() ? null : ClocheSoil.of(farm.getSoil());
         state.soil.clear();
         if (soil != null) {

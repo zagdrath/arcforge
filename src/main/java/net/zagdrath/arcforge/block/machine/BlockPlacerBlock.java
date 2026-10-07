@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.sound.MachineSounds;
 
 // Faces any of the six directions; the sound is its running loop, see MachineLoopSound.
 public class BlockPlacerBlock extends DirectionalMachineBlock {
+    private static final MapCodec<BlockPlacerBlock> CODEC = simpleCodec(BlockPlacerBlock::new);
+
+    @Override
+    protected MapCodec<BlockPlacerBlock> codec() {
+        return CODEC;
+    }
+
     public BlockPlacerBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

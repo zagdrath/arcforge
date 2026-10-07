@@ -43,7 +43,7 @@ public final class InfusionGameTests {
         InfuserBlockEntity infuser = helper.getBlockEntity(pos, InfuserBlockEntity.class);
         Item[][] cases = {
                 { Items.OAK_PLANKS, ModBlocks.TREATED_PLANKS.get().asItem() },
-                { Items.POPLAR_PLANKS, ModBlocks.TREATED_PLANKS.get().asItem() },
+                { Items.CHERRY_PLANKS, ModBlocks.TREATED_PLANKS.get().asItem() },
                 { Items.CRIMSON_STEM, ModBlocks.TREATED_LOG.get().asItem() },
                 { Items.BAMBOO_BLOCK, ModBlocks.TREATED_LOG.get().asItem() },
                 { Items.BIRCH_WOOD, ModBlocks.TREATED_WOOD.get().asItem() },

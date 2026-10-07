@@ -12,15 +12,15 @@ import org.jspecify.annotations.Nullable;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.advancements.predicates.ItemPredicate;
-import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
-import net.minecraft.core.Holder;
+import net.minecraft.advancements.criterion.ContextAwarePredicate;
+import net.minecraft.advancements.criterion.EntityPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.advancements.criterion.SimpleCriterionTrigger;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 // arcforge:machine_produced: a machine or multiblock put something out. {item?: item predicate, fluid?: id,
 // recipe_category?: the recipe's category}; every condition given must match.
@@ -34,10 +34,10 @@ public class MachineProducedTrigger extends SimpleCriterionTrigger<MachineProduc
         trigger(player, instance -> instance.matches(item, fluid, category));
     }
 
-    public record TriggerInstance(Optional<Holder<LootItemCondition>> player, Optional<ItemPredicate> item, Optional<Identifier> fluid,
+    public record TriggerInstance(Optional<ContextAwarePredicate> player, Optional<ItemPredicate> item, Optional<Identifier> fluid,
             Optional<String> recipeCategory) implements SimpleCriterionTrigger.SimpleInstance {
         public static final Codec<TriggerInstance> CODEC = RecordCodecBuilder.create(i -> i.group(
-                LootItemCondition.CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
+                EntityPredicate.ADVANCEMENT_CODEC.optionalFieldOf("player").forGetter(TriggerInstance::player),
                 ItemPredicate.CODEC.optionalFieldOf("item").forGetter(TriggerInstance::item),
                 Identifier.CODEC.optionalFieldOf("fluid").forGetter(TriggerInstance::fluid),
                 Codec.STRING.optionalFieldOf("recipe_category").forGetter(TriggerInstance::recipeCategory))

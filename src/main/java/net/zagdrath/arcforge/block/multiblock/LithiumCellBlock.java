@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
@@ -30,6 +32,13 @@ import net.zagdrath.arcforge.multiblock.BatteryArrayStructure;
 // share of the array's energy (LithiumCellBlockEntity), kept on the item when broken. CHARGE (0-4) lights its windows like
 // an Energy Cell's: in a formed array, at the array's fill (all its cells alike); loose, at its own.
 public class LithiumCellBlock extends BaseEntityBlock implements BatteryArrayPart {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<LithiumCellBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final IntegerProperty CHARGE = IntegerProperty.create("charge", 0, 4);
     private static final int[] LIGHT_BY_CHARGE = { 0, 3, 5, 7, 9 };
 

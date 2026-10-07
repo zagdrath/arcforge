@@ -12,6 +12,8 @@ import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -66,6 +68,13 @@ import net.zagdrath.arcforge.registry.ModItems;
 // entity. Whether a run is drawn as one straight tube is derived from the six sides (see straightAxis)
 // rather than stored, which keeps the block state count down.
 public class ConduitBlock extends BaseEntityBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<ConduitBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final EnumProperty<ConnectionMode> NORTH = EnumProperty.create("north", ConnectionMode.class);
     public static final EnumProperty<ConnectionMode> SOUTH = EnumProperty.create("south", ConnectionMode.class);
     public static final EnumProperty<ConnectionMode> EAST = EnumProperty.create("east", ConnectionMode.class);

@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:config_ore",
+  "config": {
+    "ore": "sulfur",
+    "size": 10,
+    "discard_chance_on_air_exposure": 0.0,
+    "targets": [
+      {
+        "target": {
+          "predicate_type": "minecraft:block_match",
+          "block": "minecraft:netherrack"
+        },
+        "state": {
+          "Name": "arcforge:nether_sulfur_ore"
+        }
+      }
+    ]
+  }
+}

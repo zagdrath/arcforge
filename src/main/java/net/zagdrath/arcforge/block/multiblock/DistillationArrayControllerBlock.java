@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -38,6 +40,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Distillation Array's controller: its display faces the column's front (the structure's facing),
 // and its block entity runs the column and holds its contents.
 public class DistillationArrayControllerBlock extends BaseEntityBlock implements ColumnPart, PortHolder {
+    private static final MapCodec<DistillationArrayControllerBlock> CODEC = simpleCodec(DistillationArrayControllerBlock::new);
+
+    @Override
+    protected MapCodec<DistillationArrayControllerBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
 
     public DistillationArrayControllerBlock(BlockBehaviour.Properties properties) {

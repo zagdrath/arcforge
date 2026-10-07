@@ -7,7 +7,6 @@ package net.zagdrath.arcforge.event;
 
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Prediction;
 import net.minecraft.util.TriState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -55,7 +54,7 @@ public final class MachineInteractionEvents {
         }
         ItemStack taken = vault.extract(player.isShiftKeyDown() ? 1 : vault.getTemplate().getMaxStackSize());
         if (!taken.isEmpty()) {
-            player.getInventory().placeItemBackInInventory(taken, Prediction.SERVER_ONLY);
+            player.getInventory().placeItemBackInInventory(taken);
             event.getLevel().playSound(null, event.getPos(), SoundEvents.ITEM_PICKUP, SoundSource.PLAYERS, 0.3F,
                     1.0F + event.getLevel().getRandom().nextFloat() * 0.4F);
         }

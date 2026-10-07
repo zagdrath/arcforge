@@ -23,7 +23,7 @@ import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.crafting.RecipeMap;
 import net.minecraft.world.level.block.Block;
@@ -459,7 +459,7 @@ public class ArcforgeClient {
                 renderer.addLayer(new JetpackLayer(renderer, event.getEntityModels()));
             }
         }
-        if (event.getRenderer(EntityTypes.ARMOR_STAND) instanceof LivingEntityRenderer renderer) {
+        if (event.getRenderer(EntityType.ARMOR_STAND) instanceof LivingEntityRenderer renderer) {
             renderer.addLayer(new JetpackLayer(renderer, event.getEntityModels()));
         }
     }

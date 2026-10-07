@@ -15,7 +15,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -67,7 +67,7 @@ final class CrateVaultGameTests {
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
         player.setShiftKeyDown(true);
         ConduitGameTests.useWrench(helper, player, pos, new Vec3(0, 0.5, 0), WrenchMode.DISMANTLE);
-        var drops = helper.getEntities(EntityTypes.ITEM, pos, 2.0);
+        var drops = helper.getEntities(EntityType.ITEM, pos, 2.0);
         helper.assertTrue(drops.size() == 1, "Wrenching dropped " + drops.size() + " items, expected just the block");
         ItemStack dropped = drops.getFirst().getItem().copy();
         drops.getFirst().discard();
@@ -136,7 +136,7 @@ final class CrateVaultGameTests {
         helper.assertTrue(Component.literal("Loot").equals(upgraded.components().get(DataComponents.CUSTOM_NAME)), "Name lost");
         helper.assertTrue(upgraded.getSideMode(RelativeSide.TOP) == SideMode.NONE, "Face settings lost");
         helper.assertTrue(upgrade.isEmpty(), "Upgrade wasn't used up");
-        helper.assertTrue(helper.getEntities(EntityTypes.ITEM, POS, 2.0).isEmpty(), "Items spilled during the upgrade");
+        helper.assertTrue(helper.getEntities(EntityType.ITEM, POS, 2.0).isEmpty(), "Items spilled during the upgrade");
         helper.succeed();
     }
 
@@ -163,7 +163,7 @@ final class CrateVaultGameTests {
         helper.setBlock(broken, ModBlocks.crate(ConduitTier.WROUGHT).get());
         fillCrate(helper.getBlockEntity(broken, CrateBlockEntity.class));
         helper.destroyBlock(broken);
-        var spilled = helper.getEntities(EntityTypes.ITEM, broken, 2.0).stream().map(entity -> entity.getItem()).toList();
+        var spilled = helper.getEntities(EntityType.ITEM, broken, 2.0).stream().map(entity -> entity.getItem()).toList();
         helper.assertTrue(spilled.stream().anyMatch(stack -> stack.is(Items.IRON_INGOT)) && spilled.stream().anyMatch(stack -> stack.is(Items.GOLD_INGOT))
                 && spilled.stream().anyMatch(stack -> stack.is(Items.DIAMOND)), "Broken crate spilled " + spilled);
 

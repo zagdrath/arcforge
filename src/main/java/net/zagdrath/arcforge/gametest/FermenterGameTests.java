@@ -98,7 +98,7 @@ public final class FermenterGameTests {
                 Identifier.fromNamespaceAndPath(Arcforge.MODID, "chemical_reacting/slime_ball_from_latex")));
         helper.assertTrue(holder != null && holder.value() instanceof ChemicalReactingRecipe, "No Chemical Reactor Slimeball recipe");
         ChemicalReactingRecipe reacting = (ChemicalReactingRecipe) holder.value();
-        helper.assertTrue(reacting.itemInput().map(input -> input.test(new ItemStack(Items.DYE.pick(net.minecraft.world.item.DyeColor.LIME)))).orElse(false), "It doesn't take Lime Dye");
+        helper.assertTrue(reacting.itemInput().map(input -> input.test(new ItemStack(Items.LIME_DYE))).orElse(false), "It doesn't take Lime Dye");
         helper.assertTrue(reacting.fluidInputs().size() == 1 && reacting.fluidInputs().getFirst().test(FluidResource.of(ModFluids.LATEX.get()), 250),
                 "It doesn't take 250 mB of Latex");
         helper.assertTrue(reacting.itemOutput().map(out -> out.create().is(Items.SLIME_BALL) && out.create().getCount() == 2).orElse(false),

@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -25,6 +27,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Grain Dryer (see GrainDryerBlockEntity): a heated cabinet of drying racks, lit while it dries.
 public class GrainDryerBlock extends MachineBlock {
+    private static final MapCodec<GrainDryerBlock> CODEC = simpleCodec(GrainDryerBlock::new);
+
+    @Override
+    protected MapCodec<GrainDryerBlock> codec() {
+        return CODEC;
+    }
+
     public GrainDryerBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

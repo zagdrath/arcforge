@@ -219,7 +219,7 @@ public final class ModBlocks {
     // A lever with a signal of 0-15. Only its gauge LED glows (in the model), so it gives no light.
     public static final DeferredBlock<ThrottleLeverBlock> THROTTLE_LEVER = BLOCKS.registerBlock("throttle_lever",
             ThrottleLeverBlock::new, p -> p.mapColor(MapColor.METAL).noCollision().strength(0.5F).sound(SoundType.METAL)
-                    .pushReaction(PushReaction.POPPED));
+                    .pushReaction(PushReaction.DESTROY));
 
     // Meters pass one kind of flow from their left side to their right and read its rate.
     public static final DeferredBlock<MeterBlock> ENERGY_METER = meter("energy_meter", MeterKind.ENERGY);
@@ -238,14 +238,14 @@ public final class ModBlocks {
                     .isValidSpawn((state, level, pos, type) -> false)
                     .isRedstoneConductor((state, level, pos) -> false)
                     .isSuffocating((state, level, pos) -> false)
-                    .isViewBlocking((state, level, pos, box) -> false));
+                    .isViewBlocking((state, level, pos) -> false));
 
     // Liquid Experience: the XP Drain grate laid on a tank, and the XP Shower hung from a ceiling.
     public static final DeferredBlock<XpDrainBlock> XP_DRAIN = BLOCKS.registerBlock("xp_drain",
             XpDrainBlock::new, p -> p.mapColor(MapColor.METAL).strength(2.0F, 6.0F).sound(SoundType.METAL).noOcclusion());
     public static final DeferredBlock<XpShowerBlock> XP_SHOWER = BLOCKS.registerBlock("xp_shower",
             XpShowerBlock::new, p -> p.mapColor(MapColor.METAL).strength(2.0F, 6.0F).sound(SoundType.METAL).noOcclusion()
-                    .pushReaction(PushReaction.POPPED));
+                    .pushReaction(PushReaction.DESTROY));
     public static final DeferredBlock<LiquidBlock> LIQUID_EXPERIENCE = BLOCKS.registerBlock("liquid_experience",
             p -> new LiquidBlock(ModFluids.LIQUID_EXPERIENCE.get(), p) {},
             p -> liquidProperties(p, MapColor.COLOR_LIGHT_GREEN).lightLevel(state -> 10));
@@ -323,10 +323,10 @@ public final class ModBlocks {
     // The Arc Quarry: its main block (the centre of the 3x3x3, which draws it all) and the invisible parts around it.
     // Pistons can't move either.
     public static final DeferredBlock<ArcQuarryBlock> ARC_QUARRY = BLOCKS.registerBlock("arc_quarry",
-            ArcQuarryBlock::new, p -> machineProperties(p, 6).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
+            ArcQuarryBlock::new, p -> machineProperties(p, 6).noOcclusion().pushReaction(PushReaction.BLOCK));
     public static final DeferredBlock<ArcQuarryBoundingBlock> ARC_QUARRY_BOUNDING = BLOCKS.registerBlock("arc_quarry_bounding",
             ArcQuarryBoundingBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
-                    .noOcclusion().noLootTable().pushReaction(PushReaction.IMMOVEABLE)
+                    .noOcclusion().noLootTable().pushReaction(PushReaction.BLOCK)
                     // Its shape depends on where its main block is, so it can't be cached per state.
                     .dynamicShape());
 
@@ -367,7 +367,7 @@ public final class ModBlocks {
                     .isValidSpawn((state, level, pos, type) -> false)
                     .isRedstoneConductor((state, level, pos) -> false)
                     .isSuffocating((state, level, pos) -> false)
-                    .isViewBlocking((state, level, pos, box) -> false));
+                    .isViewBlocking((state, level, pos) -> false));
 
     // --- Mineral wool ---
 
@@ -407,15 +407,15 @@ public final class ModBlocks {
     public static final DeferredBlock<FenceGateBlock> TREATED_FENCE_GATE = BLOCKS.registerBlock("treated_fence_gate",
             p -> new FenceGateBlock(TREATED_WOOD_TYPE, p), p -> treatedWood(p).forceSolidOn().strength(2.0F, 3.0F));
     public static final DeferredBlock<DoorBlock> TREATED_DOOR = BLOCKS.registerBlock("treated_door",
-            p -> new DoorBlock(TREATED_SET, p), p -> treatedWood(p).strength(3.0F).noOcclusion().pushReaction(PushReaction.POPPED));
+            p -> new DoorBlock(TREATED_SET, p), p -> treatedWood(p).strength(3.0F).noOcclusion().pushReaction(PushReaction.DESTROY));
     public static final DeferredBlock<TrapDoorBlock> TREATED_TRAPDOOR = BLOCKS.registerBlock("treated_trapdoor",
             p -> new TrapDoorBlock(TREATED_SET, p),
             p -> treatedWood(p).strength(3.0F).noOcclusion().isValidSpawn((state, level, pos, entity) -> false));
     public static final DeferredBlock<PressurePlateBlock> TREATED_PRESSURE_PLATE = BLOCKS.registerBlock("treated_pressure_plate",
             p -> new PressurePlateBlock(TREATED_SET, p),
-            p -> treatedWood(p).forceSolidOn().noCollision().strength(0.5F).pushReaction(PushReaction.POPPED));
+            p -> treatedWood(p).forceSolidOn().noCollision().strength(0.5F).pushReaction(PushReaction.DESTROY));
     public static final DeferredBlock<ButtonBlock> TREATED_BUTTON = BLOCKS.registerBlock("treated_button",
-            p -> new ButtonBlock(TREATED_SET, 30, p), p -> p.noCollision().strength(0.5F).pushReaction(PushReaction.POPPED));
+            p -> new ButtonBlock(TREATED_SET, 30, p), p -> p.noCollision().strength(0.5F).pushReaction(PushReaction.DESTROY));
 
     // --- Steelmaking ---
 
@@ -539,7 +539,7 @@ public final class ModBlocks {
                     .replaceable()
                     .noCollision()
                     .strength(100.0F)
-                    .pushReaction(PushReaction.POPPED)
+                    .pushReaction(PushReaction.DESTROY)
                     .noLootTable()
                     .liquid()
                     .sound(SoundType.EMPTY));
@@ -674,7 +674,7 @@ public final class ModBlocks {
                     .isValidSpawn((state, level, pos, type) -> false)
                     .isRedstoneConductor((state, level, pos) -> false)
                     .isSuffocating((state, level, pos) -> false)
-                    .isViewBlocking((state, level, pos, box) -> false));
+                    .isViewBlocking((state, level, pos) -> false));
 
     public static final DeferredBlock<DistillationArrayControllerBlock> DISTILLATION_ARRAY_CONTROLLER = BLOCKS.registerBlock("distillation_array_controller",
             DistillationArrayControllerBlock::new, ModBlocks::columnProperties);
@@ -746,10 +746,10 @@ public final class ModBlocks {
             CopperSprinklerBlock::new, p -> p.mapColor(MapColor.COLOR_ORANGE).strength(2.0F, 6.0F).sound(SoundType.COPPER).noOcclusion());
     // The Resin Tap: a small spout and cup hung on the side of a log; it breaks with the log under it.
     public static final DeferredBlock<ResinTapBlock> RESIN_TAP = BLOCKS.registerBlock("resin_tap",
-            ResinTapBlock::new, p -> treatedWood(p).strength(0.8F).noOcclusion().forceSolidOff().pushReaction(PushReaction.POPPED));
+            ResinTapBlock::new, p -> treatedWood(p).strength(0.8F).noOcclusion().forceSolidOff().pushReaction(PushReaction.DESTROY));
     // Not solid, so it can stand on farmland among the crops.
     public static final DeferredBlock<ScarecrowBlock> SCARECROW = BLOCKS.registerBlock("scarecrow",
-            ScarecrowBlock::new, p -> treatedWood(p).strength(0.8F).noOcclusion().forceSolidOff().pushReaction(PushReaction.POPPED));
+            ScarecrowBlock::new, p -> treatedWood(p).strength(0.8F).noOcclusion().forceSolidOff().pushReaction(PushReaction.DESTROY));
 
     // Farm processing. The Millstone is rustic (stone on a treated-wood frame, broken with a pickaxe); the Mill, Oil
     // Press and Seed Extractor are FE machines, and the Grain Dryer runs on heat.
@@ -839,7 +839,7 @@ public final class ModBlocks {
                             .sound(TANK_SOUND)
                             .noOcclusion()
                             .isSuffocating((state, level, pos) -> false)
-                            .isViewBlocking((state, level, pos, box) -> false)
+                            .isViewBlocking((state, level, pos) -> false)
                             .isRedstoneConductor((state, level, pos) -> false)));
             ENERGY_CELLS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_energy_cell",
                     p -> new EnergyCellBlock(p, tier),
@@ -855,7 +855,7 @@ public final class ModBlocks {
                             .sound(SoundType.METAL)
                             .noOcclusion()
                             .isSuffocating((state, level, pos) -> false)
-                            .isViewBlocking((state, level, pos, box) -> false)
+                            .isViewBlocking((state, level, pos) -> false)
                             .isRedstoneConductor((state, level, pos) -> false)));
         }
         for (ConduitTier tier : ConduitTier.values()) {
@@ -889,7 +889,7 @@ public final class ModBlocks {
                 .randomTicks()
                 .instabreak()
                 .sound(SoundType.CROP)
-                .pushReaction(PushReaction.POPPED);
+                .pushReaction(PushReaction.DESTROY);
     }
 
     // Like a flower: replaceable, set off-centre, no collision.
@@ -900,7 +900,7 @@ public final class ModBlocks {
                 .instabreak()
                 .sound(SoundType.GRASS)
                 .offsetType(BlockBehaviour.OffsetType.XZ)
-                .pushReaction(PushReaction.POPPED);
+                .pushReaction(PushReaction.DESTROY);
     }
 
     // Like vanilla farmland: random ticks for moisture, a shovel breaks it, and it suffocates like a full block.
@@ -914,7 +914,7 @@ public final class ModBlocks {
 
     // A full-block machine you can see into: light and view pass through its glass.
     private static BlockBehaviour.Properties glazedMachine(BlockBehaviour.Properties p) {
-        return p.noOcclusion().isViewBlocking((state, level, pos, box) -> false).isSuffocating((state, level, pos) -> false);
+        return p.noOcclusion().isViewBlocking((state, level, pos) -> false).isSuffocating((state, level, pos) -> false);
     }
 
     // Like oak (an axe breaks it), much darker, and never ignited by lava or fire.
@@ -935,7 +935,7 @@ public final class ModBlocks {
                 .replaceable()
                 .noCollision()
                 .strength(100.0F)
-                .pushReaction(PushReaction.POPPED)
+                .pushReaction(PushReaction.DESTROY)
                 .noLootTable()
                 .liquid()
                 .sound(SoundType.EMPTY);
@@ -982,7 +982,7 @@ public final class ModBlocks {
                 .noOcclusion()
                 .dynamicShape()
                 .isSuffocating((state, level, pos) -> false)
-                .isViewBlocking((state, level, pos, box) -> false)
+                .isViewBlocking((state, level, pos) -> false)
                 .isRedstoneConductor((state, level, pos) -> false);
     }
 

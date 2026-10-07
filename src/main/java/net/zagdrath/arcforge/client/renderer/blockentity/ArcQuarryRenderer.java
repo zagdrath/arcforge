@@ -87,7 +87,7 @@ public class ArcQuarryRenderer implements BlockEntityRenderer<ArcQuarryBlockEnti
             List<BakedQuad> quads = emitter.getAll();
             poseStack.pushPose();
             poseStack.translate(0.5, 0.0, 0.5);
-            poseStack.rotate(Axis.YP.rotationDegrees(state.spin));
+            poseStack.mulPose(Axis.YP.rotationDegrees(state.spin));
             poseStack.translate(-0.5, 0.0, -0.5);
             collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sprite.atlasLocation()),
                     (pose, buffer) -> TiledBoxes.quads(pose, buffer, quads, -1, state.lit ? FULL_BRIGHT : state.light));

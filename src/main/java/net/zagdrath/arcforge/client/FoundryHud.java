@@ -44,7 +44,7 @@ public final class FoundryHud {
     private static void draw(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
-        if (player == null || minecraft.gui.hud.isHidden() || !FoundrySuit.fullSet(player)) {
+        if (player == null || minecraft.options.hideGui || !FoundrySuit.fullSet(player)) {
             return;
         }
         FoundrySuit.LavaShield shield = player.getData(FoundrySuit.LAVA_SHIELD);

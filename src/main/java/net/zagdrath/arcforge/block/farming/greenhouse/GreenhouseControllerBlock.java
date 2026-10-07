@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.farming.greenhouse;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -40,6 +42,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Greenhouse Array's controller, in one of its walls: its climate panel faces out of the greenhouse (FACING), and
 // its block entity runs the greenhouse and holds its contents. LIT while it grows.
 public class GreenhouseControllerBlock extends BaseEntityBlock implements GreenhousePart, PortHolder {
+    private static final MapCodec<GreenhouseControllerBlock> CODEC = simpleCodec(GreenhouseControllerBlock::new);
+
+    @Override
+    protected MapCodec<GreenhouseControllerBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 

@@ -76,14 +76,14 @@ public final class ArcforgeConfigScreen {
         }
 
         private void confirm() {
-            minecraft.gui.setScreen(new ConfirmScreen(yes -> {
+            minecraft.setScreen(new ConfirmScreen(yes -> {
                 if (yes) {
                     resetAll(modConfig);
                     // The pages below were built with the old values.
                     sectionCache.clear();
                     rebuild();
                 }
-                minecraft.gui.setScreen(this);
+                minecraft.setScreen(this);
             }, RESET_ALL_TITLE, RESET_ALL_MESSAGE));
         }
     }

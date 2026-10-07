@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -20,6 +22,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Sifter (see SifterBlockEntity): sieves gravel and sand through a mesh for ore dusts and minerals. LIT while it works.
 public class SifterBlock extends MachineBlock {
+    private static final MapCodec<SifterBlock> CODEC = simpleCodec(SifterBlock::new);
+
+    @Override
+    protected MapCodec<SifterBlock> codec() {
+        return CODEC;
+    }
+
     public SifterBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

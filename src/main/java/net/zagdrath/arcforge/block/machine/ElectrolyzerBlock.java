@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.sound.MachineSounds;
 
 // The front's cell fizzes while it splits water (an animated texture); the sound is its running loop, see MachineLoopSound.
 public class ElectrolyzerBlock extends MachineBlock {
+    private static final MapCodec<ElectrolyzerBlock> CODEC = simpleCodec(ElectrolyzerBlock::new);
+
+    @Override
+    protected MapCodec<ElectrolyzerBlock> codec() {
+        return CODEC;
+    }
+
     public ElectrolyzerBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

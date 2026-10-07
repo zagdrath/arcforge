@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -25,6 +27,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Seed Extractor (see SeedExtractorBlockEntity). Its front shows the threshing drum.
 public class SeedExtractorBlock extends MachineBlock {
+    private static final MapCodec<SeedExtractorBlock> CODEC = simpleCodec(SeedExtractorBlock::new);
+
+    @Override
+    protected MapCodec<SeedExtractorBlock> codec() {
+        return CODEC;
+    }
+
     public SeedExtractorBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

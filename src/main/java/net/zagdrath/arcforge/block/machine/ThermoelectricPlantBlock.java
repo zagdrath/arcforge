@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -19,6 +21,13 @@ import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 public class ThermoelectricPlantBlock extends MachineBlock {
+    private static final MapCodec<ThermoelectricPlantBlock> CODEC = simpleCodec(ThermoelectricPlantBlock::new);
+
+    @Override
+    protected MapCodec<ThermoelectricPlantBlock> codec() {
+        return CODEC;
+    }
+
     public ThermoelectricPlantBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

@@ -58,10 +58,10 @@ public final class ArcToolClient {
         Minecraft minecraft = Minecraft.getInstance();
         if (player == minecraft.player) {
             return minecraft.gameMode != null && (minecraft.gameMode.isDestroying()
-                    || (player.isSwinging() && minecraft.options.keyAttack.isDown() && minecraft.hitResult != null
+                    || (player.swinging && minecraft.options.keyAttack.isDown() && minecraft.hitResult != null
                             && minecraft.hitResult.getType() == net.minecraft.world.phys.HitResult.Type.BLOCK));
         }
-        return player.isSwinging();
+        return player.swinging;
     }
 
     // The item model condition: true for the main-hand tool of a running player, so the animated model shows.
@@ -112,7 +112,7 @@ public final class ArcToolClient {
     static void onScroll(InputEvent.MouseScrollingEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
-        if (minecraft.gui.screen() != null || player == null || !player.isShiftKeyDown()) {
+        if (minecraft.screen != null || player == null || !player.isShiftKeyDown()) {
             return;
         }
         var item = player.getItemInHand(InteractionHand.MAIN_HAND).getItem();

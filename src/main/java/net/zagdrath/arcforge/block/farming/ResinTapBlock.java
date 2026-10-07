@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -51,6 +53,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // only on the side of a log. CONTENT shows what's in the cup: nothing, Latex or Pine Resin. A bucket takes the Latex;
 // an empty hand the Pine Resin. Hoppers under it and conduits empty it too.
 public class ResinTapBlock extends BaseEntityBlock {
+    private static final MapCodec<ResinTapBlock> CODEC = simpleCodec(ResinTapBlock::new);
+
+    @Override
+    protected MapCodec<ResinTapBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final EnumProperty<Content> CONTENT = EnumProperty.create("content", Content.class);
 

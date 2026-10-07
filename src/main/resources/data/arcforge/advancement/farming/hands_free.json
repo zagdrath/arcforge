@@ -19,27 +19,31 @@
     "planter": {
       "trigger": "minecraft:placed_block",
       "conditions": {
-        "location": {
-          "type": "minecraft:location_check",
-          "predicate": {
-            "block": {
-              "blocks": "arcforge:planter"
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "arcforge:planter"
+              }
             }
           }
-        }
+        ]
       }
     },
     "harvester": {
       "trigger": "minecraft:placed_block",
       "conditions": {
-        "location": {
-          "type": "minecraft:location_check",
-          "predicate": {
-            "block": {
-              "blocks": "arcforge:harvester"
+        "location": [
+          {
+            "condition": "minecraft:location_check",
+            "predicate": {
+              "block": {
+                "blocks": "arcforge:harvester"
+              }
             }
           }
-        }
+        ]
       }
     }
   },

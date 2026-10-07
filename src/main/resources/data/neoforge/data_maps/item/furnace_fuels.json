@@ -1,0 +1,22 @@
+{
+  "values": {
+    "arcforge:bio_coal": {
+      "burn_time": 1600
+    },
+    "arcforge:bio_coal_block": {
+      "burn_time": 16000
+    },
+    "arcforge:carbon_dust": {
+      "burn_time": 800
+    },
+    "arcforge:coal_coke": {
+      "burn_time": 3200
+    },
+    "arcforge:coal_coke_block": {
+      "burn_time": 32000
+    },
+    "arcforge:pitch": {
+      "burn_time": 2400
+    }
+  }
+}

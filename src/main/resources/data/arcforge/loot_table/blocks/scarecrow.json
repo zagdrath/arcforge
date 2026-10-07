@@ -3,21 +3,18 @@
   "pools": [
     {
       "rolls": 1,
-      "condition": {
-        "type": "minecraft:all_of",
-        "terms": [
-          {
-            "type": "minecraft:survives_explosion"
-          },
-          {
-            "type": "minecraft:match_block",
-            "blocks": "arcforge:scarecrow",
-            "state": {
-              "half": "lower"
-            }
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        },
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "arcforge:scarecrow",
+          "properties": {
+            "half": "lower"
           }
-        ]
-      },
+        }
+      ],
       "entries": [
         {
           "type": "minecraft:item",

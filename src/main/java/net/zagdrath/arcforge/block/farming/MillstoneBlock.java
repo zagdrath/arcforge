@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.farming;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -47,6 +49,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 //  - Sneak-use with an empty hand to take the results (or, with none, the input back).
 // A redstone pulse turns it too, so a clock or an observer can run it.
 public class MillstoneBlock extends BaseEntityBlock {
+    private static final MapCodec<MillstoneBlock> CODEC = simpleCodec(MillstoneBlock::new);
+
+    @Override
+    protected MapCodec<MillstoneBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty TURN = IntegerProperty.create("turn", 0, 3);
     // The frame (y 0-6) and the stones (x/z 2-14, y 6-12), with the handle's peg.

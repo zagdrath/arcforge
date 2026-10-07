@@ -10,16 +10,18 @@
             {
               "type": "minecraft:item",
               "name": "arcforge:soybeans",
-              "condition": {
-                "type": "minecraft:match_block",
-                "blocks": "arcforge:soybeans",
-                "state": {
-                  "age": "7"
-                }
-              },
-              "modifier": [
+              "conditions": [
                 {
-                  "type": "minecraft:set_count",
+                  "condition": "minecraft:block_state_property",
+                  "block": "arcforge:soybeans",
+                  "properties": {
+                    "age": "7"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
                   "count": {
                     "type": "minecraft:uniform",
                     "min": 2,

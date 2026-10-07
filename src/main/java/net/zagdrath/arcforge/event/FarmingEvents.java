@@ -22,8 +22,7 @@ import net.zagdrath.arcforge.farming.LoamGrowth;
 
 // Loam Farmland can't be trampled, nor can a mob trample any farmland near a Scarecrow, and crops growing on Loam use
 // its nutrients (LoamGrowth). A ripe crop broken by hand counts for crop rotation (CropRotation), as the Harvester, Sickle
-// and Scythe do through CropHarvest. A hoe tills Loam through
-// data/neoforge/data_maps/block_transformer/block_transform_appenders.json (a rule added to minecraft:hoe).
+// and Scythe do through CropHarvest. A hoe tills Loam through LoamBlock.getToolModifiedState.
 @EventBusSubscriber(modid = Arcforge.MODID)
 public final class FarmingEvents {
     private FarmingEvents() {}

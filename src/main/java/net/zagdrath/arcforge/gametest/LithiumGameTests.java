@@ -10,7 +10,7 @@ import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.EntityTypes;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
@@ -253,7 +253,7 @@ public final class LithiumGameTests {
                     // Break a cell out: it carries its half of the energy, and the array un-forms.
                     long half = array.getStored() / 2;
                     helper.getLevel().destroyBlock(helper.absolutePos(min.offset(1, 1, 1)), true);
-                    var drops = helper.getEntities(EntityTypes.ITEM, min.offset(1, 1, 1), 2.0);
+                    var drops = helper.getEntities(EntityType.ITEM, min.offset(1, 1, 1), 2.0);
                     helper.assertTrue(drops.size() == 1, "Expected one drop, got " + drops.size());
                     long carried = drops.getFirst().getItem().getOrDefault(ModDataComponents.STORED_ENERGY.get(), 0L);
                     helper.assertTrue(Math.abs(carried - half) <= 2, "The cell carried " + carried + " FE, its share was " + half);

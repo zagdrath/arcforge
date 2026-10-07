@@ -13,6 +13,7 @@ import org.jspecify.annotations.Nullable;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -25,7 +26,6 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -99,7 +99,7 @@ public class FireboxArrayRenderer implements BlockEntityRenderer<FireboxArrayBlo
         state.flame = SteamBoilerArrayRenderer.sprite(FLAME);
         state.windows = array.windowQuads(found -> findWindowQuads(array.getLevel(), found));
         state.light = state.burning ? FULL_BRIGHT
-                : array.getLevel() != null ? LightCoordsUtil.getLightCoords(array.getLevel(), box.centre()) : state.lightCoords;
+                : array.getLevel() != null ? LevelRenderer.getLightCoords(array.getLevel(), box.centre()) : state.lightCoords;
     }
 
     // The half-block lining tiles of the box's walls that lie behind window (TiledBoxes.windowKey): those behind a Pressure

@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.block.multiblock;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.core.BlockPos;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // up to 7x7x7, drawn as one connected skin (box=true). Water runs down the cube's tubes while it condenses (the formed
 // model's lit texture).
 public class CondenserArrayCasingBlock extends CubeCasingBlock {
+    private static final MapCodec<CondenserArrayCasingBlock> CODEC = simpleCodec(CondenserArrayCasingBlock::new);
+
+    @Override
+    protected MapCodec<CondenserArrayCasingBlock> codec() {
+        return CODEC;
+    }
+
     // The largest box, each way.
     public static final int MAX_SIZE = 7;
     public static final CubeMultiblockStructure<CondenserArrayBlockEntity> STRUCTURE =

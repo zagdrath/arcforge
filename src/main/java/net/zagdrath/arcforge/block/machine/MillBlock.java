@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -25,6 +27,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Mill: the powered Millstone (see MillBlockEntity). Its front shows the stones turning.
 public class MillBlock extends MachineBlock {
+    private static final MapCodec<MillBlock> CODEC = simpleCodec(MillBlock::new);
+
+    @Override
+    protected MapCodec<MillBlock> codec() {
+        return CODEC;
+    }
+
     public MillBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

@@ -10,16 +10,18 @@
             {
               "type": "minecraft:item",
               "name": "arcforge:rubber_dandelion_roots",
-              "condition": {
-                "type": "minecraft:match_block",
-                "blocks": "arcforge:rubber_dandelion",
-                "state": {
-                  "age": "7"
-                }
-              },
-              "modifier": [
+              "conditions": [
                 {
-                  "type": "minecraft:set_count",
+                  "condition": "minecraft:block_state_property",
+                  "block": "arcforge:rubber_dandelion",
+                  "properties": {
+                    "age": "7"
+                  }
+                }
+              ],
+              "functions": [
+                {
+                  "function": "minecraft:set_count",
                   "count": {
                     "type": "minecraft:uniform",
                     "min": 1,
@@ -38,20 +40,22 @@
     },
     {
       "rolls": 1,
-      "condition": {
-        "type": "minecraft:match_block",
-        "blocks": "arcforge:rubber_dandelion",
-        "state": {
-          "age": "7"
+      "conditions": [
+        {
+          "condition": "minecraft:block_state_property",
+          "block": "arcforge:rubber_dandelion",
+          "properties": {
+            "age": "7"
+          }
         }
-      },
+      ],
       "entries": [
         {
           "type": "minecraft:item",
           "name": "arcforge:rubber_dandelion_seeds",
-          "modifier": [
+          "functions": [
             {
-              "type": "minecraft:set_count",
+              "function": "minecraft:set_count",
               "count": {
                 "type": "minecraft:uniform",
                 "min": 1,

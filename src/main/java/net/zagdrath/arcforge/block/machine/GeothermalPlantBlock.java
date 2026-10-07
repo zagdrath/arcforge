@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -29,6 +31,13 @@ import net.zagdrath.arcforge.machine.interaction.MachineInteractions;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 public class GeothermalPlantBlock extends MachineBlock {
+    private static final MapCodec<GeothermalPlantBlock> CODEC = simpleCodec(GeothermalPlantBlock::new);
+
+    @Override
+    protected MapCodec<GeothermalPlantBlock> codec() {
+        return CODEC;
+    }
+
     public GeothermalPlantBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

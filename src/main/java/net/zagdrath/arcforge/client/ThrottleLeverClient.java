@@ -58,7 +58,7 @@ public final class ThrottleLeverClient {
     static void onScroll(InputEvent.MouseScrollingEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
-        if (minecraft.gui.screen() != null || player == null || player.isSpectator()) {
+        if (minecraft.screen != null || player == null || player.isSpectator()) {
             return;
         }
         // Sneak + wheel belongs to the held tool (Wrench mode, Arc tool modules).
@@ -81,7 +81,7 @@ public final class ThrottleLeverClient {
 
     private static void drawHud(GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.gui.screen() != null) {
+        if (minecraft.screen != null) {
             return;
         }
         BlockPos pos = target(minecraft);

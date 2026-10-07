@@ -12,6 +12,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -25,7 +26,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -98,7 +98,7 @@ public class CarbonizerDoorRenderer implements BlockEntityRenderer<CarbonizerBlo
                 .getSprite(state.piece.texture(blockState.getValue(CarbonizerBlock.TALL)));
         // The door hangs in front of the (opaque) block, so it takes the light of the space it sits in.
         BlockPos front = carbonizer.getBlockPos().relative(state.facing);
-        state.doorLight = carbonizer.getLevel() != null ? LightCoordsUtil.getLightCoords(carbonizer.getLevel(), front) : state.lightCoords;
+        state.doorLight = carbonizer.getLevel() != null ? LevelRenderer.getLightCoords(carbonizer.getLevel(), front) : state.lightCoords;
     }
 
     @Override

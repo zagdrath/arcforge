@@ -18,7 +18,6 @@ import net.minecraft.network.protocol.game.ServerboundContainerButtonClickPacket
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Rotation;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.RegisterGameTestsEvent;
@@ -514,18 +513,18 @@ public final class ArcforgeGameTests {
 
     private static void registerTests(RegisterGameTestsEvent event) {
         Holder<TestEnvironmentDefinition<?>> environment = event.registerEnvironment(id("default"));
-        TestData<Holder<TestEnvironmentDefinition<?>>> data = new TestData<>(environment, Level.OVERWORLD, Identifier.withDefaultNamespace("empty"),
+        TestData<Holder<TestEnvironmentDefinition<?>>> data = new TestData<>(environment, Identifier.withDefaultNamespace("empty"),
                 600, 0, true, Rotation.NONE, false, 1, 1, false, 8);
         TESTS.keySet().forEach(name -> event.registerTest(id(name), new FunctionGameTestInstance(function(name), data)));
-        TestData<Holder<TestEnvironmentDefinition<?>>> longData = new TestData<>(environment, Level.OVERWORLD, Identifier.withDefaultNamespace("empty"),
+        TestData<Holder<TestEnvironmentDefinition<?>>> longData = new TestData<>(environment, Identifier.withDefaultNamespace("empty"),
                 1_500, 0, true, Rotation.NONE, false, 1, 1, false, 8);
         LONG_TESTS.keySet().forEach(name -> event.registerTest(id(name), new FunctionGameTestInstance(function(name), longData)));
-        TestData<Holder<TestEnvironmentDefinition<?>>> flakyData = new TestData<>(environment, Level.OVERWORLD, Identifier.withDefaultNamespace("empty"),
+        TestData<Holder<TestEnvironmentDefinition<?>>> flakyData = new TestData<>(environment, Identifier.withDefaultNamespace("empty"),
                 600, 0, false, Rotation.NONE, false, 1, 1, false, 8);
         FLAKY_TESTS.keySet().forEach(name -> event.registerTest(id(name), new FunctionGameTestInstance(function(name), flakyData)));
         SOLAR_TESTS.keySet().forEach(name -> {
             Holder<TestEnvironmentDefinition<?>> own = event.registerEnvironment(id(name));
-            event.registerTest(id(name), new FunctionGameTestInstance(function(name), new TestData<>(own, Level.OVERWORLD,
+            event.registerTest(id(name), new FunctionGameTestInstance(function(name), new TestData<>(own,
                     Identifier.withDefaultNamespace("empty"), 1_500, 0, true, Rotation.NONE, false, 1, 1, true, 8)));
         });
     }

@@ -1,8 +1,7 @@
 {
-  "parent": "minecraft:block/template_cube_bottom_top_indented",
+  "parent": "minecraft:block/template_farmland",
   "textures": {
-    "bottom": "arcforge:block/loam",
-    "side": "arcforge:block/loam",
+    "dirt": "arcforge:block/loam",
     "top": "arcforge:block/loam_farmland_moist"
   }
 }

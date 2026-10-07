@@ -73,12 +73,12 @@ public class ThrottleLeverRenderer implements BlockEntityRenderer<ThrottleLeverB
         poseStack.pushPose();
         // The housing's variant rotation (BlockModelRotation: rotateYXZ(-y, -x, 0) about the block centre).
         poseStack.translate(0.5F, 0.5F, 0.5F);
-        poseStack.rotate(Axis.YP.rotationDegrees(-state.yRot));
-        poseStack.rotate(Axis.XP.rotationDegrees(-state.xRot));
+        poseStack.mulPose(Axis.YP.rotationDegrees(-state.yRot));
+        poseStack.mulPose(Axis.XP.rotationDegrees(-state.xRot));
         poseStack.translate(-0.5F, -0.5F, -0.5F);
         // The arm pivots on the axle; positive angles lean it toward +z (signal 15's end of the model).
         poseStack.translate(PIVOT_X, PIVOT_Y, PIVOT_Z);
-        poseStack.rotate(Axis.XP.rotationDegrees(state.angle));
+        poseStack.mulPose(Axis.XP.rotationDegrees(state.angle));
         poseStack.translate(-PIVOT_X, -PIVOT_Y, -PIVOT_Z);
         collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(quads.getFirst().materialInfo().sprite().atlasLocation()),
                 (pose, buffer) -> TiledBoxes.quads(pose, buffer, quads, -1, state.lightCoords));

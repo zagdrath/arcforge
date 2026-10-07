@@ -89,7 +89,7 @@ public class EngineersHandbookScreen extends Screen {
     }
 
     public static void open() {
-        Minecraft.getInstance().gui.setScreen(new EngineersHandbookScreen());
+        Minecraft.getInstance().setScreen(new EngineersHandbookScreen());
     }
 
     @Override

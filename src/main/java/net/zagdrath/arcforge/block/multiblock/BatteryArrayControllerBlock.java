@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.multiblock;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -40,6 +42,13 @@ import net.zagdrath.arcforge.multiblock.BatteryArrayStructure;
 // its block entity runs the array. CHARGE (0-4) is the array's fill, as the cells show it: the display lights that many
 // bars and the block glows brighter the fuller it is. A comparator reads how full the array is.
 public class BatteryArrayControllerBlock extends BaseEntityBlock implements BatteryArrayPart, PortHolder {
+    private static final MapCodec<BatteryArrayControllerBlock> CODEC = simpleCodec(BatteryArrayControllerBlock::new);
+
+    @Override
+    protected MapCodec<BatteryArrayControllerBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty CHARGE = IntegerProperty.create("charge", 0, 4);
     // Light by CHARGE while formed: dark when empty, brightest when full.

@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -20,6 +22,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The Diamond Press (see DiamondPressBlockEntity): presses Graphite into Diamonds with FE and heat. LIT while it works.
 public class DiamondPressBlock extends MachineBlock {
+    private static final MapCodec<DiamondPressBlock> CODEC = simpleCodec(DiamondPressBlock::new);
+
+    @Override
+    protected MapCodec<DiamondPressBlock> codec() {
+        return CODEC;
+    }
+
     public DiamondPressBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

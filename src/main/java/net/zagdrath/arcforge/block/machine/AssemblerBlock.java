@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.sound.MachineSounds;
 
 // The front animates while it works (an animated texture); the sound is its running loop, see MachineLoopSound.
 public class AssemblerBlock extends MachineBlock {
+    private static final MapCodec<AssemblerBlock> CODEC = simpleCodec(AssemblerBlock::new);
+
+    @Override
+    protected MapCodec<AssemblerBlock> codec() {
+        return CODEC;
+    }
+
     public AssemblerBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

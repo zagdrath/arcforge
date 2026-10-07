@@ -354,7 +354,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Distilling.TYPE, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(),
                 ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get());
         registration.addCraftingStation(RecipeTypes.SMELTING, ModBlocks.INDUCTION_FURNACE.get(), ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get());
-        // The Compost Bin takes what a composter takes, at the same chances (the minecraft:compostable component).
+        // The Compost Bin takes what a composter takes, at the same chances (NeoForge's compostables data map).
         registration.addCraftingStation(RecipeTypes.COMPOSTING, ModBlocks.COMPOST_BIN.get());
         List<ItemLike> multiblockBlocks = new ArrayList<>();
         for (MultiblockBlueprints.Blueprint blueprint : MultiblockBlueprints.all()) {

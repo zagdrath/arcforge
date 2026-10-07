@@ -27,7 +27,7 @@ public final class WrenchScrollHandler {
     static void onScroll(InputEvent.MouseScrollingEvent event) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
-        if (minecraft.gui.screen() != null || player == null || !player.isShiftKeyDown()
+        if (minecraft.screen != null || player == null || !player.isShiftKeyDown()
                 || !(player.getItemInHand(InteractionHand.MAIN_HAND).getItem() instanceof WrenchItem)) {
             return;
         }

@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.farming;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -38,6 +40,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Copper Sprinkler (see CopperSprinklerBlockEntity): a copper riser with a spray head on top, sitting on the pipe or
 // tank that feeds it. A water bucket fills it by hand. RUNNING while it has water, which shows the spray.
 public class CopperSprinklerBlock extends BaseEntityBlock {
+    private static final MapCodec<CopperSprinklerBlock> CODEC = simpleCodec(CopperSprinklerBlock::new);
+
+    @Override
+    protected MapCodec<CopperSprinklerBlock> codec() {
+        return CODEC;
+    }
+
     public static final BooleanProperty RUNNING = BooleanProperty.create("running");
     // The flanged foot, the riser and the spray head.
     private static final VoxelShape SHAPE = Shapes.or(

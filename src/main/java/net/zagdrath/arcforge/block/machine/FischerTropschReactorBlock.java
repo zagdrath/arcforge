@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -21,6 +23,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Fischer-Tropsch Reactor (see FischerTropschReactorBlockEntity): Syngas into Naphtha, Light Oil, Heavy Oil and
 // Water over a catalyst, with FE and heat. LIT while it works.
 public class FischerTropschReactorBlock extends MachineBlock {
+    private static final MapCodec<FischerTropschReactorBlock> CODEC = simpleCodec(FischerTropschReactorBlock::new);
+
+    @Override
+    protected MapCodec<FischerTropschReactorBlock> codec() {
+        return CODEC;
+    }
+
     public FischerTropschReactorBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

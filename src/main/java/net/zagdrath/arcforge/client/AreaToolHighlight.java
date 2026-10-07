@@ -8,7 +8,7 @@ package net.zagdrath.arcforge.client;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.ARGB;
@@ -67,18 +67,22 @@ public final class AreaToolHighlight {
             return;
         }
         boolean highContrast = event.isHighContrast();
-        event.addCustomRenderer((state, collector, poseStack, levelState) -> {
-            var gameRenderer = Minecraft.getInstance().gameRenderer;
-            RenderType type = highContrast ? RenderTypes.linesDepthBias()
-                    : gameRenderer.useImprovedTransparency() ? RenderTypes.linesTranslucentNoDepthWrite() : RenderTypes.linesTranslucent();
+        // Called in the opaque and the translucent pass; draws, as vanilla's outline does (LevelRenderer.renderBlockOutline),
+        // in the one the centre block's own outline uses.
+        event.addCustomRenderer((state, buffers, poseStack, translucentPass, levelState) -> {
+            if (state.isTranslucent() != translucentPass) {
+                return false;
+            }
             int color = highContrast ? -11010079 : ARGB.black(102);
-            float width = gameRenderer.gameRenderState().windowRenderState.appropriateLineWidth;
+            float width = Minecraft.getInstance().gameRenderer.getGameRenderState().windowRenderState.appropriateLineWidth;
             Vec3 camera = levelState.cameraRenderState.pos;
             for (Target target : targets) {
-                poseStack.pushPose();
-                poseStack.translate(target.pos().getX() - camera.x, target.pos().getY() - camera.y, target.pos().getZ() - camera.z);
-                collector.submitShapeOutline(poseStack, target.shape(), type, color, width, state.isTranslucent());
-                poseStack.popPose();
+                double x = target.pos().getX() - camera.x, y = target.pos().getY() - camera.y, z = target.pos().getZ() - camera.z;
+                if (highContrast) {
+                    ShapeRenderer.renderShape(poseStack, buffers.getBuffer(RenderTypes.secondaryBlockOutline()), target.shape(), x, y, z,
+                            -16777216, 7.0F);
+                }
+                ShapeRenderer.renderShape(poseStack, buffers.getBuffer(RenderTypes.lines()), target.shape(), x, y, z, color, width);
             }
             // Vanilla still draws the centre's own outline.
             return false;

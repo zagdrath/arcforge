@@ -12,7 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Containers;
 import net.minecraft.world.entity.player.Player;
@@ -81,7 +80,7 @@ public class ResinTapBlockEntity extends BlockEntity implements ConduitConnectab
         if (!ResinTapBlock.isLog(log)) {
             return Source.NONE;
         }
-        return dripsLatex(log) ? Source.LATEX : log.is(BlockItemTags.SPRUCE_LOGS.block()) ? Source.SPRUCE : Source.OTHER;
+        return dripsLatex(log) ? Source.LATEX : log.is(BlockTags.SPRUCE_LOGS) ? Source.SPRUCE : Source.OTHER;
     }
 
     // Natural leaves: player-placed (persistent) ones don't count, so a log in a wall isn't a tree.

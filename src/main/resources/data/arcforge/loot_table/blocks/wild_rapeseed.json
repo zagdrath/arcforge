@@ -7,9 +7,9 @@
         {
           "type": "minecraft:item",
           "name": "arcforge:rapeseeds",
-          "modifier": [
+          "functions": [
             {
-              "type": "minecraft:set_count",
+              "function": "minecraft:set_count",
               "count": {
                 "type": "minecraft:uniform",
                 "min": 1,

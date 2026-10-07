@@ -99,7 +99,7 @@ public class MeterRenderer implements BlockEntityRenderer<MeterBlockEntity, Mete
         poseStack.pushPose();
         // As a wall sign: turned so local +Z points out of the front face, then just in front of it.
         poseStack.translate(0.5F, 0.5F, 0.5F);
-        poseStack.rotate(Axis.YP.rotationDegrees(-state.facing.toYRot()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(-state.facing.toYRot()));
         poseStack.translate((LCD_X - 8.0F) / 16.0F, (8.0F - LCD_Y) / 16.0F, 0.5F + 0.002F);
         poseStack.scale(SCALE, -SCALE, SCALE);
         FormattedCharSequence value = Component.literal(state.value).getVisualOrderText();

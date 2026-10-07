@@ -1,8 +1,10 @@
 {
   "type": "neoforge:add_table",
-  "condition": {
-    "type": "neoforge:loot_table_id",
-    "loot_table_id": "minecraft:blocks/short_grass"
-  },
+  "conditions": [
+    {
+      "condition": "neoforge:loot_table_id",
+      "loot_table_id": "minecraft:blocks/short_grass"
+    }
+  ],
   "table": "arcforge:gameplay/grass_seeds"
 }

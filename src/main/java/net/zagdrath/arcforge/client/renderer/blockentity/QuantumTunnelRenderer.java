@@ -79,8 +79,8 @@ public class QuantumTunnelRenderer implements BlockEntityRenderer<QuantumTunnelB
         int coreColor = state.linked ? -1 : 0xFF7A8C8C;
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F + 0.02F * (float) Math.sin(time * 0.05F), 0.5F);
-        poseStack.rotate(Axis.YP.rotationDegrees(time * 1.2F));
-        poseStack.rotate(Axis.XP.rotationDegrees(time * 0.7F));
+        poseStack.mulPose(Axis.YP.rotationDegrees(time * 1.2F));
+        poseStack.mulPose(Axis.XP.rotationDegrees(time * 0.7F));
         collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(core.atlasLocation()),
                 (pose, buffer) -> cube(pose, buffer, core, coreColor, FULL_BRIGHT, CORE_HALF));
         poseStack.popPose();
@@ -100,7 +100,7 @@ public class QuantumTunnelRenderer implements BlockEntityRenderer<QuantumTunnelB
             TextureAtlasSprite ring = in && out ? state.ringMixed : in ? state.ringInput : state.ringOutput;
             poseStack.pushPose();
             poseStack.translate(0.5F, 0.5F, 0.5F);
-            poseStack.rotate(face.getRotation());
+            poseStack.mulPose(face.getRotation());
             collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(ring.atlasLocation()),
                     (pose, buffer) -> ring(pose, buffer, ring, light));
             poseStack.popPose();

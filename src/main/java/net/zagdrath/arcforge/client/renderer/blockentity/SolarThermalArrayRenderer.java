@@ -13,6 +13,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
@@ -117,7 +118,7 @@ public class SolarThermalArrayRenderer implements BlockEntityRenderer<SolarTherm
 
         int temperature = array.getReceiverTemperature();
         state.receiverColor = glow(temperature) | 0xFF000000;
-        state.troughLight = LightCoordsUtil.getLightCoords(level, tower.max().above());
+        state.troughLight = LevelRenderer.getLightCoords(level, tower.max().above());
         state.receiverLight = temperature >= ArcforgeConfig.SOLAR_GLOW_FULLBRIGHT.getAsInt() ? LightCoordsUtil.FULL_BRIGHT : state.troughLight;
 
         state.facing = array.getBlockState().getValue(SolarThermalArrayControllerBlock.FACING);
@@ -169,9 +170,9 @@ public class SolarThermalArrayRenderer implements BlockEntityRenderer<SolarTherm
             poseStack.pushPose();
             poseStack.translate(state.minX + PIVOT_X / 16.0F, state.minY + PIVOT_Y / 16.0F, state.minZ + PIVOT_Z / 16.0F);
             if (!state.northSouth) {
-                poseStack.rotate(Axis.YP.rotationDegrees(90.0F));
+                poseStack.mulPose(Axis.YP.rotationDegrees(90.0F));
             }
-            poseStack.rotate(Axis.ZP.rotationDegrees(state.angle));
+            poseStack.mulPose(Axis.ZP.rotationDegrees(state.angle));
             poseStack.translate(-0.5F, -0.5F, -0.5F);
             collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, mirrorQuads, -1, state.troughLight));
             collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, receiverQuads, state.receiverColor, state.receiverLight));
@@ -183,7 +184,7 @@ public class SolarThermalArrayRenderer implements BlockEntityRenderer<SolarTherm
             poseStack.pushPose();
             poseStack.translate(state.minX + state.panelX / 16.0F, state.minY + PANEL_Y / 16.0F, state.minZ + state.panelZ / 16.0F);
             // The screen faces +Z in the model: turn it to face the controller's way.
-            poseStack.rotate(Axis.YP.rotationDegrees(switch (state.facing) {
+            poseStack.mulPose(Axis.YP.rotationDegrees(switch (state.facing) {
                 case EAST -> 90.0F;
                 case NORTH -> 180.0F;
                 case WEST -> -90.0F;

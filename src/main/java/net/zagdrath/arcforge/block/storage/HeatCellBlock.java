@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.storage;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -25,6 +27,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // A full-block HU store, built like an energy cell but in orange. HEAT (0-4) comes from its temperature
 // and picks the model (lit window segments and a glowing core) and the light level.
 public class HeatCellBlock extends StorageBlock {
+    // 26.1 requires a block codec. Nothing decodes this block type, and its constructor arguments aren't
+    // data, so the codec stands for this instance.
+    @Override
+    protected MapCodec<HeatCellBlock> codec() {
+        return MapCodec.unit(this);
+    }
+
     public static final IntegerProperty HEAT = IntegerProperty.create("heat", 0, 4);
 
     public HeatCellBlock(BlockBehaviour.Properties properties, ConduitTier tier) {

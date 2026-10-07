@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -41,6 +43,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // face, the FE port (see ChargepadBlockEntity). CHARGE is the gauge (0 empty, 1-4 quarters) and CHARGING lights the
 // coil while it's giving FE.
 public class ChargepadBlock extends BaseEntityBlock implements WrenchableMachine {
+    private static final MapCodec<ChargepadBlock> CODEC = simpleCodec(ChargepadBlock::new);
+
+    @Override
+    protected MapCodec<ChargepadBlock> codec() {
+        return CODEC;
+    }
+
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final IntegerProperty CHARGE = IntegerProperty.create("charge", 0, 4);
     public static final BooleanProperty CHARGING = BooleanProperty.create("charging");

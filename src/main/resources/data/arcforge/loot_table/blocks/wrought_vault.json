@@ -2,21 +2,25 @@
   "type": "minecraft:block",
   "pools": [
     {
-      "condition": {
-        "type": "minecraft:survives_explosion"
-      },
+      "conditions": [
+        {
+          "condition": "minecraft:survives_explosion"
+        }
+      ],
       "entries": [
         {
           "type": "minecraft:item",
           "name": "arcforge:wrought_vault",
-          "modifier": {
-            "type": "minecraft:copy_components",
-            "include": [
-              "minecraft:custom_name",
-              "arcforge:vault_contents"
-            ],
-            "source": "block_entity"
-          }
+          "functions": [
+            {
+              "function": "minecraft:copy_components",
+              "include": [
+                "minecraft:custom_name",
+                "arcforge:vault_contents"
+              ],
+              "source": "block_entity"
+            }
+          ]
         }
       ],
       "rolls": 1

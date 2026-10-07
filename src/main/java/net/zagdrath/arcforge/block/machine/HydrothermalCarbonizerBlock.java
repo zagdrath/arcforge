@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.block.machine;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -24,6 +26,13 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // The Hydrothermal Carbonizer (see HydrothermalCarbonizerBlockEntity): a pressure vessel that cooks biomass in hot water
 // into Bio-Coal, lit while it works.
 public class HydrothermalCarbonizerBlock extends MachineBlock {
+    private static final MapCodec<HydrothermalCarbonizerBlock> CODEC = simpleCodec(HydrothermalCarbonizerBlock::new);
+
+    @Override
+    protected MapCodec<HydrothermalCarbonizerBlock> codec() {
+        return CODEC;
+    }
+
     public HydrothermalCarbonizerBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }

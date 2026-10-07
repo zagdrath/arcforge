@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.MapCodec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -31,6 +33,13 @@ import net.zagdrath.arcforge.sound.MachineSounds;
 
 // A glass fermenting vessel on a steel base, with a stirrer motor on the lid. Not a full block.
 public class FermenterBlock extends MachineBlock {
+    private static final MapCodec<FermenterBlock> CODEC = simpleCodec(FermenterBlock::new);
+
+    @Override
+    protected MapCodec<FermenterBlock> codec() {
+        return CODEC;
+    }
+
     private static final Map<Direction, VoxelShape> SHAPES = Shapes.rotateHorizontal(Shapes.or(
             Block.box(1, 0, 1, 15, 1, 15),
             Block.box(2, 1, 2, 14, 4, 14),
