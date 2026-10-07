@@ -16,7 +16,7 @@ Versions are `MAJOR.MINOR.PATCH+MINECRAFT` (for example `1.2.0+26.3`), set by `m
   change or go away, or items and blocks that disappear on load.
 
 Changes land under **Unreleased** as they're made; when a version is released, that section gets its
-number and date.
+number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.md).
 
 ## [Unreleased]
 
