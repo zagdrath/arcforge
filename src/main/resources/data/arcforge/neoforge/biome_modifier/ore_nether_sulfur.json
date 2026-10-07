@@ -1,8 +1,9 @@
 {
+  "_comment": "Keep this in underground_ores, not underground_decoration where vanilla's Nether ores sit. Mods like BetterNether (via WorldWeaver) add their ores to vanilla Nether biomes after us but list them inline in their own biomes, so in step 7 our ore lands before theirs in one biome and after them in another, and the feature sorter crashes on the cycle. Step 6 is otherwise empty in the Nether, so one feature there can't form a cycle. The step only sets placement order; the ore generates the same. Checked by the ores_nether_sulfur_step GameTest.",
   "type": "neoforge:add_features",
   "biomes": "#minecraft:is_nether",
   "features": "arcforge:ore_nether_sulfur",
-  "step": "underground_decoration",
+  "step": "underground_ores",
   "neoforge:conditions": [
     {
       "type": "arcforge:ore_enabled",

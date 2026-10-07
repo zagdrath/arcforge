@@ -458,6 +458,7 @@ public final class ArcforgeGameTests {
         TESTS.put("ores_tags", OreGameTests::tags);
         TESTS.put("ores_toggle", OreGameTests::oreToggle);
         TESTS.put("ores_vein_generates", OreGameTests::veinGenerates);
+        TESTS.put("ores_nether_sulfur_step", OreGameTests::netherSulfurStep);
         TESTS.put("machine_control_single_blocks", MachineControlGameTests::singleBlockCoverage);
         TESTS.put("machine_control_non_machines", MachineControlGameTests::nonMachinesHaveNone);
         TESTS.put("machine_control_cube_arrays", MachineControlGameTests::cubeArraysCoverage);

@@ -55,6 +55,14 @@ Suggested version: **2.5.0** (minor: a new feature; worlds and configs carry ove
   consumes, and how long it has spent running and loaded. The totals are saved with the machine. For now, other mods
   read them through the API; the GUIs don't show them.
 
+### Fixed
+
+- **Nether generation crashed with BetterNether** (with WorldWeaver) installed: `Feature order cycle found` between
+  `minecraft:warped_forest` and `betternether:old_fungiwoods`. Nether Sulfur Ore was placed in the same worldgen step
+  as BetterNether's ores, which come after it in vanilla biomes and before it in BetterNether's own. It now uses the
+  underground ores step, which nothing else uses in the Nether. It generates the same as before. A GameTest checks
+  the step in every Nether biome.
+
 ## [2.4.0] - 2026-10-04
 
 ### Upgrading

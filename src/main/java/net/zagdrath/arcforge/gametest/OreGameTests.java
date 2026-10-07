@@ -21,6 +21,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BiomeTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.item.Item;
@@ -32,6 +33,7 @@ import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -380,6 +382,27 @@ public final class OreGameTests {
         helper.assertTrue(ArcforgeConfig.ORES.get("arcite").enabled() == null, "Arcite has a toggle");
         helper.assertTrue(conditions(helper, "ore_silver").isPresent(), "Silver's biome modifier has no condition");
         helper.assertTrue(conditions(helper, "ore_arcite").isEmpty(), "Arcite's biome modifier has a condition");
+        helper.succeed();
+    }
+
+    // 15. Nether sulfur is placed in every Nether biome in UNDERGROUND_ORES, never UNDERGROUND_DECORATION: there it
+    // sorts against BetterNether's ores, which are inline in its own biomes but added to vanilla's after ours, and the
+    // feature order cycle crashes Nether generation. UNDERGROUND_ORES is otherwise empty in the Nether.
+    static void netherSulfurStep(GameTestHelper helper) {
+        var registries = helper.getLevel().registryAccess();
+        var sulfur = registries.lookupOrThrow(Registries.PLACED_FEATURE)
+                .getOrThrow(ResourceKey.create(Registries.PLACED_FEATURE, Identifier.fromNamespaceAndPath(Arcforge.MODID, "ore_nether_sulfur")));
+        int biomes = 0;
+        for (var biome : registries.lookupOrThrow(Registries.BIOME).getOrThrow(BiomeTags.IS_NETHER)) {
+            var steps = biome.value().getGenerationSettings().features();
+            String name = biome.getRegisteredName();
+            helper.assertTrue(steps.size() > GenerationStep.Decoration.UNDERGROUND_DECORATION.ordinal()
+                    && steps.get(GenerationStep.Decoration.UNDERGROUND_ORES.ordinal()).contains(sulfur), "Sulfur isn't in " + name + "'s underground_ores");
+            helper.assertTrue(!steps.get(GenerationStep.Decoration.UNDERGROUND_DECORATION.ordinal()).contains(sulfur),
+                    "Sulfur is in " + name + "'s underground_decoration");
+            biomes++;
+        }
+        helper.assertTrue(biomes > 0, "No Nether biomes");
         helper.succeed();
     }
 
