@@ -98,8 +98,9 @@ up to 1,100°C: in clear weather it's above 500°C (High-Pressure Steam) from ab
 900°C (a Superheater Array, or Superheated Steam) from about 9:40 to 14:20. On the east-west axis (×0.7) it
 tops out at about 780°C, too cool to superheat.
 It holds 16,000 HU and gives heat out of its heat ports (a new tower has one on the bottom block behind
-the controller), at its whole output even into a touching machine. A boiler it feeds only gets to 500°C
-set to High-Pressure (see the Steam Boiler Array), since one array gives less heat than a boiler can boil. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
+the controller), at its whole output even into a touching machine. A boiler it feeds climbs toward the
+receiver's temperature (see the Steam Boiler Array); set to High-Pressure, it stays at 500°C or more in the rain and
+overnight rather than cooling into plain Steam. A buffer hotter than the sun now allows cools off over a few seconds. No sky, no heat:
 it does nothing in the Nether or the End. Everything is configurable (`power.generators.solarThermalArray`).
 
 ### Steelmaking and alloys
@@ -312,21 +313,32 @@ and Pressure Glass on a footprint 3 to 7 by 3 to 9 (either way round), 3 to 12 b
   twelve edges must be casings. The water and steam show through the glass.
 - It forms from the casings and glass joined to the block you place last, so keep other loose casings and
   glass from touching it (or it forms only as a 3×3, if it can).
-- The steam grade depends on its temperature:
-  - Steam from 100°C (8 HU/mB);
+- The steam grade depends on its temperature. Each grade's band runs up to the next one's temperature:
+  - Steam from 100°C (8 HU/mB in a 3×3×3);
   - High-Pressure from 500°C (12 HU/mB);
   - Superheated from 900°C (16 HU/mB).
+- **Bigger is cheaper.** Heat per mB is multiplied by (sections ÷ 3)^-0.2: a 3×3×12 pays 76% of a 3×3×3's, an
+  8×7×12 53%, a 7×9×12 51% (`sizeEfficiency`).
+- **Hotter is cheaper.** Running at the top of a grade's band saves another 20% (`hotSaving`), less lower in the
+  band: a 7×9×12 at 499°C boils Steam for 3.3 HU/mB.
 - Per section (width × depth ÷ 9 × height: 3 for a 3×3×3, 84 for a 7×9×12) it holds 100,000 HU, uses up to
-  600 HU/t, and has 16,000 mB tanks.
-- A 7×9×12 boiler boils up to 50,400 HU/t: 6,300 mB/t of Steam or 3,150 mB/t of Superheated Steam.
+  600 HU/t, and has 16,000 mB tanks. A 7×9×12 boils with up to 50,400 HU/t.
 
-Its **pressure** (a tab in its GUI) picks the grade:
-- **Auto** boils all the heat above 100°C. Fed more heat than it uses, it climbs toward its heat
-  source's temperature and makes better steam. Underfed, it holds at 100°C making plain Steam.
-- **Steam**, **High-Pressure** or **Superheated** heats without boiling until the boiler reaches that
-  grade's temperature, then boils only the heat above it. It holds there, making that grade at whatever
-  rate its heat comes in. So a slow source such as a Solar Thermal Array can still make High-Pressure
-  Steam.
+It **climbs**: from 100°C it boils with half the heat coming in and heats up on the rest, until it reaches the top
+of its band. There it boils all its heat. If its heat source is no hotter than it, it settles there and boils nearly
+all of it. If the heat stops, it keeps boiling from what it holds at the rate heat had been coming in, cooling as it
+goes.
+
+Its **pressure** (a tab in its GUI) picks the band:
+- **Auto** climbs as hot as its heat allows (up to 1,390°C), making whatever grade it's hot enough for.
+- **Steam**, **High-Pressure** or **Superheated** climbs to the top of that grade's band (499°C, 899°C or
+  1,390°C) and holds there. Below the grade's temperature it makes the grade it's hot enough for, so it never
+  stops boiling. Once there, it never boils itself back below it, so a slow source such as a Solar Thermal Array
+  can still make High-Pressure Steam.
+
+**Overpressure.** With its steam tank full it vents what it boils instead of stopping (steam blows from its roof,
+with a hiss). Heat that pushes it past the top of its band (more than it can boil, or after its pressure was
+turned down) is vented too. Either way its status reads Venting.
 
 Cooling into a lower grade turns the steam it holds into that grade.
 
@@ -381,8 +393,8 @@ straight to FE.
   it waits a second before it relights. The rotor spools up in about 1.5 s (faster with Heavy Oil
   lubricant, which also adds 8%) and coasts down over about 4 s; output follows the rotor.
 - **Exhaust heat.** A quarter of the fuel's heat leaves at half its burn temperature (Naphtha: 600°C) through
-  Heat ports, e.g. into a Steam Boiler Array's Heat port for High-Pressure Steam: about 1.94× the FE of the
-  burner-and-boiler route in all. With nowhere to go, it vents as a heat haze.
+  Heat ports, e.g. into a Steam Boiler Array's Heat port for High-Pressure Steam, on top of the turbine's own
+  FE. With nowhere to go, it vents as a heat haze.
 - A new one has an energy port on the bottom-left block of the intake end, a heat port in the middle of the
   exhaust end, and a fuel port under the middle of its length.
 
@@ -395,9 +407,10 @@ Its flow, heat and tanks scale with its volume ÷ 27.
   - Steam → High-Pressure: 3 HU;
   - High-Pressure → Superheated: 3 HU;
   - Steam → Superheated: 6 HU.
-- **Why use one:** boiling plain Steam (8 HU per mB) and superheating it (6) costs 14 HU per mB of Superheated
-  Steam, against 16 to boil it directly. Only the superheater needs 900°C heat, so the boiler can run on any
-  heat above 100°C.
+- **Why use one:** only the superheater needs 900°C heat, so the boiler can run on any heat above 100°C. In a
+  3×3×3 boiler, plain Steam at 100°C (8 HU per mB) superheated (6) costs 14 HU per mB of Superheated Steam,
+  against 16 to boil it directly at 900°C. Bigger and hotter boilers pay less to boil, so the saving shrinks.
+  The biggest, running hot, boil Superheated Steam directly for less.
 - Its own heat must be at least the target grade's temperature (500°C / 900°C). Below that, steam
   passes through unchanged.
 - **Pressure tab:**
@@ -493,8 +506,8 @@ default).
 The Electrolyzer never charges less than 1.25× (`balanceSafetyFactor`) the most FE the best heat-to-FE setup
 could get back from what it makes, worked out from the live config and data maps (every Heat upgrade in the
 burner, then the better of a fully carded Thermoelectric Plant and a Superheated boiler into a lubricated,
-exhausting turbine, times `power.generationMultiplier`). By default that floor is 708 FE per mB of hydrogen
-(141,600 FE per 100 mB of water), above the water recipe's 1,200 FE per mB, so splitting water costs the floor and
+exhausting turbine, times `power.generationMultiplier`; the boiler counted is the biggest, at the top of its
+band). By default that floor is 1,508 FE per mB of hydrogen (301,588 FE per 100 mB of water), above the water recipe's 1,200 FE per mB, so splitting water costs the floor and
 Energy upgrades don't lower it.
 
 **Oxygen** (from the Electrolyzer or the Air Separator) speeds up the Arcforge Furnace: give it an Oxygen port with the Wrench and pipe oxygen in. A smelt

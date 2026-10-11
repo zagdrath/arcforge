@@ -10,6 +10,8 @@ import java.util.EnumSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -53,18 +55,32 @@ public class SteamBoilerArrayCasingBlock extends ShellCasingBlock {
         return new SteamBoilerArrayBlockEntity(pos, state);
     }
 
-    // Steam wisps from the roof while boiling (the master is lit through its block entity's data).
+    // Steam wisps from the roof while boiling (the master is lit through its block entity's data), and a hissing jet from
+    // the middle of the roof while it vents overpressure.
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
         if (!state.getValue(FORMED) || !(level.getBlockEntity(pos) instanceof SteamBoilerArrayBlockEntity boiler) || !boiler.isBoilingOnClient()) {
             return;
         }
         ShellStructure.Shell shell = boiler.getShell();
-        if (shell != null && random.nextInt(2) == 0) {
-            BlockPos low = shell.min();
-            BlockPos top = shell.max();
+        if (shell == null) {
+            return;
+        }
+        BlockPos low = shell.min();
+        BlockPos top = shell.max();
+        if (random.nextInt(2) == 0) {
             level.addParticle(ParticleTypes.CLOUD, low.getX() + random.nextDouble() * (top.getX() - low.getX() + 1), top.getY() + 1.05,
                     low.getZ() + random.nextDouble() * (top.getZ() - low.getZ() + 1), 0.0, 0.04, 0.0);
+        }
+        if (boiler.isVentingOnClient()) {
+            double x = (low.getX() + top.getX() + 1) / 2.0, y = top.getY() + 1.05, z = (low.getZ() + top.getZ() + 1) / 2.0;
+            for (int i = 0; i < 3; i++) {
+                level.addParticle(ParticleTypes.CLOUD, x + random.nextGaussian() * 0.15, y, z + random.nextGaussian() * 0.15,
+                        random.nextGaussian() * 0.02, 0.25 + random.nextDouble() * 0.1, random.nextGaussian() * 0.02);
+            }
+            if (random.nextInt(8) == 0) {
+                level.playLocalSound(x, y, z, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.3F, 0.6F + random.nextFloat() * 0.3F, false);
+            }
         }
     }
 }

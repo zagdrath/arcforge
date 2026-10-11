@@ -22,6 +22,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.recipe.AirSeparatingRecipe;
@@ -1359,9 +1360,11 @@ final class MachineCategories {
         @Override
         public void draw(SteamRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             SteamGrade grade = recipe.grade();
-            // What the Steam Boiler Array pays per mB (after its heat cost multiplier) and the Steam Turbine Array makes.
-            String huPerMb = String.format(Locale.ROOT, "%.0f", grade.huPerMb() * ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble());
-            text(graphics, Component.translatable("jei.arcforge.steam.boil", grade.minCelsius(), huPerMb), 0, 30);
+            // What the Steam Boiler Array pays per mB (a 3x3x3 at the grade's temperature, down to the biggest at the
+            // top of its band) and the Steam Turbine Array makes.
+            String huPerMb = String.format(Locale.ROOT, "%.1f", grade.huPerMb() * ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble()).replaceAll("\\.0$", "");
+            String least = String.format(Locale.ROOT, "%.1f", grade.huPerMb() * SteamBoilerArrayBlockEntity.bestHeatCostMultiplier());
+            text(graphics, Component.translatable("jei.arcforge.steam.boil", grade.minCelsius(), least, huPerMb), 0, 30);
             // Times the power multiplier, as the turbine makes it.
             String fePerMb = String.format(Locale.ROOT, "%.1f", grade.arrayFePerMb() * PowerGeneration.multiplier()).replaceAll("\\.0$", "");
             text(graphics, Component.translatable("jei.arcforge.steam.turbine", fePerMb), 0, 40);

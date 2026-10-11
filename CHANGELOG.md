@@ -22,7 +22,29 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Changed
+
+- **Bigger Steam Boiler Arrays make more steam from the same heat.** Heat per mB is multiplied by (sections ÷ 3)^-0.2:
+  a 3×3×12 pays 76% of a 3×3×3's, an 8×7×12 53%, a 7×9×12 51%. Before, every size made the same steam from the
+  same heat. Configurable as `sizeEfficiency`.
+- **Steam Boiler Arrays climb, and run cheaper hot.** From 100°C a boiler boils with half the heat coming in and
+  heats up on the rest, to the top of its grade's band (499°C for Steam, 899°C for High-Pressure, 1,390°C for
+  Superheated and Auto). At the top of a band each mB costs 20% less heat (`hotSaving`). A boiler as hot as its heat
+  source settles there and boils nearly all its heat. One whose heat stops keeps boiling from what it holds as it
+  cools, but never below its set grade's temperature.
+- **Steam Boiler Arrays vent overpressure.** With a full steam tank a boiler vents what it boils instead of stopping.
+  Heat that pushes it past the top of its band is vented too, for example after its pressure is turned down. It
+  shows Venting, with a jet of steam and a hiss from its roof.
+- **Steam's energy balance counts the new boilers.** The best heat-to-FE route is now the biggest boiler at the top
+  of Superheated's band, 10.05 FE per HU (was 4.72). The Electrolyzer's floor rises with it: 100 mB of water costs at
+  least 301,588 FE (was 141,600), so hydrogen still can't make free power. JEI's steam page shows each grade's heat
+  per mB as a range.
+
 ### Fixed
+
+- **A Steam Boiler Array no longer stops boiling while it heats toward its pressure setting.** Set to High-Pressure
+  or Superheated below that grade's temperature, it now keeps making the grade it's hot enough for as it climbs,
+  instead of making nothing until it got there.
 
 - **The Tree Cutter no longer leaves bare trunks standing.** When a big tree's branch grew into a neighbouring trunk, it
   took the neighbour's leaves and the logs above the branch but left the trunk below, a leafless stump it never cut.

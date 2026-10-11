@@ -54,9 +54,10 @@ import com.mojang.serialization.Codec;
 
 // The Steam Boiler Array (see ShellMultiblockBlockEntity): boils water into steam with heat, and grows with its
 // sections s = width x depth / 9 x height (a 3x3x3 is 3, a 7x9x12 is 84). It holds 100,000 x s HU and boils with up
-// to 600 x s HU/t; each mB costs 8 / 12 / 16 HU for Steam / High-Pressure / Superheated (a 7x9x12 boils up to 50,400
-// HU/t: 6,300 mB/t of Steam, 3,150 of Superheated). Water and steam tanks hold 16,000 x s mB. The grade and pressure
-// rules are in BoilerCore.
+// to 600 x s HU/t. In a 3x3x3 each mB costs 8 / 12 / 16 HU for Steam / High-Pressure / Superheated; bigger boilers pay
+// less ((s / 3)^-0.2: a 7x9x12 pays 51%), and running hot in a grade's band takes off up to 20% more (see
+// heatCostMultiplier and BoilerCore). Water and steam tanks hold 16,000 x s mB. The grade, pressure and vent rules
+// are in BoilerCore.
 public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity implements Boiler {
     // Water buckets go in the input slot and are poured into the tank; the empty buckets come out below.
     public static final int SLOT_BUCKET_IN = 0;
@@ -78,6 +79,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     private BoilerCore core;
     private final ContainerData data;
     private boolean boiling;
+    private boolean venting;
     private boolean syncPending;
     private long lastSync;
     // Client side: the water and steam levels (0-1) the renderer shows, easing toward the synced ones.
@@ -157,6 +159,19 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
         return scaled(ArcforgeConfig.BOILER_ARRAY_MAX_HEAT_PER_SECTION.getAsInt(), getSections());
     }
 
+    // The multiplier on a grade's heat per mB for a boiler this big: the configured cost, cut by size (a 3x3x3 pays
+    // it in full; BoilerCore takes off more the hotter it runs).
+    public static double heatCostMultiplier(double sections) {
+        return ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble()
+                * Math.pow(Math.max(1.0, sections / 3.0), -ArcforgeConfig.BOILER_ARRAY_SIZE_EFFICIENCY.getAsDouble());
+    }
+
+    // The least any boiler pays per mB, as a multiplier on the grade's heat per mB: the biggest, at the top of its band.
+    public static double bestHeatCostMultiplier() {
+        double biggest = SteamBoilerArrayCasingBlock.MAX_WIDTH * SteamBoilerArrayCasingBlock.MAX_DEPTH / 9.0 * SteamBoilerArrayCasingBlock.MAX_HEIGHT;
+        return heatCostMultiplier(biggest) * (1.0 - ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble());
+    }
+
     // "W×D×H" for names and tooltips.
     public String sizeText() {
         ShellStructure.Shell shell = getShell();
@@ -192,21 +207,23 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
             // Only boiling moves water to steam during the core's tick, so the tanks' changes are what it boiled.
             int waterBefore = water.getAmount();
             int steamBefore = steam.getAmount();
-            BoilerCore.State boiled = core.tick(maxHeatPerTick(), ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble());
+            BoilerCore.State boiled = core.tick(maxHeatPerTick(), heatCostMultiplier(getSections()), ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble());
             controlState.consumedFluid(Math.max(0, waterBefore - water.getAmount()));
             controlState.producedFluid(Math.max(0, steam.getAmount() - steamBefore));
             status = switch (boiled) {
                 case BOILING -> MachineStatus.BOILING;
                 case HEATING -> MachineStatus.HEATING;
                 case NO_WATER -> MachineStatus.NO_WATER;
-                case STEAM_FULL -> MachineStatus.STEAM_FULL;
+                case VENTING -> MachineStatus.VENTING;
             };
-            boiling = status == MachineStatus.BOILING;
+            boiling = status == MachineStatus.BOILING || status == MachineStatus.VENTING;
         }
+        boolean wasVenting = venting;
+        venting = status == MachineStatus.VENTING;
         if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
             MultiblockAutomation.pushOutputs(level, this);
         }
-        if (boiling != wasBoiling || (syncPending && level.getGameTime() - lastSync >= SYNC_INTERVAL)) {
+        if (boiling != wasBoiling || venting != wasVenting || (syncPending && level.getGameTime() - lastSync >= SYNC_INTERVAL)) {
             syncPending = false;
             lastSync = level.getGameTime();
             sync();
@@ -250,6 +267,11 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     // Client side: whether it was boiling at the last sync (for particles).
     public boolean isBoilingOnClient() {
         return boiling;
+    }
+
+    // Client side: whether it was venting at the last sync (for the plume and hiss).
+    public boolean isVentingOnClient() {
+        return venting;
     }
 
     // --- Capabilities (MultiblockController) ---
@@ -320,6 +342,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
         steam.deserialize(input.childOrEmpty("steam"));
         core.deserialize(input);
         boiling = input.getBooleanOr("boiling", false);
+        venting = input.getBooleanOr("venting", false);
     }
 
     @Override
@@ -330,6 +353,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
         steam.serialize(output.child("steam"));
         core.serialize(output);
         output.putBoolean("boiling", boiling);
+        output.putBoolean("venting", venting);
     }
 
     @Override

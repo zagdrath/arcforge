@@ -194,10 +194,9 @@ public final class SolarGameTests {
                 .thenSucceed();
     }
 
-    // 7. Through its heat port the tower heats a Steam Boiler Array, set to High-Pressure (the setting for a slow
-    //    heat source: on Auto a boiler this big boils the heat away faster than the tower gives it), to
-    //    High-Pressure Steam at clear noon; in the rain the receiver cools below the boiler and no more heat
-    //    comes in, so the boiler just holds at 500°C.
+    // 7. Through its heat port the tower heats a Steam Boiler Array, set to High-Pressure, to High-Pressure Steam at
+    //    clear noon; in the rain the receiver cools below the boiler and no more heat comes in, so the boiler boils
+    //    off what it holds above 500°C and holds there.
     static void boilerGrades(GameTestHelper helper) {
         plains(helper);
         time(helper, NOON);

@@ -98,10 +98,11 @@ public class SteamBoilerScreen extends MachineScreen<SteamBoilerMenu> {
         }
         Component status = menu.getStatus().getDescription();
         graphics.text(font, status, STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
-        // The rate shares the status line, so it only shows while boiling (the other statuses are longer),
-        // and only if it fits; the tooltip always has it.
+        // The rate shares the status line, so it only shows while boiling or venting (the other statuses are
+        // longer), and only if it fits; the tooltip always has it.
         Component rate = rateText();
-        if (menu.getStatus() == MachineStatus.BOILING && STATUS_X + font.width(status) + RATE_GAP <= VALUE_RIGHT - font.width(rate)) {
+        boolean boiling = menu.getStatus() == MachineStatus.BOILING || menu.getStatus() == MachineStatus.VENTING;
+        if (boiling && STATUS_X + font.width(status) + RATE_GAP <= VALUE_RIGHT - font.width(rate)) {
             textRight(graphics, rate, VALUE_RIGHT, STATUS_Y, ArcforgeGui.ACCENT);
         }
     }

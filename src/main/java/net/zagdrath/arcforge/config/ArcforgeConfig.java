@@ -499,6 +499,16 @@ public class ArcforgeConfig {
             .comment("Multiplier on the heat per mB of steam (0.8: 8 / 12 / 16 HU per mB of Steam / High-Pressure / Superheated).")
             .defineInRange("heatCostMultiplier", 0.8, 0.1, 10.0);
 
+    public static final ModConfigSpec.DoubleValue BOILER_ARRAY_SIZE_EFFICIENCY = BUILDER
+            .comment("How much a bigger boiler saves on heat per mB: the cost is multiplied by (sections / 3) to minus this",
+                    "(0.2: a 3x3x12 pays 76%, a 7x9x12 51% of a 3x3x3's). 0 turns it off.")
+            .defineInRange("sizeEfficiency", 0.2, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue BOILER_ARRAY_HOT_SAVING = BUILDER
+            .comment("Share of the heat per mB a boiler saves at the top of its grade's temperature band (0.2: 20% less at",
+                    "499°C than at 100°C for Steam), scaling down to none at the band's start. 0 turns it off.")
+            .defineInRange("hotSaving", 0.2, 0.0, 0.9);
+
     static {
         BUILDER.pop();
     }

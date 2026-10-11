@@ -252,7 +252,8 @@ public final class BigArrayGameTests {
     }
 
     // Every generator's FE goes through PowerGeneration: the turbines' caps are their best output times the multiplier,
-    // and the energy balance counts it, so the steam route stays 66.08 FE per 14 HU times the multiplier.
+    // and the energy balance counts it, so the steam route stays 66.08 FE per 9.29 HU (the best boiler's Steam, superheated)
+    // times the multiplier.
     static void powerMultiplier(GameTestHelper helper) {
         double multiplier = PowerGeneration.multiplier();
         double lubricant = ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble(), vacuum = ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble();
@@ -263,7 +264,8 @@ public final class BigArrayGameTests {
                 * ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * (1.0 + lubricant)), "The Gas Turbine Array's cap is " + GasTurbineArrayBlockEntity.maxOutput(9));
         helper.assertTrue(PowerGeneration.fe(1_000.0) == Math.round(1_000.0 * multiplier), "1,000 FE comes out as " + PowerGeneration.fe(1_000.0));
         double steam = EnergyBalance.steamFePerHu(SteamGrade.STEAM, SteamGrade.SUPERHEATED);
-        helper.assertTrue(Math.abs(steam - 56 * (1.0 + lubricant + vacuum) / 14.0 * multiplier) < 1e-9, "The steam route gives " + steam + " FE/HU");
+        double hu = 10.0 * SteamBoilerArrayBlockEntity.bestHeatCostMultiplier() + 10.0 * ArcforgeConfig.SUPERHEATER_HEAT_COST.getAsDouble();
+        helper.assertTrue(Math.abs(steam - 56 * (1.0 + lubricant + vacuum) / hu * multiplier) < 1e-9, "The steam route gives " + steam + " FE/HU");
         helper.succeed();
     }
 }

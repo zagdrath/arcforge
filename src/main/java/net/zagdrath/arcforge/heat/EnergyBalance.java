@@ -13,6 +13,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.CombustionFuel;
 import net.zagdrath.arcforge.machine.PowerGeneration;
@@ -46,7 +47,7 @@ public final class EnergyBalance {
     }
 
     // Steam Boiler Array into a lubricated Steam Turbine Array with its exhaust draining, over every grade, boiled
-    // directly or raised by a Superheater Array.
+    // directly or raised by a Superheater Array. The boiler is the biggest there is, at the top of its band.
     public static double bestSteamFePerHu() {
         double best = 0.0;
         for (SteamGrade made : SteamGrade.values()) {
@@ -61,7 +62,7 @@ public final class EnergyBalance {
 
     // FE per HU boiling into one grade and (if different) superheating it into another.
     public static double steamFePerHu(SteamGrade boiled, SteamGrade made) {
-        double hu = boiled.huPerMb() * ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble()
+        double hu = boiled.huPerMb() * SteamBoilerArrayBlockEntity.bestHeatCostMultiplier()
                 + (made.huPerMb() - boiled.huPerMb()) * ArcforgeConfig.SUPERHEATER_HEAT_COST.getAsDouble();
         double fe = made.arrayFePerMb() * (1.0 + ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble()
                 + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble()) * PowerGeneration.multiplier();

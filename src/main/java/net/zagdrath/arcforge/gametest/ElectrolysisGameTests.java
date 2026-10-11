@@ -32,6 +32,7 @@ import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcforgeFurnaceBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -141,12 +142,12 @@ public final class ElectrolysisGameTests {
                 .thenSucceed();
     }
 
-    // One operation (100 mB of water) uses exactly its cost: the balance floor of 141,600 FE (its 200 mB of hydrogen can
-    // give back 113,280 FE through a Steam Turbine Array, times the 1.25 safety factor), which is above the recipe's
-    // 120,000, so Energy upgrades can't take it lower.
+    // One operation (100 mB of water) uses exactly its cost: the balance floor of 301,588 FE (its 200 mB of hydrogen can
+    // give back 241,270 FE through the biggest Steam Boiler Array into a Steam Turbine Array, times the 1.25 safety
+    // factor), which is above the recipe's 120,000, so Energy upgrades can't take it lower.
     static void energyExact(GameTestHelper helper) {
         int[] energyUpgrades = { 0, 1, 8 };
-        int[] expected = { 141_600, 141_600, 141_600 };
+        int[] expected = { 301_588, 301_588, 301_588 };
         List<ElectrolyzerBlockEntity> machines = new ArrayList<>();
         List<Meter> meters = new ArrayList<>();
         for (int i = 0; i < energyUpgrades.length; i++) {
@@ -160,7 +161,7 @@ public final class ElectrolysisGameTests {
             meters.add(new Meter(machine));
         }
         ElectrolyzingRecipe recipe = waterRecipe(helper);
-        helper.assertTrue(EnergyBalance.minEnergyFor(recipe) == 141_600, "The floor is " + EnergyBalance.minEnergyFor(recipe) + " FE, not 141,600");
+        helper.assertTrue(EnergyBalance.minEnergyFor(recipe) == 301_588, "The floor is " + EnergyBalance.minEnergyFor(recipe) + " FE, not 301,588");
         helper.onEachTick(() -> meters.forEach(Meter::topUp));
         helper.startSequence()
                 .thenWaitUntil(() -> machines.forEach(machine -> helper.assertTrue(machine.getOxygen().getAmount() == 100, "Not split yet")))
@@ -183,7 +184,7 @@ public final class ElectrolysisGameTests {
     static void hydrogenNetNegative(GameTestHelper helper) {
         double lubricant = ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble();
         double vacuum = ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble();
-        double boilerCost = ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble();
+        double boilerCost = SteamBoilerArrayBlockEntity.bestHeatCostMultiplier();
         double superheaterCost = ArcforgeConfig.SUPERHEATER_HEAT_COST.getAsDouble();
         List<Double> routes = new ArrayList<>();
         routes.add(ArcforgeConfig.THERMOELECTRIC_BONUS_EFFICIENCY.getAsDouble()
@@ -201,13 +202,14 @@ public final class ElectrolysisGameTests {
         for (double route : routes) {
             helper.assertTrue(best >= route - 1e-9, "A route gives " + route + " FE/HU, more than bestFePerHu() " + best);
         }
-        // Boiling Steam (8 HU) and superheating it (6 HU) into 66.08 FE: 4.72 FE per HU.
-        helper.assertTrue(Math.abs(best - 4.72) < 0.001, "bestFePerHu() is " + best + ", not 4.72");
+        // The biggest boiler (7x9x12) at the top of Superheated's band boils it for 6.57 HU/mB (20 x 0.8 x 28^-0.2, less
+        // 20%), into 66.08 FE: 10.05 FE per HU.
+        helper.assertTrue(Math.abs(best - 10.0529) < 0.001, "bestFePerHu() is " + best + ", not 10.0529");
         helper.assertTrue(Math.abs(EnergyBalance.thermoelectricFePerHu() - 1.725) < 0.001, "Thermoelectric route is " + EnergyBalance.thermoelectricFePerHu());
         double hydrogen = EnergyBalance.recoverableFePerMb(ModFluids.HYDROGEN.get());
         helper.assertTrue(Math.abs(hydrogen - 60 * 2.0 * best) < 1e-6, "Hydrogen gives back " + hydrogen + " FE/mB");
         // The Gas Turbine Array burns it straight to FE (1.5 x 1.08 lubricated, plus a quarter of the heat as
-        // exhaust raising steam: 2.80 FE per HU), under the upgraded burner route (9.44), so the floor stays the
+        // exhaust raising steam: 4.13 FE per HU), under the upgraded burner route (20.11), so the floor stays the
         // burner's. recoverableFePerMb takes the larger of the two if the turbine is ever tuned past it.
         double turbine = 60 * EnergyBalance.gasTurbineFePerHu(1_400);
         helper.assertTrue(Math.abs(turbine / 60 - (1.5 * 1.08 + 0.25 * best)) < 1e-6, "The Gas Turbine route is " + turbine / 60 + " FE/HU");

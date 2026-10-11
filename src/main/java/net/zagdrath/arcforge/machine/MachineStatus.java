@@ -133,6 +133,8 @@ public enum MachineStatus {
     // The Sifter at work, and without a mesh. (The Diamond Press shows PRESSING, TOO_COLD under 1,400°C.)
     SIFTING("sifting", "led_running"),
     NO_MESH("no_mesh", "led_blocked"),
+    // The Steam Boiler Array blowing off overpressure: steam that doesn't fit its full tank, or heat past its band.
+    VENTING("venting", "led_idle"),
     // Switched off through the machine control API (docs/API.md), whatever its redstone mode.
     SWITCHED_OFF("switched_off", "led_off");
 
