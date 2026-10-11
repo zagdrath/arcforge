@@ -67,10 +67,10 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 //    area, or else plants one sapling from its sapling slots on an empty spot where it can grow. It plants in 2x2 patches
 //    with a gap between them, so 2x2 spruce, jungle and dark oak saplings stand together and grow into big trees.
 //  - A tree is a column of logs standing on its area with natural (not player-placed) leaves: it takes every log joined
-//    to it (diagonals too, so branches and 2x2 trunks), up to maxLogsPerTree (a bigger one is left standing), and every
-//    natural leaf round them. Logs drop as an axe would; leaves drop their saplings, sticks and apples, and themselves too
-//    with collectLeaves. Saplings go back into its sapling slots first (so it replants), everything else into its 9
-//    output slots. A tree whose drops won't all fit waits.
+//    to it (diagonals too, so branches and 2x2 trunks, and the whole trunk of a neighbour a branch has grown into), up to
+//    maxLogsPerTree (a bigger one is left standing), and every natural leaf round them. Logs drop as an axe would;
+//    leaves drop their saplings, sticks and apples, and themselves too with collectLeaves. Saplings go back into its
+//    sapling slots first (so it replants), everything else into its 9 output slots. A tree whose drops won't all fit waits.
 //  - Felling costs energyPerLog FE a log, planting energyPerPlant, both cut by Energy upgrades.
 //  - Bone Meal or any fertilizer (Compost, NPK Fertilizer, ...) in its fertilizer slot is used on a sapling in the area
 //    every fertilizeInterval ticks (faster with Speed): one item a sapling, each working as one Bone Meal.
@@ -275,8 +275,8 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
     public record Tree(List<BlockPos> logs, List<BlockPos> leaves) {}
 
     // The tree whose trunk stands at base, or null if it isn't a grown tree (no natural leaves: a log post or a house) or
-    // has more than maxLogsPerTree logs. Logs are joined on any side or diagonal, above the area's level, within the tree's
-    // reach of the area. Its leaves are every natural leaf joined (on a side) to its logs or to each other that would decay
+    // has more than maxLogsPerTree logs. Logs are joined on any side or diagonal, up or down but not below base, within the
+    // tree's reach of the area; a trunk beside it on the ground is only taken when they're joined above the ground. Its leaves are every natural leaf joined (on a side) to its logs or to each other that would decay
     // once those logs are gone: the ones no other log keeps within LEAF_REACH steps, as vanilla leaf decay counts. So the
     // whole crown comes down with the tree and nothing is left to rot into saplings, sticks and apples, while leaves a
     // neighbouring trunk still holds stay on the neighbour (which would otherwise be left a bare post that never counts as
@@ -292,7 +292,9 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         queue.add(base);
         while (!queue.isEmpty()) {
             BlockPos pos = queue.poll();
-            for (BlockPos next : BlockPos.betweenClosed(pos.offset(-1, 0, -1), pos.offset(1, 1, 1))) {
+            // Down too: a branch grown into a neighbour's trunk joins the two, and the neighbour's trunk below it comes
+            // down with the rest (left standing, it would be a bare stump that never counts as a tree).
+            for (BlockPos next : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
                 if (next.getY() < base.getY() || next.getY() > top || Math.abs(next.getX() - centre.getX()) > reach
                         || Math.abs(next.getZ() - centre.getZ()) > reach || logs.contains(next)) {
                     continue;
@@ -300,9 +302,9 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
                 if (!level.isLoaded(next) || !level.getBlockState(next).is(BlockTags.LOGS)) {
                     continue;
                 }
-                // A trunk standing on the ground beside it is another tree.
-                if (next.getY() == base.getY() && !level.getBlockState(next.below()).is(BlockTags.LOGS) && !next.equals(base)
-                        && !isTwoByTwo(base, next)) {
+                // A trunk standing on the ground beside it is another tree, unless the two are joined higher up.
+                if (next.getY() == base.getY() && pos.getY() == base.getY() && !level.getBlockState(next.below()).is(BlockTags.LOGS)
+                        && !next.equals(base) && !isTwoByTwo(base, next)) {
                     continue;
                 }
                 BlockPos found = next.immutable();

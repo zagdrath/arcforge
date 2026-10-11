@@ -242,6 +242,33 @@ public final class RenewableCoalGameTests {
         helper.succeed();
     }
 
+    // Two 2x2 trunks (as dark oaks grow in neighbouring patches) joined by a branch from one into the other halfway up are
+    // found as one tree, the neighbour's trunk below the branch too, so no leafless stump is left that never counts as a
+    // tree. Two trunks side by side that aren't joined stay separate trees.
+    static void treeCutterTakesJoinedTrunk(GameTestHelper helper) {
+        BlockPos base = new BlockPos(2, 1, 2);
+        BlockPos neighbour = base.offset(3, 0, 0);
+        for (BlockPos corner : new BlockPos[] { base, neighbour }) {
+            for (int dx = 0; dx < 2; dx++) {
+                for (int dz = 0; dz < 2; dz++) {
+                    for (int y = 0; y < 5; y++) {
+                        helper.setBlock(corner.offset(dx, y, dz), Blocks.DARK_OAK_LOG);
+                    }
+                    helper.setBlock(corner.offset(dx, 5, dz), Blocks.DARK_OAK_LEAVES);
+                }
+            }
+        }
+        var level = helper.getLevel();
+        TreeCutterBlockEntity.Tree apart = TreeCutterBlockEntity.findTree(level, helper.absolutePos(base), 3, helper.absolutePos(base));
+        helper.assertTrue(apart != null && apart.logs().size() == 20, "Unjoined trunks: " + (apart == null ? "none" : apart.logs().size() + " logs, not 20"));
+        // A branch out of the first trunk's side, three up, ending against the neighbour's.
+        helper.setBlock(base.offset(2, 3, 0), Blocks.DARK_OAK_LOG);
+        TreeCutterBlockEntity.Tree joined = TreeCutterBlockEntity.findTree(level, helper.absolutePos(base), 3, helper.absolutePos(base));
+        helper.assertTrue(joined != null && joined.logs().size() == 41, "Joined trunks: " + (joined == null ? "none" : joined.logs().size() + " logs, not 41"));
+        helper.assertTrue(joined.logs().contains(helper.absolutePos(neighbour.offset(1, 0, 1))), "The neighbour's stump was left");
+        helper.succeed();
+    }
+
     // With Discard returned Water on, a batch gives back no water, and water already in the returned tank is emptied.
     // The setting survives a save and load.
     static void hydrothermalDiscardsWater(GameTestHelper helper) {

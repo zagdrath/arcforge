@@ -22,6 +22,12 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Fixed
+
+- **The Tree Cutter no longer leaves bare trunks standing.** When a big tree's branch grew into a neighbouring trunk, it
+  took the neighbour's leaves and the logs above the branch but left the trunk below, a leafless stump it never cut.
+  Trees joined like that now come down together, whole.
+
 ## [2.5.1] - 2026-10-11
 
 ### Changed
