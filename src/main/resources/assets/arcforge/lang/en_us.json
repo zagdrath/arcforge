@@ -2447,7 +2447,7 @@
   "block.arcforge.arcforged_power_regulator": "Arcforged Power Regulator",
   "block.arcforge.tree_cutter": "Tree Cutter",
   "container.arcforge.tree_cutter": "Tree Cutter",
-  "tooltip.arcforge.info.tree_cutter": "Plants saplings from its inventory in the area in front of it and fells every fully grown tree there with FE: logs, leaves, saplings, apples and sticks, 2x2 trees included. It replants from what it collects. Bone Meal in its fertilizer slot grows the saplings faster; Range upgrades widen the area.",
+  "tooltip.arcforge.info.tree_cutter": "Plants saplings from its inventory in the area in front of it and fells every fully grown tree there with FE: logs, leaves, saplings, apples and sticks, 2x2 trees included. It replants from what it collects. Bone Meal or any fertilizer in its fertilizer slot grows the saplings faster; Range upgrades widen the area.",
   "gui.arcforge.tree_cutter.area": "Area: %sx%s",
   "gui.arcforge.tree_cutter.logs": "Last tree: %s logs",
   "gui.arcforge.tree_cutter.area_hint": "Works a %sx%s area in front of it, starting one block from its front face",

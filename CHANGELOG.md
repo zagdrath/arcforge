@@ -22,7 +22,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.5.1** (patch: no gameplay changes; the API jar is renamed, the API itself is unchanged).
+Suggested version: **2.5.1** (patch: a small Tree Cutter tweak and a texture fix; the API jar is renamed, the API
+itself is unchanged).
 
 ### Changed
 
@@ -30,6 +31,9 @@ Suggested version: **2.5.1** (patch: no gameplay changes; the API jar is renamed
   `net.zagdrath.arcforge:arcforge-api:1.1.0+26.3`) rather than `arcforge-api-1.1.0.jar`, since each Minecraft version
   Arcforge supports builds its own. The API itself is unchanged. Releases are now tagged `vX.Y.Z+26.3` and named
   "Arcforge X.Y.Z for Minecraft 26.3", and CurseForge files "Arcforge X.Y.Z+26.3".
+- **The Tree Cutter takes any fertilizer.** Its fertilizer slot now accepts Compost, Wood Ash, Basic Slag, Mixed
+  Fertilizer, Seed Meal, Digestate and NPK Fertilizer as well as Bone Meal. Each item grows one sapling, as one Bone
+  Meal does.
 
 ### Fixed
 

@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.Item;
@@ -17,6 +18,7 @@ import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.entity.FurnaceBlockEntity;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
 import net.zagdrath.arcforge.blockentity.machine.HydrothermalCarbonizerBlockEntity;
@@ -195,6 +197,16 @@ public final class RenewableCoalGameTests {
                     }
                 })
                 .thenSucceed();
+    }
+
+    // The Tree Cutter's fertilizer slot takes Bone Meal and every fertilizer, and nothing else.
+    static void treeCutterTakesFertilizers(GameTestHelper helper) {
+        int slot = TreeCutterBlockEntity.SLOT_FERTILIZER;
+        helper.assertTrue(TreeCutterBlockEntity.isItemValid(slot, ItemResource.of(Items.BONE_MEAL)), "Bone Meal refused");
+        BuiltInRegistries.ITEM.getTagOrEmpty(ModItemTags.FERTILIZERS).forEach(item ->
+                helper.assertTrue(TreeCutterBlockEntity.isItemValid(slot, ItemResource.of(item.value())), item.getRegisteredName() + " refused"));
+        helper.assertFalse(TreeCutterBlockEntity.isItemValid(slot, ItemResource.of(Items.DIRT)), "Dirt taken as a fertilizer");
+        helper.succeed();
     }
 
     // A full crown (far more leaves per log than a small test tree), with stale leaf distances as a freshly grown tree can

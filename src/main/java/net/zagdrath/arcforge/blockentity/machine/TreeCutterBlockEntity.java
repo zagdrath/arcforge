@@ -46,6 +46,7 @@ import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.farming.FertilizerItem;
 import net.zagdrath.arcforge.machine.ArcforgeFakePlayer;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
@@ -71,7 +72,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 //    with collectLeaves. Saplings go back into its sapling slots first (so it replants), everything else into its 9
 //    output slots. A tree whose drops won't all fit waits.
 //  - Felling costs energyPerLog FE a log, planting energyPerPlant, both cut by Energy upgrades.
-//  - Bone Meal in its fertilizer slot is used on a sapling in the area every fertilizeInterval ticks (faster with Speed).
+//  - Bone Meal or any fertilizer (Compost, NPK Fertilizer, ...) in its fertilizer slot is used on a sapling in the area
+//    every fertilizeInterval ticks (faster with Speed): one item a sapling, each working as one Bone Meal.
 // It works as its owner (it won't fell a tree its owner couldn't break) and as a fake player, so protection mods can
 // refuse.
 public class TreeCutterBlockEntity extends MachineBlockEntity {
@@ -134,13 +136,13 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         };
     }
 
-    // Saplings in the sapling slots, Bone Meal in the fertilizer slot; nothing goes into the outputs by hand.
+    // Saplings in the sapling slots, Bone Meal or a fertilizer in the fertilizer slot; nothing goes into the outputs by hand.
     public static boolean isItemValid(int slot, ItemResource resource) {
         ItemStack stack = resource.toStack(1);
         if (slot < SAPLING_SLOTS) {
             return isSapling(stack);
         }
-        return slot == SLOT_FERTILIZER && stack.is(Items.BONE_MEAL);
+        return slot == SLOT_FERTILIZER && (stack.is(Items.BONE_MEAL) || stack.getItem() instanceof FertilizerItem);
     }
 
     public static boolean isSapling(ItemStack stack) {
@@ -548,7 +550,7 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         return room ? MachineStatus.NO_SAPLINGS : MachineStatus.GROWING_TREES;
     }
 
-    // Uses one Bone Meal on the next sapling in the area that can take it, once its whole 2x2 patch is planted (so a
+    // Uses one Bone Meal (or fertilizer) on the next sapling in the area that can take it, once its whole 2x2 patch is planted (so a
     // spruce, jungle or dark oak patch grows into one big tree rather than a small one, or nothing).
     private void fertilize(ServerLevel level) {
         ItemStack meal = items.getStack(SLOT_FERTILIZER);

@@ -1498,7 +1498,7 @@ public class ArcforgeConfig {
             .defineInRange("interval", 40, 1, 72_000);
 
     public static final ModConfigSpec.IntValue TREE_CUTTER_FERTILIZE_INTERVAL = BUILDER
-            .comment("Ticks between bone meal uses on a sapling (one Bone Meal each), before Speed upgrades.")
+            .comment("Ticks between bone meal uses on a sapling (one Bone Meal or fertilizer each), before Speed upgrades.")
             .defineInRange("fertilizeInterval", 40, 1, 72_000);
 
     public static final ModConfigSpec.IntValue TREE_CUTTER_RADIUS = BUILDER
