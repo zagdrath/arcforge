@@ -220,6 +220,8 @@ public final class ArcforgeGameTests {
         TESTS.put("foundry_damage_reduction", FoundryGameTests::damageReduction);
         TESTS.put("foundry_lava_timer_and_cooldown", FoundryGameTests::lavaTimerAndCooldown);
         TESTS.put("dyed_conduits_connect_by_colour", DyedConduitGameTests::connectByColour);
+        TESTS.put("dyed_conduits_placed_by_colour", DyedConduitGameTests::placedByColour);
+        TESTS.put("dyed_conduit_placing_knows_colour", DyedConduitGameTests::placingKnowsColour);
         TESTS.put("dyed_conduit_recipe", DyedConduitGameTests::recipe);
         TESTS.put("gas_turbine_fuel_acceptance", GasTurbineGameTests::fuelAcceptance);
         TESTS.put("gas_turbine_throttle", GasTurbineGameTests::throttle);

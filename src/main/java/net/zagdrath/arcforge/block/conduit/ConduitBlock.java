@@ -9,6 +9,7 @@ import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
 
@@ -22,6 +23,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
@@ -83,6 +85,10 @@ public class ConduitBlock extends BaseEntityBlock {
     private static final Map<Direction.Axis, VoxelShape> STRAIGHT = Shapes.rotateAllAxis(Block.box(5, 5, 0, 11, 11, 16));
 
     private final ConduitType conduitType;
+    // The conduit being placed from a dyed item (see placing): its colour, before its block entity has it.
+    private static final ThreadLocal<@Nullable Placing> PLACING = new ThreadLocal<>();
+
+    private record Placing(BlockPos pos, @Nullable DyeColor color) {}
     private final ConduitTier tier;
     private final Map<BlockState, VoxelShape> shapeCache = new ConcurrentHashMap<>();
 
@@ -203,7 +209,7 @@ public class ConduitBlock extends BaseEntityBlock {
         if (neighbourState.getBlock() instanceof ConduitBlock other && other.conduitType == conduitType) {
             ConduitBlockEntity neighbour = level.getBlockEntity(neighbourPos) instanceof ConduitBlockEntity be ? be : null;
             boolean disabled = setting == SideSetting.DISABLED || (neighbour != null && neighbour.isSideDisabled(side.getOpposite()));
-            if (disabled || hasConflictingFluids(own, neighbour) || !ConduitBlockEntity.colorsMatch(own, neighbour)) {
+            if (disabled || hasConflictingFluids(own, neighbour) || !ConduitBlockEntity.colorsMatch(colorAt(pos, own), colorAt(neighbourPos, neighbour))) {
                 return ConnectionMode.NONE;
             }
             return ConnectionMode.PIPE;
@@ -225,6 +231,28 @@ public class ConduitBlock extends BaseEntityBlock {
             case OUTPUT -> ConduitCapabilities.canConnect(fullLevel, pos, side, conduitType) ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case DISABLED -> ConnectionMode.NONE;
         };
+    }
+
+    // Runs place (an item placing a conduit at pos) with that conduit's colour already known. A placed block only gets
+    // its item's colour after it's in the world, and in between it and its neighbours work out their joins: without
+    // this it would count as unsheathed and join a differently coloured neighbour for a moment (long enough for the
+    // client to show the arm and items or fluid moving through it).
+    public static <T> T placing(BlockPos pos, @Nullable DyeColor color, Supplier<T> place) {
+        Placing outer = PLACING.get();
+        PLACING.set(new Placing(pos.immutable(), color));
+        try {
+            return place.get();
+        } finally {
+            PLACING.set(outer);
+        }
+    }
+
+    private static @Nullable DyeColor colorAt(BlockPos pos, @Nullable ConduitBlockEntity conduit) {
+        Placing placing = PLACING.get();
+        if (placing != null && placing.pos().equals(pos)) {
+            return placing.color();
+        }
+        return conduit != null ? conduit.getColor() : null;
     }
 
     // A fluid network carries one fluid at a time, so conduits holding different fluids stay apart.

@@ -253,8 +253,8 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     }
 
     // Two conduits join unless both are sheathed in different colours.
-    public static boolean colorsMatch(@Nullable ConduitBlockEntity a, @Nullable ConduitBlockEntity b) {
-        return a == null || b == null || a.color == null || b.color == null || a.color == b.color;
+    public static boolean colorsMatch(@Nullable DyeColor a, @Nullable DyeColor b) {
+        return a == null || b == null || a == b;
     }
 
     @Override

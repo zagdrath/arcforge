@@ -9,11 +9,13 @@ import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -29,6 +31,14 @@ public class ConduitBlockItem extends BlockItem {
         super(block, properties);
         this.conduitType = block.getConduitType();
         this.tier = block.getTier();
+    }
+
+    // A dyed conduit is placed with its colour known from the start, so it never joins a differently coloured
+    // neighbour for a moment (see ConduitBlock.placing).
+    @Override
+    public InteractionResult place(BlockPlaceContext context) {
+        return ConduitBlock.placing(context.getClickedPos(), context.getItemInHand().get(ModDataComponents.CONDUIT_COLOR.get()),
+                () -> super.place(context));
     }
 
     // "Red Wrought Item Conduit" when sheathed.

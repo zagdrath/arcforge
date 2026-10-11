@@ -39,6 +39,9 @@ itself is unchanged).
 
 - **Distillation Arrays built against each other no longer merge into one connected texture.** Each 2x2 column keeps
   its own edge beams, tray window frames and roof hatch.
+- **Dyed conduits no longer join a differently coloured conduit for a moment when placed.** A new conduit took its
+  colour only after it was in the world, so for an instant it joined any neighbour, and items or fluid briefly
+  moved between the two colours before they split. This affected every conduit type.
 
 ## [2.5.0] - 2026-10-07
 

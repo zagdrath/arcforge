@@ -16,11 +16,20 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
@@ -70,6 +79,61 @@ public final class DyedConduitGameTests {
             helper.assertFalse(joined(helper, new BlockPos(x, 1, 4), Direction.UP), "The red and blue rows joined at x " + x);
             helper.assertTrue(x == 2 || joined(helper, new BlockPos(x, 2, 4), Direction.EAST), "The red row broke at x " + x);
         }
+        helper.succeed();
+    }
+
+    // Placed by hand from dyed items, as a player lays them: for every conduit type, red–red–blue–blue along x joins
+    // each pair and keeps the colours apart, from both sides of the seam.
+    static void placedByColour(GameTestHelper helper) {
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        DyeColor[] row = { DyeColor.RED, DyeColor.RED, DyeColor.BLUE, DyeColor.BLUE };
+        ConduitType[] types = ConduitType.values();
+        for (int t = 0; t < types.length; t++) {
+            for (int x = 0; x < row.length; x++) {
+                ItemStack stack = new ItemStack(ModBlocks.conduit(types[t], ConduitTier.WROUGHT).get().asItem());
+                stack.set(ModDataComponents.CONDUIT_COLOR.get(), row[x]);
+                BlockPos pos = new BlockPos(x, 1, 1 + 2 * t);
+                // Clicking the top of a stone block under the (cleared) spot, as a player would.
+                helper.setBlock(pos.below(), Blocks.STONE);
+                helper.setBlock(pos, Blocks.AIR);
+                BlockPos floor = helper.absolutePos(pos.below());
+                player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+                stack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
+                        new BlockHitResult(Vec3.atCenterOf(floor).add(0, 0.5, 0), Direction.UP, floor, false)));
+                helper.assertTrue(helper.getBlockEntity(pos, ConduitBlockEntity.class).getColor() == row[x],
+                        types[t] + " conduit at x " + x + " wasn't placed " + row[x]);
+            }
+        }
+        for (int t = 0; t < types.length; t++) {
+            int z = 1 + 2 * t;
+            helper.assertTrue(joined(helper, new BlockPos(0, 1, z), Direction.EAST), types[t] + ": red didn't join red");
+            helper.assertTrue(joined(helper, new BlockPos(2, 1, z), Direction.EAST), types[t] + ": blue didn't join blue");
+            helper.assertFalse(joined(helper, new BlockPos(1, 1, z), Direction.EAST), types[t] + ": red joined blue");
+            helper.assertFalse(joined(helper, new BlockPos(2, 1, z), Direction.WEST), types[t] + ": blue joined red");
+        }
+        helper.succeed();
+    }
+
+    // A red conduit being placed against a blue one never joins it, not even before its block entity has its colour:
+    // that moment's state is what a client shows (an arm, and items or fluid moving through it) until the server
+    // corrects it.
+    static void placingKnowsColour(GameTestHelper helper) {
+        conduit(helper, new BlockPos(1, 1, 1), DyeColor.BLUE);
+        BlockPos pos = new BlockPos(2, 1, 1);
+        helper.setBlock(pos, Blocks.AIR);
+        ItemStack red = new ItemStack(ModBlocks.conduit(ConduitType.ITEM, ConduitTier.WROUGHT).get().asItem());
+        red.set(ModDataComponents.CONDUIT_COLOR.get(), DyeColor.RED);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        player.setItemInHand(InteractionHand.MAIN_HAND, red);
+        BlockPos absolute = helper.absolutePos(pos);
+        BlockPlaceContext context = new BlockPlaceContext(player, InteractionHand.MAIN_HAND, red,
+                new BlockHitResult(Vec3.atCenterOf(absolute), Direction.UP, absolute, false));
+        ConduitBlock block = ModBlocks.conduit(ConduitType.ITEM, ConduitTier.WROUGHT).get();
+        BlockState unknown = block.getStateForPlacement(context);
+        helper.assertTrue(ConduitBlock.mode(unknown, Direction.WEST) == ConnectionMode.PIPE,
+                "Without its colour a new conduit should count as unsheathed (so this test means something)");
+        BlockState known = ConduitBlock.placing(absolute, DyeColor.RED, () -> block.getStateForPlacement(context));
+        helper.assertTrue(ConduitBlock.mode(known, Direction.WEST) == ConnectionMode.NONE, "A red conduit being placed joined blue");
         helper.succeed();
     }
 
