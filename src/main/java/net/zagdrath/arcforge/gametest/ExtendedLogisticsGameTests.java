@@ -35,6 +35,7 @@ import net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
 import net.zagdrath.arcforge.chunkloading.ChunkLoaderStatus;
 import net.zagdrath.arcforge.chunkloading.ChunkLoaders;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -83,7 +84,7 @@ public final class ExtendedLogisticsGameTests {
     static void reservoir(GameTestHelper helper) {
         BlockPos a = new BlockPos(1, 1, 1), b = new BlockPos(2, 1, 1), c = new BlockPos(1, 2, 1), d = new BlockPos(1, 3, 1);
         for (BlockPos pos : List.of(a, b, c, d)) {
-            helper.setBlock(pos, ModBlocks.RESERVOIR.get());
+            helper.setBlock(pos, ModBlocks.FLUID_RESERVOIR.get());
         }
         ResourceHandler<FluidResource> top = reservoir(helper, d).getFluidHandler();
         helper.assertTrue(insert(top, Fluids.WATER, 50_000) == 50_000, "The tank didn't take 50,000 mB");
@@ -91,7 +92,7 @@ public final class ExtendedLogisticsGameTests {
                 && reservoir(helper, c).ownAmount() == 0 && reservoir(helper, d).ownAmount() == 0,
                 "Not filled bottom-up evenly: " + reservoir(helper, a).ownAmount() + "/" + reservoir(helper, b).ownAmount() + "/"
                         + reservoir(helper, c).ownAmount() + "/" + reservoir(helper, d).ownAmount());
-        helper.assertTrue(top.getCapacityAsLong(0, FluidResource.of(Fluids.WATER)) == 4L * ReservoirBlockEntity.CAPACITY, "Group capacity is "
+        helper.assertTrue(top.getCapacityAsLong(0, FluidResource.of(Fluids.WATER)) == 4L * ReservoirKind.FLUID.capacity(), "Group capacity is "
                 + top.getCapacityAsLong(0, FluidResource.of(Fluids.WATER)));
         helper.assertTrue(insert(top, Fluids.LAVA, 1_000) == 0, "It took a second liquid");
         insert(reservoir(helper, b).getFluidHandler(), Fluids.WATER, 30_000);
@@ -111,8 +112,8 @@ public final class ExtendedLogisticsGameTests {
         helper.setBlock(b, Blocks.AIR);
         // A Reservoir already holding lava, placed against the water, stays apart.
         BlockPos e = new BlockPos(0, 1, 1);
-        helper.setBlock(e, ModBlocks.RESERVOIR.get());
-        ItemStack lava = new ItemStack(ModItems.RESERVOIR.get());
+        helper.setBlock(e, ModBlocks.FLUID_RESERVOIR.get());
+        ItemStack lava = new ItemStack(ModItems.FLUID_RESERVOIR.get());
         lava.set(ModDataComponents.FLUID_CONTENTS.get(), SimpleFluidContent.copyOf(new FluidStack(Fluids.LAVA, 1_000)));
         reservoir(helper, e).applyComponentsFromItemStack(lava);
         helper.assertTrue(insert(reservoir(helper, e).getFluidHandler(), Fluids.LAVA, 1_000) == 1_000, "The lava Reservoir took no lava");
@@ -134,7 +135,7 @@ public final class ExtendedLogisticsGameTests {
         helper.assertTrue(LiquidExperience.pointsForLevel(0) == 7 && LiquidExperience.pointsForLevel(15) == 37
                 && LiquidExperience.pointsForLevel(30) == 112, "Wrong level curve");
         BlockPos tank = new BlockPos(1, 1, 1), drain = new BlockPos(1, 2, 1);
-        helper.setBlock(tank, ModBlocks.RESERVOIR.get());
+        helper.setBlock(tank, ModBlocks.FLUID_RESERVOIR.get());
         helper.setBlock(drain, ModBlocks.XP_DRAIN.get());
         Vec3 at = helper.absoluteVec(new Vec3(1.5, 2.15, 1.5));
         // A new orb gets a random kick (up to 0.4 up), which can carry it off the grate before the drain sees it.
@@ -164,7 +165,7 @@ public final class ExtendedLogisticsGameTests {
     // An XP Shower under a Reservoir of Liquid Experience gives a sneaking player a level at a time; redstone stops it.
     static void xpShower(GameTestHelper helper) {
         BlockPos tank = new BlockPos(1, 4, 1), shower = new BlockPos(1, 3, 1);
-        helper.setBlock(tank, ModBlocks.RESERVOIR.get());
+        helper.setBlock(tank, ModBlocks.FLUID_RESERVOIR.get());
         helper.setBlock(shower, ModBlocks.XP_SHOWER.get());
         insert(reservoir(helper, tank).getFluidHandler(), ModFluids.LIQUID_EXPERIENCE.get(), 10_000);
         ServerPlayer player = helper.makeMockServerPlayerInLevel();

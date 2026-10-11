@@ -31,6 +31,12 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
   - **Energy cell:** always full. It gives any FE it's asked for and destroys any FE put in.
   - They move things with no rate limit, and their GUIs read Infinite.
   - Sneak-use one with an empty hand, or press Clear in its GUI's new Creative tab, to empty it.
+- **Gas Reservoir.** A connected 64,000 mB pressure vessel for gases: heavy steel corners and edge beams on the outside
+  of the merged vessel, clear glass between, and the gas drawn as an even tint by fill. Pressurized Conduits only; Gas
+  Cartridges fill and empty it; comparator; a broken block keeps its share.
+- **Item Reservoir.** Bulk item storage that forms one store from blocks making a solid box (rims round the store's
+  outside, riveted bands at both ends), 20 slots a block, a scrolling GUI with search, hoppers, conduits and item
+  handlers on any block, and a comparator. Broken blocks spill their share; wrenched ones keep it.
 
 ### Changed
 
@@ -55,10 +61,17 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 - **A Steam Boiler Array no longer stops boiling while it heats toward its pressure setting.** Set to High-Pressure
   or Superheated below that grade's temperature, it now keeps making the grade it's hot enough for as it climbs,
   instead of making nothing until it got there.
-
 - **The Tree Cutter no longer leaves bare trunks standing.** When a big tree's branch grew into a neighbouring trunk, it
   took the neighbour's leaves and the logs above the branch but left the trunk below, a leafless stump it never cut.
   Trees joined like that now come down together, whole.
+
+### Upgrading
+
+- **Reservoir renamed to Fluid Reservoir** (`arcforge:reservoir` is now `arcforge:fluid_reservoir`). An alias keeps
+  placed Reservoirs, their contents and Reservoir items working; they load as Fluid Reservoirs. Recipes or scripts that
+  name `arcforge:reservoir` should switch to the new id. Its textures moved to `block/fluid_reservoir/`.
+- **New config keys**: `logistics.reservoir.fluidCapacity`, `logistics.reservoir.gasCapacity`, and the
+  `logistics.itemReservoir` section (`slotsPerBlock`, `maxWidth`, `lengthRatio`) get their defaults.
 
 ## [2.5.1] - 2026-10-11
 

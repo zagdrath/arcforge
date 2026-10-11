@@ -382,9 +382,12 @@ public final class ModCapabilities {
                 ThermoelectricPlantBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FLUID_TANK.get(),
                 FluidTankBlockEntity::getFluidHandler);
-        // A Reservoir: the whole tank it's part of, from every face.
+        // A Fluid or Gas Reservoir: the whole tank it's part of, from every face.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.RESERVOIR.get(),
                 (reservoir, side) -> reservoir.getFluidHandler());
+        // An Item Reservoir: the whole store it's part of, from every face.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ITEM_RESERVOIR.get(),
+                (reservoir, side) -> reservoir.getItemHandler());
         // The XP Shower fills from any face.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.XP_SHOWER.get(),
                 XpShowerBlockEntity::getFluidHandler);

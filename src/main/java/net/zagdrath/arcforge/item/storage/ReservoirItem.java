@@ -17,10 +17,11 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
-import net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity;
+import net.zagdrath.arcforge.block.storage.ReservoirBlock;
+import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 
-// The Reservoir item: shows the share of fluid a broken Reservoir block kept.
+// The Fluid and Gas Reservoir items: show the share a broken Reservoir block kept.
 public class ReservoirItem extends BlockItem {
     public ReservoirItem(Block block, Item.Properties properties) {
         super(block, properties);
@@ -31,6 +32,10 @@ public class ReservoirItem extends BlockItem {
         FluidStack fluid = stack.getOrDefault(ModDataComponents.FLUID_CONTENTS.get(), SimpleFluidContent.EMPTY).copy();
         Component name = fluid.isEmpty() ? Component.translatable("gui.arcforge.empty") : fluid.getHoverName();
         builder.accept(Component.translatable("tooltip.arcforge.tank.contents", name,
-                String.format("%,d", fluid.getAmount()), String.format("%,d", ReservoirBlockEntity.CAPACITY)).withStyle(ChatFormatting.GRAY));
+                String.format("%,d", fluid.getAmount()), String.format("%,d", capacity())).withStyle(ChatFormatting.GRAY));
+    }
+
+    private int capacity() {
+        return getBlock() instanceof ReservoirBlock reservoir ? reservoir.kind().capacity() : ReservoirKind.FLUID.capacity();
     }
 }

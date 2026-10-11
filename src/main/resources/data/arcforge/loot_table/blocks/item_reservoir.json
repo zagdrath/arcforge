@@ -11,16 +11,15 @@
           "modifier": {
             "type": "minecraft:copy_components",
             "include": [
-              "minecraft:custom_name",
-              "arcforge:fluid_contents"
+              "minecraft:custom_name"
             ],
             "source": "block_entity"
           },
-          "name": "arcforge:reservoir"
+          "name": "arcforge:item_reservoir"
         }
       ],
       "rolls": 1
     }
   ],
-  "random_sequence": "arcforge:blocks/reservoir"
+  "random_sequence": "arcforge:blocks/item_reservoir"
 }

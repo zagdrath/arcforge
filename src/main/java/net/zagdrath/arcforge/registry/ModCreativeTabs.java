@@ -85,7 +85,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.CREATIVE_FLUID_TANK.get());
                 output.accept(ModItems.CREATIVE_PRESSURIZED_CYLINDER.get());
                 output.accept(ModItems.CREATIVE_ENERGY_CELL.get());
-                output.accept(ModItems.RESERVOIR.get());
+                output.accept(ModItems.FLUID_RESERVOIR.get());
+                output.accept(ModItems.GAS_RESERVOIR.get());
+                output.accept(ModItems.ITEM_RESERVOIR.get());
                 output.accept(ModItems.XP_DRAIN.get());
                 output.accept(ModItems.XP_SHOWER.get());
                 output.accept(ModItems.QUANTUM_TUNNEL.get());

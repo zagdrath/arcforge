@@ -60,6 +60,7 @@ import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
 import net.zagdrath.arcforge.menu.storage.CrateMenu;
+import net.zagdrath.arcforge.menu.storage.ItemReservoirMenu;
 import net.zagdrath.arcforge.menu.storage.EnergyCellMenu;
 import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
 import net.zagdrath.arcforge.menu.storage.PressurizedCylinderMenu;
@@ -226,6 +227,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<CrateMenu>> CRATE = MENU_TYPES.register("crate",
             () -> IMenuTypeExtension.create(CrateMenu::new));
+
+    public static final Supplier<MenuType<ItemReservoirMenu>> ITEM_RESERVOIR = MENU_TYPES.register("item_reservoir",
+            () -> IMenuTypeExtension.create(ItemReservoirMenu::new));
 
     public static final Supplier<MenuType<VaultMenu>> VAULT = MENU_TYPES.register("vault",
             () -> IMenuTypeExtension.create(VaultMenu::new));

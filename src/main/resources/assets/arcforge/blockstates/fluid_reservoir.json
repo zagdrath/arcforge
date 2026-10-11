@@ -2,7 +2,7 @@
   "variants": {
     "": {
       "type": "arcforge:connected",
-      "model": "arcforge:block/reservoir_ctm"
+      "model": "arcforge:block/fluid_reservoir_ctm"
     }
   }
 }

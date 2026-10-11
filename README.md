@@ -893,16 +893,32 @@ A slim glass tank that shows the liquid inside, and glows with lava or any other
 - Sides: fill from every side and drain from the bottom by default. Output faces push fluid into
   the block beside them, so stacked tanks drain downwards into the lowest one.
 
-### Reservoir
+### Reservoirs
 
-A 32,000 mB glass tank in a thin steel frame. Reservoirs that touch merge into one tank of any shape and size,
-drawn as one: the frame runs only round its outer edges and the liquid is one body at its level.
+Three connected storage blocks. Touching blocks of the same one join and are drawn as one.
+
+**Fluid Reservoir** (the Reservoir until it was renamed). A 32,000 mB glass tank in a thin steel frame for liquids; it
+refuses gases. Fluid Reservoirs that touch merge into one tank of any shape and size: the frame runs only round its
+outer edges and the liquid is one body at its level.
 
 - The tank shares one liquid and fills from the bottom up: the lowest layer first, spread evenly.
 - Any block takes and gives the liquid (buckets, conduits, pipes, an XP Drain on top), and a comparator on any
   block reads the whole tank.
 - A broken block keeps its share of the liquid on the item and rejoins whatever it's placed against.
 - Tanks of different liquids stay apart. Up to `logistics.reservoir.maxBlocks` (4,096) blocks make one tank.
+
+**Gas Reservoir**. A 64,000 mB pressure vessel for gases: heavy steel corner pieces at the vessel's outer corners, steel
+beams along its outer edges, clear glass between. It refuses liquids and connects only to Pressurized Conduits.
+Touching ones merge into one vessel of any shape; the gas fills it evenly and shows as a tint through the glass,
+stronger the fuller it is (glowing gases glow). A Gas Cartridge fills or empties it by hand, a comparator reads the
+whole vessel, and a broken block keeps its share.
+
+**Item Reservoir**. Bulk item storage, like Create's Item Vault: riveted steel, 20 slots a block. Blocks that make a
+solid box (a cross-section 1 to 3 blocks wide and tall, a length up to 3 times its width, along any axis) form one store
+with rims round its outside and a band at each end; others stay stores of their own. Any block opens the whole store
+(a scrolling grid with a search box, `@mod` for a mod), takes and gives items through hoppers and conduits, and gives a
+comparator its fill. Broken, a block spills its share; the Wrench's Dismantle keeps it. Sizes and capacities are in the
+`logistics.reservoir` and `logistics.itemReservoir` config sections.
 
 ### Liquid Experience
 

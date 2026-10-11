@@ -35,6 +35,7 @@ import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.storage.ItemReservoirItem;
 import net.zagdrath.arcforge.item.storage.ReservoirItem;
 import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.item.conduit.ConduitBlockItem;
@@ -110,8 +111,12 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> TREE_CUTTER = ITEMS.registerSimpleBlockItem(ModBlocks.TREE_CUTTER);
     public static final DeferredItem<BlockItem> BLOCK_PLACER = ITEMS.registerSimpleBlockItem(ModBlocks.BLOCK_PLACER);
     public static final DeferredItem<BlockItem> VACUUM_COLLECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.VACUUM_COLLECTOR);
-    public static final DeferredItem<ReservoirItem> RESERVOIR = ITEMS.registerItem("reservoir",
-            p -> new ReservoirItem(ModBlocks.RESERVOIR.get(), p), p -> p.useBlockDescriptionPrefix());
+    public static final DeferredItem<ReservoirItem> FLUID_RESERVOIR = ITEMS.registerItem("fluid_reservoir",
+            p -> new ReservoirItem(ModBlocks.FLUID_RESERVOIR.get(), p), p -> p.useBlockDescriptionPrefix());
+    public static final DeferredItem<ReservoirItem> GAS_RESERVOIR = ITEMS.registerItem("gas_reservoir",
+            p -> new ReservoirItem(ModBlocks.GAS_RESERVOIR.get(), p), p -> p.useBlockDescriptionPrefix());
+    public static final DeferredItem<ItemReservoirItem> ITEM_RESERVOIR = ITEMS.registerItem("item_reservoir",
+            p -> new ItemReservoirItem(ModBlocks.ITEM_RESERVOIR.get(), p), p -> p.useBlockDescriptionPrefix());
     public static final DeferredItem<BlockItem> XP_DRAIN = ITEMS.registerSimpleBlockItem(ModBlocks.XP_DRAIN);
     public static final DeferredItem<BlockItem> XP_SHOWER = ITEMS.registerSimpleBlockItem(ModBlocks.XP_SHOWER);
     public static final DeferredItem<BlockItem> QUANTUM_TUNNEL = ITEMS.registerSimpleBlockItem(ModBlocks.QUANTUM_TUNNEL, p -> p.rarity(Rarity.EPIC));
@@ -716,6 +721,8 @@ public final class ModItems {
         // Removed with the Evaporation Pond.
         ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_liner"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_casing"));
         ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_outlet"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_controller"));
+        // The Reservoir became the Fluid Reservoir in 2.2.
+        ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "reservoir"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "fluid_reservoir"));
         ITEMS.register(modEventBus);
     }
 }

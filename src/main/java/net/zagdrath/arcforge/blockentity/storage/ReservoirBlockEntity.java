@@ -8,6 +8,7 @@ package net.zagdrath.arcforge.blockentity.storage;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
@@ -28,21 +29,24 @@ import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import net.zagdrath.arcforge.block.storage.ReservoirBlock;
+import net.zagdrath.arcforge.conduit.ConduitConnectable;
+import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.machine.interaction.FluidInteractable;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModDataComponents;
-import net.zagdrath.arcforge.steam.Gases;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
-// One block of a Reservoir: its own 32,000 mB share of the tank it belongs to (see ReservoirGroup). Every face takes and
-// gives fluid for the whole group, with no rate limit beyond what's moved; a comparator reads the whole group. The share
-// is synced to clients for ReservoirRenderer, and the block lights up with its fluid. Broken (or picked up), the block
-// keeps its share on the item; placed again it rejoins whatever group it touches.
-public class ReservoirBlockEntity extends BlockEntity implements FluidInteractable {
-    public static final int CAPACITY = 32_000;
+// One block of a Fluid or Gas Reservoir: its own share (its kind's capacity) of the tank it belongs to (see
+// ReservoirGroup). Every face takes and gives for the whole group, with no rate limit beyond what's moved; conduits of its
+// kind connect (Fluid Conduits to a Fluid Reservoir, Pressurized Conduits to a Gas Reservoir); a comparator reads the whole
+// group. The share is synced to clients for ReservoirRenderer, and the block lights up with its contents. Broken (or
+// picked up), the block keeps its share on the item; placed again it rejoins whatever group of its kind it touches.
+public class ReservoirBlockEntity extends BlockEntity implements FluidInteractable, ConduitConnectable {
     private static final int SYNC_INTERVAL = 5;
 
-    private final FilteredFluidTank tank = new FilteredFluidTank(CAPACITY, ReservoirBlockEntity::accepts, this::onTankChanged);
+    private final ReservoirKind kind;
+    private final FilteredFluidTank tank;
     // The group's tank, seen from this block: resolves the (lazily rebuilt) group on every call.
     private final ResourceHandler<FluidResource> groupView = new GroupView();
     private @Nullable ReservoirGroup group;
@@ -52,11 +56,21 @@ public class ReservoirBlockEntity extends BlockEntity implements FluidInteractab
 
     public ReservoirBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.RESERVOIR.get(), pos, state);
+        this.kind = state.getBlock() instanceof ReservoirBlock block ? block.kind() : ReservoirKind.FLUID;
+        this.tank = new FilteredFluidTank(kind.capacity(), kind::accepts, this::onTankChanged);
     }
 
-    // Any liquid; gases go in Pressurized Cylinders.
-    public static boolean accepts(FluidResource resource) {
-        return !resource.isEmpty() && !Gases.isGas(resource);
+    public ReservoirKind kind() {
+        return kind;
+    }
+
+    // What this kind holds: liquids in a Fluid Reservoir, gases in a Gas Reservoir.
+    public boolean accepts(FluidResource resource) {
+        return kind.accepts(resource);
+    }
+
+    public int capacity() {
+        return tank.getCapacity();
     }
 
     private void onTankChanged() {
@@ -89,7 +103,8 @@ public class ReservoirBlockEntity extends BlockEntity implements FluidInteractab
                 tank.set(0, FluidResource.EMPTY, 0);
             }
         } else if (tank.getAmount() != amount || !tank.getResource(0).equals(fluid)) {
-            tank.set(0, fluid, Math.min(amount, CAPACITY));
+            // Not capped: after the capacity config is lowered, ReservoirGroup.settle leaves the excess here until drained.
+            tank.set(0, fluid, amount);
         }
     }
 
@@ -119,7 +134,7 @@ public class ReservoirBlockEntity extends BlockEntity implements FluidInteractab
 
     public int getComparatorSignal() {
         if (level == null || level.isClientSide()) {
-            return Mth.floor(15.0 * tank.getAmount() / CAPACITY);
+            return Mth.floor(15.0 * tank.getAmount() / capacity());
         }
         return getGroup().comparatorSignal();
     }
@@ -155,6 +170,12 @@ public class ReservoirBlockEntity extends BlockEntity implements FluidInteractab
     }
 
     // --- Capabilities ---
+
+    // Auto conduits of its kind push into it (a Wrench-forced output side pulls); other conduits don't connect.
+    @Override
+    public ConnectionMode getConduitConnection(Direction side, ConduitType type) {
+        return type == kind.conduitType() ? ConnectionMode.INPUT : ConnectionMode.NONE;
+    }
 
     // The whole group's tank, from every face.
     public ResourceHandler<FluidResource> getFluidHandler() {
@@ -214,7 +235,7 @@ public class ReservoirBlockEntity extends BlockEntity implements FluidInteractab
         super.applyImplicitComponents(components);
         FluidStack stack = components.getOrDefault(ModDataComponents.FLUID_CONTENTS.get(), SimpleFluidContent.EMPTY).copy();
         if (!stack.isEmpty() && accepts(FluidResource.of(stack))) {
-            tank.set(0, FluidResource.of(stack), Math.min(stack.getAmount(), CAPACITY));
+            tank.set(0, FluidResource.of(stack), Math.min(stack.getAmount(), capacity()));
         }
     }
 
@@ -239,6 +260,8 @@ public class ReservoirBlockEntity extends BlockEntity implements FluidInteractab
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        // The capacity follows the config (keeping what it held up to it).
+        tank.setCapacity(kind.capacity());
         tank.deserialize(input.childOrEmpty("fluid"));
     }
 

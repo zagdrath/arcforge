@@ -738,17 +738,46 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   with the additive slot copied under it at y 44; the Grain Dryer gains the Infuser's tank frame at x 24; the Vulcanizer
   is the Grain Dryer's background with its input slot copied to x 23.
 
-## Reservoir, Liquid Experience, Quantum Tunnel, Chunk Loader
-- **Reservoir** (`block/reservoir/`): clear glass (alpha 0) with small glints like vanilla glass (a 3 px `#DCE8EE` streak
+## Reservoirs (Fluid, Gas, Item), Liquid Experience, Quantum Tunnel, Chunk Loader
+- **Fluid Reservoir** (`block/fluid_reservoir/`, the Reservoir until it was renamed; unchanged): clear glass (alpha 0) with small glints like vanilla glass (a 3 px `#DCE8EE` streak
   and a 2 px `#A9BCC6` one beside it near the top left, a 2 px `#A9BCC6` one near the bottom right), inside a 2 px
   machine-steel frame round the face's edges, kept light so the corners don't go black: `#959DA6` then `#727982` on the top
   and left, `#575D65` then `#474C53` on the bottom and right, `#727982` where lit meets shaded. Connected like the other
   CTM blocks, by quadrant (ConnectedModel "reservoir", ReservoirModel): each 8×8 quadrant of a face comes from one of five
   textures by which of its two edges carry the frame: `frame` (both: an outer corner), `frame_h` (top or bottom only),
   `frame_v` (left or right only), `glass` (neither) or `frame_corners` (neither, but the frame turns there: the 2×2 corner
-  of `frame`, closing an inner corner). An edge where two Reservoirs join drops its frame; a concave edge keeps it. Faces
+  of `frame`, closing an inner corner). An edge where two Fluid Reservoirs join drops its frame; a concave edge keeps it. Faces
   between Reservoirs aren't drawn. The liquid is ReservoirRenderer's: one body at the shared level, run to the block edge
   toward a neighbour with the same liquid, full-bright for glowing fluids. Nothing is painted into the glass.
+- **Gas Reservoir** (`block/gas_reservoir/`): a pressure vessel in the Steam Boiler Array's steel, on the same five
+  quadrant pieces and ConnectedModel "reservoir" (it joins only Gas Reservoirs). `frame` is a 6×6 heavy corner piece at each
+  corner of the face (the boiler casing shrunk: `#727982` / `#575D65` bevel top-left, `#2B2F34` / `#16181B` bottom-right,
+  `#383C42` where they meet and as its face, one `#959DA6` rivet at (2,2) with its `#2B2F34` shadow at (3,3)) joined by
+  3 px edge beams: top and left beams `#727982`, `#575D65`, `#2B2F34` from the outside in; bottom and right beams
+  `#16181B`, `#40454C`, `#575D65` from the outside in (lit on the edge facing the glass). `frame_h` / `frame_v` are the
+  beams alone, `frame_corners` the 3×3 elbows where two beams meet at an inner corner. Only a quadrant whose two edges
+  are both outer edges of the vessel gets the corner piece, so the pieces land on the vessel's outer corners and merged
+  tanks show beams only round the outside. Glass is alpha 0 with the two glints moved off the corners and beams (a 3 px
+  `#DCE8EE` streak (8,4)-(6,6) with a 2 px `#A9BCC6` one beside it, and a 2 px `#A9BCC6` one at (12,7)-(11,8)), so no
+  piece clips a glint. The gas is ReservoirRenderer's: `block/gas_reservoir/fill` (plain white, tinted) filling each block
+  to 0.01 inside its outer faces and to the edge toward the same gas, alpha 0.12 empty to 0.72 full, full-bright for
+  glowing gases. Nothing is painted into the glass.
+- **Item Reservoir** (`block/item_reservoir/`): fully solid, no glass. ConnectedModel "item_reservoir" (ReservoirModel's
+  quadrant scheme on `panel` / `rim` / `rim_h` / `rim_v` / `rim_corners`), joined only between FORMED blocks, so a formed
+  store's rims run round its outer edges and a block that isn't part of a box keeps all four. `panel` is the split face
+  (`#474C53` x < 10, `#40454C` x ≥ 10) with a `#959DA6` rivet near each corner ((2,2), (13,2), (2,13), (13,13), each with
+  its `#2B2F34` shadow 1 px diagonally inward): no seams, so a merged face reads as plates riveted at their corners. Rims
+  follow the CTM rule (`#727982` / `#575D65` top and left, `#16181B` / `#2B2F34` bottom and right, `#383C42` where they
+  meet). The ends along the store's length (AXIS; vertical for an unformed block) carry the riveted strap (3 px: `#575D65`;
+  `#959DA6` rivets every 4 px with `#2B2F34` beside them on `#383C42`; `#16181B`) just inside the rim, as overlays
+  0.02 out from the face: `band_top` (rows 2–4), `band_bottom` (rows 11–13), `band_left` (cols 2–4), `band_right` (cols
+  11–13), one per edge so the strap stays lit on its top/left. Every face along the length gets a band at each end, so the
+  bands wrap the store like an Item Vault's; the end faces are plain panels. The item model is a lone block (rims all
+  round, bands top and bottom).
+- **Item Reservoir GUI** (`gui/container/item_reservoir.png`): the scrolling Crate's panel (194×222, scroll track at
+  x 175) with a search field recessed into the title row (x 96, y 4, 91×12: `#0E0E0E` top/left lip, `#1F1F1F` floor,
+  `#5C5C5C` bottom/right lip, like a slot) and a 7×7 magnifier in `#8B8B8B` / `#5C5C5C` at its left; the text box starts
+  at x 108.
 - **Liquid Experience**: Ethanol's frames recoloured by brightness onto a pale XP green
   `#5E9A2C #7DBA3C #9CD24E #BDE86C #DCF89A #F4FFD2`, more opaque than Ethanol; it glows (light 10), fog `#B6F07A`. The
   Vacuum Collector's GUI gains the steam turbines' slim tank frame at x 160 for it (fallback fill recoloured the same).

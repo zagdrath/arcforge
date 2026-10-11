@@ -80,6 +80,7 @@ import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.CrateBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.ItemReservoirBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.VaultBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
@@ -285,8 +286,11 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<FluidTankBlockEntity>> FLUID_TANK = BLOCK_ENTITY_TYPES.register("fluid_tank",
             () -> new BlockEntityType<>(FluidTankBlockEntity::new, tierBlocks(ModBlocks::fluidTank, ModBlocks.CREATIVE_FLUID_TANK)));
 
+    // The Fluid and Gas Reservoirs (one type: the kind comes from the block).
     public static final Supplier<BlockEntityType<ReservoirBlockEntity>> RESERVOIR = BLOCK_ENTITY_TYPES.register("reservoir",
-            () -> new BlockEntityType<>(ReservoirBlockEntity::new, ModBlocks.RESERVOIR.get()));
+            () -> new BlockEntityType<>(ReservoirBlockEntity::new, ModBlocks.FLUID_RESERVOIR.get(), ModBlocks.GAS_RESERVOIR.get()));
+    public static final Supplier<BlockEntityType<ItemReservoirBlockEntity>> ITEM_RESERVOIR = BLOCK_ENTITY_TYPES.register("item_reservoir",
+            () -> new BlockEntityType<>(ItemReservoirBlockEntity::new, ModBlocks.ITEM_RESERVOIR.get()));
     public static final Supplier<BlockEntityType<XpDrainBlockEntity>> XP_DRAIN = BLOCK_ENTITY_TYPES.register("xp_drain",
             () -> new BlockEntityType<>(XpDrainBlockEntity::new, ModBlocks.XP_DRAIN.get()));
     public static final Supplier<BlockEntityType<XpShowerBlockEntity>> XP_SHOWER = BLOCK_ENTITY_TYPES.register("xp_shower",

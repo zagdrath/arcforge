@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "GRG",
+    "PGP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "arcforge:pressure_glass",
+    "R": "arcforge:fluid_reservoir"
+  },
+  "result": {
+    "id": "arcforge:gas_reservoir",
+    "count": 2
+  }
+}

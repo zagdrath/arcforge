@@ -86,7 +86,9 @@ import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
 import net.zagdrath.arcforge.block.machine.BlockPlacerBlock;
 import net.zagdrath.arcforge.block.machine.BlockBreakerBlock;
 import net.zagdrath.arcforge.block.machine.AssemblerBlock;
+import net.zagdrath.arcforge.block.storage.ItemReservoirBlock;
 import net.zagdrath.arcforge.block.storage.ReservoirBlock;
+import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
 import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
@@ -232,13 +234,25 @@ public final class ModBlocks {
             ChargepadBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.METAL).noOcclusion());
 
-    // The Reservoir: glass in a thin steel frame; touching Reservoirs merge into one tank. No tool needed to keep its fluid.
-    public static final DeferredBlock<ReservoirBlock> RESERVOIR = BLOCKS.registerBlock("reservoir",
-            ReservoirBlock::new, p -> p.mapColor(MapColor.NONE).strength(2.0F, 6.0F).sound(SoundType.GLASS).noOcclusion()
+    // The Fluid Reservoir (arcforge:reservoir until 2.2): glass in a thin steel frame; touching Fluid Reservoirs merge into
+    // one tank. No tool needed to keep its fluid.
+    public static final DeferredBlock<ReservoirBlock> FLUID_RESERVOIR = BLOCKS.registerBlock("fluid_reservoir",
+            p -> new ReservoirBlock(ReservoirKind.FLUID, p), p -> p.mapColor(MapColor.NONE).strength(2.0F, 6.0F).sound(SoundType.GLASS).noOcclusion()
                     .isValidSpawn((state, level, pos, type) -> false)
                     .isRedstoneConductor((state, level, pos) -> false)
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos, box) -> false));
+    // The Gas Reservoir: a glass pressure vessel with heavy steel corners and edge beams; touching Gas Reservoirs merge into
+    // one tank of gas.
+    public static final DeferredBlock<ReservoirBlock> GAS_RESERVOIR = BLOCKS.registerBlock("gas_reservoir",
+            p -> new ReservoirBlock(ReservoirKind.GAS, p), p -> p.mapColor(MapColor.METAL).strength(3.0F, 6.0F).sound(SoundType.METAL).noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false)
+                    .isRedstoneConductor((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos, box) -> false));
+    // The Item Reservoir: bulk item storage; blocks that make a solid box form one store.
+    public static final DeferredBlock<ItemReservoirBlock> ITEM_RESERVOIR = BLOCKS.registerBlock("item_reservoir",
+            ItemReservoirBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.0F, 6.0F).sound(SoundType.METAL));
 
     // Liquid Experience: the XP Drain grate laid on a tank, and the XP Shower hung from a ceiling.
     public static final DeferredBlock<XpDrainBlock> XP_DRAIN = BLOCKS.registerBlock("xp_drain",
@@ -1127,6 +1141,8 @@ public final class ModBlocks {
         // Removed with the Evaporation Pond: its blocks load as the Thermal Evaporator Array's (ponds need rebuilding as towers).
         BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_liner"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_casing"));
         BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_outlet"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_controller"));
+        // The Reservoir became the Fluid Reservoir in 2.2.
+        BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "reservoir"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "fluid_reservoir"));
         BLOCKS.register(modEventBus);
     }
 }

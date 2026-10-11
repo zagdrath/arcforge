@@ -2,7 +2,7 @@
   "parent": "arcforge:start/wrench",
   "display": {
     "icon": {
-      "id": "arcforge:reservoir"
+      "id": "arcforge:fluid_reservoir"
     },
     "title": {
       "translate": "advancements.arcforge.logistics.reservoir.title"
@@ -22,7 +22,9 @@
         "items": [
           {
             "items": [
-              "arcforge:reservoir"
+              "arcforge:fluid_reservoir",
+              "arcforge:gas_reservoir",
+              "arcforge:item_reservoir"
             ]
           }
         ]

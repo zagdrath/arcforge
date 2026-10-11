@@ -244,7 +244,7 @@ public final class MachineControlGameTests {
     // Storage blocks, conduits, the Meter, the Chargepad, the Chunk Loader, the Quantum Tunnel, plain blocks and loose
     // casings of cube and shell arrays aren't machines.
     static void nonMachinesHaveNone(GameTestHelper helper) {
-        List<BlockState> others = List.of(ModBlocks.STEEL_BLOCK.get().defaultBlockState(), ModBlocks.RESERVOIR.get().defaultBlockState(),
+        List<BlockState> others = List.of(ModBlocks.STEEL_BLOCK.get().defaultBlockState(), ModBlocks.FLUID_RESERVOIR.get().defaultBlockState(),
                 ModBlocks.energyCell(ConduitTier.WROUGHT).get().defaultBlockState(), ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get().defaultBlockState(),
                 ModBlocks.conduit(ConduitType.ITEM, ConduitTier.WROUGHT).get().defaultBlockState(), ModBlocks.ENERGY_METER.get().defaultBlockState(),
                 ModBlocks.CHARGEPAD.get().defaultBlockState(), ModBlocks.CHUNK_LOADER.get().defaultBlockState(), ModBlocks.QUANTUM_TUNNEL.get().defaultBlockState(),

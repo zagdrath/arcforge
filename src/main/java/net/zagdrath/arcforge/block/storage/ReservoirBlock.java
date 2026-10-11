@@ -32,20 +32,30 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
 import net.zagdrath.arcforge.machine.interaction.MachineInteractions;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-// The Reservoir: a 32,000 mB glass tank in a thin steel frame. Reservoirs that touch merge into one tank of any shape
-// (see ReservoirGroup), drawn as one: ConnectedModel's "reservoir" mode drops the frame where two of them join, and
-// ReservoirRenderer draws the shared fluid as one body. Any block of the tank takes and gives fluid (buckets, conduits,
-// pipes) and a comparator reads the whole tank. Breaking a block keeps its share of the fluid on the item.
-// The block glows with its fluid's light level (LIGHT is kept in sync by the block entity).
+// The tank Reservoirs (see ReservoirKind): the Fluid Reservoir, a glass tank in a thin steel frame for liquids, and the Gas
+// Reservoir, a glass pressure vessel with heavy steel corners and edge beams for gases. Reservoirs of one kind that touch
+// merge into one tank of any shape (see ReservoirGroup), drawn as one: ConnectedModel's "reservoir" mode (ReservoirModel)
+// drops the frame where two of them join, and ReservoirRenderer draws the shared contents as one body. Any block of the
+// tank takes and gives (buckets on a Fluid Reservoir, Gas Cartridges on a Gas Reservoir, conduits of its kind, pipes) and a
+// comparator reads the whole tank. Breaking a block keeps its share on the item.
+// The block glows with its contents' light level (LIGHT is kept in sync by the block entity).
 public class ReservoirBlock extends BaseEntityBlock {
     public static final IntegerProperty LIGHT = IntegerProperty.create("light", 0, 15);
 
-    public ReservoirBlock(BlockBehaviour.Properties properties) {
+    private final ReservoirKind kind;
+
+    public ReservoirBlock(ReservoirKind kind, BlockBehaviour.Properties properties) {
         super(properties.lightLevel(state -> state.getValue(LIGHT)));
+        this.kind = kind;
         registerDefaultState(stateDefinition.any().setValue(LIGHT, 0));
+    }
+
+    public ReservoirKind kind() {
+        return kind;
     }
 
     @Override
@@ -74,7 +84,7 @@ public class ReservoirBlock extends BaseEntityBlock {
         return true;
     }
 
-    // Right-click with a filled bucket pours it into the tank; with an empty bucket takes a bucket out.
+    // Right-click with a filled bucket (or Gas Cartridge) pours it into the tank; with an empty one takes some out.
     @Override
     protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
             BlockHitResult hitResult) {

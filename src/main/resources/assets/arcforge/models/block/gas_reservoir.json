@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "arcforge:block/reservoir/frame"
+    "all": "arcforge:block/gas_reservoir/frame"
   },
   "render_type": "minecraft:cutout"
 }

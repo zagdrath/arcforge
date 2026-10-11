@@ -96,11 +96,12 @@ import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 // with its casings, controller, cells and regulators; its Pressure Glass counts them as part of it (no beam against them),
 // while the casings keep their faces and beams toward the glass, as the Greenhouse Array's frames do. Reservoirs use "reservoir" (glass /
 // frame / frame_h / frame_v / frame_corners; see ReservoirModel): touching Reservoirs share one steel frame round their
-// outer edges.
+// outer edges. The Item Reservoir uses "item_reservoir" (panel / rim / rim_h / rim_v / rim_corners and four band_*
+// overlays; also ReservoirModel): the blocks of one formed store share rims round its outer edges and a band at each end.
 public final class ConnectedModel {
     public static final Identifier ID = Identifier.fromNamespaceAndPath("arcforge", "connected");
     private static final String COLUMN = "column_2x2", TRAY = "tray_window", DIGESTER = "digester", GREENHOUSE = "greenhouse",
-            EVAPORATOR = "thermal_evaporator", RESERVOIR = "reservoir", CUBE_BOX = "cube_box", FIREBOX_ARRAY = "firebox_array",
+            EVAPORATOR = "thermal_evaporator", RESERVOIR = "reservoir", ITEM_RESERVOIR = "item_reservoir", CUBE_BOX = "cube_box", FIREBOX_ARRAY = "firebox_array",
             BATTERY_ARRAY = "battery_array";
     // The tray band's glass: the top 10 px of a side face (the sill and strap are below it).
     private static final int BAND = 10;
@@ -159,7 +160,8 @@ public final class ConnectedModel {
                 case TRAY -> new String[] { "base", "frame", "top", "bottom" };
                 case DIGESTER, GREENHOUSE, CUBE_BOX, BATTERY_ARRAY -> new String[] { "base", "beam", "top" };
                 case EVAPORATOR, FIREBOX_ARRAY -> new String[] { "base", "beam", "top", "window", "lip" };
-                case RESERVOIR -> new String[] { "glass", "frame", "frame_h", "frame_v", "frame_corners" };
+                case RESERVOIR -> ReservoirModel.FLUID_TEXTURES;
+                case ITEM_RESERVOIR -> ReservoirModel.STORE_TEXTURES;
                 default -> new String[] { "base", "beam", "lip", "window" };
             };
             for (String required : needed) {
@@ -194,8 +196,8 @@ public final class ConnectedModel {
             if (!(resolved.wrapped() instanceof JsonModel unbaked)) {
                 throw new IllegalStateException("Model " + model + " is not an arcforge:connected model");
             }
-            if (unbaked.connect().equals(RESERVOIR)) {
-                return new ReservoirModel(baker, unbaked, model);
+            if (unbaked.connect().equals(RESERVOIR) || unbaked.connect().equals(ITEM_RESERVOIR)) {
+                return new ReservoirModel(baker, unbaked, model, unbaked.connect().equals(ITEM_RESERVOIR));
             }
             return unbaked.digester() ? new DigesterBaked(baker, unbaked, model)
                     : unbaked.column() ? new ColumnBaked(baker, unbaked, model) : new Baked(baker, unbaked, model);

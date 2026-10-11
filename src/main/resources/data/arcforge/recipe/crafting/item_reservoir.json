@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PIP",
+    "IBI",
+    "PIP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "I": "#c:ingots/steel",
+    "B": "minecraft:barrel"
+  },
+  "result": {
+    "id": "arcforge:item_reservoir",
+    "count": 1
+  }
+}

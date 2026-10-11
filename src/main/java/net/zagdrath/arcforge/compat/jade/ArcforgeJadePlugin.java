@@ -159,6 +159,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, DistillationArrayCasingBlock.class);
         // Reservoirs, Liquid Experience, the Quantum Tunnel and the Chunk Loader.
         registration.registerBlockDataProvider(LogisticsProviders.Reservoir.INSTANCE, net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity.class);
+        registration.registerBlockDataProvider(LogisticsProviders.ItemReservoir.INSTANCE, net.zagdrath.arcforge.blockentity.storage.ItemReservoirBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.XpDrain.INSTANCE, net.zagdrath.arcforge.blockentity.experience.XpDrainBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.Experience.INSTANCE, net.zagdrath.arcforge.blockentity.experience.XpShowerBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.Experience.INSTANCE, VacuumCollectorBlockEntity.class);
@@ -255,6 +256,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockComponent(GreenhouseProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(LogisticsProviders.Reservoir.Client.INSTANCE, net.zagdrath.arcforge.block.storage.ReservoirBlock.class);
+        registration.registerBlockComponent(LogisticsProviders.ItemReservoir.Client.INSTANCE, net.zagdrath.arcforge.block.storage.ItemReservoirBlock.class);
         registration.registerBlockComponent(LogisticsProviders.XpDrain.Client.INSTANCE, net.zagdrath.arcforge.block.experience.XpDrainBlock.class);
         registration.registerBlockComponent(LogisticsProviders.Experience.Client.INSTANCE, net.zagdrath.arcforge.block.experience.XpShowerBlock.class);
         registration.registerBlockComponent(LogisticsProviders.Experience.Client.INSTANCE, VacuumCollectorBlock.class);

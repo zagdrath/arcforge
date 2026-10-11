@@ -12,7 +12,7 @@
     "B": "minecraft:bucket"
   },
   "result": {
-    "id": "arcforge:reservoir",
+    "id": "arcforge:fluid_reservoir",
     "count": 2
   }
 }

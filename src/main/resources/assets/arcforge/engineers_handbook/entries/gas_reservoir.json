@@ -1,0 +1,17 @@
+{
+  "title": "Gas Reservoir",
+  "icon": "arcforge:gas_reservoir",
+  "items": [
+    "arcforge:gas_reservoir"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A pressure vessel for gases: 64,000 mB a block, heavy steel corners and edge beams round clear glass. It refuses liquids, and only Pressurized Conduits connect to it.\n# One vessel\nGas Reservoirs that touch merge into one vessel of any shape, sharing one gas. The corners and beams run only round its outside.\n- The gas fills the whole vessel evenly, not from the bottom: you see it as a tint, stronger the fuller it is. Glowing gases glow.\n- Every block takes and gives the gas; a comparator on any block reads the whole vessel."
+    },
+    {
+      "type": "text",
+      "text": "# By hand\nRight-click with a Gas Cartridge to empty it into the vessel, or with an empty one to fill it.\n# Breaking one\nA broken Gas Reservoir keeps its share of the gas on the item; place it back on a vessel of the same gas and it joins in. Vessels holding different gases stay apart."
+    }
+  ]
+}

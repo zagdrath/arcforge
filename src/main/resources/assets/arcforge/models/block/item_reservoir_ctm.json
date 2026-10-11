@@ -1,0 +1,18 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "item_reservoir",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "arcforge:block/item_reservoir/rim",
+    "panel": "arcforge:block/item_reservoir/panel",
+    "rim": "arcforge:block/item_reservoir/rim",
+    "rim_h": "arcforge:block/item_reservoir/rim_h",
+    "rim_v": "arcforge:block/item_reservoir/rim_v",
+    "rim_corners": "arcforge:block/item_reservoir/rim_corners",
+    "band_top": "arcforge:block/item_reservoir/band_top",
+    "band_bottom": "arcforge:block/item_reservoir/band_bottom",
+    "band_left": "arcforge:block/item_reservoir/band_left",
+    "band_right": "arcforge:block/item_reservoir/band_right"
+  },
+  "fallback": "arcforge:block/item_reservoir"
+}

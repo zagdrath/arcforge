@@ -1,0 +1,17 @@
+{
+  "title": "Item Reservoir",
+  "icon": "arcforge:item_reservoir",
+  "items": [
+    "arcforge:item_reservoir"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Bulk item storage in riveted steel: 20 slots a block.\n# One store\nItem Reservoirs placed together form one store when they make a solid box: a cross-section 1 to 3 blocks wide and tall, and a length up to 3 times its width, along any axis. The rims run round its outer edges and a band wraps each end, so a long store reads as one container.\n- Blocks that don't make a valid box stay separate stores, each with rims and bands of its own.\n- Each block adds its slots to the store."
+    },
+    {
+      "type": "text",
+      "text": "# Using it\nAny block opens the whole store: a scrolling grid of its slots with a search box (type a name, or @mod). Hoppers, Item Conduits and other mods' item handlers take and give items through any block, and a comparator reads how full it is.\n# Breaking one\nA broken block spills its share of the items, like a chest. Pick it up with the Wrench's Dismantle to keep them on the item."
+    }
+  ]
+}

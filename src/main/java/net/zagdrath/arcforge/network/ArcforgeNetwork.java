@@ -10,7 +10,8 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 // Arcforge's own packets: the Wrench's mode change, the port lists of open multiblock menus, and JEI setting an
-// Assembler's pattern.
+// Assembler's pattern, the
+// Item Reservoir's search.
 public final class ArcforgeNetwork {
     private static final String VERSION = "1";
 
@@ -26,6 +27,7 @@ public final class ArcforgeNetwork {
         registrar.playToClient(PortsPayload.TYPE, PortsPayload.STREAM_CODEC, PortsPayload::handle);
         registrar.playToServer(AssemblerPatternPayload.TYPE, AssemblerPatternPayload.STREAM_CODEC, AssemblerPatternPayload::handle);
         registrar.playToServer(ArcQuarryAreaPayload.TYPE, ArcQuarryAreaPayload.STREAM_CODEC, ArcQuarryAreaPayload::handle);
+        registrar.playToServer(ItemReservoirSearchPayload.TYPE, ItemReservoirSearchPayload.STREAM_CODEC, ItemReservoirSearchPayload::handle);
         registrar.playToServer(ArcQuarryTagPayload.TYPE, ArcQuarryTagPayload.STREAM_CODEC, ArcQuarryTagPayload::handle);
         registrar.playToServer(GhostSlotPayload.TYPE, GhostSlotPayload.STREAM_CODEC, GhostSlotPayload::handle);
         registrar.playToServer(JetpackInputPayload.TYPE, JetpackInputPayload.STREAM_CODEC, JetpackInputPayload::handle);

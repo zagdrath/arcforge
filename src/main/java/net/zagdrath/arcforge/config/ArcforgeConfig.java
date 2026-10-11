@@ -2710,16 +2710,40 @@ public class ArcforgeConfig {
         BUILDER.pop();
     }
 
-    // --- Reservoir, Liquid Experience, Quantum Tunnel, Chunk Loader ---
+    // --- Reservoirs (Fluid, Gas, Item), Liquid Experience, Quantum Tunnel, Chunk Loader ---
 
     static {
-        BUILDER.comment("Reservoir: a 32,000 mB tank block; touching Reservoirs merge into one tank of any shape that fills from the",
-                "bottom up.").push("reservoir");
+        BUILDER.comment("Fluid and Gas Reservoirs: tank blocks; touching ones of the same kind merge into one tank of any shape (a Fluid",
+                "Reservoir fills from the bottom up, a Gas Reservoir's gas fills it evenly).").push("reservoir");
     }
 
     public static final ModConfigSpec.IntValue RESERVOIR_MAX_BLOCKS = BUILDER
             .comment("Most Reservoir blocks that join into one tank. Blocks past this form a tank of their own.")
             .defineInRange("maxBlocks", 4_096, 1, 65_536);
+    public static final ModConfigSpec.IntValue FLUID_RESERVOIR_CAPACITY = BUILDER
+            .comment("mB of liquid a Fluid Reservoir block holds.")
+            .defineInRange("fluidCapacity", 32_000, 1_000, 1_000_000);
+    public static final ModConfigSpec.IntValue GAS_RESERVOIR_CAPACITY = BUILDER
+            .comment("mB of gas a Gas Reservoir block holds.")
+            .defineInRange("gasCapacity", 64_000, 1_000, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Item Reservoir: bulk item storage. Blocks that together make a solid box form one store.").push("itemReservoir");
+    }
+
+    public static final ModConfigSpec.IntValue ITEM_RESERVOIR_SLOTS = BUILDER
+            .comment("Slots each Item Reservoir block adds to its store. Lowering it doesn't shrink blocks already placed.")
+            .defineInRange("slotsPerBlock", 20, 1, 54);
+    public static final ModConfigSpec.IntValue ITEM_RESERVOIR_MAX_WIDTH = BUILDER
+            .comment("Widest and tallest a store's cross-section can be, in blocks.")
+            .defineInRange("maxWidth", 3, 1, 5);
+    public static final ModConfigSpec.IntValue ITEM_RESERVOIR_LENGTH_RATIO = BUILDER
+            .comment("Longest a store can be, as a multiple of its cross-section's wider side.")
+            .defineInRange("lengthRatio", 3, 1, 5);
 
     static {
         BUILDER.pop();

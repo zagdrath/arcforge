@@ -25,12 +25,13 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 
-// Reservoir blocks that touch (on a face, in loaded chunks) and hold the same fluid, or none, form one tank: a group.
-// Each block keeps its own 32,000 mB share in its own tank, so a block always carries exactly its share when it's broken
-// or unloaded, and the group only decides where fluid goes. The group fills from the bottom up: fluid goes into the
-// lowest layer (the group's blocks at one height) with room, spread evenly across it, and comes out of the highest layer
-// that holds any, so every layer below the surface is full, every one above it empty, and the blocks of the surface layer
-// share one level. After the group changes shape (a block placed, broken, loaded or unloaded) the fluid is settled into
+// Reservoir blocks of one kind (see ReservoirKind) that touch (on a face, in loaded chunks) and hold the same fluid or gas,
+// or none, form one tank: a group. Each block keeps its own share in its own tank, so a block always carries exactly its
+// share when it's broken or unloaded, and the group only decides where the contents go. A Fluid Reservoir group fills
+// from the bottom up: fluid goes into the lowest layer (the group's blocks at one height) with room, spread evenly across
+// it, and comes out of the highest layer that holds any, so every layer below the surface is full, every one above it
+// empty, and the blocks of the surface layer share one level. A Gas Reservoir group is one layer: its gas fills every
+// block alike. After the group changes shape (a block placed, broken, loaded or unloaded) the contents are settled into
 // that order again on the next tick (never inside a transaction).
 //
 // A group is built lazily from any of its blocks (a flood fill, up to logistics.reservoir.maxBlocks) and shared by all of them;
@@ -38,6 +39,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 // group it was in, so the rest rebuild. Blocks holding a different fluid next to the group stay separate tanks.
 public final class ReservoirGroup {
     private final List<ReservoirBlockEntity> members;
+    private final ReservoirKind kind;
     // The members by height, lowest first; each layer one height.
     private final List<List<ReservoirBlockEntity>> layers = new ArrayList<>();
     private final ResourceHandler<FluidResource> handler = new Handler();
@@ -47,8 +49,14 @@ public final class ReservoirGroup {
     private int comparatorSignal = -1;
     private boolean hadFluid;
 
-    private ReservoirGroup(List<ReservoirBlockEntity> members) {
+    private ReservoirGroup(ReservoirKind kind, List<ReservoirBlockEntity> members) {
         this.members = members;
+        this.kind = kind;
+        if (!kind.layered()) {
+            layers.add(new ArrayList<>(members));
+            this.hadFluid = !fluid().isEmpty();
+            return;
+        }
         List<ReservoirBlockEntity> sorted = new ArrayList<>(members);
         sorted.sort(Comparator.comparingInt(reservoir -> reservoir.getBlockPos().getY()));
         int y = Integer.MIN_VALUE;
@@ -79,7 +87,7 @@ public final class ReservoirGroup {
             for (Direction direction : level != null ? Direction.values() : new Direction[0]) {
                 BlockPos next = reservoir.getBlockPos().relative(direction);
                 if (!seen.add(next) || !level.isLoaded(next) || !(level.getBlockEntity(next) instanceof ReservoirBlockEntity neighbour)
-                        || neighbour.isRemoved()) {
+                        || neighbour.isRemoved() || neighbour.kind() != seed.kind()) {
                     continue;
                 }
                 FluidResource theirs = neighbour.groupFluid();
@@ -93,7 +101,7 @@ public final class ReservoirGroup {
                 queue.add(neighbour);
             }
         }
-        ReservoirGroup group = new ReservoirGroup(members);
+        ReservoirGroup group = new ReservoirGroup(seed.kind(), members);
         for (ReservoirBlockEntity member : members) {
             member.joinGroup(group);
         }
@@ -141,8 +149,16 @@ public final class ReservoirGroup {
         return amount;
     }
 
+    public ReservoirKind kind() {
+        return kind;
+    }
+
     public long capacity() {
-        return (long) members.size() * ReservoirBlockEntity.CAPACITY;
+        long capacity = 0;
+        for (ReservoirBlockEntity reservoir : members) {
+            capacity += reservoir.capacity();
+        }
+        return capacity;
     }
 
     public int comparatorSignal() {
@@ -180,17 +196,31 @@ public final class ReservoirGroup {
         }
     }
 
-    // Lays the group's fluid out bottom-up again, each layer filled evenly.
+    // Lays the group's contents out bottom-up again, each layer filled evenly (a gas group is one layer).
     private void settle() {
         FluidResource fluid = fluid();
         long remaining = amount();
         for (List<ReservoirBlockEntity> layer : layers) {
-            long take = Math.min(remaining, (long) layer.size() * ReservoirBlockEntity.CAPACITY);
+            long room = 0;
+            for (ReservoirBlockEntity reservoir : layer) {
+                room += reservoir.capacity();
+            }
+            long take = Math.min(remaining, room);
             remaining -= take;
             int base = (int) (take / layer.size());
             int extra = (int) (take % layer.size());
             for (int i = 0; i < layer.size(); i++) {
                 layer.get(i).setOwn(fluid, base + (i < extra ? 1 : 0));
+            }
+        }
+        // More than the blocks now hold (the capacity config was lowered): the rest stays in the top layer, over its
+        // capacity until drained, rather than being lost.
+        if (remaining > 0 && !layers.isEmpty()) {
+            List<ReservoirBlockEntity> top = layers.get(layers.size() - 1);
+            for (int i = 0; i < top.size(); i++) {
+                long share = remaining / top.size() + (i < remaining % top.size() ? 1 : 0);
+                ReservoirBlockEntity reservoir = top.get(i);
+                reservoir.setOwn(fluid, (int) Math.min(Integer.MAX_VALUE, reservoir.ownAmount() + share));
             }
         }
     }
@@ -220,13 +250,13 @@ public final class ReservoirGroup {
 
         @Override
         public boolean isValid(int index, FluidResource resource) {
-            return ReservoirBlockEntity.accepts(resource);
+            return kind.accepts(resource);
         }
 
         // Into the lowest layer with room, spread evenly over its blocks (least full first), then the next layer up.
         @Override
         public int insert(int index, FluidResource resource, int amount, TransactionContext transaction) {
-            if (index != 0 || amount <= 0 || !ReservoirBlockEntity.accepts(resource)) {
+            if (index != 0 || amount <= 0 || !kind.accepts(resource)) {
                 return 0;
             }
             FluidResource fluid = fluid();

@@ -20,6 +20,8 @@ import net.zagdrath.arcforge.blockentity.experience.XpShowerBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.ItemReservoirBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.ItemReservoirStore;
 import net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.ReservoirGroup;
 import net.zagdrath.arcforge.chunkloading.ChunkLoaderStatus;
@@ -31,10 +33,12 @@ import snownee.jade.api.ITooltip;
 import snownee.jade.api.StreamServerDataProvider;
 import snownee.jade.api.config.IPluginConfig;
 
-// Jade for the Reservoir ("Tank of 12 blocks", "This block: 32,000 mB"; the group's fluid shows as its fluid storage),
-// the XP Drain ("Drains into the tank below" or "Place on a fluid container"), the XP Shower and the Vacuum Collector's
-// experience ("Liquid Experience: 2,000 mB (100 points)", "Off: redstone signal"), the Quantum Tunnel ("Frequency:
-// Base (private)" or "No frequency") and the Chunk Loader ("Loading 9 chunks (radius 1)" or its status).
+// Jade for the Fluid and Gas Reservoirs ("Tank of 12 blocks", "This block: 32,000 / 32,000 mB"; the group's contents
+// show as its fluid storage), the Item Reservoir ("Store of 27 blocks (3×3×3)", or "A store of its own: not a box" when it
+// touches others it can't join; "12 / 540 slots used (3% full)"), the XP Drain ("Drains into the tank below" or "Place on
+// a fluid container"), the XP Shower and the Vacuum Collector's experience ("Liquid Experience: 2,000 mB (100 points)",
+// "Off: redstone signal"), the Quantum Tunnel ("Frequency: Base (private)" or "No frequency") and the Chunk Loader
+// ("Loading 9 chunks (radius 1)" or its status).
 public final class LogisticsProviders {
     private LogisticsProviders() {}
 
@@ -49,9 +53,9 @@ public final class LogisticsProviders {
     public enum Reservoir implements StreamServerDataProvider<BlockAccessor, Reservoir.Data> {
         INSTANCE;
 
-        public record Data(int blocks, int own) {
+        public record Data(int blocks, int own, int capacity) {
             public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
-                    ByteBufCodecs.VAR_INT, Data::blocks, ByteBufCodecs.VAR_INT, Data::own, Data::new);
+                    ByteBufCodecs.VAR_INT, Data::blocks, ByteBufCodecs.VAR_INT, Data::own, ByteBufCodecs.VAR_INT, Data::capacity, Data::new);
         }
 
         @Override
@@ -60,7 +64,7 @@ public final class LogisticsProviders {
                 return null;
             }
             ReservoirGroup group = reservoir.getGroup();
-            return new Data(group.size(), reservoir.ownAmount());
+            return new Data(group.size(), reservoir.ownAmount(), reservoir.capacity());
         }
 
         @Override
@@ -84,13 +88,84 @@ public final class LogisticsProviders {
                         tooltip.add(Component.translatable("jade.arcforge.reservoir.blocks", data.blocks()));
                     }
                     tooltip.add(Component.translatable("jade.arcforge.reservoir.own", grouped(data.own()),
-                            grouped(ReservoirBlockEntity.CAPACITY)).withStyle(ChatFormatting.GRAY));
+                            grouped(data.capacity())).withStyle(ChatFormatting.GRAY));
                 });
             }
 
             @Override
             public Identifier getUid() {
                 return uid("reservoir");
+            }
+        }
+    }
+
+    public enum ItemReservoir implements StreamServerDataProvider<BlockAccessor, ItemReservoir.Data> {
+        INSTANCE;
+
+        // size is the store's box ("3×3×3"), empty for a block that isn't part of one; percent is how full by stacks.
+        public record Data(int blocks, String size, int used, int slots, int percent) {
+            public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
+                    ByteBufCodecs.VAR_INT, Data::blocks, ByteBufCodecs.STRING_UTF8, Data::size, ByteBufCodecs.VAR_INT, Data::used,
+                    ByteBufCodecs.VAR_INT, Data::slots, ByteBufCodecs.VAR_INT, Data::percent, Data::new);
+        }
+
+        @Override
+        public @Nullable Data streamData(BlockAccessor accessor) {
+            if (!(accessor.getBlockEntity() instanceof ItemReservoirBlockEntity reservoir)) {
+                return null;
+            }
+            ItemReservoirStore store = reservoir.getStore();
+            int slots = store.slots();
+            int used = 0;
+            for (int index = 0; index < slots; index++) {
+                if (!store.getStack(index).isEmpty()) {
+                    used++;
+                }
+            }
+            ItemReservoirStore.Box box = store.box();
+            return new Data(store.blocks(), box != null ? box.describe() : "", used, slots, Math.round(store.fullness() * 100.0F));
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, Data> streamCodec() {
+            return Data.STREAM_CODEC;
+        }
+
+        @Override
+        public Identifier getUid() {
+            return uid("item_reservoir");
+        }
+
+        // Jade needs the tooltip half as its own provider, under the same uid.
+        public enum Client implements IBlockComponentProvider {
+            INSTANCE;
+
+            @Override
+            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                ItemReservoir.INSTANCE.decodeFromData(accessor).ifPresent(data -> {
+                    if (!data.size().isEmpty()) {
+                        tooltip.add(Component.translatable("jade.arcforge.item_reservoir.store", data.blocks(), data.size()));
+                    } else if (accessor.getLevel() != null && hasReservoirNeighbour(accessor)) {
+                        tooltip.add(Component.translatable("jade.arcforge.item_reservoir.alone").withStyle(ChatFormatting.GRAY));
+                    }
+                    tooltip.add(Component.translatable("jade.arcforge.item_reservoir.slots", grouped(data.used()), grouped(data.slots()),
+                            data.percent()).withStyle(ChatFormatting.GRAY));
+                });
+            }
+
+            // "Not a box" only says something when it touches other Item Reservoirs it would otherwise have joined.
+            private static boolean hasReservoirNeighbour(BlockAccessor accessor) {
+                for (Direction direction : Direction.values()) {
+                    if (accessor.getLevel().getBlockState(accessor.getPosition().relative(direction)).is(accessor.getBlock())) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            @Override
+            public Identifier getUid() {
+                return uid("item_reservoir");
             }
         }
     }

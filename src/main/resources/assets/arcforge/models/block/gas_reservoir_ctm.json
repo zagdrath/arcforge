@@ -1,0 +1,14 @@
+{
+  "loader": "arcforge:connected",
+  "connect": "reservoir",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "particle": "arcforge:block/gas_reservoir/frame",
+    "glass": "arcforge:block/gas_reservoir/glass",
+    "frame": "arcforge:block/gas_reservoir/frame",
+    "frame_h": "arcforge:block/gas_reservoir/frame_h",
+    "frame_v": "arcforge:block/gas_reservoir/frame_v",
+    "frame_corners": "arcforge:block/gas_reservoir/frame_corners"
+  },
+  "fallback": "arcforge:block/gas_reservoir"
+}

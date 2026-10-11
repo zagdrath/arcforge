@@ -288,6 +288,10 @@ public final class ArcforgeGameTests {
         TESTS.put("rubber_bio_plastics", RubberGameTests::bioPlastics);
         TESTS.put("rubber_plastics_tag", RubberGameTests::plastics);
         TESTS.put("reservoir_one_tank", ExtendedLogisticsGameTests::reservoir);
+        TESTS.put("gas_reservoir_one_vessel", ReservoirGameTests::gasReservoir);
+        TESTS.put("item_reservoir_store", ReservoirGameTests::itemReservoirStore);
+        TESTS.put("item_reservoir_shapes", ReservoirGameTests::itemReservoirShapes);
+        TESTS.put("item_reservoir_no_nesting", ReservoirGameTests::itemReservoirNoNesting);
         TESTS.put("xp_drain", ExtendedLogisticsGameTests::xpDrain);
         TESTS.put("xp_shower", ExtendedLogisticsGameTests::xpShower);
         TESTS.put("vacuum_experience", ExtendedLogisticsGameTests::vacuumExperience);

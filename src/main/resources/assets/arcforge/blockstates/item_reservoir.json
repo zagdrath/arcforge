@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "axis=x,formed=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/item_reservoir_ctm"
+    },
+    "axis=x,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/item_reservoir_ctm"
+    },
+    "axis=y,formed=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/item_reservoir_ctm"
+    },
+    "axis=y,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/item_reservoir_ctm"
+    },
+    "axis=z,formed=false": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/item_reservoir_ctm"
+    },
+    "axis=z,formed=true": {
+      "type": "arcforge:connected",
+      "model": "arcforge:block/item_reservoir_ctm"
+    }
+  }
+}

@@ -137,6 +137,7 @@ import net.zagdrath.arcforge.client.screen.conduit.ConduitFilterScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.ArcforgeFurnaceScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.CarbonizerScreen;
 import net.zagdrath.arcforge.client.screen.storage.CrateScreen;
+import net.zagdrath.arcforge.client.screen.storage.ItemReservoirScreen;
 import net.zagdrath.arcforge.client.screen.storage.EnergyCellScreen;
 import net.zagdrath.arcforge.client.screen.storage.FluidTankScreen;
 import net.zagdrath.arcforge.client.screen.storage.HeatCellScreen;
@@ -260,6 +261,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.SOLAR_THERMAL_ARRAY.get(), SolarThermalArrayScreen::new);
         event.register(ModMenuTypes.CONDUIT_FILTER.get(), ConduitFilterScreen::new);
         event.register(ModMenuTypes.CRATE.get(), CrateScreen::new);
+        event.register(ModMenuTypes.ITEM_RESERVOIR.get(), ItemReservoirScreen::new);
         event.register(ModMenuTypes.VAULT.get(), VaultScreen::new);
     }
 
