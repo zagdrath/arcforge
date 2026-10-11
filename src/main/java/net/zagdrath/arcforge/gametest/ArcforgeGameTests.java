@@ -248,6 +248,7 @@ public final class ArcforgeGameTests {
         TESTS.put("farming_loam_tills", FarmingGameTests::loamTills);
         TESTS.put("config_migration", ConfigGameTests::migration);
         TESTS.put("config_names_translated", ConfigGameTests::namesTranslated);
+        TESTS.put("config_reset", ConfigGameTests::reset);
         TESTS.put("farming_loam_grows_saplings", FarmingGameTests::loamGrowsSaplings);
         TESTS.put("farming_fertilizers_add_nutrients", FarmingGameTests::fertilizersAddNutrients);
         TESTS.put("farming_growth_uses_nutrients", FarmingGameTests::growthUsesNutrients);

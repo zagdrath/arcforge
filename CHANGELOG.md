@@ -37,6 +37,9 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 - **Item Reservoir.** Bulk item storage that forms one store from blocks making a solid box (rims round the store's
   outside, riveted bands at both ends), 20 slots a block, a scrolling GUI with search, hoppers, conduits and item
   handlers on any block, and a comparator. Broken blocks spill their share; wrenched ones keep it.
+- **`/arcforge config reset`** for server admins (permission level 3), in game or from the console. `reset all` lists the
+  settings that differ from their defaults, `reset all confirm` resets them, and `reset <path>` resets one setting or a
+  section (tab completes). The server's `arcforge-common.toml` is saved at once, so there's no file to edit.
 
 ### Changed
 
@@ -61,6 +64,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 - **A Steam Boiler Array no longer stops boiling while it heats toward its pressure setting.** Set to High-Pressure
   or Superheated below that grade's temperature, it now keeps making the grade it's hot enough for as it climbs,
   instead of making nothing until it got there.
+- **A big Firebox Array's output no longer overlaps its label.** From 10,000 HU/t it reads like "+28.8k HU/t", and the
+  Output label is left out when even that doesn't fit; hovering the line shows the exact figure.
 - **The Tree Cutter no longer leaves bare trunks standing.** When a big tree's branch grew into a neighbouring trunk, it
   took the neighbour's leaves and the logs above the branch but left the trunk below, a leafless stump it never cut.
   Trees joined like that now come down together, whole.

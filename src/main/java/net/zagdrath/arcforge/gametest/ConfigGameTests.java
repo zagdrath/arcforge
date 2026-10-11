@@ -22,6 +22,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 import net.zagdrath.arcforge.config.ArcforgeClientConfig;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.config.ConfigMigration;
+import net.zagdrath.arcforge.config.ConfigReset;
 
 // The config: settings saved before the sections were grouped move to their new places, and every section and
 // setting has a name on the config screen.
@@ -74,6 +75,43 @@ final class ConfigGameTests {
             }
         } catch (IOException e) {
             throw new IllegalStateException(e);
+        }
+        helper.succeed();
+    }
+
+    // /arcforge config reset: the command is registered, paths name settings and sections, a changed setting is found
+    // and put back to its default (by its own path and by its section's), and "all" sees it too. It's changed and reset in
+    // one go, so tests running alongside never see the changed value.
+    static void reset(GameTestHelper helper) {
+        helper.assertTrue(helper.getLevel().getServer().getCommands().getDispatcher().getRoot().getChild("arcforge") != null,
+                "/arcforge isn't registered");
+        String path = ConfigReset.settings().entrySet().stream().filter(entry -> entry.getValue() == ArcforgeConfig.BOILER_ARRAY_HOT_SAVING)
+                .map(java.util.Map.Entry::getKey).findFirst().orElse("");
+        helper.assertTrue(path.endsWith(".steamBoilerArray.hotSaving"), "hotSaving is at " + path);
+        String section = path.substring(0, path.lastIndexOf('.'));
+        helper.assertTrue(ConfigReset.exists(path) && ConfigReset.exists(section) && !ConfigReset.exists("power.nothing"), "Paths aren't recognised");
+        double fallback = ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getDefault();
+        helper.assertTrue(!ConfigReset.changed(path).contains(path), "hotSaving counts as changed at its default");
+
+        ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.set(0.5);
+        boolean seen = ConfigReset.changed("").contains(path) && ConfigReset.changed(section).contains(path);
+        List<String> reset = ConfigReset.reset(section);
+        double after = ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble();
+        ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.set(0.5);
+        List<String> resetOne = ConfigReset.reset(path);
+        double afterOne = ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble();
+
+        helper.assertTrue(seen, "A changed hotSaving wasn't listed");
+        helper.assertTrue(reset.contains(path) && after == fallback, "Resetting " + section + " left hotSaving at " + after);
+        helper.assertTrue(resetOne.equals(List.of(path)) && afterOne == fallback, "Resetting " + path + " left it at " + afterOne);
+
+        // The commands parse and run as the console would (nothing left to reset here, so each changes nothing).
+        var server = helper.getLevel().getServer();
+        try {
+            server.getCommands().getDispatcher().execute("arcforge config reset all", server.createCommandSourceStack());
+            server.getCommands().getDispatcher().execute("arcforge config reset " + path, server.createCommandSourceStack());
+        } catch (com.mojang.brigadier.exceptions.CommandSyntaxException e) {
+            helper.fail("/arcforge config reset didn't parse: " + e.getMessage());
         }
         helper.succeed();
     }

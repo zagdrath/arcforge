@@ -1112,6 +1112,17 @@ categories, most with subcategories and a page per machine:
 
 **Reset All**, at the bottom of the first page, puts every value back to its default.
 
+On a server, admins (permission level 3) can reset the server's `arcforge-common.toml` with a command, in game or
+from the console, without editing the file:
+
+- `/arcforge config reset all` lists the settings that differ from their defaults; nothing changes yet.
+- `/arcforge config reset all confirm` resets every one of them.
+- `/arcforge config reset <path>` resets one setting (`power.steam.steamBoilerArray.hotSaving`) or a whole section
+  (`power.steam`) at once. Tab completes the paths.
+
+The file is saved straight away and most values apply at once; a few (block sizes, world generation) apply only to
+blocks placed or loaded, or chunks generated, afterwards.
+
 Each player's own settings are in `config/arcforge-client.toml` (**Arcforge Client** on the same screen): for now
 `notifications.arcQuarryFinished`, the toast an Arc Quarry's owner gets when it finishes (on by default).
 

@@ -35,6 +35,8 @@ public class FireboxArrayScreen extends MachineScreen<FireboxArrayMenu> {
     private static final int STATUS_X = 65, STATUS_Y = 56, STATUS_W = 76;
     private static final int SCREEN_LEFT = 57, SCREEN_RIGHT = 141;
     private static final int HEAT_TEXT_Y = 23, OUTPUT_TEXT_Y = 42;
+    // Least space between the Output label and its value.
+    private static final int LABEL_GAP = 3;
 
     private final Identifier heatBuffer = sprite("heat_buffer");
     private final Identifier fuelFill = sprite("fuel_fill");
@@ -79,9 +81,15 @@ public class FireboxArrayScreen extends MachineScreen<FireboxArrayMenu> {
         graphics.text(font, Component.translatable("gui.arcforge.heat_label"), SCREEN_LEFT, HEAT_TEXT_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())), SCREEN_RIGHT, HEAT_TEXT_Y,
                 ArcforgeGui.TEXT);
-        graphics.text(font, Component.translatable("gui.arcforge.output"), SCREEN_LEFT, OUTPUT_TEXT_Y, ArcforgeGui.LABEL, false);
-        textRight(graphics, Component.translatable("gui.arcforge.hu_per_tick_gain", ArcforgeGui.grouped(menu.getHeatPerTick())), SCREEN_RIGHT,
-                OUTPUT_TEXT_Y, ArcforgeGui.HEAT);
+        // A big array's output is shortened (28.8k), and its label left out if even that doesn't fit beside it; the
+        // line's tooltip has both in full.
+        int output = menu.getHeatPerTick();
+        Component rate = Component.translatable("gui.arcforge.hu_per_tick_gain", output < 10_000 ? ArcforgeGui.grouped(output) : ArcforgeGui.compact(output));
+        Component label = Component.translatable("gui.arcforge.output");
+        if (SCREEN_LEFT + font.width(label) + LABEL_GAP <= SCREEN_RIGHT - font.width(rate)) {
+            graphics.text(font, label, SCREEN_LEFT, OUTPUT_TEXT_Y, ArcforgeGui.LABEL, false);
+        }
+        textRight(graphics, rate, SCREEN_RIGHT, OUTPUT_TEXT_Y, ArcforgeGui.HEAT);
         graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
     }
 
@@ -114,6 +122,9 @@ public class FireboxArrayScreen extends MachineScreen<FireboxArrayMenu> {
                 addOxyFuelTooltip(lines, menu.getOxygen(), menu.getOxygenCapacity(),
                         menu.getMaxHeatPerTick() / 1000.0 * ArcforgeConfig.FIREBOX_ARRAY_OXYGEN_PER_THOUSAND_HU.getAsDouble());
             }
+        } else if (isHovering(SCREEN_LEFT, OUTPUT_TEXT_Y - 1, SCREEN_RIGHT - SCREEN_LEFT, 10, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.output"));
+            lines.add(Component.translatable("gui.arcforge.hu_per_tick_gain", ArcforgeGui.grouped(menu.getHeatPerTick())).withStyle(ChatFormatting.GOLD));
         } else if (isHovering(STATUS_X, STATUS_Y - 1, STATUS_W, 10, mouseX, mouseY)) {
             lines.add(menu.getStatus().getDescription());
         }
