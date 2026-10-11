@@ -33,7 +33,9 @@ public class StorageBlockItem extends BlockItem {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
         ConduitTier tier = ((StorageBlock) getBlock()).getTier();
-        if (getBlock() instanceof FluidTankBlock || getBlock() instanceof PressurizedCylinderBlock) {
+        if (((StorageBlock) getBlock()).isCreative()) {
+            appendCreative(stack, builder);
+        } else if (getBlock() instanceof FluidTankBlock || getBlock() instanceof PressurizedCylinderBlock) {
             FluidStack fluid = stack.getOrDefault(ModDataComponents.FLUID_CONTENTS.get(), SimpleFluidContent.EMPTY).copy();
             Component name = fluid.isEmpty() ? Component.translatable("gui.arcforge.empty") : fluid.getHoverName();
             int capacity = getBlock() instanceof FluidTankBlock ? tier.tankCapacity() : tier.cylinderCapacity();
@@ -50,6 +52,19 @@ public class StorageBlockItem extends BlockItem {
             builder.accept(Component.translatable("tooltip.arcforge.heat_cell.insulation", tier.getDisplayName())
                     .withStyle(ChatFormatting.GRAY));
         }
+    }
+
+    // A creative block: what it's set to, or that it's waiting for something.
+    private void appendCreative(ItemStack stack, Consumer<Component> builder) {
+        Component line;
+        if (getBlock() instanceof EnergyCellBlock) {
+            line = Component.translatable("tooltip.arcforge.creative.energy");
+        } else {
+            FluidStack fluid = stack.getOrDefault(ModDataComponents.FLUID_CONTENTS.get(), SimpleFluidContent.EMPTY).copy();
+            line = fluid.isEmpty() ? Component.translatable("tooltip.arcforge.creative.unset")
+                    : Component.translatable("tooltip.arcforge.creative.contents", fluid.getHoverName());
+        }
+        builder.accept(line.copy().withStyle(ChatFormatting.LIGHT_PURPLE));
     }
 
     private static String format(int value) {

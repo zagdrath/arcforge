@@ -56,7 +56,8 @@ public class StorageUpgradeItem extends Item {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
         BlockState state = level.getBlockState(pos);
-        if (!(state.getBlock() instanceof CrateBlock) && !(state.getBlock() instanceof VaultBlock)) {
+        // A creative vault is past every tier.
+        if (!(state.getBlock() instanceof CrateBlock) && !(state.getBlock() instanceof VaultBlock) || StorageBlock.isCreative(state)) {
             return InteractionResult.PASS;
         }
         Player player = context.getPlayer();

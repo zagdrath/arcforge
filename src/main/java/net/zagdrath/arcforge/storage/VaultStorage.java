@@ -19,6 +19,9 @@ import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 // there's anything in it, or while it's locked (locking an empty vault makes the next item inserted its type).
 // In void mode anything offered to a full vault is accepted and destroyed. Takes part in transactions like
 // NeoForge's own stack handlers; committed changes are reported to the listener.
+//
+// A creative vault's storage (see StorageBlock) fills to capacity with the first item put in and stays full: taking
+// never runs it down, and more of that item is taken and destroyed. clear() empties it.
 public class VaultStorage extends SnapshotJournal<VaultStorage.Snapshot> implements ResourceHandler<ItemResource> {
     public interface Listener {
         // Called after a change. typeChanged: the item type, lock or void setting changed, not just the amount.
@@ -28,6 +31,7 @@ public class VaultStorage extends SnapshotJournal<VaultStorage.Snapshot> impleme
     record Snapshot(ItemStack template, int amount) {}
 
     private final int capacity;
+    private final boolean creative;
     private final Listener listener;
     private ItemStack template = ItemStack.EMPTY;
     private int amount;
@@ -35,8 +39,25 @@ public class VaultStorage extends SnapshotJournal<VaultStorage.Snapshot> impleme
     private boolean voidMode;
 
     public VaultStorage(int capacity, Listener listener) {
+        this(capacity, false, listener);
+    }
+
+    public VaultStorage(int capacity, boolean creative, Listener listener) {
         this.capacity = capacity;
+        this.creative = creative;
         this.listener = listener;
+    }
+
+    public boolean isCreative() {
+        return creative;
+    }
+
+    // Empties it and forgets its type and lock.
+    public void clear() {
+        template = ItemStack.EMPTY;
+        amount = 0;
+        locked = false;
+        listener.onChanged(true);
     }
 
     // --- State ---
@@ -78,7 +99,7 @@ public class VaultStorage extends SnapshotJournal<VaultStorage.Snapshot> impleme
 
     // Replaces everything, e.g. when loading (no listener call).
     public void load(ItemStack template, int amount, boolean locked, boolean voidMode) {
-        this.amount = Math.clamp(amount, 0, capacity);
+        this.amount = creative && amount > 0 && !template.isEmpty() ? capacity : Math.clamp(amount, 0, capacity);
         this.locked = locked;
         this.voidMode = voidMode;
         this.template = this.amount > 0 || locked ? template.copyWithCount(template.isEmpty() ? 0 : 1) : ItemStack.EMPTY;
@@ -136,6 +157,14 @@ public class VaultStorage extends SnapshotJournal<VaultStorage.Snapshot> impleme
         if (!accepts(resource)) {
             return 0;
         }
+        if (creative) {
+            if (this.amount == 0) {
+                updateSnapshots(transaction);
+                template = resource.toStack(1);
+                this.amount = capacity;
+            }
+            return amount;
+        }
         int accepted = Math.min(amount, capacity - this.amount);
         if (accepted > 0) {
             updateSnapshots(transaction);
@@ -154,6 +183,9 @@ public class VaultStorage extends SnapshotJournal<VaultStorage.Snapshot> impleme
         TransferPreconditions.checkNonEmptyNonNegative(resource, amount);
         if (this.amount == 0 || !ItemStack.isSameItemSameComponents(template, resource.toStack(1))) {
             return 0;
+        }
+        if (creative) {
+            return amount;
         }
         int extracted = Math.min(amount, this.amount);
         updateSnapshots(transaction);

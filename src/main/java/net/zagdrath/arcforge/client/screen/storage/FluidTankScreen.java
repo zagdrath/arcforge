@@ -17,6 +17,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.CreativeTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
@@ -37,6 +38,9 @@ public class FluidTankScreen extends StorageScreen<FluidTankMenu> {
                 (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
                 () -> sendButton(MachineMenuButtons.CLEAR_SIDES))
                 .withAutoEject(menu::isAutoEject, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT)));
+        if (menu.isCreative()) {
+            tabs.add(new CreativeTab(Component.translatable("gui.arcforge.creative.fluid_hint"), () -> sendButton(MachineMenuButtons.CLEAR_CONTENTS)));
+        }
     }
 
     // Renders the fluid's still texture, tinted and tiled in 16px steps, clipped to the fill, then the gauge marks.
@@ -79,6 +83,10 @@ public class FluidTankScreen extends StorageScreen<FluidTankMenu> {
             graphics.text(font, name, TEXT_X, FLUID_Y, ArcforgeGui.TEXT, false);
         }
         graphics.text(font, Component.translatable("gui.arcforge.stored"), TEXT_X, STORED_LABEL_Y, ArcforgeGui.LABEL, false);
+        if (menu.isCreative()) {
+            graphics.text(font, Component.translatable(menu.getAmount() > 0 ? "gui.arcforge.infinite" : "gui.arcforge.creative.nothing"), TEXT_X, AMOUNT_Y, ArcforgeGui.WHITE, false);
+            return;
+        }
         graphics.text(font, Component.translatable("gui.arcforge.buckets", ArcforgeGui.buckets(menu.getAmount())), TEXT_X, AMOUNT_Y, ArcforgeGui.WHITE, false);
         graphics.text(font, Component.translatable("gui.arcforge.buckets_capacity", ArcforgeGui.buckets(menu.getCapacity())), TEXT_X, CAPACITY_Y, ArcforgeGui.LABEL, false);
     }

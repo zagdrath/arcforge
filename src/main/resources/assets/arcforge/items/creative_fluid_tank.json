@@ -1,0 +1,19 @@
+{
+  "model": {
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "arcforge:item/creative_fluid_tank"
+      },
+      {
+        "type": "minecraft:special",
+        "base": "arcforge:item/creative_fluid_tank",
+        "model": {
+          "type": "arcforge:fluid_tank_contents",
+          "capacity": 1024000
+        }
+      }
+    ]
+  }
+}

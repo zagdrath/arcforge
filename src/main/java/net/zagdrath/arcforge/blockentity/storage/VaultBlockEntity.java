@@ -91,7 +91,7 @@ public class VaultBlockEntity extends StorageBlockEntity implements SettingsCopy
         // Defaults: in from the top, sides and back, out of the bottom; the front is the player's.
         super(ModBlockEntityTypes.VAULT.get(), pos, state, ((VaultBlock) state.getBlock()).getTier(),
                 new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.NONE), 0);
-        this.storage = new VaultStorage(tier.vaultCapacity(), this::onStorageChanged);
+        this.storage = new VaultStorage(tier.vaultCapacity(), creative, this::onStorageChanged);
         this.inputView = new AutomationResourceHandler<>(storage, slot -> true, slot -> false);
         this.outputView = new AutomationResourceHandler<>(storage, slot -> false, slot -> true);
         this.automationView = new AutomationResourceHandler<>(storage, slot -> true, slot -> true);
@@ -200,6 +200,16 @@ public class VaultBlockEntity extends StorageBlockEntity implements SettingsCopy
     public void setVoidMode(boolean voidMode) {
         storage.setVoidMode(voidMode);
         updateStateFlags();
+    }
+
+    @Override
+    public boolean clearContents() {
+        if (!creative) {
+            return false;
+        }
+        storage.clear();
+        updateStateFlags();
+        return true;
     }
 
     // The front's status lights (the LOCKED and VOID block state properties) follow the settings.

@@ -39,14 +39,19 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // A Vault: bulk storage for one stackable item. Its front is for players: right-click puts in what's held,
 // right-clicking twice quickly puts in every matching item carried, left-click takes a stack (Shift: one; see
 // MachineInteractionEvents). Sneaking with an empty hand on the front, or using any other face, opens the GUI;
-// the Wrench in Configure mode on the front toggles the lock. LOCKED and VOID light the front's status lights.
+// the Wrench in Configure mode on the front toggles the lock. LOCKED and VOID light the front's status lights. On the
+// Creative Vault, sneaking with an empty hand clears it instead (see StorageBlock).
 public class VaultBlock extends StorageBlock {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LOCKED = BooleanProperty.create("locked");
     public static final BooleanProperty VOID = BooleanProperty.create("void");
 
     public VaultBlock(BlockBehaviour.Properties properties, ConduitTier tier) {
-        super(properties, tier);
+        this(properties, tier, false);
+    }
+
+    public VaultBlock(BlockBehaviour.Properties properties, ConduitTier tier, boolean creative) {
+        super(properties, tier, creative);
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(LOCKED, false).setValue(VOID, false));
     }
 

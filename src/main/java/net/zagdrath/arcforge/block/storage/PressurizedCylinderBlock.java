@@ -33,7 +33,11 @@ public class PressurizedCylinderBlock extends StorageBlock {
     private static final VoxelShape SHAPE = Shapes.or(Block.box(3, 0, 3, 13, 13, 13), Block.box(4, 13, 4, 12, 16, 12));
 
     public PressurizedCylinderBlock(BlockBehaviour.Properties properties, ConduitTier tier) {
-        super(properties, tier);
+        this(properties, tier, false);
+    }
+
+    public PressurizedCylinderBlock(BlockBehaviour.Properties properties, ConduitTier tier, boolean creative) {
+        super(properties, tier, creative);
         registerDefaultState(stateDefinition.any().setValue(LEVEL, 0));
     }
 

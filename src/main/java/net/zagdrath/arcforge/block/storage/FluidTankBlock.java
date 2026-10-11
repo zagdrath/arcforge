@@ -38,7 +38,11 @@ public class FluidTankBlock extends StorageBlock {
     private static final VoxelShape SHAPE = Block.box(3, 0, 3, 13, 16, 13);
 
     public FluidTankBlock(BlockBehaviour.Properties properties, ConduitTier tier) {
-        super(properties.lightLevel(state -> state.getValue(LIGHT)), tier);
+        this(properties, tier, false);
+    }
+
+    public FluidTankBlock(BlockBehaviour.Properties properties, ConduitTier tier, boolean creative) {
+        super(properties.lightLevel(state -> state.getValue(LIGHT)), tier, creative);
         registerDefaultState(stateDefinition.any().setValue(LIGHT, 0));
     }
 

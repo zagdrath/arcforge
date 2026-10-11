@@ -52,8 +52,12 @@ public class EnergyCellScreen extends StorageScreen<EnergyCellMenu> {
     @Override
     protected void drawInfo(GuiGraphicsExtractor graphics) {
         graphics.text(font, Component.translatable("gui.arcforge.stored"), TEXT_X, STORED_LABEL_Y, ArcforgeGui.LABEL, false);
-        graphics.text(font, Component.translatable("gui.arcforge.fe_amount", ArcforgeGui.compact(menu.getEnergy())), TEXT_X, STORED_Y, ArcforgeGui.WHITE, false);
-        graphics.text(font, Component.translatable("gui.arcforge.fe_capacity", ArcforgeGui.compact(menu.getCapacity())), TEXT_X, CAPACITY_Y, ArcforgeGui.LABEL, false);
+        if (menu.isCreative()) {
+            graphics.text(font, Component.translatable("gui.arcforge.infinite"), TEXT_X, STORED_Y, ArcforgeGui.WHITE, false);
+        } else {
+            graphics.text(font, Component.translatable("gui.arcforge.fe_amount", ArcforgeGui.compact(menu.getEnergy())), TEXT_X, STORED_Y, ArcforgeGui.WHITE, false);
+            graphics.text(font, Component.translatable("gui.arcforge.fe_capacity", ArcforgeGui.compact(menu.getCapacity())), TEXT_X, CAPACITY_Y, ArcforgeGui.LABEL, false);
+        }
         graphics.text(font, Component.translatable("gui.arcforge.fe_in", ArcforgeGui.compact(menu.getReceivedPerTick())), TEXT_X, IN_Y, IN_COLOR, false);
         graphics.text(font, Component.translatable("gui.arcforge.fe_out", ArcforgeGui.compact(menu.getExtractedPerTick())), TEXT_X, OUT_Y, OUT_COLOR, false);
     }

@@ -22,6 +22,16 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Added
+
+- **Creative storage.** A Creative Fluid Tank, Pressurized Cylinder, Energy Cell and Vault, trimmed in pink, in the
+  creative tabs. They have no recipe, and broken they drop nothing (the Wrench still picks them up).
+  - **Tank, cylinder and vault:** the first liquid, gas or item put in sets it for good. Taking from it never runs it
+    down, more of the same is destroyed, and anything else is refused.
+  - **Energy cell:** always full. It gives any FE it's asked for and destroys any FE put in.
+  - They move things with no rate limit, and their GUIs read Infinite.
+  - Sneak-use one with an empty hand, or press Clear in its GUI's new Creative tab, to empty it.
+
 ### Changed
 
 - **Bigger Steam Boiler Arrays make more steam from the same heat.** Heat per mB is multiplied by (sections ÷ 3)^-0.2:

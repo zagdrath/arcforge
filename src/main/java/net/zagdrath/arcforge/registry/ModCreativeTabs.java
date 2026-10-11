@@ -82,6 +82,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.SOLAR_THERMAL_ARRAY_CASING.get());
                 output.accept(ModItems.SOLAR_COLLECTOR.get());
                 ModItems.allStorage().forEach(item -> output.accept(item.get()));
+                output.accept(ModItems.CREATIVE_FLUID_TANK.get());
+                output.accept(ModItems.CREATIVE_PRESSURIZED_CYLINDER.get());
+                output.accept(ModItems.CREATIVE_ENERGY_CELL.get());
                 output.accept(ModItems.RESERVOIR.get());
                 output.accept(ModItems.XP_DRAIN.get());
                 output.accept(ModItems.XP_SHOWER.get());
@@ -206,6 +209,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.BATTERY_ARRAY_CASING.get());
                 ModItems.batteryParts().forEach(item -> output.accept(item.get()));
                 ModItems.allCratesAndVaults().forEach(item -> output.accept(item.get()));
+                output.accept(ModItems.CREATIVE_VAULT.get());
                 ModItems.storageUpgrades().forEach(item -> output.accept(item.get()));
             }).build());
 

@@ -13,7 +13,9 @@ and items through NeoForge's standard capabilities, so they connect to cables, p
 from any other NeoForge mod that uses FE. Other mods can also monitor and control Arcforge machines, and
 store and move its gases, through its API; see [docs/API.md](docs/API.md).
 
-Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Machines** creative tab.
+Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Machines** creative tab, along with
+the creative-only [Creative Fluid Tank, Pressurized Cylinder and Energy Cell](#creative-storage). The Creative Vault is in
+**Arcforge: Logistics**.
 
 ## Machines
 
@@ -973,6 +975,21 @@ better insulated.
   insulation pips for the tier.
 - Breaking the cell keeps its energy on the item, which lights up to show its charge. A comparator
   reads how full it is.
+
+### Creative storage
+
+Creative-only versions of the Arcforged Fluid Tank, Pressurized Cylinder, Energy Cell and Vault, trimmed in pink. They
+have no recipe, and broken they drop nothing (the Wrench still picks them up, keeping what they're set to).
+
+- **Creative Fluid Tank, Pressurized Cylinder and Vault:** the first liquid, gas or stackable item put in (any amount, by
+  hand, bucket, slot or conduit) sets it for good. Taking from it never runs it down, and more of the same is accepted and
+  destroyed, so it is both an endless source and a sink. Anything else is refused. The tank never spills when broken.
+- **Creative Energy Cell:** always full. It gives any FE it's asked for, charges items in its slot, and destroys any FE
+  put in.
+- Their faces, auto-eject and redstone control work like the Arcforged blocks', with no limit on how fast they move
+  things. Their GUIs read Infinite.
+- **Clearing:** sneak-use one with an empty hand, or press Clear in its GUI's Creative tab, to empty it ready for
+  something else.
 
 ### Portable storage
 

@@ -17,6 +17,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.block.storage.VaultBlock;
 import net.zagdrath.arcforge.blockentity.storage.VaultBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -81,6 +82,11 @@ public class VaultMenu extends AbstractContainerMenu implements SecuredMenu {
 
     public ConduitTier getTier() {
         return player.level().getBlockState(pos).getBlock() instanceof VaultBlock block ? block.getTier() : ConduitTier.WROUGHT;
+    }
+
+    // Whether it's the Creative Vault (see StorageBlock).
+    public boolean isCreative() {
+        return StorageBlock.isCreative(player.level().getBlockState(pos));
     }
 
     public int getAmount() {

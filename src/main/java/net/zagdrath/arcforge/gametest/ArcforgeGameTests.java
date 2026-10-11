@@ -89,6 +89,10 @@ public final class ArcforgeGameTests {
         TESTS.put("tank_buckets", StorageGameTests::tankBuckets);
         TESTS.put("tank_spills", StorageGameTests::tankSpills);
         TESTS.put("tank_wrench_keeps_fluid", StorageGameTests::tankWrenchKeepsFluid);
+        TESTS.put("creative_fluid_tank", CreativeStorageGameTests::fluidTank);
+        TESTS.put("creative_pressurized_cylinder", CreativeStorageGameTests::pressurizedCylinder);
+        TESTS.put("creative_energy_cell", CreativeStorageGameTests::energyCell);
+        TESTS.put("creative_vault", CreativeStorageGameTests::vault);
         TESTS.put("tanks_stack", StorageGameTests::tanksStack);
         TESTS.put("machines_drop_items", StorageGameTests::machinesDropItems);
         TESTS.put("cell_charge", StorageGameTests::cellCharge);

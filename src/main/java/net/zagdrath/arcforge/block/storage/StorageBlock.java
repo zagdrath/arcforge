@@ -9,6 +9,7 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -26,22 +27,45 @@ import net.zagdrath.arcforge.machine.interaction.WrenchableMachine;
 // Fluid tanks and energy cells. They look the same from every side, so the direction the player faced
 // when placing one is kept in the block entity and only used to name the faces in the side config.
 // Sneak-use with the wrench picks one up with its contents.
+//
+// A creative block (the Creative Vault, Energy Cell, Fluid Tank and Pressurized Cylinder) is the Arcforged block made
+// infinite: the first item or fluid put in fills it for good, taking from it never runs it down, and more of the same
+// is destroyed (a Creative Energy Cell is always full). Sneak-using one with an empty hand, or its GUI's Creative tab,
+// clears it.
 public abstract class StorageBlock extends BaseEntityBlock implements WrenchableMachine {
     private final ConduitTier tier;
+    private final boolean creative;
 
     protected StorageBlock(BlockBehaviour.Properties properties, ConduitTier tier) {
+        this(properties, tier, false);
+    }
+
+    protected StorageBlock(BlockBehaviour.Properties properties, ConduitTier tier, boolean creative) {
         super(properties);
         this.tier = tier;
+        this.creative = creative;
     }
 
     public ConduitTier getTier() {
         return tier;
     }
 
+    public boolean isCreative() {
+        return creative;
+    }
+
+    public static boolean isCreative(BlockState state) {
+        return state.getBlock() instanceof StorageBlock block && block.isCreative();
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof StorageBlockEntity storage) {
-            player.openMenu(storage, pos);
+            if (creative && player.isSecondaryUseActive() && storage.clearContents()) {
+                player.sendOverlayMessage(Component.translatable("message.arcforge.creative_storage.cleared", getName()));
+            } else {
+                player.openMenu(storage, pos);
+            }
         }
         return InteractionResult.SUCCESS;
     }

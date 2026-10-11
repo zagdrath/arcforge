@@ -867,6 +867,30 @@ public final class ModBlocks {
         }
     }
 
+    // arcforge:creative_fluid_tank, _pressurized_cylinder and _energy_cell: the Arcforged blocks made infinite (see
+    // StorageBlock). Creative only: no recipe, and broken they drop nothing (the Wrench still picks them up).
+    public static final DeferredBlock<FluidTankBlock> CREATIVE_FLUID_TANK = BLOCKS.registerBlock("creative_fluid_tank",
+            p -> new FluidTankBlock(p, ConduitTier.ARCFORGED, true),
+            p -> p.mapColor(MapColor.COLOR_MAGENTA)
+                    .strength(2.0F)
+                    .sound(TANK_SOUND)
+                    .noOcclusion()
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos, box) -> false)
+                    .isRedstoneConductor((state, level, pos) -> false));
+    public static final DeferredBlock<PressurizedCylinderBlock> CREATIVE_PRESSURIZED_CYLINDER = BLOCKS.registerBlock("creative_pressurized_cylinder",
+            p -> new PressurizedCylinderBlock(p, ConduitTier.ARCFORGED, true),
+            p -> p.mapColor(MapColor.COLOR_MAGENTA)
+                    .strength(3.0F)
+                    .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos, box) -> false)
+                    .isRedstoneConductor((state, level, pos) -> false));
+    public static final DeferredBlock<EnergyCellBlock> CREATIVE_ENERGY_CELL = BLOCKS.registerBlock("creative_energy_cell",
+            p -> new EnergyCellBlock(p, ConduitTier.ARCFORGED, true),
+            p -> p.mapColor(MapColor.COLOR_MAGENTA).strength(3.0F).sound(SoundType.METAL));
+
     private ModBlocks() {}
 
     public static String conduitName(ConduitType type, ConduitTier tier) {
@@ -1067,12 +1091,22 @@ public final class ModBlocks {
         return VAULTS.get(tier);
     }
 
+    // arcforge:creative_vault: the Arcforged Vault made infinite (see StorageBlock and CREATIVE_FLUID_TANK).
+    public static final DeferredBlock<VaultBlock> CREATIVE_VAULT = BLOCKS.registerBlock("creative_vault",
+            p -> new VaultBlock(p, ConduitTier.ARCFORGED, true),
+            p -> p.mapColor(MapColor.COLOR_MAGENTA).strength(2.5F).sound(SoundType.METAL));
+
     // Crates, then Vaults, each ordered by tier.
     public static List<DeferredBlock<? extends StorageBlock>> allCratesAndVaults() {
         List<DeferredBlock<? extends StorageBlock>> all = new ArrayList<>();
         all.addAll(CRATES.values());
         all.addAll(VAULTS.values());
         return all;
+    }
+
+    // The creative blocks: tank, cylinder, cell, then vault.
+    public static List<DeferredBlock<? extends StorageBlock>> allCreativeStorage() {
+        return List.of(CREATIVE_FLUID_TANK, CREATIVE_PRESSURIZED_CYLINDER, CREATIVE_ENERGY_CELL, CREATIVE_VAULT);
     }
 
     // Every fluid tank, then every pressurized cylinder, energy cell and heat cell, each ordered by tier.

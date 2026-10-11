@@ -33,6 +33,12 @@ public class VaultBlockItem extends StorageBlockItem {
     @Override
     public void appendHoverText(ItemStack stack, Item.TooltipContext context, TooltipDisplay display, Consumer<Component> builder, TooltipFlag flag) {
         VaultBlock vault = (VaultBlock) getBlock();
+        if (vault.isCreative()) {
+            ItemStack template = stack.getOrDefault(ModDataComponents.VAULT_CONTENTS.get(), VaultContents.EMPTY).template();
+            builder.accept((template.isEmpty() ? Component.translatable("tooltip.arcforge.creative.unset")
+                    : Component.translatable("tooltip.arcforge.creative.contents", template.getHoverName())).withStyle(ChatFormatting.LIGHT_PURPLE));
+            return;
+        }
         builder.accept(Component.translatable("tooltip.arcforge.vault.capacity", StorageCounts.grouped(vault.getTier().vaultCapacity()))
                 .withStyle(ChatFormatting.GRAY));
         VaultContents contents = stack.getOrDefault(ModDataComponents.VAULT_CONTENTS.get(), VaultContents.EMPTY);

@@ -18,6 +18,7 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.transfer.item.ResourceHandlerSlot;
+import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
@@ -133,6 +134,11 @@ public abstract class StorageMenu extends AbstractContainerMenu implements Secur
     public boolean stillValid(Player player) {
         return access.evaluate((level, pos) -> validBlock.test(level.getBlockState(pos).getBlock())
                 && player.isWithinBlockInteractionRange(pos, 4.0) && SecuredMenu.stillAllowed(player, level, pos), true);
+    }
+
+    // Whether it's a creative block (see StorageBlock), on either side.
+    public boolean isCreative() {
+        return access.evaluate((level, pos) -> StorageBlock.isCreative(level.getBlockState(pos)), false);
     }
 
     public Slot getInputSlot() {

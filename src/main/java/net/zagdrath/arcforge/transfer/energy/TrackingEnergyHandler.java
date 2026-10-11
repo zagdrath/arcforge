@@ -11,8 +11,8 @@ import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 // for showing live input/output rates. Each insert/extract is capped at the I/O rate.
 public class TrackingEnergyHandler extends SimpleEnergyHandler {
     private final Runnable onChanged;
-    private int received;
-    private int extracted;
+    protected int received;
+    protected int extracted;
 
     public TrackingEnergyHandler(int capacity, int maxTransfer, Runnable onChanged) {
         super(capacity, maxTransfer, maxTransfer);

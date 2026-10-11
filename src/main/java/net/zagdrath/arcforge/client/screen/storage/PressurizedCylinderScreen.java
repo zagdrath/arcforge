@@ -15,6 +15,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.CreativeTab;
 import net.zagdrath.arcforge.client.gui.tab.RedstoneTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
@@ -34,12 +35,16 @@ public class PressurizedCylinderScreen extends StorageScreen<PressurizedCylinder
 
     // "Hardened Cylinder": the full block name doesn't fit the panel.
     public PressurizedCylinderScreen(PressurizedCylinderMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, Component.translatable("container.arcforge.cylinder_short", menu.getTier().getDisplayName()), "pressurized_cylinder");
+        super(menu, inventory, Component.translatable("container.arcforge.cylinder_short",
+                menu.isCreative() ? Component.translatable("gui.arcforge.creative") : menu.getTier().getDisplayName()), "pressurized_cylinder");
         tabs.add(new RedstoneTab(menu::getRedstoneMode, mode -> sendButton(MachineMenuButtons.redstoneButtonId(mode))))
                 .add(new SideConfigTab(menu::getSideMode,
                         (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
                         () -> sendButton(MachineMenuButtons.CLEAR_SIDES))
                         .withAutoEject(menu::isAutoEject, () -> sendButton(MachineMenuButtons.TOGGLE_AUTO_EJECT)));
+        if (menu.isCreative()) {
+            tabs.add(new CreativeTab(Component.translatable("gui.arcforge.creative.gas_hint"), () -> sendButton(MachineMenuButtons.CLEAR_CONTENTS)));
+        }
     }
 
     @Override
@@ -65,6 +70,10 @@ public class PressurizedCylinderScreen extends StorageScreen<PressurizedCylinder
             graphics.text(font, name, TEXT_X, GAS_Y, grade != null ? grade.guiColor() : ArcforgeGui.TEXT, false);
         }
         graphics.text(font, Component.translatable("gui.arcforge.stored"), TEXT_X, STORED_LABEL_Y, ArcforgeGui.LABEL, false);
+        if (menu.isCreative()) {
+            graphics.text(font, Component.translatable(menu.getAmount() > 0 ? "gui.arcforge.infinite" : "gui.arcforge.creative.nothing"), TEXT_X, AMOUNT_Y, ArcforgeGui.WHITE, false);
+            return;
+        }
         graphics.text(font, Component.translatable("gui.arcforge.buckets", ArcforgeGui.buckets(menu.getAmount())), TEXT_X, AMOUNT_Y, ArcforgeGui.WHITE, false);
         graphics.text(font, Component.translatable("gui.arcforge.buckets_capacity", ArcforgeGui.buckets(menu.getCapacity())), TEXT_X, CAPACITY_Y, ArcforgeGui.LABEL, false);
     }

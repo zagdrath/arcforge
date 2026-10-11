@@ -40,6 +40,7 @@ import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.storage.EnergyCellMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModDataComponents;
+import net.zagdrath.arcforge.transfer.energy.CreativeEnergyHandler;
 import net.zagdrath.arcforge.transfer.energy.SidedEnergyHandler;
 import net.zagdrath.arcforge.transfer.energy.TrackingEnergyHandler;
 
@@ -62,7 +63,8 @@ public class EnergyCellBlockEntity extends StorageBlockEntity {
         // Defaults: charge from every side, discharge from the front.
         super(ModBlockEntityTypes.ENERGY_CELL.get(), pos, state, ((EnergyCellBlock) state.getBlock()).getTier(),
                 new SideConfig(SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.OUTPUT));
-        this.energy = new TrackingEnergyHandler(tier.cellCapacity(), tier.cellRate(), this::setChanged);
+        this.energy = creative ? new CreativeEnergyHandler(tier.cellCapacity(), this::setChanged)
+                : new TrackingEnergyHandler(tier.cellCapacity(), tier.cellRate(), this::setChanged);
         this.inputView = new SidedEnergyHandler(energy, true, false);
         this.outputView = new SidedEnergyHandler(energy, false, true);
         this.data = new WideIntContainerData(EnergyCellMenu.DATA_VALUES) {
@@ -128,7 +130,7 @@ public class EnergyCellBlockEntity extends StorageBlockEntity {
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        int rate = tier.cellRate();
+        int rate = rate(tier.cellRate());
         EnergyHandler discharging = itemEnergy(SLOT_IN);
         if (discharging != null) {
             EnergyHandlerUtil.move(discharging, energy, rate, null);

@@ -48,6 +48,7 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.steam.Gases;
 import net.zagdrath.arcforge.transfer.SidedResourceHandler;
+import net.zagdrath.arcforge.transfer.fluid.CreativeFluidTank;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
 // One tank of one gas (see Gases), filled and drained by Pressurized Conduits and gas machines. A gas can't
@@ -68,10 +69,11 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
         // Defaults: fill from every side, drain from the bottom.
         super(ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(), pos, state, ((PressurizedCylinderBlock) state.getBlock()).getTier(),
                 new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT));
-        this.tank = new FilteredFluidTank(tier.cylinderCapacity(), Gases::isGas, this::setChanged);
-        this.inputView = new SidedResourceHandler<>(tank, true, false, tier.cylinderRate());
-        this.outputView = new SidedResourceHandler<>(tank, false, true, tier.cylinderRate());
-        this.automationView = new SidedResourceHandler<>(tank, true, true, tier.cylinderRate());
+        this.tank = creative ? new CreativeFluidTank(tier.cylinderCapacity(), Gases::isGas, this::setChanged)
+                : new FilteredFluidTank(tier.cylinderCapacity(), Gases::isGas, this::setChanged);
+        this.inputView = new SidedResourceHandler<>(tank, true, false, rate(tier.cylinderRate()));
+        this.outputView = new SidedResourceHandler<>(tank, false, true, rate(tier.cylinderRate()));
+        this.automationView = new SidedResourceHandler<>(tank, true, true, rate(tier.cylinderRate()));
         this.data = new WideIntContainerData(PressurizedCylinderMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -166,7 +168,7 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
 
     // Pushes gas out of every output face into the block beside it, up to the tier rate in total.
     private void pushGas(ServerLevel level, BlockPos pos) {
-        int budget = tier.cylinderRate();
+        int budget = rate(tier.cylinderRate());
         for (Direction direction : Direction.values()) {
             if (budget <= 0 || tank.getAmount() <= 0) {
                 return;
@@ -193,6 +195,15 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
             comparatorSignal = signal;
             level.updateNeighbourForOutputSignal(pos, state.getBlock());
         }
+    }
+
+    @Override
+    public boolean clearContents() {
+        if (!(tank instanceof CreativeFluidTank creativeTank)) {
+            return false;
+        }
+        creativeTank.clear();
+        return true;
     }
 
     // --- Capabilities ---

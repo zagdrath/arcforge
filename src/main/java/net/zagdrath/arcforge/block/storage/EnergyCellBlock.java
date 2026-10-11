@@ -29,7 +29,11 @@ public class EnergyCellBlock extends StorageBlock {
     private static final int[] LIGHT_BY_CHARGE = { 0, 3, 5, 7, 9 };
 
     public EnergyCellBlock(BlockBehaviour.Properties properties, ConduitTier tier) {
-        super(properties.lightLevel(state -> LIGHT_BY_CHARGE[state.getValue(CHARGE)]), tier);
+        this(properties, tier, false);
+    }
+
+    public EnergyCellBlock(BlockBehaviour.Properties properties, ConduitTier tier, boolean creative) {
+        super(properties.lightLevel(state -> LIGHT_BY_CHARGE[state.getValue(CHARGE)]), tier, creative);
         registerDefaultState(stateDefinition.any().setValue(CHARGE, 0));
     }
 

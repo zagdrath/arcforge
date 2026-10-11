@@ -23,6 +23,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.conduit.ConduitConnectable;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
@@ -56,6 +57,8 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT);
 
     protected final ConduitTier tier;
+    // A creative block (see StorageBlock): its contents never run out.
+    protected final boolean creative;
     protected final SideConfig sideConfig;
     protected final FilteredItemHandler items;
     private final ResourceHandler<ItemResource> itemInput;
@@ -76,6 +79,7 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
     protected StorageBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, ConduitTier tier, SideConfig sideConfig, int slotCount) {
         super(type, pos, state);
         this.tier = tier;
+        this.creative = StorageBlock.isCreative(state);
         this.sideConfig = sideConfig;
         this.slotCount = slotCount;
         this.items = new FilteredItemHandler(slotCount, this::isItemValid, this::setChanged);
@@ -104,6 +108,21 @@ public abstract class StorageBlockEntity extends BlockEntity implements MenuProv
 
     public ConduitTier getTier() {
         return tier;
+    }
+
+    public boolean isCreative() {
+        return creative;
+    }
+
+    // Empties a creative block, ready to be set to something else; false if there's nothing to clear (other blocks, and
+    // the Creative Energy Cell, which is always full).
+    public boolean clearContents() {
+        return false;
+    }
+
+    // The most a block moves through one face, or pushes out in a tick: its tier's rate, or no limit if it's creative.
+    protected int rate(int tierRate) {
+        return creative ? Integer.MAX_VALUE : tierRate;
     }
 
     public FilteredItemHandler getItems() {

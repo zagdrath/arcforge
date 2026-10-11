@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
+import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
 import net.zagdrath.arcforge.machine.config.ConfigurableMachine;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
@@ -28,6 +29,8 @@ public final class MachineMenuButtons {
     private static final int SIDE_FIRST = 100;
     public static final int CLEAR_SIDES = 99;
     public static final int TOGGLE_AUTO_EJECT = 98;
+    // Empties a creative storage block (see StorageBlock).
+    public static final int CLEAR_CONTENTS = 97;
     // Security: SECURITY_PROFILE clears the override (follow the owner's profile), then Public, Trusted, Private.
     public static final int SECURITY_PROFILE = 300;
 
@@ -76,6 +79,15 @@ public final class MachineMenuButtons {
 
         if (buttonId == CLEAR_SIDES) {
             apply(access, ConfigurableMachine::clearSideModes);
+            return true;
+        }
+
+        if (buttonId == CLEAR_CONTENTS) {
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof StorageBlockEntity storage && storage.isCreative()) {
+                    storage.clearContents();
+                }
+            });
             return true;
         }
 

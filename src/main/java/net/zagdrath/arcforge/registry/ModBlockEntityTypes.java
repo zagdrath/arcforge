@@ -283,7 +283,7 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(ConduitBlockEntity::new, conduitBlocks(true)));
 
     public static final Supplier<BlockEntityType<FluidTankBlockEntity>> FLUID_TANK = BLOCK_ENTITY_TYPES.register("fluid_tank",
-            () -> new BlockEntityType<>(FluidTankBlockEntity::new, tierBlocks(ModBlocks::fluidTank)));
+            () -> new BlockEntityType<>(FluidTankBlockEntity::new, tierBlocks(ModBlocks::fluidTank, ModBlocks.CREATIVE_FLUID_TANK)));
 
     public static final Supplier<BlockEntityType<ReservoirBlockEntity>> RESERVOIR = BLOCK_ENTITY_TYPES.register("reservoir",
             () -> new BlockEntityType<>(ReservoirBlockEntity::new, ModBlocks.RESERVOIR.get()));
@@ -297,10 +297,10 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(ChunkLoaderBlockEntity::new, ModBlocks.CHUNK_LOADER.get()));
 
     public static final Supplier<BlockEntityType<PressurizedCylinderBlockEntity>> PRESSURIZED_CYLINDER = BLOCK_ENTITY_TYPES.register("pressurized_cylinder",
-            () -> new BlockEntityType<>(PressurizedCylinderBlockEntity::new, tierBlocks(ModBlocks::pressurizedCylinder)));
+            () -> new BlockEntityType<>(PressurizedCylinderBlockEntity::new, tierBlocks(ModBlocks::pressurizedCylinder, ModBlocks.CREATIVE_PRESSURIZED_CYLINDER)));
 
     public static final Supplier<BlockEntityType<EnergyCellBlockEntity>> ENERGY_CELL = BLOCK_ENTITY_TYPES.register("energy_cell",
-            () -> new BlockEntityType<>(EnergyCellBlockEntity::new, tierBlocks(ModBlocks::energyCell)));
+            () -> new BlockEntityType<>(EnergyCellBlockEntity::new, tierBlocks(ModBlocks::energyCell, ModBlocks.CREATIVE_ENERGY_CELL)));
 
     public static final Supplier<BlockEntityType<HeatCellBlockEntity>> HEAT_CELL = BLOCK_ENTITY_TYPES.register("heat_cell",
             () -> new BlockEntityType<>(HeatCellBlockEntity::new, tierBlocks(ModBlocks::heatCell)));
@@ -309,7 +309,7 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(CrateBlockEntity::new, tierBlocks(ModBlocks::crate)));
 
     public static final Supplier<BlockEntityType<VaultBlockEntity>> VAULT = BLOCK_ENTITY_TYPES.register("vault",
-            () -> new BlockEntityType<>(VaultBlockEntity::new, tierBlocks(ModBlocks::vault)));
+            () -> new BlockEntityType<>(VaultBlockEntity::new, tierBlocks(ModBlocks::vault, ModBlocks.CREATIVE_VAULT)));
 
     // Every Carbonizer block has one; the structure's master block runs it.
     public static final Supplier<BlockEntityType<CarbonizerBlockEntity>> CARBONIZER = BLOCK_ENTITY_TYPES.register("carbonizer",
@@ -329,6 +329,14 @@ public final class ModBlockEntityTypes {
 
     private static Block[] tierBlocks(Function<ConduitTier, DeferredBlock<? extends Block>> byTier) {
         return Arrays.stream(ConduitTier.values()).map(tier -> byTier.apply(tier).get()).toArray(Block[]::new);
+    }
+
+    // Every tier's block, then the creative one.
+    private static Block[] tierBlocks(Function<ConduitTier, DeferredBlock<? extends Block>> byTier, DeferredBlock<? extends Block> creative) {
+        Block[] tiers = tierBlocks(byTier);
+        Block[] all = Arrays.copyOf(tiers, tiers.length + 1);
+        all[tiers.length] = creative.get();
+        return all;
     }
 
     private static Block[] conduitBlocks(boolean transparent) {

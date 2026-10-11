@@ -136,6 +136,10 @@ only).
 | Tempered (copper) | `#3C1C0C #8A4822 #AE6632 #C98244 #E0A062 #F6C898` |
 | Hardened (purple) | `#1E0E36 #52307E #7042A4 #8A55C2 #A476DA #CEAAF2` |
 | Arcforged (cyan) | `#0A2A38 #1E6A88 #2E96B6 #40B6D8 #6AD2EE #B4F2FF` |
+| Creative (pink; creative-only blocks) | `#3A0A2E #882068 #B42E8C #D442AA #EC70C8 #FFB8EC` |
+
+The creative storage blocks are their Arcforged textures with every cyan tier pixel moved to the same step of the
+Creative ramp (`tools/creative_storage_gen.py`).
 
 ---
 

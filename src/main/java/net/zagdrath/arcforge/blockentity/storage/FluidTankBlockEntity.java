@@ -56,13 +56,14 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.steam.Gases;
 import net.zagdrath.arcforge.transfer.SidedResourceHandler;
+import net.zagdrath.arcforge.transfer.fluid.CreativeFluidTank;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 
 // One tank of any fluid but a gas (those go in Pressurized Cylinders). The GUI's bucket slot empties filled containers into the tank (or fills empty
 // ones from it) and moves the result to the slot below. A Canister is different: in the top slot it's
 // emptied into the tank and in the bottom slot filled from it, at the canister's rate, and stays put. The fluid is synced to clients for the block
 // entity renderer, and the tank lights up with the fluid's light level. Breaking the tank spills its
-// fluid as a source block; picking it up with the wrench keeps the fluid on the item.
+// fluid as a source block (a creative tank spills nothing); picking it up with the wrench keeps the fluid on the item.
 public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInteractable {
     private static final int SYNC_INTERVAL = 5;
 
@@ -81,10 +82,11 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
         // Defaults: fill from every side, drain from the bottom.
         super(ModBlockEntityTypes.FLUID_TANK.get(), pos, state, ((FluidTankBlock) state.getBlock()).getTier(),
                 new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT));
-        this.tank = new FilteredFluidTank(tier.tankCapacity(), resource -> !Gases.isGas(resource), this::onTankChanged);
-        this.inputView = new SidedResourceHandler<>(tank, true, false, tier.tankRate());
-        this.outputView = new SidedResourceHandler<>(tank, false, true, tier.tankRate());
-        this.automationView = new SidedResourceHandler<>(tank, true, true, tier.tankRate());
+        this.tank = creative ? new CreativeFluidTank(tier.tankCapacity(), resource -> !Gases.isGas(resource), this::onTankChanged)
+                : new FilteredFluidTank(tier.tankCapacity(), resource -> !Gases.isGas(resource), this::onTankChanged);
+        this.inputView = new SidedResourceHandler<>(tank, true, false, rate(tier.tankRate()));
+        this.outputView = new SidedResourceHandler<>(tank, false, true, rate(tier.tankRate()));
+        this.automationView = new SidedResourceHandler<>(tank, true, true, rate(tier.tankRate()));
         this.data = new WideIntContainerData(FluidTankMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -223,7 +225,7 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
     // With auto-eject on, pushes fluid out of every output face into the block beside it, up to the tier rate in total.
     // With the default sides (output on the bottom, input on top) stacked tanks drain downwards.
     private void pushFluid(ServerLevel level, BlockPos pos) {
-        int budget = tier.tankRate();
+        int budget = rate(tier.tankRate());
         for (Direction direction : Direction.values()) {
             if (budget <= 0 || tank.getAmount() <= 0) {
                 return;
@@ -274,6 +276,15 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
         };
     }
 
+    @Override
+    public boolean clearContents() {
+        if (!(tank instanceof CreativeFluidTank creativeTank)) {
+            return false;
+        }
+        creativeTank.clear();
+        return true;
+    }
+
     // Buckets clicked on the block fill or drain the tank from any face.
     @Override
     public ResourceHandler<FluidResource> getInteractionFluidHandler() {
@@ -286,7 +297,7 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
         FluidStack fluid = getFluid();
-        if (!isDismantled() && level instanceof ServerLevel serverLevel && fluid.getAmount() >= FluidType.BUCKET_VOLUME) {
+        if (!isDismantled() && !creative && level instanceof ServerLevel serverLevel && fluid.getAmount() >= FluidType.BUCKET_VOLUME) {
             FluidSpills.queue(serverLevel, pos, FluidResource.of(fluid));
         }
     }

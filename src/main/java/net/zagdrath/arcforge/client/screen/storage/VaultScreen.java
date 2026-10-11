@@ -22,6 +22,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.CreativeTab;
 import net.zagdrath.arcforge.client.gui.tab.SecurityTab;
 import net.zagdrath.arcforge.client.gui.tab.SideConfigTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTabPanel;
@@ -52,6 +53,9 @@ public class VaultScreen extends AbstractContainerScreen<VaultMenu> {
         tabs.add(new SideConfigTab(menu::getSideMode,
                 (side, action) -> sendButton(MachineMenuButtons.sideButtonId(side, action)),
                 () -> sendButton(MachineMenuButtons.CLEAR_SIDES)));
+        if (menu.isCreative()) {
+            tabs.add(new CreativeTab(Component.translatable("gui.arcforge.creative.item_hint"), () -> sendButton(MachineMenuButtons.CLEAR_CONTENTS)));
+        }
     }
 
     private void sendButton(int buttonId) {
@@ -124,8 +128,9 @@ public class VaultScreen extends AbstractContainerScreen<VaultMenu> {
         } else {
             graphics.text(font, clip(template.getHoverName().getString()), NAME_X, NAME_Y, ArcforgeGui.TEXT, false);
         }
-        graphics.text(font, Component.translatable("gui.arcforge.vault.count", StorageCounts.grouped(menu.getAmount()),
-                StorageCounts.grouped(menu.getCapacity())), NAME_X, COUNT_Y, ArcforgeGui.LABEL, false);
+        Component count = menu.isCreative() ? Component.translatable(menu.getAmount() > 0 ? "gui.arcforge.infinite" : "gui.arcforge.creative.nothing")
+                : Component.translatable("gui.arcforge.vault.count", StorageCounts.grouped(menu.getAmount()), StorageCounts.grouped(menu.getCapacity()));
+        graphics.text(font, count, NAME_X, COUNT_Y, ArcforgeGui.LABEL, false);
     }
 
     // Fits a name into the screen, ending in "…" if it's cut short.

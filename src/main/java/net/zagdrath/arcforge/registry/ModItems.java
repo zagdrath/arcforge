@@ -630,6 +630,16 @@ public final class ModItems {
         }
     }
 
+    // The creative storage blocks' items, named in the creative pink.
+    public static final DeferredItem<StorageBlockItem> CREATIVE_FLUID_TANK = ITEMS.registerItem("creative_fluid_tank",
+            p -> new StorageBlockItem(ModBlocks.CREATIVE_FLUID_TANK.get(), p), p -> p.useBlockDescriptionPrefix().rarity(Rarity.EPIC));
+    public static final DeferredItem<StorageBlockItem> CREATIVE_PRESSURIZED_CYLINDER = ITEMS.registerItem("creative_pressurized_cylinder",
+            p -> new StorageBlockItem(ModBlocks.CREATIVE_PRESSURIZED_CYLINDER.get(), p), p -> p.useBlockDescriptionPrefix().rarity(Rarity.EPIC));
+    public static final DeferredItem<StorageBlockItem> CREATIVE_ENERGY_CELL = ITEMS.registerItem("creative_energy_cell",
+            p -> new StorageBlockItem(ModBlocks.CREATIVE_ENERGY_CELL.get(), p), p -> p.useBlockDescriptionPrefix().rarity(Rarity.EPIC));
+    public static final DeferredItem<VaultBlockItem> CREATIVE_VAULT = ITEMS.registerItem("creative_vault",
+            p -> new VaultBlockItem(ModBlocks.CREATIVE_VAULT.get(), p), p -> p.useBlockDescriptionPrefix().rarity(Rarity.EPIC));
+
     // Lithium Cells then Power Regulators, by tier.
     private static final List<DeferredItem<BatteryPartItem>> BATTERY_PARTS = new ArrayList<>();
 
