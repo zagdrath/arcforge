@@ -59,6 +59,8 @@ public final class ArcforgeGameTests {
         TESTS.put("conduit_item_transfer", ConduitGameTests::itemTransfer);
         TESTS.put("conduit_fluid_transfer", ConduitGameTests::fluidTransfer);
         TESTS.put("conduit_fluid_split", ConduitGameTests::fluidSplit);
+        TESTS.put("conduit_energy_balance", ConduitGameTests::energyBalance);
+        TESTS.put("conduit_fluid_balance", ConduitGameTests::fluidBalance);
         TESTS.put("conduit_auto_connect", ConduitGameTests::autoConnect);
         TESTS.put("conduit_energy_storage", ConduitGameTests::energyStorage);
         TESTS.put("conduit_glow_extends", ConduitGameTests::glowExtends);

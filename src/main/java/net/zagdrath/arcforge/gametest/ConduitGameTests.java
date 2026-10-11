@@ -160,6 +160,89 @@ final class ConduitGameTests {
                 .thenSucceed();
     }
 
+    // Load balancing: a run of three conduits along x at z 2, with two sources on its north side (x 1 and 3) and three
+    // sinks on its south side (x 1, 2 and 3). Returns the source and sink positions.
+    private static BlockPos[][] balanceLayout(GameTestHelper helper, ConduitType type, net.minecraft.world.level.block.Block fixture) {
+        BlockPos[] sources = { new BlockPos(1, 1, 1), new BlockPos(3, 1, 1) };
+        BlockPos[] sinks = { new BlockPos(1, 1, 3), new BlockPos(2, 1, 3), new BlockPos(3, 1, 3) };
+        for (BlockPos pos : sources) {
+            TestFixtures.reset(helper.absolutePos(pos));
+            helper.setBlock(pos, fixture);
+        }
+        for (BlockPos pos : sinks) {
+            TestFixtures.reset(helper.absolutePos(pos));
+            helper.setBlock(pos, fixture);
+        }
+        for (int x = 1; x <= 3; x++) {
+            helper.setBlock(new BlockPos(x, 1, 2), ModBlocks.conduit(type, ConduitTier.WROUGHT).get());
+        }
+        for (int x = 1; x <= 3; x++) {
+            ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(new BlockPos(x, 1, 2)));
+        }
+        for (BlockPos pos : sources) {
+            setPort(helper, pos.south(), Direction.NORTH, SideSetting.OUTPUT);
+        }
+        for (BlockPos pos : sinks) {
+            setPort(helper, pos.north(), Direction.SOUTH, SideSetting.INPUT);
+        }
+        return new BlockPos[][] { sources, sinks };
+    }
+
+    private static void assertEven(GameTestHelper helper, String what, int[] amounts, int tolerance) {
+        int min = Integer.MAX_VALUE, max = Integer.MIN_VALUE;
+        for (int amount : amounts) {
+            min = Math.min(min, amount);
+            max = Math.max(max, amount);
+        }
+        helper.assertTrue(max - min <= tolerance, what + " uneven: " + java.util.Arrays.toString(amounts));
+    }
+
+    // Energy is drawn evenly from every source (not the first one until it's empty) and shared evenly among the sinks;
+    // a full sink doesn't hold back the others.
+    static void energyBalance(GameTestHelper helper) {
+        BlockPos[][] layout = balanceLayout(helper, ConduitType.ENERGY, Blocks.LODESTONE);
+        var sources = java.util.Arrays.stream(layout[0]).map(pos -> TestFixtures.energy(helper.absolutePos(pos))).toList();
+        var sinks = java.util.Arrays.stream(layout[1]).map(pos -> TestFixtures.energy(helper.absolutePos(pos))).toList();
+        sources.forEach(source -> source.set(100_000));
+        int rate = ConduitTier.WROUGHT.energyPerTick();
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(sinks.stream().mapToInt(sink -> sink.getAmountAsInt()).sum() >= 20 * rate, "Not enough moved yet"))
+                .thenExecute(() -> {
+                    assertEven(helper, "Sources drawn", sources.stream().mapToInt(source -> source.getAmountAsInt()).toArray(), 2);
+                    assertEven(helper, "Sinks fed", sinks.stream().mapToInt(sink -> sink.getAmountAsInt()).toArray(), 2);
+                    // Fill the first sink: the other two now take the whole rate between them.
+                    sinks.getFirst().set(TestFixtures.ENERGY_CAPACITY);
+                })
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    int[] before = { sinks.get(1).getAmountAsInt(), sinks.get(2).getAmountAsInt() };
+                    long start = helper.getLevel().getGameTime();
+                    helper.runAfterDelay(10, () -> {
+                        long ticks = helper.getLevel().getGameTime() - start;
+                        int gained = sinks.get(1).getAmountAsInt() - before[0] + sinks.get(2).getAmountAsInt() - before[1];
+                        helper.assertTrue(gained == rate * ticks, "With one sink full the others got " + gained + " FE in " + ticks + " ticks, not " + rate * ticks);
+                        assertEven(helper, "Open sinks fed", new int[] { sinks.get(1).getAmountAsInt(), sinks.get(2).getAmountAsInt() }, 2);
+                        helper.succeed();
+                    });
+                });
+    }
+
+    // Fluid is drawn evenly from every source tank and shared evenly among the sink tanks.
+    static void fluidBalance(GameTestHelper helper) {
+        BlockPos[][] layout = balanceLayout(helper, ConduitType.FLUID, Blocks.TARGET);
+        var sources = java.util.Arrays.stream(layout[0]).map(pos -> TestFixtures.tank(helper.absolutePos(pos))).toList();
+        var sinks = java.util.Arrays.stream(layout[1]).map(pos -> TestFixtures.tank(helper.absolutePos(pos))).toList();
+        sources.forEach(source -> source.set(0, FluidResource.of(Fluids.WATER), 8_000));
+        int rate = ConduitTier.WROUGHT.fluidPerTick();
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(sinks.stream().mapToInt(sink -> sink.getAmountAsInt(0)).sum() >= 20 * rate, "Not enough moved yet"))
+                .thenExecute(() -> {
+                    assertEven(helper, "Source tanks drawn", sources.stream().mapToInt(source -> source.getAmountAsInt(0)).toArray(), 2);
+                    assertEven(helper, "Sink tanks fed", sinks.stream().mapToInt(sink -> sink.getAmountAsInt(0)).toArray(), 2);
+                })
+                .thenSucceed();
+    }
+
     // Items travel from one chest to another; none are lost or dropped.
     static void itemTransfer(GameTestHelper helper) {
         BlockPos source = new BlockPos(0, 1, 0);

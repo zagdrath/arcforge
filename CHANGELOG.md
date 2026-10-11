@@ -34,6 +34,10 @@ itself is unchanged).
 - **The Tree Cutter takes any fertilizer.** Its fertilizer slot now accepts Compost, Wood Ash, Basic Slag, Mixed
   Fertilizer, Seed Meal, Digestate and NPK Fertilizer as well as Bone Meal. Each item grows one sapling, as one Bone
   Meal does.
+- **Energy, thermal, fluid and pressurized conduits load-balance.** They now draw evenly from every machine they pull
+  from, rather than emptying the first one before touching the next. What they push in is shared evenly among the
+  machines they feed, taking turns. When one machine is full (or empty, when pulling), its share goes to the others
+  instead of being lost for that tick. Item conduits already took turns and are unchanged.
 
 ### Fixed
 

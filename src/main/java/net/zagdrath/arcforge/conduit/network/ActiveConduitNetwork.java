@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.conduit.network;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -20,7 +21,8 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 
 // Energy and thermal networks. Each conduit holds up to one tick's worth of its tier's rate, pooled
 // across the network: output sides are pulled into the pool even when nothing wants it yet, and the
-// pool is pushed into input sides. Conduits light up while the network holds anything or it is moving.
+// pool is pushed into input sides, both shared evenly among the machines (see ConduitNetwork.shareOut). Conduits
+// light up while the network holds anything or it is moving.
 public abstract class ActiveConduitNetwork<H> extends ConduitNetwork<H> {
     // Ticks without movement before the conduits go dark (prevents flicker).
     private static final int IDLE_TICKS = 10;
@@ -99,42 +101,30 @@ public abstract class ActiveConduitNetwork<H> extends ConduitNetwork<H> {
         }
     }
 
+    // Draws up to the tier rate evenly from the sources, taken in turn (see shareOut).
     private int pull() {
-        int budget = Math.min(budget(), capacity - stored);
-        int pulled = 0;
-        for (Endpoint<H> source : sources) {
-            H handler = source.handler();
-            if (budget <= 0) {
-                break;
-            }
-            if (handler == null) {
-                continue;
-            }
-            int amount = extract(handler, budget);
-            budget -= amount;
-            pulled += amount;
-        }
+        int pulled = shareOut(handlers(sourcesInTurn()), Math.min(budget(), capacity - stored), this::extract);
         stored += pulled;
         return pulled;
     }
 
-    // Splits what's stored (up to the tier rate) evenly across sinks in round-robin order.
+    // Splits what's stored (up to the tier rate) evenly across the sinks, taken in turn (see shareOut).
     private int push() {
-        int budget = Math.min(budget(), stored);
-        int pushed = 0;
-        List<Endpoint<H>> ordered = sinksInTurn();
-        for (int i = 0; i < ordered.size() && budget > 0; i++) {
-            H handler = ordered.get(i).handler();
-            if (handler == null) {
-                continue;
-            }
-            int share = Math.ceilDiv(budget, ordered.size() - i);
-            int amount = insert(handler, share);
-            budget -= amount;
-            pushed += amount;
-        }
+        int pushed = shareOut(handlers(sinksInTurn()), Math.min(budget(), stored), this::insert);
         stored -= pushed;
         return pushed;
+    }
+
+    // The machines behind these endpoints, leaving out any that aren't there (unloaded, or broken).
+    private List<H> handlers(List<Endpoint<H>> endpoints) {
+        List<H> handlers = new ArrayList<>(endpoints.size());
+        for (Endpoint<H> endpoint : endpoints) {
+            H handler = endpoint.handler();
+            if (handler != null) {
+                handlers.add(handler);
+            }
+        }
+        return handlers;
     }
 
     // Splits the pool evenly across the conduits (the remainder goes to the first ones) so it survives

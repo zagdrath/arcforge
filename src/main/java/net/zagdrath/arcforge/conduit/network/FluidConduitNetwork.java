@@ -27,6 +27,7 @@ import net.zagdrath.arcforge.steam.Gases;
 // A shared tank of one fluid (1,000 mB per conduit). Pulls from output sides and pushes into input
 // sides, each capped at the tier's mB/t. Fluid conduits never carry gases (see GasConduitNetwork). The tank is split evenly back into the conduit block
 // entities whenever it changes, so splitting or unloading a network never creates or loses fluid.
+// Both are shared evenly among the machines (see ConduitNetwork.shareOut).
 // Conduit Filters are checked live: sources and sinks whose filter rejects the fluid are skipped. The network
 // still carries one fluid at a time, so a fluid no sink accepts stays in it until one does.
 public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidResource>> {
@@ -106,62 +107,54 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
     // Called every tick with how much was pulled in and pushed out.
     protected void onMoved(int moved, long gameTime) {}
 
+    // Draws up to the rate evenly from the sources, taken in turn (see shareOut).
     private int pull() {
-        int budget = rate;
+        return shareOut(sourcesInTurn(), Math.min(rate, capacity - amount), this::pullFrom);
+    }
+
+    // Draws up to max of the network's fluid (or, while it's empty, of whatever fluid comes first) from one source.
+    private int pullFrom(Endpoint<ResourceHandler<FluidResource>> source, int max) {
+        ResourceHandler<FluidResource> handler = source.handler();
+        if (handler == null) {
+            return 0;
+        }
         int pulled = 0;
-        for (Endpoint<ResourceHandler<FluidResource>> source : sources) {
-            ResourceHandler<FluidResource> handler = source.handler();
-            int space = Math.min(capacity - amount, budget);
-            if (handler == null || space <= 0) {
+        for (int index = 0; index < handler.size() && pulled < max; index++) {
+            FluidResource resource = handler.getResource(index);
+            if (resource.isEmpty() || !accepts.test(resource) || (!fluid.isEmpty() && !resource.equals(fluid))
+                    || !filterAllows(source, resource.getFluid(), false)) {
                 continue;
             }
-            for (int index = 0; index < handler.size() && space > 0; index++) {
-                FluidResource resource = handler.getResource(index);
-                if (resource.isEmpty() || !accepts.test(resource) || (!fluid.isEmpty() && !resource.equals(fluid))
-                        || !filterAllows(source, resource.getFluid(), false)) {
-                    continue;
-                }
-                try (Transaction tx = Transaction.openRoot()) {
-                    int extracted = handler.extract(index, resource, space, tx);
-                    tx.commit();
-                    if (extracted > 0) {
-                        fluid = resource;
-                        amount += extracted;
-                        budget -= extracted;
-                        space -= extracted;
-                        pulled += extracted;
-                    }
+            try (Transaction tx = Transaction.openRoot()) {
+                int extracted = handler.extract(index, resource, max - pulled, tx);
+                tx.commit();
+                if (extracted > 0) {
+                    fluid = resource;
+                    amount += extracted;
+                    pulled += extracted;
                 }
             }
         }
         return pulled;
     }
 
+    // Splits up to the rate evenly across the sinks, taken in turn (see shareOut). Sinks whose filter rejects the fluid
+    // are left out, so the rest share it.
     private int push() {
         if (fluid.isEmpty()) {
             return 0;
         }
-        int budget = rate;
-        int pushed = 0;
-        // Sinks whose filter rejects the fluid are left out, so the rest share it in turn.
         List<Endpoint<ResourceHandler<FluidResource>>> ordered = sinksInTurn().stream()
-                .filter(sink -> filterAllows(sink, fluid.getFluid(), true))
+                .filter(sink -> sink.handler() != null && filterAllows(sink, fluid.getFluid(), true))
                 .toList();
-        for (int i = 0; i < ordered.size() && amount > 0 && budget > 0; i++) {
-            ResourceHandler<FluidResource> handler = ordered.get(i).handler();
-            if (handler == null) {
-                continue;
-            }
-            int share = Math.ceilDiv(Math.min(amount, budget), ordered.size() - i);
+        return shareOut(ordered, Math.min(rate, amount), (sink, max) -> {
             try (Transaction tx = Transaction.openRoot()) {
-                int inserted = handler.insert(fluid, share, tx);
+                int inserted = sink.handler().insert(fluid, max, tx);
                 tx.commit();
                 amount -= inserted;
-                budget -= inserted;
-                pushed += inserted;
+                return inserted;
             }
-        }
-        return pushed;
+        });
     }
 
     // Splits the tank evenly across the conduits (the remainder goes to the first ones).

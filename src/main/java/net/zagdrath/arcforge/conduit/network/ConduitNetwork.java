@@ -8,6 +8,7 @@ package net.zagdrath.arcforge.conduit.network;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.ToIntBiFunction;
 
 import org.jspecify.annotations.Nullable;
 
@@ -33,6 +34,7 @@ public abstract class ConduitNetwork<H> {
     protected final List<Endpoint<H>> sources = new ArrayList<>();
     protected final List<Endpoint<H>> sinks = new ArrayList<>();
     private int sinkCursor;
+    private int sourceCursor;
     private int nextSink;
 
     protected ConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier, BlockCapability<H, @Nullable Direction> capability) {
@@ -98,6 +100,53 @@ public abstract class ConduitNetwork<H> {
             ordered.add(sinks.get((start + i) % count));
         }
         return ordered;
+    }
+
+    // Sources in round-robin order, starting one further along each call so no machine is always drawn from first.
+    protected List<Endpoint<H>> sourcesInTurn() {
+        int count = sources.size();
+        if (count == 0) {
+            return List.of();
+        }
+        int start = sourceCursor++ % count;
+        List<Endpoint<H>> ordered = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            ordered.add(sources.get((start + i) % count));
+        }
+        return ordered;
+    }
+
+    // Load balancing: shares up to `budget` out across the endpoints (in the order given, so callers pass them in turn)
+    // and returns how much was moved. move(endpoint, max) moves up to max and returns how much it did. Each round offers
+    // every endpoint still open an equal part of what's left (the remainder to the first ones). One that takes less than
+    // its part is done (full, or empty when pulling), and what it left is shared among the rest in the next round, so
+    // one full machine never holds back the others, nor favours the one after it.
+    protected static <E> int shareOut(List<E> endpoints, int budget, ToIntBiFunction<E, Integer> move) {
+        int moved = 0;
+        List<E> open = new ArrayList<>(endpoints);
+        while (budget > 0 && !open.isEmpty()) {
+            int each = budget / open.size();
+            int remainder = budget % open.size();
+            List<E> stillOpen = new ArrayList<>(open.size());
+            for (int i = 0; i < open.size(); i++) {
+                int share = each + (i < remainder ? 1 : 0);
+                if (share == 0) {
+                    stillOpen.add(open.get(i));
+                    continue;
+                }
+                int amount = move.applyAsInt(open.get(i), share);
+                budget -= amount;
+                moved += amount;
+                if (amount >= share) {
+                    stillOpen.add(open.get(i));
+                }
+            }
+            if (stillOpen.size() == open.size()) {
+                break;
+            }
+            open = stillOpen;
+        }
+        return moved;
     }
 
     // Whether the Conduit Filter on an endpoint's side (if any) lets this through, when the network inserts into
