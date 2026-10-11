@@ -31,6 +31,11 @@ Suggested version: **2.5.1** (patch: no gameplay changes; the API jar is renamed
   Arcforge supports builds its own. The API itself is unchanged. Releases are now tagged `vX.Y.Z+26.3` and named
   "Arcforge X.Y.Z for Minecraft 26.3", and CurseForge files "Arcforge X.Y.Z+26.3".
 
+### Fixed
+
+- **Distillation Arrays built against each other no longer merge into one connected texture.** Each 2x2 column keeps
+  its own edge beams, tray window frames and roof hatch.
+
 ## [2.5.0] - 2026-10-07
 
 ### Added

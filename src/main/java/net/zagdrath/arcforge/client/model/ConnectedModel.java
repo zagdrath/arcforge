@@ -697,7 +697,8 @@ public final class ConnectedModel {
     // faces: its display on the front, a louvred panel (the "side" texture) on the others, each with the
     // frame wherever its neighbour isn't a tray, and trays leave out their frame toward it. On a side face
     // the band's frame closes the glass only: none along the bottom (the sill does that), and the left and
-    // right run down the top BAND px, stopping at the sill.
+    // right run down the top BAND px, stopping at the sill. Arrays built against each other don't join: each
+    // column keeps its own beams, frames and roof hatch (see sameColumn).
     private static final class ColumnBaked implements DynamicBlockStateModel {
         private final boolean tray;
         private final Material.Baked particle;
@@ -791,6 +792,35 @@ public final class ConnectedModel {
             return DistillationStructure.isFormedPart(state);
         }
 
+        // How far partner looks back along a row of formed parts (as far as shellAt walks across panes).
+        private static final int ROW = 16;
+
+        // The side, on a horizontal axis, of the block pos pairs with in its column. Columns are exactly 2 across and
+        // never overlap, so along a row of formed parts (arrays side by side) the parts pair off from the row's start.
+        private static Direction partner(BlockAndTintGetter level, BlockPos pos, Direction.Axis axis) {
+            Direction back = Direction.fromAxisAndDirection(axis, Direction.AxisDirection.NEGATIVE);
+            BlockPos.MutableBlockPos at = pos.mutable();
+            int behind = 0;
+            while (behind < ROW && isPart(level.getBlockState(at.move(back)))) {
+                behind++;
+            }
+            return behind % 2 == 0 ? back.getOpposite() : back;
+        }
+
+        // Whether the block beside pos that way is part of the same column, not of an array built against it. Above or
+        // below, a formed part is in the same column if it pairs the same way (a column can't form on top of another).
+        private static boolean sameColumn(BlockAndTintGetter level, BlockPos pos, Direction direction) {
+            BlockPos other = pos.relative(direction);
+            if (!isPart(level.getBlockState(other))) {
+                return false;
+            }
+            if (direction.getAxis().isHorizontal()) {
+                return partner(level, pos, direction.getAxis()) == direction;
+            }
+            return partner(level, pos, Direction.Axis.X) == partner(level, other, Direction.Axis.X)
+                    && partner(level, pos, Direction.Axis.Z) == partner(level, other, Direction.Axis.Z);
+        }
+
         // The glass band's frame on one side of a face. On a side face it closes the glass only: nothing along
         // the bottom (the sill closes it), and the left and right frames cover just the top BAND px, so they
         // stop at the sill instead of running down over it and the strap. The top and bottom faces keep a
@@ -840,8 +870,8 @@ public final class ConnectedModel {
                 if (banded != null) {
                     faceQuads.addAll(banded);
                     for (Side side : Side.values()) {
-                        BlockState neighbour = level.getBlockState(pos.relative(Baked.sideDirection(face, side)));
-                        if (formed && !isTray(neighbour, face)) {
+                        Direction toward = Baked.sideDirection(face, side);
+                        if (formed && !(isTray(level.getBlockState(pos.relative(toward)), face) && sameColumn(level, pos, toward))) {
                             faceQuads.addAll(frontFrame.get(face)[side.ordinal()]);
                         }
                     }
@@ -849,15 +879,16 @@ public final class ConnectedModel {
                     faceQuads.forEach(quad -> quads.addCulledFace(face, quad));
                     continue;
                 } else if (face == Direction.UP && !tray && formed) {
-                    int east = isPart(level.getBlockState(pos.west())) ? 1 : 0;
-                    int south = isPart(level.getBlockState(pos.north())) ? 1 : 0;
+                    int east = partner(level, pos, Direction.Axis.X) == Direction.WEST ? 1 : 0;
+                    int south = partner(level, pos, Direction.Axis.Z) == Direction.NORTH ? 1 : 0;
                     faceQuads.addAll(roof[east][south]);
                 } else {
                     faceQuads.addAll(base.get(face));
                 }
                 for (Side side : Side.values()) {
-                    BlockState neighbour = level.getBlockState(pos.relative(Baked.sideDirection(face, side)));
-                    if (formed && (tray ? !isTray(neighbour, face) : !isPart(neighbour))) {
+                    Direction toward = Baked.sideDirection(face, side);
+                    boolean joined = sameColumn(level, pos, toward) && (!tray || isTray(level.getBlockState(pos.relative(toward)), face));
+                    if (formed && !joined) {
                         faceQuads.addAll(edges.get(face)[side.ordinal()]);
                     }
                 }
