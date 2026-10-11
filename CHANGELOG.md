@@ -42,6 +42,8 @@ itself is unchanged).
 - **Dyed conduits no longer join a differently coloured conduit for a moment when placed.** A new conduit took its
   colour only after it was in the world, so for an instant it joined any neighbour, and items or fluid briefly
   moved between the two colours before they split. This affected every conduit type.
+- **Long statuses no longer run into the output slot's frame** ("Output full", for example) in the Gasifier, Hydrothermal
+  Carbonizer, Diamond Press, Grain Dryer and Vulcanizer. The status line sits 2px lower, as it does in the Fiberizer.
 
 ## [2.5.0] - 2026-10-07
 

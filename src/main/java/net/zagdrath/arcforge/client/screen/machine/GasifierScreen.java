@@ -28,8 +28,8 @@ public class GasifierScreen extends MachineScreen<GasifierMenu> {
     private static final int BUFFER_X = 157, BUFFER_Y = 19;
     private static final int STEAM_X = 25, SYNGAS_X = 139, TANK_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int PROGRESS_X = 68, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
-    private static final int LED_X = 43, LED_Y = 54;
-    private static final int STATUS_X = 51, STATUS_Y = 54, STATUS_W = 84;
+    private static final int LED_X = 43, LED_Y = 56;
+    private static final int STATUS_X = 51, STATUS_Y = 56, STATUS_W = 84;
     private static final int HEAT_X = 43, HEAT_Y = 66, HEAT_W = 92;
     private static final int TICK_Y = 63, TICK_W = 3, TICK_H = 7;
 

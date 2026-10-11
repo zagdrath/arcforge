@@ -29,8 +29,8 @@ public class GrainDryerScreen extends MachineScreen<GrainDryerMenu> {
     private static final int TANK_X = 25, TANK_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int PROGRESS_X = 68, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
     // Two rows higher than the Fiberizer's: the 60°C tick sits under the start of the status text.
-    private static final int LED_X = 43, LED_Y = 54;
-    private static final int STATUS_X = 51, STATUS_Y = 54, STATUS_W = 96;
+    private static final int LED_X = 43, LED_Y = 56;
+    private static final int STATUS_X = 51, STATUS_Y = 56, STATUS_W = 96;
     private static final int HEAT_X = 43, HEAT_Y = 66, HEAT_W = 105;
     private static final int TICK_Y = 63, TICK_W = 3, TICK_H = 7;
 
