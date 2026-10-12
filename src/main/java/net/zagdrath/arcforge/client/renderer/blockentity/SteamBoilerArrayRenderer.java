@@ -11,7 +11,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -27,7 +26,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.Arcforge;
@@ -48,7 +46,7 @@ import java.util.Set;
 // behind the windows; see TiledBoxes.lining): an opaque dark drum just inside the walls, then water rising from the floor
 // (a full tank fills the lower 65%), and steam gathering under the roof and filling the space above the
 // water as it builds up, thicker the more there is. Levels ease toward the synced ones.
-public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoilerArrayBlockEntity, SteamBoilerArrayRenderer.State> {
+public class SteamBoilerArrayRenderer implements ShellMultiblockRenderer<SteamBoilerArrayBlockEntity, SteamBoilerArrayRenderer.State> {
     // Lining, then the water and steam, then the drum: each a little further in, so no two share a plane.
     static final float LINER_INSET = 1.0F / 16.0F;
     private static final float VOLUME_INSET = 1.5F / 16.0F, DRUM_INSET = 2.0F / 16.0F;
@@ -85,7 +83,7 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
     @Override
     public void extractRenderState(SteamBoilerArrayBlockEntity boiler, State state, float partialTicks, Vec3 cameraPosition,
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(boiler, state, partialTicks, cameraPosition, breakProgress);
+        ShellMultiblockRenderer.super.extractRenderState(boiler, state, partialTicks, cameraPosition, breakProgress);
         ShellStructure.Shell shell = boiler.getShell();
         state.formed = boiler.isMaster() && shell != null;
         if (!state.formed) {
@@ -213,11 +211,5 @@ public class SteamBoilerArrayRenderer implements BlockEntityRenderer<SteamBoiler
             TiledBoxes.box(pose, buffer, water, state.waterColor, state.light, x0, y0, z0, x1, waterTop, z1, false);
             TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light, x0, steamFloor, z0, x1, y1, z1, false, steamSkip);
         });
-    }
-
-    // The whole structure, so it isn't culled when the master corner is off screen.
-    @Override
-    public AABB getRenderBoundingBox(SteamBoilerArrayBlockEntity boiler) {
-        return boiler.getRenderBox();
     }
 }

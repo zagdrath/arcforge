@@ -17,7 +17,6 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -48,7 +47,7 @@ import net.zagdrath.arcforge.multiblock.ShellStructure;
 // The compressor narrows toward the combustor and the turbine widens toward the exhaust, and neighbouring stages
 // are offset by half a blade. The rotor turns at up to 60° a tick (see GasTurbineArrayBlockEntity.advanceAngle).
 // The intake and exhaust caps are drawn over the two end faces.
-public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineArrayBlockEntity, GasTurbineArrayRenderer.State> {
+public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbineArrayBlockEntity, GasTurbineArrayRenderer.State> {
     public static final StandaloneModelKey<QuadCollection> SHAFT = key("gas_turbine_rotor_shaft");
     public static final StandaloneModelKey<QuadCollection> COMPRESSOR_BLADE = key("gas_turbine_compressor_blade");
     public static final StandaloneModelKey<QuadCollection> TURBINE_BLADE = key("gas_turbine_turbine_blade");
@@ -148,7 +147,7 @@ public class GasTurbineArrayRenderer implements BlockEntityRenderer<GasTurbineAr
     @Override
     public void extractRenderState(GasTurbineArrayBlockEntity turbine, State state, float partialTicks, Vec3 cameraPosition,
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(turbine, state, partialTicks, cameraPosition, breakProgress);
+        ShellMultiblockRenderer.super.extractRenderState(turbine, state, partialTicks, cameraPosition, breakProgress);
         ShellStructure.Shell shell = turbine.getShell();
         state.formed = turbine.isMaster() && shell != null;
         if (!state.formed) {

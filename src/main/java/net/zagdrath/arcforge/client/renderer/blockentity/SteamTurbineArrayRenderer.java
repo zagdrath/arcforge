@@ -16,7 +16,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
@@ -30,7 +29,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
@@ -47,7 +45,7 @@ import net.zagdrath.arcforge.steam.TurbineLayout;
 // built once and again when the ports change (checked every second); the rotor (shaft, couplings and the blades seen
 // through each casing's windows) is built each frame at the rotor's angle, so the spin-up and coast-down show on it.
 // The rotor turns at up to 36° a tick (see SteamTurbineArrayBlockEntity.advanceAngle).
-public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
+public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
     public static final Identifier SHEET = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/turbine");
     // How often (ticks) the ports are looked at again.
     private static final int PORT_SCAN_INTERVAL = 20;
@@ -96,7 +94,7 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
     @Override
     public void extractRenderState(SteamTurbineArrayBlockEntity turbine, State state, float partialTicks, Vec3 cameraPosition,
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(turbine, state, partialTicks, cameraPosition, breakProgress);
+        ShellMultiblockRenderer.super.extractRenderState(turbine, state, partialTicks, cameraPosition, breakProgress);
         ShellStructure.Shell shell = turbine.getShell();
         Level level = turbine.getLevel();
         state.formed = turbine.isMaster() && shell != null && level != null;
@@ -183,11 +181,5 @@ public class SteamTurbineArrayRenderer implements BlockEntityRenderer<SteamTurbi
                     .setLight(light)
                     .setNormal(pose, data[i + 5], data[i + 6], data[i + 7]);
         }
-    }
-
-    // The whole structure, so it isn't culled when the master corner is off screen.
-    @Override
-    public AABB getRenderBoundingBox(SteamTurbineArrayBlockEntity turbine) {
-        return turbine.getRenderBox();
     }
 }

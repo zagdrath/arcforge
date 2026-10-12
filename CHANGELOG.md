@@ -44,6 +44,12 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
   every tick, and skip it altogether on Ignore. An idle Condenser Array with no water doesn't look for somewhere to push
   it.
 
+### Fixed
+
+- **The Steam Turbine, Steam Boiler and Gas Turbine Arrays' models no longer vanish at some angles.** They were only
+  drawn while the chunk section holding the structure's corner block was visible; now they're drawn whenever any part
+  of the structure is in view, and their draw distance counts from the nearest part of the structure.
+
 ## [2.6.0] - 2026-10-11
 
 ### Added
