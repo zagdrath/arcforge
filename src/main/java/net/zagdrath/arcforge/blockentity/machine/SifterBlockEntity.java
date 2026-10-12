@@ -94,7 +94,7 @@ public class SifterBlockEntity extends MachineBlockEntity {
                     case SifterMenu.DATA_TOTAL -> total;
                     case SifterMenu.DATA_STATUS -> status.ordinal();
                     case SifterMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case SifterMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case SifterMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

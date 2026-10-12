@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "SIS",
+    "HXH",
+    "SIS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "I": "#c:gems/iolite",
+    "H": "arcforge:hardened_alloy",
+    "X": "arcforge:link_conduit"
+  },
+  "result": {
+    "id": "arcforge:wired_machine_link",
+    "count": 1
+  }
+}

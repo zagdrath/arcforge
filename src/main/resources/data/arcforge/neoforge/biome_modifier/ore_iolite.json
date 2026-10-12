@@ -1,0 +1,14 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": [
+    "minecraft:the_end"
+  ],
+  "features": "arcforge:ore_iolite",
+  "step": "underground_ores",
+  "neoforge:conditions": [
+    {
+      "type": "arcforge:ore_enabled",
+      "ore": "iolite"
+    }
+  ]
+}

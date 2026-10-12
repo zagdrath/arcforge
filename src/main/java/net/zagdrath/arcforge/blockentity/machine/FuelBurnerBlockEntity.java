@@ -115,7 +115,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
                     case FuelBurnerMenu.DATA_BURN_RATE -> (int) Math.round(burnedPerTick * 1_000.0);
                     case FuelBurnerMenu.DATA_STATUS -> status.ordinal();
                     case FuelBurnerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case FuelBurnerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case FuelBurnerMenu.DATA_SIDE_CONFIG -> packedSides();
                     case FuelBurnerMenu.DATA_OXYGEN -> oxy.getTank().getAmount();
                     case FuelBurnerMenu.DATA_OXYGEN_CAPACITY -> oxy.getTank().getCapacity();
                     case FuelBurnerMenu.DATA_OXY_ACTIVE -> oxy.isActive() ? 1 : 0;

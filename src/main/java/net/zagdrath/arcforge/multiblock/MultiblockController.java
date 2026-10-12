@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.machine.config.ConfigurableMachine;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.link.LinkableMachine;
 
 // The block entity that runs a formed multiblock (the Carbonizer's master block, the Arcforge Furnace's
 // port). The structure does IO only through its ports (see MultiblockPorts): each port block exposes its
@@ -76,6 +77,17 @@ public interface MultiblockController extends ConfigurableMachine {
     // The mode of the port on `side` of the block at pos, if that faces out of the structure; null if that
     // face isn't a port, faces into the structure, or the block can't hold ports.
     default @Nullable SideMode faceMode(BlockPos pos, Direction side) {
+        // A Wired Machine Link asking for a mode's handler (see LinkableMachine.withForcedMode); the face a Link Conduit
+        // is on, which exposes nothing and keeps its own port underneath.
+        if (this instanceof LinkableMachine machine) {
+            SideMode forced = machine.forcedLinkMode();
+            if (forced != null) {
+                return forced == SideMode.NONE ? null : forced;
+            }
+            if (machine.isLinkFace(pos, side)) {
+                return SideMode.MACHINE_LINK;
+            }
+        }
         Level level = getLevel();
         if (level == null || isInside(pos.relative(side))) {
             return null;

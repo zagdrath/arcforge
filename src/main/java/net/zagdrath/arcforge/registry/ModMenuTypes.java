@@ -14,6 +14,7 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.menu.logistics.ChunkLoaderMenu;
 import net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu;
+import net.zagdrath.arcforge.menu.logistics.WiredMachineLinkMenu;
 import net.zagdrath.arcforge.menu.machine.AirSeparatorMenu;
 import net.zagdrath.arcforge.menu.machine.HaberReactorMenu;
 import net.zagdrath.arcforge.menu.multiblock.BiogasDigesterMenu;
@@ -114,6 +115,8 @@ public final class ModMenuTypes {
             () -> IMenuTypeExtension.create(QuantumTunnelMenu::new));
     public static final Supplier<MenuType<ChunkLoaderMenu>> CHUNK_LOADER = MENU_TYPES.register("chunk_loader",
             () -> IMenuTypeExtension.create(ChunkLoaderMenu::new));
+    public static final Supplier<MenuType<WiredMachineLinkMenu>> WIRED_MACHINE_LINK = MENU_TYPES.register("wired_machine_link",
+            () -> IMenuTypeExtension.create(WiredMachineLinkMenu::new));
 
     public static final Supplier<MenuType<ArcMelterMenu>> ARC_MELTER = MENU_TYPES.register("arc_melter",
             () -> IMenuTypeExtension.create(ArcMelterMenu::new));

@@ -93,7 +93,7 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
                     case WaterIntakeMenu.DATA_OPEN_WATER -> openWater ? 1 : 0;
                     case WaterIntakeMenu.DATA_STATUS -> status.ordinal();
                     case WaterIntakeMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case WaterIntakeMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case WaterIntakeMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

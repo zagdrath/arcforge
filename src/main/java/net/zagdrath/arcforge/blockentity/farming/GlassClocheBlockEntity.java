@@ -56,6 +56,9 @@ public class GlassClocheBlockEntity extends ClocheBlockEntity {
     // Fixed faces: the bottom gives the harvest, the rest take everything in.
     @Override
     protected @Nullable SideMode modeFor(@Nullable Direction side) {
+        if (side != null && forcedLinkMode() != null) {
+            return forcedLinkMode();
+        }
         return side == null ? null : side == Direction.DOWN ? SideMode.OUTPUT : SideMode.INPUT;
     }
 

@@ -137,7 +137,7 @@ public class BatteryArrayBlockEntity extends MachineBlockEntity implements Multi
                     case BatteryArrayMenu.DATA_FORMED -> box != null ? 1 : 0;
                     case BatteryArrayMenu.DATA_STATUS -> status.ordinal();
                     case BatteryArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case BatteryArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case BatteryArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

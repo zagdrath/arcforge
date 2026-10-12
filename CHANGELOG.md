@@ -24,6 +24,30 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Added
 
+- **Iolite.** A new ore, found only in the End, in End Stone: a little on the main island and more on the outer
+  islands, Y 0 to 80. It needs an iron pickaxe and drops Iolite Crystals (Fortune works; Silk Touch drops the ore). There
+  is a Block of Iolite (9 crystals) and Iolite Dust (the Arc Crusher gives 2 per ore, the Arc Crushing Array 4, and a
+  crystal crushes to 1); dust and ore smelt back into a crystal. Tags `c:gems/iolite`, `c:ores/iolite`, `c:dusts/iolite`,
+  `c:storage_blocks/iolite` and `c:ores_in_ground/end_stone`. Advancement "Edge of the World".
+- **Link Conduit.** A thin cable with an Iolite core (Iolite Crystal, copper and Plastic Sheet, 8 at a time) that links
+  one machine or multiblock to one Wired Machine Link, through up to 64 blocks of cable. It carries nothing itself,
+  never branches and joins no other conduits; its core glows purple while the link is live.
+  - The face it plugs into (any face of a single machine, any outer face of a formed multiblock) becomes a **Wired
+    Machine Link port**: purple, locked, and shown as "Wired Machine Link" in the machine's Sides or Ports tab and in
+    Jade. The GUI, the Wrench, Settings Cards and the machine control API leave it alone while the cable is there, and
+    taking the cable off gives the face back the mode it had.
+  - A machine takes one Wired Machine Link.
+- **Wired Machine Link.** A casing with Iolite accents and a status screen (Hardened Alloy, Iolite Crystals, steel
+  plates and a Link Conduit) that works as a remote set of the linked machine's ports.
+  - Each face other than the cable's can be set to any port mode the machine has, and works exactly as that port would
+    on the machine: items, fluids, gases, FE and heat go straight to and from the machine's own inventories, tanks and
+    buffers, with no limit of its own. Conduits connect to it as they would to the machine. Output faces push with the
+    machine's auto-eject, and Energy and Heat faces give out what the machine gives out.
+  - Its GUI shows the machine it's linked to (for example "Steam Boiler Array 7×9×12"), the face the cable is on, the
+    cable's length, and a face grid like the Sides tab. A broken or overlong cable, a cable to nothing, a machine that
+    already has a link, or one whose owner hasn't let you use it shows "Not linked" and why.
+  - Jade shows the linked machine and each face's mode, and on the machine, its link port. Handbook entry, JEI
+    information, and the advancement "Long Arm" (new trigger `arcforge:machine_linked`).
 - **Industrial Water Intake.** A 3×3×3 multiblock pump house that stands in a body of at least 400 connected water
   sources and pumps 8,000 mB/t of water (×1.25 in rivers and oceans) for 0.25 FE per mB, enough for a full-size Steam
   Boiler Array. Its Output ports push as fast as it pumps, so they can feed a boiler's water port directly. It has its
@@ -104,6 +128,10 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Upgrading
 
+- **New config keys**: `world.ores.iolite`, `world.ores.ioliteOuter` and `logistics.machineLink.maxCableLength` get
+  their defaults. Iolite generates only in End chunks generated after the update.
+- **Machine control API:** a face a Link Conduit is plugged into reads `"machine_link"` through `sideMode` and
+  `ports()`, and can't be set while the cable is there (`REJECTED`). See docs/API.md.
 - **New config keys**: `power.energyConduits` and `power.energyCells` (per tier) and the `power.steam.waterIntake`
   section get their defaults. The Condenser Array's new defaults (`power.steam.condenserArray.baseRatePerCube` 400,
   `maxRatePerCube` 800) and the Energy Meter's `logistics.meters.energyRateCap` (now 262,144) only apply to new configs:

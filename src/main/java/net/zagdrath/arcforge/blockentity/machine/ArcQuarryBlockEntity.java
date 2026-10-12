@@ -162,7 +162,7 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
                     case ArcQuarryMenu.DATA_SCAN_PERCENT -> scanPercent();
                     case ArcQuarryMenu.DATA_STATUS -> status.ordinal();
                     case ArcQuarryMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ArcQuarryMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ArcQuarryMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

@@ -168,6 +168,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(LogisticsProviders.Experience.INSTANCE, VacuumCollectorBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.QuantumTunnel.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.ChunkLoader.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity.class);
+        // The machine end of a Wired Machine Link (any block of a linked machine or multiblock).
+        registration.registerBlockDataProvider(MachineLinkProviders.Port.INSTANCE, Block.class);
     }
 
     @Override
@@ -268,6 +270,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(LogisticsProviders.Experience.Client.INSTANCE, VacuumCollectorBlock.class);
         registration.registerBlockComponent(LogisticsProviders.QuantumTunnel.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.QuantumTunnelBlock.class);
         registration.registerBlockComponent(LogisticsProviders.ChunkLoader.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.ChunkLoaderBlock.class);
+        registration.registerBlockComponent(MachineLinkProviders.Link.INSTANCE, net.zagdrath.arcforge.block.logistics.WiredMachineLinkBlock.class);
+        registration.registerBlockComponent(MachineLinkProviders.Port.Client.INSTANCE, Block.class);
         registration.registerEnergyStorageClient(ConduitProviders.Energy.INSTANCE);
         registration.registerFluidStorageClient(ConduitProviders.Fluid.INSTANCE);
         registration.registerItemStorageClient(ConduitProviders.Items.INSTANCE);

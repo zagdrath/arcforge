@@ -180,7 +180,7 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
                     case ThermalEvaporatorMenu.DATA_BYPRODUCT_CAPACITY -> byproduct.getCapacity();
                     case ThermalEvaporatorMenu.DATA_STATUS -> status.ordinal();
                     case ThermalEvaporatorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ThermalEvaporatorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ThermalEvaporatorMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

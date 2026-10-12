@@ -132,6 +132,7 @@ only).
 | Heat (hot orange): heat ports, flames, hot thermal conduit cores | `#FFB02E`, `#F26A16`, `#C73A0E`, `#7A1B0A` |
 | Input (blue) | `#7FB3F0`, `#4A8FE0`, `#3A76C0`, `#22497E` |
 | Status LED / arc (cyan) | `#B8F2EA`, `#5FD4C4`, `#2F6E68` |
+| Link (purple, from the Iolite ramp): the Wired Machine Link port, the Link Conduit core, Wired Machine Link accents | `#636CD0`, `#4A3CB4`, `#3C298A`, `#2E1660` (glow highlight `#7C9CEC`, unlit glass `#1E0E3E`) |
 | Hazard stripe | `#E0B020` / `#1A1A1A` |
 | Furnace brick (firebox and furnace interiors) | `#553F34`, `#3A2C23`, `#2B211B` |
 
@@ -232,6 +233,7 @@ The controller is a screen pane inside that band, not a boxed bezel.
     - orange = out;
     - red = FE;
     - hot orange = heat (the Heat row);
+    - purple = the Wired Machine Link (the Link row);
   - a dark bore;
   - a resource-colour chip.
   Everything outside the collar is transparent.
@@ -256,6 +258,12 @@ The controller is a screen pane inside that band, not a boxed bezel.
 - **3D machine models:** the 8×8 plate is centred on the face. When the body is inset, the port sits
   on an 8×8 socket that reaches the block edge, so a conduit meets it flush (Electric Pump back).
 - **Storage blocks** (tanks, cylinders, crates, vaults, cells) get no port overlays.
+- **Wired Machine Link port (`block/port/machine_link`):** the 10×10 plate (the Energy plate's layout) with the Link row:
+  ring `#636CD0` lit / `#2E1660` dark, chip `#4A3CB4` round a `#2E1660` centre, and one `#7C9CEC` Iolite glint on the
+  chip's lit corner. It is never set with the Wrench: it marks the face a Link Conduit is attached to. The cable carries it
+  as the plate at its plugged end (raised 1.5 px off the machine's face, so it covers the port under it), and a Wired
+  Machine Link shows it on its own cable face. Ports-tab / Sides-tab icon `face_machine_link`: the Link row as a face
+  tile (`#636CD0` lit, `#2E1660` dark, `#4A3CB4` fill) with a `#1E0E3E` padlock (it's locked), its keyhole `#7C9CEC`.
 
 ### Conduits
 
@@ -345,6 +353,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - Sources: silverish → silver and arcite; cream → nickel and tungsten (wolframite); green → fluorite
     (alternate clusters purple and green) and spodumene (mint); iridescent → bismuth (rainbow ramp); cream → halite
     (pinkish rock salt).
+  - Iolite (the End's ore): cream → iolite, on **End Stone**: its grey bevels go to End Stone shadow tones
+    (`#9C9D68 #AAAC73 #B8BA7D #C6C888` for source greys 83/93/102/114), as the Nether Sulfur ore's go to netherrack's.
   - Use the same method for any future ore.
 - **Raw items:** Cody's own raw item textures, recoloured per ore by brightness onto the ore's 7-tone ramp,
   keeping every pixel and his outline shading.
@@ -357,7 +367,11 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   future raw block.
 - **Crystals and crystal blocks:** Cody's own crystal item and crystal block textures, recoloured per ore by
   brightness onto the ore's 7-tone ramp. Fluorite is purple with a green crystal / green patches; arcite is
-  cyan. Use the same method for any future crystal.
+  cyan. Use the same method for any future crystal block.
+  - **Iolite Crystal** has its own shape (Cody's pick, after reference art): one long faceted shard leaning to the top
+    left out of a chunky, clustered base, with a shorter point to the right and a stub on the left. Flat facets in the
+    Iolite tones: the facet facing the top left lit, a pale ridge up each point, the facet facing the bottom right
+    shadowed, the darkest tone as the outline. Block of Iolite and Iolite Dust use the usual crystal block and dust.
 - **Metal storage blocks:** Cody's own block textures, recoloured per metal, then SMOOTHED.
   - Smoothing: blur the interior brightness (3×3, or horizontal-only for the banded texture), then flatten
     it to 4 tones. The 2 px frame and the corner rivets are kept from the source.
@@ -374,6 +388,9 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - Bismuth rainbow (blue, magenta, gold, cyan) on the ore/raw; bismuth metal pink-silver
     `#6E5E70 → #FFF4FA`.
   - Arcite `#1B6E8C → #E8FCFF`.
+  - Iolite: deep violet through indigo to a pale icy blue, `#2E1660 #4A3CB4 #7C9CEC #E2F2FF` (7 tones
+    `#1E0E3E #2E1660 #3C298A #4A3CB4 #636CD0 #7C9CEC #E2F2FF`), so it reads as an End material and apart from
+    Arcite's cyan and Fluorite's purple.
 - **Ingots:** Cody's reference ingot shape (exact 16×16, 8 light levels, tonal outline) for every ingot,
   including steel.
 - **Coal Coke:** his reference lump shape, in its light grey.
@@ -1074,3 +1091,23 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   fixed pitch, a `#3A76C0` right column, and a lit status lamp beside it.
 - **GUI** (`gui/container/water_intake.png`): the Condenser Array's frame with the Electric Pump's 10-wide FE gauge on
   the left; its sprites are the Electric Pump's.
+
+## Wired Machine Link and Link Conduit
+- **Link Conduit** (`block/link_conduit/*`, multipart `link_conduit`): a thin 4×4 cable. A centre node (a 4×4 bevelled steel
+  clamp: `#727982` top/left, `#474C53` face, `#16181B` bottom/right), an arm per joined side, and at a plugged end the
+  Wired Machine Link port plate (10×10, 1.5 px thick, `#575D65` / `#2B2F34` / `#383C42` edges). The jacket (`jacket`, along the
+  cable) is a `#727982` lit row, a 2 px slot open onto the core, and a `#2B2F34` dark row, with a steel clamp band
+  (`#959DA6` / `#575D65` / `#383C42` / `#16181B`) every 8 px. The Iolite core (a 3×3 element inside) shows through the slot:
+  unlit `#3C298A` / `#2E1660` / `#1E0E3E`; while the link is live (`arm_on`) `#4A3CB4` / `#7C9CEC` / `#3C298A` and emissive.
+  Arms point north and are turned by the blockstate (y for sides, x 270 up, x 90 down).
+- **Wired Machine Link** (`block/wired_machine_link/*`, models `wired_machine_link` / `_on`, `arcforge:ported`): the machine
+  casing (split face, bevel, four rivets) with a Link-row Iolite inlay at the middle of each edge (`#636CD0` over
+  `#4A3CB4` top and left, `#3C298A` over `#2E1660` bottom and right), outside the 10×10 port plate, so a set face shows
+  the usual port plate for its mode in the middle. The front has a status screen: an 8×6 recess (deepest top/left lip,
+  lit bottom/right lip) at x4–11, y4–9; off, `#1E0E3E` glass with a `#2E1660` line; linked, `#3C298A` glass, a `#4A3CB4`
+  top row and a flat `#7C9CEC` pulse line, emissive (`screen_on`). A port set on the front draws over the screen.
+- **GUI** (`gui/container/wired_machine_link.png`, 176×126): the house frame, one screen recess (7,17)-(168,60) for the
+  read-out (machine name, cable face and length, status LED and line), and below it the face grid drawn from the
+  `face_<mode>` icons in the Sides tab's cross, with a wrapped hint to its right.
+- **Iolite** (`block/ore/iolite_ore`, `block/iolite_block`, `item/iolite_crystal`, `item/iolite_dust`): see Natural
+  materials (the ore on End Stone, the crystal's own shape).

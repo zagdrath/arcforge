@@ -49,7 +49,11 @@ public enum SideMode implements StringRepresentable {
     ENERGY_INPUT("energy_input"),
     ENERGY_OUTPUT("energy_output"),
     // The Biogas Digester's Sulfur Dust out (scrubbed from its Biogas). Ports only.
-    SULFUR("sulfur");
+    SULFUR("sulfur"),
+    // The face a Link Conduit is attached to (see MachineLink): it carries nothing itself and can't be changed while the
+    // cable is there. Never stored: a machine or structure reports it on top of the face's own mode, which comes back when
+    // the cable goes. No machine allows it, so nothing cycles to it.
+    MACHINE_LINK("machine_link");
 
     private final String name;
 

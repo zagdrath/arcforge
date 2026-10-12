@@ -103,7 +103,7 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
                     case CondenserArrayMenu.DATA_MULTIPLIER -> cooling.multiplierPercent();
                     case CondenserArrayMenu.DATA_STATUS -> status.ordinal();
                     case CondenserArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case CondenserArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case CondenserArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

@@ -173,7 +173,7 @@ public abstract class ClocheBlockEntity extends MachineBlockEntity implements Fl
                     case ClocheMenu.DATA_RATE -> (int) Math.round(rate * 100);
                     case ClocheMenu.DATA_STATUS -> status.ordinal();
                     case ClocheMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ClocheMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ClocheMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

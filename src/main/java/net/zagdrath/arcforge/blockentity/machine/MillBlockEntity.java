@@ -90,7 +90,7 @@ public class MillBlockEntity extends MachineBlockEntity {
                     case MillMenu.DATA_USAGE -> usage;
                     case MillMenu.DATA_STATUS -> status.ordinal();
                     case MillMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case MillMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case MillMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

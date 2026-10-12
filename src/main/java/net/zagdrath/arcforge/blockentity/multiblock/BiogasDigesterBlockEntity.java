@@ -158,7 +158,7 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
                     case BiogasDigesterMenu.DATA_LANES -> laneRecipe.length;
                     case BiogasDigesterMenu.DATA_STATUS -> status.ordinal();
                     case BiogasDigesterMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case BiogasDigesterMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case BiogasDigesterMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

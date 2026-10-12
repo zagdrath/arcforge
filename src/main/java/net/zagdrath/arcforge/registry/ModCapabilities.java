@@ -409,6 +409,14 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.QUANTUM_TUNNEL.get(), QuantumTunnelBlockEntity::getItemHandler);
         // The Chunk Loader takes FE only when logistics.chunkLoader.energyPerChunk is above 0.
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHUNK_LOADER.get(), ChunkLoaderBlockEntity::getEnergyHandler);
+        // A Wired Machine Link: each face offers what that port would on the machine it's linked to.
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.WIRED_MACHINE_LINK.get(),
+                (link, side) -> link.handler(Capabilities.Item.BLOCK, side));
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.WIRED_MACHINE_LINK.get(),
+                (link, side) -> link.handler(Capabilities.Fluid.BLOCK, side));
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.WIRED_MACHINE_LINK.get(),
+                (link, side) -> link.handler(Capabilities.Energy.BLOCK, side));
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.WIRED_MACHINE_LINK.get(), (link, side) -> link.handler(HEAT, side));
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(),
                 PressurizedCylinderBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(),

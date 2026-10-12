@@ -202,7 +202,7 @@ public class GreenhouseBlockEntity extends MachineBlockEntity implements Multibl
                     case GreenhouseMenu.DATA_SYSTEM_LAMPS -> lampState.ordinal();
                     case GreenhouseMenu.DATA_STATUS -> status.ordinal();
                     case GreenhouseMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case GreenhouseMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case GreenhouseMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

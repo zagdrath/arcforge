@@ -24,6 +24,8 @@
     "arcforge:arcite_block",
     "arcforge:arc_quarry",
     "arcforge:arc_quarry_bounding",
-    "arcforge:diamond_press"
+    "arcforge:diamond_press",
+    "arcforge:iolite_ore",
+    "arcforge:iolite_block"
   ]
 }

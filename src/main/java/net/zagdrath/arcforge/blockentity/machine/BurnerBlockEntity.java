@@ -86,7 +86,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity implements Ou
                     case BurnerMenu.DATA_BURNING_ITEM -> burning == null ? -1 : BuiltInRegistries.ITEM.getId(burning);
                     case BurnerMenu.DATA_STATUS -> status.ordinal();
                     case BurnerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case BurnerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case BurnerMenu.DATA_SIDE_CONFIG -> packedSides();
                     case BurnerMenu.DATA_OXYGEN -> oxygenAmount();
                     case BurnerMenu.DATA_OXYGEN_CAPACITY -> oxygenCapacity();
                     case BurnerMenu.DATA_OXY_ACTIVE -> isOxyActive() ? 1 : 0;

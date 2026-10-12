@@ -112,7 +112,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
                     case GeothermalPlantMenu.DATA_MAGMA_BLOCKS -> around.magmaBlocks();
                     case GeothermalPlantMenu.DATA_STATUS -> status.ordinal();
                     case GeothermalPlantMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case GeothermalPlantMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case GeothermalPlantMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

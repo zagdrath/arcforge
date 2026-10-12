@@ -1,0 +1,29 @@
+{
+  "parent": "arcforge:logistics/quantum_tunnel",
+  "display": {
+    "icon": {
+      "id": "arcforge:wired_machine_link"
+    },
+    "title": {
+      "translate": "advancements.arcforge.logistics.wired_machine_link.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.logistics.wired_machine_link.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_linked",
+      "conditions": {}
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

@@ -257,6 +257,10 @@ or `REJECTED` (it can't be changed right now). `succeeded()` is true for the fir
   `"gas_output"`. They are strings so Arcforge can add modes without a major API change. Sides are relative to the
   machine's front (`MachineSide.TOP`, `BOTTOM`, `LEFT`, `RIGHT`, `BACK`, `FRONT`). A port can only be set on a block of
   the structure that can hold ports, and only on a face that points out of the structure, as with the Wrench.
+- **Linked faces.** The face a Link Conduit plugs into (the machine's end of a Wired Machine Link) reads
+  `"machine_link"` in `sideMode` and `ports()`, a mode no machine lists as allowed. While the cable is there,
+  `setSideMode` and `setPort` on that face return `REJECTED`, and `clearSideModes` leaves it alone; the face's own mode
+  comes back when the cable goes.
 - **Machine-specific options** have an `id`, a `name`, an `OptionType` (`BOOLEAN` as `"true"`/`"false"`, `INTEGER`
   with `min`/`max`, `CHOICE` from `choices`) and the current `value`:
 

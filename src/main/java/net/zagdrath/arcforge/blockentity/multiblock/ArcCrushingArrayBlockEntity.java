@@ -68,7 +68,7 @@ public class ArcCrushingArrayBlockEntity extends CubeMultiblockBlockEntity {
                     case ArcCrushingArrayMenu.DATA_POWER_SAVING -> powerSaving();
                     case ArcCrushingArrayMenu.DATA_STATUS -> status.ordinal();
                     case ArcCrushingArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ArcCrushingArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ArcCrushingArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

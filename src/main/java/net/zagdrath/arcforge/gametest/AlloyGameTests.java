@@ -176,8 +176,9 @@ final class AlloyGameTests {
         // coal's five (Tree Cutter, Hydrothermal Carbonizer, Range Upgrade, and Block of Bio-Coal both ways), and carbon
         // capture's three (Carbon Reclaimer, Gasifier and Fischer-Tropsch Reactor), and the Sifter and Diamond Press drop's
         // five (Sifter, Diamond Press, and the Steel, Invar and Tungsten Meshes), and the Slimeball from Pine Resin, and the
-        // Heat Pipe, and the Industrial Water Intake Casing.
-        helper.assertTrue(crafting == 260, crafting + " crafting/ recipes, not 260");
+        // Heat Pipe, and the Industrial Water Intake Casing, and the machine link's four (Block of Iolite both ways, Link Conduit
+        // and Wired Machine Link).
+        helper.assertTrue(crafting == 264, crafting + " crafting/ recipes, not 264");
         // Plus the fluorite-fluxed steel, and Graphite from Coal Coke and from Carbon Dust.
         helper.assertTrue(smelting == 8, smelting + " arcforge_smelting/ recipes, not 8");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

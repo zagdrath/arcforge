@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_iolite_outer",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "ioliteOuter",
+      "default": 8
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "ioliteOuter",
+      "shape": "uniform",
+      "default_min": 0,
+      "default_max": 80
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

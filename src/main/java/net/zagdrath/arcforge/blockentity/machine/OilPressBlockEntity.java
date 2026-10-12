@@ -99,7 +99,7 @@ public class OilPressBlockEntity extends MachineBlockEntity implements FluidInte
                     case OilPressMenu.DATA_OIL_CAPACITY -> oil.getCapacity();
                     case OilPressMenu.DATA_STATUS -> status.ordinal();
                     case OilPressMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case OilPressMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case OilPressMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

@@ -84,7 +84,7 @@ public class SeedExtractorBlockEntity extends MachineBlockEntity {
                     case SeedExtractorMenu.DATA_USAGE -> usage;
                     case SeedExtractorMenu.DATA_STATUS -> status.ordinal();
                     case SeedExtractorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case SeedExtractorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case SeedExtractorMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

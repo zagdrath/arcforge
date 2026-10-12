@@ -183,7 +183,7 @@ public class FischerTropschReactorBlockEntity extends MachineBlockEntity impleme
                     case FischerTropschReactorMenu.DATA_CATALYST_LIFE -> catalystLife(items.getStack(SLOT_CATALYST));
                     case FischerTropschReactorMenu.DATA_STATUS -> status.ordinal();
                     case FischerTropschReactorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case FischerTropschReactorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case FischerTropschReactorMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

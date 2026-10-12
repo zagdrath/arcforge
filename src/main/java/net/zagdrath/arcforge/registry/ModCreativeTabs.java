@@ -94,6 +94,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.QUANTUM_TUNNEL.get());
                 output.accept(ModItems.HEAT_PIPE.get());
                 output.accept(ModItems.CHUNK_LOADER.get());
+                output.accept(ModItems.WIRED_MACHINE_LINK.get());
+                output.accept(ModItems.LINK_CONDUIT.get());
                 output.accept(ModItems.ENERGY_METER.get());
                 output.accept(ModItems.HEAT_METER.get());
                 output.accept(ModItems.FLUID_METER.get());

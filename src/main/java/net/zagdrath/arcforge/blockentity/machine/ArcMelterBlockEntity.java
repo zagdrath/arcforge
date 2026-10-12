@@ -99,7 +99,7 @@ public class ArcMelterBlockEntity extends MachineBlockEntity implements FluidInt
                     case ArcMelterMenu.DATA_FLUID_CAPACITY -> tank.getCapacity();
                     case ArcMelterMenu.DATA_STATUS -> status.ordinal();
                     case ArcMelterMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ArcMelterMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ArcMelterMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

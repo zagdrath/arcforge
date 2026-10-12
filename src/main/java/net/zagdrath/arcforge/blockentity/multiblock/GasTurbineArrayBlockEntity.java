@@ -179,7 +179,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imple
                     case GasTurbineArrayMenu.DATA_LENGTH -> getLength();
                     case GasTurbineArrayMenu.DATA_STATUS -> status.ordinal();
                     case GasTurbineArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case GasTurbineArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case GasTurbineArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     case GasTurbineArrayMenu.DATA_LUBRICANT -> lubricant.getAmount();
                     case GasTurbineArrayMenu.DATA_LUBRICANT_CAPACITY -> lubricant.getCapacity();
                     case GasTurbineArrayMenu.DATA_LUBRICANT_FLUID -> lubricant.getAmount() > 0

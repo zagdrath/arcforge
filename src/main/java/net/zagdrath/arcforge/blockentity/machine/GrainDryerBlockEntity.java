@@ -104,7 +104,7 @@ public class GrainDryerBlockEntity extends MachineBlockEntity implements FluidIn
                     case GrainDryerMenu.DATA_HEAT_USAGE -> heatUsage;
                     case GrainDryerMenu.DATA_STATUS -> status.ordinal();
                     case GrainDryerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case GrainDryerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case GrainDryerMenu.DATA_SIDE_CONFIG -> packedSides();
                     case GrainDryerMenu.DATA_FLUID -> tank.getAmount() > 0 ? BuiltInRegistries.FLUID.getId(tank.getResource(0).getFluid()) : -1;
                     case GrainDryerMenu.DATA_FLUID_AMOUNT -> tank.getAmount();
                     case GrainDryerMenu.DATA_FLUID_CAPACITY -> tank.getCapacity();

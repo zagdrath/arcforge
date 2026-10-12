@@ -89,7 +89,7 @@ public class BlockPlacerBlockEntity extends MachineBlockEntity {
                     case BlockPlacerMenu.DATA_FRONT_BLOCKED -> frontBlocked() ? 1 : 0;
                     case BlockPlacerMenu.DATA_STATUS -> status.ordinal();
                     case BlockPlacerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case BlockPlacerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case BlockPlacerMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

@@ -116,7 +116,7 @@ public class AirSeparatorBlockEntity extends MachineBlockEntity implements Fluid
                     case AirSeparatorMenu.DATA_RECIPE_SECONDARY -> shown != null ? shown.secondary().map(FluidStackTemplate::amount).orElse(0) : 0;
                     case AirSeparatorMenu.DATA_STATUS -> status.ordinal();
                     case AirSeparatorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case AirSeparatorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case AirSeparatorMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

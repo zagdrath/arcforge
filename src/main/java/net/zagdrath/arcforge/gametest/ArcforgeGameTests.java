@@ -490,6 +490,14 @@ public final class ArcforgeGameTests {
         TESTS.put("ores_tags", OreGameTests::tags);
         TESTS.put("ores_toggle", OreGameTests::oreToggle);
         TESTS.put("ores_vein_generates", OreGameTests::veinGenerates);
+        TESTS.put("iolite_ore", MachineLinkGameTests::ioliteOre);
+        TESTS.put("iolite_crushing", MachineLinkGameTests::ioliteCrushing);
+        TESTS.put("iolite_generates", MachineLinkGameTests::ioliteGenerates);
+        TESTS.put("link_conduit_joins", MachineLinkGameTests::conduitJoins);
+        TESTS.put("machine_link_links_a_machine", MachineLinkGameTests::linksAMachine);
+        TESTS.put("machine_link_unlink_restores_face", MachineLinkGameTests::unlinkRestoresFace);
+        TESTS.put("machine_link_one_per_machine", MachineLinkGameTests::oneLinkPerMachine);
+        TESTS.put("machine_link_links_a_multiblock", MachineLinkGameTests::linksAMultiblock);
         TESTS.put("ores_nether_sulfur_step", OreGameTests::netherSulfurStep);
         TESTS.put("machine_control_single_blocks", MachineControlGameTests::singleBlockCoverage);
         TESTS.put("machine_control_non_machines", MachineControlGameTests::nonMachinesHaveNone);

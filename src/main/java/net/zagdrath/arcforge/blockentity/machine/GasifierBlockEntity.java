@@ -119,7 +119,7 @@ public class GasifierBlockEntity extends MachineBlockEntity implements FluidInte
                     case GasifierMenu.DATA_HEAT_USAGE -> heatUsage;
                     case GasifierMenu.DATA_STATUS -> status.ordinal();
                     case GasifierMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case GasifierMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case GasifierMenu.DATA_SIDE_CONFIG -> packedSides();
                     case GasifierMenu.DATA_STEAM -> steam.getAmount();
                     case GasifierMenu.DATA_STEAM_CAPACITY -> steam.getCapacity();
                     case GasifierMenu.DATA_SYNGAS -> syngas.getAmount();

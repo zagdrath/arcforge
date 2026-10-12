@@ -3004,6 +3004,19 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Wired Machine Link: a Link Conduit from one machine (or multiblock) to a Wired Machine Link block, whose faces",
+                "then work as that machine's ports.").push("machineLink");
+    }
+
+    public static final ModConfigSpec.IntValue LINK_CONDUIT_MAX_LENGTH = BUILDER
+            .comment("Most blocks of Link Conduit between a machine and its Wired Machine Link.")
+            .defineInRange("maxCableLength", 64, 1, 512);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.pop();
     }
 
@@ -3053,6 +3066,9 @@ public class ArcforgeConfig {
         ore("spodumene", "Spodumene: uncommon, everywhere in stone and deepslate.", true, 3, 7, -48, 48, 0.0);
         ore("spodumenePegmatite", "Spodumene pegmatites: extra, bigger veins under mountains and badlands (only while ores.spodumene is on too).",
                 true, 6, 10, 0, 160, 0.0);
+        ore("iolite", "Iolite: the End's ore, in End Stone on the main island; needs an iron pickaxe, drops Iolite Crystals.", true, 3, 6, 0, 80, 0.0);
+        ore("ioliteOuter", "Iolite on the outer End islands: more of it than on the main island (only while ores.iolite is on too).",
+                true, 8, 7, 0, 80, 0.0);
         BUILDER.pop();
     }
 

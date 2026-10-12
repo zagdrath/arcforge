@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:gems/iolite"
+  },
+  "result": {
+    "id": "arcforge:iolite_block",
+    "count": 1
+  }
+}

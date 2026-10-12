@@ -109,7 +109,7 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
                     case ElectricPumpMenu.DATA_INFINITE -> infiniteSource ? 1 : 0;
                     case ElectricPumpMenu.DATA_STATUS -> status.ordinal();
                     case ElectricPumpMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ElectricPumpMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ElectricPumpMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

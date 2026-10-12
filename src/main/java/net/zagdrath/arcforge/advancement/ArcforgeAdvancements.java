@@ -98,6 +98,15 @@ public final class ArcforgeAdvancements {
         }
     }
 
+    // A Wired Machine Link has just linked a machine (or a multiblock) down this many blocks of Link Conduit.
+    public static void machineLinked(BlockEntity link, boolean multiblock, int distance) {
+        if (link.getLevel() instanceof ServerLevel level) {
+            for (ServerPlayer player : recipients(level, link.getBlockPos())) {
+                ModTriggers.MACHINE_LINKED.get().trigger(player, multiblock, distance);
+            }
+        }
+    }
+
     // A burner is running on oxy-fuel at this temperature (callers check this about once a second).
     public static void oxyFuel(BlockEntity burner, int celsius) {
         if (burner.getLevel() instanceof ServerLevel level) {

@@ -144,6 +144,10 @@ public class SideConfigTab extends SideTab {
         }
 
         RelativeSide side = faceAt(localX, localY);
+        if (side != null && modes.apply(side) == SideMode.MACHINE_LINK) {
+            // Locked while the Link Conduit is attached.
+            return true;
+        }
         if (side == null || (event.button() != InputConstants.MOUSE_BUTTON_LEFT && event.button() != InputConstants.MOUSE_BUTTON_RIGHT)) {
             return false;
         }
@@ -171,6 +175,9 @@ public class SideConfigTab extends SideTab {
         if (side != null) {
             lines.add(side.getDescription());
             lines.add(names.apply(modes.apply(side)).copy().withStyle(ChatFormatting.GRAY));
+            if (modes.apply(side) == SideMode.MACHINE_LINK) {
+                lines.add(Component.translatable("gui.arcforge.side_mode.machine_link.locked").withStyle(ChatFormatting.DARK_GRAY));
+            }
         }
     }
 }

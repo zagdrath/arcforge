@@ -72,7 +72,7 @@ public class InductionFurnaceArrayBlockEntity extends CubeMultiblockBlockEntity 
                     case InductionFurnaceArrayMenu.DATA_POWER_SAVING -> powerSaving();
                     case InductionFurnaceArrayMenu.DATA_STATUS -> status.ordinal();
                     case InductionFurnaceArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case InductionFurnaceArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case InductionFurnaceArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

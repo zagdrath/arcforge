@@ -126,7 +126,7 @@ public class AssemblerBlockEntity extends MachineBlockEntity {
                     case AssemblerMenu.DATA_TOTAL -> craftTicks();
                     case AssemblerMenu.DATA_STATUS -> status.ordinal();
                     case AssemblerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case AssemblerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case AssemblerMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

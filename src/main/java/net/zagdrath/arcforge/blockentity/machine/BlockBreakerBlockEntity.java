@@ -95,7 +95,7 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
                     case BlockBreakerMenu.DATA_TOTAL -> total;
                     case BlockBreakerMenu.DATA_STATUS -> status.ordinal();
                     case BlockBreakerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case BlockBreakerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case BlockBreakerMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

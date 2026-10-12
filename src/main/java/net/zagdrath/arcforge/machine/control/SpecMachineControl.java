@@ -717,6 +717,10 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
                 return SettingResult.INVALID;
             }
             RelativeSide relative = RelativeSide.valueOf(side.name());
+            // A Link Conduit's face is locked while the cable is there.
+            if (configurable.getSideMode(relative) == SideMode.MACHINE_LINK) {
+                return SettingResult.REJECTED;
+            }
             if (configurable.getSideMode(relative) == own) {
                 return SettingResult.UNCHANGED;
             }
@@ -760,7 +764,8 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
             if (controller == null || machine.getLevel() == null) {
                 return List.of();
             }
-            return MultiblockPorts.list(machine.getLevel(), controller).stream()
+            // As the Ports tab shows them: a Link Conduit's face as "machine_link" in place of the port under it.
+            return MultiblockPorts.shown(machine.getLevel(), controller).stream()
                     .map(port -> new MachinePort(port.pos(), port.face(), port.mode().getSerializedName())).toList();
         }
 
@@ -786,7 +791,9 @@ final class SpecMachineControl<T extends BlockEntity> implements MachineControl 
                 return SettingResult.INVALID;
             }
             // As the Wrench in Port mode: a part of this structure that holds ports, on a face pointing out of it.
-            if (!controller.isInside(pos) || !MultiblockPorts.canHold(level, controller, pos) || controller.isInside(pos.relative(face))) {
+            // A Link Conduit's face is locked while the cable is there.
+            if (!controller.isInside(pos) || !MultiblockPorts.canHold(level, controller, pos) || controller.isInside(pos.relative(face))
+                    || MultiblockPorts.isLinkFace(controller, pos, face)) {
                 return SettingResult.REJECTED;
             }
             if (MultiblockPorts.get(level, pos, face) == own) {

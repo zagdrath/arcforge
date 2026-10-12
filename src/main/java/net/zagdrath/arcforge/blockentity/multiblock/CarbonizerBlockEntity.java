@@ -66,6 +66,8 @@ import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
 import net.zagdrath.arcforge.multiblock.CarbonizerStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
+import net.zagdrath.arcforge.machine.link.LinkableMachine;
+import net.zagdrath.arcforge.machine.link.MachineLinkState;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
@@ -91,8 +93,11 @@ import com.mojang.serialization.Codec;
 //
 // The master's contents stay with that block when the structure breaks and come back when it re-forms.
 // If a different block becomes master, the old one hands everything over (see absorb).
-public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, MultiblockController, Owned, SettingsCopyable,
-        ControlStateHolder {
+public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, FluidInteractable, MultiblockController, LinkableMachine, Owned,
+        SettingsCopyable, ControlStateHolder {
+    // Its Wired Machine Link, if a Link Conduit links it to one (see LinkableMachine).
+    private final MachineLinkState machineLinkState = new MachineLinkState();
+
     // Who placed it and its security override (see SecurityRules).
     protected final Ownership ownership = new Ownership(this::setChanged);
     // The machine control API's enable switch and statistics (see docs/API.md); only the master's is used.
@@ -835,6 +840,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        machineLinkState.load(input);
         ownership.load(input);
         controlState.load(input);
         portDefaults.load(input);
@@ -866,6 +872,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        machineLinkState.save(output);
         ownership.save(output);
         controlState.save(output);
         portDefaults.save(output);
@@ -886,6 +893,11 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     }
 
     // --- Menu ---
+
+    @Override
+    public MachineLinkState machineLinkState() {
+        return machineLinkState;
+    }
 
     @Override
     public Component getDisplayName() {

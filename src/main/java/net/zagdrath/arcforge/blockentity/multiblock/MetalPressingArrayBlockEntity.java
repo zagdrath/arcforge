@@ -72,7 +72,7 @@ public class MetalPressingArrayBlockEntity extends CubeMultiblockBlockEntity {
                     case MetalPressingArrayMenu.DATA_POWER_SAVING -> powerSaving();
                     case MetalPressingArrayMenu.DATA_STATUS -> status.ordinal();
                     case MetalPressingArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case MetalPressingArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case MetalPressingArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

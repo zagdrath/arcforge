@@ -106,7 +106,7 @@ public class DiamondPressBlockEntity extends MachineBlockEntity {
                     case DiamondPressMenu.DATA_TOTAL -> total;
                     case DiamondPressMenu.DATA_STATUS -> status.ordinal();
                     case DiamondPressMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case DiamondPressMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case DiamondPressMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

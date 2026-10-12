@@ -106,7 +106,7 @@ public class FiberizerBlockEntity extends MachineBlockEntity {
                     case FiberizerMenu.DATA_HEAT_USAGE -> heatUsage;
                     case FiberizerMenu.DATA_STATUS -> status.ordinal();
                     case FiberizerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case FiberizerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case FiberizerMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

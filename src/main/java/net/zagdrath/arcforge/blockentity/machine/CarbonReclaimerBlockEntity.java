@@ -130,7 +130,7 @@ public class CarbonReclaimerBlockEntity extends MachineBlockEntity implements Fl
                     case CarbonReclaimerMenu.DATA_TANK_CAPACITY -> water.getCapacity();
                     case CarbonReclaimerMenu.DATA_STATUS -> status.ordinal();
                     case CarbonReclaimerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case CarbonReclaimerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case CarbonReclaimerMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

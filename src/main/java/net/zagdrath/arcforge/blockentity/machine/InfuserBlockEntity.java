@@ -112,7 +112,7 @@ public class InfuserBlockEntity extends MachineBlockEntity implements FluidInter
                     case InfuserMenu.DATA_USAGE -> usage;
                     case InfuserMenu.DATA_STATUS -> status.ordinal();
                     case InfuserMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case InfuserMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case InfuserMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

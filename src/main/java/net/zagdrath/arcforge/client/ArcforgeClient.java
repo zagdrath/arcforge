@@ -58,6 +58,7 @@ import net.zagdrath.arcforge.client.renderer.blockentity.QuantumTunnelRenderer;
 import net.zagdrath.arcforge.client.renderer.blockentity.ReservoirRenderer;
 import net.zagdrath.arcforge.client.screen.logistics.ChunkLoaderScreen;
 import net.zagdrath.arcforge.client.screen.logistics.QuantumTunnelScreen;
+import net.zagdrath.arcforge.client.screen.logistics.WiredMachineLinkScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.GreenhouseScreen;
 import net.zagdrath.arcforge.registry.ModParticleTypes;
 import net.zagdrath.arcforge.client.sound.GasTurbineArraySound;
@@ -201,6 +202,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.METER.get(), net.zagdrath.arcforge.client.screen.logistics.MeterScreen::new);
         event.register(ModMenuTypes.QUANTUM_TUNNEL.get(), QuantumTunnelScreen::new);
         event.register(ModMenuTypes.CHUNK_LOADER.get(), ChunkLoaderScreen::new);
+        event.register(ModMenuTypes.WIRED_MACHINE_LINK.get(), WiredMachineLinkScreen::new);
         event.register(ModMenuTypes.GEOTHERMAL_PLANT.get(), GeothermalPlantScreen::new);
         event.register(ModMenuTypes.COMBUSTION_PLANT.get(), CombustionPlantScreen::new);
         event.register(ModMenuTypes.FIREBOX.get(), FireboxScreen::new);

@@ -144,7 +144,7 @@ public class ElectrolyzerBlockEntity extends MachineBlockEntity implements Fluid
                     case ElectrolyzerMenu.DATA_FLOOR -> shown != null ? EnergyBalance.minEnergyFor(shown) : 0;
                     case ElectrolyzerMenu.DATA_STATUS -> status.ordinal();
                     case ElectrolyzerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ElectrolyzerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ElectrolyzerMenu.DATA_SIDE_CONFIG -> packedSides();
                     case ElectrolyzerMenu.DATA_VENT -> (ventHydrogen ? 1 : 0) | (ventOxygen ? 2 : 0);
                     case ElectrolyzerMenu.DATA_TERTIARY_FLUID -> fluidId(liquid);
                     case ElectrolyzerMenu.DATA_TERTIARY -> liquid.getAmount();

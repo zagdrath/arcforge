@@ -45,6 +45,9 @@ import net.zagdrath.arcforge.machine.control.ControlStateHolder;
 import net.zagdrath.arcforge.machine.control.MachineControlState;
 import net.zagdrath.arcforge.machine.control.MachineControlTracker;
 import net.zagdrath.arcforge.machine.interaction.Dismantleable;
+import net.zagdrath.arcforge.machine.link.LinkableMachine;
+import net.zagdrath.arcforge.machine.link.MachineLink;
+import net.zagdrath.arcforge.machine.link.MachineLinkState;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.security.Owned;
 import net.zagdrath.arcforge.security.Ownership;
@@ -57,7 +60,8 @@ import com.mojang.serialization.Codec;
 // What every single-block machine shares: its item slots (the machine's own, then four upgrade slots),
 // the side configuration and redstone mode set from its GUI, pushing output into touching blocks,
 // and dropping its items when removed.
-public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider, Dismantleable, ConduitConnectable, ConfigurableMachine, Owned, SettingsCopyable, ControlStateHolder {
+public abstract class MachineBlockEntity extends BlockEntity implements MenuProvider, Dismantleable, ConduitConnectable, ConfigurableMachine, LinkableMachine, Owned, SettingsCopyable,
+        ControlStateHolder {
     // Who placed it and its security override (see SecurityRules).
     protected final Ownership ownership = new Ownership(this::setChanged);
     // The machine control API's enable switch and statistics (see docs/API.md).
@@ -69,6 +73,10 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected final SideConfig sideConfig;
     protected final MachineOutputs outputs = new MachineOutputs();
     private final List<SideMode> allowedSideModes;
+
+    // Its Wired Machine Link, if a Link Conduit links it to one (see machine.link.MachineLinks), and the mode a Wired Machine
+    // Link is asking for while it looks up a handler (see withForcedMode).
+    private final MachineLinkState machineLinkState = new MachineLinkState();
 
     protected RedstoneMode redstoneMode = RedstoneMode.IGNORE;
     // PULSE: the signal last tick, and whether a rising edge is still waiting for its operation (at most one).
@@ -122,9 +130,40 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         }
     }
 
-    // The mode of the face on the given world side, or null for an internal (unsided) query.
+    // The mode of the face on the given world side, or null for an internal (unsided) query. The face a Link Conduit is on
+    // is MACHINE_LINK (it exposes nothing); while a Wired Machine Link looks up a handler, every face is the mode it asks for.
     protected @Nullable SideMode modeFor(@Nullable Direction side) {
-        return side == null ? null : sideConfig.get(getFacing(), side);
+        if (side == null) {
+            return null;
+        }
+        SideMode forced = forcedLinkMode();
+        if (forced != null) {
+            return forced;
+        }
+        MachineLink link = getMachineLink();
+        if (link != null && !(this instanceof MultiblockController) && link.isFace(worldPosition, side)) {
+            return SideMode.MACHINE_LINK;
+        }
+        return sideConfig.get(getFacing(), side);
+    }
+
+    // --- Wired Machine Link (see LinkableMachine) ---
+
+    @Override
+    public MachineLinkState machineLinkState() {
+        return machineLinkState;
+    }
+
+    // A single machine's face with its Link Conduit on it, or null.
+    public @Nullable RelativeSide linkedSide() {
+        MachineLink link = getMachineLink();
+        return link != null && !(this instanceof MultiblockController) && link.anchor().equals(worldPosition)
+                ? RelativeSide.fromDirection(getFacing(), link.face()) : null;
+    }
+
+    // The side configuration for a menu, with the face a Link Conduit is on (shown as the locked Wired Machine Link).
+    protected int packedSides() {
+        return SideConfig.withLinkSide(sideConfig.pack(), linkedSide());
     }
 
     public MachineStatus getStatus() {
@@ -191,18 +230,25 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         }
     }
 
+    // The face a Link Conduit is on is locked until the cable goes.
     @Override
     public void setSideMode(RelativeSide side, SideMode mode) {
-        if (sideConfig.get(side) == mode) {
+        if (side == linkedSide() || mode == SideMode.MACHINE_LINK || sideConfig.get(side) == mode) {
             return;
         }
         sideConfig.set(side, mode);
         onSideConfigChanged();
     }
 
+    // The face a Link Conduit is on keeps its mode, for when the cable goes.
     @Override
     public void clearSideModes() {
+        RelativeSide linked = linkedSide();
+        SideMode kept = linked != null ? sideConfig.get(linked) : null;
         sideConfig.clear();
+        if (linked != null && kept != null) {
+            sideConfig.set(linked, kept);
+        }
         onSideConfigChanged();
     }
 
@@ -216,7 +262,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
 
     @Override
     public SideMode getSideMode(RelativeSide side) {
-        return sideConfig.get(side);
+        return side == linkedSide() ? SideMode.MACHINE_LINK : sideConfig.get(side);
     }
 
     // Only machines with output faces have auto-eject.
@@ -286,7 +332,13 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
             }
         } else {
             input.getInt("side_config").ifPresent(packed -> {
+                // The face a Link Conduit is on keeps its own mode.
+                RelativeSide linked = linkedSide();
+                SideMode kept = linked != null ? sideConfig.get(linked) : null;
                 sideConfig.load(packed);
+                if (linked != null && kept != null) {
+                    sideConfig.set(linked, kept);
+                }
                 onSideConfigChanged();
             });
         }
@@ -313,6 +365,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
+        notifyMachineLinkRemoved();
         if (level != null) {
             for (int slot = 0; slot < items.size(); slot++) {
                 if (!(dismantled && items.isUpgradeSlot(slot))) {
@@ -370,6 +423,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", 0));
         lastPowered = input.getBooleanOr("last_powered", false);
         pendingPulses = input.getIntOr("pending_pulses", 0);
+        machineLinkState.load(input);
     }
 
     @Override
@@ -382,5 +436,6 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
         output.putInt("redstone_mode", redstoneMode.ordinal());
         output.putBoolean("last_powered", lastPowered);
         output.putInt("pending_pulses", pendingPulses);
+        machineLinkState.save(output);
     }
 }

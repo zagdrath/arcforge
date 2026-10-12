@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.machine.config;
 
 import java.util.Arrays;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -21,6 +23,10 @@ public class SideConfig {
     // "side_modes" (before the distillation modes).
     private static final int LEGACY_BITS_PER_SIDE = 2;
     private static final int OLD_BITS_PER_SIDE = 3;
+
+    // Menu syncing only (never saved or put on a Settings Card): the face a Wired Machine Link's cable is on, as its
+    // RelativeSide ordinal + 1 (0: none), in the three bits after auto-eject.
+    private static final int LINK_SHIFT = 6 * BITS_PER_SIDE + 1;
 
     // Player actions on a face, sent from the side-config tab.
     public static final int ACTION_NEXT = 0;
@@ -79,6 +85,17 @@ public class SideConfig {
 
     public static SideMode unpack(int packed, RelativeSide side) {
         return SideMode.byId((packed >>> (side.ordinal() * BITS_PER_SIDE)) & SIDE_MASK);
+    }
+
+    // Adds the Wired Machine Link's face to a packed value for a menu (see MachineBlockEntity.packedSides).
+    public static int withLinkSide(int packed, @Nullable RelativeSide link) {
+        return link == null ? packed : packed | (link.ordinal() + 1) << LINK_SHIFT;
+    }
+
+    // The face shown as the Wired Machine Link in a menu's packed value, or null.
+    public static @Nullable RelativeSide unpackLinkSide(int packed) {
+        int link = (packed >>> LINK_SHIFT) & 0b111;
+        return link == 0 ? null : RelativeSide.byId(link - 1);
     }
 
     public static boolean unpackAutoEject(int packed) {

@@ -14,14 +14,11 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.zagdrath.arcforge.Arcforge;
-import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
-import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
-import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
-import net.zagdrath.arcforge.multiblock.MultiblockPart;
+import net.zagdrath.arcforge.multiblock.Multiblocks;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.ITooltip;
@@ -53,29 +50,7 @@ public enum MultiblockNameProvider implements IBlockComponentProvider {
 
     // The controller of the multiblock the block at pos is part of (formed or not), or null.
     static @Nullable MultiblockController controllerAt(Level level, BlockPos pos, Block block) {
-        MultiblockController controller = null;
-        if (block instanceof MultiblockPart part) {
-            controller = part.findController(level, pos);
-        } else if (block instanceof PressureGlassBlock) {
-            controller = WindowProviders.master(level, pos);
-            if (controller == null) {
-                // A pane in a Greenhouse Array's wall or roof.
-                controller = GreenhouseStructure.findController(level, pos);
-            }
-            if (controller == null) {
-                // A window up a Thermal Evaporator Array.
-                controller = ThermalEvaporatorStructure.findController(level, pos);
-            }
-            if (controller == null) {
-                // A window in a Firebox Array.
-                controller = net.zagdrath.arcforge.multiblock.FireboxArrayStructure.findController(level, pos);
-            }
-            if (controller == null) {
-                // A window in a Battery Array.
-                controller = net.zagdrath.arcforge.multiblock.BatteryArrayStructure.findController(level, pos);
-            }
-        }
-        return controller;
+        return Multiblocks.controllerAt(level, pos);
     }
 
     // Right after Jade's own name, so there is one to replace.

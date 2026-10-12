@@ -198,6 +198,10 @@ public class WrenchItem extends Item {
             tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.not_port"));
             return InteractionResult.SUCCESS;
         }
+        if (MultiblockPorts.isLinkFace(controller, pos, face)) {
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.link_locked"));
+            return InteractionResult.SUCCESS;
+        }
         SideMode current = MultiblockPorts.get(level, pos, face);
         if (change) {
             SideMode next = MultiblockPorts.next(controller, current, false);
@@ -250,6 +254,10 @@ public class WrenchItem extends Item {
         }
         RelativeSide side = RelativeSide.fromDirection(facingOf(blockEntity, state), context.getClickedFace());
         SideMode mode = machine.getSideMode(side);
+        if (mode == SideMode.MACHINE_LINK) {
+            tell(context.getPlayer(), Component.translatable("message.arcforge.wrench.link_locked"));
+            return InteractionResult.SUCCESS;
+        }
         if (change) {
             List<SideMode> allowed = machine.getAllowedSideModes();
             int index = allowed.indexOf(mode);

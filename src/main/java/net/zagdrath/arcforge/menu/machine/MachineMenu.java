@@ -236,8 +236,10 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
         return RedstoneMode.byId(value(redstoneIndex()));
     }
 
+    // A face's mode; the face a Wired Machine Link's cable is on shows as MACHINE_LINK (locked while it's there).
     public SideMode getSideMode(RelativeSide side) {
-        return SideConfig.unpack(value(sidesIndex()), side);
+        int packed = value(sidesIndex());
+        return side == SideConfig.unpackLinkSide(packed) ? SideMode.MACHINE_LINK : SideConfig.unpack(packed, side);
     }
 
     public boolean isAutoEject() {

@@ -1,0 +1,23 @@
+{
+  "title": "Wired Machine Link",
+  "icon": "arcforge:wired_machine_link",
+  "items": [
+    "arcforge:wired_machine_link",
+    "arcforge:link_conduit",
+    "arcforge:iolite_crystal"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Puts one machine's ports somewhere else. Run a Link Conduit from a machine, or from any outer face of a formed multiblock, to a Wired Machine Link: each of the link's other faces can then be set to any port mode that machine has, and works just as that port would on the machine.\n- Items, fluids, gases, FE and heat go straight to and from the machine's own inventories, tanks and buffers. The link adds no limit of its own.\n- Conduits connect to its faces as they would to the machine's.\n- Output faces push out with the machine's auto-eject; Energy and Heat faces give out what the machine gives out."
+    },
+    {
+      "type": "text",
+      "text": "# Link Conduit\nA thin cable with an Iolite core. It links one machine to one Wired Machine Link, up to 64 blocks of cable. It carries nothing itself, never branches, and doesn't join other conduits. Its core glows purple while the link is live.\n# The link port\nThe face the cable is attached to becomes a Wired Machine Link port: purple and locked, shown in the machine's Sides or Ports tab and in Jade. Take the cable off and the face goes back to what it was. A machine takes one Wired Machine Link."
+    },
+    {
+      "type": "text",
+      "text": "# The screen\nIt shows the machine it's linked to (e.g. \"Steam Boiler Array 7×9×12\"), the face of the machine the cable is on, and how long the cable is. Below, its own faces: left click cycles through the machine's port modes, right click goes back, shift-click clears. The cable's face is the locked purple link.\nIf the cable is broken, too long, ends at nothing, the machine already has a link, or it belongs to someone who hasn't let you use it, it shows Not linked and why. Its faces keep their settings until the link is back.\nThe cable's length limit is in the machineLink config."
+    }
+  ]
+}

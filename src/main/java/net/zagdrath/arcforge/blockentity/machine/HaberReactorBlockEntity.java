@@ -133,7 +133,7 @@ public class HaberReactorBlockEntity extends MachineBlockEntity implements Fluid
                     case HaberReactorMenu.DATA_HEAT_USAGE -> heatUsage;
                     case HaberReactorMenu.DATA_STATUS -> status.ordinal();
                     case HaberReactorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case HaberReactorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case HaberReactorMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

@@ -86,7 +86,7 @@ public class MetalPressBlockEntity extends MachineBlockEntity {
                     case MetalPressMenu.DATA_USAGE -> usage;
                     case MetalPressMenu.DATA_STATUS -> status.ordinal();
                     case MetalPressMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case MetalPressMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case MetalPressMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

@@ -157,7 +157,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
                     case ChemicalReactorMenu.DATA_TANK_CAPACITY -> output.getCapacity();
                     case ChemicalReactorMenu.DATA_STATUS -> status.ordinal();
                     case ChemicalReactorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ChemicalReactorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ChemicalReactorMenu.DATA_SIDE_CONFIG -> packedSides();
                     case ChemicalReactorMenu.DATA_FLUID_BYPRODUCT -> fluidId(byproductTank);
                     case ChemicalReactorMenu.DATA_AMOUNT_BYPRODUCT -> byproductTank.getAmount();
                     default -> 0;

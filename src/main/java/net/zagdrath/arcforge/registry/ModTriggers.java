@@ -11,6 +11,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.advancement.MachineLinkedTrigger;
 import net.zagdrath.arcforge.advancement.MachineProducedTrigger;
 import net.zagdrath.arcforge.advancement.MultiblockFormedTrigger;
 import net.zagdrath.arcforge.advancement.OxyFuelTrigger;
@@ -27,6 +28,8 @@ public final class ModTriggers {
     public static final DeferredHolder<CriterionTrigger<?>, TurbineFullSpeedTrigger> TURBINE_FULL_SPEED = TRIGGERS.register("turbine_full_speed",
             TurbineFullSpeedTrigger::new);
     public static final DeferredHolder<CriterionTrigger<?>, OxyFuelTrigger> OXY_FUEL = TRIGGERS.register("oxy_fuel", OxyFuelTrigger::new);
+    public static final DeferredHolder<CriterionTrigger<?>, MachineLinkedTrigger> MACHINE_LINKED = TRIGGERS.register("machine_linked",
+            MachineLinkedTrigger::new);
 
     private ModTriggers() {}
 

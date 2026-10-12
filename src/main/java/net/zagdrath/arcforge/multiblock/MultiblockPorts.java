@@ -23,6 +23,8 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.link.LinkableMachine;
+import net.zagdrath.arcforge.machine.link.MachineLink;
 
 // Multiblock ports: a structure does IO only through its ports, each an outer face of one of its blocks set
 // to a mode (see MultiblockController.faceMode). Each face of a block is its own port, so a corner can take
@@ -96,6 +98,10 @@ public final class MultiblockPorts {
     // Sets this face of the block at pos to a port in mode (NONE clears it), and reconnects everything round
     // the structure. The block's other faces keep their ports.
     public static void set(Level level, MultiblockController controller, BlockPos pos, SideMode mode, Direction face) {
+        if (isLinkFace(controller, pos, face) || mode == SideMode.MACHINE_LINK) {
+            // Locked while its Link Conduit is there (see MachineLinks).
+            return;
+        }
         if (PortStore.set(level, pos, faces(level, pos).with(face, mode))) {
             changed(level, controller);
         }
@@ -127,6 +133,24 @@ public final class MultiblockPorts {
             }
         }
         return ports;
+    }
+
+    // The ports as the Ports tab shows them: every port, with the face a Link Conduit is on as the Wired Machine Link in
+    // place of the port under it.
+    public static List<Port> shown(Level level, MultiblockController controller) {
+        List<Port> ports = new ArrayList<>(list(level, controller));
+        MachineLink link = controller instanceof LinkableMachine machine ? machine.getMachineLink() : null;
+        if (link != null) {
+            ports.removeIf(port -> link.isFace(port.pos(), port.face()));
+            ports.addFirst(new Port(link.anchor(), SideMode.MACHINE_LINK, link.face(),
+                    RelativeSide.fromDirection(controller.getStructureFacing(), link.face())));
+        }
+        return ports;
+    }
+
+    // Whether this face of the block at pos is where the structure's Link Conduit is.
+    public static boolean isLinkFace(MultiblockController controller, BlockPos pos, Direction face) {
+        return controller instanceof LinkableMachine machine && machine.isLinkFace(pos, face);
     }
 
     // --- Defaults ---

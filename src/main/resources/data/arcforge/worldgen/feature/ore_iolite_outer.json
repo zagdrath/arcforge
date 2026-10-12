@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:config_ore",
+  "ore": "ioliteOuter",
+  "size": 7,
+  "discard_chance_on_air_exposure": 0.0,
+  "targets": [
+    {
+      "target": {
+        "predicate_type": "minecraft:block_match",
+        "block": "minecraft:end_stone"
+      },
+      "state": "arcforge:iolite_ore"
+    }
+  ]
+}

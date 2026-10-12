@@ -141,6 +141,7 @@
         "chargepad",
         "quantum_tunnel",
         "chunk_loader",
+        "wired_machine_link",
         "portable_storage"
       ]
     },

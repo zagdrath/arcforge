@@ -122,6 +122,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> QUANTUM_TUNNEL = ITEMS.registerSimpleBlockItem(ModBlocks.QUANTUM_TUNNEL, p -> p.rarity(Rarity.EPIC));
     public static final DeferredItem<BlockItem> HEAT_PIPE = ITEMS.registerSimpleBlockItem(ModBlocks.HEAT_PIPE, p -> p.rarity(Rarity.RARE));
     public static final DeferredItem<BlockItem> CHUNK_LOADER = ITEMS.registerSimpleBlockItem(ModBlocks.CHUNK_LOADER, p -> p.rarity(Rarity.RARE));
+    public static final DeferredItem<BlockItem> WIRED_MACHINE_LINK = ITEMS.registerSimpleBlockItem(ModBlocks.WIRED_MACHINE_LINK, p -> p.rarity(Rarity.UNCOMMON));
+    public static final DeferredItem<BlockItem> LINK_CONDUIT = ITEMS.registerSimpleBlockItem(ModBlocks.LINK_CONDUIT);
     // Places a whole 3x3x3 (see ArcQuarryItem). The bounding parts have no item.
     public static final DeferredItem<ArcQuarryItem> ARC_QUARRY = ITEMS.registerItem("arc_quarry",
             p -> new ArcQuarryItem(ModBlocks.ARC_QUARRY.get(), p), p -> p.useBlockDescriptionPrefix());
@@ -413,6 +415,10 @@ public final class ModItems {
     public static final DeferredItem<Item> ARCITE_DUST = ITEMS.registerSimpleItem("arcite_dust");
     public static final DeferredItem<Item> ARCITE_CRYSTAL = ITEMS.registerSimpleItem("arcite_crystal");
     public static final DeferredItem<BlockItem> ARCITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.ARCITE_BLOCK);
+    public static final DeferredItem<BlockItem> IOLITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.IOLITE_ORE);
+    public static final DeferredItem<Item> IOLITE_DUST = ITEMS.registerSimpleItem("iolite_dust");
+    public static final DeferredItem<Item> IOLITE_CRYSTAL = ITEMS.registerSimpleItem("iolite_crystal");
+    public static final DeferredItem<BlockItem> IOLITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.IOLITE_BLOCK);
     public static final DeferredItem<Item> SILVER_PLATE = ITEMS.registerSimpleItem("silver_plate");
     public static final DeferredItem<Item> SILVER_GEAR = ITEMS.registerSimpleItem("silver_gear");
     public static final DeferredItem<Item> SILVER_ROD = ITEMS.registerSimpleItem("silver_rod");
@@ -449,7 +455,7 @@ public final class ModItems {
     }
 
     public static List<DeferredItem<? extends Item>> ores() {
-        return List.of(SILVER_ORE, DEEPSLATE_SILVER_ORE, RAW_SILVER, RAW_SILVER_BLOCK, SILVER_DUST, SILVER_INGOT, SILVER_BLOCK, NICKEL_ORE, DEEPSLATE_NICKEL_ORE, RAW_NICKEL, RAW_NICKEL_BLOCK, NICKEL_DUST, NICKEL_INGOT, NICKEL_BLOCK, WOLFRAMITE_ORE, DEEPSLATE_WOLFRAMITE_ORE, RAW_WOLFRAMITE, RAW_WOLFRAMITE_BLOCK, TUNGSTEN_DUST, TUNGSTEN_INGOT, TUNGSTEN_BLOCK, FLUORITE_ORE, DEEPSLATE_FLUORITE_ORE, RAW_FLUORITE, RAW_FLUORITE_BLOCK, FLUORITE_DUST, FLUORITE_CRYSTAL, FLUORITE_BLOCK, BISMUTH_ORE, DEEPSLATE_BISMUTH_ORE, RAW_BISMUTH, RAW_BISMUTH_BLOCK, BISMUTH_DUST, BISMUTH_INGOT, BISMUTH_BLOCK, ARCITE_ORE, DEEPSLATE_ARCITE_ORE, RAW_ARCITE, RAW_ARCITE_BLOCK, ARCITE_DUST, ARCITE_CRYSTAL, ARCITE_BLOCK, NETHER_SULFUR_ORE, INVAR_DUST, INVAR_INGOT);
+        return List.of(SILVER_ORE, DEEPSLATE_SILVER_ORE, RAW_SILVER, RAW_SILVER_BLOCK, SILVER_DUST, SILVER_INGOT, SILVER_BLOCK, NICKEL_ORE, DEEPSLATE_NICKEL_ORE, RAW_NICKEL, RAW_NICKEL_BLOCK, NICKEL_DUST, NICKEL_INGOT, NICKEL_BLOCK, WOLFRAMITE_ORE, DEEPSLATE_WOLFRAMITE_ORE, RAW_WOLFRAMITE, RAW_WOLFRAMITE_BLOCK, TUNGSTEN_DUST, TUNGSTEN_INGOT, TUNGSTEN_BLOCK, FLUORITE_ORE, DEEPSLATE_FLUORITE_ORE, RAW_FLUORITE, RAW_FLUORITE_BLOCK, FLUORITE_DUST, FLUORITE_CRYSTAL, FLUORITE_BLOCK, BISMUTH_ORE, DEEPSLATE_BISMUTH_ORE, RAW_BISMUTH, RAW_BISMUTH_BLOCK, BISMUTH_DUST, BISMUTH_INGOT, BISMUTH_BLOCK, ARCITE_ORE, DEEPSLATE_ARCITE_ORE, RAW_ARCITE, RAW_ARCITE_BLOCK, ARCITE_DUST, ARCITE_CRYSTAL, ARCITE_BLOCK, NETHER_SULFUR_ORE, IOLITE_ORE, IOLITE_DUST, IOLITE_CRYSTAL, IOLITE_BLOCK, INVAR_DUST, INVAR_INGOT);
     }
 
     // What's made from the ores, in creative tab order (Components): each metal's plate, gear and rod, then the components.

@@ -86,7 +86,7 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
                     case InductionFurnaceMenu.DATA_USAGE -> usage;
                     case InductionFurnaceMenu.DATA_STATUS -> status.ordinal();
                     case InductionFurnaceMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case InductionFurnaceMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case InductionFurnaceMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

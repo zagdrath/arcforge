@@ -116,7 +116,7 @@ public class HydrothermalCarbonizerBlockEntity extends MachineBlockEntity implem
                     case HydrothermalCarbonizerMenu.DATA_HEAT_USAGE -> heatUsage;
                     case HydrothermalCarbonizerMenu.DATA_STATUS -> status.ordinal();
                     case HydrothermalCarbonizerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case HydrothermalCarbonizerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case HydrothermalCarbonizerMenu.DATA_SIDE_CONFIG -> packedSides();
                     case HydrothermalCarbonizerMenu.DATA_WATER -> water.getAmount();
                     case HydrothermalCarbonizerMenu.DATA_RETURNED -> returned.getAmount();
                     case HydrothermalCarbonizerMenu.DATA_TANK_CAPACITY -> water.getCapacity();

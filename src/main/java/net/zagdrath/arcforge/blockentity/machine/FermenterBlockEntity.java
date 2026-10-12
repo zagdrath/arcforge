@@ -138,7 +138,7 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
                     case FermenterMenu.DATA_ETHANOL_CAPACITY -> ethanol.getCapacity();
                     case FermenterMenu.DATA_STATUS -> status.ordinal();
                     case FermenterMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case FermenterMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case FermenterMenu.DATA_SIDE_CONFIG -> packedSides();
                     case FermenterMenu.DATA_CO2 -> carbonDioxide.getAmount();
                     case FermenterMenu.DATA_CO2_CAPACITY -> carbonDioxide.getCapacity();
                     case FermenterMenu.DATA_ADDITIVE_LEFT -> additiveLeft;

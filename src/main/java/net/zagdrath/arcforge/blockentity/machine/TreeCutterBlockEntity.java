@@ -129,7 +129,7 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
                     case TreeCutterMenu.DATA_FELLED -> felled;
                     case TreeCutterMenu.DATA_STATUS -> status.ordinal();
                     case TreeCutterMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case TreeCutterMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case TreeCutterMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

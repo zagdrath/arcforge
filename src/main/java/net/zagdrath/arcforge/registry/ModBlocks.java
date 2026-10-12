@@ -49,7 +49,9 @@ import net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.PlantingBedBlock;
 import net.zagdrath.arcforge.block.logistics.ChunkLoaderBlock;
 import net.zagdrath.arcforge.block.logistics.HeatPipeBlock;
+import net.zagdrath.arcforge.block.logistics.LinkConduitBlock;
 import net.zagdrath.arcforge.block.logistics.QuantumTunnelBlock;
+import net.zagdrath.arcforge.block.logistics.WiredMachineLinkBlock;
 import net.zagdrath.arcforge.block.machine.AirSeparatorBlock;
 import net.zagdrath.arcforge.block.machine.HaberReactorBlock;
 import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
@@ -278,6 +280,14 @@ public final class ModBlocks {
     public static final DeferredBlock<HeatPipeBlock> HEAT_PIPE = BLOCKS.registerBlock("heat_pipe",
             HeatPipeBlock::new, p -> p.mapColor(MapColor.METAL).strength(5.0F, 6.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.METAL).noOcclusion().lightLevel(state -> state.getValue(HeatPipeBlock.LIT) ? 6 : 0));
+
+    // The Wired Machine Link and its Link Conduit: one machine's ports, extended to another block down a thin cable.
+    public static final DeferredBlock<WiredMachineLinkBlock> WIRED_MACHINE_LINK = BLOCKS.registerBlock("wired_machine_link",
+            WiredMachineLinkBlock::new, p -> p.mapColor(MapColor.METAL).strength(5.0F, 6.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL).lightLevel(state -> state.getValue(WiredMachineLinkBlock.LIT) ? 4 : 0));
+    public static final DeferredBlock<LinkConduitBlock> LINK_CONDUIT = BLOCKS.registerBlock("link_conduit",
+            LinkConduitBlock::new, p -> p.mapColor(MapColor.METAL).strength(1.0F, 6.0F).sound(SoundType.METAL).noOcclusion()
+                    .lightLevel(state -> state.getValue(LinkConduitBlock.LIT) ? 4 : 0));
 
     private static DeferredBlock<MeterBlock> meter(String name, MeterKind kind) {
         return BLOCKS.registerBlock(name, properties -> new MeterBlock(kind, properties),
@@ -541,6 +551,17 @@ public final class ModBlocks {
                     .strength(3.0F, 3.0F)
                     .sound(SoundType.NETHER_ORE)
                     .requiresCorrectToolForDrops());
+
+    // Iolite: the End's ore, in End Stone only (more on the outer islands than the main one). It drops Iolite Crystals
+    // straight away (see its loot table) and needs an iron pickaxe. Hardness as End Stone plus the usual ore margin.
+    public static final DeferredBlock<DropExperienceBlock> IOLITE_ORE = BLOCKS.registerBlock("iolite_ore",
+            p -> new DropExperienceBlock(UniformInt.of(3, 7), p), p -> p
+                    .mapColor(MapColor.SAND)
+                    .instrument(NoteBlockInstrument.BASEDRUM)
+                    .strength(3.5F, 9.0F)
+                    .sound(SoundType.STONE)
+                    .requiresCorrectToolForDrops());
+    public static final DeferredBlock<Block> IOLITE_BLOCK = BLOCKS.registerSimpleBlock("iolite_block", p -> storageProperties(p, SoundType.AMETHYST, MapColor.COLOR_BLUE, 0));
 
     // Ores: stone 3.0 or deepslate 4.5 hardness, the right tool to drop anything; xp as given.
     private static DeferredBlock<DropExperienceBlock> ore(String name, IntProvider xp, boolean deepslate, int light, @Nullable MapColor color) {

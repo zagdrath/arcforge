@@ -94,7 +94,7 @@ public class VulcanizerBlockEntity extends MachineBlockEntity {
                     case VulcanizerMenu.DATA_HEAT_USAGE -> heatUsage;
                     case VulcanizerMenu.DATA_STATUS -> status.ordinal();
                     case VulcanizerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case VulcanizerMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case VulcanizerMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

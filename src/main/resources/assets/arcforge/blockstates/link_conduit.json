@@ -1,0 +1,180 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "arcforge:block/link_conduit/node"
+      }
+    },
+    {
+      "when": {
+        "north": "cable|plug",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm"
+      }
+    },
+    {
+      "when": {
+        "north": "cable|plug",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm_on"
+      }
+    },
+    {
+      "when": {
+        "north": "plug"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/plate"
+      }
+    },
+    {
+      "when": {
+        "east": "cable|plug",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "cable|plug",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm_on",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "east": "plug"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/plate",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "south": "cable|plug",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "cable|plug",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm_on",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "south": "plug"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/plate",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "west": "cable|plug",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "cable|plug",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm_on",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "west": "plug"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/plate",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "up": "cable|plug",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "cable|plug",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm_on",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "up": "plug"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/plate",
+        "x": 270
+      }
+    },
+    {
+      "when": {
+        "down": "cable|plug",
+        "lit": "false"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "cable|plug",
+        "lit": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/arm_on",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "down": "plug"
+      },
+      "apply": {
+        "model": "arcforge:block/link_conduit/plate",
+        "x": 90
+      }
+    }
+  ]
+}

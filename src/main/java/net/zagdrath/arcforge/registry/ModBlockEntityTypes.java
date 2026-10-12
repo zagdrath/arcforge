@@ -26,6 +26,7 @@ import net.zagdrath.arcforge.blockentity.farming.GreenhouseBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.PlantingBedBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity;
+import net.zagdrath.arcforge.blockentity.logistics.WiredMachineLinkBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity;
@@ -307,6 +308,8 @@ public final class ModBlockEntityTypes {
                     ModBlocks.HEAT_PIPE.get()));
     public static final Supplier<BlockEntityType<ChunkLoaderBlockEntity>> CHUNK_LOADER = BLOCK_ENTITY_TYPES.register("chunk_loader",
             () -> new BlockEntityType<>(ChunkLoaderBlockEntity::new, ModBlocks.CHUNK_LOADER.get()));
+    public static final Supplier<BlockEntityType<WiredMachineLinkBlockEntity>> WIRED_MACHINE_LINK = BLOCK_ENTITY_TYPES.register("wired_machine_link",
+            () -> new BlockEntityType<>(WiredMachineLinkBlockEntity::new, ModBlocks.WIRED_MACHINE_LINK.get()));
 
     public static final Supplier<BlockEntityType<PressurizedCylinderBlockEntity>> PRESSURIZED_CYLINDER = BLOCK_ENTITY_TYPES.register("pressurized_cylinder",
             () -> new BlockEntityType<>(PressurizedCylinderBlockEntity::new, tierBlocks(ModBlocks::pressurizedCylinder, ModBlocks.CREATIVE_PRESSURIZED_CYLINDER)));

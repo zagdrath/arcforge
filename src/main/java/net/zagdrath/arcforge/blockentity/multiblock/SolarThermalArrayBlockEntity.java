@@ -129,7 +129,7 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
                     case SolarThermalArrayMenu.DATA_STOWED -> stowed ? 1 : 0;
                     case SolarThermalArrayMenu.DATA_STATUS -> status.ordinal();
                     case SolarThermalArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case SolarThermalArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case SolarThermalArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

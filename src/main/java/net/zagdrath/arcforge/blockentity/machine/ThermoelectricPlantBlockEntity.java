@@ -129,7 +129,7 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity implement
                     case ThermoelectricPlantMenu.DATA_FE_PER_TICK -> fePerTick;
                     case ThermoelectricPlantMenu.DATA_STATUS -> status.ordinal();
                     case ThermoelectricPlantMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ThermoelectricPlantMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ThermoelectricPlantMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

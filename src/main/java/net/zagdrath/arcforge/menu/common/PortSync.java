@@ -45,7 +45,7 @@ public final class PortSync {
             return;
         }
         List<PortsPayload.Entry> ports = controller.isFormed()
-                ? MultiblockPorts.list(level, controller).stream()
+                ? MultiblockPorts.shown(level, controller).stream()
                         .map(port -> new PortsPayload.Entry(port.mode(), port.side(), port.pos().subtract(pos)))
                         .toList()
                 : List.of();

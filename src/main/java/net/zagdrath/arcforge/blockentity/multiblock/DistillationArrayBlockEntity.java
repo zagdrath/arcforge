@@ -168,7 +168,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
                     case DistillationArrayMenu.DATA_HEAT_PER_TICK -> heatPerTick;
                     case DistillationArrayMenu.DATA_STATUS -> status.ordinal();
                     case DistillationArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case DistillationArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case DistillationArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

@@ -112,7 +112,7 @@ public class SuperheaterArrayBlockEntity extends CubeMultiblockBlockEntity {
                     case SuperheaterArrayMenu.DATA_PRESSURE -> pressure.ordinal();
                     case SuperheaterArrayMenu.DATA_STATUS -> status.ordinal();
                     case SuperheaterArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case SuperheaterArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case SuperheaterArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

@@ -1,0 +1,82 @@
+{
+  "parent": "minecraft:block/block",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "jacket": "arcforge:block/link_conduit/jacket",
+    "core": "arcforge:block/link_conduit/core",
+    "plate": "arcforge:block/port/machine_link",
+    "edge": "arcforge:block/link_conduit/plate_edge",
+    "particle": "arcforge:block/link_conduit/jacket"
+  },
+  "elements": [
+    {
+      "from": [
+        3,
+        3,
+        0
+      ],
+      "to": [
+        13,
+        13,
+        1.5
+      ],
+      "faces": {
+        "south": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#plate"
+        },
+        "north": {
+          "uv": [
+            3,
+            3,
+            13,
+            13
+          ],
+          "texture": "#plate",
+          "cullface": "north"
+        },
+        "east": {
+          "uv": [
+            0,
+            0,
+            10,
+            1.5
+          ],
+          "texture": "#edge"
+        },
+        "west": {
+          "uv": [
+            0,
+            0,
+            10,
+            1.5
+          ],
+          "texture": "#edge"
+        },
+        "up": {
+          "uv": [
+            0,
+            0,
+            10,
+            1.5
+          ],
+          "texture": "#edge"
+        },
+        "down": {
+          "uv": [
+            0,
+            0,
+            10,
+            1.5
+          ],
+          "texture": "#edge"
+        }
+      }
+    }
+  ]
+}

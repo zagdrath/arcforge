@@ -156,7 +156,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imp
                     case SteamTurbineArrayMenu.DATA_LENGTH -> getLength();
                     case SteamTurbineArrayMenu.DATA_STATUS -> status.ordinal();
                     case SteamTurbineArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case SteamTurbineArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case SteamTurbineArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     case SteamTurbineArrayMenu.DATA_LUBRICANT -> lubricant.getAmount();
                     case SteamTurbineArrayMenu.DATA_LUBRICANT_CAPACITY -> lubricant.getCapacity();
                     case SteamTurbineArrayMenu.DATA_LUBRICANT_FLUID -> lubricant.getAmount() > 0

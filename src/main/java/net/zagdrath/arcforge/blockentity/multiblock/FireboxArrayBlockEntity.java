@@ -177,7 +177,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
                     case FireboxArrayMenu.DATA_VOLUME -> volume();
                     case FireboxArrayMenu.DATA_STATUS -> status.ordinal();
                     case FireboxArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case FireboxArrayMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case FireboxArrayMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }

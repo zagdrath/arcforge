@@ -116,7 +116,7 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
                     case VacuumCollectorMenu.DATA_MAX_RANGE -> maxRange();
                     case VacuumCollectorMenu.DATA_STATUS -> status.ordinal();
                     case VacuumCollectorMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case VacuumCollectorMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case VacuumCollectorMenu.DATA_SIDE_CONFIG -> packedSides();
                     case VacuumCollectorMenu.DATA_XP -> xpTank.getAmount();
                     case VacuumCollectorMenu.DATA_XP_CAPACITY -> xpTank.getCapacity();
                     default -> 0;

@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:ores/iolite",
+  "result": {
+    "count": 2,
+    "id": "arcforge:iolite_dust"
+  },
+  "time": 200,
+  "ore": true
+}

@@ -230,6 +230,11 @@ takes the common tags (`c:ingots/silver`, `c:gems/arcite`, ...), so other mods' 
 **Spodumene** (lithium) doesn't smelt: the Arc Crusher grinds it into Spodumene Dust for the Chemical Reactor (see
 Lithium and batteries). A stone pickaxe mines it.
 
+**Iolite** is the End's ore, in End Stone only: 3 veins of 6 per chunk on the main island and 8 veins of 7 on the outer
+islands, Y 0 to 80 (`world.ores.iolite`, `world.ores.ioliteOuter`). It needs an iron pickaxe and drops Iolite Crystals straight
+away (Fortune works; Silk Touch drops the ore); the Arc Crusher gives 2 Iolite Dust per ore. It makes the Link Conduit
+and the Wired Machine Link.
+
 **Halite** is different: it forms wide, flat beds rather than veins, one layer thick, and three layers thick under
 deserts and oceans (`haliteBeds`). It drops Rock Salt, which doesn't smelt; the Arc Crusher grinds it into Salt.
 
@@ -991,6 +996,17 @@ maps them and outlines them in the world).
   0 by default).
 - It stops when broken, when a redstone signal turns it off, or when it runs out of FE.
 
+
+### Wired Machine Link
+
+A Link Conduit (a thin Iolite-cored cable, up to 64 blocks, `logistics.machineLink.maxCableLength`) runs from one machine, or any
+outer face of a formed multiblock, to a Wired Machine Link. Each of the link's other faces can then be set to any port
+mode that machine has, and works as that port would: items, fluids, gases, FE and heat go straight to and from the
+machine, with no limit of its own, and output faces push with the machine's auto-eject. The face the cable is on becomes
+a locked purple Wired Machine Link port (shown in the machine's Sides or Ports tab and in Jade) until the cable comes
+off; then it's back to what it was. One link per machine. The cable carries nothing itself, never branches, and glows
+while the link is live. The link's GUI shows the machine (e.g. "Steam Boiler Array 7×9×12"), the face the cable is on
+and its length, or "Not linked" and why.
 ### Energy Cells
 
 A full-block FE store. Its side windows light up segment by segment as it charges, and it gives

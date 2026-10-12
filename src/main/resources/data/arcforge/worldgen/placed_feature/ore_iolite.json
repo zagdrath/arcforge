@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_iolite",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "iolite",
+      "default": 3
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "iolite",
+      "shape": "uniform",
+      "default_min": 0,
+      "default_max": 80
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

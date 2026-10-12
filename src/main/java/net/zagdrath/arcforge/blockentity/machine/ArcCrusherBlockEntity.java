@@ -83,7 +83,7 @@ public class ArcCrusherBlockEntity extends MachineBlockEntity {
                     case ArcCrusherMenu.DATA_USAGE -> usage;
                     case ArcCrusherMenu.DATA_STATUS -> status.ordinal();
                     case ArcCrusherMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
-                    case ArcCrusherMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
+                    case ArcCrusherMenu.DATA_SIDE_CONFIG -> packedSides();
                     default -> 0;
                 };
             }
