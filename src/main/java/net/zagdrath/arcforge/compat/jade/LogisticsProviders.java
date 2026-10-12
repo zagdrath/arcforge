@@ -18,6 +18,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.experience.XpShowerBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity;
+import net.zagdrath.arcforge.blockentity.logistics.HeatPipeBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.ItemReservoirBlockEntity;
@@ -38,7 +39,8 @@ import snownee.jade.api.config.IPluginConfig;
 // touches others it can't join; "12 / 540 slots used (3% full)"), the XP Drain ("Drains into the tank below" or "Place on
 // a fluid container"), the XP Shower and the Vacuum Collector's experience ("Liquid Experience: 2,000 mB (100 points)",
 // "Off: redstone signal"), the Quantum Tunnel ("Frequency: Base (private)" or "No frequency") and the Chunk Loader
-// ("Loading 9 chunks (radius 1)" or its status).
+// ("Loading 9 chunks (radius 1)" or its status), and the Heat Pipe ("Pipe of 12 blocks, 6.0% lost", "Carrying 50,400 HU/t at
+// 1,100°C" or "Idle"), from any block of it.
 public final class LogisticsProviders {
     private LogisticsProviders() {}
 
@@ -166,6 +168,58 @@ public final class LogisticsProviders {
             @Override
             public Identifier getUid() {
                 return uid("item_reservoir");
+            }
+        }
+    }
+
+    public enum HeatPipe implements StreamServerDataProvider<BlockAccessor, HeatPipe.Data> {
+        INSTANCE;
+
+        // loss: tenths of a percent of the heat the pipe loses over its length.
+        public record Data(int length, int rate, int celsius, int loss) {
+            public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
+                    ByteBufCodecs.VAR_INT, Data::length, ByteBufCodecs.VAR_INT, Data::rate, ByteBufCodecs.VAR_INT, Data::celsius,
+                    ByteBufCodecs.VAR_INT, Data::loss, Data::new);
+        }
+
+        @Override
+        public @Nullable Data streamData(BlockAccessor accessor) {
+            HeatPipeBlockEntity pipe = HeatPipeBlockEntity.controllerOf(accessor.getLevel(), accessor.getPosition());
+            if (pipe == null || pipe.getLength() <= 0) {
+                return null;
+            }
+            int loss = (int) Math.round((1.0 - HeatPipeBlockEntity.efficiency(pipe.getLength())) * 1000.0);
+            return new Data(pipe.getLength(), pipe.getRate(), pipe.getCarrying(), loss);
+        }
+
+        @Override
+        public StreamCodec<RegistryFriendlyByteBuf, Data> streamCodec() {
+            return Data.STREAM_CODEC;
+        }
+
+        @Override
+        public Identifier getUid() {
+            return uid("heat_pipe");
+        }
+
+        // Jade needs the tooltip half as its own provider, under the same uid.
+        public enum Client implements IBlockComponentProvider {
+            INSTANCE;
+
+            @Override
+            public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+                HeatPipe.INSTANCE.decodeFromData(accessor).ifPresent(data -> {
+                    String loss = String.format(java.util.Locale.ROOT, "%.1f", data.loss() / 10.0);
+                    tooltip.add(Component.translatable("jade.arcforge.heat_pipe.length", data.length(), loss));
+                    tooltip.add((data.rate() > 0
+                            ? Component.translatable("jade.arcforge.heat_pipe.carrying", grouped(data.rate()), grouped(data.celsius()))
+                            : Component.translatable("jade.arcforge.heat_pipe.idle")).withStyle(ChatFormatting.GRAY));
+                });
+            }
+
+            @Override
+            public Identifier getUid() {
+                return uid("heat_pipe");
             }
         }
     }

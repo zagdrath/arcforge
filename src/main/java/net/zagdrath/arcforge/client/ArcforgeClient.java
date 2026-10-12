@@ -276,6 +276,8 @@ public class ArcforgeClient {
                 event.register(List.of(glow, ConduitDyeModel.Tint.INSTANCE), conduit);
             }
         }
+        // The Heat Pipe's core glows by the temperature it carries.
+        event.register(List.of(HeatPipeTint.INSTANCE), ModBlocks.HEAT_PIPE.get());
     }
 
     // The structure viewer caches block sprites, which a resource reload replaces.

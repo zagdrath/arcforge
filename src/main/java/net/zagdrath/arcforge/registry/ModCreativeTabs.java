@@ -91,6 +91,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.XP_DRAIN.get());
                 output.accept(ModItems.XP_SHOWER.get());
                 output.accept(ModItems.QUANTUM_TUNNEL.get());
+                output.accept(ModItems.HEAT_PIPE.get());
                 output.accept(ModItems.CHUNK_LOADER.get());
                 output.accept(ModItems.ENERGY_METER.get());
                 output.accept(ModItems.HEAT_METER.get());

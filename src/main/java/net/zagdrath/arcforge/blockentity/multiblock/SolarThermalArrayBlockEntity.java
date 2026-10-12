@@ -63,13 +63,15 @@ import net.zagdrath.arcforge.multiblock.SolarThermalStructure;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // Runs the Solar Thermal Array: its receiver takes in heat by the sun (see SolarModel), into a heat buffer at
 // the temperature the sun allows, and gives it out through heat ports (only ever to something cooler). A
 // buffer hotter than the sun now allows loses the difference over a few seconds, so the receiver cools with
 // the weather and the evening. Which collectors see the sky and the biome are rechecked every 2 seconds.
 // Its only port mode is heat; a new tower gets one on the bottom-layer block behind the controller.
-public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements MultiblockController {
+public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements MultiblockController, OutputLimited {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.HEAT);
     private static final int REDSTONE_CHECK_INTERVAL = 10;
@@ -84,6 +86,7 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
     private final MultiblockPorts.Defaults portDefaults = new MultiblockPorts.Defaults();
 
     private final HeatBuffer heat;
+    private final OutputLimit outputLimit = new OutputLimit(OutputLimit.Unit.HU);
     private final HeatHandler heatOutput;
     private final ContainerData data;
     private final List<BlockCapabilityCache<HeatHandler, @Nullable Direction>> heatTargets = new ArrayList<>();
@@ -236,6 +239,7 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
         }
         if (tower == null) {
             status = MachineStatus.NOT_FORMED;
+            outputLimit.reset();
             heatPerTick = 0;
             heat.setProducing(false);
             return;
@@ -267,9 +271,12 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
             heat.setProducing(false);
         }
         if (heat.getStored() > limit) {
-            heat.remove(Math.min(heat.getStored() - limit, Math.max(1, heat.getCapacity() / COOLING_SHARE)));
+            heat.bleed(Math.min(heat.getStored() - limit, Math.max(1, heat.getCapacity() / COOLING_SHARE)));
         }
         pushHeat(level);
+        // Running while the sun gives heat; it could give all of it, against what it holds at the receiver's temperature.
+        outputLimit.tick(level, heatPerTick > 0, () -> OutputLimit.anyPortTakes(level, this, SideMode.HEAT, OutputLimit.Unit.HU),
+                heat.getStored(), limit, heat.drained(), heatPerTick);
 
         if (!enabled) {
             status = stoppedStatus();
@@ -492,5 +499,9 @@ public class SolarThermalArrayBlockEntity extends MachineBlockEntity implements 
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
         return new SolarThermalArrayMenu(containerId, inventory, worldPosition, items, data);
+    }
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
     }
 }

@@ -11,9 +11,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 
 // Arcforge tiers in progression order, shared by conduits and storage blocks. Different tiers of the
-// same conduit type connect, and a network runs at the rate of its lowest tier.
+// same conduit type connect, and a network runs at the rate of its lowest tier. The HU/t column is the heat cell's and
+// thermal capsule's rate; the Thermodynamic Conduit's rate is in config (power.heat.thermodynamicConduits), 50 / 200 /
+// 800 / 51,200 by default, so an Arcforged conduit can carry a big multiblock's heat.
 public enum ConduitTier implements StringRepresentable {
-    //            FE/t    items/op  ticks/op  mB/t    HU/t   item speed (blocks/tick)
+    //            FE/t    items/op  ticks/op  mB/t    cell HU/t   item speed (blocks/tick)
     WROUGHT("wrought", 256, 8, 20, 200, 50, 0.05F),
     TEMPERED("tempered", 1_024, 16, 10, 800, 200, 0.08F),
     HARDENED("hardened", 8_192, 32, 5, 3_200, 800, 0.12F),
@@ -31,16 +33,16 @@ public enum ConduitTier implements StringRepresentable {
     private final int itemsPerOperation;
     private final int ticksPerItemOperation;
     private final int fluidPerTick;
-    private final int heatPerTick;
+    private final int cellHeatPerTick;
     private final float itemSpeed;
 
-    ConduitTier(String name, int energyPerTick, int itemsPerOperation, int ticksPerItemOperation, int fluidPerTick, int heatPerTick, float itemSpeed) {
+    ConduitTier(String name, int energyPerTick, int itemsPerOperation, int ticksPerItemOperation, int fluidPerTick, int cellHeatPerTick, float itemSpeed) {
         this.name = name;
         this.energyPerTick = energyPerTick;
         this.itemsPerOperation = itemsPerOperation;
         this.ticksPerItemOperation = ticksPerItemOperation;
         this.fluidPerTick = fluidPerTick;
-        this.heatPerTick = heatPerTick;
+        this.cellHeatPerTick = cellHeatPerTick;
         this.itemSpeed = itemSpeed;
     }
 
@@ -65,8 +67,19 @@ public enum ConduitTier implements StringRepresentable {
         return fluidPerTick * 2;
     }
 
+    // The Thermodynamic Conduit's HU/t (and the heat each conduit holds: one tick's worth), from config.
     public int heatPerTick() {
-        return heatPerTick;
+        return net.zagdrath.arcforge.config.ArcforgeConfig.thermodynamicConduitRate(this);
+    }
+
+    // The default of that rate, for config defaults that follow it (read before the config is).
+    public int defaultHeatPerTick() {
+        return switch (this) {
+            case WROUGHT -> 50;
+            case TEMPERED -> 200;
+            case HARDENED -> 800;
+            case ARCFORGED -> 51_200;
+        };
     }
 
     public float itemSpeed() {
@@ -150,9 +163,10 @@ public enum ConduitTier implements StringRepresentable {
         };
     }
 
-    // Most HU a heat cell takes in or gives out per tick: the thermodynamic conduit rate of the same tier.
+    // Most HU a heat cell takes in or gives out per tick: 50 / 200 / 800 / 3,200 (the Arcforged cell kept its rate when the
+    // Arcforged conduit was raised).
     public int heatCellRate() {
-        return heatPerTick;
+        return cellHeatPerTick;
     }
 
     // Share of its stored heat a heat cell leaks away per minute, in percent. Better tiers are better insulated.
@@ -259,7 +273,7 @@ public enum ConduitTier implements StringRepresentable {
             case ENERGY -> Component.translatable("tooltip.arcforge.conduit.throughput.energy", format(energyPerTick));
             case FLUID -> Component.translatable("tooltip.arcforge.conduit.throughput.fluid", format(fluidPerTick));
             case GAS -> Component.translatable("tooltip.arcforge.conduit.throughput.fluid", format(gasPerTick()));
-            case THERMAL -> Component.translatable("tooltip.arcforge.conduit.throughput.thermal", format(heatPerTick));
+            case THERMAL -> Component.translatable("tooltip.arcforge.conduit.throughput.thermal", format(heatPerTick()));
             case ITEM -> Component.translatable("tooltip.arcforge.conduit.throughput.item", itemsPerOperation,
                     String.format("%.1f", ticksPerItemOperation / 20.0));
         };

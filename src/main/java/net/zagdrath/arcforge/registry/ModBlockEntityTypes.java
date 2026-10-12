@@ -297,6 +297,10 @@ public final class ModBlockEntityTypes {
             () -> new BlockEntityType<>(XpShowerBlockEntity::new, ModBlocks.XP_SHOWER.get()));
     public static final Supplier<BlockEntityType<QuantumTunnelBlockEntity>> QUANTUM_TUNNEL = BLOCK_ENTITY_TYPES.register("quantum_tunnel",
             () -> new BlockEntityType<>(QuantumTunnelBlockEntity::new, ModBlocks.QUANTUM_TUNNEL.get()));
+
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.logistics.HeatPipeBlockEntity>> HEAT_PIPE =
+            BLOCK_ENTITY_TYPES.register("heat_pipe", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.logistics.HeatPipeBlockEntity::new,
+                    ModBlocks.HEAT_PIPE.get()));
     public static final Supplier<BlockEntityType<ChunkLoaderBlockEntity>> CHUNK_LOADER = BLOCK_ENTITY_TYPES.register("chunk_loader",
             () -> new BlockEntityType<>(ChunkLoaderBlockEntity::new, ModBlocks.CHUNK_LOADER.get()));
 

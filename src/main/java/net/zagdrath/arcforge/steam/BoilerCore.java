@@ -220,7 +220,7 @@ public class BoilerCore {
             return false;
         }
         int excess = heat.getStored() - (heat.minStoredAt(top + 1) - 1);
-        return heat.remove(Math.min(excess, max)) > 0;
+        return heat.bleed(Math.min(excess, max)) > 0;
     }
 
     // Applies the grade rules to the stored steam and returns the grade to make this tick.

@@ -40,19 +40,22 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // Turns heat into FE. Heat arriving on heat faces fills its buffer, and heat passes through the
 // thermocouples in proportion to how hot the buffer is: heatThroughput HU/t (80) at 1,100°C, and more
 // above that, up to ~102 HU/t when full at 1,400°C. The FE made from that heat depends on the temperature:
 // 0% at 100°C, 100% at 1,100°C, and up to 115% at 1,400°C. So it needs a hot source: a Firebox (1,100°C)
 // runs it at full efficiency, and only a Geothermal Plant's hotter heat (1,400°C) earns the bonus.
-public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
+public class ThermoelectricPlantBlockEntity extends MachineBlockEntity implements OutputLimited {
     public static final int MACHINE_SLOTS = 0;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT, UpgradeType.THERMOELECTRIC);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.HEAT, SideMode.ENERGY);
 
     private final HeatBuffer heat;
     private final GeneratorEnergyHandler energy;
+    private final OutputLimit outputLimit = new OutputLimit(OutputLimit.Unit.FE);
     private final ContainerData data;
     // Heat faces together take at most heatThroughput HU in a tick.
     private final HeatHandler heatInput;
@@ -177,6 +180,9 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
         boolean enabled = canRun(level);
         heatPerTick = 0;
         fePerTick = 0;
+        // What it would make from the heat it holds, with room for it all.
+        int rated = heat.getStored() > 0 ? (int) ((int) Math.ceil((double) throughput() * heat.getStored() / heat.getCapacity())
+                * upgradedEfficiency() * PowerGeneration.multiplier()) : 0;
         if (enabled && !energy.isFull() && heat.getStored() > 0) {
             // FE per HU, times the power multiplier (see PowerGeneration).
             float efficiency = upgradedEfficiency() * (float) PowerGeneration.multiplier();
@@ -194,6 +200,10 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
             fePerTick = energy.generate(Math.min(wantedFe, (int) (heatPerTick * efficiency)));
         }
         outputs.pushEnergy(level, pos, getFacing(), sideConfig, energy, PowerGeneration.cap(ArcforgeConfig.THERMOELECTRIC_MAX_OUTPUT.getAsInt()));
+        // Held back by what takes its FE only when the heat backs up too (its heat buffer nearly full).
+        boolean heatBackedUp = (long) heat.getStored() * 100 >= (long) heat.getCapacity() * ArcforgeConfig.OUTPUT_LIMIT_FULL_PERCENT.getAsInt();
+        outputLimit.tick(level, enabled && heatBackedUp, () -> OutputLimit.anyFaceTakes(level, pos, getFacing(), sideConfig, SideMode.ENERGY,
+                OutputLimit.Unit.FE), energy.getAmountAsInt(), energy.getCapacityAsInt(), energy.drained(), rated);
 
         if (!enabled) {
             status = stoppedStatus();
@@ -209,6 +219,11 @@ public class ThermoelectricPlantBlockEntity extends MachineBlockEntity {
 
     public HeatBuffer getHeat() {
         return heat;
+    }
+
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
     }
 
     public int getFePerTick() {

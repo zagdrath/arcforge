@@ -66,6 +66,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // The Gas Turbine Array (see ShellMultiblockBlockEntity): a turbine 5 to 9 blocks long that burns Fuel Burner
 // fuels straight to FE. It burns up to maxFuelHeatPerLength x L HU/t of fuel (2,500 x L: about 34,000 FE/t at 9 long) (the limit is heat, so Hydrogen's
@@ -78,7 +80,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // 20 ticks of ignition; running dry is a flameout, and it waits 20 ticks before it can ignite again. With a Gas Output
 // port (named Flue Gas) it gives off Carbon Dioxide through it while burning carbon fuels, in proportion to the fuel's
 // heat (see FlueGas); Hydrogen gives none, and with no such port nothing changes.
-public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
+public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity implements OutputLimited {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     // Eight blades look the same every 45°, so a turn of more than 22.5° a tick would look like it went
     // backwards; the stagger hides most of that, and full speed turns 60° a tick.
@@ -101,6 +103,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     // Replaced (keeping what it holds) when the length changes, since its size and rate follow it.
     private GeneratorEnergyHandler energy;
+    private final OutputLimit outputLimit = new OutputLimit(OutputLimit.Unit.FE);
     private final FilteredFluidTank fuel;
     private final ResourceHandler<FluidResource> fuelInput;
     private final FilteredFluidTank lubricant;
@@ -421,7 +424,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         }
         // Exhaust nothing took since last tick is vented. Heat ports push it out in pushHeat, but Thermodynamic
         // Conduits pull it on their own tick, after this one, so it has to wait a tick for them.
-        ventedHu = exhaust.remove(exhaust.getStored());
+        ventedHu = exhaust.bleed(exhaust.getStored());
         fePerTick = 0;
         exhaustHu = 0;
         if (burnedHu > 0 && burning != null) {
@@ -455,6 +458,12 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
         status = status(allowed, hasFuel, target);
         pushEnergy(level);
+        // What it would make at its throttle on this fuel, at full speed with the lubricant as it stands, against its FE buffer.
+        int rated = burning == null || !burning.gasTurbine() ? 0 : PowerGeneration.fe(maxHu * throttle() * fePerHu(burnTemperature(burning))
+                * (1.0 + (lubricated ? Lubricant.bonus() - 1.0 : 0.0)));
+        outputLimit.tick(level, allowed && intakeOpen && hasFuel,
+                () -> OutputLimit.anyPortTakes(level, this, SideMode.ENERGY, OutputLimit.Unit.FE),
+                energy.getAmountAsInt(), energy.getCapacityAsInt(), energy.drained(), rated);
         boolean changed = Math.abs(rpm - syncedRpm) >= 1.0 || isVenting() != syncedVenting || Math.abs(load() - syncedLoad) >= 0.01F
                 || exhaustHu != syncedExhaustHu;
         if (changed && time - lastSync >= SYNC_INTERVAL || (rpm == 0 && syncedRpm != 0)) {
@@ -799,5 +808,9 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
         return new GasTurbineArrayMenu(containerId, inventory, worldPosition, items, data);
+    }
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
     }
 }

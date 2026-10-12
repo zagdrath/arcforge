@@ -31,6 +31,8 @@ import net.zagdrath.arcforge.machine.CombustionFuel;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.registry.ModItems;
@@ -45,7 +47,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // farming.growing.fertilizers.woodAshChance; the ash comes out through Output faces, and a full ash slot loses it.
 // With a Flue Gas face (the Gas Output side mode) set, burning a carbon fuel gives off Carbon Dioxide through it in
 // proportion to the heat made (see FlueGas, flueHeat); with none, nothing changes.
-public abstract class BurnerBlockEntity extends MachineBlockEntity {
+public abstract class BurnerBlockEntity extends MachineBlockEntity implements OutputLimited {
     public static final int SLOT_FUEL = 0;
     public static final int SLOT_ASH = 1;
     public static final int MACHINE_SLOTS = 2;
@@ -58,6 +60,7 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
     private final ContainerData data;
     protected final FlueGas flue;
 
+    private final OutputLimit outputLimit = new OutputLimit(limitUnit());
     private int burnTime;
     private int burnTotal;
     private @Nullable Item burning;
@@ -119,6 +122,30 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
     public abstract int getStored();
 
     public abstract int getCapacity();
+
+    // --- "Limited by connections" (see OutputLimit) ---
+
+    // HU for heat burners, FE for the Combustion Plant. Called from the constructor: return a constant.
+    protected abstract OutputLimit.Unit limitUnit();
+
+    // The side mode its output goes out of (HEAT or ENERGY).
+    protected abstract SideMode outputMode();
+
+    // What it makes a tick while burning, with its upgrades (whether or not the buffer lets it burn this tick).
+    protected abstract int ratedOutput();
+
+    // The buffer's running total of what was given out.
+    protected abstract long drainedTotal();
+
+    // The most the buffer may hold right now.
+    protected int bufferLimit() {
+        return getCapacity();
+    }
+
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
+    }
 
     // °C for heat, 0 for FE.
     // What it made this tick (FE or HU).
@@ -201,6 +228,10 @@ public abstract class BurnerBlockEntity extends MachineBlockEntity {
         flue.push(level, pos, getFacing(), sideConfig, outputs);
         pushOutput(level, pos, getFacing());
         autoEject(level, ashOutput);
+        // Running: switched on with something burning or to burn.
+        boolean running = enabled && (burnTime > 0 || CombustionFuel.isFuel(items.getStack(SLOT_FUEL)));
+        outputLimit.tick(level, running, () -> OutputLimit.anyFaceTakes(level, pos, getFacing(), sideConfig, outputMode(), limitUnit()),
+                getStored(), bufferLimit(), drainedTotal(), ratedOutput());
 
         if (!enabled) {
             status = stoppedStatus();

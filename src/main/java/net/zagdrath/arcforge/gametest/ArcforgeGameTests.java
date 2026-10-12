@@ -123,6 +123,13 @@ public final class ArcforgeGameTests {
         TESTS.put("heat_cell_leaks", HeatGameTests::heatCellLeaks);
         TESTS.put("heat_cell_outputs", HeatGameTests::heatCellOutputs);
         TESTS.put("heat_cell_keeps_heat", HeatGameTests::heatCellKeepsHeat);
+        TESTS.put("thermal_conduit_rates", HeatTransportGameTests::thermalConduitRates);
+        TESTS.put("heat_pipe_carries_heat", HeatTransportGameTests::heatPipeCarriesHeat);
+        TESTS.put("heat_pipe_one_way", HeatTransportGameTests::heatPipeOneWay);
+        TESTS.put("heat_pipe_sides_dont_connect", HeatTransportGameTests::heatPipeSidesDontConnect);
+        TESTS.put("heat_pipe_splits_long_lines", HeatTransportGameTests::heatPipeSplitsLongLines);
+        TESTS.put("output_limit_detects", HeatTransportGameTests::outputLimitDetects);
+        TESTS.put("firebox_limited_by_connections", HeatTransportGameTests::fireboxLimitedByConnections);
         TESTS.put("fiberizer_accepts_inputs", FiberGameTests::fiberizerAcceptsInputs);
         TESTS.put("heat_cell_insulation", FiberGameTests::heatCellInsulation);
         TESTS.put("heat_cell_tier_temperature", FiberGameTests::heatCellTierTemperature);

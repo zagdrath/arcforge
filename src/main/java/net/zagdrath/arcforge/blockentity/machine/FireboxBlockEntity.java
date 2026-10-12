@@ -33,6 +33,7 @@ import net.zagdrath.arcforge.heat.OxyFuel;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
@@ -86,13 +87,42 @@ public class FireboxBlockEntity extends BurnerBlockEntity {
             oxy.idle();
             return 0;
         }
-        double made = ArcforgeConfig.FIREBOX_HEAT_PER_TICK.getAsInt() * speedMultiplier() * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT));
+        double made = baseHeatPerTick();
         int oxygen = oxy.getTank().getAmount();
         if (oxy.burn()) {
             made *= OxyFuel.heatMultiplier();
         }
         controlState.consumedFluid(oxygen - oxy.getTank().getAmount());
         return heat.add((int) Math.round(made));
+    }
+
+    private double baseHeatPerTick() {
+        return ArcforgeConfig.FIREBOX_HEAT_PER_TICK.getAsInt() * speedMultiplier() * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT));
+    }
+
+    @Override
+    protected OutputLimit.Unit limitUnit() {
+        return OutputLimit.Unit.HU;
+    }
+
+    @Override
+    protected SideMode outputMode() {
+        return SideMode.HEAT;
+    }
+
+    @Override
+    protected int ratedOutput() {
+        return (int) Math.round(baseHeatPerTick() * (oxy.available() ? OxyFuel.heatMultiplier() : 1.0));
+    }
+
+    @Override
+    protected long drainedTotal() {
+        return heat.drained();
+    }
+
+    @Override
+    protected int bufferLimit() {
+        return heat.getLimit();
     }
 
     @Override

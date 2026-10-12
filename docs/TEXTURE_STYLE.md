@@ -1026,3 +1026,24 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - The Metal Press dies engrave the part they press, in the die's face (x/y 3..12): the plate's silhouette, a 10 px gear
   (eight teeth round a ring, a 2×2 hole) and the rod's diagonal, each a `#2E3237` floor with a `#0C0D0F` shadow along its
   top edge and a `#5C646C` lit lip under its bottom edge. The coloured strip at the bottom stays.
+
+## Heat Pipe and the "Limited by connections" line
+- **Heat Pipe** (`block/heat_pipe/`): a UV-unwrapped 32×32 sheet `pipe` (1 texel per px, UVs in half-units) and a
+  tinted `core`. The model runs along Z (its negative end north) and the blockstate turns it for X (y 90/270) and Y
+  (x 90/270): `body` (a 12×12 jacket, 2..14, and a 6×6 core, 5..11, end to end) and `cap` (a 16×16 plate 3 px thick at
+  a pipe end, against the port). Only the ends are flanged: between the blocks of a pipe the jacket runs on unbroken, so
+  a pipe reads as one length.
+  - Jacket strip (x 0–15, y 0–11), along the pipe: `#727982` lit edge, `#575D65`, two rows of `#474C53` face, the window
+    band as a recess (a `#16181B` top lip, 2 clear rows, a `#727982` lower lip), two rows of `#40454C`, then `#2B2F34`
+    and `#16181B`. All four long faces share it (up and down turned 90°).
+  - Cap ring (x 0–15, y 12–27), the cap's inner face: the house bevel 2 px wide round a hidden `#2B2F34` middle. Cap sides (x 16–18): `#727982`, `#474C53` with a `#959DA6` bolt head
+    and its `#2B2F34` shadow every 4 px, `#2B2F34`.
+  - Cap face (x 16–31, y 16–31): the single-block casing (bevel, split face at x 10, four rivets with inward shadows)
+    with a recessed 4×4 plug in the middle.
+  - `core` is neutral grey for the tint (rows 2–3, the ones the window shows: `#FFFFFF` over `#D2D2D2`; the rest
+    `#B4B4B4`), full-bright (`block_light` 15) and unshaded. HeatPipeTint colours it by the temperature carried with the
+    Thermodynamic Conduits' heat ramp (`#9A2A18` at 100°C, `#E0461A`, `#FF8A2A`, `#FFD35A`, `#FFF4D6` at 1,500°C) and
+    `#2B2F34` while it carries nothing. The item shows it at `#E0461A`.
+- **"Limited by connections"** (every heat, FE or steam producer's GUI): one line in warning yellow `#FFD24A` in place of
+  the inventory label, scaled down to fit the 160 px between the margins (to 2/3 at most; past that the short form
+  "Limited: ..." is used). Jade shows the same line in the same colour.

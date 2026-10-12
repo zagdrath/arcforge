@@ -31,7 +31,8 @@
         "hydrogen_and_oxygen",
         "solar_thermal_array",
         "thermoelectric_plant",
-        "heat_cells"
+        "heat_cells",
+        "heat_pipe"
       ]
     },
     {

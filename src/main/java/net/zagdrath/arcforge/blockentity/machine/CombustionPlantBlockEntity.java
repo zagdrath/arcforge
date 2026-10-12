@@ -30,6 +30,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
@@ -70,6 +71,26 @@ public class CombustionPlantBlockEntity extends BurnerBlockEntity {
     private int energyPerTick() {
         return PowerGeneration.fe(ArcforgeConfig.COMBUSTION_PLANT_ENERGY_PER_TICK.getAsInt() * speedMultiplier()
                 * UpgradeType.outputMultiplier(upgrades(UpgradeType.ENERGY)));
+    }
+
+    @Override
+    protected OutputLimit.Unit limitUnit() {
+        return OutputLimit.Unit.FE;
+    }
+
+    @Override
+    protected SideMode outputMode() {
+        return SideMode.ENERGY;
+    }
+
+    @Override
+    protected int ratedOutput() {
+        return energyPerTick();
+    }
+
+    @Override
+    protected long drainedTotal() {
+        return energy.drained();
     }
 
     // It makes FE, not heat: each FE counts as flueGas.combustionPlantHuPerFe HU (2: a coal gives the same Carbon Dioxide

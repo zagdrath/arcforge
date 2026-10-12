@@ -58,7 +58,69 @@ public class ArcforgeConfig {
             .defineInRange("contactTransferRate", 100, 1, 1_000_000);
 
     static {
+        BUILDER.comment("Thermodynamic Conduits: HU/t a network of each tier moves (a network runs at its lowest tier), and the heat",
+                "each conduit holds (one tick's worth). Heat Cells and Thermal Capsules keep their own rates.").push("thermodynamicConduits");
+    }
+
+    public static final ModConfigSpec.IntValue THERMAL_CONDUIT_WROUGHT = BUILDER.defineInRange("wrought",
+            net.zagdrath.arcforge.conduit.ConduitTier.WROUGHT.defaultHeatPerTick(), 1, 2_000_000);
+    public static final ModConfigSpec.IntValue THERMAL_CONDUIT_TEMPERED = BUILDER.defineInRange("tempered",
+            net.zagdrath.arcforge.conduit.ConduitTier.TEMPERED.defaultHeatPerTick(), 1, 2_000_000);
+    public static final ModConfigSpec.IntValue THERMAL_CONDUIT_HARDENED = BUILDER.defineInRange("hardened",
+            net.zagdrath.arcforge.conduit.ConduitTier.HARDENED.defaultHeatPerTick(), 1, 2_000_000);
+    public static final ModConfigSpec.IntValue THERMAL_CONDUIT_ARCFORGED = BUILDER.defineInRange("arcforged",
+            net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.defaultHeatPerTick(), 1, 2_000_000);
+
+    static {
         BUILDER.pop();
+        BUILDER.comment("Heat Pipe: Heat Pipes in a straight line form one pipe that joins the heat ports or heat faces at its two ends,",
+                "carrying heat from the hotter end to the colder one and losing some per block of length.").push("heatPipe");
+    }
+
+    public static final ModConfigSpec.IntValue HEAT_PIPE_RATE = BUILDER
+            .comment("Most HU/t a pipe draws from its hotter end.")
+            .defineInRange("ratePerTick", 262_144, 1, 100_000_000);
+
+    public static final ModConfigSpec.IntValue HEAT_PIPE_MAX_LENGTH = BUILDER
+            .comment("Most blocks in one pipe. A longer straight line is split into pipes of this length, which don't pass heat on to",
+                    "each other.")
+            .defineInRange("maxLength", 32, 1, 256);
+
+    public static final ModConfigSpec.DoubleValue HEAT_PIPE_LOSS_PER_BLOCK = BUILDER
+            .comment("Percent of the heat lost per block of the pipe's length (0.5: a 32-block pipe delivers about 85%).")
+            .defineInRange("lossPercentPerBlock", 0.5, 0.0, 100.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.pop();
+        BUILDER.comment("\"Limited by connections\": the warning a heat, FE or steam producer shows (GUI and Jade) when what's connected",
+                "holds its output back: its buffer stays nearly full while it gives out less than it could, for a while.").push("outputLimit");
+    }
+
+    public static final ModConfigSpec.IntValue OUTPUT_LIMIT_FULL_PERCENT = BUILDER
+            .comment("How full (percent of what it can hold) its buffer must be.")
+            .defineInRange("bufferFullPercent", 90, 1, 100);
+
+    public static final ModConfigSpec.IntValue OUTPUT_LIMIT_SHORTFALL_PERCENT = BUILDER
+            .comment("How far below what it could give out (percent) its output must be.")
+            .defineInRange("shortfallPercent", 5, 1, 99);
+
+    public static final ModConfigSpec.IntValue OUTPUT_LIMIT_DELAY = BUILDER
+            .comment("Ticks that must last before the warning shows (100: 5 seconds).")
+            .defineInRange("delayTicks", 100, 1, 12_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    // The Thermodynamic Conduit's HU/t for a tier.
+    public static int thermodynamicConduitRate(net.zagdrath.arcforge.conduit.ConduitTier tier) {
+        return switch (tier) {
+            case WROUGHT -> THERMAL_CONDUIT_WROUGHT.getAsInt();
+            case TEMPERED -> THERMAL_CONDUIT_TEMPERED.getAsInt();
+            case HARDENED -> THERMAL_CONDUIT_HARDENED.getAsInt();
+            case ARCFORGED -> THERMAL_CONDUIT_ARCFORGED.getAsInt();
+        };
     }
 
     static {
@@ -2668,7 +2730,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue METER_HEAT_CAP = BUILDER
             .comment("Most HU a Heat Meter passes per tick.")
-            .defineInRange("heatRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.heatPerTick(), 1, Integer.MAX_VALUE);
+            .defineInRange("heatRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.defaultHeatPerTick(), 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue METER_FLUID_CAP = BUILDER
             .comment("Most mB of liquid a Fluid Meter passes per tick.")

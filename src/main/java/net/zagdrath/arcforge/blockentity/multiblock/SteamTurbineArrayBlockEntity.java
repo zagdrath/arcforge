@@ -63,6 +63,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // The Steam Turbine Array (see ShellMultiblockBlockEntity): a turbine L blocks long with a rotor of L - 2
 // blade sets, sized to its cross-section's shorter side. It grows with its sections s = width x height / 9 x L (a
@@ -82,7 +84,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // has an Exhaust port: then it goes into an exhaust tank as Exhaust Steam, pushed out of the Exhaust ports
 // every tick, and while that tank has room the turbine makes 10% more (added to the lubricant bonus). A full
 // exhaust tank vents the rest and loses the bonus, so the turbine never stalls.
-public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
+public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity implements OutputLimited {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     // The rotor's four blades look the same every 90°, so a turn of more than 45° a tick would look like it
     // was going backwards: full speed stays under that.
@@ -95,6 +97,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
 
     // Replaced (keeping what it holds) when the structure's size changes, since its size and rate follow it.
     private GeneratorEnergyHandler energy;
+    private final OutputLimit outputLimit = new OutputLimit(OutputLimit.Unit.FE);
     private final FilteredFluidTank steam;
     private final ResourceHandler<FluidResource> steamInput;
     private final FilteredFluidTank lubricant;
@@ -327,6 +330,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         SteamGrade grade = SteamGrade.of(steam.getResource(0));
         int maxFlow = maxFlow();
         boolean running = canRun(level);
+        int steamBefore = steam.getAmount();
         if (running && grade != null && steam.getAmount() > 0 && !energy.isFull()) {
             try (Transaction tx = Transaction.openRoot()) {
                 flow = steam.extract(0, steam.getResource(0), Math.min(steam.getAmount(), maxFlow), tx);
@@ -376,6 +380,12 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
         if (hasExhaust && exhaust.getAmount() > 0) {
             pushExhaust(level);
         }
+        // What the steam it holds would make at full speed (lubricant and vacuum bonuses as they stand), against its FE buffer.
+        int rated = grade == null ? 0 : PowerGeneration.fe(Math.min(steamBefore, maxFlow) * grade.arrayFePerMb()
+                * (1.0 + (lubricated ? Lubricant.bonus() - 1.0 : 0.0) + (vacuum ? ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() : 0.0)));
+        outputLimit.tick(level, running && grade != null && steamBefore > 0,
+                () -> OutputLimit.anyPortTakes(level, this, SideMode.ENERGY, OutputLimit.Unit.FE),
+                energy.getAmountAsInt(), energy.getCapacityAsInt(), energy.drained(), rated);
         boolean changed = Math.abs(rpm - syncedRpm) >= 1.0 || flow != syncedFlow;
         if (changed && level.getGameTime() - lastSync >= SYNC_INTERVAL || (rpm == 0 && syncedRpm != 0)) {
             syncedRpm = (float) rpm;
@@ -590,5 +600,9 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity {
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
         return new SteamTurbineArrayMenu(containerId, inventory, worldPosition, items, data);
+    }
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
     }
 }

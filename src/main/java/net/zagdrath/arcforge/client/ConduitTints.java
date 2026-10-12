@@ -69,7 +69,7 @@ public final class ConduitTints implements BlockTintSource {
         return model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(stack) | 0xFF000000 : WHITE;
     }
 
-    static int heatColor(int celsius) {
+    public static int heatColor(int celsius) {
         if (celsius <= HEAT_CELSIUS[0]) {
             return HEAT_COLORS[0];
         }

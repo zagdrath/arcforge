@@ -861,9 +861,12 @@ to force a side to **Input** (push into the machine) or **Output** (pull from it
 | Energy (FE/t) | 256 | 1,024 | 8,192 | 65,536 |
 | Item (items per transfer) | 8 every 1.0s | 16 every 0.5s | 32 every 0.25s | 64 every 0.1s |
 | Fluid (mB/t) | 200 | 800 | 3,200 | 12,800 |
-| Thermodynamic (HU/t) | 50 | 200 | 800 | 3,200 |
+| Thermodynamic (HU/t) | 50 | 200 | 800 | 51,200 |
 
 Conduits store what they pull, so they keep pulling from machines even when nothing will take it yet:
+
+The Thermodynamic rates are in config (`power.heat.thermodynamicConduits`); the Arcforged one carries a big multiblock's
+heat. Heat Cells and Thermal Capsules keep their own rates (up to 3,200 HU/t).
 
 - **Energy** and **Thermodynamic** conduits each hold one tick's worth of their tier's rate
   (e.g. 256 FE per wrought energy conduit), and glow while they hold or move energy or heat (thermodynamic conduits from dull red to white-hot with the temperature).
@@ -929,6 +932,30 @@ Experience as a glowing liquid, 20 mB per point, in `c:experience` (other mods' 
 - **XP Shower:** hung under a block and fed by conduit or from a tank above it. A player sneaking under it (up
   to 3 blocks down) gains experience a level at a time; a redstone signal turns it off.
 - The **Vacuum Collector** also gathers orbs into a 16,000 mB Liquid Experience tank.
+
+### Heat Pipe
+
+A late-game block for moving large amounts of heat between multiblocks: a thick insulated steel jacket running unbroken
+from end to end, flanged end caps, and a thin window band along it showing a core that glows from dull red to white-hot with the heat it
+carries.
+
+- Heat Pipes in a straight line form one pipe, up to `heatPipe.maxLength` (32) blocks. It connects only at its two ends,
+  to heat ports or heat faces (flanged end caps there), never along its sides.
+- It carries heat from the hotter end to the colder one, never the other way, up to `heatPipe.ratePerTick`
+  (262,144 HU/t), and loses `heatPipe.lossPercentPerBlock` (0.5%) of it per block of length: a 32-block pipe delivers
+  about 85%.
+- A longer straight line splits into pipes of 32 that don't pass heat to each other.
+- Jade shows its length, loss, rate and temperature. Made from Arcforged Alloy, Tungsten plates, Rock Wool and an
+  Arcforged Thermodynamic Conduit.
+
+### Limited by connections
+
+Every machine and multiblock that gives out heat, FE or steam (Firebox, Fuel Burner, Geothermal Plant, Combustion and
+Thermoelectric Plants, Firebox Array, Solar Thermal Array, Steam Boiler Array, Steam and Gas Turbine Arrays) watches
+whether what's connected holds it back. When its buffer stays nearly full while it gives out less than it could, for a
+few seconds, its GUI and Jade show a yellow line such as "Limited by connections: 3,200 / 50,400 HU/t" (FE/t, or mB/t
+of steam). It clears as soon as output catches up, and never shows while the machine is idle or has nothing connected
+to take its output. The thresholds are in config (`power.outputLimit`).
 
 ### Quantum Tunnel
 

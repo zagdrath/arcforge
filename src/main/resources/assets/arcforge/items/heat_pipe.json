@@ -1,0 +1,12 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "arcforge:block/heat_pipe/item",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": -2079206
+      }
+    ]
+  }
+}

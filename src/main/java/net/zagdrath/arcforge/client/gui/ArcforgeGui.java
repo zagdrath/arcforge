@@ -25,6 +25,8 @@ public final class ArcforgeGui {
     // Heat amounts and rates (HU).
     public static final int HEAT = 0xFFFF9A3C;
     public static final int TEXT = 0xFFE0E0E0;
+    // Warnings on machine screens ("Limited by connections").
+    public static final int WARNING = 0xFFFFD24A;
     public static final int LABEL = 0xFFA0A0A0;
     public static final int TOOLTIP_GRAY = 0xFFAAAAAA;
     public static final int TOOLTIP_GREEN = 0xFF55FF55;

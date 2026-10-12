@@ -26,6 +26,9 @@ public class HeatBuffer {
     private int ceilingCelsius;
     // Not saved: the owning machine sets it every tick.
     private int sourceCelsius = AMBIENT_CELSIUS;
+    // Heat taken out through remove() (pushed out or drawn by conduits and pipes) since it was made; not saved. Losses
+    // the machine bleeds away itself (bleed()) don't count. OutputLimit reads it.
+    private long drained;
 
     public HeatBuffer(int capacity, int maxCelsius, Runnable onChanged) {
         this.capacity = Math.max(1, capacity);
@@ -130,12 +133,24 @@ public class HeatBuffer {
 
     // Removes up to the given heat, returning how much was taken.
     public int remove(int amount) {
+        int removed = bleed(amount);
+        drained += removed;
+        return removed;
+    }
+
+    // Removes heat that is lost rather than given out (cooling, venting): the same as remove(), not counted in drained().
+    public int bleed(int amount) {
         int removed = Math.min(Math.max(0, amount), stored);
         if (removed > 0) {
             stored -= removed;
             onChanged.run();
         }
         return removed;
+    }
+
+    // All the heat given out through remove() so far (see OutputLimit).
+    public long drained() {
+        return drained;
     }
 
     // What producers expose on their heat faces: heat can be drawn out but not put in.

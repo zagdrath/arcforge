@@ -48,6 +48,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // Burns liquid fuel from its tank into heat (HU). What burns, how well and how hot comes from the
 // arcforge:burner_fuels data map: creosote burns at 0.5 mB/t for 120 HU per mB, so 60 HU/t, and only
@@ -58,7 +60,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // to 1,600°C, with more heat per mB. The Oxygen face is separate from the fuel's Input face, which still takes
 // hydrogen as a fuel. With a Flue Gas face (the Gas Output side mode) set, carbon fuels (#arcforge:carbon_fuels) give off
 // Carbon Dioxide through it in proportion to the heat made (see FlueGas); Hydrogen gives none.
-public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidInteractable {
+public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidInteractable, OutputLimited {
     public static final int SLOT_BUCKET_IN = 0;
     public static final int SLOT_BUCKET_OUT = 1;
     public static final int MACHINE_SLOTS = 2;
@@ -66,6 +68,7 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT, SideMode.OXYGEN, SideMode.GAS_OUTPUT);
 
     private final HeatBuffer heat;
+    private final OutputLimit outputLimit = new OutputLimit(OutputLimit.Unit.HU);
     private final HeatHandler heatOutput;
     private final FilteredFluidTank tank;
     private final ResourceHandler<FluidResource> fluidInput;
@@ -172,6 +175,13 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
             heat.setProducing(false);
         }
         outputs.pushHeat(level, pos, getFacing(), sideConfig, heat, ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt());
+        // What it would burn a tick with this fuel (and oxygen, if there is some), against the heat it holds at the fuel's
+        // temperature.
+        int rated = fuel == null ? 0 : (int) Math.round(fuel.mbPerTick() * speedMultiplier() * fuel.huPerMb()
+                * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT)) * (oxyReady ? OxyFuel.heatMultiplier() : 1.0));
+        outputLimit.tick(level, enabled && fuel != null && tank.getAmount() > 0,
+                () -> OutputLimit.anyFaceTakes(level, pos, getFacing(), sideConfig, SideMode.HEAT, OutputLimit.Unit.HU),
+                heat.getStored(), fuel != null ? heat.storedAt(burnCelsius) : heat.getLimit(), heat.drained(), rated);
 
         if (!enabled) {
             status = stoppedStatus();
@@ -210,6 +220,11 @@ public class FuelBurnerBlockEntity extends MachineBlockEntity implements FluidIn
 
     public HeatBuffer getHeat() {
         return heat;
+    }
+
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
     }
 
     public FilteredFluidTank getTank() {

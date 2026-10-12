@@ -10,6 +10,8 @@ import net.neoforged.neoforge.transfer.energy.SimpleEnergyHandler;
 // FE buffer for generators: other mods can extract but never insert. The owning machine fills it with generate().
 public class GeneratorEnergyHandler extends SimpleEnergyHandler {
     private final Runnable onChanged;
+    // FE taken out (pushed out or drawn by conduits) since it was made; not saved. OutputLimit reads it.
+    private long drained;
 
     public GeneratorEnergyHandler(int capacity, int maxExtract, Runnable onChanged) {
         super(capacity, 0, maxExtract);
@@ -29,8 +31,16 @@ public class GeneratorEnergyHandler extends SimpleEnergyHandler {
         return energy >= capacity;
     }
 
+    // All the FE taken out so far (see OutputLimit).
+    public long drained() {
+        return drained;
+    }
+
     @Override
     protected void onEnergyChanged(int previousAmount) {
+        if (energy < previousAmount) {
+            drained += previousAmount - energy;
+        }
         onChanged.run();
     }
 }

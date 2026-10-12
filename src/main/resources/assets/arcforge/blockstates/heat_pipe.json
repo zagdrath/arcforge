@@ -1,0 +1,89 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "axis": "z"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/body"
+      }
+    },
+    {
+      "when": {
+        "axis": "z",
+        "neg_end": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/cap"
+      }
+    },
+    {
+      "when": {
+        "axis": "z",
+        "pos_end": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/cap",
+        "y": 180
+      }
+    },
+    {
+      "when": {
+        "axis": "x"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/body",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "axis": "x",
+        "neg_end": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/cap",
+        "y": 270
+      }
+    },
+    {
+      "when": {
+        "axis": "x",
+        "pos_end": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/cap",
+        "y": 90
+      }
+    },
+    {
+      "when": {
+        "axis": "y"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/body",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "axis": "y",
+        "neg_end": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/cap",
+        "x": 90
+      }
+    },
+    {
+      "when": {
+        "axis": "y",
+        "pos_end": "true"
+      },
+      "apply": {
+        "model": "arcforge:block/heat_pipe/cap",
+        "x": 270
+      }
+    }
+  ]
+}

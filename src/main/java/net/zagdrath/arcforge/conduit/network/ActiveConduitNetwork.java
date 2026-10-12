@@ -34,7 +34,7 @@ public abstract class ActiveConduitNetwork<H> extends ConduitNetwork<H> {
 
     protected ActiveConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier, BlockCapability<H, @Nullable Direction> capability) {
         super(level, members, memberSet, tier, capability);
-        this.capacity = members.size() * budget();
+        this.capacity = (int) Math.min(Integer.MAX_VALUE, (long) members.size() * budget());
     }
 
     @Override

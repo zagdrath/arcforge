@@ -49,6 +49,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 import com.mojang.serialization.Codec;
 
@@ -58,7 +60,7 @@ import com.mojang.serialization.Codec;
 // less ((s / 3)^-0.2: a 7x9x12 pays 51%), and running hot in a grade's band takes off up to 20% more (see
 // heatCostMultiplier and BoilerCore). Water and steam tanks hold 16,000 x s mB. The grade, pressure and vent rules
 // are in BoilerCore.
-public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity implements Boiler {
+public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity implements Boiler, OutputLimited {
     // Water buckets go in the input slot and are poured into the tank; the empty buckets come out below.
     public static final int SLOT_BUCKET_IN = 0;
     public static final int SLOT_BUCKET_OUT = 1;
@@ -81,6 +83,10 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     private boolean boiling;
     private boolean venting;
     private boolean syncPending;
+    private final OutputLimit outputLimit = new OutputLimit(OutputLimit.Unit.STEAM);
+    // Steam given out so far, and what the tank held at the end of the last tick (-1 before the first); not saved.
+    private long steamGiven;
+    private int lastSteam = -1;
     private long lastSync;
     // Client side: the water and steam levels (0-1) the renderer shows, easing toward the synced ones.
     private float shownWater = -1;
@@ -200,7 +206,12 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     protected void tickMaster(ServerLevel level) {
         BucketSlots.pour(items, SLOT_BUCKET_IN, SLOT_BUCKET_OUT, water);
         boolean wasBoiling = boiling;
-        if (!canRun(level)) {
+        // Steam taken since the last tick (drawn by conduits, or by the turbine's own pull).
+        if (lastSteam >= 0) {
+            steamGiven += Math.max(0, lastSteam - steam.getAmount());
+        }
+        boolean on = canRun(level);
+        if (!on) {
             status = stoppedStatus();
             boiling = false;
         } else {
@@ -220,9 +231,19 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
         }
         boolean wasVenting = venting;
         venting = status == MachineStatus.VENTING;
+        int afterBoil = steam.getAmount();
         if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
             MultiblockAutomation.pushOutputs(level, this);
         }
+        // And what its Output ports pushed out this tick.
+        steamGiven += Math.max(0, afterBoil - steam.getAmount());
+        lastSteam = steam.getAmount();
+        // It could give out all the steam it boils (kept or vented). It vents what doesn't fit rather than backing its heat
+        // up, so a full tank giving out less than it boils is steam lost for want of connections; a boiler short of heat
+        // boils less, and isn't flagged.
+        int rated = on && boiling ? (int) Math.round(core.getRate()) : 0;
+        outputLimit.tick(level, on && boiling, () -> OutputLimit.anyPortTakes(level, this, SideMode.OUTPUT, OutputLimit.Unit.STEAM),
+                steam.getAmount(), steam.getCapacity(), steamGiven, rated);
         if (boiling != wasBoiling || venting != wasVenting || (syncPending && level.getGameTime() - lastSync >= SYNC_INTERVAL)) {
             syncPending = false;
             lastSync = level.getGameTime();
@@ -233,6 +254,11 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
     @Override
     public BoilerCore getCore() {
         return core;
+    }
+
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
     }
 
     @Override

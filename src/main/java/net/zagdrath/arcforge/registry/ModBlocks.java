@@ -48,6 +48,7 @@ import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseFrameBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.PlantingBedBlock;
 import net.zagdrath.arcforge.block.logistics.ChunkLoaderBlock;
+import net.zagdrath.arcforge.block.logistics.HeatPipeBlock;
 import net.zagdrath.arcforge.block.logistics.QuantumTunnelBlock;
 import net.zagdrath.arcforge.block.machine.AirSeparatorBlock;
 import net.zagdrath.arcforge.block.machine.HaberReactorBlock;
@@ -271,6 +272,11 @@ public final class ModBlocks {
     public static final DeferredBlock<ChunkLoaderBlock> CHUNK_LOADER = BLOCKS.registerBlock("chunk_loader",
             ChunkLoaderBlock::new, p -> p.mapColor(MapColor.METAL).strength(5.0F, 1_200.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.METAL).noOcclusion().lightLevel(state -> state.getValue(ChunkLoaderBlock.ACTIVE) ? 5 : 0));
+
+    // The Heat Pipe: a thick insulated pipe that carries a big multiblock's heat between the ports at its two ends.
+    public static final DeferredBlock<HeatPipeBlock> HEAT_PIPE = BLOCKS.registerBlock("heat_pipe",
+            HeatPipeBlock::new, p -> p.mapColor(MapColor.METAL).strength(5.0F, 6.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL).noOcclusion().lightLevel(state -> state.getValue(HeatPipeBlock.LIT) ? 6 : 0));
 
     private static DeferredBlock<MeterBlock> meter(String name, MeterKind kind) {
         return BLOCKS.registerBlock(name, properties -> new MeterBlock(kind, properties),

@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +29,8 @@ import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
 import net.zagdrath.arcforge.menu.common.MenuReach;
 import net.zagdrath.arcforge.menu.common.PortSync;
@@ -55,6 +59,8 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
     private final Block block;
     private final List<ToggleableSlot> upgradeSlots = new ArrayList<>();
     private int machineSlots;
+    // The "Limited by connections" warning of producers (OutputLimited); zeros for every other machine.
+    private ContainerData outputLimit = OutputLimit.emptyData();
 
     protected MachineMenu(MenuType<?> type, int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items,
             ContainerData data, int dataValues, Block block) {
@@ -119,6 +125,15 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
         machineSlots = slots.size();
         addStandardInventorySlots(inventory, 8, inventoryY);
         addDataSlots(data);
+        if (!inventory.player.level().isClientSide() && inventory.player.level().getBlockEntity(pos) instanceof OutputLimited limited) {
+            outputLimit = limited.getOutputLimit().data(inventory.player.level()::getGameTime);
+        }
+        addDataSlots(outputLimit);
+    }
+
+    // The warning to show, or null when the machine isn't held back (or doesn't give anything out).
+    public OutputLimit.@Nullable Shown getOutputLimit() {
+        return OutputLimit.read(outputLimit);
     }
 
     public static int redstoneButtonId(RedstoneMode mode) {

@@ -178,6 +178,7 @@
     "arcforge:gasifier",
     "arcforge:fischer_tropsch_reactor",
     "arcforge:sifter",
-    "arcforge:diamond_press"
+    "arcforge:diamond_press",
+    "arcforge:heat_pipe"
   ]
 }

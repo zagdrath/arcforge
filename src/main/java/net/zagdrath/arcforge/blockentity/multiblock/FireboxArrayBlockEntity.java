@@ -73,6 +73,8 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // The Firebox Array (see FireboxArrayStructure), run by its controller: a big firebox that burns solid fuels and Fuel
 // Burner fuels into heat.
@@ -89,7 +91,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 //    proportion to the heat made (see FlueGas); with none, nothing changes.
 // It does IO only through its ports: fuel items, liquids and gases in (Input), oxygen in (Oxygen), heat out (Heat). The
 // controller also takes fuel from a held bucket. Clients get the box and whether it burns, for the renderer's fire.
-public class FireboxArrayBlockEntity extends MachineBlockEntity implements MultiblockController, FluidInteractable {
+public class FireboxArrayBlockEntity extends MachineBlockEntity implements MultiblockController, FluidInteractable, OutputLimited {
     public static final int SLOT_FUEL = 0;
     public static final int MACHINE_SLOTS = 1;
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
@@ -132,6 +134,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
     // mB of oxygen this tick of oxy-fuel takes (set before each burn).
     private double oxygenRate;
     private int heatPerTick;
+    private final OutputLimit outputLimit = new OutputLimit(OutputLimit.Unit.HU);
     private int burnCelsius;
     private boolean running;
     private boolean syncedRunning;
@@ -357,6 +360,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         heatPerTick = 0;
         if (box == null) {
             status = MachineStatus.NOT_FORMED;
+            outputLimit.reset();
             heat.setProducing(false);
             oxy.idle();
             setRunning(false);
@@ -385,6 +389,12 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         }
         pushHeat(level);
         flue.pushTo(flueTargets);
+        // Running: switched on with fuel burning or to burn; it could make its full rate, against the heat it holds at the
+        // fuel's temperature.
+        boolean fuelled = solidLeft > 1.0E-6 || BurnerFuel.of(tank.getResource(0)) != null || isSolidFuel(items.getStack(SLOT_FUEL));
+        outputLimit.tick(level, redstoneMode.canRun(powered) && fuelled,
+                () -> OutputLimit.anyPortTakes(level, this, SideMode.HEAT, OutputLimit.Unit.HU),
+                heat.getStored(), burnCelsius > 0 ? heat.storedAt(burnCelsius) : heat.getLimit(), heat.drained(), maxHeatPerTick());
         setRunning(heatPerTick > 0);
         if (oxy.isActive() && level.getGameTime() % 20 == 0) {
             ArcforgeAdvancements.oxyFuel(this, heat.getTemperature());
@@ -750,5 +760,9 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory inventory, Player player) {
         return new FireboxArrayMenu(containerId, inventory, worldPosition, items, data);
+    }
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
     }
 }

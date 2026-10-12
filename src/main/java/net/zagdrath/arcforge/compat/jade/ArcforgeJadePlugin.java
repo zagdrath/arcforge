@@ -58,6 +58,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, BlockEntity.class);
+        registration.registerBlockDataProvider(OutputLimitProvider.INSTANCE, Block.class);
         // Owner and security of any owned block, or any part of an owned structure (glass included).
         registration.registerBlockDataProvider(SecurityProvider.INSTANCE, Block.class);
         registration.registerEnergyStorage(ConduitProviders.Energy.INSTANCE, ConduitBlockEntity.class);
@@ -160,6 +161,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         // Reservoirs, Liquid Experience, the Quantum Tunnel and the Chunk Loader.
         registration.registerBlockDataProvider(LogisticsProviders.Reservoir.INSTANCE, net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.ItemReservoir.INSTANCE, net.zagdrath.arcforge.blockentity.storage.ItemReservoirBlockEntity.class);
+        registration.registerBlockDataProvider(LogisticsProviders.HeatPipe.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.HeatPipeBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.XpDrain.INSTANCE, net.zagdrath.arcforge.blockentity.experience.XpDrainBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.Experience.INSTANCE, net.zagdrath.arcforge.blockentity.experience.XpShowerBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.Experience.INSTANCE, VacuumCollectorBlockEntity.class);
@@ -170,6 +172,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerBlockComponent(MultiblockNameProvider.INSTANCE, Block.class);
+        registration.registerBlockComponent(OutputLimitProvider.Client.INSTANCE, Block.class);
         registration.registerBlockComponent(SecurityProvider.Client.INSTANCE, Block.class);
         registration.registerBlockComponent(HeatProvider.Client.INSTANCE, Block.class);
         registration.registerBlockComponent(ConduitProviders.Info.INSTANCE, ConduitBlock.class);
@@ -257,6 +260,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         }
         registration.registerBlockComponent(LogisticsProviders.Reservoir.Client.INSTANCE, net.zagdrath.arcforge.block.storage.ReservoirBlock.class);
         registration.registerBlockComponent(LogisticsProviders.ItemReservoir.Client.INSTANCE, net.zagdrath.arcforge.block.storage.ItemReservoirBlock.class);
+        registration.registerBlockComponent(LogisticsProviders.HeatPipe.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.HeatPipeBlock.class);
         registration.registerBlockComponent(LogisticsProviders.XpDrain.Client.INSTANCE, net.zagdrath.arcforge.block.experience.XpDrainBlock.class);
         registration.registerBlockComponent(LogisticsProviders.Experience.Client.INSTANCE, net.zagdrath.arcforge.block.experience.XpShowerBlock.class);
         registration.registerBlockComponent(LogisticsProviders.Experience.Client.INSTANCE, VacuumCollectorBlock.class);

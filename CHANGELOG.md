@@ -24,6 +24,17 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Added
 
+- **Heat Pipe.** A late-game block for moving a lot of heat between multiblocks. Heat Pipes in a straight line form one
+  pipe of up to 32 blocks that joins only the heat ports or heat faces at its two ends, and carries up to 262,144 HU/t
+  from the hotter end to the colder one, losing 0.5% per block of length. It's one unbroken steel jacket with flanged
+  caps at its ends, and a window band whose core glows with the heat it carries. Jade shows its length, loss, rate and
+  temperature. Settings in `power.heat.heatPipe`.
+- **"Limited by connections" warning.** The Firebox Array, Fuel Burner, Firebox, Geothermal Plant, Solar Thermal Array,
+  Steam Boiler Array, Steam Turbine Array, Gas Turbine Array, Thermoelectric Plant and Combustion Plant show a yellow line
+  in their GUI and in Jade ("Limited by connections: 3,200 / 50,400 HU/t", or FE/t, or mB/t of steam) when, for a few
+  seconds, their buffer stays full while they give out less than they could. It isn't shown while the machine is idle
+  or has nothing connected. A Steam Boiler Array shows it while it vents steam that nothing takes. Settings in
+  `power.outputLimit`.
 - **Creative storage.** A Creative Fluid Tank, Pressurized Cylinder, Energy Cell and Vault, trimmed in pink, in the
   creative tabs. They have no recipe, and broken they drop nothing (the Wrench still picks them up).
   - **Tank, cylinder and vault:** the first liquid, gas or item put in sets it for good. Taking from it never runs it
@@ -43,6 +54,10 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Changed
 
+- **The Arcforged Thermodynamic Conduit carries 51,200 HU/t** (was 3,200), and each conduit holds one tick's worth to
+  match, so one conduit line can carry a big multiblock's heat. Wrought, Tempered and Hardened stay at 50 / 200 / 800
+  HU/t, and the Arcforged Heat Cell and Thermal Capsule keep 3,200 HU/t. The Quantum Tunnel's heat, which moves at the
+  Arcforged conduit rate, follows it. All four rates are now in config (`power.heat.thermodynamicConduits`).
 - **Bigger Steam Boiler Arrays make more steam from the same heat.** Heat per mB is multiplied by (sections ÷ 3)^-0.2:
   a 3×3×12 pays 76% of a 3×3×3's, an 8×7×12 53%, a 7×9×12 51%. Before, every size made the same steam from the
   same heat. Configurable as `sizeEfficiency`.
@@ -72,6 +87,10 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Upgrading
 
+- **New config keys**: `power.heat.thermodynamicConduits` (`wrought`, `tempered`, `hardened`, `arcforged`),
+  `power.heat.heatPipe` (`ratePerTick`, `maxLength`, `lossPercentPerBlock`) and `power.outputLimit` (`bufferFullPercent`,
+  `shortfallPercent`, `delayTicks`) get their defaults. The Heat Meter's `meters.heatRateCap` now defaults to 51,200; an
+  existing config keeps the value it has.
 - **Reservoir renamed to Fluid Reservoir** (`arcforge:reservoir` is now `arcforge:fluid_reservoir`). An alias keeps
   placed Reservoirs, their contents and Reservoir items working; they load as Fluid Reservoirs. Recipes or scripts that
   name `arcforge:reservoir` should switch to the new id. Its textures moved to `block/fluid_reservoir/`.

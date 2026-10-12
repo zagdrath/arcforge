@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "WAW",
+    "TCT",
+    "WAW"
+  ],
+  "key": {
+    "W": "arcforge:rock_wool",
+    "A": "arcforge:arcforged_alloy",
+    "T": "#c:plates/tungsten",
+    "C": "arcforge:arcforged_thermal_conduit"
+  },
+  "result": {
+    "id": "arcforge:heat_pipe",
+    "count": 4
+  }
+}

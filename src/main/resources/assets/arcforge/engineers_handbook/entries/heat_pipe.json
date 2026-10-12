@@ -1,0 +1,17 @@
+{
+  "title": "Heat Pipe",
+  "icon": "arcforge:heat_pipe",
+  "items": [
+    "arcforge:heat_pipe"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A thick insulated pipe for moving a big multiblock's heat: a Firebox Array's into a Steam Boiler Array, a Solar Thermal Array's into a Superheater.\n# One pipe\nHeat Pipes placed in a straight line form one pipe, up to 32 blocks long. Place the first against a heat port and it runs out from it.\n- It connects only at its two ends, to heat ports or heat faces; its sides join nothing.\n- It carries heat from the hotter end to the colder end, never the other way, up to 262,144 HU/t."
+    },
+    {
+      "type": "text",
+      "text": "# Loss\nIt loses 0.5% of the heat per block of length: a 10-block pipe delivers 95%, a 32-block one about 85%. Keep pipes short.\n# Longer runs\nA straight line longer than 32 blocks is split into pipes of 32, which don't pass heat to each other. Put a Heat Cell or a machine between them.\n# Reading it\nThe core glows through the window band, dull red to white-hot with the heat it carries. Jade shows its length, loss, rate and temperature."
+    }
+  ]
+}

@@ -47,6 +47,12 @@ public enum MultiblockNameProvider implements IBlockComponentProvider {
 
     // The name of the formed machine the block at pos is part of, or null.
     static @Nullable Component structureName(Level level, BlockPos pos, Block block) {
+        MultiblockController controller = controllerAt(level, pos, block);
+        return controller != null && controller.isFormed() && controller instanceof MenuProvider menu ? menu.getDisplayName() : null;
+    }
+
+    // The controller of the multiblock the block at pos is part of (formed or not), or null.
+    static @Nullable MultiblockController controllerAt(Level level, BlockPos pos, Block block) {
         MultiblockController controller = null;
         if (block instanceof MultiblockPart part) {
             controller = part.findController(level, pos);
@@ -69,7 +75,7 @@ public enum MultiblockNameProvider implements IBlockComponentProvider {
                 controller = net.zagdrath.arcforge.multiblock.BatteryArrayStructure.findController(level, pos);
             }
         }
-        return controller != null && controller.isFormed() && controller instanceof MenuProvider menu ? menu.getDisplayName() : null;
+        return controller;
     }
 
     // Right after Jade's own name, so there is one to replace.

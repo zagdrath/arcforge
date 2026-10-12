@@ -38,6 +38,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MachineMenuButtons;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
 import net.zagdrath.arcforge.menu.machine.MachineMenu;
 import net.zagdrath.arcforge.registry.ModFluids;
 
@@ -174,8 +175,37 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     @Override
     protected void extractLabels(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         graphics.text(font, title, titleLabelX, titleLabelY, ArcforgeGui.TEXT, false);
-        graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, ArcforgeGui.LABEL, false);
+        OutputLimit.Shown limit = menu.getOutputLimit();
+        if (limit != null) {
+            drawOutputLimit(graphics, limit);
+        } else {
+            graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, ArcforgeGui.LABEL, false);
+        }
         drawText(graphics);
+    }
+
+    // The "Limited by connections" line, in warning yellow where the inventory label sits. A line too wide for the panel
+    // is scaled down to fit, down to 2/3; past that the short form ("Limited: ...") is used, scaled if it must be. The
+    // tooltip has the whole line.
+    private void drawOutputLimit(GuiGraphicsExtractor graphics, OutputLimit.Shown limit) {
+        int room = imageWidth - 2 * inventoryLabelX;
+        Component line = font.width(limit.line()) * 2 <= room * 3 ? limit.line() : limit.shortLine();
+        int width = font.width(line);
+        if (width <= room) {
+            graphics.text(font, line, inventoryLabelX, inventoryLabelY, ArcforgeGui.WARNING, false);
+            return;
+        }
+        float scale = room / (float) width;
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(inventoryLabelX, inventoryLabelY + (1.0F - scale) * font.lineHeight / 2.0F);
+        graphics.pose().scale(scale, scale);
+        graphics.text(font, line, 0, 0, ArcforgeGui.WARNING, false);
+        graphics.pose().popMatrix();
+    }
+
+    private boolean isOverOutputLimit(int mouseX, int mouseY) {
+        return menu.getOutputLimit() != null && ArcforgeGui.isInside(mouseX, mouseY, leftPos + inventoryLabelX, topPos + inventoryLabelY,
+                imageWidth - 2 * inventoryLabelX, font.lineHeight);
     }
 
     @Override
@@ -185,6 +215,13 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         addTooltip(lines, mouseX, mouseY);
         if (lines.isEmpty()) {
             tabs.addTooltip(lines, mouseX, mouseY);
+        }
+        if (lines.isEmpty() && isOverOutputLimit(mouseX, mouseY)) {
+            OutputLimit.Shown limit = menu.getOutputLimit();
+            if (limit != null) {
+                lines.add(limit.line().copy().withColor(ArcforgeGui.WARNING));
+            }
+            lines.add(Component.translatable("gui.arcforge.output_limited.tooltip").withStyle(ChatFormatting.GRAY));
         }
         if (!lines.isEmpty()) {
             graphics.setComponentTooltipForNextFrame(font, lines, mouseX, mouseY);

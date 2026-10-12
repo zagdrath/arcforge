@@ -47,12 +47,14 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // Turns lava into heat (HU); it makes no FE itself. Lava drains from the tank at 1 mB/t for lavaHeat
 // HU/t, and touching lava source blocks and magma blocks add passive heat, tank or no tank. Production
 // pauses while the heat buffer is full. At up to 1,400°C it is the hottest heat source, hot enough to
 // drive a Thermoelectric Plant past 100% efficiency and fill the rock-wool Heat Cells.
-public class GeothermalPlantBlockEntity extends MachineBlockEntity implements FluidInteractable {
+public class GeothermalPlantBlockEntity extends MachineBlockEntity implements FluidInteractable, OutputLimited {
     // Lava buckets go in the input slot and are poured into the tank; the empty buckets come out below.
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
@@ -64,6 +66,7 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HEAT);
 
     private final HeatBuffer heat;
+    private final OutputLimit outputLimit = new OutputLimit(OutputLimit.Unit.HU);
     private final HeatHandler heatOutput;
     private final FilteredFluidTank lavaTank;
     private final ResourceHandler<ItemResource> itemAutomation;
@@ -125,6 +128,11 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
         return new MachineItemHandler(MACHINE_SLOTS, GeothermalPlantBlockEntity::isItemValid, UPGRADES, () -> {});
     }
 
+    @Override
+    public OutputLimit getOutputLimit() {
+        return outputLimit;
+    }
+
     private GeothermalHeat.Surroundings surroundings() {
         return surroundings != null ? surroundings : GeothermalHeat.Surroundings.NONE;
     }
@@ -160,6 +168,12 @@ public class GeothermalPlantBlockEntity extends MachineBlockEntity implements Fl
         // While it's making heat it is at full temperature, so the heat moves on straight away.
         heat.setProducing(heatPerTick > 0);
         outputs.pushHeat(level, pos, getFacing(), sideConfig, heat, ArcforgeConfig.HEAT_CONTACT_RATE.getAsInt());
+        // What it would make a tick from its surroundings and, while it has lava, from the lava.
+        boolean lava = lavaBurning > 0 || lavaTank.getAmount() > 0;
+        double rated = surroundings().passiveHeat() + (lava ? GeothermalHeat.lavaHeat() * speedMultiplier() : 0.0);
+        outputLimit.tick(level, enabled && rated > 0, () -> OutputLimit.anyFaceTakes(level, pos, getFacing(), sideConfig, SideMode.HEAT,
+                OutputLimit.Unit.HU), heat.getStored(), heat.getLimit(), heat.drained(),
+                (int) Math.round(rated * UpgradeType.outputMultiplier(upgrades(UpgradeType.HEAT))));
 
         if (!enabled) {
             status = stoppedStatus();

@@ -120,6 +120,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> XP_DRAIN = ITEMS.registerSimpleBlockItem(ModBlocks.XP_DRAIN);
     public static final DeferredItem<BlockItem> XP_SHOWER = ITEMS.registerSimpleBlockItem(ModBlocks.XP_SHOWER);
     public static final DeferredItem<BlockItem> QUANTUM_TUNNEL = ITEMS.registerSimpleBlockItem(ModBlocks.QUANTUM_TUNNEL, p -> p.rarity(Rarity.EPIC));
+    public static final DeferredItem<BlockItem> HEAT_PIPE = ITEMS.registerSimpleBlockItem(ModBlocks.HEAT_PIPE, p -> p.rarity(Rarity.RARE));
     public static final DeferredItem<BlockItem> CHUNK_LOADER = ITEMS.registerSimpleBlockItem(ModBlocks.CHUNK_LOADER, p -> p.rarity(Rarity.RARE));
     // Places a whole 3x3x3 (see ArcQuarryItem). The bounding parts have no item.
     public static final DeferredItem<ArcQuarryItem> ARC_QUARRY = ITEMS.registerItem("arc_quarry",
