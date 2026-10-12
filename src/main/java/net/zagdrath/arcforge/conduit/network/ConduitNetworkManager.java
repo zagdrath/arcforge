@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.conduit.network;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -21,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 
@@ -33,6 +36,9 @@ public final class ConduitNetworkManager {
     private final Map<BlockPos, ConduitNetwork<?>> byPos = new HashMap<>();
     private final Set<ConduitNetwork<?>> networks = new LinkedHashSet<>();
     private final Set<BlockPos> dirty = new HashSet<>();
+    // Conduits with contents to send to clients (see ConduitBlockEntity.markContentsChanged), sent at the end of the
+    // tick: several changes to one conduit in a tick go as one update.
+    private final Set<ConduitBlockEntity> pendingSync = new LinkedHashSet<>();
 
     private ConduitNetworkManager(ServerLevel level) {
         this.level = level;
@@ -51,8 +57,25 @@ public final class ConduitNetworkManager {
         return byPos.get(pos);
     }
 
+    // Every network in the level (for /arcforge debug conduits).
+    public Collection<ConduitNetwork<?>> getNetworks() {
+        return Collections.unmodifiableCollection(networks);
+    }
+
     public void markDirty(BlockPos pos) {
         dirty.add(pos.immutable());
+    }
+
+    public void queueSync(ConduitBlockEntity conduit) {
+        pendingSync.add(conduit);
+    }
+
+    // A client update was sent for the conduit at pos (counted for /arcforge debug conduits).
+    public void countSync(BlockPos pos) {
+        ConduitNetwork<?> network = byPos.get(pos);
+        if (network != null) {
+            network.countSync();
+        }
     }
 
     public void tick() {
@@ -62,6 +85,13 @@ public final class ConduitNetworkManager {
         long gameTime = level.getGameTime();
         for (ConduitNetwork<?> network : networks) {
             network.tick(gameTime);
+        }
+        // Throttled conduits stay queued until their turn.
+        if (!pendingSync.isEmpty()) {
+            pendingSync.removeIf(conduit -> conduit.flushSync(gameTime));
+        }
+        if (gameTime % 20 == 0) {
+            networks.forEach(ConduitNetwork::rollCounters);
         }
     }
 
@@ -87,6 +117,7 @@ public final class ConduitNetworkManager {
         ConduitNetwork<?> network = byPos.get(pos);
         if (network != null) {
             networks.remove(network);
+            network.dissolve();
             for (BlockPos member : network.getMembers()) {
                 byPos.remove(member);
                 seeds.add(member);

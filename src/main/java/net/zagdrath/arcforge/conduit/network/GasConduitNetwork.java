@@ -83,8 +83,8 @@ public class GasConduitNetwork extends FluidConduitNetwork {
             return;
         }
         flowing = gas;
-        for (BlockPos pos : members) {
-            if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
+        for (ConduitBlockEntity conduit : conduits) {
+            if (conduit != null) {
                 conduit.setFlowingGas(gas);
             }
         }

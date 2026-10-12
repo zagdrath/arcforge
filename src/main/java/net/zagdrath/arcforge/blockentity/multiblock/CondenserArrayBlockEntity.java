@@ -234,7 +234,8 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
             status = n > 0 ? MachineStatus.CONDENSING : MachineStatus.IDLE;
         }
         setLit(condensed > 0);
-        if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
+        // Water is all its ports give: with none there's nothing to push, so the faces aren't walked.
+        if (waterOut.getAmount() > 0 && level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
             // Each port face up to the rate for every tick since the last push, so ports keep up with it.
             MultiblockAutomation.pushOutputs(level, this, true,
                     Math.max(FluidType.BUCKET_VOLUME, cooling.rate() * ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt()));

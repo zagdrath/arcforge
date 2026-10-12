@@ -26,9 +26,12 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.Containers;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -36,10 +39,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.model.data.ModelProperty;
+import net.neoforged.neoforge.network.PacketDistributor;
+import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.conduit.ConduitFacades;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -49,9 +55,11 @@ import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.SideSetting;
 import net.zagdrath.arcforge.conduit.item.ItemPacket;
+import net.zagdrath.arcforge.conduit.network.ActiveConduitNetwork;
 import net.zagdrath.arcforge.conduit.network.ConduitNetworkManager;
 import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.item.tool.SettingsCopyable;
+import net.zagdrath.arcforge.network.ConduitContentsPayload;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 
@@ -61,6 +69,8 @@ import net.zagdrath.arcforge.registry.ModDataComponents;
 public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable {
     // Fluid and item conduits sync their contents to clients at most this often.
     private static final int CONTENTS_SYNC_INTERVAL = 5;
+    // A fluid level change is only sent once it moves the drawn level by at least 1/FILL_SYNC_STEPS of a full conduit.
+    private static final int FILL_SYNC_STEPS = 32;
     // Thermal conduits tint their glow by temperature in steps this big.
     private static final int HEAT_TINT_STEP = 50;
 
@@ -88,8 +98,11 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     private final List<ItemPacket> packets = new ArrayList<>();
     // Items pulled in with nowhere to go yet; shown resting in the conduit's core.
     private final List<ItemStack> storedItems = new ArrayList<>();
-    // Energy (FE) or heat (HU) held by this conduit, for energy and thermal conduits.
+    // Energy (FE) or heat (HU) held by this conduit, for energy and thermal conduits, while it's in no network.
     private int stored;
+    // The network pooling it while it's in one, and its place in that network's members (see getStored).
+    private @Nullable ActiveConduitNetwork<?> pool;
+    private int poolIndex;
     // Thermal conduits: the temperature (°C) of the heat held, so a rebuilt network remembers it.
     private int heatTemperature = HeatBuffer.AMBIENT_CELSIUS;
     private FluidStack fluid = FluidStack.EMPTY;
@@ -97,9 +110,14 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     // the tank is empty (a fast network can pass all its gas straight through in a tick). EMPTY when idle.
     private Fluid flowingGas = Fluids.EMPTY;
     private float itemSpeed;
+    // Queued with the network manager to send contents to clients; syncNow: without waiting for CONTENTS_SYNC_INTERVAL.
     private boolean syncPending;
+    private boolean syncNow;
     // Game time is never negative, so the first sync is always allowed. (Long.MIN_VALUE would overflow the subtraction.)
     private long lastSyncTick = -CONTENTS_SYNC_INTERVAL;
+    // The fluid and fill step (see fillStep) last sent, so level changes too small to see aren't sent.
+    private Fluid syncedFluid = Fluids.EMPTY;
+    private int syncedFillStep = -1;
     // The glow tint last sent to clients (server) or last drawn (client); see glowKey.
     private int syncedGlow = Integer.MIN_VALUE;
 
@@ -272,14 +290,29 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
 
     // --- Energy / heat buffer ---
 
+    // Its share of its network's pool, or what it held when it left one.
     public int getStored() {
-        return stored;
+        return pool != null ? pool.shareOf(poolIndex) : stored;
     }
 
     public void setStored(int amount) {
         if (amount != stored) {
             stored = amount;
-            setChanged();
+            markUnsaved();
+        }
+    }
+
+    // Called by the network pooling this conduit's energy or heat (see ActiveConduitNetwork).
+    public void joinPool(ActiveConduitNetwork<?> network, int index) {
+        pool = network;
+        poolIndex = index;
+    }
+
+    // The network is taken apart and hands back this conduit's share.
+    public void leavePool(ActiveConduitNetwork<?> network, int share) {
+        if (pool == network) {
+            pool = null;
+            setStored(share);
         }
     }
 
@@ -290,8 +323,16 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     public void setHeatTemperature(int celsius) {
         if (celsius != heatTemperature) {
             heatTemperature = celsius;
-            setChanged();
+            markUnsaved();
             syncGlow();
+        }
+    }
+
+    // What the network moves through a conduit only needs saving: conduits give no comparator output, so unlike
+    // setChanged this doesn't update neighbours.
+    private void markUnsaved() {
+        if (level != null) {
+            level.blockEntityChanged(worldPosition);
         }
     }
 
@@ -409,30 +450,73 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         }
     }
 
-    // Records a content change. Items sync right away so clients see packets enter and leave;
-    // fluid levels change every tick and are throttled.
+    // Records a content change. Items sync at the end of this tick so clients see packets enter and leave;
+    // fluid levels change every tick and are throttled, and only sent once the drawn level moves (see fillStep).
     public void markContentsChanged(boolean immediate) {
-        setChanged();
-        if (!getConduitType().showsContents()) {
+        markUnsaved();
+        if (!getConduitType().showsContents() || !(level instanceof ServerLevel serverLevel)) {
             return;
         }
-        syncPending = true;
-        if (immediate) {
-            flushSync(true);
+        syncNow |= immediate;
+        if (!syncPending) {
+            syncPending = true;
+            ConduitNetworkManager.get(serverLevel).queueSync(this);
         }
     }
 
-    // Called by the network manager each tick.
-    public void flushSync(boolean force) {
-        if (!syncPending || level == null || level.isClientSide()) {
-            return;
-        }
-        long now = level.getGameTime();
-        if (force || now - lastSyncTick >= CONTENTS_SYNC_INTERVAL) {
+    // Called by the network manager at the end of each tick while a sync is queued. Sends the contents to the players
+    // tracking this chunk unless it's too soon (see CONTENTS_SYNC_INTERVAL); returns whether it's done.
+    public boolean flushSync(long now) {
+        if (!(level instanceof ServerLevel serverLevel) || isRemoved()) {
             syncPending = false;
-            lastSyncTick = now;
-            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 2);
+            return true;
         }
+        if (!syncNow && now - lastSyncTick < CONTENTS_SYNC_INTERVAL) {
+            return false;
+        }
+        boolean force = syncNow;
+        syncPending = false;
+        syncNow = false;
+        int fillStep = fillStep();
+        if (!force && fluid.getFluid() == syncedFluid && fillStep == syncedFillStep) {
+            return true;
+        }
+        syncedFluid = fluid.getFluid();
+        syncedFillStep = fillStep;
+        lastSyncTick = now;
+        // Built only if someone's watching, and sent only to connections that know it (not the game tests' fake ones).
+        ConduitContentsPayload payload = null;
+        for (ServerPlayer player : serverLevel.getChunkSource().chunkMap.getPlayers(ChunkPos.containing(worldPosition), false)) {
+            if (player.connection.hasChannel(ConduitContentsPayload.TYPE)) {
+                if (payload == null) {
+                    payload = ConduitContentsPayload.of(this);
+                    ConduitNetworkManager.get(serverLevel).countSync(worldPosition);
+                }
+                PacketDistributor.sendToPlayer(player, payload);
+            }
+        }
+        return true;
+    }
+
+    // How full the conduit is drawn, in FILL_SYNC_STEPS steps (-1 when empty).
+    private int fillStep() {
+        if (fluid.isEmpty()) {
+            return -1;
+        }
+        int capacity = getConduitType() == ConduitType.GAS ? ConduitTier.GAS_CAPACITY_PER_CONDUIT : ConduitTier.FLUID_CAPACITY_PER_CONDUIT;
+        return (int) Math.min(FILL_SYNC_STEPS, (long) fluid.getAmount() * FILL_SYNC_STEPS / capacity);
+    }
+
+    // Client: the contents the server sent (see ConduitContentsPayload).
+    public void applyContents(FluidStack fluid, Fluid flowingGas, List<ItemPacket> packets, List<ItemStack> storedItems, float itemSpeed) {
+        this.fluid = fluid;
+        this.flowingGas = flowingGas;
+        this.packets.clear();
+        this.packets.addAll(packets);
+        this.storedItems.clear();
+        this.storedItems.addAll(storedItems);
+        this.itemSpeed = itemSpeed;
+        syncGlow();
     }
 
     // Clients move item packets along between server updates.
@@ -594,6 +678,18 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        writeShared(output);
+        int share = getStored();
+        if (share > 0) {
+            output.putInt("stored", share);
+        }
+        if (pool != null) {
+            pool.onMemberSaved();
+        }
+    }
+
+    // What both the save and clients get: everything but the energy/heat share, which no client draws.
+    private void writeShared(ValueOutput output) {
         output.putInt("sides", packSettings());
         if (color != null) {
             output.putInt("color", color.getId());
@@ -608,9 +704,6 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         }
         if (heatTemperature != HeatBuffer.AMBIENT_CELSIUS) {
             output.putInt("heat_temperature", heatTemperature);
-        }
-        if (stored > 0) {
-            output.putInt("stored", stored);
         }
         if (!fluid.isEmpty()) {
             output.store("fluid", FluidStack.OPTIONAL_CODEC, fluid);
@@ -722,9 +815,15 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         }
     }
 
+    // Sent when the chunk loads and on full updates (connections, sheath, filters, facades, glow); contents changes
+    // go by ConduitContentsPayload instead.
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveCustomOnly(registries);
+        try (ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(problemPath(), Arcforge.LOGGER)) {
+            TagValueOutput output = TagValueOutput.createWithContext(reporter, registries);
+            writeShared(output);
+            return output.buildResult();
+        }
     }
 
     @Override

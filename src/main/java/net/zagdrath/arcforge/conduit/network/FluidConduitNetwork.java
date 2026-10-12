@@ -97,11 +97,6 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
                 members.forEach(pos -> ConduitBlock.refreshConnections(level, pos));
             }
         }
-        for (BlockPos pos : members) {
-            if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
-                conduit.flushSync(false);
-            }
-        }
     }
 
     // Called every tick with how much was pulled in and pushed out.
@@ -109,6 +104,9 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
 
     // Draws up to the rate evenly from the sources, taken in turn (see shareOut).
     private int pull() {
+        if (amount >= capacity || sources.isEmpty()) {
+            return 0;
+        }
         return shareOut(sourcesInTurn(), Math.min(rate, capacity - amount), this::pullFrom);
     }
 
@@ -148,6 +146,7 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
                 .filter(sink -> sink.handler() != null && filterAllows(sink, fluid.getFluid(), true))
                 .toList();
         return shareOut(ordered, Math.min(rate, amount), (sink, max) -> {
+            countInsertCall();
             try (Transaction tx = Transaction.openRoot()) {
                 int inserted = sink.handler().insert(fluid, max, tx);
                 tx.commit();
@@ -163,7 +162,8 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
         int each = amount / count;
         int remainder = amount % count;
         for (int i = 0; i < count; i++) {
-            if (level.getBlockEntity(members.get(i)) instanceof ConduitBlockEntity conduit) {
+            ConduitBlockEntity conduit = conduits[i];
+            if (conduit != null) {
                 int share = each + (i < remainder ? 1 : 0);
                 conduit.setFluid(share > 0 ? fluid.toStack(share) : FluidStack.EMPTY);
             }

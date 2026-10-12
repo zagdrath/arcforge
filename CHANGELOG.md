@@ -22,6 +22,28 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Added
+
+- **`/arcforge debug conduits`** (admins): the conduit networks in your dimension, busiest first, each with its
+  sources, targets (input sides), calls into machines' insert per tick and contents updates sent to players per second.
+
+### Changed
+
+- **Conduits use less server time.** They move the same amounts, shared out the same way:
+  - Energy conduits move each tick's pull and push in one transaction. A machine that takes nothing (full) is left out
+    for up to 8 ticks, asked first with a simulated insert when its wait ends, and fed straight away once it has room
+    again. Networks with nothing stored skip the push entirely.
+  - The FE and heat a network holds are only split back into its conduits when they're saved or the network changes,
+    not every tick.
+  - Item conduits work out once per network which inputs each output can reach, and an output with nothing to give is
+    tried less often (at most 8 ticks apart, so only Hardened and Arcforged conduits notice).
+  - Fluid, pressurized and item conduits send what they hold in a small packet instead of a full block update, at most
+    once a tick per conduit, and a fluid level only once it has changed by 1/32 of a conduit.
+- **Cube multiblocks** (the Arc Crushing, Induction Furnace, Metal Pressing, Superheater and Condenser Arrays and the
+  Industrial Water Intake) check for a redstone signal only when a casing's neighbour changes, not across every casing
+  every tick, and skip it altogether on Ignore. An idle Condenser Array with no water doesn't look for somewhere to push
+  it.
+
 ## [2.6.0] - 2026-10-11
 
 ### Added

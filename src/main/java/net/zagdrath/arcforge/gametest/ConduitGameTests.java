@@ -227,6 +227,23 @@ final class ConduitGameTests {
                 });
     }
 
+    // A full sink is left out for a few ticks at a time, but once it has room again it's fed on the next tick, without
+    // waiting out the rest of its wait.
+    static void energyFullSinkResumes(GameTestHelper helper) {
+        BlockPos[][] layout = balanceLayout(helper, ConduitType.ENERGY, Blocks.LODESTONE);
+        var sources = java.util.Arrays.stream(layout[0]).map(pos -> TestFixtures.energy(helper.absolutePos(pos))).toList();
+        var full = TestFixtures.energy(helper.absolutePos(layout[1][0]));
+        sources.forEach(source -> source.set(100_000));
+        full.set(TestFixtures.ENERGY_CAPACITY);
+        helper.startSequence()
+                // Long enough to be waiting the longest between tries.
+                .thenIdle(20)
+                .thenExecute(() -> full.set(0))
+                .thenIdle(2)
+                .thenExecute(() -> helper.assertTrue(full.getAmountAsInt() > 0, "A sink with room again wasn't fed"))
+                .thenSucceed();
+    }
+
     // Fluid is drawn evenly from every source tank and shared evenly among the sink tanks.
     static void fluidBalance(GameTestHelper helper) {
         BlockPos[][] layout = balanceLayout(helper, ConduitType.FLUID, Blocks.TARGET);

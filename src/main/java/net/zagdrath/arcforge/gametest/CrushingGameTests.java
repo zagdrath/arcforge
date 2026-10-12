@@ -21,6 +21,8 @@ import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -181,6 +183,30 @@ public final class CrushingGameTests {
                     helper.assertTrue(helper.getBlockState(new BlockPos(1, 2, 1)).getLightDampening() == 15, "Loose casing lets light through");
                 })
                 .thenSucceed();
+    }
+
+    // On HIGH the Array runs only with a signal into a casing (here a corner, not the centre), and stops when it goes:
+    // the cached signal follows the casings' neighbour updates.
+    static void arrayRedstoneSignal(GameTestHelper helper) {
+        buildArray(helper);
+        BlockPos torch = new BlockPos(3, 1, 0);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class).setRedstoneMode(RedstoneMode.HIGH))
+                .thenIdle(2)
+                .thenExecute(() -> assertArrayStatus(helper, true, "with no signal"))
+                .thenExecute(() -> helper.setBlock(torch, Blocks.REDSTONE_BLOCK))
+                .thenIdle(2)
+                .thenExecute(() -> assertArrayStatus(helper, false, "with a signal into a corner casing"))
+                .thenExecute(() -> helper.setBlock(torch, Blocks.AIR))
+                .thenIdle(2)
+                .thenExecute(() -> assertArrayStatus(helper, true, "once the signal went"))
+                .thenSucceed();
+    }
+
+    private static void assertArrayStatus(GameTestHelper helper, boolean disabled, String when) {
+        MachineStatus status = helper.getBlockEntity(new BlockPos(1, 2, 1), ArcCrushingArrayBlockEntity.class).getStatus();
+        helper.assertTrue((status == MachineStatus.DISABLED) == disabled, "Status " + status + " " + when);
     }
 
     // Ore recipes give double; ingots don't.

@@ -61,6 +61,7 @@ public final class ArcforgeGameTests {
         TESTS.put("conduit_fluid_transfer", ConduitGameTests::fluidTransfer);
         TESTS.put("conduit_fluid_split", ConduitGameTests::fluidSplit);
         TESTS.put("conduit_energy_balance", ConduitGameTests::energyBalance);
+        TESTS.put("conduit_energy_full_sink_resumes", ConduitGameTests::energyFullSinkResumes);
         TESTS.put("conduit_fluid_balance", ConduitGameTests::fluidBalance);
         TESTS.put("conduit_auto_connect", ConduitGameTests::autoConnect);
         TESTS.put("conduit_energy_storage", ConduitGameTests::energyStorage);
@@ -164,6 +165,7 @@ public final class ArcforgeGameTests {
         TESTS.put("nether_sulfur_ore_drops", ChemicalGameTests::netherSulfurOreDrops);
         TESTS.put("firebox_heat_upgrades", CrushingGameTests::fireboxHeatUpgrades);
         TESTS.put("array_forms", CrushingGameTests::arrayForms);
+        TESTS.put("array_redstone_signal", CrushingGameTests::arrayRedstoneSignal);
         TESTS.put("press_slots_and_recipes", PressingGameTests::pressSlotsAndRecipes);
         TESTS.put("press_every_plate_metal", PressingGameTests::everyPlateMetalHasGearsAndRods);
         TESTS.put("press_upgrades", PressingGameTests::pressUpgrades);

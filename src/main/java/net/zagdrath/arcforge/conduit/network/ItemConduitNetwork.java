@@ -7,6 +7,7 @@ package net.zagdrath.arcforge.conduit.network;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,10 +38,18 @@ import net.zagdrath.arcforge.conduit.item.ItemPacket;
 // refuses a packet makes it reroute, and if nothing can take it the items are stored where they are.
 // Conduit Filters are checked live: a destination whose filter rejects the items is skipped (the rest keep
 // their round-robin turns), and a source's extract filter leaves what it rejects in the machine.
+// A source that yields nothing (empty, or nowhere takes what it holds) is skipped for a few ticks (see
+// ConduitNetwork.Endpoint.backOff), and which sinks can be reached from where is worked out once per network.
 public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResource>> {
     // For each sink, the direction to leave each conduit in to get one step closer to it.
     private final Map<SinkKey, Map<BlockPos, Direction>> routes = new HashMap<>();
     private final Map<SinkKey, Endpoint<ResourceHandler<ItemResource>>> sinksByKey = new HashMap<>();
+    // The same, by index in sinks.
+    private final List<SinkKey> sinkKeys = new ArrayList<>();
+    private final List<Map<BlockPos, Direction>> sinkRoutes = new ArrayList<>();
+    // The sinks reachable from each origin, as indexes into sinks in order (see reachableSinks). Any change to the
+    // conduits or their sides rebuilds the network, and with it this.
+    private final Map<Origin, int[]> reachable = new HashMap<>();
     private int sourceCursor;
     private int storageCursor;
 
@@ -50,18 +59,38 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
 
     private record SinkKey(BlockPos conduit, Direction side) {}
 
+    // Where items leave from: a conduit, and the machine they came out of (never sent back into it), if any.
+    private record Origin(BlockPos from, @Nullable BlockPos excludeMachine) {}
+
     @Override
     protected void onCreated() {
         for (Endpoint<ResourceHandler<ItemResource>> sink : sinks) {
             SinkKey key = new SinkKey(sink.conduit(), sink.side());
+            Map<BlockPos, Direction> route = buildRoute(sink);
             sinksByKey.put(key, sink);
-            routes.put(key, buildRoute(sink));
+            routes.put(key, route);
+            sinkKeys.add(key);
+            sinkRoutes.add(route);
         }
-        for (BlockPos pos : members) {
-            if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
+        for (ConduitBlockEntity conduit : conduits) {
+            if (conduit != null) {
                 conduit.setItemSpeed(tier.itemSpeed());
             }
         }
+    }
+
+    // The sinks items leaving `from` can reach, leaving out excludeMachine, in the order of sinks.
+    private int[] reachableSinks(BlockPos from, @Nullable BlockPos excludeMachine) {
+        return reachable.computeIfAbsent(new Origin(from, excludeMachine), origin -> {
+            int[] found = new int[sinks.size()];
+            int count = 0;
+            for (int i = 0; i < sinks.size(); i++) {
+                if (!sinks.get(i).machine().equals(excludeMachine) && sinkRoutes.get(i).containsKey(from)) {
+                    found[count++] = i;
+                }
+            }
+            return Arrays.copyOf(found, count);
+        });
     }
 
     // Breadth-first search outwards from the sink's conduit.
@@ -91,7 +120,7 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
                 dispatchStored();
             }
             if (!sources.isEmpty()) {
-                extract();
+                extract(gameTime);
             }
         }
         movePackets();
@@ -99,18 +128,25 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
 
     // --- Pulling items into the network ---
 
-    private void extract() {
+    // Sources take turns; one backing off is passed over like one with nothing to give.
+    private void extract(long gameTime) {
         for (int attempt = 0; attempt < sources.size(); attempt++) {
             Endpoint<ResourceHandler<ItemResource>> source = sources.get(sourceCursor++ % sources.size());
+            if (source.isBackingOff(gameTime, 0)) {
+                continue;
+            }
             if (extractFrom(source)) {
+                source.resetBackoff();
                 return;
             }
+            source.backOff(gameTime, 0);
         }
     }
 
     private boolean extractFrom(Endpoint<ResourceHandler<ItemResource>> source) {
         ResourceHandler<ItemResource> handler = source.handler();
-        if (handler == null || !(level.getBlockEntity(source.conduit()) instanceof ConduitBlockEntity conduit)) {
+        ConduitBlockEntity conduit = source.conduitEntity();
+        if (handler == null || conduit == null) {
             return false;
         }
         // The operation's items may come from several slots: a machine that tops up its first output slot as it works
@@ -174,8 +210,10 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
     private void dispatchStored() {
         int count = members.size();
         for (int attempt = 0; attempt < count; attempt++) {
-            BlockPos pos = members.get(storageCursor++ % count);
-            if (!(level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) || conduit.getStoredItems().isEmpty()) {
+            int index = storageCursor++ % count;
+            BlockPos pos = members.get(index);
+            ConduitBlockEntity conduit = conduits[index];
+            if (conduit == null || conduit.getStoredItems().isEmpty()) {
                 continue;
             }
             var iterator = conduit.getStoredItems().iterator();
@@ -202,42 +240,46 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
     // Whether a sink reachable from `from` (other than excludeMachine) has a filter that lets these items through, or
     // there is no such sink at all yet (the items wait in the conduits for one to be connected).
     private boolean anySinkAllows(ItemResource resource, BlockPos from, @Nullable BlockPos excludeMachine) {
+        int[] candidates = reachableSinks(from, excludeMachine);
         ItemStack stack = resource.toStack(1);
-        boolean reachable = false;
-        for (Endpoint<ResourceHandler<ItemResource>> sink : sinks) {
-            Map<BlockPos, Direction> route = routes.get(new SinkKey(sink.conduit(), sink.side()));
-            if (sink.machine().equals(excludeMachine) || route == null || !route.containsKey(from)) {
-                continue;
-            }
-            reachable = true;
-            if (filterAllows(sink, stack, true)) {
+        for (int index : candidates) {
+            if (filterAllows(sinks.get(index), stack, true)) {
                 return true;
             }
         }
-        return !reachable;
+        return candidates.length == 0;
     }
 
     private record Target(SinkKey key, Map<BlockPos, Direction> route, int accepted) {}
 
-    // The first sink (round-robin) reachable from `from` that will accept some of the items.
+    // The first sink (round-robin, from the one after the last served) reachable from `from` that will accept some of
+    // the items. Simulated: the items are only inserted when their packet arrives.
     private @Nullable Target findTarget(ItemResource resource, int amount, BlockPos from, @Nullable BlockPos excludeMachine) {
-        for (Endpoint<ResourceHandler<ItemResource>> sink : sinksFromLastServed()) {
-            if (sink.machine().equals(excludeMachine)) {
-                continue;
-            }
-            SinkKey key = new SinkKey(sink.conduit(), sink.side());
-            Map<BlockPos, Direction> route = routes.get(key);
+        int[] candidates = reachableSinks(from, excludeMachine);
+        if (candidates.length == 0) {
+            return null;
+        }
+        // The first candidate at or after nextSink, wrapping round.
+        int start = Arrays.binarySearch(candidates, nextSink());
+        if (start < 0) {
+            start = -start - 1;
+        }
+        ItemStack stack = resource.toStack(1);
+        for (int k = 0; k < candidates.length; k++) {
+            int index = candidates[(start + k) % candidates.length];
+            Endpoint<ResourceHandler<ItemResource>> sink = sinks.get(index);
             ResourceHandler<ItemResource> handler = sink.handler();
-            if (route == null || !route.containsKey(from) || handler == null || !filterAllows(sink, resource.toStack(1), true)) {
+            if (handler == null || !filterAllows(sink, stack, true)) {
                 continue;
             }
             int accepted;
+            countInsertCall();
             try (Transaction simulation = Transaction.openRoot()) {
                 accepted = handler.insert(resource, amount, simulation);
             }
             if (accepted > 0) {
-                served(sink);
-                return new Target(key, route, accepted);
+                served(index);
+                return new Target(sinkKeys.get(index), sinkRoutes.get(index), accepted);
             }
         }
         return null;
@@ -249,10 +291,12 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
 
     private void movePackets() {
         List<Handoff> handoffs = new ArrayList<>();
-        for (BlockPos pos : members) {
-            if (!(level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) || conduit.getPackets().isEmpty()) {
+        for (int index = 0; index < conduits.length; index++) {
+            ConduitBlockEntity conduit = conduits[index];
+            if (conduit == null || conduit.getPackets().isEmpty()) {
                 continue;
             }
+            BlockPos pos = members.get(index);
             boolean changed = false;
             var iterator = conduit.getPackets().iterator();
             while (iterator.hasNext()) {
@@ -312,6 +356,7 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
             return stack;
         }
         int inserted;
+        countInsertCall();
         try (Transaction tx = Transaction.openRoot()) {
             inserted = handler.insert(ItemResource.of(stack), stack.getCount(), tx);
             tx.commit();

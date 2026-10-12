@@ -25,6 +25,7 @@ public final class ArcforgeNetwork {
         PayloadRegistrar registrar = event.registrar(VERSION);
         registrar.playToServer(WrenchModePayload.TYPE, WrenchModePayload.STREAM_CODEC, WrenchModePayload::handle);
         registrar.playToClient(PortsPayload.TYPE, PortsPayload.STREAM_CODEC, PortsPayload::handle);
+        registrar.playToClient(ConduitContentsPayload.TYPE, ConduitContentsPayload.STREAM_CODEC, ConduitContentsPayload::handle);
         registrar.playToServer(AssemblerPatternPayload.TYPE, AssemblerPatternPayload.STREAM_CODEC, AssemblerPatternPayload::handle);
         registrar.playToServer(ArcQuarryAreaPayload.TYPE, ArcQuarryAreaPayload.STREAM_CODEC, ArcQuarryAreaPayload::handle);
         registrar.playToServer(ItemReservoirSearchPayload.TYPE, ItemReservoirSearchPayload.STREAM_CODEC, ItemReservoirSearchPayload::handle);

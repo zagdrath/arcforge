@@ -32,6 +32,7 @@ import net.zagdrath.arcforge.block.multiblock.CubeCasingBlock;
 import net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
+import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.CubeMultiblockStructure;
@@ -62,6 +63,9 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
     protected int usage;
     // The larger box this casing is part of (see CubeMultiblockStructure), or null for a 3x3x3 or loose casing.
     private CubeMultiblockStructure.@Nullable Box box;
+    // The structure's redstone signal, while powerKnown (see isPowered).
+    private boolean powered;
+    private boolean powerKnown;
 
     // inputSlots: each lane's input slot, in lane order. productSlot: the slots output faces give from.
     protected CubeMultiblockBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots, LevelSlotFilter filter,
@@ -146,19 +150,31 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
         MultiblockAutomation.pushOutputs(level, this);
     }
 
+    // Whether any casing has a redstone signal. Kept until a casing's neighbour changes (see invalidatePower), the way a
+    // redstone lamp only looks again then, instead of checking every casing every tick.
     protected boolean isPowered(Level level) {
-        for (BlockPos pos : BlockPos.betweenClosed(getMinCorner(), getMaxCorner())) {
-            if (level.hasNeighborSignal(pos)) {
-                return true;
+        if (!powerKnown) {
+            powered = false;
+            for (BlockPos pos : BlockPos.betweenClosed(getMinCorner(), getMaxCorner())) {
+                if (level.hasNeighborSignal(pos)) {
+                    powered = true;
+                    break;
+                }
             }
+            powerKnown = true;
         }
-        return false;
+        return powered;
+    }
+
+    // A casing's neighbour changed (see CubeCasingBlock.neighborChanged), or the structure did: look again next time.
+    public void invalidatePower() {
+        powerKnown = false;
     }
 
     // A signal into any casing counts, not just the centre's.
     @Override
     protected boolean canRun(Level level) {
-        return controlState.isEnabled() && redstoneMode.canRun(isPowered(level));
+        return controlState.isEnabled() && (redstoneMode == RedstoneMode.IGNORE || redstoneMode.canRun(isPowered(level)));
     }
 
     public ConsumerEnergyHandler getEnergy() {
@@ -200,6 +216,7 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
 
     // The facing turned or the side configuration changed: every face of the cube may be different now.
     public void onStructureChanged() {
+        invalidatePower();
         if (level != null) {
             MultiblockAutomation.refresh(level, getMinCorner(), getMaxCorner());
         }
@@ -229,6 +246,7 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
     public void setBox(CubeMultiblockStructure.@Nullable Box box) {
         if (!java.util.Objects.equals(this.box, box)) {
             this.box = box;
+            invalidatePower();
             setChanged();
             onSizeChanged();
             if (level != null && !level.isClientSide()) {
@@ -346,6 +364,7 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
             box = loaded;
             onSizeChanged();
         }
+        invalidatePower();
     }
 
     @Override

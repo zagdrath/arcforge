@@ -37,8 +37,8 @@ public class ThermalConduitNetwork extends ActiveConduitNetwork<HeatHandler> {
     @Override
     protected void onCreated() {
         super.onCreated();
-        for (BlockPos pos : members) {
-            if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
+        for (ConduitBlockEntity conduit : conduits) {
+            if (conduit != null) {
                 temperature = Math.max(temperature, conduit.getHeatTemperature());
             }
         }
@@ -89,8 +89,8 @@ public class ThermalConduitNetwork extends ActiveConduitNetwork<HeatHandler> {
     }
 
     private void saveTemperature() {
-        for (BlockPos pos : members) {
-            if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
+        for (ConduitBlockEntity conduit : conduits) {
+            if (conduit != null) {
                 conduit.setHeatTemperature(temperature);
             }
         }

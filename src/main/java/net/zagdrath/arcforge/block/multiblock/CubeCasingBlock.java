@@ -30,6 +30,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -149,6 +150,16 @@ public abstract class CubeCasingBlock extends BaseEntityBlock implements Multibl
     @Override
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         structure().rebuild(level, pos, null);
+    }
+
+    // The signal into this casing may have changed: the machine looks again (see CubeMultiblockBlockEntity.isPowered).
+    // Redstone updates the neighbours of every block whose signal it changes, as redstone lamps rely on.
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, block, orientation, movedByPiston);
+        if (!level.isClientSide() && isFormed(state) && structure().findController(level, pos) instanceof CubeMultiblockBlockEntity machine) {
+            machine.invalidatePower();
+        }
     }
 
     @Override
