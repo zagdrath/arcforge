@@ -28,15 +28,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
-// Pressure Glass: the windows of the Steam Boiler Array and Steam Turbine Array, the walls and roof of the
-// Greenhouse Array, the windows up the sides of the Thermal Evaporator Array, the faces of the Firebox and Battery Arrays,
-// and a decorative glass on its own. Neighbouring panes merge into one window. When a
-// structure forms around it, FORMED is set and clicking it opens the machine's GUI; glass never does IO.
+// Pressure Glass: the windows of the Steam Boiler Array and Steam Turbine Array, the walls and roof of the Greenhouse
+// Array, the windows up the sides of the Thermal Evaporator Array, the faces of the Firebox and Battery Arrays, and a
+// decorative glass on its own. Neighbouring panes merge into one window. When a structure forms around it, FORMED is
+// set and clicking it opens the machine's GUI; glass never does IO. A formed pane of a Steam Turbine Array takes the
+// shape of the model's pieces in it, as the array's casings do (see TurbineHitbox).
 public class PressureGlassBlock extends TransparentBlock {
     public static final BooleanProperty FORMED = BooleanProperty.create("formed");
 
@@ -67,6 +71,24 @@ public class PressureGlassBlock extends TransparentBlock {
             }
         }
         return null;
+    }
+
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        VoxelShape shape = state.getValue(FORMED) ? TurbineHitbox.glass(level, pos) : null;
+        return shape != null ? shape : super.getShape(state, level, pos, context);
+    }
+
+    @Override
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        VoxelShape shape = state.getValue(FORMED) ? TurbineHitbox.glass(level, pos) : null;
+        return shape != null ? shape : super.getCollisionShape(state, level, pos, context);
+    }
+
+    // Still a whole block to whatever hangs on it (levers, buttons, torches, redstone), so the array keeps its controls.
+    @Override
+    protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter level, BlockPos pos) {
+        return state.getValue(FORMED) ? Shapes.block() : super.getBlockSupportShape(state, level, pos);
     }
 
     @Override

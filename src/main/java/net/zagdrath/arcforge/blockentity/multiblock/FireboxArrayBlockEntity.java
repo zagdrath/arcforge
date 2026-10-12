@@ -78,8 +78,8 @@ import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // The Firebox Array (see FireboxArrayStructure), run by its controller: a big firebox that burns solid fuels and Fuel
 // Burner fuels into heat.
-//  - It makes heatPerTickPerBlock (160) HU/t for every block of its volume while it burns: 4,320 HU/t for a 3x3x3,
-//    50,400 for a 7x5x9. Its heat buffer, fuel tank and oxygen tank scale with the volume too.
+//  - It makes the largest array's heatPerTickAtMaxSize (50,400 HU/t for a 7x7x7) times its volume / 343 while it
+//    burns: 3,967 HU/t for a 3x3x3. Its heat buffer, fuel tank and oxygen tank scale with the volume too.
 //  - Solid fuels (#arcforge:combustion_fuel) give the heat they give in a Firebox (coal 64,000 HU) and burn at 1,100°C;
 //    Coal Coke gives 1.5 times a coal's (and its block 1.5 times a coal block's) and burns at 1,300°C. Liquid and gas
 //    fuels (arcforge:burner_fuels) give their HU per mB, at their own burn temperature (or the array's maximum).
@@ -208,8 +208,14 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         return box != null ? box.volume() : 27;
     }
 
+    // The largest array's HU/t, shared by volume (heatPerTickAtMaxSize x volume / 343).
     public int maxHeatPerTick() {
-        return (int) Math.min(Integer.MAX_VALUE, (long) ArcforgeConfig.FIREBOX_ARRAY_HEAT_PER_BLOCK.getAsInt() * volume());
+        return heatAt(volume());
+    }
+
+    public static int heatAt(int volume) {
+        return (int) Math.min(Integer.MAX_VALUE, Math.round((double) ArcforgeConfig.FIREBOX_ARRAY_HEAT_AT_MAX_SIZE.getAsInt() * volume
+                / FireboxArrayStructure.MAX_VOLUME));
     }
 
     private HeatBuffer newHeat(int volume) {

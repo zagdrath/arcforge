@@ -55,11 +55,11 @@ import net.zagdrath.arcforge.machine.output.OutputLimited;
 import com.mojang.serialization.Codec;
 
 // The Steam Boiler Array (see ShellMultiblockBlockEntity): boils water into steam with heat, and grows with its
-// sections s = width x depth / 9 x height (a 3x3x3 is 3, a 7x9x12 is 84). It holds 100,000 x s HU and boils with up
-// to 600 x s HU/t. In a 3x3x3 each mB costs 8 / 12 / 16 HU for Steam / High-Pressure / Superheated; bigger boilers pay
-// less ((s / 3)^-0.2: a 7x9x12 pays 51%), and running hot in a grade's band takes off up to 20% more (see
-// heatCostMultiplier and BoilerCore). Water and steam tanks hold 16,000 x s mB. The grade, pressure and vent rules
-// are in BoilerCore.
+// sections s = width x depth / 9 x height (a 3x3x3 is 3, a 7x7x16 is 87.1). It holds 100,000 x s HU and boils with
+// up to the largest array's 50,400 HU/t times s / 87.1 (about 579 x s: 1,736 HU/t for a 3x3x3). In a 3x3x3 each mB
+// costs 8 / 12 / 16 HU for Steam / High-Pressure / Superheated; bigger boilers pay less ((s / 3)^-0.2: a 7x7x16 pays
+// 51%), and running hot in a grade's band takes off up to 20% more (see heatCostMultiplier and BoilerCore). Water and
+// steam tanks hold 16,000 x s mB. The grade, pressure and vent rules are in BoilerCore.
 public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity implements Boiler, OutputLimited {
     // Water buckets go in the input slot and are poured into the tank; the empty buckets come out below.
     public static final int SLOT_BUCKET_IN = 0;
@@ -160,9 +160,17 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
         return (int) Math.min(Integer.MAX_VALUE, Math.round(perSection * sections));
     }
 
-    // Most HU/t it boils with.
+    // Most HU/t it boils with: the largest array's, shared by sections (maxHeatPerTickAtMaxSize x sections / 87.1).
     public int maxHeatPerTick() {
-        return scaled(ArcforgeConfig.BOILER_ARRAY_MAX_HEAT_PER_SECTION.getAsInt(), getSections());
+        return heatAt(getSections());
+    }
+
+    // The sections of the largest Steam Boiler Array (7x7x16).
+    public static final double MAX_SECTIONS = SteamBoilerArrayCasingBlock.MAX_WIDTH * SteamBoilerArrayCasingBlock.MAX_DEPTH / 9.0
+            * SteamBoilerArrayCasingBlock.MAX_HEIGHT;
+
+    public static int heatAt(double sections) {
+        return (int) Math.min(Integer.MAX_VALUE, Math.round(ArcforgeConfig.BOILER_ARRAY_MAX_HEAT_AT_MAX_SIZE.getAsInt() * sections / MAX_SECTIONS));
     }
 
     // The multiplier on a grade's heat per mB for a boiler this big: the configured cost, cut by size (a 3x3x3 pays
@@ -174,8 +182,7 @@ public class SteamBoilerArrayBlockEntity extends ShellMultiblockBlockEntity impl
 
     // The least any boiler pays per mB, as a multiplier on the grade's heat per mB: the biggest, at the top of its band.
     public static double bestHeatCostMultiplier() {
-        double biggest = SteamBoilerArrayCasingBlock.MAX_WIDTH * SteamBoilerArrayCasingBlock.MAX_DEPTH / 9.0 * SteamBoilerArrayCasingBlock.MAX_HEIGHT;
-        return heatCostMultiplier(biggest) * (1.0 - ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble());
+        return heatCostMultiplier(MAX_SECTIONS) * (1.0 - ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble());
     }
 
     // "W×D×H" for names and tooltips.

@@ -41,11 +41,11 @@ import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
-// The large heat source and the bigger arrays: the Firebox Array (it forms as a rectangular hollow box with a controller
-// and windows, and not too tall; it burns coal at 160 HU/t a block until it is as hot as the fuel, Coal Coke for 1.5 times
-// coal's heat at 1,300°C, Naphtha by the mB, and pushes its heat out of a Heat port); rectangular Steam Boiler and Steam
-// Turbine Arrays and a Superheater box that scale with their size; and the power multiplier reaching every generator's
-// FE and the energy balance.
+// The large heat source and the bigger arrays: the Firebox Array (it forms as a rectangular hollow box with a
+// controller and windows, and not too tall; it burns coal at its share of 50,400 HU/t by volume until it is as hot as
+// the fuel, Coal Coke for 1.5 times coal's heat at 1,300°C, Naphtha by the mB, and pushes its heat out of a Heat port);
+// rectangular Steam Boiler and Steam Turbine Arrays and a Superheater box that scale with their size; and the power
+// multiplier reaching every generator's FE and the energy balance.
 public final class BigArrayGameTests {
     private BigArrayGameTests() {}
 
@@ -75,8 +75,9 @@ public final class BigArrayGameTests {
         return helper.getBlockEntity(controller, FireboxArrayBlockEntity.class);
     }
 
-    // A 5 wide, 3 tall, 4 deep box forms (it needn't be square), with a window in its east wall: 60 blocks, so 9,600 HU/t.
-    // Its walls know their way in; the size rule takes 7x9 either way round and 3 to 5 tall, and nothing bigger.
+    // A 5 wide, 3 tall, 4 deep box forms (it needn't be square), with a window in its east wall: 60 blocks, so 8,816
+    // HU/t (50,400 x 60 / 343). Its walls know their way in; the size rule takes up to 7x7 and 3 to 7 tall, and nothing
+    // bigger.
     static void fireboxArrayForms(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 1);
         BlockPos pane = min.offset(4, 1, 2);
@@ -86,14 +87,14 @@ public final class BigArrayGameTests {
                 .thenExecute(() -> {
                     FireboxArrayBlockEntity array = firebox(helper, controller);
                     helper.assertTrue(array.isFormed(), "The 5x3x4 Firebox Array didn't form");
-                    helper.assertTrue(array.volume() == 60 && array.maxHeatPerTick() == 9_600,
+                    helper.assertTrue(array.volume() == 60 && array.maxHeatPerTick() == 8_816,
                             "Volume " + array.volume() + ", " + array.maxHeatPerTick() + " HU/t");
                     helper.assertTrue(PressureGlassBlock.isFormed(helper.getBlockState(pane)), "The window isn't part of it");
                     helper.assertTrue(FireboxArrayPart.inward(helper.getBlockState(min.offset(2, 0, 2))) == Direction.UP, "The floor doesn't face up into it");
                     helper.assertTrue(FireboxArrayPart.inward(helper.getBlockState(min.offset(0, 1, 2))) == Direction.EAST, "The west wall doesn't face in");
                     helper.assertTrue(FireboxArrayPart.inward(helper.getBlockState(min)) == null, "A corner has a way in");
-                    helper.assertTrue(FireboxArrayStructure.allows(7, 5, 9) && FireboxArrayStructure.allows(9, 3, 7)
-                            && !FireboxArrayStructure.allows(8, 3, 8) && !FireboxArrayStructure.allows(3, 6, 3), "The size rule is wrong");
+                    helper.assertTrue(FireboxArrayStructure.allows(7, 7, 7) && FireboxArrayStructure.allows(3, 3, 7)
+                            && !FireboxArrayStructure.allows(8, 3, 7) && !FireboxArrayStructure.allows(3, 8, 3), "The size rule is wrong");
                     helper.assertTrue(array.getHeat().getCapacity() == 600_000, "Heat buffer " + array.getHeat().getCapacity());
                     // A block inside breaks it (within its periodic check).
                     helper.setBlock(min.offset(2, 1, 2), Blocks.STONE);
@@ -103,8 +104,8 @@ public final class BigArrayGameTests {
                 .thenSucceed();
     }
 
-    // A 3x3x3 burns coal at 4,320 HU/t (27 blocks x 160), at most 1,100°C: it stops (Full) once it's that hot. Each coal
-    // gives a Firebox's 64,000 HU; Coal Coke gives 1.5 times that and burns at 1,300°C.
+    // A 3x3x3 burns coal at 3,967 HU/t (50,400 x 27 / 343), at most 1,100°C: it stops (Full) once it's that hot. Each
+    // coal gives a Firebox's 64,000 HU; Coal Coke gives 1.5 times that and burns at 1,300°C.
     static void fireboxArrayBurnsCoal(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 1);
         BlockPos controller = buildFirebox(helper, min, 3, 3, 3, Set.of());
@@ -124,7 +125,7 @@ public final class BigArrayGameTests {
                 .thenIdle(5)
                 .thenExecute(() -> {
                     FireboxArrayBlockEntity array = firebox(helper, controller);
-                    helper.assertTrue(array.getHeatPerTick() == 4_320, "Burning coal makes " + array.getHeatPerTick() + " HU/t");
+                    helper.assertTrue(array.getHeatPerTick() == 3_967, "Burning coal makes " + array.getHeatPerTick() + " HU/t");
                     helper.assertTrue(array.getStatus() == MachineStatus.BURNING, "Status is " + array.getStatus());
                 })
                 .thenIdle(60)
@@ -140,7 +141,7 @@ public final class BigArrayGameTests {
                 .thenSucceed();
     }
 
-    // Naphtha burns by the mB: 4,320 HU/t at 400 HU/mB is 10.8 mB/t, so ten ticks take 108 mB (give or take one).
+    // Naphtha burns by the mB: 3,967 HU/t at 400 HU/mB is 9.9 mB/t, so ten ticks take 99 mB (give or take one).
     static void fireboxArrayBurnsNaphtha(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 1);
         BlockPos controller = buildFirebox(helper, min, 3, 3, 3, Set.of());
@@ -154,8 +155,8 @@ public final class BigArrayGameTests {
                 .thenExecute(() -> {
                     FireboxArrayBlockEntity array = firebox(helper, controller);
                     int used = before[0] - array.getTank().getAmount();
-                    helper.assertTrue(Math.abs(used - 108) <= 1, "Ten ticks burned " + used + " mB of Naphtha");
-                    helper.assertTrue(array.getHeatPerTick() == 4_320, "Naphtha makes " + array.getHeatPerTick() + " HU/t");
+                    helper.assertTrue(Math.abs(used - 99) <= 1, "Ten ticks burned " + used + " mB of Naphtha");
+                    helper.assertTrue(array.getHeatPerTick() == 3_967, "Naphtha makes " + array.getHeatPerTick() + " HU/t");
                 })
                 .thenSucceed();
     }
@@ -181,9 +182,10 @@ public final class BigArrayGameTests {
                 .thenSucceed();
     }
 
-    // A 5 wide, 7 deep, 4 tall boiler forms (its edges casings, a window in a wall), and scales by footprint and height:
-    // 5 x 7 / 9 x 4 = 15.6 sections, so 9,333 HU/t and 248,889 mB tanks. A turbine 5 wide, 4 tall and 6 long along X forms
-    // too: 13.3 sections, 533 mB/t, its rotor sized to the 4-block side; its ends have no middle block, so no generator.
+    // A 5 wide, 7 deep, 4 tall boiler forms (its edges casings, a window in a wall), and scales by footprint and
+    // height: 5 x 7 / 9 x 4 = 15.6 sections, so 9,000 HU/t (50,400 x 15.6 / 87.1) and 248,889 mB tanks. A turbine 5
+    // wide, 4 tall and 6 long along X forms too: 13.3 sections, 533 mB/t, its rotor sized to the 4-block side; its ends
+    // have no middle block, so no generator.
     static void rectangularSteamArrays(GameTestHelper helper) {
         BlockPos boilerMin = new BlockPos(0, 1, 0);
         BlockPos pane = boilerMin.offset(2, 1, 0);
@@ -196,7 +198,7 @@ public final class BigArrayGameTests {
                     SteamBoilerArrayBlockEntity boiler = helper.getBlockEntity(boilerMin, SteamBoilerArrayBlockEntity.class);
                     helper.assertTrue(boiler.isMaster(), "The 5x7x4 boiler didn't form");
                     helper.assertTrue(PressureGlassBlock.isFormed(helper.getBlockState(pane)), "Its window isn't part of it");
-                    helper.assertTrue(boiler.maxHeatPerTick() == 9_333, "It boils with " + boiler.maxHeatPerTick() + " HU/t");
+                    helper.assertTrue(boiler.maxHeatPerTick() == 9_000, "It boils with " + boiler.maxHeatPerTick() + " HU/t");
                     helper.assertTrue(boiler.getWater().getCapacity() == 248_889, "Water tank " + boiler.getWater().getCapacity());
                     SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(turbineMin, SteamTurbineArrayBlockEntity.class);
                     helper.assertTrue(turbine.isMaster() && turbine.getShell() != null && turbine.getShell().axis() == Direction.Axis.X,

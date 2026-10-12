@@ -37,8 +37,9 @@ import snownee.jade.api.ui.IDisplayHelper;
 // limit, so an undersized boiler behind a heat source shows), a Superheater Array's "Steam → Superheated · 200 mB/t" (or
 // "Passing through (420 °C)"), a Condenser Array's "Condensing 287 mB/t", and a Steam Turbine Array's exhaust
 // ("Exhaust: 1,200 mB", "Vacuum bonus +10%"), with the part of the turbine-generator set the casing is in ("Section:
-// Low-pressure casing") and, on a fitted spot, the port that fits there ("Exhaust neck: fits an Exhaust port"). Their
-// tanks and heat show through Jade's own views. This half gathers the data on the server; Client draws it.
+// Low-pressure casing", or "Low-pressure casing 2 of 3" on a set with several) and, on a fitted spot, the port that
+// fits there ("Exhaust neck: fits an Exhaust port"). Their tanks and heat show through Jade's own views. This half
+// gathers the data on the server; Client draws it.
 public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor, SteamCycleProvider.Data> {
     INSTANCE;
 
@@ -85,8 +86,9 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
             ShellStructure.Shell shell = turbine.getShell();
             if (shell != null && shell.contains(accessor.getPosition())) {
                 TurbineLayout layout = TurbineLayout.of(shell, turbine.getFacing());
-                where = layout.partAt(TurbineLayout.blockU(shell, accessor.getPosition())).ordinal() + 1
-                        | layout.spotAt(shell, accessor.getPosition()).ordinal() << 4;
+                int u = TurbineLayout.blockU(shell, accessor.getPosition());
+                where = layout.partAt(u).ordinal() + 1 | layout.spotAt(shell, accessor.getPosition()).ordinal() << 4
+                        | layout.lowNumberAt(u) << 8 | layout.lowCount() << 12;
             }
             return new Data(Kind.TURBINE.ordinal(), turbine.hasExhaust() ? 1 : 0, turbine.isVacuum() ? 1 : 0, turbine.getExhaust().getAmount(), where);
         }
@@ -131,10 +133,13 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
                     case TURBINE -> {
                         int part = (data.d() & 15) - 1;
                         if (part >= 0 && part < TurbineLayout.Part.values().length) {
-                            tooltip.add(Component.translatable("jade.arcforge.turbine.section",
-                                    Component.translatable(TurbineLayout.Part.values()[part].translationKey())).withStyle(ChatFormatting.GRAY));
+                            // One of several low-pressure casings: "Low-pressure casing 2 of 3".
+                            int number = data.d() >> 8 & 15, of = data.d() >> 12 & 15;
+                            Component name = number > 0 ? Component.translatable("arcforge.steam_turbine_array.part.low_pressure_numbered", number, of)
+                                    : Component.translatable(TurbineLayout.Part.values()[part].translationKey());
+                            tooltip.add(Component.translatable("jade.arcforge.turbine.section", name).withStyle(ChatFormatting.GRAY));
                         }
-                        int spot = data.d() >> 4;
+                        int spot = data.d() >> 4 & 15;
                         if (spot > 0 && spot < TurbineLayout.Spot.values().length) {
                             tooltip.add(Component.translatable(TurbineLayout.Spot.values()[spot].translationKey()).withStyle(ChatFormatting.GRAY));
                         }

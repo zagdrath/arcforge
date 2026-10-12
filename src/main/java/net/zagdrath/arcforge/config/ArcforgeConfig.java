@@ -269,16 +269,17 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Firebox Array: a hollow box 3 to 7 by 3 to 9 across and 3 to 5 tall that burns solid fuels",
+        BUILDER.comment("Firebox Array: a hollow box 3 to 7 by 3 to 7 across and 3 to 7 tall that burns solid fuels",
                 "(#arcforge:combustion_fuel, and Coal Coke) and Fuel Burner fuels (arcforge:burner_fuels) into heat (HU). Each item",
                 "or mB gives the heat it gives in a Firebox or Fuel Burner (without upgrades); values marked per block scale with",
-                "the box's whole volume (a 3x3x3 is 27 blocks, a 7x5x9 is 315). It pauses while its buffer is as hot as the fuel",
+                "the box's whole volume (a 3x3x3 is 27 blocks, a 7x7x7 is 343). It pauses while its buffer is as hot as the fuel",
                 "burns. Fed oxygen through an Oxygen port it burns on oxy-fuel (see oxyFuel).").push("fireboxArray");
     }
 
-    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_PER_BLOCK = BUILDER
-            .comment("HU/t it makes while burning, per block of its volume (160: a 3x3x3 makes 4,320 HU/t, a 7x5x9 50,400).")
-            .defineInRange("heatPerTickPerBlock", 160, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_AT_MAX_SIZE = BUILDER
+            .comment("HU/t the largest Firebox Array (7x7x7) makes while burning; smaller ones make their share by volume",
+                    "(50,400: a 3x3x3 makes 3,967 HU/t).")
+            .defineInRange("heatPerTickAtMaxSize", 50_400, 1, 100_000_000);
 
     public static final ModConfigSpec.IntValue FIREBOX_ARRAY_HEAT_CAPACITY_PER_BLOCK = BUILDER
             .comment("Heat buffer size in HU, per block of its volume.")
@@ -589,9 +590,9 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Steam Boiler Array: a boiler on a footprint 3 to 7 by 3 to 9, 3 to 12 blocks tall. Values are per",
+        BUILDER.comment("Steam Boiler Array: a boiler on a footprint 3 to 7 by 3 to 7, 3 to 16 blocks tall. Values are per",
                 "section: a 3x3 footprint's worth of area, one block tall, so they scale with width x depth / 9 x height",
-                "(a 3x3x3 is 3 sections, a 7x9x12 is 84).").push("steamBoilerArray");
+                "(a 3x3x3 is 3 sections, a 7x7x16 is 87.1).").push("steamBoilerArray");
     }
 
     public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_TEMPERATURE = BUILDER
@@ -602,9 +603,10 @@ public class ArcforgeConfig {
             .comment("Heat buffer size in HU, per section.")
             .defineInRange("heatCapacityPerSection", 100_000, 1_000, 100_000_000);
 
-    public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_HEAT_PER_SECTION = BUILDER
-            .comment("Most HU/t it boils with, per section (600: a 7x9x12 boils with up to 50,400 HU/t).")
-            .defineInRange("maxHeatPerTickPerSection", 600, 1, 1_000_000);
+    public static final ModConfigSpec.IntValue BOILER_ARRAY_MAX_HEAT_AT_MAX_SIZE = BUILDER
+            .comment("Most HU/t the largest Steam Boiler Array (7x7x16) boils with; smaller ones get their share by sections",
+                    "(50,400: a 3x3x3 boils with up to 1,736 HU/t).")
+            .defineInRange("maxHeatPerTickAtMaxSize", 50_400, 1, 100_000_000);
 
     public static final ModConfigSpec.IntValue BOILER_ARRAY_TANK_PER_SECTION = BUILDER
             .comment("Water and steam tank sizes in mB, per section.")
@@ -616,7 +618,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.DoubleValue BOILER_ARRAY_SIZE_EFFICIENCY = BUILDER
             .comment("How much a bigger boiler saves on heat per mB: the cost is multiplied by (sections / 3) to minus this",
-                    "(0.2: a 3x3x12 pays 76%, a 7x9x12 51% of a 3x3x3's). 0 turns it off.")
+                    "(0.2: a 3x3x12 pays 76%, a 7x7x16 51% of a 3x3x3's). 0 turns it off.")
             .defineInRange("sizeEfficiency", 0.2, 0.0, 1.0);
 
     public static final ModConfigSpec.DoubleValue BOILER_ARRAY_HOT_SAVING = BUILDER
@@ -629,15 +631,15 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Steam Turbine Array: a turbine 3 to 15 blocks long with a cross-section 3 to 7 wide and 3 to 9 tall, whose",
+        BUILDER.comment("Steam Turbine Array: a turbine 3 to 27 blocks long with a cross-section 3 to 7 wide and 3 to 7 tall, whose",
                 "rotor spins up and coasts down. Values are per section: a 3x3 cross-section's worth of area, one block long, so",
-                "they scale with width x height / 9 x length (a 3x3x3 is 3 sections, a 7x9x15 is 105). It makes 20 / 36 / 56 FE",
+                "they scale with width x height / 9 x length (a 3x3x3 is 3 sections, a 7x7x27 is 147). It makes 20 / 36 / 56 FE",
                 "per mB of Steam / High-Pressure / Superheated Steam (times power.generationMultiplier); its output cap is a full",
                 "flow of lubricated Superheated Steam with the vacuum bonus.").push("steamTurbineArray");
     }
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_FLOW_PER_SECTION = BUILDER
-            .comment("Most steam it uses in mB/t, per section (40: a 7x9x15 takes up to 4,200 mB/t).")
+            .comment("Most steam it uses in mB/t, per section (40: a 7x7x27 takes up to 5,880 mB/t).")
             .defineInRange("maxFlowPerSection", 40, 1, 1_000_000);
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_TANK_PER_SECTION = BUILDER

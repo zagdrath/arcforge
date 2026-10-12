@@ -15,22 +15,30 @@ import net.minecraft.core.Direction;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
 // How a formed Steam Turbine Array is laid out as one turbine-generator set (drawn by SteamTurbineArrayRenderer, named
-// by Jade, checked by the GameTests). Everything is in pixels in the turbine's own frame: u along the axis from the
-// bearing (steam) end at 0 to the generator end at length x 16, x across from one long side to the other, y up from
-// the bottom of the structure.
+// by Jade, given its block shapes by TurbineShapes, checked by the GameTests). Everything is in pixels in the turbine's
+// own frame: u along the axis from the bearing (steam) end at 0 to the generator end at length x 16, x across from one
+// long side to the other, y up from the bottom of the structure.
 //
 // - A steel plinth: a deck slab on footings (a stepped base, or stepped columns when the structure is taller than the
 //   turbine needs). A cross-section wider than tall gives the extra width to the deck and a walkway with railings along
 //   the front.
-// - The turbine casings on one shaft, with bearing pedestals between them: length 3-5 one turbine casing; 6-9 a small
-//   high-pressure and a large low-pressure casing; 10-15 high-, intermediate- and a double-flow low-pressure casing (wide
-//   in the middle, tapering to each end) with a crossover pipe from the intermediate casing's top into the
-//   low-pressure casing's. Diameters follow the cross-section's shorter side (the low-pressure casing nearly fills it,
-//   the high-pressure about half); lengths share the array's length (about high 15%, intermediate 20%, low 30%,
-//   generator 25%, the rest bearings and couplings).
-// - The generator at the far end: a housing with cooling ribs and a terminal box on top.
+// - The turbine casings on one shaft, the front standard in the first gap and a pair of bearing pedestals either side
+//   of a coupling in each gap after it (pedestals): length 3-5 one turbine casing; 6-9 a small high-pressure and a
+//   large low-pressure casing; 10 and up high-, intermediate- and double-flow low-pressure casings (wide in the middle,
+//   tapering to each end), as many low-pressure casings (up to three) as the length holds at a real turbine's
+//   proportions (squeezed a little for one more on a long set), with a crossover pipe from the intermediate casing's
+//   top into each low-pressure casing's. Diameters follow the cross-section's shorter side (the low-pressure casings
+//   nearly fill it, the high-pressure about half). Each section is laid out at its natural length for its diameter
+//   (high about 1.1 diameters, intermediate 1.2, low 1.15, the generator 1.6 of its width), then all are scaled
+//   together to fill the length, so a long set gets more casings rather than stretched ones.
+// - The generator at the far end: a housing with cooling ribs and a terminal box on top, and on a long set an exciter
+//   beyond it.
+// - Inspection windows on both upper sides of each casing's full-diameter part, kept clear of everything that enters
+//   the casing (the steam chest, the stop-valve pipes, the crossover), so nothing passes through the glass; the blading
+//   in them stays inside the casing's inner wall (tipLimit). A short steam end with no room for a window beside the
+//   stop valves goes without them.
 // - Three fitted spots for ports: the top face above the high-pressure steam chest (steam), the generator end's face
-//   (energy) and the bottom face under the low-pressure exhaust neck (exhaust, where a Condenser Array can sit).
+//   (energy) and the bottom face under the last low-pressure exhaust neck (exhaust, where a Condenser Array can sit).
 public final class TurbineLayout {
     public static final float PX = 16.0F;
     // Blocks long up to which the turbine has one casing, then two; longer ones have three.
@@ -41,6 +49,20 @@ public final class TurbineLayout {
     public static final float COLUMN_FOOTING = 6.0F;
     // The shortest bearing gap between sections, and the shortest casing and generator.
     public static final float MIN_GAP = 8.0F, MAX_GAP = 16.0F, MIN_CASING = 12.0F, MIN_GENERATOR = 16.0F;
+    // The most low-pressure casings, the shortest window, and the generator length from which it has an exciter.
+    public static final int MAX_LOW_PRESSURE = 3;
+    public static final float MIN_WINDOW = 4.0F, EXCITER_FROM = 56.0F;
+    // How far the sections may be squeezed below their natural lengths to fit one more low-pressure casing (on a set
+    // long enough that the high-pressure casing stays two blocks long).
+    private static final float LOW_SQUEEZE = 1.3F;
+    // The casings are 16-sided; their inner wall (behind the windows) is WALL px inside the outer surface, the glass
+    // GLASS px, and blade tips stay BLADE_CLEARANCE px inside the inner wall's flats. What enters a casing from the top
+    // (the steam chest, the crossover) ends between the two walls, so it never shows inside a window.
+    public static final int CASING_SIDES = 16;
+    // How much of a double-flow casing's length each tapering end takes.
+    public static final float DOUBLE_FLOW_TAPER = 0.18F;
+    public static final float WALL = 1.5F, GLASS = 0.25F, BLADE_CLEARANCE = 1.0F;
+    public static final float CASING_APOTHEM = (float) Math.cos(Math.PI / CASING_SIDES);
 
     public enum Part {
         HIGH_PRESSURE("high_pressure"),
@@ -90,18 +112,25 @@ public final class TurbineLayout {
     }
 
     // A turbine casing: its stretch, its largest and end diameters, whether it's double-flow (widest in the middle),
-    // its inspection window's stretch (on both sides, on the full-diameter part) and its blading: rows seen through the
-    // window, blades per row, and the hub and last row's tip radius as shares of the casing's radius.
-    public record Casing(Part part, Span span, float diameter, float endDiameter, boolean doubleFlow, Span window,
-            int bladeRows, int blades, float hub, float tip) {
+    // its inspection windows' stretches (on both upper sides, on the full-diameter part, clear of what enters the
+    // casing), its blading (rows seen through the windows, blades per row, and the hub and the outlet rows' tip radius
+    // as shares of the casing's radius), and where the steam comes in and leaves along it (the blades lengthen from
+    // inlet to outlet; a double-flow casing's inlet is its middle and the steam leaves toward both ends).
+    public record Casing(Part part, Span span, float diameter, float endDiameter, boolean doubleFlow, List<Span> windows,
+            int bladeRows, int blades, float hub, float tip, float inlet, float outlet) {
         public float radius() {
             return diameter / 2.0F;
+        }
+
+        // The first window (empty when it has none).
+        public Span window() {
+            return windows.isEmpty() ? new Span(span.u0(), span.u0()) : windows.get(0);
         }
 
         // The outline from end to end: (u, radius) points, the full radius between the middle two.
         public float[][] profile() {
             float r = diameter / 2.0F, e = endDiameter / 2.0F, length = span.length();
-            float taper = doubleFlow ? length * 0.25F : Math.min(3.0F, length * 0.15F);
+            float taper = doubleFlow ? length * DOUBLE_FLOW_TAPER : Math.min(3.0F, length * 0.15F);
             return new float[][] { { span.u0(), e }, { span.u0() + taper, r }, { span.u1() - taper, r }, { span.u1(), e } };
         }
 
@@ -116,21 +145,49 @@ public final class TurbineLayout {
             return endDiameter / 2.0F;
         }
 
-        // Row i's tip radius share: the rows get longer as the pressure drops (outward from the middle of a double-flow
-        // casing, toward the generator otherwise).
+        // The inner wall's radius (its corners), the glass's, and how far the blade tips may reach: inside the inner
+        // wall's flats with BLADE_CLEARANCE to spare, whatever the rotor's angle.
+        public float innerRadius() {
+            return radius() - WALL;
+        }
+
+        public float glassRadius() {
+            return radius() - GLASS;
+        }
+
+        public float tipLimit() {
+            return innerRadius() * CASING_APOTHEM - BLADE_CLEARANCE;
+        }
+
+        public float hubRadius() {
+            return radius() * hub;
+        }
+
+        // The tip radius of a blade row at u: from 85% of the outlet tip at the inlet to the full tip at the outlet,
+        // never past tipLimit.
+        public float tipAt(float u) {
+            float reach = doubleFlow ? Math.abs(u - inlet) / Math.max(1.0F, outlet - inlet) : (u - inlet) / Math.max(1.0F, outlet - inlet);
+            float share = tip * (0.85F + 0.15F * Math.clamp(reach, 0.0F, 1.0F));
+            return Math.min(radius() * share, tipLimit());
+        }
+
+        // Row i's tip radius share, for checks: the share at the outlet rows is tip.
         public float tipShare(int row) {
-            int fromInlet = doubleFlow ? Math.abs(2 * row - (bladeRows - 1)) / 2 : row;
-            int last = doubleFlow ? (bladeRows - 1) / 2 : bladeRows - 1;
-            return tip - (last - fromInlet) * 0.05F;
+            return tip;
         }
     }
 
     // A box in the turbine's frame (pixels).
     public record Box(float x0, float y0, float u0, float x1, float y1, float u1) {}
 
-    // The crossover pipe: up from the intermediate casing at riseU, along at runY, down into the low-pressure casing at
-    // dropU; base and drop are where it enters the casings (a little inside them).
-    public record Crossover(float riseU, float dropU, float baseY, float runY, float dropY, float diameter) {}
+    // The crossover pipe: up from the intermediate casing at riseU, along at runY, down into each low-pressure casing
+    // at dropUs; base and drop are where it enters the casings (just inside their outer surface, never into the hollow
+    // behind a window).
+    public record Crossover(float riseU, float[] dropUs, float baseY, float runY, float dropY, float diameter) {
+        public float dropU() {
+            return dropUs[dropUs.length - 1];
+        }
+    }
 
     // The walkway along one long side: its stretch across, its floor, and how tall its railings are.
     public record Walkway(float x0, float x1, float floorY, float railHeight, boolean high) {}
@@ -140,17 +197,18 @@ public final class TurbineLayout {
     public record Valve(float x, float u, float radius, float bottom, float top, float pipeY, float pipeEnd) {}
 
     private final int length, width, height;
-    private final int tier;
+    private final int tier, lowCount;
     private final float shaftX, shaftY, deckTop, footingTop;
     private final float regionX0, regionX1;
     private final List<Casing> casings;
     private final List<Span> gaps;
     private final Span generator;
+    private final @Nullable Span exciter;
     private final float generatorWidth, generatorTop;
     private final Box terminalBox;
     private final Box steamChest;
     private final List<Valve> valves;
-    private final Box exhaustNeck;
+    private final List<Box> exhaustNecks;
     private final @Nullable Crossover crossover;
     private final @Nullable Walkway walkway;
     private final float shaftRadius;
@@ -197,90 +255,194 @@ public final class TurbineLayout {
         float hp = even(Math.min(n16 * 0.5F, lp * 0.62F));
         float ip = even(Math.clamp(n16 * 0.66F, hp + 4.0F, lp - 4.0F));
         float slack = Math.max(0.0F, h16 - (FOOTING + DECK + STANDOFF + lp + top));
+        if (width >= 5 && height >= 5) {
+            // The deck no higher than the core's first layer, as deeper in the core it couldn't be stood on (see
+            // TurbineShapes): the rest of the room goes over the turbine.
+            slack = Math.min(slack, 2.0F * PX - FOOTING - DECK);
+        }
         this.footingTop = FOOTING + slack;
         this.deckTop = footingTop + DECK;
         this.shaftY = deckTop + STANDOFF + lp / 2.0F;
         this.shaftRadius = Math.max(1.5F, Math.round(n16 * 0.035F * 2.0F) / 2.0F);
+        float generatorWidthPx = even(Math.min(lp * 0.86F, region - 4.0F));
 
-        // Along: bearing gaps between the sections, then the sections by their shares.
-        Part[] parts = tier == 1 ? new Part[] { Part.TURBINE }
-                : tier == 2 ? new Part[] { Part.HIGH_PRESSURE, Part.LOW_PRESSURE }
-                : new Part[] { Part.HIGH_PRESSURE, Part.INTERMEDIATE, Part.LOW_PRESSURE };
-        float[] weights = tier == 1 ? new float[] { 0.55F, 0.30F } : tier == 2 ? new float[] { 0.20F, 0.38F, 0.27F } : new float[] { 0.15F, 0.20F, 0.30F, 0.25F };
-        float shareSum = 0.0F;
-        for (float weight : weights) {
-            shareSum += weight;
+        // Along: the sections at their natural lengths for their diameters, as many low-pressure casings as fit (up to
+        // three), a bearing gap before each section; then everything scaled together to fill the length.
+        float gap = Math.clamp(even(lp * 0.18F), MIN_GAP, MAX_GAP);
+        float generatorNatural = generatorWidthPx * 1.6F;
+        int lows = 1;
+        if (tier == 3) {
+            for (int n = MAX_LOW_PRESSURE; n >= 1; n--) {
+                float sections = hp * 1.1F + ip * 1.2F + n * lp * 1.15F + generatorNatural, gaps = (n + 3) * gap + 1.0F;
+                // Squeezed to fit, the high-pressure casing still at least two blocks long.
+                float squeeze = (sections + gaps) / total, scale = (total - gaps) / sections;
+                if (squeeze <= 1.0F || squeeze <= LOW_SQUEEZE && hp * 1.1F * scale >= 2.0F * PX || n == 1) {
+                    lows = n;
+                    break;
+                }
+            }
         }
-        int gapCount = parts.length + 1;
-        float gap = Math.clamp((float) Math.floor((1.0F - shareSum) * total / gapCount), MIN_GAP, MAX_GAP);
-        float[] lengths = share(total - gapCount * gap - 1.0F, weights, parts.length);
+        this.lowCount = tier == 3 ? lows : tier == 2 ? 1 : 0;
+        List<Part> partList = new ArrayList<>();
+        List<Float> naturals = new ArrayList<>();
+        if (tier == 1) {
+            partList.add(Part.TURBINE);
+            naturals.add(lp * 1.2F);
+        } else {
+            partList.add(Part.HIGH_PRESSURE);
+            naturals.add(hp * 1.1F);
+            if (tier == 3) {
+                partList.add(Part.INTERMEDIATE);
+                naturals.add(ip * 1.2F);
+            }
+            for (int i = 0; i < (tier == 3 ? lows : 1); i++) {
+                partList.add(Part.LOW_PRESSURE);
+                naturals.add(lp * (tier == 3 ? 1.15F : 1.0F));
+            }
+        }
+        naturals.add(generatorNatural);
+        int gapCount = partList.size() + 1;
+        // Short sets can't have full gaps: the gaps give way first, down to MIN_GAP.
+        float least = partList.size() * MIN_CASING + MIN_GENERATOR;
+        gap = Math.max(MIN_GAP, Math.min(gap, (float) Math.floor((total - 1.0F - least) / gapCount)));
+        float[] weights = new float[naturals.size()];
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = naturals.get(i);
+        }
+        float[] lengths = share(total - gapCount * gap - 1.0F, weights, partList.size());
 
-        List<Casing> builtCasings = new ArrayList<>();
+        // The steam end's and crossover's sizes, so the windows can keep clear of them.
+        float pipeRadius = crossoverDiameter / 2.0F;
         List<Span> builtGaps = new ArrayList<>();
+        List<Span> spans = new ArrayList<>();
         float u = 0.0F;
-        for (int i = 0; i < parts.length; i++) {
+        for (int i = 0; i < partList.size(); i++) {
             builtGaps.add(new Span(u, u + gap));
             u += gap;
-            Span span = new Span(u, u + lengths[i]);
+            spans.add(new Span(u, u + lengths[i]));
             u += lengths[i];
-            builtCasings.add(casing(parts[i], span, parts[i] == Part.HIGH_PRESSURE ? hp : parts[i] == Part.INTERMEDIATE ? ip : lp, ip, tier));
         }
         builtGaps.add(new Span(u, u + gap));
         u += gap;
-        this.casings = List.copyOf(builtCasings);
         this.gaps = List.copyOf(builtGaps);
-        this.generator = new Span(u, total - 1.0F);
+        Span generatorSpan = new Span(u, total - 1.0F);
 
-        // The generator: a housing a little narrower than the low-pressure casing, its top under the terminal box.
-        this.generatorWidth = even(Math.min(lp * 0.86F, region - 4.0F));
+        // The steam chest on top of the steam end's casing, under the steam spot's block.
+        Span firstSpan = spans.get(0);
+        float firstDiameter = partList.get(0) == Part.HIGH_PRESSURE ? hp : lp;
+        float firstRadius = firstDiameter / 2.0F;
+        this.steamU = (int) Math.floor(firstSpan.middle() / PX);
+        this.steamX = (int) Math.floor(shaftX / PX);
+        float chestSize = Math.clamp(even(firstDiameter * 0.5F), 8.0F, 14.0F);
+        float chestAlong = Math.min(chestSize, firstSpan.length() - 2.0F);
+        float chestU = Math.clamp((steamU + 0.5F) * PX, firstSpan.u0() + 1.0F + chestAlong / 2.0F, firstSpan.u1() - 1.0F - chestAlong / 2.0F);
+        // On the shaft's line, its foot between the casing's outer surface and its inner wall (so it never shows in a
+        // window).
+        float chestX = shaftX;
+        // No wider than the top facets between the two windows, so it never reaches down over them.
+        float chestWidth = Math.min(chestSize, Math.max(4.0F, 2.0F * (float) Math.floor((firstRadius - GLASS) * Math.cos(3.0 * Math.PI / 8.0) - 0.5)));
+        float chestBottom = shaftY + firstRadius - WALL + 0.05F;
+        float room = h16 - 1.0F - 3.0F - chestBottom;
+        float chestHeight = Math.max(2.0F, Math.min(Math.clamp(Math.round(firstDiameter * 0.25F), 4.0F, 7.0F), room));
+        this.steamChest = new Box(chestX - chestWidth / 2.0F, chestBottom, chestU - chestAlong / 2.0F,
+                chestX + chestWidth / 2.0F, chestBottom + chestHeight, chestU + chestAlong / 2.0F);
+
+        // The valve housings beside the steam end's casing, where they fit.
+        List<Valve> builtValves = new ArrayList<>();
+        float valveRadius = Math.clamp(Math.round(firstDiameter * 0.16F), 3.0F, 6.0F);
+        float valveOffset = firstRadius + 3.0F + valveRadius;
+        if (shaftX - valveOffset - valveRadius >= regionX0 + 1.0F && shaftX + valveOffset + valveRadius <= regionX1 - 1.0F
+                && firstSpan.length() >= 2 * valveRadius + 4.0F) {
+            float valveBottom = Math.max(deckTop + 3.0F, shaftY - firstRadius * 0.4F);
+            float valveTop = Math.min(shaftY + firstRadius * 0.55F, h16 - 8.0F);
+            float pipeY = Math.min(shaftY + firstRadius * 0.35F, valveTop - 2.0F);
+            if (valveTop - valveBottom >= 4.0F) {
+                // At the inlet end, where the steam comes in, so the windows have the rest of the casing.
+                float pipe = Math.max(1.5F, valveRadius * 0.5F);
+                float valveU = firstSpan.u0() + Math.min(3.0F, firstSpan.length() * 0.15F) + pipe + 1.5F;
+                for (int side = -1; side <= 1; side += 2) {
+                    builtValves.add(new Valve(shaftX + side * valveOffset, valveU, valveRadius, valveBottom, valveTop, pipeY,
+                            shaftX + side * firstRadius * 0.6F));
+                }
+            }
+        }
+
+        // The crossover: up from near the intermediate casing's outlet end, along over the low-pressure casings, and
+        // down into the middle of each.
+        float riseU = 0.0F;
+        if (tier == 3) {
+            Span ipSpan = spans.get(1);
+            float taper = Math.min(3.0F, ipSpan.length() * 0.15F);
+            riseU = ipSpan.u1() - taper - pipeRadius - 2.0F;
+        }
+
+        // The casings, their windows clear of what enters them.
+        List<Casing> builtCasings = new ArrayList<>();
+        List<Float> drops = new ArrayList<>();
+        for (int i = 0; i < partList.size(); i++) {
+            Part part = partList.get(i);
+            Span span = spans.get(i);
+            float diameter = part == Part.HIGH_PRESSURE ? hp : part == Part.INTERMEDIATE ? ip : lp;
+            List<Span> blocked = new ArrayList<>();
+            if (i == 0) {
+                for (Valve valve : builtValves) {
+                    float pr = Math.max(1.5F, valve.radius() * 0.5F);
+                    blocked.add(new Span(valve.u() - pr - 1.0F, valve.u() + pr + 1.0F));
+                }
+                // The chest too, where it reaches down over the windows' top edges (wider than the top facets between
+                // them, and its bottom below their top corners).
+                float glass = firstRadius - GLASS, corner = (float) (3.0 * Math.PI / 8.0);
+                if (chestWidth / 2.0F > glass * (float) Math.cos(corner) - 0.5F && chestBottom - shaftY < glass * (float) Math.sin(corner) + 0.05F) {
+                    blocked.add(new Span(steamChest.u0() - 1.0F, steamChest.u1() + 1.0F));
+                }
+            }
+            if (tier == 3 && part == Part.LOW_PRESSURE) {
+                drops.add(span.middle());
+            }
+            Casing built = casing(part, span, diameter, ip, tier, blocked);
+            if (i == 0 && built.windows().isEmpty() && !builtValves.isEmpty()) {
+                // A short steam end with no room for a window beside the valve pipes: it goes without the valves.
+                blocked.subList(0, builtValves.size()).clear();
+                builtValves.clear();
+                built = casing(part, span, diameter, ip, tier, blocked);
+            }
+            builtCasings.add(built);
+        }
+        this.casings = List.copyOf(builtCasings);
+        this.valves = List.copyOf(builtValves);
+
+        // The generator: a housing a little narrower than the low-pressure casing, its top under the terminal box; on a
+        // long set an exciter beyond it.
+        this.generatorWidth = generatorWidthPx;
         this.generatorTop = Math.max(shaftY + 4.0F, Math.min(shaftY + lp * 0.42F, h16 - 7.0F));
+        if (generatorSpan.length() >= EXCITER_FROM) {
+            float exciterLength = Math.clamp(even(generatorSpan.length() * 0.16F), 8.0F, 16.0F);
+            this.exciter = new Span(generatorSpan.u1() - exciterLength, generatorSpan.u1());
+            this.generator = new Span(generatorSpan.u0(), generatorSpan.u1() - exciterLength - 2.0F);
+        } else {
+            this.exciter = null;
+            this.generator = generatorSpan;
+        }
         float terminalLength = Math.clamp(even(generator.length() * 0.22F), 6.0F, 14.0F);
         float terminalWidth = even(generatorWidth * 0.45F);
         this.terminalBox = new Box(shaftX - terminalWidth / 2.0F, generatorTop, generator.u1() - 3.0F - terminalLength,
                 shaftX + terminalWidth / 2.0F, Math.min(generatorTop + 4.0F, h16 - 3.0F), generator.u1() - 3.0F);
 
-        // The steam chest on top of the steam end's casing, under the steam spot's block.
-        Casing first = casings.get(0);
-        this.steamU = (int) Math.floor(first.span().middle() / PX);
-        this.steamX = (int) Math.floor(shaftX / PX);
-        float firstRadius = first.radius();
-        float chestSize = Math.clamp(even(first.diameter() * 0.5F), 8.0F, 14.0F);
-        float chestAlong = Math.min(chestSize, first.span().length() - 2.0F);
-        float chestU = Math.clamp((steamU + 0.5F) * PX, first.span().u0() + 1.0F + chestAlong / 2.0F, first.span().u1() - 1.0F - chestAlong / 2.0F);
-        float chestX = Math.clamp((steamX + 0.5F) * PX, shaftX - firstRadius * 0.5F, shaftX + firstRadius * 0.5F);
-        float dx = Math.abs(chestX - shaftX) + chestSize / 2.0F;
-        float surface = shaftY + (float) Math.sqrt(Math.max(0.0F, firstRadius * firstRadius - dx * dx));
-        float chestBottom = Math.min(surface, shaftY + firstRadius) - 1.5F;
-        float room = h16 - 1.0F - 3.0F - chestBottom;
-        float chestHeight = Math.max(2.0F, Math.min(Math.clamp(Math.round(first.diameter() * 0.25F), 4.0F, 7.0F), room));
-        this.steamChest = new Box(chestX - chestSize / 2.0F, chestBottom, chestU - chestAlong / 2.0F,
-                chestX + chestSize / 2.0F, chestBottom + chestHeight, chestU + chestAlong / 2.0F);
-
-        // The valve housings beside the steam end's casing, where they fit.
-        List<Valve> builtValves = new ArrayList<>();
-        float valveRadius = Math.clamp(Math.round(first.diameter() * 0.16F), 3.0F, 6.0F);
-        float valveOffset = firstRadius + 3.0F + valveRadius;
-        if (shaftX - valveOffset - valveRadius >= regionX0 + 1.0F && shaftX + valveOffset + valveRadius <= regionX1 - 1.0F
-                && first.span().length() >= 2 * valveRadius + 4.0F) {
-            float valveBottom = Math.max(deckTop + 3.0F, shaftY - firstRadius * 0.4F);
-            float valveTop = Math.min(shaftY + firstRadius * 0.55F, h16 - 8.0F);
-            float pipeY = Math.min(shaftY + firstRadius * 0.35F, valveTop - 2.0F);
-            if (valveTop - valveBottom >= 4.0F) {
-                for (int side = -1; side <= 1; side += 2) {
-                    builtValves.add(new Valve(shaftX + side * valveOffset, first.span().middle(), valveRadius, valveBottom, valveTop, pipeY,
-                            shaftX + side * firstRadius * 0.6F));
-                }
+        // An exhaust neck under each low-pressure casing (the only casing of a one-casing set), down to the deck or on
+        // down between the columns; its top meets the casing's underside.
+        List<Box> necks = new ArrayList<>();
+        for (Casing casing : casings) {
+            if (casing.part() != Part.LOW_PRESSURE && casing.part() != Part.TURBINE) {
+                continue;
             }
+            float neckLength = even(Math.clamp(casing.span().length() * 0.4F, 8.0F, Math.max(8.0F, casing.span().length() - 6.0F)));
+            float neckWidth = even(casing.diameter() * 0.6F);
+            float neckBottom = hasColumns() ? 1.0F : deckTop;
+            necks.add(new Box(shaftX - neckWidth / 2.0F, neckBottom, casing.span().middle() - neckLength / 2.0F,
+                    shaftX + neckWidth / 2.0F, shaftY + underside(casing.radius(), neckWidth / 2.0F), casing.span().middle() + neckLength / 2.0F));
         }
-        this.valves = List.copyOf(builtValves);
-
-        // The exhaust neck under the low-pressure (last) casing: down to the deck, or on down between the columns.
+        this.exhaustNecks = List.copyOf(necks);
         Casing last = casings.get(casings.size() - 1);
-        float neckLength = even(Math.clamp(last.span().length() * 0.4F, 8.0F, Math.max(8.0F, last.span().length() - 6.0F)));
-        float neckWidth = even(last.diameter() * 0.6F);
-        float neckBottom = hasColumns() ? 1.0F : deckTop;
-        this.exhaustNeck = new Box(shaftX - neckWidth / 2.0F, neckBottom, last.span().middle() - neckLength / 2.0F,
-                shaftX + neckWidth / 2.0F, shaftY, last.span().middle() + neckLength / 2.0F);
         this.exhaustU = (int) Math.floor(last.span().middle() / PX);
         this.exhaustX = steamX;
         this.energyX = steamX;
@@ -289,28 +451,69 @@ public final class TurbineLayout {
         if (tier == 3) {
             Casing intermediate = casings.get(1);
             float runY = shaftY + last.radius() + 2.0F + crossoverDiameter / 2.0F;
-            this.crossover = new Crossover(intermediate.span().middle(), last.span().middle(), shaftY + intermediate.radius() - 2.0F, runY,
-                    shaftY + last.radius() - 2.0F, crossoverDiameter);
+            float[] dropUs = new float[drops.size()];
+            for (int i = 0; i < dropUs.length; i++) {
+                dropUs[i] = drops.get(i);
+            }
+            this.crossover = new Crossover(riseU, dropUs, shaftY + intermediate.radius() - WALL + 0.05F, runY,
+                    shaftY + last.radius() - WALL + 0.05F, crossoverDiameter);
         } else {
             this.crossover = null;
         }
         this.walkway = hasWalkway ? new Walkway(walkX0, walkX1, deckTop, railHeight, walkwayHigh) : null;
     }
 
-    private static Casing casing(Part part, Span span, float diameter, float intermediate, int tier) {
+    private static Casing casing(Part part, Span span, float diameter, float intermediate, int tier, List<Span> blocked) {
         boolean doubleFlow = part == Part.LOW_PRESSURE && tier == 3;
         float end = doubleFlow ? even(Math.max(intermediate, diameter * 0.62F)) : even(diameter * 0.7F);
         float length = span.length();
-        float taper = doubleFlow ? length * 0.25F : Math.min(3.0F, length * 0.15F);
+        float taper = doubleFlow ? length * DOUBLE_FLOW_TAPER : Math.min(3.0F, length * 0.15F);
         float a = span.u0() + taper, b = span.u1() - taper;
-        float margin = Math.max(1.0F, (b - a) * 0.12F);
-        Span window = b - a >= 6.0F ? new Span(a + margin, b - margin) : new Span(a, a);
-        return switch (part) {
-            case HIGH_PRESSURE -> new Casing(part, span, diameter, end, false, window, 4, 10, 0.42F, 0.86F);
-            case INTERMEDIATE -> new Casing(part, span, diameter, end, false, window, 5, 12, 0.36F, 0.88F);
-            case LOW_PRESSURE -> new Casing(part, span, diameter, end, doubleFlow, window, 6, 14, 0.30F, 0.92F);
-            default -> new Casing(part, span, diameter, end, false, window, 5, 12, 0.36F, 0.88F);
+        // Clear of the hoops at the taper points (1 px each way), with a pixel of casing between.
+        float margin = Math.max(2.0F, (b - a) * 0.08F);
+        List<Span> windows = cut(new Span(a + margin, b - margin), blocked);
+        float windowLength = 0.0F;
+        for (Span window : windows) {
+            windowLength += window.length();
+        }
+        float pitch = switch (part) {
+            case HIGH_PRESSURE -> 3.0F;
+            case INTERMEDIATE -> 3.25F;
+            default -> 3.5F;
         };
+        int rows = Math.max(2, Math.round(windowLength / pitch));
+        float inlet = doubleFlow ? span.middle() : span.u0();
+        float outlet = doubleFlow ? span.u1() : span.u1();
+        return switch (part) {
+            case HIGH_PRESSURE -> new Casing(part, span, diameter, end, false, windows, rows, 24, 0.50F, 0.84F, inlet, outlet);
+            case INTERMEDIATE -> new Casing(part, span, diameter, end, false, windows, Math.max(rows, 3), 30, 0.44F, 0.88F, inlet, outlet);
+            case LOW_PRESSURE -> new Casing(part, span, diameter, end, doubleFlow, windows, Math.max(rows, 4), 36, 0.36F, 0.94F, inlet, outlet);
+            default -> new Casing(part, span, diameter, end, false, windows, rows, 30, 0.42F, 0.90F, inlet, outlet);
+        };
+    }
+
+    // The parts of a stretch not blocked, at least MIN_WINDOW long.
+    private static List<Span> cut(Span window, List<Span> blocked) {
+        List<Span> pieces = new ArrayList<>();
+        pieces.add(window);
+        for (Span block : blocked) {
+            List<Span> next = new ArrayList<>();
+            for (Span piece : pieces) {
+                if (block.u1() <= piece.u0() || block.u0() >= piece.u1()) {
+                    next.add(piece);
+                    continue;
+                }
+                if (block.u0() > piece.u0()) {
+                    next.add(new Span(piece.u0(), block.u0()));
+                }
+                if (block.u1() < piece.u1()) {
+                    next.add(new Span(block.u1(), piece.u1()));
+                }
+            }
+            pieces = next;
+        }
+        pieces.removeIf(piece -> piece.length() < MIN_WINDOW);
+        return List.copyOf(pieces);
     }
 
     // Splits total among count casings and the generator (the last weight) by their weights, keeping each at its least.
@@ -352,8 +555,100 @@ public final class TurbineLayout {
         return lengths;
     }
 
+    // How far below the shaft (negative) a casing's outer surface is dx across from it: the bottom of its 16-sided
+    // outline (a corner straight down).
+    public static float underside(float radius, float dx) {
+        float best = 0.0F;
+        boolean found = false;
+        double step = 2.0 * Math.PI / CASING_SIDES;
+        for (int f = 0; f < CASING_SIDES; f++) {
+            float x0 = radius * (float) Math.cos(f * step), y0 = radius * (float) Math.sin(f * step);
+            float x1 = radius * (float) Math.cos((f + 1) * step), y1 = radius * (float) Math.sin((f + 1) * step);
+            if (dx < Math.min(x0, x1) - 1.0E-4F || dx > Math.max(x0, x1) + 1.0E-4F || Math.abs(x1 - x0) < 1.0E-5F) {
+                continue;
+            }
+            float y = y0 + (y1 - y0) * (dx - x0) / (x1 - x0);
+            if (!found || y < best) {
+                best = y;
+                found = true;
+            }
+        }
+        return found ? best : 0.0F;
+    }
+
     private static float even(float value) {
         return 2.0F * Math.round(value / 2.0F);
+    }
+
+    // --- Parts the model and the hitbox share ---
+
+    // Half the length of the coupling in gap i (gap 0, the front standard's, has none): the generator's is longer.
+    public float couplingHalf(int gap) {
+        return gap == gaps.size() - 1 ? 1.5F : 1.0F;
+    }
+
+    // The bearing pedestals, from the deck to the top of their bearing caps: the front standard filling the first gap;
+    // in each gap after it one for each rotor's bearing, either side of the coupling (one on the near side when the gap
+    // is too short for two).
+    public List<Box> pedestals() {
+        List<Box> out = new ArrayList<>();
+        float top = shaftY + shaftRadius + 2.0F + 2.0F;
+        for (int i = 0; i < gaps.size(); i++) {
+            Span gap = gaps.get(i);
+            float neighbour = casings.get(Math.min(i, casings.size() - 1)).diameter();
+            if (i > 0) {
+                neighbour = Math.min(neighbour, casings.get(i - 1).diameter());
+            }
+            float pw = Math.clamp(2.0F * Math.round(neighbour * 0.45F / 2.0F), 8.0F, 20.0F);
+            float x0 = shaftX - pw / 2.0F, x1 = shaftX + pw / 2.0F;
+            if (i == 0) {
+                out.add(new Box(x0, deckTop, gap.u0() + 1.0F, x1, top, gap.u1() - 1.0F));
+                continue;
+            }
+            float coupling = couplingHalf(i);
+            float room = (gap.length() - 2.0F * coupling - 2.0F) / 2.0F - 1.0F;
+            if (room < 3.0F) {
+                out.add(new Box(x0, deckTop, gap.u0() + 1.0F, x1, top, gap.u0() + 1.0F + Math.max(3.0F, Math.round(gap.length() * 0.4F))));
+                continue;
+            }
+            float p = Math.min(room, 7.0F);
+            out.add(new Box(x0, deckTop, gap.middle() - coupling - 1.0F - p, x1, top, gap.middle() - coupling - 1.0F));
+            out.add(new Box(x0, deckTop, gap.middle() + coupling + 1.0F, x1, top, gap.middle() + coupling + 1.0F + p));
+        }
+        return out;
+    }
+
+    // The columns under a raised deck (none on a deck on a solid base), from the ground to under the deck, without
+    // their feet and caps: a pair at each bearing gap and one under the generator's far end.
+    public List<Box> columns() {
+        List<Box> out = new ArrayList<>();
+        if (!hasColumns()) {
+            return out;
+        }
+        float w = widthPx(), t = lengthPx();
+        float cw = Math.clamp(2.0F * Math.round(w * 0.075F), 6.0F, 12.0F), cl = Math.min(8.0F, cw);
+        List<Float> stations = new ArrayList<>();
+        for (Span gap : gaps) {
+            stations.add(gap.middle());
+        }
+        stations.add(generator.u1() - 5.0F);
+        for (float station : stations) {
+            float u0 = Math.clamp(station - cl / 2.0F, 2.0F, t - 2.0F - cl);
+            for (float x0 : new float[] { 2.0F, w - 2.0F - cw }) {
+                out.add(new Box(x0, 0.0F, u0, x0 + cw, footingTop, u0 + cl));
+            }
+        }
+        return out;
+    }
+
+    // The exciter's housing, without its sole plate and ribs, or null.
+    public @Nullable Box exciterHousing() {
+        if (exciter == null) {
+            return null;
+        }
+        float eh = Math.max(4.0F, (float) Math.floor(generatorWidth / 2.0F * 0.62F));
+        float top = Math.min(generatorTop - 2.0F, shaftY + eh * 0.9F);
+        return new Box(shaftX - eh, deckTop + 2.0F, exciter.u0() + 0.5F, shaftX + eh, top, exciter.u1());
     }
 
     // --- Making one ---
@@ -400,7 +695,26 @@ public final class TurbineLayout {
                 return casing.part();
             }
         }
-        return generator.contains(u) || u >= generator.u1() ? Part.GENERATOR : Part.BEARING;
+        return generator.contains(u) || u >= generator.u1() || exciter != null && exciter.contains(u) ? Part.GENERATOR : Part.BEARING;
+    }
+
+    // Which of several low-pressure casings a block's slice is in (1 from the steam end), or 0 when there's only one or
+    // it isn't in one.
+    public int lowNumberAt(int blockU) {
+        if (lowCount < 2) {
+            return 0;
+        }
+        float u = (blockU + 0.5F) * PX;
+        int number = 0;
+        for (Casing casing : casings) {
+            if (casing.part() == Part.LOW_PRESSURE) {
+                number++;
+                if (casing.span().contains(u)) {
+                    return number;
+                }
+            }
+        }
+        return 0;
     }
 
     // The fitted spot a block of the shell is, if any.
@@ -449,7 +763,7 @@ public final class TurbineLayout {
         return height;
     }
 
-    // 1: one casing, 2: high and low pressure, 3: high, intermediate and double-flow low pressure.
+    // 1: one casing, 2: high and low pressure, 3: high, intermediate and one to three double-flow low pressure.
     public int tier() {
         return tier;
     }
@@ -522,8 +836,22 @@ public final class TurbineLayout {
         return valves;
     }
 
+    // The last low-pressure casing's exhaust neck (under the exhaust spot).
     public Box exhaustNeck() {
-        return exhaustNeck;
+        return exhaustNecks.get(exhaustNecks.size() - 1);
+    }
+
+    public List<Box> exhaustNecks() {
+        return exhaustNecks;
+    }
+
+    public @Nullable Span exciter() {
+        return exciter;
+    }
+
+    // How many low-pressure casings it has (0 for a one-casing set).
+    public int lowCount() {
+        return lowCount;
     }
 
     public @Nullable Crossover crossover() {

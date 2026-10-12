@@ -20,7 +20,7 @@
       "trigger": "arcforge:multiblock_formed",
       "conditions": {
         "multiblock": "arcforge:firebox_array",
-        "min_length": 315
+        "min_length": 343
       }
     }
   },

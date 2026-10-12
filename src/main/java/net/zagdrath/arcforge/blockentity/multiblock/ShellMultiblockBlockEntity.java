@@ -67,6 +67,9 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
         super(type, pos, state, machineSlots, filter, upgrades, sideConfig, allowedSideModes);
     }
 
+    // Server side: whether its shell's size has been checked against the size rule since it loaded.
+    private boolean sizeChecked;
+
     protected abstract ShellStructure structure();
 
     // Runs the formed machine; called on the master only.
@@ -131,6 +134,15 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
 
     public static void serverTick(ServerLevel level, BlockPos pos, BlockState state, ShellMultiblockBlockEntity part) {
         if (part.isMaster()) {
+            // A structure saved bigger than its size rule now allows (the limits were lowered) falls apart once, on its
+            // first tick, and has to be rebuilt to a size that fits.
+            if (!part.sizeChecked) {
+                part.sizeChecked = true;
+                if (part.shell != null && !part.structure().allows(part.shell)) {
+                    part.structure().onRemoved(level, pos);
+                    return;
+                }
+            }
             part.portDefaults.tick(level, part);
             if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
                 part.powered = part.checkPowered(level);

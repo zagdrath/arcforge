@@ -23,7 +23,9 @@ texture-unification drop.
      diagonal bands, lightest at the top left and darkest at the bottom right (tone index from
      0.55·x/w + 0.45·y/h). Each band is several px wide, with hard steps and no dithering. The face's bevel,
      rivets, straps and louvres sit on top unchanged. This is not pillow shading, which darkens every edge towards
-     a lit middle. First used on the Industrial Water Intake.
+     a lit middle. First used on the Industrial Water Intake. On a model whose faces are sized by its structure (the
+     Steam Turbine Array) the bands are tone polygons laid over each big face, its corners and bevels from a panel round
+     them; long round facets step along their length instead (see "Steam Turbine Array model").
 3. **No noise.**
    - Texture comes from *shapes*: straps, rivets, seams, slats and panels.
    - Never use random pixels or speckle.
@@ -205,6 +207,9 @@ Creative ramp (`tools/creative_storage_gen.py`).
   diagonal glint streaks (`#DCE8EE`, `#A9BCC6`), so it stays cutout-safe.
 - Whatever is behind the glass (fluids, vapour, rotors) is drawn by a renderer, not painted into the
   texture.
+- In a 3D model the glass follows the part it's set in: on a round casing, one pane per facet, just inside the
+  casing's outer surface (never a flat pane across several facets), with nothing (a shaft, a blade tip, a bolt, a pipe)
+  passing through it. Check every part against the windows.
 
 ### Distillation column band grammar
 
@@ -869,23 +874,52 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 ## Steam Turbine Array model
 - Formed, the array's casings and Pressure Glass draw nothing (`steam_turbine_array/hidden`, with the port plates);
   SteamTurbineArrayRenderer draws one turbine-generator set from TurbineLayout, built by TurbineMesh on one sheet,
-  `block/steam_turbine_array/turbine` (128×48, positions in TurbineMesh.Paint, painted by its art script):
+  `block/steam_turbine_array/turbine` (128×96, positions in ModelMesh.Paint, painted by its art script):
   - Row 0–3: 4×4 flat tones (the machine steel ramp, the generator steel `#3E444B #4E545C #646A72 #7E848C`, FE red, the
-    blade steel `#9AA0A8`). Row 4: tiles: the grating (`#575D65` bar, `#40454C`, two `#16181B` gap rows), the riveted
-    strap (4×3: `#575D65` / `#474C53` with a `#959DA6` rivet / `#2B2F34`) and a louvre (`#7E848C` lip, `#646A72` slat,
-    `#3E444B` shadow, `#16181B` gap).
+    blade steel `#B4BAC0` with its back `#7E848C`, as the Gas Turbine Array's compressor blades). Row 4: tiles: the
+    grating (`#575D65` bar, `#40454C`, two `#16181B` gap rows), the riveted strap (4×3: `#575D65` / `#474C53` with a
+    `#959DA6` rivet / `#2B2F34`) and a louvre (`#7E848C` lip, `#646A72` slat, `#3E444B` shadow, `#16181B` gap).
   - 16×16 panels in the single-block casing grammar (2 px bevel, split face at x 10, rivets with inward shadows):
     PLATE, PLAIN, GEN_PLATE / GEN_PLAIN (the generator steel lit half, `#474C53` shade half), FOOTING (`#383C42`),
     DECK (a deck plate with a recessed panel inset 4: `#2B2F34` top/left, `#575D65` lip bottom/right, `#40454C` floor),
-    FE_BAND (`#E5483C`, `#FF8577` / `#8E231C` edges) and GLASS (12×12: clear, 1 px frame, the two glints in its 5 px
-    corner).
+    FE_BAND (`#E5483C`, `#FF8577` / `#8E231C` edges), GLASS (12×12: clear, a 1 px frame, the standard glints: two 1 px
+    diagonal streaks in the top-left corner, `#DCE8EE` (4 px) and `#A9BCC6` (3 px) apart from each other; cut 7 / 1 / 4
+    so the glints keep their size on any pane) and GLASS_SMALL (4×4: the frame alone, for windows under 11 px).
   - CASING_0…5 (8×12 each): the casings' shell plates in the band tones `#2B2F34 #383C42 #40454C #474C53 #575D65 #727982`,
     a seam band at each end (`#16181B` seam, a lip one band lighter / darker, a rivet on the facet's centre column with
     its shadow), so each shell section reads as riveted plates meeting at seams; the window frames sit in those seams.
+  - Rows 64–87: broad shading (rule 2). BROAD_0…7 (4×4 at x 4k, y 64) are the eight broad tones; GEN_BROAD_0…7 (at
+    x 32 + 4k) the generator's lighter steel `#7A8088 #727880 #6A7078 #636970 #5C6268 #565B62 #50555B #4A4F55`. Under
+    them, 16×16 panels with CORNERS cuts (4 px corners at 1 texel per px, 2 px bevel strips that stretch): B_PLATE and
+    B_GEN_PLATE (riveted), B_PLAIN, B_FOOTING and B_GEN_PLAIN, each corner's field painted in the broad tone that corner
+    of a face has (top left tone 0, top right 4, bottom left 3, bottom right 7).
+- **Big faces** (PLATE, PLAIN, DECK, FOOTING and the generator's, at least 12 px each way and 16 px one way: the plinth
+  deck and footings, the pedestals, the generator and exciter housings, and the chest where it's that big) are
+  broad-shaded: the panel's
+  corners and bevels round the face, and inside them the eight tones as diagonal bands (tone from 0.55·x/w + 0.45·y/h),
+  each a flat polygon, hard-edged. Bevels, rivets, straps, seams and louvres sit on top as before. Smaller faces keep
+  their panel, then one or two flat tones (1–2 px faces).
+- **Round parts** keep the banded-facet rule (one band tone per facet, never blended). A facet 24 px or longer (a long
+  casing, the crossover's run) steps along its length: its band tone over the middle third, one band lighter
+  toward the steam end and one darker toward the far end (never the darkest tone), a casing facet keeping its seam rows
+  and rivets at 1 texel per px at both ends.
+- **The casings**: 16-sided shells, each split by a bolted flange, with hoops where the ends taper, end rings with bolt
+  circles and gland bosses; long sets get longer casings and up to three double-flow low-pressure casings, a pair of
+  bearing pedestals and a coupling between each two, and an exciter (a smaller ribbed housing) beyond the generator.
+  - **Windows** run along both upper sides (two facets each side) between the hoops: one GLASS pane per facet, 0.25 px
+    inside the outer surface. Behind them a cavity: the inner wall `#2B2F34` 1.5 px in, `#16181B` end walls, and stage
+    rings (`#575D65` lit / `#383C42` shade, 0.5 px) between the blade rows. What enters a casing (the chest, the valve
+    pipes, the crossover) ends inside its wall, and a window never runs under one.
+  - **Rotors** (drawn with the rotor, turning with it): a 12-sided hub drum and, per row, a disc and a ring of flat
+    blades angled 35° to the axis, in the blade steel (front `#B4BAC0`, back `#7E848C`); more and longer blades toward
+    low pressure (24 / 30 / 36 blades a row), the tips growing along each casing but always 1 px inside the
+    inner wall's flats.
   - Pipes, hoops, gland bosses and valve bodies use the band tones per facet; flanges `#575D65` on top, `#383C42` under,
-    bolt heads `#959DA6`; a bolt circle on each casing end ring; elbows PLATE; the deck slab's edge the strap; louvred
-    vents on both generator ends; the window cavity `#2B2F34` with `#16181B` end walls.
+    bolt heads `#959DA6`; elbows PLATE; the deck slab's edge the strap, with a plate seam (`#16181B` then `#575D65`, ½ px
+    each) across the deck every block; louvred vents on both generator ends.
   - Port nozzles are PLAIN collars 10 px across (the port plate's collar) from the model to the face.
+- **Hitbox** (not a texture, but it follows the model): formed, each block's shape is the model's parts in it
+  (TurbineShapes), so a block's outline follows the parts a player sees.
 
 ## Lithium and the Battery Array
 - **Spodumene** follows the ore method: Cody's green ore (as for fluorite, without the alternate purple clusters), his green

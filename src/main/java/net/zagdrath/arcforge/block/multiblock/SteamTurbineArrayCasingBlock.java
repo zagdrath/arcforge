@@ -12,6 +12,7 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -21,15 +22,20 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-// A casing of the Steam Turbine Array: a tube 3 to 15 blocks long along either horizontal axis, its cross-section
-// 3 to 7 wide and 3 to 9 tall, with Pressure Glass windows. The casings in the middle of the two end faces are the
+// A casing of the Steam Turbine Array: a tube 3 to 27 blocks long along either horizontal axis, its cross-section
+// 3 to 7 wide and 3 to 7 tall, with Pressure Glass windows. The casings in the middle of the two end faces are the
 // rotor's bearings: END marks the generator end (positive along the axis, with the FE port) and the plain bearing
-// end (a cross-section with an even side has no middle block, so its ends stay plain).
+// end (a cross-section with an even side has no middle block, so its ends stay plain). Formed, each casing's shape is
+// the pieces of the model in it (see TurbineHitbox), so players walk on the deck and round the casings; loose, a full
+// block.
 public class SteamTurbineArrayCasingBlock extends ShellCasingBlock {
     public enum End implements StringRepresentable {
         NONE("none"), GENERATOR("generator"), BEARING("bearing");
@@ -47,7 +53,7 @@ public class SteamTurbineArrayCasingBlock extends ShellCasingBlock {
     }
 
     public static final EnumProperty<End> END = EnumProperty.create("end", End.class);
-    public static final int MAX_WIDTH = 7, MAX_HEIGHT = 9, MAX_LENGTH = 15;
+    public static final int MAX_WIDTH = 7, MAX_HEIGHT = 7, MAX_LENGTH = 27;
     public static final ShellStructure STRUCTURE = new ShellStructure(block -> block instanceof SteamTurbineArrayCasingBlock,
             EnumSet.of(Direction.Axis.X, Direction.Axis.Z), (axis, x, y, z) -> {
                 int width = axis == Direction.Axis.X ? z : x, length = axis == Direction.Axis.X ? x : z;
@@ -77,6 +83,24 @@ public class SteamTurbineArrayCasingBlock extends ShellCasingBlock {
     @Override
     public BlockState looseState(BlockState state) {
         return super.looseState(state).setValue(END, End.NONE);
+    }
+
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        VoxelShape shape = state.getValue(FORMED) ? TurbineHitbox.casing(level, pos, state) : null;
+        return shape != null ? shape : super.getShape(state, level, pos, context);
+    }
+
+    @Override
+    protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        VoxelShape shape = state.getValue(FORMED) ? TurbineHitbox.casing(level, pos, state) : null;
+        return shape != null ? shape : super.getCollisionShape(state, level, pos, context);
+    }
+
+    // Still a whole block to whatever hangs on it (levers, buttons, torches, redstone), so the array keeps its controls.
+    @Override
+    protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter level, BlockPos pos) {
+        return state.getValue(FORMED) ? Shapes.block() : super.getBlockSupportShape(state, level, pos);
     }
 
     @Override

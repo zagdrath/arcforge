@@ -142,12 +142,12 @@ public final class ElectrolysisGameTests {
                 .thenSucceed();
     }
 
-    // One operation (100 mB of water) uses exactly its cost: the balance floor of 301,588 FE (its 200 mB of hydrogen can
-    // give back 241,270 FE through the biggest Steam Boiler Array into a Steam Turbine Array, times the 1.25 safety
+    // One operation (100 mB of water) uses exactly its cost: the balance floor of 303,789 FE (its 200 mB of hydrogen can
+    // give back 243,031 FE through the biggest Steam Boiler Array into a Steam Turbine Array, times the 1.25 safety
     // factor), which is above the recipe's 120,000, so Energy upgrades can't take it lower.
     static void energyExact(GameTestHelper helper) {
         int[] energyUpgrades = { 0, 1, 8 };
-        int[] expected = { 301_588, 301_588, 301_588 };
+        int[] expected = { 303_789, 303_789, 303_789 };
         List<ElectrolyzerBlockEntity> machines = new ArrayList<>();
         List<Meter> meters = new ArrayList<>();
         for (int i = 0; i < energyUpgrades.length; i++) {
@@ -161,7 +161,7 @@ public final class ElectrolysisGameTests {
             meters.add(new Meter(machine));
         }
         ElectrolyzingRecipe recipe = waterRecipe(helper);
-        helper.assertTrue(EnergyBalance.minEnergyFor(recipe) == 301_588, "The floor is " + EnergyBalance.minEnergyFor(recipe) + " FE, not 301,588");
+        helper.assertTrue(EnergyBalance.minEnergyFor(recipe) == 303_789, "The floor is " + EnergyBalance.minEnergyFor(recipe) + " FE, not 303,789");
         helper.onEachTick(() -> meters.forEach(Meter::topUp));
         helper.startSequence()
                 .thenWaitUntil(() -> machines.forEach(machine -> helper.assertTrue(machine.getOxygen().getAmount() == 100, "Not split yet")))
@@ -202,9 +202,9 @@ public final class ElectrolysisGameTests {
         for (double route : routes) {
             helper.assertTrue(best >= route - 1e-9, "A route gives " + route + " FE/HU, more than bestFePerHu() " + best);
         }
-        // The biggest boiler (7x9x12) at the top of Superheated's band boils it for 6.57 HU/mB (20 x 0.8 x 28^-0.2, less
-        // 20%), into 66.08 FE: 10.05 FE per HU.
-        helper.assertTrue(Math.abs(best - 10.0529) < 0.001, "bestFePerHu() is " + best + ", not 10.0529");
+        // The biggest boiler (7x7x16) at the top of Superheated's band boils it for 6.53 HU/mB (20 x 0.8 x 29.04^-0.2,
+        // less 20%), into 66.08 FE: 10.13 FE per HU.
+        helper.assertTrue(Math.abs(best - 10.1263) < 0.001, "bestFePerHu() is " + best + ", not 10.1263");
         helper.assertTrue(Math.abs(EnergyBalance.thermoelectricFePerHu() - 1.725) < 0.001, "Thermoelectric route is " + EnergyBalance.thermoelectricFePerHu());
         double hydrogen = EnergyBalance.recoverableFePerMb(ModFluids.HYDROGEN.get());
         helper.assertTrue(Math.abs(hydrogen - 60 * 2.0 * best) < 1e-6, "Hydrogen gives back " + hydrogen + " FE/mB");

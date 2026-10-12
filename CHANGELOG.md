@@ -43,7 +43,7 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
     on the machine: items, fluids, gases, FE and heat go straight to and from the machine's own inventories, tanks and
     buffers, with no limit of its own. Conduits connect to it as they would to the machine. Output faces push with the
     machine's auto-eject, and Energy and Heat faces give out what the machine gives out.
-  - Its GUI shows the machine it's linked to (for example "Steam Boiler Array 7×9×12"), the face the cable is on, the
+  - Its GUI shows the machine it's linked to (for example "Steam Boiler Array 7×7×16"), the face the cable is on, the
     cable's length, and a face grid like the Sides tab. A broken or overlong cable, a cable to nothing, a machine that
     already has a link, or one whose owner hasn't let you use it shows "Not linked" and why.
   - Jade shows the linked machine and each face's mode, and on the machine, its link port. Handbook entry, JEI
@@ -97,14 +97,14 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 - **Sifter Meshes take Unbreaking.** Enchant one at an enchanting table or with a book on an anvil, and it wears as a tool
   does with Unbreaking: Unbreaking III makes a mesh last about four times as long (a Tungsten Mesh about 4,000 blocks).
 - **The Arcforged Energy Conduit carries 262,144 FE/t** (was 65,536), and each conduit holds one tick's worth to match.
-  The **Arcforged Energy Cell** moves 262,144 FE/t in and out (was 131,072). One line now carries a full-size 7×9×15
-  Steam Turbine Array on lubricant (254,016 FE/t). With the Exhaust port's vacuum bonus as well, the turbine makes
-  277,536 FE/t, more than one line carries; raise `power.energyConduits.arcforged` and `power.energyCells.arcforged` to
-  277,536 or more for that. The Quantum Tunnel's FE, which moves at the Arcforged conduit rate, follows it. Conduit and
-  cell rates are now in config (`power.energyConduits`, `power.energyCells`).
+  The **Arcforged Energy Cell** moves 262,144 FE/t in and out (was 131,072). One line carries a 7×7×19 Steam Turbine
+  Array on lubricant (250,253 FE/t); a full-size 7×7×27 needs two (see the turbine's new sizes below). The Quantum
+  Tunnel's FE, which moves at the Arcforged conduit rate, follows it. Conduit and cell rates are now in config
+  (`power.energyConduits`, `power.energyCells`).
 - **Condenser Arrays condense faster.** 400 mB/t per cube in open air (was 120) and up to 800 (was 400): a 7×7×7
-  condenses 5,081 mB/t in open air and up to 10,163 with water or ice around it, so one keeps up with a full-size Steam
-  Turbine Array's 4,200 mB/t of exhaust. Its Output ports now push as fast as it condenses (they pushed 100 mB/t a face).
+  condenses 5,081 mB/t in open air and up to 10,163 with water or ice around it, so with some water or ice against it
+  one keeps up with a full-size Steam Turbine Array's 5,880 mB/t of exhaust. Its Output ports now push as fast as it
+  condenses (they pushed 100 mB/t a face).
 - **The Carbonizer takes Speed Upgrades, and the Distillation Array Speed and Heat Upgrades,** in a new Upgrades tab,
   with the usual rules (Speed bakes or feeds 2^(n/2) times as fast; Heat uses 0.8^n of the heat per batch), so fuel
   production can keep up with a maxed Firebox Array.
@@ -113,8 +113,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
   HU/t, and the Arcforged Heat Cell and Thermal Capsule keep 3,200 HU/t. The Quantum Tunnel's heat, which moves at the
   Arcforged conduit rate, follows it. All four rates are now in config (`power.heat.thermodynamicConduits`).
 - **Bigger Steam Boiler Arrays make more steam from the same heat.** Heat per mB is multiplied by (sections ÷ 3)^-0.2:
-  a 3×3×12 pays 76% of a 3×3×3's, an 8×7×12 53%, a 7×9×12 51%. Before, every size made the same steam from the
-  same heat. Configurable as `sizeEfficiency`.
+  a 3×3×12 pays 76% of a 3×3×3's, a 7×7×16 51%. Before, every size made the same steam from the same heat.
+  Configurable as `sizeEfficiency`.
 - **Steam Boiler Arrays climb, and run cheaper hot.** From 100°C a boiler boils with half the heat coming in and
   heats up on the rest, to the top of its grade's band (499°C for Steam, 899°C for High-Pressure, 1,390°C for
   Superheated and Auto). At the top of a band each mB costs 20% less heat (`hotSaving`). A boiler as hot as its heat
@@ -124,9 +124,42 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
   Heat that pushes it past the top of its band is vented too, for example after its pressure is turned down. It
   shows Venting, with a jet of steam and a hiss from its roof.
 - **Steam's energy balance counts the new boilers.** The best heat-to-FE route is now the biggest boiler at the top
-  of Superheated's band, 10.05 FE per HU (was 4.72). The Electrolyzer's floor rises with it: 100 mB of water costs at
-  least 301,588 FE (was 141,600), so hydrogen still can't make free power. JEI's steam page shows each grade's heat
-  per mB as a range.
+  of Superheated's band (a 7×7×16), 10.13 FE per HU (was 4.72). The Electrolyzer's floor rises with it: 100 mB of
+  water costs at least 303,789 FE (was 141,600), so hydrogen still can't make free power. JEI's steam page shows each
+  grade's heat per mB as a range.
+- **No large multiblock is more than 7×7 across.**
+  - **Steam Boiler Array:** a footprint 3–7 by 3–7 (was 3–7 by 3–9), 3 to 16 tall (was 12).
+  - **Firebox Array:** 3–7 by 3–7 across (was 3–7 by 3–9), 3 to 7 tall (was 5).
+  - **Steam Turbine Array:** a cross-section 3–7 by 3–7 (was 3–7 wide by 3–9 tall), 3 to 27 long (was 15).
+  - The Superheater, Condenser, Battery and Distillation Arrays are unchanged.
+- **Each large multiblock's largest size keeps the largest output.**
+  - **Firebox Array:** the largest (7×7×7) makes 50,400 HU/t (`heatPerTickAtMaxSize`) and a smaller one its share by
+    volume (was 160 HU/t per block): a 3×3×3 makes 3,967 HU/t (was 4,320).
+  - **Steam Boiler Array:** the largest (7×7×16, 87.1 sections) boils with up to 50,400 HU/t (`maxHeatPerTickAtMaxSize`)
+    and a smaller one its share by sections, about 579 HU/t each (was 600): a 3×3×3 boils with up to 1,736 HU/t (was
+    1,800).
+  - **Steam Turbine Array:** still 40 mB/t per section, so the largest (7×7×27, 147 sections) takes 5,880 mB/t (was
+    4,200 for a 7×9×15) and on Superheated Steam makes 329,280 FE/t before its bonuses, 355,622 with lubricant and
+    388,550 with the vacuum bonus as well. That's more than one Arcforged Energy Conduit carries (262,144), so give it
+    a second energy port, or raise `power.energyConduits.arcforged` and `power.energyCells.arcforged`.
+- **The Steam Turbine Array's model is rebuilt for the longer sizes.**
+  - Each casing is as long as its diameter calls for. A long set gets up to three double-flow low-pressure casings,
+    each fed by its own drop of the crossover pipe, a pair of bearing pedestals and a coupling between each two
+    casings, and an exciter beyond the generator.
+  - Bladed rotors: discs of angled blades in light steel with stage rings between them, more and longer toward low
+    pressure, turning with the rotor.
+  - Glazed windows along each casing's upper facets, just inside its outer surface, with the standard glints. Nothing
+    shows through the glass or the casing: the blades stay inside the inner wall, and the steam chest, valve pipes and
+    crossover end inside the casing's wall.
+  - Re-textured to the house style: big plated faces have broad shading under their bevels, rivets, straps and seams,
+    and long round parts are shaded facet by facet.
+  - Jade names each of several low-pressure casings ("Low-pressure casing 2 of 3").
+- **A formed Steam Turbine Array's blocks take the shape of its model.** Each casing's and pane's outline and collision
+  follow the parts in it, so you walk on the plinth and walkway and round the casings. Loose casings stay full blocks,
+  and formed ones still hold levers, buttons and redstone on any face; fluids don't wash them away. Parts in the hollow
+  core are carried by the shell block beside them. A block with nothing of the model in it can't be aimed at; break
+  another to take the array down. Deep inside a 5×5 or bigger cross-section, which no block's shape reaches, a lid and
+  walls just inside the shell stand in for the parts there.
 
 ### Fixed
 
@@ -145,6 +178,12 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Upgrading
 
+- **Large multiblocks over the new size limits un-form** (see Changed): a Steam Boiler Array or Firebox Array 8 or 9
+  across, and a Steam Turbine Array 8 or 9 tall, un-form when the world loads (the Firebox Array within two seconds).
+  Rebuild them within the limits, up to 7×7 across; every height and length they could have before still fits.
+- **Config keys replaced:** `power.burners.fireboxArray.heatPerTickPerBlock` becomes `heatPerTickAtMaxSize` and
+  `power.steam.steamBoilerArray.maxHeatPerTickPerSection` becomes `maxHeatPerTickAtMaxSize` (both 50,400: the largest
+  array's HU/t, shared out by size). A value you had changed isn't carried over; set the new key again.
 - **Conduit Covers become Conduit Facades.** A covered conduit loads with a facade on every side: dressed in the
   cover's look, or blank if it had none, so it still looks like a block (a plain cover is now steel rather than a clear
   pane). Conduit Cover items load as blank Conduit Facades (`arcforge:conduit_cover` is now `arcforge:conduit_facade`;

@@ -28,8 +28,8 @@ import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 
 // A hollow box of casings and Pressure Glass along one of the allowed axes. Its cross-section (the two
 // other axes) and its length along the axis may be any size the structure's SizeRule allows: the Steam
-// Boiler Array stands 3-12 tall on a footprint 3-7 by 3-9; the Steam Turbine Array lies 3-15 long with a
-// cross-section 3-7 wide and 3-9 tall; the Gas Turbine Array keeps its 3x3 cross-section, 5-9 long. The
+// Boiler Array stands 3-16 tall on a footprint 3-7 by 3-7; the Steam Turbine Array lies 3-27 long with a
+// cross-section 3-7 wide and 3-7 tall; the Gas Turbine Array keeps its 3x3 cross-section, 5-9 long. The
 // eight corners must be casings. In a 3x3 cross-section the rest of the skin may be casing or glass, as it
 // always could, so a window can take a whole wall; in a larger one the twelve edges must be casings too,
 // and the faces between them may be casing or glass. Everything inside (the core) must be air.
@@ -40,7 +40,7 @@ public final class ShellStructure {
     // The cross-section of the original arrays, and of a shell saved before cross-sections could vary.
     public static final int WIDTH = 3;
     // The most blocks a search follows, and how far it reaches from where it started: past the biggest box.
-    private static final int MAX_SPAN = 16;
+    private static final int MAX_SPAN = 28;
     private static final int MAX_FLOOD = 4_096;
 
     // Which box sizes make a valid structure, by its long axis and its sizes along X, Y and Z.

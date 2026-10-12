@@ -33,15 +33,17 @@ import net.zagdrath.arcforge.block.multiblock.FireboxArrayPart;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity;
 
-// The Firebox Array: a hollow box of Firebox Array Casings with one Firebox Array Controller, 3 to 7 by 3 to 9 across
-// (either way round, so it needn't be square) and 3 to 5 tall. Its twelve edges are casings; its walls, floor and roof
+// The Firebox Array: a hollow box of Firebox Array Casings with one Firebox Array Controller, 3 to 7 by 3 to 7 across
+// (it needn't be square) and 3 to 7 tall. Its twelve edges are casings; its walls, floor and roof
 // are casings or Pressure Glass, so the fire shows through a window; exactly one controller sits in a side wall (not on
 // an edge), facing out. Inside is air. The controller's block entity runs it and decides whether it's formed; every
 // controller is kept in a per-level registry (as the Greenhouse Array's are), so the other parts find it without
 // searching. FORMED is set on every casing, the controller and every pane of a formed box, and INWARD on each wall block
 // says which way the inside is (its model leaves that face out; the renderer lines the inside with firebrick).
 public final class FireboxArrayStructure {
-    public static final int MIN_SIZE = 3, MAX_WIDTH = 7, MAX_DEPTH = 9, MAX_HEIGHT = 5;
+    public static final int MIN_SIZE = 3, MAX_WIDTH = 7, MAX_DEPTH = 7, MAX_HEIGHT = 7;
+    // The largest array's volume (7x7x7), which heatPerTickAtMaxSize is for.
+    public static final int MAX_VOLUME = MAX_WIDTH * MAX_DEPTH * MAX_HEIGHT;
 
     // A formed or candidate box: its inclusive corners, and the side the controller faces out of.
     public record Box(BlockPos min, BlockPos max, Direction front) {
@@ -109,7 +111,7 @@ public final class FireboxArrayStructure {
         }
     }
 
-    // Whether a box of these sizes is allowed: 3 to 7 by 3 to 9 across (either way round), 3 to 5 tall.
+    // Whether a box of these sizes is allowed: 3 to 7 by 3 to 7 across, 3 to 7 tall.
     public static boolean allows(int x, int y, int z) {
         return Math.min(x, z) >= MIN_SIZE && Math.min(x, z) <= MAX_WIDTH && Math.max(x, z) <= MAX_DEPTH && y >= MIN_SIZE && y <= MAX_HEIGHT;
     }

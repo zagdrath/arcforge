@@ -33,10 +33,10 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.logistics.WiredMachineLinkMenu;
 
 // A Wired Machine Link's screen (176x126, no inventory). The read-out across the top: the machine it's linked to (its
-// name, e.g. "Steam Boiler Array 7×9×12"), the face of the machine the cable is on and the cable's length, and a status
-// line; or "Not linked", with why on the status line. Below, a face grid like the machines' Sides tab for its own faces (left click cycles
-// through the machine's port modes, right click back, shift-click clears; the cable's face is the locked purple link),
-// and how it works. A Security tab on the right.
+// name, e.g. "Steam Boiler Array 7×7×16"), the face of the machine the cable is on and the cable's length, and a status
+// line; or "Not linked", with why on the status line. Below, a face grid like the machines' Sides tab for its own faces
+// (left click cycles through the machine's port modes, right click back, shift-click clears; the cable's face is the
+// locked purple link), and how it works. A Security tab on the right.
 public class WiredMachineLinkScreen extends AbstractContainerScreen<WiredMachineLinkMenu> {
     private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/wired_machine_link.png");
     private static final Identifier FACE_HOVER = ArcforgeGui.widget("face_hover");

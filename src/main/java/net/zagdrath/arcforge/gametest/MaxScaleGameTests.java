@@ -39,10 +39,13 @@ public final class MaxScaleGameTests {
             helper.assertTrue(tier.energyPerTick() == conduit[tier.ordinal()], tier + " energy conduit carries " + tier.energyPerTick() + " FE/t");
             helper.assertTrue(tier.cellRate() == cell[tier.ordinal()], tier + " energy cell moves " + tier.cellRate() + " FE/t");
         }
-        // A full-size (7x9x15) Steam Turbine Array on Superheated Steam with lubricant fits down one Arcforged line.
-        int lubricated = (int) Math.round(105 * ArcforgeConfig.TURBINE_ARRAY_FLOW_PER_SECTION.getAsInt() * 56
-                * net.zagdrath.arcforge.steam.Lubricant.bonus());
-        helper.assertTrue(ConduitTier.ARCFORGED.energyPerTick() >= lubricated, "One Arcforged conduit can't carry " + lubricated + " FE/t");
+        // A 7x7x19 Steam Turbine Array (103.4 sections) on Superheated Steam with lubricant fits down one Arcforged
+        // line; a full-size 7x7x27 (147 sections) needs two.
+        double perSection = ArcforgeConfig.TURBINE_ARRAY_FLOW_PER_SECTION.getAsInt() * 56 * net.zagdrath.arcforge.steam.Lubricant.bonus();
+        int nineteen = (int) Math.round(49.0 / 9.0 * 19 * perSection), full = (int) Math.round(147 * perSection);
+        helper.assertTrue(ConduitTier.ARCFORGED.energyPerTick() >= nineteen, "One Arcforged conduit can't carry " + nineteen + " FE/t");
+        helper.assertTrue(ConduitTier.ARCFORGED.energyPerTick() < full && 2 * ConduitTier.ARCFORGED.energyPerTick() >= full,
+                "A full-size turbine's " + full + " FE/t doesn't take two Arcforged conduits");
         helper.succeed();
     }
 

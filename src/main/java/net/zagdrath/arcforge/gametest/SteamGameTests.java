@@ -184,9 +184,9 @@ public final class SteamGameTests {
     }
 
     // Heated past 900°C a boiler array makes Superheated Steam; at 150°C plain Steam; below 100°C nothing.
-    // Cooling into a lower grade turns the stored steam into it. A 3-tall array boils with up to 1,800 HU/t, and
-    // Superheated costs it 12.8 HU/mB at the top of its band (20 x 0.8, less 20%), so the hot one (kept topped up)
-    // makes 140.625 mB/t.
+    // Cooling into a lower grade turns the stored steam into it. A 3x3x3 array boils with up to 1,736 HU/t (50,400 x
+    // 3 / 87.1), and Superheated costs it 12.8 HU/mB at the top of its band (20 x 0.8, less 20%), so the hot one (kept
+    // topped up) makes 135.625 mB/t.
     static void boilerGrades(GameTestHelper helper) {
         BlockPos[] mins = { new BlockPos(0, 1, 0), new BlockPos(4, 1, 0), new BlockPos(8, 1, 0) };
         int[] temperatures = { 1_400, 150, 60 };
@@ -213,7 +213,7 @@ public final class SteamGameTests {
                 .thenExecute(() -> {
                     SteamBoilerArrayBlockEntity hot = boilerAt(helper, mins[0]), warm = boilerAt(helper, mins[1]), cold = boilerAt(helper, mins[2]);
                     helper.assertTrue(SteamGrade.of(hot.getSteam().getResource(0)) == SteamGrade.SUPERHEATED, "Hot boiler made " + hot.getSteam().getResource(0));
-                    helper.assertTrue(Math.abs(hot.getCore().getRate() - 140.625) < 0.5, "Hot boiler makes " + hot.getCore().getRate() + " mB/t");
+                    helper.assertTrue(Math.abs(hot.getCore().getRate() - 135.625) < 0.5, "Hot boiler makes " + hot.getCore().getRate() + " mB/t");
                     helper.assertTrue(SteamGrade.of(warm.getSteam().getResource(0)) == SteamGrade.STEAM, "Warm boiler made " + warm.getSteam().getResource(0));
                     helper.assertTrue(cold.getSteam().getAmount() == 0 && cold.getStatus() == MachineStatus.HEATING,
                             "Cold boiler is " + cold.getStatus() + " with " + cold.getSteam().getAmount() + " mB");
@@ -349,7 +349,7 @@ public final class SteamGameTests {
         double cost = ArcforgeConfig.BOILER_ARRAY_HEAT_COST.getAsDouble();
         helper.assertTrue(Math.abs(SteamBoilerArrayBlockEntity.heatCostMultiplier(3.0) - cost) < 1e-9,
                 "A 3x3x3 pays " + SteamBoilerArrayBlockEntity.heatCostMultiplier(3.0));
-        helper.assertTrue(Math.abs(SteamBoilerArrayBlockEntity.bestHeatCostMultiplier() - cost * Math.pow(28.0, -0.2) * 0.8) < 1e-9,
+        helper.assertTrue(Math.abs(SteamBoilerArrayBlockEntity.bestHeatCostMultiplier() - cost * Math.pow(49.0 / 9.0 * 16.0 / 3.0, -0.2) * 0.8) < 1e-9,
                 "The best boiler pays " + SteamBoilerArrayBlockEntity.bestHeatCostMultiplier());
         boolean[] started = { false };
         helper.onEachTick(() -> {
@@ -474,8 +474,8 @@ public final class SteamGameTests {
         }
     }
 
-    // 3x3x4 forms (with a wall window), the master is the minimum corner; 3x3x13 is too tall (by the size rule);
-    // glass on a corner doesn't form; breaking a pane breaks it.
+    // 3x3x4 forms (with a wall window), the master is the minimum corner; 3x3x17 is too tall and 8 wide too wide (by
+    // the size rule: up to 7x7 and 16 tall); glass on a corner doesn't form; breaking a pane breaks it.
     static void boilerArrayForms(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
         BlockPos pane = new BlockPos(1, 2, 0);
@@ -489,11 +489,12 @@ public final class SteamGameTests {
                     helper.assertTrue(boiler.isMaster() && boiler.getHeight() == 4, "Boiler array: master " + boiler.isMaster() + ", height " + boiler.getHeight());
                     helper.assertTrue(PressureGlassBlock.isFormed(helper.getBlockState(pane)), "The window is not part of it");
                     helper.assertTrue(boiler.getWater().getCapacity() == 64_000, "Water tank holds " + boiler.getWater().getCapacity());
-                    helper.assertTrue(!SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 13)),
-                            "A 3x3x13 boiler is allowed");
-                    helper.assertTrue(SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 12, 7, 9))
-                            && SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 3, 9, 7))
-                            && !SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 3, 8, 8)),
+                    helper.assertTrue(!SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 17)),
+                            "A 3x3x17 boiler is allowed");
+                    helper.assertTrue(SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 16, 7, 7))
+                            && SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 3, 7, 3))
+                            && !SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 3, 9, 7))
+                            && !SteamBoilerArrayCasingBlock.STRUCTURE.allows(new ShellStructure.Shell(BlockPos.ZERO, Direction.Axis.Y, 3, 3, 8)),
                             "The boiler's footprint rule is wrong");
                     helper.assertTrue(!ShellCasingBlock.isFormed(helper.getBlockState(cornerMin)), "A boiler with glass on a corner formed");
                     // Water goes in through an input port on the left (east) face.

@@ -272,7 +272,7 @@ public final class MultiblockBlueprints {
         return new Blueprint("distillation_array", placements, new BlockPos(2, 8, 2));
     }
 
-    // 3x3, 5 tall (3 to 7 work), with a window up the front.
+    // 3x3 (up to 7x7 work), 4 tall (3 to 16 work), with a window up the front.
     private static Blueprint steamBoilerArray() {
         BlockPos size = new BlockPos(4, 4, 5);
         List<BlockPos> glass = List.of(new BlockPos(1, 1, 4), new BlockPos(2, 1, 4), new BlockPos(1, 2, 4), new BlockPos(2, 2, 4));
@@ -301,8 +301,8 @@ public final class MultiblockBlueprints {
         return sorted;
     }
 
-    // A Firebox Array 4 wide, 3 tall and 5 deep (3 to 7 by 3 to 9 across and 3 to 5 tall work): casings on the edges, the
-    // controller in the middle of the front wall facing south, and a window in the east wall.
+    // A Firebox Array 4 wide, 3 tall and 5 deep (3 to 7 by 3 to 7 across and 3 to 7 tall work): casings on the edges,
+    // the controller in the middle of the front wall facing south, and a window in the east wall.
     private static Blueprint fireboxArray() {
         BlockPos size = new BlockPos(4, 3, 5);
         BlockState casing = ModBlocks.FIREBOX_ARRAY_CASING.get().defaultBlockState();
@@ -351,7 +351,7 @@ public final class MultiblockBlueprints {
         return new Blueprint("battery_array", sorted(placements), size);
     }
 
-    // 3x3, 5 long along X (3 to 9 work), with a window along the front.
+    // 3x3 (up to 7x7 work), 5 long along X (3 to 27 work), with a window along the front.
     private static Blueprint steamTurbineArray() {
         BlockPos size = new BlockPos(5, 3, 3);
         List<BlockPos> glass = List.of(new BlockPos(1, 1, 2), new BlockPos(2, 1, 2), new BlockPos(3, 1, 2));

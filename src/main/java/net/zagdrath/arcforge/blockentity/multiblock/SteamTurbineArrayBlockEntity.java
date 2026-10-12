@@ -66,10 +66,10 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 import net.zagdrath.arcforge.machine.output.OutputLimit;
 import net.zagdrath.arcforge.machine.output.OutputLimited;
 
-// The Steam Turbine Array (see ShellMultiblockBlockEntity): a turbine L blocks long with a rotor of L - 2
-// blade sets, sized to its cross-section's shorter side. It grows with its sections s = width x height / 9 x L (a
-// 3x3x3 is 3, a 7x9x15 is 105): it takes up to 40 x s mB/t of steam at the array's FE per mB (Steam 20, High-Pressure
-// 36, Superheated 56, times power.generationMultiplier; a 7x9x15 on Superheated makes 235,200 FE/t, more with its
+// The Steam Turbine Array (see ShellMultiblockBlockEntity): a turbine L blocks long with a rotor of L - 2 blade sets,
+// sized to its cross-section's shorter side. It grows with its sections s = width x height / 9 x L (a 3x3x3 is 3, a
+// 7x7x27 is 147): it takes up to 40 x s mB/t of steam at the array's FE per mB (Steam 20, High-Pressure 36, Superheated
+// 56, times power.generationMultiplier; a 7x7x27 takes 5,880 mB/t and on Superheated makes 329,280 FE/t, more with its
 // bonuses). Its output cap is a full flow of Superheated Steam with both bonuses, its FE buffer energyBufferTicks of
 // that, and its energy ports share the cap. The rotor spins up toward a speed set
 // by the power in the steam, flow times FE per mB, so a higher grade spins it faster (full speed is a full

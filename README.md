@@ -24,7 +24,7 @@ the creative-only [Creative Fluid Tank, Pressurized Cylinder and Energy Cell](#c
 ```
 coal / charcoal / coal block --[Combustion Plant]--> FE      (simple, least FE per coal)
 coal / charcoal / coal block --[Firebox]--> heat (HU)            (up to 1,100°C)
-coal, Coal Coke, burner fuels --[Firebox Array]--> heat (HU)     (160 HU/t per block, up to 1,300°C; 1,400°C on Hydrogen)
+coal, Coal Coke, burner fuels --[Firebox Array]--> heat (HU)     (up to 50,400 HU/t, 1,300°C; 1,400°C on Hydrogen)
 lava (tank, pipes, nearby blocks) --[Geothermal Plant]--> heat   (up to 1,400°C)
 heat --[Thermoelectric Plant]--> FE                              (hotter heat = more FE)
 ```
@@ -66,12 +66,13 @@ It only ever flows from a hotter machine into a colder one.
   never becomes free power).
 
 **Firebox Array.** A hollow box of Firebox Array Casings with one Firebox Array Controller in a side wall (not on an
-edge), facing out: 3 to 7 by 3 to 9 across (either way round) and 3 to 5 tall. The twelve edges are casings; the
+edge), facing out: 3 to 7 by 3 to 7 across and 3 to 7 tall. The twelve edges are casings; the
 walls, floor and roof may be Pressure Glass, and through them you see the fire on its firebrick-lined floor.
 
-- It makes 160 HU/t per block of its whole volume: 4,320 HU/t for a 3×3×3, 50,400 HU/t for a 7×5×9 (all a 7×9×12
-  Steam Boiler Array takes). Its heat buffer (10,000 HU per block, full at 1,400°C), fuel tank (1,000 mB per block)
-  and oxygen tank (200 mB per block) scale with it.
+- The largest (7×7×7) makes `power.burners.fireboxArray.heatPerTickAtMaxSize` (50,400) HU/t, all the largest
+  (7×7×16) Steam Boiler Array takes; a smaller one makes its share by volume (× volume ÷ 343): 3,967 HU/t for a 3×3×3.
+  Its heat buffer (10,000 HU per block, full at 1,400°C), fuel tank (1,000 mB per block) and oxygen tank (200 mB per
+  block) scale with it.
 - Solid fuels (`#arcforge:combustion_fuel`) give a Firebox's heat per item (64,000 HU a coal) at 1,100°C; Coal Coke
   gives 1.5× a coal's (its block 1.5× a coal block's) at 1,300°C. Liquid and gas fuels (`arcforge:burner_fuels`) give
   the Fuel Burner's HU per mB at their own burn temperature.
@@ -318,7 +319,7 @@ pushes up to 1,000 mB/t out of its top. Takes Speed and Energy upgrades. On wate
 biome it pumps Seawater instead (for the Thermal Evaporator Array).
 
 **Steam Boiler Array.** Boils water into steam with heat. It is a hollow box of Steam Boiler Array Casings
-and Pressure Glass on a footprint 3 to 7 by 3 to 9 (either way round), 3 to 12 blocks tall.
+and Pressure Glass on a footprint 3 to 7 by 3 to 7, 3 to 16 blocks tall.
 
 - In a 3×3 tower only the 8 corners must be casings, so whole walls can be windows; in a bigger one all
   twelve edges must be casings. The water and steam show through the glass.
@@ -328,12 +329,14 @@ and Pressure Glass on a footprint 3 to 7 by 3 to 9 (either way round), 3 to 12 b
   - Steam from 100°C (8 HU/mB in a 3×3×3);
   - High-Pressure from 500°C (12 HU/mB);
   - Superheated from 900°C (16 HU/mB).
-- **Bigger is cheaper.** Heat per mB is multiplied by (sections ÷ 3)^-0.2: a 3×3×12 pays 76% of a 3×3×3's, an
-  8×7×12 53%, a 7×9×12 51% (`sizeEfficiency`).
+- **Bigger is cheaper.** Heat per mB is multiplied by (sections ÷ 3)^-0.2: a 3×3×12 pays 76% of a 3×3×3's, a
+  7×7×16 51% (`sizeEfficiency`).
 - **Hotter is cheaper.** Running at the top of a grade's band saves another 20% (`hotSaving`), less lower in the
-  band: a 7×9×12 at 499°C boils Steam for 3.3 HU/mB.
-- Per section (width × depth ÷ 9 × height: 3 for a 3×3×3, 84 for a 7×9×12) it holds 100,000 HU, uses up to
-  600 HU/t, and has 16,000 mB tanks. A 7×9×12 boils with up to 50,400 HU/t.
+  band: a 7×7×16 at 499°C boils Steam for 3.3 HU/mB.
+- Per section (width × depth ÷ 9 × height: 3 for a 3×3×3, 87.1 for a 7×7×16) it holds 100,000 HU and has 16,000 mB
+  tanks.
+- The largest (7×7×16) boils with up to `power.steam.steamBoilerArray.maxHeatPerTickAtMaxSize` (50,400) HU/t. A
+  smaller one gets its share by sections (about 579 HU/t each): 1,736 HU/t for a 3×3×3.
 
 It **climbs**: from 100°C it boils with half the heat coming in and heats up on the rest, until it reaches the top
 of its band. There it boils all its heat. If its heat source is no hotter than it, it settles there and boils nearly
@@ -353,10 +356,11 @@ turned down) is vented too. Either way its status reads Venting.
 
 Cooling into a lower grade turns the steam it holds into that grade.
 
-**Steam Turbine Array.** A hollow tube along either horizontal axis, built the same way: 3 to 15 long, its
-cross-section 3 to 7 wide and 3 to 9 tall. It takes up to 40 mB/t per section (width × height ÷ 9 × length:
-3 for a 3×3×3, 105 for a 7×9×15) at 20 / 36 / 56 FE per mB (a 7×9×15 on Superheated makes 235,200 FE/t
-before its bonuses). Its output cap is a full flow of Superheated Steam with both bonuses (no fixed cap), its
+**Steam Turbine Array.** A hollow tube along either horizontal axis, built the same way: 3 to 27 long, its
+cross-section 3 to 7 wide and 3 to 7 tall. It takes up to 40 mB/t per section (width × height ÷ 9 × length:
+3 for a 3×3×3, 147 for a 7×7×27) at 20 / 36 / 56 FE per mB (a 7×7×27 takes 5,880 mB/t and on Superheated makes
+329,280 FE/t before its bonuses, about 355,600 with lubricant: more than one Arcforged Energy Conduit's 262,144, so
+give it two energy ports). Its output cap is a full flow of Superheated Steam with both bonuses (no fixed cap), its
 FE buffer 400 ticks of that, and its energy ports share the cap. Its rotor spins up over a few seconds when steam flows, and output rises with it; it
 coasts down when the steam stops. Its speed follows the power in the steam (flow times FE per mB), so a
 higher grade spins it faster: full speed is a full flow of Superheated Steam. A new one starts with a steam, an energy and an Exhaust port on its fitted spots (below); move or clear them with the Wrench. Heavy Oil in its 4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
@@ -368,12 +372,17 @@ tank isn't full), the turbine makes 10% more FE, on top of the lubricant bonus.
 
 Formed, the turbine hides its blocks and is drawn as one **turbine-generator set** along its axis, on a steel plinth
 with stepped footings (columns when the structure is taller than it needs): from the steam end, turbine casings on
-one shaft (each split along the middle by a bolted flange, with bearing pedestals and couplings between them), then
-the generator (cooling ribs, terminal box, FE-red accents) at the positive end. 3 to 5 long it has one turbine casing,
-6 to 9 a small high-pressure and a large low-pressure casing, 10 to 15 high-, intermediate- and a double-flow
-low-pressure casing with a crossover pipe. Casings fill the cross-section's shorter side; a cross-section wider than
-tall gets a walkway with railings along its front. A window on each side of every casing shows its blades turning
-with the rotor. Ports fit best on top over the high-pressure steam chest (steam), on the generator end (energy) and
+one shaft (each split along the middle by a bolted flange, with a pair of bearing pedestals and a coupling between
+each two), then the generator (cooling ribs, terminal box, FE-red accents) at the positive end, with an exciter beyond
+it on a long set. 3 to 5 long it has one turbine casing, 6 to 9 a small high-pressure and a large low-pressure casing,
+10 to 27 high- and intermediate-pressure casings and one to three double-flow low-pressure casings (as many as the
+length has room for), with a crossover pipe dropping into each. Casings fill the cross-section's shorter side; a
+cross-section wider than tall gets a walkway with railings along its front. Glazed windows along each casing's upper
+sides show its bladed rotor (discs of angled blades, more and longer toward low pressure) turning with the
+rotor. Its blocks take the shape of the parts in them, so you walk on the plinth and walkway and round the casings, and a
+block's outline follows the parts in it (parts in the hollow core are carried by the shell block beside them; deep
+inside the biggest cross-sections, where no block's shape can reach, a lid and walls just inside the shell stand in
+for the parts there). Ports fit best on top over the high-pressure steam chest (steam), on the generator end (energy) and
 underneath the low-pressure exhaust neck (Exhaust, where a Condenser Array can sit), and a new turbine starts with a
 port on each; a port anywhere else gets a pipe
 from the machine out to it. Jade names the section and these spots.
@@ -441,7 +450,8 @@ like the Superheater Array. It turns Exhaust Steam back into water, 1:1.
   - each packed ice: 40;
   - each blue ice: 60.
 - Cold biomes condense ×1.25 and the Nether ×0.5, up to 800 mB/t per 27 blocks (a 7×7×7: 10,163 mB/t). A
-  7×7×7 in open air already takes a full-size Steam Turbine Array's 4,200 mB/t of exhaust.
+  7×7×7 in open air takes 5,081 of a full-size Steam Turbine Array's 5,880 mB/t of exhaust; some water or ice
+  against it makes up the rest.
 - A new one has an exhaust-in and a water-out port.
 - Boiler → turbine → condenser → back to the boiler's water port is a closed loop. The ports push on
   their own, as fast as it condenses, so it runs without a pump.
@@ -529,7 +539,7 @@ The Electrolyzer never charges less than 1.25× (`balanceSafetyFactor`) the most
 could get back from what it makes, worked out from the live config and data maps (every Heat upgrade in the
 burner, then the better of a fully carded Thermoelectric Plant and a Superheated boiler into a lubricated,
 exhausting turbine, times `power.generationMultiplier`; the boiler counted is the biggest, at the top of its
-band). By default that floor is 1,508 FE per mB of hydrogen (301,588 FE per 100 mB of water), above the water recipe's 1,200 FE per mB, so splitting water costs the floor and
+band). By default that floor is 1,519 FE per mB of hydrogen (303,789 FE per 100 mB of water), above the water recipe's 1,200 FE per mB, so splitting water costs the floor and
 Energy upgrades don't lower it.
 
 **Oxygen** (from the Electrolyzer or the Air Separator) speeds up the Arcforge Furnace: give it an Oxygen port with the Wrench and pipe oxygen in. A smelt
@@ -1016,7 +1026,7 @@ mode that machine has, and works as that port would: items, fluids, gases, FE an
 machine, with no limit of its own, and output faces push with the machine's auto-eject. The face the cable is on becomes
 a locked purple Wired Machine Link port (shown in the machine's Sides or Ports tab and in Jade) until the cable comes
 off; then it's back to what it was. One link per machine. The cable carries nothing itself, never branches, and glows
-while the link is live. The link's GUI shows the machine (e.g. "Steam Boiler Array 7×9×12"), the face the cable is on
+while the link is live. The link's GUI shows the machine (e.g. "Steam Boiler Array 7×7×16"), the face the cable is on
 and its length, or "Not linked" and why.
 ### Energy Cells
 

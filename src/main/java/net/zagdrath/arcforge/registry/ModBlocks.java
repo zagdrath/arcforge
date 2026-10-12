@@ -364,8 +364,10 @@ public final class ModBlocks {
     public static final DeferredBlock<SteamBoilerArrayCasingBlock> STEAM_BOILER_ARRAY_CASING = BLOCKS.registerBlock("steam_boiler_array_casing",
             SteamBoilerArrayCasingBlock::new, ModBlocks::steamCasingProperties);
 
+    // Formed, its shape follows the turbine's model (see TurbineHitbox), so it can't be cached per state; it stays solid
+    // (fluids don't wash it away) whatever its shape.
     public static final DeferredBlock<SteamTurbineArrayCasingBlock> STEAM_TURBINE_ARRAY_CASING = BLOCKS.registerBlock("steam_turbine_array_casing",
-            SteamTurbineArrayCasingBlock::new, ModBlocks::steamCasingProperties);
+            SteamTurbineArrayCasingBlock::new, p -> steamCasingProperties(p).dynamicShape().forceSolidOn());
 
     // Burns fuel straight to FE (Hardened tier).
     public static final DeferredBlock<GasTurbineArrayCasingBlock> GAS_TURBINE_ARRAY_CASING = BLOCKS.registerBlock("gas_turbine_array_casing",
@@ -396,10 +398,13 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL));
 
-    // The steam arrays' windows; also fine as decorative glass.
+    // The steam arrays' windows; also fine as decorative glass. In a Steam Turbine Array its shape follows the model
+    // (so it isn't cached per state), and it stays solid whatever its shape.
     public static final DeferredBlock<PressureGlassBlock> PRESSURE_GLASS = BLOCKS.registerBlock("pressure_glass",
             PressureGlassBlock::new,
             p -> p.mapColor(MapColor.NONE)
+                    .dynamicShape()
+                    .forceSolidOn()
                     .strength(1.5F, 12.0F)
                     .sound(SoundType.GLASS)
                     .noOcclusion()

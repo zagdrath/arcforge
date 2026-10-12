@@ -8,188 +8,53 @@ package net.zagdrath.arcforge.client.renderer.blockentity;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
 
 import net.zagdrath.arcforge.steam.TurbineLayout;
 
-// The formed Steam Turbine Array's model, built from its TurbineLayout (see SteamTurbineArrayRenderer): the still parts
-// once (and again when its ports change), the rotor every frame at its angle.
-//
-// Texturing follows docs/TEXTURE_STYLE.md "3D models": one sheet (block/steam_turbine_array/turbine, SHEET_W x SHEET_H)
-// for the whole model at 1 texel per px. The model's size follows its structure, so it can't have a fixed unwrap:
-// each face is cut into nine at its own size from a painted 9-slice panel (corners and edges at 1 texel per px, so every
-// face keeps its own 1 px lit top/left and dark bottom/right edge and, at 9 px and up, its corner rivets; the middles
-// are one flat tone, which can stretch). Faces under 9 px drop the rivets, faces under 3 px are one flat tone. Round
-// parts are polygons in one flat tone, so the game's face shading gives the curve; their caps are flat concentric rings
-// (lit on the top-left half, a step darker on the bottom-right). The walkway's grating is a 4 px tile laid at 1:1.
-//
-// Output: per vertex x, y, z (blocks from the structure's minimum corner), u, v (0-1 across the sheet), nx, ny, nz;
-// four vertices a quad. Solid and cutout (the window glass) quads go in separate lists.
-public final class TurbineMesh {
-    public static final int SHEET_W = 128, SHEET_H = 48;
-    private static final float PX = TurbineLayout.PX;
-    private static final int SIDES = 16, PIPE_SIDES = 8;
+// The formed Steam Turbine Array's model, built from its TurbineLayout (see SteamTurbineArrayRenderer) on the sheet
+// block/steam_turbine_array/turbine: the still parts once (and again when its ports change), the rotor every frame at
+// its angle. How it's built and painted: ModelMesh, with broad shading on its big plated faces and long round facets.
+// Each window is glazed facet by facet, a pane on each of the casing's own facets just inside its outer surface, so the
+// glass follows the round casing; behind it the casing's inner wall, stage rings between the blade rows, and the
+// bladed rotor (discs carrying dense rows of angled blades) kept inside the inner wall.
+public final class TurbineMesh extends ModelMesh {
+    public static final int SHEET_W = 128, SHEET_H = 96;
+    private static final int SIDES_CASING = TurbineLayout.CASING_SIDES;
     // The inspection window takes these two facets on each side (counted from the flange line at angle 0).
     private static final int WINDOW_FIRST = 1, WINDOW_LAST = 2;
-    // The collar of a port nozzle, across (px): the port plate's collar (x3..12).
-    private static final float COLLAR = 10.0F;
     // Blade pitch against the axis.
     private static final double PITCH = Math.toRadians(35.0);
 
-    public enum Kind { FLAT, PANEL, TILED, BANDED }
-
-    // A painted area of the sheet: a flat tone (FLAT, its middle used); a panel (PANEL) cut into columns and rows,
-    // each either fixed (drawn at 1 texel per px) or stretching (a band of one tone along it, sharing what's left of
-    // the face by weight); or a tile laid at 1:1 (TILED). BANDED paints aren't on the sheet: a round part painted with
-    // one gets each facet in the band tone (or the casing strip) for how that facet faces the light.
-    public enum Paint {
-        DEEP(0, 0), DARK(4, 0), SHADE(8, 0), FACE_SHADE(12, 0), FACE(16, 0), MID(20, 0), LIT(24, 0), RIVET(28, 0),
-        GEN_DARK(32, 0), GEN_FACE(36, 0), GEN_MID(40, 0), GEN_LIT(44, 0), FE_LIT(48, 0), FE(52, 0), FE_DARK(56, 0), BLADE(60, 0),
-        BLADE_BACK(0, 4),
-        GRATE(4, 4, 4, 4, Kind.TILED),
-        STRAP(8, 4, 4, 3, Kind.TILED),
-        VENT(12, 4, 4, 4, Kind.TILED),
-        PLATE(0, 8, 16, 16, true, Cuts.SPLIT, Cuts.CORNERS),
-        PLAIN(16, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),
-        DECK(32, 8, 16, 16, true, Cuts.RECESS, Cuts.RECESS),
-        FOOTING(48, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),
-        GEN_PLATE(64, 8, 16, 16, true, Cuts.SPLIT, Cuts.CORNERS),
-        GEN_PLAIN(80, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),
-        FE_BAND(96, 8, 16, 16, false, Cuts.THIN, Cuts.THIN),
-        GLASS(112, 8, 12, 12, false, new int[][] { { 5, 0 }, { 2, 100 }, { 5, 0 } }, new int[][] { { 5, 0 }, { 2, 100 }, { 5, 0 } }),
-        CASING_0(0, 24, 8, 12, false, Cuts.STRIP_ACROSS, Cuts.STRIP_ALONG),
-        CASING_1(8, 24, 8, 12, false, Cuts.STRIP_ACROSS, Cuts.STRIP_ALONG),
-        CASING_2(16, 24, 8, 12, false, Cuts.STRIP_ACROSS, Cuts.STRIP_ALONG),
-        CASING_3(24, 24, 8, 12, false, Cuts.STRIP_ACROSS, Cuts.STRIP_ALONG),
-        CASING_4(32, 24, 8, 12, false, Cuts.STRIP_ACROSS, Cuts.STRIP_ALONG),
-        CASING_5(40, 24, 8, 12, false, Cuts.STRIP_ACROSS, Cuts.STRIP_ALONG),
-        // Markers: tones by facing (pipes, bosses, valve bodies), or the casing strips by facing (the casings' shells).
-        BANDED(0, 0, 0, 0, Kind.BANDED),
-        CASING(0, 0, 0, 0, Kind.BANDED);
-
-        public final int x, y, w, h;
-        public final Kind kind;
-        // Riveted panels drop to their plain panel on faces under 9 px.
-        public final boolean riveted;
-        // Columns and rows (rows top down): {texels, stretch weight}, weight 0 for fixed.
-        final int[][] cols, rows;
-
-        Paint(int x, int y) {
-            this(x, y, 4, 4, Kind.FLAT);
-        }
-
-        Paint(int x, int y, int w, int h, Kind kind) {
-            this(x, y, w, h, kind, false, new int[0][], new int[0][]);
-        }
-
-        Paint(int x, int y, int w, int h, boolean riveted, int[][] cols, int[][] rows) {
-            this(x, y, w, h, Kind.PANEL, riveted, cols, rows);
-        }
-
-        Paint(int x, int y, int w, int h, Kind kind, boolean riveted, int[][] cols, int[][] rows) {
-            this.x = x;
-            this.y = y;
-            this.w = w;
-            this.h = h;
-            this.kind = kind;
-            this.riveted = riveted;
-            this.cols = cols;
-            this.rows = rows;
-        }
-
-        // What a face too small for this panel uses instead: the plain panel, then a flat tone.
-        Paint fallback() {
-            return switch (this) {
-                case PLATE, DECK -> PLAIN;
-                case PLAIN -> FACE;
-                case FOOTING -> SHADE;
-                case GEN_PLATE -> GEN_PLAIN;
-                case GEN_PLAIN -> GEN_FACE;
-                case FE_BAND -> FE;
-                case GLASS -> LIT;
-                case CASING_0 -> DARK;
-                case CASING_1 -> SHADE;
-                case CASING_2 -> FACE_SHADE;
-                case CASING_3 -> FACE;
-                case CASING_4 -> MID;
-                case CASING_5 -> LIT;
-                default -> FACE;
-            };
-        }
-
-        // The least a face needs across (or down) for this panel: its fixed texels and a pixel for each stretch.
-        float least(boolean across) {
-            float least = 0.0F;
-            for (int[] segment : across ? cols : rows) {
-                least += segment[1] == 0 ? segment[0] : 1.0F;
-            }
-            return least;
-        }
-    }
-
-    // The band tones, darkest first, and the casing strips in the same order.
-    private static final Paint[] TONES = { Paint.DARK, Paint.SHADE, Paint.FACE_SHADE, Paint.FACE, Paint.MID, Paint.LIT };
-    private static final Paint[] STRIPS = { Paint.CASING_0, Paint.CASING_1, Paint.CASING_2, Paint.CASING_3, Paint.CASING_4, Paint.CASING_5 };
-    // The light the bands are painted for (in the turbine's frame): from above, a little toward x = 0 and the steam end.
-    private static final float[] LIGHT = normalize(new float[] { -0.35F, 0.85F, -0.4F });
-
-    // The panel cuts (in a class of their own, so Paint can use them while it's being set up).
-    private static final class Cuts {
-        private Cuts() {}
-
-        static final int[][] SPLIT = { { 4, 0 }, { 6, 60 }, { 2, 40 }, { 4, 0 } };
-        static final int[][] CORNERS = { { 4, 0 }, { 8, 100 }, { 4, 0 } };
-        static final int[][] SPLIT_PLAIN = { { 2, 0 }, { 8, 60 }, { 4, 40 }, { 2, 0 } };
-        static final int[][] EDGES = { { 2, 0 }, { 12, 100 }, { 2, 0 } };
-        static final int[][] RECESS = { { 5, 0 }, { 6, 100 }, { 5, 0 } };
-        static final int[][] THIN = { { 1, 0 }, { 14, 100 }, { 1, 0 } };
-        static final int[][] STRIP_ACROSS = { { 3, 50 }, { 1, 0 }, { 4, 50 } };
-        static final int[][] STRIP_ALONG = { { 4, 0 }, { 4, 100 }, { 4, 0 } };
-    }
-
-    // A port on the structure: its block (along, up, across) and the face it's on, as a unit normal in the turbine's
-    // frame (x, y, u).
-    public record Port(int u, int y, int x, int nx, int ny, int nu) {}
-
     private final TurbineLayout layout;
-    private final boolean alongX;
-    private final float widthPx;
-    private Floats solid = new Floats(), cutout = new Floats();
-    // While building the rotor: its angle (radians) about the shaft.
-    private boolean rotating;
-    private double cos = 1.0, sin = 0.0;
-    // What the nozzles stop at: boxes {x0, y0, u0, x1, y1, u1} and cylinders along u {cx, cy, r, u0, u1}.
-    private final List<float[]> solidBoxes = new ArrayList<>();
-    private final List<float[]> solidCylinders = new ArrayList<>();
 
     public TurbineMesh(TurbineLayout layout, boolean alongX) {
+        super(alongX, false, layout.widthPx(), layout.lengthPx(), layout.shaftX(), layout.shaftY(), SHEET_W, SHEET_H);
         this.layout = layout;
-        this.alongX = alongX;
-        this.widthPx = layout.widthPx();
+        this.broadShading = true;
     }
 
     // --- The model ---
 
     // The still parts and the nozzles of these ports: {solid, cutout}.
     public float[][] buildStatic(List<Port> ports) {
-        solid = new Floats();
-        cutout = new Floats();
-        rotating = false;
-        solidBoxes.clear();
-        solidCylinders.clear();
+        startStatic();
         plinth();
         if (layout.walkway() != null) {
             walkway(layout.walkway());
         }
-        for (int i = 0; i < layout.gaps().size(); i++) {
-            pedestal(i);
+        for (TurbineLayout.Box pedestal : layout.pedestals()) {
+            pedestalAt(pedestal.u0(), pedestal.u1(), pedestal.x1() - pedestal.x0());
         }
         for (TurbineLayout.Casing casing : layout.casings()) {
             casing(casing);
         }
         steamEnd();
-        exhaustNeck();
+        for (TurbineLayout.Box neck : layout.exhaustNecks()) {
+            exhaustNeck(neck);
+        }
         if (layout.crossover() != null) {
             crossover(layout.crossover());
         }
@@ -203,21 +68,22 @@ public final class TurbineMesh {
     // The parts that turn with the rotor (shaft, couplings, the drums and blades seen through the windows), at angle
     // degrees.
     public float[] buildRotor(float angle) {
-        solid = new Floats();
-        cutout = new Floats();
-        rotating = true;
-        cos = Math.cos(Math.toRadians(angle));
-        sin = Math.sin(Math.toRadians(angle));
+        startRotor(angle);
         float sx = layout.shaftX(), sy = layout.shaftY(), r = layout.shaftRadius();
-        // The shaft, from the front standard into the generator.
+        // The shaft, from the front standard into the generator, and on into the exciter.
         prismU(sx, sy, new float[][] { { 1.5F, r }, { layout.generator().u0() + 3.0F, r } }, PIPE_SIDES, 0.0, Paint.MID, Paint.MID, Paint.MID, null);
-        // A coupling in each gap after the first, on the side toward the next section.
+        TurbineLayout.Span exciter = layout.exciter();
+        if (exciter != null) {
+            prismU(sx, sy, new float[][] { { layout.generator().u1() - 1.0F, r }, { exciter.u0() + 1.0F, r } }, PIPE_SIDES, 0.0, Paint.MID, Paint.MID, Paint.MID, null);
+        }
+        // A coupling in each gap after the first, between its two bearing pedestals.
         List<TurbineLayout.Span> gaps = layout.gaps();
         for (int i = 1; i < gaps.size(); i++) {
             TurbineLayout.Span gap = gaps.get(i);
             boolean generator = i == gaps.size() - 1;
             float cr = r * (generator ? 2.8F : 2.3F);
-            float c1 = gap.u1() - 1.0F, c0 = c1 - (generator ? 3.0F : 2.0F);
+            float half = layout.couplingHalf(i);
+            float c0 = gap.middle() - half, c1 = gap.middle() + half;
             prismU(sx, sy, new float[][] { { c0, cr }, { c1, cr } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.FACE, Paint.MID, Paint.SHADE, null);
             // Bolt heads on the coupling's face toward the pedestal, so its turning shows.
             int bolts = generator ? 6 : 4;
@@ -228,7 +94,9 @@ public final class TurbineMesh {
             }
         }
         for (TurbineLayout.Casing casing : layout.casings()) {
-            rotorInWindow(casing);
+            for (TurbineLayout.Span window : casing.windows()) {
+                rotorInWindow(casing, window);
+            }
         }
         return solid.toArray();
     }
@@ -244,18 +112,8 @@ public final class TurbineMesh {
             deckSlab(0.0F, neck.u1(), w, t);
             deckSlab(0.0F, neck.u0(), neck.x0(), neck.u1());
             deckSlab(neck.x1(), neck.u0(), w, neck.u1());
-            float cw = Math.clamp(2.0F * Math.round(w * 0.075F), 6.0F, 12.0F);
-            List<Float> stations = new ArrayList<>();
-            for (TurbineLayout.Span gap : layout.gaps()) {
-                stations.add(gap.middle());
-            }
-            stations.add(layout.generator().u1() - 5.0F);
-            for (float station : stations) {
-                float cl = Math.min(8.0F, cw);
-                float u0 = Math.clamp(station - cl / 2.0F, 2.0F, t - 2.0F - cl);
-                for (float x0 : new float[] { 2.0F, w - 2.0F - cw }) {
-                    column(x0, u0, cw, cl, foot);
-                }
+            for (TurbineLayout.Box column : layout.columns()) {
+                column(column.x0(), column.u0(), column.x1() - column.x0(), column.u1() - column.u0(), foot);
             }
             solidBoxes.add(new float[] { 0, foot, 0, w, deck, t });
         } else {
@@ -275,10 +133,13 @@ public final class TurbineMesh {
         }
         float foot = layout.footingTop(), deck = layout.deckTop();
         box(x0, foot, u0, x1, deck, u1, Paint.STRAP, null, Paint.FOOTING, SKIP_UP);
-        for (float u = u0; u < u1 - 0.01F; u += PX) {
-            float end = Math.min(u1, (float) Math.floor(u / PX) * PX + PX);
-            face(new float[] { x0, deck, end }, new float[] { 1, 0, 0 }, new float[] { 0, 0, -1 }, x1 - x0, end - u, Paint.DECK, false);
-            u = end - PX;
+        // The deck top: one broad-shaded face, with a plate seam (a deepest line, then a lit one) across it every
+        // block.
+        face(new float[] { x0, deck, u1 }, new float[] { 1, 0, 0 }, new float[] { 0, 0, -1 }, x1 - x0, u1 - u0, Paint.DECK, false);
+        for (float u = (float) Math.ceil(u0 / PX + 0.01F) * PX; u < u1 - 1.5F; u += PX) {
+            float lift = deck + 0.02F;
+            face(new float[] { x0, lift, u + 0.5F }, new float[] { 1, 0, 0 }, new float[] { 0, 0, -1 }, x1 - x0, 0.5F, Paint.DEEP, false);
+            face(new float[] { x0, lift, u + 1.0F }, new float[] { 1, 0, 0 }, new float[] { 0, 0, -1 }, x1 - x0, 0.5F, Paint.MID, false);
         }
     }
 
@@ -309,24 +170,8 @@ public final class TurbineMesh {
 
     // --- The turbine ---
 
-    // A bearing pedestal in gap i, with its bearing cap on top.
-    private void pedestal(int i) {
-        TurbineLayout.Span gap = layout.gaps().get(i);
-        List<TurbineLayout.Casing> casings = layout.casings();
-        float neighbour = casings.get(Math.min(i, casings.size() - 1)).diameter();
-        if (i > 0) {
-            neighbour = Math.min(neighbour, casings.get(i - 1).diameter());
-        }
-        float pw = Math.clamp(2.0F * Math.round(neighbour * 0.45F / 2.0F), 8.0F, 20.0F);
-        float u0, u1;
-        if (i == 0) {
-            u0 = gap.u0() + 1.0F;
-            u1 = gap.u1() - 1.0F;
-        } else {
-            float p = Math.max(4.0F, Math.round(gap.length() * 0.45F));
-            u0 = gap.u0() + 1.0F;
-            u1 = u0 + p;
-        }
+    // A bearing pedestal (see TurbineLayout.pedestals), with its bearing cap on top.
+    private void pedestalAt(float u0, float u1, float pw) {
         float sx = layout.shaftX(), sy = layout.shaftY();
         float top = sy + layout.shaftRadius() + 2.0F;
         box(sx - pw / 2.0F, layout.deckTop(), u0, sx + pw / 2.0F, top, u1, Paint.PLATE, Paint.PLAIN, null, 0);
@@ -336,28 +181,30 @@ public final class TurbineMesh {
     }
 
     // A casing: the round shell split along the middle by a bolted flange, hoops where its ends taper, its end rings,
-    // and an inspection window on each side (glass over a dark inside; the rotor in it is drawn with the rotor).
+    // and its inspection windows on both upper sides (glazed facet by facet over its inside; the rotor in them is drawn
+    // with the rotor).
     private void casing(TurbineLayout.Casing casing) {
         float sx = layout.shaftX(), sy = layout.shaftY();
         float[][] profile = casing.profile();
-        TurbineLayout.Span window = casing.window();
-        boolean hasWindow = window.length() > 0.0F;
-        // Cut the full-radius part at the window's ends.
+        // Cut the full-radius part at each window's ends.
         List<float[]> points = new ArrayList<>(Arrays.asList(profile));
-        if (hasWindow) {
-            points.add(2, new float[] { window.u0(), casing.radius() });
-            points.add(3, new float[] { window.u1(), casing.radius() });
+        List<Integer> windowSegments = new ArrayList<>();
+        int at = 2;
+        for (TurbineLayout.Span window : casing.windows()) {
+            points.add(at, new float[] { window.u0(), casing.radius() });
+            points.add(at + 1, new float[] { window.u1(), casing.radius() });
+            windowSegments.add(at);
+            at += 2;
         }
         float[][] cut = points.toArray(new float[0][]);
-        int windowSegment = hasWindow ? 2 : -1;
-        prismU(sx, sy, cut, SIDES, 0.0, Paint.CASING, null, null,
-                (segment, facet) -> segment == windowSegment && isWindowFacet(facet));
+        prismU(sx, sy, cut, SIDES_CASING, 0.0, Paint.CASING, null, null,
+                (segment, facet) -> windowSegments.contains(segment) && isWindowFacet(facet));
         // The end rings round the shaft gland.
         float gland = layout.shaftRadius() + 1.5F;
-        ringU(sx, sy, profile[0][0], profile[0][1], gland * 1.8F, SIDES, 0.0, false, Paint.FACE, Paint.SHADE);
-        ringU(sx, sy, profile[3][0], profile[3][1], gland * 1.8F, SIDES, 0.0, true, Paint.FACE, Paint.SHADE);
-        prismU(sx, sy, new float[][] { { profile[0][0] - 1.0F, gland * 1.8F }, { profile[0][0], gland * 1.8F } }, SIDES, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
-        prismU(sx, sy, new float[][] { { profile[3][0], gland * 1.8F }, { profile[3][0] + 1.0F, gland * 1.8F } }, SIDES, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
+        ringU(sx, sy, profile[0][0], profile[0][1], gland * 1.8F, SIDES_CASING, 0.0, false, Paint.FACE, Paint.SHADE);
+        ringU(sx, sy, profile[3][0], profile[3][1], gland * 1.8F, SIDES_CASING, 0.0, true, Paint.FACE, Paint.SHADE);
+        prismU(sx, sy, new float[][] { { profile[0][0] - 1.0F, gland * 1.8F }, { profile[0][0], gland * 1.8F } }, SIDES_CASING, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
+        prismU(sx, sy, new float[][] { { profile[3][0], gland * 1.8F }, { profile[3][0] + 1.0F, gland * 1.8F } }, SIDES_CASING, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
         // A bolt circle on each end ring.
         float ringIn = gland * 1.8F;
         for (int end = 0; end < 2; end++) {
@@ -375,21 +222,21 @@ public final class TurbineMesh {
         }
         // Hoops where the ends taper.
         for (float u : new float[] { profile[1][0], profile[2][0] }) {
-            prismU(sx, sy, new float[][] { { u - 1.0F, casing.radius() + 0.75F }, { u + 1.0F, casing.radius() + 0.75F } }, SIDES, 0.0,
+            prismU(sx, sy, new float[][] { { u - 1.0F, casing.radius() + 0.75F }, { u + 1.0F, casing.radius() + 0.75F } }, SIDES_CASING, 0.0,
                     Paint.BANDED, Paint.MID, Paint.SHADE, null);
         }
         flange(casing);
-        if (hasWindow) {
-            windowCavity(casing);
+        for (TurbineLayout.Span window : casing.windows()) {
+            windowCavity(casing, window);
         }
         for (int i = 0; i + 1 < profile.length; i++) {
-            float r = Math.min(profile[i][1], profile[i + 1][1]) * (float) Math.cos(Math.PI / SIDES);
+            float r = Math.min(profile[i][1], profile[i + 1][1]) * (float) Math.cos(Math.PI / SIDES_CASING);
             solidCylinders.add(new float[] { sx, sy, r, profile[i][0], profile[i + 1][0] });
         }
     }
 
     private static boolean isWindowFacet(int facet) {
-        int half = SIDES / 2;
+        int half = SIDES_CASING / 2;
         return facet >= WINDOW_FIRST && facet <= WINDOW_LAST || facet >= half - 1 - WINDOW_LAST && facet <= half - 1 - WINDOW_FIRST;
     }
 
@@ -425,16 +272,15 @@ public final class TurbineMesh {
         }
     }
 
-    // Behind each window: the casing's inside wall and the window's two end walls, dark, and the glass on the chord
-    // across the two missing facets.
-    private void windowCavity(TurbineLayout.Casing casing) {
+    // Behind a window: the casing's inside wall and the window's two end walls, dark; a stage ring between each pair of
+    // blade rows (from just past the longer tips out to the wall); and the glass, a pane on each of the window's facets
+    // just inside the outer surface, each with its own frame and glints.
+    private void windowCavity(TurbineLayout.Casing casing, TurbineLayout.Span window) {
         float sx = layout.shaftX(), sy = layout.shaftY();
-        float r = casing.radius();
-        float inner = r - 0.5F;
-        TurbineLayout.Span window = casing.window();
-        double step = 2.0 * Math.PI / SIDES;
+        float inner = casing.innerRadius();
+        double step = 2.0 * Math.PI / SIDES_CASING;
         // The inside wall, facing in.
-        for (int facet = 0; facet < SIDES; facet++) {
+        for (int facet = 0; facet < SIDES_CASING; facet++) {
             double a0 = facet * step, a1 = (facet + 1) * step;
             float[] p0 = { sx + (float) Math.cos(a0) * inner, sy + (float) Math.sin(a0) * inner, window.u0() };
             float[] p1 = { sx + (float) Math.cos(a1) * inner, sy + (float) Math.sin(a1) * inner, window.u0() };
@@ -443,19 +289,37 @@ public final class TurbineMesh {
             flat(p3, p2, p1, p0, Paint.DARK, false);
         }
         // The end walls, facing into the window.
-        ringU(sx, sy, window.u0(), inner, 0.0F, SIDES, 0.0, true, Paint.DEEP, Paint.DEEP);
-        ringU(sx, sy, window.u1(), inner, 0.0F, SIDES, 0.0, false, Paint.DEEP, Paint.DEEP);
-        // The glass.
-        for (int side = 0; side < 2; side++) {
-            double a0 = side == 0 ? WINDOW_FIRST * step : (SIDES / 2 - 1 - WINDOW_LAST) * step;
-            double a1 = side == 0 ? (WINDOW_LAST + 1) * step : (SIDES / 2 - WINDOW_FIRST) * step;
-            float[] low = { sx + (float) Math.cos(side == 0 ? a0 : a1) * r, sy + (float) Math.sin(side == 0 ? a0 : a1) * r };
-            float[] high = { sx + (float) Math.cos(side == 0 ? a1 : a0) * r, sy + (float) Math.sin(side == 0 ? a1 : a0) * r };
+        ringU(sx, sy, window.u0(), inner, 0.0F, SIDES_CASING, 0.0, true, Paint.DEEP, Paint.DEEP);
+        ringU(sx, sy, window.u1(), inner, 0.0F, SIDES_CASING, 0.0, false, Paint.DEEP, Paint.DEEP);
+        // The stage rings.
+        int rows = rowsIn(casing, window);
+        float pitch = window.length() / rows;
+        for (int i = 1; i < rows; i++) {
+            float u = window.u0() + pitch * i;
+            float tip = Math.max(casing.tipAt(u - pitch / 2.0F), casing.tipAt(u + pitch / 2.0F));
+            float in = tip / TurbineLayout.CASING_APOTHEM + 0.5F, out = inner - 0.05F;
+            if (out - in < 0.4F) {
+                continue;
+            }
+            ringU(sx, sy, u - 0.25F, out, in, SIDES_CASING, 0.0, false, Paint.MID, Paint.SHADE);
+            ringU(sx, sy, u + 0.25F, out, in, SIDES_CASING, 0.0, true, Paint.MID, Paint.SHADE);
+        }
+        // The glass: one pane per facet, at the glass radius, its texture's top toward the higher corner.
+        float g = casing.glassRadius();
+        for (int facet = 0; facet < SIDES_CASING; facet++) {
+            if (!isWindowFacet(facet)) {
+                continue;
+            }
+            double a0 = facet * step, a1 = (facet + 1) * step;
+            boolean rising = Math.sin(a1) > Math.sin(a0);
+            double lowA = rising ? a0 : a1, highA = rising ? a1 : a0;
+            float[] low = { sx + (float) Math.cos(lowA) * g, sy + (float) Math.sin(lowA) * g };
+            float[] high = { sx + (float) Math.cos(highA) * g, sy + (float) Math.sin(highA) * g };
             float[] up = { high[0] - low[0], high[1] - low[1], 0.0F };
             float height = (float) Math.hypot(up[0], up[1]);
             up[0] /= height;
             up[1] /= height;
-            // The window faces out from the shaft: right = up x normal.
+            // The pane faces out from the shaft: right = up x normal.
             float[] normal = { (float) Math.cos((a0 + a1) / 2.0), (float) Math.sin((a0 + a1) / 2.0), 0.0F };
             float[] right = cross(up, normal);
             float[] origin = right[2] > 0 ? new float[] { low[0], low[1], window.u0() } : new float[] { low[0], low[1], window.u1() };
@@ -463,26 +327,39 @@ public final class TurbineMesh {
         }
     }
 
-    // The blades and drum seen through a casing's windows: rows across the window, each a little longer than the last
-    // as the pressure drops, neighbouring rows offset by half a blade.
-    private void rotorInWindow(TurbineLayout.Casing casing) {
-        TurbineLayout.Span window = casing.window();
-        if (window.length() <= 0.0F) {
-            return;
+    // How many blade rows a window shows: the casing's rows, shared among its windows by length.
+    private static int rowsIn(TurbineLayout.Casing casing, TurbineLayout.Span window) {
+        float total = 0.0F;
+        for (TurbineLayout.Span each : casing.windows()) {
+            total += each.length();
         }
-        float sx = layout.shaftX(), sy = layout.shaftY(), r = casing.radius() - 0.5F;
-        float hub = r * casing.hub();
+        return Math.max(2, Math.round(casing.bladeRows() * window.length() / Math.max(total, 0.01F)));
+    }
+
+    // The bladed rotor seen through a window: the hub drum, and in each row a disc carrying a dense ring of blades, each
+    // row's blades a little longer as the pressure drops (to the casing's tipAt), neighbouring rows offset by half a
+    // blade.
+    private void rotorInWindow(TurbineLayout.Casing casing, TurbineLayout.Span window) {
+        float sx = layout.shaftX(), sy = layout.shaftY();
+        float hub = casing.hubRadius();
+        float disc = Math.max(hub + 0.75F, hub * 1.15F);
         prismU(sx, sy, new float[][] { { window.u0(), hub }, { window.u1(), hub } }, 12, 0.0, Paint.MID, Paint.MID, Paint.MID, null);
-        int rows = casing.bladeRows();
+        int rows = rowsIn(casing, window);
         float pitch = window.length() / rows;
-        float chord = Math.clamp(pitch * 0.55F, 1.0F, 3.0F);
+        float chord = Math.clamp(pitch * 0.55F, 0.75F, 2.5F);
+        float discHalf = Math.min(0.5F, pitch * 0.15F);
+        int blades = casing.blades();
         for (int row = 0; row < rows; row++) {
             float u = window.u0() + pitch * (row + 0.5F);
-            float tip = r * casing.tipShare(row);
-            double offset = (row % 2) * Math.PI / casing.blades();
-            for (int b = 0; b < casing.blades(); b++) {
-                double a = 2.0 * Math.PI * b / casing.blades() + offset;
-                blade(sx, sy, u, (float) a, hub, tip, chord);
+            prismU(sx, sy, new float[][] { { u - discHalf, disc }, { u + discHalf, disc } }, 12, 0.0, Paint.FACE, Paint.MID, Paint.SHADE, null);
+            float tip = casing.tipAt(u);
+            if (tip - disc < 1.0F) {
+                continue;
+            }
+            double offset = (row % 2) * Math.PI / blades;
+            for (int b = 0; b < blades; b++) {
+                double a = 2.0 * Math.PI * b / blades + offset;
+                blade(sx, sy, u, (float) a, disc, tip, chord);
             }
         }
     }
@@ -527,36 +404,61 @@ public final class TurbineMesh {
         }
     }
 
-    // The exhaust neck under the last casing, down to the deck (or on between the columns, with a flange at its foot).
-    private void exhaustNeck() {
-        TurbineLayout.Box neck = layout.exhaustNeck();
-        box(neck.x0(), neck.y0(), neck.u0(), neck.x1(), neck.y1(), neck.u1(), Paint.PLATE, null, Paint.PLAIN, 0);
+    // An exhaust neck under a low-pressure casing, down to the deck (or on between the columns, with a flange at its
+    // foot): built of 2 px columns, each up to where the casing's underside is lowest over it, so it meets the casing
+    // without entering it.
+    private void exhaustNeck(TurbineLayout.Box neck) {
+        float sx = layout.shaftX(), sy = layout.shaftY();
+        TurbineLayout.Casing over = casingAt((neck.u0() + neck.u1()) / 2.0F);
+        float r = over != null ? over.radius() : 0.0F;
+        int columns = Math.max(1, Math.round((neck.x1() - neck.x0()) / 2.0F));
+        float cw = (neck.x1() - neck.x0()) / columns;
+        for (int c = 0; c < columns; c++) {
+            float x0 = neck.x0() + c * cw, x1 = x0 + cw;
+            float nearest = x0 <= sx && x1 >= sx ? 0.0F : Math.min(Math.abs(x0 - sx), Math.abs(x1 - sx));
+            float top = over != null ? sy + TurbineLayout.underside(r, nearest) : neck.y1();
+            int skip = (c > 0 ? SKIP_NEG_X : 0) | (c < columns - 1 ? SKIP_POS_X : 0);
+            box(x0, neck.y0(), neck.u0(), x1, top, neck.u1(), Paint.PLATE, null, Paint.PLAIN, skip);
+        }
         float flangeY = layout.hasColumns() ? neck.y0() : layout.deckTop();
         box(neck.x0() - 1.0F, flangeY, neck.u0() - 1.0F, neck.x1() + 1.0F, flangeY + 2.0F, neck.u1() + 1.0F, Paint.PLAIN, Paint.MID, Paint.PLAIN, 0);
         solidBoxes.add(new float[] { neck.x0() - 1.0F, neck.y0(), neck.u0() - 1.0F, neck.x1() + 1.0F, neck.y1(), neck.u1() + 1.0F });
     }
 
-    // The crossover: up out of the intermediate casing, along over the low-pressure casing and down into it, with
-    // elbows and flanged joints.
+    private TurbineLayout.@Nullable Casing casingAt(float u) {
+        for (TurbineLayout.Casing casing : layout.casings()) {
+            if (casing.span().contains(u)) {
+                return casing;
+            }
+        }
+        return null;
+    }
+
+    // The crossover: up out of the intermediate casing, along over the low-pressure casings and down into each, with an
+    // elbow at each end of the run, a tee over each drop between, and flanged joints.
     private void crossover(TurbineLayout.Crossover pipe) {
         float sx = layout.shaftX(), r = pipe.diameter() / 2.0F, flange = r + 1.0F;
+        float last = pipe.dropU();
         prismY(sx, pipe.riseU(), pipe.baseY(), pipe.runY() - r, r, Paint.BANDED, Paint.MID);
-        prismY(sx, pipe.dropU(), pipe.dropY(), pipe.runY() - r, r, Paint.BANDED, Paint.MID);
-        prismU(sx, pipe.runY(), new float[][] { { pipe.riseU() + r, r }, { pipe.dropU() - r, r } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, Paint.MID, Paint.SHADE, null);
-        for (float u : new float[] { pipe.riseU(), pipe.dropU() }) {
-            box(sx - r - 0.5F, pipe.runY() - r - 0.5F, u - r - 0.5F, sx + r + 0.5F, pipe.runY() + r + 0.5F, u + r + 0.5F, Paint.PLATE, Paint.PLATE, Paint.PLAIN, 0);
-            // Flanged joints: where it leaves the casing, under the elbow, and beside it along the run.
-            float base = u == pipe.riseU() ? pipe.baseY() + 2.0F : pipe.dropY() + 2.0F;
-            prismY(sx, u, base, base + 1.5F, flange, Paint.MID, Paint.LIT);
-            prismY(sx, u, pipe.runY() - r - 2.5F, pipe.runY() - r - 1.0F, flange, Paint.MID, Paint.LIT);
-            float side = u == pipe.riseU() ? 1.0F : -1.0F;
-            float joint = u + side * (r + 1.0F);
-            prismU(sx, pipe.runY(), new float[][] { { Math.min(joint, joint + side * 1.5F), flange }, { Math.max(joint, joint + side * 1.5F), flange } },
-                    PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.MID, Paint.LIT, Paint.SHADE, null);
+        prismU(sx, pipe.runY(), new float[][] { { pipe.riseU() + r, r }, { last - r, r } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, Paint.MID, Paint.SHADE, null);
+        List<Float> joints = new ArrayList<>();
+        joints.add(pipe.riseU());
+        for (float drop : pipe.dropUs()) {
+            joints.add(drop);
         }
-        solidBoxes.add(new float[] { sx - r, pipe.baseY(), pipe.riseU() - r, sx + r, pipe.runY() + r, pipe.riseU() + r });
-        solidBoxes.add(new float[] { sx - r, pipe.dropY(), pipe.dropU() - r, sx + r, pipe.runY() + r, pipe.dropU() + r });
-        solidBoxes.add(new float[] { sx - r, pipe.runY() - r, pipe.riseU(), sx + r, pipe.runY() + r, pipe.dropU() });
+        for (float u : joints) {
+            boolean rise = u == pipe.riseU();
+            float base = rise ? pipe.baseY() : pipe.dropY();
+            if (!rise) {
+                prismY(sx, u, base, pipe.runY() - r, r, Paint.BANDED, Paint.MID);
+            }
+            box(sx - r - 0.5F, pipe.runY() - r - 0.5F, u - r - 0.5F, sx + r + 0.5F, pipe.runY() + r + 0.5F, u + r + 0.5F, Paint.PLATE, Paint.PLATE, Paint.PLAIN, 0);
+            // Flanged joints: just above the casing, and under the elbow or tee.
+            prismY(sx, u, base + 2.0F, base + 3.5F, flange, Paint.MID, Paint.LIT);
+            prismY(sx, u, pipe.runY() - r - 2.5F, pipe.runY() - r - 1.0F, flange, Paint.MID, Paint.LIT);
+            solidBoxes.add(new float[] { sx - r, base, u - r, sx + r, pipe.runY() + r, u + r });
+        }
+        solidBoxes.add(new float[] { sx - r, pipe.runY() - r, pipe.riseU(), sx + r, pipe.runY() + r, last });
     }
 
     // The generator: a sole plate, the housing in the lighter steel with cooling ribs up its sides and over its top, an
@@ -598,473 +500,18 @@ public final class TurbineMesh {
         }
         solidBoxes.add(new float[] { sx - half - 1.0F, deck, span.u0(), sx + half + 1.0F, top, span.u1() });
         solidBoxes.add(new float[] { terminal.x0(), terminal.y0(), terminal.u0(), terminal.x1(), terminal.y1(), terminal.u1() });
-    }
-
-    // --- Port nozzles ---
-
-    // A port's collar: from the model out to the port's face (where the block model draws its plate), straight in along
-    // the face's normal to the first part it meets. One that would meet nothing runs in a block and turns down.
-    private void nozzle(Port port) {
-        float[] n = { port.nx(), port.ny(), port.nu() };
-        float[] centre = { (port.x() + 0.5F + port.nx() * 0.5F) * PX, (port.y() + 0.5F + port.ny() * 0.5F) * PX, (port.u() + 0.5F + port.nu() * 0.5F) * PX };
-        float[] in = { -n[0], -n[1], -n[2] };
-        float depth = collarDepth(centre, in);
-        if (depth >= 0.0F) {
-            if (depth > 0.01F) {
-                collar(centre, in, depth, true);
+        TurbineLayout.Span exciter = layout.exciter();
+        if (exciter != null) {
+            // The exciter: a smaller housing on its own sole plate beyond the generator, ribbed like it.
+            TurbineLayout.Box housing = Objects.requireNonNull(layout.exciterHousing());
+            float eh = housing.x1() - sx, etop = housing.y1();
+            box(sx - eh - 1.0F, deck, exciter.u0(), sx + eh + 1.0F, deck + 2.0F, exciter.u1(), Paint.FOOTING, Paint.FOOTING, null, 0);
+            box(sx - eh, deck + 2.0F, exciter.u0() + 0.5F, sx + eh, etop, exciter.u1(), Paint.GEN_PLATE, Paint.GEN_PLATE, null, 0);
+            for (float u = exciter.u0() + 3.0F; u <= exciter.u1() - 2.0F; u += 4.0F) {
+                box(sx - eh - 0.75F, deck + 4.0F, u, sx - eh, etop, u + 1.0F, Paint.GEN_MID, Paint.GEN_LIT, Paint.GEN_DARK, 0);
+                box(sx + eh, deck + 4.0F, u, sx + eh + 0.75F, etop, u + 1.0F, Paint.GEN_MID, Paint.GEN_LIT, Paint.GEN_DARK, 0);
             }
-            return;
-        }
-        if (port.ny() < 0 || port.ny() > 0) {
-            return;
-        }
-        float run = PX;
-        collar(centre, in, run + COLLAR / 2.0F, true);
-        float[] elbow = { centre[0] + in[0] * run, centre[1], centre[2] + in[2] * run };
-        float h = COLLAR / 2.0F + 0.5F;
-        box(elbow[0] - h, elbow[1] - h, elbow[2] - h, elbow[0] + h, elbow[1] + h, elbow[2] + h, Paint.PLAIN, Paint.PLAIN, Paint.PLAIN, 0);
-        float[] down = { 0, -1, 0 };
-        float[] start = { elbow[0], elbow[1] - h, elbow[2] };
-        float drop = collarDepth(start, down);
-        if (drop > 0.01F) {
-            collar(start, down, drop, false);
-        }
-    }
-
-    // How far along dir from the face point the model's surface is under the whole collar (the farthest of its corners,
-    // so no edge ends in the air), or under its middle when a corner misses; -1 when the middle misses too.
-    private float collarDepth(float[] point, float[] dir) {
-        float middle = ray(point, dir);
-        if (middle < 0.0F) {
-            return -1.0F;
-        }
-        float[][] axes = across(dir);
-        float deepest = middle;
-        float h = COLLAR / 2.0F - 0.5F;
-        for (int i = 0; i < 4; i++) {
-            float su = (i & 1) == 0 ? -h : h, sv = (i & 2) == 0 ? -h : h;
-            float[] corner = { point[0] + axes[0][0] * su + axes[1][0] * sv, point[1] + axes[0][1] * su + axes[1][1] * sv, point[2] + axes[0][2] * su + axes[1][2] * sv };
-            float hit = ray(corner, dir);
-            if (hit < 0.0F) {
-                return middle;
-            }
-            deepest = Math.max(deepest, hit);
-        }
-        return Math.min(deepest + 0.5F, middle + 6.0F);
-    }
-
-    // The nearest solid along an axis-aligned ray, or -1.
-    private float ray(float[] p, float[] dir) {
-        int axis = dir[0] != 0 ? 0 : dir[1] != 0 ? 1 : 2;
-        float sign = dir[axis];
-        float best = Float.MAX_VALUE;
-        for (float[] b : solidBoxes) {
-            boolean inside = true;
-            for (int k = 0; k < 3; k++) {
-                if (k != axis && !(p[k] > b[k] && p[k] < b[k + 3])) {
-                    inside = false;
-                }
-            }
-            if (!inside) {
-                continue;
-            }
-            float near = sign > 0 ? b[axis] - p[axis] : p[axis] - b[axis + 3];
-            float far = sign > 0 ? b[axis + 3] - p[axis] : p[axis] - b[axis];
-            if (far > 0.0F) {
-                best = Math.min(best, Math.max(0.0F, near));
-            }
-        }
-        for (float[] c : solidCylinders) {
-            float cx = c[0], cy = c[1], r = c[2];
-            if (axis == 2) {
-                float dx = p[0] - cx, dy = p[1] - cy;
-                if (dx * dx + dy * dy < r * r) {
-                    float near = sign > 0 ? c[3] - p[2] : p[2] - c[4];
-                    float far = sign > 0 ? c[4] - p[2] : p[2] - c[3];
-                    if (far > 0.0F) {
-                        best = Math.min(best, Math.max(0.0F, near));
-                    }
-                }
-                continue;
-            }
-            if (p[2] <= c[3] || p[2] >= c[4]) {
-                continue;
-            }
-            float offset = axis == 0 ? p[1] - cy : p[0] - cx;
-            if (Math.abs(offset) >= r) {
-                continue;
-            }
-            float reach = (float) Math.sqrt(r * r - offset * offset);
-            float centre = axis == 0 ? cx : cy;
-            float near = sign > 0 ? centre - reach - p[axis] : p[axis] - (centre + reach);
-            float far = sign > 0 ? centre + reach - p[axis] : p[axis] - (centre - reach);
-            if (far > 0.0F) {
-                best = Math.min(best, Math.max(0.0F, near));
-            }
-        }
-        return best == Float.MAX_VALUE ? -1.0F : best;
-    }
-
-    // The two directions across an axis-aligned direction.
-    private static float[][] across(float[] dir) {
-        if (dir[0] != 0) {
-            return new float[][] { { 0, 1, 0 }, { 0, 0, 1 } };
-        }
-        if (dir[1] != 0) {
-            return new float[][] { { 1, 0, 0 }, { 0, 0, 1 } };
-        }
-        return new float[][] { { 1, 0, 0 }, { 0, 1, 0 } };
-    }
-
-    // A collar COLLAR px across from point along dir for length px; its end at point is left open when that's the port's
-    // face (the block model's plate covers it).
-    private void collar(float[] point, float[] dir, float length, boolean openStart) {
-        float h = COLLAR / 2.0F;
-        float[] min = new float[3], max = new float[3];
-        for (int k = 0; k < 3; k++) {
-            float a = point[k], b = point[k] + dir[k] * length;
-            min[k] = dir[k] != 0 ? Math.min(a, b) : a - h;
-            max[k] = dir[k] != 0 ? Math.max(a, b) : a + h;
-        }
-        int skip = 0;
-        if (openStart) {
-            int axis = dir[0] != 0 ? 0 : dir[1] != 0 ? 1 : 2;
-            // The face at point: the min face when dir points to +, else the max face.
-            skip = faceBit(axis, dir[axis] < 0);
-        }
-        box(min[0], min[1], min[2], max[0], max[1], max[2], Paint.PLAIN, Paint.PLAIN, Paint.PLAIN, skip);
-    }
-
-    // --- Building blocks ---
-
-    // Bits for box(): which faces to leave out.
-    private static final int SKIP_DOWN = 1, SKIP_UP = 2, SKIP_NEG_X = 4, SKIP_POS_X = 8, SKIP_NEG_U = 16, SKIP_POS_U = 32;
-
-    private static int faceBit(int axis, boolean positive) {
-        return switch (axis) {
-            case 0 -> positive ? SKIP_POS_X : SKIP_NEG_X;
-            case 1 -> positive ? SKIP_UP : SKIP_DOWN;
-            default -> positive ? SKIP_POS_U : SKIP_NEG_U;
-        };
-    }
-
-    // An axis-aligned box, its sides, top and bottom painted (null: the sides' paint; skip: faces left out).
-    private void box(float x0, float y0, float u0, float x1, float y1, float u1, Paint sides, @Nullable Paint top, @Nullable Paint bottom, int skip) {
-        if (x1 - x0 <= 0.001F || y1 - y0 <= 0.001F || u1 - u0 <= 0.001F) {
-            return;
-        }
-        Paint t = top != null ? top : sides, b = bottom != null ? bottom : sides;
-        float w = x1 - x0, h = y1 - y0, l = u1 - u0;
-        if ((skip & SKIP_UP) == 0) {
-            face(new float[] { x0, y1, u1 }, new float[] { 1, 0, 0 }, new float[] { 0, 0, -1 }, w, l, t, false);
-        }
-        if ((skip & SKIP_DOWN) == 0) {
-            face(new float[] { x0, y0, u0 }, new float[] { 1, 0, 0 }, new float[] { 0, 0, 1 }, w, l, b, false);
-        }
-        if ((skip & SKIP_POS_X) == 0) {
-            face(new float[] { x1, y0, u1 }, new float[] { 0, 0, -1 }, new float[] { 0, 1, 0 }, l, h, sides, false);
-        }
-        if ((skip & SKIP_NEG_X) == 0) {
-            face(new float[] { x0, y0, u0 }, new float[] { 0, 0, 1 }, new float[] { 0, 1, 0 }, l, h, sides, false);
-        }
-        if ((skip & SKIP_POS_U) == 0) {
-            face(new float[] { x0, y0, u1 }, new float[] { 1, 0, 0 }, new float[] { 0, 1, 0 }, w, h, sides, false);
-        }
-        if ((skip & SKIP_NEG_U) == 0) {
-            face(new float[] { x1, y0, u0 }, new float[] { -1, 0, 0 }, new float[] { 0, 1, 0 }, w, h, sides, false);
-        }
-    }
-
-    // A face w x h px from origin (its bottom-left seen from outside) along right and up (outside is right x up),
-    // painted to its size (see slab).
-    private void face(float[] origin, float[] right, float[] up, float w, float h, Paint paint, boolean glass) {
-        if (w <= 0.001F || h <= 0.001F) {
-            return;
-        }
-        slab(origin, at(origin, right, up, w, 0), at(origin, right, up, w, h), at(origin, right, up, 0, h), w, h, paint, glass);
-    }
-
-    // A quad p0 p1 p2 p3 (bottom-left, bottom-right, top-right, top-left seen from outside; it may be a trapezoid, as a
-    // tapering facet is) about w px across and h px up, painted to its size: a panel cut into its columns and rows (fixed
-    // ones at 1 texel per px, stretching bands sharing the rest), dropping to its fallback when the face is too small
-    // (and from riveted to plain under 9 px); a flat tone; or a tile laid at 1:1 from the top-left.
-    private void slab(float[] p0, float[] p1, float[] p2, float[] p3, float w, float h, Paint paint, boolean glass) {
-        Paint p = paint.kind == Kind.BANDED ? Paint.FACE : paint;
-        while (p.kind == Kind.PANEL && (w < p.least(true) || h < p.least(false) || p.riveted && Math.min(w, h) < 9.0F)) {
-            p = p.fallback();
-        }
-        switch (p.kind) {
-            case TILED -> {
-                for (float x = 0; x < w - 0.001F; x += p.w) {
-                    for (float y = 0; y < h - 0.001F; y += p.h) {
-                        float x1 = Math.min(w, x + p.w), y1 = Math.min(h, y + p.h);
-                        // Laid up from the bottom edge; a cut tile at the top keeps its top rows.
-                        float top0 = h - y1, top1 = h - y;
-                        cell(p0, p1, p2, p3, x / w, x1 / w, 1.0F - top1 / h, 1.0F - top0 / h, p, 0, 0, x1 - x, y1 - y, glass);
-                    }
-                }
-            }
-            case PANEL -> {
-                float[] xs = cuts(p.cols, w), ys = cuts(p.rows, h);
-                float tx = 0;
-                for (int i = 0; i < p.cols.length; i++) {
-                    float ty = 0;
-                    for (int j = 0; j < p.rows.length; j++) {
-                        // Rows run down from the top: row j spans ys[j]..ys[j + 1] from the top edge.
-                        cell(p0, p1, p2, p3, xs[i] / w, xs[i + 1] / w, 1.0F - ys[j + 1] / h, 1.0F - ys[j] / h, p,
-                                tx, ty, tx + p.cols[i][0], ty + p.rows[j][0], glass);
-                        ty += p.rows[j][0];
-                    }
-                    tx += p.cols[i][0];
-                }
-            }
-            default -> cell(p0, p1, p2, p3, 0, 1, 0, 1, p, 1, 1, 3, 3, glass);
-        }
-    }
-
-    // Where each column (or row) of a panel starts and ends across a face size px long: fixed ones at their texels, the
-    // stretching ones sharing the rest by weight.
-    private static float[] cuts(int[][] segments, float size) {
-        float fixed = 0, weight = 0;
-        for (int[] segment : segments) {
-            if (segment[1] == 0) {
-                fixed += segment[0];
-            } else {
-                weight += segment[1];
-            }
-        }
-        float spare = Math.max(0.0F, size - fixed);
-        float[] at = new float[segments.length + 1];
-        for (int i = 0; i < segments.length; i++) {
-            float length = segments[i][1] == 0 ? segments[i][0] : (weight > 0 ? spare * segments[i][1] / weight : 0);
-            at[i + 1] = at[i] + length;
-        }
-        // Rounding: the last edge is the face's.
-        at[segments.length] = size;
-        return at;
-    }
-
-    // One cell of a slab: the part between s0..s1 across and t0..t1 up (fractions, bilinear over the quad), showing
-    // the paint's texels tu0..tu1 across and tv0..tv1 down (tv0 at the cell's top).
-    private void cell(float[] p0, float[] p1, float[] p2, float[] p3, float s0, float s1, float t0, float t1, Paint paint,
-            float tu0, float tv0, float tu1, float tv1, boolean glass) {
-        if (s1 - s0 <= 1.0E-5F || t1 - t0 <= 1.0E-5F) {
-            return;
-        }
-        float[] bl = bilinear(p0, p1, p2, p3, s0, t0), br = bilinear(p0, p1, p2, p3, s1, t0);
-        float[] tr = bilinear(p0, p1, p2, p3, s1, t1), tl = bilinear(p0, p1, p2, p3, s0, t1);
-        float u0 = (paint.x + tu0) / SHEET_W, u1 = (paint.x + tu1) / SHEET_W, v0 = (paint.y + tv0) / SHEET_H, v1 = (paint.y + tv1) / SHEET_H;
-        quad(bl, br, tr, tl, new float[] { u0, v1, u1, v1, u1, v0, u0, v0 }, glass);
-    }
-
-    private static float[] bilinear(float[] p0, float[] p1, float[] p2, float[] p3, float s, float t) {
-        float[] out = new float[3];
-        for (int k = 0; k < 3; k++) {
-            float bottom = p0[k] + (p1[k] - p0[k]) * s, top = p3[k] + (p2[k] - p3[k]) * s;
-            out[k] = bottom + (top - bottom) * t;
-        }
-        return out;
-    }
-
-    private static float[] at(float[] origin, float[] right, float[] up, float x, float y) {
-        return new float[] { origin[0] + right[0] * x + up[0] * y, origin[1] + right[1] * x + up[1] * y, origin[2] + right[2] * x + up[2] * y };
-    }
-
-    // A quad in one paint, wound counter-clockwise seen from outside, its size taken from its edges.
-    private void flat(float[] p0, float[] p1, float[] p2, float[] p3, Paint paint, boolean glass) {
-        if (paint.kind == Kind.FLAT) {
-            cell(p0, p1, p2, p3, 0, 1, 0, 1, paint, 1, 1, 3, 3, glass);
-            return;
-        }
-        float w = (length(sub(p1, p0)) + length(sub(p2, p3))) / 2.0F, h = (length(sub(p3, p0)) + length(sub(p2, p1))) / 2.0F;
-        slab(p0, p1, p2, p3, w, h, paint, glass);
-    }
-
-    // The band tone (or casing strip) for a facet facing n.
-    private static Paint band(Paint marker, float[] n) {
-        float d = dot(normalize(n), LIGHT);
-        // The game shades faces turned away from the light as well, so the darkest band is never used on round parts.
-        int tone = d > 0.85F ? 5 : d > 0.55F ? 4 : d > 0.2F ? 3 : d > -0.2F ? 2 : 1;
-        return marker == Paint.CASING ? STRIPS[tone] : TONES[tone];
-    }
-
-    private static float length(float[] v) {
-        return (float) Math.sqrt(dot(v, v));
-    }
-
-    private static float[] normalize(float[] v) {
-        float l = (float) Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
-        return l < 1.0E-9F ? v : new float[] { v[0] / l, v[1] / l, v[2] / l };
-    }
-
-    // A flat quad wound to face along outward (whichever way its points were given).
-    private void orient(float[] p0, float[] p1, float[] p2, float[] p3, float[] outward, Paint given) {
-        Paint paint = given.kind == Kind.BANDED ? band(given, outward) : given;
-        float[] n = cross(sub(p2, p0), sub(p3, p1));
-        if (dot(n, outward) >= 0) {
-            flat(p0, p1, p2, p3, paint, false);
-        } else {
-            flat(p3, p2, p1, p0, paint, false);
-        }
-    }
-
-    // A polygon tube along u about (cx, cy): its outline as (u, radius) points, the facets painted side, and a ring cap
-    // on each end (lit / shade halves; none when they're null). skip leaves out facets (segment, facet).
-    private void prismU(float cx, float cy, float[][] profile, int sides, double start, Paint side, @Nullable Paint capLit,
-            @Nullable Paint capShade, @Nullable FacetFilter skip) {
-        double step = 2.0 * Math.PI / sides;
-        for (int i = 0; i + 1 < profile.length; i++) {
-            float ua = profile[i][0], ub = profile[i + 1][0], ra = profile[i][1], rb = profile[i + 1][1];
-            if (ub - ua <= 0.001F) {
-                continue;
-            }
-            for (int f = 0; f < sides; f++) {
-                if (skip != null && skip.skip(i, f)) {
-                    continue;
-                }
-                double a0 = start + f * step, a1 = a0 + step;
-                float[] p0 = { cx + (float) Math.cos(a0) * ra, cy + (float) Math.sin(a0) * ra, ua };
-                float[] p1 = { cx + (float) Math.cos(a1) * ra, cy + (float) Math.sin(a1) * ra, ua };
-                float[] p2 = { cx + (float) Math.cos(a1) * rb, cy + (float) Math.sin(a1) * rb, ub };
-                float[] p3 = { cx + (float) Math.cos(a0) * rb, cy + (float) Math.sin(a0) * rb, ub };
-                double mid = (a0 + a1) / 2.0;
-                flat(p0, p1, p2, p3, side.kind == Kind.BANDED ? band(side, new float[] { (float) Math.cos(mid), (float) Math.sin(mid), 0.0F }) : side, false);
-            }
-        }
-        if (capLit == null || capShade == null) {
-            return;
-        }
-        float[] first = profile[0], last = profile[profile.length - 1];
-        ringU(cx, cy, first[0], first[1], 0.0F, sides, start, false, capLit, capShade);
-        ringU(cx, cy, last[0], last[1], 0.0F, sides, start, true, capLit, capShade);
-    }
-
-    @FunctionalInterface
-    private interface FacetFilter {
-        boolean skip(int segment, int facet);
-    }
-
-    // A flat ring (a disc when inner is 0) across u at u, facing +u or -u; its facets on the top-left half seen from
-    // outside are lit, the rest shade.
-    private void ringU(float cx, float cy, float u, float outer, float inner, int sides, double start, boolean facingPositive, Paint lit, Paint shade) {
-        double step = 2.0 * Math.PI / sides;
-        // Seen from +u, right is +x; from -u, right is -x. Up is +y either way.
-        float rightSign = facingPositive ? 1.0F : -1.0F;
-        for (int f = 0; f < sides; f++) {
-            double a0 = start + f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
-            boolean topLeft = Math.sin(mid) - rightSign * Math.cos(mid) > 0;
-            Paint paint = topLeft ? lit : shade;
-            float[] o0 = { cx + (float) Math.cos(a0) * outer, cy + (float) Math.sin(a0) * outer, u };
-            float[] o1 = { cx + (float) Math.cos(a1) * outer, cy + (float) Math.sin(a1) * outer, u };
-            float[] i1 = { cx + (float) Math.cos(a1) * inner, cy + (float) Math.sin(a1) * inner, u };
-            float[] i0 = { cx + (float) Math.cos(a0) * inner, cy + (float) Math.sin(a0) * inner, u };
-            if (facingPositive) {
-                flat(o0, o1, i1, i0, paint, false);
-            } else {
-                flat(i0, i1, o1, o0, paint, false);
-            }
-        }
-    }
-
-    // An upright octagonal pipe at (x, u) from y0 to y1, with flat caps.
-    private void prismY(float x, float u, float y0, float y1, float r, Paint side, Paint cap) {
-        if (y1 - y0 <= 0.001F) {
-            return;
-        }
-        double step = 2.0 * Math.PI / PIPE_SIDES, start = Math.PI / PIPE_SIDES;
-        for (int f = 0; f < PIPE_SIDES; f++) {
-            double a0 = start + f * step, a1 = a0 + step;
-            // In the (u, x) plane, so (u, x, y) keeps the frame's handedness.
-            float[] p0 = { x + (float) Math.sin(a0) * r, y0, u + (float) Math.cos(a0) * r };
-            float[] p1 = { x + (float) Math.sin(a1) * r, y0, u + (float) Math.cos(a1) * r };
-            float[] p2 = { p1[0], y1, p1[2] };
-            float[] p3 = { p0[0], y1, p0[2] };
-            orient(p0, p1, p2, p3, new float[] { (float) Math.sin((a0 + a1) / 2.0), 0, (float) Math.cos((a0 + a1) / 2.0) }, side);
-            float[] c0 = { x, y1, u };
-            orient(c0, p3, p2, c0, new float[] { 0, 1, 0 }, cap);
-            float[] b0 = { x, y0, u };
-            orient(b0, p0, p1, b0, new float[] { 0, -1, 0 }, side);
-        }
-    }
-
-    // An octagonal pipe along x at (u, y) from x0 to x1, with flat caps.
-    private void prismX(float u, float y, float x0, float x1, float r, Paint side, Paint cap) {
-        if (x1 - x0 <= 0.001F) {
-            return;
-        }
-        double step = 2.0 * Math.PI / PIPE_SIDES, start = Math.PI / PIPE_SIDES;
-        for (int f = 0; f < PIPE_SIDES; f++) {
-            double a0 = start + f * step, a1 = a0 + step;
-            float[] p0 = { x0, y + (float) Math.cos(a0) * r, u + (float) Math.sin(a0) * r };
-            float[] p1 = { x0, y + (float) Math.cos(a1) * r, u + (float) Math.sin(a1) * r };
-            float[] p2 = { x1, p1[1], p1[2] };
-            float[] p3 = { x1, p0[1], p0[2] };
-            orient(p0, p1, p2, p3, new float[] { 0, (float) Math.cos((a0 + a1) / 2.0), (float) Math.sin((a0 + a1) / 2.0) }, side);
-            orient(new float[] { x1, y, u }, p3, p2, new float[] { x1, y, u }, new float[] { 1, 0, 0 }, cap);
-            orient(new float[] { x0, y, u }, p0, p1, new float[] { x0, y, u }, new float[] { -1, 0, 0 }, cap);
-        }
-    }
-
-    // --- Output ---
-
-    // Appends a quad: its points in the turbine's frame (px), turned with the rotor while building it, mapped to blocks
-    // from the minimum corner, with its normal.
-    private void quad(float[] p0, float[] p1, float[] p2, float[] p3, float[] uv, boolean glass) {
-        float[][] points = { turn(p0), turn(p1), turn(p2), turn(p3) };
-        // Across the diagonals, so a quad with two points the same (a triangle) still gets its normal.
-        float[] n = cross(sub(points[2], points[0]), sub(points[3], points[1]));
-        float length = (float) Math.sqrt(dot(n, n));
-        if (length < 1.0E-6F) {
-            return;
-        }
-        float nx = n[0] / length, ny = n[1] / length, nu = n[2] / length;
-        Floats out = glass ? cutout : solid;
-        for (int i = 0; i < 4; i++) {
-            float[] p = points[i];
-            if (alongX) {
-                out.add(p[2] / PX, p[1] / PX, (widthPx - p[0]) / PX, uv[2 * i], uv[2 * i + 1], nu, ny, -nx);
-            } else {
-                out.add(p[0] / PX, p[1] / PX, p[2] / PX, uv[2 * i], uv[2 * i + 1], nx, ny, nu);
-            }
-        }
-    }
-
-    private float[] turn(float[] p) {
-        if (!rotating) {
-            return p;
-        }
-        float sx = layout.shaftX(), sy = layout.shaftY();
-        float dx = p[0] - sx, dy = p[1] - sy;
-        return new float[] { sx + (float) (dx * cos - dy * sin), sy + (float) (dx * sin + dy * cos), p[2] };
-    }
-
-    private static float[] sub(float[] a, float[] b) {
-        return new float[] { a[0] - b[0], a[1] - b[1], a[2] - b[2] };
-    }
-
-    private static float[] cross(float[] a, float[] b) {
-        return new float[] { a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0] };
-    }
-
-    private static float dot(float[] a, float[] b) {
-        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
-    }
-
-    // A growable float array.
-    private static final class Floats {
-        private float[] data = new float[4096];
-        private int size;
-
-        void add(float... values) {
-            if (size + values.length > data.length) {
-                data = Arrays.copyOf(data, Math.max(data.length * 2, size + values.length));
-            }
-            System.arraycopy(values, 0, data, size, values.length);
-            size += values.length;
-        }
-
-        float[] toArray() {
-            return Arrays.copyOf(data, size);
+            solidBoxes.add(new float[] { sx - eh - 1.0F, deck, exciter.u0(), sx + eh + 1.0F, etop, exciter.u1() });
         }
     }
 }

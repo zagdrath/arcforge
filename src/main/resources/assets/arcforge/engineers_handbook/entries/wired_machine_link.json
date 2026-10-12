@@ -17,7 +17,7 @@
     },
     {
       "type": "text",
-      "text": "# The screen\nIt shows the machine it's linked to (e.g. \"Steam Boiler Array 7×9×12\"), the face of the machine the cable is on, and how long the cable is. Below, its own faces: left click cycles through the machine's port modes, right click goes back, shift-click clears. The cable's face is the locked purple link.\nIf the cable is broken, too long, ends at nothing, the machine already has a link, or it belongs to someone who hasn't let you use it, it shows Not linked and why. Its faces keep their settings until the link is back.\nThe cable's length limit is in the machineLink config."
+      "text": "# The screen\nIt shows the machine it's linked to (e.g. \"Steam Boiler Array 7×7×16\"), the face of the machine the cable is on, and how long the cable is. Below, its own faces: left click cycles through the machine's port modes, right click goes back, shift-click clears. The cable's face is the locked purple link.\nIf the cable is broken, too long, ends at nothing, the machine already has a link, or it belongs to someone who hasn't let you use it, it shows Not linked and why. Its faces keep their settings until the link is back.\nThe cable's length limit is in the machineLink config."
     }
   ]
 }
