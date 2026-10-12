@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package net.zagdrath.arcforge.client.renderer.blockentity;
+package net.zagdrath.arcforge.steam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,8 +11,6 @@ import java.util.List;
 import java.util.Objects;
 
 import org.jspecify.annotations.Nullable;
-
-import net.zagdrath.arcforge.steam.TurbineLayout;
 
 // The formed Steam Turbine Array's model, built from its TurbineLayout (see SteamTurbineArrayRenderer) on the sheet
 // block/steam_turbine_array/turbine: the still parts once (and again when its ports change), the rotor every frame at
@@ -25,6 +23,8 @@ public final class TurbineMesh extends ModelMesh {
     private static final int SIDES_CASING = TurbineLayout.CASING_SIDES;
     // The inspection window takes these two facets on each side (counted from the flange line at angle 0).
     private static final int WINDOW_FIRST = 1, WINDOW_LAST = 2;
+    // How far the stage rings stand in from the inner wall (px).
+    private static final float RING_DEPTH = 1.5F;
     // Blade pitch against the axis.
     private static final double PITCH = Math.toRadians(35.0);
 
@@ -273,7 +273,7 @@ public final class TurbineMesh extends ModelMesh {
     }
 
     // Behind a window: the casing's inside wall and the window's two end walls, dark; a stage ring between each pair of
-    // blade rows (from just past the longer tips out to the wall); and the glass, a pane on each of the window's facets
+    // blade rows (a lip standing in from the wall); and the glass, a pane on each of the window's facets
     // just inside the outer surface, each with its own frame and glints.
     private void windowCavity(TurbineLayout.Casing casing, TurbineLayout.Span window) {
         float sx = layout.shaftX(), sy = layout.shaftY();
@@ -297,7 +297,8 @@ public final class TurbineMesh extends ModelMesh {
         for (int i = 1; i < rows; i++) {
             float u = window.u0() + pitch * i;
             float tip = Math.max(casing.tipAt(u - pitch / 2.0F), casing.tipAt(u + pitch / 2.0F));
-            float in = tip / TurbineLayout.CASING_APOTHEM + 0.5F, out = inner - 0.05F;
+            // Only a lip at the wall: rings reaching in to the tips hid the blades behind them from any slant.
+            float in = Math.max(tip / TurbineLayout.CASING_APOTHEM + 0.5F, inner - RING_DEPTH), out = inner - 0.05F;
             if (out - in < 0.4F) {
                 continue;
             }

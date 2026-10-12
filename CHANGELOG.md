@@ -49,6 +49,12 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 - **The Steam Turbine, Steam Boiler and Gas Turbine Arrays' models no longer vanish at some angles.** They were only
   drawn while the chunk section holding the structure's corner block was visible; now they're drawn whenever any part
   of the structure is in view, and their draw distance counts from the nearest part of the structure.
+- **The Steam Turbine Array's hitbox matches its model.** It's now taken from the model itself, pixel for pixel,
+  instead of being built separately in rough steps, so what you see is what you click and walk on.
+- **Every part of a big Steam Turbine Array can be clicked.** Parts deep inside a turbine 5 or more blocks across
+  (the middle of a big casing, the pedestals between casings) open its GUI too, where clicks used to go through them.
+- **Steam Turbine Array windows show the blades from any angle.** The stage rings between the blade rows are now a
+  shallow lip at the casing wall, so they no longer hide the rotor when you look in at a slant.
 
 ## [2.6.0] - 2026-10-11
 

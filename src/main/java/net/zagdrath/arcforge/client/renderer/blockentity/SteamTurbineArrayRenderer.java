@@ -38,6 +38,7 @@ import net.zagdrath.arcforge.multiblock.PortFaces;
 import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.TurbineLayout;
+import net.zagdrath.arcforge.steam.TurbineMesh;
 
 // Draws a formed Steam Turbine Array as one turbine-generator set along its axis (its blocks draw nothing but their port
 // plates): the plinth, the casings, pedestals, crossover and generator from its TurbineLayout, built by TurbineMesh on

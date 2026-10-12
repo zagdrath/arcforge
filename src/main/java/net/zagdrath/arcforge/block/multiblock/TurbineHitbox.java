@@ -33,7 +33,7 @@ import net.zagdrath.arcforge.steam.TurbineShapes;
 // and its collar in from it. Kept for each shape of array (size, front and axis), as both sides ask for them often.
 // Only asked of a real level: anything else (a chunk being meshed, a pathfinding region, world generation) gets the
 // full cube, as it can't be trusted to reach the array's master.
-final class TurbineHitbox {
+public final class TurbineHitbox {
     private static final int CACHE_LIMIT = 32;
     // A port: the plate on the face (as the block model draws it) and the collar in from it.
     private static final int PLATE = 1, COLLAR = 10;
@@ -44,12 +44,14 @@ final class TurbineHitbox {
     private record Key(int length, int width, int height, boolean high, boolean alongX) {}
 
     private static final class Built {
+        final Key key;
         final TurbineShapes frame;
         final @Nullable VoxelShape[] shapes;
         // The same with a block's ports on it, by which faces have them (a bit per Direction).
         final Map<Long, VoxelShape> ported = new ConcurrentHashMap<>();
 
-        Built(TurbineShapes frame, int count) {
+        Built(Key key, TurbineShapes frame, int count) {
+            this.key = key;
             this.frame = frame;
             this.shapes = new VoxelShape[count];
         }
@@ -149,17 +151,8 @@ final class TurbineHitbox {
             return null;
         }
         boolean alongX = shell.axis() == Direction.Axis.X;
-        Direction.Axis across = alongX ? Direction.Axis.Z : Direction.Axis.X;
-        Key key = new Key(shell.length(), shell.size(across), shell.size(Direction.Axis.Y),
-                TurbineLayout.frontIsHigh(shell.axis(), master.getFacing()), alongX);
-        Built built = CACHE.get(key);
-        if (built == null) {
-            if (CACHE.size() >= CACHE_LIMIT) {
-                CACHE.clear();
-            }
-            built = CACHE.computeIfAbsent(key, k -> new Built(TurbineShapes.of(TurbineLayout.of(k.length(), k.width(), k.height(), k.high())),
-                    k.length() * k.width() * k.height()));
-        }
+        Built built = built(shell, master);
+        Key key = built.key;
         int u = TurbineLayout.blockU(shell, pos), y = shell.offset(pos, Direction.Axis.Y), x = TurbineLayout.blockX(shell, pos);
         int index = (u * key.height() + y) * key.width() + x;
         VoxelShape shape = built.shapes[index];
@@ -173,6 +166,28 @@ final class TurbineHitbox {
         }
         VoxelShape base = shape;
         return built.ported.computeIfAbsent((long) index << 6 | ports, k -> withPorts(base, ports));
+    }
+
+    // The whole model's shape of a formed array, for picking what no block's shape reaches (see TurbinePick).
+    public static TurbineShapes model(ShellStructure.Shell shell, SteamTurbineArrayBlockEntity master) {
+        return built(shell, master).frame;
+    }
+
+    // The shapes of an array of this one's size, front and axis, built on first asking.
+    private static Built built(ShellStructure.Shell shell, SteamTurbineArrayBlockEntity master) {
+        boolean alongX = shell.axis() == Direction.Axis.X;
+        Direction.Axis across = alongX ? Direction.Axis.Z : Direction.Axis.X;
+        Key key = new Key(shell.length(), shell.size(across), shell.size(Direction.Axis.Y),
+                TurbineLayout.frontIsHigh(shell.axis(), master.getFacing()), alongX);
+        Built built = CACHE.get(key);
+        if (built == null) {
+            if (CACHE.size() >= CACHE_LIMIT) {
+                CACHE.clear();
+            }
+            built = CACHE.computeIfAbsent(key, k -> new Built(k, TurbineShapes.of(TurbineLayout.of(k.length(), k.width(), k.height(), k.high())),
+                    k.length() * k.width() * k.height()));
+        }
+        return built;
     }
 
     // Boxes in the turbine's frame (x across, y up, u along) to a shape in the block's: along Z, x is world X and u

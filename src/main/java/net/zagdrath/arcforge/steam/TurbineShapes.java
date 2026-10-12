@@ -6,27 +6,33 @@
 package net.zagdrath.arcforge.steam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-// The formed Steam Turbine Array's hitbox: the solid parts of its model (the plinth and deck, the walkway and its
-// railing, the bearing pedestals and couplings, the casings, the steam chest and stop valves, the exhaust necks, the
-// crossover, the generator and exciter) as boxes in the turbine's frame (px; x across, y up, u along), cut up by blocks
-// and snapped to whole pixels. The hollow core is air, so the shell's blocks carry it all: each its own block's pieces,
-// and the first layer of the core is shared out among the shell blocks beside it (a shape may reach one block past its
-// own, which entity collision honours for a block without a cached shape; block picking finds such a piece along a
-// sight line through the block that carries it). Deeper in the core
-// (a cross-section 5 or more each way) no shape can reach, so what's there that could be walked into from above or
-// from the sides (the top of a small casing, the pedestals between casings) is covered over instead: a 1 px lid at
-// the bottom of the core's top layer over it, and a 1 px wall at the inside of the side layers beside it.
+// The formed Steam Turbine Array's hitbox, taken from its model (TurbineMesh): every pixel the model's surfaces pass
+// through, and every pixel they close off from the air outside, so its parts are solid (px; x across, y up, u along),
+// cut up by blocks. The hollow core is air, so the shell's blocks carry it all: each its own block's pieces, and the
+// first layer of the core is shared out among the shell blocks beside it (a shape may reach one block past its own,
+// which entity collision honours for a block without a cached shape; block picking finds such a piece along a sight
+// line through the block that carries it). Deeper in the core (a cross-section 5 or more each way) no shape can reach,
+// so what's there that could be walked into from above or from the sides (the top of a small casing, the pedestals
+// between casings) is covered over instead: a 1 px lid at the bottom of the core's top layer over it, and a 1 px wall
+// at the inside of the side layers beside it; and clicks find it with clip (see TurbinePick).
 public final class TurbineShapes {
     private static final int PX = 16;
-    // Round parts are stepped in bands this tall, and their tapers in steps this long.
-    private static final float BAND = 2.0F, STEP = 4.0F;
+    // The mesh's floats per vertex and per quad.
+    private static final int VERTEX = 8, QUAD = 4 * VERTEX;
+    // How far apart (px) a quad is sampled, and how far in from its surface each sample is taken.
+    private static final float SAMPLE = 0.5F, INSET = 0.05F;
 
     private final int length, width, height;
+    // The structure's size in px.
+    private final int sizeX, sizeY, sizeU;
+    // The model's solid pixels (see pixel).
+    private final BitSet solid;
     // Per block (see index): {x0, y0, u0, x1, y1, u1} in the block's own px (0 to 16), or null for the core.
     private final int[][][] boxes;
 
@@ -34,11 +40,11 @@ public final class TurbineShapes {
         this.length = layout.length();
         this.width = layout.width();
         this.height = layout.height();
-        List<float[]> parts = parts(layout);
-        BitSet[] grids = new BitSet[length * height * width];
-        for (float[] part : parts) {
-            fill(grids, part);
-        }
+        this.sizeX = width * PX;
+        this.sizeY = height * PX;
+        this.sizeU = length * PX;
+        this.solid = voxels(layout);
+        BitSet[] grids = split(solid);
         cover(grids);
         List<List<int[]>> pieces = new ArrayList<>();
         for (int i = 0; i < grids.length; i++) {
@@ -96,6 +102,50 @@ public final class TurbineShapes {
         return boxes[index(u, y, x)];
     }
 
+    // How far (px) along a ray in the turbine's frame (from and dir in px, dir of length 1) its first solid pixel is,
+    // within max; -1 when it meets none. The model's own shape, deep core and all, for picking what can't carry a
+    // block's shape.
+    public double clip(double[] from, double[] dir, double max) {
+        int[] size = { sizeX, sizeY, sizeU };
+        double enter = 0.0, leave = max;
+        for (int k = 0; k < 3; k++) {
+            if (Math.abs(dir[k]) < 1.0E-9) {
+                if (from[k] < 0.0 || from[k] >= size[k]) {
+                    return -1.0;
+                }
+            } else {
+                double a = -from[k] / dir[k], b = (size[k] - from[k]) / dir[k];
+                enter = Math.max(enter, Math.min(a, b));
+                leave = Math.min(leave, Math.max(a, b));
+            }
+        }
+        if (enter > leave) {
+            return -1.0;
+        }
+        int[] cell = new int[3], step = new int[3];
+        double[] next = new double[3], delta = new double[3];
+        for (int k = 0; k < 3; k++) {
+            cell[k] = Math.clamp((long) Math.floor(from[k] + dir[k] * enter), 0, size[k] - 1);
+            step[k] = dir[k] > 0.0 ? 1 : dir[k] < 0.0 ? -1 : 0;
+            next[k] = step[k] == 0 ? Double.MAX_VALUE : (cell[k] + (step[k] > 0 ? 1 : 0) - from[k]) / dir[k];
+            delta[k] = step[k] == 0 ? Double.MAX_VALUE : Math.abs(1.0 / dir[k]);
+        }
+        double t = enter;
+        while (t <= leave) {
+            if (solid.get(pixel(cell[0], cell[1], cell[2]))) {
+                return t;
+            }
+            int k = next[0] < next[1] ? (next[0] < next[2] ? 0 : 2) : (next[1] < next[2] ? 1 : 2);
+            t = next[k];
+            cell[k] += step[k];
+            if (cell[k] < 0 || cell[k] >= size[k]) {
+                return -1.0;
+            }
+            next[k] += delta[k];
+        }
+        return -1.0;
+    }
+
     private int index(int u, int y, int x) {
         return (u * height + y) * width + x;
     }
@@ -105,165 +155,153 @@ public final class TurbineShapes {
         return u == 0 || u == length - 1 || y == 0 || y == height - 1 || x == 0 || x == width - 1;
     }
 
-    // --- The parts ---
+    // --- The model, in pixels ---
 
-    private static List<float[]> parts(TurbineLayout layout) {
-        List<float[]> out = new ArrayList<>();
-        float w = layout.widthPx(), t = layout.lengthPx(), foot = layout.footingTop(), deck = layout.deckTop();
-        float sx = layout.shaftX(), sy = layout.shaftY();
-        // The plinth: the deck on columns, or on a solid base.
-        if (layout.hasColumns()) {
-            out.add(new float[] { 0, foot, 0, w, deck, t });
-            for (TurbineLayout.Box column : layout.columns()) {
-                out.add(new float[] { column.x0() - 1.0F, 0, column.u0() - 1.0F, column.x1() + 1.0F, 2.0F, column.u1() + 1.0F });
-                out.add(new float[] { column.x0(), 0, column.u0(), column.x1(), column.y1(), column.u1() });
-            }
-        } else {
-            out.add(new float[] { 0, 0, 0, w, deck, t });
-        }
-        // The walkway's grating and its railing.
-        TurbineLayout.Walkway walk = layout.walkway();
-        if (walk != null) {
-            float floor = walk.floorY();
-            out.add(new float[] { walk.x0(), floor, 1.0F, walk.x1(), floor + 1.0F, t - 1.0F });
-            float rx = walk.high() ? walk.x1() - 1.0F : walk.x0();
-            out.add(new float[] { rx, floor + 1.0F, 2.0F, rx + 1.0F, floor + 1.0F + walk.railHeight(), t - 2.0F });
-        }
-        // The bearing pedestals, the shaft and the couplings.
-        for (TurbineLayout.Box pedestal : layout.pedestals()) {
-            out.add(box(pedestal));
-        }
-        float r = layout.shaftRadius();
-        out.add(new float[] { sx - r, sy - r, 1.5F, sx + r, sy + r, layout.generator().u0() + 3.0F });
-        List<TurbineLayout.Span> gaps = layout.gaps();
-        for (int i = 1; i < gaps.size(); i++) {
-            float cr = r * (i == gaps.size() - 1 ? 2.8F : 2.3F), half = layout.couplingHalf(i), middle = gaps.get(i).middle();
-            out.add(new float[] { sx - cr, sy - cr, middle - half, sx + cr, sy + cr, middle + half });
-        }
-        // The casings, their flanges and hoops.
-        for (TurbineLayout.Casing casing : layout.casings()) {
-            float[][] profile = casing.profile();
-            for (int i = 0; i + 1 < profile.length; i++) {
-                float ua = profile[i][0], ub = profile[i + 1][0];
-                int steps = Math.max(1, (int) Math.ceil((ub - ua) / STEP));
-                for (int s = 0; s < steps; s++) {
-                    float u0 = ua + (ub - ua) * s / steps, u1 = ua + (ub - ua) * (s + 1) / steps;
-                    float k = (s + 0.5F) / steps;
-                    round(out, sx, sy, profile[i][1] + (profile[i + 1][1] - profile[i][1]) * k, u0, u1);
-                }
-                float flange = Math.max(profile[i][1], profile[i + 1][1]) + 2.0F;
-                if (ub - ua > 0.01F) {
-                    out.add(new float[] { sx - flange, sy - 1.0F, ua, sx + flange, sy + 1.0F, ub });
-                }
-            }
-            for (float u : new float[] { profile[1][0], profile[2][0] }) {
-                round(out, sx, sy, casing.radius() + 0.75F, u - 1.0F, u + 1.0F);
+    // The model's solid pixels over the whole structure: every pixel its surfaces pass through (the still parts and the
+    // glass, without ports, and the rotor at rest), then every pixel the air outside can't reach, so its parts come out
+    // solid rather than as skins.
+    private BitSet voxels(TurbineLayout layout) {
+        BitSet surface = new BitSet(sizeX * sizeY * sizeU);
+        TurbineMesh mesh = new TurbineMesh(layout, false);
+        float[][] still = mesh.buildStatic(List.of());
+        for (float[] quads : new float[][] { still[0], still[1], mesh.buildRotor(0.0F) }) {
+            for (int i = 0; i + QUAD <= quads.length; i += QUAD) {
+                surface(surface, quads, i);
             }
         }
-        // The steam chest and its bonnet, and the stop valves with their inlet pipes.
-        TurbineLayout.Box chest = layout.steamChest();
-        float bonnet = Math.min(chest.y1() + 2.0F, layout.heightPx() - 1.5F);
-        out.add(new float[] { chest.x0(), chest.y0(), chest.u0(), chest.x1(), Math.max(chest.y1(), bonnet), chest.u1() });
-        for (TurbineLayout.Valve valve : layout.valves()) {
-            float b = valve.radius() + 0.5F, pr = Math.max(1.5F, valve.radius() * 0.5F);
-            out.add(new float[] { valve.x() - b, deck, valve.u() - b, valve.x() + b, valve.top() + 5.0F, valve.u() + b });
-            out.add(new float[] { Math.min(valve.x(), valve.pipeEnd()), valve.pipeY() - pr, valve.u() - pr,
-                    Math.max(valve.x(), valve.pipeEnd()), valve.pipeY() + pr, valve.u() + pr });
-        }
-        // The exhaust necks, each with its flange at the foot.
-        for (TurbineLayout.Box neck : layout.exhaustNecks()) {
-            out.add(box(neck));
-            float flangeY = layout.hasColumns() ? neck.y0() : deck;
-            out.add(new float[] { neck.x0() - 1.0F, flangeY, neck.u0() - 1.0F, neck.x1() + 1.0F, flangeY + 2.0F, neck.u1() + 1.0F });
-        }
-        // The crossover: the rise, the run and each drop, with the elbows and tees.
-        TurbineLayout.Crossover pipe = layout.crossover();
-        if (pipe != null) {
-            float pr = pipe.diameter() / 2.0F;
-            out.add(new float[] { sx - pr, pipe.runY() - pr, pipe.riseU(), sx + pr, pipe.runY() + pr, pipe.dropU() });
-            List<Float> joints = new ArrayList<>();
-            joints.add(pipe.riseU());
-            for (float drop : pipe.dropUs()) {
-                joints.add(drop);
-            }
-            for (float u : joints) {
-                float base = u == pipe.riseU() ? pipe.baseY() : pipe.dropY();
-                out.add(new float[] { sx - pr, base, u - pr, sx + pr, pipe.runY() + pr, u + pr });
-                out.add(new float[] { sx - pr - 0.5F, pipe.runY() - pr - 0.5F, u - pr - 0.5F, sx + pr + 0.5F, pipe.runY() + pr + 0.5F, u + pr + 0.5F });
-                out.add(new float[] { sx - pr - 1.0F, base + 2.0F, u - pr - 1.0F, sx + pr + 1.0F, base + 3.5F, u + pr + 1.0F });
-            }
-        }
-        // The generator with its ribs and terminal box, and the exciter.
-        TurbineLayout.Span span = layout.generator();
-        float half = layout.generatorWidth() / 2.0F;
-        out.add(new float[] { sx - half - 1.0F, deck, span.u0(), sx + half + 1.0F, layout.generatorTop(), span.u1() });
-        out.add(box(layout.terminalBox()));
-        TurbineLayout.Box exciter = layout.exciterHousing();
-        TurbineLayout.Span exciterSpan = layout.exciter();
-        if (exciter != null && exciterSpan != null) {
-            float eh = exciter.x1() - sx;
-            out.add(new float[] { sx - eh - 1.0F, deck, exciterSpan.u0(), sx + eh + 1.0F, deck + 2.0F, exciterSpan.u1() });
-            out.add(new float[] { sx - eh - 0.75F, deck + 2.0F, exciter.u0(), sx + eh + 0.75F, exciter.y1(), exciter.u1() });
-        }
-        return out;
+        return inside(surface);
     }
 
-    private static float[] box(TurbineLayout.Box box) {
-        return new float[] { box.x0(), box.y0(), box.u0(), box.x1(), box.y1(), box.u1() };
-    }
-
-    // A round part along u (radius r about the shaft), as bands across it, each as wide as the part at its middle.
-    private static void round(List<float[]> out, float sx, float sy, float r, float u0, float u1) {
-        if (r <= 0.0F || u1 - u0 <= 0.01F) {
-            return;
-        }
-        int bands = Math.max(1, Math.round(2.0F * r / BAND));
-        float band = 2.0F * r / bands;
-        for (int b = 0; b < bands; b++) {
-            float y0 = sy - r + b * band, y1 = y0 + band;
-            float d = Math.abs((y0 + y1) / 2.0F - sy);
-            float half = (float) Math.sqrt(Math.max(0.0F, r * r - d * d));
-            if (half > 0.25F) {
-                out.add(new float[] { sx - half, y0, u0, sx + half, y1, u1 });
+    // Marks the pixels a quad of the mesh (four vertices of x, y, z in blocks, u, v, normal; built along Z, so z is u)
+    // passes through, sampled every SAMPLE px across it, each sample a little in from the surface so a face on a pixel
+    // boundary marks the pixel of the part it belongs to.
+    private void surface(BitSet grid, float[] quads, int i) {
+        float x0 = quads[i] * PX, y0 = quads[i + 1] * PX, u0 = quads[i + 2] * PX;
+        float x1 = quads[i + VERTEX] * PX, y1 = quads[i + VERTEX + 1] * PX, u1 = quads[i + VERTEX + 2] * PX;
+        float x2 = quads[i + 2 * VERTEX] * PX, y2 = quads[i + 2 * VERTEX + 1] * PX, u2 = quads[i + 2 * VERTEX + 2] * PX;
+        float x3 = quads[i + 3 * VERTEX] * PX, y3 = quads[i + 3 * VERTEX + 1] * PX, u3 = quads[i + 3 * VERTEX + 2] * PX;
+        float nx = quads[i + 5] * INSET, ny = quads[i + 6] * INSET, nu = quads[i + 7] * INSET;
+        int across = steps(Math.max(distance(x0, y0, u0, x1, y1, u1), distance(x3, y3, u3, x2, y2, u2)));
+        int up = steps(Math.max(distance(x0, y0, u0, x3, y3, u3), distance(x1, y1, u1, x2, y2, u2)));
+        for (int a = 0; a <= across; a++) {
+            float s = (float) a / across;
+            float lx = x0 + (x1 - x0) * s - nx, ly = y0 + (y1 - y0) * s - ny, lu = u0 + (u1 - u0) * s - nu;
+            float hx = x3 + (x2 - x3) * s - nx, hy = y3 + (y2 - y3) * s - ny, hu = u3 + (u2 - u3) * s - nu;
+            for (int b = 0; b <= up; b++) {
+                float t = (float) b / up;
+                int x = (int) Math.floor(lx + (hx - lx) * t), y = (int) Math.floor(ly + (hy - ly) * t), u = (int) Math.floor(lu + (hu - lu) * t);
+                if (x >= 0 && x < sizeX && y >= 0 && y < sizeY && u >= 0 && u < sizeU) {
+                    grid.set(pixel(x, y, u));
+                }
             }
         }
+    }
+
+    private static int steps(float length) {
+        return Math.max(1, (int) Math.ceil(length / SAMPLE));
+    }
+
+    private static float distance(float x0, float y0, float u0, float x1, float y1, float u1) {
+        return (float) Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0) + (u1 - u0) * (u1 - u0));
+    }
+
+    // Everything but the air reachable from the structure's outside without crossing a surface.
+    private BitSet inside(BitSet surface) {
+        int total = sizeX * sizeY * sizeU;
+        BitSet outside = new BitSet(total);
+        Queue queue = new Queue();
+        for (int u = 0; u < sizeU; u++) {
+            for (int y = 0; y < sizeY; y++) {
+                for (int x = 0; x < sizeX; x++) {
+                    if (u == 0 || u == sizeU - 1 || y == 0 || y == sizeY - 1 || x == 0 || x == sizeX - 1) {
+                        reach(surface, outside, queue, pixel(x, y, u));
+                    } else if (x == 1) {
+                        // Only the two ends of a row inside the faces are on the outside.
+                        x = sizeX - 2;
+                    }
+                }
+            }
+        }
+        while (!queue.isEmpty()) {
+            int i = queue.poll();
+            int x = i % sizeX, y = i / sizeX % sizeY, u = i / sizeX / sizeY;
+            if (x > 0) {
+                reach(surface, outside, queue, i - 1);
+            }
+            if (x < sizeX - 1) {
+                reach(surface, outside, queue, i + 1);
+            }
+            if (y > 0) {
+                reach(surface, outside, queue, i - sizeX);
+            }
+            if (y < sizeY - 1) {
+                reach(surface, outside, queue, i + sizeX);
+            }
+            if (u > 0) {
+                reach(surface, outside, queue, i - sizeX * sizeY);
+            }
+            if (u < sizeU - 1) {
+                reach(surface, outside, queue, i + sizeX * sizeY);
+            }
+        }
+        outside.flip(0, total);
+        return outside;
+    }
+
+    private static void reach(BitSet surface, BitSet outside, Queue queue, int i) {
+        if (!surface.get(i) && !outside.get(i)) {
+            outside.set(i);
+            queue.add(i);
+        }
+    }
+
+    // A growable queue of pixel indices, its spent front dropped as it grows.
+    private static final class Queue {
+        private int[] items = new int[4096];
+        private int head, tail;
+
+        void add(int value) {
+            if (tail == items.length) {
+                if (head > items.length / 2) {
+                    System.arraycopy(items, head, items, 0, tail - head);
+                } else {
+                    items = Arrays.copyOf(items, items.length * 2);
+                    System.arraycopy(items, head, items, 0, tail - head);
+                }
+                tail -= head;
+                head = 0;
+            }
+            items[tail++] = value;
+        }
+
+        int poll() {
+            return items[head++];
+        }
+
+        boolean isEmpty() {
+            return head == tail;
+        }
+    }
+
+    private int pixel(int x, int y, int u) {
+        return (u * sizeY + y) * sizeX + x;
     }
 
     // --- Into blocks ---
 
-    // Marks the whole pixels a part covers (rounded to the nearest pixel) in the grid of each block it reaches.
-    private void fill(BitSet[] grids, float[] part) {
-        int x0 = Math.round(part[0]), y0 = Math.round(part[1]), u0 = Math.round(part[2]);
-        int x1 = Math.round(part[3]), y1 = Math.round(part[4]), u1 = Math.round(part[5]);
-        x0 = Math.max(x0, 0);
-        y0 = Math.max(y0, 0);
-        u0 = Math.max(u0, 0);
-        x1 = Math.min(x1, width * PX);
-        y1 = Math.min(y1, height * PX);
-        u1 = Math.min(u1, length * PX);
-        if (x1 <= x0 || y1 <= y0 || u1 <= u0) {
-            return;
-        }
-        for (int bu = u0 / PX; bu <= (u1 - 1) / PX; bu++) {
-            for (int by = y0 / PX; by <= (y1 - 1) / PX; by++) {
-                for (int bx = x0 / PX; bx <= (x1 - 1) / PX; bx++) {
-                    int index = index(bu, by, bx);
-                    BitSet grid = grids[index];
-                    if (grid == null) {
-                        grid = grids[index] = new BitSet(PX * PX * PX);
-                    }
-                    int lx0 = Math.max(x0 - bx * PX, 0), lx1 = Math.min(x1 - bx * PX, PX);
-                    int ly0 = Math.max(y0 - by * PX, 0), ly1 = Math.min(y1 - by * PX, PX);
-                    int lu0 = Math.max(u0 - bu * PX, 0), lu1 = Math.min(u1 - bu * PX, PX);
-                    for (int y = ly0; y < ly1; y++) {
-                        for (int x = lx0; x < lx1; x++) {
-                            int row = (y * PX + x) * PX;
-                            grid.set(row + lu0, row + lu1);
-                        }
-                    }
-                }
+    // The solid pixels cut up by block, each block's in its own grid (see bit); null for a block with none.
+    private BitSet[] split(BitSet solid) {
+        BitSet[] grids = new BitSet[length * height * width];
+        for (int i = solid.nextSetBit(0); i >= 0; i = solid.nextSetBit(i + 1)) {
+            int x = i % sizeX, y = i / sizeX % sizeY, u = i / sizeX / sizeY;
+            int index = index(u / PX, y / PX, x / PX);
+            BitSet grid = grids[index];
+            if (grid == null) {
+                grid = grids[index] = new BitSet(PX * PX * PX);
             }
+            grid.set(bit(x % PX, y % PX, u % PX));
         }
+        return grids;
     }
 
     // Covers what's solid deeper in the core than a shape can reach (see the class comment).

@@ -918,8 +918,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     bolt heads `#959DA6`; elbows PLATE; the deck slab's edge the strap, with a plate seam (`#16181B` then `#575D65`, ½ px
     each) across the deck every block; louvred vents on both generator ends.
   - Port nozzles are PLAIN collars 10 px across (the port plate's collar) from the model to the face.
-- **Hitbox** (not a texture, but it follows the model): formed, each block's shape is the model's parts in it
-  (TurbineShapes), so a block's outline follows the parts a player sees.
+- **Hitbox** (not a texture, but it follows the model): formed, each block's shape is the model's parts in it,
+  voxelized from TurbineMesh itself at 1 px (TurbineShapes), so a block's outline follows the parts a player sees.
 
 ## Lithium and the Battery Array
 - **Spodumene** follows the ore method: Cody's green ore (as for fluorite, without the alternate purple clusters), his green

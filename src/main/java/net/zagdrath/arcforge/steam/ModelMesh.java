@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: MIT
  */
 
-package net.zagdrath.arcforge.client.renderer.blockentity;
+package net.zagdrath.arcforge.steam;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +24,7 @@ import org.jspecify.annotations.Nullable;
 // The model's frame: x across, y up, u along the axis, in px. Output: per vertex x, y, z (blocks from the structure's
 // minimum corner), u, v (0-1 across the sheet), nx, ny, nz; four vertices a quad, in solid, cutout (glass) and glow
 // (full-bright) lists.
-abstract class ModelMesh {
+public abstract class ModelMesh {
     static final float PX = 16.0F;
     static final int SIDES = 16, PIPE_SIDES = 8;
     // The collar of a port nozzle, across (px): the port plate's collar (x3..12).
