@@ -65,6 +65,7 @@ public final class MultiblockBlueprints {
                 cube("metal_pressing_array", ModBlocks.METAL_PRESSING_ARRAY_CASING.get()),
                 cube("superheater_array", ModBlocks.SUPERHEATER_ARRAY_CASING.get()),
                 cube("condenser_array", ModBlocks.CONDENSER_ARRAY_CASING.get()),
+                cube("water_intake", ModBlocks.WATER_INTAKE_CASING.get()),
                 carbonizer(),
                 arcforgeFurnace(),
                 steamBoilerArray(),

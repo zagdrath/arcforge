@@ -126,6 +126,7 @@ import net.zagdrath.arcforge.client.screen.multiblock.InductionFurnaceArrayScree
 import net.zagdrath.arcforge.client.screen.multiblock.MetalPressingArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.SteamTurbineArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.CondenserArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.WaterIntakeScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.SuperheaterArrayScreen;
 import net.zagdrath.arcforge.client.screen.machine.FireboxScreen;
 import net.zagdrath.arcforge.client.screen.machine.FiberizerScreen;
@@ -248,6 +249,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.GAS_TURBINE_ARRAY.get(), GasTurbineArrayScreen::new);
         event.register(ModMenuTypes.SUPERHEATER_ARRAY.get(), SuperheaterArrayScreen::new);
         event.register(ModMenuTypes.CONDENSER_ARRAY.get(), CondenserArrayScreen::new);
+        event.register(ModMenuTypes.WATER_INTAKE.get(), WaterIntakeScreen::new);
         event.register(ModMenuTypes.FIBERIZER.get(), FiberizerScreen::new);
         event.register(ModMenuTypes.FUEL_BURNER.get(), FuelBurnerScreen::new);
         event.register(ModMenuTypes.INFUSER.get(), InfuserScreen::new);

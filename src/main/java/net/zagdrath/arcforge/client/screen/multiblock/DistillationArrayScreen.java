@@ -43,7 +43,7 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
                 Component.translatable("gui.arcforge.usage"),
                 () -> Component.translatable("gui.arcforge.hu_per_tick_loss", menu.getHeatPerTick()),
                 Component.translatable("gui.arcforge.temp"),
-                () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())))), false);
+                () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())))), true);
         enableAutoEject();
     }
 

@@ -24,6 +24,11 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Added
 
+- **Industrial Water Intake.** A 3×3×3 multiblock pump house that stands in a body of at least 400 connected water
+  sources and pumps 8,000 mB/t of water (×1.25 in rivers and oceans) for 0.25 FE per mB, enough for a full-size Steam
+  Boiler Array. Its Output ports push as fast as it pumps, so they can feed a boiler's water port directly. It has its
+  own GUI, Jade tooltip, Handbook page and JEI build view. The water isn't taken from the world. Settings in
+  `power.steam.waterIntake`.
 - **Heat Pipe.** A late-game block for moving a lot of heat between multiblocks. Heat Pipes in a straight line form one
   pipe of up to 32 blocks that joins only the heat ports or heat faces at its two ends, and carries up to 262,144 HU/t
   from the hotter end to the colder one, losing 0.5% per block of length. It's one unbroken steel jacket with flanged
@@ -54,6 +59,18 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Changed
 
+- **The Arcforged Energy Conduit carries 262,144 FE/t** (was 65,536), and each conduit holds one tick's worth to match.
+  The **Arcforged Energy Cell** moves 262,144 FE/t in and out (was 131,072). One line now carries a full-size 7×9×15
+  Steam Turbine Array on lubricant (254,016 FE/t). With the Exhaust port's vacuum bonus as well, the turbine makes
+  277,536 FE/t, more than one line carries; raise `power.energyConduits.arcforged` and `power.energyCells.arcforged` to
+  277,536 or more for that. The Quantum Tunnel's FE, which moves at the Arcforged conduit rate, follows it. Conduit and
+  cell rates are now in config (`power.energyConduits`, `power.energyCells`).
+- **Condenser Arrays condense faster.** 400 mB/t per cube in open air (was 120) and up to 800 (was 400): a 7×7×7
+  condenses 5,081 mB/t in open air and up to 10,163 with water or ice around it, so one keeps up with a full-size Steam
+  Turbine Array's 4,200 mB/t of exhaust. Its Output ports now push as fast as it condenses (they pushed 100 mB/t a face).
+- **The Carbonizer takes Speed Upgrades, and the Distillation Array Speed and Heat Upgrades,** in a new Upgrades tab,
+  with the usual rules (Speed bakes or feeds 2^(n/2) times as fast; Heat uses 0.8^n of the heat per batch), so fuel
+  production can keep up with a maxed Firebox Array.
 - **The Arcforged Thermodynamic Conduit carries 51,200 HU/t** (was 3,200), and each conduit holds one tick's worth to
   match, so one conduit line can carry a big multiblock's heat. Wrought, Tempered and Hardened stay at 50 / 200 / 800
   HU/t, and the Arcforged Heat Cell and Thermal Capsule keep 3,200 HU/t. The Quantum Tunnel's heat, which moves at the
@@ -87,9 +104,14 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Upgrading
 
+- **New config keys**: `power.energyConduits` and `power.energyCells` (per tier) and the `power.steam.waterIntake`
+  section get their defaults. The Condenser Array's new defaults (`power.steam.condenserArray.baseRatePerCube` 400,
+  `maxRatePerCube` 800) and the Energy Meter's `logistics.meters.energyRateCap` (now 262,144) only apply to new configs:
+  an existing config keeps its values until you change them (or `/arcforge config reset` them).
+- **Carbonizer upgrade slot.** Saved Carbonizers get an empty upgrade slot when the world loads; nothing moves.
 - **New config keys**: `power.heat.thermodynamicConduits` (`wrought`, `tempered`, `hardened`, `arcforged`),
   `power.heat.heatPipe` (`ratePerTick`, `maxLength`, `lossPercentPerBlock`) and `power.outputLimit` (`bufferFullPercent`,
-  `shortfallPercent`, `delayTicks`) get their defaults. The Heat Meter's `meters.heatRateCap` now defaults to 51,200; an
+  `shortfallPercent`, `delayTicks`) get their defaults. The Heat Meter's `logistics.meters.heatRateCap` now defaults to 51,200; an
   existing config keeps the value it has.
 - **Reservoir renamed to Fluid Reservoir** (`arcforge:reservoir` is now `arcforge:fluid_reservoir`). An alias keeps
   placed Reservoirs, their contents and Reservoir items working; they load as Fluid Reservoirs. Recipes or scripts that

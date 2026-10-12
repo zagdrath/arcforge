@@ -121,6 +121,7 @@ import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.block.storage.CrateBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
@@ -372,6 +373,14 @@ public final class ModBlocks {
     // Turns Exhaust Steam back into water; no glow, lit only swaps the textures.
     public static final DeferredBlock<CondenserArrayCasingBlock> CONDENSER_ARRAY_CASING = BLOCKS.registerBlock("condenser_array_casing",
             CondenserArrayCasingBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
+
+    // Pumps water from the water body it stands in, with FE; lit only swaps the textures.
+    public static final DeferredBlock<WaterIntakeCasingBlock> WATER_INTAKE_CASING = BLOCKS.registerBlock("water_intake_casing",
+            WaterIntakeCasingBlock::new,
             p -> p.mapColor(MapColor.METAL)
                     .strength(3.5F, 6.0F)
                     .requiresCorrectToolForDrops()

@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
 import net.zagdrath.arcforge.registry.ModFluids;
+import net.zagdrath.arcforge.client.gui.tab.UpgradesTab;
 
 // Layout follows carbonizer_gui_layout.json. All positions are relative to leftPos/topPos.
 public class CarbonizerScreen extends MultiblockScreen<CarbonizerMenu> {
@@ -41,6 +42,8 @@ public class CarbonizerScreen extends MultiblockScreen<CarbonizerMenu> {
     public CarbonizerScreen(CarbonizerMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "carbonizer", menu::getRedstoneMode, menu::getPorts);
         enableAutoEject(menu::isAutoEject);
+        // Speed Upgrades, third tab after Redstone and Ports.
+        tabs.add(new UpgradesTab(menu.getUpgradeSlots()));
     }
 
     @Override

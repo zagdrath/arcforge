@@ -28,6 +28,59 @@ public class ArcforgeConfig {
                     "it, so hydrogen still never makes free power.")
             .defineInRange("generationMultiplier", 1.0, 0.1, 100.0);
 
+    static {
+        BUILDER.comment("Energy Conduits: FE/t a network of each tier moves (a network runs at its lowest tier), and the FE each conduit",
+                "holds (one tick's worth).").push("energyConduits");
+    }
+
+    public static final ModConfigSpec.IntValue ENERGY_CONDUIT_WROUGHT = BUILDER.defineInRange("wrought",
+            net.zagdrath.arcforge.conduit.ConduitTier.WROUGHT.defaultEnergyPerTick(), 1, 2_000_000);
+    public static final ModConfigSpec.IntValue ENERGY_CONDUIT_TEMPERED = BUILDER.defineInRange("tempered",
+            net.zagdrath.arcforge.conduit.ConduitTier.TEMPERED.defaultEnergyPerTick(), 1, 2_000_000);
+    public static final ModConfigSpec.IntValue ENERGY_CONDUIT_HARDENED = BUILDER.defineInRange("hardened",
+            net.zagdrath.arcforge.conduit.ConduitTier.HARDENED.defaultEnergyPerTick(), 1, 2_000_000);
+    public static final ModConfigSpec.IntValue ENERGY_CONDUIT_ARCFORGED = BUILDER.defineInRange("arcforged",
+            net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.defaultEnergyPerTick(), 1, 2_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Energy Cells: FE/t each tier takes in or gives out (each way).").push("energyCells");
+    }
+
+    public static final ModConfigSpec.IntValue ENERGY_CELL_RATE_WROUGHT = BUILDER.defineInRange("wrought",
+            net.zagdrath.arcforge.conduit.ConduitTier.WROUGHT.defaultCellRate(), 1, 100_000_000);
+    public static final ModConfigSpec.IntValue ENERGY_CELL_RATE_TEMPERED = BUILDER.defineInRange("tempered",
+            net.zagdrath.arcforge.conduit.ConduitTier.TEMPERED.defaultCellRate(), 1, 100_000_000);
+    public static final ModConfigSpec.IntValue ENERGY_CELL_RATE_HARDENED = BUILDER.defineInRange("hardened",
+            net.zagdrath.arcforge.conduit.ConduitTier.HARDENED.defaultCellRate(), 1, 100_000_000);
+    public static final ModConfigSpec.IntValue ENERGY_CELL_RATE_ARCFORGED = BUILDER.defineInRange("arcforged",
+            net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.defaultCellRate(), 1, 100_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    // The Energy Conduit's FE/t for a tier.
+    public static int energyConduitRate(net.zagdrath.arcforge.conduit.ConduitTier tier) {
+        return switch (tier) {
+            case WROUGHT -> ENERGY_CONDUIT_WROUGHT.getAsInt();
+            case TEMPERED -> ENERGY_CONDUIT_TEMPERED.getAsInt();
+            case HARDENED -> ENERGY_CONDUIT_HARDENED.getAsInt();
+            case ARCFORGED -> ENERGY_CONDUIT_ARCFORGED.getAsInt();
+        };
+    }
+
+    // An Energy Cell's FE/t each way for a tier.
+    public static int energyCellRate(net.zagdrath.arcforge.conduit.ConduitTier tier) {
+        return switch (tier) {
+            case WROUGHT -> ENERGY_CELL_RATE_WROUGHT.getAsInt();
+            case TEMPERED -> ENERGY_CELL_RATE_TEMPERED.getAsInt();
+            case HARDENED -> ENERGY_CELL_RATE_HARDENED.getAsInt();
+            case ARCFORGED -> ENERGY_CELL_RATE_ARCFORGED.getAsInt();
+        };
+    }
+
+
     // The tier's Lithium Cell capacity (FE).
     public static long lithiumCellCapacity(net.zagdrath.arcforge.conduit.ConduitTier tier) {
         return switch (tier) {
@@ -740,8 +793,8 @@ public class ArcforgeConfig {
             .defineInRange("tankCapacityPerCube", 16_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.IntValue CONDENSER_BASE_RATE_PER_CUBE = BUILDER
-            .comment("mB/t it condenses in open air, per cube.")
-            .defineInRange("baseRatePerCube", 120, 0, 1_000_000);
+            .comment("mB/t it condenses in open air, per cube (400: a 7x7x7 condenses 5,081 mB/t).")
+            .defineInRange("baseRatePerCube", 400, 0, 1_000_000);
 
     public static final ModConfigSpec.IntValue CONDENSER_WATER_BONUS = BUILDER
             .comment("mB/t added by each water source touching its outer faces.")
@@ -768,8 +821,8 @@ public class ArcforgeConfig {
             .defineInRange("netherMultiplier", 0.5, 0.0, 10.0);
 
     public static final ModConfigSpec.IntValue CONDENSER_MAX_RATE_PER_CUBE = BUILDER
-            .comment("Most mB/t it condenses, whatever cools it, per cube (400: a 7x7x7 condenses up to 5,081 mB/t).")
-            .defineInRange("maxRatePerCube", 400, 1, 1_000_000);
+            .comment("Most mB/t it condenses, whatever cools it, per cube (800: a 7x7x7 condenses up to 10,163 mB/t).")
+            .defineInRange("maxRatePerCube", 800, 1, 1_000_000);
 
     public static final ModConfigSpec.ConfigValue<List<? extends String>> CONDENSER_COLD_BIOME_TAGS = BUILDER
             .comment("Biome tags counted as cold.")
@@ -778,6 +831,46 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue CONDENSER_SCAN_INTERVAL = BUILDER
             .comment("Ticks between looks at what's touching it (and at the biome).")
             .defineInRange("scanInterval", 40, 1, 1_200);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Industrial Water Intake: a 3x3x3 pump house standing in water. The water touching its bottom face must be part of",
+                "a body of at least minWaterBlocks connected water sources; then it pumps with FE, faster in rivers and oceans.")
+                .push("waterIntake");
+    }
+
+    public static final ModConfigSpec.IntValue WATER_INTAKE_MIN_WATER = BUILDER
+            .comment("Connected water sources (counted from the ones under its bottom face) it needs.")
+            .defineInRange("minWaterBlocks", 400, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue WATER_INTAKE_RATE = BUILDER
+            .comment("mB/t of water it pumps (8,000: a full-size Steam Boiler Array boils about 7,700).")
+            .defineInRange("waterPerTick", 8_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue WATER_INTAKE_OPEN_WATER_MULTIPLIER = BUILDER
+            .comment("Multiplier on the rate in the biomes of openWaterBiomeTags (rivers and oceans).")
+            .defineInRange("openWaterMultiplier", 1.25, 0.0, 100.0);
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> WATER_INTAKE_OPEN_WATER_TAGS = BUILDER
+            .comment("Biome tags (at the bottom face's centre) counted as rivers and oceans.")
+            .defineListAllowEmpty("openWaterBiomeTags", List.of("minecraft:is_river", "minecraft:is_ocean"), () -> "minecraft:is_river",
+                    value -> value instanceof String);
+
+    public static final ModConfigSpec.DoubleValue WATER_INTAKE_FE_PER_MB = BUILDER
+            .comment("FE per mB pumped (0.25: 2,000 FE/t at 8,000 mB/t).")
+            .defineInRange("energyPerMb", 0.25, 0.0, 1_000.0);
+
+    public static final ModConfigSpec.IntValue WATER_INTAKE_ENERGY_CAPACITY = BUILDER
+            .comment("FE it holds.")
+            .defineInRange("energyCapacity", 200_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue WATER_INTAKE_TANK = BUILDER
+            .comment("mB its water tank holds (its ports push up to what it pumps between pushes).")
+            .defineInRange("tankCapacity", 128_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue WATER_INTAKE_SCAN_INTERVAL = BUILDER
+            .comment("Ticks between counts of the water around it.")
+            .defineInRange("scanInterval", 100, 1, 12_000);
 
     static {
         BUILDER.pop();
@@ -2726,7 +2819,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue METER_ENERGY_CAP = BUILDER
             .comment("Most FE an Energy Meter passes per tick.")
-            .defineInRange("energyRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.energyPerTick(), 1, Integer.MAX_VALUE);
+            .defineInRange("energyRateCap", net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.defaultEnergyPerTick(), 1, Integer.MAX_VALUE);
 
     public static final ModConfigSpec.IntValue METER_HEAT_CAP = BUILDER
             .comment("Most HU a Heat Meter passes per tick.")

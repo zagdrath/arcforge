@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -50,11 +51,12 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The Condenser Array (see CubeMultiblockBlockEntity): a solid box, 3x3x3 up to 7x7x7, that turns Exhaust Steam from a
-// Steam Turbine Array's Exhaust ports back into water, 1 mB for 1 mB. It condenses 120 mB/t per cube (27 blocks of its
-// volume) in open air; water sources and ice touching its outer faces add to that (20 each, ice 30, packed ice 40, blue
-// ice 60), a cold biome multiplies it by 1.25 and the Nether by 0.5, up to 400 mB/t per cube (a 7x7x7: 5,081). Its
-// tanks hold 16,000 mB per cube. It looks around every 40 ticks.
-// Its ports push the water out on their own.
+// Steam Turbine Array's Exhaust ports back into water, 1 mB for 1 mB. It condenses 400 mB/t per cube (27 blocks of its
+// volume) in open air (a 7x7x7: 5,081); water sources and ice touching its outer faces add to that (20 each, ice 30,
+// packed ice 40, blue ice 60), a cold biome multiplies it by 1.25 and the Nether by 0.5, up to 800 mB/t per cube (a
+// 7x7x7: 10,163). A 7x7x7 in open air takes a full-size Steam Turbine Array's 4,200 mB/t of exhaust with room to spare.
+// Its tanks hold 16,000 mB per cube. It looks around every 40 ticks.
+// Its ports push the water out on their own, each up to its rate a tick (see MultiblockAutomation).
 public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT);
@@ -232,7 +234,9 @@ public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {
         }
         setLit(condensed > 0);
         if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
-            MultiblockAutomation.pushOutputs(level, this, true);
+            // Each port face up to the rate for every tick since the last push, so ports keep up with it.
+            MultiblockAutomation.pushOutputs(level, this, true,
+                    Math.max(FluidType.BUCKET_VOLUME, cooling.rate() * ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt()));
         }
     }
 

@@ -1,0 +1,17 @@
+{
+  "title": "Industrial Water Intake",
+  "icon": "arcforge:water_intake_casing",
+  "items": [
+    "arcforge:water_intake_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A 3×3×3 pump house that stands in water and pumps it with FE: enough for a full-size Steam Boiler Array.\n# Placing it\n- Its intake is the middle of its bottom face: the block under it must be a water source.\n- That water must be part of a body of at least 400 connected water sources (counted through water sources only). A lake, a river or the sea will do; a pond won't.\n- It doesn't use the water up.\n# Pumping\n- 8,000 mB/t, ×1.25 in rivers and oceans.\n- 0.25 FE per mB: 2,000 FE/t.\n- Its Output ports push the water out on their own, as fast as it pumps; Fluid Conduits can pull it too."
+    },
+    {
+      "type": "multiblock",
+      "structure": "water_intake"
+    }
+  ]
+}

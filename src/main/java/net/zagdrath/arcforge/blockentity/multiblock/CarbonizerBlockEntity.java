@@ -7,8 +7,10 @@ package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
@@ -74,6 +76,8 @@ import net.zagdrath.arcforge.security.Ownership;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 import com.mojang.serialization.Codec;
 
@@ -81,6 +85,9 @@ import com.mojang.serialization.Codec;
 // bottom, front block), which runs one chamber per slice in parallel, holds the shared slots and the
 // creosote buffer tank, and serves the GUI and capabilities for every block. Bigger slices bake a
 // bigger batch in the same time: one input per 3 blocks of slice volume (2x2: 1, 2x3: 2, 3x3: 3).
+//
+// Speed Upgrades (in its one upgrade slot) bake each batch 2^(n/2) times as fast, like every machine; a batch keeps the
+// time it started with.
 //
 // The master's contents stay with that block when the structure breaks and come back when it re-forms.
 // If a different block becomes master, the old one hands everything over (see absorb).
@@ -95,13 +102,17 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     public static final int SLOT_OUTPUT = 1;
     public static final int SLOT_BUCKET_IN = 2;
     public static final int SLOT_BUCKET_OUT = 3;
-    public static final int SLOT_COUNT = 4;
+    // Its machine slots, then one upgrade slot (Speed only).
+    public static final int MACHINE_SLOTS = 4;
+    public static final int SLOT_UPGRADE = 4;
+    public static final int SLOT_COUNT = 5;
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED);
     public static final int MAX_CHAMBERS = 8;
 
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT);
     private static final int REDSTONE_CHECK_INTERVAL = 4;
 
-    private final FilteredItemHandler items;
+    private final MachineItemHandler items;
     private final FilteredFluidTank tank;
     private final ResourceHandler<ItemResource> itemInput;
     private final ResourceHandler<ItemResource> itemOutput;
@@ -134,7 +145,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
     public CarbonizerBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.CARBONIZER.get(), pos, state);
         Arrays.fill(chamberInput, ItemStack.EMPTY);
-        this.items = new FilteredItemHandler(SLOT_COUNT, (slot, resource) -> isItemValid(level, slot, resource), this::setChanged);
+        this.items = newItems((slot, resource) -> isItemValid(level, slot, resource), this::setChanged);
         this.tank = new FilteredFluidTank(minCapacity(), resource -> true, this::setChanged);
         this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT);
@@ -166,6 +177,25 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
                 };
             }
         };
+    }
+
+    // The slots: the machine's four, then the upgrade slot. The client's menu makes its own copy.
+    public static MachineItemHandler newItems(FilteredItemHandler.SlotFilter filter, Runnable onChanged) {
+        return new MachineItemHandler(MACHINE_SLOTS, 1, filter, UPGRADES, onChanged);
+    }
+
+    public MachineItemHandler getItems() {
+        return items;
+    }
+
+    // The ticks the chamber's batch takes (0 while idle).
+    public int getChamberTime(int chamber) {
+        return chamberTime[chamber];
+    }
+
+    // Speed Upgrades installed.
+    public int speedUpgrades() {
+        return items.count(UpgradeType.SPEED);
     }
 
     // Whether players and automation may put this item in a slot. The client passes a null level and
@@ -354,10 +384,6 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         return lead;
     }
 
-    public FilteredItemHandler getItems() {
-        return items;
-    }
-
     public FilteredFluidTank getTank() {
         return tank;
     }
@@ -515,7 +541,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         }
         chamberInput[chamber] = input.copyWithCount(count);
         chamberProgress[chamber] = 0;
-        chamberTime[chamber] = recipe.value().time();
+        chamberTime[chamber] = UpgradeType.time(recipe.value().time(), speedUpgrades());
         items.setStack(SLOT_INPUT, input.copyWithCount(input.getCount() - count));
     }
 
@@ -816,6 +842,8 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
         formation = input.read("formation", CarbonizerStructure.Formation.CODEC).orElse(null);
         holdsContents = input.getBooleanOr("holds_contents", false);
         items.deserialize(input.childOrEmpty("items"));
+        // Saved before the upgrade slot: one more, empty.
+        items.ensureSize(SLOT_COUNT);
         tank.deserialize(input.childOrEmpty("creosote"));
         sideConfig.deserialize(input);
         redstoneMode = RedstoneMode.byId(input.getIntOr("redstone_mode", 0));

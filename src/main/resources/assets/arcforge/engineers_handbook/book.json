@@ -115,6 +115,7 @@
         "steam_turbine_array",
         "superheater_array",
         "condenser_array",
+        "water_intake",
         "pressurized_storage"
       ]
     },

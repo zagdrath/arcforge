@@ -68,6 +68,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.GAS_TURBINE_ARRAY_CASING.get());
                 output.accept(ModItems.SUPERHEATER_ARRAY_CASING.get());
                 output.accept(ModItems.CONDENSER_ARRAY_CASING.get());
+                output.accept(ModItems.WATER_INTAKE_CASING.get());
                 output.accept(ModItems.PRESSURE_GLASS.get());
                 output.accept(ModItems.FIBERIZER.get());
                 output.accept(ModItems.INFUSER.get());

@@ -53,6 +53,7 @@ import net.zagdrath.arcforge.menu.multiblock.MetalPressingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.SolarThermalArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.CondenserArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.WaterIntakeMenu;
 import net.zagdrath.arcforge.menu.multiblock.SuperheaterArrayMenu;
 import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
 import net.zagdrath.arcforge.menu.machine.InfuserMenu;
@@ -200,6 +201,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<CondenserArrayMenu>> CONDENSER_ARRAY = MENU_TYPES.register("condenser_array",
             () -> IMenuTypeExtension.create(CondenserArrayMenu::new));
+
+    public static final Supplier<MenuType<WaterIntakeMenu>> WATER_INTAKE = MENU_TYPES.register("water_intake",
+            () -> IMenuTypeExtension.create(WaterIntakeMenu::new));
 
     public static final Supplier<MenuType<MetalPressingArrayMenu>> METAL_PRESSING_ARRAY = MENU_TYPES.register("metal_pressing_array",
             () -> IMenuTypeExtension.create(MetalPressingArrayMenu::new));

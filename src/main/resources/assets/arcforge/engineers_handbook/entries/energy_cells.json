@@ -10,7 +10,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Store FE, from 500,000 to 256,000,000 by tier, and keep it when broken. The lights on top show how full they are.\nIts top slot drains a Battery into the cell, the bottom one charges it."
+      "text": "Store FE, from 500,000 to 256,000,000 by tier, and keep it when broken. The lights on top show how full they are.\nIts top slot drains a Battery into the cell, the bottom one charges it.\nThey take in and give out 512, 2,048, 16,384 and 262,144 FE/t: an Arcforged cell keeps up with an Arcforged Energy Conduit."
     }
   ]
 }

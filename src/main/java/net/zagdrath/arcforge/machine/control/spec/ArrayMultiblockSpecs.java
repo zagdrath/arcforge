@@ -23,6 +23,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntit
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity;
 import net.zagdrath.arcforge.machine.control.MachineControlSpec;
 import net.zagdrath.arcforge.machine.control.MachineControls;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -95,6 +96,13 @@ public final class ArrayMultiblockSpecs {
                 .primary(CondenserArrayBlockEntity::isFormed)
                 .tank(SlotRole.INPUT, CondenserArrayBlockEntity::getExhaustIn)
                 .tank(SlotRole.OUTPUT, CondenserArrayBlockEntity::getWaterOut)
+                .fluidAutomation(be -> be.getFluidHandler(null))
+                .build());
+
+        MachineControls.register(ModBlockEntityTypes.WATER_INTAKE.get(), MachineControlSpec.builder(WaterIntakeBlockEntity.class)
+                .primary(WaterIntakeBlockEntity::isFormed)
+                .energy(EnergyRole.CONSUMER, WaterIntakeBlockEntity::getEnergy, WaterIntakeBlockEntity::getUsage)
+                .tank(SlotRole.OUTPUT, WaterIntakeBlockEntity::getWater)
                 .fluidAutomation(be -> be.getFluidHandler(null))
                 .build());
 

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "CPC",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "#c:plates/copper",
+    "P": "arcforge:electric_pump"
+  },
+  "result": {
+    "id": "arcforge:water_intake_casing",
+    "count": 6
+  }
+}

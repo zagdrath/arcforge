@@ -114,6 +114,9 @@ log         --[Carbonizer]--> charcoal + 100 mB creosote    (400 ticks; any log 
 metal + additive(s) + coal coke --[Arcforge Furnace]--> result + slag
 ```
 
+The Carbonizer takes Speed Upgrades (its Upgrades tab, up to 8): each batch bakes 2^(n/2) times as fast, ×16 at 8,
+so its coke and creosote keep up with a maxed Firebox Array.
+
 **Arcforge Furnace.** Four inputs: the metal, two additive slots and coal coke, which is both its fuel and
 its reagent (it keeps back what each smelt uses; a coke block counts as nine). Burning coke heats it towards
 1,600°C, and a smelt only progresses above its recipe's minimum. A recipe's two additives can sit in either
@@ -425,16 +428,26 @@ Its flow, heat and tanks scale with its volume ÷ 27.
 **Condenser Array.** A solid box of Condenser Array Casings (Tempered tier), 3 to 7 blocks each way, formed
 like the Superheater Array. It turns Exhaust Steam back into water, 1:1.
 
-- It condenses 120 mB/t in open air per 27 blocks of its volume, with 16,000 mB tanks per 27 blocks.
+- It condenses 400 mB/t in open air per 27 blocks of its volume (a 7×7×7: 5,081 mB/t), with 16,000 mB tanks per 27 blocks.
 - Blocks touching its outer faces add to that:
   - each water source: 20;
   - each ice: 30;
   - each packed ice: 40;
   - each blue ice: 60.
-- Cold biomes condense ×1.25 and the Nether ×0.5, up to 400 mB/t per 27 blocks (a 7×7×7: 5,081 mB/t).
+- Cold biomes condense ×1.25 and the Nether ×0.5, up to 800 mB/t per 27 blocks (a 7×7×7: 10,163 mB/t). A
+  7×7×7 in open air already takes a full-size Steam Turbine Array's 4,200 mB/t of exhaust.
 - A new one has an exhaust-in and a water-out port.
 - Boiler → turbine → condenser → back to the boiler's water port is a closed loop. The ports push on
-  their own, so it runs without a pump.
+  their own, as fast as it condenses, so it runs without a pump.
+
+**Industrial Water Intake.** A 3×3×3 cube of Industrial Water Intake Casings that stands in water: a pump house
+with a long motor housing, a discharge header and a junction box low on its roof, and a sight glass that shows water racing past while it pumps.
+
+- Its intake is the middle of its bottom face: the block under it must be a water source in a body of at least
+  `power.steam.waterIntake.minWaterBlocks` (400) connected water sources. The water isn't used up.
+- With FE (`energyPerMb`, 0.25) it pumps `waterPerTick` (8,000) mB/t, ×1.25 in rivers and oceans: enough for a
+  full-size Steam Boiler Array (~7,700 mB/t). Its Output ports push the water out on their own, as fast as it pumps.
+- A new one has two water-out ports and an energy port.
 
 ### Distillation
 
@@ -446,7 +459,8 @@ pitch --[Fiberizer, 1,000°C]--> Carbon Fiber --> Arcforged Alloy
 
 **Distillation Array.** A solid 2x2 column exactly 4, 6 or 8 tall of Distillation Array Casings and Tray
 Level Casings with one Distillation Array Controller (Hardened tier). The controller and the trays can't
-be in the top or bottom layer; the controller's display is the front. Formed, the column reads as one
+be in the top or bottom layer; the controller's display is the front. Speed Upgrades feed it 2^(n/2) times as
+fast (heat as fast, so a batch still takes 4,000 HU), and Heat Upgrades cut a batch's heat to 0.8^n. Formed, the column reads as one
 block, and its tray levels are glass: each shows its steel tray, the fraction pooled on it (as deep as its
 tank is full) and vapour rising while it runs. It distils
 1,000 mB batches of creosote with heat, at 4,000 HU a batch and only at 350°C or hotter:
@@ -858,7 +872,7 @@ to force a side to **Input** (push into the machine) or **Output** (pull from it
 
 | Type | Wrought | Tempered | Hardened | Arcforged |
 |---|---|---|---|---|
-| Energy (FE/t) | 256 | 1,024 | 8,192 | 65,536 |
+| Energy (FE/t) | 256 | 1,024 | 8,192 | 262,144 |
 | Item (items per transfer) | 8 every 1.0s | 16 every 0.5s | 32 every 0.25s | 64 every 0.1s |
 | Fluid (mB/t) | 200 | 800 | 3,200 | 12,800 |
 | Thermodynamic (HU/t) | 50 | 200 | 800 | 51,200 |
@@ -985,7 +999,7 @@ off more light the fuller it is.
 | | Wrought | Tempered | Hardened | Arcforged |
 |---|---|---|---|---|
 | Capacity (FE) | 500,000 | 4,000,000 | 32,000,000 | 256,000,000 |
-| I/O (FE/t) | 512 | 2,048 | 16,384 | 131,072 |
+| I/O (FE/t) | 512 | 2,048 | 16,384 | 262,144 |
 
 - Output faces push FE into neighbouring machines every tick. By default the front (the side
   facing you when you placed it) is the output and every other face is an input.

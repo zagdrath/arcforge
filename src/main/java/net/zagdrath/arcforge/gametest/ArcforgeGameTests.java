@@ -124,6 +124,11 @@ public final class ArcforgeGameTests {
         TESTS.put("heat_cell_outputs", HeatGameTests::heatCellOutputs);
         TESTS.put("heat_cell_keeps_heat", HeatGameTests::heatCellKeepsHeat);
         TESTS.put("thermal_conduit_rates", HeatTransportGameTests::thermalConduitRates);
+        TESTS.put("energy_rates", MaxScaleGameTests::energyRates);
+        TESTS.put("water_intake_pumps", MaxScaleGameTests::waterIntakePumps);
+        TESTS.put("water_intake_needs_a_water_body", MaxScaleGameTests::waterIntakeNeedsAWaterBody);
+        TESTS.put("carbonizer_speed_upgrades", MaxScaleGameTests::carbonizerSpeedUpgrades);
+        TESTS.put("distillation_upgrades", MaxScaleGameTests::distillationUpgrades);
         TESTS.put("heat_pipe_carries_heat", HeatTransportGameTests::heatPipeCarriesHeat);
         TESTS.put("heat_pipe_one_way", HeatTransportGameTests::heatPipeOneWay);
         TESTS.put("heat_pipe_sides_dont_connect", HeatTransportGameTests::heatPipeSidesDontConnect);

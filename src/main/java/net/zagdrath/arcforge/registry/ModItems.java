@@ -130,6 +130,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> GAS_TURBINE_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.GAS_TURBINE_ARRAY_CASING);
     public static final DeferredItem<BlockItem> SUPERHEATER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.SUPERHEATER_ARRAY_CASING);
     public static final DeferredItem<BlockItem> CONDENSER_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CONDENSER_ARRAY_CASING);
+    public static final DeferredItem<BlockItem> WATER_INTAKE_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.WATER_INTAKE_CASING);
     public static final DeferredItem<BlockItem> PRESSURE_GLASS = ITEMS.registerSimpleBlockItem(ModBlocks.PRESSURE_GLASS);
     public static final DeferredItem<BlockItem> FIBERIZER = ITEMS.registerSimpleBlockItem(ModBlocks.FIBERIZER);
     public static final DeferredItem<BlockItem> INFUSER = ITEMS.registerSimpleBlockItem(ModBlocks.INFUSER);

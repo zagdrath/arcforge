@@ -27,6 +27,7 @@ import net.zagdrath.arcforge.gas.FluidGasHandler;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity;
@@ -36,6 +37,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
@@ -192,6 +194,15 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CONDENSER_ARRAY.get(), (casing, side) -> {
             CondenserArrayBlockEntity array = CondenserArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
             return array != null ? array.fluidHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        // Every casing of a formed Industrial Water Intake exposes the cube face it lies on: water out, FE in.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.WATER_INTAKE.get(), (casing, side) -> {
+            WaterIntakeBlockEntity intake = WaterIntakeCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return intake != null ? intake.fluidHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.WATER_INTAKE.get(), (casing, side) -> {
+            WaterIntakeBlockEntity intake = WaterIntakeCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return intake != null ? intake.energyHandlerAt(casing.getBlockPos(), side) : null;
         });
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ELECTRIC_PUMP.get(),
                 ElectricPumpBlockEntity::getItemHandler);

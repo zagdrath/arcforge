@@ -79,11 +79,13 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // 60 / 80 HU/t) and only while the column is at 350°C or hotter. The taller the column, the more
 // fractions it makes (4 high: Naphtha and Pitch; 6: + Heavy Oil; 8: + Light Oil). Steam in its steam tank
 // is used for steam stripping: 100 mB a batch, for more Naphtha by the grade. Its heat buffer holds
-// 40,000 HU per 4 blocks of height, up to 1,400°C.
+// 40,000 HU per 4 blocks of height, up to 1,400°C. Speed Upgrades feed it 2^(n/2) times as fast (heat as fast too, so the
+// heat per batch doesn't change), like every machine; Heat Upgrades cut the heat per batch to 0.8^n, like the other heat
+// machines.
 public class DistillationArrayBlockEntity extends MachineBlockEntity implements MultiblockController {
     public static final int SLOT_PITCH = 0;
     public static final int MACHINE_SLOTS = 1;
-    public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.STEAM, SideMode.HEAT,
             SideMode.NAPHTHA, SideMode.LIGHT_OIL, SideMode.HEAVY_OIL, SideMode.PITCH);
     private static final int REDSTONE_CHECK_INTERVAL = 10;
@@ -196,9 +198,9 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         return column;
     }
 
-    // Feed through the column per tick, in mB.
+    // Feed through the column per tick, in mB: faster with Speed upgrades.
     public int feedRate() {
-        return ArcforgeConfig.DISTILLATION_FEED_RATE.getAsInt() * getHeight() / BASE_HEIGHT;
+        return (int) Math.round(ArcforgeConfig.DISTILLATION_FEED_RATE.getAsInt() * getHeight() / BASE_HEIGHT * speedMultiplier());
     }
 
     // --- Structure ---
@@ -401,7 +403,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
             return MachineStatus.HEATING;
         }
         double fed = Math.min(feedRate(), recipe.amount() - progress);
-        double heatNeeded = fed * recipe.heat() / recipe.amount();
+        double heatNeeded = fed * recipe.heat() / recipe.amount() * UpgradeType.energyCostMultiplier(upgrades(UpgradeType.HEAT));
         if (heat.getStored() < pendingHeat + heatNeeded) {
             return MachineStatus.HEATING;
         }

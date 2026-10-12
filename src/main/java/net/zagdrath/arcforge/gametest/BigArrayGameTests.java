@@ -216,7 +216,7 @@ public final class BigArrayGameTests {
     }
 
     // A 5x3x4 Superheater box forms as one connected skin with its master at the minimum corner, and scales by its 60 blocks
-    // (60 / 27 cubes): 2,222 mB/t and 4,444 HU/t. A 4x3x3 Condenser box condenses 160 mB/t in open air. Breaking a casing
+    // (60 / 27 cubes): 2,222 mB/t and 4,444 HU/t. A 4x3x3 Condenser box condenses 533 mB/t in open air (36 / 27 cubes). Breaking a casing
     // breaks it.
     static void boxArrays(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);
@@ -244,7 +244,7 @@ public final class BigArrayGameTests {
                     helper.assertTrue(!CubeCasingBlock.isFormed(helper.getBlockState(min)), "The Superheater stayed formed with a casing missing");
                     CondenserArrayBlockEntity condenser = helper.getBlockEntity(condenserMin, CondenserArrayBlockEntity.class);
                     helper.assertTrue(CondenserArrayBlockEntity.cooling(helper.getLevel(), helper.absolutePos(condenserMin),
-                            helper.absolutePos(condenserMin.offset(3, 2, 2))).air() == 160, "Open air condenses "
+                            helper.absolutePos(condenserMin.offset(3, 2, 2))).air() == (int) Math.round(ArcforgeConfig.CONDENSER_BASE_RATE_PER_CUBE.getAsInt() * 36 / 27.0), "Open air condenses "
                             + CondenserArrayBlockEntity.cooling(helper.getLevel(), helper.absolutePos(condenserMin), helper.absolutePos(condenserMin.offset(3, 2, 2))).air());
                     helper.assertTrue(condenser.isFormed(), "The Condenser broke");
                 })

@@ -13,7 +13,7 @@
     },
     {
       "type": "text",
-      "text": "# Steam stripping\nSteam in its steam tank (fed through a steam port) raises the Naphtha yield of every batch, out of the Heavy Oil: Steam +15%, High-Pressure +30%, Superheated +50%. Each batch uses 100 mB.\nIt stops when a product it makes is full, so pipe them away or turn on auto-eject. Each product has its own port mode."
+      "text": "# Steam stripping\nSteam in its steam tank (fed through a steam port) raises the Naphtha yield of every batch, out of the Heavy Oil: Steam +15%, High-Pressure +30%, Superheated +50%. Each batch uses 100 mB.\nIt stops when a product it makes is full, so pipe them away or turn on auto-eject. Each product has its own port mode.\n# Upgrades\nSpeed Upgrades feed it 2^(n/2) times as fast (×16 at 8), using heat as fast. Heat Upgrades cut the heat per batch to 0.8^n."
     },
     {
       "type": "multiblock",

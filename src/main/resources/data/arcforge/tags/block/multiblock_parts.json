@@ -6,6 +6,7 @@
     "arcforge:arcforge_furnace_port",
     "arcforge:carbonizer",
     "arcforge:condenser_array_casing",
+    "arcforge:water_intake_casing",
     "arcforge:distillation_array_casing",
     "arcforge:distillation_array_controller",
     "arcforge:induction_furnace_array_casing",

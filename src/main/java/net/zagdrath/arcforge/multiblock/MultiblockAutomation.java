@@ -37,6 +37,12 @@ public final class MultiblockAutomation {
     // Pushes out of every output face whether auto-eject is on or not (machines whose ports always push,
     // like the Superheater and Condenser Arrays). force = false behaves like pushOutputs(level, controller).
     public static void pushOutputs(ServerLevel level, MultiblockController controller, boolean force) {
+        pushOutputs(level, controller, force, FLUID_PER_FACE);
+    }
+
+    // The same, moving up to fluidPerFace mB through each fluid face (machines that make more than a bucket per face
+    // between pushes: the Condenser Array, the Industrial Water Intake).
+    public static void pushOutputs(ServerLevel level, MultiblockController controller, boolean force, int fluidPerFace) {
         if (!force && !controller.isAutoEject()) {
             return;
         }
@@ -64,7 +70,7 @@ public final class MultiblockAutomation {
                 if (fluid != null) {
                     ResourceHandler<FluidResource> into = level.getCapability(Capabilities.Fluid.BLOCK, target, side.getOpposite());
                     if (into != null) {
-                        ResourceHandlerUtil.move(fluid, into, resource -> true, FLUID_PER_FACE, null);
+                        ResourceHandlerUtil.move(fluid, into, resource -> true, fluidPerFace, null);
                     }
                 }
             }

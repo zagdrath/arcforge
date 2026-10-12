@@ -114,6 +114,7 @@
     "arcforge:vacuum_collector",
     "arcforge:superheater_array_casing",
     "arcforge:condenser_array_casing",
+    "arcforge:water_intake_casing",
     "arcforge:arc_quarry",
     "arcforge:arc_quarry_bounding",
     "arcforge:security_terminal",

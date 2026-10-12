@@ -33,6 +33,9 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.security.SecuredMenu;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
+import net.zagdrath.arcforge.menu.slot.ToggleableSlot;
+import net.zagdrath.arcforge.menu.machine.MachineMenu;
+import net.zagdrath.arcforge.item.upgrade.UpgradeItem;
 
 import java.util.List;
 
@@ -68,11 +71,12 @@ public class CarbonizerMenu extends AbstractContainerMenu implements SecuredMenu
     private final ContainerLevelAccess access;
     private final PortSync ports;
     private final ContainerData data;
+    private final List<ToggleableSlot> upgradeSlots = new java.util.ArrayList<>();
 
     // Client constructor, called with the master's position written by the server.
     public CarbonizerMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(),
-                new FilteredItemHandler(MACHINE_SLOTS, (slot, resource) -> CarbonizerBlockEntity.isItemValid(null, slot, resource), () -> {}),
+                CarbonizerBlockEntity.newItems((slot, resource) -> CarbonizerBlockEntity.isItemValid(null, slot, resource), () -> {}),
                 WideIntContainerData.client(DATA_VALUES));
     }
 
@@ -87,6 +91,11 @@ public class CarbonizerMenu extends AbstractContainerMenu implements SecuredMenu
         addSlot(new ResourceHandlerSlot(items, items::set, CarbonizerBlockEntity.SLOT_OUTPUT, OUTPUT_X, OUTPUT_Y));
         addSlot(new ResourceHandlerSlot(items, items::set, CarbonizerBlockEntity.SLOT_BUCKET_IN, BUCKET_IN_X, BUCKET_IN_Y));
         addSlot(new ResourceHandlerSlot(items, items::set, CarbonizerBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y));
+        // The Speed Upgrade slot, in the Upgrades tab (the third tab, as on every machine).
+        ToggleableSlot upgrade = new ToggleableSlot(items, items::set, CarbonizerBlockEntity.SLOT_UPGRADE, MachineMenu.UPGRADE_SLOT_X,
+                MachineMenu.UPGRADE_SLOT_Y);
+        upgradeSlots.add(upgrade);
+        addSlot(upgrade);
         addStandardInventorySlots(inventory, 8, 84);
         addDataSlots(data);
     }
@@ -121,6 +130,10 @@ public class CarbonizerMenu extends AbstractContainerMenu implements SecuredMenu
 
         if (slotIndex < MACHINE_SLOTS) {
             if (!moveItemStackTo(stack, MACHINE_SLOTS, PLAYER_HOTBAR_END, true)) {
+                return ItemStack.EMPTY;
+            }
+        } else if (resource.getItem() instanceof UpgradeItem upgrade && CarbonizerBlockEntity.UPGRADES.contains(upgrade.getType())) {
+            if (!moveItemStackTo(stack, CarbonizerBlockEntity.SLOT_UPGRADE, CarbonizerBlockEntity.SLOT_UPGRADE + 1, false)) {
                 return ItemStack.EMPTY;
             }
         } else if (CarbonizerBlockEntity.isItemValid(player.level(), CarbonizerBlockEntity.SLOT_INPUT, resource)) {
@@ -161,6 +174,10 @@ public class CarbonizerMenu extends AbstractContainerMenu implements SecuredMenu
     @Override
     public boolean stillValid(Player player) {
         return MenuReach.stillValid(access, player, ModBlocks.CARBONIZER.get());
+    }
+
+    public List<ToggleableSlot> getUpgradeSlots() {
+        return upgradeSlots;
     }
 
     public Slot getSlotFor(int machineSlot) {

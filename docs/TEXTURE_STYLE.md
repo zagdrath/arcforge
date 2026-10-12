@@ -17,6 +17,13 @@ texture-unification drop.
 2. **Flat faces.**
    - Use one or two tones per face.
    - Never use gradients, pillow shading, radial glows on metal, or dithering or checkerboards.
+   - **Exception: broad shading on big UV-unwrapped faces.** On the large faces of a formed multiblock model (about
+     16 px or more each way), a two-tone split reads as a flat fill. Those faces use *broad shading* instead: eight
+     flat steel tones (`#5C626A` `#555B63` `#4F555D` `#494E56` `#43484F` `#3E4349` `#393D43` `#34383D`) in wide
+     diagonal bands, lightest at the top left and darkest at the bottom right (tone index from
+     0.55·x/w + 0.45·y/h). Each band is several px wide, with hard steps and no dithering. The face's bevel,
+     rivets, straps and louvres sit on top unchanged. This is not pillow shading, which darkens every edge towards
+     a lit middle. First used on the Industrial Water Intake.
 3. **No noise.**
    - Texture comes from *shapes*: straps, rivets, seams, slats and panels.
    - Never use random pixels or speckle.
@@ -1047,3 +1054,23 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - **"Limited by connections"** (every heat, FE or steam producer's GUI): one line in warning yellow `#FFD24A` in place of
   the inventory label, scaled down to fit the 160 px between the margins (to 2/3 at most; past that the short form
   "Limited: ..." is used). Jade shows the same line in the same colour.
+
+## Industrial Water Intake
+- **Casing** (`block/water_intake/casing`): the single-block casing (broad shading, bevel, four rivets) with a recessed
+  intake grille: two `#575D65` slats with `#16181B` shadows over water (`#2C4FA6` top, `#3A76C0` bottom) and one
+  `#4A8FE0` glint.
+- **Formed** (`block/water_intake/formed`, `formed_on`; models `formed` / `formed_active` on the centre block): one
+  UV-unwrapped 128×128 sheet, 1 texel per px. Every
+  large face (skid top, walls, lid, motor-housing top, junction-box top, and the faces between the housing's
+  ribs) uses broad shading (see rule 2). A 48×4 skid (edges the 4-row strip,
+  top the broad-shaded wall plate, underside the intake strainer: `#16181B` with a `#383C42` bar every 4 px in a bevel), a 42×28
+  pump house set in 3 px (walls: the broad-shaded wall plate with a riveted strap across rows 5–7 and an intake louvre band near the
+  bottom: a recess with a slat every 3 rows), a 44×44 lid with a seam, and low, flat roof equipment (nothing tall or
+  round sticks up): a 32×6×14 motor housing lying along the front half (long sides broad-shaded between cooling ribs, a
+  `#575D65` column and a `#16181B` column every 3 px, under a `#727982` top row; ends the edge strip; top the broad-shaded wall plate),
+  a 6×6 discharge header across the full width behind it (lit-to-deepest rows, flange bands at the ends and middle) and
+  a small 10×4×6 junction box. The front's sight glass (a 17×7 recess) shows still water
+  (`#2C4FA6` / `#1C2E44`) idle and, in `formed_on`, `#4A8FE0` with a `#7FB3F0` top row and diagonal flow streaks on a
+  fixed pitch, a `#3A76C0` right column, and a lit status lamp beside it.
+- **GUI** (`gui/container/water_intake.png`): the Condenser Array's frame with the Electric Pump's 10-wide FE gauge on
+  the left; its sprites are the Electric Pump's.

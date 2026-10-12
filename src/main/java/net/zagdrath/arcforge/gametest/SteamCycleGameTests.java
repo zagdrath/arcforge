@@ -246,7 +246,7 @@ public final class SteamCycleGameTests {
                 .thenSucceed();
     }
 
-    // 120 mB/t in open air; 2 water sources and a blue ice add 40 and 60; enough blue ice caps it at 400. It
+    // 400 mB/t in open air; 2 water sources and a blue ice add 40 and 60; enough blue ice caps it at 800. It
     // condenses 1:1.
     static void condenserRateFromCooling(GameTestHelper helper) {
         MultiblockTestHelpers.buildCube(helper, MIN, ModBlocks.CONDENSER_ARRAY_CASING.get());
@@ -256,7 +256,7 @@ public final class SteamCycleGameTests {
                 .thenExecute(() -> {
                     helper.assertTrue(condenser(helper, MIN).isFormed(), "Condenser did not form");
                     int air = CondenserArrayBlockEntity.cooling(helper.getLevel(), centre).rate();
-                    helper.assertTrue(air == 120, "In open air it condenses " + air + " mB/t");
+                    helper.assertTrue(air == ArcforgeConfig.CONDENSER_BASE_RATE_PER_CUBE.getAsInt(), "In open air it condenses " + air + " mB/t");
                     // Two water sources in the bottom row against the west face (with stone under them so they
                     // stay sources), and a blue ice on top.
                     for (int z = 0; z < 3; z++) {
@@ -269,7 +269,7 @@ public final class SteamCycleGameTests {
                 .thenIdle(2)
                 .thenExecute(() -> {
                     CondenserArrayBlockEntity.Cooling cooling = CondenserArrayBlockEntity.cooling(helper.getLevel(), centre);
-                    helper.assertTrue(cooling.water() == 40 && cooling.ice() == 60 && cooling.rate() == 220,
+                    helper.assertTrue(cooling.water() == 40 && cooling.ice() == 60 && cooling.rate() == ArcforgeConfig.CONDENSER_BASE_RATE_PER_CUBE.getAsInt() + 100,
                             "Water " + cooling.water() + ", ice " + cooling.ice() + ": " + cooling.rate() + " mB/t");
                     for (Direction side : Direction.values()) {
                         for (int a = -1; a <= 1; a++) {
@@ -303,10 +303,16 @@ public final class SteamCycleGameTests {
     // The climate: x1.25 cold, x0.5 in the Nether, rounded down and capped. (The test world's biome is fixed, so
     // this checks the formula, and that the overworld doesn't count as the Nether.)
     static void condenserClimate(GameTestHelper helper) {
-        helper.assertTrue(CondenserArrayBlockEntity.cooling(120, 40, 60, 1.25).rate() == 275, "Cold: " + CondenserArrayBlockEntity.cooling(120, 40, 60, 1.25).rate());
-        helper.assertTrue(CondenserArrayBlockEntity.cooling(120, 0, 0, 0.5).rate() == 60, "Nether: " + CondenserArrayBlockEntity.cooling(120, 0, 0, 0.5).rate());
-        helper.assertTrue(CondenserArrayBlockEntity.cooling(120, 0, 480, 1.25).rate() == 400, "Not capped");
-        helper.assertTrue(CondenserArrayBlockEntity.cooling(120, 0, 0, 1.25).multiplierPercent() == 125, "Multiplier not kept for the GUI");
+        helper.assertTrue(CondenserArrayBlockEntity.cooling(400, 40, 60, 1.25).rate() == 625, "Cold: " + CondenserArrayBlockEntity.cooling(400, 40, 60, 1.25).rate());
+        helper.assertTrue(CondenserArrayBlockEntity.cooling(400, 0, 0, 0.5).rate() == 200, "Nether: " + CondenserArrayBlockEntity.cooling(400, 0, 0, 0.5).rate());
+        helper.assertTrue(CondenserArrayBlockEntity.cooling(400, 0, 480, 1.25).rate() == 800, "Not capped");
+        helper.assertTrue(CondenserArrayBlockEntity.cooling(400, 0, 0, 1.25).multiplierPercent() == 125, "Multiplier not kept for the GUI");
+        // A 7x7x7 (343 / 27 cubes): about 5,000 mB/t in open air, capped about 10,000.
+        double cubes = 343 / 27.0;
+        int open = CondenserArrayBlockEntity.cooling((int) Math.round(400 * cubes), 0, 0, 1.0, cubes).rate();
+        int packed = CondenserArrayBlockEntity.cooling((int) Math.round(400 * cubes), 294 * 20, 0, 1.0, cubes).rate();
+        helper.assertTrue(open == 5_081, "A 7x7x7 condenses " + open + " mB/t in open air");
+        helper.assertTrue(packed == 10_163, "A 7x7x7 in water condenses " + packed + " mB/t");
         helper.assertFalse(ClimateHelper.waterEvaporates(helper.getLevel(), helper.absolutePos(MIN)), "Water evaporates in the test world");
         helper.succeed();
     }

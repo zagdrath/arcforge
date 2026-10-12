@@ -15,11 +15,11 @@ import net.minecraft.util.StringRepresentable;
 // thermal capsule's rate; the Thermodynamic Conduit's rate is in config (power.heat.thermodynamicConduits), 50 / 200 /
 // 800 / 51,200 by default, so an Arcforged conduit can carry a big multiblock's heat.
 public enum ConduitTier implements StringRepresentable {
-    //            FE/t    items/op  ticks/op  mB/t    cell HU/t   item speed (blocks/tick)
+    //            FE/t (default; config)  items/op  ticks/op  mB/t    cell HU/t   item speed (blocks/tick)
     WROUGHT("wrought", 256, 8, 20, 200, 50, 0.05F),
     TEMPERED("tempered", 1_024, 16, 10, 800, 200, 0.08F),
     HARDENED("hardened", 8_192, 32, 5, 3_200, 800, 0.12F),
-    ARCFORGED("arcforged", 65_536, 64, 2, 12_800, 3_200, 0.2F);
+    ARCFORGED("arcforged", 262_144, 64, 2, 12_800, 3_200, 0.2F);
 
     // Fluid each conduit block can hold.
     public static final int FLUID_CAPACITY_PER_CONDUIT = 1_000;
@@ -46,7 +46,13 @@ public enum ConduitTier implements StringRepresentable {
         this.itemSpeed = itemSpeed;
     }
 
+    // The Energy Conduit's FE/t (and what each conduit holds: one tick's worth), from config (power.energyConduits).
     public int energyPerTick() {
+        return net.zagdrath.arcforge.config.ArcforgeConfig.energyConduitRate(this);
+    }
+
+    // The default of that rate (256 / 1,024 / 8,192 / 262,144), for config defaults that follow it.
+    public int defaultEnergyPerTick() {
         return energyPerTick;
     }
 
@@ -118,13 +124,18 @@ public enum ConduitTier implements StringRepresentable {
         };
     }
 
-    // Most FE an energy cell takes in or gives out per tick.
+    // Most FE an energy cell takes in or gives out per tick, from config (power.energyCells).
     public int cellRate() {
+        return net.zagdrath.arcforge.config.ArcforgeConfig.energyCellRate(this);
+    }
+
+    // Its default: 512 / 2,048 / 16,384 / 262,144 (the Arcforged cell matches the Arcforged Energy Conduit).
+    public int defaultCellRate() {
         return switch (this) {
             case WROUGHT -> 512;
             case TEMPERED -> 2_048;
             case HARDENED -> 16_384;
-            case ARCFORGED -> 131_072;
+            case ARCFORGED -> 262_144;
         };
     }
 
@@ -270,7 +281,7 @@ public enum ConduitTier implements StringRepresentable {
     // Tooltip line describing this tier's maximum throughput for a conduit type.
     public Component describeThroughput(ConduitType type) {
         return switch (type) {
-            case ENERGY -> Component.translatable("tooltip.arcforge.conduit.throughput.energy", format(energyPerTick));
+            case ENERGY -> Component.translatable("tooltip.arcforge.conduit.throughput.energy", format(energyPerTick()));
             case FLUID -> Component.translatable("tooltip.arcforge.conduit.throughput.fluid", format(fluidPerTick));
             case GAS -> Component.translatable("tooltip.arcforge.conduit.throughput.fluid", format(gasPerTick()));
             case THERMAL -> Component.translatable("tooltip.arcforge.conduit.throughput.thermal", format(heatPerTick()));

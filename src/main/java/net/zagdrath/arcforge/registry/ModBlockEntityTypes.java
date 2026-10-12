@@ -67,6 +67,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
@@ -258,6 +259,9 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<CondenserArrayBlockEntity>> CONDENSER_ARRAY = BLOCK_ENTITY_TYPES.register("condenser_array",
             () -> new BlockEntityType<>(CondenserArrayBlockEntity::new, ModBlocks.CONDENSER_ARRAY_CASING.get()));
+
+    public static final Supplier<BlockEntityType<WaterIntakeBlockEntity>> WATER_INTAKE = BLOCK_ENTITY_TYPES.register("water_intake",
+            () -> new BlockEntityType<>(WaterIntakeBlockEntity::new, ModBlocks.WATER_INTAKE_CASING.get()));
 
     // Every casing has one; only the centre's runs.
     public static final Supplier<BlockEntityType<MetalPressingArrayBlockEntity>> METAL_PRESSING_ARRAY = BLOCK_ENTITY_TYPES.register("metal_pressing_array",
