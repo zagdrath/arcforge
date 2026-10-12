@@ -29,8 +29,8 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.conduit.item.ItemPacket;
 
-// Every few ticks (per tier) pulls one stack from an output side and sends it as a packet towards an
-// input side that will accept it. Packets travel conduit by conduit along precomputed routes.
+// Every few ticks (per tier) pulls up to the tier's items per operation from an output side, slot after slot until that's
+// used up, and sends each slot's share as a packet towards an input side that will accept it. Packets travel conduit by conduit along precomputed routes.
 // When nothing has room for the items they are pulled into the source conduit's storage anyway (up to
 // ConduitTier.ITEM_STORAGE_SLOTS stacks) and sent on once a destination has room, but only if some destination's filter
 // lets them through (or there is no destination yet): items every destination's filter rejects stay in the machine. A destination that
@@ -113,9 +113,13 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
         if (handler == null || !(level.getBlockEntity(source.conduit()) instanceof ConduitBlockEntity conduit)) {
             return false;
         }
-        for (int index = 0; index < handler.size(); index++) {
+        // The operation's items may come from several slots: a machine that tops up its first output slot as it works
+        // (a Block Breaker) would otherwise only ever have that slot's few new items taken, never its full slots.
+        int budget = tier.itemsPerOperation();
+        boolean any = false;
+        for (int index = 0; index < handler.size() && budget > 0; index++) {
             ItemResource resource = handler.getResource(index);
-            int available = Math.min(handler.getAmountAsInt(index), tier.itemsPerOperation());
+            int available = Math.min(handler.getAmountAsInt(index), budget);
             if (resource.isEmpty() || available <= 0) {
                 continue;
             }
@@ -130,9 +134,9 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
                     continue;
                 }
                 int space = Math.min(available, conduit.storageSpaceFor(resource.toStack(1)));
-                if (space > 0 && extractInto(handler, index, resource, space, conduit)) {
-                    return true;
-                }
+                int stored = space > 0 ? extractInto(handler, index, resource, space, conduit) : 0;
+                budget -= stored;
+                any |= stored > 0;
                 continue;
             }
             int extracted;
@@ -145,13 +149,15 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
                 conduit.getPackets().add(new ItemPacket(resource.toStack(extracted), source.side(), exit, 0.0F,
                         target.key().conduit(), target.key().side()));
                 conduit.markContentsChanged(true);
-                return true;
+                budget -= extracted;
+                any = true;
             }
         }
-        return false;
+        return any;
     }
 
-    private static boolean extractInto(ResourceHandler<ItemResource> handler, int index, ItemResource resource, int amount, ConduitBlockEntity conduit) {
+    // Returns how many it pulled into the conduit's storage.
+    private static int extractInto(ResourceHandler<ItemResource> handler, int index, ItemResource resource, int amount, ConduitBlockEntity conduit) {
         int extracted;
         try (Transaction tx = Transaction.openRoot()) {
             extracted = handler.extract(index, resource, amount, tx);
@@ -160,7 +166,7 @@ public class ItemConduitNetwork extends ConduitNetwork<ResourceHandler<ItemResou
         if (extracted > 0) {
             conduit.storeItems(resource.toStack(extracted), true);
         }
-        return extracted > 0;
+        return extracted;
     }
 
     // Sends one stored stack (conduits taken in turn) towards a destination that will accept it.

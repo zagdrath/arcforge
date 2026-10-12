@@ -268,6 +268,28 @@ final class ConduitGameTests {
                 .thenSucceed();
     }
 
+    // A source that tops up its first slot as it works (as a Block Breaker does) still has its other slots emptied: an
+    // operation takes from slot after slot, up to the tier's items, not just the first slot's few.
+    static void itemPullsAcrossSlots(GameTestHelper helper) {
+        BlockPos source = new BlockPos(0, 1, 0);
+        BlockPos sink = new BlockPos(4, 1, 0);
+        helper.setBlock(source, Blocks.CHEST);
+        helper.setBlock(sink, Blocks.CHEST);
+        placeRun(helper, ConduitType.ITEM, ConduitTier.WROUGHT, 3);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, SideSetting.INPUT);
+        ChestBlockEntity from = helper.getBlockEntity(source, ChestBlockEntity.class);
+        from.setItem(1, new ItemStack(Items.COBBLESTONE, 64));
+        helper.onEachTick(() -> {
+            if (from.getItem(0).isEmpty()) {
+                from.setItem(0, new ItemStack(Items.COBBLESTONE));
+            }
+        });
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(from.getItem(1).isEmpty(), "The second slot still has " + from.getItem(1).getCount()))
+                .thenSucceed();
+    }
+
     private static int countItem(ChestBlockEntity chest, net.minecraft.world.item.Item item) {
         int count = 0;
         for (int slot = 0; slot < chest.getContainerSize(); slot++) {

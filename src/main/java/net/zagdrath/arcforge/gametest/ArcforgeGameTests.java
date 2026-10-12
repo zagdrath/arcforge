@@ -57,6 +57,7 @@ public final class ArcforgeGameTests {
         TESTS.put(SIDE_CONFIG_BUTTONS, ArcforgeGameTests::sideConfigButtons);
         TESTS.put("conduit_energy_transfer", ConduitGameTests::energyTransfer);
         TESTS.put("conduit_item_transfer", ConduitGameTests::itemTransfer);
+        TESTS.put("conduit_item_pulls_across_slots", ConduitGameTests::itemPullsAcrossSlots);
         TESTS.put("conduit_fluid_transfer", ConduitGameTests::fluidTransfer);
         TESTS.put("conduit_fluid_split", ConduitGameTests::fluidSplit);
         TESTS.put("conduit_energy_balance", ConduitGameTests::energyBalance);
@@ -266,6 +267,7 @@ public final class ArcforgeGameTests {
         TESTS.put("farming_growth_uses_nutrients", FarmingGameTests::growthUsesNutrients);
         TESTS.put("farming_irrigation_and_drying", FarmingGameTests::irrigationAndDrying);
         TESTS.put("farming_firebox_ash_slot", FarmingGameTests::fireboxAshSlot);
+        LONG_TESTS.put("sifter_mesh_unbreaking", MineralsGameTests::sifterMeshUnbreaking);
         LONG_TESTS.put("farming_combustion_plant_coal_then_charcoal", FarmingGameTests::combustionPlantCoalThenCharcoal);
         TESTS.put("farming_burner_old_save_migrates", FarmingGameTests::burnerOldSaveMigrates);
         TESTS.put("farming_recipes", FarmingGameTests::recipes);

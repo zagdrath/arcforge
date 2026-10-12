@@ -24,6 +24,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
@@ -229,9 +230,10 @@ public class SifterBlockEntity extends MachineBlockEntity {
             items.setStack(FIRST_OUTPUT + i, slots[i]);
         }
         controlState.completed(finds, List.of(), 1, 0);
-        // The mesh wears.
+        // The mesh wears, less with Unbreaking (as a tool does).
         ItemStack meshStack = items.getStack(SLOT_MESH);
-        if (level.getRandom().nextDouble() < ArcforgeConfig.SIFTER_MESH_WEAR_CHANCE.getAsDouble()) {
+        if (level.getRandom().nextDouble() < ArcforgeConfig.SIFTER_MESH_WEAR_CHANCE.getAsDouble()
+                && EnchantmentHelper.processDurabilityChange(level, meshStack, 1) > 0) {
             ItemStack worn = meshStack.copy();
             worn.setDamageValue(worn.getDamageValue() + 1);
             if (worn.getDamageValue() >= worn.getMaxDamage()) {

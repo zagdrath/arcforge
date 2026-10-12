@@ -273,7 +273,8 @@ Cobbled deepslate --[Arc Crusher]--> Deepslate Gravel --[Sifter]--> tungsten dus
 **Sifter** (Wrought). Sieves a block every 5 seconds at 20 FE/t (`machines.processing.sifter`), rolling each find on its own
 (`arcforge:sifting`: `ingredient`, `outputs` of `item` and `chance`, optional `time` and `energy_per_tick`). It needs a
 **Sifter Mesh** in its mesh slot: Steel (base), Invar (chances x1.25, 1.5x as fast) or Tungsten (x1.5, 2x as fast), worn a
-point a block (`meshWearChance`) until it breaks after 256, 512 or 1,024 blocks. Arcite never sifts. Blocks and meshes in
+point a block (`meshWearChance`) until it breaks after 256, 512 or 1,024 blocks; Unbreaking makes it last longer, as it
+does a tool. Arcite never sifts. Blocks and meshes in
 on top, finds out underneath (six slots), FE at the back; Speed and Energy upgrades.
 
 ### Pressing

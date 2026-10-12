@@ -15,7 +15,7 @@
     },
     {
       "type": "text",
-      "text": "It needs a Sifter Mesh in its mesh slot (eight rods in a ring):\n- Steel Mesh: the base chances and speed, 256 blocks.\n- Invar Mesh: chances x1.25, 1.5x as fast, 512 blocks.\n- Tungsten Mesh: chances x1.5, twice as fast, 1,024 blocks.\nBlocks and meshes go in on top (each to its own slot), finds come out underneath, FE at the back. Six output slots; a block waits until all its finds would fit. Speed and Energy upgrades."
+      "text": "It needs a Sifter Mesh in its mesh slot (eight rods in a ring):\n- Steel Mesh: the base chances and speed, 256 blocks.\n- Invar Mesh: chances x1.25, 1.5x as fast, 512 blocks.\n- Tungsten Mesh: chances x1.5, twice as fast, 1,024 blocks.\nUnbreaking (enchanting table or anvil) makes a mesh last longer, as it does a tool. Blocks and meshes go in on top (each to its own slot), so a conduit can bring new meshes; finds come out underneath, FE at the back. Six output slots; a block waits until all its finds would fit. Speed and Energy upgrades."
     }
   ]
 }

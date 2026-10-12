@@ -7,10 +7,15 @@ package net.zagdrath.arcforge.gametest;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity;
@@ -112,6 +117,31 @@ public final class MineralsGameTests {
                 .thenExecute(() -> {
                     if (ArcforgeConfig.SIFTER_MESH_WEAR_CHANCE.getAsDouble() >= 1.0) {
                         helper.assertTrue(sifter.getItems().getStack(SifterBlockEntity.SLOT_MESH).isEmpty(), "The worn-out mesh didn't break");
+                    }
+                })
+                .thenSucceed();
+    }
+
+    // Meshes take Unbreaking (an enchanting table offers it), and with Unbreaking III a mesh wears about a quarter as fast:
+    // 8 gravel cost it far fewer than 8 points (about 2).
+    static void sifterMeshUnbreaking(GameTestHelper helper) {
+        ItemStack mesh = new ItemStack(ModItems.TUNGSTEN_MESH.get());
+        Holder<Enchantment> unbreaking = helper.getLevel().registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.UNBREAKING);
+        helper.assertTrue(mesh.is(ItemTags.DURABILITY_ENCHANTABLE) && unbreaking.value().canEnchant(mesh), "Unbreaking can't go on a mesh");
+        helper.assertTrue(mesh.isEnchantable(), "A mesh can't be enchanted at a table");
+        mesh.enchant(unbreaking, 3);
+        BlockPos pos = new BlockPos(0, 1, 0);
+        helper.setBlock(pos, ModBlocks.SIFTER.get());
+        SifterBlockEntity sifter = helper.getBlockEntity(pos, SifterBlockEntity.class);
+        sifter.getItems().setStack(SifterBlockEntity.SLOT_MESH, mesh);
+        sifter.getItems().setStack(SifterBlockEntity.SLOT_INPUT, new ItemStack(Items.GRAVEL, 8));
+        helper.onEachTick(() -> CrushingGameTests.charge(sifter.getEnergy(), 20_000));
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(sifter.getItems().getStack(SifterBlockEntity.SLOT_INPUT).isEmpty(), "Gravel left"))
+                .thenExecute(() -> {
+                    int worn = sifter.getItems().getStack(SifterBlockEntity.SLOT_MESH).getDamageValue();
+                    if (ArcforgeConfig.SIFTER_MESH_WEAR_CHANCE.getAsDouble() >= 1.0) {
+                        helper.assertTrue(worn <= 6, "With Unbreaking III the mesh wore " + worn + " for 8 blocks");
                     }
                 })
                 .thenSucceed();

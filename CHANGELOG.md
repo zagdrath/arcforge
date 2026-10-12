@@ -83,6 +83,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Changed
 
+- **Sifter Meshes take Unbreaking.** Enchant one at an enchanting table or with a book on an anvil, and it wears as a tool
+  does with Unbreaking: Unbreaking III makes a mesh last about four times as long (a Tungsten Mesh about 4,000 blocks).
 - **The Arcforged Energy Conduit carries 262,144 FE/t** (was 65,536), and each conduit holds one tick's worth to match.
   The **Arcforged Energy Cell** moves 262,144 FE/t in and out (was 131,072). One line now carries a full-size 7×9×15
   Steam Turbine Array on lubricant (254,016 FE/t). With the Exhaust port's vacuum bonus as well, the turbine makes
@@ -117,6 +119,10 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Fixed
 
+- **Item conduits empty every output slot, not just the first.** Each operation took items from one slot only, the first
+  that had any. A machine that keeps topping up its first output slot, such as a Block Breaker, only ever had that
+  slot's few new items taken, so its other slots stayed full. An operation now takes from slot after slot, up to the
+  tier's items per operation (8 / 16 / 32 / 64).
 - **A Steam Boiler Array no longer stops boiling while it heats toward its pressure setting.** Set to High-Pressure
   or Superheated below that grade's temperature, it now keeps making the grade it's hot enough for as it climbs,
   instead of making nothing until it got there.

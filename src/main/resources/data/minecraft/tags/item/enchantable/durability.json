@@ -15,6 +15,9 @@
     "arcforge:foundry_helmet",
     "arcforge:foundry_chestplate",
     "arcforge:foundry_leggings",
-    "arcforge:foundry_boots"
+    "arcforge:foundry_boots",
+    "arcforge:steel_mesh",
+    "arcforge:invar_mesh",
+    "arcforge:tungsten_mesh"
   ]
 }
