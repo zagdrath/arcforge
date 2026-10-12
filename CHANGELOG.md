@@ -22,6 +22,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+## [2.6.1] - 2026-10-12
+
 ### Added
 
 - **`/arcforge debug conduits`** (admins): the conduit networks in your dimension, busiest first, each with its
@@ -1429,7 +1431,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.6.0+26.3...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.6.1+26.3...HEAD
+[2.6.1]: https://github.com/zagdrath/arcforge/compare/v2.6.0+26.3...v2.6.1+26.3
 [2.6.0]: https://github.com/zagdrath/arcforge/compare/v2.5.1+26.3...v2.6.0+26.3
 [2.5.1]: https://github.com/zagdrath/arcforge/compare/v2.5.0...v2.5.1+26.3
 [2.5.0]: https://github.com/zagdrath/arcforge/compare/v2.4.0...v2.5.0
