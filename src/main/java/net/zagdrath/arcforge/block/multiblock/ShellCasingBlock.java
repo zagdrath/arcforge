@@ -144,7 +144,7 @@ public abstract class ShellCasingBlock extends BaseEntityBlock implements Multib
     protected void tick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
         if (state.getValue(FORMED)) {
             checkCore(level, pos, structure());
-        } else {
+        } else if (!structure().justSettled(level, pos)) {
             rebuild(level, pos, null);
         }
     }
@@ -152,7 +152,7 @@ public abstract class ShellCasingBlock extends BaseEntityBlock implements Multib
     // Breaks the formed structure at pos if its core isn't empty any more.
     static void checkCore(ServerLevel level, BlockPos pos, ShellStructure structure) {
         ShellStructure.Shell shell = structure.findFormed(level, pos);
-        if (shell == null) {
+        if (shell == null || structure.coreCheckedNow(level, shell)) {
             return;
         }
         for (BlockPos inside : shell.positions()) {

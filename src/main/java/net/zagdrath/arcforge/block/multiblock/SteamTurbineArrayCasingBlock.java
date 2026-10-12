@@ -33,9 +33,9 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 // A casing of the Steam Turbine Array: a tube 3 to 27 blocks long along either horizontal axis, its cross-section
 // 3 to 7 wide and 3 to 7 tall, with Pressure Glass windows. The casings in the middle of the two end faces are the
 // rotor's bearings: END marks the generator end (positive along the axis, with the FE port) and the plain bearing
-// end (a cross-section with an even side has no middle block, so its ends stay plain). Formed, each casing's shape is
-// the pieces of the model in it (see TurbineHitbox), so players walk on the deck and round the casings; loose, a full
-// block.
+// end (a cross-section with an even side has no middle block, so its ends stay plain). Formed, each casing collides as
+// the pieces of the model in it (see TurbineHitbox), so players walk on the deck and round the casings, but is picked
+// as a full block, so the whole array is one target with one outline (see TurbineOutline); loose, a full block.
 public class SteamTurbineArrayCasingBlock extends ShellCasingBlock {
     public enum End implements StringRepresentable {
         NONE("none"), GENERATOR("generator"), BEARING("bearing");
@@ -83,12 +83,6 @@ public class SteamTurbineArrayCasingBlock extends ShellCasingBlock {
     @Override
     public BlockState looseState(BlockState state) {
         return super.looseState(state).setValue(END, End.NONE);
-    }
-
-    @Override
-    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape shape = state.getValue(FORMED) ? TurbineHitbox.casing(level, pos, state) : null;
-        return shape != null ? shape : super.getShape(state, level, pos, context);
     }
 
     @Override

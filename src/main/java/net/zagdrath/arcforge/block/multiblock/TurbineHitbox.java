@@ -28,9 +28,9 @@ import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.steam.TurbineLayout;
 import net.zagdrath.arcforge.steam.TurbineShapes;
 
-// The shapes of a formed Steam Turbine Array's blocks (casings and Pressure Glass alike): the pieces of its model in
-// each (see TurbineShapes), turned into the world's frame, and on a block holding ports, each port's plate on its face
-// and its collar in from it. Kept for each shape of array (size, front and axis), as both sides ask for them often.
+// The collision shapes of a formed Steam Turbine Array's blocks (casings and Pressure Glass alike): the pieces of its
+// model in each (see TurbineShapes), turned into the world's frame, and on a block holding ports, each port's plate on
+// its face and its collar in from it. Kept for each shape of array (size, front and axis), as both sides ask for them often.
 // Only asked of a real level: anything else (a chunk being meshed, a pathfinding region, world generation) gets the
 // full cube, as it can't be trusted to reach the array's master.
 public final class TurbineHitbox {
@@ -166,11 +166,6 @@ public final class TurbineHitbox {
         }
         VoxelShape base = shape;
         return built.ported.computeIfAbsent((long) index << 6 | ports, k -> withPorts(base, ports));
-    }
-
-    // The whole model's shape of a formed array, for picking what no block's shape reaches (see TurbinePick).
-    public static TurbineShapes model(ShellStructure.Shell shell, SteamTurbineArrayBlockEntity master) {
-        return built(shell, master).frame;
     }
 
     // The shapes of an array of this one's size, front and axis, built on first asking.

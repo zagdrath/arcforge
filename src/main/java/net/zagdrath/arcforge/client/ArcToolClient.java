@@ -95,7 +95,8 @@ public final class ArcToolClient {
             PLAYING.clear();
             return;
         }
-        PLAYING.values().removeIf(ArcToolSound::isStopped);
+        // Also those the sound engine dropped (see TurbineArraySound): they never tick again to be marked stopped.
+        PLAYING.values().removeIf(sound -> sound.isStopped() || !minecraft.getSoundManager().isActive(sound));
         for (Player player : level.players()) {
             if (player.distanceToSqr(self) > HEARING_RANGE * HEARING_RANGE || PLAYING.containsKey(player.getId()) || !isRunning(player)) {
                 continue;

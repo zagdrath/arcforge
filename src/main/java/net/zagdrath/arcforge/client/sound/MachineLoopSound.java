@@ -14,6 +14,7 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -91,12 +92,17 @@ public class MachineLoopSound extends AbstractTickableSoundInstance {
             return;
         }
         MachineLoopSound sound = PLAYING.get(machine.getBlockPos());
-        if (sound != null && !sound.isStopped()) {
+        SoundManager sounds = Minecraft.getInstance().getSoundManager();
+        // A sound the engine refused or dropped never ticks again, so it's replaced (see TurbineArraySound).
+        if (sound != null && !sound.isStopped() && sounds.isActive(sound)) {
             return;
+        }
+        if (sound != null) {
+            sound.stop();
         }
         sound = new MachineLoopSound(level, machine.getBlockPos(), state.getBlock(), loop);
         PLAYING.put(sound.pos, sound);
-        Minecraft.getInstance().getSoundManager().play(sound);
+        sounds.play(sound);
     }
 
     // Lit, and for an array its centre block (the one that runs it).

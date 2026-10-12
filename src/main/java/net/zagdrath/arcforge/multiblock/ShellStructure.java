@@ -9,7 +9,9 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 import java.util.function.Predicate;
 
 import org.jspecify.annotations.Nullable;
@@ -182,6 +184,12 @@ public final class ShellStructure {
     // Whether the middle blocks of the two end faces must be casings, not glass (the Gas Turbine Array's
     // intake and exhaust).
     private final boolean casingEndCenters;
+    // Per level, the structures formed or broken in the last tick, and when (see justSettled).
+    private final Map<Level, List<Settled>> settled = new WeakHashMap<>();
+    // Per level, the formed structures whose core was found empty this tick, and the tick (see coreCheckedNow).
+    private final Map<Level, Settled> coreChecked = new WeakHashMap<>();
+
+    private record Settled(Shell shell, long time) {}
 
     public ShellStructure(Predicate<Block> casing, Set<Direction.Axis> axes, SizeRule sizes) {
         this(casing, axes, sizes, false);
@@ -413,7 +421,46 @@ public final class ShellStructure {
         }
     }
 
+    // Whether pos is in a structure broken (or formed) a tick ago. Each of its blocks changing schedules a 1-tick check
+    // on the casings and panes beside it (see ShellCasingBlock.updateShape), which a casing that is loose by then takes
+    // as a cue to look for a structure to form. There's none to find, and a big turbine's hundreds of loose casings
+    // each searching every box they could be part of stalled the server for seconds.
+    public boolean justSettled(ServerLevel level, BlockPos pos) {
+        List<Settled> recent = settled.get(level);
+        if (recent == null) {
+            return false;
+        }
+        long time = level.getGameTime();
+        for (Settled each : recent) {
+            if (time - each.time() <= 1 && each.shell().contains(pos)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // Whether this shell's core was already found empty this tick, noting it as found now if not: forming or breaking
+    // a structure schedules a check on each of its casings for the same tick, and one look at the core does for all.
+    // Anything entering the core later schedules a check of its own for a later tick.
+    public boolean coreCheckedNow(ServerLevel level, Shell shell) {
+        long time = level.getGameTime();
+        Settled last = coreChecked.get(level);
+        if (last != null && last.time() == time && last.shell().equals(shell)) {
+            return true;
+        }
+        coreChecked.put(level, new Settled(shell, time));
+        return false;
+    }
+
+    private void settle(ServerLevel level, Shell shell) {
+        long time = level.getGameTime();
+        List<Settled> recent = settled.computeIfAbsent(level, l -> new ArrayList<>());
+        recent.removeIf(each -> time - each.time() > 1);
+        recent.add(new Settled(shell, time));
+    }
+
     private void form(ServerLevel level, Shell shell, @Nullable Direction facing) {
+        settle(level, shell);
         for (BlockPos pos : shell.positions()) {
             if (shell.isCore(pos)) {
                 continue;
@@ -440,6 +487,7 @@ public final class ShellStructure {
     }
 
     private void unform(ServerLevel level, Shell shell) {
+        settle(level, shell);
         if (level.getBlockEntity(shell.min()) instanceof ShellMultiblockBlockEntity master && shell.equals(master.getShell())) {
             master.onUnformed();
         }

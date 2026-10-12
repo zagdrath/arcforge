@@ -22,6 +22,24 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Changed
+
+- **A formed Steam Turbine Array is one target.** Looking at any part of it outlines the whole array as one box, and
+  each of its blocks is clicked as a full block, instead of the outline following the model block by block. You still
+  walk on and around the model itself.
+
+### Fixed
+
+- **Machine and multiblock sounds come back after they cut out.** When the game's sound engine dropped a running loop
+  (on an audio device change, a resource reload or when it ran out of channels), the machine thought it was still
+  playing and stayed silent until you rejoined. This hit every machine and array loop, the Steam and Gas Turbine
+  Arrays, the jetpack and the Arc tools. They now start again on their own.
+- **Breaking or finishing a big shell multiblock no longer stalls the game.** After a Steam Turbine, Steam Boiler or
+  Gas Turbine Array broke, every one of its casings searched for a structure to form, which took seconds on a big
+  turbine, so its model lingered and rebuilding it was slow.
+- **Steam Turbine Array windows no longer fill with slats at a slant.** The stage rings now only line the lower half of
+  the casing, so the upper panes show the blades from low and side angles.
+
 ## [2.6.1] - 2026-10-12
 
 ### Added

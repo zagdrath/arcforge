@@ -12,15 +12,15 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
-// The formed Steam Turbine Array's hitbox, taken from its model (TurbineMesh): every pixel the model's surfaces pass
-// through, and every pixel they close off from the air outside, so its parts are solid (px; x across, y up, u along),
-// cut up by blocks. The hollow core is air, so the shell's blocks carry it all: each its own block's pieces, and the
-// first layer of the core is shared out among the shell blocks beside it (a shape may reach one block past its own,
-// which entity collision honours for a block without a cached shape; block picking finds such a piece along a sight
-// line through the block that carries it). Deeper in the core (a cross-section 5 or more each way) no shape can reach,
-// so what's there that could be walked into from above or from the sides (the top of a small casing, the pedestals
-// between casings) is covered over instead: a 1 px lid at the bottom of the core's top layer over it, and a 1 px wall
-// at the inside of the side layers beside it; and clicks find it with clip (see TurbinePick).
+// The formed Steam Turbine Array's collision shape, taken from its model (TurbineMesh): every pixel the model's
+// surfaces pass through, and every pixel they close off from the air outside, so its parts are solid (px; x across,
+// y up, u along), cut up by blocks. The hollow core is air, so the shell's blocks carry it all: each its own block's
+// pieces, and the first layer of the core is shared out among the shell blocks beside it (a shape may reach one block
+// past its own, which entity collision honours for a block without a cached shape). Deeper in the core (a
+// cross-section 5 or more each way) no shape can reach, so what's there that could be walked into from above or from
+// the sides (the top of a small casing, the pedestals between casings) is covered over instead: a 1 px lid at the
+// bottom of the core's top layer over it, and a 1 px wall at the inside of the side layers beside it. Clicks don't use
+// it: the formed array's blocks are picked as full blocks (see TurbineOutline).
 public final class TurbineShapes {
     private static final int PX = 16;
     // The mesh's floats per vertex and per quad.
@@ -100,50 +100,6 @@ public final class TurbineShapes {
             return null;
         }
         return boxes[index(u, y, x)];
-    }
-
-    // How far (px) along a ray in the turbine's frame (from and dir in px, dir of length 1) its first solid pixel is,
-    // within max; -1 when it meets none. The model's own shape, deep core and all, for picking what can't carry a
-    // block's shape.
-    public double clip(double[] from, double[] dir, double max) {
-        int[] size = { sizeX, sizeY, sizeU };
-        double enter = 0.0, leave = max;
-        for (int k = 0; k < 3; k++) {
-            if (Math.abs(dir[k]) < 1.0E-9) {
-                if (from[k] < 0.0 || from[k] >= size[k]) {
-                    return -1.0;
-                }
-            } else {
-                double a = -from[k] / dir[k], b = (size[k] - from[k]) / dir[k];
-                enter = Math.max(enter, Math.min(a, b));
-                leave = Math.min(leave, Math.max(a, b));
-            }
-        }
-        if (enter > leave) {
-            return -1.0;
-        }
-        int[] cell = new int[3], step = new int[3];
-        double[] next = new double[3], delta = new double[3];
-        for (int k = 0; k < 3; k++) {
-            cell[k] = Math.clamp((long) Math.floor(from[k] + dir[k] * enter), 0, size[k] - 1);
-            step[k] = dir[k] > 0.0 ? 1 : dir[k] < 0.0 ? -1 : 0;
-            next[k] = step[k] == 0 ? Double.MAX_VALUE : (cell[k] + (step[k] > 0 ? 1 : 0) - from[k]) / dir[k];
-            delta[k] = step[k] == 0 ? Double.MAX_VALUE : Math.abs(1.0 / dir[k]);
-        }
-        double t = enter;
-        while (t <= leave) {
-            if (solid.get(pixel(cell[0], cell[1], cell[2]))) {
-                return t;
-            }
-            int k = next[0] < next[1] ? (next[0] < next[2] ? 0 : 2) : (next[1] < next[2] ? 1 : 2);
-            t = next[k];
-            cell[k] += step[k];
-            if (cell[k] < 0 || cell[k] >= size[k]) {
-                return -1.0;
-            }
-            next[k] += delta[k];
-        }
-        return -1.0;
     }
 
     private int index(int u, int y, int x) {

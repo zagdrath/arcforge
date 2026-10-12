@@ -11,6 +11,7 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
@@ -39,12 +40,18 @@ public class TurbineArraySound extends AbstractTickableSoundInstance {
         }
         BlockPos pos = turbine.getBlockPos();
         TurbineArraySound sound = PLAYING.get(pos);
-        if (sound != null && sound.turbine == turbine && !sound.isStopped()) {
+        SoundManager sounds = Minecraft.getInstance().getSoundManager();
+        // Asks the sound engine, not just the sound: a sound it refused or dropped (no free channel, all sounds
+        // stopped on a resource reload) never ticks again, so it would never be marked stopped and never replaced.
+        if (sound != null && sound.turbine == turbine && !sound.isStopped() && sounds.isActive(sound)) {
             return;
+        }
+        if (sound != null) {
+            sound.stop();
         }
         sound = new TurbineArraySound(turbine);
         PLAYING.put(pos.immutable(), sound);
-        Minecraft.getInstance().getSoundManager().play(sound);
+        sounds.play(sound);
     }
 
     private TurbineArraySound(SteamTurbineArrayBlockEntity turbine) {

@@ -273,7 +273,7 @@ public final class TurbineMesh extends ModelMesh {
     }
 
     // Behind a window: the casing's inside wall and the window's two end walls, dark; a stage ring between each pair of
-    // blade rows (a lip standing in from the wall); and the glass, a pane on each of the window's facets
+    // blade rows (a lip standing in from the lower half of the wall); and the glass, a pane on each of the window's facets
     // just inside the outer surface, each with its own frame and glints.
     private void windowCavity(TurbineLayout.Casing casing, TurbineLayout.Span window) {
         float sx = layout.shaftX(), sy = layout.shaftY();
@@ -291,9 +291,11 @@ public final class TurbineMesh extends ModelMesh {
         // The end walls, facing into the window.
         ringU(sx, sy, window.u0(), inner, 0.0F, SIDES_CASING, 0.0, true, Paint.DEEP, Paint.DEEP);
         ringU(sx, sy, window.u1(), inner, 0.0F, SIDES_CASING, 0.0, false, Paint.DEEP, Paint.DEEP);
-        // The stage rings.
+        // The stage rings, on the lower half only: on the upper half they stand between the glass and the blade tips,
+        // and at a slant their lips lined up into slats that hid the rotor.
         int rows = rowsIn(casing, window);
         float pitch = window.length() / rows;
+        FacetFilter upperHalf = (segment, facet) -> facet < SIDES_CASING / 2;
         for (int i = 1; i < rows; i++) {
             float u = window.u0() + pitch * i;
             float tip = Math.max(casing.tipAt(u - pitch / 2.0F), casing.tipAt(u + pitch / 2.0F));
@@ -302,8 +304,8 @@ public final class TurbineMesh extends ModelMesh {
             if (out - in < 0.4F) {
                 continue;
             }
-            ringU(sx, sy, u - 0.25F, out, in, SIDES_CASING, 0.0, false, Paint.MID, Paint.SHADE);
-            ringU(sx, sy, u + 0.25F, out, in, SIDES_CASING, 0.0, true, Paint.MID, Paint.SHADE);
+            ringU(sx, sy, u - 0.25F, out, in, SIDES_CASING, 0.0, false, Paint.MID, Paint.SHADE, upperHalf);
+            ringU(sx, sy, u + 0.25F, out, in, SIDES_CASING, 0.0, true, Paint.MID, Paint.SHADE, upperHalf);
         }
         // The glass: one pane per facet, at the glass radius, its texture's top toward the higher corner.
         float g = casing.glassRadius();

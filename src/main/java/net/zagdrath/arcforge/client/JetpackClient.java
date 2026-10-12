@@ -133,7 +133,8 @@ public final class JetpackClient {
 
     // Exhaust at both nozzles, and a thrust sound per firing jetpack.
     private static void effects(Minecraft minecraft, ClientLevel level) {
-        SOUNDS.values().removeIf(JetpackSound::isStopped);
+        // Also those the sound engine dropped (see TurbineArraySound): they never tick again to be marked stopped.
+        SOUNDS.values().removeIf(sound -> sound.isStopped() || !minecraft.getSoundManager().isActive(sound));
         for (Map.Entry<Integer, State> entry : STATES.entrySet()) {
             Entity entity = level.getEntity(entry.getKey());
             if (!(entity instanceof LivingEntity living)) {

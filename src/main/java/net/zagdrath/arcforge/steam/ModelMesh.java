@@ -713,10 +713,19 @@ public abstract class ModelMesh {
     // A flat ring (a disc when inner is 0) across u at u, facing +u or -u; its facets on the top-left half seen from
     // outside are lit, the rest shade.
     void ringU(float cx, float cy, float u, float outer, float inner, int sides, double start, boolean facingPositive, Paint lit, Paint shade) {
+        ringU(cx, cy, u, outer, inner, sides, start, facingPositive, lit, shade, null);
+    }
+
+    // The same, leaving out the facets skip names (its segment is always 0).
+    void ringU(float cx, float cy, float u, float outer, float inner, int sides, double start, boolean facingPositive, Paint lit, Paint shade,
+            @Nullable FacetFilter skip) {
         double step = 2.0 * Math.PI / sides;
         // Seen from +u, right is +x; from -u, right is -x. Up is +y either way.
         float rightSign = facingPositive ? 1.0F : -1.0F;
         for (int f = 0; f < sides; f++) {
+            if (skip != null && skip.skip(0, f)) {
+                continue;
+            }
             double a0 = start + f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
             boolean topLeft = Math.sin(mid) - rightSign * Math.cos(mid) > 0;
             Paint paint = topLeft ? lit : shade;

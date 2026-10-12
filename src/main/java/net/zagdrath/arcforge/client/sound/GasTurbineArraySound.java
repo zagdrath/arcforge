@@ -11,6 +11,7 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.AbstractTickableSoundInstance;
 import net.minecraft.client.resources.sounds.SoundInstance;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
@@ -46,12 +47,17 @@ public class GasTurbineArraySound extends AbstractTickableSoundInstance {
         }
         BlockPos pos = turbine.getBlockPos();
         GasTurbineArraySound sound = PLAYING.get(pos);
-        if (sound != null && sound.turbine == turbine && !sound.isStopped()) {
+        SoundManager sounds = Minecraft.getInstance().getSoundManager();
+        // A sound the engine refused or dropped never ticks again, so it's replaced (see TurbineArraySound).
+        if (sound != null && sound.turbine == turbine && !sound.isStopped() && sounds.isActive(sound)) {
             return;
+        }
+        if (sound != null) {
+            sound.stop();
         }
         sound = new GasTurbineArraySound(turbine);
         PLAYING.put(pos.immutable(), sound);
-        Minecraft.getInstance().getSoundManager().play(sound);
+        sounds.play(sound);
     }
 
     // Venting exhaust shimmers out of the exhaust end: up to HAZE_PER_TICK a tick, scaled by the exhaust.
