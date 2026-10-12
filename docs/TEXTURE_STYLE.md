@@ -456,7 +456,7 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - Gas Turbine Array skin: the steam turbine's banded plates at double height with a thin Hardened-purple line; 3x3 end caps (48x48) drawn by the BER keep the outer 3 px clear for frame beams.
 - Any 3D machine with default ports follows "Ports": 8×8 plates at its default faces, on a socket to the block edge when the body is inset.
 
-## Meters, Chargepad, Conduit Cover, oxy-fuel, advancements
+## Meters, Chargepad, Conduit Facade, oxy-fuel, advancements
 - Meters (Energy / Heat / Fluid / Gas): the standard casing on every face.
   - Front: a steel bezel at x2..13, y3..10 framing a 10×6 `#16181B` LCD at x3..12, y4..9. The LCD is centred on
     the block (x 8). The renderer centres the value and unit on it by their ink width (the font's width − 1), in
@@ -475,11 +475,9 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - A thin housing at the back (x3..13, y0..14, z13..16), so the standing area runs to z13:
     - a 4-segment charge gauge on its front, using the FE row lit and the cell dims unlit;
     - the 8×8 FE port on its back face at the block edge (the housing is the socket).
-- Conduit Cover (default look): a translucent pane.
-  - Fill: `#DCE8EE` at alpha 40, with a `#DCE8EE` / `#A9BCC6` inner ring at alpha 140.
-  - A crisp opaque 1 px outline: `#727982` on the top and left, `#2B2F34` on the bottom and right.
-  - Two glass glints.
-  - Rendered translucent; a copied look uses that block's own model.
+- Conduit Facade (blank, `block/conduit/facade_blank`): the single-block machine casing face with no centre art, so a
+  wall of blank facades reads as riveted steel panels: the split face, 1 px bevels and four rivets. The 16×16×1 panel's
+  edges take the matching strip of it. A dressed facade uses the sprites of its block's own model, side by side.
 - Oxy-fuel GUI: no new frames. The flame sprite swaps to `flame_oxy` (orange edge, blue-white core `#BFE0FF` /
   `#F4FAFF`), the status reads "Oxy-fuel", and the oxygen level is a row in the Heat tab.
 - Meter GUI (no player inventory, like the Security Terminal): a 176×124 panel with the standard frame.

@@ -83,6 +83,17 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Changed
 
+- **Conduit Covers are now Conduit Facades**, one panel per side as Encoded Logistics' Cable Facades. A facade covers
+  one side of a conduit, connected or not, and the conduit keeps connecting and working through it; a connected side's
+  arm comes through a hole in the panel, and an output's flange shows through like a port.
+  - Right-click a conduit with a facade to put it on the side you're aiming at; a ghost panel shows where it will go.
+  - Right-click a facade with a full, non-translucent block to dress it in that block's look. One block is used, and
+    the block it had comes back. Sneak-right-click with an empty hand to take the block back, then again to take the
+    facade off. Mining it, or the Wrench in Dismantle mode, takes it off too, and pick block gives that facade.
+  - Facades dressed in the same block tile like the real block, tinted blocks (grass, leaves) keep their colours, and
+    a solid facade hides the face of the block behind it. Six facades make the conduit a full block to walk on.
+  - A blank facade is a riveted steel panel (the old cover was a clear pane). Crafted 6 at a time from 3 Iron Nuggets
+    and a Steel Plate. Server admins can stop blocks being copied with `logistics.conduitFacades.blocklist`.
 - **Sifter Meshes take Unbreaking.** Enchant one at an enchanting table or with a book on an anvil, and it wears as a tool
   does with Unbreaking: Unbreaking III makes a mesh last about four times as long (a Tungsten Mesh about 4,000 blocks).
 - **The Arcforged Energy Conduit carries 262,144 FE/t** (was 65,536), and each conduit holds one tick's worth to match.
@@ -134,6 +145,11 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Upgrading
 
+- **Conduit Covers become Conduit Facades.** A covered conduit loads with a facade on every side: dressed in the
+  cover's look, or blank if it had none, so it still looks like a block (a plain cover is now steel rather than a clear
+  pane). Conduit Cover items load as blank Conduit Facades (`arcforge:conduit_cover` is now `arcforge:conduit_facade`;
+  recipes or scripts that name the old id should switch). The cover recipe is replaced, and the new config key
+  `logistics.conduitFacades.blocklist` gets its default.
 - **New config keys**: `world.ores.iolite`, `world.ores.ioliteOuter` and `logistics.machineLink.maxCableLength` get
   their defaults. Iolite generates only in End chunks generated after the update.
 - **Machine control API:** a face a Link Conduit is plugged into reads `"machine_link"` through `sideMode` and

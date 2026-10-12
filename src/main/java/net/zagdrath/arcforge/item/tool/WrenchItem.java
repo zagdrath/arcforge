@@ -298,14 +298,13 @@ public class WrenchItem extends Item {
         return InteractionResult.SUCCESS;
     }
 
-    // A covered conduit gives up its cover first, then a filtered side its filter (settings kept on the item); the next
-    // click breaks the conduit.
+    // The facade clicked comes off first (with the block it was dressed in), then a filtered side's filter (settings kept
+    // on the item); the next click breaks the conduit.
     private static InteractionResult removeFilterOrBreak(UseOnContext context) {
         Level level = context.getLevel();
         BlockPos pos = context.getClickedPos();
-        if (level.getBlockEntity(pos) instanceof ConduitBlockEntity covered && covered.hasCover()) {
-            covered.setCover(null);
-            Block.popResource(level, pos, new ItemStack(ModItems.CONDUIT_COVER.get()));
+        Direction facade = ConduitBlock.facadeAt(level, pos, context.getClickLocation());
+        if (facade != null && ConduitBlock.detachFacade(level, pos, context.getPlayer(), facade)) {
             return InteractionResult.SUCCESS;
         }
         Direction side = ConduitBlock.sideAt(pos, context.getClickLocation());

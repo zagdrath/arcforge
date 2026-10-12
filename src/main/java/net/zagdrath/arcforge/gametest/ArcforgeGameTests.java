@@ -393,10 +393,11 @@ public final class ArcforgeGameTests {
         TESTS.put("oxy_fuel_firebox", OxyFuelGameTests::firebox);
         TESTS.put("oxy_fuel_hydrogen_cap", OxyFuelGameTests::hydrogenCap);
         TESTS.put("oxy_fuel_side_mode", OxyFuelGameTests::sideMode);
-        TESTS.put("cover_keeps_connections", LogisticsGameTests::coverKeepsConnections);
-        TESTS.put("cover_look_persists", LogisticsGameTests::coverLookPersists);
-        TESTS.put("cover_rejects_non_full", LogisticsGameTests::coverRejectsNonFull);
-        TESTS.put("cover_dismantle_returns_item", LogisticsGameTests::coverDismantleReturnsItem);
+        TESTS.put("facade_keeps_connections", LogisticsGameTests::facadeKeepsConnections);
+        TESTS.put("facades_persist_and_drop", LogisticsGameTests::facadesPersistAndDrop);
+        TESTS.put("facade_old_cover_loads", LogisticsGameTests::oldCoverLoadsAsFacades);
+        TESTS.put("facade_dressing", LogisticsGameTests::facadeDressing);
+        TESTS.put("facade_dismantle_returns_item", LogisticsGameTests::facadeDismantleReturnsItem);
         TESTS.put("meter_energy_passes_and_reads", LogisticsGameTests::meterEnergyPassesAndReads);
         TESTS.put("meter_fluid_rejects_gas", LogisticsGameTests::meterFluidRejectsGas);
         TESTS.put("meter_gas_via_pressurized_conduit", LogisticsGameTests::meterGasViaPressurizedConduit);

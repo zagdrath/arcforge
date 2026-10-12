@@ -2813,6 +2813,19 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Conduit Facades: panels that cover a conduit's sides, dressed in the look of a block.").push("conduitFacades");
+    }
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> FACADE_BLOCKLIST = BUILDER
+            .comment("Blocks a Conduit Facade can't copy, by id (e.g. \"minecraft:bedrock\"), on top of the built-in rules: the block must be",
+                    "a full, non-translucent cube without a block entity.")
+            .defineListAllowEmpty("blocklist", List.of(), () -> "minecraft:stone", entry -> entry instanceof String);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Energy, Heat, Fluid and Gas Meters: pass flow from their left side to their right, up to a cap per tick, and",
                 "report the rate. The caps default to the Arcforged conduit rates.").push("meters");
     }

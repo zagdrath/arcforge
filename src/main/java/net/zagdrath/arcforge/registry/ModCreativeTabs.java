@@ -210,7 +210,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 ModItems.allConduits().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.CONDUIT_FILTER.get());
-                output.accept(ModItems.CONDUIT_COVER.get());
+                output.accept(ModItems.CONDUIT_FACADE.get());
                 output.accept(ModItems.BATTERY_ARRAY_CONTROLLER.get());
                 output.accept(ModItems.BATTERY_ARRAY_CASING.get());
                 ModItems.batteryParts().forEach(item -> output.accept(item.get()));

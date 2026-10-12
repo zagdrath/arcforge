@@ -52,11 +52,17 @@ import snownee.jade.api.WailaPlugin;
 // Jade support (only loaded when Jade is installed): formed multiblocks are named as the machine, heat is
 // shown for everything that holds it, conduits show what their network carries, and an Arc Melter or
 // Chemical Reactor what it is making. Loam Farmland shows its nutrients and a Compost Bin how full it is. Looking
-// through a Pressure Glass window shows the same as looking at its array's casings.
+// through a Pressure Glass window shows the same as looking at its array's casings. Conduits are named after their
+// pick-block item (the Conduit Facade looked at), which Jade only does for blocks marked to pick.
 @WailaPlugin
 public class ArcforgeJadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
+        for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.values()) {
+            for (net.zagdrath.arcforge.conduit.ConduitType type : net.zagdrath.arcforge.conduit.ConduitType.values()) {
+                registration.blockOperations().pick(net.zagdrath.arcforge.registry.ModBlocks.conduit(type, tier).getKey());
+            }
+        }
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, BlockEntity.class);
         registration.registerBlockDataProvider(OutputLimitProvider.INSTANCE, Block.class);
         // Owner and security of any owned block, or any part of an owned structure (glass included).

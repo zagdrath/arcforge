@@ -7,10 +7,11 @@ package net.zagdrath.arcforge.gametest;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -18,11 +19,15 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.access.ItemAccess;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
@@ -36,9 +41,11 @@ import net.zagdrath.arcforge.blockentity.logistics.ChargepadBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
+import net.zagdrath.arcforge.conduit.ConduitFacades;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
+import net.zagdrath.arcforge.item.conduit.ConduitFacadeItem;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.WrenchMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
@@ -50,7 +57,7 @@ import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
-// The Conduit Cover, the Meters and the Chargepad.
+// Conduit Facades, the Meters and the Chargepad.
 public final class LogisticsGameTests {
     private LogisticsGameTests() {}
 
@@ -97,10 +104,19 @@ public final class LogisticsGameTests {
         return modes;
     }
 
-    // --- Conduit Cover ---
+    // --- Conduit Facades ---
 
-    // Covering the middle of three energy conduits changes none of their connections, and the energy still flows.
-    static void coverKeepsConnections(GameTestHelper helper) {
+    private static ConduitFacades allSides(ConduitFacades.Facade facade) {
+        ConduitFacades facades = ConduitFacades.NONE;
+        for (Direction side : Direction.values()) {
+            facades = facades.with(side, facade);
+        }
+        return facades;
+    }
+
+    // Facades on every side of the middle of three energy conduits change none of their connections, the energy still
+    // flows, and the enclosed conduit is a full block to walk on.
+    static void facadeKeepsConnections(GameTestHelper helper) {
         cell(helper, new BlockPos(0, 1, 1), SideMode.OUTPUT, 50_000);
         EnergyCellBlockEntity sink = cell(helper, new BlockPos(4, 1, 1), SideMode.INPUT, 0);
         List<BlockPos> line = List.of(new BlockPos(1, 1, 1), new BlockPos(2, 1, 1), new BlockPos(3, 1, 1));
@@ -112,64 +128,122 @@ public final class LogisticsGameTests {
                 .thenIdle(5)
                 .thenExecute(() -> {
                     before.addAll(connections(helper, line));
-                    helper.getBlockEntity(line.get(1), ConduitBlockEntity.class).setCover(ConduitBlockEntity.Cover.PLAIN);
+                    helper.getBlockEntity(line.get(1), ConduitBlockEntity.class).setFacades(allSides(ConduitFacades.Facade.BLANK));
                     received[0] = sink.getEnergy();
                 })
                 .thenIdle(20)
                 .thenExecute(() -> {
-                    helper.assertTrue(connections(helper, line).equals(before), "Covering the conduit changed its connections");
-                    helper.assertTrue(sink.getEnergy() > received[0], "No energy flowed through the covered conduit");
-                    helper.assertTrue(helper.getBlockState(line.get(1)).getShape(helper.getLevel(), helper.absolutePos(line.get(1)))
-                            .bounds().getSize() >= 1.0, "The covered conduit isn't a full block");
+                    helper.assertTrue(connections(helper, line).equals(before), "The facades changed the conduits' connections");
+                    helper.assertTrue(sink.getEnergy() > received[0], "No energy flowed through the enclosed conduit");
+                    VoxelShape collision = helper.getBlockState(line.get(1)).getCollisionShape(helper.getLevel(), helper.absolutePos(line.get(1)));
+                    helper.assertTrue(Block.isShapeFullBlock(collision), "Six facades aren't a full block: " + collision.bounds());
                 })
                 .thenSucceed();
     }
 
-    // A look copied onto a cover survives saving and loading the block entity.
-    static void coverLookPersists(GameTestHelper helper) {
+    // What a facade can copy: full, non-translucent cubes without a block entity. Six stone facades survive saving and
+    // loading, and breaking the conduit drops six blank facades and the six stone they were dressed in.
+    static void facadesPersistAndDrop(GameTestHelper helper) {
+        BlockState stone = Blocks.STONE.defaultBlockState();
+        helper.assertTrue(ConduitFacadeItem.canCopy(stone), "Stone can't be a facade");
+        helper.assertFalse(ConduitFacadeItem.canCopy(Blocks.GLASS.defaultBlockState()), "Glass can be a facade");
+        helper.assertFalse(ConduitFacadeItem.canCopy(Blocks.STONE_SLAB.defaultBlockState()), "A slab can be a facade");
+        helper.assertFalse(ConduitFacadeItem.canCopy(Blocks.CHEST.defaultBlockState()), "A chest can be a facade");
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
         ConduitBlockEntity conduit = helper.getBlockEntity(pos, ConduitBlockEntity.class);
-        conduit.setCover(new ConduitBlockEntity.Cover(Optional.of(Blocks.STONE.defaultBlockState())));
+        conduit.setFacades(allSides(new ConduitFacades.Facade(stone)));
         var registries = helper.getLevel().registryAccess();
-        var saved = conduit.saveWithFullMetadata(registries);
-        BlockEntity loaded = BlockEntity.loadStatic(helper.absolutePos(pos), conduit.getBlockState(), saved, registries);
-        helper.assertTrue(loaded instanceof ConduitBlockEntity copy && copy.getCover() != null
-                && copy.getCover().look().map(look -> look.is(Blocks.STONE)).orElse(false), "The stone look didn't survive a reload");
-        helper.succeed();
+        BlockEntity loaded = BlockEntity.loadStatic(helper.absolutePos(pos), conduit.getBlockState(), conduit.saveWithFullMetadata(registries), registries);
+        helper.assertTrue(loaded instanceof ConduitBlockEntity copy && copy.getFacades().equals(conduit.getFacades()), "The facades didn't survive saving");
+        helper.startSequence()
+                .thenExecute(() -> helper.destroyBlock(pos))
+                .thenIdle(1)
+                .thenExecute(() -> {
+                    helper.assertTrue(dropped(helper, pos, ModItems.CONDUIT_FACADE.get()) == 6, dropped(helper, pos, ModItems.CONDUIT_FACADE.get()) + " facades dropped");
+                    helper.assertTrue(dropped(helper, pos, Items.STONE) == 6, dropped(helper, pos, Items.STONE) + " stone dropped");
+                })
+                .thenSucceed();
     }
 
-    // Only full, solid blocks can be copied onto a cover: stone yes; a slab or a glass pane no.
-    static void coverRejectsNonFull(GameTestHelper helper) {
+    private static int dropped(GameTestHelper helper, BlockPos pos, net.minecraft.world.item.Item item) {
+        return helper.getEntities(net.minecraft.world.entity.EntityTypes.ITEM, pos, 2.0).stream()
+                .filter(entity -> entity.getItem().is(item)).mapToInt(entity -> entity.getItem().getCount()).sum();
+    }
+
+    // A Conduit Cover saved before facades loads as a facade on every side: dressed in its look, or blank.
+    static void oldCoverLoadsAsFacades(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
         ConduitBlockEntity conduit = helper.getBlockEntity(pos, ConduitBlockEntity.class);
-        conduit.setCover(ConduitBlockEntity.Cover.PLAIN);
-        BlockPos at = helper.absolutePos(pos);
-        helper.assertTrue(ConduitBlock.isFullSolidBlock(Blocks.STONE.defaultBlockState(), helper.getLevel(), at), "Stone can't be copied");
-        helper.assertFalse(ConduitBlock.isFullSolidBlock(Blocks.STONE_SLAB.defaultBlockState(), helper.getLevel(), at), "A slab can be copied");
-        helper.assertFalse(ConduitBlock.isFullSolidBlock(Blocks.GLASS_PANE.defaultBlockState(), helper.getLevel(), at), "A glass pane can be copied");
+        var registries = helper.getLevel().registryAccess();
+        CompoundTag saved = conduit.saveWithFullMetadata(registries);
+        CompoundTag look = new CompoundTag();
+        look.put("look", BlockState.CODEC.encodeStart(NbtOps.INSTANCE, Blocks.STONE.defaultBlockState()).getOrThrow());
+        saved.put("cover", look);
+        BlockEntity dressed = BlockEntity.loadStatic(helper.absolutePos(pos), conduit.getBlockState(), saved, registries);
+        helper.assertTrue(dressed instanceof ConduitBlockEntity copy && copy.getFacades().enclosed()
+                && copy.getFacades().target(Direction.NORTH) == Blocks.STONE.defaultBlockState(), "A stone cover didn't load as stone facades");
+        saved.put("cover", new CompoundTag());
+        BlockEntity plain = BlockEntity.loadStatic(helper.absolutePos(pos), conduit.getBlockState(), saved, registries);
+        helper.assertTrue(plain instanceof ConduitBlockEntity copy && copy.getFacades().equals(allSides(ConduitFacades.Facade.BLANK)),
+                "A plain cover didn't load as blank facades");
+        helper.succeed();
+    }
+
+    // A facade goes on the side the crosshair is toward, a connected side too (the conduit still connects through it); a
+    // block used on it dresses it (one taken), sneak-use with an empty hand takes the block back, then the facade.
+    static void facadeDressing(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1), next = new BlockPos(1, 1, 2);
+        helper.setBlock(pos, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
+        helper.setBlock(next, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
+        ConduitBlock.refreshConnections(helper.getLevel(), helper.absolutePos(pos));
         ServerPlayer player = player(helper, new BlockPos(0, 1, 1));
-        ItemStack slab = new ItemStack(Items.STONE_SLAB);
-        player.setItemInHand(InteractionHand.MAIN_HAND, slab);
-        player.gameMode.useItemOn(player, helper.getLevel(), slab, InteractionHand.MAIN_HAND,
-                new net.minecraft.world.phys.BlockHitResult(net.minecraft.world.phys.Vec3.atCenterOf(at), Direction.UP, at, false));
-        helper.assertTrue(conduit.getCover() != null && conduit.getCover().look().isEmpty(), "A slab set the cover's look");
-        helper.succeed();
+        helper.startSequence()
+                .thenIdle(1)
+                .thenExecute(() -> {
+                    BlockPos at = helper.absolutePos(pos);
+                    helper.assertTrue(ConduitBlock.mode(helper.getBlockState(pos), Direction.SOUTH) == ConnectionMode.PIPE, "The conduits didn't join");
+                    // On the east face of the south arm, toward the south (connected) side.
+                    BlockHitResult armSide = new BlockHitResult(Vec3.atLowerCornerOf(at).add(0.6875, 0.5, 0.9), Direction.EAST, at, false);
+                    helper.assertTrue(ConduitBlock.facadeSide(helper.getLevel(), at, armSide.getLocation(), Direction.EAST) == Direction.SOUTH,
+                            "Facade not aimed at the connected side");
+                    player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(ModItems.CONDUIT_FACADE.get()));
+                    helper.getBlockState(pos).useItemOn(player.getMainHandItem(), helper.getLevel(), player, InteractionHand.MAIN_HAND, armSide);
+                    ConduitBlockEntity conduit = helper.getBlockEntity(pos, ConduitBlockEntity.class);
+                    helper.assertTrue(conduit.getFacades().has(Direction.SOUTH), "No facade on the south side");
+                    helper.assertTrue(ConduitBlock.mode(helper.getBlockState(pos), Direction.SOUTH) == ConnectionMode.PIPE, "The facade cut the connection");
+
+                    BlockHitResult onFacade = new BlockHitResult(Vec3.atLowerCornerOf(at).add(0.5, 0.2, 0.97), Direction.SOUTH, at, false);
+                    player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.STONE, 2));
+                    helper.getBlockState(pos).useItemOn(player.getMainHandItem(), helper.getLevel(), player, InteractionHand.MAIN_HAND, onFacade);
+                    helper.assertTrue(conduit.getFacades().target(Direction.SOUTH) == Blocks.STONE.defaultBlockState(), "Facade not dressed");
+                    helper.assertTrue(player.getMainHandItem().getCount() == 1, "Stone not taken");
+
+                    player.setItemInHand(InteractionHand.MAIN_HAND, ItemStack.EMPTY);
+                    player.setShiftKeyDown(true);
+                    helper.getBlockState(pos).useWithoutItem(helper.getLevel(), player, onFacade);
+                    helper.assertTrue(conduit.getFacades().has(Direction.SOUTH) && conduit.getFacades().target(Direction.SOUTH) == null,
+                            "Block not taken off the facade");
+                    helper.assertTrue(player.getInventory().countItem(Items.STONE) == 1, "Stone not given back");
+                    helper.getBlockState(pos).useWithoutItem(helper.getLevel(), player, onFacade);
+                    helper.assertFalse(conduit.getFacades().has(Direction.SOUTH), "Facade not taken off");
+                })
+                .thenSucceed();
     }
 
-    // The Wrench (Dismantle, sneaking) takes the cover off first, giving it back, and leaves the conduit.
-    static void coverDismantleReturnsItem(GameTestHelper helper) {
+    // The Wrench (Dismantle, sneaking) takes the facade it's used on off first, giving it back, and leaves the conduit.
+    static void facadeDismantleReturnsItem(GameTestHelper helper) {
         BlockPos pos = new BlockPos(1, 1, 1);
         helper.setBlock(pos, ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get());
         ConduitBlockEntity conduit = helper.getBlockEntity(pos, ConduitBlockEntity.class);
-        conduit.setCover(ConduitBlockEntity.Cover.PLAIN);
+        conduit.setFacade(Direction.UP, ConduitFacades.Facade.BLANK);
         ServerPlayer player = player(helper, new BlockPos(0, 1, 1));
         player.setShiftKeyDown(true);
         PortGameTests.wrench(helper, player, pos, Direction.UP, WrenchMode.DISMANTLE);
-        helper.assertTrue(!conduit.hasCover(), "The cover is still on");
+        helper.assertTrue(conduit.getFacades().isEmpty(), "The facade is still on");
         helper.assertBlockPresent(ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get(), pos);
-        helper.assertItemEntityPresent(ModItems.CONDUIT_COVER.get(), pos, 2.0);
+        helper.assertItemEntityPresent(ModItems.CONDUIT_FACADE.get(), pos, 2.0);
         helper.succeed();
     }
 

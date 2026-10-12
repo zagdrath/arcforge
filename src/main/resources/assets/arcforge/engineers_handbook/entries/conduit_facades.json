@@ -1,0 +1,17 @@
+{
+  "title": "Conduit Facades",
+  "icon": "arcforge:conduit_facade",
+  "items": [
+    "arcforge:conduit_facade"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A Conduit Facade is a panel that covers one side of a conduit. The conduit keeps connecting and working through it exactly as before.\n- Right-click a conduit with a facade to put it on the side you're aiming at, connected or not. A ghost panel shows where it will go. A connected side's arm comes through a hole in the panel.\n- Right-click a facade with a full, solid block to dress it in that block's look (one block is used; the old block comes back).\n- Sneak-right-click a dressed facade with an empty hand to take its block back, and again to take the facade off. Mining it, or the Wrench in Dismantle mode, takes it off too."
+    },
+    {
+      "type": "text",
+      "text": "# Hiding conduits\nSix facades make the conduit a full block to stand on and walk against, so a run of conduits can disappear into a wall or floor. Facades dressed in the same block tile like the real block, grass and leaves keep their colours, and a solid facade hides the face of the block behind it.\n# What can be copied\nOnly full, non-translucent cubes without a block entity (no glass, slabs or chests). Server admins can block more in the config.\nCrafted 6 at a time from 3 Iron Nuggets and a Steel Plate."
+    }
+  ]
+}

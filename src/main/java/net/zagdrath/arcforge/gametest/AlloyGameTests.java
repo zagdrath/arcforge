@@ -161,7 +161,7 @@ final class AlloyGameTests {
         // with its two parts, the 11 steel tools and armour pieces, the jetpack and arc tool drop's 16 (three
         // tier-one crafts, six tier upgrades and seven modules), and the security, foundry and gas turbine drop's 11
         // (Settings Card, Security Terminal, Fermenter, four Foundry Suit pieces, conduit dyeing, Turbine Blade Set,
-        // Combustor and Gas Turbine Array Casing), the Throttle Lever, the Wrench, Conduit Cover, four Meters and
+        // Combustor and Gas Turbine Array Casing), the Throttle Lever, the Wrench, Conduit Facade, four Meters and
         // Chargepad, farming's four (Compost Bin, Loam, Irrigated Loam Farmland and Mixed Fertilizer), and
         // the crops' three (String from Flax Fibre, Linen and the Trellis), the rustic farming eight (Planter,
         // Harvester, Fertilizer Spreader, Copper Sprinkler, Scarecrow, two Sickles and the Scythe), and the farm

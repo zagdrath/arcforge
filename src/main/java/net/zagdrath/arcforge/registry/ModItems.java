@@ -141,8 +141,9 @@ public final class ModItems {
     public static final DeferredItem<SettingsCardItem> SETTINGS_CARD = ITEMS.registerItem("settings_card", SettingsCardItem::new);
     public static final DeferredItem<WrenchItem> WRENCH = ITEMS.registerItem("wrench", WrenchItem::new, p -> p.stacksTo(1));
     public static final DeferredItem<ConduitFilterItem> CONDUIT_FILTER = ITEMS.registerItem("conduit_filter", ConduitFilterItem::new, p -> p.stacksTo(16));
-    // Encases a conduit (right-click it); ConduitBlock handles fitting it and copying a look onto it.
-    public static final DeferredItem<Item> CONDUIT_COVER = ITEMS.registerSimpleItem("conduit_cover");
+    // Covers one side of a conduit (right-click it); ConduitBlock handles mounting it and dressing it in a block.
+    public static final DeferredItem<net.zagdrath.arcforge.item.conduit.ConduitFacadeItem> CONDUIT_FACADE = ITEMS.registerItem("conduit_facade",
+            net.zagdrath.arcforge.item.conduit.ConduitFacadeItem::new);
     public static final DeferredItem<EngineersHandbookItem> ENGINEERS_HANDBOOK = ITEMS.registerItem("engineers_handbook", EngineersHandbookItem::new, p -> p.stacksTo(1));
 
     // Steel tools and armour (between iron and diamond, mining at iron level), and the 3x3 Hammer and Excavator.
@@ -731,6 +732,8 @@ public final class ModItems {
         ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_outlet"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_controller"));
         // The Reservoir became the Fluid Reservoir in 2.2.
         ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "reservoir"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "fluid_reservoir"));
+        // Conduit Covers became Conduit Facades (one panel a side); saved Cover items load as blank facades.
+        ITEMS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "conduit_cover"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "conduit_facade"));
         ITEMS.register(modEventBus);
     }
 }

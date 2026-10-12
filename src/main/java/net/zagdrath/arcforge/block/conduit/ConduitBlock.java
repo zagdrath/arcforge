@@ -8,7 +8,6 @@ package net.zagdrath.arcforge.block.conduit;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Optional;
 import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
@@ -41,6 +40,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.zagdrath.arcforge.item.conduit.ConduitFacadeItem;
+import net.zagdrath.arcforge.conduit.ConduitFacades;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -58,8 +61,6 @@ import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.level.block.RenderShape;
 import net.zagdrath.arcforge.registry.ModItems;
 
 // A 6px pipe that auto-connects to conduits of the same type (any tier) and to machines. A side facing a
@@ -83,6 +84,8 @@ public class ConduitBlock extends BaseEntityBlock {
     private static final Map<Direction, VoxelShape> INPUT_ARMS = Shapes.rotateAll(Shapes.or(Block.box(5, 5, 2, 11, 11, 5), Block.box(6, 6, 0, 10, 10, 2)));
     private static final Map<Direction, VoxelShape> OUTPUT_ARMS = Shapes.rotateAll(Shapes.or(Block.box(5, 5, 2, 11, 11, 5), Block.box(4, 4, 0, 12, 12, 2)));
     private static final Map<Direction.Axis, VoxelShape> STRAIGHT = Shapes.rotateAllAxis(Block.box(5, 5, 0, 11, 11, 16));
+    // A Conduit Facade: a 16x16x1 panel over the side.
+    private static final Map<Direction, VoxelShape> FACADES = Shapes.rotateAll(Block.box(0, 0, 0, 16, 16, 1));
 
     private final ConduitType conduitType;
     // The conduit being placed from a dyed item (see placing): its colour, before its block entity has it.
@@ -91,6 +94,10 @@ public class ConduitBlock extends BaseEntityBlock {
     private record Placing(BlockPos pos, @Nullable DyeColor color) {}
     private final ConduitTier tier;
     private final Map<BlockState, VoxelShape> shapeCache = new ConcurrentHashMap<>();
+    // The shapes with facades, by state and which sides have one.
+    private final Map<ShapeKey, VoxelShape> facadeShapeCache = new ConcurrentHashMap<>();
+
+    private record ShapeKey(BlockState state, int facades) {}
 
     public ConduitBlock(BlockBehaviour.Properties properties, ConduitType conduitType, ConduitTier tier) {
         super(properties);
@@ -148,11 +155,32 @@ public class ConduitBlock extends BaseEntityBlock {
 
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        // A covered conduit is a full block to click, stand on and see (its collision and visual shapes follow this).
-        if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit && conduit.hasCover()) {
-            return Shapes.block();
+        ConduitFacades facades = facades(level, pos);
+        if (facades.isEmpty()) {
+            return shapeCache.computeIfAbsent(state, ConduitBlock::buildShape);
         }
-        return shapeCache.computeIfAbsent(state, ConduitBlock::buildShape);
+        // Six facades enclose the conduit: a solid block to stand on and walk against. Otherwise the conduit and its panels.
+        return facadeShapeCache.computeIfAbsent(new ShapeKey(state, facades.mask()), key -> {
+            if (key.facades() == 0b111111) {
+                return Shapes.block();
+            }
+            VoxelShape shape = shapeCache.computeIfAbsent(key.state(), ConduitBlock::buildShape);
+            for (Direction side : Direction.values()) {
+                if ((key.facades() & 1 << side.ordinal()) != 0) {
+                    shape = Shapes.or(shape, FACADES.get(side));
+                }
+            }
+            return shape.optimize();
+        });
+    }
+
+    // The facade panel on a side, for working out whether a hit landed on it.
+    public static VoxelShape facade(Direction side) {
+        return FACADES.get(side);
+    }
+
+    public static ConduitFacades facades(BlockGetter level, BlockPos pos) {
+        return level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit ? conduit.getFacades() : ConduitFacades.NONE;
     }
 
     private static VoxelShape buildShape(BlockState state) {
@@ -361,53 +389,119 @@ public class ConduitBlock extends BaseEntityBlock {
         return Direction.getApproximateNearest(hit.subtract(Vec3.atCenterOf(pos)));
     }
 
-    // A Conduit Filter in hand goes on to the item (installing it) rather than being handled here. A Conduit Cover
-    // encases a bare conduit; a full block held against a covered one copies its look onto the cover.
+    // A Conduit Filter in hand goes on to the item (installing it) rather than being handled here. A Conduit Facade goes on
+    // the side the crosshair is toward (facadeSide), connected or not; a block used on a facade dresses it in that block
+    // (handing back the block it had).
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hit) {
         if (stack.getItem() instanceof ConduitFilterItem) {
             return InteractionResult.PASS;
         }
-        if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
-            if (stack.is(ModItems.CONDUIT_COVER.get()) && !conduit.hasCover()) {
-                if (!level.isClientSide()) {
-                    conduit.setCover(ConduitBlockEntity.Cover.PLAIN);
-                    stack.consume(1, player);
-                    level.playSound(null, pos, SoundEvents.METAL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
-                }
-                return InteractionResult.SUCCESS;
-            }
-            if (conduit.hasCover() && stack.getItem() instanceof BlockItem blockItem) {
-                BlockState look = blockItem.getBlock().defaultBlockState();
-                if (!level.isClientSide()) {
-                    if (isFullSolidBlock(look, level, pos)) {
-                        conduit.setCover(new ConduitBlockEntity.Cover(Optional.of(look)));
-                        player.sendOverlayMessage(Component.translatable("message.arcforge.cover.look_set", look.getBlock().getName()));
-                    } else {
-                        player.sendOverlayMessage(Component.translatable("message.arcforge.cover.not_full_block"));
-                    }
-                }
-                return InteractionResult.SUCCESS;
-            }
+        if (stack.is(ModItems.CONDUIT_FACADE.get())) {
+            Direction side = facadeSide(level, pos, hit.getLocation(), hit.getDirection());
+            return side != null ? attachFacade(stack, level, pos, player, side) : InteractionResult.FAIL;
+        }
+        Direction facade = facadeAt(level, pos, hit.getLocation());
+        BlockState dress = facade != null ? ConduitFacadeItem.targetFor(stack) : null;
+        if (dress != null) {
+            return dress(level, pos, player, facade, dress, stack);
         }
         return super.useItemOn(stack, state, level, pos, player, hand, hit);
     }
 
-    // What a cover can look like: a full, solid, opaque cube drawn by its model, with no block entity.
-    public static boolean isFullSolidBlock(BlockState look, BlockGetter level, BlockPos pos) {
-        return look.isCollisionShapeFullBlock(level, pos) && look.canOcclude() && !look.hasBlockEntity() && look.getRenderShape() == RenderShape.MODEL;
+    // Mounts a facade (blank, or the block it carries) on a side of the conduit at pos; FAIL when that side has one.
+    public static InteractionResult attachFacade(ItemStack stack, Level level, BlockPos pos, Player player, Direction side) {
+        if (!(level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) || conduit.getFacades().has(side)) {
+            return InteractionResult.FAIL;
+        }
+        BlockState target = ConduitFacadeItem.target(stack);
+        if (target != null && !ConduitFacadeItem.canCopy(target)) {
+            return InteractionResult.FAIL;
+        }
+        if (!level.isClientSide()) {
+            conduit.setFacade(side, new ConduitFacades.Facade(target));
+            stack.consume(1, player);
+            level.playSound(null, pos, SoundEvents.METAL_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+        return InteractionResult.SUCCESS;
     }
 
-    // Sneaking with an empty hand clears a cover's copied look; otherwise an empty hand on a filtered side opens that
-    // filter's settings.
+    // Where a facade used at a point on the conduit goes: the side the point lies toward from the middle (an arm's side
+    // too, so a connected side can take one), else the face clicked; null when both have one.
+    public static @Nullable Direction facadeSide(BlockGetter level, BlockPos pos, Vec3 hit, Direction face) {
+        ConduitFacades facades = facades(level, pos);
+        Direction toward = sideAt(pos, hit);
+        if (!facades.has(toward)) {
+            return toward;
+        }
+        return !facades.has(face) ? face : null;
+    }
+
+    // The facade a point on the conduit lies on, or null.
+    public static @Nullable Direction facadeAt(BlockGetter level, BlockPos pos, Vec3 hit) {
+        ConduitFacades facades = facades(level, pos);
+        Vec3 local = hit.subtract(pos.getX(), pos.getY(), pos.getZ());
+        for (Direction side : Direction.values()) {
+            if (facades.has(side) && FACADES.get(side).bounds().inflate(1.0E-4).contains(local)) {
+                return side;
+            }
+        }
+        return null;
+    }
+
+    // Dresses the facade on a side in a block (one taken from the stack), or undresses it (block null); the block it
+    // had goes back to the player.
+    private static InteractionResult dress(Level level, BlockPos pos, Player player, Direction side, @Nullable BlockState block, ItemStack stack) {
+        if (!(level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit)) {
+            return InteractionResult.FAIL;
+        }
+        BlockState old = conduit.getFacades().target(side);
+        if (block != null && old != null && old.getBlock() == block.getBlock()) {
+            return InteractionResult.FAIL;
+        }
+        if (!level.isClientSide()) {
+            conduit.setFacade(side, new ConduitFacades.Facade(block));
+            if (!player.hasInfiniteMaterials()) {
+                if (block != null) {
+                    stack.consume(1, player);
+                }
+                if (old != null) {
+                    ItemStack back = new ItemStack(old.getBlock());
+                    if (!player.getInventory().add(back)) {
+                        Block.popResourceFromFace(level, pos, side, back);
+                    }
+                }
+            }
+            level.playSound(null, pos, (block != null ? block : old).getSoundType().getPlaceSound(), SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+        return InteractionResult.SUCCESS;
+    }
+
+    // Takes the facade off a side and drops it (with the block it was dressed in); false when there's none.
+    public static boolean detachFacade(Level level, BlockPos pos, @Nullable Player player, Direction side) {
+        if (!(level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) || !conduit.getFacades().has(side)) {
+            return false;
+        }
+        if (!level.isClientSide()) {
+            if (player == null || !player.hasInfiniteMaterials()) {
+                conduit.getFacades().drops(side).forEach(drop -> Block.popResourceFromFace(level, pos, side, drop));
+            }
+            conduit.setFacade(side, null);
+            level.playSound(null, pos, SoundEvents.METAL_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+        }
+        return true;
+    }
+
+    // Sneak-use with an empty hand on a facade: a dressed one gives its block back first, then the facade comes off.
+    // Otherwise an empty hand on a filtered side opens that filter's settings.
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (player.isShiftKeyDown() && player.getMainHandItem().isEmpty() && level.getBlockEntity(pos) instanceof ConduitBlockEntity covered
-                && covered.getCover() != null && covered.getCover().look().isPresent()) {
-            if (!level.isClientSide()) {
-                covered.setCover(ConduitBlockEntity.Cover.PLAIN);
-                player.sendOverlayMessage(Component.translatable("message.arcforge.cover.cleared"));
+        Direction facade = facadeAt(level, pos, hit.getLocation());
+        if (player.isSecondaryUseActive() && facade != null) {
+            if (facades(level, pos).target(facade) != null) {
+                return dress(level, pos, player, facade, null, ItemStack.EMPTY);
             }
+            detachFacade(level, pos, player, facade);
             return InteractionResult.SUCCESS;
         }
         Direction side = sideAt(pos, hit.getLocation());
@@ -422,6 +516,48 @@ public class ConduitBlock extends BaseEntityBlock {
                     });
         }
         return InteractionResult.SUCCESS;
+    }
+
+    // Mining a conduit takes off the facade you're looking at first; the conduit itself goes once none is in the way.
+    @Override
+    public boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, ItemStack toolStack, boolean willHarvest,
+            FluidState fluid) {
+        Direction facade = facadeLookedAt(level, pos, player);
+        if (facade != null) {
+            detachFacade(level, pos, player, facade);
+            return false;
+        }
+        return super.onDestroyedByPlayer(state, level, pos, player, toolStack, willHarvest, fluid);
+    }
+
+    // Pick block (and Jade's name and icon): the facade you're looking at, otherwise the conduit.
+    @Override
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
+        Direction side = facadeLookedAt(level, pos, player);
+        ConduitFacades.Facade facade = side != null ? facades(level, pos).get(side) : null;
+        return facade != null ? facade.toItem() : super.getCloneItemStack(level, pos, state, includeData, player);
+    }
+
+    private static @Nullable Direction facadeLookedAt(BlockGetter level, BlockPos pos, Player player) {
+        if (facades(level, pos).isEmpty()) {
+            return null;
+        }
+        HitResult hit = player.pick(player.blockInteractionRange(), 1.0F, false);
+        if (!(hit instanceof BlockHitResult blockHit) || !blockHit.getBlockPos().equals(pos)) {
+            return null;
+        }
+        return facadeAt(level, pos, blockHit.getLocation());
+    }
+
+    // A facade of an opaque block hides the neighbour's face behind it, like a full block would.
+    @Override
+    public boolean hidesNeighborFace(BlockGetter level, BlockPos pos, BlockState state, BlockState neighborState, Direction dir) {
+        ConduitFacades facades = level.getModelData(pos).get(ConduitBlockEntity.FACADES);
+        if (facades == null || !facades.has(dir)) {
+            return false;
+        }
+        BlockState target = facades.target(dir);
+        return target == null || target.canOcclude();
     }
 
     // --- Block entity ---

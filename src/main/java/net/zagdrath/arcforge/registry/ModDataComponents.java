@@ -11,6 +11,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.Unit;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -26,8 +28,8 @@ import net.zagdrath.arcforge.storage.VaultContents;
 
 import com.mojang.serialization.Codec;
 
-// Item components carrying a storage block's or Vault's contents while it is an item, the Wrench's mode and a
-// Conduit Filter's settings.
+// Item components carrying a storage block's or Vault's contents while it is an item, the Wrench's mode, a
+// Conduit Facade's look and a Conduit Filter's settings.
 public final class ModDataComponents {
     public static final DeferredRegister.DataComponents DATA_COMPONENTS = DeferredRegister.createDataComponents(Registries.DATA_COMPONENT_TYPE, Arcforge.MODID);
 
@@ -53,6 +55,10 @@ public final class ModDataComponents {
     // What the Wrench does (absent: Configure).
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<WrenchMode>> WRENCH_MODE =
             DATA_COMPONENTS.registerComponentType("wrench_mode", b -> b.persistent(WrenchMode.CODEC).networkSynchronized(WrenchMode.STREAM_CODEC));
+
+    // The block a Conduit Facade copies the look of; a facade without one is blank.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockState>> FACADE_TARGET =
+            DATA_COMPONENTS.registerComponentType("facade_target", b -> b.persistent(BlockState.CODEC).networkSynchronized(ByteBufCodecs.idMapper(Block.BLOCK_STATE_REGISTRY)));
 
     // A Conduit Filter's settings (absent: unconfigured, see FilterSettings).
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<FilterSettings>> CONDUIT_FILTER =

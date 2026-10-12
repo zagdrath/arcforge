@@ -896,6 +896,16 @@ heat. Heat Cells and Thermal Capsules keep their own rates (up to 3,200 HU/t).
   shown resting in its centre, and sends them on once a destination has room. Items that can't
   be delivered are rerouted or stored; they are only dropped when the conduit is broken.
 
+**Conduit Facades** (6 from 3 Iron Nuggets and a Steel Plate) hide conduits. A facade is a 16×16×1 panel over one side of
+a conduit, connected or not; the conduit keeps connecting and working through it, its arm coming through a hole in the
+panel (an output's flange shows through it like a port). A ghost panel shows where one will go.
+- Right-click a facade with a full, non-translucent block (no block entity) to dress it in that block's look; one block
+  is used and the old one comes back. Facades of the same block tile like the real block, tinted blocks (grass, leaves)
+  keep their colours, and a solid facade hides the face of the block behind it.
+- Sneak-right-click with an empty hand to take its block back, then again to take the facade off; mining it or the
+  Wrench (Dismantle) takes it off too. Six facades make the conduit a full block to walk on.
+- `logistics.conduitFacades.blocklist` lists blocks a facade can't copy.
+
 ### Fluid Tanks
 
 A slim glass tank that shows the liquid inside, and glows with lava or any other glowing fluid.

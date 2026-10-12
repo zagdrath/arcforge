@@ -69,7 +69,8 @@ import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
-import net.zagdrath.arcforge.client.model.ConduitCoverModel;
+import net.zagdrath.arcforge.client.model.ConduitFacadeModel;
+import net.zagdrath.arcforge.client.model.FacadeTints;
 import net.zagdrath.arcforge.client.model.ConduitFilterModel;
 import net.zagdrath.arcforge.client.model.ConduitDyeModel;
 import net.zagdrath.arcforge.client.model.PortNozzleModel;
@@ -272,12 +273,16 @@ public class ArcforgeClient {
     // Lit Pressurized and Thermodynamic Conduits glow in the colour of what they hold.
     @SubscribeEvent
     static void registerBlockTints(RegisterColorHandlersEvent.BlockTintSources event) {
-        // Tint index 0 is the thermal glow, index 1 a dyed conduit's colour (its _dyed pieces; see ConduitDyeModel).
+        // Tint index 0 is the thermal glow, index 1 a dyed conduit's colour (its _dyed pieces; see ConduitDyeModel), and the
+        // rest its Conduit Facades' (FacadeTints).
+        List<BlockTintSource> facades = FacadeTints.sources(event.getBlockColors());
         for (ConduitTier tier : ConduitTier.values()) {
             for (ConduitType type : ConduitType.values()) {
                 Block conduit = ModBlocks.conduit(type, tier).get();
                 BlockTintSource glow = conduit.defaultBlockState().hasProperty(ActiveConduitBlock.ACTIVE) ? ConduitTints.INSTANCE : ConduitTints.UNLIT;
-                event.register(List.of(glow, ConduitDyeModel.Tint.INSTANCE), conduit);
+                List<BlockTintSource> sources = new java.util.ArrayList<>(List.of(glow, ConduitDyeModel.Tint.INSTANCE));
+                sources.addAll(facades);
+                event.register(sources, conduit);
             }
         }
         // The Heat Pipe's core glows by the temperature it carries.
@@ -520,7 +525,7 @@ public class ArcforgeClient {
                     SimpleUnbakedStandaloneModel.quadCollection(GasTurbineArrayRenderer.model(GasTurbineArrayRenderer.MODELS.get(i))));
         }
         ConduitFilterModel.registerStandalone(event);
-        ConduitCoverModel.registerStandalone(event);
+        ConduitFacadeModel.registerStandalone(event);
     }
 
     // The Gas Turbine Array's exhaust haze.
@@ -529,11 +534,11 @@ public class ArcforgeClient {
         event.registerSpriteSet(ModParticleTypes.HEAT_HAZE.get(), HeatHazeParticle.Provider::new);
     }
 
-    // Conduit Filter sleeves on filtered conduit arms (see ConduitFilterModel).
+    // Conduit Filter sleeves on filtered conduit arms (see ConduitFilterModel), then Conduit Facades (ConduitFacadeModel).
     @SubscribeEvent
     static void modifyBakingResult(ModelEvent.ModifyBakingResult event) {
         ConduitFilterModel.wrap(event);
-        ConduitCoverModel.wrap(event);
+        ConduitFacadeModel.wrap(event);
     }
 
     // A dyed conduit item's colour.
