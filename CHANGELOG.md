@@ -22,8 +22,12 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+## [2.6.0] - 2026-10-11
+
 ### Added
 
+- **API 1.2.0:** `SideModes.MACHINE_LINK` (`"machine_link"`), the mode the machine control API reads on a face a Link
+  Conduit is plugged into (see Upgrading). The API jar is `arcforge-api-1.2.0+26.3.jar`.
 - **Iolite.** A new ore, found only in the End, in End Stone: a little on the main island and more on the outer
   islands, Y 0 to 80. It needs an iron pickaxe and drops Iolite Crystals (Fortune works; Silk Touch drops the ore). There
   is a Block of Iolite (9 crystals) and Iolite Dust (the Arc Crusher gives 2 per ore, the Arc Crushing Array 4, and a
@@ -1391,7 +1395,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.5.1+26.3...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.6.0+26.3...HEAD
+[2.6.0]: https://github.com/zagdrath/arcforge/compare/v2.5.1+26.3...v2.6.0+26.3
 [2.5.1]: https://github.com/zagdrath/arcforge/compare/v2.5.0...v2.5.1+26.3
 [2.5.0]: https://github.com/zagdrath/arcforge/compare/v2.4.0...v2.5.0
 [2.4.0]: https://github.com/zagdrath/arcforge/compare/v2.3.0...v2.4.0

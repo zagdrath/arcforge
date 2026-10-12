@@ -57,6 +57,11 @@ public final class SideModes {
     public static final String ENERGY_OUTPUT = "energy_output";
     /** Sulfur Dust comes out (ports only). */
     public static final String SULFUR = "sulfur";
+    /**
+     * A Link Conduit is plugged into this face, the machine's end of a Wired Machine Link (since 1.2.0). No machine
+     * lists it as allowed: setting a face to it, or changing a face that has it, is rejected while the cable is there.
+     */
+    public static final String MACHINE_LINK = "machine_link";
 
     private SideModes() {}
 }
