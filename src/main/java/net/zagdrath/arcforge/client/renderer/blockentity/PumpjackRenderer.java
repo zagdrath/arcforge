@@ -176,14 +176,19 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
         poseStack.popPose();
     }
 
+    // Each face shaded as a block face turned its way is (top 1.0, north and south 0.8, east and west 0.6, bottom 0.5,
+    // blended for slanted faces), with its normal straight up so the entity lighting adds nothing: the model shades like
+    // the casing blocks round it instead of darker.
     private static void emit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet, int light) {
         for (int i = 0; i + 7 < data.length; i += 8) {
+            float nx = data[i + 5], ny = data[i + 6], nz = data[i + 7];
+            int shade = Math.round(255.0F * (nx * nx * 0.6F + ny * ny * (ny > 0.0F ? 1.0F : 0.5F) + nz * nz * 0.8F));
             buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
-                    .setColor(-1)
+                    .setColor(0xFF000000 | shade << 16 | shade << 8 | shade)
                     .setUv(sheet.getU(data[i + 3]), sheet.getV(data[i + 4]))
                     .setOverlay(OverlayTexture.NO_OVERLAY)
                     .setLight(light)
-                    .setNormal(pose, data[i + 5], data[i + 6], data[i + 7]);
+                    .setNormal(pose, 0.0F, 1.0F, 0.0F);
         }
     }
 

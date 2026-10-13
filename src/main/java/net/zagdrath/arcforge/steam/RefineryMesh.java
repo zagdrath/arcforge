@@ -14,12 +14,14 @@ import net.zagdrath.arcforge.multiblock.RefineryLayout;
 // The formed Distillation Array's refinery tower, built from its RefineryLayout (see DistillationArrayRenderer) on the
 // sheet block/distillation_array/refinery: the still parts once (and again when its ports or draw-offs change), with
 // the reboiler's burner windows in a glow list of their own; the condenser fans every frame at their angle; and each
-// sight glass's pool and vapour every frame, in UVs across a fluid's own sprite. How it's built and painted: ModelMesh.
+// sight glass's pool and vapour every frame, in UVs across a fluid's own sprite. How it's built and painted: ModelMesh,
+// in plate modules (modules): riveted plates wrapped round the shell, plates and gratings laid at 1:1 on the block grid
+// elsewhere, and ramps across its round parts; the game's face shading lights it.
 //
 // Round parts here stand upright (the turbines' lie along u), so this adds upright banded tubes, discs facing any way,
 // rays against upright cylinders (for the port nozzles) and the fans' turn about an upright axis.
 public final class RefineryMesh extends ModelMesh {
-    public static final int SHEET_W = 128, SHEET_H = 96;
+    public static final int SHEET_W = 128, SHEET_H = 256;
     private static final float PIPE = 0.9F, PIPE_RING = 1.8F;
 
     private final RefineryLayout layout;
@@ -38,7 +40,7 @@ public final class RefineryMesh extends ModelMesh {
         super(frame.alongX(), frame.flip(), layout.size, layout.size, 0.0F, 0.0F, SHEET_W, SHEET_H);
         this.layout = layout;
         this.drawOffs = drawOffs;
-        this.broadShading = true;
+        this.modules = true;
     }
 
     // --- The model ---
@@ -143,7 +145,7 @@ public final class RefineryMesh extends ModelMesh {
         for (int i = 0; i < count; i++) {
             double a = 2.0 * Math.PI * (i + 0.5) / count;
             float bx = layout.cx + (float) Math.cos(a) * (r + 0.3F), bu = layout.cu + (float) Math.sin(a) * (r + 0.3F);
-            box(bx - 0.4F, y - 0.4F, bu - 0.4F, bx + 0.4F, y + 0.4F, bu + 0.4F, Paint.RIVET, Paint.RIVET, Paint.DARK, 0);
+            box(bx - 0.5F, y - 0.5F, bu - 0.5F, bx + 0.5F, y + 0.5F, bu + 0.5F, Paint.RIVET, Paint.RIVET, Paint.DARK, 0);
         }
     }
 
@@ -188,7 +190,7 @@ public final class RefineryMesh extends ModelMesh {
         for (int i = 0; i < 8; i++) {
             double a = Math.PI * 2.0 * (i + 0.5) / 8.0;
             float by = y + (float) Math.sin(a) * 4.4F, bu = u + (float) Math.cos(a) * 4.4F;
-            box(shell - 4.6F, by - 0.4F, bu - 0.4F, shell - 4.2F, by + 0.4F, bu + 0.4F, Paint.RIVET, Paint.RIVET, Paint.DARK, 0);
+            box(shell - 4.7F, by - 0.5F, bu - 0.5F, shell - 4.2F, by + 0.5F, bu + 0.5F, Paint.RIVET, Paint.RIVET, Paint.DARK, 0);
         }
         float arm = y + 7.0F;
         tube(new float[] { shell - 3.6F, y + 4.6F, u }, new float[] { shell - 3.6F, arm, u }, 0.45F, 4, Paint.BANDED);
@@ -256,12 +258,12 @@ public final class RefineryMesh extends ModelMesh {
         if (alongX) {
             box(lo, y, t0, lo + length, y + 2.0F, t1, Paint.MID, Paint.LIT, Paint.SHADE, 0);
             box(lo, y + RefineryLayout.RAIL - 1.0F, t0, lo + length, y + RefineryLayout.RAIL, t1, Paint.MID, Paint.LIT, Paint.SHADE, 0);
-            box(lo, y + RefineryLayout.RAIL / 2.0F, t0 + 0.25F, lo + length, y + RefineryLayout.RAIL / 2.0F + 0.75F, t1 - 0.25F,
+            box(lo, y + RefineryLayout.RAIL / 2.0F, t0, lo + length, y + RefineryLayout.RAIL / 2.0F + 1.0F, t1,
                     Paint.FACE, Paint.MID, Paint.SHADE, 0);
         } else {
             box(t0, y, lo, t1, y + 2.0F, lo + length, Paint.MID, Paint.LIT, Paint.SHADE, 0);
             box(t0, y + RefineryLayout.RAIL - 1.0F, lo, t1, y + RefineryLayout.RAIL, lo + length, Paint.MID, Paint.LIT, Paint.SHADE, 0);
-            box(t0 + 0.25F, y + RefineryLayout.RAIL / 2.0F, lo, t1 - 0.25F, y + RefineryLayout.RAIL / 2.0F + 0.75F, lo + length,
+            box(t0, y + RefineryLayout.RAIL / 2.0F, lo, t1, y + RefineryLayout.RAIL / 2.0F + 1.0F, lo + length,
                     Paint.FACE, Paint.MID, Paint.SHADE, 0);
         }
         int posts = Math.max(1, (int) Math.ceil(length / 8.0F));
@@ -275,22 +277,23 @@ public final class RefineryMesh extends ModelMesh {
         }
     }
 
-    // The caged ladder up the front left corner: two rails and rungs from the ground to above the top deck, and from a
-    // block and a half up, a cage of hoops and bars on its outer side.
+    // The caged ladder up the front left corner, as wide as a ladder block: two 1 px stiles 11 px apart and a 1 px rung
+    // every 4 px, from the ground to above the top deck, and from a block and a half up, a cage of hoops and bars bowed
+    // out round it.
     private void ladder() {
         float[] c = layout.ladder();
         double a = RefineryLayout.LADDER_ANGLE;
-        float ox = (float) Math.cos(a), ou = (float) Math.sin(a), tx = -ou, tu = ox;
+        float ox = (float) Math.cos(a), ou = (float) Math.sin(a), tx = -ou, tu = ox, half = RefineryLayout.LADDER_HALF;
         float top = layout.deckTop + RefineryLayout.RAIL;
         for (int side = -1; side <= 1; side += 2) {
-            float rx = c[0] + tx * 2.0F * side, ru = c[1] + tu * 2.0F * side;
+            float rx = c[0] + tx * half * side, ru = c[1] + tu * half * side;
             tube(new float[] { rx, 0.0F, ru }, new float[] { rx, top, ru }, 0.5F, 4, Paint.BANDED);
         }
-        for (float y = 3.0F; y < top - 1.0F; y += 4.0F) {
-            tube(new float[] { c[0] - tx * 2.0F, y, c[1] - tu * 2.0F }, new float[] { c[0] + tx * 2.0F, y, c[1] + tu * 2.0F }, 0.35F, 4, Paint.MID);
+        for (float y = 2.0F; y < top - 1.0F; y += 4.0F) {
+            tube(new float[] { c[0] - tx * half, y, c[1] - tu * half }, new float[] { c[0] + tx * half, y, c[1] + tu * half }, 0.5F, 4, Paint.BANDED);
         }
-        float cageX = c[0] + ox * 3.5F, cageU = c[1] + ou * 3.5F, cageR = 4.0F, cageBottom = 24.0F;
-        int segments = 6;
+        float cageX = c[0] + ox * 1.0F, cageU = c[1] + ou * 1.0F, cageR = half + 1.0F, cageBottom = 24.0F;
+        int segments = 8;
         float[][] hoop = new float[segments + 1][];
         for (int i = 0; i <= segments; i++) {
             double b = Math.atan2(tu, tx) - Math.PI * i / segments;
@@ -306,11 +309,11 @@ public final class RefineryMesh extends ModelMesh {
         }
         for (float y = cageBottom; y <= top - 0.5F; y += 10.0F) {
             for (int i = 0; i < segments; i++) {
-                tube(new float[] { hoop[i][0], y, hoop[i][1] }, new float[] { hoop[i + 1][0], y, hoop[i + 1][1] }, 0.35F, 4, Paint.MID);
+                tube(new float[] { hoop[i][0], y, hoop[i][1] }, new float[] { hoop[i + 1][0], y, hoop[i + 1][1] }, 0.5F, 4, Paint.BANDED);
             }
         }
-        for (int i = 1; i < segments; i += 1) {
-            tube(new float[] { hoop[i][0], cageBottom, hoop[i][1] }, new float[] { hoop[i][0], top, hoop[i][1] }, 0.3F, 4, Paint.FACE);
+        for (int i = 1; i < segments; i += 2) {
+            tube(new float[] { hoop[i][0], cageBottom, hoop[i][1] }, new float[] { hoop[i][0], top, hoop[i][1] }, 0.5F, 4, Paint.BANDED);
         }
     }
 
@@ -464,6 +467,13 @@ public final class RefineryMesh extends ModelMesh {
             if (yb - ya <= 0.001F) {
                 continue;
             }
+            // The shell's plates, laid out once over the section unrolled (round it by up it), so they carry on from
+            // facet to facet: riveted plates as tall as the section, seams only where they meet.
+            float facetWidth = 2.0F * (float) Math.sin(step / 2.0) * ra;
+            List<float[]> shellPlates = modules && side == Paint.CASING && ra == rb
+                    ? plateFrame(new float[] { x, ya, u }, new float[] { 1, 0, 0 }, new float[] { 0, 1, 0 }, facetWidth * sides, yb - ya,
+                            new Plating(Steel.MACHINE, true, false)).rects()
+                    : null;
             for (int f = 0; f < sides; f++) {
                 double a0 = start + f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
                 float[] n = { (float) Math.cos(mid), (rb < ra ? (ra - rb) / (yb - ya) : 0.0F), (float) Math.sin(mid) };
@@ -473,13 +483,30 @@ public final class RefineryMesh extends ModelMesh {
                 float[] p1 = { x + (float) Math.cos(a0) * ra, ya, u + (float) Math.sin(a0) * ra };
                 float[] p2 = { x + (float) Math.cos(a0) * rb, yb, u + (float) Math.sin(a0) * rb };
                 float[] p3 = { x + (float) Math.cos(a1) * rb, yb, u + (float) Math.sin(a1) * rb };
-                if (dot(cross(sub(p2, p0), sub(p3, p1)), n) < 0) {
+                boolean swapped = dot(cross(sub(p2, p0), sub(p3, p1)), n) < 0;
+                if (swapped) {
                     float[] t = p0;
                     p0 = p1;
                     p1 = t;
                     t = p2;
                     p2 = p3;
                     p3 = t;
+                }
+                if (modules && side.kind == Kind.BANDED) {
+                    float chord = 2.0F * (float) Math.sin(step / 2.0), fw = chord * (ra + rb) / 2.0F;
+                    float height = (float) Math.hypot(yb - ya, rb - ra);
+                    if (ra != rb) {
+                        // A tapering ring (the elliptical head) narrows to a point, so no strip ramp keeps 1:1 across
+                        // it; it's one pressed piece, so its facets are bare grain (no plate edges on every facet).
+                        List<float[]> points = List.of(p0, p1, p2, p3);
+                        plateIn(plateFrame(points, new Plating(Steel.MACHINE, false, false, false)), points);
+                    } else if (shellPlates != null) {
+                        float s0 = (swapped ? f : sides - 1 - f) * fw;
+                        plateStrip(p0, p1, p2, p3, s0, s0 + fw, height, shellPlates);
+                    } else {
+                        roundFacet(p0, p1, p2, p3, n, side, swapped ? f : sides - 1 - f, sides, fw, height);
+                    }
+                    continue;
                 }
                 Paint paint = side.kind == Kind.BANDED ? band(side, n) : side;
                 if (broadShading && side.kind == Kind.BANDED && yb - ya >= STEP_FROM && ra == rb) {
@@ -515,10 +542,24 @@ public final class RefineryMesh extends ModelMesh {
         float[][] axes = plane(normal);
         float[] right = axes[0], up = axes[1];
         double step = 2.0 * Math.PI / sides;
+        // A large model's disc is plated as one surface across its wedges (no painted light on it).
+        Plating plating = modules ? plating(lit, 2.0F * radius, 2.0F * radius) : null;
+        PlateFrame frame = null;
+        if (plating != null) {
+            List<float[]> rim = new ArrayList<>();
+            for (int f = 0; f < sides; f++) {
+                rim.add(at(centre, right, up, (float) Math.cos(f * step) * radius, (float) Math.sin(f * step) * radius));
+            }
+            frame = plateFrame(rim, plating);
+        }
         for (int f = 0; f < sides; f++) {
             double a0 = f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
             float[] e0 = at(centre, right, up, (float) Math.cos(a0) * radius, (float) Math.sin(a0) * radius);
             float[] e1 = at(centre, right, up, (float) Math.cos(a1) * radius, (float) Math.sin(a1) * radius);
+            if (frame != null) {
+                plateIn(frame, List.of(centre, e0, e1));
+                continue;
+            }
             boolean topLeft = Math.sin(mid) - Math.cos(mid) > 0;
             orient(centre, e0, e1, centre, normal, topLeft ? lit : shade);
         }

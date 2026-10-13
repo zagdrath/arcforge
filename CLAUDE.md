@@ -1,7 +1,9 @@
 # Arcforge
 
 - Textures: follow docs/TEXTURE_STYLE.md (Distillation Array style: flat tones, 1px bevels,
-  top-left light, machine steel ramp). Never add gradients, dithering or speckle.
+  top-left light, machine steel ramp). Never add gradients, dithering or speckle, except on large models: formed
+  multiblock and renderer models follow "Large model texturing" in docs/TEXTURE_STYLE.md (plate modules with a
+  controlled grain, ramps across round parts).
 - Releasing: follow docs/RELEASING.md. A pushed v<mod_version>+<minecraft_version> tag (e.g. v2.6.0+26.3) runs
   .github/workflows/release.yml, which publishes the mod and API jars on GitHub and uploads the mod jar to CurseForge.
   Tags up to v2.5.0 predate the scheme.

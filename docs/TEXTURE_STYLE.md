@@ -26,10 +26,16 @@ texture-unification drop.
      a lit middle. First used on the Industrial Water Intake. On a model whose faces are sized by its structure (the
      Steam Turbine Array) the bands are tone polygons laid over each big face, its corners and bevels from a panel round
      them; long round facets step along their length instead (see "Steam Turbine Array model").
+   - **Large models no longer use it:** formed multiblock models and other large renderer models follow "Large model
+     texturing (IE / Mekanism / Create style)" in section 5, which replaces this exception and the single light from
+     the top left for them. The Pumpjack is the first; the models still on broad shading are listed there.
 3. **No noise.**
    - Texture comes from *shapes*: straps, rivets, seams, slats and panels.
    - Never use random pixels or speckle.
    - Every isolated pixel must be intentional, for example a rivet, a glint or a pore.
+   - Large models (section 5, "Large model texturing") may carry a controlled material grain in their plate
+     modules: a few neighbouring steel tones in a deliberate brushed or mottled pattern that repeats with the tile.
+     That isn't speckle; random isolated pixels are still out.
 4. **Tight palettes.**
    - About 8 greys for casing.
    - 3–5 tones per accent colour.
@@ -319,7 +325,8 @@ The controller is a screen pane inside that band, not a boxed bezel.
 - **UV-unwrap every model** like Mekanism and Blockbench: one texture sheet per model, with every element
   face pointing at its own painted rectangle at 1 texel per px.
 - **Never tile a 16 px block texture across model faces.** The seams, straps and bands then land at random
-  on each part and read as stripes and noise.
+  on each part and read as stripes and noise. (Large models tile *plate modules* instead: tiles drawn as whole plates,
+  laid on the block grid. See "Large model texturing" below.)
 - **Paint each face flat, sized to that face:**
   - a 1 px lit top/left edge and a dark bottom/right edge;
   - rivets only on faces 9 px or larger;
@@ -344,6 +351,59 @@ The controller is a screen pane inside that band, not a boxed bezel.
   Round parts are banded like the 16 px cylinders: each facet gets one band tone (or a banded plate strip) for how it
   faces the light from the top left, stepping round the part, never blended; the game's face shading adds to it. Caps
   are flat concentric rings. A repeating surface (a grating, a strap, a louvre) is a small tile laid at 1:1.
+
+### Large model texturing (IE / Mekanism / Create style)
+
+For formed multiblock models and other large renderer models, after Immersive Engineering's multiblocks
+(`multiblock_base`, `diesel_generator`, `crusher`, `excavator`), Mekanism's models (`digital_miner`,
+`chemical_crystallizer`, the turbine casing) and Create's blocks (`andesite_casing`, `fluid_tank`,
+`mechanical_press_side`, `flywheel`). It replaces rule 2's broad-shading exception and rule 1's single light for these
+models; rule 3 allows their material grain. `tools/LargeModelTextureGen.java` paints what the plating samples (the grain
+fields, edge strips and rivet heads) and the small parts' tiles into rows 96–233 of each large model's sheet (128×256,
+the same layout on all of them); ModelMesh `modules` and `plating` lay them.
+
+1. **No global light.** The texture never paints a light direction across a whole face or part: no broad diagonal
+   shading. The game's own face shading lights the model. Every plate shades itself: a 1 px lighter top and left
+   edge, a 1 px darker bottom and right edge, on that plate only, and a 1 px darkest seam between neighbouring plates.
+   Recessed panels invert it (shadow on the top/left lip, light on the bottom/right).
+2. **Never stretch; continuous plates, never a block grid.** Every face is drawn at exactly 16 texels per block; no
+   panel, band or tone is ever stretched to fill a face. A large face is painted as **one continuous surface of a few
+   big plates sized to the part**: as few as keep each within 4 blocks (64 px), or the whole face when it's smaller.
+   Each plate has its own 1 px lit top and left edge and dark bottom and right edge; the darkest seam runs only where
+   two of its plates meet: at the ends of a part, at flanges, at the tower's tray seams, at the pumpjack's structural
+   joints. **Never a seam on every block line**, and no block-sized tile repeated across a big face. Rivets run in rows
+   along the plate edges, a 2×2 head every 4 px, on riveted plates 9 px or more each way. A deck plate has a recessed
+   panel inset 3 px with its lips inverted. A curved part's side (a horse head, a counterweight) is one plated surface
+   across all its facets; a curved shell (the tower) is plated unrolled, its plates carrying on from facet to facet, as
+   tall as each tray section; a domed head, being one pressed piece, is bare grain with no plate edges.
+   Block-sized **tiles are only for small parts**, and even they carry no frame or seam on every block line: the
+   seamless grating, the girder flange (a row of rivets every 4 px, laid along a face's longer side), the motor's
+   ribbed plate, the hazard edge and a burner's fire (8×6, full-bright).
+3. **Material grain.** Steel isn't a flat fill. Each plate's field has a low-contrast grain of 3–4 neighbouring tones
+   from the machine steel ramp (luminance steps of 2–6) in a brushed pattern: about 60–75% of neighbouring pixels differ
+   by a small step. The grain **doesn't repeat across a face**: the sheet holds one large non-repeating grain field per
+   steel (116×64 machine, 116×32 generator), and each plate shows its own window of it at 1:1, picked by a seed from
+   where the face is, so it's the same every frame and every load. Plate edges come from grained edge strips the same
+   way. No harsh speckle, no isolated bright or dark pixel except rivets, glints and holes, and no checkerboards. Keep
+   the dark machine steel (field median luminance 66–69; the generator steel sits lighter, at about 85).
+4. **Round and curved parts** (rods, legs, the polished rod, bearings, half-round tops, curved faces, curved edges)
+   carry a soft stepped ramp across their width: 5–7 close tones in 1–2 px steps, lightest just off centre, darkest at
+   the edges, like Create's tanks and shafts and IE's cylinders. The ramp runs across the part, never along it, with
+   no dithering. The faceted geometry stays; the ramp is painted per facet strip at 1:1. A facet 3 px or more round
+   carries the whole ramp across itself. Narrower facets share one ramp that carries on round the part, repeating so
+   it is never wider than 14 px. A band wider round than it is long (a flange, a ring) carries its ramp across its
+   length instead, the same all the way round. A tile on a curved edge (the hazard stripe) carries on round the arc.
+   The polished rod has its own bright steel ramp.
+5. **No flat faces.** No face larger than about 4×4 px is a single flat tone. Faces under that get one or two tones,
+   and a thin strip longer than that shows a slice of a plate at 1:1 rather than a stretched tone.
+6. **Block models on a large model** (the Well Head) can't share its sheet, and a block model's UVs span a whole
+   texture, so only 16×16 textures keep 1 texel per px. Each visible face gets its own region painted to its exact size
+   (a grain plate with its edges, or the ramp across a round part), packed into 16×16 sheets, and the model's UVs point
+   at them: `tools/WellHeadModelGen.java` writes both together.
+
+Converted: the **Pumpjack** and the **refinery tower** (Distillation Array). Their renderers shade each face as a block
+face turned its way is, so the models sit in the light like the blocks round them. Models still to bring into line: the
+**Steam Turbine Array**, **Gas Turbine Array** and **Industrial Water Intake**.
 
 ### Natural materials: ores, raw items, raw blocks, crystals (VANILLA texture language)
 
@@ -1181,32 +1241,45 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 ## Refinery tower model
 - Formed, the Distillation Array's casings, tray levels and controller draw nothing (`distillation_array/hidden`, with
   the port plates); DistillationArrayRenderer draws a refinery column from RefineryLayout, built by RefineryMesh (on
-  ModelMesh, as the turbines') on one sheet, `block/distillation_array/refinery` (128×96). The sheet is laid out as the
-  Steam Turbine Array's (flat tones, tiles, panels, CASING strips, broad-shading rows 64–87) with, in rows 48–51, the
+  ModelMesh, as the turbines') on one sheet, `block/distillation_array/refinery` (128×256). Rows 0–95 are laid out as
+  the Steam Turbine Array's (flat tones, tiles, panels, CASING strips, broad-shading rows 64–87) with, in rows 48–51, the
   fire glow: GLOW (4×7: `#7A1B0A #C73A0E #F26A16 #FFB02E #F26A16 #C73A0E #7A1B0A`), GLOW_CORE `#FFB02E` and
   GLOW_SMALL (`#C73A0E #FFB02E #C73A0E`), dark red at the ends stepping to an orange core; no blue (it's a fired heater,
-  not a combustor).
+  not a combustor). Rows 96–233 hold the large-model layout (`tools/LargeModelTextureGen.java`), as on the Pumpjack's
+  sheet: the small parts' tiles, ramps, the burner fire, the grain fields, edge strips and rivet heads.
+- **Textured as a large model** (section 5, "Large model texturing"): every face at exactly 1 texel per model px, nothing
+  stretched, no broad shading, no face over 4.5×4.5 px in one flat tone; DistillationArrayRenderer shades each face as a
+  block face turned its way is (the burners' fire and the vapour stay unshaded, being light).
+  - The shell is plated unrolled: riveted plates as tall as each tray section and as few round it as keep each within
+    4 blocks (two on a 2×2 or a 3×3), carrying on from facet to facet, rivet rows along their edges and seams only where
+    they meet and at the tray seams. The elliptical head, one pressed piece, is bare grain (no plate edges on its facets).
+  - The reboiler, headers and the other plated boxes are continuous plates sized to each face (seams only between
+    plates, rivet rows along their edges); the decks and the condenser's top the seamless grating; the bundle's sides
+    keep the VENT louvre tile at 1:1; discs (the fan shroud tops) are one plate each.
+  - The base ring, flanges, fan shrouds and lips carry their ramp across their height, the same all the way round;
+    pipes, the vapour line, the stack, the manways and the ladder's stiles, rungs and cage carry it round them.
+  - The burner windows show the fire tile (8×6), drawn full-bright at the column's heat.
 - **Sizing:** the shell's radius follows the cross-section (11.5 px for 2×2, 17.5 px for 3×3; 16 or 24 sides), and its
   tray sections are 32 px tall with the top section at least 20 px; taller columns get more sections, never stretched ones.
-- **Reboiler:** a plated box over the footprint up to 13 px (PLATE sides, DECK top, FOOTING under; big faces
-  broad-shaded), the base deck plate on it, its front left corner cut away for the ladder. Burner windows on all four
-  sides: a 1 px steel frame half a px proud, a DEEP pane, and the glow drawn full-bright over it, its brightness
-  (T − 100) / 500 of the column's temperature; cold, only the dark pane shows. A stack (banded, a DEEP-capped lip)
-  rises at the back left.
-- **Shell:** CASING strips per facet (one band tone per facet, stepped along long sections and one band lighter toward
-  the top), a banded base ring, a bolted flange at each tray seam (`#575D65` band, RIVET bolt heads on every facet) and
-  a banded elliptical head.
+- **Reboiler:** a plated box over the footprint up to 13 px (riveted plates on its sides, deck plates on top), the base
+  deck plate on it, its front left corner cut away for the ladder (11.5 px square on a 2×2, 15 px on a 3×3). Burner
+  windows on all four sides: a 1 px steel frame half a px proud, a DEEP pane, and the fire drawn full-bright over it,
+  its brightness (T − 100) / 500 of the column's temperature; cold, only the dark pane shows. A stack (a DEEP-capped
+  lip) rises at the back left.
+- **Shell:** riveted plates wrapped round it, a base ring, a bolted flange at each tray seam (1 px RIVET bolt heads on
+  every facet) and an elliptical head.
 - **Sight glasses** (rule "Glass"): on each section's front a flat boss (PLAIN sides, a 1 px frame lit top/right, shade
   bottom/left) with one 12×12 GLASS pane a quarter px inside its face. Behind it a shallow cavity (DARK back and top,
   DEEP underside, SHADE sides) where the renderer draws the tray's pool in its product's own fluid sprite and tint and
   the rising vapour, as the old tray windows did. Nothing passes in front of a pane: fittings sit at `fittingsY`, clear
   of the platform bands.
 - **Manways** on each section's left: a banded nozzle with a bolted blind flange (eight bolt heads) and a davit arm.
-- **Platforms** on every other flange: GRATE fans from the shell out to the footprint's edge (SHADE undersides), open
-  at the ladder's corner; the top deck is GRATE plates over the head with a hatch at that corner. Railings on every deck
-  edge: a 2 px kick plate and a hand rail (MID, LIT top), a knee rail (FACE) and posts at most 8 px apart.
-- **Caged ladder** up the front left corner: banded rails, MID rungs every 4 px, and from 24 px up a cage of hoops every
-  10 px with FACE bars, bowing away from the shell.
+- **Platforms** on every other flange: grating fans from the shell out to the footprint's edge, open at the ladder's
+  corner; the top deck is grating over the head with a hatch at that corner. Railings on every deck edge: a 2 px kick
+  plate, a hand rail, a 1 px knee rail and posts at most 8 px apart.
+- **Caged ladder** up the front left corner, as wide as a ladder block: two 1 px stiles 11 px apart (`LADDER_HALF`
+  either side of its middle, 3 px out from the shell) and a 1 px rung every 4 px, from the ground to above the top
+  deck; from 24 px up, a cage of 1 px hoops every 10 px, bowing out round it a px wider than the ladder, joined by bars.
 - **Top:** the condenser bank on legs: the tube bundle in the VENT louvre tile with a GRATE top, PLATE headers at both
   ends, one or two fan shrouds (banded, a DARK inner wall so the opening reads as a well, two MID guard bars) with the
   fan blades in BLADE / BLADE_BACK turning while it runs. The vapour line (banded, PLAIN elbows) rises from the head
@@ -1218,34 +1291,60 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 
 ## Pumpjack model
 - Formed, the Pumpjack's casings and controller hide their faces and PumpjackRenderer draws the unit from
-  PumpjackLayout, built by PumpjackMesh on `block/pumpjack/pumpjack` (the same 128×96 sheet as the refinery's) with
-  the HAZARD tile at (16, 4): `#E0B020` / `#1A1A1A` in 2 px diagonal bands.
-- **Shape** (a conventional beam pump, after real units): the beam pivots high on the post (58 px, over 3½ blocks) and
-  the horse head is big, so the unit stands about as tall as it is long. Keep those proportions; don't squash the post
-  back down to the skid.
+  PumpjackLayout, built by PumpjackMesh on `block/pumpjack/pumpjack` (128×256). Rows 0–95 are the shared model sheet
+  layout (the flat tones and panels the Oil Derrick's drill string still uses). Rows 96–233 hold the large-model layout:
+  the small parts' tiles, the hazard edge (`#E0B020` / `#1A1A1A` in 2 px diagonal bands, its edge rows darker), the
+  round parts' ramps 2 to 14 px across and the polished rod's bright ramp, the grain fields, edge strips and rivet
+  heads. `tools/LargeModelTextureGen.java` paints them (run `java tools/LargeModelTextureGen.java` from the repository
+  root).
+- **Textured as a large model** (section 5, "Large model texturing"): every face at exactly 1 texel per model px, still
+  and moving parts alike, so its pixels match the blocks round it; nothing stretched, no broad shading, no face over
+  4.5×4.5 px in one flat tone. The game's face shading lights it.
+  - Plated faces are continuous plates sized to the part, seams only where its plates meet: the plinth deck is one
+    recessed deck plate, its sides one plate each; the reducer, guard and beam sides one plate per face; the
+    reducer's riveted plates have rivet rows along their edges. A moving part's plates move with it.
+  - The platform is the seamless grating; the skid rails and the beam's top and bottom flanges the girder flange, laid
+    along them; the motor the ribbed motor plate in generator steel; the horse head's side plates one plain plate and
+    each counterweight's side one riveted plate, laid out over its whole outline and cut by it; the plinth lip, flange
+    edges, stiles and other thin strips a 1:1 slice of a plate. The reducer's and bearings' end caps are each one plate.
+  - Round parts carry the ramp across them, per facet strip: the legs, braces, pitman arms, bridle wires, the bearings
+    and split ring, the reducer's half-round top, and the horse head's curved face (a 9 px ramp across its width, the
+    same down the whole arc); the polished rod its bright ramp, the only bright steel. The counterweights' curved edges
+    carry the hazard edge, carried on round the arc.
+  - **Well Head** (its own block model, `tools/WellHeadModelGen.java`, rule 6): a flanged casing head on the ground
+    (a 12 px flange, the casing spool and its top flange), a short valve tree (a flanged body), a side outlet with its
+    flange, a valve bonnet, stem and handwheel, and a stuffing box with a gland nut on top, where the polished rod goes
+    in. Its round parts' sides carry the ramp across them (thin flanges across their height); its tops and ends are
+    grain plates with their edges. All in the machine steel; the polished rod (the Pumpjack's) is the only bright part.
+  - The FE band on the motor is red laid in 2×2 texel cells; the lightening holes are 2 px DEEP squares.
 - In the house steel, from the ground up:
-  - The skid rails as the strap (STRAP sides, MID top) running past the well, with FACE cross members under the well
-    end.
-  - The base: a deep plinth (PLATE sides, DECK top, a MID lip) under everything but the well.
-  - The Samson post: an A-frame of four banded legs (3.6 px), the front pair splayed wide, braced along both sides
-    and across front and back low down (clear of the horse head's swing).
-  - A grating platform round the saddle with railings along both sides, and a ladder up the far side from the rail.
-  - The saddle PLAIN with a banded bearing.
-  - The gear reducer: a PLATE box with a banded half-round top about the crankshaft, a banded split ring and bearing
-    caps at the shaft, and a MID footing lip.
-  - The motor in the generator steel (GEN_PLATE, GEN_PLAIN) with an FE red band, behind the reducer, with a PLATE belt
-    guard.
-  - Big faces are broad-shaded.
+  - The skid rails running past the well, open at the well end (a real skid is slid over the well) with one cross
+    member just behind the Well Head, never through its base plate.
+  - The base: a deep plinth under everything but the well, with a lip round its top.
+  - The Samson post: an A-frame of four legs (3.6 px), the front pair splayed wide, braced along both sides and across
+    front and back low down (clear of the horse head's swing).
+  - A grating platform round the saddle with railings along both sides, and a ladder up the far side from the rail,
+    as wide as a ladder block (12 px between 1 px stiles, a 1 px rung every 4 px), the stiles running on past the deck.
+  - The saddle with its bearing.
+  - The gear reducer: a box with a half-round top about the crankshaft, a split ring and bearing caps at the shaft,
+    and a footing lip.
+  - The motor (with its FE band) behind the reducer, with a belt guard.
+  - Faces nobody sees aren't drawn (the skid's undersides, the plinth lip's, the beam web's top and bottom inside the
+    flanges, where they would z-fight).
+- **Block shading:** PumpjackRenderer shades each face as a block face turned its way (top 1.0, N/S 0.8, E/W 0.6,
+  bottom 0.5) and sends its normal up, so entity lighting doesn't darken it below the blocks beside it.
 - Moving parts, drawn each frame at the crank's angle:
-  - The walking beam: a PLAIN girder with MID flanges, running past the equalizer at the back.
-  - The horse head: a ring sector about the saddle bearing, so the bridle always hangs over the well. It reaches 34°
-    below the beam and 26° above, is deepest (13 px) just above the beam and tapers to 4 px at both tips, with FACE
-    side plates, a DARK curved face, a SHADE back and four DEEP lightening holes in each side plate.
-  - The equalizer: a PLAIN crossbar out to the pitman arms (banded) on its own bearing.
-  - The cranks: PLAIN arms with big counterweights on the pin's side (a ring sector about the shaft, 17 px out, ±38°;
-    PLAIN sides, DARK inside). Only the curved edge is HAZARD; the sides stay plain (striping all of it was too
-    loud).
-  - The bridle wires are DARK, the carrier bar MID and the polished rod bright steel (BLADE).
+  - The walking beam: a 12 px deep girder with flanges top and bottom, running past the equalizer at the back.
+  - The horse head: its curved face an arc about the saddle bearing (so the bridle always hangs over the well), 36°
+    below the beam and 32° above (covering the beam's end), and its back a flat plate square to the beam's end,
+    which runs 2 px into it. Over its bottom 14° the back rounds in to the face, a quarter circle in its depth, to a
+    tip 2 px deep under the bridle. **28 facets** over the arc (about 2.4° each), so the face and the plates' outline
+    read as one smooth sweep. Four lightening holes in each side plate. The bridle's wires lie over the face from its
+    top down to where they leave it.
+  - The equalizer: a crossbar out to the pitman arms on its own bearing.
+  - The cranks: arms with big counterweights on the pin's side (a ring sector about the shaft, 17 px out, ±38°, in
+    **24 facets**). Only the curved edge is hazard-striped; the sides stay unstriped (striping all of it was too loud).
+  - The bridle wires, the carrier bar and the polished rod.
 - The beam rocks from −0.42 to +0.35 rad, set by the crank geometry. The crank turns at 9° a tick scaled by the pump
   rate (at least a fifth of that), so a draining deposit visibly slows it.
 - **Hitbox:** the still parts only (skid, plinth, A-frame steps, platform, ladder, reducer, motor, guard, saddle),

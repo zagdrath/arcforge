@@ -276,7 +276,7 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
             for (Tray tray : state.trays) {
                 if (tray.vapour().length > 0) {
                     collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(vapour.atlasLocation()),
-                            (pose, buffer) -> emit(pose, buffer, tray.vapour(), vapour, color, LightCoordsUtil.FULL_BRIGHT));
+                            (pose, buffer) -> emitLit(pose, buffer, tray.vapour(), vapour, color, LightCoordsUtil.FULL_BRIGHT));
                 }
             }
         }
@@ -287,13 +287,30 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
             int level = Math.round(255 * state.brightness);
             int color = ARGB.color(level, level, level, level);
             collector.submitCustomGeometry(poseStack, RenderTypes.eyes(sheet.atlasLocation()),
-                    (pose, buffer) -> emit(pose, buffer, glow, sheet, color, LightCoordsUtil.FULL_BRIGHT));
+                    (pose, buffer) -> emitLit(pose, buffer, glow, sheet, color, LightCoordsUtil.FULL_BRIGHT));
         }
         poseStack.popPose();
     }
 
-    // RefineryMesh's vertices (x, y, z, u, v across the sheet or a sprite, normal), the UVs mapped into the atlas.
+    // RefineryMesh's vertices (x, y, z, u, v across the sheet or a sprite, normal), the UVs mapped into the atlas. Each
+    // face is shaded as a block face turned its way is (top 1.0, north and south 0.8, east and west 0.6, bottom 0.5,
+    // blended for slanted faces), with its normal straight up so the entity lighting adds nothing: the tower shades like
+    // the blocks round it (docs/TEXTURE_STYLE.md, "Large model texturing").
     private static void emit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sprite, int color, int light) {
+        for (int i = 0; i + 7 < data.length; i += 8) {
+            float nx = data[i + 5], ny = data[i + 6], nz = data[i + 7];
+            float shade = nx * nx * 0.6F + ny * ny * (ny > 0.0F ? 1.0F : 0.5F) + nz * nz * 0.8F;
+            buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
+                    .setColor(ARGB.scaleRGB(color, shade))
+                    .setUv(sprite.getU(data[i + 3]), sprite.getV(data[i + 4]))
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setLight(light)
+                    .setNormal(pose, 0.0F, 1.0F, 0.0F);
+        }
+    }
+
+    // The same without face shading, for light: the burners' glow and the vapour.
+    private static void emitLit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sprite, int color, int light) {
         for (int i = 0; i + 7 < data.length; i += 8) {
             buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
                     .setColor(color)

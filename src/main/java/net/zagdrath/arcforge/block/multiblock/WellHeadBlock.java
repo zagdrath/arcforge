@@ -17,10 +17,14 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 
-// The Well Head: what an Oil Derrick leaves capping the hole when it strikes oil (a casing flange, a master valve and a
-// side outlet). A Pumpjack is built round it. It can't be carried off: broken, it's gone, and so is the hole.
+// The Well Head: what an Oil Derrick leaves capping the hole when it strikes oil (a flanged casing head, a valve tree
+// with a stuffing box on top, and a side outlet with a valve and handwheel). A Pumpjack is built round it. It can't be
+// carried off: broken, it's gone, and so is the hole.
 public class WellHeadBlock extends Block {
-    private static final VoxelShape SHAPE = Shapes.or(Block.box(2, 0, 2, 14, 3, 14), Block.box(5, 3, 5, 11, 13, 11), Block.box(3, 7, 6, 13, 10, 10));
+    // Its shape follows the model (tools/WellHeadModelGen.java): the casing head, the valve tree and stuffing box, the
+    // side outlet with its valve, and the handwheel.
+    private static final VoxelShape SHAPE = Shapes.or(Block.box(2, 0, 2, 14, 2, 14), Block.box(4, 2, 4, 12, 6, 12), Block.box(3, 6, 3, 13, 7, 13),
+            Block.box(5, 7, 5, 11, 16, 11), Block.box(11, 7, 6, 15, 12, 10), Block.box(11, 12, 6, 16, 15, 11));
 
     public WellHeadBlock(BlockBehaviour.Properties properties) {
         super(properties);

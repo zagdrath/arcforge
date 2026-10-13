@@ -24,12 +24,13 @@ import java.util.List;
 public final class PumpjackLayout {
     public static final float WIDTH = 48.0F, LENGTH = 80.0F, CX = 24.0F;
     // The saddle bearing (y, u), the beam's half width and depth, its ends, and the horse head: its radius (so its face
-    // hangs over the well's middle), half width, how far it reaches below and above the beam, its depth at the middle
-    // and at its tips.
+    // hangs over the well's middle), half width, and how far it reaches below and above the beam (far enough up to
+    // cover the beam's end). Its back is a flat plate across the beam's front end, which runs into it, rounding in to
+    // the face over its bottom HEAD_ROUND to a tip HEAD_TIP deep under the bridle.
     public static final float PIVOT_Y = 58.0F, PIVOT_U = 40.0F;
-    public static final float BEAM_HALF = 3.0F, BEAM_DEPTH = 7.0F, BEAM_FRONT = 20.0F, BEAM_BACK = 72.0F;
-    public static final float HEAD_RADIUS = PIVOT_U - 8.0F, HEAD_HALF = 4.5F, HEAD_DEPTH = 13.0F, HEAD_TIP = 4.0F;
-    public static final double HEAD_BELOW = Math.toRadians(34.0), HEAD_ABOVE = Math.toRadians(26.0), HEAD_THICKEST = Math.toRadians(4.0);
+    public static final float BEAM_HALF = 3.0F, BEAM_DEPTH = 12.0F, BEAM_FRONT = 20.0F, BEAM_BACK = 72.0F;
+    public static final float HEAD_RADIUS = PIVOT_U - 8.0F, HEAD_HALF = 4.5F, HEAD_TIP = 2.0F;
+    public static final double HEAD_BELOW = Math.toRadians(36.0), HEAD_ABOVE = Math.toRadians(32.0), HEAD_ROUND = Math.toRadians(14.0);
     // The equalizer, its distance back from the pivot along the beam; the crankshaft (y, u), crank radius and the
     // pitman arms' length (set so the beam rests level with the crank pins toward the far end).
     public static final float EQUALIZER = 24.0F, CRANK_Y = 28.0F, CRANK_U = 62.0F, CRANK_RADIUS = 9.0F;
@@ -40,10 +41,11 @@ public final class PumpjackLayout {
     public static final float CARRIER_Y = 32.0F, CRANK_X = 12.5F, PITMAN_X = 9.0F;
     public static final float WEIGHT_INNER = 3.0F, WEIGHT_OUTER = 17.0F, WEIGHT_HALF = 2.0F;
     public static final double WEIGHT_SPAN = Math.toRadians(38.0);
-    // The base: rails, cross members under the well end, and the plinth (its top is what the rest stands on).
+    // The base: rails, a cross member just behind the Well Head (the skid is open at the well end, so it sits round the
+    // well head's base plate), and the plinth (its top is what the rest stands on).
     public static final float SKID_TOP = 4.0F, BASE_TOP = 9.0F;
     public static final float[][] RAILS = { { 3.0F, 7.0F }, { 41.0F, 45.0F } };
-    public static final float[][] CROSS = { { 2.0F, 5.0F }, { 17.0F, 20.0F } };
+    public static final float[][] CROSS = { { 17.0F, 20.0F } };
     public static final float[] PLINTH = { 5.0F, SKID_TOP, 22.0F, 43.0F, BASE_TOP, 79.0F };
     // The gear reducer (a box with a half-round top about the crankshaft), the motor and the belt guard.
     public static final float GEARBOX_X0 = 15.0F, GEARBOX_X1 = 33.0F, GEARBOX_TOP = 24.0F, GEARBOX_ROUND = 8.0F;
@@ -57,10 +59,10 @@ public final class PumpjackLayout {
             { 6.0F, 26.0F, CX - 4.0F, PIVOT_U - 2.0F }, { 42.0F, 26.0F, CX + 4.0F, PIVOT_U - 2.0F },
             { 15.5F, 51.0F, CX - 4.0F, PIVOT_U + 2.0F }, { 32.5F, 51.0F, CX + 4.0F, PIVOT_U + 2.0F } };
     // The platform round the saddle (x0, deck top, u0, x1, u1) and its railings' height; the ladder up the far side,
-    // from the rail to the platform (x of its rails, u0, u1).
+    // from the rail to the platform (x of its middle, u0, u1: as wide as a ladder block's rungs).
     public static final float[] PLATFORM = { 13.0F, 50.0F, 33.0F, 43.0F, 47.0F };
     public static final float RAIL_HEIGHT = 8.0F;
-    public static final float LADDER_X = 44.25F, LADDER_U0 = 35.0F, LADDER_U1 = 39.0F;
+    public static final float LADDER_X = 44.5F, LADDER_U0 = 34.0F, LADDER_U1 = 46.0F;
 
     private PumpjackLayout() {}
 
@@ -128,11 +130,22 @@ public final class PumpjackLayout {
         return boxes;
     }
 
-    // How deep the horse head is (px in from its face) at angle a (radians up from level, about the pivot): deepest
-    // just above level, where the beam joins it, tapering to its tips.
-    public static float headDepth(double a) {
-        double half = a >= HEAD_THICKEST ? HEAD_ABOVE - HEAD_THICKEST : HEAD_BELOW + HEAD_THICKEST;
-        double t = Math.min(1.0, Math.abs(a - HEAD_THICKEST) / half);
-        return HEAD_TIP + (HEAD_DEPTH - HEAD_TIP) * (float) (1.0 - t * t);
+    // How far from the pivot the horse head's back plate is at angle a (radians up from level, about the pivot): the
+    // plate is flat, square to the beam at its front end, so the head is deepest at level and thins toward its tips.
+    public static float headBack(double a) {
+        return (PIVOT_U - BEAM_FRONT) / (float) Math.cos(a);
+    }
+
+    // The horse head's inner edge at angle a: the back plate, rounding in to the face (as a quarter circle in its depth)
+    // over the bottom HEAD_ROUND, so the head ends in a rounded tip HEAD_TIP deep.
+    public static float headInner(double a) {
+        float back = headBack(a);
+        double into = (a + HEAD_BELOW) / HEAD_ROUND;
+        if (into >= 1.0) {
+            return back;
+        }
+        float depth = HEAD_RADIUS - back;
+        double round = Math.sqrt(Math.max(0.0, 1.0 - (1.0 - into) * (1.0 - into)));
+        return HEAD_RADIUS - (float) (HEAD_TIP + (depth - HEAD_TIP) * round);
     }
 }

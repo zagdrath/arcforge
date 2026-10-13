@@ -26,8 +26,10 @@ public final class RefineryLayout {
     public static final float REBOILER_TOP = 13.0F, BASE_DECK = 15.0F;
     public static final float SECTION = 32.0F;
     public static final float RAIL = 11.0F, DECK = 1.5F;
-    // The ladder's corner (front left), the room left for it there, and its rails' distance out from the shell.
+    // The ladder's corner (front left); the ladder's half width (its stiles are LADDER_HALF either side of its middle,
+    // 11 px apart, so it's as wide as a ladder block).
     public static final double LADDER_ANGLE = -0.75 * Math.PI;
+    public static final float LADDER_HALF = 5.5F;
     public static final double STACK_ANGLE = 0.75 * Math.PI;
 
     public final int width, height;
@@ -53,7 +55,7 @@ public final class RefineryLayout {
         this.cu = size / 2.0F;
         this.radius = width == 2 ? 11.5F : 17.5F;
         this.sides = width == 2 ? 16 : 24;
-        this.notch = width == 2 ? 10.0F : 13.0F;
+        this.notch = width == 2 ? 11.5F : 15.0F;
         this.deckBottom = (height - 1) * 16.0F + 0.5F;
         this.deckTop = deckBottom + DECK;
         this.headHeight = radius * 0.5F;
@@ -136,7 +138,7 @@ public final class RefineryLayout {
 
     // The ladder: the middle of its rails (x, u), and the direction out from the shell.
     public float[] ladder() {
-        float d = radius + 2.5F;
+        float d = radius + 3.0F;
         return new float[] { cx + (float) Math.cos(LADDER_ANGLE) * d, cu + (float) Math.sin(LADDER_ANGLE) * d };
     }
 
