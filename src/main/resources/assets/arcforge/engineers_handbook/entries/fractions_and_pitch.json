@@ -15,11 +15,11 @@
   "pages": [
     {
       "type": "text",
-      "text": "- Refinery Gas: the lightest cut of Crude Oil, a gas. Burns at 1,150°C in the Fuel Burner and the Gas Turbine Array.\n- Naphtha: the hottest liquid Fuel Burner fuel (1,200°C), so it can boil Superheated Steam. Catches fire in the world.\n- Kerosene: a clean, hot fuel (1,150°C). Catches fire in the world.\n- Light Oil: burns at 1,000°C.\n- Diesel: burns at 1,050°C. Catches fire in the world.\n- Heavy Oil: a long, cool burn (750°C), and a steam turbine lubricant.\n- Bitumen: the bottom of the barrel, thick as tar."
+      "text": "- Refinery Gas: the lightest cut of Crude Oil, a gas. Burns at 1,200°C in the Fuel Burner and the Gas Turbine Array, and runs the Diesel Generator. Burn off what you can't use in a Flare Stack.\n- Naphtha: the hottest liquid Fuel Burner fuel (1,200°C), so it can boil Superheated Steam. Catches fire in the world.\n- Kerosene: a clean, hot fuel (1,150°C), and Jetpack fuel. Catches fire in the world.\n- Light Oil: burns at 1,000°C.\n- Diesel: burns at 1,150°C, and runs the Diesel Generator. Catches fire in the world.\n- Heavy Oil: a long, cool burn (750°C), and a turbine lubricant. Crack it into lighter fuels in the Cracking Unit, or blend it into Lubricant.\n- Bitumen: the bottom of the barrel, thick as tar. The Coker turns it into Petroleum Coke and Refinery Gas.\nSee Refinery Fuels for Gasoline, made from Naphtha."
     },
     {
       "type": "text",
-      "text": "- Pitch: a long-burning furnace fuel. Spin it into Carbon Fiber in a Fiberizer (1,000°C); Carbon Fiber makes Arcforged Alloy.\n- Asphalt: 8 gravel around 1 pitch makes 8. You walk, run and ride about 30% faster on it, and on its slabs and stairs."
+      "text": "- Pitch: a long-burning furnace fuel. Spin it into Carbon Fiber in a Fiberizer (1,000°C); Carbon Fiber makes Arcforged Alloy.\n- Asphalt: 8 gravel around 1 pitch, or around a Bitumen bucket, makes 8. You walk, run and ride about 30% faster on it, and on its slabs and stairs."
     }
   ]
 }

@@ -123,6 +123,13 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class);
         registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.WellHeadBlock.class);
         registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, DistillationArrayCasingBlock.class);
+        // The refinery's downstream units: the three machines, the Cracking Unit and Diesel Generator (through any of
+        // their blocks) and the Flare Stack.
+        registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity.class);
+        registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity.class);
+        registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity.class);
+        registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.class);
+        registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, PressureGlassBlock.class);
@@ -267,6 +274,11 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class, net.zagdrath.arcforge.block.multiblock.WellHeadBlock.class,
                 net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock.class, DistillationArrayCasingBlock.class)) {
             registration.registerBlockComponent(OilfieldProvider.Client.INSTANCE, type);
+        }
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.machine.RefiningMachineBlock.class,
+                net.zagdrath.arcforge.block.machine.FlareStackBlock.class, net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class)) {
+            registration.registerBlockComponent(RefineryProvider.Client.INSTANCE, type);
         }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock.class,
                 net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class, PressureGlassBlock.class)) {

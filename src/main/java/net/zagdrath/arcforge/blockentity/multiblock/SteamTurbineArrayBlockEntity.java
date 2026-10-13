@@ -188,7 +188,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imp
     // multiplier. Also the most its energy ports push out a tick.
     public static int maxOutput(double sections) {
         int flow = SteamBoilerArrayBlockEntity.scaled(ArcforgeConfig.TURBINE_ARRAY_FLOW_PER_SECTION.getAsInt(), sections);
-        return PowerGeneration.cap(flow * SteamGrade.SUPERHEATED.arrayFePerMb() * (Lubricant.bonus() + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble()));
+        return PowerGeneration.cap(flow * SteamGrade.SUPERHEATED.arrayFePerMb() * (Lubricant.best() + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble()));
     }
 
     public int maxOutput() {
@@ -358,7 +358,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imp
         }
         if (flow > 0 && grade != null) {
             double spun = Mth.clamp(rpm / Math.max(target, 1.0), 0.0, 1.0);
-            double bonus = 1.0 + (lubricated ? Lubricant.bonus() - 1.0 : 0.0) + (vacuum ? ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() : 0.0);
+            double bonus = 1.0 + Lubricant.share(lubricant.getResource(0)) + (vacuum ? ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() : 0.0);
             fePerTick = energy.generate(PowerGeneration.fe(flow * grade.arrayFePerMb() * spun * bonus));
             if (lubricated) {
                 useLubricant();
@@ -382,7 +382,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imp
         }
         // What the steam it holds would make at full speed (lubricant and vacuum bonuses as they stand), against its FE buffer.
         int rated = grade == null ? 0 : PowerGeneration.fe(Math.min(steamBefore, maxFlow) * grade.arrayFePerMb()
-                * (1.0 + (lubricated ? Lubricant.bonus() - 1.0 : 0.0) + (vacuum ? ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() : 0.0)));
+                * (1.0 + Lubricant.share(lubricant.getResource(0)) + (vacuum ? ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() : 0.0)));
         outputLimit.tick(level, running && grade != null && steamBefore > 0,
                 () -> OutputLimit.anyPortTakes(level, this, SideMode.ENERGY, OutputLimit.Unit.FE),
                 energy.getAmountAsInt(), energy.getCapacityAsInt(), energy.drained(), rated);

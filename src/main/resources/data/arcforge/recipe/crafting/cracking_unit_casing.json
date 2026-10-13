@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PNP",
+    "NTN",
+    "PNP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "N": "#c:plates/nickel",
+    "T": "arcforge:wrought_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:cracking_unit_casing",
+    "count": 8
+  }
+}

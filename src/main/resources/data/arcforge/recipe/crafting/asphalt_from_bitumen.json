@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "vvv",
+    "vbv",
+    "vvv"
+  ],
+  "key": {
+    "v": "minecraft:gravel",
+    "b": "arcforge:bitumen_bucket"
+  },
+  "result": {
+    "id": "arcforge:asphalt",
+    "count": 8
+  }
+}

@@ -316,7 +316,9 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         lines.add(fluid != Fluids.EMPTY ? Component.translatable("gui.arcforge.lubricant_of", fluid.getFluidType().getDescription())
                 : Component.translatable("gui.arcforge.lubricant"));
         lines.add(Component.translatable("gui.arcforge.mb_stored", ArcforgeGui.grouped(amount), ArcforgeGui.grouped(capacity)).withStyle(ChatFormatting.GRAY));
-        int bonus = (int) Math.round(ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble() * 100);
+        double share = fluid == ModFluids.LUBRICANT.get() ? ArcforgeConfig.LUBRICANT_PREMIUM_BONUS.getAsDouble()
+                : ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble();
+        int bonus = (int) Math.round(share * 100);
         String spin = String.format(Locale.ROOT, "%.1f", spinUp).replaceAll("\\.0$", "");
         lines.add((spinUp > 0 ? Component.translatable("gui.arcforge.lubricant.effect_spin_up", bonus, spin)
                 : Component.translatable("gui.arcforge.lubricant.effect", bonus)).withStyle(amount > 0 ? ChatFormatting.GOLD : ChatFormatting.DARK_GRAY));

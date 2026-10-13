@@ -18,8 +18,7 @@ import net.zagdrath.arcforge.multiblock.RefineryLayout;
 // in plate modules (modules): riveted plates wrapped round the shell, plates and gratings laid at 1:1 on the block grid
 // elsewhere, and ramps across its round parts; the game's face shading lights it.
 //
-// Round parts here stand upright (the turbines' lie along u), so this adds upright banded tubes, discs facing any way,
-// rays against upright cylinders (for the port nozzles) and the fans' turn about an upright axis.
+// Its fans turn about their own upright axis.
 public final class RefineryMesh extends ModelMesh {
     public static final int SHEET_W = 128, SHEET_H = 256;
     private static final float PIPE = 0.9F, PIPE_RING = 1.8F;
@@ -29,8 +28,6 @@ public final class RefineryMesh extends ModelMesh {
     private final int drawOffs;
     // Each sight glass's cavity: {x0, y0, front u, x1, y1, back u, section}.
     public final List<float[]> windows = new ArrayList<>();
-    // Upright cylinders the nozzles stop at: {x, u, radius, y0, y1}.
-    private final List<float[]> uprights = new ArrayList<>();
     // While building a fan: its angle and axis.
     private boolean spinning;
     private double spinCos = 1.0, spinSin = 0.0;
@@ -48,7 +45,6 @@ public final class RefineryMesh extends ModelMesh {
     // The still parts and the nozzles of these ports: {solid, cutout, glow}.
     public float[][] buildStatic(List<Port> ports) {
         startStatic();
-        uprights.clear();
         windows.clear();
         reboiler();
         shell();
@@ -453,163 +449,6 @@ public final class RefineryMesh extends ModelMesh {
         quad(new float[] { x1, bottom, u }, new float[] { x0, bottom, u }, new float[] { x0, y1, u }, new float[] { x1, y1, u },
                 new float[] { 0, 1, 0.75F, 1, 0.75F, 1 - (y1 - bottom) / 16.0F, 0, 1 - (y1 - bottom) / 16.0F }, false);
         return solid.toArray();
-    }
-
-    // --- Building blocks for upright parts ---
-
-    // A polygon tube standing upright about (x, u): its outline as (y, radius) points from the bottom, its facets
-    // painted side (banded by facing for BANDED and CASING; a facet 24 px or taller steps along its length, lightest at
-    // the top), with a flat cap on top when cap is set.
-    void uprightTube(float x, float u, float[][] profile, int sides, double start, Paint side, @org.jspecify.annotations.Nullable Paint cap) {
-        double step = 2.0 * Math.PI / sides;
-        for (int i = 0; i + 1 < profile.length; i++) {
-            float ya = profile[i][0], yb = profile[i + 1][0], ra = profile[i][1], rb = profile[i + 1][1];
-            if (yb - ya <= 0.001F) {
-                continue;
-            }
-            // The shell's plates, laid out once over the section unrolled (round it by up it), so they carry on from
-            // facet to facet: riveted plates as tall as the section, seams only where they meet.
-            float facetWidth = 2.0F * (float) Math.sin(step / 2.0) * ra;
-            List<float[]> shellPlates = modules && side == Paint.CASING && ra == rb
-                    ? plateFrame(new float[] { x, ya, u }, new float[] { 1, 0, 0 }, new float[] { 0, 1, 0 }, facetWidth * sides, yb - ya,
-                            new Plating(Steel.MACHINE, true, false)).rects()
-                    : null;
-            for (int f = 0; f < sides; f++) {
-                double a0 = start + f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
-                float[] n = { (float) Math.cos(mid), (rb < ra ? (ra - rb) / (yb - ya) : 0.0F), (float) Math.sin(mid) };
-                // Seen from outside: bottom-left, bottom-right, top-right, top-left (angle grows to the left seen from
-                // outside).
-                float[] p0 = { x + (float) Math.cos(a1) * ra, ya, u + (float) Math.sin(a1) * ra };
-                float[] p1 = { x + (float) Math.cos(a0) * ra, ya, u + (float) Math.sin(a0) * ra };
-                float[] p2 = { x + (float) Math.cos(a0) * rb, yb, u + (float) Math.sin(a0) * rb };
-                float[] p3 = { x + (float) Math.cos(a1) * rb, yb, u + (float) Math.sin(a1) * rb };
-                boolean swapped = dot(cross(sub(p2, p0), sub(p3, p1)), n) < 0;
-                if (swapped) {
-                    float[] t = p0;
-                    p0 = p1;
-                    p1 = t;
-                    t = p2;
-                    p2 = p3;
-                    p3 = t;
-                }
-                if (modules && side.kind == Kind.BANDED) {
-                    float chord = 2.0F * (float) Math.sin(step / 2.0), fw = chord * (ra + rb) / 2.0F;
-                    float height = (float) Math.hypot(yb - ya, rb - ra);
-                    if (ra != rb) {
-                        // A tapering ring (the elliptical head) narrows to a point, so no strip ramp keeps 1:1 across
-                        // it; it's one pressed piece, so its facets are bare grain (no plate edges on every facet).
-                        List<float[]> points = List.of(p0, p1, p2, p3);
-                        plateIn(plateFrame(points, new Plating(Steel.MACHINE, false, false, false)), points);
-                    } else if (shellPlates != null) {
-                        float s0 = (swapped ? f : sides - 1 - f) * fw;
-                        plateStrip(p0, p1, p2, p3, s0, s0 + fw, height, shellPlates);
-                    } else {
-                        roundFacet(p0, p1, p2, p3, n, side, swapped ? f : sides - 1 - f, sides, fw, height);
-                    }
-                    continue;
-                }
-                Paint paint = side.kind == Kind.BANDED ? band(side, n) : side;
-                if (broadShading && side.kind == Kind.BANDED && yb - ya >= STEP_FROM && ra == rb) {
-                    // stepped() puts its lighter step at its start: here the top (p2 p3 first, still wound outward).
-                    stepped(p2, p3, p0, p1, yb - ya, paint, side == Paint.CASING);
-                } else {
-                    flat(p0, p1, p2, p3, paint, false);
-                }
-            }
-        }
-        if (cap != null) {
-            float[] last = profile[profile.length - 1];
-            disc(new float[] { x, last[0], u }, new float[] { 0, 1, 0 }, last[1], sides, cap, cap);
-        }
-    }
-
-    // The inside of an upright ring (a fan shroud), its facets facing in, in one paint.
-    void uprightInner(float x, float u, float y0, float y1, float r, int sides, Paint paint) {
-        double step = 2.0 * Math.PI / sides;
-        for (int f = 0; f < sides; f++) {
-            double a0 = f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
-            float[] p0 = { x + (float) Math.cos(a0) * r, y0, u + (float) Math.sin(a0) * r };
-            float[] p1 = { x + (float) Math.cos(a1) * r, y0, u + (float) Math.sin(a1) * r };
-            float[] p2 = { p1[0], y1, p1[2] };
-            float[] p3 = { p0[0], y1, p0[2] };
-            orient(p0, p1, p2, p3, new float[] { -(float) Math.cos(mid), 0, -(float) Math.sin(mid) }, paint);
-        }
-    }
-
-    // A flat disc facing normal (unit, any way), its facets on the top-left half (seen from outside) in lit, the rest
-    // in shade.
-    void disc(float[] centre, float[] normal, float radius, int sides, Paint lit, Paint shade) {
-        float[][] axes = plane(normal);
-        float[] right = axes[0], up = axes[1];
-        double step = 2.0 * Math.PI / sides;
-        // A large model's disc is plated as one surface across its wedges (no painted light on it).
-        Plating plating = modules ? plating(lit, 2.0F * radius, 2.0F * radius) : null;
-        PlateFrame frame = null;
-        if (plating != null) {
-            List<float[]> rim = new ArrayList<>();
-            for (int f = 0; f < sides; f++) {
-                rim.add(at(centre, right, up, (float) Math.cos(f * step) * radius, (float) Math.sin(f * step) * radius));
-            }
-            frame = plateFrame(rim, plating);
-        }
-        for (int f = 0; f < sides; f++) {
-            double a0 = f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
-            float[] e0 = at(centre, right, up, (float) Math.cos(a0) * radius, (float) Math.sin(a0) * radius);
-            float[] e1 = at(centre, right, up, (float) Math.cos(a1) * radius, (float) Math.sin(a1) * radius);
-            if (frame != null) {
-                plateIn(frame, List.of(centre, e0, e1));
-                continue;
-            }
-            boolean topLeft = Math.sin(mid) - Math.cos(mid) > 0;
-            orient(centre, e0, e1, centre, normal, topLeft ? lit : shade);
-        }
-    }
-
-    // Right and up across a face facing normal, seen from outside (up is world up unless the face looks up or down).
-    private static float[][] plane(float[] normal) {
-        float[] up = Math.abs(normal[1]) > 0.9F ? new float[] { 0, 0, -Math.signum(normal[1]) } : new float[] { 0, 1, 0 };
-        float[] right = normalize(cross(up, normal));
-        up = cross(normal, right);
-        return new float[][] { right, up };
-    }
-
-    // --- Nozzles: rays against upright cylinders too ---
-
-    @Override
-    float ray(float[] p, float[] dir) {
-        float best = super.ray(p, dir);
-        best = best < 0.0F ? Float.MAX_VALUE : best;
-        int axis = dir[0] != 0 ? 0 : dir[1] != 0 ? 1 : 2;
-        float sign = dir[axis];
-        for (float[] c : uprights) {
-            float cx = c[0], cu = c[1], r = c[2], y0 = c[3], y1 = c[4];
-            if (axis == 1) {
-                float dx = p[0] - cx, du = p[2] - cu;
-                if (dx * dx + du * du < r * r) {
-                    float near = sign > 0 ? y0 - p[1] : p[1] - y1;
-                    float far = sign > 0 ? y1 - p[1] : p[1] - y0;
-                    if (far > 0.0F) {
-                        best = Math.min(best, Math.max(0.0F, near));
-                    }
-                }
-                continue;
-            }
-            if (p[1] < y0 || p[1] > y1) {
-                continue;
-            }
-            float offset = axis == 0 ? p[2] - cu : p[0] - cx;
-            if (Math.abs(offset) >= r) {
-                continue;
-            }
-            float reach = (float) Math.sqrt(r * r - offset * offset);
-            float centre = axis == 0 ? cx : cu;
-            float near = sign > 0 ? centre - reach - p[axis] : p[axis] - (centre + reach);
-            float far = sign > 0 ? centre + reach - p[axis] : p[axis] - (centre - reach);
-            if (far > 0.0F) {
-                best = Math.min(best, Math.max(0.0F, near));
-            }
-        }
-        return best == Float.MAX_VALUE ? -1.0F : best;
     }
 
     // The fans turn about their own upright axis while they're built.

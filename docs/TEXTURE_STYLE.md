@@ -394,16 +394,24 @@ the same layout on all of them); ModelMesh `modules` and `plating` lay them.
    it is never wider than 14 px. A band wider round than it is long (a flange, a ring) carries its ramp across its
    length instead, the same all the way round. A tile on a curved edge (the hazard stripe) carries on round the arc.
    The polished rod has its own bright steel ramp.
-5. **No flat faces.** No face larger than about 4×4 px is a single flat tone. Faces under that get one or two tones,
-   and a thin strip longer than that shows a slice of a plate at 1:1 rather than a stretched tone.
+5. **No flat faces.** No face larger than about 4×4 px is a single flat tone. Faces under that get one or two tones.
+   A thin strip in a steel tone longer than that shows a slice of a plate at 1:1; a thin part in a colour of its own (a
+   blade, a cooling rib, the FE band) may stay one tone, which has nothing to stretch. Panels with stretching cuts
+   (FE_BAND) aren't used on large models: they drop to their flat colour.
 6. **Block models on a large model** (the Well Head) can't share its sheet, and a block model's UVs span a whole
    texture, so only 16×16 textures keep 1 texel per px. Each visible face gets its own region painted to its exact size
    (a grain plate with its edges, or the ramp across a round part), packed into 16×16 sheets, and the model's UVs point
    at them: `tools/WellHeadModelGen.java` writes both together.
+7. **Glass** on a large model is laid at 1:1 too: the GLASS tile's 1 px frame (lit top and left, dark bottom and
+   right) runs round the pane's edge in runs of up to 10 px, its glints sit once in the top-left corner (on a pane 8 px
+   or more each way), and the clear middle isn't drawn at all.
+8. **Round caps and discs** (pipe ends, flywheel faces, a casing's end rings) are plated as one surface across their
+   wedges, never wedge by wedge.
 
-Converted: the **Pumpjack** and the **refinery tower** (Distillation Array). Their renderers shade each face as a block
-face turned its way is, so the models sit in the light like the blocks round them. Models still to bring into line: the
-**Steam Turbine Array**, **Gas Turbine Array** and **Industrial Water Intake**.
+Converted: the **Pumpjack**, the **refinery tower** (Distillation Array), the **Steam Turbine Array**, and the refinery
+units' models (the **Cracking Unit**, the **Diesel Generator** and the **Flare Stack**'s stack). Their renderers shade
+each face as a block face turned its way is, so the models sit in the light like the blocks round them. Models still to
+bring into line: the **Gas Turbine Array** and the **Industrial Water Intake**.
 
 ### Natural materials: ores, raw items, raw blocks, crystals (VANILLA texture language)
 
@@ -936,7 +944,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 ## Steam Turbine Array model
 - Formed, the array's casings and Pressure Glass draw nothing (`steam_turbine_array/hidden`, with the port plates);
   SteamTurbineArrayRenderer draws one turbine-generator set from TurbineLayout, built by TurbineMesh on one sheet,
-  `block/steam_turbine_array/turbine` (128×96, positions in ModelMesh.Paint, painted by its art script):
+  `block/steam_turbine_array/turbine` (128×256, positions in ModelMesh.Paint; rows 0–95 by its art script, rows 96–233
+  the large-model plating by `tools/LargeModelTextureGen.java`). It's a large model: see "Large model texturing".
   - Row 0–3: 4×4 flat tones (the machine steel ramp, the generator steel `#3E444B #4E545C #646A72 #7E848C`, FE red, the
     blade steel `#B4BAC0` with its back `#7E848C`, as the Gas Turbine Array's compressor blades). Row 4: tiles: the
     grating (`#575D65` bar, `#40454C`, two `#16181B` gap rows), the riveted strap (4×3: `#575D65` / `#474C53` with a
@@ -950,21 +959,14 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - CASING_0…5 (8×12 each): the casings' shell plates in the band tones `#2B2F34 #383C42 #40454C #474C53 #575D65 #727982`,
     a seam band at each end (`#16181B` seam, a lip one band lighter / darker, a rivet on the facet's centre column with
     its shadow), so each shell section reads as riveted plates meeting at seams; the window frames sit in those seams.
-  - Rows 64–87: broad shading (rule 2). BROAD_0…7 (4×4 at x 4k, y 64) are the eight broad tones; GEN_BROAD_0…7 (at
-    x 32 + 4k) the generator's lighter steel `#7A8088 #727880 #6A7078 #636970 #5C6268 #565B62 #50555B #4A4F55`. Under
-    them, 16×16 panels with CORNERS cuts (4 px corners at 1 texel per px, 2 px bevel strips that stretch): B_PLATE and
-    B_GEN_PLATE (riveted), B_PLAIN, B_FOOTING and B_GEN_PLAIN, each corner's field painted in the broad tone that corner
-    of a face has (top left tone 0, top right 4, bottom left 3, bottom right 7).
-- **Big faces** (PLATE, PLAIN, DECK, FOOTING and the generator's, at least 12 px each way and 16 px one way: the plinth
-  deck and footings, the pedestals, the generator and exciter housings, and the chest where it's that big) are
-  broad-shaded: the panel's
-  corners and bevels round the face, and inside them the eight tones as diagonal bands (tone from 0.55·x/w + 0.45·y/h),
-  each a flat polygon, hard-edged. Bevels, rivets, straps, seams and louvres sit on top as before. Smaller faces keep
-  their panel, then one or two flat tones (1–2 px faces).
-- **Round parts** keep the banded-facet rule (one band tone per facet, never blended). A facet 24 px or longer (a long
-  casing, the crossover's run) steps along its length: its band tone over the middle third, one band lighter
-  toward the steam end and one darker toward the far end (never the darkest tone), a casing facet keeping its seam rows
-  and rivets at 1 texel per px at both ends.
+  - Rows 64–87 hold the old broad-shading tones and panels; nothing draws them any more.
+- **Plated faces** (PLATE, PLAIN, DECK, FOOTING, the band tones and the generator's: the plinth deck and footings, the
+  pedestals, the steam chest, the generator and exciter housings) are continuous plates, as few as keep each within
+  4 blocks, riveted where the paint is riveted; the deck is deck plates with recessed panels, with no seam across it
+  every block. The generator steel plates in its own lighter grain.
+- **The casings' shells** are riveted plates wrapped round them unrolled, as the refinery tower's shell is, their seams
+  at the casing's ends, its tapers and its windows; the tapering ends are bare grain. **Round parts** (pipes, hoops,
+  gland bosses, valve bodies, the shaft, couplings, hub drums and rotor discs) carry the ramp across them.
 - **The casings**: 16-sided shells, each split by a bolted flange, with hoops where the ends taper, end rings with bolt
   circles and gland bosses; long sets get longer casings and up to three double-flow low-pressure casings, a pair of
   bearing pedestals and a coupling between each two, and an exciter (a smaller ribbed housing) beyond the generator.
@@ -976,9 +978,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     blades angled 35° to the axis, in the blade steel (front `#B4BAC0`, back `#7E848C`); more and longer blades toward
     low pressure (24 / 30 / 36 blades a row), the tips growing along each casing but always 1 px inside the
     inner wall's flats.
-  - Pipes, hoops, gland bosses and valve bodies use the band tones per facet; flanges `#575D65` on top, `#383C42` under,
-    bolt heads `#959DA6`; elbows PLATE; the deck slab's edge the strap, with a plate seam (`#16181B` then `#575D65`, ½ px
-    each) across the deck every block; louvred vents on both generator ends.
+  - Flanges are plate slices; bolt heads `#959DA6`; elbows PLATE; the deck slab's edge the girder flange; louvred vents
+    on both generator ends.
   - Port nozzles are PLAIN collars 10 px across (the port plate's collar) from the model to the face.
 - **Hitbox** (not a texture, but it follows the model): formed, each block's shape is the model's parts in it,
   voxelized from TurbineMesh itself at 1 px (TurbineShapes), so a block's outline follows the parts a player sees.
@@ -1357,3 +1358,83 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - The screen is shortened to y 18–52 (x 40–93) with the Pitch output slot frame under it at (40, 54); right of it, seven
   narrow product tanks (6 px inside, the turbines' lubricant gauge), at x 97 + 10k, lightest product on the left.
   A product the column doesn't make at its height shows `product_locked`; the fallback fill is `#4E5258` with a `#6A6E74` top row.
+
+## Refinery units, fuels and generators
+- **Fluids** (re-toned by rank from Light Oil's still/flow frames, keeping its alpha and `.mcmeta`):
+  - Gasoline: a pale straw-orange (`#B27428 #DDA044 #F2C678 #FBE6B8`). Its fog is `#E8A850`.
+  - Lubricant: a clear golden amber (`#7A4E10 #B07418 #D89A2A #F2C25A`). Its fog is `#C88A28`.
+- **Items:** Petroleum Coke is Coal Coke's lump re-toned by rank onto a darker blue-black, so the two read as kin. The
+  Cracking Catalyst is a small heap of zeolite pellets: flat cream tones, each pellet with a lit top-left pixel and a
+  shadow under it, inside the item outline.
+- **Single-block units** (the machine casing, with the 8×8 ports at their default faces and each product's chip):
+  - Catalytic Reformer: three catalyst tubes in a furnace window on its front. `_on` lights the window up the Heat row,
+    with a bright band climbing each tube.
+  - Coker: a coke drum's bolted door with a viewing slit. `_on` flickers fire in the slit.
+  - Lubricant Blender: a vat of amber Lubricant with its mixer. `_on` turns the mixer.
+  - Port chips: Naphtha `#F6E0AA` / `#D4AA5C`, Bitumen `#3A3A40` / `#141418`, Heavy Oil `#6A4A2A` / `#2A1A0C`,
+    Refinery Gas `#E4E8EE` / `#B4BCC8`, Petroleum Coke `#5A5E66` / `#22252A`.
+- **Plant casings and controllers** (`block/refinery/*`, in the oilfield's casing grammar: 2 px bevel, split face at
+  x 10, top rivets, the tread deck on top):
+  - Cracking Unit: the riveted strap and a small vent.
+  - Diesel Generator: an FE band in place of the strap.
+  - Controllers: the screen recess with the status LED and a glyph (a cracking column; a sine wave). `_on` lights them.
+  - Formed, both hide their faces (`*_hidden`, with the port plates) and a renderer draws the plant (PlantRenderer, on
+    ModelMesh like the turbines, shading each face as a block face, as PumpjackRenderer does).
+- The three models below are **large models** ("Large model texturing"): their PLATE, PLAIN, DECK, FOOTING and band
+  tone faces are continuous plates, CASING shells riveted plates wrapped round them, domed heads and cones bare grain,
+  and their round parts carry the ramp across them. The names below are the paints each part is given.
+- **Cracking Unit model** (CrackingUnitLayout and CrackingUnitMesh, on the refinery tower's sheet,
+  `block/distillation_array/refinery`): a fluid catalytic cracker in the 3×3×5 box.
+  - The base deck: deck plates over the footprint on a FOOTING, with a MID lip.
+  - The regenerator, the big vessel at the back: a banded base ring, a riveted CASING shell in two courses with a
+    bolted flange between, a banded elliptical head, and a flue stack with a lip rising past the top of the box.
+  - The sight port on the regenerator's front: a steel frame standing proud, a DARK pane, and the catalyst bed's GLOW
+    over it in the glow list, as bright as (T − 150) / 450 of the unit's temperature.
+  - The reactor at the front right: a skirt, the stripper, a stepped cone up to the wider disengager and its head, with
+    flanges at the joints.
+  - The riser: a wye at its foot, the pipe up the front and its crossover into the disengager's side.
+  - The standpipes and the hopper's feed line, each with a slide valve (a body and its actuator) halfway down.
+  - The fresh-catalyst hopper: four braced legs, a body with a lid, and a three-step cone to its feed line.
+  - The vapour line from the reactor's head across to the right edge and down to the deck, flanged at each turn.
+  - Port nozzles are PLAIN collars 10 px across, as the turbines'.
+  - **Hitbox:** each block's shape is the model's still parts in it (PlantHitbox), with the port plates added. Empty
+    cells on the ground get the floor plate; empty cells above it are empty.
+- **Diesel Generator model** (DieselGeneratorLayout and DieselGeneratorMesh, on the Pumpjack's sheet for its
+  generator steel, FE band and louvres): an engine-generator set on a skid along the 5-block length.
+  - The skid: two STRAP rails, cross members and the engine's mounts.
+  - The radiator at the front: a plated core with a VENT grille, header tanks top and bottom with a filler cap, and the
+    fan's banded shroud.
+  - The engine, an inline six: oil pan, crankcase, head with a flange line and head bolts, six rocker covers, the
+    intake manifold and a canister air filter on the left, and the exhaust manifold into the turbocharger on the right.
+    The exhaust stack (banded) carries a rain cap.
+  - The flywheel housing (a banded drum on the shaft line).
+  - The alternator in the generator steel (GEN_PLATE, GEN_PLAIN) with louvres down both sides, an FE band round its
+    middle, an end bell, and a terminal box whose cable glands are FE red.
+  - Moving parts, drawn each frame about the shaft: the fan's five blades and hub, and the coupling (a short drum with
+    bolt heads). They turn at 30° a tick times the engine's speed, so spin-up and coast-down show.
+  - **Hitbox:** the still parts only, as for the Pumpjack.
+- **Flare Stack** (`block/flare_stack/side`, `top`, `bottom`): the base block, with Input ports (Refinery Gas chip) on
+  its sides and bottom and the stack's seat (a recessed ring) on top.
+  - FlareStackMesh (on the refinery sheet) draws the stack above it: a banded pipe in three flanged lengths up to 74 px,
+    and the tip up to 80 px in a wind shield of plates.
+  - The pilot line runs up the north side. A GRATE service platform at 62 px has a kick plate, railings and struts to
+    its corners, with a ladder up the south side on stand-offs: two 1 px stiles 9 px apart and a 1 px rung every 4 px,
+    the railing open above it.
+- **Flare flame** (`block/flare_stack/flame`, 8 frames): a tongue of fire in the Heat row with a pale core, on black.
+  - It is drawn additively and full-bright on two crossed sheets (RenderTypes.eyes), from a 5 px pilot up to 32 px
+    as the stack burns more.
+  - Never use blue: it's a hydrocarbon flare.
+- **GUIs:**
+  - Refining machines (`gui/container/cracking_unit`, `catalytic_reformer`, `coker`, `lubricant_blender`): the
+    Fischer-Tropsch Reactor's 176×186 frame, with the band above the inventory redrawn to hold only the parts each
+    machine has:
+    - the FE gauge (Blender only);
+    - the feed tank;
+    - the catalyst slot (Cracking Unit; a white pellet ghost at the ghost alphas `0x69` rim / `0x37` body);
+    - the arrow;
+    - one tank per product;
+    - the Coker's coke slot (orange, an output);
+    - the heat buffer and heat bar on the heated ones, with a tick at the recipe's least temperature.
+  - Diesel Generator (`gui/container/diesel_generator`): the Pumpjack's frame without its bucket slots. The screen runs
+    across to the fuel tank, with a speed bar under it in the accent colour. The tank fill falls back to an amber
+    hatch (`fuel_fill`) when the fluid sprite isn't there.

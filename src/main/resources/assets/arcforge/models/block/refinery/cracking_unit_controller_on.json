@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/refinery/cracking_unit_controller_on",
+    "south": "arcforge:block/refinery/cracking_unit_casing",
+    "east": "arcforge:block/refinery/cracking_unit_casing",
+    "west": "arcforge:block/refinery/cracking_unit_casing",
+    "up": "arcforge:block/refinery/cracking_unit_casing_top",
+    "down": "arcforge:block/refinery/cracking_unit_casing_top",
+    "particle": "arcforge:block/refinery/cracking_unit_casing"
+  }
+}

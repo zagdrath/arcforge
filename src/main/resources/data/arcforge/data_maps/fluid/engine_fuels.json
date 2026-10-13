@@ -1,0 +1,16 @@
+{
+  "values": {
+    "arcforge:diesel": {
+      "fe_per_mb": 420
+    },
+    "arcforge:gasoline": {
+      "fe_per_mb": 400
+    },
+    "arcforge:biodiesel": {
+      "fe_per_mb": 340
+    },
+    "arcforge:refinery_gas": {
+      "fe_per_mb": 240
+    }
+  }
+}

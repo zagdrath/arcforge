@@ -671,6 +671,23 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> BITUMEN = BLOCKS.registerBlock("bitumen",
             p -> new LiquidBlock(ModFluids.BITUMEN.get(), p) {},
             p -> liquidProperties(p, MapColor.COLOR_BLACK));
+    // Gasoline burns where it lies, faster than anything; Lubricant doesn't.
+    public static final DeferredBlock<LiquidBlock> GASOLINE = BLOCKS.registerBlock("gasoline",
+            p -> new LiquidBlock(ModFluids.GASOLINE.get(), p) {
+                @Override
+                public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 300;
+                }
+
+                @Override
+                public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 100;
+                }
+            },
+            p -> liquidProperties(p, MapColor.COLOR_ORANGE));
+    public static final DeferredBlock<LiquidBlock> LUBRICANT = BLOCKS.registerBlock("lubricant",
+            p -> new LiquidBlock(ModFluids.LUBRICANT.get(), p) {},
+            p -> liquidProperties(p, MapColor.GOLD));
 
     // The Oil Press's Seed Oil.
     public static final DeferredBlock<LiquidBlock> SEED_OIL = BLOCKS.registerBlock("seed_oil",
@@ -723,14 +740,14 @@ public final class ModBlocks {
             p -> columnProperties(p).lightLevel(state -> state.getValue(ThermalEvaporatorControllerBlock.LIT) ? 7 : 0));
     // The oilfield (see OilfieldStructures): the Oil Derrick's floor casings, lattice frame and controller; the Well
     // Head it leaves (it can't be carried off, and a pick won't hurry it); and the Pumpjack's casings and controller,
-    // which take the shape of the pumpjack once formed (see PumpjackHitbox).
+    // which take the shape of the pumpjack once formed (see PlantHitbox).
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> DERRICK_CASING = BLOCKS.registerBlock(
             "derrick_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, false, true), ModBlocks::columnProperties);
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> DERRICK_FRAME = BLOCKS.registerBlock(
             "derrick_frame", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, false, false),
             p -> columnProperties(p).noOcclusion().isSuffocating((state, level, pos) -> false).isViewBlocking((state, level, pos, box) -> false));
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> OIL_DERRICK_CONTROLLER = BLOCKS.registerBlock(
-            "oil_derrick_controller", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, false),
+            "oil_derrick_controller", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, net.zagdrath.arcforge.multiblock.PlantKind.DERRICK),
             p -> columnProperties(p).lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.LIT) ? 7 : 0));
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.WellHeadBlock> WELL_HEAD = BLOCKS.registerBlock("well_head",
             net.zagdrath.arcforge.block.multiblock.WellHeadBlock::new,
@@ -739,8 +756,38 @@ public final class ModBlocks {
             "pumpjack_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, true, true),
             p -> columnProperties(p).dynamicShape().forceSolidOn());
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> PUMPJACK_CONTROLLER = BLOCKS.registerBlock(
-            "pumpjack_controller", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, true),
+            "pumpjack_controller", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, net.zagdrath.arcforge.multiblock.PlantKind.PUMPJACK),
             p -> columnProperties(p).dynamicShape().forceSolidOn());
+    // The refinery's downstream units: the Catalytic Reformer, Coker and Lubricant Blender (single blocks, see
+    // RefiningMachineBlockEntity); the Cracking Unit and Diesel Generator (fixed boxes of casings round a controller,
+    // drawn by their renderers once formed, see OilfieldStructures.PlantBox); and the Flare Stack.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.RefiningMachineBlock> CATALYTIC_REFORMER = BLOCKS.registerBlock(
+            "catalytic_reformer", p -> new net.zagdrath.arcforge.block.machine.RefiningMachineBlock(p, net.zagdrath.arcforge.recipe.RefiningProcess.REFORMING),
+            p -> machineProperties(p, 7));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.RefiningMachineBlock> COKER = BLOCKS.registerBlock(
+            "coker", p -> new net.zagdrath.arcforge.block.machine.RefiningMachineBlock(p, net.zagdrath.arcforge.recipe.RefiningProcess.COKING),
+            p -> machineProperties(p, 9));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.RefiningMachineBlock> LUBRICANT_BLENDER = BLOCKS.registerBlock(
+            "lubricant_blender", p -> new net.zagdrath.arcforge.block.machine.RefiningMachineBlock(p, net.zagdrath.arcforge.recipe.RefiningProcess.BLENDING),
+            p -> machineProperties(p, 0));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> CRACKING_UNIT_CASING = BLOCKS.registerBlock(
+            "cracking_unit_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, true, true),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> CRACKING_UNIT_CONTROLLER = BLOCKS.registerBlock(
+            "cracking_unit_controller",
+            p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, net.zagdrath.arcforge.multiblock.PlantKind.CRACKING_UNIT),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> DIESEL_GENERATOR_CASING = BLOCKS.registerBlock(
+            "diesel_generator_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, true, true),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> DIESEL_GENERATOR_CONTROLLER = BLOCKS.registerBlock(
+            "diesel_generator_controller",
+            p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, net.zagdrath.arcforge.multiblock.PlantKind.DIESEL_GENERATOR),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.FlareStackBlock> FLARE_STACK = BLOCKS.registerBlock("flare_stack",
+            net.zagdrath.arcforge.block.machine.FlareStackBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)
+                    .lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.machine.FlareStackBlock.LIT) ? 10 : 0));
     // Seawater, pumped from oceans and beaches.
     public static final DeferredBlock<LiquidBlock> SEAWATER = BLOCKS.registerBlock("seawater",
             p -> new LiquidBlock(ModFluids.SEAWATER.get(), p) {},

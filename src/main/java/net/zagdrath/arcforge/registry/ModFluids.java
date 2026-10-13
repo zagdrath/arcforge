@@ -82,6 +82,18 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(bitumenProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BITUMEN = FLUIDS.register("flowing_bitumen",
             () -> new BaseFlowingFluid.Flowing(bitumenProperties()));
+    // The refinery's downstream products: Gasoline (from the Catalytic Reformer, a thin, volatile fuel) and Lubricant
+    // (the Lubricant Blender's refined Heavy Oil: a clear amber oil, a better turbine lubricant than Heavy Oil).
+    public static final DeferredHolder<FluidType, FluidType> GASOLINE_TYPE = liquidType("gasoline", 740, 900, 0.022F, 0.85, 0.85);
+    public static final DeferredHolder<FluidType, FluidType> LUBRICANT_TYPE = liquidType("lubricant", 870, 3_500, 0.016F, 0.6, 0.7);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> GASOLINE = FLUIDS.register("gasoline",
+            () -> new BaseFlowingFluid.Source(gasolineProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_GASOLINE = FLUIDS.register("flowing_gasoline",
+            () -> new BaseFlowingFluid.Flowing(gasolineProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LUBRICANT = FLUIDS.register("lubricant",
+            () -> new BaseFlowingFluid.Source(lubricantProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LUBRICANT = FLUIDS.register("flowing_lubricant",
+            () -> new BaseFlowingFluid.Flowing(lubricantProperties()));
     // Refinery Gas: the lightest cut of Crude Oil, off the top of the column. A gas that burns in the Fuel Burner and
     // the Gas Turbine Array.
     public static final DeferredHolder<FluidType, FluidType> REFINERY_GAS_TYPE = gasType("refinery_gas", 293);
@@ -451,6 +463,28 @@ public final class ModFluids {
                 .slopeFindDistance(4)
                 .levelDecreasePerBlock(1)
                 .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // Thinner than Kerosene: spreads 4 blocks, every 5 ticks.
+    private static BaseFlowingFluid.Properties gasolineProperties() {
+        return new BaseFlowingFluid.Properties(GASOLINE_TYPE, GASOLINE, FLOWING_GASOLINE)
+                .bucket(ModItems.GASOLINE_BUCKET)
+                .block(ModBlocks.GASOLINE)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // An oil: spreads 2 blocks, every 20 ticks.
+    private static BaseFlowingFluid.Properties lubricantProperties() {
+        return new BaseFlowingFluid.Properties(LUBRICANT_TYPE, LUBRICANT, FLOWING_LUBRICANT)
+                .bucket(ModItems.LUBRICANT_BUCKET)
+                .block(ModBlocks.LUBRICANT)
+                .slopeFindDistance(2)
+                .levelDecreasePerBlock(2)
+                .tickRate(20)
                 .explosionResistance(100.0F);
     }
 

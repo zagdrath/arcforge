@@ -1,0 +1,24 @@
+{
+  "title": "Cracking Unit",
+  "icon": "arcforge:cracking_unit_controller",
+  "items": [
+    "arcforge:cracking_unit_controller",
+    "arcforge:cracking_unit_casing",
+    "arcforge:cracking_catalyst",
+    "arcforge:heavy_oil_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Cracks Heavy Oil with heat over a catalyst into the lighter cuts.\n# Building\nA solid 3x3 box of Cracking Unit Casings five tall, with the Cracking Unit Controller in the middle of the bottom of one side, facing out. Formed, it becomes a cracker: the regenerator at the back (its sight port glows as hot as the unit is), the reactor on its skirt at the front, the riser and standpipes between them, and the catalyst hopper."
+    },
+    {
+      "type": "text",
+      "text": "# Cracking\n100 mB Heavy Oil makes 40 mB Naphtha, 45 mB Diesel and 60 mB Refinery Gas, in 1 second (5 mB/t), using 30 HU/t at 480°C or hotter.\n# Catalyst\nIts catalyst slot takes Cracking Catalyst (clay, sand and Nickel Dust). One lasts 50 operations, 5,000 mB of Heavy Oil; without it, it stops.\n# Ports\nA new Cracking Unit has no ports: set them with the Wrench in Port mode.\n- Input: Heavy Oil and Cracking Catalyst in.\n- Heat: heat in.\n- Output: Naphtha and Diesel out; or a Naphtha, Diesel or Refinery Gas port for just that one.\nSpeed Upgrades make it faster."
+    },
+    {
+      "type": "multiblock",
+      "structure": "cracking_unit"
+    }
+  ]
+}

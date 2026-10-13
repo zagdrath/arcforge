@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/cracking",
+  "display": {
+    "icon": {
+      "id": "arcforge:gasoline_bucket"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.gasoline.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.gasoline.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:gasoline"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

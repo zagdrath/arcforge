@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/refinery/diesel_generator_casing",
+    "south": "arcforge:block/refinery/diesel_generator_casing",
+    "east": "arcforge:block/refinery/diesel_generator_casing",
+    "west": "arcforge:block/refinery/diesel_generator_casing",
+    "up": "arcforge:block/refinery/diesel_generator_casing_top",
+    "down": "arcforge:block/refinery/diesel_generator_casing_top",
+    "particle": "arcforge:block/refinery/diesel_generator_casing"
+  }
+}

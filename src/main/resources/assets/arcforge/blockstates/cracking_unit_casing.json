@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/refinery/cracking_unit_casing"
+    },
+    "formed=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/cracking_unit_hidden"
+    }
+  }
+}

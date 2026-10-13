@@ -295,7 +295,7 @@ final class DistillationGameTests {
                     int flow = turbine.maxFlow();
                     double target = (double) SteamTurbineArrayBlockEntity.maxRpm() * flow / turbine.maxFlow();
                     double spun = Math.min(1.0, turbine.getRpm() / target);
-                    int expected = (int) Math.round(flow * SteamGrade.SUPERHEATED.arrayFePerMb() * spun * Lubricant.bonus());
+                    int expected = (int) Math.round(flow * SteamGrade.SUPERHEATED.arrayFePerMb() * spun * Lubricant.bonus(FluidResource.of(ModFluids.HEAVY_OIL.get())));
                     helper.assertTrue(Math.abs(turbine.getFePerTick() - expected) <= 1, "A lubricated turbine makes " + turbine.getFePerTick() + " FE/t, expected " + expected);
                 })
                 .thenIdle(100)

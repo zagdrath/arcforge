@@ -229,6 +229,11 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.THERMAL_EVAPORATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.ThermalEvaporatorScreen::new);
         event.register(ModMenuTypes.OIL_DERRICK.get(), net.zagdrath.arcforge.client.screen.multiblock.OilDerrickScreen::new);
         event.register(ModMenuTypes.PUMPJACK.get(), net.zagdrath.arcforge.client.screen.multiblock.PumpjackScreen::new);
+        event.register(ModMenuTypes.CRACKING_UNIT.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
+        event.register(ModMenuTypes.CATALYTIC_REFORMER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
+        event.register(ModMenuTypes.COKER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
+        event.register(ModMenuTypes.LUBRICANT_BLENDER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
+        event.register(ModMenuTypes.DIESEL_GENERATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.DieselGeneratorScreen::new);
         event.register(ModMenuTypes.FIREBOX_ARRAY.get(), net.zagdrath.arcforge.client.screen.multiblock.FireboxArrayScreen::new);
         event.register(ModMenuTypes.BATTERY_ARRAY.get(), net.zagdrath.arcforge.client.screen.multiblock.BatteryArrayScreen::new);
         event.register(ModMenuTypes.GLASS_CLOCHE.get(), ClocheScreen::new);
@@ -309,6 +314,8 @@ public class ArcforgeClient {
         event.register(liquidModel("kerosene"), ModFluids.KEROSENE, ModFluids.FLOWING_KEROSENE);
         event.register(liquidModel("diesel"), ModFluids.DIESEL, ModFluids.FLOWING_DIESEL);
         event.register(liquidModel("bitumen"), ModFluids.BITUMEN, ModFluids.FLOWING_BITUMEN);
+        event.register(liquidModel("gasoline"), ModFluids.GASOLINE, ModFluids.FLOWING_GASOLINE);
+        event.register(liquidModel("lubricant"), ModFluids.LUBRICANT, ModFluids.FLOWING_LUBRICANT);
         event.register(liquidModel("seed_oil"), ModFluids.SEED_OIL, ModFluids.FLOWING_SEED_OIL);
         event.register(liquidModel("nutrient_solution"), ModFluids.NUTRIENT_SOLUTION, ModFluids.FLOWING_NUTRIENT_SOLUTION);
         event.register(liquidModel("biodiesel"), ModFluids.BIODIESEL, ModFluids.FLOWING_BIODIESEL);
@@ -414,6 +421,8 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xDCE0C8, 9.0F), ModFluids.KEROSENE_TYPE.get());
         event.registerFluidType(liquidFog(0xC8A848, 6.0F), ModFluids.DIESEL_TYPE.get());
         event.registerFluidType(liquidFog(0x08080A, 1.0F), ModFluids.BITUMEN_TYPE.get());
+        event.registerFluidType(liquidFog(0xE8A850, 9.0F), ModFluids.GASOLINE_TYPE.get());
+        event.registerFluidType(liquidFog(0xC88A28, 5.0F), ModFluids.LUBRICANT_TYPE.get());
         event.registerFluidType(liquidFog(0xC8961E, 4.0F), ModFluids.SEED_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(EXHAUST_STEAM_TINT & 0xFFFFFF, 6.0F), ModFluids.EXHAUST_STEAM_TYPE.get());
@@ -593,6 +602,12 @@ public class ArcforgeClient {
                 net.zagdrath.arcforge.client.renderer.blockentity.OilDerrickRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.PUMPJACK.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.PumpjackRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.CRACKING_UNIT.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.CrackingUnitRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.DIESEL_GENERATOR.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.DieselGeneratorRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.FLARE_STACK.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.FlareStackRenderer::new);
         // The automated farms draw the soil and the plant growing inside.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheRenderer::new);

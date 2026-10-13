@@ -8,7 +8,7 @@ package net.zagdrath.arcforge.multiblock;
 import java.util.ArrayList;
 import java.util.List;
 
-// Where the Pumpjack's parts are (see PumpjackRenderer, which draws it, and PumpjackHitbox, whose shapes follow it),
+// Where the Pumpjack's parts are (see PumpjackRenderer, which draws it, and PlantHitbox, whose shapes follow it),
 // and how its walking beam rocks as the crank turns. In the model's frame (ModelFrame): x across (0 to 48 px, the well
 // in the middle), y up, u along from the well (0 at the well's end, 80 at the far end), in px.
 //

@@ -69,17 +69,17 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 import net.zagdrath.arcforge.machine.output.OutputLimit;
 import net.zagdrath.arcforge.machine.output.OutputLimited;
 
-// The Gas Turbine Array (see ShellMultiblockBlockEntity): a turbine 5 to 9 blocks long that burns Fuel Burner
-// fuels straight to FE. It burns up to maxFuelHeatPerLength x L HU/t of fuel (2,500 x L: about 34,000 FE/t at 9 long) (the limit is heat, so Hydrogen's
-// thin HU/mB isn't punished), scaled by the throttle: full in the standard redstone modes, signal / 15 in
-// THROTTLE. Each HU makes simpleCycleFactor FE (1.5), less for fuels burning cooler than the reference
-// temperature, scaled by how close the rotor is to its speed, +8% with lubricant, and times power.generationMultiplier.
-// Its output cap is its full-throttle lubricated output, and its FE buffer energyBufferTicks of that. A quarter of the heat
-// leaves as exhaust at half the burn temperature, pushed out of Heat ports (a Steam Boiler Array takes it)
-// or vented. One end is the intake, which needs air in front of it; the other is the exhaust. Starting takes
-// 20 ticks of ignition; running dry is a flameout, and it waits 20 ticks before it can ignite again. With a Gas Output
-// port (named Flue Gas) it gives off Carbon Dioxide through it while burning carbon fuels, in proportion to the fuel's
-// heat (see FlueGas); Hydrogen gives none, and with no such port nothing changes.
+// The Gas Turbine Array (see ShellMultiblockBlockEntity): a turbine 5 to 9 blocks long that burns Fuel Burner fuels
+// straight to FE. It burns up to maxFuelHeatPerLength x L HU/t of fuel (2,500 x L: about 34,000 FE/t at 9 long) (the
+// limit is heat, so Hydrogen's thin HU/mB isn't punished), scaled by the throttle: full in the standard redstone modes,
+// signal / 15 in THROTTLE. Each HU makes simpleCycleFactor FE (1.5), less for fuels burning cooler than the reference
+// temperature, scaled by how close the rotor is to its speed, +8% with lubricant (+12% with Lubricant), and times
+// power.generationMultiplier. Its output cap is its full-throttle lubricated output, and its FE buffer
+// energyBufferTicks of that. A quarter of the heat leaves as exhaust at half the burn temperature, pushed out of Heat
+// ports (a Steam Boiler Array takes it) or vented. One end is the intake, which needs air in front of it; the other is
+// the exhaust. Starting takes 20 ticks of ignition; running dry is a flameout, and it waits 20 ticks before it can
+// ignite again. With a Gas Output port (named Flue Gas) it gives off Carbon Dioxide through it while burning carbon
+// fuels, in proportion to the fuel's heat (see FlueGas); Hydrogen gives none, and with no such port nothing changes.
 public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity implements OutputLimited {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     // Eight blades look the same every 45°, so a turn of more than 22.5° a tick would look like it went
@@ -238,7 +238,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imple
     // the power multiplier. Also the most its energy ports push out a tick.
     public static int maxOutput(int length) {
         return PowerGeneration.cap((double) ArcforgeConfig.GAS_TURBINE_MAX_HU_PER_LENGTH.getAsInt() * length
-                * ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * Lubricant.bonus());
+                * ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * Lubricant.best());
     }
 
     public int maxOutput() {
@@ -430,7 +430,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imple
         if (burnedHu > 0 && burning != null) {
             int celsius = burnTemperature(burning);
             double spun = Mth.clamp(rpm / Math.max(target, 1.0), 0.0, 1.0);
-            double bonus = 1.0 + (lubricated ? Lubricant.bonus() - 1.0 : 0.0);
+            double bonus = Lubricant.bonus(lubricant.getResource(0));
             fePerTick = energy.generate(PowerGeneration.fe(burnedHu * fePerHu(celsius) * spun * bonus));
             if (lubricated) {
                 useLubricant();
@@ -460,7 +460,7 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imple
         pushEnergy(level);
         // What it would make at its throttle on this fuel, at full speed with the lubricant as it stands, against its FE buffer.
         int rated = burning == null || !burning.gasTurbine() ? 0 : PowerGeneration.fe(maxHu * throttle() * fePerHu(burnTemperature(burning))
-                * (1.0 + (lubricated ? Lubricant.bonus() - 1.0 : 0.0)));
+                * Lubricant.bonus(lubricant.getResource(0)));
         outputLimit.tick(level, allowed && intakeOpen && hasFuel,
                 () -> OutputLimit.anyPortTakes(level, this, SideMode.ENERGY, OutputLimit.Unit.FE),
                 energy.getAmountAsInt(), energy.getCapacityAsInt(), energy.drained(), rated);

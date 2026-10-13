@@ -11,6 +11,7 @@ import net.zagdrath.arcforge.machine.control.spec.ChemicalMachineSpecs;
 import net.zagdrath.arcforge.machine.control.spec.ControllerMultiblockSpecs;
 import net.zagdrath.arcforge.machine.control.spec.PowerMachineSpecs;
 import net.zagdrath.arcforge.machine.control.spec.ProcessingMachineSpecs;
+import net.zagdrath.arcforge.machine.control.spec.RefineryMachineSpecs;
 
 // Every machine the machine control API covers, by family. Registered when capabilities are (block entity types exist).
 final class MachineSpecs {
@@ -23,5 +24,6 @@ final class MachineSpecs {
         AutomationMachineSpecs.register();
         ArrayMultiblockSpecs.register();
         ControllerMultiblockSpecs.register();
+        RefineryMachineSpecs.register();
     }
 }

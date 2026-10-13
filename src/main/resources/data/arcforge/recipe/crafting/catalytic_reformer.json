@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PNP",
+    "TKR",
+    "PNP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "N": "#c:plates/nickel",
+    "T": "arcforge:wrought_fluid_tank",
+    "K": "arcforge:thermocouple",
+    "R": "arcforge:wrought_pressurized_cylinder"
+  },
+  "result": {
+    "id": "arcforge:catalytic_reformer",
+    "count": 1
+  }
+}

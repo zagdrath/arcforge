@@ -37,35 +37,45 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.OilfieldController;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
+import net.zagdrath.arcforge.multiblock.PlantKind;
 import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
-// The Oil Derrick's controller (in the middle of one side of the rig's floor, its panel facing out) or the Pumpjack's
-// (the middle of the skid's far end, facing away from the well). Its block entity runs the structure and holds its
-// contents. LIT while it drills or pumps. A formed Pumpjack Controller draws nothing (see OilfieldCasingBlock).
+// The controller of an oil or refinery fixed-size multiblock (see PlantKind): the Oil Derrick's (in the middle of one
+// side of the rig's floor, its panel facing out), the Pumpjack's (the middle of the skid's far end, facing away from
+// the well), the Cracking Unit's or the Diesel Generator's (the middle of the bottom of one end, facing out). Its block
+// entity runs the structure and holds its contents. LIT while it works. A formed modelled controller draws nothing but
+// its port plates (see OilfieldCasingBlock).
 public class OilfieldControllerBlock extends BaseEntityBlock implements OilfieldPart, PortHolder {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
 
-    private final boolean pumpjack;
+    private final PlantKind kind;
 
-    public OilfieldControllerBlock(BlockBehaviour.Properties properties, boolean pumpjack) {
+    public OilfieldControllerBlock(BlockBehaviour.Properties properties, PlantKind kind) {
         super(properties);
-        this.pumpjack = pumpjack;
+        this.kind = kind;
         registerDefaultState(stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(FORMED, false).setValue(LIT, false));
     }
 
-    public boolean isPumpjack() {
-        return pumpjack;
+    public PlantKind getKind() {
+        return kind;
     }
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return pumpjack ? new PumpjackBlockEntity(pos, state) : new OilDerrickBlockEntity(pos, state);
+        return switch (kind) {
+            case DERRICK -> new OilDerrickBlockEntity(pos, state);
+            case PUMPJACK -> new PumpjackBlockEntity(pos, state);
+            case CRACKING_UNIT -> new CrackingUnitBlockEntity(pos, state);
+            case DIESEL_GENERATOR -> new DieselGeneratorBlockEntity(pos, state);
+        };
     }
 
     @Override
@@ -73,9 +83,14 @@ public class OilfieldControllerBlock extends BaseEntityBlock implements Oilfield
         if (!(level instanceof ServerLevel serverLevel)) {
             return null;
         }
-        return pumpjack
-                ? createTickerHelper(type, ModBlockEntityTypes.PUMPJACK.get(), (innerLevel, pos, blockState, unit) -> unit.serverTick(serverLevel))
-                : createTickerHelper(type, ModBlockEntityTypes.OIL_DERRICK.get(), (innerLevel, pos, blockState, rig) -> rig.serverTick(serverLevel));
+        return switch (kind) {
+            case DERRICK -> createTickerHelper(type, ModBlockEntityTypes.OIL_DERRICK.get(), (innerLevel, pos, blockState, rig) -> rig.serverTick(serverLevel));
+            case PUMPJACK -> createTickerHelper(type, ModBlockEntityTypes.PUMPJACK.get(), (innerLevel, pos, blockState, unit) -> unit.serverTick(serverLevel));
+            case CRACKING_UNIT -> createTickerHelper(type, ModBlockEntityTypes.CRACKING_UNIT.get(),
+                    (innerLevel, pos, blockState, cracker) -> cracker.serverTick(serverLevel));
+            case DIESEL_GENERATOR -> createTickerHelper(type, ModBlockEntityTypes.DIESEL_GENERATOR.get(),
+                    (innerLevel, pos, blockState, generator) -> generator.serverTick(serverLevel));
+        };
     }
 
     @Override
@@ -143,26 +158,26 @@ public class OilfieldControllerBlock extends BaseEntityBlock implements Oilfield
         builder.add(FACING, FORMED, LIT);
     }
 
-    // A formed Pumpjack Controller's shape follows the pumpjack (see PumpjackHitbox).
+    // A formed modelled controller's shape follows the model (see PlantHitbox).
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape shape = pumpjack && state.getValue(FORMED) ? PumpjackHitbox.shape(level, pos) : null;
+        VoxelShape shape = kind.modelled() && state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
         return shape != null ? shape : super.getShape(state, level, pos, context);
     }
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape shape = pumpjack && state.getValue(FORMED) ? PumpjackHitbox.shape(level, pos) : null;
+        VoxelShape shape = kind.modelled() && state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
         return shape != null ? shape : super.getCollisionShape(state, level, pos, context);
     }
 
     @Override
     protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter level, BlockPos pos) {
-        return pumpjack && state.getValue(FORMED) ? Shapes.block() : super.getBlockSupportShape(state, level, pos);
+        return kind.modelled() && state.getValue(FORMED) ? Shapes.block() : super.getBlockSupportShape(state, level, pos);
     }
 
     @Override
     protected VoxelShape getOcclusionShape(BlockState state) {
-        return pumpjack && state.getValue(FORMED) ? Shapes.empty() : super.getOcclusionShape(state);
+        return kind.modelled() && state.getValue(FORMED) ? Shapes.empty() : super.getOcclusionShape(state);
     }
 }

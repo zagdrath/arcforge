@@ -178,8 +178,10 @@ final class AlloyGameTests {
         // five (Sifter, Diamond Press, and the Steel, Invar and Tungsten Meshes), and the Slimeball from Pine Resin, and the
         // Heat Pipe, and the Industrial Water Intake Casing, and the machine link's four (Block of Iolite both ways, Link Conduit
         // and Wired Machine Link), and the oilfield's seven (Steel Pipe, Seismic Survey Tool, Derrick Casing and Frame, Oil
-        // Derrick Controller, Pumpjack Casing and Controller).
-        helper.assertTrue(crafting == 271, crafting + " crafting/ recipes, not 271");
+        // Derrick Controller, Pumpjack Casing and Controller), and the refinery units' ten (Catalytic Reformer, Coker,
+        // Lubricant Blender, Cracking Catalyst, Cracking Unit Casing and Controller, Diesel Generator Casing and Controller,
+        // Flare Stack, and Asphalt from Bitumen).
+        helper.assertTrue(crafting == 281, crafting + " crafting/ recipes, not 281");
         // Plus the fluorite-fluxed steel, and Graphite from Coal Coke and from Carbon Dust.
         helper.assertTrue(smelting == 8, smelting + " arcforge_smelting/ recipes, not 8");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

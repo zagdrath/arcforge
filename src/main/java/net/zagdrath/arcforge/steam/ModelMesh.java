@@ -74,17 +74,6 @@ public abstract class ModelMesh {
         GLOW(40, 48, 4, 7, false, new int[][] { { 4, 100 } }, new int[][] { { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 }, { 1, 1 } }),
         GLOW_CORE(44, 48),
         GLOW_SMALL(48, 48, 4, 3, false, new int[][] { { 4, 100 } }, new int[][] { { 1, 1 }, { 1, 1 }, { 1, 1 } }),
-        // The Steam Turbine Array's sheet only (rows 64-87): broad shading (docs/TEXTURE_STYLE.md rule 2) for its big
-        // faces, eight flat tones each for the machine steel and the generator's lighter steel, lightest first, and the
-        // panels' corners and bevels to lay round them (see broadSlab).
-        BROAD_0(0, 64), BROAD_1(4, 64), BROAD_2(8, 64), BROAD_3(12, 64), BROAD_4(16, 64), BROAD_5(20, 64), BROAD_6(24, 64), BROAD_7(28, 64),
-        GEN_BROAD_0(32, 64), GEN_BROAD_1(36, 64), GEN_BROAD_2(40, 64), GEN_BROAD_3(44, 64), GEN_BROAD_4(48, 64), GEN_BROAD_5(52, 64),
-        GEN_BROAD_6(56, 64), GEN_BROAD_7(60, 64),
-        B_PLATE(0, 72, 16, 16, true, Cuts.CORNERS, Cuts.CORNERS),
-        B_PLAIN(16, 72, 16, 16, false, Cuts.CORNERS, Cuts.CORNERS),
-        B_FOOTING(32, 72, 16, 16, false, Cuts.CORNERS, Cuts.CORNERS),
-        B_GEN_PLATE(48, 72, 16, 16, true, Cuts.CORNERS, Cuts.CORNERS),
-        B_GEN_PLAIN(64, 72, 16, 16, false, Cuts.CORNERS, Cuts.CORNERS),
         // Markers: tones by facing (pipes, bosses, valve bodies), the casing strips by facing (the casings' shells), or
         // the Hardened purple tones by facing (the gas turbine's heat-blued band).
         BANDED(0, 0, 0, 0, Kind.BANDED),
@@ -154,13 +143,6 @@ public abstract class ModelMesh {
         }
     }
 
-    static final Paint[] BROAD = { Paint.BROAD_0, Paint.BROAD_1, Paint.BROAD_2, Paint.BROAD_3, Paint.BROAD_4, Paint.BROAD_5, Paint.BROAD_6, Paint.BROAD_7 };
-    static final Paint[] GEN_BROAD = { Paint.GEN_BROAD_0, Paint.GEN_BROAD_1, Paint.GEN_BROAD_2, Paint.GEN_BROAD_3, Paint.GEN_BROAD_4, Paint.GEN_BROAD_5,
-            Paint.GEN_BROAD_6, Paint.GEN_BROAD_7 };
-    // Broad shading's weights across and down a face (tone = 8 x (0.55 x across + 0.45 x down), as fractions of it),
-    // and the least a face needs each way for it; and the facet length from which round parts step along their length.
-    static final float BROAD_ACROSS = 0.55F, BROAD_DOWN = 0.45F, BROAD_LEAST = 12.0F, BROAD_LONG = 16.0F, STEP_FROM = 24.0F;
-
     // The band tones, darkest first, and the casing strips in the same order.
     static final Paint[] TONES = { Paint.DARK, Paint.SHADE, Paint.FACE_SHADE, Paint.FACE, Paint.MID, Paint.LIT };
     static final Paint[] HARD = { Paint.HARD_0, Paint.HARD_1, Paint.HARD_2, Paint.HARD_3, Paint.HARD_4, Paint.HARD_5 };
@@ -194,9 +176,6 @@ public abstract class ModelMesh {
     Floats solid = new Floats(), cutout = new Floats(), glow = new Floats();
     // Quads go to the glow list while this is set.
     boolean glowing;
-    // Whether this model's sheet has the broad-shading areas (the Steam Turbine Array's): its big plated faces are then
-    // broad-shaded and its long round facets step along their length (see broadSlab, stepped).
-    boolean broadShading;
     // Whether this is a large model (the Pumpjack and the refinery tower; docs/TEXTURE_STYLE.md, "Large model
     // texturing"): its big faces are plated as a few continuous plates sized to the part (see plating), its small parts'
     // faces laid in their tiles on a grid from moduleOrigin, no face over FLAT_MOST px each way is one flat tone, and
@@ -208,9 +187,11 @@ public abstract class ModelMesh {
     // While building the rotor: its angle about the pivot (the shaft).
     boolean rotating;
     double cos = 1.0, sin = 0.0;
-    // What the nozzles stop at: boxes {x0, y0, u0, x1, y1, u1} and cylinders along u {cx, cy, r, u0, u1}.
+    // What the nozzles stop at: boxes {x0, y0, u0, x1, y1, u1}, cylinders along u {cx, cy, r, u0, u1} and upright
+    // cylinders {x, u, radius, y0, y1}.
     final List<float[]> solidBoxes = new ArrayList<>();
     final List<float[]> solidCylinders = new ArrayList<>();
+    final List<float[]> uprights = new ArrayList<>();
 
     // alongX: the structure runs along world X (x then runs toward -Z); flip: the model's u = 0 is at the structure's
     // positive end (turned end for end, x mirrored with it so the frame keeps its handedness).
@@ -234,6 +215,7 @@ public abstract class ModelMesh {
         glowing = false;
         solidBoxes.clear();
         solidCylinders.clear();
+        uprights.clear();
     }
 
     // Starts the parts that turn, at angle degrees.
@@ -349,6 +331,35 @@ public abstract class ModelMesh {
                 best = Math.min(best, Math.max(0.0F, near));
             }
         }
+        // Upright cylinders (round vessels and stacks).
+        for (float[] c : uprights) {
+            float cx = c[0], cu = c[1], r = c[2], y0 = c[3], y1 = c[4];
+            if (axis == 1) {
+                float dx = p[0] - cx, du = p[2] - cu;
+                if (dx * dx + du * du < r * r) {
+                    float near = sign > 0 ? y0 - p[1] : p[1] - y1;
+                    float far = sign > 0 ? y1 - p[1] : p[1] - y0;
+                    if (far > 0.0F) {
+                        best = Math.min(best, Math.max(0.0F, near));
+                    }
+                }
+                continue;
+            }
+            if (p[1] < y0 || p[1] > y1) {
+                continue;
+            }
+            float offset = axis == 0 ? p[2] - cu : p[0] - cx;
+            if (Math.abs(offset) >= r) {
+                continue;
+            }
+            float reach = (float) Math.sqrt(r * r - offset * offset);
+            float centre = axis == 0 ? cx : cu;
+            float near = sign > 0 ? centre - reach - p[axis] : p[axis] - (centre + reach);
+            float far = sign > 0 ? centre + reach - p[axis] : p[axis] - (centre - reach);
+            if (far > 0.0F) {
+                best = Math.min(best, Math.max(0.0F, near));
+            }
+        }
         return best == Float.MAX_VALUE ? -1.0F : best;
     }
 
@@ -436,6 +447,10 @@ public abstract class ModelMesh {
     // ones at 1 texel per px, stretching bands sharing the rest), dropping to its fallback when the face is too small
     // (and from riveted to plain under 9 px); a flat tone; or a tile laid at 1:1 from the top-left.
     void slab(float[] p0, float[] p1, float[] p2, float[] p3, float w, float h, Paint paint, boolean glass) {
+        if (modules && glass && (paint == Paint.GLASS || paint == Paint.GLASS_SMALL)) {
+            glassPane(p0, p1, p3, w, h);
+            return;
+        }
         if (modules && !glass) {
             Plating plating = plating(paint, w, h);
             if (plating != null) {
@@ -449,13 +464,9 @@ public abstract class ModelMesh {
                 return;
             }
         }
-        Paint broad = broadShading && !glass ? broadPanel(paint) : null;
-        if (broad != null && Math.min(w, h) >= BROAD_LEAST && Math.max(w, h) >= BROAD_LONG) {
-            broadSlab(p0, p1, p2, p3, w, h, broad);
-            return;
-        }
         Paint p = paint.kind == Kind.BANDED ? Paint.FACE : paint;
-        while (p.kind == Kind.PANEL && (w < p.least(true) || h < p.least(false) || p.riveted && Math.min(w, h) < 9.0F)) {
+        // A large model stretches nothing: a panel not plated (the FE band) drops to its flat colour.
+        while (p.kind == Kind.PANEL && (modules && !glass || w < p.least(true) || h < p.least(false) || p.riveted && Math.min(w, h) < 9.0F)) {
             p = p.fallback();
         }
         switch (p.kind) {
@@ -484,8 +495,9 @@ public abstract class ModelMesh {
                 }
             }
             default -> {
-                if (modules && !glass && p.kind == Kind.FLAT && Math.max(w, h) > FLAT_MOST) {
-                    // With modules a flat colour (an FE band) isn't stretched either: laid in 2x2 texel cells at 1:1.
+                if (modules && !glass && p.kind == Kind.FLAT && Math.min(w, h) > FLAT_MOST) {
+                    // A large model's flat colour more than FLAT_MOST px each way is laid in 2x2 texel cells at 1:1; a
+                    // thinner face (a blade, a rib, an FE band) may be one flat tone, which has nothing to stretch.
                     for (float x = 0; x < w - 0.001F; x += 2.0F) {
                         for (float y = 0; y < h - 0.001F; y += 2.0F) {
                             float x1 = Math.min(w, x + 2.0F), y1 = Math.min(h, y + 2.0F);
@@ -543,6 +555,7 @@ public abstract class ModelMesh {
             case GEN_PLATE -> new Plating(Steel.GENERATOR, true, false);
             case GEN_PLAIN -> new Plating(Steel.GENERATOR, false, false);
             case DARK, SHADE, FACE_SHADE, FACE, MID, LIT, BANDED -> Math.max(w, h) > FLAT_MOST ? new Plating(Steel.MACHINE, false, false) : null;
+            case GEN_DARK, GEN_FACE, GEN_MID, GEN_LIT -> Math.max(w, h) > FLAT_MOST ? new Plating(Steel.GENERATOR, false, false) : null;
             default -> null;
         };
     }
@@ -731,8 +744,30 @@ public abstract class ModelMesh {
             seed = (seed ^ Math.round(value * 8.0F)) * 1099511628211L;
         }
         seed = (seed ^ plating.steel().ordinal() ^ (plating.riveted() ? 2 : 0) ^ (plating.deck() ? 4 : 0)) * 1099511628211L;
-        return new PlateFrame(base, right, up, w, h, plateLayout(w, h, plating, seed));
+        LayoutKey key = new LayoutKey(Math.round(w * 64.0F), Math.round(h * 64.0F), plating, seed);
+        List<float[]> rects;
+        synchronized (LAYOUTS) {
+            rects = LAYOUTS.get(key);
+        }
+        if (rects == null) {
+            rects = plateLayout(w, h, plating, seed);
+            synchronized (LAYOUTS) {
+                LAYOUTS.put(key, rects);
+            }
+        }
+        return new PlateFrame(base, right, up, w, h, rects);
     }
+
+    // Plate layouts already worked out (the parts that turn are built every frame, the same each time), the most
+    // recently used kept.
+    private record LayoutKey(int w, int h, Plating plating, long seed) {}
+
+    private static final java.util.Map<LayoutKey, List<float[]>> LAYOUTS = new java.util.LinkedHashMap<>(256, 0.75F, true) {
+        @Override
+        protected boolean removeEldestEntry(java.util.Map.Entry<LayoutKey, List<float[]>> eldest) {
+            return size() > 8192;
+        }
+    };
 
     // A flat convex polygon (points in the frame's plane, wound counter-clockwise seen from outside) plated as its frame
     // lays it out.
@@ -742,7 +777,7 @@ public abstract class ModelMesh {
             float[] d = sub(p, frame.base());
             st.add(new float[] { dot(d, frame.right()), dot(d, frame.up()) });
         }
-        paintPlane(st, frame.base(), frame.right(), frame.up(), frame.rects());
+        paintPlane(st, frame.base(), frame.right(), frame.up(), frame.rects(), false);
     }
 
     // A strip of a curved shell (p0 p1 across it, s0 to s1 round the shell; p0 p3 up it, 0 to height) plated as the
@@ -807,12 +842,38 @@ public abstract class ModelMesh {
                 rects.add(new float[] { i * tile.w, (i + 1) * tile.w, j * tile.h, (j + 1) * tile.h, tile.x, tile.y });
             }
         }
-        paintPlane(st, base, right, up, rects);
+        paintPlane(st, base, right, up, rects, false);
+    }
+
+    // A large model's pane of glass, w x h px (p0 its bottom-left, p1 along its bottom, p3 up its left), at 1:1: the
+    // glass tile's 1 px frame round its edge (lit top and left, dark bottom and right) in runs of up to 10 px, and its
+    // glints in the top-left corner where there's room. Its clear middle needs nothing drawn.
+    void glassPane(float[] p0, float[] p1, float[] p3, float w, float h) {
+        int gx = Paint.GLASS.x, gy = Paint.GLASS.y;
+        List<float[]> rects = new ArrayList<>();
+        for (float a = 0; a < w - 1.0F - 1.0E-4F; a += 10.0F) {
+            rects.add(new float[] { a, Math.min(w - 1.0F, a + 10.0F), h - 1.0F, h, gx, gy });
+        }
+        for (float a = 1.0F; a < w - 1.0E-4F; a += 10.0F) {
+            rects.add(new float[] { a, Math.min(w, a + 10.0F), 0.0F, 1.0F, gx + 1, gy + 11 });
+        }
+        for (float t = h - 1.0F; t > 1.0F + 1.0E-4F; t -= 10.0F) {
+            rects.add(new float[] { 0.0F, 1.0F, Math.max(1.0F, t - 10.0F), t, gx, gy + 1 });
+            rects.add(new float[] { w - 1.0F, w, Math.max(1.0F, t - 10.0F), t, gx + 11, gy + 1 });
+        }
+        rects.add(new float[] { w - 1.0F, w, h - 1.0F, h, gx + 11, gy });
+        rects.add(new float[] { 0.0F, 1.0F, 0.0F, 1.0F, gx, gy + 11 });
+        if (w >= 8.0F && h >= 8.0F) {
+            rects.add(new float[] { 2.0F, 7.0F, h - 7.0F, h - 2.0F, gx + 2, gy + 2 });
+        }
+        List<float[]> st = List.of(new float[] { 0, 0 }, new float[] { w, 0 }, new float[] { w, h }, new float[] { 0, h });
+        paintPlane(st, p0, normalize(sub(p1, p0)), normalize(sub(p3, p0)), rects, true);
     }
 
     // A flat convex polygon (st: its points across and up a plane from base) cut by rectangles {s0, s1, t0, t1, u, v},
-    // each piece showing the sheet at 1:1 with texel (u, v) at its rectangle's top left (s0, t1).
-    private void paintPlane(List<float[]> st, float[] base, float[] right, float[] up, List<float[]> rects) {
+    // each piece showing the sheet at 1:1 with texel (u, v) at its rectangle's top left (s0, t1); to the glass list when
+    // glass is set.
+    private void paintPlane(List<float[]> st, float[] base, float[] right, float[] up, List<float[]> rects, boolean glass) {
         float area = 0;
         for (int i = 0; i < st.size(); i++) {
             float[] a = st.get(i), b = st.get((i + 1) % st.size());
@@ -869,7 +930,7 @@ public abstract class ModelMesh {
                     continue;
                 }
                 quad(p3[0], p3[k], p3[k + 1], p3[c], new float[] { uv[0], uv[1], uv[2 * k], uv[2 * k + 1], uv[2 * k + 2], uv[2 * k + 3], uv[2 * c],
-                        uv[2 * c + 1] }, false);
+                        uv[2 * c + 1] }, glass);
             }
         }
     }
@@ -932,65 +993,6 @@ public abstract class ModelMesh {
         }
     }
 
-    // --- Broad shading (docs/TEXTURE_STYLE.md rule 2) ---
-
-    // The broad-shaded panel for a plated paint, or null.
-    static @Nullable Paint broadPanel(Paint paint) {
-        return switch (paint) {
-            case PLATE -> Paint.B_PLATE;
-            case PLAIN, DECK -> Paint.B_PLAIN;
-            case FOOTING -> Paint.B_FOOTING;
-            case GEN_PLATE -> Paint.B_GEN_PLATE;
-            case GEN_PLAIN -> Paint.B_GEN_PLAIN;
-            default -> null;
-        };
-    }
-
-    // A big face, broad-shaded: its four 4 px corners (bevel and, on a riveted panel 9 px or more each way, a rivet) and
-    // its 2 px bevels from the panel at 1 texel per px (only the bevels' one-tone rows stretch along the edges), and
-    // everything inside them in eight flat tones in wide diagonal bands, lightest at the top left: each pixel's band is
-    // 8 x (0.55 x across + 0.45 x down) as fractions of the face. Each band is its own polygon in its flat tone, so the
-    // steps are hard and nothing is blended.
-    void broadSlab(float[] p0, float[] p1, float[] p2, float[] p3, float w, float h, Paint panel) {
-        Paint src = panel.riveted && Math.min(w, h) < 9.0F ? (panel == Paint.B_GEN_PLATE ? Paint.B_GEN_PLAIN : Paint.B_PLAIN) : panel;
-        Paint[] tones = panel == Paint.B_GEN_PLATE || panel == Paint.B_GEN_PLAIN ? GEN_BROAD : BROAD;
-        // Corners (texels 0..4 / 12..16 each way).
-        for (int cx = 0; cx < 2; cx++) {
-            for (int cy = 0; cy < 2; cy++) {
-                float s0 = cx == 0 ? 0 : 1 - 4 / w, s1 = cx == 0 ? 4 / w : 1;
-                // cy 0: the top corners (texture rows 0..4).
-                float t0 = cy == 0 ? 1 - 4 / h : 0, t1 = cy == 0 ? 1 : 4 / h;
-                cell(p0, p1, p2, p3, s0, s1, t0, t1, src, cx == 0 ? 0 : 12, cy == 0 ? 0 : 12, cx == 0 ? 4 : 16, cy == 0 ? 4 : 16, false);
-            }
-        }
-        // The bevels between the corners.
-        cell(p0, p1, p2, p3, 4 / w, 1 - 4 / w, 1 - 2 / h, 1, src, 4, 0, 12, 2, false);
-        cell(p0, p1, p2, p3, 4 / w, 1 - 4 / w, 0, 2 / h, src, 4, 14, 12, 16, false);
-        cell(p0, p1, p2, p3, 0, 2 / w, 4 / h, 1 - 4 / h, src, 0, 4, 2, 12, false);
-        cell(p0, p1, p2, p3, 1 - 2 / w, 1, 4 / h, 1 - 4 / h, src, 14, 4, 16, 12, false);
-        // The field, as three rectangles (x0, y0 down from the top, x1, y1) between the corners and inside the bevels.
-        float[][] rects = { { 4, 2, w - 4, h - 2 }, { 2, 4, 4, h - 4 }, { w - 4, 4, w - 2, h - 4 } };
-        for (float[] rect : rects) {
-            if (rect[2] - rect[0] <= 1.0E-4F || rect[3] - rect[1] <= 1.0E-4F) {
-                continue;
-            }
-            for (int band = 0; band < tones.length; band++) {
-                // Corners in (across, up) face fractions, counter-clockwise.
-                List<float[]> poly = new ArrayList<>(List.of(
-                        new float[] { rect[0] / w, 1 - rect[3] / h }, new float[] { rect[2] / w, 1 - rect[3] / h },
-                        new float[] { rect[2] / w, 1 - rect[1] / h }, new float[] { rect[0] / w, 1 - rect[1] / h }));
-                // tone(s, t) = 8 x (0.55 s + 0.45 (1 - t)); keep band <= tone < band + 1.
-                if (band > 0) {
-                    poly = clip(poly, BROAD_ACROSS, -BROAD_DOWN, BROAD_DOWN - band / (float) tones.length);
-                }
-                if (band < tones.length - 1) {
-                    poly = clip(poly, -BROAD_ACROSS, BROAD_DOWN, (band + 1) / (float) tones.length - BROAD_DOWN);
-                }
-                polygon(p0, p1, p2, p3, poly, tones[band]);
-            }
-        }
-    }
-
     // The part of a polygon (in face fractions) where a s + b t + c >= 0.
     static List<float[]> clip(List<float[]> poly, float a, float b, float c) {
         List<float[]> out = new ArrayList<>();
@@ -1006,55 +1008,6 @@ public abstract class ModelMesh {
             }
         }
         return out;
-    }
-
-    // A convex polygon (face fractions, counter-clockwise) in one flat tone, as a fan of quads (a triangle repeats its
-    // last point).
-    void polygon(float[] p0, float[] p1, float[] p2, float[] p3, List<float[]> poly, Paint tone) {
-        if (poly.size() < 3) {
-            return;
-        }
-        float u = (tone.x + 2.0F) / sheetW, v = (tone.y + 2.0F) / sheetH;
-        float[] uv = { u, v, u, v, u, v, u, v };
-        float[] first = bilinear(p0, p1, p2, p3, poly.get(0)[0], poly.get(0)[1]);
-        for (int i = 1; i + 1 < poly.size(); i += 2) {
-            float[] a = bilinear(p0, p1, p2, p3, poly.get(i)[0], poly.get(i)[1]);
-            float[] b = bilinear(p0, p1, p2, p3, poly.get(i + 1)[0], poly.get(i + 1)[1]);
-            float[] c = i + 2 < poly.size() ? bilinear(p0, p1, p2, p3, poly.get(i + 2)[0], poly.get(i + 2)[1]) : b;
-            quad(first, a, b, c, uv, false);
-        }
-    }
-
-    // A long round facet (p0 p1 at its start, p2 p3 at its end, along u) in broad shading's steps: its band tone over its
-    // middle third, a band lighter over the third toward the light (the start) and a band darker over the last, hard
-    // steps; a casing strip keeps its seam bands (with their rivets) at both ends at 1 texel per px.
-    void stepped(float[] p0, float[] p1, float[] p2, float[] p3, float length, Paint band, boolean strip) {
-        int tone = 1;
-        for (int i = 0; i < TONES.length; i++) {
-            if (TONES[i] == band || STRIPS[i] == band) {
-                tone = i;
-            }
-        }
-        float seam = strip ? 4.0F / length : 0.0F;
-        if (strip) {
-            // Across, the strip's columns as slab cuts them (the rivet column at 1 texel per px); its seam rows 8..12 at
-            // the start (the deepest row at the very end) and 0..4 at the end.
-            float w = (length(sub(p1, p0)) + length(sub(p2, p3))) / 2.0F;
-            float[] xs = cuts(band.cols, w);
-            float tx = 0;
-            for (int i = 0; i < band.cols.length; i++) {
-                cell(p0, p1, p2, p3, xs[i] / w, xs[i + 1] / w, 0, seam, band, tx, 8, tx + band.cols[i][0], 12, false);
-                cell(p0, p1, p2, p3, xs[i] / w, xs[i + 1] / w, 1 - seam, 1, band, tx, 0, tx + band.cols[i][0], 4, false);
-                tx += band.cols[i][0];
-            }
-        }
-        Paint[] steps = { TONES[Math.min(5, tone + 1)], TONES[tone], TONES[Math.max(1, tone - 1)] };
-        float span = (1 - 2 * seam) / 3.0F;
-        for (int i = 0; i < 3; i++) {
-            Paint step = steps[i];
-            float t0 = seam + span * i, t1 = seam + span * (i + 1);
-            cell(p0, p1, p2, p3, 0, 1, t0, t1, step, 1, 1, 3, 3, false);
-        }
     }
 
     // Where each column (or row) of a panel starts and ends across a face size px long: fixed ones at their texels, the
@@ -1144,7 +1097,9 @@ public abstract class ModelMesh {
     }
 
     // A polygon tube along u about (cx, cy): its outline as (u, radius) points, the facets painted side, and a ring cap
-    // on each end (lit / shade halves; none when they're null). skip leaves out facets (segment, facet).
+    // on each end (lit / shade halves; none when they're null). skip leaves out facets (segment, facet). On a large
+    // model a casing's shell is plated as the refinery tower's is (see uprightTube), a tapering ring is bare grain, and
+    // other round parts carry the ramp across them.
     void prismU(float cx, float cy, float[][] profile, int sides, double start, Paint side, @Nullable Paint capLit,
             @Nullable Paint capShade, @Nullable FacetFilter skip) {
         double step = 2.0 * Math.PI / sides;
@@ -1153,6 +1108,11 @@ public abstract class ModelMesh {
             if (ub - ua <= 0.001F) {
                 continue;
             }
+            float fw = 2.0F * (float) Math.sin(step / 2.0) * (ra + rb) / 2.0F, length = (float) Math.hypot(ub - ua, rb - ra);
+            List<float[]> shellPlates = modules && side == Paint.CASING && ra == rb
+                    ? plateFrame(new float[] { cx, cy, ua }, new float[] { 0, 1, 0 }, new float[] { 0, 0, 1 }, fw * sides, ub - ua,
+                            new Plating(Steel.MACHINE, true, false)).rects()
+                    : null;
             for (int f = 0; f < sides; f++) {
                 if (skip != null && skip.skip(i, f)) {
                     continue;
@@ -1163,13 +1123,19 @@ public abstract class ModelMesh {
                 float[] p2 = { cx + (float) Math.cos(a1) * rb, cy + (float) Math.sin(a1) * rb, ub };
                 float[] p3 = { cx + (float) Math.cos(a0) * rb, cy + (float) Math.sin(a0) * rb, ub };
                 double mid = (a0 + a1) / 2.0;
-                Paint paint = side.kind == Kind.BANDED ? band(side, new float[] { (float) Math.cos(mid), (float) Math.sin(mid), 0.0F }) : side;
-                if (broadShading && side.kind == Kind.BANDED && side != Paint.HARDENED && ub - ua >= STEP_FROM) {
-                    // The facet runs along u from p0 p1 to p3 p2: stepped wants its start at the bottom (p0 p1).
-                    stepped(p0, p1, p2, p3, ub - ua, paint, side == Paint.CASING);
-                } else {
-                    flat(p0, p1, p2, p3, paint, false);
+                float[] out = { (float) Math.cos(mid), (float) Math.sin(mid), 0.0F };
+                if (modules && side.kind == Kind.BANDED) {
+                    if (ra != rb) {
+                        List<float[]> points = List.of(p0, p1, p2, p3);
+                        plateIn(plateFrame(points, new Plating(Steel.MACHINE, false, false, false)), points);
+                    } else if (shellPlates != null) {
+                        plateStrip(p0, p1, p2, p3, f * fw, (f + 1) * fw, length, shellPlates);
+                    } else {
+                        roundFacet(p0, p1, p2, p3, out, side, f, sides, fw, length);
+                    }
+                    continue;
                 }
+                flat(p0, p1, p2, p3, side.kind == Kind.BANDED ? band(side, out) : side, false);
             }
         }
         if (capLit == null || capShade == null) {
@@ -1186,7 +1152,7 @@ public abstract class ModelMesh {
     }
 
     // A flat ring (a disc when inner is 0) across u at u, facing +u or -u; its facets on the top-left half seen from
-    // outside are lit, the rest shade.
+    // outside are lit, the rest shade (on a large model, plated as one surface across its facets).
     void ringU(float cx, float cy, float u, float outer, float inner, int sides, double start, boolean facingPositive, Paint lit, Paint shade) {
         ringU(cx, cy, u, outer, inner, sides, start, facingPositive, lit, shade, null);
     }
@@ -1197,6 +1163,16 @@ public abstract class ModelMesh {
         double step = 2.0 * Math.PI / sides;
         // Seen from +u, right is +x; from -u, right is -x. Up is +y either way.
         float rightSign = facingPositive ? 1.0F : -1.0F;
+        List<float[]> rim = new ArrayList<>();
+        for (int f = 0; f < sides; f++) {
+            rim.add(new float[] { cx + (float) Math.cos(start + f * step) * outer, cy + (float) Math.sin(start + f * step) * outer, u });
+        }
+        PlateFrame frame = roundFace(rim, new float[] { 0, 0, rightSign }, lit, 2.0F * outer);
+        if (frame != null && inner <= 0.0F && skip == null) {
+            // A whole disc is one polygon: its plates cut it into far fewer pieces than its wedges would.
+            plateIn(frame, rim);
+            return;
+        }
         for (int f = 0; f < sides; f++) {
             if (skip != null && skip.skip(0, f)) {
                 continue;
@@ -1208,7 +1184,9 @@ public abstract class ModelMesh {
             float[] o1 = { cx + (float) Math.cos(a1) * outer, cy + (float) Math.sin(a1) * outer, u };
             float[] i1 = { cx + (float) Math.cos(a1) * inner, cy + (float) Math.sin(a1) * inner, u };
             float[] i0 = { cx + (float) Math.cos(a0) * inner, cy + (float) Math.sin(a0) * inner, u };
-            if (facingPositive) {
+            if (frame != null) {
+                plateIn(frame, List.of(o0, o1, i1, i0));
+            } else if (facingPositive) {
                 flat(o0, o1, i1, i0, paint, false);
             } else {
                 flat(i0, i1, o1, o0, paint, false);
@@ -1222,6 +1200,15 @@ public abstract class ModelMesh {
             return;
         }
         double step = 2.0 * Math.PI / PIPE_SIDES, start = Math.PI / PIPE_SIDES;
+        // A large model's caps are plated each as one surface across its wedges.
+        List<float[]> rimTop = new ArrayList<>(), rimBottom = new ArrayList<>();
+        for (int f = 0; f < PIPE_SIDES; f++) {
+            double a = start + f * step;
+            rimTop.add(new float[] { x + (float) Math.sin(a) * r, y1, u + (float) Math.cos(a) * r });
+            rimBottom.add(new float[] { x + (float) Math.sin(a) * r, y0, u + (float) Math.cos(a) * r });
+        }
+        PlateFrame top = roundFace(rimTop, new float[] { 0, 1, 0 }, cap, 2.0F * r);
+        PlateFrame bottom = roundFace(rimBottom, new float[] { 0, -1, 0 }, side, 2.0F * r);
         for (int f = 0; f < PIPE_SIDES; f++) {
             double a0 = start + f * step, a1 = a0 + step;
             // In the (u, x) plane, so (u, x, y) keeps the frame's handedness.
@@ -1231,11 +1218,34 @@ public abstract class ModelMesh {
             float[] p3 = { p0[0], y1, p0[2] };
             roundFacet(p0, p1, p2, p3, new float[] { (float) Math.sin((a0 + a1) / 2.0), 0, (float) Math.cos((a0 + a1) / 2.0) }, side, f, PIPE_SIDES,
                     2.0F * r * (float) Math.sin(Math.PI / PIPE_SIDES), y1 - y0);
-            float[] c0 = { x, y1, u };
-            orient(c0, p3, p2, c0, new float[] { 0, 1, 0 }, cap);
-            float[] b0 = { x, y0, u };
-            orient(b0, p0, p1, b0, new float[] { 0, -1, 0 }, side);
+            float[] c0 = { x, y1, u }, b0 = { x, y0, u };
+            if (top == null) {
+                orient(c0, p3, p2, c0, new float[] { 0, 1, 0 }, cap);
+            }
+            if (bottom == null) {
+                orient(b0, p0, p1, b0, new float[] { 0, -1, 0 }, side);
+            }
         }
+        if (top != null) {
+            plateIn(top, rimTop);
+        }
+        if (bottom != null) {
+            plateIn(bottom, rimBottom);
+        }
+    }
+
+    // The frame a large model's flat round face (its rim's points in order round it, either way) is plated in as one
+    // surface across its wedges, facing outward; null when paint isn't plated, or this isn't a large model.
+    @Nullable PlateFrame roundFace(List<float[]> rim, float[] outward, Paint paint, float diameter) {
+        Plating plating = modules ? plating(paint, diameter, diameter) : null;
+        if (plating == null) {
+            return null;
+        }
+        if (dot(cross(sub(rim.get(2), rim.get(0)), sub(rim.get(3), rim.get(1))), outward) < 0) {
+            rim = new ArrayList<>(rim);
+            java.util.Collections.reverse(rim);
+        }
+        return plateFrame(rim, plating);
     }
 
     // An octagonal pipe along x at (u, y) from x0 to x1, with flat caps.
@@ -1300,6 +1310,113 @@ public abstract class ModelMesh {
             float[] p3 = { b[0] + d0[0] * r, b[1] + d0[1] * r, b[2] + d0[2] * r };
             roundFacet(p0, p1, p2, p3, out, side, f, sides, 2.0F * r * (float) Math.sin(Math.PI / sides), length(sub(b, a)));
         }
+    }
+
+    // --- Building blocks for upright parts (round vessels, stacks) ---
+
+    // A polygon tube standing upright about (x, u): its outline as (y, radius) points from the bottom, its facets
+    // painted side (banded by facing for BANDED and CASING), with a flat cap on top when cap is set.
+    void uprightTube(float x, float u, float[][] profile, int sides, double start, Paint side, @Nullable Paint cap) {
+        double step = 2.0 * Math.PI / sides;
+        for (int i = 0; i + 1 < profile.length; i++) {
+            float ya = profile[i][0], yb = profile[i + 1][0], ra = profile[i][1], rb = profile[i + 1][1];
+            if (yb - ya <= 0.001F) {
+                continue;
+            }
+            // The shell's plates, laid out once over the section unrolled (round it by up it), so they carry on from
+            // facet to facet: riveted plates as tall as the section, seams only where they meet.
+            float facetWidth = 2.0F * (float) Math.sin(step / 2.0) * ra;
+            List<float[]> shellPlates = modules && side == Paint.CASING && ra == rb
+                    ? plateFrame(new float[] { x, ya, u }, new float[] { 1, 0, 0 }, new float[] { 0, 1, 0 }, facetWidth * sides, yb - ya,
+                            new Plating(Steel.MACHINE, true, false)).rects()
+                    : null;
+            for (int f = 0; f < sides; f++) {
+                double a0 = start + f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
+                float[] n = { (float) Math.cos(mid), (rb < ra ? (ra - rb) / (yb - ya) : 0.0F), (float) Math.sin(mid) };
+                // Seen from outside: bottom-left, bottom-right, top-right, top-left (angle grows to the left seen from
+                // outside).
+                float[] p0 = { x + (float) Math.cos(a1) * ra, ya, u + (float) Math.sin(a1) * ra };
+                float[] p1 = { x + (float) Math.cos(a0) * ra, ya, u + (float) Math.sin(a0) * ra };
+                float[] p2 = { x + (float) Math.cos(a0) * rb, yb, u + (float) Math.sin(a0) * rb };
+                float[] p3 = { x + (float) Math.cos(a1) * rb, yb, u + (float) Math.sin(a1) * rb };
+                boolean swapped = dot(cross(sub(p2, p0), sub(p3, p1)), n) < 0;
+                if (swapped) {
+                    float[] t = p0;
+                    p0 = p1;
+                    p1 = t;
+                    t = p2;
+                    p2 = p3;
+                    p3 = t;
+                }
+                if (modules && side.kind == Kind.BANDED) {
+                    float chord = 2.0F * (float) Math.sin(step / 2.0), fw = chord * (ra + rb) / 2.0F;
+                    float height = (float) Math.hypot(yb - ya, rb - ra);
+                    if (ra != rb) {
+                        // A tapering ring (the elliptical head) narrows to a point, so no strip ramp keeps 1:1 across
+                        // it; it's one pressed piece, so its facets are bare grain (no plate edges on every facet).
+                        List<float[]> points = List.of(p0, p1, p2, p3);
+                        plateIn(plateFrame(points, new Plating(Steel.MACHINE, false, false, false)), points);
+                    } else if (shellPlates != null) {
+                        float s0 = (swapped ? f : sides - 1 - f) * fw;
+                        plateStrip(p0, p1, p2, p3, s0, s0 + fw, height, shellPlates);
+                    } else {
+                        roundFacet(p0, p1, p2, p3, n, side, swapped ? f : sides - 1 - f, sides, fw, height);
+                    }
+                    continue;
+                }
+                flat(p0, p1, p2, p3, side.kind == Kind.BANDED ? band(side, n) : side, false);
+            }
+        }
+        if (cap != null) {
+            float[] last = profile[profile.length - 1];
+            disc(new float[] { x, last[0], u }, new float[] { 0, 1, 0 }, last[1], sides, cap, cap);
+        }
+    }
+
+    // The inside of an upright ring (a fan shroud), its facets facing in, in one paint.
+    void uprightInner(float x, float u, float y0, float y1, float r, int sides, Paint paint) {
+        double step = 2.0 * Math.PI / sides;
+        for (int f = 0; f < sides; f++) {
+            double a0 = f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
+            float[] p0 = { x + (float) Math.cos(a0) * r, y0, u + (float) Math.sin(a0) * r };
+            float[] p1 = { x + (float) Math.cos(a1) * r, y0, u + (float) Math.sin(a1) * r };
+            float[] p2 = { p1[0], y1, p1[2] };
+            float[] p3 = { p0[0], y1, p0[2] };
+            orient(p0, p1, p2, p3, new float[] { -(float) Math.cos(mid), 0, -(float) Math.sin(mid) }, paint);
+        }
+    }
+
+    // A flat disc facing normal (unit, any way), its facets on the top-left half (seen from outside) in lit, the rest
+    // in shade.
+    void disc(float[] centre, float[] normal, float radius, int sides, Paint lit, Paint shade) {
+        float[][] axes = plane(normal);
+        float[] right = axes[0], up = axes[1];
+        double step = 2.0 * Math.PI / sides;
+        // A large model's disc is plated as one surface (no painted light on it).
+        List<float[]> rim = new ArrayList<>();
+        for (int f = 0; f < sides; f++) {
+            rim.add(at(centre, right, up, (float) Math.cos(f * step) * radius, (float) Math.sin(f * step) * radius));
+        }
+        PlateFrame frame = roundFace(rim, normal, lit, 2.0F * radius);
+        if (frame != null) {
+            plateIn(frame, rim);
+            return;
+        }
+        for (int f = 0; f < sides; f++) {
+            double a0 = f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
+            float[] e0 = at(centre, right, up, (float) Math.cos(a0) * radius, (float) Math.sin(a0) * radius);
+            float[] e1 = at(centre, right, up, (float) Math.cos(a1) * radius, (float) Math.sin(a1) * radius);
+            boolean topLeft = Math.sin(mid) - Math.cos(mid) > 0;
+            orient(centre, e0, e1, centre, normal, topLeft ? lit : shade);
+        }
+    }
+
+    // Right and up across a face facing normal, seen from outside (up is world up unless the face looks up or down).
+    static float[][] plane(float[] normal) {
+        float[] up = Math.abs(normal[1]) > 0.9F ? new float[] { 0, 0, -Math.signum(normal[1]) } : new float[] { 0, 1, 0 };
+        float[] right = normalize(cross(up, normal));
+        up = cross(normal, right);
+        return new float[][] { right, up };
     }
 
     // --- Output ---

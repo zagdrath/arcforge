@@ -556,11 +556,40 @@ optional `burn_temperature` of the `arcforge:burner_fuels` data map; without it,
 | Refinery Gas (gas) | 55 | 1.0 | 55 | 1,150°C |
 | Hydrogen (gas) | 60 | 1.0 | 60 | 1,400°C |
 | Ethanol | 300 | 0.5 | 150 | 900°C |
+| Gasoline | 450 | 0.5 | 225 | 1,250°C |
+| Diesel | 420 | 0.5 | 210 | 1,150°C |
+| Kerosene | 380 | 0.5 | 190 | 1,150°C |
+| Refinery Gas (gas) | 300 | 0.5 | 150 | 1,200°C |
 
 Superheated Steam needs a 900°C boiler, so Naphtha is the fuel that makes it without a Geothermal Plant.
 Naphtha, Kerosene and Diesel also catch fire in the world. Hydrogen comes through Pressurized Conduits (they connect to the burner's
 input faces), Cylinders or Gas Cartridges. **Pitch** is a long-burning furnace fuel (12 items) and spins into
 Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running and riding by about 30%.
+
+### Refinery units
+
+```
+Heavy Oil + heat + Cracking Catalyst --[Cracking Unit]--> Naphtha, Diesel, Refinery Gas
+Naphtha + heat --[Catalytic Reformer]--> Gasoline + Hydrogen
+Bitumen + heat --[Coker]--> Petroleum Coke + Refinery Gas
+Heavy Oil + FE --[Lubricant Blender]--> Lubricant
+8 gravel + Bitumen bucket --> 8 Asphalt
+```
+
+They take what the Distillation Array draws off Crude Oil. The **Cracking Unit** is a fixed 3×3×5 multiblock
+(Cracking Unit Casings round a controller in the middle of the bottom of one side), drawn as a fluid catalytic cracker;
+its Cracking Catalyst wears out slowly (one lasts 50 batches). The other three are single blocks. **Petroleum Coke**
+works as Coal Coke everywhere (`#c:coal_coke`), and **Lubricant** lubricates the turbine arrays at +12% instead of
+Heavy Oil's +8%. Recipes are data-driven (`arcforge:cracking`, `arcforge:reforming`, `arcforge:coking`,
+`arcforge:lubricant_blending`: `input`, `fluids`, `item`, `time`, `heat_per_tick`, `min_temp`, `energy_per_tick`,
+`catalyst`, `catalyst_uses`).
+
+**Diesel Generator** (a fixed 3×2×5 multiblock, drawn as an engine-generator set with a turning fan and coupling).
+Burns Diesel, Gasoline, Biodiesel or Refinery Gas straight to FE (the `arcforge:engine_fuels` data map, `fe_per_mb`:
+420, 400, 340 and 240 by default), up to 3,000 FE/t after a 3-second spin-up, and throttles back when full.
+
+**Flare Stack.** A block with a tall stack drawn above it: gas pushed into it burns off, up to 1,000 mB/t, with a
+flame at the top as big as what it burns, so a refinery never stalls on a full gas tank.
 
 ### Electrolysis
 
@@ -589,7 +618,7 @@ The Electrolyzer never charges less than 1.25× (`balanceSafetyFactor`) the most
 could get back from what it makes, worked out from the live config and data maps (every Heat upgrade in the
 burner, then the better of a fully carded Thermoelectric Plant and a Superheated boiler into a lubricated,
 exhausting turbine, times `power.generationMultiplier`; the boiler counted is the biggest, at the top of its
-band). By default that floor is 1,519 FE per mB of hydrogen (303,789 FE per 100 mB of water), above the water recipe's 1,200 FE per mB, so splitting water costs the floor and
+band). By default that floor is 1,570 FE per mB of hydrogen (314,087 FE per 100 mB of water), above the water recipe's 1,200 FE per mB, so splitting water costs the floor and
 Energy upgrades don't lower it.
 
 **Oxygen** (from the Electrolyzer or the Air Separator) speeds up the Arcforge Furnace: give it an Oxygen port with the Wrench and pipe oxygen in. A smelt

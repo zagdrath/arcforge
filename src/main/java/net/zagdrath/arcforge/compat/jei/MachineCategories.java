@@ -734,6 +734,100 @@ final class MachineCategories {
         }
     }
 
+    // --- Cracking Unit, Catalytic Reformer, Coker, Lubricant Blender ---
+
+    // One category per refining process: the feed (and the catalyst, worn slowly, for cracking) in, the arrow, the
+    // products out (and the Coker's coke); the time with its FE, or the heat and the least temperature, below.
+    static final class Refining extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.RefiningRecipe>> {
+        private final net.zagdrath.arcforge.recipe.RefiningProcess process;
+
+        Refining(IGuiHelper gui, net.zagdrath.arcforge.recipe.RefiningProcess process) {
+            super(type(process), process.getSerializedName(), icon(process), gui, 150, 50);
+            this.process = process;
+        }
+
+        static IRecipeHolderType<net.zagdrath.arcforge.recipe.RefiningRecipe> type(net.zagdrath.arcforge.recipe.RefiningProcess process) {
+            return IRecipeHolderType.create(process.type());
+        }
+
+        static net.minecraft.world.level.block.Block icon(net.zagdrath.arcforge.recipe.RefiningProcess process) {
+            return switch (process) {
+                case CRACKING -> ModBlocks.CRACKING_UNIT_CONTROLLER.get();
+                case REFORMING -> ModBlocks.CATALYTIC_REFORMER.get();
+                case COKING -> ModBlocks.COKER.get();
+                case BLENDING -> ModBlocks.LUBRICANT_BLENDER.get();
+            };
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.RefiningRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            ChemicalReactingRecipe.FluidInput input = recipe.input();
+            var slot = builder.addInputSlot(1, 5).setStandardSlotBackground()
+                    .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, input.amount()), false, 16, 16);
+            input.fluids().forEach(fluid -> slot.add(fluid, input.amount()));
+            recipe.catalyst().ifPresent(catalyst -> builder.addInputSlot(21, 5).setStandardSlotBackground().add(catalyst)
+                    .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.refining.catalyst",
+                            recipe.catalystUses()).withStyle(ChatFormatting.GRAY))));
+            int x = 71;
+            for (FluidStackTemplate product : recipe.fluids()) {
+                fluid(builder, false, x, 5, product);
+                x += 20;
+            }
+            ItemStack item = recipe.itemResult();
+            if (!item.isEmpty()) {
+                builder.addOutputSlot(x, 5).setStandardSlotBackground().add(item);
+            }
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.RefiningRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().ticks()).setPosition(44, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.RefiningRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            var recipe = holder.value();
+            if (process.powered()) {
+                text(graphics, Component.translatable("jei.arcforge.melting.cost", seconds(recipe.ticks()),
+                        String.format(Locale.ROOT, "%,d", recipe.ticks() * recipe.energyPerTick())), 0, 30);
+            } else {
+                text(graphics, Component.translatable("jei.arcforge.gasifying.time", seconds(recipe.ticks())), 0, 30);
+            }
+            if (process.heated()) {
+                text(graphics, Component.translatable("jei.arcforge.refining.heat", recipe.heatPerTick(), recipe.minTemp()), 0, 40);
+            }
+        }
+    }
+
+    // --- Diesel Generator fuels ---
+
+    record EngineFuelRecipe(Fluid fluid, net.zagdrath.arcforge.machine.EngineFuel fuel) {}
+
+    // A fuel the Diesel Generator burns: its FE per mB and how fast it goes at full output.
+    static final class EngineFuels extends ArcforgeCategory<EngineFuelRecipe> {
+        static final IRecipeType<EngineFuelRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "engine_fuel", EngineFuelRecipe.class);
+
+        EngineFuels(IGuiHelper gui) {
+            super(TYPE, "engine_fuels", ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), gui, 150, 30);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, EngineFuelRecipe recipe, IFocusGroup focuses) {
+            fluid(builder, true, 1, 7, recipe.fluid(), 1_000);
+        }
+
+        @Override
+        public void draw(EngineFuelRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            int fePerMb = net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.fePerMb(recipe.fuel());
+            int full = net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.maxOutput();
+            text(graphics, Component.translatable("jei.arcforge.engine_fuel.value", String.format(Locale.ROOT, "%,d", fePerMb)), 24, 5);
+            text(graphics, Component.translatable("jei.arcforge.engine_fuel.rate", String.format(Locale.ROOT, "%,d", full),
+                    String.format(Locale.ROOT, "%.2f", fePerMb > 0 ? full / (double) fePerMb : 0.0)), 24, 16);
+        }
+    }
+
     // --- Tree Cutter ---
 
     // A sapling the Tree Cutter plants (with Bone Meal to speed it), and the log and leaves of its tree.
@@ -1313,7 +1407,8 @@ final class MachineCategories {
             recipe.additive().ifPresent(needed -> additive.addItemStacks(counted(needed)));
             var additive2 = builder.addInputSlot(37, 5).setStandardSlotBackground();
             recipe.additive2().ifPresent(needed -> additive2.addItemStacks(counted(needed)));
-            builder.addInputSlot(55, 5).setStandardSlotBackground().add(new ItemStack(ModItems.COAL_COKE.get(), Math.max(1, recipe.coke())));
+            builder.addInputSlot(55, 5).setStandardSlotBackground().add(new ItemStack(ModItems.COAL_COKE.get(), Math.max(1, recipe.coke())))
+                    .add(new ItemStack(ModItems.PETROLEUM_COKE.get(), Math.max(1, recipe.coke())));
             builder.addOutputSlot(113, 5).setStandardSlotBackground().add(recipe.result());
             recipe.byproduct().ifPresent(byproduct -> builder.addOutputSlot(137, 5).setStandardSlotBackground().add(byproduct));
         }

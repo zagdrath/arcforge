@@ -1,0 +1,15 @@
+{
+  "title": "Lubricant Blender",
+  "icon": "arcforge:lubricant_blender",
+  "items": [
+    "arcforge:lubricant_blender",
+    "arcforge:lubricant_bucket",
+    "arcforge:heavy_oil_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Blends Heavy Oil into Lubricant, a refined turbine oil.\n- 100 mB Heavy Oil makes 90 mB Lubricant in 2 seconds, using 20 FE/t.\n- Heavy Oil in the top, FE into the back, Lubricant out of the left.\n- Speed and Energy Upgrades work as usual.\n# In the turbines\nLubricant goes in a Steam or Gas Turbine Array's lubricant tank like Heavy Oil, and adds 12% to its output instead of 8%. It spins the rotor up just as fast."
+    }
+  ]
+}

@@ -53,7 +53,7 @@ import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
-import net.zagdrath.arcforge.multiblock.OilfieldController;
+import net.zagdrath.arcforge.multiblock.ShapedPlant;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.oil.OilDeposits;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -70,7 +70,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // good. Several pumpjacks on one deposit share it. Its Crude Oil leaves through Output ports (pushed every few ticks)
 // or into buckets in its bucket slot; FE comes in through Energy ports. The beam rocks as fast as it pumps (see
 // PumpjackRenderer).
-public class PumpjackBlockEntity extends MachineBlockEntity implements OilfieldController {
+public class PumpjackBlockEntity extends MachineBlockEntity implements ShapedPlant {
     public static final int SLOT_BUCKET_IN = 0, SLOT_BUCKET_OUT = 1;
     public static final int MACHINE_SLOTS = 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
@@ -161,6 +161,25 @@ public class PumpjackBlockEntity extends MachineBlockEntity implements OilfieldC
     // The frame the pumpjack's model and shapes are built in: u from the well toward the far end.
     public static ModelFrame frame(OilfieldStructures.Unit unit) {
         return ModelFrame.toward(unit.back(), OilfieldStructures.UNIT_WIDTH, OilfieldStructures.UNIT_HEIGHT, OilfieldStructures.UNIT_LENGTH);
+    }
+
+    @Override
+    public @Nullable ModelFrame plantFrame() {
+        return unit != null ? frame(unit) : null;
+    }
+
+    // The blocks' shapes, by the way the pumpjack faces (see PlantHitbox).
+    private static final java.util.Map<Direction, net.minecraft.world.phys.shapes.VoxelShape[]> SHAPES = new java.util.EnumMap<>(Direction.class);
+
+    @Override
+    public net.minecraft.world.phys.shapes.VoxelShape[] plantShapes() {
+        OilfieldStructures.Unit shown = unit;
+        if (shown == null) {
+            return new net.minecraft.world.phys.shapes.VoxelShape[0];
+        }
+        synchronized (SHAPES) {
+            return SHAPES.computeIfAbsent(shown.back(), back -> frame(shown).shapes(net.zagdrath.arcforge.multiblock.PumpjackLayout.solids()));
+        }
     }
 
     // --- Structure ---

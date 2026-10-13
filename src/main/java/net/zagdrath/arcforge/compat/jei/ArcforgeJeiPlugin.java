@@ -22,8 +22,10 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.ItemInfoTooltips;
 import net.zagdrath.arcforge.client.screen.machine.FermenterScreen;
 import net.zagdrath.arcforge.heat.BurnerFuel;
+import net.zagdrath.arcforge.machine.EngineFuel;
 import net.zagdrath.arcforge.multiblock.MultiblockBlueprints;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
+import net.zagdrath.arcforge.recipe.RefiningProcess;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModDataMaps;
@@ -113,6 +115,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.CarbonReclaiming(gui),
                 new MachineCategories.Gasifying(gui),
                 new MachineCategories.FischerTropsch(gui),
+                new MachineCategories.Refining(gui, RefiningProcess.CRACKING),
+                new MachineCategories.Refining(gui, RefiningProcess.REFORMING),
+                new MachineCategories.Refining(gui, RefiningProcess.COKING),
+                new MachineCategories.Refining(gui, RefiningProcess.BLENDING),
                 new MachineCategories.Vulcanizing(gui),
                 new MachineCategories.ResinTap(gui),
                 new MachineCategories.AirSeparating(gui),
@@ -133,6 +139,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Condensing(gui),
                 new MachineCategories.BurnerFuels(gui),
                 new MachineCategories.GasTurbineFuels(gui),
+                new MachineCategories.EngineFuels(gui),
                 new MachineCategories.BatteryComponents(gui),
                 new MultiblockCategory(gui));
     }
@@ -157,6 +164,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.CarbonReclaiming.TYPE, recipes(ModRecipes.CARBON_RECLAIMING.get()));
         registration.addRecipes(MachineCategories.Gasifying.TYPE, recipes(ModRecipes.GASIFYING.get()));
         registration.addRecipes(MachineCategories.FischerTropsch.TYPE, recipes(ModRecipes.FISCHER_TROPSCH.get()));
+        for (RefiningProcess process : RefiningProcess.values()) {
+            registration.addRecipes(MachineCategories.Refining.type(process), recipes(process.type()));
+        }
         // Every sapling; its log and leaves found by name (oak_sapling: oak_log, oak_leaves), where they exist.
         List<MachineCategories.TreeCuttingRecipe> trees = new ArrayList<>();
         BuiltInRegistries.ITEM.listElements().forEach(holder -> {
@@ -200,6 +210,14 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         });
         registration.addRecipes(MachineCategories.BurnerFuels.TYPE, fuels);
         registration.addRecipes(MachineCategories.GasTurbineFuels.TYPE, fuels.stream().filter(fuel -> fuel.fuel().gasTurbine()).toList());
+        List<MachineCategories.EngineFuelRecipe> engineFuels = new ArrayList<>();
+        BuiltInRegistries.FLUID.listElements().forEach(holder -> {
+            EngineFuel fuel = holder.getData(ModDataMaps.ENGINE_FUELS);
+            if (fuel != null && holder.value().isSource(holder.value().defaultFluidState())) {
+                engineFuels.add(new MachineCategories.EngineFuelRecipe(holder.value(), fuel));
+            }
+        });
+        registration.addRecipes(MachineCategories.EngineFuels.TYPE, engineFuels);
         List<MachineCategories.BatteryComponentRecipe> batteryParts = new ArrayList<>();
         for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.values()) {
             batteryParts.add(new MachineCategories.BatteryComponentRecipe(ModBlocks.lithiumCell(tier).get().asItem(), tier, true));
@@ -276,6 +294,12 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 MachineCategories.Gasifying.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.FischerTropschReactorScreen.class, 64, 35, ARROW_W, ARROW_H,
                 MachineCategories.FischerTropsch.TYPE);
+        // The refining machines share a screen: its arrow shows all four processes.
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.RefiningScreen.class, 64, 35, ARROW_W, ARROW_H,
+                MachineCategories.Refining.type(RefiningProcess.CRACKING), MachineCategories.Refining.type(RefiningProcess.REFORMING),
+                MachineCategories.Refining.type(RefiningProcess.COKING), MachineCategories.Refining.type(RefiningProcess.BLENDING));
+        registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.DieselGeneratorScreen.class, 31, 50, 114, 7,
+                MachineCategories.EngineFuels.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen.class, 114, 35, ARROW_W, ARROW_H,
                 MachineCategories.AirSeparating.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen.class, 81, 35, ARROW_W, ARROW_H,
@@ -335,6 +359,12 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.CarbonReclaiming.TYPE, ModBlocks.CARBON_RECLAIMER.get());
         registration.addCraftingStation(MachineCategories.Gasifying.TYPE, ModBlocks.GASIFIER.get());
         registration.addCraftingStation(MachineCategories.FischerTropsch.TYPE, ModBlocks.FISCHER_TROPSCH_REACTOR.get());
+        registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.CRACKING), ModBlocks.CRACKING_UNIT_CONTROLLER.get(),
+                ModBlocks.CRACKING_UNIT_CASING.get(), ModItems.CRACKING_CATALYST.get());
+        registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.REFORMING), ModBlocks.CATALYTIC_REFORMER.get());
+        registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.COKING), ModBlocks.COKER.get());
+        registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.BLENDING), ModBlocks.LUBRICANT_BLENDER.get());
+        registration.addCraftingStation(MachineCategories.EngineFuels.TYPE, ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), ModBlocks.DIESEL_GENERATOR_CASING.get());
         registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
         registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());
         registration.addCraftingStation(MachineCategories.AirSeparating.TYPE, ModBlocks.AIR_SEPARATOR.get());

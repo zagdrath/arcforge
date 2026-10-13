@@ -1,0 +1,24 @@
+{
+  "title": "Diesel Generator",
+  "icon": "arcforge:diesel_generator_controller",
+  "items": [
+    "arcforge:diesel_generator_controller",
+    "arcforge:diesel_generator_casing",
+    "arcforge:diesel_bucket",
+    "arcforge:gasoline_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "An engine-generator set: it burns liquid and gas fuels straight to FE, a mid-game step below the Gas Turbine Array.\n# Building\nA solid box of Diesel Generator Casings 3 wide, 5 long and 2 tall, with the Diesel Generator Controller in the middle of the bottom of one end, facing out. Formed, it becomes the set: radiator and fan, an inline six with its stack, the flywheel housing and the alternator."
+    },
+    {
+      "type": "text",
+      "text": "# Running\nIt runs up to speed over 3 seconds, then makes 3,000 FE/t. When its FE buffer fills it throttles back to what's drawn, burning only the fuel for that.\n| Fuel | FE/mB | mB/t at full power |\n| Diesel | 420 | 7.1 |\n| Gasoline | 400 | 7.5 |\n| Biodiesel | 340 | 8.8 |\n| Refinery Gas | 240 | 12.5 |\n# Ports\n- Input: fuel in (liquid or gas).\n- Energy: FE out, pushed to what it touches (8,192 FE/t a port).\nThe fuels are data-driven (arcforge:engine_fuels)."
+    },
+    {
+      "type": "multiblock",
+      "structure": "diesel_generator"
+    }
+  ]
+}

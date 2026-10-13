@@ -10,9 +10,10 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 // Paints the large models' plate modules, ramps and edges (docs/TEXTURE_STYLE.md, "Large model texturing") into rows
-// 96-127 of each large model's sheet (the Pumpjack's and the refinery tower's), keeping rows 0-95: the shared model
-// sheet layout of flat tones and panels (the Oil Derrick's drill string still uses the Pumpjack's). Run from the
-// repository root: java tools/LargeModelTextureGen.java
+// 96-233 of each large model's sheet (the Pumpjack's, which the Diesel Generator shares; the refinery tower's, which the
+// Cracking Unit and the Flare Stack share; and the Steam Turbine Array's), keeping rows 0-95: the shared model sheet
+// layout of flat tones and panels (the Oil Derrick's drill string still uses the Pumpjack's). Run from the repository
+// root: java tools/LargeModelTextureGen.java
 //
 // Large faces aren't tiled: ModelMesh paints each as a few big plates, sampling a window of a grain field per plate and
 // laying edge strips and rivets round it (see ModelMesh.plating). This paints what that samples, and the small parts'
@@ -28,7 +29,8 @@ import javax.imageio.ImageIO;
 //   rows 232-233: the rivet heads, 2x2: machine steel (0, 232), generator steel (2, 232).
 public class LargeModelTextureGen {
     static final String[] SHEETS = { "src/main/resources/assets/arcforge/textures/block/pumpjack/pumpjack.png",
-            "src/main/resources/assets/arcforge/textures/block/distillation_array/refinery.png" };
+            "src/main/resources/assets/arcforge/textures/block/distillation_array/refinery.png",
+            "src/main/resources/assets/arcforge/textures/block/steam_turbine_array/turbine.png" };
     static final int W = 128, H = 256;
     // Each material's edges (luminance): lit, dark, seam.
     static final int[] EDGES = { 84, 54, 37 }, GEN_EDGES = { 100, 70, 54 };

@@ -14,12 +14,14 @@ import org.jspecify.annotations.Nullable;
 
 // The formed Steam Turbine Array's model, built from its TurbineLayout (see SteamTurbineArrayRenderer) on the sheet
 // block/steam_turbine_array/turbine: the still parts once (and again when its ports change), the rotor every frame at
-// its angle. How it's built and painted: ModelMesh, with broad shading on its big plated faces and long round facets.
+// its angle. How it's built and painted: ModelMesh, as a large model (docs/TEXTURE_STYLE.md, "Large model texturing"):
+// its big faces in a few continuous plates, the casings' shells in riveted plates wrapped round them, and ramps across
+// its round parts.
 // Each window is glazed facet by facet, a pane on each of the casing's own facets just inside its outer surface, so the
 // glass follows the round casing; behind it the casing's inner wall, stage rings between the blade rows, and the
 // bladed rotor (discs carrying dense rows of angled blades) kept inside the inner wall.
 public final class TurbineMesh extends ModelMesh {
-    public static final int SHEET_W = 128, SHEET_H = 96;
+    public static final int SHEET_W = 128, SHEET_H = 256;
     private static final int SIDES_CASING = TurbineLayout.CASING_SIDES;
     // The inspection window takes these two facets on each side (counted from the flange line at angle 0).
     private static final int WINDOW_FIRST = 1, WINDOW_LAST = 2;
@@ -33,7 +35,7 @@ public final class TurbineMesh extends ModelMesh {
     public TurbineMesh(TurbineLayout layout, boolean alongX) {
         super(alongX, false, layout.widthPx(), layout.lengthPx(), layout.shaftX(), layout.shaftY(), SHEET_W, SHEET_H);
         this.layout = layout;
-        this.broadShading = true;
+        this.modules = true;
     }
 
     // --- The model ---
@@ -71,10 +73,11 @@ public final class TurbineMesh extends ModelMesh {
         startRotor(angle);
         float sx = layout.shaftX(), sy = layout.shaftY(), r = layout.shaftRadius();
         // The shaft, from the front standard into the generator, and on into the exciter.
-        prismU(sx, sy, new float[][] { { 1.5F, r }, { layout.generator().u0() + 3.0F, r } }, PIPE_SIDES, 0.0, Paint.MID, Paint.MID, Paint.MID, null);
+        prismU(sx, sy, new float[][] { { 1.5F, r }, { layout.generator().u0() + 3.0F, r } }, PIPE_SIDES, 0.0, Paint.BANDED, Paint.MID, Paint.MID, null);
         TurbineLayout.Span exciter = layout.exciter();
         if (exciter != null) {
-            prismU(sx, sy, new float[][] { { layout.generator().u1() - 1.0F, r }, { exciter.u0() + 1.0F, r } }, PIPE_SIDES, 0.0, Paint.MID, Paint.MID, Paint.MID, null);
+            prismU(sx, sy, new float[][] { { layout.generator().u1() - 1.0F, r }, { exciter.u0() + 1.0F, r } }, PIPE_SIDES, 0.0, Paint.BANDED, Paint.MID, Paint.MID,
+                    null);
         }
         // A coupling in each gap after the first, between its two bearing pedestals.
         List<TurbineLayout.Span> gaps = layout.gaps();
@@ -84,7 +87,7 @@ public final class TurbineMesh extends ModelMesh {
             float cr = r * (generator ? 2.8F : 2.3F);
             float half = layout.couplingHalf(i);
             float c0 = gap.middle() - half, c1 = gap.middle() + half;
-            prismU(sx, sy, new float[][] { { c0, cr }, { c1, cr } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.FACE, Paint.MID, Paint.SHADE, null);
+            prismU(sx, sy, new float[][] { { c0, cr }, { c1, cr } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, Paint.MID, Paint.SHADE, null);
             // Bolt heads on the coupling's face toward the pedestal, so its turning shows.
             int bolts = generator ? 6 : 4;
             for (int b = 0; b < bolts; b++) {
@@ -126,21 +129,13 @@ public final class TurbineMesh extends ModelMesh {
         }
     }
 
-    // A piece of the deck slab, its top in one-block plates.
+    // A piece of the deck slab: its edge a girder flange, its top deck plates (as few as keep each within 4 blocks).
     private void deckSlab(float x0, float u0, float x1, float u1) {
         if (x1 - x0 <= 0.01F || u1 - u0 <= 0.01F) {
             return;
         }
         float foot = layout.footingTop(), deck = layout.deckTop();
-        box(x0, foot, u0, x1, deck, u1, Paint.STRAP, null, Paint.FOOTING, SKIP_UP);
-        // The deck top: one broad-shaded face, with a plate seam (a deepest line, then a lit one) across it every
-        // block.
-        face(new float[] { x0, deck, u1 }, new float[] { 1, 0, 0 }, new float[] { 0, 0, -1 }, x1 - x0, u1 - u0, Paint.DECK, false);
-        for (float u = (float) Math.ceil(u0 / PX + 0.01F) * PX; u < u1 - 1.5F; u += PX) {
-            float lift = deck + 0.02F;
-            face(new float[] { x0, lift, u + 0.5F }, new float[] { 1, 0, 0 }, new float[] { 0, 0, -1 }, x1 - x0, 0.5F, Paint.DEEP, false);
-            face(new float[] { x0, lift, u + 1.0F }, new float[] { 1, 0, 0 }, new float[] { 0, 0, -1 }, x1 - x0, 0.5F, Paint.MID, false);
-        }
+        box(x0, foot, u0, x1, deck, u1, Paint.STRAP, Paint.DECK, Paint.FOOTING, 0);
     }
 
     // A stepped column from the ground to under the deck: a wide foot, the column, a cap.
@@ -346,7 +341,7 @@ public final class TurbineMesh extends ModelMesh {
         float sx = layout.shaftX(), sy = layout.shaftY();
         float hub = casing.hubRadius();
         float disc = Math.max(hub + 0.75F, hub * 1.15F);
-        prismU(sx, sy, new float[][] { { window.u0(), hub }, { window.u1(), hub } }, 12, 0.0, Paint.MID, Paint.MID, Paint.MID, null);
+        prismU(sx, sy, new float[][] { { window.u0(), hub }, { window.u1(), hub } }, 12, 0.0, Paint.BANDED, Paint.MID, Paint.MID, null);
         int rows = rowsIn(casing, window);
         float pitch = window.length() / rows;
         float chord = Math.clamp(pitch * 0.55F, 0.75F, 2.5F);
@@ -354,7 +349,7 @@ public final class TurbineMesh extends ModelMesh {
         int blades = casing.blades();
         for (int row = 0; row < rows; row++) {
             float u = window.u0() + pitch * (row + 0.5F);
-            prismU(sx, sy, new float[][] { { u - discHalf, disc }, { u + discHalf, disc } }, 12, 0.0, Paint.FACE, Paint.MID, Paint.SHADE, null);
+            prismU(sx, sy, new float[][] { { u - discHalf, disc }, { u + discHalf, disc } }, 12, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
             float tip = casing.tipAt(u);
             if (tip - disc < 1.0F) {
                 continue;

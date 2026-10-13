@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/catalytic_reformer_front_on",
+    "south": "arcforge:block/catalytic_reformer_back",
+    "east": "arcforge:block/catalytic_reformer_left",
+    "west": "arcforge:block/catalytic_reformer_right",
+    "up": "arcforge:block/catalytic_reformer_top",
+    "down": "arcforge:block/catalytic_reformer_bottom",
+    "particle": "arcforge:block/catalytic_reformer_back"
+  }
+}

@@ -26,8 +26,9 @@ import net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.OilfieldPart;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
-// The oilfield's two multiblocks. Their controllers' block entities run them and decide whether they're formed; the
-// other parts find the controller by searching around themselves.
+// The oil and refinery family's fixed-size multiblocks: the oilfield's two, and the refinery's Cracking Unit and Diesel
+// Generator (PlantBox). Their controllers' block entities run them and decide whether they're formed; the other parts
+// find the controller by searching around themselves.
 //
 // The Oil Derrick (Rig): a 3x3 rig six blocks tall over the hole it drills. Its floor (the bottom layer) is a ring of
 // eight Derrick Casings round the bore, which stays open, with the Oil Derrick Controller in the middle of one side,
@@ -38,9 +39,15 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 // wide and 5 long round the Well Head, which is the middle of one end, with the Pumpjack Controller in the middle of
 // the other end, facing away from the well; and a Samson post of three Pumpjack Casings standing on the middle of the
 // skid.
+//
+// The Cracking Unit and Diesel Generator (PlantBox): a solid box of their casings, 3 wide, with the controller in the
+// middle of the bottom of one end, facing out of it: the Cracking Unit 3 long and 5 tall, the Diesel Generator 5 long
+// and 2 tall.
 public final class OilfieldStructures {
     public static final int RIG_WIDTH = 3, RIG_HEIGHT = 6, LEG_LAYERS = 4;
     public static final int UNIT_WIDTH = 3, UNIT_LENGTH = 5, UNIT_HEIGHT = 4, POST_U = 2;
+    public static final int CRACKER_WIDTH = 3, CRACKER_HEIGHT = 5, CRACKER_LENGTH = 3;
+    public static final int GENERATOR_WIDTH = 3, GENERATOR_HEIGHT = 2, GENERATOR_LENGTH = 5;
 
     // --- The Oil Derrick ---
 
@@ -196,6 +203,86 @@ public final class OilfieldStructures {
             }
             BlockState state = level.getBlockState(pos);
             boolean fits = pos.equals(controller) ? state.is(ModBlocks.PUMPJACK_CONTROLLER.get()) : state.is(ModBlocks.PUMPJACK_CASING.get());
+            if (!fits || state.getValue(OilfieldPart.FORMED) && (current == null || !current.contains(pos))) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // --- The Cracking Unit and the Diesel Generator ---
+
+    // A box of casings `width` across (odd), `height` tall and `length` long, its controller in the middle of the
+    // bottom of its front end (front), the box running `back` from there.
+    public record PlantBox(BlockPos front, Direction back, int width, int height, int length) {
+        public static PlantBox of(PlantKind kind, BlockPos front, Direction back) {
+            return kind == PlantKind.CRACKING_UNIT ? new PlantBox(front, back, CRACKER_WIDTH, CRACKER_HEIGHT, CRACKER_LENGTH)
+                    : new PlantBox(front, back, GENERATOR_WIDTH, GENERATOR_HEIGHT, GENERATOR_LENGTH);
+        }
+
+        // The block x across (to the right seen from the front), y up and u back from the front.
+        public BlockPos at(int x, int y, int u) {
+            return front.relative(back, u).relative(back.getClockWise(), x).above(y);
+        }
+
+        public BlockPos controller() {
+            return front;
+        }
+
+        // Which way the controller faces: out of the front.
+        public Direction facing() {
+            return back.getOpposite();
+        }
+
+        public BlockPos min() {
+            BlockPos a = at(-width / 2, 0, 0), b = at(width / 2, height - 1, length - 1);
+            return new BlockPos(Math.min(a.getX(), b.getX()), a.getY(), Math.min(a.getZ(), b.getZ()));
+        }
+
+        public BlockPos max() {
+            BlockPos a = at(-width / 2, 0, 0), b = at(width / 2, height - 1, length - 1);
+            return new BlockPos(Math.max(a.getX(), b.getX()), b.getY(), Math.max(a.getZ(), b.getZ()));
+        }
+
+        public List<BlockPos> parts() {
+            List<BlockPos> parts = new ArrayList<>();
+            for (int u = 0; u < length; u++) {
+                for (int y = 0; y < height; y++) {
+                    for (int x = -width / 2; x <= width / 2; x++) {
+                        parts.add(at(x, y, u));
+                    }
+                }
+            }
+            return parts;
+        }
+
+        public boolean contains(BlockPos pos) {
+            BlockPos min = min(), max = max();
+            return pos.getX() >= min.getX() && pos.getX() <= max.getX() && pos.getY() >= min.getY() && pos.getY() <= max.getY()
+                    && pos.getZ() >= min.getZ() && pos.getZ() <= max.getZ();
+        }
+    }
+
+    // The valid box of this kind the controller at pos is the front of, or null (see findRig).
+    public static @Nullable PlantBox findPlant(Level level, BlockPos controller, PlantKind kind, @Nullable PlantBox current) {
+        for (Direction facing : candidates(level, controller)) {
+            PlantBox box = PlantBox.of(kind, controller, facing.getOpposite());
+            if (isValid(level, box, kind, controller, current)) {
+                return box;
+            }
+        }
+        return null;
+    }
+
+    private static boolean isValid(Level level, PlantBox box, PlantKind kind, BlockPos controller, @Nullable PlantBox current) {
+        Block casing = kind == PlantKind.CRACKING_UNIT ? ModBlocks.CRACKING_UNIT_CASING.get() : ModBlocks.DIESEL_GENERATOR_CASING.get();
+        Block control = kind == PlantKind.CRACKING_UNIT ? ModBlocks.CRACKING_UNIT_CONTROLLER.get() : ModBlocks.DIESEL_GENERATOR_CONTROLLER.get();
+        for (BlockPos pos : box.parts()) {
+            if (!level.isLoaded(pos)) {
+                return false;
+            }
+            BlockState state = level.getBlockState(pos);
+            boolean fits = pos.equals(controller) ? state.is(control) : state.is(casing);
             if (!fits || state.getValue(OilfieldPart.FORMED) && (current == null || !current.contains(pos))) {
                 return false;
             }

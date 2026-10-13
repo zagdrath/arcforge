@@ -217,7 +217,7 @@ public final class SteamCycleGameTests {
                 .thenIdle(30)
                 .thenExecute(() -> {
                     double[] bonus = { 1.0 + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble(),
-                            Lubricant.bonus() + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() };
+                            Lubricant.bonus(FluidResource.of(ModFluids.HEAVY_OIL.get())) + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble() };
                     for (int i = 0; i < 2; i++) {
                         SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(mins[i], SteamTurbineArrayBlockEntity.class);
                         helper.assertTrue(turbine.isVacuum(), "Turbine " + i + " has no vacuum bonus");

@@ -1,0 +1,128 @@
+/*
+ * Copyright (c) 2026 Zagdrath
+ * SPDX-License-Identifier: MIT
+ */
+
+package net.zagdrath.arcforge.compat.jade;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+import org.jspecify.annotations.Nullable;
+
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.ComponentSerialization;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.Identifier;
+import net.minecraft.server.level.ServerLevel;
+import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity;
+import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.refining.RefiningCore;
+import net.zagdrath.arcforge.multiblock.OilfieldStructures;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.IBlockComponentProvider;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.StreamServerDataProvider;
+import snownee.jade.api.config.IPluginConfig;
+
+// The refinery's downstream units in Jade. On the Catalytic Reformer, Coker, Lubricant Blender or any block of a
+// Cracking Unit: the operation's progress, the temperature it needs, the catalyst left and the status (HeatProvider
+// shows the heat, Jade's own views the tanks). On any block of a Diesel Generator: FE/t against its full output, its
+// speed, the fuel it burns and the status. On a Flare Stack: what it burns. The server builds the lines; Client draws
+// them.
+public enum RefineryProvider implements StreamServerDataProvider<BlockAccessor, List<Component>> {
+    INSTANCE;
+
+    public static final Identifier UID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "refinery");
+    private static final StreamCodec<RegistryFriendlyByteBuf, List<Component>> CODEC = ComponentSerialization.STREAM_CODEC.apply(ByteBufCodecs.list());
+
+    @Override
+    public @Nullable List<Component> streamData(BlockAccessor accessor) {
+        if (!(accessor.getLevel() instanceof ServerLevel level)) {
+            return null;
+        }
+        List<Component> lines = new ArrayList<>();
+        Object target = accessor.getBlockEntity();
+        if (target instanceof FlareStackBlockEntity flare) {
+            lines.add(flare.getBurnt() > 0
+                    ? Component.translatable("jade.arcforge.flare_stack.burning", String.format(Locale.ROOT, "%,d", flare.getBurnt()))
+                            .withStyle(ChatFormatting.GOLD)
+                    : Component.translatable("jade.arcforge.flare_stack.idle").withStyle(ChatFormatting.GRAY));
+            return lines;
+        }
+        if (target instanceof RefiningMachineBlockEntity machine) {
+            refining(lines, machine.getCore(), machine.getStatus());
+            return lines;
+        }
+        if (!(target instanceof CrackingUnitBlockEntity || target instanceof DieselGeneratorBlockEntity)) {
+            target = OilfieldStructures.findController(level, accessor.getPosition());
+        }
+        if (target instanceof CrackingUnitBlockEntity cracker) {
+            if (cracker.isFormed()) {
+                refining(lines, cracker.getCore(), cracker.getStatus());
+            } else {
+                lines.add(cracker.getStatus().getDescription());
+            }
+        } else if (target instanceof DieselGeneratorBlockEntity generator) {
+            if (generator.isFormed()) {
+                lines.add(Component.translatable("jade.arcforge.diesel_generator.output", String.format(Locale.ROOT, "%,d", generator.getMade()),
+                        String.format(Locale.ROOT, "%,d", DieselGeneratorBlockEntity.maxOutput()), Math.round(generator.getSpeed() * 100))
+                        .withStyle(ChatFormatting.GOLD));
+                if (generator.getBurned() > 0) {
+                    lines.add(Component.translatable("jade.arcforge.diesel_generator.fuel", String.format(Locale.ROOT, "%.2f", generator.getBurned()))
+                            .withStyle(ChatFormatting.GRAY));
+                }
+            }
+            lines.add(generator.getStatus().getDescription());
+        } else {
+            return null;
+        }
+        return lines;
+    }
+
+    private static void refining(List<Component> lines, RefiningCore core, MachineStatus status) {
+        if (core.total() > 0) {
+            lines.add(Component.translatable("jade.arcforge.refining.progress", Math.round(100.0F * core.progress() / core.total())));
+        }
+        if (core.process().heated() && core.minTemperature() > 0) {
+            lines.add(Component.translatable("jade.arcforge.refining.needs", core.minTemperature()).withStyle(ChatFormatting.GOLD));
+        }
+        if (core.catalystLife() > 0) {
+            lines.add(Component.translatable("jade.arcforge.refining.catalyst", core.catalystLeft(), core.catalystLife()).withStyle(ChatFormatting.GRAY));
+        }
+        lines.add(status.getDescription());
+    }
+
+    @Override
+    public StreamCodec<RegistryFriendlyByteBuf, List<Component>> streamCodec() {
+        return CODEC;
+    }
+
+    @Override
+    public Identifier getUid() {
+        return UID;
+    }
+
+    // Jade needs the tooltip half as its own provider, under the same uid.
+    public enum Client implements IBlockComponentProvider {
+        INSTANCE;
+
+        @Override
+        public void appendTooltip(ITooltip tooltip, BlockAccessor accessor, IPluginConfig config) {
+            RefineryProvider.INSTANCE.decodeFromData(accessor).ifPresent(lines -> lines.forEach(tooltip::add));
+        }
+
+        @Override
+        public Identifier getUid() {
+            return UID;
+        }
+    }
+}

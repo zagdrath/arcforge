@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " F ",
+    "PCP",
+    "PRP"
+  ],
+  "key": {
+    "F": "minecraft:flint_and_steel",
+    "P": "#c:plates/steel",
+    "C": "arcforge:wrought_pressurized_cylinder",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:flare_stack",
+    "count": 1
+  }
+}

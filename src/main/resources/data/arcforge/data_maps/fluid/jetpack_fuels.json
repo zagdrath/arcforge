@@ -19,6 +19,11 @@
       "thrust": 0.2,
       "mb_per_tick": 4,
       "particle": "flame"
+    },
+    "arcforge:kerosene": {
+      "thrust": 0.18,
+      "mb_per_tick": 2,
+      "particle": "flame"
     }
   }
 }

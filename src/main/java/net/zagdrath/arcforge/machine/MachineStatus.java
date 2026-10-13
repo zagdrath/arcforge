@@ -143,7 +143,14 @@ public enum MachineStatus {
     // PUMPING.)
     DRILLING("drilling", "led_running"),
     NO_OIL("no_oil", "led_blocked"),
-    NO_PIPE("no_pipe", "led_blocked");
+    NO_PIPE("no_pipe", "led_blocked"),
+    // The refinery's downstream units, the Flare Stack and the Diesel Generator.
+    CRACKING("cracking", "led_running"),
+    REFORMING("reforming", "led_running"),
+    COKING("coking", "led_running"),
+    BLENDING("blending", "led_running"),
+    FLARING("flaring", "led_running"),
+    THROTTLED("throttled", "led_idle");
 
     private final String name;
     private final String led;

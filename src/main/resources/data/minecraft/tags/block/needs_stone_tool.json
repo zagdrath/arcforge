@@ -67,6 +67,14 @@
     "arcforge:derrick_frame",
     "arcforge:oil_derrick_controller",
     "arcforge:pumpjack_casing",
-    "arcforge:pumpjack_controller"
+    "arcforge:pumpjack_controller",
+    "arcforge:catalytic_reformer",
+    "arcforge:coker",
+    "arcforge:lubricant_blender",
+    "arcforge:cracking_unit_casing",
+    "arcforge:cracking_unit_controller",
+    "arcforge:diesel_generator_casing",
+    "arcforge:diesel_generator_controller",
+    "arcforge:flare_stack"
   ]
 }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "CEC",
+    "PGP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:gears/steel",
+    "C": "#c:plates/copper",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:diesel_generator_casing",
+    "count": 8
+  }
+}

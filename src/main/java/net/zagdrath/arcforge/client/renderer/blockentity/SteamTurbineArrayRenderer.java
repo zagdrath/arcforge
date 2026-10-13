@@ -172,15 +172,19 @@ public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamT
         }
     }
 
-    // TurbineMesh's vertices (x, y, z, u, v across the sheet, normal), the sheet's UVs mapped into the atlas.
+    // TurbineMesh's vertices (x, y, z, u, v across the sheet, normal), the sheet's UVs mapped into the atlas. Each face
+    // shaded as a block face turned its way is, its normal straight up (as PumpjackRenderer.emit), so the model shades
+    // like the casing blocks round it.
     private static void emit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet, int light) {
         for (int i = 0; i + 7 < data.length; i += 8) {
+            float nx = data[i + 5], ny = data[i + 6], nz = data[i + 7];
+            int shade = Math.round(255.0F * (nx * nx * 0.6F + ny * ny * (ny > 0.0F ? 1.0F : 0.5F) + nz * nz * 0.8F));
             buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
-                    .setColor(-1)
+                    .setColor(0xFF000000 | shade << 16 | shade << 8 | shade)
                     .setUv(sheet.getU(data[i + 3]), sheet.getV(data[i + 4]))
                     .setOverlay(OverlayTexture.NO_OVERLAY)
                     .setLight(light)
-                    .setNormal(pose, data[i + 5], data[i + 6], data[i + 7]);
+                    .setNormal(pose, 0.0F, 1.0F, 0.0F);
         }
     }
 }

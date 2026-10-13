@@ -18,6 +18,9 @@ public final class ModItemTags {
     // Items the Arcforge Furnace burns for heat (coal coke by default).
     public static final TagKey<Item> ARCFORGE_FURNACE_FUELS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "arcforge_furnace_fuels"));
 
+    // Coal coke, and what works as it (Petroleum Coke): Arcforge Furnace fuel and reagent, Graphite, the Firebox Array.
+    public static final TagKey<Item> COAL_COKE = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "coal_coke"));
+
     // Coal coke blocks: the Arcforge Furnace breaks them open into nine coal coke for fuel and reagent.
     public static final TagKey<Item> COAL_COKE_BLOCKS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "storage_blocks/coal_coke"));
 

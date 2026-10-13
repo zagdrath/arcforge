@@ -63,6 +63,14 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.PUMPJACK_CONTROLLER.get());
                 output.accept(ModItems.PUMPJACK_CASING.get());
                 output.accept(ModItems.WELL_HEAD.get());
+                output.accept(ModItems.CRACKING_UNIT_CONTROLLER.get());
+                output.accept(ModItems.CRACKING_UNIT_CASING.get());
+                output.accept(ModItems.CATALYTIC_REFORMER.get());
+                output.accept(ModItems.COKER.get());
+                output.accept(ModItems.LUBRICANT_BLENDER.get());
+                output.accept(ModItems.FLARE_STACK.get());
+                output.accept(ModItems.DIESEL_GENERATOR_CONTROLLER.get());
+                output.accept(ModItems.DIESEL_GENERATOR_CASING.get());
                 output.accept(ModItems.ASSEMBLER.get());
                 output.accept(ModItems.BLOCK_BREAKER.get());
                 output.accept(ModItems.TREE_CUTTER.get());
@@ -120,6 +128,8 @@ public final class ModCreativeTabs {
                 ModItems.ores().forEach(item -> output.accept(item.get()));
                 ModItems.alloys().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.COAL_COKE.get());
+                output.accept(ModItems.PETROLEUM_COKE.get());
+                output.accept(ModItems.CRACKING_CATALYST.get());
                 output.accept(ModItems.COAL_COKE_BLOCK.get());
                 output.accept(ModItems.BIO_COAL.get());
                 output.accept(ModItems.BIO_COAL_BLOCK.get());
@@ -211,6 +221,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.KEROSENE_BUCKET.get());
                 output.accept(ModItems.DIESEL_BUCKET.get());
                 output.accept(ModItems.BITUMEN_BUCKET.get());
+                output.accept(ModItems.GASOLINE_BUCKET.get());
+                output.accept(ModItems.LUBRICANT_BUCKET.get());
                 output.accept(ModItems.LIQUID_EXPERIENCE_BUCKET.get());
                 ModItems.chemicalBuckets().forEach(item -> output.accept(item.get()));
             }).build());

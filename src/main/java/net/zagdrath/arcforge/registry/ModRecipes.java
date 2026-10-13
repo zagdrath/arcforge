@@ -95,6 +95,16 @@ public final class ModRecipes {
             RECIPE_TYPES.register("gasifying", () -> RecipeType.simple(id("gasifying")));
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.FischerTropschRecipe>> FISCHER_TROPSCH =
             RECIPE_TYPES.register("fischer_tropsch", () -> RecipeType.simple(id("fischer_tropsch")));
+    // The refinery's downstream units (see RefiningRecipe): the Cracking Unit, Catalytic Reformer, Coker and Lubricant
+    // Blender.
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.RefiningRecipe>> CRACKING =
+            RECIPE_TYPES.register("cracking", () -> RecipeType.simple(id("cracking")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.RefiningRecipe>> REFORMING =
+            RECIPE_TYPES.register("reforming", () -> RecipeType.simple(id("reforming")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.RefiningRecipe>> COKING =
+            RECIPE_TYPES.register("coking", () -> RecipeType.simple(id("coking")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.RefiningRecipe>> LUBRICANT_BLENDING =
+            RECIPE_TYPES.register("lubricant_blending", () -> RecipeType.simple(id("lubricant_blending")));
     // The Sifter and the Diamond Press.
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.SiftingRecipe>> SIFTING =
             RECIPE_TYPES.register("sifting", () -> RecipeType.simple(id("sifting")));
@@ -160,6 +170,14 @@ public final class ModRecipes {
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.FischerTropschRecipe>> FISCHER_TROPSCH_SERIALIZER =
             RECIPE_SERIALIZERS.register("fischer_tropsch", () -> new RecipeSerializer<>(
                     net.zagdrath.arcforge.recipe.FischerTropschRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.FischerTropschRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.RefiningRecipe>> CRACKING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("cracking", () -> refining(net.zagdrath.arcforge.recipe.RefiningProcess.CRACKING));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.RefiningRecipe>> REFORMING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("reforming", () -> refining(net.zagdrath.arcforge.recipe.RefiningProcess.REFORMING));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.RefiningRecipe>> COKING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("coking", () -> refining(net.zagdrath.arcforge.recipe.RefiningProcess.COKING));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.RefiningRecipe>> LUBRICANT_BLENDING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("lubricant_blending", () -> refining(net.zagdrath.arcforge.recipe.RefiningProcess.BLENDING));
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.SiftingRecipe>> SIFTING_SERIALIZER =
             RECIPE_SERIALIZERS.register("sifting", () -> new RecipeSerializer<>(
                     net.zagdrath.arcforge.recipe.SiftingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.SiftingRecipe.STREAM_CODEC));
@@ -199,6 +217,11 @@ public final class ModRecipes {
         return Identifier.fromNamespaceAndPath(Arcforge.MODID, path);
     }
 
+    private static RecipeSerializer<net.zagdrath.arcforge.recipe.RefiningRecipe> refining(net.zagdrath.arcforge.recipe.RefiningProcess process) {
+        return new RecipeSerializer<>(net.zagdrath.arcforge.recipe.RefiningRecipe.mapCodec(process),
+                net.zagdrath.arcforge.recipe.RefiningRecipe.streamCodec(process));
+    }
+
     public static void register(IEventBus modEventBus) {
         RECIPE_TYPES.register(modEventBus);
         RECIPE_SERIALIZERS.register(modEventBus);
@@ -210,7 +233,7 @@ public final class ModRecipes {
         event.sendRecipes(CARBONIZING.get(), ARCFORGE_SMELTING.get(), CHEMICAL_REACTING.get(), CRUSHING.get(), DISTILLING.get(), ELECTROLYZING.get(), FERMENTING.get(), CULTURING.get(), FIBERIZING.get(), INFUSING.get(), MELTING.get(), PRESSING.get(),
                 MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(), VULCANIZING.get(),
                 HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
-                SIFTING.get(), DIAMOND_PRESSING.get(),
+                SIFTING.get(), DIAMOND_PRESSING.get(), CRACKING.get(), REFORMING.get(), COKING.get(), LUBRICANT_BLENDING.get(),
                 RecipeType.SMELTING);
     }
 }

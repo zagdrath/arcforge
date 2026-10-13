@@ -22,16 +22,16 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.multiblock.PortHolder;
 
-// A casing of an Oil Derrick (its drill floor) or a Pumpjack (its skid and Samson post). The Derrick Casing is a plain
-// block, formed or not, and any on the outside can be one of the rig's ports; a formed Pumpjack Casing draws nothing
-// (the pumpjack's renderer draws the unit) but its port plates, and its shape follows the model (see PumpjackLayout).
-// The Derrick Frame (holdsPorts false) is the rig's steel lattice.
+// A casing of an Oil Derrick (its drill floor), a Pumpjack (its skid and Samson post), a Cracking Unit or a Diesel
+// Generator. The Derrick Casing is a plain block, formed or not, and any on the outside can be one of the rig's ports;
+// the others (modelled) draw nothing once formed (the structure's renderer draws it) but their port plates, and their
+// shape follows the model (see PlantHitbox). The Derrick Frame (holdsPorts false) is the rig's steel lattice.
 public class OilfieldCasingBlock extends Block implements OilfieldPart, PortHolder {
-    private final boolean pumpjack, ports;
+    private final boolean modelled, ports;
 
-    public OilfieldCasingBlock(BlockBehaviour.Properties properties, boolean pumpjack, boolean ports) {
+    public OilfieldCasingBlock(BlockBehaviour.Properties properties, boolean modelled, boolean ports) {
         super(properties);
-        this.pumpjack = pumpjack;
+        this.modelled = modelled;
         this.ports = ports;
         registerDefaultState(stateDefinition.any().setValue(FORMED, false));
     }
@@ -65,36 +65,36 @@ public class OilfieldCasingBlock extends Block implements OilfieldPart, PortHold
         return OilfieldStructures.useOnPart(level, pos, player);
     }
 
-    // A formed Pumpjack Casing: the parts of the pumpjack in it (see PumpjackHitbox).
+    // A formed modelled casing: the parts of the model in it (see PlantHitbox).
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape shape = pumpjack && state.getValue(FORMED) ? PumpjackHitbox.shape(level, pos) : null;
+        VoxelShape shape = modelled && state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
         return shape != null ? shape : super.getShape(state, level, pos, context);
     }
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape shape = pumpjack && state.getValue(FORMED) ? PumpjackHitbox.shape(level, pos) : null;
+        VoxelShape shape = modelled && state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
         return shape != null ? shape : super.getCollisionShape(state, level, pos, context);
     }
 
     @Override
     protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter level, BlockPos pos) {
-        return pumpjack && state.getValue(FORMED) ? Shapes.block() : super.getBlockSupportShape(state, level, pos);
+        return modelled && state.getValue(FORMED) ? Shapes.block() : super.getBlockSupportShape(state, level, pos);
     }
 
     @Override
     protected VoxelShape getOcclusionShape(BlockState state) {
-        return pumpjack && state.getValue(FORMED) ? Shapes.empty() : super.getOcclusionShape(state);
+        return modelled && state.getValue(FORMED) ? Shapes.empty() : super.getOcclusionShape(state);
     }
 
     @Override
     protected boolean propagatesSkylightDown(BlockState state) {
-        return pumpjack && state.getValue(FORMED);
+        return modelled && state.getValue(FORMED);
     }
 
     @Override
     protected int getLightDampening(BlockState state) {
-        return pumpjack && state.getValue(FORMED) ? 0 : super.getLightDampening(state);
+        return modelled && state.getValue(FORMED) ? 0 : super.getLightDampening(state);
     }
 }

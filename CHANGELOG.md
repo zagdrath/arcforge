@@ -63,9 +63,34 @@ Suggested version: **2.7.0** (minor: new content and a rebuilt Distillation Arra
 
   Steam stripping moves Bitumen into Naphtha, as it moves Heavy Oil on creosote.
   - New fluids: **Refinery Gas** (a gas, in the gas API), **Kerosene**, **Diesel** and **Bitumen**, with buckets for
-    the liquids and a port mode each. Kerosene (190 HU/t at 1,150°C), Diesel (175 HU/t at 1,050°C) and Refinery Gas
-    (55 HU/t at 1,150°C) are Fuel Burner, Firebox Array and Gas Turbine Array fuels, and Kerosene and Diesel catch
+    the liquids and a port mode each. Kerosene (190 HU/t at 1,150°C), Diesel (210 HU/t at 1,150°C) and Refinery Gas
+    (150 HU/t at 1,200°C) are Fuel Burner, Firebox Array and Gas Turbine Array fuels, and Kerosene and Diesel catch
     fire in the world.
+- **The refinery's downstream units, fuels and generators:**
+  - **Cracking Unit**, a fixed 3×3×5 multiblock of Cracking Unit Casings with its controller in the middle of the
+    bottom of one side. With heat (480°C or more, 30 HU/t) and a **Cracking Catalyst** in its slot (8 from clay, sand
+    and Nickel Dust; one lasts 50 batches) it cracks 100 mB of Heavy Oil a second into 40 mB Naphtha, 45 mB Diesel and
+    60 mB Refinery Gas. Formed, it draws as a fluid catalytic cracker (regenerator and flue stack with a sight port that
+    glows as it heats, reactor, riser, standpipes and catalyst hopper), with a form-fitting hitbox.
+  - **Catalytic Reformer** (Naphtha + heat at 450°C → Gasoline + Hydrogen, 100 mB → 85 + 60), **Coker** (Bitumen +
+    heat at 420°C → Petroleum Coke + Refinery Gas, 250 mB → 1 coke + 50 mB) and **Lubricant Blender** (Heavy Oil + FE
+    → Lubricant, 100 mB → 90 mB). Each process is a data-driven recipe type (`arcforge:cracking`, `reforming`, `coking`,
+    `lubricant_blending`).
+  - **Gasoline** and **Lubricant**, new fluids with buckets. **Lubricant** in a Steam or Gas Turbine Array's lubricant
+    tank adds 12% (Heavy Oil and Seed Oil stay at 8%). **Petroleum Coke** works as Coal Coke everywhere (the Arcforge
+    Furnace, Graphite, the Gasifier, the Firebox Array, furnace fuel) and is in `#c:coal_coke`. **Asphalt** from
+    Bitumen: 8 gravel round a Bitumen bucket.
+  - **Gasoline** burns in the Fuel Burner, Firebox Array and Gas Turbine Array (225 HU/t at 1,250°C). The refinery
+    fuels' heat and burn temperatures are in config (`power.burners.refineryFuels`). **Kerosene fuels the Jetpack**:
+    click a Kerosene bucket or Canister onto it in your inventory.
+  - **Diesel Generator**, a fixed 3×2×5 multiblock: an engine-generator set on a skid whose fan and coupling turn as it
+    runs. It burns Diesel, Gasoline, Biodiesel or Refinery Gas (420, 400, 340 and 240 FE per mB, the data map
+    `arcforge:engine_fuels`) straight to FE, up to 3,000 FE/t after a 3-second spin-up, and throttles back when its
+    buffer is full.
+  - **Flare Stack**: burns off any gas pushed into it (1,000 mB/t), with a flame at the top of its stack as big as
+    what it burns, so a refinery doesn't stall when a gas tank fills.
+  - Handbook entries, JEI categories (the four processes and the Diesel Generator's fuels), Jade lines, the machine
+    control API for the five machines, advancements and GameTests.
 
 ### Changed
 

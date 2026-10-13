@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/refinery/diesel_generator_casing"
+    },
+    "formed=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/diesel_generator_hidden"
+    }
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "arcforge:lubricant_blending",
+  "input": {
+    "fluid": "arcforge:heavy_oil",
+    "amount": 100
+  },
+  "fluids": [
+    {
+      "id": "arcforge:lubricant",
+      "amount": 90
+    }
+  ],
+  "time": 40,
+  "energy_per_tick": 20
+}

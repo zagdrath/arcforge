@@ -12,9 +12,11 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.registry.ModFluids;
 
-// The Steam and Gas Turbine Arrays' lubricants: any fluid in #arcforge:lubricants (Heavy Oil and Seed Oil). While a
-// turbine's lubricant tank isn't empty it makes more FE and spins up faster. The tank holds one fluid at a time.
+// The Steam and Gas Turbine Arrays' lubricants: any fluid in #arcforge:lubricants (Heavy Oil, Seed Oil and Lubricant).
+// While a turbine's lubricant tank isn't empty it makes more FE (lubricant.outputBonus, or lubricantOutputBonus with
+// the refined Lubricant) and spins up faster. The tank holds one fluid at a time.
 public final class Lubricant {
     public static final TagKey<Fluid> TAG = TagKey.create(Registries.FLUID, Identifier.fromNamespaceAndPath(Arcforge.MODID, "lubricants"));
 
@@ -24,8 +26,22 @@ public final class Lubricant {
         return !resource.isEmpty() && resource.getFluid().defaultFluidState().is(TAG);
     }
 
-    // The output multiplier while lubricated.
-    public static double bonus() {
-        return 1.0 + ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble();
+    // The output multiplier with this lubricant in the tank (1 with none).
+    public static double bonus(FluidResource resource) {
+        return 1.0 + share(resource);
+    }
+
+    // The extra share of output this lubricant gives (0 with none).
+    public static double share(FluidResource resource) {
+        if (!isLubricant(resource)) {
+            return 0.0;
+        }
+        return resource.getFluid() == ModFluids.LUBRICANT.get() ? ArcforgeConfig.LUBRICANT_PREMIUM_BONUS.getAsDouble()
+                : ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble();
+    }
+
+    // The output multiplier with the best lubricant, for the most a turbine can make.
+    public static double best() {
+        return 1.0 + Math.max(ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble(), ArcforgeConfig.LUBRICANT_PREMIUM_BONUS.getAsDouble());
     }
 }

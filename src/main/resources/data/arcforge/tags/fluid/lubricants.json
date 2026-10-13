@@ -1,6 +1,7 @@
 {
   "values": [
     "arcforge:heavy_oil",
-    "arcforge:seed_oil"
+    "arcforge:seed_oil",
+    "arcforge:lubricant"
   ]
 }

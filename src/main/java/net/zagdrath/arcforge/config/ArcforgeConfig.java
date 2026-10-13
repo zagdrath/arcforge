@@ -372,6 +372,48 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("The refinery's fuels in the Fuel Burner, Firebox Array and Gas Turbine Array: the heat each mB gives (HU) and",
+                "how hot it burns (°C). These override the arcforge:burner_fuels data map for these four fluids (how fast",
+                "they burn still comes from it).").push("refineryFuels");
+    }
+
+    public static final ModConfigSpec.IntValue GASOLINE_HU_PER_MB = BUILDER
+            .comment("Gasoline: HU per mB.")
+            .defineInRange("gasolineHeatPerMb", 450, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue GASOLINE_BURN_TEMPERATURE = BUILDER
+            .comment("Gasoline: burn temperature in °C.")
+            .defineInRange("gasolineBurnTemperature", 1_250, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue DIESEL_HU_PER_MB = BUILDER
+            .comment("Diesel: HU per mB.")
+            .defineInRange("dieselHeatPerMb", 420, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue DIESEL_BURN_TEMPERATURE = BUILDER
+            .comment("Diesel: burn temperature in °C.")
+            .defineInRange("dieselBurnTemperature", 1_150, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue KEROSENE_HU_PER_MB = BUILDER
+            .comment("Kerosene: HU per mB.")
+            .defineInRange("keroseneHeatPerMb", 380, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue KEROSENE_BURN_TEMPERATURE = BUILDER
+            .comment("Kerosene: burn temperature in °C.")
+            .defineInRange("keroseneBurnTemperature", 1_150, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue REFINERY_GAS_HU_PER_MB = BUILDER
+            .comment("Refinery Gas: HU per mB.")
+            .defineInRange("refineryGasHeatPerMb", 300, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue REFINERY_GAS_BURN_TEMPERATURE = BUILDER
+            .comment("Refinery Gas: burn temperature in °C.")
+            .defineInRange("refineryGasBurnTemperature", 1_200, 100, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.pop();
     }
 
@@ -710,7 +752,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue GAS_TURBINE_SPOOL_TIME = BUILDER
             .comment("Fewest ticks the rotor takes from standstill to full speed: however far the throttle jumps, it speeds up",
-                    "by at most full speed / spoolTime each tick (Heavy Oil or Seed Oil lubricant shortens it like spinUp).")
+                    "by at most full speed / spoolTime each tick (lubricant shortens it like spinUp).")
             .defineInRange("spoolTime", 200, 1, 12_000);
 
     public static final ModConfigSpec.DoubleValue GAS_TURBINE_SPIN_DOWN = BUILDER
@@ -879,12 +921,18 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Heavy Oil in a steam turbine's lubricant tank, while it isn't empty and the turbine generates.").push("lubricant");
+        BUILDER.comment("A lubricant (Heavy Oil, Seed Oil or Lubricant) in a turbine's lubricant tank, while it isn't empty and the",
+                "turbine generates.").push("lubricant");
     }
 
     public static final ModConfigSpec.DoubleValue LUBRICANT_OUTPUT_BONUS = BUILDER
-            .comment("Extra FE per mB of steam (0.08 = +8%).")
+            .comment("Extra FE per mB of steam with Heavy Oil or Seed Oil in the tank (0.08 = +8%).")
             .defineInRange("outputBonus", 0.08, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue LUBRICANT_PREMIUM_BONUS = BUILDER
+            .comment("The same with Lubricant (the Lubricant Blender's refined oil) in the tank instead (0.12 = +12%), in the Steam",
+                    "and Gas Turbine Arrays.")
+            .defineInRange("lubricantOutputBonus", 0.12, 0.0, 10.0);
 
     public static final ModConfigSpec.DoubleValue LUBRICANT_SPIN_UP = BUILDER
             .comment("Multiplier on how fast a Steam Turbine Array's rotor spins up.")
@@ -1458,6 +1506,123 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue FT_OUTPUT_RATE = BUILDER
             .comment("Most mB/t of each product it pushes out of its faces.")
             .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Catalytic Reformer: Naphtha + heat -> Gasoline and Hydrogen. Recipes are data-driven (arcforge:reforming: the feed,",
+                "the products, heat_per_tick and min_temp, and time unless it follows the value here).",
+                "Gasoline comes out of Output faces, Hydrogen out of Gas Output faces.").push("catalyticReformer");
+    }
+
+    public static final ModConfigSpec.IntValue REFORMER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 20000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue REFORMER_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full heat buffer.")
+            .defineInRange("bufferMaxTemperature", 700, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue REFORMER_TIME = BUILDER
+            .comment("Ticks per operation for recipes that don't set their own time, before Speed upgrades.")
+            .defineInRange("time", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue REFORMER_FEED_CAPACITY = BUILDER
+            .comment("Feed tank size in mB.")
+            .defineInRange("feedTankCapacity", 16000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue REFORMER_PRODUCT_CAPACITY = BUILDER
+            .comment("Each product tank's size in mB.")
+            .defineInRange("productTankCapacity", 8000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue REFORMER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each product it pushes out of its faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Coker: Bitumen + heat -> Petroleum Coke (it works as Coal Coke everywhere) and Refinery Gas. Recipes are",
+                "data-driven (arcforge:coking). The coke comes out of Output faces, the gas out of Gas Output faces.").push("coker");
+    }
+
+    public static final ModConfigSpec.IntValue COKER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 20000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue COKER_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full heat buffer.")
+            .defineInRange("bufferMaxTemperature", 700, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue COKER_TIME = BUILDER
+            .comment("Ticks per operation for recipes that don't set their own time, before Speed upgrades.")
+            .defineInRange("time", 80, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue COKER_FEED_CAPACITY = BUILDER
+            .comment("Feed tank size in mB.")
+            .defineInRange("feedTankCapacity", 16000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue COKER_PRODUCT_CAPACITY = BUILDER
+            .comment("Each product tank's size in mB.")
+            .defineInRange("productTankCapacity", 8000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue COKER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each product it pushes out of its faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Lubricant Blender: Heavy Oil + FE -> Lubricant, the better turbine lubricant. Recipes are data-driven",
+                "(arcforge:lubricant_blending).").push("lubricantBlender");
+    }
+
+    public static final ModConfigSpec.IntValue BLENDER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 50_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue BLENDER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue BLENDER_TIME = BUILDER
+            .comment("Ticks per operation for recipes that don't set their own time, before Speed upgrades.")
+            .defineInRange("time", 60, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue BLENDER_FEED_CAPACITY = BUILDER
+            .comment("Feed tank size in mB.")
+            .defineInRange("feedTankCapacity", 16000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue BLENDER_PRODUCT_CAPACITY = BUILDER
+            .comment("Each product tank's size in mB.")
+            .defineInRange("productTankCapacity", 8000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue BLENDER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each product it pushes out of its faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Flare Stack: burns off any gas pushed into it (through any face but the top), so a refinery never stalls when a",
+                "gas tank fills. Its flame shows at the top of its stack, as big as it burns.").push("flareStack");
+    }
+
+    public static final ModConfigSpec.IntValue FLARE_RATE = BUILDER
+            .comment("Most gas it burns off in mB/t.")
+            .defineInRange("burnRate", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue FLARE_TANK_CAPACITY = BUILDER
+            .comment("Its gas tank (what's waiting to burn), in mB.")
+            .defineInRange("tankCapacity", 4_000, 100, 1_000_000);
 
     static {
         BUILDER.pop();
@@ -2104,6 +2269,67 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue PUMPJACK_TANK_CAPACITY = BUILDER
             .comment("Crude Oil tank size in mB.")
             .defineInRange("tankCapacity", 16_000, 1_000, 100_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Cracking Unit: a 3x3 multiblock five tall that cracks Heavy Oil with heat over a catalyst into Naphtha, Diesel",
+                "and Refinery Gas. Recipes are data-driven (arcforge:cracking: the feed, products, heat, min_temp, the catalyst and",
+                "how many operations one catalyst item lasts).").push("crackingUnit");
+    }
+
+    public static final ModConfigSpec.IntValue CRACKING_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 80_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue CRACKING_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full heat buffer.")
+            .defineInRange("bufferMaxTemperature", 800, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue CRACKING_TIME = BUILDER
+            .comment("Ticks per operation for recipes that don't set their own time, before Speed upgrades.")
+            .defineInRange("time", 20, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue CRACKING_FEED_CAPACITY = BUILDER
+            .comment("Heavy Oil (feed) tank size in mB.")
+            .defineInRange("feedTankCapacity", 32_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue CRACKING_PRODUCT_CAPACITY = BUILDER
+            .comment("Each product tank's size in mB.")
+            .defineInRange("productTankCapacity", 16_000, 1_000, 100_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Diesel Generator: a 3x5 engine-generator set two blocks tall that burns liquid and gas fuels straight to FE.",
+                "Fuels and the FE each mB gives are data-driven (data map arcforge:engine_fuels, keyed by fluid): Diesel,",
+                "Gasoline, Biodiesel and Refinery Gas by default. It runs at full power while its FE buffer has room and",
+                "throttles back to what's drawn when it's full.").push("dieselGenerator");
+    }
+
+    public static final ModConfigSpec.IntValue DIESEL_GENERATOR_MAX_OUTPUT = BUILDER
+            .comment("FE/t at full power (before power.generationMultiplier).")
+            .defineInRange("maxPowerOutput", 3_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue DIESEL_GENERATOR_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 400_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue DIESEL_GENERATOR_MAX_OUTPUT_RATE = BUILDER
+            .comment("Most FE/t each Energy port gives out.")
+            .defineInRange("maxEnergyOutput", 8_192, 1, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DIESEL_GENERATOR_TANK_CAPACITY = BUILDER
+            .comment("Fuel tank size in mB.")
+            .defineInRange("fuelTankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DIESEL_GENERATOR_SPIN_UP = BUILDER
+            .comment("Ticks it takes to run up from a standstill to full speed (and power).")
+            .defineInRange("spinUpTicks", 60, 1, 1_200);
 
     static {
         BUILDER.pop();

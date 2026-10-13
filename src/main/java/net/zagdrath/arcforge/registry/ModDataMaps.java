@@ -32,6 +32,12 @@ public final class ModDataMaps {
             .synced(JetpackFuel.CODEC, false)
             .build();
 
+    // Fuels the Diesel Generator burns, keyed by fluid: the FE each mB makes. Synced so its GUI and JEI can show them.
+    public static final DataMapType<Fluid, net.zagdrath.arcforge.machine.EngineFuel> ENGINE_FUELS = DataMapType.builder(
+            Identifier.fromNamespaceAndPath(Arcforge.MODID, "engine_fuels"), Registries.FLUID, net.zagdrath.arcforge.machine.EngineFuel.CODEC)
+            .synced(net.zagdrath.arcforge.machine.EngineFuel.CODEC, false)
+            .build();
+
     // Soils for the Glass Cloche and Grow Chamber, keyed by item: the block drawn inside and how fast crops grow in it.
     // Synced so the client can draw it and the GUI's soil slot knows what it takes.
     public static final DataMapType<Item, ClocheSoil> CLOCHE_SOILS = DataMapType.builder(
@@ -45,6 +51,7 @@ public final class ModDataMaps {
         modEventBus.addListener(RegisterDataMapTypesEvent.class, event -> {
             event.register(BURNER_FUELS);
             event.register(JETPACK_FUELS);
+            event.register(ENGINE_FUELS);
             event.register(CLOCHE_SOILS);
             // The gas API's gas colours (its own type, declared in GasRegistry).
             event.register(GasRegistry.PROPERTIES);

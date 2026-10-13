@@ -9,11 +9,11 @@
   "pages": [
     {
       "type": "text",
-      "text": "The Jetpack goes in your chest slot and burns gas for thrust. It holds one gas at a time.\n- Fill it in a Pressurized Cylinder's item slot, or pick up a Gas Cartridge and click it onto the Jetpack in your inventory.\n- Tanks: 16,000 mB Tempered, 64,000 mB Hardened, 256,000 mB Arcforged. Higher tiers also climb faster: 0.5, 0.65 and 0.8 blocks per tick."
+      "text": "The Jetpack goes in your chest slot and burns gas for thrust. It holds one fuel at a time.\n- Fill it in a Pressurized Cylinder's item slot, or pick up a Gas Cartridge, Canister or Kerosene bucket and click it onto the Jetpack in your inventory.\n- Tanks: 16,000 mB Tempered, 64,000 mB Hardened, 256,000 mB Arcforged. Higher tiers also climb faster: 0.5, 0.65 and 0.8 blocks per tick."
     },
     {
       "type": "text",
-      "text": "# Fuels\n| Gas | Thrust | mB/t |\n| Steam | 0.10 | 10 |\n| High-Pressure Steam | 0.13 | 8 |\n| Superheated Steam | 0.16 | 6 |\n| Hydrogen | 0.20 | 4 |\nGravity pulls 0.08, so every fuel can lift you; better fuels climb faster and last longer. Steam fuels puff white steam, Hydrogen burns with a blue flame."
+      "text": "# Fuels\n| Fuel | Thrust | mB/t |\n| Steam | 0.10 | 10 |\n| High-Pressure Steam | 0.13 | 8 |\n| Superheated Steam | 0.16 | 6 |\n| Hydrogen | 0.20 | 4 |\n| Kerosene | 0.18 | 2 |\nGravity pulls 0.08, so every fuel can lift you; better fuels climb faster and last longer. Steam fuels puff white steam, Hydrogen and Kerosene burn with a blue flame."
     },
     {
       "type": "text",

@@ -1,0 +1,26 @@
+{
+  "type": "arcforge:cracking",
+  "input": {
+    "fluid": "arcforge:heavy_oil",
+    "amount": 100
+  },
+  "fluids": [
+    {
+      "id": "arcforge:naphtha",
+      "amount": 40
+    },
+    {
+      "id": "arcforge:diesel",
+      "amount": 45
+    },
+    {
+      "id": "arcforge:refinery_gas",
+      "amount": 60
+    }
+  ],
+  "time": 20,
+  "heat_per_tick": 30,
+  "min_temp": 480,
+  "catalyst": "arcforge:cracking_catalyst",
+  "catalyst_uses": 50
+}

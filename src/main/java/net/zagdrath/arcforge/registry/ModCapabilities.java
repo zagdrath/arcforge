@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.registry;
 
+import java.util.List;
+
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.Direction;
@@ -297,6 +299,16 @@ public final class ModCapabilities {
                 net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity::getEnergyHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.FISCHER_TROPSCH_REACTOR.get(),
                 net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity::getHeatHandler);
+        // The refinery's single-block units: the Catalytic Reformer, Coker and Lubricant Blender.
+        for (var type : List.of(ModBlockEntityTypes.CATALYTIC_REFORMER.get(), ModBlockEntityTypes.COKER.get(), ModBlockEntityTypes.LUBRICANT_BLENDER.get())) {
+            event.registerBlockEntity(Capabilities.Item.BLOCK, type, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity::getItemHandler);
+            event.registerBlockEntity(Capabilities.Fluid.BLOCK, type, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity::getFluidHandler);
+            event.registerBlockEntity(Capabilities.Energy.BLOCK, type, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity::getEnergyHandler);
+            event.registerBlockEntity(HEAT, type, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity::getHeatHandler);
+        }
+        // The Flare Stack takes gas in through every face but the top.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FLARE_STACK.get(),
+                net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity::getFluidHandler);
         // Farm chemistry: the Air Separator's gases and FE; the Haber Reactor's gases, FE and heat.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.AIR_SEPARATOR.get(),
                 net.zagdrath.arcforge.blockentity.machine.AirSeparatorBlockEntity::getFluidHandler);
@@ -538,10 +550,13 @@ public final class ModCapabilities {
             var evaporator = net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure.findController(level, pos);
             return evaporator != null ? evaporator.heatHandlerAt(pos, side) : null;
         }, evaporatorParts);
-        // The oilfield: the Oil Derrick takes Water and Steel Pipes in (Input) and FE (Energy); the Pumpjack gives
-        // Crude Oil out (Output) and takes FE (Energy), through their ports.
+        // The oilfield and the refinery's fixed boxes, through their ports: the Oil Derrick takes Water and Steel Pipes
+        // in (Input) and FE (Energy); the Pumpjack gives Crude Oil out (Output) and takes FE (Energy); the Cracking
+        // Unit takes Heavy Oil and catalyst in (Input) and heat (Heat) and gives its products out; the Diesel Generator
+        // takes fuel in (Input) and gives FE out (Energy).
         Block[] oilfieldParts = { ModBlocks.OIL_DERRICK_CONTROLLER.get(), ModBlocks.DERRICK_CASING.get(), ModBlocks.PUMPJACK_CONTROLLER.get(),
-                ModBlocks.PUMPJACK_CASING.get() };
+                ModBlocks.PUMPJACK_CASING.get(), ModBlocks.CRACKING_UNIT_CONTROLLER.get(), ModBlocks.CRACKING_UNIT_CASING.get(),
+                ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), ModBlocks.DIESEL_GENERATOR_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
             var controller = net.zagdrath.arcforge.multiblock.OilfieldStructures.findController(level, pos);
             return controller != null ? controller.itemHandlerAt(pos, side) : null;
@@ -552,11 +567,11 @@ public final class ModCapabilities {
         }, oilfieldParts);
         event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
             var controller = net.zagdrath.arcforge.multiblock.OilfieldStructures.findController(level, pos);
-            if (controller instanceof net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity derrick) {
-                return derrick.energyHandlerAt(pos, side);
-            }
-            return controller instanceof net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity pumpjack
-                    ? pumpjack.energyHandlerAt(pos, side) : null;
+            return controller != null ? controller.energyHandlerAt(pos, side) : null;
+        }, oilfieldParts);
+        event.registerBlock(HEAT, (level, pos, state, blockEntity, side) -> {
+            var controller = net.zagdrath.arcforge.multiblock.OilfieldStructures.findController(level, pos);
+            return controller != null ? controller.heatHandlerAt(pos, side) : null;
         }, oilfieldParts);
         // The Greenhouse Array: fertilizer and fluids in, the harvest out, FE and heat in, through the ports on its
         // frames.

@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PRP",
+    "TGT",
+    "PEP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "R": "#c:rods/steel",
+    "T": "arcforge:wrought_fluid_tank",
+    "G": "#c:gears/steel",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:lubricant_blender",
+    "count": 1
+  }
+}

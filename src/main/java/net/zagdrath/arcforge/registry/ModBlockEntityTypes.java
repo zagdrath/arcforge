@@ -191,6 +191,28 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity>> PUMPJACK =
             BLOCK_ENTITY_TYPES.register("pumpjack", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity::new, ModBlocks.PUMPJACK_CONTROLLER.get()));
+    // The refinery's downstream units, the Diesel Generator and the Flare Stack.
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity>> CATALYTIC_REFORMER =
+            BLOCK_ENTITY_TYPES.register("catalytic_reformer", () -> new BlockEntityType<>((pos, state) ->
+                    new net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity(net.zagdrath.arcforge.recipe.RefiningProcess.REFORMING, pos, state),
+                    ModBlocks.CATALYTIC_REFORMER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity>> COKER =
+            BLOCK_ENTITY_TYPES.register("coker", () -> new BlockEntityType<>((pos, state) ->
+                    new net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity(net.zagdrath.arcforge.recipe.RefiningProcess.COKING, pos, state),
+                    ModBlocks.COKER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity>> LUBRICANT_BLENDER =
+            BLOCK_ENTITY_TYPES.register("lubricant_blender", () -> new BlockEntityType<>((pos, state) ->
+                    new net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity(net.zagdrath.arcforge.recipe.RefiningProcess.BLENDING, pos, state),
+                    ModBlocks.LUBRICANT_BLENDER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity>> CRACKING_UNIT =
+            BLOCK_ENTITY_TYPES.register("cracking_unit", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity::new, ModBlocks.CRACKING_UNIT_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity>> DIESEL_GENERATOR =
+            BLOCK_ENTITY_TYPES.register("diesel_generator", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity::new, ModBlocks.DIESEL_GENERATOR_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity>> FLARE_STACK =
+            BLOCK_ENTITY_TYPES.register("flare_stack", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity::new, ModBlocks.FLARE_STACK.get()));
 
     // Automated farms.
     public static final Supplier<BlockEntityType<GlassClocheBlockEntity>> GLASS_CLOCHE = BLOCK_ENTITY_TYPES.register("glass_cloche",

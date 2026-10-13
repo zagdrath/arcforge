@@ -1,0 +1,15 @@
+{
+  "title": "Catalytic Reformer",
+  "icon": "arcforge:catalytic_reformer",
+  "items": [
+    "arcforge:catalytic_reformer",
+    "arcforge:gasoline_bucket",
+    "arcforge:naphtha_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Reforms Naphtha into Gasoline, giving off Hydrogen.\n- 100 mB Naphtha makes 85 mB Gasoline and 60 mB Hydrogen in 2 seconds, using 20 HU/t at 450°C or hotter.\n- Naphtha in the top, heat into the bottom (a Fuel Burner or a Firebox works), Gasoline out of the left and Hydrogen out of the right. It pushes both out on its own.\n- Speed Upgrades make it faster, drawing heat that much faster.\nThe Hydrogen is worth keeping: it makes Plastic, Hydrochloric Acid and Ammonia, or burns."
+    }
+  ]
+}

@@ -68,7 +68,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 import net.zagdrath.arcforge.heat.FlueGas;
-import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
@@ -193,8 +193,9 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
         return CombustionFuel.isFuel(stack) || isCoke(stack);
     }
 
+    // Coal Coke and anything else tagged c:coal_coke (Petroleum Coke), and their blocks.
     private static boolean isCoke(ItemStack stack) {
-        return stack.is(ModItems.COAL_COKE.get()) || stack.is(ModItems.COAL_COKE_BLOCK.get());
+        return stack.is(ModItemTags.COAL_COKE) || stack.is(ModItemTags.COAL_COKE_BLOCKS);
     }
 
     // A client-side copy of the slots, for the menu.
@@ -246,7 +247,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
     // (its block, a coal block's).
     public static double solidHeat(ServerLevel level, net.minecraft.world.level.block.entity.BlockEntity machine, ItemStack stack) {
         if (isCoke(stack)) {
-            ItemStack coal = new ItemStack(stack.is(ModItems.COAL_COKE_BLOCK.get()) ? Items.COAL_BLOCK : Items.COAL);
+            ItemStack coal = new ItemStack(stack.is(ModItemTags.COAL_COKE_BLOCKS) ? Items.COAL_BLOCK : Items.COAL);
             return ArcforgeConfig.FIREBOX_ARRAY_COKE_HEAT.getAsDouble() * fireboxHeat(CombustionFuel.vanillaBurnTicks(level, machine, coal));
         }
         return fireboxHeat(CombustionFuel.vanillaBurnTicks(level, machine, stack));

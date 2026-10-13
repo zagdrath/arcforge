@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/lubricant_blender_front",
+    "south": "arcforge:block/lubricant_blender_back",
+    "east": "arcforge:block/lubricant_blender_left",
+    "west": "arcforge:block/lubricant_blender_right",
+    "up": "arcforge:block/lubricant_blender_top",
+    "down": "arcforge:block/lubricant_blender_bottom",
+    "particle": "arcforge:block/lubricant_blender_back"
+  }
+}

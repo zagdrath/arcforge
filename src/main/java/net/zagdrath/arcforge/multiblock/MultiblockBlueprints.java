@@ -75,6 +75,9 @@ public final class MultiblockBlueprints {
                 refinery(),
                 oilDerrick(),
                 pumpjack(),
+                plant("cracking_unit", PlantKind.CRACKING_UNIT, ModBlocks.CRACKING_UNIT_CASING.get(), ModBlocks.CRACKING_UNIT_CONTROLLER.get()),
+                plant("diesel_generator", PlantKind.DIESEL_GENERATOR, ModBlocks.DIESEL_GENERATOR_CASING.get(),
+                        ModBlocks.DIESEL_GENERATOR_CONTROLLER.get()),
                 solarThermalArray(),
                 biogasDigester(),
                 greenhouse(),
@@ -323,6 +326,20 @@ public final class MultiblockBlueprints {
         }
         return new Blueprint("pumpjack", placements,
                 new BlockPos(OilfieldStructures.UNIT_WIDTH, OilfieldStructures.UNIT_HEIGHT, OilfieldStructures.UNIT_LENGTH));
+    }
+
+    // A fixed box plant (the Cracking Unit or the Diesel Generator): casings, the controller in the middle of the
+    // bottom row at the south end, facing south.
+    private static Blueprint plant(String id, PlantKind kind, Block casing, Block controller) {
+        BlockState controllerState = controller.defaultBlockState()
+                .setValue(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.FACING, Direction.SOUTH);
+        OilfieldStructures.PlantBox probe = OilfieldStructures.PlantBox.of(kind, BlockPos.ZERO, Direction.NORTH);
+        OilfieldStructures.PlantBox box = OilfieldStructures.PlantBox.of(kind, new BlockPos(probe.width() / 2, 0, probe.length() - 1), Direction.NORTH);
+        List<Placement> placements = new ArrayList<>();
+        for (BlockPos pos : box.parts()) {
+            placements.add(new Placement(pos, pos.equals(box.controller()) ? controllerState : casing.defaultBlockState()));
+        }
+        return new Blueprint(id, placements, new BlockPos(box.width(), box.height(), box.length()));
     }
 
     // 3x3 (up to 7x7 work), 4 tall (3 to 16 work), with a window up the front.

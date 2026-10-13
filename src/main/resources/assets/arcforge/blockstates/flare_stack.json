@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "lit=false": {
+      "model": "arcforge:block/flare_stack"
+    },
+    "lit=true": {
+      "model": "arcforge:block/flare_stack"
+    }
+  }
+}

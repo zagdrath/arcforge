@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/flare_stack/side",
+    "south": "arcforge:block/flare_stack/side",
+    "east": "arcforge:block/flare_stack/side",
+    "west": "arcforge:block/flare_stack/side",
+    "up": "arcforge:block/flare_stack/top",
+    "down": "arcforge:block/flare_stack/bottom",
+    "particle": "arcforge:block/flare_stack/side"
+  }
+}

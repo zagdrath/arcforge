@@ -1,0 +1,19 @@
+{
+  "title": "Refinery Fuels",
+  "icon": "arcforge:gasoline_bucket",
+  "items": [
+    "arcforge:gasoline_bucket",
+    "arcforge:diesel_bucket",
+    "arcforge:kerosene_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The refinery's fuels burn in the Fuel Burner, the Firebox Array and the Gas Turbine Array:\n| Fuel | HU/mB | Burns at |\n| Gasoline | 450 | 1,250°C |\n| Diesel | 420 | 1,150°C |\n| Kerosene | 380 | 1,150°C |\n| Refinery Gas (a gas) | 300 | 1,200°C |\nAll four burn 0.5 mB/t in the Fuel Burner. Their values are in config (power.burners.refineryFuels)."
+    },
+    {
+      "type": "text",
+      "text": "# Diesel Generator\nThe Diesel Generator burns Diesel, Gasoline, Biodiesel or Refinery Gas straight to FE (see Diesel Generator).\n# Jetpack\nKerosene fuels the Jetpack: 0.18 thrust for 2 mB/t, a long burn. Click a Kerosene Canister or bucket onto it in your inventory.\n# Where they come from\n- Gasoline: the Catalytic Reformer, from Naphtha.\n- Diesel: the Distillation Array and the Cracking Unit.\n- Kerosene: the Distillation Array, 10 or more tall.\n- Refinery Gas: the Distillation Array, the Cracking Unit and the Coker."
+    }
+  ]
+}

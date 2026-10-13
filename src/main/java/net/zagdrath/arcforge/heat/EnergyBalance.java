@@ -64,7 +64,7 @@ public final class EnergyBalance {
     public static double steamFePerHu(SteamGrade boiled, SteamGrade made) {
         double hu = boiled.huPerMb() * SteamBoilerArrayBlockEntity.bestHeatCostMultiplier()
                 + (made.huPerMb() - boiled.huPerMb()) * ArcforgeConfig.SUPERHEATER_HEAT_COST.getAsDouble();
-        double fe = made.arrayFePerMb() * (1.0 + ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble()
+        double fe = made.arrayFePerMb() * (net.zagdrath.arcforge.steam.Lubricant.best()
                 + ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble()) * PowerGeneration.multiplier();
         return fe / hu;
     }
@@ -74,14 +74,18 @@ public final class EnergyBalance {
         return UpgradeType.outputMultiplier(UpgradeType.MAX_PER_MACHINE);
     }
 
-    // The most FE a mB of this fluid can give back when burnt, or 0 if it isn't a fuel: through a fully upgraded
-    // burner and the best heat route, or through a lubricated Gas Turbine Array with its exhaust raising steam.
+    // The most FE a mB of this fluid can give back when burnt, or 0 if it isn't a fuel: through a fully upgraded burner
+    // and the best heat route, through a Gas Turbine Array on the best lubricant with its exhaust raising steam, or
+// through the Diesel Generator.
     public static double recoverableFePerMb(Fluid fluid) {
+        // The Diesel Generator burns its fuels (arcforge:engine_fuels) straight to FE.
+        net.zagdrath.arcforge.machine.EngineFuel engine = net.zagdrath.arcforge.machine.EngineFuel.of(fluid);
+        double generator = engine != null ? engine.fePerMb() * PowerGeneration.multiplier() : 0.0;
         BurnerFuel fuel = BurnerFuel.of(fluid);
         if (fuel == null) {
-            return 0.0;
+            return generator;
         }
-        double burner = fuel.huPerMb() * maxHeatMultiplier() * bestFePerHu();
+        double burner = Math.max(generator, fuel.huPerMb() * maxHeatMultiplier() * bestFePerHu());
         if (!fuel.gasTurbine()) {
             return burner;
         }
@@ -89,11 +93,11 @@ public final class EnergyBalance {
         return Math.max(burner, fuel.huPerMb() * gasTurbineFePerHu(celsius));
     }
 
-    // FE per HU of fuel a lubricated Gas Turbine Array makes burning at this temperature, counting its exhaust
-    // heat turned into FE by the best steam route (the combined cycle).
+    // FE per HU of fuel a Gas Turbine Array on the best lubricant makes burning at this temperature, counting its
+    // exhaust heat turned into FE by the best steam route (the combined cycle).
     public static double gasTurbineFePerHu(int celsius) {
         double efficiency = Math.min(1.0, celsius / (double) ArcforgeConfig.GAS_TURBINE_REFERENCE_TEMPERATURE.getAsInt());
-        return ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * efficiency * (1.0 + ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble())
+        return ArcforgeConfig.GAS_TURBINE_SIMPLE_CYCLE_FACTOR.getAsDouble() * efficiency * net.zagdrath.arcforge.steam.Lubricant.best()
                 * PowerGeneration.multiplier() + ArcforgeConfig.GAS_TURBINE_EXHAUST_FRACTION.getAsDouble() * bestSteamFePerHu();
     }
 

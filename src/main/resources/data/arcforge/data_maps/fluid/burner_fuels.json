@@ -54,14 +54,19 @@
       "burn_temperature": 1150
     },
     "arcforge:diesel": {
-      "hu_per_mb": 350,
+      "hu_per_mb": 420,
       "mb_per_tick": 0.5,
-      "burn_temperature": 1050
+      "burn_temperature": 1150
     },
     "arcforge:refinery_gas": {
-      "hu_per_mb": 55,
-      "mb_per_tick": 1.0,
-      "burn_temperature": 1150
+      "hu_per_mb": 300,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1200
+    },
+    "arcforge:gasoline": {
+      "hu_per_mb": 450,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1250
     }
   }
 }

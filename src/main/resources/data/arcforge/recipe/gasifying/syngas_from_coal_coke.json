@@ -1,6 +1,6 @@
 {
   "type": "arcforge:gasifying",
-  "ingredient": "arcforge:coal_coke",
+  "ingredient": "#c:coal_coke",
   "result": {
     "id": "arcforge:syngas",
     "amount": 1500

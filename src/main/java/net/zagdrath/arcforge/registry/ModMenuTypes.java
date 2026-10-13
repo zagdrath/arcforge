@@ -155,6 +155,23 @@ public final class ModMenuTypes {
             MENU_TYPES.register("oil_derrick", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.OilDerrickMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.PumpjackMenu>> PUMPJACK =
             MENU_TYPES.register("pumpjack", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.PumpjackMenu::new));
+    // The refinery's downstream units: one menu class, one type each.
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> CRACKING_UNIT = refining("cracking_unit",
+            net.zagdrath.arcforge.recipe.RefiningProcess.CRACKING);
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> CATALYTIC_REFORMER = refining("catalytic_reformer",
+            net.zagdrath.arcforge.recipe.RefiningProcess.REFORMING);
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> COKER = refining("coker",
+            net.zagdrath.arcforge.recipe.RefiningProcess.COKING);
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> LUBRICANT_BLENDER = refining("lubricant_blender",
+            net.zagdrath.arcforge.recipe.RefiningProcess.BLENDING);
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.DieselGeneratorMenu>> DIESEL_GENERATOR =
+            MENU_TYPES.register("diesel_generator", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.DieselGeneratorMenu::new));
+
+    private static Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> refining(String name,
+            net.zagdrath.arcforge.recipe.RefiningProcess process) {
+        return MENU_TYPES.register(name, () -> IMenuTypeExtension.create((containerId, inventory, extraData) ->
+                new net.zagdrath.arcforge.menu.machine.RefiningMenu(process, containerId, inventory, extraData)));
+    }
 
     // Automated farms: one menu class, one type each.
     public static final Supplier<MenuType<ClocheMenu>> GLASS_CLOCHE = MENU_TYPES.register("glass_cloche",

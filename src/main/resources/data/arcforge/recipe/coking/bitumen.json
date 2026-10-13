@@ -1,0 +1,20 @@
+{
+  "type": "arcforge:coking",
+  "input": {
+    "fluid": "arcforge:bitumen",
+    "amount": 250
+  },
+  "fluids": [
+    {
+      "id": "arcforge:refinery_gas",
+      "amount": 50
+    }
+  ],
+  "item": {
+    "id": "arcforge:petroleum_coke",
+    "count": 1
+  },
+  "time": 60,
+  "heat_per_tick": 25,
+  "min_temp": 420
+}

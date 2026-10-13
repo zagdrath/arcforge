@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Burners can give off their Carbon Dioxide instead of losing it. Set a face of a Combustion Plant, Firebox or Fuel Burner to Flue Gas (on a Firebox Array or Gas Turbine Array, a Gas Output port): while it burns a carbon fuel, Carbon Dioxide comes out of it.\n- About 4 mB for every 1,000 HU of heat (256 mB from a coal in a Firebox).\n- Carbon fuels: coal, charcoal, Bio-Coal, Coal Coke, Carbon Dust, the oils, Creosote, Ethanol, Biodiesel, Biogas and Syngas. Hydrogen gives none.\n- What isn't taken away is vented; without a Flue Gas face the burner works as before."
+      "text": "Burners can give off their Carbon Dioxide instead of losing it. Set a face of a Combustion Plant, Firebox or Fuel Burner to Flue Gas (on a Firebox Array or Gas Turbine Array, a Gas Output port): while it burns a carbon fuel, Carbon Dioxide comes out of it.\n- About 4 mB for every 1,000 HU of heat (256 mB from a coal in a Firebox).\n- Carbon fuels: coal, charcoal, Bio-Coal, Coal Coke, Petroleum Coke, Carbon Dust, the oils and refinery fuels, Creosote, Ethanol, Biodiesel, Biogas and Syngas. Hydrogen gives none.\n- What isn't taken away is vented; without a Flue Gas face the burner works as before."
     },
     {
       "type": "text",

@@ -254,11 +254,13 @@ public final class BigArrayGameTests {
     }
 
     // Every generator's FE goes through PowerGeneration: the turbines' caps are their best output times the multiplier,
-    // and the energy balance counts it, so the steam route stays 66.08 FE per 9.29 HU (the best boiler's Steam, superheated)
+    // and the energy balance counts it, so the steam route stays 68.32 FE per 9.29 HU (the best boiler's Steam, superheated)
     // times the multiplier.
     static void powerMultiplier(GameTestHelper helper) {
         double multiplier = PowerGeneration.multiplier();
-        double lubricant = ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble(), vacuum = ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble();
+        // The caps assume the best lubricant (Lubricant's bonus).
+        double lubricant = Math.max(ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble(), ArcforgeConfig.LUBRICANT_PREMIUM_BONUS.getAsDouble()),
+                vacuum = ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble();
         int flow = ArcforgeConfig.TURBINE_ARRAY_FLOW_PER_SECTION.getAsInt() * 3;
         helper.assertTrue(SteamTurbineArrayBlockEntity.maxOutput(3.0) == PowerGeneration.cap(flow * SteamGrade.SUPERHEATED.arrayFePerMb() * (1.0 + lubricant + vacuum)),
                 "The Steam Turbine Array's cap is " + SteamTurbineArrayBlockEntity.maxOutput(3.0));

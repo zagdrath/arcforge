@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/coker_front",
+    "south": "arcforge:block/coker_back",
+    "east": "arcforge:block/coker_left",
+    "west": "arcforge:block/coker_right",
+    "up": "arcforge:block/coker_top",
+    "down": "arcforge:block/coker_bottom",
+    "particle": "arcforge:block/coker_back"
+  }
+}

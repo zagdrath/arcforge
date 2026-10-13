@@ -1,0 +1,20 @@
+{
+  "type": "arcforge:reforming",
+  "input": {
+    "fluid": "arcforge:naphtha",
+    "amount": 100
+  },
+  "fluids": [
+    {
+      "id": "arcforge:gasoline",
+      "amount": 85
+    },
+    {
+      "id": "arcforge:hydrogen",
+      "amount": 60
+    }
+  ],
+  "time": 40,
+  "heat_per_tick": 20,
+  "min_temp": 450
+}

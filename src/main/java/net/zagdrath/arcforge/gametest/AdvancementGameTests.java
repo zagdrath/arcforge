@@ -48,7 +48,9 @@ public final class AdvancementGameTests {
             "farming/greenhouse", "farming/greenhouse_night_shift", "farming/greenhouse_fully_fed", "farming/soybeans", "farming/crop_rotation", "processing/rock_salt",
             "farming/rubber_dandelion", "farming/resin_tap", "farming/raw_rubber", "chemistry/rubber", "chemistry/ethylene", "chemistry/pvc",
             "logistics/reservoir", "logistics/liquid_experience", "logistics/quantum_tunnel", "logistics/chunk_loader",
-            "processing/iolite", "logistics/wired_machine_link");
+            "processing/iolite", "logistics/wired_machine_link",
+            "chemistry/cracking", "chemistry/gasoline", "chemistry/lubricant", "chemistry/petroleum_coke", "chemistry/flare_stack",
+            "chemistry/diesel_generator");
 
     @SuppressWarnings("removal")
     private static ServerPlayer player(GameTestHelper helper, BlockPos standRelative) {

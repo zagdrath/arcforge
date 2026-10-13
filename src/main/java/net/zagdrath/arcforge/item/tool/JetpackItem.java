@@ -18,15 +18,19 @@ import net.minecraft.world.entity.SlotAccess;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.EquipmentAsset;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
 import net.neoforged.neoforge.fluids.SimpleFluidContent;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.conduit.ConduitTier;
@@ -102,10 +106,25 @@ public class JetpackItem extends Item {
         return held.isEmpty() || held.getFluid() == fluid;
     }
 
-    // A Gas Cartridge clicked onto it pours in as much of an accepted gas as fits.
+    // A Gas Cartridge or Canister clicked onto it pours in as much of an accepted fuel as fits (Kerosene, a liquid,
+    // comes in a Canister); a bucket of one pours in whole if it fits, leaving an empty bucket.
     @Override
     public boolean overrideOtherStackedOnMe(ItemStack self, ItemStack other, Slot slot, ClickAction clickAction, Player player, SlotAccess carriedItem) {
-        if (!PortableStorageItem.is(other, PortableStorageItem.Kind.GAS_CARTRIDGE) || !slot.allowModification(player)) {
+        if (!slot.allowModification(player)) {
+            return false;
+        }
+        if (other.getItem() instanceof BucketItem bucket && other.getCount() == 1 && bucket.getContent() != Fluids.EMPTY) {
+            Fluid fuel = bucket.getContent();
+            FluidStack held = fluid(self);
+            if (!accepts(self, fuel) || capacity() - held.getAmount() < FluidType.BUCKET_VOLUME) {
+                return false;
+            }
+            setFluid(self, new FluidStack(fuel, held.getAmount() + FluidType.BUCKET_VOLUME));
+            carriedItem.set(new ItemStack(Items.BUCKET));
+            player.playSound(SoundEvents.BUCKET_EMPTY, 0.6F, 1.0F);
+            return true;
+        }
+        if (!PortableStorageItem.is(other, PortableStorageItem.Kind.GAS_CARTRIDGE) && !PortableStorageItem.is(other, PortableStorageItem.Kind.CANISTER)) {
             return false;
         }
         FluidStack gas = PortableStorageItem.fluid(other);

@@ -456,6 +456,16 @@ public final class ArcforgeGameTests {
         OIL_TESTS.put("oil_derrick_strikes_oil", OilGameTests::derrickStrikesOil);
         OIL_TESTS.put("oil_pumpjack_pumps", OilGameTests::pumpjackPumps);
         TESTS.put("oil_crude_oil_fluids", OilGameTests::crudeOilFluids);
+        TESTS.put("refinery_recipes_present", RefineryGameTests::recipesPresent);
+        TESTS.put("refinery_reformer_reforms", RefineryGameTests::reformerReforms);
+        TESTS.put("refinery_coker_cokes", RefineryGameTests::cokerCokes);
+        TESTS.put("refinery_blender_blends", RefineryGameTests::blenderBlends);
+        TESTS.put("refinery_cracking_unit_cracks", RefineryGameTests::crackingUnitCracks);
+        TESTS.put("refinery_diesel_generator_generates", RefineryGameTests::dieselGeneratorGenerates);
+        TESTS.put("refinery_flare_stack_burns", RefineryGameTests::flareStackBurns);
+        TESTS.put("refinery_fuels_and_lubricant", RefineryGameTests::fuelsAndLubricant);
+        TESTS.put("refinery_coke_and_kerosene", RefineryGameTests::cokeAndKerosene);
+        TESTS.put("refinery_asphalt_from_bitumen", RefineryGameTests::asphaltFromBitumen);
         TESTS.put("portable_capsule_heat_flows_hot_to_cold", AlloyGameTests::capsuleHeatFlowsHotToCold);
         TESTS.put("steam_copper_parts_and_upgrades", SteamGameTests::copperPartsAndUpgrades);
         TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);

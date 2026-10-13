@@ -142,12 +142,12 @@ public final class ElectrolysisGameTests {
                 .thenSucceed();
     }
 
-    // One operation (100 mB of water) uses exactly its cost: the balance floor of 303,789 FE (its 200 mB of hydrogen can
-    // give back 243,031 FE through the biggest Steam Boiler Array into a Steam Turbine Array, times the 1.25 safety
+    // One operation (100 mB of water) uses exactly its cost: the balance floor of 314,087 FE (its 200 mB of hydrogen can
+    // give back 251,269 FE through the biggest Steam Boiler Array into a Steam Turbine Array, times the 1.25 safety
     // factor), which is above the recipe's 120,000, so Energy upgrades can't take it lower.
     static void energyExact(GameTestHelper helper) {
         int[] energyUpgrades = { 0, 1, 8 };
-        int[] expected = { 303_789, 303_789, 303_789 };
+        int[] expected = { 314_087, 314_087, 314_087 };
         List<ElectrolyzerBlockEntity> machines = new ArrayList<>();
         List<Meter> meters = new ArrayList<>();
         for (int i = 0; i < energyUpgrades.length; i++) {
@@ -161,7 +161,7 @@ public final class ElectrolysisGameTests {
             meters.add(new Meter(machine));
         }
         ElectrolyzingRecipe recipe = waterRecipe(helper);
-        helper.assertTrue(EnergyBalance.minEnergyFor(recipe) == 303_789, "The floor is " + EnergyBalance.minEnergyFor(recipe) + " FE, not 303,789");
+        helper.assertTrue(EnergyBalance.minEnergyFor(recipe) == 314_087, "The floor is " + EnergyBalance.minEnergyFor(recipe) + " FE, not 314,087");
         helper.onEachTick(() -> meters.forEach(Meter::topUp));
         helper.startSequence()
                 .thenWaitUntil(() -> machines.forEach(machine -> helper.assertTrue(machine.getOxygen().getAmount() == 100, "Not split yet")))
@@ -182,7 +182,7 @@ public final class ElectrolysisGameTests {
     // Gas Turbine Array route is counted too). If this fails after adding a route, add that route to
     // EnergyBalance.bestFePerHu().
     static void hydrogenNetNegative(GameTestHelper helper) {
-        double lubricant = ArcforgeConfig.LUBRICANT_OUTPUT_BONUS.getAsDouble();
+        double lubricant = net.zagdrath.arcforge.steam.Lubricant.best() - 1.0;
         double vacuum = ArcforgeConfig.TURBINE_ARRAY_VACUUM_BONUS.getAsDouble();
         double boilerCost = SteamBoilerArrayBlockEntity.bestHeatCostMultiplier();
         double superheaterCost = ArcforgeConfig.SUPERHEATER_HEAT_COST.getAsDouble();
@@ -203,16 +203,16 @@ public final class ElectrolysisGameTests {
             helper.assertTrue(best >= route - 1e-9, "A route gives " + route + " FE/HU, more than bestFePerHu() " + best);
         }
         // The biggest boiler (7x7x16) at the top of Superheated's band boils it for 6.53 HU/mB (20 x 0.8 x 29.04^-0.2,
-        // less 20%), into 66.08 FE: 10.13 FE per HU.
-        helper.assertTrue(Math.abs(best - 10.1263) < 0.001, "bestFePerHu() is " + best + ", not 10.1263");
+        // less 20%), into 68.32 FE on Lubricant: 10.47 FE per HU.
+        helper.assertTrue(Math.abs(best - 10.4696) < 0.001, "bestFePerHu() is " + best + ", not 10.4696");
         helper.assertTrue(Math.abs(EnergyBalance.thermoelectricFePerHu() - 1.725) < 0.001, "Thermoelectric route is " + EnergyBalance.thermoelectricFePerHu());
         double hydrogen = EnergyBalance.recoverableFePerMb(ModFluids.HYDROGEN.get());
         helper.assertTrue(Math.abs(hydrogen - 60 * 2.0 * best) < 1e-6, "Hydrogen gives back " + hydrogen + " FE/mB");
-        // The Gas Turbine Array burns it straight to FE (1.5 x 1.08 lubricated, plus a quarter of the heat as
-        // exhaust raising steam: 4.13 FE per HU), under the upgraded burner route (20.11), so the floor stays the
+        // The Gas Turbine Array burns it straight to FE (1.5 x 1.12 on Lubricant, plus a quarter of the heat as
+        // exhaust raising steam: 4.30 FE per HU), under the upgraded burner route (20.79), so the floor stays the
         // burner's. recoverableFePerMb takes the larger of the two if the turbine is ever tuned past it.
         double turbine = 60 * EnergyBalance.gasTurbineFePerHu(1_400);
-        helper.assertTrue(Math.abs(turbine / 60 - (1.5 * 1.08 + 0.25 * best)) < 1e-6, "The Gas Turbine route is " + turbine / 60 + " FE/HU");
+        helper.assertTrue(Math.abs(turbine / 60 - (1.5 * 1.12 + 0.25 * best)) < 1e-6, "The Gas Turbine route is " + turbine / 60 + " FE/HU");
         helper.assertTrue(hydrogen >= turbine, "Hydrogen gives back " + hydrogen + " FE/mB, less than the Gas Turbine's " + turbine);
         helper.assertTrue(EnergyBalance.recoverableFePerMb(ModFluids.OXYGEN.get()) == 0.0, "Oxygen burns");
 

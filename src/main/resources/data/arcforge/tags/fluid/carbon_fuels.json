@@ -10,6 +10,7 @@
     "arcforge:syngas",
     "arcforge:kerosene",
     "arcforge:diesel",
-    "arcforge:refinery_gas"
+    "arcforge:refinery_gas",
+    "arcforge:gasoline"
   ]
 }

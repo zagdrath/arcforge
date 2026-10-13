@@ -233,6 +233,11 @@ public final class ModItems {
     public static final DeferredItem<Item> STEEL_INGOT = ITEMS.registerSimpleItem("steel_ingot");
     public static final DeferredItem<BlockItem> STEEL_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.STEEL_BLOCK);
     public static final DeferredItem<Item> COAL_COKE = ITEMS.registerSimpleItem("coal_coke", p -> p.cookingFuel(COAL_COKE_BURN_TIME));
+    // The Coker's Petroleum Coke: tagged c:coal_coke, so it is Coal Coke everywhere (Arcforge Furnace fuel and reagent,
+    // Graphite, the Gasifier, the Firebox Array), and burns as long.
+    public static final DeferredItem<Item> PETROLEUM_COKE = ITEMS.registerSimpleItem("petroleum_coke", p -> p.cookingFuel(COAL_COKE_BURN_TIME));
+    // The Cracking Unit's catalyst: zeolite pellets, worn away slowly (see the cracking recipes' catalyst_uses).
+    public static final DeferredItem<Item> CRACKING_CATALYST = ITEMS.registerSimpleItem("cracking_catalyst");
     public static final DeferredItem<BlockItem> COAL_COKE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.COAL_COKE_BLOCK,
             p -> p.cookingFuel(COAL_COKE_BLOCK_BURN_TIME));
     public static final DeferredItem<Item> SLAG = ITEMS.registerSimpleItem("slag");
@@ -312,6 +317,10 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.CRUDE_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> KEROSENE_BUCKET = ITEMS.registerItem("kerosene_bucket",
             p -> new BucketItem(ModFluids.KEROSENE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> GASOLINE_BUCKET = ITEMS.registerItem("gasoline_bucket",
+            p -> new BucketItem(ModFluids.GASOLINE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> LUBRICANT_BUCKET = ITEMS.registerItem("lubricant_bucket",
+            p -> new BucketItem(ModFluids.LUBRICANT.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> DIESEL_BUCKET = ITEMS.registerItem("diesel_bucket",
             p -> new BucketItem(ModFluids.DIESEL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> BITUMEN_BUCKET = ITEMS.registerItem("bitumen_bucket",
@@ -346,6 +355,15 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> WELL_HEAD = ITEMS.registerSimpleBlockItem(ModBlocks.WELL_HEAD);
     public static final DeferredItem<BlockItem> PUMPJACK_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.PUMPJACK_CASING);
     public static final DeferredItem<BlockItem> PUMPJACK_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.PUMPJACK_CONTROLLER);
+    // The refinery's downstream units.
+    public static final DeferredItem<BlockItem> CATALYTIC_REFORMER = ITEMS.registerSimpleBlockItem(ModBlocks.CATALYTIC_REFORMER);
+    public static final DeferredItem<BlockItem> COKER = ITEMS.registerSimpleBlockItem(ModBlocks.COKER);
+    public static final DeferredItem<BlockItem> LUBRICANT_BLENDER = ITEMS.registerSimpleBlockItem(ModBlocks.LUBRICANT_BLENDER);
+    public static final DeferredItem<BlockItem> CRACKING_UNIT_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CRACKING_UNIT_CASING);
+    public static final DeferredItem<BlockItem> CRACKING_UNIT_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.CRACKING_UNIT_CONTROLLER);
+    public static final DeferredItem<BlockItem> DIESEL_GENERATOR_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.DIESEL_GENERATOR_CASING);
+    public static final DeferredItem<BlockItem> DIESEL_GENERATOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.DIESEL_GENERATOR_CONTROLLER);
+    public static final DeferredItem<BlockItem> FLARE_STACK = ITEMS.registerSimpleBlockItem(ModBlocks.FLARE_STACK);
     public static final DeferredItem<Item> STEEL_PIPE = ITEMS.registerSimpleItem("steel_pipe");
     public static final DeferredItem<net.zagdrath.arcforge.item.tool.SeismicSurveyToolItem> SEISMIC_SURVEY_TOOL = ITEMS.registerItem(
             "seismic_survey_tool", net.zagdrath.arcforge.item.tool.SeismicSurveyToolItem::new, p -> p.stacksTo(1));

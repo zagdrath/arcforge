@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "KCK",
+    "PQP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:glass_blocks",
+    "K": "arcforge:thermocouple",
+    "C": "arcforge:cracking_unit_casing",
+    "Q": "minecraft:comparator"
+  },
+  "result": {
+    "id": "arcforge:cracking_unit_controller",
+    "count": 1
+  }
+}
