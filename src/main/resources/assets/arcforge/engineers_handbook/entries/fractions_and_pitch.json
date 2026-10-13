@@ -3,8 +3,11 @@
   "icon": "arcforge:pitch",
   "items": [
     "arcforge:naphtha_bucket",
+    "arcforge:kerosene_bucket",
     "arcforge:light_oil_bucket",
+    "arcforge:diesel_bucket",
     "arcforge:heavy_oil_bucket",
+    "arcforge:bitumen_bucket",
     "arcforge:pitch",
     "arcforge:carbon_fiber",
     "arcforge:asphalt"
@@ -12,7 +15,11 @@
   "pages": [
     {
       "type": "text",
-      "text": "- Naphtha: the hottest liquid Fuel Burner fuel (1,200°C), so it can boil Superheated Steam. Catches fire in the world.\n- Light Oil: burns at 1,000°C.\n- Heavy Oil: a long, cool burn (750°C), and a steam turbine lubricant.\n- Pitch: a long-burning furnace fuel. Spin it into Carbon Fiber in a Fiberizer (1,000°C); Carbon Fiber makes Arcforged Alloy.\n- Asphalt: 8 gravel around 1 pitch makes 8. You walk, run and ride about 30% faster on it, and on its slabs and stairs."
+      "text": "- Refinery Gas: the lightest cut of Crude Oil, a gas. Burns at 1,150°C in the Fuel Burner and the Gas Turbine Array.\n- Naphtha: the hottest liquid Fuel Burner fuel (1,200°C), so it can boil Superheated Steam. Catches fire in the world.\n- Kerosene: a clean, hot fuel (1,150°C). Catches fire in the world.\n- Light Oil: burns at 1,000°C.\n- Diesel: burns at 1,050°C. Catches fire in the world.\n- Heavy Oil: a long, cool burn (750°C), and a steam turbine lubricant.\n- Bitumen: the bottom of the barrel, thick as tar."
+    },
+    {
+      "type": "text",
+      "text": "- Pitch: a long-burning furnace fuel. Spin it into Carbon Fiber in a Fiberizer (1,000°C); Carbon Fiber makes Arcforged Alloy.\n- Asphalt: 8 gravel around 1 pitch makes 8. You walk, run and ride about 30% faster on it, and on its slabs and stairs."
     }
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/oilfield/derrick_frame"
+    },
+    "formed=true": {
+      "model": "arcforge:block/oilfield/derrick_frame"
+    }
+  }
+}

@@ -72,6 +72,9 @@ public final class MultiblockBlueprints {
                 steamTurbineArray(),
                 gasTurbineArray(),
                 distillationArray(),
+                refinery(),
+                oilDerrick(),
+                pumpjack(),
                 solarThermalArray(),
                 biogasDigester(),
                 greenhouse(),
@@ -196,8 +199,9 @@ public final class MultiblockBlueprints {
         return new Blueprint("biogas_digester", placements, new BlockPos(3, 3, 3));
     }
 
-    // The Thermal Evaporator Array: a 3x3x9 tower of casings round a hollow core, the controller in the middle of the bottom
-    // layer's front, and a Pressure Glass window up the middle of the front (any side's middle may be glass or casing).
+    // The Thermal Evaporator Array: a 3x3x9 tower of casings round a hollow core, the controller in the middle of the
+    // bottom layer's front, and a Pressure Glass window up the middle of the front (any side's middle may be glass or
+    // casing).
     private static Blueprint thermalEvaporator() {
         int width = ThermalEvaporatorStructure.WIDTH, height = ThermalEvaporatorStructure.HEIGHT;
         BlockState casing = ModBlocks.THERMAL_EVAPORATOR_CASING.get().defaultBlockState();
@@ -221,8 +225,9 @@ public final class MultiblockBlueprints {
         return new Blueprint("thermal_evaporator", placements, new BlockPos(width, height, width));
     }
 
-    // The smallest Greenhouse Array, 5x5 and 4 tall (up to 11x11 and 8 tall work): frame edges, glass walls and roof, the
-    // controller in the middle of the front wall, a 3x3 of Planting Beds in the floor and a Grow Lamp under the roof.
+    // The smallest Greenhouse Array, 5x5 and 4 tall (up to 11x11 and 8 tall work): frame edges, glass walls and roof,
+    // the controller in the middle of the front wall, a 3x3 of Planting Beds in the floor and a Grow Lamp under the
+    // roof.
     private static Blueprint greenhouse() {
         BlockState frame = ModBlocks.GREENHOUSE_FRAME.get().defaultBlockState();
         BlockState glass = ModBlocks.PRESSURE_GLASS.get().defaultBlockState();
@@ -270,6 +275,54 @@ public final class MultiblockBlueprints {
             }
         }
         return new Blueprint("distillation_array", placements, new BlockPos(2, 8, 2));
+    }
+
+    // A crude oil refinery: 3x3 and 10 tall (any height from 4 to 16 works, 2x2 too), all casings, the controller at
+    // the front of the second layer.
+    private static Blueprint refinery() {
+        BlockState casing = ModBlocks.DISTILLATION_ARRAY_CASING.get().defaultBlockState();
+        BlockState controller = ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get().defaultBlockState()
+                .setValue(DistillationArrayControllerBlock.FACING, Direction.SOUTH);
+        int height = 10;
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < height; y++) {
+            for (int z = 0; z < 3; z++) {
+                for (int x = 0; x < 3; x++) {
+                    placements.add(new Placement(new BlockPos(x, y, z), y == 1 && x == 1 && z == 2 ? controller : casing));
+                }
+            }
+        }
+        return new Blueprint("distillation_array_3x3", placements, new BlockPos(3, height, 3));
+    }
+
+    // The Oil Derrick: a floor of Derrick Casings round the open bore, the controller in the middle of the front
+    // (facing south), Derrick Frame legs on the corners and a 3x3 crown of them.
+    private static Blueprint oilDerrick() {
+        BlockState casing = ModBlocks.DERRICK_CASING.get().defaultBlockState();
+        BlockState frame = ModBlocks.DERRICK_FRAME.get().defaultBlockState();
+        BlockState controller = ModBlocks.OIL_DERRICK_CONTROLLER.get().defaultBlockState()
+                .setValue(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.FACING, Direction.SOUTH);
+        OilfieldStructures.Rig rig = new OilfieldStructures.Rig(BlockPos.ZERO, Direction.SOUTH);
+        List<Placement> placements = new ArrayList<>();
+        for (BlockPos pos : rig.parts()) {
+            placements.add(new Placement(pos, pos.equals(rig.controller()) ? controller : rig.isFrame(pos) ? frame : casing));
+        }
+        return new Blueprint("oil_derrick", placements, new BlockPos(OilfieldStructures.RIG_WIDTH, OilfieldStructures.RIG_HEIGHT, OilfieldStructures.RIG_WIDTH));
+    }
+
+    // The Pumpjack round its Well Head (at the north end), the controller at the south end facing south.
+    private static Blueprint pumpjack() {
+        BlockState casing = ModBlocks.PUMPJACK_CASING.get().defaultBlockState();
+        BlockState controller = ModBlocks.PUMPJACK_CONTROLLER.get().defaultBlockState()
+                .setValue(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.FACING, Direction.SOUTH);
+        OilfieldStructures.Unit unit = new OilfieldStructures.Unit(new BlockPos(1, 0, 0), Direction.SOUTH);
+        List<Placement> placements = new ArrayList<>();
+        placements.add(new Placement(unit.well(), ModBlocks.WELL_HEAD.get().defaultBlockState()));
+        for (BlockPos pos : unit.parts()) {
+            placements.add(new Placement(pos, pos.equals(unit.controller()) ? controller : casing));
+        }
+        return new Blueprint("pumpjack", placements,
+                new BlockPos(OilfieldStructures.UNIT_WIDTH, OilfieldStructures.UNIT_HEIGHT, OilfieldStructures.UNIT_LENGTH));
     }
 
     // 3x3 (up to 7x7 work), 4 tall (3 to 16 work), with a window up the front.
@@ -323,9 +376,9 @@ public final class MultiblockBlueprints {
         return new Blueprint("firebox_array", sorted(placements), size);
     }
 
-    // A Battery Array 4 wide, 3 tall and 4 deep (3 to 5 each way work): casings on the edges, the controller in the front
-    // face facing south, a window in the east face, and inside three Wrought Lithium Cells and a Wrought Power Regulator
-    // (any mix works).
+    // A Battery Array 4 wide, 3 tall and 4 deep (3 to 5 each way work): casings on the edges, the controller in the
+    // front face facing south, a window in the east face, and inside three Wrought Lithium Cells and a Wrought Power
+    // Regulator (any mix works).
     private static Blueprint batteryArray() {
         BlockPos size = new BlockPos(4, 3, 4);
         BlockState casing = ModBlocks.BATTERY_ARRAY_CASING.get().defaultBlockState();

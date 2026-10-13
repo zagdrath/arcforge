@@ -1,0 +1,24 @@
+{
+  "title": "Pumpjack",
+  "icon": "arcforge:pumpjack_controller",
+  "items": [
+    "arcforge:pumpjack_controller",
+    "arcforge:pumpjack_casing",
+    "arcforge:well_head",
+    "arcforge:crude_oil_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Pumps Crude Oil out of the deposit under a Well Head.\n# Building\nA skid of Pumpjack Casings 3 wide and 5 long round the Well Head, which is the middle of one end; the Pumpjack Controller in the middle of the other end, facing away from the well; and three more Pumpjack Casings stacked on the middle of the skid as the Samson post. Formed, it becomes a pumpjack: the walking beam nods on its post, the horse head working the well and the cranks turning at the far end."
+    },
+    {
+      "type": "text",
+      "text": "# Pumping\nIt pumps 30 mB/t from a full deposit using 60 FE/t, slowing as the deposit drains to a quarter of that, and rocks as fast as it pumps. A drained deposit still gives 40 mB a second.\n# Ports\nA new pumpjack has no ports: set them with the Wrench in Port mode.\n- Output: Crude Oil out (it pushes it out on its own).\n- Energy: FE in.\nIt also fills buckets put in its bucket slot."
+    },
+    {
+      "type": "multiblock",
+      "structure": "pumpjack"
+    }
+  ]
+}

@@ -184,6 +184,12 @@
     "arcforge:iolite_ore",
     "arcforge:iolite_block",
     "arcforge:wired_machine_link",
-    "arcforge:link_conduit"
+    "arcforge:link_conduit",
+    "arcforge:derrick_casing",
+    "arcforge:derrick_frame",
+    "arcforge:oil_derrick_controller",
+    "arcforge:pumpjack_casing",
+    "arcforge:pumpjack_controller",
+    "arcforge:well_head"
   ]
 }

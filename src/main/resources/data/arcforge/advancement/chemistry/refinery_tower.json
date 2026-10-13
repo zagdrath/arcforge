@@ -1,0 +1,32 @@
+{
+  "parent": "arcforge:chemistry/kerosene",
+  "display": {
+    "icon": {
+      "id": "arcforge:distillation_array_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.refinery_tower.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.refinery_tower.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:distillation_array",
+        "min_length": 16
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

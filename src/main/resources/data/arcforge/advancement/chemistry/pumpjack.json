@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/struck_oil",
+  "display": {
+    "icon": {
+      "id": "arcforge:pumpjack_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.pumpjack.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.pumpjack.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "formed": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:pumpjack"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "formed"
+    ]
+  ]
+}

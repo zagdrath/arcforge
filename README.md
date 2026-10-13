@@ -394,8 +394,8 @@ straight to FE.
 - **Intake and exhaust.** The end with air in front of its middle is the intake (the west or north end if
   both are open); the other is the exhaust. Block the intake and it shuts down. The intake's middle can't
   hold a port.
-- **Fuel.** Any `arcforge:burner_fuels` fuel not marked `"gas_turbine": false`: Naphtha, Light Oil, Ethanol
-  and Hydrogen (Heavy Oil and Creosote are refused). 32,000 mB of tank per block of length, one fuel at a time;
+- **Fuel.** Any `arcforge:burner_fuels` fuel not marked `"gas_turbine": false`: Naphtha, Light Oil, Kerosene,
+  Diesel, Ethanol, Hydrogen and Refinery Gas (Heavy Oil and Creosote are refused). 32,000 mB of tank per block of length, one fuel at a time;
   liquids through fluid conduits, Hydrogen through Pressurized Conduits.
 - **Output.** It burns up to 2,500 HU/t per block of length, at 1.5 FE per HU times the fuel's burn temperature
   over 1,200°C (at most 1). Its output cap is its full-throttle lubricated output, and its FE buffer 400 ticks of that:
@@ -465,35 +465,82 @@ with a long motor housing, a discharge header and a junction box low on its roof
   full-size Steam Boiler Array (~7,700 mB/t). Its Output ports push the water out on their own, as fast as it pumps.
 - A new one has two water-out ports and an energy port.
 
+### Crude oil
+
+```
+Seismic Survey Tool --> finds a deposit
+Oil Derrick (FE, Water, Steel Pipes) --> drills down to it --> Well Head
+Pumpjack on the Well Head (FE) --> Crude Oil --[Distillation Array]--> refinery products
+```
+
+**Oil deposits.** Deep underground, the world is split into regions (`world.oilDeposits.regionSize`, 8 chunks
+across), and each has a 30% chance of an oil deposit: a round patch of chunks between Y −48 and 8. A region whose
+middle is in a desert, ocean, badlands or plains biome (the tag `arcforge:oil_rich`) has a 65% chance, and its deposits
+run bigger. There are four kinds: Oil Seep (1,000–3,000 buckets), Oil Pocket (4,000–10,000), Oil Field
+(12,000–30,000) and Giant Oil Field (40,000–100,000). Giant Oil Fields are the rarest everywhere; elsewhere Oil Seeps
+are the most common, and in oil-rich regions Oil Pockets. Deposits follow from the world seed, so
+existing worlds have them too, and every well over a deposit draws from the same oil. A drained deposit never runs dry: each Pumpjack
+on it still gets a trickle (`multiblocks.pumpjack.tricklePerSecond`, 40 mB a second).
+
+**Seismic Survey Tool.** Use it on the ground: it tells you whether there's oil under the chunk, its kind, roughly how
+many buckets are left and its depth, or that it's drained.
+
+**Oil Derrick.** A 3×3 rig six blocks tall over a deposit: a floor ring of eight blocks round an open bore (seven
+Derrick Casings and the Oil Derrick Controller, facing out), Derrick Frame legs four blocks tall on its corners, and a
+full 3×3 of Derrick Frames on top. The bore and the column above it must be open. With 120 FE/t, 10 mB/t of water and a
+Steel Pipe for every 4 blocks of hole, it drills a block every 2 seconds down to the deposit's depth. There it strikes
+oil: the rig comes down, a Well Head caps the hole, and the rig's blocks and spare pipes drop there. Broken and rebuilt
+over the same hole, it carries on where it was. Its ports take Input (water and Steel Pipes) and Energy.
+
+**Pumpjack.** A 3×5 skid of Pumpjack Casings round a Well Head (the middle of one end), three more casings stacked on
+the middle as its post, and the Pumpjack Controller in the middle of the far end. With 60 FE/t it pumps Crude Oil: 30
+mB/t from a full deposit, slowing in a straight line to a quarter of that as the deposit drains, then the trickle. It
+fills buckets, and its ports take Output (Crude Oil, pushed out on its own) and Energy. Formed, it's a beam pump whose
+walking beam nods on its post, slower as the pumping slows.
+
 ### Distillation
 
 ```
 creosote + heat (+ steam) --[Distillation Array]--> Naphtha, Light Oil, Heavy Oil, Pitch
+Crude Oil + heat (+ steam) --[Distillation Array, 6+ tall]--> Refinery Gas, Naphtha, Kerosene, Diesel, Heavy Oil, Bitumen
 pitch --[Fiberizer, 1,000°C]--> Carbon Fiber --> Arcforged Alloy
 8 gravel + 1 pitch --> 8 Asphalt
 ```
 
-**Distillation Array.** A solid 2x2 column exactly 4, 6 or 8 tall of Distillation Array Casings and Tray
+**Distillation Array.** A solid column 2x2 or 3x3 across and 4 to 16 tall of Distillation Array Casings and Tray
 Level Casings with one Distillation Array Controller (Hardened tier). The controller and the trays can't
-be in the top or bottom layer; the controller's display is the front. Speed Upgrades feed it 2^(n/2) times as
-fast (heat as fast, so a batch still takes 4,000 HU), and Heat Upgrades cut a batch's heat to 0.8^n. Formed, the column reads as one
-block, and its tray levels are glass: each shows its steel tray, the fraction pooled on it (as deep as its
-tank is full) and vapour rising while it runs. It distils
-1,000 mB batches of creosote with heat, at 4,000 HU a batch and only at 350°C or hotter:
+be in the top or bottom layer, and the controller needs a side on the outside (not the middle of a 3x3); its display is
+the front. Formed, it becomes a refinery tower: a round shell in flanged tray sections with a sight glass on each tray
+(showing the fraction pooled on it and vapour rising while it runs), platforms, a caged ladder, a draw-off pipe for each
+product, and a condenser bank whose fans turn while it runs over a reboiler whose burners glow with its heat.
 
-| Height | Per 1,000 mB of creosote | Feed | Heat |
-|---|---|---|---|
-| 4 | 250 Naphtha, 2 Pitch | 10 mB/t | 40 HU/t |
-| 6 | 250 Naphtha, 450 Heavy Oil, 1 Pitch | 15 mB/t | 60 HU/t |
-| 8 | 250 Naphtha, 300 Light Oil, 300 Heavy Oil, 1 Pitch | 20 mB/t | 80 HU/t |
+Its feed rate and heat buffer scale with its cross-section (a 3x3 ×2.25) and height (per 4 blocks): 10 mB/t and
+40,000 HU (up to 1,400°C) for a 2x2 4 tall, 20 mB/t for a 2x2x8, 90 mB/t for a 3x3x16. Its heat use scales the same way,
+since each batch takes the same heat. Its tanks hold 16,000 mB of feed, 8,000 mB of steam and 8,000 mB of each product
+at 2x2x8, scaled by its volume. Speed Upgrades feed it 2^(n/2) times as fast (heat as fast, so a batch's heat doesn't
+change), and Heat Upgrades cut a batch's heat to 0.8^n. It distils 1,000 mB batches, and what it makes depends on its
+height. Creosote takes 4,000 HU a batch at 350°C or hotter:
 
-It holds 40,000 HU per 4 blocks of height (up to 1,400°C), 16,000 mB of creosote, 8,000 mB of steam and
-8,000 mB of each product, and stops when a product it makes is full. **Steam stripping:** steam in its
-steam tank raises each batch's Naphtha by the grade (Steam +15%, High-Pressure +30%, Superheated +50%), out
-of the Heavy Oil (a straight bonus at 4 high), using 100 mB a batch. Its ports take the modes Input
-(creosote), Steam, Heat, Naphtha, Light Oil, Heavy Oil and Pitch, with auto-eject; a new column has heat
-underneath, feed on the left, Naphtha on top, Heavy Oil on the right and Pitch at the back. Recipes are data-driven
-(`arcforge:distilling`: `input`, `heat`, `min_temp`, `by_height`, `item_output`, `steam_stripping`).
+| Height | Per 1,000 mB of creosote |
+|---|---|
+| 4–5 | 250 Naphtha, 2 Pitch |
+| 6–7 | 250 Naphtha, 450 Heavy Oil, 1 Pitch |
+| 8–16 | 250 Naphtha, 300 Light Oil, 300 Heavy Oil, 1 Pitch |
+
+Crude Oil takes 5,000 HU a batch at 380°C or hotter, and a column under 6 tall can't distil it (it makes no Pitch):
+
+| Height | Refinery Gas | Naphtha | Kerosene | Diesel | Heavy Oil | Bitumen |
+|---|---|---|---|---|---|---|
+| 6–9 | 100 | 200 | – | 350 | – | 250 |
+| 10–13 | 100 | 200 | 150 | 250 | 150 | 100 |
+| 14–16 | 130 | 270 | 190 | 230 | 90 | 60 |
+
+It stops when a product it makes is full. **Steam stripping:** steam in its steam tank raises each batch's Naphtha by
+the grade (Steam +15%, High-Pressure +30%, Superheated +50%), out of the Heavy Oil on creosote (a straight bonus at 4
+high) and out of the Bitumen on Crude Oil, using 100 mB a batch. Its ports take the modes Input (creosote or Crude
+Oil), Steam, Heat, Refinery Gas, Naphtha, Kerosene, Light Oil, Diesel, Heavy Oil, Bitumen and Pitch, with auto-eject; a
+new column has heat underneath, feed on the left, Naphtha on top, Heavy Oil on the right and Pitch at the back. Recipes
+are data-driven (`arcforge:distilling`: `input`, `heat`, `min_temp`, `by_height`, `item_output`, `steam_stripping`).
 
 **Fuel Burner.** Burns liquid fuels into heat, but never hotter than the fuel's burn temperature (the
 optional `burn_temperature` of the `arcforge:burner_fuels` data map; without it, the burner's 1,400°C):
@@ -504,11 +551,14 @@ optional `burn_temperature` of the `arcforge:burner_fuels` data map; without it,
 | Naphtha | 400 | 0.5 | 200 | 1,200°C |
 | Light Oil | 250 | 0.5 | 125 | 1,000°C |
 | Heavy Oil | 200 | 0.25 | 50 | 750°C |
+| Kerosene | 380 | 0.5 | 190 | 1,150°C |
+| Diesel | 350 | 0.5 | 175 | 1,050°C |
+| Refinery Gas (gas) | 55 | 1.0 | 55 | 1,150°C |
 | Hydrogen (gas) | 60 | 1.0 | 60 | 1,400°C |
 | Ethanol | 300 | 0.5 | 150 | 900°C |
 
 Superheated Steam needs a 900°C boiler, so Naphtha is the fuel that makes it without a Geothermal Plant.
-Naphtha also catches fire in the world. Hydrogen comes through Pressurized Conduits (they connect to the burner's
+Naphtha, Kerosene and Diesel also catch fire in the world. Hydrogen comes through Pressurized Conduits (they connect to the burner's
 input faces), Cylinders or Gas Cartridges. **Pitch** is a long-burning furnace fuel (12 items) and spins into
 Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running and riding by about 30%.
 
@@ -1120,8 +1170,9 @@ by the colour of its grip). Where a mode does nothing with a block, the click go
 
 Multiblocks do IO only through their **ports**: blocks on the outside of the structure set to a mode,
 marked with a plate (a blue ring takes in, an orange one gives out, red is energy, hot orange is heat, grey is exhaust).
-Each outer face of a block is its own port, so a corner can take things in on one side and give them out on another. Ports stay where they were set, even if their block is broken and put back. On the cube arrays and the Solar Thermal Array, whose
-formed model isn't a cube, a port is a steel nozzle from the model out to the block face. Set them with
+Each outer face of a block is its own port, so a corner can take things in on one side and give them out on another. Ports stay where they were set, even if their block is broken and put back. On the cube arrays, the Solar Thermal Array, the
+Distillation Array and the Pumpjack, whose formed model isn't a cube, a port is a steel nozzle from the model out to
+the block face. Set them with
 the wrench in Port mode; each structure cycles only through its own modes. A new structure gets a few in
 the middle of its sides (as listed with each machine), and ports come back when the structure breaks
 and forms again. Worlds from before ports get ports where their side configuration had faces.

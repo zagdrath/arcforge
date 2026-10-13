@@ -19,6 +19,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
+import net.zagdrath.arcforge.oil.DepositKind;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
@@ -603,8 +604,8 @@ final class MachineCategories {
 
     // --- Carbon capture ---
 
-    // Carbon Dioxide and Hydrogen in, the arrow, the Carbon Dust and the Water out; the FE below (before Energy upgrades;
-    // never less than the balance floor).
+    // Carbon Dioxide and Hydrogen in, the arrow, the Carbon Dust and the Water out; the FE below (before Energy
+    // upgrades; never less than the balance floor).
     static final class CarbonReclaiming extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe>> {
         static final IRecipeHolderType<net.zagdrath.arcforge.recipe.CarbonReclaimingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.CARBON_RECLAIMING.get());
 
@@ -640,8 +641,8 @@ final class MachineCategories {
         }
     }
 
-    // The fuel (with its count) and the Steam in, the arrow, the Syngas and a chance of ash out; the heat, the temperature
-    // it needs and the time below, before upgrades.
+    // The fuel (with its count) and the Steam in, the arrow, the Syngas and a chance of ash out; the heat, the
+    // temperature it needs and the time below, before upgrades.
     static final class Gasifying extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.GasifyingRecipe>> {
         static final IRecipeHolderType<net.zagdrath.arcforge.recipe.GasifyingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.GASIFYING.get());
 
@@ -682,8 +683,8 @@ final class MachineCategories {
         }
     }
 
-    // Syngas and a catalyst (Iron or Nickel Dust, worn down slowly) in, the arrow, the four products out; the FE, heat and
-    // temperature window below, before upgrades.
+    // Syngas and a catalyst (Iron or Nickel Dust, worn down slowly) in, the arrow, the four products out; the FE, heat
+    // and temperature window below, before upgrades.
     static final class FischerTropsch extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.FischerTropschRecipe>> {
         static final IRecipeHolderType<net.zagdrath.arcforge.recipe.FischerTropschRecipe> TYPE = IRecipeHolderType.create(ModRecipes.FISCHER_TROPSCH.get());
 
@@ -1026,8 +1027,8 @@ final class MachineCategories {
 
     // --- The Greenhouse Array ---
 
-    // A Planting Bed's crop: seed and soil -> the harvest, with how long a bed takes on water alone and what the systems
-    // add. Every arcforge:cloche recipe that isn't hydroponic-only.
+    // A Planting Bed's crop: seed and soil -> the harvest, with how long a bed takes on water alone and what the
+    // systems add. Every arcforge:cloche recipe that isn't hydroponic-only.
     record GreenhousePlanting(RecipeHolder<ClocheRecipe> holder) {}
 
     static final class Greenhouse extends ArcforgeCategory<GreenhousePlanting> {
@@ -1150,8 +1151,8 @@ final class MachineCategories {
 
     // --- Thermal Evaporator Array ---
 
-    // The fluid the tower boils down, what it gives (a fluid and/or an item), the water it returns and its by-product, with
-    // its heat and the temperature it needs.
+    // The fluid the tower boils down, what it gives (a fluid and/or an item), the water it returns and its by-product,
+    // with its heat and the temperature it needs.
     static final class Evaporating extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.EvaporatingRecipe>> {
         static final IRecipeHolderType<net.zagdrath.arcforge.recipe.EvaporatingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.EVAPORATING.get());
 
@@ -1450,17 +1451,17 @@ final class MachineCategories {
         static final IRecipeType<DistillingPage> TYPE = IRecipeType.create(Arcforge.MODID, "distilling", DistillingPage.class);
 
         Distilling(IGuiHelper gui) {
-            super(TYPE, "distilling", ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), gui, 150, 58);
+            super(TYPE, "distilling", ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(), gui, 176, 58);
         }
 
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, DistillingPage page, IFocusGroup focuses) {
             DistillingRecipe recipe = page.recipe();
             fluid(builder, true, 1, 5, recipe.input(), recipe.amount());
-            int x = 56;
+            int x = 46;
             for (var output : recipe.outputs(page.height(), 0.0F).entrySet()) {
                 fluid(builder, false, x, 5, output.getKey(), output.getValue());
-                x += 20;
+                x += 18;
             }
             int items = recipe.items(page.height());
             if (items > 0) {
@@ -1470,22 +1471,104 @@ final class MachineCategories {
 
         @Override
         public void createRecipeExtras(IRecipeExtrasBuilder builder, DistillingPage page, IFocusGroup focuses) {
-            builder.addAnimatedRecipeArrowWidget(ticks(page)).setPosition(24, 5);
+            builder.addAnimatedRecipeArrowWidget(ticks(page, 2)).setPosition(20, 5);
         }
 
-        private static int ticks(DistillingPage page) {
-            int feed = ArcforgeConfig.DISTILLATION_FEED_RATE.getAsInt() * page.height() / 4;
-            return (int) Math.ceil((double) page.recipe().amount() / Math.max(1, feed));
+        // Ticks a batch takes in a column `width` across and the page's height (feed 10 mB/t per 4 blocks of a 2x2).
+        private static int ticks(DistillingPage page, int width) {
+            double feed = ArcforgeConfig.DISTILLATION_FEED_RATE.getAsInt() * width * width / 4.0 * page.height() / 4.0;
+            return (int) Math.ceil(page.recipe().amount() / Math.max(1.0, feed));
         }
 
         @Override
         public void draw(DistillingPage page, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             DistillingRecipe recipe = page.recipe();
-            text(graphics, Component.translatable("jei.arcforge.distilling.column", page.height(), seconds(ticks(page))), 0, 26);
+            text(graphics, Component.translatable("jei.arcforge.distilling.column", page.height(), seconds(ticks(page, 2)), seconds(ticks(page, 3))), 0, 26);
             text(graphics, Component.translatable("jei.arcforge.distilling.heat", recipe.heat(), recipe.minTemp()), 0, 36);
             // Steam stripping on its own line: beside the column text it ran into it.
             recipe.steamStripping().ifPresent(stripping -> text(graphics, Component.translatable("jei.arcforge.distilling.steam",
                     Math.round(recipe.bonusFor(SteamGrade.SUPERHEATED) * 100), stripping.boosts().getFluidType().getDescription()), 0, 46));
+        }
+    }
+
+    // --- Crude oil: the deposits (what a Pumpjack can get from each kind), and drilling for them ---
+
+    record DepositPage(DepositKind kind) {}
+
+    static final class OilDeposits extends ArcforgeCategory<DepositPage> {
+        static final IRecipeType<DepositPage> TYPE = IRecipeType.create(Arcforge.MODID, "oil_deposit", DepositPage.class);
+
+        OilDeposits(IGuiHelper gui) {
+            super(TYPE, "oil_deposit", ModItems.SEISMIC_SURVEY_TOOL.get(), gui, 160, 58);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, DepositPage page, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(new ItemStack(ModItems.WELL_HEAD.get()));
+            long most = Math.round(page.kind().maxBuckets * 1_000L * ArcforgeConfig.OIL_AMOUNT_MULTIPLIER.getAsDouble());
+            fluid(builder, false, 61, 5, ModFluids.CRUDE_OIL.get(), (int) Math.min(Integer.MAX_VALUE, most));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, DepositPage page, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(40).setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(DepositPage page, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            DepositKind kind = page.kind();
+            double multiplier = ArcforgeConfig.OIL_AMOUNT_MULTIPLIER.getAsDouble();
+            text(graphics, kind.getDescription(), 82, 9);
+            text(graphics, Component.translatable("jei.arcforge.oil_deposit.amount", String.format(Locale.ROOT, "%,d", Math.round(kind.minBuckets * multiplier)),
+                    String.format(Locale.ROOT, "%,d", Math.round(kind.maxBuckets * multiplier))), 0, 26);
+            text(graphics, Component.translatable("jei.arcforge.oil_deposit.odds", share(kind, false), share(kind, true)), 0, 36);
+            text(graphics, Component.translatable("jei.arcforge.oil_deposit.rate", ArcforgeConfig.PUMPJACK_RATE.getAsInt(),
+                    Math.round(ArcforgeConfig.PUMPJACK_MIN_SHARE.getAsDouble() * 100), ArcforgeConfig.PUMPJACK_TRICKLE.getAsInt()), 0, 46);
+        }
+
+        // The chance a region holds this kind of deposit, in percent.
+        private static long share(DepositKind kind, boolean rich) {
+            int total = 0;
+            for (DepositKind other : DepositKind.values()) {
+                total += rich ? other.richWeight : other.weight;
+            }
+            double chance = (rich ? ArcforgeConfig.OIL_RICH_CHANCE : ArcforgeConfig.OIL_CHANCE).getAsDouble();
+            return Math.round(chance * (rich ? kind.richWeight : kind.weight) * 100.0 / Math.max(1, total));
+        }
+    }
+
+    record DrillingPage(int blocks) {}
+
+    // The Oil Derrick: Steel Pipe and Water down a hole (a page for a typical depth), a Well Head at the bottom.
+    static final class OilDrilling extends ArcforgeCategory<DrillingPage> {
+        static final IRecipeType<DrillingPage> TYPE = IRecipeType.create(Arcforge.MODID, "oil_drilling", DrillingPage.class);
+
+        OilDrilling(IGuiHelper gui) {
+            super(TYPE, "oil_drilling", ModBlocks.OIL_DERRICK_CONTROLLER.get(), gui, 150, 48);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, DrillingPage page, IFocusGroup focuses) {
+            int perPipe = ArcforgeConfig.DERRICK_BLOCKS_PER_PIPE.getAsInt();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(new ItemStack(ModItems.STEEL_PIPE.get(), (page.blocks() + perPipe - 1) / perPipe));
+            int water = ArcforgeConfig.DERRICK_WATER_PER_TICK.getAsInt() * ArcforgeConfig.DERRICK_TICKS_PER_BLOCK.getAsInt() * page.blocks();
+            if (water > 0) {
+                fluid(builder, true, 21, 5, net.minecraft.world.level.material.Fluids.WATER, water);
+            }
+            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(new ItemStack(ModItems.WELL_HEAD.get()));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, DrillingPage page, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(ArcforgeConfig.DERRICK_TICKS_PER_BLOCK.getAsInt() * page.blocks()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(DrillingPage page, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            int ticks = ArcforgeConfig.DERRICK_TICKS_PER_BLOCK.getAsInt();
+            text(graphics, Component.translatable("jei.arcforge.oil_drilling.depth", page.blocks(), seconds(ticks * page.blocks())), 0, 26);
+            text(graphics, Component.translatable("jei.arcforge.oil_drilling.cost", ArcforgeConfig.DERRICK_ENERGY_PER_TICK.getAsInt(),
+                    ArcforgeConfig.DERRICK_BLOCKS_PER_PIPE.getAsInt()), 0, 36);
         }
     }
 

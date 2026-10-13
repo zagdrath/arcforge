@@ -1,0 +1,36 @@
+{
+  "parent": "arcforge:chemistry/naphtha",
+  "display": {
+    "icon": {
+      "id": "arcforge:seismic_survey_tool"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.oil_survey.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.oil_survey.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "survey": {
+      "trigger": "minecraft:item_used_on_block",
+      "conditions": {
+        "location": {
+          "type": "minecraft:match_tool",
+          "predicate": {
+            "items": "arcforge:seismic_survey_tool"
+          }
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "survey"
+    ]
+  ]
+}

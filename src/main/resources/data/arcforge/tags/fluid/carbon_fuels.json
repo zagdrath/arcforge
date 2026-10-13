@@ -7,6 +7,9 @@
     "arcforge:ethanol",
     "arcforge:biodiesel",
     "arcforge:biogas",
-    "arcforge:syngas"
+    "arcforge:syngas",
+    "arcforge:kerosene",
+    "arcforge:diesel",
+    "arcforge:refinery_gas"
   ]
 }

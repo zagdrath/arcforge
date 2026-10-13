@@ -43,6 +43,8 @@ public abstract class ModelMesh {
         GRATE(4, 4, 4, 4, Kind.TILED),
         STRAP(8, 4, 4, 3, Kind.TILED),
         VENT(12, 4, 4, 4, Kind.TILED),
+        // The Pumpjack's sheet only: the hazard stripe, as a tile.
+        HAZARD(16, 4, 4, 4, Kind.TILED),
         PLATE(0, 8, 16, 16, true, Cuts.SPLIT, Cuts.CORNERS),
         PLAIN(16, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),
         DECK(32, 8, 16, 16, true, Cuts.RECESS, Cuts.RECESS),

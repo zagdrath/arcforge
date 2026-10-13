@@ -160,7 +160,8 @@ public final class ModBlocks {
     public static final DeferredBlock<FireboxBlock> FIREBOX = BLOCKS.registerBlock("firebox",
             FireboxBlock::new, p -> machineProperties(p, 13));
 
-    // The Firebox Array: a hollow box of casings round a fire (see FireboxArrayStructure), like the other arrays' casings.
+    // The Firebox Array: a hollow box of casings round a fire (see FireboxArrayStructure), like the other arrays'
+    // casings.
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock> FIREBOX_ARRAY_CASING = BLOCKS.registerBlock(
             "firebox_array_casing", net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock::new, ModBlocks::columnProperties);
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock> FIREBOX_ARRAY_CONTROLLER =
@@ -238,16 +239,16 @@ public final class ModBlocks {
             ChargepadBlock::new, p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.METAL).noOcclusion());
 
-    // The Fluid Reservoir (arcforge:reservoir until 2.2): glass in a thin steel frame; touching Fluid Reservoirs merge into
-    // one tank. No tool needed to keep its fluid.
+    // The Fluid Reservoir (arcforge:reservoir until 2.2): glass in a thin steel frame; touching Fluid Reservoirs merge
+    // into one tank. No tool needed to keep its fluid.
     public static final DeferredBlock<ReservoirBlock> FLUID_RESERVOIR = BLOCKS.registerBlock("fluid_reservoir",
             p -> new ReservoirBlock(ReservoirKind.FLUID, p), p -> p.mapColor(MapColor.NONE).strength(2.0F, 6.0F).sound(SoundType.GLASS).noOcclusion()
                     .isValidSpawn((state, level, pos, type) -> false)
                     .isRedstoneConductor((state, level, pos) -> false)
                     .isSuffocating((state, level, pos) -> false)
                     .isViewBlocking((state, level, pos, box) -> false));
-    // The Gas Reservoir: a glass pressure vessel with heavy steel corners and edge beams; touching Gas Reservoirs merge into
-    // one tank of gas.
+    // The Gas Reservoir: a glass pressure vessel with heavy steel corners and edge beams; touching Gas Reservoirs merge
+    // into one tank of gas.
     public static final DeferredBlock<ReservoirBlock> GAS_RESERVOIR = BLOCKS.registerBlock("gas_reservoir",
             p -> new ReservoirBlock(ReservoirKind.GAS, p), p -> p.mapColor(MapColor.METAL).strength(3.0F, 6.0F).sound(SoundType.METAL).noOcclusion()
                     .isValidSpawn((state, level, pos, type) -> false)
@@ -364,8 +365,8 @@ public final class ModBlocks {
     public static final DeferredBlock<SteamBoilerArrayCasingBlock> STEAM_BOILER_ARRAY_CASING = BLOCKS.registerBlock("steam_boiler_array_casing",
             SteamBoilerArrayCasingBlock::new, ModBlocks::steamCasingProperties);
 
-    // Formed, its shape follows the turbine's model (see TurbineHitbox), so it can't be cached per state; it stays solid
-    // (fluids don't wash it away) whatever its shape.
+    // Formed, its shape follows the turbine's model (see TurbineHitbox), so it can't be cached per state; it stays
+    // solid (fluids don't wash it away) whatever its shape.
     public static final DeferredBlock<SteamTurbineArrayCasingBlock> STEAM_TURBINE_ARRAY_CASING = BLOCKS.registerBlock("steam_turbine_array_casing",
             SteamTurbineArrayCasingBlock::new, p -> steamCasingProperties(p).dynamicShape().forceSolidOn());
 
@@ -534,14 +535,14 @@ public final class ModBlocks {
     public static final DeferredBlock<Block> RAW_ARCITE_BLOCK = BLOCKS.registerSimpleBlock("raw_arcite_block", p -> storageProperties(p, SoundType.STONE, MapColor.DIAMOND, 9));
     public static final DeferredBlock<Block> ARCITE_BLOCK = BLOCKS.registerSimpleBlock("arcite_block", p -> storageProperties(p, SoundType.AMETHYST, MapColor.DIAMOND, 12));
 
-    // Sulfur, through the Nether: it drops Sulfur Dust (see its loot table) and needs a stone pickaxe.
-    // Halite: rock salt in large flat beds, in stone and deepslate (see ModWorldgen.ConfigBed). Softer than the metal ores.
+    // Sulfur, through the Nether: it drops Sulfur Dust (see its loot table) and needs a stone pickaxe. Halite: rock
+    // salt in large flat beds, in stone and deepslate (see ModWorldgen.ConfigBed). Softer than the metal ores.
     public static final DeferredBlock<DropExperienceBlock> HALITE_ORE = ore("halite_ore", UniformInt.of(0, 1), false, 0, MapColor.TERRACOTTA_WHITE);
     public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_HALITE_ORE = ore("deepslate_halite_ore", UniformInt.of(0, 1), true, 0, null);
     public static final DeferredBlock<Block> RAW_ROCK_SALT_BLOCK = BLOCKS.registerSimpleBlock("raw_rock_salt_block",
             p -> storageProperties(p, SoundType.CALCITE, MapColor.TERRACOTTA_WHITE, 0));
-    // Spodumene: the lithium ore, in stone and deepslate, with richer pegmatite veins under mountains and badlands. Needs a
-    // stone pickaxe, like lapis.
+    // Spodumene: the lithium ore, in stone and deepslate, with richer pegmatite veins under mountains and badlands.
+    // Needs a stone pickaxe, like lapis.
     public static final DeferredBlock<DropExperienceBlock> SPODUMENE_ORE = ore("spodumene_ore", UniformInt.of(0, 2), false, 0, null);
     public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_SPODUMENE_ORE = ore("deepslate_spodumene_ore", UniformInt.of(0, 2), true, 0, null);
     public static final DeferredBlock<Block> RAW_SPODUMENE_BLOCK = BLOCKS.registerSimpleBlock("raw_spodumene_block",
@@ -637,6 +638,40 @@ public final class ModBlocks {
             p -> new LiquidBlock(ModFluids.HEAVY_OIL.get(), p) {},
             p -> liquidProperties(p, MapColor.COLOR_BROWN));
 
+    // Crude Oil and its fractions. Kerosene and Diesel burn where they lie, like Naphtha.
+    public static final DeferredBlock<LiquidBlock> CRUDE_OIL = BLOCKS.registerBlock("crude_oil",
+            p -> new LiquidBlock(ModFluids.CRUDE_OIL.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_BLACK));
+    public static final DeferredBlock<LiquidBlock> KEROSENE = BLOCKS.registerBlock("kerosene",
+            p -> new LiquidBlock(ModFluids.KEROSENE.get(), p) {
+                @Override
+                public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 300;
+                }
+
+                @Override
+                public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 60;
+                }
+            },
+            p -> liquidProperties(p, MapColor.TERRACOTTA_WHITE));
+    public static final DeferredBlock<LiquidBlock> DIESEL = BLOCKS.registerBlock("diesel",
+            p -> new LiquidBlock(ModFluids.DIESEL.get(), p) {
+                @Override
+                public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 200;
+                }
+
+                @Override
+                public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 30;
+                }
+            },
+            p -> liquidProperties(p, MapColor.COLOR_YELLOW));
+    public static final DeferredBlock<LiquidBlock> BITUMEN = BLOCKS.registerBlock("bitumen",
+            p -> new LiquidBlock(ModFluids.BITUMEN.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_BLACK));
+
     // The Oil Press's Seed Oil.
     public static final DeferredBlock<LiquidBlock> SEED_OIL = BLOCKS.registerBlock("seed_oil",
             p -> new LiquidBlock(ModFluids.SEED_OIL.get(), p) {},
@@ -679,12 +714,33 @@ public final class ModBlocks {
             p -> new SulfuricAcidBlock(ModFluids.HYDROCHLORIC_ACID.get(), ModDamageTypes.HYDROCHLORIC_ACID, p),
             p -> liquidProperties(p, MapColor.COLOR_YELLOW));
 
-    // The Thermal Evaporator Array: a 3x3x9 steel tower (see ThermalEvaporatorStructure), like the other arrays' casings.
+    // The Thermal Evaporator Array: a 3x3x9 steel tower (see ThermalEvaporatorStructure), like the other arrays'
+    // casings.
     public static final DeferredBlock<ThermalEvaporatorCasingBlock> THERMAL_EVAPORATOR_CASING = BLOCKS.registerBlock("thermal_evaporator_casing",
             ThermalEvaporatorCasingBlock::new, ModBlocks::columnProperties);
     public static final DeferredBlock<ThermalEvaporatorControllerBlock> THERMAL_EVAPORATOR_CONTROLLER = BLOCKS.registerBlock(
             "thermal_evaporator_controller", ThermalEvaporatorControllerBlock::new,
             p -> columnProperties(p).lightLevel(state -> state.getValue(ThermalEvaporatorControllerBlock.LIT) ? 7 : 0));
+    // The oilfield (see OilfieldStructures): the Oil Derrick's floor casings, lattice frame and controller; the Well
+    // Head it leaves (it can't be carried off, and a pick won't hurry it); and the Pumpjack's casings and controller,
+    // which take the shape of the pumpjack once formed (see PumpjackHitbox).
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> DERRICK_CASING = BLOCKS.registerBlock(
+            "derrick_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, false, true), ModBlocks::columnProperties);
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> DERRICK_FRAME = BLOCKS.registerBlock(
+            "derrick_frame", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, false, false),
+            p -> columnProperties(p).noOcclusion().isSuffocating((state, level, pos) -> false).isViewBlocking((state, level, pos, box) -> false));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> OIL_DERRICK_CONTROLLER = BLOCKS.registerBlock(
+            "oil_derrick_controller", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, false),
+            p -> columnProperties(p).lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.LIT) ? 7 : 0));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.WellHeadBlock> WELL_HEAD = BLOCKS.registerBlock("well_head",
+            net.zagdrath.arcforge.block.multiblock.WellHeadBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(50.0F, 1_200.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion().noLootTable());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> PUMPJACK_CASING = BLOCKS.registerBlock(
+            "pumpjack_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, true, true),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> PUMPJACK_CONTROLLER = BLOCKS.registerBlock(
+            "pumpjack_controller", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, true),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
     // Seawater, pumped from oceans and beaches.
     public static final DeferredBlock<LiquidBlock> SEAWATER = BLOCKS.registerBlock("seawater",
             p -> new LiquidBlock(ModFluids.SEAWATER.get(), p) {},
@@ -719,8 +775,9 @@ public final class ModBlocks {
 
     // --- Distillation ---
 
+    // Formed, the column's blocks take the shape of its refinery tower (see RefineryHitbox).
     public static final DeferredBlock<DistillationArrayCasingBlock> DISTILLATION_ARRAY_CASING = BLOCKS.registerBlock("distillation_array_casing",
-            DistillationArrayCasingBlock::new, ModBlocks::columnProperties);
+            DistillationArrayCasingBlock::new, p -> columnProperties(p).dynamicShape().forceSolidOn());
 
     // Glass round a tray: see-through, so it neither hides its neighbours' faces nor blocks light or view.
     public static final DeferredBlock<TrayLevelCasingBlock> TRAY_LEVEL_CASING = BLOCKS.registerBlock("tray_level_casing",
@@ -729,10 +786,12 @@ public final class ModBlocks {
                     .isValidSpawn((state, level, pos, type) -> false)
                     .isRedstoneConductor((state, level, pos) -> false)
                     .isSuffocating((state, level, pos) -> false)
-                    .isViewBlocking((state, level, pos, box) -> false));
+                    .isViewBlocking((state, level, pos, box) -> false)
+                    .dynamicShape()
+                    .forceSolidOn());
 
     public static final DeferredBlock<DistillationArrayControllerBlock> DISTILLATION_ARRAY_CONTROLLER = BLOCKS.registerBlock("distillation_array_controller",
-            DistillationArrayControllerBlock::new, ModBlocks::columnProperties);
+            DistillationArrayControllerBlock::new, p -> columnProperties(p).dynamicShape().forceSolidOn());
 
     // --- Solar Thermal Array ---
 
@@ -766,7 +825,8 @@ public final class ModBlocks {
     public static final DeferredBlock<LoamFarmlandBlock> IRRIGATED_LOAM_FARMLAND = BLOCKS.registerBlock("irrigated_loam_farmland",
             p -> new LoamFarmlandBlock(LOAM.get(), true, p), p -> farmlandProperties(p).sound(SoundType.COPPER));
 
-    // Crops: Flax, Rapeseed and Sorghum grow like wheat, but two blocks tall; Hops climb a Trellis. Each has a wild clump that worldgen places.
+    // Crops: Flax, Rapeseed and Sorghum grow like wheat, but two blocks tall; Hops climb a Trellis. Each has a wild
+    // clump that worldgen places.
     public static final DeferredBlock<ArcforgeCropBlock> FLAX = BLOCKS.registerBlock("flax",
             p -> new ArcforgeCropBlock(() -> ModItems.FLAX_SEEDS.get(), 2, p), ModBlocks::cropProperties);
     public static final DeferredBlock<ArcforgeCropBlock> RAPESEED = BLOCKS.registerBlock("rapeseed",
@@ -828,7 +888,8 @@ public final class ModBlocks {
                     p -> machineProperties(p, 7));
 
     // Farm chemistry. The Air Separator runs on FE; the Haber Reactor on FE and heat (its catalyst bed glows while it
-    // runs). The Biogas Digester is a 3x3x3 of Biogas Digester Casings with one controller (see BiogasDigesterStructure).
+    // runs). The Biogas Digester is a 3x3x3 of Biogas Digester Casings with one controller (see
+    // BiogasDigesterStructure).
     public static final DeferredBlock<AirSeparatorBlock> AIR_SEPARATOR = BLOCKS.registerBlock("air_separator",
             AirSeparatorBlock::new, p -> machineProperties(p, 0));
     public static final DeferredBlock<HaberReactorBlock> HABER_REACTOR = BLOCKS.registerBlock("haber_reactor",
@@ -848,8 +909,8 @@ public final class ModBlocks {
     public static final DeferredBlock<ClocheBlock> HYDROPONIC_CELL = BLOCKS.registerBlock("hydroponic_cell",
             p -> new ClocheBlock(ClocheBlockEntity.Kind.HYDROPONIC_CELL, p), p -> glazedMachine(machineProperties(p, 10)));
 
-    // The Greenhouse Array (see GreenhouseStructure): a Greenhouse Frame and Pressure Glass building with one controller,
-    // Planting Beds in its floor and Grow Lamps under its roof.
+    // The Greenhouse Array (see GreenhouseStructure): a Greenhouse Frame and Pressure Glass building with one
+    // controller, Planting Beds in its floor and Grow Lamps under its roof.
     public static final DeferredBlock<GreenhouseFrameBlock> GREENHOUSE_FRAME = BLOCKS.registerBlock("greenhouse_frame",
             GreenhouseFrameBlock::new, ModBlocks::columnProperties);
     public static final DeferredBlock<GreenhouseControllerBlock> GREENHOUSE_CONTROLLER = BLOCKS.registerBlock("greenhouse_controller",
@@ -1179,7 +1240,8 @@ public final class ModBlocks {
         // array casings.
         BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_boiler_array_casing"));
         BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_turbine_array_casing"));
-        // Removed with the Evaporation Pond: its blocks load as the Thermal Evaporator Array's (ponds need rebuilding as towers).
+        // Removed with the Evaporation Pond: its blocks load as the Thermal Evaporator Array's (ponds need rebuilding
+        // as towers).
         BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_liner"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_casing"));
         BLOCKS.addAlias(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pond_outlet"), Identifier.fromNamespaceAndPath(Arcforge.MODID, "thermal_evaporator_controller"));
         // The Reservoir became the Fluid Reservoir in 2.2.

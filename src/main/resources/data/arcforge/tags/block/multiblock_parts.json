@@ -19,6 +19,11 @@
     "arcforge:steam_turbine_array_casing",
     "arcforge:superheater_array_casing",
     "arcforge:tray_level_casing",
-    "arcforge:gas_turbine_array_casing"
+    "arcforge:gas_turbine_array_casing",
+    "arcforge:derrick_casing",
+    "arcforge:derrick_frame",
+    "arcforge:oil_derrick_controller",
+    "arcforge:pumpjack_casing",
+    "arcforge:pumpjack_controller"
   ]
 }

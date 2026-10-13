@@ -1,0 +1,24 @@
+{
+  "title": "Oil Derrick",
+  "icon": "arcforge:oil_derrick_controller",
+  "items": [
+    "arcforge:oil_derrick_controller",
+    "arcforge:derrick_casing",
+    "arcforge:derrick_frame",
+    "arcforge:steel_pipe"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Drills down to an oil deposit, then turns into a Well Head.\n# Building\nA 3x3 rig six blocks tall:\n- The floor: eight Derrick Casings round an open middle (the bore), with the Oil Derrick Controller in the middle of one side, facing out.\n- Four Derrick Frame legs, four blocks tall, on the floor's corners.\n- A full 3x3 of Derrick Frames on top.\nKeep the bore and the space above it open for the drill string."
+    },
+    {
+      "type": "text",
+      "text": "# Drilling\nIt drills a block every 2 seconds, using 120 FE/t and 10 mB/t of Water (drilling mud), and a Steel Pipe for every 4 blocks of hole, from its floor down to the deposit's depth. Over no oil it won't start. Broken and rebuilt over the same hole, it carries on from where it was. The GUI shows how deep it is and how many pipes are still to come.\n# Ports\nA new rig has no ports: set them on its Derrick Casings with the Wrench in Port mode.\n- Input: Water and Steel Pipes in.\n- Energy: FE in.\n# Striking oil\nWhen it reaches the oil, the rig comes down: a Well Head caps the hole and the rig's blocks are left there to pick up, ready for the next hole. A Well Head can't be moved: broken, it's gone."
+    },
+    {
+      "type": "multiblock",
+      "structure": "oil_derrick"
+    }
+  ]
+}

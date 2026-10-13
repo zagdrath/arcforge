@@ -25,6 +25,8 @@ public final class GasTints {
     public static final int ETHYLENE = 0xFFD2EADA;
     // Syngas: colourless too, so a warm pale tan, set apart from the cool gases and Biogas's olive.
     public static final int SYNGAS = 0xFFE2CCA4;
+    // Refinery Gas: a faint dusty blue-grey, cooler than Syngas and warmer than Carbon Dioxide.
+    public static final int REFINERY_GAS = 0xFFC2CCDA;
 
     private GasTints() {}
 }

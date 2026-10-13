@@ -19,7 +19,8 @@ import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.item.tool.ModuleType;
 
-// Arcforge tabs, in order: Machines, Materials, Components, Building Blocks, Fluids, Logistics, Tools & Upgrades, Farming.
+// Arcforge tabs, in order: Machines, Materials, Components, Building Blocks, Fluids, Logistics, Tools & Upgrades,
+// Farming.
 public final class ModCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Arcforge.MODID);
 
@@ -56,6 +57,12 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.FISCHER_TROPSCH_REACTOR.get());
                 output.accept(ModItems.THERMAL_EVAPORATOR_CONTROLLER.get());
                 output.accept(ModItems.THERMAL_EVAPORATOR_CASING.get());
+                output.accept(ModItems.OIL_DERRICK_CONTROLLER.get());
+                output.accept(ModItems.DERRICK_CASING.get());
+                output.accept(ModItems.DERRICK_FRAME.get());
+                output.accept(ModItems.PUMPJACK_CONTROLLER.get());
+                output.accept(ModItems.PUMPJACK_CASING.get());
+                output.accept(ModItems.WELL_HEAD.get());
                 output.accept(ModItems.ASSEMBLER.get());
                 output.accept(ModItems.BLOCK_BREAKER.get());
                 output.accept(ModItems.TREE_CUTTER.get());
@@ -163,6 +170,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.STEEL_PLATE.get());
                 output.accept(ModItems.STEEL_GEAR.get());
                 output.accept(ModItems.STEEL_ROD.get());
+                output.accept(ModItems.STEEL_PIPE.get());
                 output.accept(ModItems.COPPER_PLATE.get());
                 output.accept(ModItems.COPPER_GEAR.get());
                 output.accept(ModItems.COPPER_ROD.get());
@@ -199,6 +207,10 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ETHANOL_BUCKET.get());
                 output.accept(ModItems.LIGHT_OIL_BUCKET.get());
                 output.accept(ModItems.HEAVY_OIL_BUCKET.get());
+                output.accept(ModItems.CRUDE_OIL_BUCKET.get());
+                output.accept(ModItems.KEROSENE_BUCKET.get());
+                output.accept(ModItems.DIESEL_BUCKET.get());
+                output.accept(ModItems.BITUMEN_BUCKET.get());
                 output.accept(ModItems.LIQUID_EXPERIENCE_BUCKET.get());
                 ModItems.chemicalBuckets().forEach(item -> output.accept(item.get()));
             }).build());
@@ -226,6 +238,7 @@ public final class ModCreativeTabs {
             .displayItems((parameters, output) -> {
                 output.accept(ModItems.ENGINEERS_HANDBOOK.get());
                 output.accept(ModItems.WRENCH.get());
+                output.accept(ModItems.SEISMIC_SURVEY_TOOL.get());
                 output.accept(ModItems.THROTTLE_LEVER.get());
                 output.accept(ModItems.SETTINGS_CARD.get());
                 for (var item : List.of(ModItems.STEEL_SWORD, ModItems.STEEL_PICKAXE, ModItems.STEEL_AXE, ModItems.STEEL_SHOVEL, ModItems.STEEL_HOE,

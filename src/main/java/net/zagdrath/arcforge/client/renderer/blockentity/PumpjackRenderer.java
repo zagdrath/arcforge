@@ -1,0 +1,194 @@
+/*
+ * Copyright (c) 2026 Zagdrath
+ * SPDX-License-Identifier: MIT
+ */
+
+package net.zagdrath.arcforge.client.renderer.blockentity;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+
+import org.jspecify.annotations.Nullable;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity;
+import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.multiblock.ModelFrame;
+import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.OilfieldStructures;
+import net.zagdrath.arcforge.multiblock.PortFaces;
+import net.zagdrath.arcforge.multiblock.PortHolder;
+import net.zagdrath.arcforge.steam.ModelMesh;
+import net.zagdrath.arcforge.steam.PumpjackMesh;
+
+// Draws a formed Pumpjack (its casings draw nothing but their port plates) from PumpjackLayout, built by PumpjackMesh
+// on the sheet block/pumpjack/pumpjack, with a nozzle from the model out to each port. The still parts are built once
+// and again when the ports change (checked every second); the beam, arms, cranks and bridle each frame at the crank's
+// angle, which turns as fast as the pumpjack pumps (see PumpjackBlockEntity.advanceCrank), so it slows as its deposit
+// drains.
+public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, PumpjackRenderer.State> {
+    public static final Identifier SHEET = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/pumpjack/pumpjack");
+    private static final int PORT_SCAN_INTERVAL = 20;
+    private static final float[] EMPTY = new float[0];
+
+    private final Map<PumpjackBlockEntity, Built> built = new WeakHashMap<>();
+
+    private static final class Built {
+        final OilfieldStructures.Unit unit;
+        final ModelFrame frame;
+        final PumpjackMesh mesh;
+        List<ModelMesh.Port> ports;
+        float[] solid = EMPTY, glass = EMPTY;
+        long scanned;
+
+        Built(OilfieldStructures.Unit unit, List<ModelMesh.Port> ports) {
+            this.unit = unit;
+            this.frame = PumpjackBlockEntity.frame(unit);
+            this.mesh = new PumpjackMesh(frame);
+            this.ports = ports;
+            rebuild();
+        }
+
+        void rebuild() {
+            float[][] parts = mesh.buildStatic(ports);
+            solid = parts[0];
+            glass = parts[1];
+        }
+    }
+
+    public static class State extends BlockEntityRenderState {
+        public boolean formed;
+        public int offsetX, offsetY, offsetZ;
+        public float[] solid = EMPTY, glass = EMPTY, moving = EMPTY;
+        public @Nullable TextureAtlasSprite sheet;
+        public int light;
+    }
+
+    public PumpjackRenderer(BlockEntityRendererProvider.Context context) {}
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(PumpjackBlockEntity pumpjack, State state, float partialTicks, Vec3 cameraPosition,
+            ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        StructureRenderer.super.extractRenderState(pumpjack, state, partialTicks, cameraPosition, breakProgress);
+        OilfieldStructures.Unit unit = pumpjack.getUnit();
+        Level level = pumpjack.getLevel();
+        state.formed = unit != null && level != null;
+        if (unit == null || level == null) {
+            built.remove(pumpjack);
+            return;
+        }
+        BlockPos min = unit.min();
+        state.offsetX = min.getX() - pumpjack.getBlockPos().getX();
+        state.offsetY = min.getY() - pumpjack.getBlockPos().getY();
+        state.offsetZ = min.getZ() - pumpjack.getBlockPos().getZ();
+        long time = level.getGameTime();
+        Built model = built.get(pumpjack);
+        if (model == null || !model.unit.equals(unit)) {
+            model = new Built(unit, ports(level, unit, PumpjackBlockEntity.frame(unit)));
+            model.scanned = time;
+            built.put(pumpjack, model);
+        } else if (Math.abs(time - model.scanned) >= PORT_SCAN_INTERVAL) {
+            model.scanned = time;
+            List<ModelMesh.Port> ports = ports(level, unit, model.frame);
+            if (!ports.equals(model.ports)) {
+                model.ports = ports;
+                model.rebuild();
+            }
+        }
+        state.solid = model.solid;
+        state.glass = model.glass;
+        state.moving = model.mesh.buildMoving(Math.toRadians(pumpjack.advanceCrank(time + partialTicks)));
+        state.sheet = SteamBoilerArrayRenderer.sprite(SHEET);
+        state.light = LightCoordsUtil.getLightCoords(level, unit.at(0, 1, OilfieldStructures.POST_U).relative(unit.back().getClockWise()));
+    }
+
+    // The ports on the pumpjack's outer faces, in the model's frame.
+    private static List<ModelMesh.Port> ports(Level level, OilfieldStructures.Unit unit, ModelFrame frame) {
+        List<ModelMesh.Port> ports = new ArrayList<>();
+        BlockPos min = unit.min(), max = unit.max();
+        for (BlockPos pos : unit.parts()) {
+            PortFaces faces = MultiblockPorts.faces(level, pos);
+            if (faces.isEmpty()) {
+                continue;
+            }
+            BlockState state = level.getBlockState(pos);
+            if (!(state.getBlock() instanceof PortHolder holder) || !holder.holdsPorts(state)) {
+                continue;
+            }
+            int[] block = frame.frameBlock(pos.getX() - min.getX(), pos.getY() - min.getY(), pos.getZ() - min.getZ());
+            for (Direction face : Direction.values()) {
+                BlockPos next = pos.relative(face);
+                boolean inside = next.getX() >= min.getX() && next.getX() <= max.getX() && next.getY() >= min.getY() && next.getY() <= max.getY()
+                        && next.getZ() >= min.getZ() && next.getZ() <= max.getZ();
+                if (faces.get(face) == SideMode.NONE || inside) {
+                    continue;
+                }
+                int[] n = frame.frameNormal(face.getStepX(), face.getStepY(), face.getStepZ());
+                ports.add(new ModelMesh.Port(block[2], block[1], block[0], n[0], n[1], n[2]));
+            }
+        }
+        return ports;
+    }
+
+    @Override
+    public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        TextureAtlasSprite sheet = state.sheet;
+        if (!state.formed || sheet == null) {
+            return;
+        }
+        poseStack.pushPose();
+        poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
+        float[] solid = state.solid, moving = state.moving, glass = state.glass;
+        int light = state.light;
+        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> {
+            emit(pose, buffer, solid, sheet, light);
+            emit(pose, buffer, moving, sheet, light);
+        });
+        if (glass.length > 0) {
+            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, glass, sheet, light));
+        }
+        poseStack.popPose();
+    }
+
+    private static void emit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet, int light) {
+        for (int i = 0; i + 7 < data.length; i += 8) {
+            buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
+                    .setColor(-1)
+                    .setUv(sheet.getU(data[i + 3]), sheet.getV(data[i + 4]))
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setLight(light)
+                    .setNormal(pose, data[i + 5], data[i + 6], data[i + 7]);
+        }
+    }
+
+    @Override
+    public AABB getRenderBoundingBox(PumpjackBlockEntity pumpjack) {
+        return pumpjack.getRenderBox();
+    }
+}

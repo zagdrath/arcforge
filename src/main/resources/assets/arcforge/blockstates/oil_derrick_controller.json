@@ -1,0 +1,72 @@
+{
+  "variants": {
+    "facing=north,formed=false,lit=false": {
+      "model": "arcforge:block/oilfield/derrick_controller"
+    },
+    "facing=north,formed=false,lit=true": {
+      "model": "arcforge:block/oilfield/derrick_controller_on"
+    },
+    "facing=north,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/oilfield/derrick_controller"
+    },
+    "facing=north,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/oilfield/derrick_controller_on"
+    },
+    "facing=east,formed=false,lit=false": {
+      "model": "arcforge:block/oilfield/derrick_controller",
+      "y": 90
+    },
+    "facing=east,formed=false,lit=true": {
+      "model": "arcforge:block/oilfield/derrick_controller_on",
+      "y": 90
+    },
+    "facing=east,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/oilfield/derrick_controller",
+      "y": 90
+    },
+    "facing=east,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/oilfield/derrick_controller_on",
+      "y": 90
+    },
+    "facing=south,formed=false,lit=false": {
+      "model": "arcforge:block/oilfield/derrick_controller",
+      "y": 180
+    },
+    "facing=south,formed=false,lit=true": {
+      "model": "arcforge:block/oilfield/derrick_controller_on",
+      "y": 180
+    },
+    "facing=south,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/oilfield/derrick_controller",
+      "y": 180
+    },
+    "facing=south,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/oilfield/derrick_controller_on",
+      "y": 180
+    },
+    "facing=west,formed=false,lit=false": {
+      "model": "arcforge:block/oilfield/derrick_controller",
+      "y": 270
+    },
+    "facing=west,formed=false,lit=true": {
+      "model": "arcforge:block/oilfield/derrick_controller_on",
+      "y": 270
+    },
+    "facing=west,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/oilfield/derrick_controller",
+      "y": 270
+    },
+    "facing=west,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/oilfield/derrick_controller_on",
+      "y": 270
+    }
+  }
+}

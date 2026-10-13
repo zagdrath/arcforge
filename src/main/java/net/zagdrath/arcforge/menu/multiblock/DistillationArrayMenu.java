@@ -29,19 +29,21 @@ public class DistillationArrayMenu extends MachineMenu {
     public static final int DATA_STEAM = 6;
     public static final int DATA_STEAM_AMOUNT = 7;
     public static final int DATA_STEAM_CAPACITY = 8;
-    public static final int DATA_NAPHTHA = 9;
-    public static final int DATA_LIGHT_OIL = 10;
-    public static final int DATA_HEAVY_OIL = 11;
-    public static final int DATA_OUTPUT_CAPACITY = 12;
-    public static final int DATA_HEIGHT = 13;
-    public static final int DATA_BONUS = 14;
-    public static final int DATA_HEAT_PER_TICK = 15;
-    public static final int DATA_STATUS = 16;
-    public static final int DATA_REDSTONE_MODE = 17;
-    public static final int DATA_SIDE_CONFIG = 18;
-    public static final int DATA_VALUES = 19;
+    // One per DistillationArrayBlockEntity.Product, lightest first.
+    public static final int DATA_PRODUCTS = 9;
+    public static final int DATA_OUTPUT_CAPACITY = 16;
+    public static final int DATA_HEIGHT = 17;
+    public static final int DATA_WIDTH = 18;
+    public static final int DATA_BONUS = 19;
+    public static final int DATA_HEAT_PER_TICK = 20;
+    public static final int DATA_FEED_RATE = 21;
+    public static final int DATA_MAKES = 22;
+    public static final int DATA_STATUS = 23;
+    public static final int DATA_REDSTONE_MODE = 24;
+    public static final int DATA_SIDE_CONFIG = 25;
+    public static final int DATA_VALUES = 26;
 
-    public static final int PITCH_X = 151, PITCH_Y = 36;
+    public static final int PITCH_X = 41, PITCH_Y = 55;
 
     // Client constructor, called with the controller's position written by the server.
     public DistillationArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -107,16 +109,13 @@ public class DistillationArrayMenu extends MachineMenu {
         return value(DATA_STEAM_CAPACITY);
     }
 
-    public int getNaphtha() {
-        return value(DATA_NAPHTHA);
+    public int getProduct(DistillationArrayBlockEntity.Product product) {
+        return value(DATA_PRODUCTS + product.ordinal());
     }
 
-    public int getLightOil() {
-        return value(DATA_LIGHT_OIL);
-    }
-
-    public int getHeavyOil() {
-        return value(DATA_HEAVY_OIL);
+    // Whether the column's recipe makes this product at its height.
+    public boolean makes(DistillationArrayBlockEntity.Product product) {
+        return (value(DATA_MAKES) & 1 << product.ordinal()) != 0;
     }
 
     public int getOutputCapacity() {
@@ -125,6 +124,14 @@ public class DistillationArrayMenu extends MachineMenu {
 
     public int getHeight() {
         return value(DATA_HEIGHT);
+    }
+
+    public int getWidth() {
+        return value(DATA_WIDTH);
+    }
+
+    public int getFeedRate() {
+        return value(DATA_FEED_RATE);
     }
 
     // The steam stripping bonus in percent, 0 without steam.

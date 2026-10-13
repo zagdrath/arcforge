@@ -25,10 +25,10 @@ import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.chemistry.OreSlurry;
 
-// Creosote: the Carbonizer's by-product. A slow, oily liquid; not flammable in the world (yet). The
-// Distillation Array splits it into Naphtha (thin, and flammable in the world), Light Oil and Heavy Oil
-// (thick, slow as lava). Sulfuric Acid and the ore slurries are the Chemical Reactor's. Their textures and
-// fog colours are registered on the client in ArcforgeClient.
+// Creosote: the Carbonizer's by-product. A slow, oily liquid; not flammable in the world (yet). The Distillation Array
+// splits it into Naphtha (thin, and flammable in the world), Light Oil and Heavy Oil (thick, slow as lava), and Crude
+// Oil into Refinery Gas, Naphtha, Kerosene, Diesel, Heavy Oil and Bitumen. Sulfuric Acid and the ore slurries are the
+// Chemical Reactor's. Their textures and fog colours are registered on the client in ArcforgeClient.
 public final class ModFluids {
     public static final DeferredRegister<FluidType> FLUID_TYPES = DeferredRegister.create(NeoForgeRegistries.Keys.FLUID_TYPES, Arcforge.MODID);
     public static final DeferredRegister<Fluid> FLUIDS = DeferredRegister.create(Registries.FLUID, Arcforge.MODID);
@@ -58,6 +58,37 @@ public final class ModFluids {
     public static final DeferredHolder<FluidType, FluidType> NAPHTHA_TYPE = liquidType("naphtha", 700, 500, 0.02F, 0.8, 0.8);
     public static final DeferredHolder<FluidType, FluidType> LIGHT_OIL_TYPE = liquidType("light_oil", 850, 1_500, 0.02F, 0.7, 0.8);
     public static final DeferredHolder<FluidType, FluidType> HEAVY_OIL_TYPE = liquidType("heavy_oil", 1_050, 6_000, 0.015F, 0.5, 0.6);
+
+    // Crude Oil, pumped from oil deposits by the Pumpjack: black, thick and slow, a little freer than Heavy Oil. The
+    // Distillation Array splits it into Refinery Gas (a gas), Naphtha, Kerosene, Diesel, Heavy Oil and Bitumen.
+    // Kerosene and Diesel are thin fuels; Bitumen is tar, thicker and slower than anything else.
+    public static final DeferredHolder<FluidType, FluidType> CRUDE_OIL_TYPE = liquidType("crude_oil", 900, 5_000, 0.015F, 0.55, 0.65);
+    public static final DeferredHolder<FluidType, FluidType> KEROSENE_TYPE = liquidType("kerosene", 800, 1_100, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<FluidType, FluidType> DIESEL_TYPE = liquidType("diesel", 840, 1_800, 0.02F, 0.75, 0.8);
+    public static final DeferredHolder<FluidType, FluidType> BITUMEN_TYPE = liquidType("bitumen", 1_100, 9_000, 0.01F, 0.45, 0.55);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CRUDE_OIL = FLUIDS.register("crude_oil",
+            () -> new BaseFlowingFluid.Source(crudeOilProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CRUDE_OIL = FLUIDS.register("flowing_crude_oil",
+            () -> new BaseFlowingFluid.Flowing(crudeOilProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> KEROSENE = FLUIDS.register("kerosene",
+            () -> new BaseFlowingFluid.Source(keroseneProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_KEROSENE = FLUIDS.register("flowing_kerosene",
+            () -> new BaseFlowingFluid.Flowing(keroseneProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> DIESEL = FLUIDS.register("diesel",
+            () -> new BaseFlowingFluid.Source(dieselProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_DIESEL = FLUIDS.register("flowing_diesel",
+            () -> new BaseFlowingFluid.Flowing(dieselProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> BITUMEN = FLUIDS.register("bitumen",
+            () -> new BaseFlowingFluid.Source(bitumenProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BITUMEN = FLUIDS.register("flowing_bitumen",
+            () -> new BaseFlowingFluid.Flowing(bitumenProperties()));
+    // Refinery Gas: the lightest cut of Crude Oil, off the top of the column. A gas that burns in the Fuel Burner and
+    // the Gas Turbine Array.
+    public static final DeferredHolder<FluidType, FluidType> REFINERY_GAS_TYPE = gasType("refinery_gas", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> REFINERY_GAS = FLUIDS.register("refinery_gas",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.REFINERY_GAS_TYPE, ModFluids.REFINERY_GAS, ModFluids.FLOWING_REFINERY_GAS)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_REFINERY_GAS = FLUIDS.register("flowing_refinery_gas",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.REFINERY_GAS_TYPE, ModFluids.REFINERY_GAS, ModFluids.FLOWING_REFINERY_GAS)));
 
     // The Fermenter's product: pale, thin and flammable.
     public static final DeferredHolder<FluidType, FluidType> ETHANOL_TYPE = liquidType("ethanol", 790, 1_200, 0.02F, 0.8, 0.8);
@@ -124,8 +155,8 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_OXYGEN = FLUIDS.register("flowing_oxygen",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.OXYGEN_TYPE, ModFluids.OXYGEN, ModFluids.FLOWING_OXYGEN)));
 
-    // Carbon Dioxide, given off by the Fermenter. A gas with nothing to burn it; it goes out of Gas Output faces, or into
-    // the air when it can't.
+    // Carbon Dioxide, given off by the Fermenter. A gas with nothing to burn it; it goes out of Gas Output faces, or
+    // into the air when it can't.
     public static final DeferredHolder<FluidType, FluidType> CARBON_DIOXIDE_TYPE = gasType("carbon_dioxide", 293);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CARBON_DIOXIDE = FLUIDS.register("carbon_dioxide",
             () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.CARBON_DIOXIDE_TYPE, ModFluids.CARBON_DIOXIDE, ModFluids.FLOWING_CARBON_DIOXIDE)));
@@ -150,8 +181,8 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BIOGAS = FLUIDS.register("flowing_biogas",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.BIOGAS_TYPE, ModFluids.BIOGAS, ModFluids.FLOWING_BIOGAS)));
 
-    // The Chemical Reactor's farm liquids: Nutrient Solution (NPK Fertilizer in water, for hydroponics) runs like water;
-    // Biodiesel (Seed Oil and Ethanol) is a Fuel Burner fuel, a little thinner than the oil it came from.
+    // The Chemical Reactor's farm liquids: Nutrient Solution (NPK Fertilizer in water, for hydroponics) runs like
+    // water; Biodiesel (Seed Oil and Ethanol) is a Fuel Burner fuel, a little thinner than the oil it came from.
     public static final DeferredHolder<FluidType, FluidType> NUTRIENT_SOLUTION_TYPE = liquidType("nutrient_solution", 1_050, 1_000, 0.02F, 0.8, 0.8);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> NUTRIENT_SOLUTION = FLUIDS.register("nutrient_solution",
             () -> new BaseFlowingFluid.Source(nutrientSolutionProperties()));
@@ -163,11 +194,11 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_BIODIESEL = FLUIDS.register("flowing_biodiesel",
             () -> new BaseFlowingFluid.Flowing(biodieselProperties()));
 
-    // Salt and chlor-alkali chemistry. Brine (Salt in water, from the Chemical Reactor) runs like water; the Electrolyzer
-    // splits it into Hydrogen, Chlorine (a gas) and Lye (Sodium Hydroxide solution, caustic). Hydrochloric Acid (Chlorine
-    // and Hydrogen) leaches ores like Sulfuric Acid, and burns like it.
-    // Seawater: what an Electric Pump draws from water in ocean and beach biomes. It runs like water; the Thermal
-    // Evaporator Array boils it down into Brine.
+    // Salt and chlor-alkali chemistry. Brine (Salt in water, from the Chemical Reactor) runs like water; the
+    // Electrolyzer splits it into Hydrogen, Chlorine (a gas) and Lye (Sodium Hydroxide solution, caustic). Hydrochloric
+    // Acid (Chlorine and Hydrogen) leaches ores like Sulfuric Acid, and burns like it. Seawater: what an Electric Pump
+    // draws from water in ocean and beach biomes. It runs like water; the Thermal Evaporator Array boils it down into
+    // Brine.
     public static final DeferredHolder<FluidType, FluidType> SEAWATER_TYPE = liquidType("seawater", 1_025, 1_050, 0.02F, 0.8, 0.8);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SEAWATER = FLUIDS.register("seawater",
             () -> new BaseFlowingFluid.Source(seawaterProperties()));
@@ -202,8 +233,9 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.CHLORINE_TYPE, ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE)));
 
     // Rubber and bio-plastics. Latex: the milky sap of the Rubber Dandelion's roots (the Oil Press) and of jungle trees
-    // (the Resin Tap), thick and slow; the Grain Dryer dries it into Raw Rubber. Ethylene: a gas, from Ethanol dehydrated
-    // over Sulfuric Acid in the Chemical Reactor; it polymerises into Plastic Sheet, and with Chlorine into PVC Sheet.
+    // (the Resin Tap), thick and slow; the Grain Dryer dries it into Raw Rubber. Ethylene: a gas, from Ethanol
+    // dehydrated over Sulfuric Acid in the Chemical Reactor; it polymerises into Plastic Sheet, and with Chlorine into
+    // PVC Sheet.
     public static final DeferredHolder<FluidType, FluidType> LATEX_TYPE = liquidType("latex", 980, 4_000, 0.016F, 0.6, 0.7);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LATEX = FLUIDS.register("latex",
             () -> new BaseFlowingFluid.Source(latexProperties()));
@@ -305,7 +337,8 @@ public final class ModFluids {
         return new BaseFlowingFluid.Properties(type, source, flowing);
     }
 
-    // A liquid like creosote: swimmable, carried in buckets. speed and the drags set how it moves entities (see LiquidType).
+    // A liquid like creosote: swimmable, carried in buckets. speed and the drags set how it moves entities (see
+    // LiquidType).
     private static DeferredHolder<FluidType, FluidType> liquidType(String name, int density, int viscosity, float speed, double horizontalDrag, double verticalDrag) {
         return FLUID_TYPES.register(name, () -> new LiquidType(FluidType.Properties.create()
                 .descriptionId("fluid_type.arcforge." + name)
@@ -396,6 +429,50 @@ public final class ModFluids {
                 .slopeFindDistance(2)
                 .levelDecreasePerBlock(2)
                 .tickRate(30)
+                .explosionResistance(100.0F);
+    }
+
+    // Slow like Heavy Oil: spreads 2 blocks, every 25 ticks.
+    private static BaseFlowingFluid.Properties crudeOilProperties() {
+        return new BaseFlowingFluid.Properties(CRUDE_OIL_TYPE, CRUDE_OIL, FLOWING_CRUDE_OIL)
+                .bucket(ModItems.CRUDE_OIL_BUCKET)
+                .block(ModBlocks.CRUDE_OIL)
+                .slopeFindDistance(2)
+                .levelDecreasePerBlock(2)
+                .tickRate(25)
+                .explosionResistance(100.0F);
+    }
+
+    // Thin, like Naphtha: spreads 4 blocks, every 5 ticks.
+    private static BaseFlowingFluid.Properties keroseneProperties() {
+        return new BaseFlowingFluid.Properties(KEROSENE_TYPE, KEROSENE, FLOWING_KEROSENE)
+                .bucket(ModItems.KEROSENE_BUCKET)
+                .block(ModBlocks.KEROSENE)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // A little thicker than water: spreads 3 blocks, every 10 ticks, like Biodiesel.
+    private static BaseFlowingFluid.Properties dieselProperties() {
+        return new BaseFlowingFluid.Properties(DIESEL_TYPE, DIESEL, FLOWING_DIESEL)
+                .bucket(ModItems.DIESEL_BUCKET)
+                .block(ModBlocks.DIESEL)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
+                .explosionResistance(100.0F);
+    }
+
+    // Tar: spreads 1 block, every 40 ticks.
+    private static BaseFlowingFluid.Properties bitumenProperties() {
+        return new BaseFlowingFluid.Properties(BITUMEN_TYPE, BITUMEN, FLOWING_BITUMEN)
+                .bucket(ModItems.BITUMEN_BUCKET)
+                .block(ModBlocks.BITUMEN)
+                .slopeFindDistance(1)
+                .levelDecreasePerBlock(3)
+                .tickRate(40)
                 .explosionResistance(100.0F);
     }
 

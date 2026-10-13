@@ -115,7 +115,14 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseFrameBlock.class);
         registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock.class);
         registration.registerBlockDataProvider(GreenhouseProvider.INSTANCE, PressureGlassBlock.class);
-        // Automated farms: what's growing, how fast, the fertilizer left.
+        // Automated farms: what's growing, how fast, the fertilizer left. Crude oil: the Oil Derrick, the Pumpjack and
+        // the Well Head, and the Distillation Array (from any of their blocks).
+        registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity.class);
+        registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity.class);
+        registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity.class);
+        registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class);
+        registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.WellHeadBlock.class);
+        registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, DistillationArrayCasingBlock.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, PressureGlassBlock.class);
@@ -255,6 +262,11 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.class,
                 net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class, PressureGlassBlock.class)) {
             registration.registerBlockComponent(FireboxArrayProvider.Client.INSTANCE, type);
+        }
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class, net.zagdrath.arcforge.block.multiblock.WellHeadBlock.class,
+                net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock.class, DistillationArrayCasingBlock.class)) {
+            registration.registerBlockComponent(OilfieldProvider.Client.INSTANCE, type);
         }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock.class,
                 net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class, PressureGlassBlock.class)) {

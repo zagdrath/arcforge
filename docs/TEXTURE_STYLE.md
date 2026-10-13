@@ -213,7 +213,9 @@ Creative ramp (`tools/creative_storage_gen.py`).
 
 ### Distillation column band grammar
 
-Every face in the 2-wide column shares the same row layout, so lines run unbroken all the way round:
+The unformed Distillation Array blocks keep this grammar; formed, the column is the refinery tower model (see
+"Refinery tower model" below), so the old formed faces (`plate`, the `roof_*` corners, `tray_glass`, the formed
+controller) are gone. Every face shares the same row layout, so lines run unbroken all the way round:
 
 | Rows | Content |
 |---|---|
@@ -1143,3 +1145,116 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   `face_<mode>` icons in the Sides tab's cross, with a wrapped hint to its right.
 - **Iolite** (`block/ore/iolite_ore`, `block/iolite_block`, `item/iolite_crystal`, `item/iolite_dust`): see Natural
   materials (the ore on End Stone, the crystal's own shape).
+
+## Crude oil and the oilfield
+- **Fluids** (`block/fluid/<name>_still` / `_flow`, each keeping its source's `.mcmeta`): re-toned by rank from an
+  existing fluid's frames, never repainted, so they move like their source.
+  - Crude Oil: Heavy Oil's frames on a warm black with a brown-grey sheen (`#0D0C0B #121110 #181614 #201D1A`; the flow
+    adds `#0A0908` and the sheen up to `#4A4238`). Its fog is near-black.
+  - Bitumen: Heavy Oil's frames on a cold blue-black (`#060607` to `#141418`; the flow up to `#30303A`).
+  - Kerosene: Light Oil's frames (keeping its alpha) in a pale water-white straw (`#C8C6AA` to `#FBFAEE`).
+  - Diesel: Light Oil's frames in amber (`#9C8418` to `#F6E6AA`).
+  - Refinery Gas: the gas model, tinted `#C2CCDA`.
+- **Ports** (`block/port/<mode>`, the Ports tab's `face_<mode>`): the 10×10 output plate (orange ring) with the
+  product's chip in two tones: Refinery Gas `#E4E8EE` / `#B4BCC8`, Kerosene `#F2F0DC` / `#D4D2B6`, Diesel
+  `#E8D27A` / `#C0A42C`, Bitumen `#3A3A40` / `#141418`. The face icons use the same pair with their mean between.
+- **Oilfield blocks** (`block/oilfield/*`), all in the single-block casing grammar (2 px bevel, split face at x 10):
+  - Derrick Casing: the wall plate with top rivets and the riveted strap on rows 11–13; its top (`derrick_casing_top`)
+    a tread deck: a recessed panel with three lit grating bars, each with its shadow row, and corner rivets.
+  - Derrick Frame: a cutout steel lattice: 2 px posts and rails round the edge (lit top/left, dark bottom/right), 1 px X
+    bracing behind them with a shadow pixel under, rivets at the corners.
+  - Controllers: the casing with a screen recess (`#1A1E22` floor) at x 3–12, y 2–9 and a status LED (`#B8F2EA` /
+    `#5FD4C4`, `#2F6E68` when idle). The Derrick's screen adds an amber depth gauge (`#E8913A` / `#C8782A`) with scale
+    ticks; the Pumpjack's a cyan nodding-beam glyph. `_on` frames light them.
+  - Pumpjack Casing and Controller: the hazard stripe (`#E0B020` / `#1A1A1A`, 2 px diagonal bands) in place of the
+    strap, between a `#575D65` lip and a `#16181B` shadow.
+  - Well Head (`block/well_head`, its own model): a 64×32 sheet with one rectangle per element face (flange, spool,
+    side outlet, gland), each painted to its size: 1 px lit top/left, dark bottom/right, flat between, rivets only on
+    faces 9 px or larger.
+- **Items:** Steel Pipe, a flanged pipe length on the diagonal (machine steel, a bore at the top end); Seismic Survey
+  Tool, a thumper plate, a shaft with a T handle and a readout box with a cyan screen.
+- **GUIs** (`gui/container/oil_derrick`, `pumpjack`): the Electric Pump's frame. The Derrick keeps the blue input slot
+  (Steel Pipes, with a white Steel Pipe ghost at the pump's ghost alphas `0x69` rim / `0x37` body) and drops the arrow
+  and output slot; the Pumpjack keeps both bucket slots. The tank fill falls back to a dark Crude Oil hatch
+  (`#1A1613` / `#241E19`, `#2E2620` top row) when the fluid sprite isn't there.
+
+## Refinery tower model
+- Formed, the Distillation Array's casings, tray levels and controller draw nothing (`distillation_array/hidden`, with
+  the port plates); DistillationArrayRenderer draws a refinery column from RefineryLayout, built by RefineryMesh (on
+  ModelMesh, as the turbines') on one sheet, `block/distillation_array/refinery` (128×96). The sheet is laid out as the
+  Steam Turbine Array's (flat tones, tiles, panels, CASING strips, broad-shading rows 64–87) with, in rows 48–51, the
+  fire glow: GLOW (4×7: `#7A1B0A #C73A0E #F26A16 #FFB02E #F26A16 #C73A0E #7A1B0A`), GLOW_CORE `#FFB02E` and
+  GLOW_SMALL (`#C73A0E #FFB02E #C73A0E`), dark red at the ends stepping to an orange core; no blue (it's a fired heater,
+  not a combustor).
+- **Sizing:** the shell's radius follows the cross-section (11.5 px for 2×2, 17.5 px for 3×3; 16 or 24 sides), and its
+  tray sections are 32 px tall with the top section at least 20 px; taller columns get more sections, never stretched ones.
+- **Reboiler:** a plated box over the footprint up to 13 px (PLATE sides, DECK top, FOOTING under; big faces
+  broad-shaded), the base deck plate on it, its front left corner cut away for the ladder. Burner windows on all four
+  sides: a 1 px steel frame half a px proud, a DEEP pane, and the glow drawn full-bright over it, its brightness
+  (T − 100) / 500 of the column's temperature; cold, only the dark pane shows. A stack (banded, a DEEP-capped lip)
+  rises at the back left.
+- **Shell:** CASING strips per facet (one band tone per facet, stepped along long sections and one band lighter toward
+  the top), a banded base ring, a bolted flange at each tray seam (`#575D65` band, RIVET bolt heads on every facet) and
+  a banded elliptical head.
+- **Sight glasses** (rule "Glass"): on each section's front a flat boss (PLAIN sides, a 1 px frame lit top/right, shade
+  bottom/left) with one 12×12 GLASS pane a quarter px inside its face. Behind it a shallow cavity (DARK back and top,
+  DEEP underside, SHADE sides) where the renderer draws the tray's pool in its product's own fluid sprite and tint and
+  the rising vapour, as the old tray windows did. Nothing passes in front of a pane: fittings sit at `fittingsY`, clear
+  of the platform bands.
+- **Manways** on each section's left: a banded nozzle with a bolted blind flange (eight bolt heads) and a davit arm.
+- **Platforms** on every other flange: GRATE fans from the shell out to the footprint's edge (SHADE undersides), open
+  at the ladder's corner; the top deck is GRATE plates over the head with a hatch at that corner. Railings on every deck
+  edge: a 2 px kick plate and a hand rail (MID, LIT top), a knee rail (FACE) and posts at most 8 px apart.
+- **Caged ladder** up the front left corner: banded rails, MID rungs every 4 px, and from 24 px up a cage of hoops every
+  10 px with FACE bars, bowing away from the shell.
+- **Top:** the condenser bank on legs: the tube bundle in the VENT louvre tile with a GRATE top, PLATE headers at both
+  ends, one or two fan shrouds (banded, a DARK inner wall so the opening reads as a well, two MID guard bars) with the
+  fan blades in BLADE / BLADE_BACK turning while it runs. The vapour line (banded, PLAIN elbows) rises from the head
+  into the left header; the reflux returns from the right header into the top section.
+- **Draw-offs:** one banded pipe per liquid product it makes, out of its tray through a MID nozzle collar, then down the
+  right side to the base deck. Port nozzles are PLAIN collars 10 px across, as the turbines'.
+- **Hitbox:** formed, each block's shape is the model's still parts in it (RefineryHitbox, as the Steam Turbine Array's
+  TurbineShapes), with the port plates added.
+
+## Pumpjack model
+- Formed, the Pumpjack's casings and controller hide their faces and PumpjackRenderer draws the unit from
+  PumpjackLayout, built by PumpjackMesh on `block/pumpjack/pumpjack` (the same 128×96 sheet as the refinery's) with
+  the HAZARD tile at (16, 4): `#E0B020` / `#1A1A1A` in 2 px diagonal bands.
+- **Shape** (a conventional beam pump, after real units): the beam pivots high on the post (58 px, over 3½ blocks) and
+  the horse head is big, so the unit stands about as tall as it is long. Keep those proportions; don't squash the post
+  back down to the skid.
+- In the house steel, from the ground up:
+  - The skid rails as the strap (STRAP sides, MID top) running past the well, with FACE cross members under the well
+    end.
+  - The base: a deep plinth (PLATE sides, DECK top, a MID lip) under everything but the well.
+  - The Samson post: an A-frame of four banded legs (3.6 px), the front pair splayed wide, braced along both sides
+    and across front and back low down (clear of the horse head's swing).
+  - A grating platform round the saddle with railings along both sides, and a ladder up the far side from the rail.
+  - The saddle PLAIN with a banded bearing.
+  - The gear reducer: a PLATE box with a banded half-round top about the crankshaft, a banded split ring and bearing
+    caps at the shaft, and a MID footing lip.
+  - The motor in the generator steel (GEN_PLATE, GEN_PLAIN) with an FE red band, behind the reducer, with a PLATE belt
+    guard.
+  - Big faces are broad-shaded.
+- Moving parts, drawn each frame at the crank's angle:
+  - The walking beam: a PLAIN girder with MID flanges, running past the equalizer at the back.
+  - The horse head: a ring sector about the saddle bearing, so the bridle always hangs over the well. It reaches 34°
+    below the beam and 26° above, is deepest (13 px) just above the beam and tapers to 4 px at both tips, with FACE
+    side plates, a DARK curved face, a SHADE back and four DEEP lightening holes in each side plate.
+  - The equalizer: a PLAIN crossbar out to the pitman arms (banded) on its own bearing.
+  - The cranks: PLAIN arms with big counterweights on the pin's side (a ring sector about the shaft, 17 px out, ±38°;
+    PLAIN sides, DARK inside). Only the curved edge is HAZARD; the sides stay plain (striping all of it was too
+    loud).
+  - The bridle wires are DARK, the carrier bar MID and the polished rod bright steel (BLADE).
+- The beam rocks from −0.42 to +0.35 rad, set by the crank geometry. The crank turns at 9° a tick scaled by the pump
+  rate (at least a fifth of that), so a draining deposit visibly slows it.
+- **Hitbox:** the still parts only (skid, plinth, A-frame steps, platform, ladder, reducer, motor, guard, saddle),
+  in the unit's part blocks. The beam, head and cranks move, so they're left out.
+- **Oil Derrick** (formed, the rig's blocks keep their textures): OilDerrickRenderer adds the drill string (DrillStringMesh,
+  on the Pumpjack's sheet): the crown block's sheaves, the hoist lines, a travelling block that strokes and a square
+  kelly that turns through the rotary table while drilling, all in machine steel.
+
+## Distillation Array GUI (seven products)
+- The screen is shortened to y 18–52 (x 40–93) with the Pitch output slot frame under it at (40, 54); right of it, seven
+  narrow product tanks (6 px inside, the turbines' lubricant gauge), at x 97 + 10k, lightest product on the left.
+  A product the column doesn't make at its height shows `product_locked`; the fallback fill is `#4E5258` with a `#6A6E74` top row.

@@ -18,6 +18,7 @@ import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock.Fraction;
 import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity.Product;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.heat.BurnerFuel;
 import net.zagdrath.arcforge.machine.MachineStatus;
@@ -39,9 +40,15 @@ final class DistillationGameTests {
 
     // A 2x2 column: casings top and bottom, the controller at min + (0, controllerLayer, 0), trays elsewhere.
     private static void buildColumn(GameTestHelper helper, BlockPos min, int height, int controllerLayer, Direction controllerFacing) {
+        buildColumn(helper, min, 2, height, controllerLayer, controllerFacing);
+    }
+
+    // A column `width` across: casings top and bottom, the controller at min + (0, controllerLayer, 0), trays
+    // elsewhere.
+    static void buildColumn(GameTestHelper helper, BlockPos min, int width, int height, int controllerLayer, Direction controllerFacing) {
         for (int y = 0; y < height; y++) {
-            for (int x = 0; x < 2; x++) {
-                for (int z = 0; z < 2; z++) {
+            for (int x = 0; x < width; x++) {
+                for (int z = 0; z < width; z++) {
                     BlockPos pos = min.offset(x, y, z);
                     if (y == controllerLayer && x == 0 && z == 0) {
                         helper.setBlock(pos, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get().defaultBlockState()
@@ -58,23 +65,26 @@ final class DistillationGameTests {
         return helper.getBlockEntity(min.above(controllerLayer), DistillationArrayBlockEntity.class);
     }
 
-    // Only 2x2 columns 4, 6 or 8 tall with the controller off the end layers form. The trays show the fractions
+    // 2x2 columns 4 to 16 tall with the controller off the end layers form (not 3 tall). The trays show the fractions
     // that column makes, the controller turns to face out, and taking a block away breaks it.
     static void columnForms(GameTestHelper helper) {
         BlockPos four = new BlockPos(0, 1, 0), eight = new BlockPos(3, 1, 0), five = new BlockPos(6, 1, 0), low = new BlockPos(9, 1, 0);
+        BlockPos three = new BlockPos(12, 1, 0);
         buildColumn(helper, four, 4, 1, Direction.NORTH);
         buildColumn(helper, eight, 8, 1, Direction.SOUTH);
         buildColumn(helper, five, 5, 1, Direction.NORTH);
         buildColumn(helper, low, 4, 0, Direction.NORTH);
+        buildColumn(helper, three, 3, 1, Direction.NORTH);
         helper.startSequence()
                 .thenIdle(3)
                 .thenExecute(() -> {
                     helper.assertTrue(controller(helper, four, 1).isFormed() && controller(helper, four, 1).getHeight() == 4, "The 4-high column didn't form");
                     DistillationArrayBlockEntity tall = controller(helper, eight, 1);
                     helper.assertTrue(tall.isFormed() && tall.getHeight() == 8, "The 8-high column didn't form");
-                    helper.assertTrue(!controller(helper, five, 1).isFormed(), "A 5-high column formed");
+                    helper.assertTrue(controller(helper, five, 1).isFormed() && controller(helper, five, 1).getHeight() == 5, "The 5-high column didn't form");
+                    helper.assertTrue(!controller(helper, three, 1).isFormed(), "A 3-high column formed");
                     helper.assertTrue(!controller(helper, low, 0).isFormed(), "A column with its controller in the bottom layer formed");
-                    helper.assertTrue(controller(helper, five, 1).getStatus() == MachineStatus.NOT_FORMED, "An incomplete column is " + controller(helper, five, 1).getStatus());
+                    helper.assertTrue(controller(helper, three, 1).getStatus() == MachineStatus.NOT_FORMED, "An incomplete column is " + controller(helper, three, 1).getStatus());
                     // The controller at the north-west corner can't face south into the column.
                     helper.assertTrue(helper.getBlockState(eight.above()).getValue(DistillationArrayControllerBlock.FACING) == Direction.NORTH,
                             "The controller faces " + helper.getBlockState(eight.above()).getValue(DistillationArrayControllerBlock.FACING));
@@ -135,6 +145,69 @@ final class DistillationGameTests {
                     helper.assertTrue(small.getNaphtha().getAmount() == 250 && small.getHeavyOil().getAmount() == 0 && small.getLightOil().getAmount() == 0,
                             "4 high made " + small.getNaphtha().getAmount() + " mB naphtha");
                     helper.assertTrue(small.getItems().getStack(DistillationArrayBlockEntity.SLOT_PITCH).getCount() == 2, "4 high didn't make two pitch");
+                })
+                .thenSucceed();
+    }
+
+    // A 3x3 forms, 4 to 16 tall, and its feed, heat buffer and tanks scale with it: a 2x2x8 feeds 20 mB/t and a 3x3x16
+    // 90. A 3x3 with the controller in the middle of a layer doesn't form, and a 17-high column doesn't either.
+    static void wideColumns(GameTestHelper helper) {
+        BlockPos small = new BlockPos(0, 1, 0), big = new BlockPos(3, 1, 0), tall = new BlockPos(7, 1, 0), middle = new BlockPos(11, 1, 0);
+        buildColumn(helper, small, 2, 8, 1, Direction.NORTH);
+        buildColumn(helper, big, 3, 16, 1, Direction.NORTH);
+        buildColumn(helper, tall, 2, 17, 1, Direction.NORTH);
+        buildColumn(helper, middle, 3, 6, 1, Direction.NORTH);
+        // Move the middle column's controller to the middle of its layer.
+        helper.setBlock(middle.offset(0, 1, 0), ModBlocks.TRAY_LEVEL_CASING.get());
+        helper.setBlock(middle.offset(1, 1, 1), ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get().defaultBlockState()
+                .setValue(DistillationArrayControllerBlock.FACING, Direction.NORTH));
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    DistillationArrayBlockEntity two = controller(helper, small, 1), three = controller(helper, big, 1);
+                    helper.assertTrue(two.isFormed() && two.getWidth() == 2 && two.feedRate() == 20, "A 2x2x8 feeds " + two.feedRate() + " mB/t");
+                    helper.assertTrue(three.isFormed() && three.getWidth() == 3 && three.getHeight() == 16 && three.feedRate() == 90,
+                            "A 3x3x16 is " + three.getWidth() + "x" + three.getHeight() + " feeding " + three.feedRate() + " mB/t");
+                    helper.assertTrue(three.getFeed().getCapacity() == two.getFeed().getCapacity() * 9 / 2,
+                            "A 3x3x16 holds " + three.getFeed().getCapacity() + " mB of feed against " + two.getFeed().getCapacity());
+                    helper.assertTrue(three.getHeat().getCapacity() == two.getHeat().getCapacity() * 9 / 2, "The heat buffer doesn't scale");
+                    helper.assertTrue(!controller(helper, tall, 1).isFormed(), "A 17-high column formed");
+                    DistillationArrayBlockEntity inner = helper.getBlockEntity(middle.offset(1, 1, 1), DistillationArrayBlockEntity.class);
+                    helper.assertTrue(!inner.isFormed(), "A 3x3 with its controller in the middle formed");
+                })
+                .thenSucceed();
+    }
+
+    private static final FluidResource CRUDE = FluidResource.of(ModFluids.CRUDE_OIL.get());
+
+    // Crude Oil needs 6 blocks: 6 high makes Refinery Gas, Naphtha, Diesel and Bitumen; 10 high adds Kerosene and Heavy
+    // Oil; 5 high is too short for it.
+    static void crudeOilFractions(GameTestHelper helper) {
+        BlockPos six = new BlockPos(0, 1, 0), ten = new BlockPos(3, 1, 0), five = new BlockPos(6, 1, 0);
+        buildColumn(helper, six, 6, 1, Direction.NORTH);
+        buildColumn(helper, ten, 10, 1, Direction.NORTH);
+        buildColumn(helper, five, 5, 1, Direction.NORTH);
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    for (BlockPos min : new BlockPos[] { six, ten, five }) {
+                        DistillationArrayBlockEntity column = controller(helper, min, 1);
+                        helper.assertTrue(SteamGameTests.fill(column.getFluidHandler(null), CRUDE, 1_000) == 1_000, "The column didn't take Crude Oil");
+                        column.getHeat().add(column.getHeat().getCapacity());
+                    }
+                })
+                .thenIdle(90)
+                .thenExecute(() -> {
+                    DistillationArrayBlockEntity short6 = controller(helper, six, 1);
+                    helper.assertTrue(short6.getProduct(Product.REFINERY_GAS).getAmount() == 100 && short6.getProduct(Product.NAPHTHA).getAmount() == 200
+                            && short6.getProduct(Product.DIESEL).getAmount() == 350 && short6.getProduct(Product.BITUMEN).getAmount() == 250
+                            && short6.getProduct(Product.KEROSENE).getAmount() == 0, "6 high made the wrong fractions");
+                    DistillationArrayBlockEntity tall = controller(helper, ten, 1);
+                    helper.assertTrue(tall.getProduct(Product.KEROSENE).getAmount() == 150 && tall.getProduct(Product.HEAVY_OIL).getAmount() == 150,
+                            "10 high made " + tall.getProduct(Product.KEROSENE).getAmount() + " kerosene");
+                    DistillationArrayBlockEntity stub = controller(helper, five, 1);
+                    helper.assertTrue(stub.getStatus() == MachineStatus.TOO_SHORT && stub.getFeed().getAmount() == 1_000,
+                            "A 5-high column with Crude Oil is " + stub.getStatus());
                 })
                 .thenSucceed();
     }
@@ -262,6 +335,7 @@ final class DistillationGameTests {
         helper.assertTrue(ModBlocks.ASPHALT.get().getSpeedFactor() > 1.0F && ModBlocks.ASPHALT_SLAB.get().getSpeedFactor() > 1.0F
                 && ModBlocks.ASPHALT_STAIRS.get().getSpeedFactor() > 1.0F, "Asphalt doesn't speed things up");
         helper.assertTrue(MachineRecipes.isDistillingFeed(helper.getLevel(), CREOSOTE), "Creosote isn't a distilling feed");
+        helper.assertTrue(MachineRecipes.isDistillingFeed(helper.getLevel(), CRUDE), "Crude Oil isn't a distilling feed");
         helper.succeed();
     }
 }

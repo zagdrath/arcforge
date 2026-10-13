@@ -1,0 +1,50 @@
+{
+  "type": "arcforge:distilling",
+  "input": {
+    "fluid": "arcforge:crude_oil",
+    "amount": 1000
+  },
+  "heat": 5000,
+  "min_temp": 380,
+  "by_height": {
+    "6": {
+      "fluids": {
+        "arcforge:refinery_gas": 100,
+        "arcforge:naphtha": 200,
+        "arcforge:diesel": 350,
+        "arcforge:bitumen": 250
+      }
+    },
+    "10": {
+      "fluids": {
+        "arcforge:refinery_gas": 100,
+        "arcforge:naphtha": 200,
+        "arcforge:kerosene": 150,
+        "arcforge:diesel": 250,
+        "arcforge:heavy_oil": 150,
+        "arcforge:bitumen": 100
+      }
+    },
+    "14": {
+      "fluids": {
+        "arcforge:refinery_gas": 130,
+        "arcforge:naphtha": 270,
+        "arcforge:kerosene": 190,
+        "arcforge:diesel": 230,
+        "arcforge:heavy_oil": 90,
+        "arcforge:bitumen": 60
+      }
+    }
+  },
+  "item_output": "arcforge:pitch",
+  "steam_stripping": {
+    "steam_per_batch": 100,
+    "boosts": "arcforge:naphtha",
+    "taken_from": "arcforge:bitumen",
+    "bonus": {
+      "arcforge:steam": 0.15,
+      "arcforge:high_pressure_steam": 0.3,
+      "arcforge:superheated_steam": 0.5
+    }
+  }
+}

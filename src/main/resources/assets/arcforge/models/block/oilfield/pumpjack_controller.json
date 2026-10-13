@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/oilfield/pumpjack_controller",
+    "particle": "arcforge:block/oilfield/pumpjack_casing",
+    "south": "arcforge:block/oilfield/pumpjack_casing",
+    "east": "arcforge:block/oilfield/pumpjack_casing",
+    "west": "arcforge:block/oilfield/pumpjack_casing",
+    "up": "arcforge:block/oilfield/casing_plain",
+    "down": "arcforge:block/oilfield/casing_plain"
+  }
+}

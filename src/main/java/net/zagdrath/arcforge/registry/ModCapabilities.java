@@ -182,7 +182,8 @@ public final class ModCapabilities {
                 casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), (casing, side) ->
                 casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine ? turbine.heatHandlerAt(casing.getBlockPos(), side) : null);
-        // Every casing of a formed Superheater or Condenser Array exposes the cube face it lies on (served by the centre).
+        // Every casing of a formed Superheater or Condenser Array exposes the cube face it lies on (served by the
+        // centre).
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.SUPERHEATER_ARRAY.get(), (casing, side) -> {
             SuperheaterArrayBlockEntity array = SuperheaterArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
             return array != null ? array.fluidHandlerAt(casing.getBlockPos(), side) : null;
@@ -222,8 +223,8 @@ public final class ModCapabilities {
                 FermenterBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.FERMENTER.get(),
                 FermenterBlockEntity::getEnergyHandler);
-        // Farm processing: the Millstone's items; the Mill, Oil Press and Seed Extractor's items and FE (and the press's
-        // oil); the Grain Dryer's items and heat.
+        // Farm processing: the Millstone's items; the Mill, Oil Press and Seed Extractor's items and FE (and the
+        // press's oil); the Grain Dryer's items and heat.
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.MILLSTONE.get(),
                 net.zagdrath.arcforge.blockentity.farming.MillstoneBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.MILL.get(),
@@ -274,8 +275,8 @@ public final class ModCapabilities {
                 net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity::getEnergyHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.DIAMOND_PRESS.get(),
                 net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity::getHeatHandler);
-        // Carbon capture: the Carbon Reclaimer's gases, Water, Carbon Dust and FE; the Gasifier's fuel, steam, Syngas, ash and
-        // heat; the Fischer-Tropsch Reactor's Syngas, products, catalyst, FE and heat.
+        // Carbon capture: the Carbon Reclaimer's gases, Water, Carbon Dust and FE; the Gasifier's fuel, steam, Syngas,
+        // ash and heat; the Fischer-Tropsch Reactor's Syngas, products, catalyst, FE and heat.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CARBON_RECLAIMER.get(),
                 net.zagdrath.arcforge.blockentity.machine.CarbonReclaimerBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CARBON_RECLAIMER.get(),
@@ -424,7 +425,8 @@ public final class ModCapabilities {
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.HEAT_CELL.get(),
                 HeatCellBlockEntity::getHeatHandler);
 
-        // The storage blocks' item slots: input faces take items into the drain slot, output faces give filled items from the fill slot.
+        // The storage blocks' item slots: input faces take items into the drain slot, output faces give filled items
+        // from the fill slot.
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.FLUID_TANK.get(), StorageBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(), StorageBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ENERGY_CELL.get(), StorageBlockEntity::getItemHandler);
@@ -465,7 +467,8 @@ public final class ModCapabilities {
                     (stack, access) -> new ItemAccessEnergyHandler(access, ModDataComponents.ENERGY.get(), item.capacity(), item.receiveRate(), 0), item);
         }
 
-        // Multiblocks: every block of a formed structure exposes the structure face it lies on (served by the controller).
+        // Multiblocks: every block of a formed structure exposes the structure face it lies on (served by the
+        // controller).
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CARBONIZER.get(),
                 CarbonizerBlockEntity::getItemCapability);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CARBONIZER.get(),
@@ -535,7 +538,28 @@ public final class ModCapabilities {
             var evaporator = net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure.findController(level, pos);
             return evaporator != null ? evaporator.heatHandlerAt(pos, side) : null;
         }, evaporatorParts);
-        // The Greenhouse Array: fertilizer and fluids in, the harvest out, FE and heat in, through the ports on its frames.
+        // The oilfield: the Oil Derrick takes Water and Steel Pipes in (Input) and FE (Energy); the Pumpjack gives
+        // Crude Oil out (Output) and takes FE (Energy), through their ports.
+        Block[] oilfieldParts = { ModBlocks.OIL_DERRICK_CONTROLLER.get(), ModBlocks.DERRICK_CASING.get(), ModBlocks.PUMPJACK_CONTROLLER.get(),
+                ModBlocks.PUMPJACK_CASING.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var controller = net.zagdrath.arcforge.multiblock.OilfieldStructures.findController(level, pos);
+            return controller != null ? controller.itemHandlerAt(pos, side) : null;
+        }, oilfieldParts);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var controller = net.zagdrath.arcforge.multiblock.OilfieldStructures.findController(level, pos);
+            return controller != null ? controller.fluidHandlerAt(pos, side) : null;
+        }, oilfieldParts);
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var controller = net.zagdrath.arcforge.multiblock.OilfieldStructures.findController(level, pos);
+            if (controller instanceof net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity derrick) {
+                return derrick.energyHandlerAt(pos, side);
+            }
+            return controller instanceof net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity pumpjack
+                    ? pumpjack.energyHandlerAt(pos, side) : null;
+        }, oilfieldParts);
+        // The Greenhouse Array: fertilizer and fluids in, the harvest out, FE and heat in, through the ports on its
+        // frames.
         Block[] greenhouseParts = { ModBlocks.GREENHOUSE_CONTROLLER.get(), ModBlocks.GREENHOUSE_FRAME.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
             GreenhouseBlockEntity greenhouse = GreenhouseStructure.findController(level, pos);

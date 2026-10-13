@@ -124,9 +124,9 @@ public enum MachineStatus {
     PLANTING("planting", "led_running"),
     GROWING_TREES("growing_trees", "led_idle"),
     NO_SAPLINGS("no_saplings", "led_idle"),
-    // Carbon capture: the Carbon Reclaimer at work, the Gasifier at work (NO_STEAM without steam, TOO_COLD under 800°C),
-    // and the Fischer-Tropsch Reactor without iron or nickel dust in its catalyst slot (it shows SYNTHESIZING at work,
-    // TOO_COLD under 200°C and TOO_HOT over 350°C).
+    // Carbon capture: the Carbon Reclaimer at work, the Gasifier at work (NO_STEAM without steam, TOO_COLD under
+    // 800°C), and the Fischer-Tropsch Reactor without iron or nickel dust in its catalyst slot (it shows SYNTHESIZING
+    // at work, TOO_COLD under 200°C and TOO_HOT over 350°C).
     RECLAIMING("reclaiming", "led_running"),
     GASIFYING("gasifying", "led_running"),
     NO_CATALYST("no_catalyst", "led_blocked"),
@@ -136,7 +136,14 @@ public enum MachineStatus {
     // The Steam Boiler Array blowing off overpressure: steam that doesn't fit its full tank, or heat past its band.
     VENTING("venting", "led_idle"),
     // Switched off through the machine control API (docs/API.md), whatever its redstone mode.
-    SWITCHED_OFF("switched_off", "led_off");
+    SWITCHED_OFF("switched_off", "led_off"),
+    // The Distillation Array with a feed its height makes nothing from (Crude Oil needs 6 blocks).
+    TOO_SHORT("too_short", "led_blocked"),
+    // The Oil Derrick at work, without oil under it (the Pumpjack too), and out of Steel Pipe. (The Pumpjack shows
+    // PUMPING.)
+    DRILLING("drilling", "led_running"),
+    NO_OIL("no_oil", "led_blocked"),
+    NO_PIPE("no_pipe", "led_blocked");
 
     private final String name;
     private final String led;

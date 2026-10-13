@@ -90,8 +90,9 @@ public final class TurbineHitbox {
         return shell != null ? shape(level, pos, shell, 0) : null;
     }
 
-    // The master of the Steam Turbine Array a pane is a window of, or NO_ARRAY: the first casing found walking out across
-    // the panes beside it, kept a second (a pane is asked often, and the walk is up to a turbine's length each way).
+    // The master of the Steam Turbine Array a pane is a window of, or NO_ARRAY: the first casing found walking out
+    // across the panes beside it, kept a second (a pane is asked often, and the walk is up to a turbine's length each
+    // way).
     private static long masterOfPane(Level level, BlockPos pos) {
         long time = level.getGameTime();
         Map<Long, long[]> panes;
@@ -198,7 +199,8 @@ public final class TurbineHitbox {
         return shape.optimize();
     }
 
-    private static VoxelShape withPorts(VoxelShape shape, int ports) {
+    // Also the Distillation Array's (see RefineryHitbox).
+    static VoxelShape withPorts(VoxelShape shape, int ports) {
         for (Direction face : Direction.values()) {
             if ((ports & 1 << face.ordinal()) != 0) {
                 shape = Shapes.or(shape, port(face));

@@ -151,6 +151,11 @@ public final class ModMenuTypes {
             MENU_TYPES.register("thermal_evaporator",
                     () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu::new));
 
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.OilDerrickMenu>> OIL_DERRICK =
+            MENU_TYPES.register("oil_derrick", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.OilDerrickMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.PumpjackMenu>> PUMPJACK =
+            MENU_TYPES.register("pumpjack", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.PumpjackMenu::new));
+
     // Automated farms: one menu class, one type each.
     public static final Supplier<MenuType<ClocheMenu>> GLASS_CLOCHE = MENU_TYPES.register("glass_cloche",
             () -> IMenuTypeExtension.create(ClocheMenu::glassCloche));

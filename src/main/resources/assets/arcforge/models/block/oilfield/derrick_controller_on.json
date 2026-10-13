@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/oilfield/derrick_controller_on",
+    "particle": "arcforge:block/oilfield/derrick_casing",
+    "south": "arcforge:block/oilfield/derrick_casing",
+    "east": "arcforge:block/oilfield/derrick_casing",
+    "west": "arcforge:block/oilfield/derrick_casing",
+    "up": "arcforge:block/oilfield/casing_plain",
+    "down": "arcforge:block/oilfield/casing_plain"
+  }
+}

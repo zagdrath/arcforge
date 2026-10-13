@@ -107,8 +107,8 @@ Which blocks provide it:
 - every block of a formed multiblock: casings, ports, glass, the controller, and interior blocks such as a Battery
   Array's cells. All of them return the same `MachineControl`, the controller's;
 - the controller block of a multiblock that has a dedicated controller block (Biogas Digester, Firebox Array, Battery
-  Array, Thermal Evaporator, Solar Thermal Array, Distillation Array, Greenhouse Array), even while the structure isn't
-  formed. It then reports `isFormed() == false` and `MachineStatus.NOT_FORMED`;
+  Array, Thermal Evaporator, Solar Thermal Array, Distillation Array, Greenhouse Array, Oil Derrick, Pumpjack), even
+  while the structure isn't formed. It then reports `isFormed() == false` and `MachineStatus.NOT_FORMED`;
 - every block of the Arc Quarry's 3x3x3 footprint, which resolves to the quarry.
 
 Casings of an unformed cube or shell array (the Arc Crushing, Induction Furnace, Metal Pressing, Superheater, Condenser,

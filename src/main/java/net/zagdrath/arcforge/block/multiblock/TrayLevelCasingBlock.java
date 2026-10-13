@@ -12,9 +12,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 
-// A casing with a window onto a tray of the column: glass above a steel sill. Formed, the column's renderer
-// draws the tray inside, the fraction that pools at its height (FRACTION, set when the column forms) and
-// vapour rising while the column runs (LIT). See-through, so light gets in (sunlight too, once formed).
+// A casing with a window onto a tray of the column: glass above a steel sill. Formed, it draws nothing and the column
+// is drawn as a refinery tower (see DistillationArrayRenderer), whose sight glasses show each tray's pool and the
+// vapour rising while it runs. FRACTION is still set when the column forms; LIT while it runs. See-through.
 public class TrayLevelCasingBlock extends DistillationArrayCasingBlock {
     // Bottom to top.
     public enum Fraction implements StringRepresentable {

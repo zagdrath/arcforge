@@ -25,25 +25,25 @@ import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 
-// The Distillation Array: a solid column exactly 2x2 across and 4, 6 or 8 tall, of Distillation Array
-// Casings and Tray Level Casings with exactly one Distillation Array Controller. The controller and the
-// trays can't be in the top or bottom layer. The controller's block entity runs it and decides whether it
-// is formed: the column is the full 2x2 layers above and below it (so stacking more casings on a formed
-// column breaks it until it reaches the next height). Other parts find the controller by searching around
-// themselves.
+// The Distillation Array: a solid column 2x2 or 3x3 across and 4 to 16 tall, of Distillation Array Casings and Tray
+// Level Casings with exactly one Distillation Array Controller. The controller and the trays can't be in the top or
+// bottom layer, and the controller needs a side on the outside (not the middle of a 3x3). The controller's block entity
+// runs it and decides whether it is formed: the column is the full layers above and below it (so stacking more casings
+// on a formed column makes it taller, up to 16). A 3x3 of parts round the controller is always read as a 3x3, never as
+// a 2x2 inside it. Other parts find the controller by searching around themselves. Formed, the column draws as a round
+// refinery tower (see DistillationArrayRenderer) and its blocks' shapes follow it (see RefineryLayout).
 public final class DistillationStructure {
-    public static final int WIDTH = 2;
-    public static final int MAX_HEIGHT = 8;
-    private static final int[] HEIGHTS = { 4, 6, 8 };
+    public static final int MIN_WIDTH = 2, MAX_WIDTH = 3;
+    public static final int MIN_HEIGHT = 4, MAX_HEIGHT = 16;
 
-    public record Column(BlockPos min, int height) {
+    public record Column(BlockPos min, int width, int height) {
         public BlockPos max() {
-            return min.offset(WIDTH - 1, height - 1, WIDTH - 1);
+            return min.offset(width - 1, height - 1, width - 1);
         }
 
         public boolean contains(BlockPos pos) {
-            return pos.getX() >= min.getX() && pos.getX() < min.getX() + WIDTH
-                    && pos.getZ() >= min.getZ() && pos.getZ() < min.getZ() + WIDTH
+            return pos.getX() >= min.getX() && pos.getX() < min.getX() + width
+                    && pos.getZ() >= min.getZ() && pos.getZ() < min.getZ() + width
                     && pos.getY() >= min.getY() && pos.getY() < min.getY() + height;
         }
 
@@ -56,6 +56,12 @@ public final class DistillationStructure {
             return layer(pos) == 0 || layer(pos) == height - 1;
         }
 
+        // Whether pos has a side on the outside of the column (every block of a 2x2 does; the middle of a 3x3 doesn't).
+        public boolean isOuter(BlockPos pos) {
+            int x = pos.getX() - min.getX(), z = pos.getZ() - min.getZ();
+            return x == 0 || z == 0 || x == width - 1 || z == width - 1;
+        }
+
         public Iterable<BlockPos> positions() {
             return BlockPos.betweenClosed(min, max());
         }
@@ -64,12 +70,7 @@ public final class DistillationStructure {
     private DistillationStructure() {}
 
     public static boolean isHeight(int height) {
-        for (int allowed : HEIGHTS) {
-            if (allowed == height) {
-                return true;
-            }
-        }
-        return false;
+        return height >= MIN_HEIGHT && height <= MAX_HEIGHT;
     }
 
     public static boolean isPart(BlockState state) {
@@ -82,36 +83,45 @@ public final class DistillationStructure {
 
     // --- Finding the column around a controller ---
 
-    // The valid column the controller at pos is in, or null. current: the column it has now (its blocks
-    // may still be formed).
+    // The valid column the controller at pos is in, or null. current: the column it has now (its blocks may still be
+    // formed). A 3x3 is tried first; where a full 3x3 layer of parts surrounds the controller (with no other controller
+    // in it, and none of another column's formed blocks), only a 3x3 will do, so a 3x3 being built doesn't form as a
+    // 2x2. 2x2 columns packed side by side still form, each round its own controller.
     public static @Nullable Column find(Level level, BlockPos controller, @Nullable Column current) {
-        for (int dx = -1; dx <= 0; dx++) {
-            for (int dz = -1; dz <= 0; dz++) {
-                int x = controller.getX() + dx;
-                int z = controller.getZ() + dz;
-                if (!isFullLayer(level, x, controller.getY(), z)) {
-                    continue;
+        boolean wide = false;
+        for (int width = MAX_WIDTH; width >= MIN_WIDTH; width--) {
+            for (int dx = -(width - 1); dx <= 0; dx++) {
+                for (int dz = -(width - 1); dz <= 0; dz++) {
+                    int x = controller.getX() + dx;
+                    int z = controller.getZ() + dz;
+                    if (!isFullLayer(level, x, controller.getY(), z, width)) {
+                        continue;
+                    }
+                    wide |= width == MAX_WIDTH && isOwnLayer(level, x, controller.getY(), z, width, controller, current);
+                    int bottom = controller.getY();
+                    while (bottom > controller.getY() - MAX_HEIGHT && isFullLayer(level, x, bottom - 1, z, width)) {
+                        bottom--;
+                    }
+                    int top = controller.getY();
+                    while (top < controller.getY() + MAX_HEIGHT && isFullLayer(level, x, top + 1, z, width)) {
+                        top++;
+                    }
+                    Column column = new Column(new BlockPos(x, bottom, z), width, top - bottom + 1);
+                    if (isHeight(column.height()) && isValid(level, column, controller, current)) {
+                        return column;
+                    }
                 }
-                int bottom = controller.getY();
-                while (bottom > controller.getY() - MAX_HEIGHT && isFullLayer(level, x, bottom - 1, z)) {
-                    bottom--;
-                }
-                int top = controller.getY();
-                while (top < controller.getY() + MAX_HEIGHT && isFullLayer(level, x, top + 1, z)) {
-                    top++;
-                }
-                Column column = new Column(new BlockPos(x, bottom, z), top - bottom + 1);
-                if (isHeight(column.height()) && isValid(level, column, controller, current)) {
-                    return column;
-                }
+            }
+            if (wide) {
+                return null;
             }
         }
         return null;
     }
 
-    private static boolean isFullLayer(Level level, int x, int y, int z) {
-        for (int dx = 0; dx < WIDTH; dx++) {
-            for (int dz = 0; dz < WIDTH; dz++) {
+    private static boolean isFullLayer(Level level, int x, int y, int z, int width) {
+        for (int dx = 0; dx < width; dx++) {
+            for (int dz = 0; dz < width; dz++) {
                 BlockPos pos = new BlockPos(x + dx, y, z + dz);
                 if (!level.isLoaded(pos) || !isPart(level.getBlockState(pos))) {
                     return false;
@@ -121,7 +131,28 @@ public final class DistillationStructure {
         return true;
     }
 
+    // Whether a full layer could only be this controller's column: no other controller and no other column's formed
+    // block.
+    private static boolean isOwnLayer(Level level, int x, int y, int z, int width, BlockPos controller, @Nullable Column current) {
+        for (int dx = 0; dx < width; dx++) {
+            for (int dz = 0; dz < width; dz++) {
+                BlockPos pos = new BlockPos(x + dx, y, z + dz);
+                BlockState state = level.getBlockState(pos);
+                if (state.getBlock() instanceof DistillationArrayControllerBlock && !pos.equals(controller)) {
+                    return false;
+                }
+                if (state.getValue(ColumnPart.FORMED) && (current == null || !current.contains(pos))) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     private static boolean isValid(Level level, Column column, BlockPos controller, @Nullable Column current) {
+        if (!column.isOuter(controller)) {
+            return false;
+        }
         for (BlockPos pos : column.positions()) {
             BlockState state = level.getBlockState(pos);
             boolean isController = state.getBlock() instanceof DistillationArrayControllerBlock;
@@ -147,7 +178,8 @@ public final class DistillationStructure {
             BlockState state = level.getBlockState(immutable);
             BlockState formed = state.setValue(ColumnPart.FORMED, true);
             if (state.getBlock() instanceof TrayLevelCasingBlock) {
-                formed = formed.setValue(TrayLevelCasingBlock.FRACTION, TrayLevelCasingBlock.Fraction.at(column.layer(immutable), column.height()));
+                formed = formed.setValue(TrayLevelCasingBlock.FRACTION, TrayLevelCasingBlock.Fraction.at(column.layer(immutable),
+                        Math.min(column.height(), 8)));
             }
             if (state.getBlock() instanceof DistillationArrayControllerBlock) {
                 formed = formed.setValue(DistillationArrayControllerBlock.FACING, outward(column, immutable, state.getValue(DistillationArrayControllerBlock.FACING)));
@@ -179,11 +211,15 @@ public final class DistillationStructure {
         MultiblockAutomation.refresh(level, column.min(), column.max());
     }
 
-    // A facing that points out of the column: each block of a 2x2 has one outward side on each axis, so a
-    // facing into the column turns round.
+    // A facing that points out of the column: a facing into it turns round, and on a 3x3's side (with one outward side)
+    // to that side.
     public static Direction outward(Column column, BlockPos pos, Direction facing) {
-        BlockPos next = pos.relative(facing);
-        return column.contains(next) ? facing.getOpposite() : facing;
+        for (Direction candidate : new Direction[] { facing, facing.getOpposite(), facing.getClockWise(), facing.getCounterClockWise() }) {
+            if (!column.contains(pos.relative(candidate))) {
+                return candidate;
+            }
+        }
+        return facing;
     }
 
     // Tray and controller lights follow whether the column is running.
@@ -219,12 +255,12 @@ public final class DistillationStructure {
         }
     }
 
-    // Controllers in any column pos could be part of: one block to each side, up to 7 above or below.
+    // Controllers in any column pos could be part of: up to two blocks to each side, up to 15 above or below.
     private static void forEachNearbyController(BlockGetter level, BlockPos pos, Consumer<DistillationArrayBlockEntity> action) {
         BlockPos.MutableBlockPos candidate = new BlockPos.MutableBlockPos();
         for (int dy = -(MAX_HEIGHT - 1); dy <= MAX_HEIGHT - 1; dy++) {
-            for (int dx = -1; dx <= 1; dx++) {
-                for (int dz = -1; dz <= 1; dz++) {
+            for (int dx = -(MAX_WIDTH - 1); dx <= MAX_WIDTH - 1; dx++) {
+                for (int dz = -(MAX_WIDTH - 1); dz <= MAX_WIDTH - 1; dz++) {
                     candidate.setWithOffset(pos, dx, dy, dz);
                     if (level.getBlockState(candidate).getBlock() instanceof DistillationArrayControllerBlock
                             && level.getBlockEntity(candidate) instanceof DistillationArrayBlockEntity controller) {

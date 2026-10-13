@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "G G",
+    "PGP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:gears/steel"
+  },
+  "result": {
+    "id": "arcforge:pumpjack_casing",
+    "count": 4
+  }
+}

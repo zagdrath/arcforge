@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P",
+    "R",
+    "P"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:steel_pipe",
+    "count": 3
+  }
+}

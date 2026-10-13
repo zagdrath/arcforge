@@ -1,0 +1,20 @@
+{
+  "title": "Crude Oil",
+  "icon": "arcforge:seismic_survey_tool",
+  "items": [
+    "arcforge:seismic_survey_tool",
+    "arcforge:crude_oil_bucket",
+    "arcforge:steel_pipe",
+    "arcforge:well_head"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Crude Oil lies in deposits deep underground. The world is split into large regions, 8 chunks across, and each may hold one deposit: a round patch of chunks with its own kind, amount and depth. Deserts, oceans, badlands and plains have deposits more often, and bigger ones.\n# Kinds\n- Oil Seep: 1,000 to 3,000 buckets.\n- Oil Pocket: 4,000 to 10,000.\n- Oil Field: 12,000 to 30,000.\n- Giant Oil Field: 40,000 to 100,000.\nA deposit lies somewhere between Y -48 and Y 8."
+    },
+    {
+      "type": "text",
+      "text": "# Seismic Survey Tool\nUse it on the ground: it tells you whether there's oil under this chunk, what kind of deposit it is, roughly how many buckets are left in it, and how deep it lies. Walk the region to find its edges.\n# Getting it out\nBuild an Oil Derrick over the deposit to drill down to it; it leaves a Well Head. Build a Pumpjack round the Well Head to pump the oil out. Several pumpjacks can share one deposit.\n# Running dry\nA Pumpjack slows as its deposit drains, down to a quarter of its full rate. A drained deposit never quite runs dry: every pumpjack on it still gets a trickle of 40 mB a second."
+    }
+  ]
+}

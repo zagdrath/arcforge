@@ -126,6 +126,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Evaporating(gui),
                 new MachineCategories.ArcforgeSmelting(gui),
                 new MachineCategories.Distilling(gui),
+                new MachineCategories.OilDeposits(gui),
+                new MachineCategories.OilDrilling(gui),
                 new MachineCategories.Steam(gui),
                 new MachineCategories.Superheating(gui),
                 new MachineCategories.Condensing(gui),
@@ -182,6 +184,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.ArcforgeSmelting.TYPE, recipes(ModRecipes.ARCFORGE_SMELTING.get()));
         registration.addRecipes(MachineCategories.Distilling.TYPE, recipes(ModRecipes.DISTILLING.get()).stream()
                 .flatMap(holder -> MachineCategories.DistillingPage.of(holder).stream()).toList());
+        registration.addRecipes(MachineCategories.OilDeposits.TYPE,
+                java.util.Arrays.stream(net.zagdrath.arcforge.oil.DepositKind.values()).map(MachineCategories.DepositPage::new).toList());
+        registration.addRecipes(MachineCategories.OilDrilling.TYPE, List.of(new MachineCategories.DrillingPage(64)));
         registration.addRecipes(MachineCategories.Steam.TYPE, List.of(SteamGrade.values()).stream().map(MachineCategories.SteamRecipe::new).toList());
         registration.addRecipes(MachineCategories.Superheating.TYPE, MachineCategories.SuperheatingRecipe.all());
         registration.addRecipes(MachineCategories.Condensing.TYPE, List.of(new MachineCategories.CondensingRecipe()));
@@ -351,6 +356,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.BurnerFuels.TYPE, ModBlocks.FUEL_BURNER.get(), ModBlocks.FIREBOX_ARRAY_CONTROLLER.get());
         registration.addCraftingStation(MachineCategories.GasTurbineFuels.TYPE, ModBlocks.GAS_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.BatteryComponents.TYPE, ModBlocks.BATTERY_ARRAY_CONTROLLER.get(), ModBlocks.BATTERY_ARRAY_CASING.get());
+        registration.addCraftingStation(MachineCategories.OilDeposits.TYPE, ModItems.SEISMIC_SURVEY_TOOL.get(), ModBlocks.PUMPJACK_CONTROLLER.get(),
+                ModBlocks.OIL_DERRICK_CONTROLLER.get());
+        registration.addCraftingStation(MachineCategories.OilDrilling.TYPE, ModBlocks.OIL_DERRICK_CONTROLLER.get(), ModBlocks.DERRICK_CASING.get(),
+                ModBlocks.DERRICK_FRAME.get());
         registration.addCraftingStation(MachineCategories.Distilling.TYPE, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(),
                 ModBlocks.DISTILLATION_ARRAY_CASING.get(), ModBlocks.TRAY_LEVEL_CASING.get());
         registration.addCraftingStation(RecipeTypes.SMELTING, ModBlocks.INDUCTION_FURNACE.get(), ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get());

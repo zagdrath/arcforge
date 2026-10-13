@@ -22,8 +22,65 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+Suggested version: **2.7.0** (minor: new content and a rebuilt Distillation Array; worlds and configs carry over).
+
+### Added
+
+- **Crude oil.** Deep underground, the world is split into regions (8 chunks across), and about a third of them hold
+  an oil deposit: a round patch of chunks between Y −48 and 8. Regions in deserts, oceans, badlands and plains (the
+  biome tag `arcforge:oil_rich`) have one about twice as often, and bigger. There are four kinds: Oil Seep
+  (1,000–3,000 buckets), Oil Pocket (4,000–10,000), Oil Field (12,000–30,000) and Giant Oil Field (40,000–100,000), the
+  Giant the rarest. Deposits follow from the world seed alone and every well over one shares it. A drained deposit
+  never runs dry: each Pumpjack on it still gets a trickle (40 mB a second).
+  - **Crude Oil**, a thick black fluid, with its bucket.
+  - **Seismic Survey Tool** (a comparator on a steel rod and plates). Use it on the ground to learn whether there's oil
+    under the chunk: its kind, roughly how many buckets are left and how deep it lies, or that it's drained.
+  - **Oil Derrick**, a 3×3 drilling rig six blocks tall over a deposit: a floor ring of Derrick Casings round an open
+    bore with the Oil Derrick Controller in it, Derrick Frame legs on the corners and a 3×3 of frames on top. With FE
+    (120 FE/t), water (10 mB/t of drilling mud) and Steel Pipes (one per 4 blocks of hole) it drills a block every 2
+    seconds down to the deposit, then strikes oil: the rig comes down, handing back its blocks, and a Well Head caps
+    the hole. A rig broken and rebuilt over the same hole carries on where it was. A drill string turns in the bore
+    while it runs.
+  - **Pumpjack**, a 3×5 skid of Pumpjack Casings round a Well Head, with a post three casings tall in the middle and a
+    Pumpjack Controller at the far end. With FE (60 FE/t) it pumps Crude Oil out through Output ports or into
+    buckets: 30 mB/t from a full deposit, slowing in a straight line to a quarter of that as it drains, then the
+    trickle. It's modelled on a real beam pump: an A-frame post with a ladder and platform, a walking beam with a
+    curved horse head over the well, and a gear reducer swinging two big crank counterweights. The beam nods slower as
+    the pumping slows.
+  - **Steel Pipe** (3 from two steel plates and a steel rod).
+  - GUIs, Handbook pages (Crude Oil, Oil Derrick, Pumpjack), JEI categories (Oil Deposits; Oil Drilling), Jade
+    tooltips (depth and pipes, pump rate and deposit left, the Well Head's deposit), the machine control API for both
+    machines, GameTests, and the advancements Prospector, Black Gold, Nodding Donkey, Cut to Size and the challenge
+    Fractionator. All values are in config (`world.oilDeposits`, `multiblocks.oilDerrick`, `multiblocks.pumpjack`).
+- **Refinery products from Crude Oil** in the Distillation Array (1,000 mB a batch, 5,000 HU, at 380°C or hotter). What
+  it gives depends on the column's height; a column under 6 tall can't distil it, and it makes no Pitch:
+
+  | Height | Refinery Gas | Naphtha | Kerosene | Diesel | Heavy Oil | Bitumen |
+  |---|---|---|---|---|---|---|
+  | 6–9 | 100 | 200 | – | 350 | – | 250 |
+  | 10–13 | 100 | 200 | 150 | 250 | 150 | 100 |
+  | 14–16 | 130 | 270 | 190 | 230 | 90 | 60 |
+
+  Steam stripping moves Bitumen into Naphtha, as it moves Heavy Oil on creosote.
+  - New fluids: **Refinery Gas** (a gas, in the gas API), **Kerosene**, **Diesel** and **Bitumen**, with buckets for
+    the liquids and a port mode each. Kerosene (190 HU/t at 1,150°C), Diesel (175 HU/t at 1,050°C) and Refinery Gas
+    (55 HU/t at 1,150°C) are Fuel Burner, Firebox Array and Gas Turbine Array fuels, and Kerosene and Diesel catch
+    fire in the world.
+
 ### Changed
 
+- **Distillation Array, rebuilt as a refinery tower:**
+  - **Sizes:** 2×2 or 3×3 across and any height from 4 to 16 (was 2×2 at 4, 6 or 8). Its feed rate, heat buffer and
+    heat use scale with its cross-section (a 3×3 ×2.25) and height: a 2×2×8 still distils 20 mB/t, and a 3×3×16 90
+    mB/t. Its tanks scale with its volume (the defaults are a 2×2×8's). Creosote keeps its recipe: a column 8 or more
+    tall gives what an 8-tall one did.
+  - **Seven product tanks** in its GUI, lightest on the left; a product the column doesn't make at its height is
+    locked. The machine control API lists all seven.
+  - **Formed model:** a round refinery column in flanged tray sections, with a sight glass on each tray showing its
+    liquid and rising vapour, manways, platforms with railings on every other flange, a caged ladder, a draw-off pipe
+    for each product, a vapour line to an air-cooled condenser bank whose fans turn while it runs, and a fired reboiler
+    whose burner windows glow with the column's heat. Ports are nozzles from the tower out to the block face.
+  - **Form-fitting hitbox:** once formed, each block's outline and collision follow the parts of the model in it.
 - **A formed Steam Turbine Array is one target.** Looking at any part of it outlines the whole array as one box, and
   each of its blocks is clicked as a full block, instead of the outline following the model block by block. You still
   walk on and around the model itself.
@@ -39,6 +96,16 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
   turbine, so its model lingered and rebuilding it was slow.
 - **Steam Turbine Array windows no longer fill with slats at a slant.** The stage rings now only line the lower half of
   the casing, so the upper panes show the blades from low and side angles.
+
+### Upgrading
+
+- **Built Distillation Arrays keep forming** and keep their tanks and heat. Formed, they now draw as the refinery
+  tower, so their casings and tray windows no longer show. A 2×2 column under 8 tall now has smaller tanks than before
+  (half at 4 tall); fluid already over the new size stays until it's drawn off.
+- **New config keys:** `world.oilDeposits`, `multiblocks.oilDerrick` and `multiblocks.pumpjack` get their defaults.
+  The `multiblocks.distillationArray` values keep their meaning, now for a 2×2 column (4 tall for the feed rate and heat
+  buffer, 8 tall for the tanks) and scaled for other sizes.
+- **Oil deposits** follow from the world seed alone, so existing worlds have them, under old chunks and new.
 
 ## [2.6.1] - 2026-10-12
 

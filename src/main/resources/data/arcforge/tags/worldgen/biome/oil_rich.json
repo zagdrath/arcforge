@@ -1,0 +1,20 @@
+{
+  "values": [
+    {
+      "id": "#c:is_desert",
+      "required": false
+    },
+    {
+      "id": "#minecraft:is_ocean",
+      "required": false
+    },
+    {
+      "id": "#minecraft:is_badlands",
+      "required": false
+    },
+    {
+      "id": "#c:is_plains",
+      "required": false
+    }
+  ]
+}

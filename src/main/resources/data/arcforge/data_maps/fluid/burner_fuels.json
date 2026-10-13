@@ -47,6 +47,21 @@
       "hu_per_mb": 50,
       "mb_per_tick": 1.0,
       "burn_temperature": 1150
+    },
+    "arcforge:kerosene": {
+      "hu_per_mb": 380,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1150
+    },
+    "arcforge:diesel": {
+      "hu_per_mb": 350,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1050
+    },
+    "arcforge:refinery_gas": {
+      "hu_per_mb": 55,
+      "mb_per_tick": 1.0,
+      "burn_temperature": 1150
     }
   }
 }

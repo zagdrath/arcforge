@@ -20,23 +20,26 @@ import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.DistillationArrayMenu;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
-import net.zagdrath.arcforge.registry.ModFluids;
+import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity.Product;
 import net.zagdrath.arcforge.steam.SteamGrade;
 
-// Layout follows distillation_array_gui_layout.json: feed and steam tanks on the left, the screen, then the
-// Naphtha, Light Oil and Heavy Oil tanks (the last two locked below the height that makes them) and the
-// Pitch slot. All positions are relative to leftPos/topPos.
+// Feed and steam tanks on the left, the screen (temperature, heat bar, steam stripping, status), the Pitch slot and the
+// column's size and feed rate under it, then a narrow tank for each product, lightest first (Refinery Gas, Naphtha,
+// Kerosene, Light Oil, Diesel, Heavy Oil, Bitumen); a product the column's recipe doesn't make at its height is locked.
+// All positions are relative to leftPos/topPos.
 public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu> {
-    private static final int FEED_X = 9, STEAM_X = 25, NAPHTHA_X = 97, LIGHT_X = 115, HEAVY_X = 133;
-    private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50;
-    private static final int LIGHT_HEIGHT = 8, HEAVY_HEIGHT = 6;
-    // The screen recess is x40..93 (inner 41..92); text keeps 2 px off its inner edges, the heat bar is centred.
-    private static final int SCREEN_X = 43, TEMP_RIGHT = 92, TEMP_Y = 23, HEAT_X = 46, HEAT_Y = 34, HEAT_W = 42, BONUS_Y = 43;
-    private static final int LED_X = 43, LED_Y = 56, STATUS_X = 51, STATUS_Y = 56, STATUS_W = TEMP_RIGHT - STATUS_X;
+    private static final int FEED_X = 9, STEAM_X = 25, PRODUCT_X = 97, PRODUCT_PITCH = 10;
+    private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50, PRODUCT_W = 6;
+    // The screen recess is x40..93, y18..52 (inner 41..92 x 19..51); text keeps 2 px off its inner edges.
+    private static final int SCREEN_X = 43, TEMP_RIGHT = 92, TEMP_Y = 21, HEAT_X = 46, HEAT_Y = 31, HEAT_W = 42, BONUS_Y = 36;
+    private static final int LED_X = 43, LED_Y = 44, STATUS_X = 51, STATUS_Y = 44, STATUS_W = TEMP_RIGHT - STATUS_X;
+    private static final int INFO_X = 61, SIZE_Y = 56, RATE_Y = 65, INFO_W = 32;
     private static final int NO_STEAM_COLOR = 0xFF707070;
 
     private final Identifier tankGauge = sprite("tank_gauge");
-    private final Identifier locked = sprite("locked");
+    private final Identifier productGauge = sprite("product_gauge");
+    private final Identifier productFill = sprite("product_fill");
+    private final Identifier locked = sprite("product_locked");
 
     public DistillationArrayScreen(DistillationArrayMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "distillation_array", List.of(new HeatTab(menu::getHeat,
@@ -63,20 +66,20 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
                 x, y, FEED_X, TANK_Y, TANK_W, TANK_H);
         drawFluidTank(graphics, menu.getSteam(), menu.getSteamAmount(), menu.getSteamCapacity(), sprite("steam_fill"), tankGauge,
                 x, y, STEAM_X, TANK_Y, TANK_W, TANK_H);
-        drawFluidTank(graphics, ModFluids.NAPHTHA.get(), menu.getNaphtha(), menu.getOutputCapacity(), sprite("naphtha_fill"), tankGauge,
-                x, y, NAPHTHA_X, TANK_Y, TANK_W, TANK_H);
-        drawFluidTank(graphics, ModFluids.LIGHT_OIL.get(), menu.getLightOil(), menu.getOutputCapacity(), sprite("light_oil_fill"), tankGauge,
-                x, y, LIGHT_X, TANK_Y, TANK_W, TANK_H);
-        drawFluidTank(graphics, ModFluids.HEAVY_OIL.get(), menu.getHeavyOil(), menu.getOutputCapacity(), sprite("heavy_oil_fill"), tankGauge,
-                x, y, HEAVY_X, TANK_Y, TANK_W, TANK_H);
-        if (menu.getHeight() < LIGHT_HEIGHT) {
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, locked, x + LIGHT_X, y + TANK_Y, TANK_W, TANK_H);
-        }
-        if (menu.getHeight() < HEAVY_HEIGHT) {
-            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, locked, x + HEAVY_X, y + TANK_Y, TANK_W, TANK_H);
+        for (Product product : Product.values()) {
+            int tankX = productX(product);
+            drawFluidTank(graphics, product.fluid(), menu.getProduct(product), menu.getOutputCapacity(), productFill, productGauge,
+                    x, y, tankX, TANK_Y, PRODUCT_W, TANK_H);
+            if (!menu.makes(product) && menu.getProduct(product) <= 0) {
+                graphics.blitSprite(RenderPipelines.GUI_TEXTURED, locked, x + tankX, y + TANK_Y, PRODUCT_W, TANK_H);
+            }
         }
         drawHeatBar(graphics, x, y, HEAT_X, HEAT_Y, HEAT_W, menu.getTemperature());
         drawLed(graphics, x, y, LED_X, LED_Y);
+    }
+
+    private static int productX(Product product) {
+        return PRODUCT_X + PRODUCT_PITCH * product.ordinal();
     }
 
     @Override
@@ -89,44 +92,60 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
             graphics.text(font, Component.translatable("gui.arcforge.no_steam"), SCREEN_X, BONUS_Y, NO_STEAM_COLOR, false);
         }
         graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
+        graphics.text(font, clipped(sizeText(), INFO_W), INFO_X, SIZE_Y, ArcforgeGui.LABEL, false);
+        graphics.text(font, clipped(Component.translatable("gui.arcforge.mb_per_tick", ArcforgeGui.grouped(menu.getFeedRate())), INFO_W),
+                INFO_X, RATE_Y, ArcforgeGui.ACCENT, false);
+    }
+
+    private Component sizeText() {
+        return Component.translatable("gui.arcforge.distillation_array.size", menu.getWidth(), menu.getHeight());
     }
 
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
-        if (overTank(FEED_X, mouseX, mouseY)) {
-            addFluidTooltip(lines, menu.getFeed(), ModFluids.CREOSOTE_TYPE.get().getDescription(), menu.getFeedAmount(), menu.getFeedCapacity());
-        } else if (overTank(STEAM_X, mouseX, mouseY)) {
+        if (overTank(FEED_X, TANK_W, mouseX, mouseY)) {
+            addFluidTooltip(lines, menu.getFeed(), Component.translatable("gui.arcforge.distillation_array.feed"), menu.getFeedAmount(),
+                    menu.getFeedCapacity());
+            return;
+        }
+        if (overTank(STEAM_X, TANK_W, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getSteam(), Component.translatable("gui.arcforge.steam"), menu.getSteamAmount(), menu.getSteamCapacity());
             lines.add(Component.translatable("gui.arcforge.steam_stripping").withStyle(ChatFormatting.DARK_GRAY));
-        } else if (overTank(NAPHTHA_X, mouseX, mouseY)) {
-            addOutputTooltip(lines, ModFluids.NAPHTHA.get(), menu.getNaphtha(), 0);
-        } else if (overTank(LIGHT_X, mouseX, mouseY)) {
-            addOutputTooltip(lines, ModFluids.LIGHT_OIL.get(), menu.getLightOil(), LIGHT_HEIGHT);
-        } else if (overTank(HEAVY_X, mouseX, mouseY)) {
-            addOutputTooltip(lines, ModFluids.HEAVY_OIL.get(), menu.getHeavyOil(), HEAVY_HEIGHT);
-        } else if (isHovering(SCREEN_X, TEMP_Y - 1, TEMP_RIGHT - SCREEN_X, 10, mouseX, mouseY)
+            return;
+        }
+        for (Product product : Product.values()) {
+            if (overTank(productX(product), PRODUCT_W, mouseX, mouseY)) {
+                addOutputTooltip(lines, product);
+                return;
+            }
+        }
+        if (isHovering(SCREEN_X, TEMP_Y - 1, TEMP_RIGHT - SCREEN_X, 10, mouseX, mouseY)
                 || isHovering(HEAT_X, HEAT_Y - 2, HEAT_W, 8, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.column_temperature", ArcforgeGui.grouped(DistillingRecipe.DEFAULT_MIN_TEMP)));
-        } else if (isHovering(SCREEN_X, BONUS_Y - 1, TEMP_RIGHT - SCREEN_X, 10, mouseX, mouseY)) {
+        } else if (isHovering(SCREEN_X, BONUS_Y - 1, TEMP_RIGHT - SCREEN_X, 9, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.steam_stripping"));
             lines.add(Component.translatable("gui.arcforge.naphtha_bonus", menu.getBonus()).withStyle(ChatFormatting.GRAY));
-        } else if (isHovering(LED_X, STATUS_Y - 1, TEMP_RIGHT - LED_X, 10, mouseX, mouseY)) {
+        } else if (isHovering(LED_X, STATUS_Y - 1, TEMP_RIGHT - LED_X, 9, mouseX, mouseY)) {
             // The status can be clipped to fit the screen; the tooltip has it in full.
             lines.add(menu.getStatus().getDescription());
+        } else if (isHovering(INFO_X, SIZE_Y - 1, INFO_W, RATE_Y - SIZE_Y + 9, mouseX, mouseY)) {
+            lines.add(sizeText());
+            lines.add(Component.translatable("gui.arcforge.distillation_array.rate", ArcforgeGui.grouped(menu.getFeedRate()))
+                    .withStyle(ChatFormatting.GRAY));
         }
     }
 
-    private boolean overTank(int tankX, int mouseX, int mouseY) {
-        return isHovering(tankX - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY);
+    private boolean overTank(int tankX, int width, int mouseX, int mouseY) {
+        return isHovering(tankX - 1, TANK_Y - 1, width + 2, TANK_H + 2, mouseX, mouseY);
     }
 
-    // neededHeight: the column height that makes this fraction (0 if every column does).
-    private void addOutputTooltip(List<Component> lines, Fluid fluid, int amount, int neededHeight) {
-        if (menu.getHeight() < neededHeight) {
-            lines.add(fluid.getFluidType().getDescription());
-            lines.add(Component.translatable("gui.arcforge.needs_height", neededHeight).withStyle(ChatFormatting.GRAY));
-        } else {
-            addFluidTooltip(lines, fluid, fluid.getFluidType().getDescription(), amount, menu.getOutputCapacity());
+    // A product the column doesn't make (at its height, from its feed) says so instead of showing an empty tank.
+    private void addOutputTooltip(List<Component> lines, Product product) {
+        Fluid fluid = product.fluid();
+        int amount = menu.getProduct(product);
+        addFluidTooltip(lines, fluid, fluid.getFluidType().getDescription(), amount, menu.getOutputCapacity());
+        if (!menu.makes(product)) {
+            lines.add(Component.translatable("gui.arcforge.distillation_array.not_made").withStyle(ChatFormatting.DARK_GRAY));
         }
     }
 }

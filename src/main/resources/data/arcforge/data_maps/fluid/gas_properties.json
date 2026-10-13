@@ -38,6 +38,9 @@
     },
     "arcforge:syngas": {
       "color": "#E2CCA4"
+    },
+    "arcforge:refinery_gas": {
+      "color": "#C2CCDA"
     }
   }
 }

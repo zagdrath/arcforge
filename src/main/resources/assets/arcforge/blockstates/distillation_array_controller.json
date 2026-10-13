@@ -4,63 +4,63 @@
       "model": "arcforge:block/distillation_array/controller"
     },
     "facing=north,formed=true,lit=false": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/distillation_array/controller_formed"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/distillation_array/hidden"
     },
     "facing=north,formed=false,lit=true": {
       "model": "arcforge:block/distillation_array/controller"
     },
     "facing=north,formed=true,lit=true": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/distillation_array/controller_formed_on"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/distillation_array/hidden"
     },
     "facing=east,formed=false,lit=false": {
       "model": "arcforge:block/distillation_array/controller",
       "y": 90
     },
     "facing=east,formed=true,lit=false": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/distillation_array/controller_formed"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/distillation_array/hidden"
     },
     "facing=east,formed=false,lit=true": {
       "model": "arcforge:block/distillation_array/controller",
       "y": 90
     },
     "facing=east,formed=true,lit=true": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/distillation_array/controller_formed_on"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/distillation_array/hidden"
     },
     "facing=south,formed=false,lit=false": {
       "model": "arcforge:block/distillation_array/controller",
       "y": 180
     },
     "facing=south,formed=true,lit=false": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/distillation_array/controller_formed"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/distillation_array/hidden"
     },
     "facing=south,formed=false,lit=true": {
       "model": "arcforge:block/distillation_array/controller",
       "y": 180
     },
     "facing=south,formed=true,lit=true": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/distillation_array/controller_formed_on"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/distillation_array/hidden"
     },
     "facing=west,formed=false,lit=false": {
       "model": "arcforge:block/distillation_array/controller",
       "y": 270
     },
     "facing=west,formed=true,lit=false": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/distillation_array/controller_formed"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/distillation_array/hidden"
     },
     "facing=west,formed=false,lit=true": {
       "model": "arcforge:block/distillation_array/controller",
       "y": 270
     },
     "facing=west,formed=true,lit=true": {
-      "type": "arcforge:connected",
-      "model": "arcforge:block/distillation_array/controller_formed_on"
+      "type": "arcforge:ported",
+      "model": "arcforge:block/distillation_array/hidden"
     }
   }
 }

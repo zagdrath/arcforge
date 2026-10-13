@@ -308,6 +308,14 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.LIGHT_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> HEAVY_OIL_BUCKET = ITEMS.registerItem("heavy_oil_bucket",
             p -> new BucketItem(ModFluids.HEAVY_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> CRUDE_OIL_BUCKET = ITEMS.registerItem("crude_oil_bucket",
+            p -> new BucketItem(ModFluids.CRUDE_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> KEROSENE_BUCKET = ITEMS.registerItem("kerosene_bucket",
+            p -> new BucketItem(ModFluids.KEROSENE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> DIESEL_BUCKET = ITEMS.registerItem("diesel_bucket",
+            p -> new BucketItem(ModFluids.DIESEL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> BITUMEN_BUCKET = ITEMS.registerItem("bitumen_bucket",
+            p -> new BucketItem(ModFluids.BITUMEN.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SULFURIC_ACID_BUCKET = ITEMS.registerItem("sulfuric_acid_bucket",
             p -> new BucketItem(ModFluids.SULFURIC_ACID.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SEED_OIL_BUCKET = ITEMS.registerItem("seed_oil_bucket",
@@ -331,6 +339,16 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> SALT_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.SALT_BLOCK);
     public static final DeferredItem<BlockItem> THERMAL_EVAPORATOR_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.THERMAL_EVAPORATOR_CASING);
     public static final DeferredItem<BlockItem> THERMAL_EVAPORATOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.THERMAL_EVAPORATOR_CONTROLLER);
+    // The oilfield.
+    public static final DeferredItem<BlockItem> DERRICK_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.DERRICK_CASING);
+    public static final DeferredItem<BlockItem> DERRICK_FRAME = ITEMS.registerSimpleBlockItem(ModBlocks.DERRICK_FRAME);
+    public static final DeferredItem<BlockItem> OIL_DERRICK_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.OIL_DERRICK_CONTROLLER);
+    public static final DeferredItem<BlockItem> WELL_HEAD = ITEMS.registerSimpleBlockItem(ModBlocks.WELL_HEAD);
+    public static final DeferredItem<BlockItem> PUMPJACK_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.PUMPJACK_CASING);
+    public static final DeferredItem<BlockItem> PUMPJACK_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.PUMPJACK_CONTROLLER);
+    public static final DeferredItem<Item> STEEL_PIPE = ITEMS.registerSimpleItem("steel_pipe");
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.SeismicSurveyToolItem> SEISMIC_SURVEY_TOOL = ITEMS.registerItem(
+            "seismic_survey_tool", net.zagdrath.arcforge.item.tool.SeismicSurveyToolItem::new, p -> p.stacksTo(1));
     public static final DeferredItem<BucketItem> LATEX_BUCKET = ITEMS.registerItem("latex_bucket",
             p -> new BucketItem(ModFluids.LATEX.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SEAWATER_BUCKET = ITEMS.registerItem("seawater_bucket",
@@ -459,7 +477,8 @@ public final class ModItems {
         return List.of(SILVER_ORE, DEEPSLATE_SILVER_ORE, RAW_SILVER, RAW_SILVER_BLOCK, SILVER_DUST, SILVER_INGOT, SILVER_BLOCK, NICKEL_ORE, DEEPSLATE_NICKEL_ORE, RAW_NICKEL, RAW_NICKEL_BLOCK, NICKEL_DUST, NICKEL_INGOT, NICKEL_BLOCK, WOLFRAMITE_ORE, DEEPSLATE_WOLFRAMITE_ORE, RAW_WOLFRAMITE, RAW_WOLFRAMITE_BLOCK, TUNGSTEN_DUST, TUNGSTEN_INGOT, TUNGSTEN_BLOCK, FLUORITE_ORE, DEEPSLATE_FLUORITE_ORE, RAW_FLUORITE, RAW_FLUORITE_BLOCK, FLUORITE_DUST, FLUORITE_CRYSTAL, FLUORITE_BLOCK, BISMUTH_ORE, DEEPSLATE_BISMUTH_ORE, RAW_BISMUTH, RAW_BISMUTH_BLOCK, BISMUTH_DUST, BISMUTH_INGOT, BISMUTH_BLOCK, ARCITE_ORE, DEEPSLATE_ARCITE_ORE, RAW_ARCITE, RAW_ARCITE_BLOCK, ARCITE_DUST, ARCITE_CRYSTAL, ARCITE_BLOCK, NETHER_SULFUR_ORE, IOLITE_ORE, IOLITE_DUST, IOLITE_CRYSTAL, IOLITE_BLOCK, INVAR_DUST, INVAR_INGOT);
     }
 
-    // What's made from the ores, in creative tab order (Components): each metal's plate, gear and rod, then the components.
+    // What's made from the ores, in creative tab order (Components): each metal's plate, gear and rod, then the
+    // components.
     public static List<DeferredItem<Item>> oreComponents() {
         return List.of(SILVER_PLATE, SILVER_GEAR, SILVER_ROD, NICKEL_PLATE, NICKEL_GEAR, NICKEL_ROD, TUNGSTEN_PLATE, TUNGSTEN_GEAR, TUNGSTEN_ROD, INVAR_PLATE, INVAR_GEAR, INVAR_ROD, TUNGSTEN_HEATING_COIL, THERMOCOUPLE, ARCITE_TUNGSTEN_COMPOSITE);
     }
@@ -495,8 +514,8 @@ public final class ModItems {
     public static final DeferredItem<FertilizerItem> MIXED_FERTILIZER = ITEMS.registerItem("mixed_fertilizer",
             p -> new FertilizerItem(ArcforgeConfig.MIXED_FERTILIZER_NUTRIENTS::getAsInt, p));
 
-    // Crops. Seeds that plant a crop are block items named as items ("Flax Seeds", not the crop). Compost Bins take them
-    // at vanilla's chances: 30% for seeds, 65% for the harvest.
+    // Crops. Seeds that plant a crop are block items named as items ("Flax Seeds", not the crop). Compost Bins take
+    // them at vanilla's chances: 30% for seeds, 65% for the harvest.
     public static final DeferredItem<BlockItem> FLAX_SEEDS = ITEMS.registerItem("flax_seeds",
             p -> new BlockItem(ModBlocks.FLAX.get(), p.useItemDescriptionPrefix().compostable(ContextIntProviders.COMPOSTABLE_LOW)));
     public static final DeferredItem<Item> FLAX_FIBRE = ITEMS.registerSimpleItem("flax_fibre", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
@@ -527,7 +546,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> WILD_RUBBER_DANDELION = ITEMS.registerSimpleBlockItem(ModBlocks.WILD_RUBBER_DANDELION,
             p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
 
-    // Rustic farming machines and tools. Durability is fixed here (it's set before the config loads); the areas are config.
+    // Rustic farming machines and tools. Durability is fixed here (it's set before the config loads); the areas are
+    // config.
     public static final DeferredItem<BlockItem> PLANTER = ITEMS.registerSimpleBlockItem(ModBlocks.PLANTER);
     public static final DeferredItem<BlockItem> HARVESTER = ITEMS.registerSimpleBlockItem(ModBlocks.HARVESTER);
     public static final DeferredItem<BlockItem> FERTILIZER_SPREADER = ITEMS.registerSimpleBlockItem(ModBlocks.FERTILIZER_SPREADER);
@@ -559,8 +579,9 @@ public final class ModItems {
     public static final DeferredItem<Item> DRIED_GRAIN = ITEMS.registerSimpleItem("dried_grain", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
     public static final DeferredItem<Item> DRIED_SORGHUM = ITEMS.registerSimpleItem("dried_sorghum", p -> p.compostable(ContextIntProviders.COMPOSTABLE_MEDIUM));
 
-    // Farm chemistry: the machines, and the fertilizers they lead to. NPK Fertilizer fills Loam Farmland and enriches it
-    // (crops on it grow faster than on any other fertilizer); Digestate, the Biogas Digester's by-product, is a middling one.
+    // Farm chemistry: the machines, and the fertilizers they lead to. NPK Fertilizer fills Loam Farmland and enriches
+    // it (crops on it grow faster than on any other fertilizer); Digestate, the Biogas Digester's by-product, is a
+    // middling one.
     public static final DeferredItem<BlockItem> AIR_SEPARATOR = ITEMS.registerSimpleBlockItem(ModBlocks.AIR_SEPARATOR);
     public static final DeferredItem<BlockItem> HABER_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.HABER_REACTOR);
     public static final DeferredItem<BlockItem> BIOGAS_DIGESTER_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.BIOGAS_DIGESTER_CONTROLLER);

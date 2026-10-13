@@ -23,8 +23,11 @@ import net.zagdrath.arcforge.blockentity.multiblock.BiogasDigesterBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.control.MachineControlSpec;
 import net.zagdrath.arcforge.machine.control.MachineControls;
 import net.zagdrath.arcforge.machine.control.StatusMapping;
@@ -110,15 +113,16 @@ public final class ControllerMultiblockSpecs {
                         be -> be.heatHandlerAt(be.getBlockPos(), null))
                 .build());
 
-        // Progress: mB of the batch through the column, at feedRate mB/t.
-        MachineControls.register(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), MachineControlSpec.builder(DistillationArrayBlockEntity.class)
+        // Progress: mB of the batch through the column, at feedRate mB/t. A tank for each product, lightest first.
+        MachineControlSpec.Builder<DistillationArrayBlockEntity> distillation = MachineControlSpec.builder(DistillationArrayBlockEntity.class)
                 .slot(DistillationArrayBlockEntity.SLOT_PITCH, SlotRole.OUTPUT)
                 .items(DistillationArrayBlockEntity::getItems, be -> be.getItemHandler(null))
                 .tank(SlotRole.INPUT, DistillationArrayBlockEntity::getFeed)
-                .tank(SlotRole.INPUT, DistillationArrayBlockEntity::getSteam)
-                .tank(SlotRole.OUTPUT, DistillationArrayBlockEntity::getNaphtha)
-                .tank(SlotRole.OUTPUT, DistillationArrayBlockEntity::getLightOil)
-                .tank(SlotRole.OUTPUT, DistillationArrayBlockEntity::getHeavyOil)
+                .tank(SlotRole.INPUT, DistillationArrayBlockEntity::getSteam);
+        for (DistillationArrayBlockEntity.Product product : DistillationArrayBlockEntity.Product.values()) {
+            distillation.tank(SlotRole.OUTPUT, be -> be.getProduct(product));
+        }
+        MachineControls.register(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), distillation
                 .fluidAutomation(be -> be.getFluidHandler(null))
                 .heat(HeatRole.CONSUMER, DistillationArrayBlockEntity::getHeat, DistillationArrayBlockEntity::getHeatPerTick,
                         be -> be.heatHandlerAt(be.getBlockPos(), null))
@@ -148,6 +152,24 @@ public final class ControllerMultiblockSpecs {
                     }
                     return made;
                 })
+                .build());
+
+        // Progress: ticks into the block the drill is boring through.
+        MachineControls.register(ModBlockEntityTypes.OIL_DERRICK.get(), MachineControlSpec.builder(OilDerrickBlockEntity.class)
+                .energy(EnergyRole.CONSUMER, OilDerrickBlockEntity::getEnergy, OilDerrickBlockEntity::getUsage)
+                .slot(OilDerrickBlockEntity.SLOT_PIPES, SlotRole.INPUT)
+                .items(OilDerrickBlockEntity::getItems, be -> be.getItemHandler(null))
+                .liquidTank(SlotRole.INPUT, OilDerrickBlockEntity::getWater)
+                .progress(OilDerrickBlockEntity::getProgress, be -> ArcforgeConfig.DERRICK_TICKS_PER_BLOCK.getAsInt())
+                .build());
+
+        // No progress: it pumps all the time, and each tick's Crude Oil counts as made.
+        MachineControls.register(ModBlockEntityTypes.PUMPJACK.get(), MachineControlSpec.builder(PumpjackBlockEntity.class)
+                .energy(EnergyRole.CONSUMER, PumpjackBlockEntity::getEnergy, PumpjackBlockEntity::getUsage)
+                .slot(PumpjackBlockEntity.SLOT_BUCKET_IN, SlotRole.INPUT)
+                .slot(PumpjackBlockEntity.SLOT_BUCKET_OUT, SlotRole.OUTPUT)
+                .items(PumpjackBlockEntity::getItems, be -> be.getItemHandler(null))
+                .liquidTank(SlotRole.OUTPUT, PumpjackBlockEntity::getCrude)
                 .build());
 
         // A plain block entity: its status is the one it works out each tick. Its heat is a bare °C with no heat

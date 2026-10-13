@@ -6,11 +6,14 @@
 package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import org.jspecify.annotations.Nullable;
 
@@ -72,24 +75,77 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// The Distillation Array (see DistillationStructure), run by its controller. It distils its feed
-// (creosote) a batch at a time (1,000 mB, see DistillingRecipe) with heat: a batch starts when the feed
-// tank holds a whole one and every product has room, and is fed through the column at 10 mB/t per 4
-// blocks of height (so 100, 67 or 50 ticks), using the recipe's heat as it goes (4,000 HU a batch: 40 /
-// 60 / 80 HU/t) and only while the column is at 350°C or hotter. The taller the column, the more
-// fractions it makes (4 high: Naphtha and Pitch; 6: + Heavy Oil; 8: + Light Oil). Steam in its steam tank
-// is used for steam stripping: 100 mB a batch, for more Naphtha by the grade. Its heat buffer holds
-// 40,000 HU per 4 blocks of height, up to 1,400°C. Speed Upgrades feed it 2^(n/2) times as fast (heat as fast too, so the
-// heat per batch doesn't change), like every machine; Heat Upgrades cut the heat per batch to 0.8^n, like the other heat
-// machines.
+// The Distillation Array (see DistillationStructure), run by its controller: a refinery column 2x2 or 3x3 across and 4
+// to 16 tall. It distils its feed (creosote or Crude Oil) a batch at a time (1,000 mB, see DistillingRecipe) with heat:
+// a batch starts when the feed tank holds a whole one and every product has room, and is fed through the column at 10
+// mB/t for a 2x2 four blocks tall, scaled by its cross-section (a 3x3 x2.25) and height (per 4 blocks): 20 mB/t for a
+// 2x2x8, 90 for a 3x3x16. It uses the recipe's heat as it goes (so the heat per tick scales the same way) and only
+// while the column is at the recipe's min_temp or hotter. What it makes follows its height (the recipe's by_height):
+// creosote gives Naphtha and Pitch at 4, Heavy Oil from 6 and Light Oil from 8; Crude Oil needs 6 (Refinery Gas,
+// Naphtha, Diesel, Bitumen), 10 adds Kerosene and Heavy Oil, and from 14 the light fractions come in larger shares.
+// Steam in its steam tank is used for steam stripping: a batch's worth, for more of the boosted fraction by the grade.
+// Its heat buffer holds 40,000 HU per 4 blocks of a 2x2 (scaled like the feed), up to 1,400°C; its tanks are 16,000 mB
+// of feed, 8,000 of steam and 8,000 of each product for a 2x2x8, scaled by its volume. Speed Upgrades feed it 2^(n/2)
+// times as fast (heat as fast too, so the heat per batch doesn't change), like every machine; Heat Upgrades cut the
+// heat per batch to 0.8^n, like the other heat machines.
 public class DistillationArrayBlockEntity extends MachineBlockEntity implements MultiblockController {
     public static final int SLOT_PITCH = 0;
     public static final int MACHINE_SLOTS = 1;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.HEAT);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.STEAM, SideMode.HEAT,
-            SideMode.NAPHTHA, SideMode.LIGHT_OIL, SideMode.HEAVY_OIL, SideMode.PITCH);
+            SideMode.REFINERY_GAS, SideMode.NAPHTHA, SideMode.KEROSENE, SideMode.LIGHT_OIL, SideMode.DIESEL, SideMode.HEAVY_OIL,
+            SideMode.BITUMEN, SideMode.PITCH);
     private static final int REDSTONE_CHECK_INTERVAL = 10;
-    private static final int BASE_HEIGHT = 4;
+    // The column the config's values are for: a 2x2, 4 tall (rates and heat) or 8 tall (tanks).
+    private static final int BASE_WIDTH = 2, BASE_HEIGHT = 4, BASE_TANK_HEIGHT = 8;
+
+    // What the column makes, lightest first, each with its own tank and port mode.
+    public enum Product {
+        REFINERY_GAS("refinery_gas", SideMode.REFINERY_GAS, ModFluids.REFINERY_GAS),
+        NAPHTHA("naphtha", SideMode.NAPHTHA, ModFluids.NAPHTHA),
+        KEROSENE("kerosene", SideMode.KEROSENE, ModFluids.KEROSENE),
+        LIGHT_OIL("light_oil", SideMode.LIGHT_OIL, ModFluids.LIGHT_OIL),
+        DIESEL("diesel", SideMode.DIESEL, ModFluids.DIESEL),
+        HEAVY_OIL("heavy_oil", SideMode.HEAVY_OIL, ModFluids.HEAVY_OIL),
+        BITUMEN("bitumen", SideMode.BITUMEN, ModFluids.BITUMEN);
+
+        public final String key;
+        public final SideMode mode;
+        private final Supplier<? extends Fluid> fluid;
+
+        Product(String key, SideMode mode, Supplier<? extends Fluid> fluid) {
+            this.key = key;
+            this.mode = mode;
+            this.fluid = fluid;
+        }
+
+        public Fluid fluid() {
+            return fluid.get();
+        }
+
+        // A gas: it leaves the top of the column for the condensers, not a tray.
+        public boolean isGas() {
+            return this == REFINERY_GAS;
+        }
+
+        public static @Nullable Product of(Fluid fluid) {
+            for (Product product : values()) {
+                if (fluid.isSame(product.fluid())) {
+                    return product;
+                }
+            }
+            return null;
+        }
+
+        public static @Nullable Product of(SideMode mode) {
+            for (Product product : values()) {
+                if (product.mode == mode) {
+                    return product;
+                }
+            }
+            return null;
+        }
+    }
 
     private DistillationStructure.@Nullable Column column;
     private boolean checkRequested = true;
@@ -99,14 +155,10 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
     private HeatHandler heatInput;
     private final FilteredFluidTank feed;
     private final SteamTank steam;
-    private final FilteredFluidTank naphtha;
-    private final FilteredFluidTank lightOil;
-    private final FilteredFluidTank heavyOil;
+    private final Map<Product, FilteredFluidTank> products = new EnumMap<>(Product.class);
+    private final Map<Product, ResourceHandler<FluidResource>> productOutputs = new EnumMap<>(Product.class);
     private final ResourceHandler<FluidResource> feedInput;
     private final ResourceHandler<FluidResource> steamInput;
-    private final ResourceHandler<FluidResource> naphthaOutput;
-    private final ResourceHandler<FluidResource> lightOilOutput;
-    private final ResourceHandler<FluidResource> heavyOilOutput;
     private final ResourceHandler<FluidResource> fluidAutomation;
     private final ResourceHandler<ItemResource> pitchOutput;
     private final ContainerData data;
@@ -119,36 +171,51 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
     private double pendingHeat;
     private int heatPerTick;
     private boolean running;
-    // What the clients last saw of the products and the column's state (see syncKey), so they're sent
-    // again only when a tank crosses a 1% step or the state changes.
-    private int lastSyncKey = -1;
+    // The feed last distilled, so the column keeps showing its draw-offs while the feed tank is empty.
+    private @Nullable Fluid lastFeed;
+    // What the clients last saw of the products and the column's state (see syncKey), so they're sent again only when a
+    // tank crosses a 1% step or the state changes.
+    private int[] lastSyncKey = new int[0];
     // Gives the structure its first ports (see MultiblockPorts.Defaults).
     private final MultiblockPorts.Defaults portDefaults = new MultiblockPorts.Defaults();
-    // Client side: the pools' fill (naphtha, light oil, heavy oil) as last drawn, easing toward the synced.
-    private final float[] shownFill = { -1.0F, -1.0F, -1.0F };
+    // Client side: the trays' pools (by Product) as last drawn, easing toward the synced fill; the products the
+    // column's recipe makes at its height (a bit per Product), and how hot it is.
+    private final float[] shownFill = new float[Product.values().length];
+    private int clientMakes;
+    private int clientTemperature;
 
     public DistillationArrayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> false, UPGRADES,
                 new SideConfig(SideMode.NAPHTHA, SideMode.HEAT, SideMode.INPUT, SideMode.HEAVY_OIL, SideMode.PITCH, SideMode.NONE),
                 SIDE_MODES);
+        Arrays.fill(shownFill, -1.0F);
         this.feed = new FilteredFluidTank(ArcforgeConfig.DISTILLATION_FEED_CAPACITY.getAsInt(),
                 resource -> MachineRecipes.isDistillingFeed(level, resource), this::setChanged);
         this.steam = new SteamTank(ArcforgeConfig.DISTILLATION_STEAM_CAPACITY.getAsInt(), this::setChanged);
         int output = ArcforgeConfig.DISTILLATION_OUTPUT_CAPACITY.getAsInt();
-        this.naphtha = new FilteredFluidTank(output, resource -> resource.is(ModFluids.NAPHTHA.get()), this::setChanged);
-        this.lightOil = new FilteredFluidTank(output, resource -> resource.is(ModFluids.LIGHT_OIL.get()), this::setChanged);
-        this.heavyOil = new FilteredFluidTank(output, resource -> resource.is(ModFluids.HEAVY_OIL.get()), this::setChanged);
+        List<ResourceHandler<FluidResource>> all = new ArrayList<>();
         this.feedInput = new AutomationResourceHandler<>(feed, index -> true, index -> false);
         this.steamInput = new AutomationResourceHandler<>(steam, index -> true, index -> false);
-        this.naphthaOutput = new AutomationResourceHandler<>(naphtha, index -> false, index -> true);
-        this.lightOilOutput = new AutomationResourceHandler<>(lightOil, index -> false, index -> true);
-        this.heavyOilOutput = new AutomationResourceHandler<>(heavyOil, index -> false, index -> true);
-        this.fluidAutomation = new CombinedResourceHandler<>(feedInput, steamInput, naphthaOutput, lightOilOutput, heavyOilOutput);
+        all.add(feedInput);
+        all.add(steamInput);
+        for (Product product : Product.values()) {
+            FilteredFluidTank tank = new FilteredFluidTank(output, resource -> resource.is(product.fluid()), this::setChanged);
+            products.put(product, tank);
+            ResourceHandler<FluidResource> out = new AutomationResourceHandler<>(tank, index -> false, index -> true);
+            productOutputs.put(product, out);
+            all.add(out);
+        }
+        @SuppressWarnings("unchecked")
+        ResourceHandler<FluidResource>[] handlers = all.toArray(new ResourceHandler[0]);
+        this.fluidAutomation = new CombinedResourceHandler<>(handlers);
         this.pitchOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_PITCH);
-        resize(BASE_HEIGHT);
+        resize(BASE_WIDTH, BASE_HEIGHT);
         this.data = new WideIntContainerData(DistillationArrayMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
+                if (index >= DistillationArrayMenu.DATA_PRODUCTS && index < DistillationArrayMenu.DATA_PRODUCTS + Product.values().length) {
+                    return products.get(Product.values()[index - DistillationArrayMenu.DATA_PRODUCTS]).getAmount();
+                }
                 return switch (index) {
                     case DistillationArrayMenu.DATA_HEAT -> heat.getStored();
                     case DistillationArrayMenu.DATA_HEAT_CAPACITY -> heat.getCapacity();
@@ -159,13 +226,13 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
                     case DistillationArrayMenu.DATA_STEAM -> fluidId(steam);
                     case DistillationArrayMenu.DATA_STEAM_AMOUNT -> steam.getAmount();
                     case DistillationArrayMenu.DATA_STEAM_CAPACITY -> steam.getCapacity();
-                    case DistillationArrayMenu.DATA_NAPHTHA -> naphtha.getAmount();
-                    case DistillationArrayMenu.DATA_LIGHT_OIL -> lightOil.getAmount();
-                    case DistillationArrayMenu.DATA_HEAVY_OIL -> heavyOil.getAmount();
-                    case DistillationArrayMenu.DATA_OUTPUT_CAPACITY -> naphtha.getCapacity();
+                    case DistillationArrayMenu.DATA_OUTPUT_CAPACITY -> products.get(Product.NAPHTHA).getCapacity();
                     case DistillationArrayMenu.DATA_HEIGHT -> getHeight();
+                    case DistillationArrayMenu.DATA_WIDTH -> getWidth();
                     case DistillationArrayMenu.DATA_BONUS -> Math.round(steamBonus() * 100);
                     case DistillationArrayMenu.DATA_HEAT_PER_TICK -> heatPerTick;
+                    case DistillationArrayMenu.DATA_FEED_RATE -> feedRate();
+                    case DistillationArrayMenu.DATA_MAKES -> makes();
                     case DistillationArrayMenu.DATA_STATUS -> status.ordinal();
                     case DistillationArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case DistillationArrayMenu.DATA_SIDE_CONFIG -> packedSides();
@@ -179,28 +246,61 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         return tank.getAmount() > 0 ? BuiltInRegistries.FLUID.getId(tank.getResource(0).getFluid()) : -1;
     }
 
-    // The heat buffer scales with the height; stored heat carries over (clamped).
-    private void resize(int height) {
+    // How much bigger than the config's column this one is: by cross-section and height (rates and heat), or by volume
+    // against a 2x2x8 (tanks).
+    private static double rateScale(int width, int height) {
+        return (double) (width * width) / (BASE_WIDTH * BASE_WIDTH) * height / BASE_HEIGHT;
+    }
+
+    private static double tankScale(int width, int height) {
+        return (double) (width * width) / (BASE_WIDTH * BASE_WIDTH) * height / BASE_TANK_HEIGHT;
+    }
+
+    // The heat buffer and tanks scale with the column; stored heat carries over (clamped), and so do the tanks'
+    // contents.
+    private void resize(int width, int height) {
         int stored = heat != null ? heat.getStored() : 0;
         heat = new HeatBuffer(
-                ArcforgeConfig.DISTILLATION_HEAT_CAPACITY.getAsInt() * height / BASE_HEIGHT,
+                (int) Math.round(ArcforgeConfig.DISTILLATION_HEAT_CAPACITY.getAsInt() * rateScale(width, height)),
                 ArcforgeConfig.DISTILLATION_MAX_TEMPERATURE.getAsInt(),
                 this::setChanged);
         heat.add(stored);
         heatInput = heat.input(Integer.MAX_VALUE);
+        double tanks = tankScale(width, height);
+        feed.setCapacity(scaled(ArcforgeConfig.DISTILLATION_FEED_CAPACITY.getAsInt(), tanks));
+        steam.setCapacity(scaled(ArcforgeConfig.DISTILLATION_STEAM_CAPACITY.getAsInt(), tanks));
+        int output = scaled(ArcforgeConfig.DISTILLATION_OUTPUT_CAPACITY.getAsInt(), tanks);
+        for (FilteredFluidTank tank : products.values()) {
+            tank.setCapacity(output);
+        }
+    }
+
+    // At least a bucket, so a small column still takes a whole batch.
+    private static int scaled(int capacity, double scale) {
+        return (int) Math.max(1_000, Math.min(Integer.MAX_VALUE, Math.round(capacity * scale)));
     }
 
     public int getHeight() {
         return column != null ? column.height() : BASE_HEIGHT;
     }
 
+    public int getWidth() {
+        return column != null ? column.width() : BASE_WIDTH;
+    }
+
     public DistillationStructure.@Nullable Column getColumn() {
         return column;
     }
 
-    // Feed through the column per tick, in mB: faster with Speed upgrades.
+    // Feed through the column per tick, in mB: by its size, faster with Speed upgrades.
     public int feedRate() {
-        return (int) Math.round(ArcforgeConfig.DISTILLATION_FEED_RATE.getAsInt() * getHeight() / BASE_HEIGHT * speedMultiplier());
+        return (int) Math.round(ArcforgeConfig.DISTILLATION_FEED_RATE.getAsInt() * rateScale(getWidth(), getHeight()) * speedMultiplier());
+    }
+
+    // The column's height, for advancements (arcforge:multiblock_formed's min_length).
+    @Override
+    public int length() {
+        return getHeight();
     }
 
     // --- Structure ---
@@ -243,7 +343,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         }
         column = found;
         if (found != null) {
-            resize(found.height());
+            resize(found.width(), found.height());
             DistillationStructure.form(level, found);
             MultiblockEffects.formed(level, found.min(), found.max());
             ArcforgeAdvancements.formed(level, this, null);
@@ -258,6 +358,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         if (level != null && column != null) {
             MultiblockAutomation.refresh(level, column.min(), column.max());
         }
+        sync();
     }
 
     @Override
@@ -312,28 +413,34 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
             MultiblockAutomation.pushOutputs(level, this);
         }
-        int key = syncKey();
-        if (key != lastSyncKey) {
+        int[] key = syncKey();
+        if (!Arrays.equals(key, lastSyncKey)) {
             lastSyncKey = key;
             sync();
         }
     }
 
-    // The renderer shows each product's pool (to the nearest percent), and vapour while running, tinted
-    // by the steam when the batch is being stripped.
-    private int syncKey() {
-        int key = 0;
-        for (FilteredFluidTank tank : List.of(naphtha, lightOil, heavyOil)) {
-            key = key * 101 + tank.getAmount() * 100 / Math.max(1, tank.getCapacity());
+    // The renderer shows each product's pool (to the nearest percent), vapour while running (tinted by the steam when
+    // the batch is being stripped), the draw-offs of what the column makes, and the reboiler's glow (to the nearest
+    // 25°C).
+    private int[] syncKey() {
+        Product[] all = Product.values();
+        int[] key = new int[all.length + 3];
+        for (int i = 0; i < all.length; i++) {
+            FilteredFluidTank tank = products.get(all[i]);
+            key[i] = tank.getAmount() * 100 / Math.max(1, tank.getCapacity());
         }
-        return key * 4 + (running ? 2 : 0) + (batchBonus > 0 ? 1 : 0);
+        key[all.length] = (running ? 2 : 0) + (batchBonus > 0 ? 1 : 0);
+        key[all.length + 1] = makes();
+        key[all.length + 2] = heat.getTemperature() / 25;
+        return key;
     }
 
-    // Client side: a product's pool fill (0..1; index 0 naphtha, 1 light oil, 2 heavy oil) to draw this
-    // frame, closing share of the gap to the synced amount.
-    public float easeFill(int index, float share) {
-        FilteredFluidTank tank = List.of(naphtha, lightOil, heavyOil).get(index);
+    // Client side: a product's pool fill (0..1) to draw this frame, closing share of the gap to the synced amount.
+    public float easeFill(Product product, float share) {
+        FilteredFluidTank tank = products.get(product);
         float target = Math.min(1.0F, tank.getAmount() / (float) Math.max(1, tank.getCapacity()));
+        int index = product.ordinal();
         float shown = shownFill[index];
         shownFill[index] = shown < 0 ? target : shown + (target - shown) * share;
         return shownFill[index];
@@ -344,22 +451,49 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         return batchBonus > 0;
     }
 
-    // A column's sides are two blocks wide: its default ports go on the left one (seen from outside) of the
+    // The products the column's recipe (the batch's, else the feed tank's, else the last one's) makes at its height, a
+    // bit per Product. On the client, as last synced.
+    public int makes() {
+        if (level != null && level.isClientSide()) {
+            return clientMakes;
+        }
+        Fluid fluid = batchFeed != null ? batchFeed : !feed.getResource(0).isEmpty() ? feed.getResource(0).getFluid() : lastFeed;
+        DistillingRecipe recipe = level != null ? recipeFor(level, fluid) : null;
+        if (recipe == null) {
+            return 0;
+        }
+        int bits = 0;
+        for (Fluid made : recipe.outputs(getHeight(), 0.0F).keySet()) {
+            Product product = Product.of(made);
+            if (product != null) {
+                bits |= 1 << product.ordinal();
+            }
+        }
+        return bits;
+    }
+
+    // The column's temperature (°C); on the client, as last synced.
+    public int temperature() {
+        return level != null && level.isClientSide() ? clientTemperature : heat.getTemperature();
+    }
+
+    // A column's sides are two or three blocks wide: its default ports go on the left one (seen from outside) of the
     // second layer up. Top and bottom ones go in the middle as usual.
     @Override
     public @Nullable BlockPos defaultPortPos(Level level, Direction side) {
         if (column == null || side.getAxis().isVertical()) {
             return MultiblockController.super.defaultPortPos(level, side);
         }
-        Vec3 layer = Vec3.atLowerCornerOf(column.min()).add(1.0, 1.5, 1.0);
-        Vec3 target = layer.add(side.getStepX() * 0.5, 0.0, side.getStepZ() * 0.5)
+        double half = column.width() / 2.0;
+        Vec3 layer = Vec3.atLowerCornerOf(column.min()).add(half, 1.5, half);
+        Vec3 target = layer.add(side.getStepX() * half, 0.0, side.getStepZ() * half)
                 .add(side.getClockWise().getStepX() * 0.5, 0.0, side.getClockWise().getStepZ() * 0.5);
         return MultiblockPorts.nearest(level, this, side, target);
     }
 
-    // The whole column, so the renderer isn't culled when the controller is off screen.
+    // The whole column and a block round it, so the renderer isn't culled when the controller is off screen.
     public AABB getRenderBox() {
-        return column != null ? AABB.encapsulatingFullBlocks(column.min(), column.max()) : new AABB(worldPosition);
+        return column != null ? AABB.encapsulatingFullBlocks(column.min(), column.max()).inflate(1.0) : new AABB(worldPosition);
     }
 
     private boolean isPowered(ServerLevel level) {
@@ -424,13 +558,17 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         return feed == null ? null : MachineRecipes.distilling(level, FluidResource.of(feed)).map(RecipeHolder::value).orElse(null);
     }
 
-    // Takes a batch of feed (and its steam) if there is a whole one and every product has room. Sets the
-    // status to why not if it can't.
+    // Takes a batch of feed (and its steam) if there is a whole one, the column is tall enough for it and every product
+    // has room. Sets the status to why not if it can't.
     private boolean startBatch(ServerLevel level) {
         FluidResource resource = feed.getResource(0);
         DistillingRecipe recipe = resource.isEmpty() ? null : recipeFor(level, resource.getFluid());
-        if (recipe == null || feed.getAmount() < recipe.amount() || recipe.fractions(getHeight()) == null) {
+        if (recipe == null || feed.getAmount() < recipe.amount()) {
             status = MachineStatus.NO_FEED;
+            return false;
+        }
+        if (recipe.fractions(getHeight()) == null) {
+            status = MachineStatus.TOO_SHORT;
             return false;
         }
         boolean stripping = recipe.steamPerBatch() > 0 && steam.getAmount() >= recipe.steamPerBatch();
@@ -451,6 +589,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
             controlState.consumedFluid(recipe.steamPerBatch());
         }
         batchFeed = resource.getFluid();
+        lastFeed = batchFeed;
         batchBonus = bonus;
         progress = 0;
         return true;
@@ -511,13 +650,8 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
     }
 
     private @Nullable FilteredFluidTank tankFor(Fluid fluid) {
-        if (fluid.isSame(ModFluids.NAPHTHA.get())) {
-            return naphtha;
-        }
-        if (fluid.isSame(ModFluids.LIGHT_OIL.get())) {
-            return lightOil;
-        }
-        return fluid.isSame(ModFluids.HEAVY_OIL.get()) ? heavyOil : null;
+        Product product = Product.of(fluid);
+        return product != null ? products.get(product) : null;
     }
 
     // The steam stripping bonus the steam in the tank would give the next batch (0 without enough steam).
@@ -552,16 +686,20 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         return steam;
     }
 
+    public FilteredFluidTank getProduct(Product product) {
+        return products.get(product);
+    }
+
     public FilteredFluidTank getNaphtha() {
-        return naphtha;
+        return products.get(Product.NAPHTHA);
     }
 
     public FilteredFluidTank getLightOil() {
-        return lightOil;
+        return products.get(Product.LIGHT_OIL);
     }
 
     public FilteredFluidTank getHeavyOil() {
-        return heavyOil;
+        return products.get(Product.HEAVY_OIL);
     }
 
     public boolean isRunning() {
@@ -598,14 +736,14 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         if (mode == null) {
             return fluidAutomation;
         }
-        return switch (mode) {
-            case INPUT -> feedInput;
-            case STEAM -> steamInput;
-            case NAPHTHA -> naphthaOutput;
-            case LIGHT_OIL -> lightOilOutput;
-            case HEAVY_OIL -> heavyOilOutput;
-            default -> null;
-        };
+        if (mode == SideMode.INPUT) {
+            return feedInput;
+        }
+        if (mode == SideMode.STEAM) {
+            return steamInput;
+        }
+        Product product = Product.of(mode);
+        return product != null ? productOutputs.get(product) : null;
     }
 
     public @Nullable HeatHandler heatHandlerAt(BlockPos pos, @Nullable Direction side) {
@@ -617,11 +755,12 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
 
     @Override
     public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
+        Product product = Product.of(mode);
         return switch (type) {
             case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT
-                    : mode == SideMode.NAPHTHA || mode == SideMode.LIGHT_OIL || mode == SideMode.HEAVY_OIL ? ConnectionMode.OUTPUT
+                    : product != null && !product.isGas() ? ConnectionMode.OUTPUT
                     : ConnectionMode.NONE;
-            case GAS -> mode == SideMode.STEAM ? ConnectionMode.INPUT : ConnectionMode.NONE;
+            case GAS -> mode == SideMode.STEAM ? ConnectionMode.INPUT : product != null && product.isGas() ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ITEM -> mode == SideMode.PITCH ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ENERGY -> ConnectionMode.NONE;
@@ -646,19 +785,22 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         column = input.getInt("column_height").map(height -> new DistillationStructure.Column(
-                BlockPos.of(input.getLongOr("column_min", 0L)), height)).orElse(null);
-        resize(getHeight());
+                BlockPos.of(input.getLongOr("column_min", 0L)), input.getIntOr("column_width", BASE_WIDTH), height)).orElse(null);
+        resize(getWidth(), getHeight());
         heat.deserialize(input);
         feed.deserialize(input.childOrEmpty("feed"));
         steam.deserialize(input.childOrEmpty("steam"));
-        naphtha.deserialize(input.childOrEmpty("naphtha"));
-        lightOil.deserialize(input.childOrEmpty("light_oil"));
-        heavyOil.deserialize(input.childOrEmpty("heavy_oil"));
+        for (Product product : Product.values()) {
+            products.get(product).deserialize(input.childOrEmpty(product.key));
+        }
         batchFeed = input.getString("batch_feed").map(id -> BuiltInRegistries.FLUID.getValue(Identifier.parse(id))).orElse(null);
+        lastFeed = input.getString("last_feed").map(id -> BuiltInRegistries.FLUID.getValue(Identifier.parse(id))).orElse(null);
         batchBonus = input.getFloatOr("batch_bonus", 0.0F);
         progress = input.getDoubleOr("progress", 0.0);
         pendingHeat = input.getDoubleOr("pending_heat", 0.0);
         running = input.getBooleanOr("running", false);
+        clientMakes = input.getIntOr("makes", 0);
+        clientTemperature = input.getIntOr("temperature", 0);
         portDefaults.load(input);
     }
 
@@ -667,16 +809,20 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         super.saveAdditional(output);
         if (column != null) {
             output.putLong("column_min", column.min().asLong());
+            output.putInt("column_width", column.width());
             output.putInt("column_height", column.height());
         }
         heat.serialize(output);
         feed.serialize(output.child("feed"));
         steam.serialize(output.child("steam"));
-        naphtha.serialize(output.child("naphtha"));
-        lightOil.serialize(output.child("light_oil"));
-        heavyOil.serialize(output.child("heavy_oil"));
+        for (Product product : Product.values()) {
+            products.get(product).serialize(output.child(product.key));
+        }
         if (batchFeed != null) {
             output.putString("batch_feed", BuiltInRegistries.FLUID.getKey(batchFeed).toString());
+        }
+        if (lastFeed != null) {
+            output.putString("last_feed", BuiltInRegistries.FLUID.getKey(lastFeed).toString());
         }
         output.putFloat("batch_bonus", batchBonus);
         output.putDouble("progress", progress);
@@ -685,9 +831,13 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         portDefaults.save(output);
     }
 
+    // Clients get the saved state, with what the column makes and how hot it is for the renderer.
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        return saveCustomOnly(registries);
+        CompoundTag tag = saveCustomOnly(registries);
+        tag.putInt("makes", makes());
+        tag.putInt("temperature", heat.getTemperature());
+        return tag;
     }
 
     @Override
@@ -697,7 +847,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
 
     @Override
     public Component getDisplayName() {
-        return Component.translatable("container.arcforge.distillation_array.sized", getHeight());
+        return Component.translatable("container.arcforge.distillation_array.sized", getWidth(), getHeight());
     }
 
     @Override

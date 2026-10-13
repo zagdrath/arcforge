@@ -170,8 +170,8 @@ public final class ModBlockEntityTypes {
             BLOCK_ENTITY_TYPES.register("firebox_array", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity::new, ModBlocks.FIREBOX_ARRAY_CONTROLLER.get()));
 
-    // The Battery Array, on its controller; casings, panes and regulators are plain blocks that find it, and each Lithium
-    // Cell holds its share of the energy.
+    // The Battery Array, on its controller; casings, panes and regulators are plain blocks that find it, and each
+    // Lithium Cell holds its share of the energy.
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity>> BATTERY_ARRAY =
             BLOCK_ENTITY_TYPES.register("battery_array", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity::new, ModBlocks.BATTERY_ARRAY_CONTROLLER.get()));
@@ -183,6 +183,14 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity>> THERMAL_EVAPORATOR =
             BLOCK_ENTITY_TYPES.register("thermal_evaporator", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity::new, ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get()));
+
+    // The oilfield: the Oil Derrick and the Pumpjack, each on its controller (see OilfieldStructures).
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity>> OIL_DERRICK =
+            BLOCK_ENTITY_TYPES.register("oil_derrick", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity::new, ModBlocks.OIL_DERRICK_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity>> PUMPJACK =
+            BLOCK_ENTITY_TYPES.register("pumpjack", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity::new, ModBlocks.PUMPJACK_CONTROLLER.get()));
 
     // Automated farms.
     public static final Supplier<BlockEntityType<GlassClocheBlockEntity>> GLASS_CLOCHE = BLOCK_ENTITY_TYPES.register("glass_cloche",

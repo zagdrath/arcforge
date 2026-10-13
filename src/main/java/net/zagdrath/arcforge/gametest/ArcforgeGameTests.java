@@ -46,6 +46,9 @@ public final class ArcforgeGameTests {
     // Solar Thermal Array tests set the time of day and the weather, which are the whole level's: each runs
     // in its own batch (its own environment), one after another, under open sky.
     private static final java.util.Map<String, Consumer<GameTestHelper>> SOLAR_TESTS = new java.util.LinkedHashMap<>();
+    // Oil tests put deposits under whole chunks (and the oil they take is the server's), so a neighbouring test's chunk
+    // could share one: each runs in its own batch, one after another.
+    private static final java.util.Map<String, Consumer<GameTestHelper>> OIL_TESTS = new java.util.LinkedHashMap<>();
     // Tests that fail now and then for reasons outside what they test. They run and report as usual but aren't
     // required, so they can't fail a run (or a release) at random. (Retrying doesn't help: the test server
     // reports before a retry finishes.) Fix them and move them back to TESTS.
@@ -446,6 +449,13 @@ public final class ArcforgeGameTests {
         TESTS.put("distillation_turbine_lubricant", DistillationGameTests::turbineLubricant);
         TESTS.put("distillation_turbine_array_lubricant", DistillationGameTests::turbineArrayLubricant);
         TESTS.put("distillation_pitch_products", DistillationGameTests::pitchProducts);
+        TESTS.put("distillation_wide_columns", DistillationGameTests::wideColumns);
+        TESTS.put("distillation_crude_oil_fractions", DistillationGameTests::crudeOilFractions);
+        TESTS.put("oil_deposits_follow_the_seed", OilGameTests::depositsFollowTheSeed);
+        OIL_TESTS.put("oil_survey_tool", OilGameTests::surveyTool);
+        OIL_TESTS.put("oil_derrick_strikes_oil", OilGameTests::derrickStrikesOil);
+        OIL_TESTS.put("oil_pumpjack_pumps", OilGameTests::pumpjackPumps);
+        TESTS.put("oil_crude_oil_fluids", OilGameTests::crudeOilFluids);
         TESTS.put("portable_capsule_heat_flows_hot_to_cold", AlloyGameTests::capsuleHeatFlowsHotToCold);
         TESTS.put("steam_copper_parts_and_upgrades", SteamGameTests::copperPartsAndUpgrades);
         TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);
@@ -544,6 +554,7 @@ public final class ArcforgeGameTests {
         SOLAR_TESTS.put("solar_no_sky", SolarGameTests::noSky);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         SOLAR_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
+        OIL_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         FLAKY_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }
@@ -570,6 +581,13 @@ public final class ArcforgeGameTests {
             Holder<TestEnvironmentDefinition<?>> own = event.registerEnvironment(id(name));
             event.registerTest(id(name), new FunctionGameTestInstance(function(name), new TestData<>(own, Level.OVERWORLD,
                     Identifier.withDefaultNamespace("empty"), 1_500, 0, true, Rotation.NONE, false, 1, 1, true, 8)));
+        });
+        // Each oil test builds across three chunks (deposits are per chunk), so it gets room enough that no other test's
+        // area or barrier walls reach into it.
+        OIL_TESTS.keySet().forEach(name -> {
+            Holder<TestEnvironmentDefinition<?>> own = event.registerEnvironment(id(name));
+            event.registerTest(id(name), new FunctionGameTestInstance(function(name), new TestData<>(own, Level.OVERWORLD,
+                    Identifier.withDefaultNamespace("empty"), 600, 0, true, Rotation.NONE, false, 1, 1, false, 48)));
         });
     }
 

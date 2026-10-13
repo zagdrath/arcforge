@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "RCR",
+    "PQP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:glass_blocks",
+    "R": "#c:rods/copper",
+    "C": "arcforge:derrick_casing",
+    "Q": "minecraft:comparator"
+  },
+  "result": {
+    "id": "arcforge:oil_derrick_controller",
+    "count": 1
+  }
+}

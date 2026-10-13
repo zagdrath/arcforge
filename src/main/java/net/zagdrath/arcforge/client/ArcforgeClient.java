@@ -227,6 +227,8 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.HABER_REACTOR.get(), net.zagdrath.arcforge.client.screen.machine.HaberReactorScreen::new);
         event.register(ModMenuTypes.BIOGAS_DIGESTER.get(), net.zagdrath.arcforge.client.screen.multiblock.BiogasDigesterScreen::new);
         event.register(ModMenuTypes.THERMAL_EVAPORATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.ThermalEvaporatorScreen::new);
+        event.register(ModMenuTypes.OIL_DERRICK.get(), net.zagdrath.arcforge.client.screen.multiblock.OilDerrickScreen::new);
+        event.register(ModMenuTypes.PUMPJACK.get(), net.zagdrath.arcforge.client.screen.multiblock.PumpjackScreen::new);
         event.register(ModMenuTypes.FIREBOX_ARRAY.get(), net.zagdrath.arcforge.client.screen.multiblock.FireboxArrayScreen::new);
         event.register(ModMenuTypes.BATTERY_ARRAY.get(), net.zagdrath.arcforge.client.screen.multiblock.BatteryArrayScreen::new);
         event.register(ModMenuTypes.GLASS_CLOCHE.get(), ClocheScreen::new);
@@ -303,6 +305,10 @@ public class ArcforgeClient {
         event.register(liquidModel("ethanol"), ModFluids.ETHANOL, ModFluids.FLOWING_ETHANOL);
         event.register(liquidModel("light_oil"), ModFluids.LIGHT_OIL, ModFluids.FLOWING_LIGHT_OIL);
         event.register(liquidModel("heavy_oil"), ModFluids.HEAVY_OIL, ModFluids.FLOWING_HEAVY_OIL);
+        event.register(liquidModel("crude_oil"), ModFluids.CRUDE_OIL, ModFluids.FLOWING_CRUDE_OIL);
+        event.register(liquidModel("kerosene"), ModFluids.KEROSENE, ModFluids.FLOWING_KEROSENE);
+        event.register(liquidModel("diesel"), ModFluids.DIESEL, ModFluids.FLOWING_DIESEL);
+        event.register(liquidModel("bitumen"), ModFluids.BITUMEN, ModFluids.FLOWING_BITUMEN);
         event.register(liquidModel("seed_oil"), ModFluids.SEED_OIL, ModFluids.FLOWING_SEED_OIL);
         event.register(liquidModel("nutrient_solution"), ModFluids.NUTRIENT_SOLUTION, ModFluids.FLOWING_NUTRIENT_SOLUTION);
         event.register(liquidModel("biodiesel"), ModFluids.BIODIESEL, ModFluids.FLOWING_BIODIESEL);
@@ -345,6 +351,7 @@ public class ArcforgeClient {
         event.register(gasModel(CHLORINE_TINT), ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE);
         event.register(gasModel(ETHYLENE_TINT), ModFluids.ETHYLENE, ModFluids.FLOWING_ETHYLENE);
         event.register(gasModel(SYNGAS_TINT), ModFluids.SYNGAS, ModFluids.FLOWING_SYNGAS);
+        event.register(gasModel(REFINERY_GAS_TINT), ModFluids.REFINERY_GAS, ModFluids.FLOWING_REFINERY_GAS);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -368,6 +375,7 @@ public class ArcforgeClient {
     public static final int CHLORINE_TINT = GasTints.CHLORINE;
     public static final int ETHYLENE_TINT = GasTints.ETHYLENE;
     public static final int SYNGAS_TINT = GasTints.SYNGAS;
+    public static final int REFINERY_GAS_TINT = GasTints.REFINERY_GAS;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(
@@ -402,6 +410,10 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xE8DCA0, 10.0F), ModFluids.ETHANOL_TYPE.get());
         event.registerFluidType(liquidFog(0xC89A20, 5.0F), ModFluids.LIGHT_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0x2A1A0C, 2.0F), ModFluids.HEAVY_OIL_TYPE.get());
+        event.registerFluidType(liquidFog(0x0E0C0A, 1.5F), ModFluids.CRUDE_OIL_TYPE.get());
+        event.registerFluidType(liquidFog(0xDCE0C8, 9.0F), ModFluids.KEROSENE_TYPE.get());
+        event.registerFluidType(liquidFog(0xC8A848, 6.0F), ModFluids.DIESEL_TYPE.get());
+        event.registerFluidType(liquidFog(0x08080A, 1.0F), ModFluids.BITUMEN_TYPE.get());
         event.registerFluidType(liquidFog(0xC8961E, 4.0F), ModFluids.SEED_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(EXHAUST_STEAM_TINT & 0xFFFFFF, 6.0F), ModFluids.EXHAUST_STEAM_TYPE.get());
@@ -414,6 +426,7 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(CHLORINE_TINT & 0xFFFFFF, 5.0F), ModFluids.CHLORINE_TYPE.get());
         event.registerFluidType(liquidFog(ETHYLENE_TINT & 0xFFFFFF, 6.0F), ModFluids.ETHYLENE_TYPE.get());
         event.registerFluidType(liquidFog(SYNGAS_TINT & 0xFFFFFF, 6.0F), ModFluids.SYNGAS_TYPE.get());
+        event.registerFluidType(liquidFog(REFINERY_GAS_TINT & 0xFFFFFF, 6.0F), ModFluids.REFINERY_GAS_TYPE.get());
         event.registerFluidType(liquidFog(0xE8E4D6, 2.0F), ModFluids.LATEX_TYPE.get());
         event.registerFluidType(liquidFog(0xB6F07A, 6.0F), ModFluids.LIQUID_EXPERIENCE_TYPE.get());
         event.registerFluidType(liquidFog(SEAWATER_TINT & 0xFFFFFF, 12.0F), ModFluids.SEAWATER_TYPE.get());
@@ -575,6 +588,11 @@ public class ArcforgeClient {
         // The Thermal Evaporator Array draws the fluid column in its core and its salt bed.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.THERMAL_EVAPORATOR.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.ThermalEvaporatorRenderer::new);
+        // The Oil Derrick draws its drill string; the Pumpjack draws the whole unit, rocking.
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.OIL_DERRICK.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.OilDerrickRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.PUMPJACK.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.PumpjackRenderer::new);
         // The automated farms draw the soil and the plant growing inside.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheRenderer::new);

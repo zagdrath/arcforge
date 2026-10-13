@@ -9,15 +9,27 @@
   "pages": [
     {
       "type": "text",
-      "text": "Splits creosote into fractions with heat. The taller the column, the more it makes, and the faster.\n# Building\nA solid 2x2 column exactly 4, 6 or 8 tall, of casings and Tray Level Casings with one controller. The controller and the trays can't be in the top or bottom layer. The controller's display is the front.\n# Per 1,000 mB of creosote\n- 4 high: 250 Naphtha, 2 Pitch.\n- 6 high: 250 Naphtha, 450 Heavy Oil, 1 Pitch.\n- 8 high: 250 Naphtha, 300 Light Oil, 300 Heavy Oil, 1 Pitch.\nEvery batch takes 4,000 HU, and the column must be at 350°C or hotter. It feeds 10, 15 or 20 mB/t by height and holds 40,000 HU per 4 blocks. A new column starts without ports: set a heat port underneath (a Fuel Burner under it heats it) and a feed port, then a port for each product you want out, with the Wrench in Port mode.\nThe tray levels are glass: each shows its tray, the fraction pooled on it, and vapour rising while the column runs."
+      "text": "A refinery column that splits creosote and Crude Oil into fractions with heat. The taller and wider the column, the more it makes, and the faster.\n# Building\nA solid column 2x2 or 3x3 across and 4 to 16 tall, of casings and Tray Level Casings with one controller. The controller and the trays can't be in the top or bottom layer, and on a 3x3 the controller goes on the outside. The controller's side is the front.\nFormed, it becomes a refinery tower: a round shell in flanged tray sections, a sight glass on each tray showing what pools there and the vapour rising, platforms and a caged ladder, draw-off pipes for each product, a condenser bank on top and a fired reboiler at the base that glows when it's hot. You can walk on its platforms."
     },
     {
       "type": "text",
-      "text": "# Steam stripping\nSteam in its steam tank (fed through a steam port) raises the Naphtha yield of every batch, out of the Heavy Oil: Steam +15%, High-Pressure +30%, Superheated +50%. Each batch uses 100 mB.\nIt stops when a product it makes is full, so pipe them away or turn on auto-eject. Each product has its own port mode.\n# Upgrades\nSpeed Upgrades feed it 2^(n/2) times as fast (×16 at 8), using heat as fast. Heat Upgrades cut the heat per batch to 0.8^n."
+      "text": "# Size\nIt feeds 10 mB/t for a 2x2 four high, more by its cross-section (a 3x3 x2.25) and height (per 4 blocks): 20 mB/t for a 2x2x8, 90 mB/t for a 3x3x16. Its heat buffer grows the same way, and its tanks with its volume.\n# Creosote (1,000 mB, 4,000 HU, 350°C)\n- 4 high: 250 Naphtha, 2 Pitch.\n- 6 high: 250 Naphtha, 450 Heavy Oil, 1 Pitch.\n- 8 high and up: 250 Naphtha, 300 Light Oil, 300 Heavy Oil, 1 Pitch."
+    },
+    {
+      "type": "text",
+      "text": "# Crude Oil (1,000 mB, 5,000 HU, 380°C)\n- 6 high: 100 Refinery Gas, 200 Naphtha, 350 Diesel, 250 Bitumen.\n- 10 high: also 150 Kerosene and 150 Heavy Oil (100 Refinery Gas, 200 Naphtha, 250 Diesel, 100 Bitumen).\n- 14 high and up: more of the light cuts: 130 Refinery Gas, 270 Naphtha, 190 Kerosene, 230 Diesel, 90 Heavy Oil, 60 Bitumen.\nBelow 6 it's too short for Crude Oil."
+    },
+    {
+      "type": "text",
+      "text": "# Ports\nA new column starts without ports: set a heat port (a Fuel Burner under it heats it), a feed port, and a port for each product you want out, with the Wrench in Port mode. Each product has its own mode, and Refinery Gas leaves by gas conduits.\n# Steam stripping\nSteam in its steam tank raises the Naphtha of every batch (out of the Heavy Oil for creosote, the Bitumen for Crude Oil): Steam +15%, High-Pressure +30%, Superheated +50%, 100 mB a batch.\n# Upgrades\nSpeed Upgrades feed it 2^(n/2) times as fast, using heat as fast. Heat Upgrades cut the heat per batch to 0.8^n."
     },
     {
       "type": "multiblock",
       "structure": "distillation_array"
+    },
+    {
+      "type": "multiblock",
+      "structure": "distillation_array_3x3"
     }
   ]
 }

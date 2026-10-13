@@ -1946,13 +1946,15 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Distillation Array: a 2x2 column 4, 6 or 8 tall that splits creosote into fractions with heat.",
-                "Recipes are data-driven (arcforge:distilling). Values scale with the height (a 4-high column gets them as given).")
+        BUILDER.comment("Distillation Array: a refinery column 2x2 or 3x3 across and 4 to 16 tall that splits creosote and Crude Oil",
+                "into fractions with heat. Recipes are data-driven (arcforge:distilling) and set what each height makes. The feed rate,",
+                "heat buffer and tanks scale with the column: the rate and heat buffer by its cross-section (a 3x3 x2.25) and height",
+                "(per 4 blocks), the tanks by its volume against a 2x2x8.")
                 .push("distillationArray");
     }
 
     public static final ModConfigSpec.IntValue DISTILLATION_HEAT_CAPACITY = BUILDER
-            .comment("Heat buffer size in HU for a 4-high column.")
+            .comment("Heat buffer size in HU for a 2x2 column 4 high.")
             .defineInRange("heatCapacity", 40_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.IntValue DISTILLATION_MAX_TEMPERATURE = BUILDER
@@ -1960,19 +1962,20 @@ public class ArcforgeConfig {
             .defineInRange("maxTemperature", 1_400, 400, 10_000);
 
     public static final ModConfigSpec.IntValue DISTILLATION_FEED_RATE = BUILDER
-            .comment("Feed distilled per tick in mB, for a 4-high column (6 high: x1.5, 8 high: x2).")
+            .comment("Feed distilled per tick in mB, for a 2x2 column 4 high (2x2x8: 20 mB/t; 3x3x16: 90 mB/t).")
             .defineInRange("feedPerTick", 10, 1, 100_000);
 
     public static final ModConfigSpec.IntValue DISTILLATION_FEED_CAPACITY = BUILDER
-            .comment("Feed (creosote) tank size in mB.")
+            .comment("Feed (creosote or Crude Oil) tank size in mB, for a 2x2 column 8 high.")
             .defineInRange("feedCapacity", 16_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.IntValue DISTILLATION_STEAM_CAPACITY = BUILDER
-            .comment("Steam tank size in mB.")
+            .comment("Steam tank size in mB, for a 2x2 column 8 high.")
             .defineInRange("steamCapacity", 8_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.IntValue DISTILLATION_OUTPUT_CAPACITY = BUILDER
-            .comment("Size of each product tank (Naphtha, Light Oil, Heavy Oil) in mB.")
+            .comment("Size of each product tank (Refinery Gas, Naphtha, Kerosene, Light Oil, Diesel, Heavy Oil, Bitumen) in mB, for a",
+                    "2x2 column 8 high.")
             .defineInRange("outputCapacity", 8_000, 1_000, 100_000_000);
 
     static {
@@ -2026,6 +2029,81 @@ public class ArcforgeConfig {
             .comment("Lithium Brine (by-product) tank size in mB. When it's full, the by-product that doesn't fit is lost and",
                     "evaporating carries on.")
             .defineInRange("byproductCapacity", 8_000, 1_000, 100_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Oil Derrick: a 3x3 drilling rig six blocks tall, built over an oil deposit. It drills down to the oil with FE,",
+                "Water and Steel Pipes, then turns into a Well Head for a Pumpjack (handing back its blocks).").push("oilDerrick");
+    }
+
+    public static final ModConfigSpec.IntValue DERRICK_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 200_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DERRICK_MAX_INPUT = BUILDER
+            .comment("Most FE/t it accepts.")
+            .defineInRange("maxInput", 2_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue DERRICK_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while drilling.")
+            .defineInRange("energyPerTick", 120, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue DERRICK_WATER_PER_TICK = BUILDER
+            .comment("Water (drilling mud) used per tick while drilling, in mB.")
+            .defineInRange("waterPerTick", 10, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue DERRICK_WATER_CAPACITY = BUILDER
+            .comment("Water tank size in mB.")
+            .defineInRange("waterCapacity", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue DERRICK_TICKS_PER_BLOCK = BUILDER
+            .comment("Ticks to drill one block deeper.")
+            .defineInRange("ticksPerBlock", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue DERRICK_BLOCKS_PER_PIPE = BUILDER
+            .comment("Blocks of hole one Steel Pipe lines.")
+            .defineInRange("blocksPerPipe", 4, 1, 1_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Pumpjack: a 3x5 pumping unit built on a Well Head. It pumps Crude Oil from the deposit under it with FE, slowing",
+                "as the deposit drains; a drained deposit keeps giving a trickle for good.").push("pumpjack");
+    }
+
+    public static final ModConfigSpec.IntValue PUMPJACK_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 100_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue PUMPJACK_MAX_INPUT = BUILDER
+            .comment("Most FE/t it accepts.")
+            .defineInRange("maxInput", 1_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.IntValue PUMPJACK_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t while pumping (the same however fast the deposit gives oil).")
+            .defineInRange("energyPerTick", 60, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue PUMPJACK_RATE = BUILDER
+            .comment("Crude Oil pumped per tick from a full deposit, in mB.")
+            .defineInRange("pumpPerTick", 30, 1, 100_000);
+
+    public static final ModConfigSpec.DoubleValue PUMPJACK_MIN_SHARE = BUILDER
+            .comment("The share of that rate it still pumps from a deposit that's nearly dry (it slows in a straight line from",
+                    "full to this).")
+            .defineInRange("minShare", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue PUMPJACK_TRICKLE = BUILDER
+            .comment("Crude Oil per second a drained deposit still gives each Pumpjack, in mB (it never runs dry).")
+            .defineInRange("tricklePerSecond", 40, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue PUMPJACK_TANK_CAPACITY = BUILDER
+            .comment("Crude Oil tank size in mB.")
+            .defineInRange("tankCapacity", 16_000, 1_000, 100_000_000);
 
     static {
         BUILDER.pop();
@@ -3108,6 +3186,50 @@ public class ArcforgeConfig {
             .comment("Biome tags (at the bed's centre) whose beds use thickLayers.")
             .defineListAllowEmpty("thickBiomeTags", List.of("c:is_desert", "minecraft:is_ocean", "minecraft:is_deep_ocean"), () -> "c:is_desert",
                     value -> value instanceof String);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Oil deposits: the world is split into regions (regionSize chunks across), and each may hold one deposit deep",
+                "underground, round and some chunks across, with a random amount of Crude Oil. Deserts, oceans, badlands and plains",
+                "(the arcforge:oil_rich biome tag) have more of them, and bigger ones. Found with the Seismic Survey Tool, drilled",
+                "with an Oil Derrick, pumped with a Pumpjack. A drained deposit keeps giving a trickle.").push("oilDeposits");
+    }
+
+    public static final ModConfigSpec.ConfigValue<List<? extends String>> OIL_DIMENSIONS = BUILDER
+            .comment("Dimensions that have oil deposits.")
+            .defineListAllowEmpty("dimensions", List.of("minecraft:overworld"), () -> "minecraft:overworld", value -> value instanceof String);
+
+    public static final ModConfigSpec.IntValue OIL_REGION_SIZE = BUILDER
+            .comment("Size of a region, in chunks across. Each region holds at most one deposit.")
+            .defineInRange("regionSize", 8, 4, 64);
+
+    public static final ModConfigSpec.DoubleValue OIL_CHANCE = BUILDER
+            .comment("Chance that a region has a deposit.")
+            .defineInRange("chance", 0.3, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue OIL_RICH_CHANCE = BUILDER
+            .comment("The same in regions whose middle is in an arcforge:oil_rich biome.")
+            .defineInRange("richChance", 0.65, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue OIL_AMOUNT_MULTIPLIER = BUILDER
+            .comment("Multiplies every deposit's Crude Oil (Oil Seep 1,000-3,000 buckets, Oil Pocket 4,000-10,000, Oil Field",
+                    "12,000-30,000, Giant Oil Field 40,000-100,000).")
+            .defineInRange("amountMultiplier", 1.0, 0.01, 1_000.0);
+
+    public static final ModConfigSpec.IntValue OIL_MIN_Y = BUILDER
+            .comment("Lowest a deposit lies (the depth an Oil Derrick drills to).")
+            .defineInRange("minY", -48, -2_032, 2_032);
+
+    public static final ModConfigSpec.IntValue OIL_MAX_Y = BUILDER
+            .comment("Highest a deposit lies.")
+            .defineInRange("maxY", 8, -2_032, 2_032);
+
+    public static final ModConfigSpec.IntValue SURVEY_COOLDOWN = BUILDER
+            .comment("Ticks before the Seismic Survey Tool can be used again.")
+            .defineInRange("surveyCooldown", 40, 0, 1_200);
 
     static {
         BUILDER.pop();

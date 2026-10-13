@@ -90,6 +90,7 @@ public final class GasApiGameTests {
         gases.put(ModFluids.CHLORINE.get(), GasTints.CHLORINE);
         gases.put(ModFluids.ETHYLENE.get(), GasTints.ETHYLENE);
         gases.put(ModFluids.SYNGAS.get(), GasTints.SYNGAS);
+        gases.put(ModFluids.REFINERY_GAS.get(), GasTints.REFINERY_GAS);
         return gases;
     }
 
