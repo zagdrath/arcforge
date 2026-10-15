@@ -22,7 +22,7 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.7.0** (minor: new content and a rebuilt Distillation Array; worlds and configs carry over).
+## [2.7.0] - 2026-10-14
 
 ### Added
 
@@ -1554,7 +1554,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.6.1+26.3...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.7.0+26.3...HEAD
+[2.7.0]: https://github.com/zagdrath/arcforge/compare/v2.6.1+26.3...v2.7.0+26.3
 [2.6.1]: https://github.com/zagdrath/arcforge/compare/v2.6.0+26.3...v2.6.1+26.3
 [2.6.0]: https://github.com/zagdrath/arcforge/compare/v2.5.1+26.3...v2.6.0+26.3
 [2.5.1]: https://github.com/zagdrath/arcforge/compare/v2.5.0...v2.5.1+26.3
