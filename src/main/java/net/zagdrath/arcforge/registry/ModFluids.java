@@ -120,6 +120,12 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.NATURAL_GAS_TYPE, ModFluids.NATURAL_GAS, ModFluids.FLOWING_NATURAL_GAS)));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NATURAL_GAS = FLUIDS.register("flowing_natural_gas",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.NATURAL_GAS_TYPE, ModFluids.NATURAL_GAS, ModFluids.FLOWING_NATURAL_GAS)));
+    // Propylene: the Steam Cracker's second olefin, a gas; the Chemical Reactor makes Polypropylene Sheet from it.
+    public static final DeferredHolder<FluidType, FluidType> PROPYLENE_TYPE = gasType("propylene", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> PROPYLENE = FLUIDS.register("propylene",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.PROPYLENE_TYPE, ModFluids.PROPYLENE, ModFluids.FLOWING_PROPYLENE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_PROPYLENE = FLUIDS.register("flowing_propylene",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.PROPYLENE_TYPE, ModFluids.PROPYLENE, ModFluids.FLOWING_PROPYLENE)));
     public static final DeferredHolder<FluidType, FluidType> HYDROGEN_SULFIDE_TYPE = gasType("hydrogen_sulfide", 293);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HYDROGEN_SULFIDE = FLUIDS.register("hydrogen_sulfide",
             () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HYDROGEN_SULFIDE_TYPE, ModFluids.HYDROGEN_SULFIDE,

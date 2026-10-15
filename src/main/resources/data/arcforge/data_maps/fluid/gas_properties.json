@@ -47,6 +47,9 @@
     },
     "arcforge:hydrogen_sulfide": {
       "color": "#C4CC6A"
+    },
+    "arcforge:propylene": {
+      "color": "#D8CCEC"
     }
   }
 }

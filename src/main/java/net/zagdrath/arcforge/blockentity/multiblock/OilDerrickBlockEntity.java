@@ -38,6 +38,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
@@ -53,12 +54,14 @@ import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.OilDerrickMenu;
+import net.zagdrath.arcforge.multiblock.DerrickLayout;
+import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
-import net.zagdrath.arcforge.multiblock.OilfieldController;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
+import net.zagdrath.arcforge.multiblock.ShapedPlant;
 import net.zagdrath.arcforge.oil.OilCavern;
 import net.zagdrath.arcforge.oil.OilCaverns;
 import net.zagdrath.arcforge.oil.OilDeposits;
@@ -79,7 +82,7 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // down, its blocks (and whatever it held) are handed back at the hole, and a Well Head caps it, ready for a Pumpjack;
 // drilled into a gas cap, the Well Head is a gas well, for a Gas Wellhead. It does IO through its ports: Water and
 // Steel Pipes in (Input), FE in (Energy).
-public class OilDerrickBlockEntity extends MachineBlockEntity implements OilfieldController {
+public class OilDerrickBlockEntity extends MachineBlockEntity implements ShapedPlant {
     public static final int SLOT_PIPES = 0;
     public static final int MACHINE_SLOTS = 1;
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
@@ -177,7 +180,7 @@ public class OilDerrickBlockEntity extends MachineBlockEntity implements Oilfiel
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
         super.preRemoveSideEffects(pos, state);
         if (level instanceof ServerLevel serverLevel && rig != null) {
-            OilfieldStructures.unform(serverLevel, rig.parts(), pos, rig.min(), rig.max());
+            OilfieldStructures.unformRig(serverLevel, rig, pos);
             rig = null;
         }
     }
@@ -188,7 +191,7 @@ public class OilDerrickBlockEntity extends MachineBlockEntity implements Oilfiel
             return;
         }
         if (rig != null) {
-            OilfieldStructures.unform(level, rig.parts(), null, rig.min(), rig.max());
+            OilfieldStructures.unformRig(level, rig, null);
         }
         // A rig built over another hole starts that hole from the top; one broken and rebuilt over the same hole
         // carries on.
@@ -424,9 +427,85 @@ public class OilDerrickBlockEntity extends MachineBlockEntity implements Oilfiel
         setChanged();
     }
 
-    // The rig and the space round it, for the drill string's renderer.
+    // The rig and a little round it (the crown's gin pole and railing, the drill string in the hole), for its renderer.
     public AABB getRenderBox() {
-        return rig != null ? AABB.encapsulatingFullBlocks(rig.min(), rig.max()) : new AABB(worldPosition);
+        return rig != null ? AABB.encapsulatingFullBlocks(rig.min().below(), rig.max()).inflate(0.5) : new AABB(worldPosition);
+    }
+
+    // --- The model's frame and shapes (see DerrickLayout and PlantHitbox) ---
+
+    public static ModelFrame frame(OilfieldStructures.Rig rig) {
+        return ModelFrame.toward(rig.front().getOpposite(), OilfieldStructures.RIG_WIDTH, OilfieldStructures.RIG_HEIGHT, OilfieldStructures.RIG_WIDTH);
+    }
+
+    @Override
+    public @Nullable ModelFrame plantFrame() {
+        return rig != null ? frame(rig) : null;
+    }
+
+    // The blocks' shapes, by the way the rig faces.
+    private static final java.util.Map<Direction, VoxelShape[]> SHAPES = new java.util.EnumMap<>(Direction.class);
+
+    @Override
+    public VoxelShape[] plantShapes() {
+        OilfieldStructures.Rig shown = rig;
+        if (shown == null) {
+            return new VoxelShape[0];
+        }
+        synchronized (SHAPES) {
+            return SHAPES.computeIfAbsent(shown.front(), front -> frame(shown).shapes(DerrickLayout.solids()));
+        }
+    }
+
+    // The frame blocks the ladder runs through (see DerrickLayout.ladderBlocks), packed as x | y << 8 | u << 16.
+    private static final java.util.Set<Integer> LADDER = new java.util.HashSet<>();
+
+    static {
+        for (int[] block : DerrickLayout.ladderBlocks()) {
+            LADDER.add(block[0] | block[1] << 8 | block[2] << 16);
+        }
+    }
+
+    // Whether the formed rig's ladder runs through the block at pos (so it can be climbed).
+    public boolean isLadderAt(BlockPos pos) {
+        OilfieldStructures.Rig shown = rig;
+        if (shown == null || !shown.contains(pos)) {
+            return false;
+        }
+        BlockPos min = shown.min();
+        int[] block = frame(shown).frameBlock(pos.getX() - min.getX(), pos.getY() - min.getY(), pos.getZ() - min.getZ());
+        return LADDER.contains(block[0] | block[1] << 8 | block[2] << 16);
+    }
+
+    // Where a player climbs the ladder (DerrickLayout.climbBoxes), in world blocks from the rig's minimum corner, by the
+    // way the rig faces.
+    private static final java.util.Map<Direction, java.util.List<AABB>> CLIMB = new java.util.EnumMap<>(Direction.class);
+
+    // Whether box (a player's) is on the formed rig's ladder.
+    public boolean onLadder(AABB box) {
+        OilfieldStructures.Rig shown = rig;
+        if (shown == null) {
+            return false;
+        }
+        java.util.List<AABB> zones;
+        synchronized (CLIMB) {
+            zones = CLIMB.computeIfAbsent(shown.front(), front -> {
+                ModelFrame frame = frame(shown);
+                java.util.List<AABB> out = new java.util.ArrayList<>();
+                for (float[] b : DerrickLayout.climbBoxes()) {
+                    float[] p = frame.worldPoint(b[0], b[1], b[2]), q = frame.worldPoint(b[3], b[4], b[5]);
+                    out.add(new AABB(p[0] / 16.0, p[1] / 16.0, p[2] / 16.0, q[0] / 16.0, q[1] / 16.0, q[2] / 16.0));
+                }
+                return out;
+            });
+        }
+        AABB local = box.move(-shown.min().getX(), -shown.min().getY(), -shown.min().getZ());
+        for (AABB zone : zones) {
+            if (zone.intersects(local)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // --- Capabilities (MultiblockController) ---

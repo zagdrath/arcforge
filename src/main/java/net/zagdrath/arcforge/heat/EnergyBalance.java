@@ -80,7 +80,12 @@ public final class EnergyBalance {
     public static double recoverableFePerMb(Fluid fluid) {
         // The Diesel Generator burns its fuels (arcforge:engine_fuels) straight to FE.
         net.zagdrath.arcforge.machine.EngineFuel engine = net.zagdrath.arcforge.machine.EngineFuel.of(fluid);
-        double generator = engine != null ? engine.fePerMb() * PowerGeneration.multiplier() : 0.0;
+        // The bigger engines get more from each mB (efficiencyV12, efficiencyV16): the best of them counts.
+        double efficiency = 1.0;
+        for (net.zagdrath.arcforge.multiblock.DieselEngine e : net.zagdrath.arcforge.multiblock.DieselEngine.values()) {
+            efficiency = Math.max(efficiency, net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.efficiency(e));
+        }
+        double generator = engine != null ? engine.fePerMb() * efficiency * PowerGeneration.multiplier() : 0.0;
         BurnerFuel fuel = BurnerFuel.of(fluid);
         if (fuel == null) {
             return generator;

@@ -173,7 +173,7 @@ final class OilGameTests {
                         controllers += stack.is(ModItems.OIL_DERRICK_CONTROLLER.get()) ? stack.getCount() : 0;
                         pipes += stack.is(ModItems.STEEL_PIPE.get()) ? stack.getCount() : 0;
                     }
-                    helper.assertTrue(casings == 7 && frames == 25 && controllers == 1, "Handed back " + casings + " casings, " + frames + " frames, "
+                    helper.assertTrue(casings == 7 && frames == 4 * OilfieldStructures.LEG_LAYERS + 9 && controllers == 1, "Handed back " + casings + " casings, " + frames + " frames, "
                             + controllers + " controllers");
                     helper.assertTrue(pipes == 3, pipes + " spare pipes dropped");
                     OilDeposits.clearTestDeposit(helper.getLevel(), helper.absolutePos(min.offset(1, 0, 1)));

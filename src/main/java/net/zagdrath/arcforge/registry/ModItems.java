@@ -277,6 +277,8 @@ public final class ModItems {
     public static final DeferredItem<Item> PLASTIC_SHEET = ITEMS.registerSimpleItem("plastic_sheet");
     // Ethylene and Chlorine, reacted in the Chemical Reactor: an acid-proof lining for fluid conduits and tanks.
     public static final DeferredItem<Item> PVC_SHEET = ITEMS.registerSimpleItem("pvc_sheet");
+    // From Propylene in the Chemical Reactor; any arcforge:plastics recipe takes it.
+    public static final DeferredItem<Item> POLYPROPYLENE_SHEET = ITEMS.registerSimpleItem("polypropylene_sheet");
     // Rubber: Raw Rubber (Latex dried in the Grain Dryer) cured with Sulfur in the Vulcanizer. Gaskets seal the
     // pressurized conduits, cylinders, cartridges and jetpacks.
     public static final DeferredItem<Item> RAW_RUBBER = ITEMS.registerSimpleItem("raw_rubber");
@@ -367,6 +369,8 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> LUBRICANT_BLENDER = ITEMS.registerSimpleBlockItem(ModBlocks.LUBRICANT_BLENDER);
     public static final DeferredItem<BlockItem> CRACKING_UNIT_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CRACKING_UNIT_CASING);
     public static final DeferredItem<BlockItem> CRACKING_UNIT_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.CRACKING_UNIT_CONTROLLER);
+    public static final DeferredItem<BlockItem> STEAM_CRACKER_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_CRACKER_CASING);
+    public static final DeferredItem<BlockItem> STEAM_CRACKER_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_CRACKER_CONTROLLER);
     public static final DeferredItem<BlockItem> DIESEL_GENERATOR_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.DIESEL_GENERATOR_CASING);
     public static final DeferredItem<BlockItem> DIESEL_GENERATOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.DIESEL_GENERATOR_CONTROLLER);
     public static final DeferredItem<BlockItem> FLARE_STACK = ITEMS.registerSimpleBlockItem(ModBlocks.FLARE_STACK);

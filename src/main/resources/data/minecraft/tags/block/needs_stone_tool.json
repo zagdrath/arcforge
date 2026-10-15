@@ -73,6 +73,8 @@
     "arcforge:lubricant_blender",
     "arcforge:cracking_unit_casing",
     "arcforge:cracking_unit_controller",
+    "arcforge:steam_cracker_controller",
+    "arcforge:steam_cracker_casing",
     "arcforge:diesel_generator_casing",
     "arcforge:diesel_generator_controller",
     "arcforge:flare_stack",

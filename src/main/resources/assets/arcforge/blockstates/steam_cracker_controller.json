@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "facing=north,formed=false,lit=false": {
+      "model": "arcforge:block/refinery/steam_cracker_controller"
+    },
+    "facing=north,formed=false,lit=true": {
+      "model": "arcforge:block/refinery/steam_cracker_controller_on"
+    },
+    "facing=north,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/steam_cracker_hidden"
+    },
+    "facing=north,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/steam_cracker_hidden"
+    },
+    "facing=east,formed=false,lit=false": {
+      "model": "arcforge:block/refinery/steam_cracker_controller",
+      "y": 90
+    },
+    "facing=east,formed=false,lit=true": {
+      "model": "arcforge:block/refinery/steam_cracker_controller_on",
+      "y": 90
+    },
+    "facing=east,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/steam_cracker_hidden"
+    },
+    "facing=east,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/steam_cracker_hidden"
+    },
+    "facing=south,formed=false,lit=false": {
+      "model": "arcforge:block/refinery/steam_cracker_controller",
+      "y": 180
+    },
+    "facing=south,formed=false,lit=true": {
+      "model": "arcforge:block/refinery/steam_cracker_controller_on",
+      "y": 180
+    },
+    "facing=south,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/steam_cracker_hidden"
+    },
+    "facing=south,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/steam_cracker_hidden"
+    },
+    "facing=west,formed=false,lit=false": {
+      "model": "arcforge:block/refinery/steam_cracker_controller",
+      "y": 270
+    },
+    "facing=west,formed=false,lit=true": {
+      "model": "arcforge:block/refinery/steam_cracker_controller_on",
+      "y": 270
+    },
+    "facing=west,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/steam_cracker_hidden"
+    },
+    "facing=west,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/refinery/steam_cracker_hidden"
+    }
+  }
+}

@@ -43,8 +43,8 @@ import net.zagdrath.arcforge.multiblock.ShapedPlant;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// The controller of the refinery's fixed boxes (see OilfieldStructures.PlantBox): the Cracking Unit and the Diesel
-// Generator. It forms and breaks the box, keeps its ports, tells clients about it (they draw it, see PlantRenderer),
+// The controller of the refinery's boxes (see OilfieldStructures.PlantBox): the Cracking Unit, the Steam Cracker and
+// the Diesel Generator (5, 7 or 9 long). It forms and breaks the box, keeps its ports, tells clients about it (they draw it, see PlantRenderer),
 // and gives its blocks their shapes (ShapedPlant, from the model's still parts). Subclasses run the machine.
 public abstract class PlantControllerBlockEntity extends MachineBlockEntity implements ShapedPlant {
     private static final int REDSTONE_CHECK_INTERVAL = 10;
@@ -63,8 +63,8 @@ public abstract class PlantControllerBlockEntity extends MachineBlockEntity impl
         this.kind = kind;
     }
 
-    // The still parts' boxes, in the model's frame (its layout's solids).
-    protected abstract List<float[]> solids();
+    // The still parts' boxes, in the model's frame (its layout's solids), for a box this long.
+    protected abstract List<float[]> solids(int length);
 
     // Called once the box has formed or broken.
     protected void onStructureChanged() {}
@@ -202,8 +202,8 @@ public abstract class PlantControllerBlockEntity extends MachineBlockEntity impl
         return box != null ? frame(box) : null;
     }
 
-    // Each kind's shapes, by the way the box runs.
-    private static final Map<PlantKind, Map<Direction, VoxelShape[]>> SHAPES = new EnumMap<>(PlantKind.class);
+    // Each kind's shapes, by its length and the way the box runs.
+    private static final Map<PlantKind, Map<Integer, Map<Direction, VoxelShape[]>>> SHAPES = new EnumMap<>(PlantKind.class);
 
     @Override
     public VoxelShape[] plantShapes() {
@@ -212,7 +212,8 @@ public abstract class PlantControllerBlockEntity extends MachineBlockEntity impl
             return new VoxelShape[0];
         }
         synchronized (SHAPES) {
-            return SHAPES.computeIfAbsent(kind, k -> new EnumMap<>(Direction.class)).computeIfAbsent(shown.back(), back -> frame(shown).shapes(solids()));
+            return SHAPES.computeIfAbsent(kind, k -> new java.util.HashMap<>()).computeIfAbsent(shown.length(), l -> new EnumMap<>(Direction.class))
+                    .computeIfAbsent(shown.back(), back -> frame(shown).shapes(solids(shown.length())));
         }
     }
 
@@ -235,7 +236,7 @@ public abstract class PlantControllerBlockEntity extends MachineBlockEntity impl
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         box = input.getLong("front").map(front -> OilfieldStructures.PlantBox.of(kind, BlockPos.of(front),
-                Direction.from2DDataValue(input.getIntOr("back", 0)))).orElse(null);
+                Direction.from2DDataValue(input.getIntOr("back", 0)), input.getIntOr("length", OilfieldStructures.GENERATOR_LENGTH))).orElse(null);
         running = input.getBooleanOr("running", false);
         portDefaults.load(input);
     }
@@ -246,6 +247,7 @@ public abstract class PlantControllerBlockEntity extends MachineBlockEntity impl
         if (box != null) {
             output.putLong("front", box.front().asLong());
             output.putInt("back", box.back().get2DDataValue());
+            output.putInt("length", box.length());
         }
         output.putBoolean("running", running);
         portDefaults.save(output);

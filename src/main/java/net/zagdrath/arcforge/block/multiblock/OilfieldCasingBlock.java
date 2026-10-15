@@ -22,10 +22,10 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.multiblock.PortHolder;
 
-// A casing of an Oil Derrick (its drill floor), a Pumpjack (its skid and Samson post), a Cracking Unit or a Diesel
-// Generator. The Derrick Casing is a plain block, formed or not, and any on the outside can be one of the rig's ports;
-// the others (modelled) draw nothing once formed (the structure's renderer draws it) but their port plates, and their
-// shape follows the model (see PlantHitbox). The Derrick Frame (holdsPorts false) is the rig's steel lattice.
+// A casing of an Oil Derrick (its drill floor, or the Derrick Frame of its tower, which holds no ports), a Pumpjack (its
+// skid and Samson post), a Cracking Unit, a Steam Cracker or a Diesel Generator. Formed, a modelled casing draws
+// nothing (the structure's renderer draws it) but its port plates, and its shape follows the model (see PlantHitbox);
+// the blocks a formed Oil Derrick's ladder runs through are climbable.
 public class OilfieldCasingBlock extends Block implements OilfieldPart, PortHolder {
     private final boolean modelled, ports;
 
@@ -76,6 +76,13 @@ public class OilfieldCasingBlock extends Block implements OilfieldPart, PortHold
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         VoxelShape shape = modelled && state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
         return shape != null ? shape : super.getCollisionShape(state, level, pos, context);
+    }
+
+    // On a formed Oil Derrick, the blocks its ladder runs through can be climbed.
+    @Override
+    public boolean isLadder(BlockState state, net.minecraft.world.level.LevelReader level, BlockPos pos, net.minecraft.world.entity.LivingEntity entity) {
+        return modelled && state.getValue(FORMED) && level instanceof Level real
+                && PlantHitbox.plant(real, pos) instanceof net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity derrick && derrick.isLadderAt(pos);
     }
 
     @Override

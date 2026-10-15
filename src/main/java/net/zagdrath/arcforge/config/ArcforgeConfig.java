@@ -2366,7 +2366,7 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Oil Derrick: a 3x3 drilling rig six blocks tall, built over an oil deposit. It drills down to the oil with FE,",
+        BUILDER.comment("Oil Derrick: a 3x3 drilling rig nine blocks tall, built over an oil deposit. It drills down to the oil with FE,",
                 "Water and Steel Pipes, then turns into a Well Head for a Pumpjack (handing back its blocks).").push("oilDerrick");
     }
 
@@ -2471,26 +2471,77 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Diesel Generator: a 3x5 engine-generator set two blocks tall that burns liquid and gas fuels straight to FE.",
-                "Fuels and the FE each mB gives are data-driven (data map arcforge:engine_fuels, keyed by fluid): Diesel,",
-                "Gasoline, Biodiesel and Refinery Gas by default. It runs at full power while its FE buffer has room and",
-                "throttles back to what's drawn when it's full.").push("dieselGenerator");
+        BUILDER.comment("Steam Cracker: a 3x3x3 multiblock, a furnace box with radiant tubes, that cracks Naphtha or Refinery Gas with steam",
+                "at 800°C or hotter into Ethylene, Propylene, a little Hydrogen and a trickle of Heavy Oil. Recipes are data-driven",
+                "(arcforge:steam_cracking: the feed, the steam (second_input), products, heat and min_temp).").push("steamCracker");
+    }
+
+    public static final ModConfigSpec.IntValue STEAM_CRACKER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 120_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue STEAM_CRACKER_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full heat buffer.")
+            .defineInRange("bufferMaxTemperature", 1_200, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue STEAM_CRACKER_TIME = BUILDER
+            .comment("Ticks per operation for recipes that don't set their own time, before Speed upgrades.")
+            .defineInRange("time", 20, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue STEAM_CRACKER_FEED_CAPACITY = BUILDER
+            .comment("Feed (Naphtha or Refinery Gas) tank size in mB.")
+            .defineInRange("feedTankCapacity", 32_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue STEAM_CRACKER_SECOND_FEED_CAPACITY = BUILDER
+            .comment("Steam tank size in mB.")
+            .defineInRange("steamTankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue STEAM_CRACKER_PRODUCT_CAPACITY = BUILDER
+            .comment("Each product tank's size in mB.")
+            .defineInRange("productTankCapacity", 16_000, 1_000, 100_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Diesel Generator: an engine-generator set 3 wide and 3 tall that burns liquid and gas fuels straight to FE.",
+                "Its length sets the engine: 5 long is a V8, 7 a V12, 9 a V16. Fuels and the FE each mB gives are data-driven",
+                "(data map arcforge:engine_fuels, keyed by fluid): Diesel, Gasoline, Biodiesel and Refinery Gas by default; sour",
+                "fuels are refused. It runs at full power while its FE buffer has room and throttles back to what's drawn when",
+                "it's full.").push("dieselGenerator");
     }
 
     public static final ModConfigSpec.IntValue DIESEL_GENERATOR_MAX_OUTPUT = BUILDER
-            .comment("FE/t at full power (before power.generationMultiplier).")
+            .comment("FE/t at full power for the V8 (5 long), before power.generationMultiplier.")
             .defineInRange("maxPowerOutput", 3_000, 1, 10_000_000);
 
+    public static final ModConfigSpec.IntValue DIESEL_GENERATOR_MAX_OUTPUT_V12 = BUILDER
+            .comment("FE/t at full power for the V12 (7 long), before power.generationMultiplier.")
+            .defineInRange("maxPowerOutputV12", 8_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue DIESEL_GENERATOR_MAX_OUTPUT_V16 = BUILDER
+            .comment("FE/t at full power for the V16 (9 long), before power.generationMultiplier.")
+            .defineInRange("maxPowerOutputV16", 15_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.DoubleValue DIESEL_GENERATOR_EFFICIENCY_V12 = BUILDER
+            .comment("FE each mB of fuel makes in the V12, as a multiple of the V8's (the fuel's fe_per_mb).")
+            .defineInRange("efficiencyV12", 1.05, 0.1, 10.0);
+
+    public static final ModConfigSpec.DoubleValue DIESEL_GENERATOR_EFFICIENCY_V16 = BUILDER
+            .comment("FE each mB of fuel makes in the V16, as a multiple of the V8's.")
+            .defineInRange("efficiencyV16", 1.10, 0.1, 10.0);
+
     public static final ModConfigSpec.IntValue DIESEL_GENERATOR_ENERGY_CAPACITY = BUILDER
-            .comment("Internal FE buffer size.")
+            .comment("The V8's FE buffer; the bigger engines' grow with their output.")
             .defineInRange("energyCapacity", 400_000, 1_000, 1_000_000_000);
 
     public static final ModConfigSpec.IntValue DIESEL_GENERATOR_MAX_OUTPUT_RATE = BUILDER
             .comment("Most FE/t each Energy port gives out.")
-            .defineInRange("maxEnergyOutput", 8_192, 1, 100_000_000);
+            .defineInRange("maxEnergyOutput", 16_384, 1, 100_000_000);
 
     public static final ModConfigSpec.IntValue DIESEL_GENERATOR_TANK_CAPACITY = BUILDER
-            .comment("Fuel tank size in mB.")
+            .comment("The V8's fuel tank in mB; the bigger engines' grow with their length (7/5 and 9/5 of it).")
             .defineInRange("fuelTankCapacity", 16_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.IntValue DIESEL_GENERATOR_SPIN_UP = BUILDER

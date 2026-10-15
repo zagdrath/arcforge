@@ -112,6 +112,8 @@ public final class ModRecipes {
             RECIPE_TYPES.register("sulfur_recovery", () -> RecipeType.simple(id("sulfur_recovery")));
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.RefiningRecipe>> STEAM_REFORMING =
             RECIPE_TYPES.register("steam_reforming", () -> RecipeType.simple(id("steam_reforming")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.RefiningRecipe>> STEAM_CRACKING =
+            RECIPE_TYPES.register("steam_cracking", () -> RecipeType.simple(id("steam_cracking")));
     // The Sifter and the Diamond Press.
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.SiftingRecipe>> SIFTING =
             RECIPE_TYPES.register("sifting", () -> RecipeType.simple(id("sifting")));
@@ -191,6 +193,8 @@ public final class ModRecipes {
             RECIPE_SERIALIZERS.register("sulfur_recovery", () -> refining(net.zagdrath.arcforge.recipe.RefiningProcess.SULFUR_RECOVERY));
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.RefiningRecipe>> STEAM_REFORMING_SERIALIZER =
             RECIPE_SERIALIZERS.register("steam_reforming", () -> refining(net.zagdrath.arcforge.recipe.RefiningProcess.STEAM_REFORMING));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.RefiningRecipe>> STEAM_CRACKING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("steam_cracking", () -> refining(net.zagdrath.arcforge.recipe.RefiningProcess.STEAM_CRACKING));
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.SiftingRecipe>> SIFTING_SERIALIZER =
             RECIPE_SERIALIZERS.register("sifting", () -> new RecipeSerializer<>(
                     net.zagdrath.arcforge.recipe.SiftingRecipe.MAP_CODEC, net.zagdrath.arcforge.recipe.SiftingRecipe.STREAM_CODEC));
@@ -247,6 +251,6 @@ public final class ModRecipes {
                 MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(), VULCANIZING.get(),
                 HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
                 SIFTING.get(), DIAMOND_PRESSING.get(), CRACKING.get(), REFORMING.get(), COKING.get(), LUBRICANT_BLENDING.get(),
-                HYDROTREATING.get(), SULFUR_RECOVERY.get(), STEAM_REFORMING.get(), RecipeType.SMELTING);
+                HYDROTREATING.get(), SULFUR_RECOVERY.get(), STEAM_REFORMING.get(), STEAM_CRACKING.get(), RecipeType.SMELTING);
     }
 }

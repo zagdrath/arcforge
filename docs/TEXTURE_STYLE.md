@@ -408,8 +408,9 @@ the same layout on all of them); ModelMesh `modules` and `plating` lay them.
 8. **Round caps and discs** (pipe ends, flywheel faces, a casing's end rings) are plated as one surface across their
    wedges, never wedge by wedge.
 
-Converted: the **Pumpjack**, the **refinery tower** (Distillation Array), the **Steam Turbine Array**, and the refinery
-units' models (the **Cracking Unit**, the **Diesel Generator** and the **Flare Stack**'s stack). Their renderers shade
+Converted: the **Pumpjack**, the **Oil Derrick**, the **refinery tower** (Distillation Array), the **Steam Turbine
+Array**, and the refinery units' models (the **Cracking Unit**, the **Steam Cracker**, the **Diesel Generator** and the
+**Flare Stack**'s stack). Their renderers shade
 each face as a block face turned its way is, so the models sit in the light like the blocks round them. Models still to
 bring into line: the **Gas Turbine Array** and the **Industrial Water Intake**.
 
@@ -1286,7 +1287,19 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   frame with a second feed tank recess beside the feed (Hydrogen, Oxygen or Steam), its tooltip naming that feed.
 - **Surface seeps:** a small pit of the deposit's oil sunk in the ground with a coarse-dirt rim; no texture of its own.
 
-## Refinery tower model
+## Steam Cracker, Propylene and Polypropylene
+- **Steam Cracker Casing** (`block/refinery/steam_cracker_casing`, in the oilfield's casing grammar: 2 px bevel, split
+  face at x 10, top rivets, the riveted strap): a peep hole in its upper half (a steel frame, a firebrick ring, the
+  Heat row's fire in it). Its top is the tread deck. **Controller:** the screen recess with the status LED and a glyph
+  of three furnace tubes over a flame; `_on` lights them. Formed, both hide their faces (`steam_cracker_hidden`, with
+  the port plates).
+- **Propylene:** the gas model tinted `#D8CCEC` (a pale lavender; GasTints, matched by `gas_properties.json`).
+- **Port chips:** Ethylene `#E2F0E6` / `#A8C8B4`, Propylene `#ECE4F6` / `#B8A8D2`; the face icons use the same pair.
+- **Polypropylene Sheet:** the Plastic Sheet's shape and outline, its four tones moved to a creamier off-white with a
+  faint warm tint (`#CCBE9E #E2D6BA #F2EAD4 #FFF8E8`), so it reads apart from the Plastic Sheet's cooler white.
+- **GUI** (`gui/container/steam_cracker`): the refining machines' frame with the feed and steam tanks on the left,
+  four product tanks (x 89 + 16k) and the heat buffer.
+
 - Formed, the Distillation Array's casings, tray levels and controller draw nothing (`distillation_array/hidden`, with
   the port plates); DistillationArrayRenderer draws a refinery column from RefineryLayout, built by RefineryMesh (on
   ModelMesh, as the turbines') on one sheet, `block/distillation_array/refinery` (128×256). Rows 0–95 are laid out as
@@ -1340,8 +1353,10 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 ## Pumpjack model
 - Formed, the Pumpjack's casings and controller hide their faces and PumpjackRenderer draws the unit from
   PumpjackLayout, built by PumpjackMesh on `block/pumpjack/pumpjack` (128×256). Rows 0–95 are the shared model sheet
-  layout (the flat tones and panels the Oil Derrick's drill string still uses). Rows 96–233 hold the large-model layout:
-  the small parts' tiles, the hazard edge (`#E0B020` / `#1A1A1A` in 2 px diagonal bands, its edge rows darker), the
+  layout (flat tones and panels). Rows 96–233 hold the large-model layout: the furnace's refractory brick (`M_BRICK`,
+  0, 96, 16×8: buff firebrick `#9C7A58 #927052 #8A684A` with a `#AE8C68` lit top row, staggered courses, `#4E3C2E`
+  mortar), a control panel's lit screen (`M_SCREEN`, 16, 96, 8×6: cyan bars and readouts on `#10181C` glass, drawn
+  full-bright), the small parts' tiles, the hazard edge (`#E0B020` / `#1A1A1A` in 2 px diagonal bands, its edge rows darker), the
   round parts' ramps 2 to 14 px across and the polished rod's bright ramp, the grain fields, edge strips and rivet
   heads. `tools/LargeModelTextureGen.java` paints them (run `java tools/LargeModelTextureGen.java` from the repository
   root).
@@ -1397,9 +1412,40 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   rate (at least a fifth of that), so a draining deposit visibly slows it.
 - **Hitbox:** the still parts only (skid, plinth, A-frame steps, platform, ladder, reducer, motor, guard, saddle),
   in the unit's part blocks. The beam, head and cranks move, so they're left out.
-- **Oil Derrick** (formed, the rig's blocks keep their textures): OilDerrickRenderer adds the drill string (DrillStringMesh,
-  on the Pumpjack's sheet): the crown block's sheaves, the hoist lines, a travelling block that strokes and a square
-  kelly that turns through the rotary table while drilling, all in machine steel.
+
+## Oil Derrick model
+- Formed, the rig's Derrick Casings, Derrick Frames and controller hide their faces (`block/oilfield/derrick_hidden`,
+  the casings keeping their port plates) and OilDerrickRenderer draws a classic four-legged lattice derrick from
+  DerrickLayout, built by DerrickMesh on the Pumpjack's sheet (it has the house steel and the FE band), in the rig's
+  footprint, nine blocks tall. Unformed, the casings and frames keep their own textures.
+- **A large model** ("Large model texturing"). The parts, from the ground up:
+  - The rig floor: a DECK plate (recessed panels, one continuous surface) on short legs and girders in the girder
+    flange, open over the hole, a two-step GRATE stair at its front between stringers, and a railing (1 px posts at
+    most 8 px apart, a knee rail and a hand rail) round its edge, open at the stair and the ladder.
+  - The rotary table: a round table (the ramp across each facet) on a plain base, a ring top and the master bushing's
+    dark square socket.
+  - The legs: square bars 3 px across, leaning in from the deck's corners to the crown platform's, their faces square
+    to the tower's sides. All four faces are plain plates (each a long plate with its own lit and dark edges, so the
+    corners read square); one row of rivet heads, every 8 px, runs down the middle of the face on the tower's front
+    or back, and never round a corner.
+  - Girts every 16 px up all four sides (2 px bars in the girder flange) and X-bracing in every bay (thin round rods
+    with the ramp across them), the front's bottom bay left open over the stair, so the tower reads as an open lattice
+    you see through.
+  - The crown: a GRATE platform on a flanged frame with a railing (open at the ladder's top), the crown block's four
+    sheaves (round, the ramp across their rims) between two beams, and a short gin pole leaning back with a sheave at
+    its tip.
+  - The drawworks at the back of the floor: a PLATE frame with side plates and bearing housings, the drum (the ramp
+    across it, flanges either end with bolt heads, a few wraps of dark line standing proud) and a brake-band guard.
+  - The engine house beside it: GEN_PLATE walls (riveted generator steel), a lipped roof, the FE band under the eaves,
+    louvres (VENT) in its front and side, and a chain guard to the drum's shaft.
+  - The ladder up the front left leg: two stiles on stand-offs and a 1 px rung every 4 px, its stiles running on past
+    the crown deck as grab rails.
+- **Moving parts**, every frame: the hoist lines (dark) from the crown block to the travelling block, which strokes
+  down while it drills (a stroke every two seconds); the hook; the square kelly, turning 18° a tick through the rotary
+  table; the fast line from the drum to the crown; and the drawworks drum, turning as the line pays out.
+- **Hitbox:** the still parts in the rig's blocks: the deck and stair, the legs (in 4 px steps up their lean), the
+  crown platform, the drawworks, the engine house and the ladder. The rig has no blocks between its legs above the
+  floor, so the tops of the drawworks and engine house have none. The blocks the ladder runs through are climbable.
 
 ## Distillation Array GUI (seven products)
 - The screen is shortened to y 18–52 (x 40–93) with the Pitch output slot frame under it at (40, 54); right of it, seven
@@ -1447,19 +1493,42 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - **Hitbox:** each block's shape is the model's still parts in it (PlantHitbox), with the port plates added. Empty
     cells on the ground get the floor plate; empty cells above it are empty.
 - **Diesel Generator model** (DieselGeneratorLayout and DieselGeneratorMesh, on the Pumpjack's sheet for its
-  generator steel, FE band and louvres): an engine-generator set on a skid along the 5-block length.
-  - The skid: two STRAP rails, cross members and the engine's mounts.
-  - The radiator at the front: a plated core with a VENT grille, header tanks top and bottom with a filler cap, and the
-    fan's banded shroud.
-  - The engine, an inline six: oil pan, crankcase, head with a flange line and head bolts, six rocker covers, the
-    intake manifold and a canister air filter on the left, and the exhaust manifold into the turbocharger on the right.
-    The exhaust stack (banded) carries a rain cap.
-  - The flywheel housing (a banded drum on the shaft line).
-  - The alternator in the generator steel (GEN_PLATE, GEN_PLAIN) with louvres down both sides, an FE band round its
-    middle, an end bell, and a terminal box whose cable glands are FE red.
-  - Moving parts, drawn each frame about the shaft: the fan's five blades and hub, and the coupling (a short drum with
-    bolt heads). They turn at 30° a tick times the engine's speed, so spin-up and coast-down show.
+  generator steel, FE band, louvres and lit screen): a large genset (a Cat or Cummins set) 3 wide and 3 tall, its length
+  setting the engine (5 long a V8, 7 a V12, 9 a V16). Front to back:
+  - The base: a sub-base fuel tank (plain plates, a seam band round its top, a filler neck and a level gauge) and the
+    base frame's two rails in the girder flange, with the engine's mounts and the alternator's feet.
+  - The radiator: the core's fins (GRATE, laid at 1:1) facing forward between plain side channels, header tanks across
+    its top and bottom (round, the ramp across them), a filler cap; behind it the fan's shroud (plated outside, SHADE
+    inside) and the guard: three rings and eight spokes of thin rod, so the fan shows through; stays to the engine.
+  - The V engine: crankcase and oil pan with a pan-rail flange, a front cover, and two banks leaning 30° out of the V,
+    each a plain plated box with a flange line at the head and a rocker cover per cylinder (4, 6 or 8 a side) with two
+    bolts; the intake manifold down the V; an exhaust manifold along the outside of each bank (round) with a runner to
+    each cylinder; the turbochargers over the banks at the flywheel end (two, four on the V16: a turbine scroll and a
+    smaller compressor, round), piped into the aftercooler (a PLATE box across the V) and up through risers into the
+    silencer (round, flanged bands near its ends) along the top, its outlet capped by a rain flap propped open.
+  - The flywheel housing (round, a tapered front, a bolt circle) and the coupling.
+  - The alternator in the generator steel (GEN_PLATE, GEN_PLAIN) with two banks of louvres down each side, the FE
+    band round its middle and lips round its ends, its end bell and bearing cap, a terminal box on top with three FE red
+    cable glands, and at its right side the control panel on two arms: a generator-steel box with its door's frame,
+    the lit screen (`M_SCREEN`, in the glow list, always lit) and three buttons.
+  - Moving parts, drawn each frame about the shaft: the fan's six blades and hub (and the shaft to the engine's nose),
+    and the coupling with its bolt heads. They turn at 30° a tick times the engine's speed, so spin-up and coast-down
+    show.
   - **Hitbox:** the still parts only, as for the Pumpjack.
+- **Steam Cracker model** (SteamCrackerLayout and SteamCrackerMesh, on the refinery tower's sheet), in its 3×3×3 box:
+  - The deck: DECK plates on a FOOTING.
+  - The furnace box: welded plain wall plates with a plinth lip and a cornice, buckstays (2 px columns in the girder
+    flange, 1 px proud) up its walls, a tie band round them; peep holes along its front and left side (a steel frame
+    standing proud, the refractory brick `M_BRICK` round the reveal, and the fire `M_FIRE` inside in the glow list,
+    as bright as (T − 300) / 600 of the furnace's temperature); the burners' housings and fuel line along its foot.
+  - On the roof: the radiant tubes (thin round rods with collars) rising into two banded headers along it, joined by a
+    collector across their front ends, and at the back the convection hood (PLATE) with a short stack (round, banded,
+    a lip at its top).
+  - The transfer line from the collector across to the quench drum: a round pipe, each turn an elbow with a flanged
+    ring either side.
+  - The quench drum at the right: a skirt, a riveted CASING shell in two courses with a flange between, an elliptical
+    head, and a level gauge on stand-offs.
+  - **Hitbox:** the still parts only.
 - **Flare Stack** (`block/flare_stack/side`, `top`, `bottom`): the base block, with Input ports (Refinery Gas chip) on
   its sides and bottom and the stack's seat (a recessed ring) on top.
   - FlareStackMesh (on the refinery sheet) draws the stack above it: a banded pipe in three flanged lengths up to 74 px,

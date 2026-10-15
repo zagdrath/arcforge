@@ -123,13 +123,14 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class);
         registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.WellHeadBlock.class);
         registration.registerBlockDataProvider(OilfieldProvider.INSTANCE, DistillationArrayCasingBlock.class);
-        // The refinery's downstream units: the three machines, the Cracking Unit and Diesel Generator (through any of
-        // their blocks) and the Flare Stack.
+        // The refinery's downstream units: the single-block machines, the Cracking Unit, Steam Cracker and Diesel
+        // Generator (through any of their blocks), the Flare Stack and the Gas Wellhead.
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.GasWellheadBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.class);
+        registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);

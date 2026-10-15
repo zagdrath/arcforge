@@ -14,6 +14,7 @@ import net.zagdrath.arcforge.api.machine.resource.SlotRole;
 import net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity;
 import net.zagdrath.arcforge.machine.control.MachineControlSpec;
 import net.zagdrath.arcforge.machine.control.MachineControls;
 import net.zagdrath.arcforge.machine.refining.RefiningCore;
@@ -44,6 +45,20 @@ public final class RefineryMachineSpecs {
             cracking.tank(SlotRole.OUTPUT, be -> be.getCore().product(index));
         }
         MachineControls.register(ModBlockEntityTypes.CRACKING_UNIT.get(), cracking
+                .heat(HeatRole.CONSUMER, be -> be.getCore().heat(), be -> be.getCore().heatUsage(), be -> be.getCore().heatInput())
+                .progress(be -> be.getCore().progress(), be -> be.getCore().total())
+                .build());
+
+        // The Steam Cracker: the feed and steam, the four product tanks; progress, ticks into the batch.
+        MachineControlSpec.Builder<SteamCrackerBlockEntity> steamCracking = MachineControlSpec.builder(SteamCrackerBlockEntity.class)
+                .items(SteamCrackerBlockEntity::getItems, null)
+                .tank(SlotRole.INPUT, be -> be.getCore().feed())
+                .tank(SlotRole.INPUT, be -> be.getCore().secondFeed());
+        for (int i = 0; i < RefiningProcess.STEAM_CRACKING.tanks(); i++) {
+            int index = i;
+            steamCracking.tank(SlotRole.OUTPUT, be -> be.getCore().product(index));
+        }
+        MachineControls.register(ModBlockEntityTypes.STEAM_CRACKER.get(), steamCracking
                 .heat(HeatRole.CONSUMER, be -> be.getCore().heat(), be -> be.getCore().heatUsage(), be -> be.getCore().heatInput())
                 .progress(be -> be.getCore().progress(), be -> be.getCore().total())
                 .build());

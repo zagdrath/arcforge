@@ -92,6 +92,7 @@ public final class GasApiGameTests {
         gases.put(ModFluids.SYNGAS.get(), GasTints.SYNGAS);
         gases.put(ModFluids.REFINERY_GAS.get(), GasTints.REFINERY_GAS);
         gases.put(ModFluids.NATURAL_GAS.get(), GasTints.NATURAL_GAS);
+        gases.put(ModFluids.PROPYLENE.get(), GasTints.PROPYLENE);
         gases.put(ModFluids.HYDROGEN_SULFIDE.get(), GasTints.HYDROGEN_SULFIDE);
         return gases;
     }

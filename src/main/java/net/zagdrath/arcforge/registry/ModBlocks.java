@@ -769,17 +769,20 @@ public final class ModBlocks {
     public static final DeferredBlock<ThermalEvaporatorControllerBlock> THERMAL_EVAPORATOR_CONTROLLER = BLOCKS.registerBlock(
             "thermal_evaporator_controller", ThermalEvaporatorControllerBlock::new,
             p -> columnProperties(p).lightLevel(state -> state.getValue(ThermalEvaporatorControllerBlock.LIT) ? 7 : 0));
-    // The oilfield (see OilfieldStructures): the Oil Derrick's floor casings, lattice frame and controller; the Well
-    // Head it leaves (it can't be carried off, and a pick won't hurry it); and the Pumpjack's casings and controller,
-    // which take the shape of the pumpjack once formed (see PlantHitbox).
+    // The oilfield (see OilfieldStructures): the Oil Derrick's floor casings, lattice frame and controller, and the
+    // Pumpjack's casings and controller, which take the shape of their model once formed (see PlantHitbox); and the Well
+    // Head the Derrick leaves (it can't be carried off, and a pick won't hurry it).
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> DERRICK_CASING = BLOCKS.registerBlock(
-            "derrick_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, false, true), ModBlocks::columnProperties);
+            "derrick_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, true, true),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> DERRICK_FRAME = BLOCKS.registerBlock(
-            "derrick_frame", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, false, false),
-            p -> columnProperties(p).noOcclusion().isSuffocating((state, level, pos) -> false).isViewBlocking((state, level, pos, box) -> false));
+            "derrick_frame", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, true, false),
+            p -> columnProperties(p).noOcclusion().dynamicShape().isSuffocating((state, level, pos) -> false)
+                    .isViewBlocking((state, level, pos, box) -> false));
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> OIL_DERRICK_CONTROLLER = BLOCKS.registerBlock(
             "oil_derrick_controller", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, net.zagdrath.arcforge.multiblock.PlantKind.DERRICK),
-            p -> columnProperties(p).lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.LIT) ? 7 : 0));
+            p -> columnProperties(p).dynamicShape().forceSolidOn()
+                    .lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.LIT) ? 7 : 0));
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.WellHeadBlock> WELL_HEAD = BLOCKS.registerBlock("well_head",
             net.zagdrath.arcforge.block.multiblock.WellHeadBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(50.0F, 1_200.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion().noLootTable());
@@ -807,6 +810,13 @@ public final class ModBlocks {
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> CRACKING_UNIT_CONTROLLER = BLOCKS.registerBlock(
             "cracking_unit_controller",
             p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, net.zagdrath.arcforge.multiblock.PlantKind.CRACKING_UNIT),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> STEAM_CRACKER_CASING = BLOCKS.registerBlock(
+            "steam_cracker_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, true, true),
+            p -> columnProperties(p).dynamicShape().forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock> STEAM_CRACKER_CONTROLLER = BLOCKS.registerBlock(
+            "steam_cracker_controller",
+            p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, net.zagdrath.arcforge.multiblock.PlantKind.STEAM_CRACKER),
             p -> columnProperties(p).dynamicShape().forceSolidOn());
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock> DIESEL_GENERATOR_CASING = BLOCKS.registerBlock(
             "diesel_generator_casing", p -> new net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock(p, true, true),

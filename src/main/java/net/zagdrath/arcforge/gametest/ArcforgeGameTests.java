@@ -475,6 +475,8 @@ public final class ArcforgeGameTests {
         TESTS.put("refinery_blender_blends", RefineryGameTests::blenderBlends);
         TESTS.put("refinery_cracking_unit_cracks", RefineryGameTests::crackingUnitCracks);
         TESTS.put("refinery_diesel_generator_generates", RefineryGameTests::dieselGeneratorGenerates);
+        TESTS.put("refinery_diesel_engines_scale", RefineryGameTests::dieselEnginesScale);
+        TESTS.put("refinery_steam_cracker_cracks", RefineryGameTests::steamCrackerCracks);
         TESTS.put("refinery_flare_stack_burns", RefineryGameTests::flareStackBurns);
         TESTS.put("refinery_fuels_and_lubricant", RefineryGameTests::fuelsAndLubricant);
         TESTS.put("refinery_coke_and_kerosene", RefineryGameTests::cokeAndKerosene);

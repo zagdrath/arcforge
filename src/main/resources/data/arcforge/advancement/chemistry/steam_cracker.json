@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/cracking",
+  "display": {
+    "icon": {
+      "id": "arcforge:steam_cracker_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.steam_cracker.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.steam_cracker.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "steam_cracking"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

@@ -207,6 +207,9 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity>> CRACKING_UNIT =
             BLOCK_ENTITY_TYPES.register("cracking_unit", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity::new, ModBlocks.CRACKING_UNIT_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity>> STEAM_CRACKER =
+            BLOCK_ENTITY_TYPES.register("steam_cracker", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity::new, ModBlocks.STEAM_CRACKER_CONTROLLER.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity>> DIESEL_GENERATOR =
             BLOCK_ENTITY_TYPES.register("diesel_generator", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity::new, ModBlocks.DIESEL_GENERATOR_CONTROLLER.get()));

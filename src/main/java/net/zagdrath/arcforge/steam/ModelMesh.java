@@ -46,11 +46,13 @@ public abstract class ModelMesh {
         // The Pumpjack's sheet only: the hazard stripe, as a tile.
         HAZARD(16, 4, 4, 4, Kind.TILED),
         // Large model sheets only (the Pumpjack's and the refinery tower's), rows 96-127 (tools/LargeModelTextureGen.java):
-        // the small parts' tiles laid at 1:1 (the motor's ribs, a seamless grating, the girder flange, the hazard edge,
-        // the burner fire) and the round parts' ramps, 2 to 14 px across, side by side (see rampFacet). Big faces are
+        // the small parts' tiles laid at 1:1 (the furnace brick, a screen, the motor's ribs, a seamless grating, the
+        // girder flange, the hazard edge, the burner fire) and the round parts' ramps, 2 to 14 px across, side by side (see rampFacet). Big faces are
         // plated instead (see plating). POLISHED marks the polished rod: its own bright ramp.
         M_MOTOR(64, 96, 16, 16, Kind.MODULE), M_GRATING(80, 96, 16, 16, Kind.MODULE), M_FLANGE(96, 104, 16, 8, Kind.MODULE),
         M_HAZARD(112, 104, 8, 4, Kind.TILED), RAMPS(0, 112, 104, 8, Kind.TILED), M_FIRE(0, 120, 8, 6, Kind.MODULE),
+        // A furnace's refractory firebrick and a control panel's lit screen (drawn in the glow list).
+        M_BRICK(0, 96, 16, 8, Kind.MODULE), M_SCREEN(16, 96, 8, 6, Kind.MODULE),
         POLISHED(104, 112, 4, 8, Kind.BANDED),
         PLATE(0, 8, 16, 16, true, Cuts.SPLIT, Cuts.CORNERS),
         PLAIN(16, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),

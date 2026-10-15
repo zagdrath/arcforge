@@ -759,6 +759,7 @@ final class MachineCategories {
                 case HYDROTREATING -> ModBlocks.HYDROTREATER.get();
                 case SULFUR_RECOVERY -> ModBlocks.SULFUR_RECOVERY_UNIT.get();
                 case STEAM_REFORMING -> ModBlocks.STEAM_METHANE_REFORMER.get();
+                case STEAM_CRACKING -> ModBlocks.STEAM_CRACKER_CONTROLLER.get();
             };
         }
 
@@ -814,12 +815,13 @@ final class MachineCategories {
 
     record EngineFuelRecipe(Fluid fluid, net.zagdrath.arcforge.machine.EngineFuel fuel) {}
 
-    // A fuel the Diesel Generator burns: its FE per mB and how fast it goes at full output.
+    // A fuel the Diesel Generator burns: for each engine (V8, V12, V16), its FE per mB and how fast it goes at full
+    // output.
     static final class EngineFuels extends ArcforgeCategory<EngineFuelRecipe> {
         static final IRecipeType<EngineFuelRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "engine_fuel", EngineFuelRecipe.class);
 
         EngineFuels(IGuiHelper gui) {
-            super(TYPE, "engine_fuels", ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), gui, 150, 30);
+            super(TYPE, "engine_fuels", ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), gui, 160, 64);
         }
 
         @Override
@@ -829,11 +831,16 @@ final class MachineCategories {
 
         @Override
         public void draw(EngineFuelRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
-            int fePerMb = net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.fePerMb(recipe.fuel());
-            int full = net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.maxOutput();
-            text(graphics, Component.translatable("jei.arcforge.engine_fuel.value", String.format(Locale.ROOT, "%,d", fePerMb)), 24, 5);
-            text(graphics, Component.translatable("jei.arcforge.engine_fuel.rate", String.format(Locale.ROOT, "%,d", full),
-                    String.format(Locale.ROOT, "%.2f", fePerMb > 0 ? full / (double) fePerMb : 0.0)), 24, 16);
+            int y = 3;
+            for (net.zagdrath.arcforge.multiblock.DieselEngine engine : net.zagdrath.arcforge.multiblock.DieselEngine.values()) {
+                int fePerMb = net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.fePerMb(recipe.fuel(), engine);
+                int full = net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.maxOutput(engine);
+                text(graphics, Component.translatable("jei.arcforge.engine_fuel.engine", Component.translatable("engine.arcforge." + engine.id()),
+                        String.format(Locale.ROOT, "%,d", fePerMb)), 24, y);
+                text(graphics, Component.translatable("jei.arcforge.engine_fuel.rate", String.format(Locale.ROOT, "%,d", full),
+                        String.format(Locale.ROOT, "%.2f", fePerMb > 0 ? full / (double) fePerMb : 0.0)), 30, y + 9);
+                y += 20;
+            }
         }
     }
 

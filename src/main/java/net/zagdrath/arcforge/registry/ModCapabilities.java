@@ -556,11 +556,13 @@ public final class ModCapabilities {
         }, evaporatorParts);
         // The oilfield and the refinery's fixed boxes, through their ports: the Oil Derrick takes Water and Steel Pipes
         // in (Input) and FE (Energy); the Pumpjack gives Crude Oil out (Output) and takes FE (Energy); the Cracking
-        // Unit takes Heavy Oil and catalyst in (Input) and heat (Heat) and gives its products out; the Diesel Generator
-        // takes fuel in (Input) and gives FE out (Energy).
+        // Unit takes Heavy Oil and catalyst in (Input) and heat (Heat) and gives its products out; the Steam Cracker takes
+        // its feed and steam in (Input, Steam) and heat (Heat) and gives its products out; the Diesel Generator takes fuel
+        // in (Input) and gives FE out (Energy).
         Block[] oilfieldParts = { ModBlocks.OIL_DERRICK_CONTROLLER.get(), ModBlocks.DERRICK_CASING.get(), ModBlocks.PUMPJACK_CONTROLLER.get(),
                 ModBlocks.PUMPJACK_CASING.get(), ModBlocks.CRACKING_UNIT_CONTROLLER.get(), ModBlocks.CRACKING_UNIT_CASING.get(),
-                ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), ModBlocks.DIESEL_GENERATOR_CASING.get() };
+                ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), ModBlocks.DIESEL_GENERATOR_CASING.get(), ModBlocks.STEAM_CRACKER_CONTROLLER.get(),
+                ModBlocks.STEAM_CRACKER_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
             var controller = net.zagdrath.arcforge.multiblock.OilfieldStructures.findController(level, pos);
             return controller != null ? controller.itemHandlerAt(pos, side) : null;

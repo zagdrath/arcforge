@@ -1,0 +1,32 @@
+{
+  "type": "arcforge:steam_cracking",
+  "input": {
+    "fluid": "arcforge:naphtha",
+    "amount": 100
+  },
+  "second_input": {
+    "fluid": "arcforge:steam",
+    "amount": 50
+  },
+  "fluids": [
+    {
+      "id": "arcforge:ethylene",
+      "amount": 50
+    },
+    {
+      "id": "arcforge:propylene",
+      "amount": 25
+    },
+    {
+      "id": "arcforge:hydrogen",
+      "amount": 10
+    },
+    {
+      "id": "arcforge:heavy_oil",
+      "amount": 5
+    }
+  ],
+  "time": 20,
+  "heat_per_tick": 60,
+  "min_temp": 800
+}

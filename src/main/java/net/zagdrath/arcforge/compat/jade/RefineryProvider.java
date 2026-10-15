@@ -33,11 +33,11 @@ import snownee.jade.api.ITooltip;
 import snownee.jade.api.StreamServerDataProvider;
 import snownee.jade.api.config.IPluginConfig;
 
-// The refinery's downstream units in Jade. On the Catalytic Reformer, Coker, Lubricant Blender or any block of a
-// Cracking Unit: the operation's progress, the temperature it needs, the catalyst left and the status (HeatProvider
-// shows the heat, Jade's own views the tanks). On any block of a Diesel Generator: FE/t against its full output, its
-// speed, the fuel it burns and the status. On a Flare Stack: what it burns. The server builds the lines; Client draws
-// them.
+// The refinery's downstream units in Jade. On a single-block unit or any block of a Cracking Unit or Steam Cracker: the
+// operation's progress, the temperature it needs, the catalyst left and the status (HeatProvider shows the heat, Jade's
+// own views the tanks). On any block of a Diesel Generator: its engine, FE/t against its full output, its speed, the
+// fuel it burns and the status. On a Gas Wellhead: its flow and the gas left. On a Flare Stack: what it burns. The
+// server builds the lines; Client draws them.
 public enum RefineryProvider implements StreamServerDataProvider<BlockAccessor, List<Component>> {
     INSTANCE;
 
@@ -78,10 +78,17 @@ public enum RefineryProvider implements StreamServerDataProvider<BlockAccessor, 
             refining(lines, machine.getCore(), machine.getStatus());
             return lines;
         }
-        if (!(target instanceof CrackingUnitBlockEntity || target instanceof DieselGeneratorBlockEntity)) {
+        if (!(target instanceof CrackingUnitBlockEntity || target instanceof DieselGeneratorBlockEntity
+                || target instanceof net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity)) {
             target = OilfieldStructures.findController(level, accessor.getPosition());
         }
-        if (target instanceof CrackingUnitBlockEntity cracker) {
+        if (target instanceof net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity steamCracker) {
+            if (steamCracker.isFormed()) {
+                refining(lines, steamCracker.getCore(), steamCracker.getStatus());
+            } else {
+                lines.add(steamCracker.getStatus().getDescription());
+            }
+        } else if (target instanceof CrackingUnitBlockEntity cracker) {
             if (cracker.isFormed()) {
                 refining(lines, cracker.getCore(), cracker.getStatus());
             } else {
@@ -89,8 +96,10 @@ public enum RefineryProvider implements StreamServerDataProvider<BlockAccessor, 
             }
         } else if (target instanceof DieselGeneratorBlockEntity generator) {
             if (generator.isFormed()) {
+                lines.add(Component.translatable("jade.arcforge.diesel_generator.engine", Component.translatable("engine.arcforge."
+                        + generator.getEngine().id())).withStyle(ChatFormatting.GRAY));
                 lines.add(Component.translatable("jade.arcforge.diesel_generator.output", String.format(Locale.ROOT, "%,d", generator.getMade()),
-                        String.format(Locale.ROOT, "%,d", DieselGeneratorBlockEntity.maxOutput()), Math.round(generator.getSpeed() * 100))
+                        String.format(Locale.ROOT, "%,d", generator.maxOutput()), Math.round(generator.getSpeed() * 100))
                         .withStyle(ChatFormatting.GOLD));
                 if (generator.getBurned() > 0) {
                     lines.add(Component.translatable("jade.arcforge.diesel_generator.fuel", String.format(Locale.ROOT, "%.2f", generator.getBurned()))

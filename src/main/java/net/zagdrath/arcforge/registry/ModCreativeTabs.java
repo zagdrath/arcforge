@@ -73,6 +73,8 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.HYDROTREATER.get());
                 output.accept(ModItems.SULFUR_RECOVERY_UNIT.get());
                 output.accept(ModItems.STEAM_METHANE_REFORMER.get());
+                output.accept(ModItems.STEAM_CRACKER_CONTROLLER.get());
+                output.accept(ModItems.STEAM_CRACKER_CASING.get());
                 output.accept(ModItems.DIESEL_GENERATOR_CONTROLLER.get());
                 output.accept(ModItems.DIESEL_GENERATOR_CASING.get());
                 output.accept(ModItems.ASSEMBLER.get());
@@ -190,6 +192,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.COPPER_ROD.get());
                 output.accept(ModItems.PLASTIC_SHEET.get());
                 output.accept(ModItems.PVC_SHEET.get());
+                output.accept(ModItems.POLYPROPYLENE_SHEET.get());
                 output.accept(ModItems.LFP_CATHODE.get());
                 output.accept(ModItems.GRAPHITE_ANODE.get());
                 output.accept(ModItems.CELL_SEPARATOR.get());

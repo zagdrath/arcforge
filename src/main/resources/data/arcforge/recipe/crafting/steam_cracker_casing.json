@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "BTB",
+    "PBP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "B": "minecraft:bricks",
+    "T": "arcforge:wrought_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:steam_cracker_casing",
+    "count": 8
+  }
+}

@@ -1,6 +1,7 @@
 {
   "values": [
     "arcforge:plastic_sheet",
-    "arcforge:pvc_sheet"
+    "arcforge:pvc_sheet",
+    "arcforge:polypropylene_sheet"
   ]
 }

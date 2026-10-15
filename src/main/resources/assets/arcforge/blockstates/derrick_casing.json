@@ -5,7 +5,7 @@
     },
     "formed=true": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_casing"
+      "model": "arcforge:block/oilfield/derrick_hidden"
     }
   }
 }

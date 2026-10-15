@@ -122,6 +122,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Refining(gui, RefiningProcess.HYDROTREATING),
                 new MachineCategories.Refining(gui, RefiningProcess.SULFUR_RECOVERY),
                 new MachineCategories.Refining(gui, RefiningProcess.STEAM_REFORMING),
+                new MachineCategories.Refining(gui, RefiningProcess.STEAM_CRACKING),
                 new MachineCategories.Vulcanizing(gui),
                 new MachineCategories.ResinTap(gui),
                 new MachineCategories.AirSeparating(gui),
@@ -304,7 +305,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 MachineCategories.Refining.type(RefiningProcess.CRACKING), MachineCategories.Refining.type(RefiningProcess.REFORMING),
                 MachineCategories.Refining.type(RefiningProcess.COKING), MachineCategories.Refining.type(RefiningProcess.BLENDING),
                 MachineCategories.Refining.type(RefiningProcess.HYDROTREATING), MachineCategories.Refining.type(RefiningProcess.SULFUR_RECOVERY),
-                MachineCategories.Refining.type(RefiningProcess.STEAM_REFORMING));
+                MachineCategories.Refining.type(RefiningProcess.STEAM_REFORMING), MachineCategories.Refining.type(RefiningProcess.STEAM_CRACKING));
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.DieselGeneratorScreen.class, 31, 50, 114, 7,
                 MachineCategories.EngineFuels.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen.class, 114, 35, ARROW_W, ARROW_H,
@@ -374,6 +375,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.HYDROTREATING), ModBlocks.HYDROTREATER.get());
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.SULFUR_RECOVERY), ModBlocks.SULFUR_RECOVERY_UNIT.get());
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.STEAM_REFORMING), ModBlocks.STEAM_METHANE_REFORMER.get());
+        registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.STEAM_CRACKING), ModBlocks.STEAM_CRACKER_CONTROLLER.get(),
+                ModBlocks.STEAM_CRACKER_CASING.get());
         registration.addCraftingStation(MachineCategories.EngineFuels.TYPE, ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), ModBlocks.DIESEL_GENERATOR_CASING.get());
         registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
         registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());

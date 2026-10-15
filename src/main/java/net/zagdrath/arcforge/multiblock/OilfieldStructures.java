@@ -30,24 +30,29 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 // Generator (PlantBox). Their controllers' block entities run them and decide whether they're formed; the other parts
 // find the controller by searching around themselves.
 //
-// The Oil Derrick (Rig): a 3x3 rig six blocks tall over the hole it drills. Its floor (the bottom layer) is a ring of
+// The Oil Derrick (Rig): a 3x3 rig nine blocks tall over the hole it drills. Its floor (the bottom layer) is a ring of
 // eight Derrick Casings round the bore, which stays open, with the Oil Derrick Controller in the middle of one side,
-// facing out; four Derrick Frame legs stand on its corners for four layers, and a full 3x3 of Derrick Frames crowns it.
-// The space over the bore stays open for the drill string.
+// facing out; four Derrick Frame legs stand on its corners for seven layers, and a full 3x3 of Derrick Frames crowns
+// it. The space over the bore stays open for the drill string.
 //
 // The Pumpjack (Unit): built on a Well Head (what a Derrick leaves when it strikes oil). A skid of Pumpjack Casings 3
 // wide and 5 long round the Well Head, which is the middle of one end, with the Pumpjack Controller in the middle of
 // the other end, facing away from the well; and a Samson post of three Pumpjack Casings standing on the middle of the
 // skid.
 //
-// The Cracking Unit and Diesel Generator (PlantBox): a solid box of their casings, 3 wide, with the controller in the
-// middle of the bottom of one end, facing out of it: the Cracking Unit 3 long and 5 tall, the Diesel Generator 5 long
-// and 2 tall.
+// The Cracking Unit, Steam Cracker and Diesel Generator (PlantBox): a solid box of their casings, 3 wide, with the
+// controller in the middle of the bottom of one end, facing out of it: the Cracking Unit 3 long and 5 tall, the Steam
+// Cracker 3 long and 3 tall, the Diesel Generator 3 tall and 5, 7 or 9 long (its engine a V8, V12 or V16).
 public final class OilfieldStructures {
-    public static final int RIG_WIDTH = 3, RIG_HEIGHT = 6, LEG_LAYERS = 4;
+    public static final int RIG_WIDTH = 3, RIG_HEIGHT = 9, LEG_LAYERS = 7;
     public static final int UNIT_WIDTH = 3, UNIT_LENGTH = 5, UNIT_HEIGHT = 4, POST_U = 2;
     public static final int CRACKER_WIDTH = 3, CRACKER_HEIGHT = 5, CRACKER_LENGTH = 3;
-    public static final int GENERATOR_WIDTH = 3, GENERATOR_HEIGHT = 2, GENERATOR_LENGTH = 5;
+    public static final int STEAM_CRACKER_SIZE = 3;
+    public static final int GENERATOR_WIDTH = 3, GENERATOR_HEIGHT = 3, GENERATOR_LENGTH = 5;
+    // The Diesel Generator's lengths, longest first (the longest that's built is the one it forms as).
+    public static final int[] GENERATOR_LENGTHS = { 9, 7, 5 };
+    // The farthest a part can be from its controller, along the ground (the longest Diesel Generator's far end).
+    private static final int REACH = 9;
 
     // --- The Oil Derrick ---
 
@@ -218,8 +223,16 @@ public final class OilfieldStructures {
     // bottom of its front end (front), the box running `back` from there.
     public record PlantBox(BlockPos front, Direction back, int width, int height, int length) {
         public static PlantBox of(PlantKind kind, BlockPos front, Direction back) {
-            return kind == PlantKind.CRACKING_UNIT ? new PlantBox(front, back, CRACKER_WIDTH, CRACKER_HEIGHT, CRACKER_LENGTH)
-                    : new PlantBox(front, back, GENERATOR_WIDTH, GENERATOR_HEIGHT, GENERATOR_LENGTH);
+            return of(kind, front, back, kind == PlantKind.DIESEL_GENERATOR ? GENERATOR_LENGTH : 0);
+        }
+
+        // length: the Diesel Generator's (5, 7 or 9); the others have one size and ignore it.
+        public static PlantBox of(PlantKind kind, BlockPos front, Direction back, int length) {
+            return switch (kind) {
+                case CRACKING_UNIT -> new PlantBox(front, back, CRACKER_WIDTH, CRACKER_HEIGHT, CRACKER_LENGTH);
+                case STEAM_CRACKER -> new PlantBox(front, back, STEAM_CRACKER_SIZE, STEAM_CRACKER_SIZE, STEAM_CRACKER_SIZE);
+                default -> new PlantBox(front, back, GENERATOR_WIDTH, GENERATOR_HEIGHT, length);
+            };
         }
 
         // The block x across (to the right seen from the front), y up and u back from the front.
@@ -267,18 +280,20 @@ public final class OilfieldStructures {
 
     // The valid box of this kind the controller at pos is the front of, or null (see findRig).
     public static @Nullable PlantBox findPlant(Level level, BlockPos controller, PlantKind kind, @Nullable PlantBox current) {
+        int[] lengths = kind == PlantKind.DIESEL_GENERATOR ? GENERATOR_LENGTHS : new int[] { 0 };
         for (Direction facing : candidates(level, controller)) {
-            PlantBox box = PlantBox.of(kind, controller, facing.getOpposite());
-            if (isValid(level, box, kind, controller, current)) {
-                return box;
+            for (int length : lengths) {
+                PlantBox box = PlantBox.of(kind, controller, facing.getOpposite(), length);
+                if (isValid(level, box, kind, controller, current)) {
+                    return box;
+                }
             }
         }
         return null;
     }
 
     private static boolean isValid(Level level, PlantBox box, PlantKind kind, BlockPos controller, @Nullable PlantBox current) {
-        Block casing = kind == PlantKind.CRACKING_UNIT ? ModBlocks.CRACKING_UNIT_CASING.get() : ModBlocks.DIESEL_GENERATOR_CASING.get();
-        Block control = kind == PlantKind.CRACKING_UNIT ? ModBlocks.CRACKING_UNIT_CONTROLLER.get() : ModBlocks.DIESEL_GENERATOR_CONTROLLER.get();
+        Block casing = casing(kind), control = controller(kind);
         for (BlockPos pos : box.parts()) {
             if (!level.isLoaded(pos)) {
                 return false;
@@ -290,6 +305,23 @@ public final class OilfieldStructures {
             }
         }
         return true;
+    }
+
+    // A box plant's casing and controller.
+    public static Block casing(PlantKind kind) {
+        return switch (kind) {
+            case CRACKING_UNIT -> ModBlocks.CRACKING_UNIT_CASING.get();
+            case STEAM_CRACKER -> ModBlocks.STEAM_CRACKER_CASING.get();
+            default -> ModBlocks.DIESEL_GENERATOR_CASING.get();
+        };
+    }
+
+    public static Block controller(PlantKind kind) {
+        return switch (kind) {
+            case CRACKING_UNIT -> ModBlocks.CRACKING_UNIT_CONTROLLER.get();
+            case STEAM_CRACKER -> ModBlocks.STEAM_CRACKER_CONTROLLER.get();
+            default -> ModBlocks.DIESEL_GENERATOR_CONTROLLER.get();
+        };
     }
 
     // The way the controller faces first, then the rest clockwise.
@@ -330,6 +362,33 @@ public final class OilfieldStructures {
         MultiblockAutomation.refresh(level, min, max);
     }
 
+    // Un-forms a rig: its parts, and any derrick block left formed in its box that no other rig claims (a rig formed
+    // before the derrick grew to RIG_HEIGHT had its crown where the legs now run, outside the rig's parts).
+    public static void unformRig(ServerLevel level, Rig rig, @Nullable BlockPos skip) {
+        List<BlockPos> parts = rig.parts();
+        for (BlockPos pos : BlockPos.betweenClosed(rig.min(), rig.max())) {
+            if (rig.contains(pos) || !level.isLoaded(pos)) {
+                continue;
+            }
+            BlockState state = level.getBlockState(pos);
+            if ((state.is(ModBlocks.DERRICK_FRAME.get()) || state.is(ModBlocks.DERRICK_CASING.get())) && isFormedPart(state)
+                    && claimedElsewhere(level, pos, rig) == null) {
+                parts.add(pos.immutable());
+            }
+        }
+        unform(level, parts, skip, rig.min(), rig.max());
+    }
+
+    private static @Nullable OilfieldController claimedElsewhere(BlockGetter level, BlockPos pos, Rig rig) {
+        OilfieldController[] found = new OilfieldController[1];
+        forEachNearbyController(level, pos, controller -> {
+            if (found[0] == null && !controller.getBlockPos().equals(rig.controller()) && controller.isFormed() && controller.isPart(pos)) {
+                found[0] = controller;
+            }
+        });
+        return found[0];
+    }
+
     // --- Finding the controller from any part ---
 
     public static boolean isFormedPart(BlockState state) {
@@ -357,13 +416,21 @@ public final class OilfieldStructures {
         }
     }
 
-    // Controllers of any rig or pumpjack pos could be part of: a rig's controller is on its floor, up to two blocks
-    // across and five below its crown; a pumpjack's up to five along its skid and three below its post.
+    // Controllers of any structure pos could be part of: a rig's controller is on its floor, up to two blocks across and
+    // eight below its crown; a pumpjack's up to five along its skid and three below its post; a plant's (a Diesel
+    // Generator's up to nine) along its length and at most a block or two across it. So: every column within SQUARE, and
+    // past that out to REACH only in a band ACROSS wide along x or z.
+    private static final int SQUARE = 5, ACROSS = 2;
+
     private static void forEachNearbyController(BlockGetter level, BlockPos pos, Consumer<OilfieldController> action) {
         BlockPos.MutableBlockPos candidate = new BlockPos.MutableBlockPos();
         for (int dy = -(RIG_HEIGHT - 1); dy <= 0; dy++) {
-            for (int dx = -UNIT_LENGTH; dx <= UNIT_LENGTH; dx++) {
-                for (int dz = -UNIT_LENGTH; dz <= UNIT_LENGTH; dz++) {
+            for (int dx = -REACH; dx <= REACH; dx++) {
+                for (int dz = -REACH; dz <= REACH; dz++) {
+                    int ax = Math.abs(dx), az = Math.abs(dz);
+                    if (ax > SQUARE && az > ACROSS || az > SQUARE && ax > ACROSS) {
+                        continue;
+                    }
                     candidate.setWithOffset(pos, dx, dy, dz);
                     if (level.getBlockState(candidate).getBlock() instanceof OilfieldControllerBlock
                             && level.getBlockEntity(candidate) instanceof OilfieldController controller) {

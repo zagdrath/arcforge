@@ -24,7 +24,7 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 // the least temperature the recipe needs, the feed tank (and the second feed tank where the unit has one), up to three
 // product tanks, and the catalyst and item output slots where the unit has them.
 public class RefiningMenu extends MachineMenu {
-    public static final int PRODUCTS = 3;
+    public static final int PRODUCTS = 4;
     public static final int DATA_ENERGY = 0;
     public static final int DATA_CAPACITY = 1;
     public static final int DATA_USAGE = 2;
@@ -86,6 +86,7 @@ public class RefiningMenu extends MachineMenu {
             case HYDROTREATING -> ModMenuTypes.HYDROTREATER.get();
             case SULFUR_RECOVERY -> ModMenuTypes.SULFUR_RECOVERY_UNIT.get();
             case STEAM_REFORMING -> ModMenuTypes.STEAM_METHANE_REFORMER.get();
+            case STEAM_CRACKING -> ModMenuTypes.STEAM_CRACKER.get();
         };
     }
 
@@ -98,6 +99,7 @@ public class RefiningMenu extends MachineMenu {
             case HYDROTREATING -> ModBlocks.HYDROTREATER.get();
             case SULFUR_RECOVERY -> ModBlocks.SULFUR_RECOVERY_UNIT.get();
             case STEAM_REFORMING -> ModBlocks.STEAM_METHANE_REFORMER.get();
+            case STEAM_CRACKING -> ModBlocks.STEAM_CRACKER_CONTROLLER.get();
         };
     }
 

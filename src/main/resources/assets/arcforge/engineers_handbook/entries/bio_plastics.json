@@ -3,7 +3,8 @@
   "icon": "arcforge:pvc_sheet",
   "items": [
     "arcforge:plastic_sheet",
-    "arcforge:pvc_sheet"
+    "arcforge:pvc_sheet",
+    "arcforge:polypropylene_sheet"
   ],
   "pages": [
     {
@@ -12,7 +13,7 @@
     },
     {
       "type": "text",
-      "text": "# PVC Sheet\n- 60 mB Ethylene + 60 mB Chlorine make 2 PVC Sheets.\n- Hardened and Arcforged Fluid Conduits and the Arcforged Fluid Tank take one, an acid-proof lining.\n# #arcforge:plastics\nPlastic Sheet and PVC Sheet are both plastics: every recipe that took Plastic Sheet takes either."
+      "text": "# PVC Sheet\n- 60 mB Ethylene + 60 mB Chlorine make 2 PVC Sheets.\n- Hardened and Arcforged Fluid Conduits and the Arcforged Fluid Tank take one, an acid-proof lining.\n# #arcforge:plastics\nPlastic Sheet and PVC Sheet are both plastics: every recipe that took Plastic Sheet takes either.\n# Polypropylene Sheet\n- 120 mB Propylene (from the Steam Cracker) makes 2 Polypropylene Sheets in the Chemical Reactor.\n- A plastic: any recipe that takes plastic (arcforge:plastics) takes it."
     }
   ]
 }

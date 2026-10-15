@@ -97,7 +97,7 @@ public class CrackingUnitBlockEntity extends PlantControllerBlockEntity {
     }
 
     @Override
-    protected List<float[]> solids() {
+    protected List<float[]> solids(int length) {
         return CrackingUnitLayout.solids();
     }
 

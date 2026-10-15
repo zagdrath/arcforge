@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/refinery/steam_cracker_casing",
+    "south": "arcforge:block/refinery/steam_cracker_casing",
+    "east": "arcforge:block/refinery/steam_cracker_casing",
+    "west": "arcforge:block/refinery/steam_cracker_casing",
+    "up": "arcforge:block/refinery/steam_cracker_casing_top",
+    "down": "arcforge:block/refinery/steam_cracker_casing_top",
+    "particle": "arcforge:block/refinery/steam_cracker_casing"
+  }
+}

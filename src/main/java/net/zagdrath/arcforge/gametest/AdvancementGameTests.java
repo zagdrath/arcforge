@@ -50,7 +50,7 @@ public final class AdvancementGameTests {
             "logistics/reservoir", "logistics/liquid_experience", "logistics/quantum_tunnel", "logistics/chunk_loader",
             "processing/iolite", "logistics/wired_machine_link",
             "chemistry/cracking", "chemistry/gasoline", "chemistry/lubricant", "chemistry/petroleum_coke", "chemistry/flare_stack",
-            "chemistry/diesel_generator", "chemistry/oil_cavern", "chemistry/survey_record", "chemistry/sour_crude", "chemistry/hydrotreater",
+            "chemistry/diesel_generator", "chemistry/steam_cracker", "chemistry/polypropylene", "chemistry/oil_cavern", "chemistry/survey_record", "chemistry/sour_crude", "chemistry/hydrotreater",
             "chemistry/sulfur_recovery", "chemistry/gas_well", "chemistry/steam_methane_reformer");
 
     @SuppressWarnings("removal")

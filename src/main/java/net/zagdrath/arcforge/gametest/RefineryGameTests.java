@@ -80,13 +80,16 @@ final class RefineryGameTests {
         }
     }
 
-    // A fixed box plant of this kind, its controller at front facing south and the box running north from it. Its parts
-    // are placed by world position: helper.relativePos doesn't undo absolutePos.
+    // A box plant of this kind, its controller at front facing south and the box running north from it. Its parts are
+    // placed by world position: helper.relativePos doesn't undo absolutePos.
     static void buildPlant(GameTestHelper helper, PlantKind kind, BlockPos front) {
-        OilfieldStructures.PlantBox box = OilfieldStructures.PlantBox.of(kind, helper.absolutePos(front), Direction.NORTH);
-        boolean cracker = kind == PlantKind.CRACKING_UNIT;
-        Block casing = cracker ? ModBlocks.CRACKING_UNIT_CASING.get() : ModBlocks.DIESEL_GENERATOR_CASING.get();
-        Block controller = cracker ? ModBlocks.CRACKING_UNIT_CONTROLLER.get() : ModBlocks.DIESEL_GENERATOR_CONTROLLER.get();
+        buildPlant(helper, kind, front, OilfieldStructures.GENERATOR_LENGTH);
+    }
+
+    // length: a Diesel Generator's (5, 7 or 9).
+    static void buildPlant(GameTestHelper helper, PlantKind kind, BlockPos front, int length) {
+        OilfieldStructures.PlantBox box = OilfieldStructures.PlantBox.of(kind, helper.absolutePos(front), Direction.NORTH, length);
+        Block casing = OilfieldStructures.casing(kind), controller = OilfieldStructures.controller(kind);
         for (BlockPos pos : box.parts()) {
             BlockState state = pos.equals(box.controller()) ? controller.defaultBlockState().setValue(OilfieldControllerBlock.FACING, Direction.SOUTH)
                     : casing.defaultBlockState();
@@ -292,7 +295,7 @@ final class RefineryGameTests {
                 .thenSucceed();
     }
 
-    // A 3x2x5 Diesel Generator forms, spins up on Diesel and makes FE; full, it throttles and burns nothing.
+    // A 3x3x5 Diesel Generator (a V8) forms, spins up on Diesel and makes FE; full, it throttles and burns nothing.
     static void dieselGeneratorGenerates(GameTestHelper helper) {
         BlockPos front = new BlockPos(1, 1, 5);
         buildPlant(helper, PlantKind.DIESEL_GENERATOR, front);
@@ -310,7 +313,7 @@ final class RefineryGameTests {
                 .thenExecute(() -> {
                     DieselGeneratorBlockEntity generator = helper.getBlockEntity(front, DieselGeneratorBlockEntity.class);
                     helper.assertTrue(generator.getStatus() == MachineStatus.GENERATING, "Spun up it's " + generator.getStatus());
-                    helper.assertTrue(generator.getMade() == DieselGeneratorBlockEntity.maxOutput(), "It makes " + generator.getMade() + " FE/t");
+                    helper.assertTrue(generator.getMade() == generator.maxOutput(), "It makes " + generator.getMade() + " FE/t");
                     helper.assertTrue(generator.getFuel().getAmount() < 4_000, "It burned no Diesel");
                     generator.getEnergy().generate(generator.getEnergy().getCapacityAsInt());
                 })
@@ -319,6 +322,83 @@ final class RefineryGameTests {
                     DieselGeneratorBlockEntity generator = helper.getBlockEntity(front, DieselGeneratorBlockEntity.class);
                     helper.assertTrue(generator.getStatus() == MachineStatus.THROTTLED, "Full, it's " + generator.getStatus());
                     helper.assertTrue(generator.getBurned() == 0.0, "Full, it burns " + generator.getBurned() + " mB/t");
+                })
+                .thenSucceed();
+    }
+
+    // Diesel Generators 5, 7 and 9 long form as a V8, V12 and V16: each makes its engine's output, the bigger ones a
+    // little more FE per mB, with a bigger fuel tank and FE buffer.
+    static void dieselEnginesScale(GameTestHelper helper) {
+        net.zagdrath.arcforge.multiblock.DieselEngine[] engines = net.zagdrath.arcforge.multiblock.DieselEngine.values();
+        BlockPos[] fronts = { new BlockPos(1, 1, 9), new BlockPos(5, 1, 9), new BlockPos(9, 1, 9) };
+        for (int i = 0; i < engines.length; i++) {
+            buildPlant(helper, PlantKind.DIESEL_GENERATOR, fronts[i], engines[i].length);
+        }
+        int spinUp = ArcforgeConfig.DIESEL_GENERATOR_SPIN_UP.getAsInt();
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    for (int i = 0; i < engines.length; i++) {
+                        DieselGeneratorBlockEntity generator = helper.getBlockEntity(fronts[i], DieselGeneratorBlockEntity.class);
+                        helper.assertTrue(generator.isFormed() && generator.getEngine() == engines[i], "The " + engines[i].length + "-long generator is "
+                                + generator.getEngine() + (generator.isFormed() ? "" : ", unformed"));
+                        helper.assertTrue(generator.getFuel().getCapacity() == DieselGeneratorBlockEntity.tankCapacity(engines[i])
+                                && generator.getEnergy().getCapacityAsInt() == DieselGeneratorBlockEntity.energyCapacity(engines[i]),
+                                engines[i] + "'s tank or buffer is the wrong size");
+                        helper.assertTrue(fill(generator.getFuel(), ModFluids.DIESEL.get(), 8_000) == 8_000, engines[i] + " refused Diesel");
+                    }
+                    var fuel = EngineFuel.of(ModFluids.DIESEL.get());
+                    int v8 = DieselGeneratorBlockEntity.fePerMb(fuel, engines[0]), v16 = DieselGeneratorBlockEntity.fePerMb(fuel, engines[2]);
+                    helper.assertTrue(DieselGeneratorBlockEntity.maxOutput(engines[2]) > DieselGeneratorBlockEntity.maxOutput(engines[1])
+                            && DieselGeneratorBlockEntity.maxOutput(engines[1]) > DieselGeneratorBlockEntity.maxOutput(engines[0]), "Outputs don't grow");
+                    helper.assertTrue(Math.abs(v16 - v8 * ArcforgeConfig.DIESEL_GENERATOR_EFFICIENCY_V16.getAsDouble()) <= 1.0,
+                            "The V16 makes " + v16 + " FE/mB against the V8's " + v8);
+                })
+                .thenIdle(spinUp + 5)
+                .thenExecute(() -> {
+                    for (int i = 0; i < engines.length; i++) {
+                        DieselGeneratorBlockEntity generator = helper.getBlockEntity(fronts[i], DieselGeneratorBlockEntity.class);
+                        helper.assertTrue(generator.getMade() == DieselGeneratorBlockEntity.maxOutput(engines[i]), engines[i] + " makes "
+                                + generator.getMade() + " FE/t");
+                    }
+                })
+                .thenSucceed();
+    }
+
+    // The Steam Cracker forms, waits for steam and 800°C, then cracks Naphtha into Ethylene, Propylene, Hydrogen and a
+    // little Heavy Oil.
+    static void steamCrackerCracks(GameTestHelper helper) {
+        BlockPos front = new BlockPos(1, 1, 3);
+        buildPlant(helper, PlantKind.STEAM_CRACKER, front);
+        RefiningRecipe recipe = recipe(helper, RefiningProcess.STEAM_CRACKING, ModFluids.NAPHTHA.get());
+        helper.assertTrue(recipe.minTemp() >= 800 && recipe.fluids().size() == 4, "Steam cracking runs at " + recipe.minTemp() + "°C");
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    var cracker = helper.getBlockEntity(front, net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity.class);
+                    helper.assertTrue(cracker.isFormed(), "The Steam Cracker didn't form");
+                    RefiningCore core = cracker.getCore();
+                    helper.assertTrue(fill(core.feed(), ModFluids.NAPHTHA.get(), recipe.input().amount()) == recipe.input().amount(), "It refused Naphtha");
+                    heat(core, recipe.minTemp() + 150);
+                })
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    var cracker = helper.getBlockEntity(front, net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity.class);
+                    helper.assertTrue(cracker.getStatus() == MachineStatus.NO_STEAM, "Without steam it's " + cracker.getStatus());
+                    fill(cracker.getCore().secondFeed(), ModFluids.STEAM.get(), recipe.secondInput().orElseThrow().amount());
+                })
+                .thenWaitUntil(() -> {
+                    var cracker = helper.getBlockEntity(front, net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity.class);
+                    helper.assertTrue(cracker.getCore().product(0).getAmount() == recipe.fluids().get(0).amount(),
+                            "No Ethylene yet (" + cracker.getStatus() + ")");
+                })
+                .thenExecute(() -> {
+                    RefiningCore core = helper.getBlockEntity(front, net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity.class).getCore();
+                    for (int i = 0; i < 4; i++) {
+                        helper.assertTrue(core.product(i).getResource(0).getFluid() == recipe.fluids().get(i).fluid().value()
+                                && core.product(i).getAmount() == recipe.fluids().get(i).amount(), "Product " + i + " is wrong");
+                    }
+                    helper.assertTrue(core.product(1).getResource(0).is(ModFluids.PROPYLENE.get()), "The second product isn't Propylene");
                 })
                 .thenSucceed();
     }

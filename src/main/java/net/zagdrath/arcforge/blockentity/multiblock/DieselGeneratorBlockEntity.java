@@ -43,6 +43,7 @@ import net.zagdrath.arcforge.machine.output.OutputLimit;
 import net.zagdrath.arcforge.machine.output.OutputLimited;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.DieselGeneratorMenu;
+import net.zagdrath.arcforge.multiblock.DieselEngine;
 import net.zagdrath.arcforge.multiblock.DieselGeneratorLayout;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.PlantKind;
@@ -53,13 +54,15 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// The Diesel Generator (see OilfieldStructures.PlantBox), run by its controller: an engine-generator set that burns a
-// fuel from the arcforge:engine_fuels data map (Diesel, Gasoline, Biodiesel, Refinery Gas) straight into FE, each mB
-// worth its fe_per_mb. It runs up to speed over dieselGenerator.spinUpTicks and then makes maxPowerOutput FE/t (times
-// power.generationMultiplier); when its FE buffer fills it throttles back to what's drawn, burning only the fuel for
-// that, and coasts down when it has no fuel or redstone stops it. Fuel goes in through Input ports; FE comes out of
-// Energy ports, pushed to what they touch. The engine's fan and flywheel turn as fast as it runs (see
-// DieselGeneratorRenderer), and its stacks smoke while it burns.
+// The Diesel Generator (see OilfieldStructures.PlantBox), run by its controller: an engine-generator set 3 wide and 3
+// tall whose length sets its engine (DieselEngine: 5 long a V8, 7 a V12, 9 a V16). It burns a fuel from the
+// arcforge:engine_fuels data map (Diesel, Gasoline, Biodiesel, Refinery Gas; never a sour fuel) straight into FE, each
+// mB worth its fe_per_mb, a little more in the bigger engines (efficiencyV12, efficiencyV16). It runs up to speed over
+// dieselGenerator.spinUpTicks and then makes its engine's full output (times power.generationMultiplier); when its FE
+// buffer fills it throttles back to what's drawn, burning only the fuel for that, and coasts down when it has no fuel
+// or redstone stops it. Its fuel tank grows with its length and its FE buffer with its output. Fuel goes in through
+// Input ports; FE comes out of Energy ports, pushed to what they touch. The engine's fan and flywheel turn as fast as
+// it runs (see DieselGeneratorRenderer), and its stacks smoke while it burns.
 public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity implements OutputLimited {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY);
@@ -68,7 +71,7 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
     // The flywheel's turn a tick (degrees) at full speed.
     public static final float FLYWHEEL_SPEED = 30.0F;
 
-    private final GeneratorEnergyHandler energy;
+    private GeneratorEnergyHandler energy;
     private final FilteredFluidTank fuel;
     private final ResourceHandler<FluidResource> fuelInput;
     private final ContainerData data;
@@ -85,14 +88,15 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
     // Client side: the flywheel's angle (degrees) and when it was last moved on.
     private float angle;
     private float lastFrame = -1.0F;
+    // The engine the tank and buffer are sized for: the one it was last formed as, kept while it's broken so a
+    // half-built or damaged V16 doesn't lose what it holds.
+    private DieselEngine sized = DieselEngine.V8;
 
     public DieselGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.DIESEL_GENERATOR.get(), PlantKind.DIESEL_GENERATOR, pos, state, 0, (level, slot, resource) -> false, UPGRADES,
                 SIDE_MODES);
-        this.energy = new GeneratorEnergyHandler(ArcforgeConfig.DIESEL_GENERATOR_ENERGY_CAPACITY.getAsInt(),
-                ArcforgeConfig.DIESEL_GENERATOR_MAX_OUTPUT_RATE.getAsInt(), this::setChanged);
-        this.fuel = new FilteredFluidTank(ArcforgeConfig.DIESEL_GENERATOR_TANK_CAPACITY.getAsInt(), resource -> EngineFuel.of(resource) != null,
-                this::setChanged);
+        this.energy = newEnergy(DieselEngine.V8);
+        this.fuel = new FilteredFluidTank(tankCapacity(DieselEngine.V8), resource -> EngineFuel.of(resource) != null, this::setChanged);
         this.fuelInput = new AutomationResourceHandler<>(fuel, index -> true, index -> false);
         this.data = new WideIntContainerData(DieselGeneratorMenu.DATA_VALUES) {
             @Override
@@ -123,18 +127,75 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
     }
 
     @Override
-    protected List<float[]> solids() {
-        return DieselGeneratorLayout.solids();
+    protected List<float[]> solids(int length) {
+        return DieselGeneratorLayout.of(DieselEngine.of(length)).solids();
     }
 
-    // FE/t at full speed, times the power multiplier.
-    public static int maxOutput() {
-        return PowerGeneration.fe(ArcforgeConfig.DIESEL_GENERATOR_MAX_OUTPUT.getAsInt());
+    // The engine it's built as (the one it was last formed as while it isn't formed).
+    public DieselEngine getEngine() {
+        return box != null ? DieselEngine.of(box.length()) : sized;
     }
 
-    // FE one mB of this fuel makes, times the power multiplier (0 for no fuel).
-    public static int fePerMb(@Nullable EngineFuel fuel) {
-        return fuel == null ? 0 : PowerGeneration.fe(fuel.fePerMb());
+    // FE/t at full speed for an engine, times the power multiplier.
+    public static int maxOutput(DieselEngine engine) {
+        return PowerGeneration.fe(switch (engine) {
+            case V8 -> ArcforgeConfig.DIESEL_GENERATOR_MAX_OUTPUT.getAsInt();
+            case V12 -> ArcforgeConfig.DIESEL_GENERATOR_MAX_OUTPUT_V12.getAsInt();
+            case V16 -> ArcforgeConfig.DIESEL_GENERATOR_MAX_OUTPUT_V16.getAsInt();
+        });
+    }
+
+    public int maxOutput() {
+        return maxOutput(getEngine());
+    }
+
+    // How much more FE a mB makes in this engine than in the V8.
+    public static double efficiency(DieselEngine engine) {
+        return switch (engine) {
+            case V8 -> 1.0;
+            case V12 -> ArcforgeConfig.DIESEL_GENERATOR_EFFICIENCY_V12.getAsDouble();
+            case V16 -> ArcforgeConfig.DIESEL_GENERATOR_EFFICIENCY_V16.getAsDouble();
+        };
+    }
+
+    // FE one mB of this fuel makes in this engine, times the power multiplier (0 for no fuel).
+    public static int fePerMb(@Nullable EngineFuel fuel, DieselEngine engine) {
+        return fuel == null ? 0 : PowerGeneration.fe((int) Math.round(fuel.fePerMb() * efficiency(engine)));
+    }
+
+    public int fePerMb(@Nullable EngineFuel fuel) {
+        return fePerMb(fuel, getEngine());
+    }
+
+    // The fuel tank: the V8's, times length / 5.
+    public static int tankCapacity(DieselEngine engine) {
+        return (int) Math.min(Integer.MAX_VALUE, (long) ArcforgeConfig.DIESEL_GENERATOR_TANK_CAPACITY.getAsInt() * engine.length / DieselEngine.V8.length);
+    }
+
+    // The FE buffer: the V8's, grown with the engine's output.
+    public static int energyCapacity(DieselEngine engine) {
+        long v8 = ArcforgeConfig.DIESEL_GENERATOR_ENERGY_CAPACITY.getAsInt();
+        return (int) Math.min(Integer.MAX_VALUE, v8 * maxOutput(engine) / Math.max(1, maxOutput(DieselEngine.V8)));
+    }
+
+    private GeneratorEnergyHandler newEnergy(DieselEngine engine) {
+        return new GeneratorEnergyHandler(energyCapacity(engine), ArcforgeConfig.DIESEL_GENERATOR_MAX_OUTPUT_RATE.getAsInt(), this::setChanged);
+    }
+
+    // Sizes the tank and buffer to the engine it's formed as (keeping what they hold, up to their new size); left as
+    // they are while it isn't formed.
+    private void resize() {
+        if (box == null) {
+            return;
+        }
+        DieselEngine engine = getEngine();
+        sized = engine;
+        fuel.setCapacity(tankCapacity(engine));
+        if (energy.getCapacityAsInt() != energyCapacity(engine)) {
+            GeneratorEnergyHandler resized = newEnergy(engine);
+            resized.generate(energy.getAmountAsInt());
+            energy = resized;
+        }
     }
 
     // --- Running ---
@@ -174,7 +235,8 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
                 double used = Math.min(need, pending);
                 pending -= used;
                 burned = used;
-                made = energy.generate((int) Math.floor(used * perMb));
+                // fe / perMb * perMb can land just under fe, so a fully fuelled tick makes fe exactly.
+                made = energy.generate(used >= need ? fe : (int) Math.floor(used * perMb));
             }
             status = made <= 0 ? MachineStatus.THROTTLED : speed < 0.98F ? MachineStatus.SPINNING_UP : made < wanted ? MachineStatus.THROTTLED
                     : MachineStatus.GENERATING;
@@ -232,6 +294,7 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
     @Override
     protected void onStructureChanged() {
         targetsDirty = true;
+        resize();
     }
 
     // Client side: the flywheel's angle (degrees) this frame, turning as fast as it runs.
@@ -314,6 +377,16 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        String id = input.getStringOr("engine", DieselEngine.V8.id());
+        for (DieselEngine engine : DieselEngine.values()) {
+            if (engine.id().equals(id)) {
+                sized = engine;
+            }
+        }
+        DieselEngine engine = getEngine();
+        sized = engine;
+        energy = newEnergy(engine);
+        fuel.setCapacity(tankCapacity(engine));
         energy.deserialize(input.childOrEmpty("energy"));
         fuel.deserialize(input.childOrEmpty("fuel"));
         speed = input.getFloatOr("speed", 0.0F);
@@ -326,6 +399,7 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
         super.saveAdditional(output);
         energy.serialize(output.child("energy"));
         fuel.serialize(output.child("fuel"));
+        output.putString("engine", sized.id());
         output.putFloat("speed", speed);
         output.putDouble("pending", pending);
         output.putFloat("shown_speed", Math.max(0.0F, syncedSpeed));

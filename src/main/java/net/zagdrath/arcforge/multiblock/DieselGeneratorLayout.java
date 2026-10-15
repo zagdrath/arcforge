@@ -9,83 +9,146 @@ import java.util.ArrayList;
 import java.util.List;
 
 // Where the Diesel Generator's parts are (see DieselGeneratorRenderer, which draws it, and PlantHitbox, whose shapes
-// follow it): an engine-generator set on a skid. In the model's frame (ModelFrame): x across (0 to 48 px), y up (0 to
-// 32, the exhaust stack standing higher), u back from the controller's end (0 to 80), in px. From the front:
-//   - the radiator: a core behind a louvred grille, with its header tanks, and the cooling fan in its shroud behind it;
-//   - the engine, an inline six: crankcase and oil pan on mounts, the cylinder head with six rocker covers, the intake
-//     manifold and air filter on the left, the exhaust manifold on the right into the turbocharger, and the exhaust
-//     stack with its rain cap;
-//   - the flywheel housing, and the coupling to the alternator (turning while it runs);
-//   - the alternator in the generator steel, louvred, with its FE band and the terminal box on top.
+// follow it), for its engine (DieselEngine: 5, 7 or 9 blocks long): a large diesel genset. In the model's frame
+// (ModelFrame): x across (0 to 48 px), y up (0 to 48, the exhaust's rain cap standing a little higher), u back from the
+// controller's end (0 to the length), in px. Front to back, on a heavy base frame over a sub-base fuel tank:
+//   - the radiator: a deep core (its fins facing forward), header tanks above and below, a filler cap, and behind it
+//     the fan in its shroud, seen through a guard of rings and spokes;
+//   - the V engine: the crankcase and oil pan, two cylinder banks leaning out in a V with a rocker cover per cylinder,
+//     the intake manifold down the middle of the V, an exhaust manifold along the outside of each bank, the
+//     turbochargers on top at the flywheel end (two, or four on the V16), the aftercooler between them, and exhaust
+//     risers up into the silencer along the top, its outlet capped with a rain flap;
+//   - the flywheel housing and the coupling (turning while it runs);
+//   - the alternator in the generator steel, louvred, with its FE band, end bell and terminal box (FE red cable
+//     glands), and the control panel on a bracket at its right side with a small lit screen.
 public final class DieselGeneratorLayout {
-    public static final float WIDTH = 48.0F, HEIGHT = 32.0F, LENGTH = 80.0F, CX = 24.0F;
-    public static final float SKID_TOP = 4.0F;
-    public static final float[][] RAILS = { { 2.0F, 6.0F }, { 42.0F, 46.0F } };
-    public static final float[][] CROSS = { { 1.0F, 4.0F }, { 38.0F, 41.0F }, { 76.0F, 79.0F } };
-    // The crankshaft's line (y), shared by the fan, flywheel housing, coupling and alternator.
-    public static final float SHAFT_Y = 15.0F;
-    // The radiator core and its grille, the header tanks, and the fan (centre on the shaft line, radius) in its shroud.
-    public static final float[] RADIATOR = { 5.0F, SKID_TOP, 2.0F, 43.0F, 29.0F, 8.0F };
-    public static final float FAN_U = 10.5F, FAN_R = 9.5F, SHROUD_U0 = 8.0F, SHROUD_U1 = 12.0F;
-    // The engine: crankcase, oil pan, cylinder head, the six rocker covers (each {u0, u1}) and the mounts.
-    public static final float[] CRANKCASE = { 14.0F, 8.0F, 14.0F, 34.0F, 22.0F, 50.0F };
-    public static final float[] OIL_PAN = { 16.0F, SKID_TOP, 16.0F, 32.0F, 8.0F, 48.0F };
-    public static final float[] HEAD = { 15.0F, 22.0F, 15.0F, 33.0F, 25.0F, 49.0F };
-    public static final int CYLINDERS = 6;
-    public static final float COVER_X0 = 17.0F, COVER_X1 = 31.0F, COVER_TOP = 28.0F;
-    // The intake manifold (left) and air filter, the exhaust manifold (right) and turbocharger, the stack.
-    public static final float[] INTAKE = { 10.0F, 17.0F, 16.0F, 14.0F, 21.0F, 48.0F };
-    public static final float FILTER_X = 8.0F, FILTER_U = 18.0F, FILTER_R = 3.5F, FILTER_Y0 = 12.0F, FILTER_Y1 = 25.0F;
-    public static final float[] EXHAUST = { 34.0F, 17.0F, 17.0F, 37.0F, 21.0F, 47.0F };
-    public static final float[] TURBO = { 35.0F, 17.0F, 42.0F, 42.0F, 26.0F, 50.0F };
-    public static final float STACK_X = 39.0F, STACK_U = 46.0F, STACK_R = 2.0F, STACK_TOP = 44.0F;
-    // The flywheel housing (a short drum along u), the coupling and the alternator, its end bell and terminal box.
-    public static final float BELL_R = 11.0F, BELL_U0 = 50.0F, BELL_U1 = 56.0F;
-    public static final float COUPLING_R = 4.0F, COUPLING_U0 = 56.0F, COUPLING_U1 = 59.0F;
-    public static final float[] ALTERNATOR = { 12.0F, SKID_TOP, 59.0F, 36.0F, 27.0F, 75.0F };
-    public static final float ALT_BELL_U = 78.0F;
-    public static final float[] TERMINAL = { 17.0F, 27.0F, 63.0F, 31.0F, 31.0F, 71.0F };
+    public static final float WIDTH = 48.0F, HEIGHT = 48.0F, CX = 24.0F;
+    // The sub-base fuel tank and the base frame's rails on it.
+    public static final float TANK_TOP = 7.0F, RAIL_TOP = 11.0F;
+    public static final float[][] RAILS = { { 5.0F, 10.0F }, { 38.0F, 43.0F } };
+    // The crankshaft's line (y), shared by the fan, the flywheel housing, the coupling and the alternator.
+    public static final float SHAFT_Y = 22.0F;
+    // The radiator {x0, y0, u0, x1, y1, u1} (its core), the fan (on the shaft line, radius) and its shroud behind.
+    public static final float[] RADIATOR = { 5.0F, RAIL_TOP, 2.0F, 43.0F, 41.0F, 9.0F };
+    public static final float FAN_U = 11.0F, FAN_R = 12.0F, SHROUD_U0 = 9.0F, SHROUD_U1 = 14.0F;
+    // The engine block's cross-section: the crankcase (x, y), the oil pan, and the banks: each leans BANK_ANGLE out of
+    // upright from its foot on the crankcase's top, BANK_DEPTH thick across and BANK_HEIGHT tall along its lean.
+    public static final float CASE_X0 = 13.0F, CASE_X1 = 35.0F, CASE_Y0 = 13.0F, CASE_Y1 = 25.0F;
+    public static final float PAN_X0 = 16.0F, PAN_X1 = 32.0F, PAN_Y0 = 8.0F;
+    public static final float BANK_ANGLE = 30.0F, BANK_DEPTH = 9.0F, BANK_HEIGHT = 10.0F, BANK_FOOT = 5.5F;
+    public static final float COVER_HEIGHT = 2.5F, COVER_INSET = 1.25F;
+    // The intake manifold in the V {x0, y0, x1, y1}, the exhaust manifolds' radius and the turbochargers' housings.
+    public static final float[] INTAKE = { 20.5F, 25.0F, 27.5F, 31.0F };
+    public static final float EXHAUST_R = 1.6F, TURBO_R = 3.5F, TURBO_LENGTH = 6.0F, TURBO_Y = 38.0F;
+    // The silencer along the top {x, y, radius} and its outlet with the rain cap.
+    public static final float SILENCER_Y = 43.5F, SILENCER_R = 3.5F, OUTLET_R = 1.8F, OUTLET_TOP = 51.0F;
+    // The flywheel housing and coupling (along u from the engine's end), the alternator's cross-section.
+    public static final float BELL_R = 13.0F, BELL_LENGTH = 6.0F, COUPLING_R = 4.5F, COUPLING_LENGTH = 3.0F;
+    public static final float ALT_X0 = 10.0F, ALT_X1 = 38.0F, ALT_Y1 = 37.0F;
+    // The control panel on its bracket (x out to, height {y0, y1}).
+    public static final float PANEL_X0 = 41.0F, PANEL_X1 = 46.5F, PANEL_Y0 = 20.0F, PANEL_Y1 = 33.0F;
 
-    private DieselGeneratorLayout() {}
+    public final DieselEngine engine;
+    public final float length;
+    // Along u: the engine block, each cylinder's pitch, the flywheel housing, the coupling, the alternator and its bell.
+    public final float engineU0, engineU1, pitch, bellU0, bellU1, couplingU0, couplingU1, altU0, altU1, altBellU;
 
-    // The rocker covers' spans along u, one per cylinder.
-    public static float[][] covers() {
-        float[][] covers = new float[CYLINDERS][];
-        float span = (HEAD[5] - HEAD[2]) / CYLINDERS;
-        for (int i = 0; i < CYLINDERS; i++) {
-            covers[i] = new float[] { HEAD[2] + span * i + 0.75F, HEAD[2] + span * (i + 1) - 0.75F };
+    private DieselGeneratorLayout(DieselEngine engine) {
+        this.engine = engine;
+        this.length = engine.length * 16.0F;
+        float altLength = switch (engine) {
+            case V8 -> 22.0F;
+            case V12 -> 32.0F;
+            case V16 -> 40.0F;
+        };
+        this.engineU0 = SHROUD_U1 + 1.0F;
+        this.bellU1 = length - 3.0F - altLength - 3.0F - COUPLING_LENGTH;
+        this.bellU0 = bellU1 - BELL_LENGTH;
+        this.engineU1 = bellU0;
+        this.pitch = (engineU1 - engineU0 - 4.0F) / engine.perBank();
+        this.couplingU0 = bellU1;
+        this.couplingU1 = bellU1 + COUPLING_LENGTH;
+        this.altU0 = couplingU1;
+        this.altU1 = altU0 + altLength;
+        this.altBellU = altU1 + 3.0F;
+    }
+
+    private static final DieselGeneratorLayout[] LAYOUTS = { new DieselGeneratorLayout(DieselEngine.V8), new DieselGeneratorLayout(DieselEngine.V12),
+            new DieselGeneratorLayout(DieselEngine.V16) };
+
+    public static DieselGeneratorLayout of(DieselEngine engine) {
+        return LAYOUTS[engine.ordinal()];
+    }
+
+    // The cylinders' spans along u on each bank, {u0, u1} each.
+    public float[][] cylinders() {
+        int n = engine.perBank();
+        float[][] spans = new float[n][];
+        for (int i = 0; i < n; i++) {
+            float u0 = engineU0 + 2.0F + pitch * i;
+            spans[i] = new float[] { u0 + 0.5F, u0 + pitch - 0.5F };
         }
-        return covers;
+        return spans;
     }
 
-    // Where the exhaust smoke leaves (the stack's top), {x, y, u}.
-    public static float[] stackTop() {
-        return new float[] { STACK_X, STACK_TOP + 1.0F, STACK_U };
+    // A bank's frame: {foot x, foot y, out x, out y} (out: the unit vector along its lean, up and away from the middle),
+    // side -1 for the left bank and 1 for the right.
+    public static float[] bank(int side) {
+        double a = Math.toRadians(BANK_ANGLE);
+        return new float[] { CX + side * BANK_FOOT, CASE_Y1, (float) Math.sin(a) * side, (float) Math.cos(a) };
     }
 
-    // The still parts as boxes {x0, y0, u0, x1, y1, u1}, for the blocks' shapes.
-    public static List<float[]> solids() {
+    // The turbochargers' centres {x, u}: one over each bank near the flywheel end, and on the V16 a second pair ahead.
+    public float[][] turbos() {
+        List<float[]> at = new ArrayList<>();
+        float u = engineU1 - 6.0F;
+        for (int pair = 0; pair < engine.turbos / 2; pair++) {
+            at.add(new float[] { 13.0F, u - pair * 18.0F });
+            at.add(new float[] { 35.0F, u - pair * 18.0F });
+        }
+        return at.toArray(float[][]::new);
+    }
+
+    // The silencer's span along u: from near the engine's front to just past the turbochargers' risers.
+    public float[] silencer() {
+        float back = engineU0 + 5.0F;
+        for (float[] t : turbos()) {
+            back = Math.max(back, t[1] + TURBO_LENGTH / 4.0F + 3.0F);
+        }
+        return new float[] { engineU0 + 5.0F, back };
+    }
+
+    // The aftercooler {x0, y0, u0, x1, y1, u1}: across the V, just ahead of the (first pair of) turbochargers.
+    public float[] aftercooler() {
+        float u1 = engineU1 - 10.0F;
+        return new float[] { 17.0F, 31.0F, u1 - 8.0F, 31.0F, 36.0F, u1 };
+    }
+
+    // The still parts as boxes {x0, y0, u0, x1, y1, u1}, for the blocks' shapes (the banks by their reach).
+    public List<float[]> solids() {
         List<float[]> boxes = new ArrayList<>();
+        boxes.add(new float[] { 2.0F, 0.0F, 1.0F, 46.0F, TANK_TOP, length - 1.0F });
         for (float[] rail : RAILS) {
-            boxes.add(new float[] { rail[0], 0.0F, 0.0F, rail[1], SKID_TOP, LENGTH });
-        }
-        for (float[] cross : CROSS) {
-            boxes.add(new float[] { RAILS[0][1], 0.0F, cross[0], RAILS[1][0], 3.0F, cross[1] });
+            boxes.add(new float[] { rail[0], TANK_TOP, 0.0F, rail[1], RAIL_TOP, length });
         }
         boxes.add(RADIATOR);
         boxes.add(new float[] { CX - FAN_R - 1.0F, SHAFT_Y - FAN_R - 1.0F, SHROUD_U0, CX + FAN_R + 1.0F, SHAFT_Y + FAN_R + 1.0F, SHROUD_U1 });
-        boxes.add(CRANKCASE);
-        boxes.add(OIL_PAN);
-        boxes.add(HEAD);
-        boxes.add(new float[] { COVER_X0, HEAD[4], HEAD[2], COVER_X1, COVER_TOP, HEAD[5] });
-        boxes.add(INTAKE);
-        boxes.add(new float[] { FILTER_X - FILTER_R, FILTER_Y0, FILTER_U - FILTER_R, FILTER_X + FILTER_R, FILTER_Y1, FILTER_U + FILTER_R });
-        boxes.add(EXHAUST);
-        boxes.add(TURBO);
-        boxes.add(new float[] { CX - BELL_R, SHAFT_Y - BELL_R, BELL_U0, CX + BELL_R, SHAFT_Y + BELL_R, BELL_U1 });
-        boxes.add(ALTERNATOR);
-        boxes.add(new float[] { ALTERNATOR[0] + 2.0F, ALTERNATOR[1] + 2.0F, ALTERNATOR[5], ALTERNATOR[3] - 2.0F, ALTERNATOR[4] - 2.0F, ALT_BELL_U });
-        boxes.add(TERMINAL);
+        boxes.add(new float[] { CASE_X0, CASE_Y0, engineU0, CASE_X1, CASE_Y1, engineU1 });
+        boxes.add(new float[] { PAN_X0, PAN_Y0, engineU0 + 2.0F, PAN_X1, CASE_Y0, engineU1 - 2.0F });
+        // Each bank as the box it reaches across.
+        for (int side = -1; side <= 1; side += 2) {
+            float[] b = bank(side);
+            float outX = b[0] + b[2] * BANK_HEIGHT, outY = b[1] + b[3] * BANK_HEIGHT;
+            float half = BANK_DEPTH / 2.0F;
+            float x0 = Math.min(b[0] - half * b[3], outX + half * b[3]), x1 = Math.max(b[0] + half * b[3], outX - half * b[3]);
+            boxes.add(new float[] { Math.min(x0, x1), b[1], engineU0 + 1.0F, Math.max(x0, x1), outY + half * Math.abs(b[2]), engineU1 - 1.0F });
+        }
+        boxes.add(new float[] { CX - BELL_R, SHAFT_Y - BELL_R, bellU0, CX + BELL_R, SHAFT_Y + BELL_R, bellU1 });
+        boxes.add(new float[] { ALT_X0, RAIL_TOP, altU0, ALT_X1, ALT_Y1, altU1 });
+        boxes.add(new float[] { ALT_X0 + 3.0F, RAIL_TOP + 2.0F, altU1, ALT_X1 - 3.0F, ALT_Y1 - 3.0F, altBellU });
+        boxes.add(new float[] { PANEL_X0, PANEL_Y0, altU0 + 3.0F, PANEL_X1, PANEL_Y1, altU0 + 13.0F });
+        float[] s = silencer();
+        boxes.add(new float[] { CX - SILENCER_R, SILENCER_Y - SILENCER_R, s[0], CX + SILENCER_R, SILENCER_Y + SILENCER_R, s[1] });
         return boxes;
     }
 }

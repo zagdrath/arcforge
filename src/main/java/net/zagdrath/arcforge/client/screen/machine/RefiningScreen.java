@@ -35,7 +35,7 @@ import net.zagdrath.arcforge.recipe.RefiningProcess;
 public class RefiningScreen extends MachineScreen<RefiningMenu> {
     private static final int HEIGHT = 186;
     private static final int ENERGY_X = 9, GAUGE_Y = 19;
-    private static final int[] PRODUCT_X = { 89, 105, 121 };
+    private static final int[] PRODUCT_X = { 89, 105, 121, 137 };
     private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int BUFFER_X = 157;
     private static final int PROGRESS_X = 64, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
@@ -95,9 +95,11 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
                 case HYDROTREATING -> sideModeName("hydrogen_sulfide");
                 case SULFUR_RECOVERY -> sideModeName("steam_output");
                 case STEAM_REFORMING -> sideModeName("carbon_dioxide");
+                case STEAM_CRACKING -> sideModeName("gases");
                 default -> sideModeName("refinery_gas");
             };
-            case HYDROGEN -> process == RefiningProcess.STEAM_REFORMING ? sideModeName("hydrogen") : sideModeName("hydrogen_input");
+            case HYDROGEN -> process == RefiningProcess.STEAM_REFORMING || process == RefiningProcess.STEAM_CRACKING ? sideModeName("hydrogen")
+                    : sideModeName("hydrogen_input");
             case OXYGEN -> sideModeName("oxygen_input");
             case STEAM -> sideModeName("steam_input");
             case OUTPUT -> process == RefiningProcess.SULFUR_RECOVERY ? sideModeName("sulfur_output") : super.sideModeName(mode);

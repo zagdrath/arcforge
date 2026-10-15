@@ -10,15 +10,27 @@
   "pages": [
     {
       "type": "text",
-      "text": "An engine-generator set: it burns liquid and gas fuels straight to FE, a mid-game step below the Gas Turbine Array.\n# Building\nA solid box of Diesel Generator Casings 3 wide, 5 long and 2 tall, with the Diesel Generator Controller in the middle of the bottom of one end, facing out. Formed, it becomes the set: radiator and fan, an inline six with its stack, the flywheel housing and the alternator."
+      "text": "An engine-generator set: it burns liquid and gas fuels straight to FE, a mid-game step below the Gas Turbine Array.\n# Building\nA solid box of Diesel Generator Casings 3 wide and 3 tall, with the Diesel Generator Controller in the middle of the bottom of one end, facing out. Its length sets the engine:\n- 5 long: a V8, 3,000 FE/t.\n- 7 long: a V12, 8,000 FE/t, 5% more FE per mB.\n- 9 long: a V16, 15,000 FE/t, 10% more FE per mB.\nIts fuel tank grows with its length (16,000 mB on the V8) and its FE buffer with its output."
     },
     {
       "type": "text",
-      "text": "# Running\nIt runs up to speed over 3 seconds, then makes 3,000 FE/t. When its FE buffer fills it throttles back to what's drawn, burning only the fuel for that.\n| Fuel | FE/mB | mB/t at full power |\n| Diesel | 420 | 7.1 |\n| Gasoline | 400 | 7.5 |\n| Biodiesel | 340 | 8.8 |\n| Refinery Gas | 240 | 12.5 |\n# Ports\n- Input: fuel in (liquid or gas).\n- Energy: FE out, pushed to what it touches (8,192 FE/t a port).\nThe fuels are data-driven (arcforge:engine_fuels)."
+      "text": "Formed, it becomes a big genset on a base frame over its fuel tank: the radiator and fan at the front, the V engine with a rocker cover per cylinder, its turbochargers (four on the V16) and silencer, the flywheel housing, and the alternator with its terminal box and control panel."
+    },
+    {
+      "type": "text",
+      "text": "# Running\nIt runs up to speed over 3 seconds, then makes its engine's full output. When its FE buffer fills it throttles back to what's drawn, burning only the fuel for that. Sour fuels are refused.\n| Fuel | FE/mB (V8 / V12 / V16) | mB/t at full power |\n| Diesel | 420 / 441 / 462 | 7.1 / 18.1 / 32.5 |\n| Gasoline | 400 / 420 / 440 | 7.5 / 19.0 / 34.1 |\n| Biodiesel | 340 / 357 / 374 | 8.8 / 22.4 / 40.1 |\n| Refinery Gas | 240 / 252 / 264 | 12.5 / 31.7 / 56.8 |\n# Ports\n- Input: fuel in (liquid or gas).\n- Energy: FE out, pushed to what it touches (16,384 FE/t a port).\nThe fuels are data-driven (arcforge:engine_fuels); the outputs and efficiencies are in config."
     },
     {
       "type": "multiblock",
       "structure": "diesel_generator"
+    },
+    {
+      "type": "multiblock",
+      "structure": "diesel_generator_v12"
+    },
+    {
+      "type": "multiblock",
+      "structure": "diesel_generator_v16"
     }
   ]
 }

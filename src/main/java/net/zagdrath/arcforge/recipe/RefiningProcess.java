@@ -23,8 +23,8 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 
 // The refinery's downstream processes (see RefiningRecipe and RefiningCore) and what each machine is built with:
 // whether it draws heat, FE, wears a catalyst or makes an item, the second fluid it takes (and through which faces),
-// and the products it's laid out for (its tanks show these while empty). The Cracking Unit is a multiblock; the others
-// are single blocks.
+// and the products it's laid out for (its tanks show these while empty). The Cracking Unit and the Steam Cracker are
+// multiblocks; the others are single blocks.
 public enum RefiningProcess implements StringRepresentable {
     // Heavy Oil + heat + a catalyst -> Naphtha, Diesel and Refinery Gas.
     CRACKING("cracking", true, false, true, false, MachineStatus.CRACKING,
@@ -46,7 +46,11 @@ public enum RefiningProcess implements StringRepresentable {
             () -> List.of(ModFluids.STEAM.get()), ArcforgeConfig.SULFUR_RECOVERY_TIME::getAsInt, SideMode.OXYGEN),
     // Natural Gas + Steam + heat -> Hydrogen and Carbon Dioxide.
     STEAM_REFORMING("steam_reforming", true, false, false, false, MachineStatus.STEAM_REFORMING,
-            () -> List.of(ModFluids.HYDROGEN.get(), ModFluids.CARBON_DIOXIDE.get()), ArcforgeConfig.SMR_TIME::getAsInt, SideMode.STEAM);
+            () -> List.of(ModFluids.HYDROGEN.get(), ModFluids.CARBON_DIOXIDE.get()), ArcforgeConfig.SMR_TIME::getAsInt, SideMode.STEAM),
+    // Naphtha or Refinery Gas + Steam + heat -> Ethylene, Propylene, a little Hydrogen and a trickle of Heavy Oil.
+    STEAM_CRACKING("steam_cracking", true, false, false, false, MachineStatus.STEAM_CRACKING,
+            () -> List.of(ModFluids.ETHYLENE.get(), ModFluids.PROPYLENE.get(), ModFluids.HYDROGEN.get(), ModFluids.HEAVY_OIL.get()),
+            ArcforgeConfig.STEAM_CRACKER_TIME::getAsInt, SideMode.STEAM);
 
     private final String name;
     private final boolean heated, powered, catalysed, makesItem;
@@ -135,6 +139,7 @@ public enum RefiningProcess implements StringRepresentable {
             case HYDROTREATING -> ModRecipes.HYDROTREATING.get();
             case SULFUR_RECOVERY -> ModRecipes.SULFUR_RECOVERY.get();
             case STEAM_REFORMING -> ModRecipes.STEAM_REFORMING.get();
+            case STEAM_CRACKING -> ModRecipes.STEAM_CRACKING.get();
         };
     }
 
@@ -147,6 +152,7 @@ public enum RefiningProcess implements StringRepresentable {
             case HYDROTREATING -> ModRecipes.HYDROTREATING_SERIALIZER.get();
             case SULFUR_RECOVERY -> ModRecipes.SULFUR_RECOVERY_SERIALIZER.get();
             case STEAM_REFORMING -> ModRecipes.STEAM_REFORMING_SERIALIZER.get();
+            case STEAM_CRACKING -> ModRecipes.STEAM_CRACKING_SERIALIZER.get();
         };
     }
 }

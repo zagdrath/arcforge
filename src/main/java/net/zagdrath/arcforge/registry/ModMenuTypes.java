@@ -158,6 +158,8 @@ public final class ModMenuTypes {
     // The refinery's downstream units: one menu class, one type each.
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> CRACKING_UNIT = refining("cracking_unit",
             net.zagdrath.arcforge.recipe.RefiningProcess.CRACKING);
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> STEAM_CRACKER = refining("steam_cracker",
+            net.zagdrath.arcforge.recipe.RefiningProcess.STEAM_CRACKING);
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> CATALYTIC_REFORMER = refining("catalytic_reformer",
             net.zagdrath.arcforge.recipe.RefiningProcess.REFORMING);
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> COKER = refining("coker",

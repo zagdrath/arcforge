@@ -21,11 +21,11 @@ import net.zagdrath.arcforge.multiblock.OilfieldController;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.multiblock.ShapedPlant;
 
-// The shapes of a formed Pumpjack's, Cracking Unit's or Diesel Generator's blocks (see ShapedPlant): the still parts of
-// its model in each (clipped to the block by ModelFrame), turned the way it faces. Only asked of a real level (see
-// RefineryHitbox); a bottom block no part reaches keeps a low floor plate, so it can still be clicked, and one higher
-// up has no shape (break another to take the structure down).
-final class PlantHitbox {
+// The shapes of a formed Oil Derrick's, Pumpjack's, Cracking Unit's, Steam Cracker's or Diesel Generator's blocks (see
+// ShapedPlant): the still parts of its model in each (clipped to the block by ModelFrame), turned the way it faces.
+// Only asked of a real level (see RefineryHitbox); a bottom block no part reaches keeps a low floor plate, so it can
+// still be clicked, and one higher up has no shape (break another to take the structure down).
+public final class PlantHitbox {
     private static final long KEEP_TICKS = 20;
     private static final long NONE = Long.MIN_VALUE;
     private static final VoxelShape FLOOR = net.minecraft.world.level.block.Block.box(0, 0, 0, 16, 2, 16);
@@ -53,6 +53,12 @@ final class PlantHitbox {
         }
         VoxelShape shape = shapes[frame.index(dx, dy, dz)];
         return shape != null ? shape : dy == 0 ? FLOOR : Shapes.empty();
+    }
+
+    // The formed structure the block at pos is part of, or null (kept a second, as for its shape).
+    public static @Nullable ShapedPlant plant(Level level, BlockPos pos) {
+        long found = controllerOf(level, pos);
+        return found != NONE && level.getBlockEntity(BlockPos.of(found)) instanceof ShapedPlant plant ? plant : null;
     }
 
     // The controller of the structure the block at pos is part of, or NONE, kept a second.

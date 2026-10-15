@@ -30,14 +30,14 @@ import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
-// The refinery's downstream processes, one shape for every refining recipe type (see RefiningProcess): arcforge:cracking
-// (the Cracking Unit), arcforge:reforming (the Catalytic Reformer), arcforge:coking (the Coker),
-// arcforge:lubricant_blending (the Lubricant Blender), arcforge:hydrotreating (the Hydrotreater), arcforge:sulfur_recovery
-// (the Sulfur Recovery Unit) and arcforge:steam_reforming (the Steam Methane Reformer). One fluid input (with its amount),
-// and for the processes that take one a second fluid ("second_input", in the machine's second feed tank: Hydrogen,
-// Oxygen or Steam), becomes up to three fluids
-// ("fluids", each {"id", "amount"}; gases and liquids alike, in the machine's product tanks in that order) and an
-// optional item ("item"), over "time" ticks, drawing "heat_per_tick" HU/t at "min_temp" °C or hotter and
+// The refinery's downstream processes, one shape for every refining recipe type (see RefiningProcess):
+// arcforge:cracking (the Cracking Unit), arcforge:reforming (the Catalytic Reformer), arcforge:coking (the Coker),
+// arcforge:lubricant_blending (the Lubricant Blender), arcforge:hydrotreating (the Hydrotreater),
+// arcforge:sulfur_recovery (the Sulfur Recovery Unit), arcforge:steam_reforming (the Steam Methane Reformer) and
+// arcforge:steam_cracking (the Steam Cracker). One fluid input (with its amount), and for the processes that take one a
+// second fluid ("second_input", in the machine's second feed tank: Hydrogen, Oxygen or Steam), becomes up to four
+// fluids ("fluids", each {"id", "amount"}; gases and liquids alike, in the machine's product tanks in that order) and
+// an optional item ("item"), over "time" ticks, drawing "heat_per_tick" HU/t at "min_temp" °C or hotter and
 // "energy_per_tick" FE/t (each 0 when left out, and the machine's own config fills in time when that's left out). An
 // optional catalyst ("catalyst", an ingredient) sits in the machine's catalyst slot; one item lasts "catalyst_uses"
 // operations.
@@ -45,7 +45,7 @@ public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.Flu
         Optional<ChemicalReactingRecipe.FluidInput> secondInput, List<FluidStackTemplate> fluids,
         Optional<ItemStackTemplate> item, Optional<Integer> time, int heatPerTick, int minTemp, int energyPerTick, Optional<Ingredient> catalyst,
         int catalystUses) implements Recipe<RefiningRecipe.Input> {
-    public static final int MAX_FLUIDS = 3;
+    public static final int MAX_FLUIDS = 4;
 
     public static MapCodec<RefiningRecipe> mapCodec(RefiningProcess process) {
         return RecordCodecBuilder.mapCodec(i -> i.group(

@@ -39,6 +39,7 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.OilfieldController;
@@ -49,9 +50,9 @@ import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 
 // The controller of an oil or refinery fixed-size multiblock (see PlantKind): the Oil Derrick's (in the middle of one
 // side of the rig's floor, its panel facing out), the Pumpjack's (the middle of the skid's far end, facing away from
-// the well), the Cracking Unit's or the Diesel Generator's (the middle of the bottom of one end, facing out). Its block
-// entity runs the structure and holds its contents. LIT while it works. A formed modelled controller draws nothing but
-// its port plates (see OilfieldCasingBlock).
+// the well), the Cracking Unit's, Steam Cracker's or Diesel Generator's (the middle of the bottom of one end, facing
+// out). Its block entity runs the structure and holds its contents. LIT while it works. A formed controller draws
+// nothing but its port plates (see OilfieldCasingBlock).
 public class OilfieldControllerBlock extends BaseEntityBlock implements OilfieldPart, PortHolder {
     public static final EnumProperty<Direction> FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty LIT = BlockStateProperties.LIT;
@@ -75,6 +76,7 @@ public class OilfieldControllerBlock extends BaseEntityBlock implements Oilfield
             case PUMPJACK -> new PumpjackBlockEntity(pos, state);
             case CRACKING_UNIT -> new CrackingUnitBlockEntity(pos, state);
             case DIESEL_GENERATOR -> new DieselGeneratorBlockEntity(pos, state);
+            case STEAM_CRACKER -> new SteamCrackerBlockEntity(pos, state);
         };
     }
 
@@ -90,6 +92,8 @@ public class OilfieldControllerBlock extends BaseEntityBlock implements Oilfield
                     (innerLevel, pos, blockState, cracker) -> cracker.serverTick(serverLevel));
             case DIESEL_GENERATOR -> createTickerHelper(type, ModBlockEntityTypes.DIESEL_GENERATOR.get(),
                     (innerLevel, pos, blockState, generator) -> generator.serverTick(serverLevel));
+            case STEAM_CRACKER -> createTickerHelper(type, ModBlockEntityTypes.STEAM_CRACKER.get(),
+                    (innerLevel, pos, blockState, cracker) -> cracker.serverTick(serverLevel));
         };
     }
 
@@ -158,26 +162,26 @@ public class OilfieldControllerBlock extends BaseEntityBlock implements Oilfield
         builder.add(FACING, FORMED, LIT);
     }
 
-    // A formed modelled controller's shape follows the model (see PlantHitbox).
+    // A formed controller's shape follows the model (see PlantHitbox).
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape shape = kind.modelled() && state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
+        VoxelShape shape = state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
         return shape != null ? shape : super.getShape(state, level, pos, context);
     }
 
     @Override
     protected VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        VoxelShape shape = kind.modelled() && state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
+        VoxelShape shape = state.getValue(FORMED) ? PlantHitbox.shape(level, pos) : null;
         return shape != null ? shape : super.getCollisionShape(state, level, pos, context);
     }
 
     @Override
     protected VoxelShape getBlockSupportShape(BlockState state, BlockGetter level, BlockPos pos) {
-        return kind.modelled() && state.getValue(FORMED) ? Shapes.block() : super.getBlockSupportShape(state, level, pos);
+        return state.getValue(FORMED) ? Shapes.block() : super.getBlockSupportShape(state, level, pos);
     }
 
     @Override
     protected VoxelShape getOcclusionShape(BlockState state) {
-        return kind.modelled() && state.getValue(FORMED) ? Shapes.empty() : super.getOcclusionShape(state);
+        return state.getValue(FORMED) ? Shapes.empty() : super.getOcclusionShape(state);
     }
 }

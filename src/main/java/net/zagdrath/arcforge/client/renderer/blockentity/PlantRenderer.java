@@ -40,7 +40,7 @@ import net.zagdrath.arcforge.multiblock.PortFaces;
 import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.steam.ModelMesh;
 
-// Draws a formed refinery box (the Cracking Unit or the Diesel Generator; its casings draw nothing but their port
+// Draws a formed refinery box (the Cracking Unit, the Steam Cracker or the Diesel Generator; its casings draw nothing but their port
 // plates) from its mesh on a model sheet, with a nozzle from the model out to each port. The still parts are built once
 // and again when the ports change (checked every second); the turning parts each frame; the glow list full-bright, as
 // bright as the subclass says. Shaded like the Pumpjack (see PumpjackRenderer.emit).
@@ -147,9 +147,14 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
 
     // The ports on the structure's outer faces, in the model's frame.
     private static List<ModelMesh.Port> ports(Level level, OilfieldStructures.PlantBox box, ModelFrame frame) {
+        return ports(level, box.parts(), box::contains, box.min(), frame);
+    }
+
+    // The ports on a structure's outer faces (its parts, inside telling which blocks are its own), in the model's frame
+    // from min.
+    static List<ModelMesh.Port> ports(Level level, List<BlockPos> parts, java.util.function.Predicate<BlockPos> inside, BlockPos min, ModelFrame frame) {
         List<ModelMesh.Port> ports = new ArrayList<>();
-        BlockPos min = box.min();
-        for (BlockPos pos : box.parts()) {
+        for (BlockPos pos : parts) {
             PortFaces faces = MultiblockPorts.faces(level, pos);
             if (faces.isEmpty()) {
                 continue;
@@ -160,7 +165,7 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
             }
             int[] block = frame.frameBlock(pos.getX() - min.getX(), pos.getY() - min.getY(), pos.getZ() - min.getZ());
             for (Direction face : Direction.values()) {
-                if (faces.get(face) == SideMode.NONE || box.contains(pos.relative(face))) {
+                if (faces.get(face) == SideMode.NONE || inside.test(pos.relative(face))) {
                     continue;
                 }
                 int[] n = frame.frameNormal(face.getStepX(), face.getStepY(), face.getStepZ());
@@ -197,7 +202,7 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
     }
 
     // Each face shaded as a block face turned its way is, its normal straight up (as PumpjackRenderer.emit).
-    private static void emit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet, int light) {
+    static void emit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet, int light) {
         for (int i = 0; i + 7 < data.length; i += 8) {
             float nx = data[i + 5], ny = data[i + 6], nz = data[i + 7];
             int shade = Math.round(255.0F * (nx * nx * 0.6F + ny * ny * (ny > 0.0F ? 1.0F : 0.5F) + nz * nz * 0.8F));

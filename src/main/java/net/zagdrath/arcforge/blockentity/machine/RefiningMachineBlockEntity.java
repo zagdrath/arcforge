@@ -85,7 +85,7 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
             case HYDROTREATING -> ModBlockEntityTypes.HYDROTREATER.get();
             case SULFUR_RECOVERY -> ModBlockEntityTypes.SULFUR_RECOVERY_UNIT.get();
             case STEAM_REFORMING -> ModBlockEntityTypes.STEAM_METHANE_REFORMER.get();
-            case CRACKING -> throw new IllegalArgumentException("The Cracking Unit is a multiblock");
+            case CRACKING, STEAM_CRACKING -> throw new IllegalArgumentException("The Cracking Unit and the Steam Cracker are multiblocks");
         };
     }
 
@@ -112,7 +112,7 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
             case STEAM_REFORMING -> new RefiningCore.Layout(-1, -1, 0, 0, ArcforgeConfig.SMR_HEAT_CAPACITY.getAsInt(),
                     ArcforgeConfig.SMR_MAX_TEMPERATURE.getAsInt(), ArcforgeConfig.SMR_FEED_CAPACITY.getAsInt(), ArcforgeConfig.SMR_PRODUCT_CAPACITY.getAsInt(),
                     ArcforgeConfig.SMR_SECOND_FEED_CAPACITY.getAsInt());
-            case CRACKING -> throw new IllegalArgumentException("The Cracking Unit is a multiblock");
+            case CRACKING, STEAM_CRACKING -> throw new IllegalArgumentException("The Cracking Unit and the Steam Cracker are multiblocks");
         };
     }
 
@@ -352,6 +352,7 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
             case SULFUR_RECOVERY -> "sulfur_recovery_unit";
             case STEAM_REFORMING -> "steam_methane_reformer";
             case CRACKING -> "cracking_unit";
+            case STEAM_CRACKING -> "steam_cracker";
         };
     }
 

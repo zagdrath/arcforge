@@ -18,8 +18,10 @@ import javax.imageio.ImageIO;
 // Large faces aren't tiled: ModelMesh paints each as a few big plates, sampling a window of a grain field per plate and
 // laying edge strips and rivets round it (see ModelMesh.plating). This paints what that samples, and the small parts'
 // tiles:
-//   rows 96-111: the motor's ribbed plate (64, 96), a seamless grating (80, 96), the girder flange (96, 104: seamless,
-//     a rivet every 4 px) and the hazard edge (112, 104);
+//   rows 96-111: the furnace's refractory brick (0, 96, 16x8: buff firebrick in staggered courses, recessed mortar),
+//     the control panel's lit screen (16, 96, 8x6: cyan readouts on a dark glass), the motor's ribbed plate (64, 96),
+//     a seamless grating (80, 96), the girder flange (96, 104: seamless, a rivet every 4 px) and the hazard edge
+//     (112, 104);
 //   rows 112-119: the round parts' ramps, 2 to 14 px across, side by side, then the polished rod's bright ramp (104);
 //   rows 120-125: the burner fire (8x6), from the sheet's glow ramp at (40, 48);
 //   rows 128-191: the machine steel's grain field (116x64), then its edge columns (x 116-118: lit, dark, seam) and the
@@ -59,6 +61,8 @@ public class LargeModelTextureGen {
                 out.setRGB(x, y, old.getRGB(x, y));
             }
         }
+        brick(0, 96);
+        screen(16, 96);
         motor(64, 96);
         grating(80, 96);
         flange(96, 104);
@@ -109,6 +113,51 @@ public class LargeModelTextureGen {
                 int index = (int) Math.round((1.0 - t) * 6);
                 out.setRGB(x0 + x, y0 + y, 0xFF000000 | ramp[Math.max(0, Math.min(6, index))]);
             }
+        }
+    }
+
+    // Refractory firebrick 16x8, seen at a furnace's peep holes and openings: two courses of bricks 8x4, the second
+    // offset by half a brick, each brick in one of three close buff tones with its own lit top edge, and the mortar
+    // joints darker (sunk between them). Tiles seamlessly both ways.
+    static void brick(int x0, int y0) {
+        int[] tones = { 0x9C7A58, 0x927052, 0x8A684A };
+        int lit = 0xAE8C68, mortar = 0x4E3C2E;
+        for (int y = 0; y < 8; y++) {
+            for (int x = 0; x < 16; x++) {
+                int course = y / 4, row = y % 4;
+                int bx = (x + (course == 1 ? 4 : 0)) % 16;
+                int c;
+                if (row == 3 || bx % 8 == 7) {
+                    c = mortar;
+                } else {
+                    int brick = (bx / 8 + course * 2 + x0) % 3;
+                    c = row == 0 ? lit : tones[brick];
+                    if (row == 2 && bx % 8 == 6) {
+                        c = scale(tones[brick], 0.9);
+                    }
+                }
+                out.setRGB(x0 + x, y0 + y, 0xFF000000 | c);
+            }
+        }
+    }
+
+    // A control panel's screen 8x6, drawn full-bright: dark glass with a cyan bar graph and two readout lines.
+    static void screen(int x0, int y0) {
+        int glass = 0x10181C, lit = 0xB8F2EA, mid = 0x5FD4C4, dim = 0x2F6E68;
+        for (int y = 0; y < 6; y++) {
+            for (int x = 0; x < 8; x++) {
+                out.setRGB(x0 + x, y0 + y, 0xFF000000 | glass);
+            }
+        }
+        int[] bars = { 3, 4, 2, 4 };
+        for (int i = 0; i < bars.length; i++) {
+            for (int y = 0; y < bars[i]; y++) {
+                out.setRGB(x0 + 1 + i, y0 + 4 - y, 0xFF000000 | (y == bars[i] - 1 ? lit : mid));
+            }
+        }
+        for (int x = 5; x < 7; x++) {
+            out.setRGB(x0 + x, y0 + 1, 0xFF000000 | mid);
+            out.setRGB(x0 + x, y0 + 3, 0xFF000000 | dim);
         }
     }
 

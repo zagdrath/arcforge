@@ -10,7 +10,11 @@
   "pages": [
     {
       "type": "text",
-      "text": "Drills down to an oil deposit, then turns into a Well Head.\n# Building\nA 3x3 rig six blocks tall:\n- The floor: eight Derrick Casings round an open middle (the bore), with the Oil Derrick Controller in the middle of one side, facing out.\n- Four Derrick Frame legs, four blocks tall, on the floor's corners.\n- A full 3x3 of Derrick Frames on top.\nKeep the bore and the space above it open for the drill string."
+      "text": "Drills down to an oil deposit, then turns into a Well Head.\n# Building\nA 3x3 rig nine blocks tall:\n- The floor: eight Derrick Casings round an open middle (the bore), with the Oil Derrick Controller in the middle of one side, facing out.\n- Four Derrick Frame legs, seven blocks tall, on the floor's corners.\n- A full 3x3 of Derrick Frames on top.\nKeep the bore and the space above it open for the drill string."
+    },
+    {
+      "type": "text",
+      "text": "Formed, it becomes a lattice derrick: four legs leaning in from the rig floor to the crown, girts and X-bracing between them, the drawworks and its engine house at the back of the floor, and the crown block's sheaves on the crown platform. The floor is a deck you can walk on (up the stair at its front), and the ladder up the front left leg climbs to the crown. While it drills, the kelly turns in the rotary table and the travelling block strokes down as the drawworks pays out line."
     },
     {
       "type": "text",

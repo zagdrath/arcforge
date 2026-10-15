@@ -30,6 +30,8 @@ public final class GasTints {
     // Natural Gas: clear, so a clean pale blue, bluer and lighter than Refinery Gas. Hydrogen Sulfide: a sickly
     // yellow-green, yellower than Chlorine and duller than Ammonia.
     public static final int NATURAL_GAS = 0xFFC8E4F6;
+    // A pale lavender.
+    public static final int PROPYLENE = 0xFFD8CCEC;
     public static final int HYDROGEN_SULFIDE = 0xFFC4CC6A;
 
     private GasTints() {}

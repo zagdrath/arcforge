@@ -157,7 +157,9 @@ public enum MachineStatus {
     RECOVERING_SULFUR("recovering_sulfur", "led_running"),
     STEAM_REFORMING("steam_reforming", "led_running"),
     NO_HYDROGEN("no_hydrogen", "led_blocked"),
-    NO_OXYGEN("no_oxygen", "led_blocked");
+    NO_OXYGEN("no_oxygen", "led_blocked"),
+    // The Steam Cracker at work.
+    STEAM_CRACKING("steam_cracking", "led_running");
 
     private final String name;
     private final String led;

@@ -4,7 +4,7 @@
       "model": "arcforge:block/oilfield/derrick_frame"
     },
     "formed=true": {
-      "model": "arcforge:block/oilfield/derrick_frame"
+      "model": "arcforge:block/oilfield/derrick_hidden"
     }
   }
 }

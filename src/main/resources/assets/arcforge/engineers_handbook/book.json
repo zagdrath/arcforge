@@ -72,6 +72,7 @@
         "survey_records",
         "distillation_array",
         "cracking_unit",
+        "steam_cracker",
         "catalytic_reformer",
         "coker",
         "lubricant_blender",

@@ -77,6 +77,28 @@ public final class MultiblockAutomation {
         }
     }
 
+    // Pushes fluid out of every port in one of these modes (ones that aren't outputs for every machine, such as Gas
+    // Output and Hydrogen), up to fluidPerFace mB a face.
+    public static void pushFluids(ServerLevel level, MultiblockController controller, java.util.Set<SideMode> modes, int fluidPerFace) {
+        for (BlockPos pos : BlockPos.betweenClosed(controller.getMinCorner(), controller.getMaxCorner())) {
+            if (!controller.isPart(pos)) {
+                continue;
+            }
+            for (Direction side : Direction.values()) {
+                SideMode mode = controller.faceMode(pos, side);
+                BlockPos target = pos.relative(side);
+                if (mode == null || !modes.contains(mode) || !level.isLoaded(target)) {
+                    continue;
+                }
+                ResourceHandler<FluidResource> fluid = controller.getFluidHandler(mode);
+                ResourceHandler<FluidResource> into = fluid != null ? level.getCapability(Capabilities.Fluid.BLOCK, target, side.getOpposite()) : null;
+                if (into != null) {
+                    ResourceHandlerUtil.move(fluid, into, resource -> true, fluidPerFace, null);
+                }
+            }
+        }
+    }
+
     // Capabilities and conduit connections of every block in the box may have changed.
     public static void refresh(Level level, BlockPos min, BlockPos max) {
         if (level.isClientSide()) {

@@ -234,6 +234,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.HYDROTREATER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.SULFUR_RECOVERY_UNIT.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.STEAM_METHANE_REFORMER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
+        event.register(ModMenuTypes.STEAM_CRACKER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.COKER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.LUBRICANT_BLENDER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.DIESEL_GENERATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.DieselGeneratorScreen::new);
@@ -366,6 +367,7 @@ public class ArcforgeClient {
         event.register(gasModel(SYNGAS_TINT), ModFluids.SYNGAS, ModFluids.FLOWING_SYNGAS);
         event.register(gasModel(REFINERY_GAS_TINT), ModFluids.REFINERY_GAS, ModFluids.FLOWING_REFINERY_GAS);
         event.register(gasModel(NATURAL_GAS_TINT), ModFluids.NATURAL_GAS, ModFluids.FLOWING_NATURAL_GAS);
+        event.register(gasModel(PROPYLENE_TINT), ModFluids.PROPYLENE, ModFluids.FLOWING_PROPYLENE);
         event.register(gasModel(HYDROGEN_SULFIDE_TINT), ModFluids.HYDROGEN_SULFIDE, ModFluids.FLOWING_HYDROGEN_SULFIDE);
     }
 
@@ -392,6 +394,7 @@ public class ArcforgeClient {
     public static final int SYNGAS_TINT = GasTints.SYNGAS;
     public static final int REFINERY_GAS_TINT = GasTints.REFINERY_GAS;
     public static final int NATURAL_GAS_TINT = GasTints.NATURAL_GAS;
+    public static final int PROPYLENE_TINT = GasTints.PROPYLENE;
     public static final int HYDROGEN_SULFIDE_TINT = GasTints.HYDROGEN_SULFIDE;
 
     private static FluidModel.Unbaked gasModel(int tint) {
@@ -450,6 +453,7 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(SYNGAS_TINT & 0xFFFFFF, 6.0F), ModFluids.SYNGAS_TYPE.get());
         event.registerFluidType(liquidFog(REFINERY_GAS_TINT & 0xFFFFFF, 6.0F), ModFluids.REFINERY_GAS_TYPE.get());
         event.registerFluidType(liquidFog(NATURAL_GAS_TINT & 0xFFFFFF, 6.0F), ModFluids.NATURAL_GAS_TYPE.get());
+        event.registerFluidType(liquidFog(PROPYLENE_TINT & 0xFFFFFF, 6.0F), ModFluids.PROPYLENE_TYPE.get());
         event.registerFluidType(liquidFog(HYDROGEN_SULFIDE_TINT & 0xFFFFFF, 5.0F), ModFluids.HYDROGEN_SULFIDE_TYPE.get());
         event.registerFluidType(liquidFog(0xE8E4D6, 2.0F), ModFluids.LATEX_TYPE.get());
         event.registerFluidType(liquidFog(0xB6F07A, 6.0F), ModFluids.LIQUID_EXPERIENCE_TYPE.get());
@@ -619,6 +623,8 @@ public class ArcforgeClient {
                 net.zagdrath.arcforge.client.renderer.blockentity.PumpjackRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CRACKING_UNIT.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.CrackingUnitRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_CRACKER.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.SteamCrackerRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DIESEL_GENERATOR.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.DieselGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FLARE_STACK.get(),

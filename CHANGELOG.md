@@ -22,8 +22,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells and three new refinery units; worlds and
-configs carry over).
+Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units and a scaling Diesel
+Generator; worlds load, but Diesel Generators and Oil Derricks need their new layers, see Upgrading).
 
 ### Added
 
@@ -72,6 +72,17 @@ configs carry over).
   Black Gold Below (swim in a cavern), For the Records, Rotten Eggs, Desulfurized, Claus and Effect (goal), Under
   Pressure (goal) and Hydrogen the Cheap Way.
 
+- **Steam Cracker**, a 3×3×3 multiblock (Steam Cracker Casings round a controller in the middle of the bottom of one
+  side): fed heat at 800°C or hotter and steam, it cracks 100 mB Naphtha into 50 mB Ethylene, 25 mB **Propylene** (a new
+  gas), 10 mB Hydrogen and 5 mB Heavy Oil a second (Refinery Gas gives more Ethylene and Hydrogen), at 60 HU/t. Ethylene
+  and Propylene each have their own port mode. Modelled as a cracking furnace: a refractory-lined box with buckstays and
+  peep holes glowing with the fire inside (as bright as it's hot), radiant tubes rising into banded headers on the roof,
+  a transfer line to a quench drum, and a short stack on a convection hood.
+- **Polypropylene Sheet**: 120 mB Propylene makes 2 in the Chemical Reactor. It's in `arcforge:plastics`, so every
+  plastic recipe takes it.
+- Handbook page (Steam Cracker), JEI category (Steam Cracking), Jade tooltips, the machine control API, GameTests and
+  the advancements Crack of Dawn (goal) and Plastic Fantastic.
+
 ### Changed
 
 - The Crude Oil, Oil Derrick, Pumpjack, Fuel Burner, Oils and Pitch, Jetpack, Gas Turbine Array and Refinery Fuels
@@ -81,15 +92,35 @@ configs carry over).
 - Refining recipes (`arcforge:hydrotreating`, `arcforge:sulfur_recovery`, `arcforge:steam_reforming`) can take a second
   fluid input (`second_input`).
 
+- **The Diesel Generator scales**: 3 wide and 3 tall, and 5, 7 or 9 long for a V8, V12 or V16, making 3,000, 8,000 or
+  15,000 FE/t; the V12 gets 5% and the V16 10% more FE from each mB of fuel. Its fuel tank grows with its length and its
+  FE buffer with its output (all in config), keeping their size while it's broken. JEI's fuel page and Jade show each
+  engine. It has a new model, a large genset: a sub-base fuel tank and base frame, the radiator with its fan behind a
+  ring guard, the V engine with a rocker cover per cylinder, exhaust manifolds, turbochargers (four on the V16),
+  aftercooler and silencer with a rain flap, the flywheel housing, and the alternator with louvres, its FE band,
+  terminal box and a control panel with a lit screen. The Energy ports now give up to 16,384 FE/t each.
+- **The Oil Derrick is a real derrick**: nine blocks tall (legs seven Derrick Frames high), and formed it hides its blocks
+  and is drawn as a four-legged lattice tower tapering to a crown platform with a railing, sheaves and a gin pole, over
+  a plated rig floor with a rotary table, stair and railing, the drawworks (its drum turning as the line pays out) and
+  an engine house, and a ladder up the front left leg. Its hitbox follows the model: walk on the rig floor and climb the
+  ladder to the crown.
+- The Oil Derrick's and Diesel Generator's Handbook pages show the new builds.
+
 ### Upgrading
 
 - Caverns, sour deposits and gas caps only come in chunks generated after this update. The first time a world loads
   with it, the chunks it already has are noted (from its region files); a deposit reaching any of them gets no cavern
   and works exactly as before everywhere (invisible, always sweet, no gas cap), so no cavern is ever cut off against
   old ground. Turn caverns off with `world.oilDeposits.caverns`.
+- **Diesel Generators** are now 3 tall: an existing 2-tall one won't form until a third layer of casings is added. New
+  config values in `dieselGenerator`: `maxPowerOutputV12`, `maxPowerOutputV16`, `efficiencyV12`, `efficiencyV16`;
+  `maxEnergyOutput` now defaults to 16,384 (an existing config keeps its value).
+- **Oil Derricks** are now 9 tall: an existing rig won't form until its legs are built up to seven Derrick Frames (37
+  frames in all); its old crown blocks are shown again when it first rechecks. A rig mid-way through a hole carries on
+  from where it was once rebuilt.
 - New config values: `world.oilDeposits` (`caverns`, `sourChance`, `sourRichChance`, `gasCapChance`, `gasPerBlock`,
   `surfaceSeepChance`, `cavernCheckInterval`), `power.burners.refineryFuels` (Natural Gas and sour fuel values) and new
-  sections for the Hydrotreater, Sulfur Recovery Unit, Steam Methane Reformer and Gas Wellhead.
+  sections for the Hydrotreater, Sulfur Recovery Unit, Steam Methane Reformer, Gas Wellhead and Steam Cracker.
 
 ## [2.7.0] - 2026-10-14
 

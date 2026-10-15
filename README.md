@@ -486,9 +486,10 @@ on it still gets a trickle (`multiblocks.pumpjack.tricklePerSecond`, 40 mB a sec
 **Seismic Survey Tool.** Use it on the ground: it tells you whether there's oil under the chunk, its kind, roughly how
 many buckets are left and its depth, or that it's drained.
 
-**Oil Derrick.** A 3×3 rig six blocks tall over a deposit: a floor ring of eight blocks round an open bore (seven
-Derrick Casings and the Oil Derrick Controller, facing out), Derrick Frame legs four blocks tall on its corners, and a
-full 3×3 of Derrick Frames on top. The bore and the column above it must be open. With 120 FE/t, 10 mB/t of water and a
+**Oil Derrick.** A 3×3 rig nine blocks tall over a deposit: a floor ring of eight blocks round an open bore (seven
+Derrick Casings and the Oil Derrick Controller, facing out), Derrick Frame legs seven blocks tall on its corners, and a
+full 3×3 of Derrick Frames on top. Formed, it's drawn as a lattice derrick with a walkable rig floor, drawworks and a
+ladder you can climb to the crown. The bore and the column above it must be open. With 120 FE/t, 10 mB/t of water and a
 Steel Pipe for every 4 blocks of hole, it drills a block every 2 seconds down to the deposit's depth. There it strikes
 oil: the rig comes down, a Well Head caps the hole, and the rig's blocks and spare pipes drop there. Broken and rebuilt
 over the same hole, it carries on where it was. Its ports take Input (water and Steel Pipes) and Energy.
@@ -574,20 +575,26 @@ Heavy Oil + heat + Cracking Catalyst --[Cracking Unit]--> Naphtha, Diesel, Refin
 Naphtha + heat --[Catalytic Reformer]--> Gasoline + Hydrogen
 Bitumen + heat --[Coker]--> Petroleum Coke + Refinery Gas
 Heavy Oil + FE --[Lubricant Blender]--> Lubricant
+Naphtha or Refinery Gas + Steam + heat (800°C+) --[Steam Cracker]--> Ethylene, Propylene, Hydrogen, a little Heavy Oil
+Propylene --[Chemical Reactor]--> Polypropylene Sheet (arcforge:plastics)
 8 gravel + Bitumen bucket --> 8 Asphalt
 ```
 
 They take what the Distillation Array draws off Crude Oil. The **Cracking Unit** is a fixed 3×3×5 multiblock
 (Cracking Unit Casings round a controller in the middle of the bottom of one side), drawn as a fluid catalytic cracker;
-its Cracking Catalyst wears out slowly (one lasts 50 batches). The other three are single blocks. **Petroleum Coke**
+its Cracking Catalyst wears out slowly (one lasts 50 batches). The **Steam Cracker** is a fixed 3×3×3 multiblock drawn as
+a cracking furnace with glowing peep holes, headers, a quench drum and a stack (`arcforge:steam_cracking` recipes, with
+steam as their `second_input`). The others are single blocks. **Petroleum Coke**
 works as Coal Coke everywhere (`#c:coal_coke`), and **Lubricant** lubricates the turbine arrays at +12% instead of
 Heavy Oil's +8%. Recipes are data-driven (`arcforge:cracking`, `arcforge:reforming`, `arcforge:coking`,
 `arcforge:lubricant_blending`: `input`, `fluids`, `item`, `time`, `heat_per_tick`, `min_temp`, `energy_per_tick`,
 `catalyst`, `catalyst_uses`).
 
-**Diesel Generator** (a fixed 3×2×5 multiblock, drawn as an engine-generator set with a turning fan and coupling).
-Burns Diesel, Gasoline, Biodiesel or Refinery Gas straight to FE (the `arcforge:engine_fuels` data map, `fe_per_mb`:
-420, 400, 340 and 240 by default), up to 3,000 FE/t after a 3-second spin-up, and throttles back when full.
+**Diesel Generator** (3 wide, 3 tall and 5, 7 or 9 long: a V8, V12 or V16, drawn as a large genset with its radiator,
+V engine, turbochargers and alternator, its fan and coupling turning). Burns Diesel, Gasoline, Biodiesel or Refinery Gas
+straight to FE (the `arcforge:engine_fuels` data map, `fe_per_mb`: 420, 400, 340 and 240 by default; the V12 gets 5%
+and the V16 10% more from each mB), up to 3,000, 8,000 or 15,000 FE/t after a 3-second spin-up, and throttles back when
+full. Its fuel tank and FE buffer grow with it.
 
 **Flare Stack.** A block with a tall stack drawn above it: gas pushed into it burns off, up to 1,000 mB/t, with a
 flame at the top as big as what it burns, so a refinery never stalls on a full gas tank.

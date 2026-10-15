@@ -8,11 +8,11 @@
     },
     "facing=north,formed=true,lit=false": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_controller"
+      "model": "arcforge:block/oilfield/derrick_hidden"
     },
     "facing=north,formed=true,lit=true": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_controller_on"
+      "model": "arcforge:block/oilfield/derrick_hidden"
     },
     "facing=east,formed=false,lit=false": {
       "model": "arcforge:block/oilfield/derrick_controller",
@@ -24,13 +24,11 @@
     },
     "facing=east,formed=true,lit=false": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_controller",
-      "y": 90
+      "model": "arcforge:block/oilfield/derrick_hidden"
     },
     "facing=east,formed=true,lit=true": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_controller_on",
-      "y": 90
+      "model": "arcforge:block/oilfield/derrick_hidden"
     },
     "facing=south,formed=false,lit=false": {
       "model": "arcforge:block/oilfield/derrick_controller",
@@ -42,13 +40,11 @@
     },
     "facing=south,formed=true,lit=false": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_controller",
-      "y": 180
+      "model": "arcforge:block/oilfield/derrick_hidden"
     },
     "facing=south,formed=true,lit=true": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_controller_on",
-      "y": 180
+      "model": "arcforge:block/oilfield/derrick_hidden"
     },
     "facing=west,formed=false,lit=false": {
       "model": "arcforge:block/oilfield/derrick_controller",
@@ -60,13 +56,11 @@
     },
     "facing=west,formed=true,lit=false": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_controller",
-      "y": 270
+      "model": "arcforge:block/oilfield/derrick_hidden"
     },
     "facing=west,formed=true,lit=true": {
       "type": "arcforge:ported",
-      "model": "arcforge:block/oilfield/derrick_controller_on",
-      "y": 270
+      "model": "arcforge:block/oilfield/derrick_hidden"
     }
   }
 }

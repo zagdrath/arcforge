@@ -75,9 +75,14 @@ public final class MultiblockBlueprints {
                 refinery(),
                 oilDerrick(),
                 pumpjack(),
-                plant("cracking_unit", PlantKind.CRACKING_UNIT, ModBlocks.CRACKING_UNIT_CASING.get(), ModBlocks.CRACKING_UNIT_CONTROLLER.get()),
+                plant("cracking_unit", PlantKind.CRACKING_UNIT, ModBlocks.CRACKING_UNIT_CASING.get(), ModBlocks.CRACKING_UNIT_CONTROLLER.get(), 0),
+                plant("steam_cracker", PlantKind.STEAM_CRACKER, ModBlocks.STEAM_CRACKER_CASING.get(), ModBlocks.STEAM_CRACKER_CONTROLLER.get(), 0),
                 plant("diesel_generator", PlantKind.DIESEL_GENERATOR, ModBlocks.DIESEL_GENERATOR_CASING.get(),
-                        ModBlocks.DIESEL_GENERATOR_CONTROLLER.get()),
+                        ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), 5),
+                plant("diesel_generator_v12", PlantKind.DIESEL_GENERATOR, ModBlocks.DIESEL_GENERATOR_CASING.get(),
+                        ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), 7),
+                plant("diesel_generator_v16", PlantKind.DIESEL_GENERATOR, ModBlocks.DIESEL_GENERATOR_CASING.get(),
+                        ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), 9),
                 solarThermalArray(),
                 biogasDigester(),
                 greenhouse(),
@@ -328,13 +333,14 @@ public final class MultiblockBlueprints {
                 new BlockPos(OilfieldStructures.UNIT_WIDTH, OilfieldStructures.UNIT_HEIGHT, OilfieldStructures.UNIT_LENGTH));
     }
 
-    // A fixed box plant (the Cracking Unit or the Diesel Generator): casings, the controller in the middle of the
-    // bottom row at the south end, facing south.
-    private static Blueprint plant(String id, PlantKind kind, Block casing, Block controller) {
+    // A box plant (the Cracking Unit, Steam Cracker or Diesel Generator, this long): casings, the controller in the
+    // middle of the bottom row at the south end, facing south.
+    private static Blueprint plant(String id, PlantKind kind, Block casing, Block controller, int length) {
         BlockState controllerState = controller.defaultBlockState()
                 .setValue(net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.FACING, Direction.SOUTH);
-        OilfieldStructures.PlantBox probe = OilfieldStructures.PlantBox.of(kind, BlockPos.ZERO, Direction.NORTH);
-        OilfieldStructures.PlantBox box = OilfieldStructures.PlantBox.of(kind, new BlockPos(probe.width() / 2, 0, probe.length() - 1), Direction.NORTH);
+        OilfieldStructures.PlantBox probe = OilfieldStructures.PlantBox.of(kind, BlockPos.ZERO, Direction.NORTH, length);
+        OilfieldStructures.PlantBox box = OilfieldStructures.PlantBox.of(kind, new BlockPos(probe.width() / 2, 0, probe.length() - 1), Direction.NORTH,
+                length);
         List<Placement> placements = new ArrayList<>();
         for (BlockPos pos : box.parts()) {
             placements.add(new Placement(pos, pos.equals(box.controller()) ? controllerState : casing.defaultBlockState()));
