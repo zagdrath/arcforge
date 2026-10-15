@@ -16,7 +16,8 @@ import net.zagdrath.arcforge.steam.ModelMesh;
 
 // Draws a formed Diesel Generator (a V8, V12 or V16, by its length) from DieselGeneratorLayout, built by
 // DieselGeneratorMesh on the Pumpjack's sheet, its fan and coupling turning as fast as the engine runs (see
-// DieselGeneratorBlockEntity.advance) and its control panel's screen lit.
+// DieselGeneratorBlockEntity.advance), the outlet's rain flap lifted by the exhaust (flap) and its control panel's
+// screen lit.
 public class DieselGeneratorRenderer extends PlantRenderer<DieselGeneratorBlockEntity, DieselGeneratorMesh> {
     public DieselGeneratorRenderer(BlockEntityRendererProvider.Context context) {}
 
@@ -43,6 +44,6 @@ public class DieselGeneratorRenderer extends PlantRenderer<DieselGeneratorBlockE
 
     @Override
     protected float[] buildMoving(DieselGeneratorMesh mesh, DieselGeneratorBlockEntity generator, float now) {
-        return mesh.buildMoving(generator.advance(now));
+        return mesh.buildMoving(generator.advance(now), generator.flap(now));
     }
 }

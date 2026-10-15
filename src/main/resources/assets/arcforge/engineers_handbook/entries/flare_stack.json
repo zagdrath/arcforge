@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Burns off excess gas so a refinery never stalls.\n- Push any gas into it (through any face but the top): Refinery Gas, Hydrogen, Syngas, steam, anything a Pressurized Conduit carries. It burns up to 1,000 mB/t of it and gives nothing back.\n- Its stack stands four blocks over its base, with a small pilot flame at the tip; the flame grows as it burns more.\n- Only the base is a block: the stack is for show.\nPut one on an overflow line (a conduit filter or a full tank's spill) rather than straight on a gas you want."
+      "text": "Burns off excess gas so a refinery never stalls.\n- Push any gas into it (through any face but the top): Refinery Gas, Hydrogen, Syngas, steam, anything a Pressurized Conduit carries. It burns up to 1,000 mB/t of it and gives nothing back.\n- Its stack stands four blocks over its base. A flame burns at the tip while it flares off gas, growing up to three and a half blocks tall as it burns more.\n- Only the base is a block: the stack is for show.\nPut one on an overflow line (a conduit filter or a full tank's spill) rather than straight on a gas you want."
     }
   ]
 }

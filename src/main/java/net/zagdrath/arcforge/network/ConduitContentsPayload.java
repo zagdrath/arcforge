@@ -49,7 +49,7 @@ public record ConduitContentsPayload(BlockPos pos, FluidStack fluid, Fluid flowi
     // A snapshot of the conduit's contents. Copied: in single player the payload reaches the client without being
     // encoded, while the server goes on changing the originals.
     public static ConduitContentsPayload of(ConduitBlockEntity conduit) {
-        return new ConduitContentsPayload(conduit.getBlockPos(), conduit.getFluid().copy(), conduit.getFlowingGas(),
+        return new ConduitContentsPayload(conduit.getBlockPos(), conduit.getFluid().copy(), conduit.getFlowing(),
                 conduit.getPackets().stream().map(packet -> new ItemPacket(packet.stack.copy(), packet.from, packet.to, packet.progress, null, null)).toList(),
                 conduit.getStoredItems().stream().map(ItemStack::copy).toList(),
                 conduit.getItemSpeed());

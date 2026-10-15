@@ -35,11 +35,13 @@ import net.zagdrath.arcforge.steam.ModelMesh;
 // Draws a formed Oil Derrick (its blocks draw nothing but the casings' port plates) from DerrickLayout, built by
 // DerrickMesh on the Pumpjack's sheet: the lattice tower, rig floor, crown, drawworks, engine house and ladder once
 // (and again when its ports change, checked every second), and every frame the drill string and the drawworks drum.
-// While it drills, the kelly turns (18° a tick) and the travelling block runs down with it, a stroke every two
-// seconds, the drum paying the line out as it goes; idle, the block hangs at the top of its run. Shaded like the
+// While it drills, the kelly turns (18° a tick) and the travelling block feeds slowly down with it over four seconds,
+// then the kelly stops and the drawworks hoists the block back up in one, easing in and out of the lift; the drum pays
+// the line out going down and reels it in coming up. Idle, the block hangs at the top of its run. Shaded like the
 // refinery boxes (see PlantRenderer.emit).
 public class OilDerrickRenderer implements StructureRenderer<OilDerrickBlockEntity, OilDerrickRenderer.State> {
-    private static final float SPIN = 18.0F, STROKE = 40.0F, DRUM_TURNS = 2.5F;
+    // The kelly's turn a tick, a stroke's feed down and hoist up (ticks), and the drum's turns over the block's run.
+    private static final float SPIN = 18.0F, FEED = 80.0F, HOIST = 20.0F, DRUM_TURNS = 2.5F;
     private static final int PORT_SCAN_INTERVAL = 20;
     private static final float[] EMPTY = new float[0];
 
@@ -109,9 +111,22 @@ public class OilDerrickRenderer implements StructureRenderer<OilDerrickBlockEnti
         }
         boolean lit = derrick.getBlockState().getValue(OilfieldControllerBlock.LIT);
         float now = time + partialTicks;
-        float hoist = lit ? now % STROKE / STROKE : 0.0F;
+        float hoist = 0.0F;
+        // In double: game time times the kelly's turn outgrows a float's precision on an old world.
+        double drilled = 0.0;
+        if (lit) {
+            float stroke = FEED + HOIST, at = (float) (((double) time + partialTicks) % stroke);
+            // The kelly only turns while the block feeds down: its turn so far is every stroke's feed, and this one's.
+            drilled = Math.floor(((double) time + partialTicks) / stroke) * FEED + Math.min(at, FEED);
+            if (at < FEED) {
+                hoist = at / FEED;
+            } else {
+                float t = (at - FEED) / HOIST;
+                hoist = 1.0F - t * t * (3.0F - 2.0F * t);
+            }
+        }
         state.solid = model.solid;
-        state.moving = model.mesh.buildMoving(hoist, lit ? now * SPIN % 360.0F : 0.0F, hoist * DRUM_TURNS * 360.0F);
+        state.moving = model.mesh.buildMoving(hoist, (float) (drilled * SPIN % 360.0), hoist * DRUM_TURNS * 360.0F);
         state.sheet = SteamBoilerArrayRenderer.sprite(PumpjackRenderer.SHEET);
         // The light just above the rig floor's front middle (inside the casings is their own darkness).
         state.light = LightCoordsUtil.getLightCoords(level, rig.controller().above());

@@ -54,6 +54,14 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> GAS_TURBINE_ARRAY_IGNITE = loop("gas_turbine_array_ignite", 24.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> GAS_TURBINE_ARRAY_FLAMEOUT = loop("gas_turbine_array_flameout", 24.0F);
 
+    // The Diesel Generator's running loop (pitch and volume follow the engine, see DieselGeneratorSound).
+    public static final DeferredHolder<SoundEvent, SoundEvent> DIESEL_GENERATOR_RUN = loop("diesel_generator_run", 24.0F);
+
+    // The oilfield's running loops (see MachineLoopSound): the Oil Derrick, the Pumpjack and the Distillation Array.
+    public static final DeferredHolder<SoundEvent, SoundEvent> OIL_DERRICK_RUN = loop("oil_derrick_run", 24.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> PUMPJACK_RUN = loop("pumpjack_run", 20.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> DISTILLATION_ARRAY_RUN = loop("distillation_array_run", 20.0F);
+
     private ModSounds() {}
 
     private static DeferredHolder<SoundEvent, SoundEvent> loop(String name, float range) {

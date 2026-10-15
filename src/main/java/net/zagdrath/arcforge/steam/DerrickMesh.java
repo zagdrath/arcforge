@@ -71,14 +71,15 @@ public final class DerrickMesh extends ModelMesh {
                 box(x, 0.0F, u, x + 3.0F, under, u + 3.0F, Paint.STRAP, null, null, SKIP_UP | SKIP_DOWN);
             }
         }
-        for (float u : new float[] { 1.0F, W - 3.0F }) {
-            box(0.5F, under - 2.0F, u, W - 0.5F, under, u + 2.0F, Paint.STRAP, Paint.MID, Paint.SHADE, SKIP_UP);
-        }
+        // Front and back, their ends in the corner legs; the front one stops either side of the stair.
+        float sx0 = DerrickLayout.STAIR_X0, sx1 = DerrickLayout.STAIR_X1;
+        box(1.0F, under - 2.0F, 1.0F, sx0, under, 3.0F, Paint.STRAP, Paint.MID, Paint.SHADE, SKIP_UP);
+        box(sx1, under - 2.0F, 1.0F, W - 1.0F, under, 3.0F, Paint.STRAP, Paint.MID, Paint.SHADE, SKIP_UP);
+        box(1.0F, under - 2.0F, W - 3.0F, W - 1.0F, under, W - 1.0F, Paint.STRAP, Paint.MID, Paint.SHADE, SKIP_UP);
         for (float x : new float[] { 1.0F, W - 3.0F }) {
             box(x, under - 2.0F, 3.0F, x + 2.0F, under, W - 3.0F, Paint.STRAP, Paint.MID, Paint.SHADE, SKIP_UP);
         }
         // The stair: two steps up the front, between stringers.
-        float sx0 = DerrickLayout.STAIR_X0, sx1 = DerrickLayout.STAIR_X1;
         box(sx0 + 1.0F, 2.0F, 0.0F, sx1 - 1.0F, 3.0F, u0 / 2.0F, Paint.MID, Paint.GRATE, Paint.SHADE, 0);
         box(sx0 + 1.0F, 5.0F, u0 / 2.0F, sx1 - 1.0F, 6.0F, u0, Paint.MID, Paint.GRATE, Paint.SHADE, 0);
         for (float x : new float[] { sx0, sx1 - 1.0F }) {
@@ -91,8 +92,9 @@ public final class DerrickMesh extends ModelMesh {
         railingX(lx + half, sx0 - 1.0F, 0.5F, top);
         railingX(sx1 + 1.0F, W - 0.5F, 0.5F, top);
         railingX(0.5F, W - 0.5F, W - 1.0F, top);
-        railingU(0.5F, 0.5F, W - 0.5F, top);
-        railingU(W - 1.0F, 0.5F, W - 0.5F, top);
+        // The sides butt into the front and back railings.
+        railingU(0.5F, 1.1F, W - 1.0F, top);
+        railingU(W - 1.0F, 1.1F, W - 1.0F, top);
     }
 
     // A railing along x at u from x0 to x1 (a post at most every 8 px, a knee and a hand rail), on a floor at y.
@@ -106,7 +108,8 @@ public final class DerrickMesh extends ModelMesh {
         int posts = Math.max(1, (int) Math.ceil((x1 - x0) / 8.0F));
         for (int i = 0; i <= posts; i++) {
             float x = x0 + Math.min(x1 - x0 - 0.6F, (x1 - x0) * i / posts);
-            box(x, y, u, x + 0.6F, y + h - 0.6F, u + 0.6F, Paint.FACE, null, null, SKIP_UP | SKIP_DOWN);
+            // A little inside the rails, so their faces don't meet in one plane.
+            box(x + 0.1F, y, u + 0.1F, x + 0.5F, y + h - 0.6F, u + 0.5F, Paint.FACE, null, null, SKIP_UP | SKIP_DOWN);
         }
     }
 
@@ -121,7 +124,7 @@ public final class DerrickMesh extends ModelMesh {
         int posts = Math.max(1, (int) Math.ceil((u1 - u0) / 8.0F));
         for (int i = 0; i <= posts; i++) {
             float u = u0 + Math.min(u1 - u0 - 0.6F, (u1 - u0) * i / posts);
-            box(x, y, u, x + 0.6F, y + h - 0.6F, u + 0.6F, Paint.FACE, null, null, SKIP_UP | SKIP_DOWN);
+            box(x + 0.1F, y, u + 0.1F, x + 0.5F, y + h - 0.6F, u + 0.5F, Paint.FACE, null, null, SKIP_UP | SKIP_DOWN);
         }
     }
 
@@ -211,8 +214,8 @@ public final class DerrickMesh extends ModelMesh {
             float x = a[0] + (b[0] - a[0]) * t, u = a[2] + (b[2] - a[2]) * t + su * h;
             box(x - 0.5F, y - 0.5F, Math.min(u, u + su * 0.4F), x + 0.5F, y + 0.5F, Math.max(u, u + su * 0.4F), Paint.RIVET, Paint.RIVET, Paint.DARK, 0);
         }
-        // Its cap under the crown deck.
-        box(b[0] - h, b[1] - 0.5F, b[2] - h, b[0] + h, b[1], b[2] + h, Paint.MID, Paint.LIT, null, SKIP_DOWN);
+        // Its cap under the crown deck, a little wider than the leg.
+        box(b[0] - h - 0.2F, b[1] - 0.5F, b[2] - h - 0.2F, b[0] + h + 0.2F, b[1], b[2] + h + 0.2F, Paint.MID, Paint.LIT, Paint.SHADE, 0);
     }
 
     // A girt from leg a to leg b at the same height: a bar in the girder flange, its ends meeting the legs' faces.
@@ -306,22 +309,26 @@ public final class DerrickMesh extends ModelMesh {
 
     // --- The ladder ---
 
-    // The ladder up the front left leg: two stiles on stand-offs from the leg and a rung every RUNG_STEP.
+    // The ladder up the front left leg: two stiles on stand-offs from the leg (running on past the crown deck as grab
+    // rails, capped), and a rung every RUNG_STEP between them.
     private void ladder() {
         float y0 = DerrickLayout.DECK_TOP, y1 = DerrickLayout.CROWN_Y + DerrickLayout.CROWN_DECK, half = DerrickLayout.LADDER_W / 2.0F;
-        for (float side : new float[] { -half, half - 0.8F }) {
-            float[] a = DerrickLayout.ladder(y0), b = DerrickLayout.ladder(DerrickLayout.CROWN_Y);
-            tube(new float[] { a[0] + side + 0.4F, y0, a[2] }, new float[] { b[0] + side + 0.4F, y1 + 4.0F, b[2] + (b[2] - a[2]) * 4.0F / (y1 - y0) },
-                    0.5F, 4, Paint.MID);
+        float sr = 0.6F;
+        float[] a = DerrickLayout.ladder(y0), b = DerrickLayout.ladder(DerrickLayout.CROWN_Y);
+        float grab = 5.0F, lean = (b[0] - a[0]) / (DerrickLayout.CROWN_Y - y0), leanU = (b[2] - a[2]) / (DerrickLayout.CROWN_Y - y0);
+        for (float side : new float[] { -half + sr, half - sr }) {
+            float[] top = { b[0] + side + lean * (y1 + grab - DerrickLayout.CROWN_Y), y1 + grab, b[2] + leanU * (y1 + grab - DerrickLayout.CROWN_Y) };
+            tube(new float[] { a[0] + side, y0, a[2] }, top, sr, 4, Paint.MID);
+            box(top[0] - 0.8F, top[1] - 0.4F, top[2] - 0.8F, top[0] + 0.8F, top[1] + 0.4F, top[2] + 0.8F, Paint.MID, Paint.LIT, Paint.SHADE, 0);
         }
         for (float y = y0 + 3.0F; y < y1; y += DerrickLayout.RUNG_STEP) {
             float[] at = DerrickLayout.ladder(y);
-            box(at[0] - half + 0.6F, y, at[2] - 0.35F, at[0] + half - 0.6F, y + 0.7F, at[2] + 0.35F, Paint.FACE, Paint.LIT, Paint.SHADE, 0);
+            box(at[0] - half + 2.0F * sr, y, at[2] - 0.45F, at[0] + half - 2.0F * sr, y + 0.9F, at[2] + 0.45F, Paint.FACE, Paint.LIT, Paint.SHADE, 0);
         }
         // Stand-offs from the leg every 16 px.
         for (float y = y0 + 8.0F; y < y1; y += 16.0F) {
-            float[] at = DerrickLayout.ladder(y);
-            box(at[0] - 0.4F, y, at[2], at[0] + 0.4F, y + 0.8F, at[2] + DerrickLayout.LADDER_OUT - 1.0F, Paint.SHADE, Paint.MID, null, 0);
+            float[] at = DerrickLayout.ladder(y), leg = DerrickLayout.leg(0, y);
+            box(leg[0] - 0.4F, y, at[2] + 0.45F, leg[0] + 0.4F, y + 0.8F, leg[2] - DerrickLayout.LEG_W / 2.0F + 0.5F, Paint.SHADE, Paint.MID, Paint.DARK, 0);
         }
     }
 

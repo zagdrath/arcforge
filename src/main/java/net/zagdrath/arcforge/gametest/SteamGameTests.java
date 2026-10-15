@@ -113,7 +113,7 @@ public final class SteamGameTests {
                 .thenExecute(() -> {
                     helper.assertTrue(SteamGrade.of(target.getGas().getFluid()) == SteamGrade.HIGH_PRESSURE, "Wrong gas arrived: " + target.getGas());
                     helper.assertTrue(helper.getBlockState(conduit).getValue(ActiveConduitBlock.ACTIVE), "The conduit is dark while steam moves");
-                    var flowing = helper.getBlockEntity(conduit, net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity.class).getFlowingGas();
+                    var flowing = helper.getBlockEntity(conduit, net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity.class).getFlowing();
                     helper.assertTrue(SteamGrade.of(flowing) == SteamGrade.HIGH_PRESSURE, "The conduit shows " + flowing + " moving through");
                     helper.assertTrue(helper.getBlockState(fluidConduit).getValue(net.zagdrath.arcforge.block.conduit.ConduitBlock.DOWN)
                             == net.zagdrath.arcforge.conduit.ConnectionMode.NONE, "A fluid conduit connected to a cylinder");
@@ -121,7 +121,7 @@ public final class SteamGameTests {
                 })
                 .thenWaitUntil(() -> helper.assertFalse(helper.getBlockState(conduit).getValue(ActiveConduitBlock.ACTIVE), "The conduit stays lit"))
                 .thenExecute(() -> {
-                    var flowing = helper.getBlockEntity(conduit, net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity.class).getFlowingGas();
+                    var flowing = helper.getBlockEntity(conduit, net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity.class).getFlowing();
                     helper.assertTrue(flowing == net.minecraft.world.level.material.Fluids.EMPTY, "A dark conduit still shows " + flowing);
                 })
                 .thenSucceed();

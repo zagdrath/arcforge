@@ -17,6 +17,8 @@ import net.minecraft.client.renderer.BindGroupLayouts;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Util;
 import net.neoforged.api.distmarker.Dist;
@@ -56,6 +58,14 @@ public final class ArcforgeRenderTypes {
 
     public static RenderType volumeTranslucent(Identifier texture) {
         return VOLUME.apply(texture);
+    }
+
+    // A fluid's contents in sprite, tinted color: a volume (above) when light passes through it (water, the light oils),
+    // but an opaque fluid (crude oil, lava: its texture and tint fully opaque) writes depth like a solid, so the
+    // translucent blocks behind it (glass conduits, other tanks' glass) don't show through it.
+    public static RenderType fluid(TextureAtlasSprite sprite, int color) {
+        return color >>> 24 == 0xFF && sprite.contents().transparency().isOpaque() ? RenderTypes.entityCutout(sprite.atlasLocation())
+                : volumeTranslucent(sprite.atlasLocation());
     }
 
     @SubscribeEvent

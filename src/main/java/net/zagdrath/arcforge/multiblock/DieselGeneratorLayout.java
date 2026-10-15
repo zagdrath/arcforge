@@ -118,6 +118,11 @@ public final class DieselGeneratorLayout {
         return new float[] { engineU0 + 5.0F, back };
     }
 
+    // Where the silencer's outlet stands along u: near its front end.
+    public float outletU() {
+        return silencer()[0] + 3.0F;
+    }
+
     // The aftercooler {x0, y0, u0, x1, y1, u1}: across the V, just ahead of the (first pair of) turbochargers.
     public float[] aftercooler() {
         float u1 = engineU1 - 10.0F;

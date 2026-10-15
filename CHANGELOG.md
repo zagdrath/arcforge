@@ -23,7 +23,7 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 ## [Unreleased]
 
 Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units, a scaling Diesel
-Generator, hydrocracking and Synthetic Rubber, and a retuned oil line; worlds load, but Diesel Generators and Oil
+Generator, hydrocracking and Synthetic Rubber, a retuned oil line, and running sounds and model fixes for the oilfield; worlds load, but Diesel Generators and Oil
 Derricks need their new layers and some refinery lines need a new port, see Upgrading).
 
 ### Added
@@ -104,6 +104,14 @@ Derricks need their new layers and some refinery lines need a new port, see Upgr
 - **Kerosene fuels the Diesel Generator**: 360 FE per mB (378 in the V12, 396 in the V16), on JEI's fuel page.
 - GameTests for the cracking modes, Natural Gas cracking, Light Oil from crude, the sulfur sour crude gives and
   Synthetic Rubber in the Vulcanizer.
+- **The Diesel Generator sounds and smokes.** A running loop (a V8's chug, its pitch and volume following the engine),
+  exhaust smoke from the silencer's outlet (a few puffs at idle, a plume at full speed, heavier and darker below 90%
+  speed), and the outlet's rain flap now lifts with the exhaust and flutters with the firing pulses.
+- **Running sounds for the Oil Derrick, Pumpjack and Distillation Array**: the derrick's drive and grinding rotary
+  table, the Pumpjack's motor hum and creaking beam, and the column's boiling and bubbling, while each runs.
+- **The Pumpjack's ladder can be climbed**, from the ground up to its platform.
+- **Fluid conduits show fluid moving through them**: while a fluid flows, each conduit shows at least a stream of it
+  along the bottom of its bore, even when the network passes all of it straight through (as gas conduits already did).
 
 ### Changed
 
@@ -146,6 +154,31 @@ Derricks need their new layers and some refinery lines need a new port, see Upgr
   an engine house, and a ladder up the front left leg. Its hitbox follows the model: walk on the rig floor and climb the
   ladder to the crown.
 - The Oil Derrick's and Diesel Generator's Handbook pages show the new builds.
+- **The Oil Derrick drills and hoists**: the travelling block feeds slowly down over four seconds with the kelly
+  turning, then the kelly stops and the drawworks hoists it back up in a second, easing in and out (it used to jump
+  back to the top). Its ladder is nearly twice as wide (11 px), with thicker stiles and rungs.
+- **The Flare Stack's flame burns only while it flares**, with no pilot flame, and is much bigger: from a block tall at
+  the least up to three and a half at full burn.
+
+### Fixed
+
+- The Flare Stack's flame drew as a black square: its texture now has a clear background.
+- The Diesel Generator GUI's output (8,192 / 15,000 FE/t) ran into its label; a wide value now shows short (8.2k /
+  15k FE/t), in full on hover.
+- Flickering and see-through spots on the large models:
+  - **Diesel Generator**: the terminal box's lid, the aftercooler's top, the intake manifold's top and the alternator's
+    ends flickered; the turbo exhaust risers' elbows, the radiator core's top, the shroud's ends, the FE cable glands,
+    the filler caps' undersides, a gap under the fuel tank's seam band and the open exhaust outlet could be seen into.
+  - **Pumpjack**: the gearbox's half-round top could be seen through and its belt guard flickered on its side; the
+    walking beam's flanges flickered against its web, the railings' posts against their rails, and a gap ran round
+    the top of the plinth.
+  - **Oil Derrick**: the railings flickered where their posts and corners met, as did the leg caps under the crown and
+    the engine house's roof (the girts ran through it); the front girder hid the stair's steps, and the ladder's stiles
+    were open at the top.
+  - The round ends of horizontal pipes on large models (the Diesel Generator's header tanks, the Derrick's sheaves and
+    drum bearings, the Pumpjack's gearbox) faced inward, so they couldn't be seen from outside.
+- Conduits and other glass behind an opaque fluid (Crude Oil, Sour Crude, Heavy Oil) in a Fluid Reservoir, Fluid Tank
+  or fluid conduit showed through it. Clear fluids still show what's behind them.
 
 ### Upgrading
 

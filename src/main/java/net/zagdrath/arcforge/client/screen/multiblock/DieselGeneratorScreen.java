@@ -63,9 +63,16 @@ public class DieselGeneratorScreen extends MachineScreen<DieselGeneratorMenu> {
 
     @Override
     protected void drawText(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Component.translatable("gui.arcforge.output"), LABEL_X, OUTPUT_Y, ArcforgeGui.LABEL, false);
-        textRight(graphics, Component.translatable("gui.arcforge.diesel_generator.output", ArcforgeGui.grouped(menu.getMade()),
-                ArcforgeGui.grouped(menu.getMaxOutput())), VALUE_RIGHT, OUTPUT_Y, ArcforgeGui.TEXT);
+        Component label = Component.translatable("gui.arcforge.output");
+        graphics.text(font, label, LABEL_X, OUTPUT_Y, ArcforgeGui.LABEL, false);
+        // In full while it fits beside the label, in short (8.2k / 15k) when it doesn't.
+        Component output = Component.translatable("gui.arcforge.diesel_generator.output", ArcforgeGui.grouped(menu.getMade()),
+                ArcforgeGui.grouped(menu.getMaxOutput()));
+        if (font.width(output) > VALUE_RIGHT - LABEL_X - font.width(label) - 4) {
+            output = Component.translatable("gui.arcforge.diesel_generator.output", ArcforgeGui.compact(menu.getMade()),
+                    ArcforgeGui.compact(menu.getMaxOutput()));
+        }
+        textRight(graphics, output, VALUE_RIGHT, OUTPUT_Y, ArcforgeGui.TEXT);
         graphics.text(font, Component.translatable("gui.arcforge.diesel_generator.fuel"), LABEL_X, FUEL_Y, ArcforgeGui.LABEL, false);
         textRight(graphics, Component.translatable("gui.arcforge.mb_per_tick", String.format(Locale.ROOT, "%.2f", menu.getBurned())), VALUE_RIGHT, FUEL_Y,
                 ArcforgeGui.TEXT);
@@ -87,6 +94,10 @@ public class DieselGeneratorScreen extends MachineScreen<DieselGeneratorMenu> {
             if (menu.getFuelFluid() == Fluids.EMPTY) {
                 lines.add(Component.translatable("gui.arcforge.diesel_generator.fuels").withStyle(ChatFormatting.GRAY));
             }
+        } else if (isHovering(LABEL_X, OUTPUT_Y - 1, VALUE_RIGHT - LABEL_X, 10, mouseX, mouseY)) {
+            // The output in full, for when it's shown short.
+            lines.add(Component.translatable("gui.arcforge.diesel_generator.output", ArcforgeGui.grouped(menu.getMade()),
+                    ArcforgeGui.grouped(menu.getMaxOutput())));
         } else if (isHovering(BAR_X, BAR_Y - 2, BAR_W, BAR_H + 4, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.diesel_generator.speed", Math.round(menu.getSpeed() * 100)));
         } else if (isHovering(LED_X, STATUS_Y - 1, VALUE_RIGHT - LED_X, 10, mouseX, mouseY)) {

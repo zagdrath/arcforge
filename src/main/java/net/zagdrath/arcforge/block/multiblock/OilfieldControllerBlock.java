@@ -47,6 +47,7 @@ import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.multiblock.PlantKind;
 import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.sound.MachineSounds;
 
 // The controller of an oil or refinery fixed-size multiblock (see PlantKind): the Oil Derrick's (in the middle of one
 // side of the rig's floor, its panel facing out), the Pumpjack's (the middle of the skid's far end, facing away from
@@ -83,7 +84,15 @@ public class OilfieldControllerBlock extends BaseEntityBlock implements Oilfield
     @Override
     public <T extends BlockEntity> @Nullable BlockEntityTicker<T> getTicker(Level level, BlockState state, BlockEntityType<T> type) {
         if (!(level instanceof ServerLevel serverLevel)) {
-            return null;
+            // Clients tick the Diesel Generator for its running sound and exhaust smoke (see
+            // DieselGeneratorBlockEntity.clientTick), and the Oil Derrick and Pumpjack for their running loops.
+            return switch (kind) {
+                case DIESEL_GENERATOR -> createTickerHelper(type, ModBlockEntityTypes.DIESEL_GENERATOR.get(),
+                        (innerLevel, pos, blockState, generator) -> generator.clientTick());
+                case DERRICK -> createTickerHelper(type, ModBlockEntityTypes.OIL_DERRICK.get(), MachineSounds.clientTicker());
+                case PUMPJACK -> createTickerHelper(type, ModBlockEntityTypes.PUMPJACK.get(), MachineSounds.clientTicker());
+                default -> null;
+            };
         }
         return switch (kind) {
             case DERRICK -> createTickerHelper(type, ModBlockEntityTypes.OIL_DERRICK.get(), (innerLevel, pos, blockState, rig) -> rig.serverTick(serverLevel));

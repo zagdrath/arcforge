@@ -60,8 +60,12 @@ public final class PumpjackMesh extends ModelMesh {
         }
         float[] p = PumpjackLayout.PLINTH;
         box(p[0], p[1], p[2], p[3], p[4], p[5], Paint.PLATE, Paint.DECK, Paint.FOOTING, 0);
-        // A lip round the plinth's top edge.
-        box(p[0] - 0.5F, p[4] - 1.0F, p[2] - 0.5F, p[3] + 0.5F, p[4], p[5] + 0.5F, Paint.MID, null, Paint.DARK, SKIP_UP | SKIP_DOWN);
+        // A lip round the plinth's top edge: four strips proud of its sides, closed on top.
+        float ly = p[4] - 1.0F;
+        box(p[0] - 0.5F, ly, p[2] - 0.5F, p[0], p[4], p[5] + 0.5F, Paint.MID, null, Paint.DARK, SKIP_POS_X);
+        box(p[3], ly, p[2] - 0.5F, p[3] + 0.5F, p[4], p[5] + 0.5F, Paint.MID, null, Paint.DARK, SKIP_NEG_X);
+        box(p[0], ly, p[2] - 0.5F, p[3], p[4], p[2], Paint.MID, null, Paint.DARK, SKIP_POS_U | SKIP_NEG_X | SKIP_POS_X);
+        box(p[0], ly, p[5], p[3], p[4], p[5] + 0.5F, Paint.MID, null, Paint.DARK, SKIP_NEG_U | SKIP_NEG_X | SKIP_POS_X);
         solidBoxes.addAll(PumpjackLayout.solids());
     }
 
@@ -125,7 +129,8 @@ public final class PumpjackMesh extends ModelMesh {
         int posts = Math.max(1, (int) Math.ceil((u1 - u0) / 7.0F));
         for (int i = 0; i <= posts; i++) {
             float u = u0 + Math.min(u1 - u0 - 1.0F, (u1 - u0) * i / posts);
-            box(x - 0.5F, y, u, x + 0.5F, y + rail - 1.0F, u + 1.0F, Paint.FACE, null, null, SKIP_UP | SKIP_DOWN);
+            // A little inside the rails, so their faces don't meet in one plane.
+            box(x - 0.4F, y, u + 0.1F, x + 0.4F, y + rail - 1.0F, u + 0.9F, Paint.FACE, null, null, SKIP_UP | SKIP_DOWN);
         }
     }
 
@@ -134,9 +139,11 @@ public final class PumpjackMesh extends ModelMesh {
     private void gearbox() {
         float[] g = PumpjackLayout.GEARBOX, m = PumpjackLayout.MOTOR, b = PumpjackLayout.GUARD;
         float cu = PumpjackLayout.CRANK_U, cy = PumpjackLayout.CRANK_Y;
-        box(g[0], g[1], g[2], g[3], g[4], g[5], Paint.PLATE, null, Paint.FOOTING, SKIP_UP);
+        // Closed on top: the half-round top is narrower than the box at its foot.
+        box(g[0], g[1], g[2], g[3], g[4], g[5], Paint.PLATE, Paint.PLAIN, Paint.FOOTING, 0);
         box(g[0] - 1.0F, g[1], g[2] - 1.0F, g[3] + 1.0F, g[1] + 1.5F, g[5] + 1.0F, Paint.MID, Paint.PLAIN, null, SKIP_DOWN);
-        prismX(cu, PumpjackLayout.GEARBOX_TOP, g[0], g[3], PumpjackLayout.GEARBOX_ROUND, Paint.BANDED, Paint.PLAIN);
+        // Its ends a little in from the box's sides, so they don't share a plane.
+        prismX(cu, PumpjackLayout.GEARBOX_TOP, g[0] + 0.3F, g[3] - 0.3F, PumpjackLayout.GEARBOX_ROUND, Paint.BANDED, Paint.PLAIN);
         // The split line round the housing at the shaft, and the bearing caps either side.
         prismX(cu, cy, g[0] - 1.0F, g[3] + 1.0F, 3.0F, Paint.BANDED, Paint.PLAIN);
         prismX(cu, cy, PumpjackLayout.CRANK_X - 2.0F, PumpjackLayout.WIDTH - PumpjackLayout.CRANK_X + 2.0F, 1.6F, Paint.BANDED, Paint.MID);
@@ -273,7 +280,9 @@ public final class PumpjackMesh extends ModelMesh {
     private void beam(double phi) {
         turnAbout(PY, PU, phi);
         float h = PumpjackLayout.BEAM_HALF, front = PumpjackLayout.BEAM_FRONT - 2.0F;
-        box(CX - h, PY, front, CX + h, PY + PumpjackLayout.BEAM_DEPTH, PumpjackLayout.BEAM_BACK, Paint.PLAIN, Paint.MID, Paint.SHADE, SKIP_NEG_U | SKIP_UP | SKIP_DOWN);
+        // The web between the flanges.
+        box(CX - h, PY + 1.0F, front, CX + h, PY + PumpjackLayout.BEAM_DEPTH - 1.0F, PumpjackLayout.BEAM_BACK, Paint.PLAIN, Paint.MID, Paint.SHADE,
+                SKIP_NEG_U | SKIP_UP | SKIP_DOWN);
         // Flanges along the top and bottom of the girder.
         box(CX - h - 1.0F, PY + PumpjackLayout.BEAM_DEPTH - 1.0F, front, CX + h + 1.0F, PY + PumpjackLayout.BEAM_DEPTH,
                 PumpjackLayout.BEAM_BACK, Paint.MID, Paint.STRAP, Paint.PLAIN, SKIP_NEG_U);

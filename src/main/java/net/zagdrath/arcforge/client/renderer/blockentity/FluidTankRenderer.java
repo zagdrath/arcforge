@@ -70,7 +70,7 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
             return;
         }
         float[] box = fluidBox(state.fill, state.gaseous);
-        collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(sprite.atlasLocation()),
+        collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.fluid(sprite, state.color),
                 (pose, buffer) -> FluidBoxes.box(pose, buffer, sprite, state.color, state.light, box[0], box[1], box[2], box[3], box[4], box[5]));
     }
 

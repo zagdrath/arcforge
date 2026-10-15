@@ -48,6 +48,8 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
     private static final int GAS_MAX_ALPHA = 200;
     // Gas flowing through a conduit that holds none of it is drawn as if it were this full, so it can be seen.
     private static final float GAS_FLOWING_SHARE = 0.4F;
+    // The least a fluid conduit shows filled while fluid moves through it: a stream along the bottom of the bore.
+    private static final float FLUID_FLOWING_FILL = 0.25F;
     // Fluid cross-section inside the 6px pipe, in 1/16 block units.
     private static final float LO = 6.0F / 16.0F, HI = 10.0F / 16.0F, SPAN = HI - LO;
     private static final float CORE_LO = 6.0F / 16.0F, CORE_HI = 10.0F / 16.0F;
@@ -85,9 +87,9 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
         state.fluidSprite = null;
         FluidStack fluid = conduit.getFluid();
         boolean gas = conduit.getConduitType() == ConduitType.GAS;
-        boolean flowing = gas && conduit.getFlowingGas() != Fluids.EMPTY;
+        boolean flowing = conduit.getFlowing() != Fluids.EMPTY;
         if (fluid.isEmpty() && flowing) {
-            fluid = new FluidStack(conduit.getFlowingGas(), 1);
+            fluid = new FluidStack(conduit.getFlowing(), 1);
         }
         if (!fluid.isEmpty()) {
             var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.getFluid().defaultFluidState());
@@ -107,6 +109,9 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
                 state.fill = 1.0F;
             } else {
                 state.fill = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.FLUID_CAPACITY_PER_CONDUIT);
+                if (flowing) {
+                    state.fill = Math.max(state.fill, FLUID_FLOWING_FILL);
+                }
             }
         }
 
@@ -134,7 +139,7 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
     @Override
     public void submit(ConduitRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (state.fluidSprite != null && state.fill > 0.0F) {
-            collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(state.fluidSprite.atlasLocation()),
+            collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.fluid(state.fluidSprite, state.fluidColor),
                     (pose, buffer) -> drawFluid(state, pose, buffer));
         }
         for (ConduitRenderState.Item item : state.items) {

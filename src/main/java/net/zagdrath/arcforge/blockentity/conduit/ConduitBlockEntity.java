@@ -106,8 +106,8 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
     // Thermal conduits: the temperature (°C) of the heat held, so a rebuilt network remembers it.
     private int heatTemperature = HeatBuffer.AMBIENT_CELSIUS;
     private FluidStack fluid = FluidStack.EMPTY;
-    // Pressurized conduits: the gas moving through while the network is lit, drawn even when this conduit's share of
-    // the tank is empty (a fast network can pass all its gas straight through in a tick). EMPTY when idle.
+    // Fluid and Pressurized conduits: the fluid or gas moving through, drawn even when this conduit's share of the tank is
+    // empty (a fast network can pass all of it straight through in a tick). EMPTY when idle.
     private Fluid flowingGas = Fluids.EMPTY;
     private float itemSpeed;
     // Queued with the network manager to send contents to clients; syncNow: without waiting for CONTENTS_SYNC_INTERVAL.
@@ -439,13 +439,13 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         }
     }
 
-    public Fluid getFlowingGas() {
+    public Fluid getFlowing() {
         return flowingGas;
     }
 
-    public void setFlowingGas(Fluid gas) {
-        if (gas != flowingGas) {
-            flowingGas = gas;
+    public void setFlowing(Fluid moving) {
+        if (moving != flowingGas) {
+            flowingGas = moving;
             markContentsChanged(true);
         }
     }

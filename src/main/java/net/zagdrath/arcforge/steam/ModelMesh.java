@@ -1256,22 +1256,14 @@ public abstract class ModelMesh {
             return;
         }
         double step = 2.0 * Math.PI / PIPE_SIDES, start = Math.PI / PIPE_SIDES;
-        // A large model's cap is plated as one surface across its wedges.
-        Plating plating = modules ? plating(cap, 2.0F * r, 2.0F * r) : null;
-        PlateFrame capFar = null, capNear = null;
-        if (plating != null) {
-            List<float[]> far = new ArrayList<>(), near = new ArrayList<>();
-            for (int f = PIPE_SIDES - 1; f >= 0; f--) {
-                double a = start + f * step;
-                far.add(new float[] { x1, y + (float) Math.cos(a) * r, u + (float) Math.sin(a) * r });
-            }
-            for (int f = 0; f < PIPE_SIDES; f++) {
-                double a = start + f * step;
-                near.add(new float[] { x0, y + (float) Math.cos(a) * r, u + (float) Math.sin(a) * r });
-            }
-            capFar = plateFrame(far, plating);
-            capNear = plateFrame(near, plating);
+        // A large model's cap is plated as one surface across its wedges, facing out of each end (roundFace winds it).
+        List<float[]> far = new ArrayList<>(), near = new ArrayList<>();
+        for (int f = 0; f < PIPE_SIDES; f++) {
+            double a = start + f * step;
+            far.add(new float[] { x1, y + (float) Math.cos(a) * r, u + (float) Math.sin(a) * r });
+            near.add(new float[] { x0, y + (float) Math.cos(a) * r, u + (float) Math.sin(a) * r });
         }
+        PlateFrame capFar = roundFace(far, new float[] { 1, 0, 0 }, cap, 2.0F * r), capNear = roundFace(near, new float[] { -1, 0, 0 }, cap, 2.0F * r);
         for (int f = 0; f < PIPE_SIDES; f++) {
             double a0 = start + f * step, a1 = a0 + step;
             float[] p0 = { x0, y + (float) Math.cos(a0) * r, u + (float) Math.sin(a0) * r };

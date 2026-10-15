@@ -185,6 +185,37 @@ public class PumpjackBlockEntity extends MachineBlockEntity implements ShapedPla
         return unit != null ? frame(unit) : null;
     }
 
+    // Where a player climbs the ladder (PumpjackLayout.climbBoxes), in world blocks from the unit's minimum corner, by
+    // the way the pumpjack faces.
+    private static final java.util.Map<Direction, List<AABB>> CLIMB = new java.util.EnumMap<>(Direction.class);
+
+    // Whether box (a player's) is on the formed pumpjack's ladder (see DerrickLadders).
+    public boolean onLadder(AABB box) {
+        OilfieldStructures.Unit shown = unit;
+        if (shown == null) {
+            return false;
+        }
+        List<AABB> zones;
+        synchronized (CLIMB) {
+            zones = CLIMB.computeIfAbsent(shown.back(), back -> {
+                ModelFrame frame = frame(shown);
+                List<AABB> out = new java.util.ArrayList<>();
+                for (float[] b : net.zagdrath.arcforge.multiblock.PumpjackLayout.climbBoxes()) {
+                    float[] p = frame.worldPoint(b[0], b[1], b[2]), q = frame.worldPoint(b[3], b[4], b[5]);
+                    out.add(new AABB(p[0] / 16.0, p[1] / 16.0, p[2] / 16.0, q[0] / 16.0, q[1] / 16.0, q[2] / 16.0));
+                }
+                return out;
+            });
+        }
+        AABB local = box.move(-shown.min().getX(), -shown.min().getY(), -shown.min().getZ());
+        for (AABB zone : zones) {
+            if (zone.intersects(local)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     // The blocks' shapes, by the way the pumpjack faces (see PlantHitbox).
     private static final java.util.Map<Direction, net.minecraft.world.phys.shapes.VoxelShape[]> SHAPES = new java.util.EnumMap<>(Direction.class);
 

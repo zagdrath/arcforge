@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.jspecify.annotations.Nullable;
 
@@ -24,6 +25,7 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -45,6 +47,7 @@ import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.DieselGeneratorMenu;
 import net.zagdrath.arcforge.multiblock.DieselEngine;
 import net.zagdrath.arcforge.multiblock.DieselGeneratorLayout;
+import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.PlantKind;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -88,6 +91,9 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
     // Client side: the flywheel's angle (degrees) and when it was last moved on.
     private float angle;
     private float lastFrame = -1.0F;
+    // Client side: the rain flap's lift (degrees) and where it flutters to next.
+    private float flap;
+    private float lastFlapFrame = -1.0F;
     // The engine the tank and buffer are sized for: the one it was last formed as, kept while it's broken so a
     // half-built or damaged V16 doesn't lose what it holds.
     private DieselEngine sized = DieselEngine.V8;
@@ -304,6 +310,39 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
         }
         lastFrame = now;
         return angle;
+    }
+
+    // Client side: the outlet's rain flap this frame (degrees up from shut): lying shut while it stands, lifted as far as
+    // the exhaust pushes it (30 to 70 degrees with its speed) and fluttering with the firing pulses; it eases up and falls
+    // back.
+    public float flap(float now) {
+        float speed = getShownSpeed();
+        float target = speed > 0.0F ? 30.0F + 40.0F * speed + speed * (5.0F * (float) Math.sin(now * 2.3F) + 3.0F * (float) Math.sin(now * 5.9F)) : 0.0F;
+        float step = lastFlapFrame >= 0.0F ? Math.max(0.0F, Math.min(20.0F, now - lastFlapFrame)) : 20.0F;
+        lastFlapFrame = now;
+        flap += (target - flap) * Math.min(1.0F, step * (target > flap ? 0.35F : 0.15F));
+        return flap;
+    }
+
+    // The client sets the hook (to DieselGeneratorSound.clientTick: its running sound and exhaust smoke), so this class
+    // never loads client code on a server.
+    public static Consumer<DieselGeneratorBlockEntity> clientHook = generator -> {};
+
+    public void clientTick() {
+        if (getBox() != null) {
+            clientHook.accept(this);
+        }
+    }
+
+    // The middle of the exhaust outlet's mouth, in the world; null while it isn't formed.
+    public @Nullable Vec3 exhaustOutlet() {
+        var box = getBox();
+        if (box == null) {
+            return null;
+        }
+        ModelFrame frame = frame(box);
+        float[] p = frame.worldPoint(DieselGeneratorLayout.CX, DieselGeneratorLayout.OUTLET_TOP, DieselGeneratorLayout.of(getEngine()).outletU());
+        return Vec3.atLowerCornerOf(box.min()).add(p[0] / 16.0, p[1] / 16.0, p[2] / 16.0);
     }
 
     // Client side: how fast it runs (0 to 1).

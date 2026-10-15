@@ -223,5 +223,41 @@
       }
     ],
     "subtitle": "subtitles.arcforge.gas_turbine_array_flameout"
+  },
+  "diesel_generator_run": {
+    "sounds": [
+      {
+        "name": "arcforge:diesel_generator_run",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.diesel_generator_run"
+  },
+  "oil_derrick_run": {
+    "sounds": [
+      {
+        "name": "arcforge:oil_derrick_run",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.oil_derrick_run"
+  },
+  "pumpjack_run": {
+    "sounds": [
+      {
+        "name": "arcforge:pumpjack_run",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.pumpjack_run"
+  },
+  "distillation_array_run": {
+    "sounds": [
+      {
+        "name": "arcforge:distillation_array_run",
+        "stream": false
+      }
+    ],
+    "subtitle": "subtitles.arcforge.distillation_array_run"
   }
 }

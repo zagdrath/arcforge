@@ -39,12 +39,13 @@ public final class DerrickLayout {
     public static final float[] DRAWWORKS = { 11.0F, 35.0F, 33.0F, 45.0F };
     public static final float DRUM_Y = 17.5F, DRUM_U = 39.0F, DRUM_R = 4.0F, DRUM_FLANGE_R = 6.0F, DRUM_X0 = 14.0F, DRUM_X1 = 32.0F;
     // The engine house {x0, y0, u0, x1, y1, u1}, beside the drawworks at the back right.
-    public static final float[] ENGINE_HOUSE = { 36.5F, DECK_TOP, 29.0F, 43.0F, 25.0F, 43.0F };
+    // (under the bottom girts).
+    public static final float[] ENGINE_HOUSE = { 36.5F, DECK_TOP, 29.0F, 43.0F, 22.0F, 43.0F };
     // The crown block: its sheaves along x on a frame over the platform's middle; the gin pole's top.
     public static final float SHEAVE_Y = 135.0F, SHEAVE_R = 2.5F, GIN_TOP = 143.0F;
-    // The ladder: on the front left leg, LADDER_OUT in front of it, LADDER_W wide (stile to stile), a rung every
-    // RUNG_STEP.
-    public static final float LADDER_OUT = 2.5F, LADDER_W = 6.0F, RUNG_STEP = 4.0F;
+    // The ladder: on the front left leg, LADDER_OUT in front of it and LADDER_SHIFT to its right (so it stays over the
+    // deck at the foot), LADDER_W wide (stile to stile), a rung every RUNG_STEP.
+    public static final float LADDER_OUT = 2.5F, LADDER_SHIFT = 3.0F, LADDER_W = 11.0F, RUNG_STEP = 4.0F;
     // The drill string's run: the travelling block from TRAVEL_TOP (hoist 0) to TRAVEL_BOTTOM (hoist 1); the lines hang
     // from under the crown.
     public static final float TRAVEL_TOP = 112.0F, TRAVEL_BOTTOM = 30.0F, LINES_TOP = CROWN_Y;
@@ -76,7 +77,7 @@ public final class DerrickLayout {
     // The ladder's middle at height y: in front of the front left leg.
     public static float[] ladder(float y) {
         float[] leg = leg(0, y);
-        return new float[] { leg[0], y, leg[2] - LADDER_OUT };
+        return new float[] { leg[0] + LADDER_SHIFT, y, leg[2] - LADDER_OUT };
     }
 
     // The fast line: from the drum's top to the crown block.
@@ -89,7 +90,7 @@ public final class DerrickLayout {
         List<int[]> blocks = new ArrayList<>();
         for (float y = DECK_TOP; y <= CROWN_Y + CROWN_DECK; y += 1.0F) {
             float[] at = ladder(Math.min(y, CROWN_Y));
-            for (float dx : new float[] { -1.0F, 1.0F }) {
+            for (float dx : new float[] { -LADDER_W / 2.0F, 0.0F, LADDER_W / 2.0F }) {
                 int[] block = { (int) Math.floor((at[0] + dx) / 16.0F), (int) Math.floor(y / 16.0F), (int) Math.floor(Math.max(0.0F, at[2]) / 16.0F) };
                 if (blocks.stream().noneMatch(b -> b[0] == block[0] && b[1] == block[1] && b[2] == block[2])) {
                     blocks.add(block);

@@ -13,6 +13,8 @@ import java.util.function.Predicate;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -30,12 +32,19 @@ import net.zagdrath.arcforge.steam.Gases;
 // Both are shared evenly among the machines (see ConduitNetwork.shareOut).
 // Conduit Filters are checked live: sources and sinks whose filter rejects the fluid are skipped. The network
 // still carries one fluid at a time, so a fluid no sink accepts stays in it until one does.
+// While fluid moves through, every conduit shows it (ConduitBlockEntity.getFlowing), even when none stays in them; it
+// clears FLOW_IDLE_TICKS after the flow stops. (GasConduitNetwork does the same its own way, lighting the conduits.)
 public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidResource>> {
+    private static final int FLOW_IDLE_TICKS = 10;
+
     private FluidResource fluid = FluidResource.EMPTY;
     private int amount;
     private final int capacity;
     private final int rate;
     private final Predicate<FluidResource> accepts;
+    // The fluid the conduits show moving through, and when it last moved.
+    private Fluid shownFlowing = Fluids.EMPTY;
+    private long lastFlowTick;
 
     public FluidConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier) {
         this(level, members, memberSet, tier, ConduitTier.FLUID_CAPACITY_PER_CONDUIT, tier.fluidPerTick(), resource -> !Gases.isGas(resource));
@@ -80,6 +89,14 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
             }
         });
         distribute();
+        // A rebuilt network carries on showing what its conduits showed, until it's seen to stop.
+        lastFlowTick = level.getGameTime();
+        for (ConduitBlockEntity conduit : conduits) {
+            if (conduit != null && conduit.getFlowing() != Fluids.EMPTY) {
+                shownFlowing = conduit.getFlowing();
+                break;
+            }
+        }
     }
 
     @Override
@@ -99,8 +116,27 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
         }
     }
 
-    // Called every tick with how much was pulled in and pushed out.
-    protected void onMoved(int moved, long gameTime) {}
+    // Called every tick with how much was pulled in and pushed out (before an emptied tank forgets its fluid).
+    protected void onMoved(int moved, long gameTime) {
+        if (moved > 0 && !fluid.isEmpty()) {
+            lastFlowTick = gameTime;
+            showFlowing(fluid.getFluid());
+        } else if (shownFlowing != Fluids.EMPTY && gameTime - lastFlowTick >= FLOW_IDLE_TICKS) {
+            showFlowing(Fluids.EMPTY);
+        }
+    }
+
+    private void showFlowing(Fluid moving) {
+        if (moving == shownFlowing) {
+            return;
+        }
+        shownFlowing = moving;
+        for (ConduitBlockEntity conduit : conduits) {
+            if (conduit != null) {
+                conduit.setFlowing(moving);
+            }
+        }
+    }
 
     // Draws up to the rate evenly from the sources, taken in turn (see shareOut).
     private int pull() {

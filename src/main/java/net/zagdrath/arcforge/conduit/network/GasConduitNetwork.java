@@ -45,7 +45,7 @@ public class GasConduitNetwork extends FluidConduitNetwork {
         for (BlockPos pos : members) {
             ActiveConduitBlock.setActive(level, pos, active);
             if (active && flowing == Fluids.EMPTY && level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
-                flowing = conduit.getFlowingGas();
+                flowing = conduit.getFlowing();
             }
         }
         showFlowing(active ? flowing : Fluids.EMPTY, true);
@@ -85,7 +85,7 @@ public class GasConduitNetwork extends FluidConduitNetwork {
         flowing = gas;
         for (ConduitBlockEntity conduit : conduits) {
             if (conduit != null) {
-                conduit.setFlowingGas(gas);
+                conduit.setFlowing(gas);
             }
         }
     }

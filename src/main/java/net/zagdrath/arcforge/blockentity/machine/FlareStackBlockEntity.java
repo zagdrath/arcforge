@@ -38,7 +38,7 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 // The Flare Stack: any gas pushed into it (through any face but the top: a Pressurized Conduit, a machine's gas output
 // or a pump) goes into its tank and burns off, up to flareStack.burnRate mB/t, so a refinery whose gas has nowhere else
 // to go never stalls. It burns whatever it's given, fuel or not, and gives nothing back. Its flame (see
-// FlareStackRenderer) is as tall as it burns; a small pilot flame always burns at the tip.
+// FlareStackRenderer) burns only while it flares, as tall as it burns.
 public class FlareStackBlockEntity extends BlockEntity implements ConduitConnectable {
     // The flame's size is synced to clients when it moves by this much.
     private static final float FLAME_STEP = 0.05F;
@@ -108,7 +108,7 @@ public class FlareStackBlockEntity extends BlockEntity implements ConduitConnect
 
     // The stack and its flame, so they aren't culled when the base is off screen.
     public AABB getRenderBox() {
-        return new AABB(worldPosition).expandTowards(0.0, 6.0, 0.0).inflate(0.5, 0.0, 0.5);
+        return new AABB(worldPosition).expandTowards(0.0, 9.0, 0.0).inflate(1.0, 0.0, 1.0);
     }
 
     @Override

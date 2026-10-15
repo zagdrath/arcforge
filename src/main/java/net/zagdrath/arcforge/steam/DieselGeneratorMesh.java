@@ -58,21 +58,25 @@ public final class DieselGeneratorMesh extends ModelMesh {
     private void base() {
         float length = layout.length, top = DieselGeneratorLayout.TANK_TOP, rail = DieselGeneratorLayout.RAIL_TOP;
         box(2.0F, 0.0F, 1.0F, 46.0F, top, length - 1.0F, Paint.PLAIN, Paint.PLAIN, Paint.FOOTING, 0);
-        // A welded seam band round the tank's top edge.
-        box(1.6F, top - 1.0F, 0.6F, 46.4F, top, length - 0.6F, Paint.MID, null, Paint.DARK, SKIP_UP);
+        // A welded seam band round the tank's top edge: four strips proud of its sides, closed on top.
+        box(1.6F, top - 1.0F, 0.6F, 2.0F, top, length - 0.6F, Paint.MID, null, Paint.DARK, SKIP_POS_X);
+        box(46.0F, top - 1.0F, 0.6F, 46.4F, top, length - 0.6F, Paint.MID, null, Paint.DARK, SKIP_NEG_X);
+        box(2.0F, top - 1.0F, 0.6F, 46.0F, top, 1.0F, Paint.MID, null, Paint.DARK, SKIP_POS_U | SKIP_NEG_X | SKIP_POS_X);
+        box(2.0F, top - 1.0F, length - 1.0F, 46.0F, top, length - 0.6F, Paint.MID, null, Paint.DARK, SKIP_NEG_U | SKIP_NEG_X | SKIP_POS_X);
         solidBoxes.add(new float[] { 2.0F, 0.0F, 1.0F, 46.0F, top, length - 1.0F });
         moduleOrigin = new float[] { 0, top, 0 };
         for (float[] r : DieselGeneratorLayout.RAILS) {
-            box(r[0], top, 0.0F, r[1], rail, length, Paint.STRAP, Paint.STRAP, null, SKIP_DOWN);
+            box(r[0], top, 0.0F, r[1], rail, length, Paint.STRAP, Paint.STRAP, null, 0);
             solidBoxes.add(new float[] { r[0], top, 0.0F, r[1], rail, length });
         }
         moduleOrigin = new float[] { 0, 0, 0 };
         // The filler neck at the right front corner, and the level gauge on the left side.
         uprightTube(44.0F, 3.0F, new float[][] { { top, 1.0F }, { top + 3.0F, 1.0F } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, null);
         uprightTube(44.0F, 3.0F, new float[][] { { top + 3.0F, 1.6F }, { top + 4.0F, 1.6F } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, Paint.MID);
+        disc(new float[] { 44.0F, top + 3.0F, 3.0F }, new float[] { 0, -1, 0 }, 1.6F, PIPE_SIDES, Paint.SHADE, Paint.SHADE);
         float gu = layout.length / 2.0F;
-        box(1.4F, 1.5F, gu - 4.0F, 2.0F, top - 1.5F, gu + 4.0F, Paint.LIT, null, null, SKIP_POS_X | SKIP_UP | SKIP_DOWN);
-        box(1.2F, 2.5F, gu - 3.0F, 1.5F, top - 2.5F, gu + 3.0F, Paint.DEEP, null, null, SKIP_POS_X | SKIP_UP | SKIP_DOWN);
+        box(1.4F, 1.5F, gu - 4.0F, 2.0F, top - 1.5F, gu + 4.0F, Paint.LIT, null, null, SKIP_POS_X);
+        box(1.2F, 2.5F, gu - 3.0F, 1.5F, top - 2.5F, gu + 3.0F, Paint.DEEP, null, null, SKIP_POS_X);
         // The engine's mounts: brackets from the crankcase's sides down to the rails.
         float[][] rails = DieselGeneratorLayout.RAILS;
         for (float u : new float[] { layout.engineU0 + 4.0F, layout.engineU1 - 4.0F }) {
@@ -92,8 +96,8 @@ public final class DieselGeneratorMesh extends ModelMesh {
     private void radiator() {
         float[] r = DieselGeneratorLayout.RADIATOR;
         float x0 = r[0], y0 = r[1], u0 = r[2], x1 = r[3], y1 = r[4], u1 = r[5];
-        // The core: fins on its front, plates on its back.
-        box(x0 + 2.0F, y0 + 4.0F, u0 + 1.0F, x1 - 2.0F, y1 - 2.0F, u1, Paint.PLAIN, null, null, SKIP_NEG_U | SKIP_UP | SKIP_DOWN);
+        // The core: fins on its front, plates on its back, closed top and bottom (the header tanks are narrower than it).
+        box(x0 + 2.0F, y0 + 4.0F, u0 + 1.0F, x1 - 2.0F, y1 - 2.0F, u1, Paint.PLAIN, null, null, SKIP_NEG_U);
         face(new float[] { x1 - 2.0F, y0 + 4.0F, u0 + 1.0F }, new float[] { -1, 0, 0 }, new float[] { 0, 1, 0 }, x1 - x0 - 4.0F, y1 - y0 - 6.0F, Paint.GRATE,
                 false);
         // The side channels.
@@ -108,6 +112,7 @@ public final class DieselGeneratorMesh extends ModelMesh {
         float cu = (u0 + u1) / 2.0F + 0.5F;
         uprightTube(x1 - 8.0F, cu, new float[][] { { y1 + 3.5F, 0.9F }, { y1 + 5.0F, 0.9F } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, null);
         uprightTube(x1 - 8.0F, cu, new float[][] { { y1 + 5.0F, 1.7F }, { y1 + 6.0F, 1.7F } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, Paint.LIT);
+        disc(new float[] { x1 - 8.0F, y1 + 5.0F, cu }, new float[] { 0, -1, 0 }, 1.7F, PIPE_SIDES, Paint.SHADE, Paint.SHADE);
         // The shroud: a short drum round the fan, plated outside and in.
         float fr = DieselGeneratorLayout.FAN_R + 1.0F, s0 = DieselGeneratorLayout.SHROUD_U0, s1 = DieselGeneratorLayout.SHROUD_U1;
         tube(new float[] { CX, SY, s0 }, new float[] { CX, SY, s1 }, fr, 20, Paint.BANDED);
@@ -119,7 +124,9 @@ public final class DieselGeneratorMesh extends ModelMesh {
                     new float[] { CX + c0, SY + d0, s1 }, new float[] { -(float) Math.cos(mid), -(float) Math.sin(mid), 0 }, Paint.SHADE);
         }
         // The shroud's back flange and the guard: three rings and eight spokes.
-        ring(s1, fr + 0.8F, fr, 20);
+        ring(s1, fr + 0.8F, fr - 0.4F, 20);
+        ringU(CX, SY, s1, fr + 0.8F, fr, 20, 0.0, false, Paint.MID, Paint.SHADE);
+        ringU(CX, SY, s0, fr, fr - 0.4F, 20, 0.0, false, Paint.MID, Paint.SHADE);
         float gu = s1 - 0.4F;
         for (float rr : new float[] { 4.0F, 7.5F, 11.0F }) {
             for (int i = 0; i < 16; i++) {
@@ -155,7 +162,8 @@ public final class DieselGeneratorMesh extends ModelMesh {
                 cy1 = DieselGeneratorLayout.CASE_Y1;
         box(DieselGeneratorLayout.PAN_X0, DieselGeneratorLayout.PAN_Y0, u0 + 2.0F, DieselGeneratorLayout.PAN_X1, cy0, u1 - 2.0F, Paint.PLAIN, null,
                 Paint.DARK, SKIP_UP);
-        box(cx0, cy0, u0, cx1, cy1, u1, Paint.PLAIN, Paint.PLAIN, Paint.SHADE, 0);
+        // Its bottom is the pan rail's (below), which covers it.
+        box(cx0, cy0, u0, cx1, cy1, u1, Paint.PLAIN, Paint.PLAIN, null, SKIP_DOWN);
         solidBoxes.add(new float[] { cx0, cy0, u0, cx1, cy1, u1 });
         // The pan rail: a flange where the pan meets the crankcase.
         box(cx0 - 0.5F, cy0, u0 - 0.5F, cx1 + 0.5F, cy0 + 1.0F, u1 + 0.5F, Paint.MID, Paint.LIT, Paint.DARK, 0);
@@ -167,7 +175,7 @@ public final class DieselGeneratorMesh extends ModelMesh {
         }
         // The intake manifold down the middle of the V, with a runner to each pair of cylinders.
         float[] in = DieselGeneratorLayout.INTAKE;
-        box(in[0], in[1], u0 + 1.0F, in[2], in[3], u1 - 1.0F, Paint.PLAIN, Paint.PLAIN, null, SKIP_DOWN);
+        box(in[0], in[1], u0 + 1.0F, in[2], in[3] - 1.0F, u1 - 1.0F, Paint.PLAIN, null, null, SKIP_DOWN | SKIP_UP);
         box(in[0] - 0.4F, in[3] - 1.0F, u0 + 0.6F, in[2] + 0.4F, in[3], u1 - 0.6F, Paint.MID, Paint.LIT, Paint.DARK, 0);
         solidBoxes.add(new float[] { in[0], in[1], u0 + 1.0F, in[2], in[3], u1 - 1.0F });
     }
@@ -230,7 +238,7 @@ public final class DieselGeneratorMesh extends ModelMesh {
     private void turbochargers() {
         float tr = DieselGeneratorLayout.TURBO_R, ty = DieselGeneratorLayout.TURBO_Y, tl = DieselGeneratorLayout.TURBO_LENGTH;
         float[] ac = layout.aftercooler();
-        box(ac[0], ac[1], ac[2], ac[3], ac[4], ac[5], Paint.PLATE, Paint.PLAIN, null, SKIP_DOWN);
+        box(ac[0], ac[1], ac[2], ac[3], ac[4] - 1.0F, ac[5], Paint.PLATE, null, null, SKIP_DOWN | SKIP_UP);
         box(ac[0] - 0.5F, ac[4] - 1.0F, ac[2] - 0.5F, ac[3] + 0.5F, ac[4], ac[5] + 0.5F, Paint.MID, Paint.LIT, Paint.DARK, 0);
         solidBoxes.add(ac);
         float sy = DieselGeneratorLayout.SILENCER_Y, sr = DieselGeneratorLayout.SILENCER_R;
@@ -246,12 +254,14 @@ public final class DieselGeneratorMesh extends ModelMesh {
             float[] m = manifold(side);
             tube(new float[] { m[0], m[1], u + tl / 4.0F }, new float[] { x, ty - tr + 0.3F, u + tl / 4.0F }, 1.2F, PIPE_SIDES, Paint.BANDED);
             // The compressor's outlet into the aftercooler's side.
-            float acx = side < 0 ? ac[0] : ac[3];
+            float acx = (side < 0 ? ac[0] : ac[3]) - side * 1.5F;
             tube(new float[] { x - side * (tr - 1.2F), ty - 1.0F, u - tl / 4.0F }, new float[] { acx, ty - 1.0F, Math.min(u - tl / 4.0F, ac[5] - 2.0F) }, 0.9F,
                     PIPE_SIDES, Paint.BANDED);
             // The riser: from the turbine's top up and in to the silencer's side.
             tube(new float[] { x, ty + tr - 0.3F, u + tl / 4.0F }, new float[] { x, sy, u + tl / 4.0F }, 1.0F, PIPE_SIDES, Paint.BANDED);
             tube(new float[] { x, sy, u + tl / 4.0F }, new float[] { CX + side * (sr - 0.3F), sy, u + tl / 4.0F }, 1.0F, PIPE_SIDES, Paint.BANDED);
+            // The elbow where it turns: a knuckle round both pipes' open ends.
+            box(x - 1.2F, sy - 1.2F, u + tl / 4.0F - 1.2F, x + 1.2F, sy + 1.2F, u + tl / 4.0F + 1.2F, Paint.MID, Paint.LIT, Paint.SHADE, 0);
         }
         float[] s = layout.silencer();
         prismU(CX, sy, new float[][] { { s[0], sr }, { s[1], sr } }, 16, 0.0, Paint.BANDED, Paint.PLAIN, Paint.SHADE, null);
@@ -263,17 +273,32 @@ public final class DieselGeneratorMesh extends ModelMesh {
         for (float u : new float[] { s[0] + 4.0F, s[1] - 4.0F }) {
             box(CX - 1.0F, DieselGeneratorLayout.INTAKE[3], u - 0.8F, CX + 1.0F, sy - sr + 0.4F, u + 0.8F, Paint.FACE, Paint.MID, null, SKIP_DOWN | SKIP_UP);
         }
-        // The outlet near its front end, up to the rain cap: a flap hinged at the back, propped a little open.
-        float ou = s[0] + 3.0F, or = DieselGeneratorLayout.OUTLET_R, otop = DieselGeneratorLayout.OUTLET_TOP;
+        // The outlet near its front end, up to the rain cap (a flap hinged at the back, which the exhaust lifts: see
+        // buildMoving): its mouth open, sooted inside, and the hinge's lug at the back.
+        float ou = layout.outletU(), or = DieselGeneratorLayout.OUTLET_R, otop = DieselGeneratorLayout.OUTLET_TOP;
         uprightTube(CX, ou, new float[][] { { sy + sr - 0.5F, or }, { otop, or } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, null);
         uprightTube(CX, ou, new float[][] { { sy + sr - 0.5F, or + 0.6F }, { sy + sr + 1.0F, or + 0.6F } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED,
                 Paint.MID);
-        float lift = 1.2F;
-        float[] h0 = { CX - or - 0.5F, otop + 0.2F, ou + or + 0.4F }, h1 = { CX + or + 0.5F, otop + 0.2F, ou + or + 0.4F };
-        float[] f1 = { CX + or + 0.5F, otop + 0.2F + lift, ou - or - 0.6F }, f0 = { CX - or - 0.5F, otop + 0.2F + lift, ou - or - 0.6F };
-        orient(h0, h1, f1, f0, new float[] { 0, 1, 0 }, Paint.MID);
-        orient(h0, h1, f1, f0, new float[] { 0, -1, 0 }, Paint.SHADE);
+        disc(new float[] { CX, sy + sr - 0.5F, ou }, new float[] { 0, -1, 0 }, or + 0.6F, PIPE_SIDES, Paint.SHADE, Paint.SHADE);
+        mouth(CX, ou, otop, or, or - 0.35F, 3.0F);
+        box(CX - 0.6F, otop - 1.0F, ou + or - 0.2F, CX + 0.6F, otop + 0.2F, ou + or + 0.6F, Paint.MID, Paint.LIT, Paint.SHADE, 0);
         uprights.add(new float[] { CX, ou, or, sy, otop });
+    }
+
+    // An upright pipe's open mouth at (x, u) down from top: the rim from outer to inner, the wall inside, facing in, and
+    // a sooted floor depth px down.
+    private void mouth(float x, float u, float top, float outer, float inner, float depth) {
+        double step = 2.0 * Math.PI / PIPE_SIDES, start = Math.PI / PIPE_SIDES;
+        for (int f = 0; f < PIPE_SIDES; f++) {
+            double a0 = start + f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
+            float c0 = (float) Math.cos(a0), s0 = (float) Math.sin(a0), c1 = (float) Math.cos(a1), s1 = (float) Math.sin(a1);
+            float[] o0 = { x + c0 * outer, top, u + s0 * outer }, o1 = { x + c1 * outer, top, u + s1 * outer };
+            float[] i0 = { x + c0 * inner, top, u + s0 * inner }, i1 = { x + c1 * inner, top, u + s1 * inner };
+            orient(o0, o1, i1, i0, new float[] { 0, 1, 0 }, Paint.MID);
+            float[] b0 = { i0[0], top - depth, i0[2] }, b1 = { i1[0], top - depth, i1[2] };
+            orient(i0, i1, b1, b0, new float[] { -(float) Math.cos(mid), 0, -(float) Math.sin(mid) }, Paint.DARK);
+            orient(new float[] { x, top - depth, u }, b0, b1, new float[] { x, top - depth, u }, new float[] { 0, 1, 0 }, Paint.DEEP);
+        }
     }
 
     // --- The generator end ---
@@ -293,7 +318,8 @@ public final class DieselGeneratorMesh extends ModelMesh {
         float x0 = DieselGeneratorLayout.ALT_X0, x1 = DieselGeneratorLayout.ALT_X1, y0 = DieselGeneratorLayout.RAIL_TOP + 1.0F,
                 y1 = DieselGeneratorLayout.ALT_Y1;
         float a0 = layout.altU0, a1 = layout.altU1;
-        box(x0, y0, a0, x1, y1, a1, Paint.GEN_PLATE, Paint.GEN_PLAIN, null, SKIP_DOWN);
+        // Its ends are the lips' (below), which cover them.
+        box(x0, y0, a0, x1, y1, a1, Paint.GEN_PLATE, Paint.GEN_PLAIN, null, SKIP_DOWN | SKIP_NEG_U | SKIP_POS_U);
         solidBoxes.add(new float[] { x0, y0, a0, x1, y1, a1 });
         // The louvres down both sides, in two banks.
         float span = (a1 - a0 - 10.0F) / 2.0F;
@@ -319,12 +345,12 @@ public final class DieselGeneratorMesh extends ModelMesh {
         prismU(CX, SY, new float[][] { { bu, 3.0F }, { bu + 1.0F, 3.0F } }, 12, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
         // The terminal box on top, its cable glands in FE red out of its right side.
         float t0 = a0 + 3.0F, t1 = Math.min(a1 - 3.0F, a0 + 13.0F);
-        box(16.0F, y1, t0, 32.0F, y1 + 5.0F, t1, Paint.GEN_PLAIN, Paint.GEN_PLAIN, null, SKIP_DOWN);
+        box(16.0F, y1, t0, 32.0F, y1 + 4.0F, t1, Paint.GEN_PLAIN, null, null, SKIP_DOWN | SKIP_UP);
         box(15.6F, y1 + 4.0F, t0 - 0.4F, 32.4F, y1 + 5.0F, t1 + 0.4F, Paint.GEN_MID, Paint.GEN_LIT, Paint.GEN_DARK, 0);
         for (int i = 0; i < 3; i++) {
             float gu = t0 + 2.0F + i * (t1 - t0 - 4.0F) / 2.0F;
             box(32.0F, y1 + 1.0F, gu - 1.0F, 33.5F, y1 + 3.0F, gu + 1.0F, Paint.FE, Paint.FE_LIT, Paint.FE_DARK, 0);
-            tube(new float[] { 33.5F, y1 + 2.0F, gu }, new float[] { 36.0F, y1 + 2.0F, gu }, 0.6F, 4, Paint.DARK);
+            box(33.5F, y1 + 1.5F, gu - 0.5F, 36.0F, y1 + 2.5F, gu + 0.5F, Paint.DARK, null, null, SKIP_NEG_X);
         }
         solidBoxes.add(new float[] { 16.0F, y1, t0, 32.0F, y1 + 5.0F, t1 });
     }
@@ -389,8 +415,9 @@ public final class DieselGeneratorMesh extends ModelMesh {
 
     // --- Each frame ---
 
-    // The fan's blades and hub (and the shaft from it to the engine's nose), and the coupling, turned to angle degrees.
-    public float[] buildMoving(float angle) {
+    // The fan's blades and hub (and the shaft from it to the engine's nose), and the coupling, turned to angle degrees;
+    // and the outlet's rain flap, lifted flap degrees.
+    public float[] buildMoving(float angle, float flap) {
         solid = new Floats();
         glowing = false;
         spinning = true;
@@ -418,7 +445,21 @@ public final class DieselGeneratorMesh extends ModelMesh {
             box(bx - 0.5F, by - 0.5F, bu - 0.5F, bx + 0.5F, by + 0.5F, bu + 0.5F, Paint.RIVET, Paint.RIVET, Paint.DARK, 0);
         }
         spinning = false;
+        rainFlap(flap);
         return solid.toArray();
+    }
+
+    // The rain flap over the outlet: a plate hinged across its back edge, lifted lift degrees from lying shut, with its
+    // hinge pin.
+    private void rainFlap(float lift) {
+        float or = DieselGeneratorLayout.OUTLET_R, otop = DieselGeneratorLayout.OUTLET_TOP, ou = layout.outletU();
+        float w = 2.0F * or + 1.0F, reach = 2.0F * or + 1.0F, thick = 0.4F;
+        double a = Math.toRadians(lift);
+        float[] across = { 1, 0, 0 }, along = { 0, (float) Math.sin(a), -(float) Math.cos(a) }, normal = { 0, (float) Math.cos(a), (float) Math.sin(a) };
+        float[] hinge = { CX - w / 2.0F, otop + 0.2F, ou + or + 0.4F };
+        obox(hinge, across, normal, along, w, thick, reach, Paint.SHADE, Paint.MID);
+        tube(new float[] { CX - w / 2.0F - 0.3F, otop + 0.4F, ou + or + 0.4F }, new float[] { CX + w / 2.0F + 0.3F, otop + 0.4F, ou + or + 0.4F }, 0.35F, 4,
+                Paint.BANDED);
     }
 
     // Turning parts turn about the shaft line.

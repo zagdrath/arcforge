@@ -29,8 +29,8 @@ import net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity;
 import net.zagdrath.arcforge.steam.FlareStackMesh;
 
 // Draws the Flare Stack's stack over its base block (FlareStackMesh, built once, on the refinery tower's sheet) and its
-// flame at the tip: two crossed sheets of the animated block/flare_stack/flame texture, full-bright and additive, from
-// a small pilot flame up to two blocks tall as it burns more.
+// flame at the tip while it burns: two crossed sheets of the animated block/flare_stack/flame texture (16x32 frames on
+// a clear background), full-bright, from a block tall at the least burn to three and a half at full burn.
 public class FlareStackRenderer implements BlockEntityRenderer<FlareStackBlockEntity, FlareStackRenderer.State> {
     public static final Identifier FLAME = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/flare_stack/flame");
     private static float @Nullable [] mesh;
@@ -86,9 +86,13 @@ public class FlareStackRenderer implements BlockEntityRenderer<FlareStackBlockEn
                         .setNormal(pose, stack[i + 5], stack[i + 6], stack[i + 7]);
             }
         });
-        // The flame: a pilot 5 px tall, up to 32 px at full burn.
+        // The flame, only while it burns: 16 px tall at the least, up to 56 px at full burn, a quarter as wide each side
+        // (the texture's 1:2).
         float size = state.flame;
-        float height = (5.0F + 27.0F * size) / 16.0F, half = (2.5F + 3.5F * size) / 16.0F;
+        if (size <= 0.0F) {
+            return;
+        }
+        float height = (16.0F + 40.0F * size) / 16.0F, half = height / 4.0F;
         float base = (FlareStackMesh.TIP_TOP - 2.0F) / 16.0F, cx = FlareStackMesh.CX / 16.0F, cu = FlareStackMesh.CU / 16.0F;
         collector.submitCustomGeometry(poseStack, RenderTypes.eyes(flame.atlasLocation()), (pose, buffer) -> {
             sheet(pose, buffer, flame, cx - half, cu, cx + half, cu, base, height);

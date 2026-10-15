@@ -38,8 +38,9 @@ import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
 // - Gas Reservoir: the gas fills its whole block, not to a level: a flat translucent fill (block/gas_reservoir/fill, a plain
 //   white tile) in the gas's tint, from GAS_ALPHA_EMPTY to GAS_ALPHA_FULL opaque by how full it is. Its tank shares the gas
 //   evenly, so neighbouring blocks match and the faces between them are left out: the gas reads as one volume.
-// Glowing contents render at their light level. The contents don't write depth (see ArcforgeRenderTypes), so glass
-// conduits and other translucent blocks behind a Reservoir still show through it.
+// Glowing contents render at their light level. Clear contents don't write depth, so glass conduits and other
+// translucent blocks behind a Reservoir still show through them; opaque ones (crude oil) do, so nothing shows through
+// them (see ArcforgeRenderTypes.fluid).
 public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEntity, ReservoirRenderer.State> {
     // Just inside the glass and frame, so no fluid face lies on a model face.
     private static final float INSET = 0.01F;
@@ -174,7 +175,7 @@ public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEnti
         }
         int color = state.color, light = state.light, skip = state.skip;
         float x0 = state.x0, y0 = state.y0, z0 = state.z0, x1 = state.x1, y1 = state.y1, z1 = state.z1;
-        collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(sprite.atlasLocation()),
+        collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.fluid(sprite, color),
                 (pose, buffer) -> FluidBoxes.box(pose, buffer, sprite, color, light, x0, y0, z0, x1, y1, z1, skip));
     }
 }

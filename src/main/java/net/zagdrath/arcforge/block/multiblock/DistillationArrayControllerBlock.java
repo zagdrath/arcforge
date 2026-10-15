@@ -38,6 +38,7 @@ import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.PortHolder;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.sound.MachineSounds;
 
 // The Distillation Array's controller: its display faces the column's front (the structure's facing),
 // and its block entity runs the column and holds its contents.
@@ -59,7 +60,8 @@ public class DistillationArrayControllerBlock extends BaseEntityBlock implements
         return level instanceof ServerLevel serverLevel
                 ? createTickerHelper(type, ModBlockEntityTypes.DISTILLATION_ARRAY.get(),
                         (innerLevel, pos, blockState, column) -> column.serverTick(serverLevel))
-                : null;
+                // Clients tick it for its running loop (see MachineLoopSound).
+                : createTickerHelper(type, ModBlockEntityTypes.DISTILLATION_ARRAY.get(), MachineSounds.clientTicker());
     }
 
     @Override

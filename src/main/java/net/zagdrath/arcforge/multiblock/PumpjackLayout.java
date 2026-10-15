@@ -51,7 +51,7 @@ public final class PumpjackLayout {
     public static final float GEARBOX_X0 = 15.0F, GEARBOX_X1 = 33.0F, GEARBOX_TOP = 24.0F, GEARBOX_ROUND = 8.0F;
     public static final float[] GEARBOX = { GEARBOX_X0, BASE_TOP, CRANK_U - 8.0F, GEARBOX_X1, GEARBOX_TOP, CRANK_U + 8.0F };
     public static final float[] MOTOR = { 18.0F, BASE_TOP, 71.0F, 30.0F, 19.0F, 78.0F };
-    public static final float[] GUARD = { 30.0F, 10.0F, 60.0F, 33.0F, 21.0F, 77.0F };
+    public static final float[] GUARD = { 30.0F, 10.0F, 60.0F, 33.5F, 21.0F, 77.0F };
     public static final float[] SADDLE = { CX - 5.0F, PIVOT_Y - 4.0F, PIVOT_U - 3.0F, CX + 5.0F, PIVOT_Y - 1.0F, PIVOT_U + 3.0F };
     // The Samson post's legs: foot (x, u) and top (x, u), all meeting under the saddle; the front pair splayed wide.
     public static final float LEG_TOP = PIVOT_Y - 4.0F, LEG_RADIUS = 1.8F;
@@ -97,6 +97,15 @@ public final class PumpjackLayout {
     // The carrier bar's height with the beam at phi: the bridle unwraps from the horse head as it drops.
     public static float carrierY(double phi) {
         return CARRIER_Y + HEAD_RADIUS * (float) phi;
+    }
+
+    // Where a player on the ladder is, as boxes {x0, y0, u0, x1, y1, u1}: from the ground to just over the platform's
+    // deck, the ladder's width along u, and CLIMB_REACH out from its rungs on the side it's climbed from (+x, outside
+    // the pumpjack's blocks; see DerrickLadders).
+    public static final float CLIMB_REACH = 7.0F;
+
+    public static List<float[]> climbBoxes() {
+        return List.of(new float[] { LADDER_X - 0.75F, 0.0F, LADDER_U0, LADDER_X + CLIMB_REACH, PLATFORM[1] + 2.0F, LADDER_U1 });
     }
 
     // The still parts, as boxes {x0, y0, u0, x1, y1, u1}: what the blocks' shapes are made of (the beam, cranks and
