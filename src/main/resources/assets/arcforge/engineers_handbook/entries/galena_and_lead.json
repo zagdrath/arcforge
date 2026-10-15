@@ -1,0 +1,19 @@
+{
+  "title": "Galena & Lead",
+  "icon": "arcforge:lead_ingot",
+  "items": [
+    "arcforge:galena_ore",
+    "arcforge:raw_galena",
+    "arcforge:raw_galena_block",
+    "arcforge:lead_dust",
+    "arcforge:lead_ingot",
+    "arcforge:lead_block",
+    "arcforge:lead_plate"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Galena, a lead ore of metallic blue-grey cubes, is common at mid depths (Y -16 to 64). It works like the other metals: smelt or blast it, crush it into Lead Dust (with a 10% chance of Silver Dust), leach it in the Chemical Reactor into Lead Slurry, and press Lead Ingots into Lead Plates.\nLead is dull and heavy, and the shield every nuclear build starts with: a Lead Block lets only 10% of radiation through. Lead (or Depleted Uranium in its place) makes the Lead Box, the Hazmat Suit and Lead Bricks."
+    }
+  ]
+}

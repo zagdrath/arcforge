@@ -3,6 +3,7 @@
     "arcforge:loam",
     "arcforge:loam_farmland",
     "arcforge:irrigated_loam_farmland",
-    "arcforge:deepslate_gravel"
+    "arcforge:deepslate_gravel",
+    "arcforge:heavy_mineral_sand"
   ]
 }

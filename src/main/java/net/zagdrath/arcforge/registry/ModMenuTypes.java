@@ -147,6 +147,8 @@ public final class ModMenuTypes {
             MENU_TYPES.register("firebox_array", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.FireboxArrayMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.BatteryArrayMenu>> BATTERY_ARRAY =
             MENU_TYPES.register("battery_array", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.BatteryArrayMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.CentrifugeCascadeMenu>> CENTRIFUGE_CASCADE =
+            MENU_TYPES.register("centrifuge_cascade", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.CentrifugeCascadeMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu>> THERMAL_EVAPORATOR =
             MENU_TYPES.register("thermal_evaporator",
                     () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu::new));
@@ -276,6 +278,8 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<ArcToolMenu>> ARC_TOOL = MENU_TYPES.register("arc_tool",
             () -> IMenuTypeExtension.create(ArcToolMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.tool.LeadBoxMenu>> LEAD_BOX = MENU_TYPES.register("lead_box",
+            () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.tool.LeadBoxMenu::new));
 
     public static final Supplier<MenuType<CarbonizerMenu>> CARBONIZER = MENU_TYPES.register("carbonizer",
             () -> IMenuTypeExtension.create(CarbonizerMenu::new));

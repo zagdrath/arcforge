@@ -2,6 +2,8 @@
   "values": [
     "#c:gems/fluorite",
     "#c:gems/arcite",
-    "#c:gems/iolite"
+    "#c:gems/iolite",
+    "#c:gems/monazite",
+    "#c:gems/zircon"
   ]
 }

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "R R",
+    "IRI",
+    "RIR"
+  ],
+  "key": {
+    "R": "#c:rubbers",
+    "I": "#arcforge:shielding_metals"
+  },
+  "result": {
+    "id": "arcforge:hazmat_chestplate",
+    "count": 1
+  }
+}

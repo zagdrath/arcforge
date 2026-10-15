@@ -23,10 +23,43 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 ## [Unreleased]
 
 Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units, a scaling Diesel
-Generator, hydrocracking and Synthetic Rubber, a retuned oil line, and running sounds and model fixes for the oilfield; worlds load, but Diesel Generators and Oil
-Derricks need their new layers and some refinery lines need a new port, see Upgrading).
+Generator, hydrocracking and Synthetic Rubber, a retuned oil line, running sounds and model fixes for the oilfield, and
+the start of the nuclear tier; worlds load, but Diesel Generators and Oil Derricks need their new layers and some
+refinery lines need a new port, see Upgrading).
 
 ### Added
+
+- **The nuclear tier, part one: ores, radiation, uranium chemistry and enrichment.** Civil power only: nothing in it
+  makes a weapon, and enrichment stops at 20% U-235. A new **Arcforge: Nuclear** creative tab, a Nuclear chapter in the
+  Handbook (ten entries) and a Nuclear advancement branch (ten advancements).
+  - **Ores.** Uraninite Ore (stone and deepslate: rare, small veins, mostly below Y 0) drops Raw Uraninite and crushes
+    into Uraninite Dust. Galena Ore (common at mid depths) drops Raw Galena, which makes **Lead** like the other metals
+    (raw block, dust, ingot, block, plate and the leach chain), with a 10% chance of Silver Dust when crushed. Heavy
+    Mineral Sand (near the surface in beach, river and desert sand and gravel; shovel-mined) sifts into Monazite and
+    Zircon, which crush into dust. All have their `c:` tags and `world.ores` toggles.
+  - **Radiation.** Data-driven sources (`arcforge:radioactivity` on items, blocks and fluids, in mSv/h at a block) and
+    shielding (`arcforge:radiation_shielding`: Lead 0.1, Depleted Uranium 0.05, concrete 0.3, iron and steel 0.4,
+    water 0.5, stone 0.6, other solid blocks 0.8). The dose rate at a player sums every source within 16 blocks by the
+    inverse square and the blocks between, counting containers, tanks, dropped items and what you carry; it's checked
+    four times a second and each chunk's sources are cached. The accumulated dose recovers slowly and brings Nausea
+    (1,000 mSv), Weakness and Hunger (2,000), Wither (4,000) and radiation sickness (8,000); dying resets it. Mobs are
+    unaffected unless `affectMobs` is on.
+  - **Geiger Counter**, **Dosimeter**, a four-piece **Hazmat Suit** (a full set lets 5% through), the nine-slot **Lead
+    Box** (nothing gets out), and **Lead Blocks**, **Lead Bricks** and **Concrete Shielding**.
+  - **Uranium chemistry.** Uraninite Dust is leached with Sulfuric Acid into Uranyl Sulfate Solution, precipitated with
+    Ammonia into Ammonium Diuranate and calcined into Yellowcake; Hydrogen, Hydrofluoric Acid (from Fluorite Dust) and
+    Fluorine (electrolysed from the acid) take it to UO2, UF4 and **Uranium Hexafluoride**, a corrosive gas only
+    Pressurized Conduits and PVC-lined Pressurized Cylinders hold.
+  - **Gas Centrifuge Cascade.** A hall of two-tall Gas Centrifuges on a 3x3 to 7x7 raised floor that enriches natural
+    UF6 to the target set in its GUI (1% to 20%) with depleted tails (0.25% by default), by the real separative-work
+    formula, at 0.02 SWU a tick per centrifuge. UF6 carries its enrichment as a component; tanks only mix the same
+    enrichment, and tooltips and Jade show it. Its model: slim columns in rows, header pipework along each row, a
+    control panel, a spinning band on each column while it runs and a faint hum.
+  - **Depleted Uranium.** Depleted UF6, Hydrogen and Steam give Depleted Uranium Dust, smelted into ingots and blocks:
+    the best shield, a little radioactive, and a stand-in for lead in the shielding recipes.
+  - JEI shows the enrichment (at 3%, 5% and 20%) and every new recipe; Jade shows the cascade's target, tails, SWU
+    and status and a cylinder's lining and UF6 enrichment. New config: `ores.uraninite`, `ores.galena`,
+    `ores.heavyMineralSand` and the `nuclear` section (radiation, the cascade and PVC lining).
 
 - **Oil caverns.** In newly generated chunks every oil deposit is a real cavern full of oil: a sealed, flattened,
   roughly round chamber (an ellipsoid about twice as wide as it is tall, its edge slightly uneven) under the middle of
@@ -133,6 +166,10 @@ Derricks need their new layers and some refinery lines need a new port, see Upgr
 - Balance check (a bucket of Crude Oil distilled 14 high, Heavy Oil cracked, Bitumen coked, Naphtha reformed, all burnt
   in a V16): 291,000 FE before, 322,000 now (+11%, mostly Kerosene now counting); a full V16 takes 1.55 full-rate
   Pumpjacks (was 1.72).
+
+- Gas Reservoirs, Gas Cartridges, the Flare Stack and Quantum Tunnels refuse corrosive gases (the
+  `arcforge:corrosive_gases` tag: UF6 and depleted UF6). A Pressurized Cylinder takes them once lined with 4 PVC
+  Sheets, and keeps its lining when broken.
 
 - The Crude Oil, Oil Derrick, Pumpjack, Fuel Burner, Oils and Pitch, Jetpack, Gas Turbine Array and Refinery Fuels
   Handbook pages cover caverns, sour fuels and Natural Gas. The Seismic Survey Tool also says whether a deposit is

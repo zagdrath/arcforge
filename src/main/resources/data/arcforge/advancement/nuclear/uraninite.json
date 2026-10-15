@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:root",
+  "display": {
+    "icon": {
+      "id": "arcforge:raw_uraninite"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.uraninite.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.uraninite.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "#c:raw_materials/uranium"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

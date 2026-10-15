@@ -51,7 +51,9 @@ public class FlareStackBlockEntity extends BlockEntity implements ConduitConnect
 
     public FlareStackBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.FLARE_STACK.get(), pos, state);
-        this.tank = new FilteredFluidTank(ArcforgeConfig.FLARE_TANK_CAPACITY.getAsInt(), Gases::isGas, this::setChanged);
+        this.tank = new FilteredFluidTank(ArcforgeConfig.FLARE_TANK_CAPACITY.getAsInt(),
+                // Not UF6: it doesn't burn, and would only be let loose.
+                resource -> Gases.isGas(resource) && !net.zagdrath.arcforge.nuclear.Corrosion.isCorrosive(resource), this::setChanged);
         this.input = new AutomationResourceHandler<>(tank, index -> true, index -> false);
     }
 

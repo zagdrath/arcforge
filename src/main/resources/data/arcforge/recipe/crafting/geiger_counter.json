@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SGS",
+    "SRS",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "G": "minecraft:glass_pane",
+    "R": "#c:dusts/redstone",
+    "C": "#c:ingots/copper"
+  },
+  "result": {
+    "id": "arcforge:geiger_counter",
+    "count": 1
+  }
+}

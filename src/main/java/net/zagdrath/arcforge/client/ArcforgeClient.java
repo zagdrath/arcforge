@@ -172,6 +172,7 @@ public class ArcforgeClient {
         SteamTurbineArrayBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
         GasTurbineArrayBlockEntity.clientHook = GasTurbineArraySound::clientTick;
         net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.DieselGeneratorSound::clientTick;
+        net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.CentrifugeCascadeSound::clientTick;
         MachineSounds.clientHook = MachineLoopSound::keepPlaying;
         JetpackStatePayload.clientHandler = JetpackClient::onState;
         net.zagdrath.arcforge.network.ArcQuarryFinishedPayload.clientHandler = ArcQuarryToast::show;
@@ -200,6 +201,8 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerScreens(RegisterMenuScreensEvent event) {
         event.register(ModMenuTypes.ARC_TOOL.get(), ArcToolScreen::new);
+        event.register(ModMenuTypes.LEAD_BOX.get(), net.zagdrath.arcforge.client.screen.tool.LeadBoxScreen::new);
+        event.register(ModMenuTypes.CENTRIFUGE_CASCADE.get(), net.zagdrath.arcforge.client.screen.multiblock.CentrifugeCascadeScreen::new);
         event.register(ModMenuTypes.SECURITY_TERMINAL.get(), SecurityTerminalScreen::new);
         event.register(ModMenuTypes.METER.get(), net.zagdrath.arcforge.client.screen.logistics.MeterScreen::new);
         event.register(ModMenuTypes.QUANTUM_TUNNEL.get(), QuantumTunnelScreen::new);
@@ -341,6 +344,8 @@ public class ArcforgeClient {
         event.register(liquidModel("liquid_experience"), ModFluids.LIQUID_EXPERIENCE, ModFluids.FLOWING_LIQUID_EXPERIENCE);
         event.register(liquidModel("lye"), ModFluids.LYE, ModFluids.FLOWING_LYE);
         event.register(liquidModel("hydrochloric_acid"), ModFluids.HYDROCHLORIC_ACID, ModFluids.FLOWING_HYDROCHLORIC_ACID);
+        event.register(liquidModel("uranyl_sulfate_solution"), ModFluids.URANYL_SULFATE_SOLUTION, ModFluids.FLOWING_URANYL_SULFATE_SOLUTION);
+        event.register(liquidModel("hydrofluoric_acid"), ModFluids.HYDROFLUORIC_ACID, ModFluids.FLOWING_HYDROFLUORIC_ACID);
         // The slurries share one greyscale texture, tinted per metal.
         for (OreSlurry slurry : OreSlurry.values()) {
             ModFluids.Slurry fluids = ModFluids.slurry(slurry);
@@ -369,6 +374,9 @@ public class ArcforgeClient {
         event.register(gasModel(REFINERY_GAS_TINT), ModFluids.REFINERY_GAS, ModFluids.FLOWING_REFINERY_GAS);
         event.register(gasModel(NATURAL_GAS_TINT), ModFluids.NATURAL_GAS, ModFluids.FLOWING_NATURAL_GAS);
         event.register(gasModel(PROPYLENE_TINT), ModFluids.PROPYLENE, ModFluids.FLOWING_PROPYLENE);
+        event.register(gasModel(FLUORINE_TINT), ModFluids.FLUORINE, ModFluids.FLOWING_FLUORINE);
+        event.register(gasModel(URANIUM_HEXAFLUORIDE_TINT), ModFluids.URANIUM_HEXAFLUORIDE, ModFluids.FLOWING_URANIUM_HEXAFLUORIDE);
+        event.register(gasModel(DEPLETED_URANIUM_HEXAFLUORIDE_TINT), ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE, ModFluids.FLOWING_DEPLETED_URANIUM_HEXAFLUORIDE);
         event.register(gasModel(HYDROGEN_SULFIDE_TINT), ModFluids.HYDROGEN_SULFIDE, ModFluids.FLOWING_HYDROGEN_SULFIDE);
     }
 
@@ -397,6 +405,9 @@ public class ArcforgeClient {
     public static final int NATURAL_GAS_TINT = GasTints.NATURAL_GAS;
     public static final int PROPYLENE_TINT = GasTints.PROPYLENE;
     public static final int HYDROGEN_SULFIDE_TINT = GasTints.HYDROGEN_SULFIDE;
+    public static final int FLUORINE_TINT = GasTints.FLUORINE;
+    public static final int URANIUM_HEXAFLUORIDE_TINT = GasTints.URANIUM_HEXAFLUORIDE;
+    public static final int DEPLETED_URANIUM_HEXAFLUORIDE_TINT = GasTints.DEPLETED_URANIUM_HEXAFLUORIDE;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(
@@ -456,6 +467,9 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(NATURAL_GAS_TINT & 0xFFFFFF, 6.0F), ModFluids.NATURAL_GAS_TYPE.get());
         event.registerFluidType(liquidFog(PROPYLENE_TINT & 0xFFFFFF, 6.0F), ModFluids.PROPYLENE_TYPE.get());
         event.registerFluidType(liquidFog(HYDROGEN_SULFIDE_TINT & 0xFFFFFF, 5.0F), ModFluids.HYDROGEN_SULFIDE_TYPE.get());
+        event.registerFluidType(liquidFog(FLUORINE_TINT & 0xFFFFFF, 5.0F), ModFluids.FLUORINE_TYPE.get());
+        event.registerFluidType(liquidFog(URANIUM_HEXAFLUORIDE_TINT & 0xFFFFFF, 5.0F), ModFluids.URANIUM_HEXAFLUORIDE_TYPE.get());
+        event.registerFluidType(liquidFog(DEPLETED_URANIUM_HEXAFLUORIDE_TINT & 0xFFFFFF, 5.0F), ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE_TYPE.get());
         event.registerFluidType(liquidFog(0xE8E4D6, 2.0F), ModFluids.LATEX_TYPE.get());
         event.registerFluidType(liquidFog(0xB6F07A, 6.0F), ModFluids.LIQUID_EXPERIENCE_TYPE.get());
         event.registerFluidType(liquidFog(SEAWATER_TINT & 0xFFFFFF, 12.0F), ModFluids.SEAWATER_TYPE.get());
@@ -463,6 +477,8 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xB8DCCC, 10.0F), ModFluids.LITHIUM_BRINE_TYPE.get());
         event.registerFluidType(liquidFog(0xE4E6DA, 8.0F), ModFluids.LYE_TYPE.get());
         event.registerFluidType(liquidFog(0xE2DC9A, 7.0F), ModFluids.HYDROCHLORIC_ACID_TYPE.get());
+        event.registerFluidType(liquidFog(0xE8D23A, 5.0F), ModFluids.URANYL_SULFATE_SOLUTION_TYPE.get());
+        event.registerFluidType(liquidFog(0xDCE6E8, 8.0F), ModFluids.HYDROFLUORIC_ACID_TYPE.get());
         event.registerFluidType(liquidFog(0x7FB84A, 5.0F), ModFluids.NUTRIENT_SOLUTION_TYPE.get());
         event.registerFluidType(liquidFog(0xD8A838, 4.0F), ModFluids.BIODIESEL_TYPE.get());
         for (OreSlurry slurry : OreSlurry.values()) {
@@ -630,6 +646,10 @@ public class ArcforgeClient {
                 net.zagdrath.arcforge.client.renderer.blockentity.DieselGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.FLARE_STACK.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.FlareStackRenderer::new);
+        // The Gas Centrifuge Cascade draws its hall: the raised floor, the centrifuges with their spinning bands, the
+        // header pipework and the control panel.
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.CENTRIFUGE_CASCADE.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.CentrifugeCascadeRenderer::new);
         // The automated farms draw the soil and the plant growing inside.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheRenderer::new);

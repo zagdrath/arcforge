@@ -1,0 +1,17 @@
+{
+  "title": "Uraninite",
+  "icon": "arcforge:raw_uraninite",
+  "items": [
+    "arcforge:uraninite_ore",
+    "arcforge:deepslate_uraninite_ore",
+    "arcforge:raw_uraninite",
+    "arcforge:raw_uraninite_block",
+    "arcforge:uraninite_dust"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Uraninite (pitchblende), the uranium ore: pitch black with a greasy green-brown sheen. Rare, in small veins, mostly below Y 0. It needs an iron pickaxe and drops Raw Uraninite (Fortune works).\n- The Arc Crusher makes 2 Uraninite Dust from the ore, 1 (and a 25% chance of another) from Raw Uraninite; the Arc Crushing Array doubles the ore.\n- It's never smelted: its uranium comes out through the chemistry (see Uranium Chemistry).\n- The ore and everything from it is radioactive: a Geiger Counter clicks near a vein, which helps find it."
+    }
+  ]
+}

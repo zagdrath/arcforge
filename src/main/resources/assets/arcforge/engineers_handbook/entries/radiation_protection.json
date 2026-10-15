@@ -1,0 +1,25 @@
+{
+  "title": "Radiation Protection",
+  "icon": "arcforge:hazmat_helmet",
+  "items": [
+    "arcforge:hazmat_helmet",
+    "arcforge:hazmat_chestplate",
+    "arcforge:hazmat_leggings",
+    "arcforge:hazmat_boots",
+    "arcforge:lead_box",
+    "arcforge:lead_bricks",
+    "arcforge:concrete_shielding",
+    "arcforge:lead_block",
+    "arcforge:depleted_uranium_block"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Hazmat Suit\nFour lead-lined rubber pieces. The full suit lets only 5% of the radiation from outside through; fewer pieces protect in part (hood 15%, suit 40%, trousers 30%, boots 15% of that). It doesn't help with what you carry: that's inside the suit with you.\n# Lead Box\nNine slots: nothing radioactive inside it is felt, wherever the box is. Use it in your main hand to open it."
+    },
+    {
+      "type": "text",
+      "text": "# Shielding blocks\n- Lead Block and Lead Bricks: 10% through.\n- Block of Depleted Uranium: 5%, the best (and itself a little radioactive).\n- Concrete Shielding (concrete cast round steel rebar): 25%; plain concrete 30%.\nDepleted Uranium can stand in for lead in the Lead Box, Hazmat Suit and Lead Bricks."
+    }
+  ]
+}

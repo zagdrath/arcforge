@@ -1,0 +1,26 @@
+{
+  "title": "Uranium Chemistry",
+  "icon": "arcforge:yellowcake",
+  "items": [
+    "arcforge:uranyl_sulfate_solution_bucket",
+    "arcforge:ammonium_diuranate",
+    "arcforge:yellowcake",
+    "arcforge:hydrofluoric_acid_bucket",
+    "arcforge:uranium_dioxide",
+    "arcforge:uranium_tetrafluoride"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# From ore to yellowcake\n- Leaching: Uraninite Dust + 250 mB Sulfuric Acid in the Chemical Reactor gives 250 mB Uranyl Sulfate Solution.\n- Precipitating: 250 mB Uranyl Sulfate Solution + 50 mB Ammonia gives Ammonium Diuranate.\n- Calcining: Ammonium Diuranate in the Induction Furnace (or any furnace) gives Yellowcake."
+    },
+    {
+      "type": "text",
+      "text": "# Fluorine\n- Hydrofluoric Acid: Fluorite Dust + 500 mB Sulfuric Acid in the Chemical Reactor gives 500 mB. It burns like the other acids.\n- Fluorine: 100 mB Hydrofluoric Acid in the Electrolyzer gives 50 mB Hydrogen and 50 mB Fluorine (out of its oxygen side)."
+    },
+    {
+      "type": "text",
+      "text": "# Conversion\nAll in the Chemical Reactor:\n- Yellowcake + 100 mB Hydrogen: Uranium Dioxide.\n- Uranium Dioxide + 400 mB Hydrofluoric Acid: Uranium Tetrafluoride (green salt).\n- Uranium Tetrafluoride + 100 mB Fluorine: 100 mB Uranium Hexafluoride (UF₆), at the natural 0.711% U-235.\nOne Uraninite Dust makes 100 mB of UF₆."
+    }
+  ]
+}

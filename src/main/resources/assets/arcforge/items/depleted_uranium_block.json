@@ -1,0 +1,6 @@
+{
+  "model": {
+    "type": "minecraft:model",
+    "model": "arcforge:block/depleted_uranium_block"
+  }
+}

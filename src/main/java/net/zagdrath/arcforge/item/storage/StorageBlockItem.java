@@ -41,6 +41,9 @@ public class StorageBlockItem extends BlockItem {
             int capacity = getBlock() instanceof FluidTankBlock ? tier.tankCapacity() : tier.cylinderCapacity();
             builder.accept(Component.translatable("tooltip.arcforge.tank.contents", name,
                     format(fluid.getAmount()), format(capacity)).withStyle(ChatFormatting.GRAY));
+            if (stack.has(ModDataComponents.PVC_LINED.get())) {
+                builder.accept(Component.translatable("tooltip.arcforge.pressurized_cylinder.lined").withStyle(ChatFormatting.DARK_AQUA));
+            }
         } else if (getBlock() instanceof EnergyCellBlock) {
             int energy = stack.getOrDefault(ModDataComponents.ENERGY.get(), 0);
             builder.accept(Component.translatable("gui.arcforge.fe_stored", format(energy), format(tier.cellCapacity()))

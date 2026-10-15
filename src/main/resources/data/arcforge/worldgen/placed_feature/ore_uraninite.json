@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_uraninite",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "uraninite",
+      "default": 2
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "uraninite",
+      "shape": "trapezoid",
+      "default_min": -64,
+      "default_max": 24
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

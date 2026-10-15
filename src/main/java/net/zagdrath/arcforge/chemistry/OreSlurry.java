@@ -13,7 +13,7 @@ import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 
 // The metals the Chemical Reactor leaches into slurry (with sulfuric acid) and precipitates back into dust,
-// three per raw ore. Each slurry is its own fluid (<metal>_slurry), drawn with one greyscale texture in its
+// three per raw ore (lead from galena). Each slurry is its own fluid (<metal>_slurry), drawn with one greyscale texture in its
 // metal's tint. Fluorite and arcite are gems and aren't leached.
 // The dusts are looked up lazily: ModItems builds the slurry buckets from this enum.
 public enum OreSlurry {
@@ -23,7 +23,8 @@ public enum OreSlurry {
     SILVER("silver", 0xFFA8B6C8, () -> ModItems.SILVER_DUST.get()),
     NICKEL("nickel", 0xFFB8AC72, () -> ModItems.NICKEL_DUST.get()),
     TUNGSTEN("tungsten", 0xFF6E7680, () -> ModItems.TUNGSTEN_DUST.get()),
-    BISMUTH("bismuth", 0xFFB89CB8, () -> ModItems.BISMUTH_DUST.get());
+    BISMUTH("bismuth", 0xFFB89CB8, () -> ModItems.BISMUTH_DUST.get()),
+    LEAD("lead", 0xFF7C8496, () -> ModItems.LEAD_DUST.get());
 
     private final String metal;
     private final int tint;

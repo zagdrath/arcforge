@@ -9,6 +9,8 @@
     "#c:ores/sulfur",
     "#c:ores/halite",
     "#c:ores/spodumene",
-    "#c:ores/iolite"
+    "#c:ores/iolite",
+    "#c:ores/uranium",
+    "#c:ores/lead"
   ]
 }

@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/uranium_hexafluoride",
+  "display": {
+    "icon": {
+      "id": "arcforge:gas_centrifuge"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.centrifuge_cascade.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.centrifuge_cascade.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:multiblock_formed",
+      "conditions": {
+        "multiblock": "arcforge:centrifuge_cascade"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

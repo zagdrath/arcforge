@@ -17,6 +17,11 @@
     "#c:dusts/sulfur",
     "#c:dusts/salt",
     "#c:dusts/spodumene",
-    "#c:dusts/iolite"
+    "#c:dusts/iolite",
+    "#c:dusts/uraninite",
+    "#c:dusts/lead",
+    "#c:dusts/monazite",
+    "#c:dusts/zircon",
+    "#c:dusts/depleted_uranium"
   ]
 }

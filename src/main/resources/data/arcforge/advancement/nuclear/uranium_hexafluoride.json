@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/yellowcake",
+  "display": {
+    "icon": {
+      "id": "arcforge:uranium_tetrafluoride"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.uranium_hexafluoride.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.uranium_hexafluoride.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "fluid": "arcforge:uranium_hexafluoride"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

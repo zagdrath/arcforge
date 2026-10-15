@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "arcforge:block/nuclear/centrifuge_cascade_casing_top",
+    "bottom": "arcforge:block/nuclear/centrifuge_cascade_casing_bottom",
+    "side": "arcforge:block/nuclear/centrifuge_cascade_casing_side"
+  }
+}

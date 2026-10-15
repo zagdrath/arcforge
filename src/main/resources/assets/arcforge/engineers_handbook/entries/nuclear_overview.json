@@ -1,0 +1,20 @@
+{
+  "title": "The Nuclear Tier",
+  "icon": "arcforge:yellowcake",
+  "items": [
+    "arcforge:raw_uraninite",
+    "arcforge:yellowcake",
+    "arcforge:centrifuge_cascade_controller",
+    "arcforge:geiger_counter"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Uranium for civil power, from the ore to enriched fuel gas.\n- Mine Uraninite deep underground, crush it and leach it into Uranyl Sulfate Solution.\n- Precipitate Ammonium Diuranate with Ammonia, then calcine it into Yellowcake.\n- Convert the Yellowcake to Uranium Dioxide, Uranium Tetrafluoride and at last Uranium Hexafluoride (UF₆), a gas.\n- Enrich the UF₆ in a Gas Centrifuge Cascade, up to 20% U-235 at most: low-enriched fuel, never more.\n- Turn the cascade's depleted tails into Depleted Uranium, the best radiation shield there is."
+    },
+    {
+      "type": "text",
+      "text": "# Radiation\nUranium is radioactive, and so is what's made from it. Carry a Geiger Counter and a Dosimeter, build with shielding, keep ore and powders in a Lead Box, and wear a Hazmat Suit near anything strong. See Radiation and Radiation Protection."
+    }
+  ]
+}

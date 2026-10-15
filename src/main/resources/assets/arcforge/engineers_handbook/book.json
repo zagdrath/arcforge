@@ -210,6 +210,24 @@
         "hydroponic_cell",
         "greenhouse"
       ]
+    },
+    {
+      "id": "nuclear",
+      "title": "Nuclear",
+      "icon": "arcforge:yellowcake",
+      "description": "Uranium for civil power: its ores, radiation, the chemistry and enrichment.",
+      "entries": [
+        "nuclear_overview",
+        "uraninite",
+        "galena_and_lead",
+        "heavy_mineral_sand",
+        "radiation",
+        "radiation_protection",
+        "uranium_chemistry",
+        "uranium_hexafluoride",
+        "centrifuge_cascade",
+        "depleted_uranium"
+      ]
     }
   ]
 }

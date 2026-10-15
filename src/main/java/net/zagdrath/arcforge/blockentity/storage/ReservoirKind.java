@@ -22,7 +22,8 @@ public enum ReservoirKind {
 
     // A Fluid Reservoir takes any liquid and no gas, a Gas Reservoir any gas and no liquid.
     public boolean accepts(FluidResource resource) {
-        return !resource.isEmpty() && Gases.isGas(resource) == (this == GAS);
+        // Corrosive gases (UF6) eat through the reservoir's seals: only a PVC-lined Pressurized Cylinder holds them.
+        return !resource.isEmpty() && Gases.isGas(resource) == (this == GAS) && !net.zagdrath.arcforge.nuclear.Corrosion.isCorrosive(resource);
     }
 
     // Whether the tank fills layer by layer from the bottom (a liquid); a gas fills every block alike.

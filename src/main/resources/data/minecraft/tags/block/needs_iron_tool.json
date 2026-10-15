@@ -27,6 +27,10 @@
     "arcforge:diamond_press",
     "arcforge:iolite_ore",
     "arcforge:iolite_block",
-    "arcforge:well_head"
+    "arcforge:well_head",
+    "arcforge:uraninite_ore",
+    "arcforge:deepslate_uraninite_ore",
+    "arcforge:raw_uraninite_block",
+    "arcforge:depleted_uranium_block"
   ]
 }

@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "#c:gems/zircon",
+  "result": {
+    "count": 1,
+    "id": "arcforge:zircon_dust"
+  },
+  "time": 200,
+  "ore": false
+}

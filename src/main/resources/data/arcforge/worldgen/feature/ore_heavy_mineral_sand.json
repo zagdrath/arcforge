@@ -1,0 +1,29 @@
+{
+  "type": "arcforge:config_ore",
+  "ore": "heavyMineralSand",
+  "size": 14,
+  "discard_chance_on_air_exposure": 0,
+  "targets": [
+    {
+      "target": {
+        "predicate_type": "minecraft:block_match",
+        "block": "minecraft:sand"
+      },
+      "state": "arcforge:heavy_mineral_sand"
+    },
+    {
+      "target": {
+        "predicate_type": "minecraft:block_match",
+        "block": "minecraft:red_sand"
+      },
+      "state": "arcforge:heavy_mineral_sand"
+    },
+    {
+      "target": {
+        "predicate_type": "minecraft:block_match",
+        "block": "minecraft:gravel"
+      },
+      "state": "arcforge:heavy_mineral_sand"
+    }
+  ]
+}

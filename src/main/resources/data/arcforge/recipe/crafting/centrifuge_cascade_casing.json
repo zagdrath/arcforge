@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SLS",
+    "LGL",
+    "SLS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "L": "#c:plates/lead",
+    "G": "#c:gears/steel"
+  },
+  "result": {
+    "id": "arcforge:centrifuge_cascade_casing",
+    "count": 4
+  }
+}

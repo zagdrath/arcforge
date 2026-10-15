@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:nuclear/uraninite",
+  "display": {
+    "icon": {
+      "id": "arcforge:yellowcake"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.yellowcake.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.yellowcake.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:yellowcake"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

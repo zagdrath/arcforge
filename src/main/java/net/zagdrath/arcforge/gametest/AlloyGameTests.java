@@ -180,8 +180,10 @@ final class AlloyGameTests {
         // and Wired Machine Link), and the oilfield's seven (Steel Pipe, Seismic Survey Tool, Derrick Casing and Frame, Oil
         // Derrick Controller, Pumpjack Casing and Controller), and the refinery units' ten (Catalytic Reformer, Coker,
         // Lubricant Blender, Cracking Catalyst, Cracking Unit Casing and Controller, Diesel Generator Casing and Controller,
-        // Flare Stack, and Asphalt from Bitumen).
-        helper.assertTrue(crafting == 287, crafting + " crafting/ recipes, not 287");
+        // Flare Stack, and Asphalt from Bitumen), and the nuclear tier's twenty (Raw Uraninite, Raw Galena, Lead and Depleted
+        // Uranium blocks both ways, Lead Bricks, Concrete Shielding, Geiger Counter, Dosimeter, Lead Box, the four Hazmat
+        // pieces, Gas Centrifuge, and the Centrifuge Cascade Casing and Controller).
+        helper.assertTrue(crafting == 307, crafting + " crafting/ recipes, not 307");
         // Plus the fluorite-fluxed steel, and Graphite from Coal Coke and from Carbon Dust.
         helper.assertTrue(smelting == 8, smelting + " arcforge_smelting/ recipes, not 8");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

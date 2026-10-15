@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "category": "precipitating",
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:uranyl_sulfate_solution",
+      "amount": 250
+    },
+    {
+      "fluid": "arcforge:ammonia",
+      "amount": 50
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:ammonium_diuranate",
+    "count": 1
+  },
+  "time": 80
+}

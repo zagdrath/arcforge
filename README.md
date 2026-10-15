@@ -210,8 +210,8 @@ FE-powered tools that never break, in three tiers: charge them in an Energy Cell
 
 ### Ores
 
-Eight ores generate in stone and deepslate (Silver, Nickel, Tungsten as wolframite ore, Fluorite, Bismuth,
-Arcite, Halite and Spodumene). Each drops its raw item (Fortune works; Silk Touch drops the ore), and has a raw block and a storage
+Ten ores generate in stone and deepslate (Silver, Nickel, Tungsten as wolframite ore, Fluorite, Bismuth,
+Arcite, Halite, Spodumene, and the nuclear tier's Uraninite and Galena). Each drops its raw item (Fortune works; Silk Touch drops the ore), and has a raw block and a storage
 block. Raw items, ores and dusts smelt into the ingot or crystal (twice as fast in a blast furnace, and in the
 Induction Furnace), and the Arc Crusher gives 2 dust per ore (+25%), 1 per raw item (+25%), 9 per raw block
 and 1 per ingot. Arcite needs a diamond pickaxe and glows (ores 5, raw block 9, block 12). Every recipe
@@ -227,6 +227,8 @@ takes the common tags (`c:ingots/silver`, `c:gems/arcite`, ...), so other mods' 
 | Arcite | 4 | 5 | -64 to -40 | Arcforged conduits and upgrades |
 | Halite | 1 bed in 4 chunks | flat beds, radius 11 | -32 to 40 | Salt (Rock Salt crushes into 2) |
 | Spodumene | 3 (+6 pegmatite veins of 10 under mountains and badlands, Y 0 to 160) | 7 | -48 to 48 | lithium, for the Battery Array |
+| Uraninite | 2 | 4 | -64 to 24 (mostly below 0) | uranium (see Nuclear) |
+| Galena | 8 | 9 | -16 to 64 | lead, and a little silver |
 
 **Spodumene** (lithium) doesn't smelt: the Arc Crusher grinds it into Spodumene Dust for the Chemical Reactor (see
 Lithium and batteries). A stone pickaxe mines it.
@@ -761,6 +763,68 @@ the controller's display shows it too and glows brighter the fuller it is, and a
 Redstone control pauses the output. Cells are crafted from an LFP Cathode, a Cell Separator, a Graphite Anode, Steel
 Plates and Wrought Alloy, regulators the same with a block of redstone; each tier upgrades into the next keeping its
 charge. Config `power.batteryArray`.
+
+### Nuclear
+
+The nuclear tier is for **civil power only**: nothing in it makes a weapon, and enrichment stops at 20% U-235. This
+first part covers the ores, radiation, uranium chemistry and enrichment; reactors come later. Everything is in the
+**Arcforge: Nuclear** creative tab and the Handbook's Nuclear chapter.
+
+**Ores.** *Uraninite* (pitchblende) is rare, in small veins mostly below Y 0, and needs an iron pickaxe. It drops Raw
+Uraninite (Fortune works); the Arc Crusher gives 2 Uraninite Dust an ore (the Arc Crushing Array 4), 1 a raw (+25%) and
+9 a raw block. *Galena* is common at mid depths and goes the way of the other metals into **Lead** (raw block, dust,
+ingot, storage block, plate, and the leach-and-precipitate chain), with a 10% chance of Silver Dust when crushed.
+*Heavy Mineral Sand* lies in patches in the sand and gravel of beaches, rivers and deserts (Y 40 to 90, a shovel mines
+it); the Sifter separates it into sand, Monazite (30%), Zircon (40%) and iron dust (15%), and the Arc Crusher turns
+Monazite and Zircon into dust (kept for later reactors). Everything has its `c:` tags.
+
+**Radiation.** Radioactive items, blocks and fluids have a dose rate in mSv/h at one block, from the
+`arcforge:radioactivity` data maps (Raw Uraninite 0.1, Uraninite Ore 0.2, a Raw Uraninite block 0.9, UF6 0.4 a bucket, a
+Depleted Uranium block 0.045, ...). The rate at a player is the sum of every source within 16 blocks
+(`nuclear.radiation.sourceRadius`) times the inverse square of the distance times what each solid block on the line
+lets through (`arcforge:radiation_shielding`): Lead 0.1, Depleted Uranium 0.05, concrete 0.3, Concrete Shielding 0.25,
+iron and steel 0.4, water 0.5, stone and deepslate 0.6, any other solid block 0.8. Chests and tanks of radioactive
+things count, as do items on the ground and in other players' inventories; what you carry counts as half a block
+away. Sources are looked up per chunk and kept for 2 seconds.
+
+The dose (mSv) builds up while you're exposed and slowly recovers (10 mSv an in-game hour). From 1,000 mSv you feel sick
+(Nausea), from 2,000 weak and hungry, from 4,000 you wither, and from 8,000 radiation sickness hurts you until you
+recover or die; dying resets it. All the thresholds are config values, `playerEffects` turns the effects off, and
+`affectMobs` (off by default) gives mobs a dose too.
+
+- **Geiger Counter**: held, it clicks faster as the rate rises and shows the rate in mSv/h; with a Dosimeter in the other
+  hand it shows your dose too.
+- **Dosimeter**: shows your accumulated dose and warns as you pass each threshold.
+- **Hazmat Suit**: four lead-lined pieces. A full set lets 5% of outside radiation through (`hazmatTransmission`); fewer
+  pieces protect in proportion. It doesn't shield what you carry.
+- **Lead Box**: nine slots that let nothing out. Carry ore in one.
+- **Lead Block**, **Lead Bricks** and **Concrete Shielding** (concrete with steel rebar) for walls.
+
+**Uranium chemistry** (Chemical Reactor unless noted):
+
+```
+Uraninite Dust + Sulfuric Acid --> Uranyl Sulfate Solution
+Uranyl Sulfate Solution + Ammonia --> Ammonium Diuranate --[Induction Furnace / furnace]--> Yellowcake
+Fluorite Dust + Sulfuric Acid --> Hydrofluoric Acid --[Electrolyzer]--> Hydrogen + Fluorine
+Yellowcake + Hydrogen --> Uranium Dioxide;  + Hydrofluoric Acid --> Uranium Tetrafluoride;  + Fluorine --> UF6 (a gas)
+```
+
+**UF6** (natural, enriched and depleted) is toxic and corrosive (`arcforge:corrosive_gases`): Gas Reservoirs, Gas Cartridges, the Flare Stack
+and Quantum Tunnels refuse it. It goes through Pressurized Conduits and into **PVC-lined** Pressurized Cylinders: use
+4 PVC Sheets (`pvcLining.sheets`) on a cylinder to line it, which it keeps when broken.
+
+**Gas Centrifuge Cascade.** A hall on a raised floor: a 3x3 to 7x7 floor of Centrifuge Cascade Casings with the
+controller in the middle of its front edge, and two-tall Gas Centrifuges standing on it (anywhere but over the
+controller), the rest open. It enriches natural UF6 (0.711%) into UF6 at the target you set (1% to 20%) and depleted UF6
+tails (0.25% by default, 0.1% to 0.5%), by the real separative-work formula: each centrifuge does 0.02 SWU a tick
+(`swuPerCentrifuge`) for 40 FE/t. A mB of 5% UF6 takes about 10.3 mB of feed and 7.9 SWU; 3% takes 6.0 and 3.8; 20%
+takes 42.8 and 41.6. UF6 carries its enrichment as a component, shown on tooltips and in Jade; tanks and conduits only
+mix UF6 of the same enrichment. Its ports (Input, Output, Tails, Energy) are any casing of the floor. The GUI shows the
+feed, target and tails with the feed and SWU each mB of product takes.
+
+**Depleted Uranium.** Depleted UF6 + Hydrogen + Steam give Depleted Uranium Dust (and Hydrofluoric Acid back), which
+smelts into ingots and blocks: the best shield (0.05), a little radioactive, and it can stand in for lead in the
+shielding recipes (`arcforge:shielding_metals`).
 
 ### Fermenting
 

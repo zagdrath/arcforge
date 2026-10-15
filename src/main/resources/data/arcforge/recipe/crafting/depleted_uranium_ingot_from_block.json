@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:storage_blocks/depleted_uranium"
+  ],
+  "result": {
+    "id": "arcforge:depleted_uranium_ingot",
+    "count": 9
+  }
+}

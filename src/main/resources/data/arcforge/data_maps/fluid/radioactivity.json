@@ -1,0 +1,22 @@
+{
+  "values": {
+    "arcforge:uranyl_sulfate_solution": {
+      "dose_rate": 0.2
+    },
+    "arcforge:uranium_hexafluoride": {
+      "dose_rate": 0.4
+    },
+    "arcforge:depleted_uranium_hexafluoride": {
+      "dose_rate": 0.18
+    },
+    "arcforge:flowing_uranyl_sulfate_solution": {
+      "dose_rate": 0.2
+    },
+    "arcforge:flowing_uranium_hexafluoride": {
+      "dose_rate": 0.4
+    },
+    "arcforge:flowing_depleted_uranium_hexafluoride": {
+      "dose_rate": 0.18
+    }
+  }
+}

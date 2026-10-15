@@ -97,7 +97,8 @@ public final class Frequency {
         this.energy = new Energy(ArcforgeConfig.QUANTUM_ENERGY_BUFFER.getAsInt(), changed);
         this.heat = new HeatBuffer(ArcforgeConfig.QUANTUM_HEAT_BUFFER.getAsInt(), MAX_CELSIUS, changed);
         this.fluid = new FilteredFluidTank(ArcforgeConfig.QUANTUM_FLUID_BUFFER.getAsInt(), resource -> !Gases.isGas(resource), changed);
-        this.gas = new FilteredFluidTank(ArcforgeConfig.QUANTUM_GAS_BUFFER.getAsInt(), Gases::isGas, changed);
+        this.gas = new FilteredFluidTank(ArcforgeConfig.QUANTUM_GAS_BUFFER.getAsInt(),
+                resource -> Gases.isGas(resource) && !net.zagdrath.arcforge.nuclear.Corrosion.isCorrosive(resource), changed);
         this.items = new FilteredItemHandler(ArcforgeConfig.QUANTUM_ITEM_SLOTS.getAsInt(), (slot, resource) -> true, changed);
     }
 

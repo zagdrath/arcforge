@@ -49,6 +49,9 @@ public final class ArcforgeGameTests {
     // Oil tests put deposits under whole chunks (and the oil they take is the server's), so a neighbouring test's chunk
     // could share one: each runs in its own batch, one after another.
     private static final java.util.Map<String, Consumer<GameTestHelper>> OIL_TESTS = new java.util.LinkedHashMap<>();
+    // Radiation tests measure the dose rate from what's round them (radiation.sourceRadius, 16 blocks), so another
+    // test's radioactive blocks mustn't be near: each gets the oil tests' wide padding.
+    private static final java.util.Map<String, Consumer<GameTestHelper>> RADIATION_TESTS = new java.util.LinkedHashMap<>();
     // Tests that fail now and then for reasons outside what they test. They run and report as usual but aren't
     // required, so they can't fail a run (or a release) at random. (Retrying doesn't help: the test server
     // reports before a retry finishes.) Fix them and move them back to TESTS.
@@ -582,7 +585,16 @@ public final class ArcforgeGameTests {
         SOLAR_TESTS.put("solar_north_south_beats_east_west", SolarGameTests::northSouthBeatsEastWest);
         SOLAR_TESTS.put("solar_boiler_grades", SolarGameTests::boilerGrades);
         SOLAR_TESTS.put("solar_no_sky", SolarGameTests::noSky);
+        TESTS.put("nuclear_ores", NuclearGameTests::ores);
+        TESTS.put("nuclear_veins", NuclearGameTests::veins);
+        TESTS.put("nuclear_chemistry", NuclearGameTests::chemistry);
+        TESTS.put("nuclear_enrichment_math", NuclearGameTests::enrichmentMath);
+        TESTS.put("nuclear_cascade_enriches", NuclearGameTests::cascadeEnriches);
+        TESTS.put("nuclear_corrosive_storage", NuclearGameTests::corrosiveStorage);
+        RADIATION_TESTS.put("nuclear_radiation_field", NuclearGameTests::radiationField);
+        RADIATION_TESTS.put("nuclear_hazmat_and_dose", NuclearGameTests::hazmatAndDose);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
+        RADIATION_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         SOLAR_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         OIL_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
@@ -613,8 +625,8 @@ public final class ArcforgeGameTests {
                     Identifier.withDefaultNamespace("empty"), 1_500, 0, true, Rotation.NONE, false, 1, 1, true, 8)));
         });
         // Each oil test builds across three chunks (deposits are per chunk), so it gets room enough that no other test's
-        // area or barrier walls reach into it.
-        OIL_TESTS.keySet().forEach(name -> {
+        // area or barrier walls reach into it; each radiation test gets the same, so no other test's sources are in range.
+        java.util.stream.Stream.concat(OIL_TESTS.keySet().stream(), RADIATION_TESTS.keySet().stream()).forEach(name -> {
             Holder<TestEnvironmentDefinition<?>> own = event.registerEnvironment(id(name));
             event.registerTest(id(name), new FunctionGameTestInstance(function(name), new TestData<>(own, Level.OVERWORLD,
                     Identifier.withDefaultNamespace("empty"), 600, 0, true, Rotation.NONE, false, 1, 1, false, 48)));

@@ -141,6 +141,10 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class);
         registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, PressureGlassBlock.class);
         // The Battery Array: its energy, rates and parts from any block of it; a loose cell's own energy.
+        registration.registerBlockDataProvider(NuclearProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity.class);
+        registration.registerBlockDataProvider(NuclearProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeCasingBlock.class);
+        registration.registerBlockDataProvider(NuclearProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.GasCentrifugeBlock.class);
+        registration.registerBlockDataProvider(NuclearProvider.INSTANCE, net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class);
@@ -267,6 +271,11 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class, net.zagdrath.arcforge.block.multiblock.LithiumCellBlock.class,
                 net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock.class, PressureGlassBlock.class)) {
             registration.registerBlockComponent(BatteryArrayProvider.Client.INSTANCE, type);
+        }
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeCasingBlock.class, net.zagdrath.arcforge.block.multiblock.GasCentrifugeBlock.class,
+                net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock.class)) {
+            registration.registerBlockComponent(NuclearProvider.Client.INSTANCE, type);
         }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.class,
                 net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class, PressureGlassBlock.class)) {

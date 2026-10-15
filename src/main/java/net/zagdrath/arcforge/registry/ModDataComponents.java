@@ -112,6 +112,16 @@ public final class ModDataComponents {
             DATA_COMPONENTS.registerComponentType("oil_markers", b -> b.persistent(net.zagdrath.arcforge.oil.SurveyRecord.CODEC.listOf())
                     .networkSynchronized(net.zagdrath.arcforge.oil.SurveyRecord.STREAM_CODEC.apply(ByteBufCodecs.list())));
 
+    // The U-235 assay of a stack of Uranium Hexafluoride or its depleted tails, in thousandths of a percent (711 =
+    // 0.711%; absent: the fluid's own, see Enrichment). Held to 20% (civil fuel only): the codec refuses more.
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> U235_ASSAY =
+            DATA_COMPONENTS.registerComponentType("u235_assay", b -> b.persistent(Codec.intRange(1, net.zagdrath.arcforge.nuclear.Enrichment.MAX_PCM))
+                    .networkSynchronized(ByteBufCodecs.VAR_INT));
+
+    // Present on a Pressurized Cylinder lined with PVC: it can hold a corrosive gas (#arcforge:corrosive_gases, UF6).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> PVC_LINED =
+            DATA_COMPONENTS.registerComponentType("pvc_lined", b -> b.persistent(Unit.CODEC).networkSynchronized(Unit.STREAM_CODEC));
+
     private ModDataComponents() {}
 
     public static void register(IEventBus modEventBus) {

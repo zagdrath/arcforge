@@ -78,6 +78,18 @@ public final class ControllerMultiblockSpecs {
                         be -> be.getLastInput() - be.getLastOutput())
                 .build());
 
+        // The Gas Centrifuge Cascade: its feed, product and tails tanks, and the FE its centrifuges use.
+        MachineControls.register(ModBlockEntityTypes.CENTRIFUGE_CASCADE.get(),
+                MachineControlSpec.builder(net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity.class)
+                        .primary(net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::isFormed)
+                        .energy(EnergyRole.CONSUMER, net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::getEnergy,
+                                be -> be.getLastEnergy())
+                        .tank(SlotRole.INPUT, net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::getFeed)
+                        .tank(SlotRole.OUTPUT, net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::getProduct)
+                        .tank(SlotRole.OUTPUT, net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::getTails)
+                        .fluidAutomation(be -> be.getFluidHandler(null))
+                        .build());
+
         // Progress: mB evaporated towards the next result; it evaporates rate mB/t, so the time left follows from that.
         MachineControls.register(ModBlockEntityTypes.THERMAL_EVAPORATOR.get(), MachineControlSpec.builder(ThermalEvaporatorBlockEntity.class)
                 .slot(ThermalEvaporatorBlockEntity.SLOT_SALT, SlotRole.OUTPUT)

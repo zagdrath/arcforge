@@ -175,6 +175,9 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity>> BATTERY_ARRAY =
             BLOCK_ENTITY_TYPES.register("battery_array", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity::new, ModBlocks.BATTERY_ARRAY_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity>> CENTRIFUGE_CASCADE =
+            BLOCK_ENTITY_TYPES.register("centrifuge_cascade", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::new, ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity>> LITHIUM_CELL =
             BLOCK_ENTITY_TYPES.register("lithium_cell", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity::new, tierBlocks(ModBlocks::lithiumCell)));

@@ -88,7 +88,8 @@ public final class MultiblockBlueprints {
                 greenhouse(),
                 thermalEvaporator(),
                 fireboxArray(),
-                batteryArray());
+                batteryArray(),
+                centrifugeCascade());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -425,6 +426,31 @@ public final class MultiblockBlueprints {
             placements.add(new Placement(at, state));
         }
         return new Blueprint("battery_array", sorted(placements), size);
+    }
+
+    // The smallest hall that reads as one: a 5x4 floor (3x3 to 7x7 work), the controller in the front edge, and two
+    // rows of centrifuges behind it with an aisle between.
+    private static Blueprint centrifugeCascade() {
+        BlockPos size = new BlockPos(5, 3, 4);
+        BlockState casing = ModBlocks.CENTRIFUGE_CASCADE_CASING.get().defaultBlockState();
+        BlockState controller = ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get().defaultBlockState()
+                .setValue(net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeControllerBlock.FACING, Direction.SOUTH);
+        BlockState lower = ModBlocks.GAS_CENTRIFUGE.get().defaultBlockState();
+        BlockState upper = lower.setValue(net.zagdrath.arcforge.block.multiblock.GasCentrifugeBlock.HALF,
+                net.minecraft.world.level.block.state.properties.DoubleBlockHalf.UPPER);
+        List<Placement> placements = new ArrayList<>();
+        for (int z = 0; z < size.getZ(); z++) {
+            for (int x = 0; x < size.getX(); x++) {
+                BlockPos at = new BlockPos(x, 0, z);
+                placements.add(new Placement(at, at.equals(new BlockPos(2, 0, 3)) ? controller : casing));
+                // Rows at z 0 and 2 (z 1 the aisle), clear of the controller's panel at the front.
+                if (z == 0 || z == 2) {
+                    placements.add(new Placement(new BlockPos(x, 1, z), lower));
+                    placements.add(new Placement(new BlockPos(x, 2, z), upper));
+                }
+            }
+        }
+        return new Blueprint("centrifuge_cascade", sorted(placements), size);
     }
 
     // 3x3 (up to 7x7 work), 5 long along X (3 to 27 work), with a window along the front.

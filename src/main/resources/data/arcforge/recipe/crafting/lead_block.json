@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:ingots/lead"
+  },
+  "result": {
+    "id": "arcforge:lead_block",
+    "count": 1
+  }
+}

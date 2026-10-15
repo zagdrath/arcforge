@@ -3607,6 +3607,11 @@ public class ArcforgeConfig {
         ore("spodumene", "Spodumene: uncommon, everywhere in stone and deepslate.", true, 3, 7, -48, 48, 0.0);
         ore("spodumenePegmatite", "Spodumene pegmatites: extra, bigger veins under mountains and badlands (only while ores.spodumene is on too).",
                 true, 6, 10, 0, 160, 0.0);
+        ore("uraninite", "Uraninite (pitchblende, the uranium ore): rare, in small veins, mostly below Y 0; needs an iron pickaxe.",
+                true, 2, 4, -64, 24, 0.0);
+        ore("galena", "Galena (lead and a little silver): common at mid depths.", true, 8, 9, -16, 64, 0.0);
+        ore("heavyMineralSand", "Heavy Mineral Sand (monazite and zircon): patches in the sand and gravel of beaches, rivers and deserts,"
+                + " near the surface; shovel-mined.", true, 5, 14, 40, 90, 0.0);
         ore("iolite", "Iolite: the End's ore, in End Stone on the main island; needs an iron pickaxe, drops Iolite Crystals.", true, 3, 6, 0, 80, 0.0);
         ore("ioliteOuter", "Iolite on the outer End islands: more of it than on the main island (only while ores.iolite is on too).",
                 true, 8, 7, 0, 80, 0.0);
@@ -3862,6 +3867,136 @@ public class ArcforgeConfig {
             .defineEnum("defaultMode", net.zagdrath.arcforge.security.SecurityMode.PUBLIC);
 
     static {
+        BUILDER.pop();
+    }
+
+    // --- Nuclear ---
+
+    static {
+        BUILDER.comment("The nuclear tier: radiation, uranium chemistry and enrichment. Civil power only: enrichment stops at 20%.")
+                .push("nuclear");
+        BUILDER.comment("Radiation. Radioactive items, blocks and fluids (the arcforge:radioactivity data maps) give a dose rate in mSv/h at",
+                "one block; at a player the rates of everything within radius add up, each falling off with the square of the",
+                "distance and cut by every block in between (the arcforge:radiation_shielding data map). The dose builds up on the",
+                "player while they're exposed and slowly recovers.").push("radiation");
+    }
+
+    public static final ModConfigSpec.BooleanValue RADIATION_ENABLED = BUILDER
+            .comment("Whether radiation is felt at all (off: no dose builds up; the Geiger Counter still reads).")
+            .define("radiationEnabled", true);
+
+    public static final ModConfigSpec.IntValue RADIATION_RADIUS = BUILDER
+            .comment("How far away a source is felt, in blocks.")
+            .defineInRange("sourceRadius", 16, 4, 32);
+
+    public static final ModConfigSpec.IntValue RADIATION_CHECK_INTERVAL = BUILDER
+            .comment("Ticks between dose rate checks at each player.")
+            .defineInRange("doseCheckInterval", 5, 1, 40);
+
+    public static final ModConfigSpec.IntValue RADIATION_CACHE_TICKS = BUILDER
+            .comment("Ticks a chunk's sources are kept before they are looked for again.")
+            .defineInRange("chunkCacheTicks", 40, 5, 1_200);
+
+    public static final ModConfigSpec.IntValue RADIATION_MAX_SOURCES = BUILDER
+            .comment("At most this many sources are traced through the blocks between (the strongest); the rest are left out.")
+            .defineInRange("maxSources", 64, 8, 1_024);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_DEFAULT_SHIELDING = BUILDER
+            .comment("What a solid block without a radiation_shielding entry lets through (0 to 1).")
+            .defineInRange("defaultShielding", 0.8, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_INVENTORY_DISTANCE = BUILDER
+            .comment("How far from the body carried items count as being, in blocks.")
+            .defineInRange("inventoryDistance", 0.5, 0.1, 2.0);
+
+    public static final ModConfigSpec.IntValue RADIATION_TICKS_PER_HOUR = BUILDER
+            .comment("Ticks to the hour of a dose rate (mSv/h): 1000 is an in-game hour, 72000 a real one.")
+            .defineInRange("ticksPerHour", 1_000, 20, 72_000);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_RECOVERY = BUILDER
+            .comment("mSv the accumulated dose falls by each hour (as ticksPerHour).")
+            .defineInRange("recoveryPerHour", 10.0, 0.0, 10_000.0);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_NAUSEA_DOSE = BUILDER
+            .comment("Accumulated dose (mSv) from which the player feels sick (Nausea).")
+            .defineInRange("nauseaDose", 1_000.0, 1.0, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_WEAKNESS_DOSE = BUILDER
+            .comment("Accumulated dose (mSv) from which they're weak and hungry (Weakness and Hunger).")
+            .defineInRange("weaknessDose", 2_000.0, 1.0, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_WITHER_DOSE = BUILDER
+            .comment("Accumulated dose (mSv) from which they wither (Wither).")
+            .defineInRange("witherDose", 4_000.0, 1.0, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_LETHAL_DOSE = BUILDER
+            .comment("Accumulated dose (mSv) from which radiation sickness hurts them every 2 seconds until they recover or die.")
+            .defineInRange("lethalDose", 8_000.0, 1.0, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_LETHAL_DAMAGE = BUILDER
+            .comment("Damage (half hearts) each 2 seconds past lethalDose.")
+            .defineInRange("lethalDamage", 2.0, 0.0, 100.0);
+
+    public static final ModConfigSpec.BooleanValue RADIATION_PLAYER_EFFECTS = BUILDER
+            .comment("Whether the dose thresholds give players their effects and damage (off: the dose only shows on the Dosimeter).")
+            .define("playerEffects", true);
+
+    public static final ModConfigSpec.BooleanValue RADIATION_AFFECTS_MOBS = BUILDER
+            .comment("Whether mobs build up a dose and get the same effects (checked less often than players).")
+            .define("affectMobs", false);
+
+    public static final ModConfigSpec.DoubleValue HAZMAT_TRANSMISSION = BUILDER
+            .comment("What a full Hazmat Suit lets through of the radiation from outside it (0 to 1); fewer pieces protect in",
+                    "part (helmet 15%, chestplate 40%, leggings 30%, boots 15% of the protection).")
+            .defineInRange("hazmatTransmission", 0.05, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Gas Centrifuge Cascade: a hall of Gas Centrifuges on a raised floor (3x3 to 7x7) that enriches Uranium",
+                "Hexafluoride. Its capacity in separative work (SWU) is its centrifuges times swuPerCentrifuge; the work each mB of",
+                "product takes follows the real separative-work formula, so higher enrichment and lower tails cost more.")
+                .push("gasCentrifugeCascade");
+    }
+
+    public static final ModConfigSpec.DoubleValue CASCADE_SWU_PER_CENTRIFUGE = BUILDER
+            .comment("Separative work each centrifuge does, in SWU per tick (a mB of UF6 is a unit).")
+            .defineInRange("swuPerCentrifuge", 0.02, 0.0001, 100.0);
+
+    public static final ModConfigSpec.IntValue CASCADE_ENERGY_PER_CENTRIFUGE = BUILDER
+            .comment("FE/t each centrifuge uses while it runs.")
+            .defineInRange("energyPerCentrifuge", 40, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue CASCADE_ENERGY_CAPACITY = BUILDER
+            .comment("The cascade's FE buffer.")
+            .defineInRange("energyCapacity", 200_000, 1_000, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue CASCADE_FEED_CAPACITY = BUILDER
+            .comment("mB of feed UF6 it holds.")
+            .defineInRange("feedTankCapacity", 16_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CASCADE_PRODUCT_CAPACITY = BUILDER
+            .comment("mB of enriched UF6 it holds.")
+            .defineInRange("productTankCapacity", 8_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CASCADE_TAILS_CAPACITY = BUILDER
+            .comment("mB of depleted UF6 (tails) it holds.")
+            .defineInRange("tailsTankCapacity", 32_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue CASCADE_MAX_TARGET = BUILDER
+            .comment("The highest enrichment its GUI lets you set, in % U-235 (never above 20: civil fuel only).")
+            .defineInRange("maxTarget", 20.0, 1.0, 20.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("PVC lining for Pressurized Cylinders (so they can hold UF6).").push("pvcLining");
+    }
+
+    public static final ModConfigSpec.IntValue PVC_LINING_SHEETS = BUILDER
+            .comment("PVC Sheets used to line one Pressurized Cylinder.")
+            .defineInRange("sheets", 4, 1, 64);
+
+    static {
+        BUILDER.pop();
         BUILDER.pop();
     }
 

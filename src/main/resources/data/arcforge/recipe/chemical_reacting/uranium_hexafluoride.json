@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:uranium_tetrafluoride",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:fluorine",
+      "amount": 100
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:uranium_hexafluoride",
+    "amount": 100
+  },
+  "time": 100
+}

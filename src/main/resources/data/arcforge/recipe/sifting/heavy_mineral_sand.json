@@ -1,0 +1,30 @@
+{
+  "type": "arcforge:sifting",
+  "ingredient": "arcforge:heavy_mineral_sand",
+  "outputs": [
+    {
+      "item": {
+        "id": "minecraft:sand"
+      },
+      "chance": 1.0
+    },
+    {
+      "item": {
+        "id": "arcforge:monazite"
+      },
+      "chance": 0.3
+    },
+    {
+      "item": {
+        "id": "arcforge:zircon"
+      },
+      "chance": 0.4
+    },
+    {
+      "item": {
+        "id": "arcforge:iron_dust"
+      },
+      "chance": 0.15
+    }
+  ]
+}

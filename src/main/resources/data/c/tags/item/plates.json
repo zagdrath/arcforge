@@ -5,6 +5,7 @@
     "#c:plates/silver",
     "#c:plates/nickel",
     "#c:plates/tungsten",
-    "#c:plates/invar"
+    "#c:plates/invar",
+    "#c:plates/lead"
   ]
 }

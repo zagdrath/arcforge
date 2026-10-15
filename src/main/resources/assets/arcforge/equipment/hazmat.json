@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "arcforge:hazmat"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "arcforge:hazmat"
+      }
+    ]
+  }
+}

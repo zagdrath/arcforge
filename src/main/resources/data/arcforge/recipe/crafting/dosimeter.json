@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "G",
+    "R",
+    "S"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "G": "minecraft:glass_pane",
+    "R": "#c:dusts/redstone"
+  },
+  "result": {
+    "id": "arcforge:dosimeter",
+    "count": 1
+  }
+}

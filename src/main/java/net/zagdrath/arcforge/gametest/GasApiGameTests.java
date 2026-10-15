@@ -94,6 +94,9 @@ public final class GasApiGameTests {
         gases.put(ModFluids.NATURAL_GAS.get(), GasTints.NATURAL_GAS);
         gases.put(ModFluids.PROPYLENE.get(), GasTints.PROPYLENE);
         gases.put(ModFluids.HYDROGEN_SULFIDE.get(), GasTints.HYDROGEN_SULFIDE);
+        gases.put(ModFluids.FLUORINE.get(), GasTints.FLUORINE);
+        gases.put(ModFluids.URANIUM_HEXAFLUORIDE.get(), GasTints.URANIUM_HEXAFLUORIDE);
+        gases.put(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get(), GasTints.DEPLETED_URANIUM_HEXAFLUORIDE);
         return gases;
     }
 

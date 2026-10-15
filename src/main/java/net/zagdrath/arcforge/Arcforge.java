@@ -56,6 +56,7 @@ public class Arcforge {
         ModParticleTypes.register(modEventBus);
         PortStore.register(modEventBus);
         FoundrySuit.register(modEventBus);
+        net.zagdrath.arcforge.nuclear.RadiationDose.register(modEventBus);
         ModDataComponents.register(modEventBus);
         net.zagdrath.arcforge.registry.ModMapDecorations.register(modEventBus);
         ModCapabilities.register(modEventBus);

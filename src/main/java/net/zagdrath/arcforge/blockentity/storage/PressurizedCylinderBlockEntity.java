@@ -64,13 +64,16 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
     private final ContainerData data;
     private final Map<Direction, BlockCapabilityCache<ResourceHandler<FluidResource>, @Nullable Direction>> gasTargets = new EnumMap<>(Direction.class);
     private int comparatorSignal = -1;
+    // Lined with PVC (a few PVC Sheets used on it): it can hold a corrosive gas (UF6, see Corrosion). The creative
+    // cylinder holds anything.
+    private boolean lined;
 
     public PressurizedCylinderBlockEntity(BlockPos pos, BlockState state) {
         // Defaults: fill from every side, drain from the bottom.
         super(ModBlockEntityTypes.PRESSURIZED_CYLINDER.get(), pos, state, ((PressurizedCylinderBlock) state.getBlock()).getTier(),
                 new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT));
         this.tank = creative ? new CreativeFluidTank(tier.cylinderCapacity(), Gases::isGas, this::setChanged)
-                : new FilteredFluidTank(tier.cylinderCapacity(), Gases::isGas, this::setChanged);
+                : new FilteredFluidTank(tier.cylinderCapacity(), this::holds, this::setChanged);
         this.inputView = new SidedResourceHandler<>(tank, true, false, rate(tier.cylinderRate()));
         this.outputView = new SidedResourceHandler<>(tank, false, true, rate(tier.cylinderRate()));
         this.automationView = new SidedResourceHandler<>(tank, true, true, rate(tier.cylinderRate()));
@@ -113,6 +116,24 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
     @Override
     protected ConduitType conduitType() {
         return ConduitType.GAS;
+    }
+
+    // A gas, and if it's corrosive only once lined.
+    private boolean holds(FluidResource resource) {
+        return Gases.isGas(resource) && (lined || !net.zagdrath.arcforge.nuclear.Corrosion.isCorrosive(resource));
+    }
+
+    public boolean isLined() {
+        return lined || creative;
+    }
+
+    // Lines it with PVC (see PressurizedCylinderBlock).
+    public void line() {
+        lined = true;
+        setChanged();
+        if (level != null) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
     }
 
     public FilteredFluidTank getTank() {
@@ -225,6 +246,7 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
     @Override
     protected void applyImplicitComponents(DataComponentGetter components) {
         super.applyImplicitComponents(components);
+        lined = components.get(ModDataComponents.PVC_LINED.get()) != null;
         FluidStack stack = components.getOrDefault(ModDataComponents.FLUID_CONTENTS.get(), SimpleFluidContent.EMPTY).copy();
         if (!stack.isEmpty() && Gases.isGas(stack)) {
             tank.set(0, FluidResource.of(stack), Math.min(stack.getAmount(), tank.getCapacity()));
@@ -234,6 +256,9 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
     @Override
     protected void collectImplicitComponents(DataComponentMap.Builder components) {
         super.collectImplicitComponents(components);
+        if (lined) {
+            components.set(ModDataComponents.PVC_LINED.get(), net.minecraft.util.Unit.INSTANCE);
+        }
         FluidStack gas = getGas();
         if (!gas.isEmpty()) {
             components.set(ModDataComponents.FLUID_CONTENTS.get(), SimpleFluidContent.copyOf(gas));
@@ -245,6 +270,7 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
     public void removeComponentsFromTag(ValueOutput output) {
         super.removeComponentsFromTag(output);
         output.discard("gas");
+        output.discard("pvc_lined");
     }
 
     // --- Saving ---
@@ -252,12 +278,14 @@ public class PressurizedCylinderBlockEntity extends StorageBlockEntity {
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
+        lined = input.getBooleanOr("pvc_lined", false);
         tank.deserialize(input.childOrEmpty("gas"));
     }
 
     @Override
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
+        output.putBoolean("pvc_lined", lined);
         tank.serialize(output.child("gas"));
     }
 

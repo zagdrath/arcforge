@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/centrifuge_cascade",
+  "display": {
+    "icon": {
+      "id": "arcforge:centrifuge_cascade_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.enriched.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.enriched.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "enrichment"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

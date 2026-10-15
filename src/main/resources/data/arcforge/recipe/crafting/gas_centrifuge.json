@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SFS",
+    "SRS",
+    "PGP"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "F": "arcforge:carbon_fiber",
+    "R": "#c:rods/tungsten",
+    "P": "arcforge:pvc_sheet",
+    "G": "#c:gears/copper"
+  },
+  "result": {
+    "id": "arcforge:gas_centrifuge",
+    "count": 1
+  }
+}

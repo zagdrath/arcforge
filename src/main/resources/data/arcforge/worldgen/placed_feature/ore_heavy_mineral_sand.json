@@ -1,0 +1,23 @@
+{
+  "feature": "arcforge:ore_heavy_mineral_sand",
+  "placement": [
+    {
+      "type": "arcforge:config_count",
+      "ore": "heavyMineralSand",
+      "default": 5
+    },
+    {
+      "type": "minecraft:in_square"
+    },
+    {
+      "type": "arcforge:config_height",
+      "ore": "heavyMineralSand",
+      "shape": "uniform",
+      "default_min": 40,
+      "default_max": 90
+    },
+    {
+      "type": "minecraft:biome"
+    }
+  ]
+}

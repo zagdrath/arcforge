@@ -367,6 +367,84 @@ public final class ModFluids {
         return Collections.unmodifiableMap(slurries);
     }
 
+    // --- Nuclear: the uranium line (see the Nuclear chapter of the Handbook) ---
+    // Uranyl Sulfate Solution: uraninite leached in sulfuric acid, bright yellow and a little radioactive. Hydrofluoric
+    // Acid: fluorite in sulfuric acid; burns like the other acids. Fluorine: from Hydrofluoric Acid in the Electrolyzer.
+    // Uranium Hexafluoride (UF6): the gas the Gas Centrifuge Cascade enriches; it carries its U-235 assay (see
+    // Enrichment), shown in its name. Depleted Uranium Hexafluoride: the cascade's tails. The two UF6 gases are corrosive
+    // (#arcforge:corrosive_gases, see Corrosion).
+    public static final DeferredHolder<FluidType, FluidType> URANYL_SULFATE_SOLUTION_TYPE = liquidType("uranyl_sulfate_solution", 1_150, 1_100, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> URANYL_SULFATE_SOLUTION = FLUIDS.register("uranyl_sulfate_solution",
+            () -> new BaseFlowingFluid.Source(uranylSulfateProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_URANYL_SULFATE_SOLUTION = FLUIDS.register("flowing_uranyl_sulfate_solution",
+            () -> new BaseFlowingFluid.Flowing(uranylSulfateProperties()));
+    public static final DeferredHolder<FluidType, FluidType> HYDROFLUORIC_ACID_TYPE = liquidType("hydrofluoric_acid", 1_150, 1_000, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HYDROFLUORIC_ACID = FLUIDS.register("hydrofluoric_acid",
+            () -> new BaseFlowingFluid.Source(hydrofluoricAcidProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HYDROFLUORIC_ACID = FLUIDS.register("flowing_hydrofluoric_acid",
+            () -> new BaseFlowingFluid.Flowing(hydrofluoricAcidProperties()));
+    public static final DeferredHolder<FluidType, FluidType> FLUORINE_TYPE = gasType("fluorine", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> FLUORINE = FLUIDS.register("fluorine",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.FLUORINE_TYPE, ModFluids.FLUORINE, ModFluids.FLOWING_FLUORINE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_FLUORINE = FLUIDS.register("flowing_fluorine",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.FLUORINE_TYPE, ModFluids.FLUORINE, ModFluids.FLOWING_FLUORINE)));
+    public static final DeferredHolder<FluidType, FluidType> URANIUM_HEXAFLUORIDE_TYPE = assayGasType("uranium_hexafluoride", 340);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> URANIUM_HEXAFLUORIDE = FLUIDS.register("uranium_hexafluoride",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.URANIUM_HEXAFLUORIDE_TYPE, ModFluids.URANIUM_HEXAFLUORIDE, ModFluids.FLOWING_URANIUM_HEXAFLUORIDE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_URANIUM_HEXAFLUORIDE = FLUIDS.register("flowing_uranium_hexafluoride",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.URANIUM_HEXAFLUORIDE_TYPE, ModFluids.URANIUM_HEXAFLUORIDE, ModFluids.FLOWING_URANIUM_HEXAFLUORIDE)));
+    public static final DeferredHolder<FluidType, FluidType> DEPLETED_URANIUM_HEXAFLUORIDE_TYPE = assayGasType("depleted_uranium_hexafluoride", 340);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> DEPLETED_URANIUM_HEXAFLUORIDE = FLUIDS.register("depleted_uranium_hexafluoride",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE_TYPE, ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE,
+                    ModFluids.FLOWING_DEPLETED_URANIUM_HEXAFLUORIDE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_DEPLETED_URANIUM_HEXAFLUORIDE = FLUIDS.register("flowing_depleted_uranium_hexafluoride",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE_TYPE, ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE,
+                    ModFluids.FLOWING_DEPLETED_URANIUM_HEXAFLUORIDE)));
+
+    // Spreads 3 blocks, every 10 ticks, like the acids.
+    private static BaseFlowingFluid.Properties uranylSulfateProperties() {
+        return new BaseFlowingFluid.Properties(URANYL_SULFATE_SOLUTION_TYPE, URANYL_SULFATE_SOLUTION, FLOWING_URANYL_SULFATE_SOLUTION)
+                .bucket(ModItems.URANYL_SULFATE_SOLUTION_BUCKET)
+                .block(ModBlocks.URANYL_SULFATE_SOLUTION)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
+                .explosionResistance(100.0F);
+    }
+
+    private static BaseFlowingFluid.Properties hydrofluoricAcidProperties() {
+        return new BaseFlowingFluid.Properties(HYDROFLUORIC_ACID_TYPE, HYDROFLUORIC_ACID, FLOWING_HYDROFLUORIC_ACID)
+                .bucket(ModItems.HYDROFLUORIC_ACID_BUCKET)
+                .block(ModBlocks.HYDROFLUORIC_ACID)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
+                .explosionResistance(100.0F);
+    }
+
+    // A gas (as gasType) whose stacks carry a U-235 assay: its name shows it, "Uranium Hexafluoride (4.5% U-235)".
+    private static DeferredHolder<FluidType, FluidType> assayGasType(String name, int kelvin) {
+        return FLUID_TYPES.register(name, () -> new FluidType(FluidType.Properties.create()
+                .descriptionId("fluid_type.arcforge." + name)
+                .density(-500)
+                .viscosity(200)
+                .temperature(kelvin)
+                .canSwim(false)
+                .canDrown(false)
+                .canPushEntity(false)
+                .canExtinguish(false)
+                .canConvertToSource(false)
+                .supportsBoating(false)) {
+            @Override
+            public net.minecraft.network.chat.Component getDescription(net.neoforged.neoforge.fluids.FluidStack stack) {
+                int assay = net.zagdrath.arcforge.nuclear.Enrichment.assay(stack);
+                net.minecraft.network.chat.Component base = super.getDescription(stack);
+                return assay > 0 ? net.minecraft.network.chat.Component.translatable("fluid_type.arcforge.with_assay", base,
+                        net.zagdrath.arcforge.nuclear.Enrichment.percent(assay)) : base;
+            }
+        });
+    }
+
     // Negative density marks a gas (see Gases); temperature in kelvin.
     private static DeferredHolder<FluidType, FluidType> gasType(String name, int kelvin) {
         return FLUID_TYPES.register(name, () -> new FluidType(FluidType.Properties.create()

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": "#c:ingots/depleted_uranium"
+  },
+  "result": {
+    "id": "arcforge:depleted_uranium_block",
+    "count": 1
+  }
+}

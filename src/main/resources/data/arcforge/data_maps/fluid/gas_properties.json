@@ -50,6 +50,15 @@
     },
     "arcforge:propylene": {
       "color": "#D8CCEC"
+    },
+    "arcforge:fluorine": {
+      "color": "#E6E49A"
+    },
+    "arcforge:uranium_hexafluoride": {
+      "color": "#DCE0D0"
+    },
+    "arcforge:depleted_uranium_hexafluoride": {
+      "color": "#B4B8AC"
     }
   }
 }

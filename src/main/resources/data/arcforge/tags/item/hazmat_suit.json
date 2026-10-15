@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:hazmat_helmet",
+    "arcforge:hazmat_chestplate",
+    "arcforge:hazmat_leggings",
+    "arcforge:hazmat_boots"
+  ]
+}

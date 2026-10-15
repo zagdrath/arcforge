@@ -26,7 +26,8 @@ public class PortableFluidHandler extends ItemAccessFluidHandler {
 
     @Override
     public boolean isValid(int index, FluidResource resource) {
-        return super.isValid(index, resource) && (resource.isEmpty() || Gases.isGas(resource) == gas);
+        // Never a corrosive gas (UF6): a cartridge isn't lined for it.
+        return super.isValid(index, resource) && (resource.isEmpty() || Gases.isGas(resource) == gas && !net.zagdrath.arcforge.nuclear.Corrosion.isCorrosive(resource));
     }
 
     @Override

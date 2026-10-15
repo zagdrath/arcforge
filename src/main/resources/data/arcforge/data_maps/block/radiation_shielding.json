@@ -1,0 +1,124 @@
+{
+  "values": {
+    "arcforge:lead_block": {
+      "transmission": 0.1
+    },
+    "arcforge:lead_bricks": {
+      "transmission": 0.1
+    },
+    "arcforge:depleted_uranium_block": {
+      "transmission": 0.05
+    },
+    "arcforge:concrete_shielding": {
+      "transmission": 0.25
+    },
+    "minecraft:white_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:orange_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:magenta_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:light_blue_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:yellow_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:lime_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:pink_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:gray_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:light_gray_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:cyan_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:purple_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:blue_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:brown_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:green_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:red_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:black_concrete": {
+      "transmission": 0.3
+    },
+    "minecraft:water": {
+      "transmission": 0.5
+    },
+    "minecraft:iron_block": {
+      "transmission": 0.4
+    },
+    "arcforge:steel_block": {
+      "transmission": 0.4
+    },
+    "#minecraft:base_stone_overworld": {
+      "transmission": 0.6
+    },
+    "minecraft:cobblestone": {
+      "transmission": 0.6
+    },
+    "minecraft:mossy_cobblestone": {
+      "transmission": 0.6
+    },
+    "minecraft:cobbled_deepslate": {
+      "transmission": 0.6
+    },
+    "minecraft:smooth_stone": {
+      "transmission": 0.6
+    },
+    "minecraft:stone_bricks": {
+      "transmission": 0.6
+    },
+    "minecraft:cracked_stone_bricks": {
+      "transmission": 0.6
+    },
+    "minecraft:mossy_stone_bricks": {
+      "transmission": 0.6
+    },
+    "minecraft:polished_deepslate": {
+      "transmission": 0.6
+    },
+    "minecraft:deepslate_bricks": {
+      "transmission": 0.6
+    },
+    "minecraft:cracked_deepslate_bricks": {
+      "transmission": 0.6
+    },
+    "minecraft:deepslate_tiles": {
+      "transmission": 0.6
+    },
+    "minecraft:cracked_deepslate_tiles": {
+      "transmission": 0.6
+    },
+    "minecraft:chiseled_deepslate": {
+      "transmission": 0.6
+    },
+    "minecraft:reinforced_deepslate": {
+      "transmission": 0.6
+    },
+    "#c:ores_in_ground/stone": {
+      "transmission": 0.6
+    },
+    "#c:ores_in_ground/deepslate": {
+      "transmission": 0.6
+    }
+  }
+}

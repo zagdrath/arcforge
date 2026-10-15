@@ -864,6 +864,38 @@ final class MachineCategories {
         }
     }
 
+    // --- Gas Centrifuge Cascade ---
+
+    // Enrichment to a target assay from natural UF6 at the default tails (see Enrichment): the feed and separative work
+    // each mB of product takes, and the tails it leaves.
+    record EnrichmentRecipe(int targetPcm) {}
+
+    static final class Enriching extends ArcforgeCategory<EnrichmentRecipe> {
+        static final IRecipeType<EnrichmentRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "enriching", EnrichmentRecipe.class);
+
+        Enriching(IGuiHelper gui) {
+            super(TYPE, "enriching", ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get(), gui, 160, 52);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, EnrichmentRecipe recipe, IFocusGroup focuses) {
+            int feed = (int) Math.ceil(net.zagdrath.arcforge.nuclear.Enrichment.feedPerProduct(recipe.targetPcm(),
+                    net.zagdrath.arcforge.nuclear.Enrichment.NATURAL_PCM, net.zagdrath.arcforge.nuclear.Enrichment.DEFAULT_TAILS_PCM) * 100.0);
+            fluid(builder, true, 1, 5, ModFluids.URANIUM_HEXAFLUORIDE.get(), feed);
+            fluid(builder, false, 61, 5, ModFluids.URANIUM_HEXAFLUORIDE.get(), 100);
+            fluid(builder, false, 81, 5, ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get(), feed - 100);
+        }
+
+        @Override
+        public void draw(EnrichmentRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            int natural = net.zagdrath.arcforge.nuclear.Enrichment.NATURAL_PCM, tails = net.zagdrath.arcforge.nuclear.Enrichment.DEFAULT_TAILS_PCM;
+            text(graphics, Component.translatable("jei.arcforge.enriching.assays", net.zagdrath.arcforge.nuclear.Enrichment.percent(natural),
+                    net.zagdrath.arcforge.nuclear.Enrichment.percent(recipe.targetPcm()), net.zagdrath.arcforge.nuclear.Enrichment.percent(tails)), 0, 26);
+            text(graphics, Component.translatable("jei.arcforge.enriching.work", String.format(Locale.ROOT, "%,.0f",
+                    net.zagdrath.arcforge.nuclear.Enrichment.swuPerProduct(recipe.targetPcm(), natural, tails) * 100.0)), 0, 36);
+        }
+    }
+
     // --- Tree Cutter ---
 
     // A sapling the Tree Cutter plants (with Bone Meal to speed it), and the log and leaves of its tree.

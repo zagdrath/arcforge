@@ -1,0 +1,27 @@
+{
+  "title": "Gas Centrifuge Cascade",
+  "icon": "arcforge:centrifuge_cascade_controller",
+  "items": [
+    "arcforge:centrifuge_cascade_controller",
+    "arcforge:centrifuge_cascade_casing",
+    "arcforge:gas_centrifuge"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A hall of Gas Centrifuges that enriches UF₆.\n# Building it\n- A floor of Centrifuge Cascade Casings, 3 to 7 blocks each way, with the controller in an edge of it (not a corner), facing out.\n- Gas Centrifuges (two blocks tall) standing on the floor, anywhere but over the controller, where its control panel stands. Put them in rows: each row gets its header pipes.\n- The two layers over the floor otherwise open (torches and the like are fine).\nPorts go on the floor's outer faces: Input (feed), Output (product), Tails, and Energy."
+    },
+    {
+      "type": "multiblock",
+      "structure": "centrifuge_cascade"
+    },
+    {
+      "type": "text",
+      "text": "# Separative work\nEach centrifuge does 0.02 SWU a tick and uses 40 FE/t. Set the target (1% to 20%) and the tails (0.1% to 0.5%, 0.25% by default) in its GUI. Each mB of product costs separative work by the real formula, so richer product and leaner tails cost more:\n- 3%: 6.0 mB of natural feed and 3.8 SWU.\n- 5%: 10.3 mB and 7.9 SWU.\n- 20%: 42.8 mB and 41.6 SWU.\nThe rest of the feed leaves as tails, Depleted Uranium Hexafluoride."
+    },
+    {
+      "type": "text",
+      "text": "# Running it\n- Feed may be any UF₆ poorer than the target and richer than the tails, so 5% can be fed back to reach 20%.\n- After changing the target or tails, drain the old product or tails first: it won't mix assays.\n- Redstone control can stop it. While it runs its centrifuges' bands spin and the hall hums."
+    }
+  ]
+}

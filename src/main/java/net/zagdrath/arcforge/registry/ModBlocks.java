@@ -569,6 +569,31 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops());
     public static final DeferredBlock<Block> IOLITE_BLOCK = BLOCKS.registerSimpleBlock("iolite_block", p -> storageProperties(p, SoundType.AMETHYST, MapColor.COLOR_BLUE, 0));
 
+    // --- Nuclear: the ores and the blocks of the radiation line (see the Nuclear chapter of the Handbook) ---
+    // Uraninite (pitchblende): rare and deep, needs an iron pickaxe, radioactive (see the arcforge:radioactivity data
+    // maps). Galena: lead with a little silver, mid-depth. Heavy Mineral Sand: a dark sand in patches near the surface of
+    // beaches, rivers and deserts (shovel-mined, it falls like sand), which the Sifter splits into Monazite and Zircon.
+    public static final DeferredBlock<DropExperienceBlock> URANINITE_ORE = ore("uraninite_ore", UniformInt.of(1, 3), false, 0, null);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_URANINITE_ORE = ore("deepslate_uraninite_ore", UniformInt.of(1, 3), true, 0, null);
+    public static final DeferredBlock<Block> RAW_URANINITE_BLOCK = BLOCKS.registerSimpleBlock("raw_uraninite_block",
+            p -> storageProperties(p, SoundType.STONE, MapColor.COLOR_BLACK, 0));
+    public static final DeferredBlock<DropExperienceBlock> GALENA_ORE = ore("galena_ore", ConstantInt.ZERO, false, 0, null);
+    public static final DeferredBlock<DropExperienceBlock> DEEPSLATE_GALENA_ORE = ore("deepslate_galena_ore", ConstantInt.ZERO, true, 0, null);
+    public static final DeferredBlock<Block> RAW_GALENA_BLOCK = BLOCKS.registerSimpleBlock("raw_galena_block", p -> storageProperties(p, SoundType.STONE, MapColor.RAW_IRON, 0));
+    public static final DeferredBlock<Block> LEAD_BLOCK = BLOCKS.registerSimpleBlock("lead_block", p -> storageProperties(p, SoundType.METAL, MapColor.COLOR_GRAY, 0));
+    public static final DeferredBlock<net.minecraft.world.level.block.ColoredFallingBlock> HEAVY_MINERAL_SAND = BLOCKS.registerBlock("heavy_mineral_sand",
+            p -> new net.minecraft.world.level.block.ColoredFallingBlock(new net.minecraft.util.ColorRGBA(0x4A3E36), p),
+            p -> p.mapColor(MapColor.COLOR_BROWN).instrument(NoteBlockInstrument.SNARE).strength(0.6F).sound(SoundType.SAND));
+    // Shielding to build with: Lead Bricks, Concrete Shielding (concrete cast round steel rebar) and the Depleted Uranium
+    // block (the best shield there is, and itself a little radioactive).
+    public static final DeferredBlock<Block> LEAD_BRICKS = BLOCKS.registerSimpleBlock("lead_bricks",
+            p -> p.mapColor(MapColor.COLOR_GRAY).strength(4.0F, 9.0F).requiresCorrectToolForDrops().sound(SoundType.METAL));
+    public static final DeferredBlock<Block> CONCRETE_SHIELDING = BLOCKS.registerSimpleBlock("concrete_shielding",
+            p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY).instrument(NoteBlockInstrument.BASEDRUM).strength(3.0F, 18.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE));
+    public static final DeferredBlock<Block> DEPLETED_URANIUM_BLOCK = BLOCKS.registerSimpleBlock("depleted_uranium_block",
+            p -> storageProperties(p, SoundType.METAL, MapColor.COLOR_GRAY, 0).strength(6.0F, 9.0F));
+
     // Ores: stone 3.0 or deepslate 4.5 hardness, the right tool to drop anything; xp as given.
     private static DeferredBlock<DropExperienceBlock> ore(String name, IntProvider xp, boolean deepslate, int light, @Nullable MapColor color) {
         return BLOCKS.registerBlock(name, p -> new DropExperienceBlock(xp, p), p -> p
@@ -761,6 +786,26 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> HYDROCHLORIC_ACID = BLOCKS.registerBlock("hydrochloric_acid",
             p -> new SulfuricAcidBlock(ModFluids.HYDROCHLORIC_ACID.get(), ModDamageTypes.HYDROCHLORIC_ACID, p),
             p -> liquidProperties(p, MapColor.COLOR_YELLOW));
+
+    public static final DeferredBlock<LiquidBlock> URANYL_SULFATE_SOLUTION = BLOCKS.registerBlock("uranyl_sulfate_solution",
+            p -> new LiquidBlock(ModFluids.URANYL_SULFATE_SOLUTION.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_YELLOW));
+    public static final DeferredBlock<LiquidBlock> HYDROFLUORIC_ACID = BLOCKS.registerBlock("hydrofluoric_acid",
+            p -> new SulfuricAcidBlock(ModFluids.HYDROFLUORIC_ACID.get(), ModDamageTypes.HYDROFLUORIC_ACID, p),
+            p -> liquidProperties(p, MapColor.SNOW));
+
+    // The Gas Centrifuge Cascade (see CentrifugeCascadeStructure): a raised floor of casings with the controller in its
+    // edge, Gas Centrifuges standing on it (each a column two blocks tall), drawn by its renderer once formed.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeCasingBlock> CENTRIFUGE_CASCADE_CASING = BLOCKS.registerBlock(
+            "centrifuge_cascade_casing", net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeCasingBlock::new,
+            p -> columnProperties(p).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeControllerBlock> CENTRIFUGE_CASCADE_CONTROLLER = BLOCKS.registerBlock(
+            "centrifuge_cascade_controller", net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeControllerBlock::new,
+            p -> columnProperties(p).forceSolidOn()
+                    .lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeControllerBlock.LIT) ? 7 : 0));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.GasCentrifugeBlock> GAS_CENTRIFUGE = BLOCKS.registerBlock(
+            "gas_centrifuge", net.zagdrath.arcforge.block.multiblock.GasCentrifugeBlock::new,
+            p -> columnProperties(p).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
 
     // The Thermal Evaporator Array: a 3x3x9 steel tower (see ThermalEvaporatorStructure), like the other arrays'
     // casings.

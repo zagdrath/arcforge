@@ -357,6 +357,14 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.GROW_LAMP.get());
             }).build());
 
+    // The nuclear tier: its ores, the uranium line, the Gas Centrifuge Cascade and radiation protection.
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> NUCLEAR = CREATIVE_MODE_TABS.register("nuclear", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.arcforge.nuclear"))
+            .withTabsBefore(FARMING.getKey())
+            .icon(() -> ModItems.YELLOWCAKE.get().getDefaultInstance())
+            .displayItems((parameters, output) -> ModItems.nuclear().forEach(item -> output.accept(item.get())))
+            .build());
+
     private ModCreativeTabs() {}
 
     public static void register(IEventBus modEventBus) {

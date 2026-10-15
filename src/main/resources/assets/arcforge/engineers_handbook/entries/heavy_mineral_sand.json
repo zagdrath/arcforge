@@ -1,0 +1,17 @@
+{
+  "title": "Heavy Mineral Sand",
+  "icon": "arcforge:heavy_mineral_sand",
+  "items": [
+    "arcforge:heavy_mineral_sand",
+    "arcforge:monazite",
+    "arcforge:monazite_dust",
+    "arcforge:zircon",
+    "arcforge:zircon_dust"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Dark, speckled sand in patches in the sand and gravel of beaches, rivers and deserts, near the surface. Dig it with a shovel.\nThe Sifter separates it: the sand back, Monazite (30%; honey-brown, with thorium and the rare earths, a little radioactive), Zircon (40%; pale gold-brown) and a little Iron Dust (15%). The Arc Crusher grinds Monazite and Zircon into their dusts.\nThorium and zirconium are for the reactors to come."
+    }
+  ]
+}

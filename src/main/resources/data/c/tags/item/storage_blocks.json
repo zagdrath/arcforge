@@ -20,6 +20,10 @@
     "#c:storage_blocks/raw_spodumene",
     "#c:storage_blocks/graphite",
     "#c:storage_blocks/bio_coal",
-    "#c:storage_blocks/iolite"
+    "#c:storage_blocks/iolite",
+    "#c:storage_blocks/raw_uranium",
+    "#c:storage_blocks/raw_lead",
+    "#c:storage_blocks/lead",
+    "#c:storage_blocks/depleted_uranium"
   ]
 }

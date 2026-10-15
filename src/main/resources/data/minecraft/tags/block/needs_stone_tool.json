@@ -81,6 +81,15 @@
     "arcforge:hydrotreater",
     "arcforge:sulfur_recovery_unit",
     "arcforge:steam_methane_reformer",
-    "arcforge:gas_wellhead"
+    "arcforge:gas_wellhead",
+    "arcforge:galena_ore",
+    "arcforge:deepslate_galena_ore",
+    "arcforge:raw_galena_block",
+    "arcforge:lead_block",
+    "arcforge:lead_bricks",
+    "arcforge:concrete_shielding",
+    "arcforge:centrifuge_cascade_casing",
+    "arcforge:centrifuge_cascade_controller",
+    "arcforge:gas_centrifuge"
   ]
 }

@@ -259,5 +259,23 @@
       }
     ],
     "subtitle": "subtitles.arcforge.distillation_array_run"
+  },
+  "centrifuge_cascade_run": {
+    "subtitle": "subtitles.arcforge.centrifuge_cascade_run",
+    "sounds": [
+      {
+        "name": "arcforge:centrifuge_cascade_run",
+        "stream": false
+      }
+    ]
+  },
+  "geiger_click": {
+    "subtitle": "subtitles.arcforge.geiger_click",
+    "sounds": [
+      {
+        "name": "arcforge:geiger_click",
+        "stream": false
+      }
+    ]
   }
 }

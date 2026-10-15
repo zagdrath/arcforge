@@ -33,6 +33,11 @@ public final class GasTints {
     // A pale lavender.
     public static final int PROPYLENE = 0xFFD8CCEC;
     public static final int HYDROGEN_SULFIDE = 0xFFC4CC6A;
+    // The nuclear gases: Fluorine pale yellow, Uranium Hexafluoride (colourless in fact, white as the crystals it freezes
+    // to) a faint grey-green white, its depleted tails a duller grey.
+    public static final int FLUORINE = 0xFFE6E49A;
+    public static final int URANIUM_HEXAFLUORIDE = 0xFFDCE0D0;
+    public static final int DEPLETED_URANIUM_HEXAFLUORIDE = 0xFFB4B8AC;
 
     private GasTints() {}
 }

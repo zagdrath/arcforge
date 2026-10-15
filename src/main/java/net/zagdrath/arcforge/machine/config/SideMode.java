@@ -61,7 +61,9 @@ public enum SideMode implements StringRepresentable {
     BITUMEN("bitumen"),
     // The Steam Cracker's olefins, each out of its own faces.
     ETHYLENE("ethylene"),
-    PROPYLENE("propylene");
+    PROPYLENE("propylene"),
+    // The Gas Centrifuge Cascade's depleted UF6 out (its enriched product goes out of OUTPUT faces). Ports only.
+    TAILS("tails");
 
     private final String name;
 
@@ -73,7 +75,7 @@ public enum SideMode implements StringRepresentable {
     public boolean isOutput() {
         return switch (this) {
             case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST, BRINE, SALT, WATER, LITHIUM_BRINE, SULFUR, REFINERY_GAS, KEROSENE,
-                    DIESEL, BITUMEN, ETHYLENE, PROPYLENE -> true;
+                    DIESEL, BITUMEN, ETHYLENE, PROPYLENE, TAILS -> true;
             default -> false;
         };
     }

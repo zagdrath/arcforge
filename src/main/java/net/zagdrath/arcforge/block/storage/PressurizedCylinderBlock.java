@@ -8,7 +8,14 @@ package net.zagdrath.arcforge.block.storage;
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -19,6 +26,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -56,6 +64,34 @@ public class PressurizedCylinderBlock extends StorageBlock {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
+    }
+
+    // PVC Sheets used on a cylinder (pvcLining.sheets of them, from the hand) line it, so it can hold a
+    // corrosive gas such as UF6 (see Corrosion). Lining stays on the item when it's broken.
+    @Override
+    protected InteractionResult useItemOn(ItemStack itemStack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!itemStack.is(net.zagdrath.arcforge.registry.ModItems.PVC_SHEET.get())
+                || !(level.getBlockEntity(pos) instanceof PressurizedCylinderBlockEntity cylinder)) {
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
+        }
+        // The server decides (the client doesn't know whether it's lined).
+        if (level.isClientSide()) {
+            return InteractionResult.SUCCESS;
+        }
+        if (cylinder.isLined()) {
+            player.sendOverlayMessage(Component.translatable("message.arcforge.pressurized_cylinder.already_lined"));
+            return InteractionResult.SUCCESS;
+        }
+        int sheets = net.zagdrath.arcforge.config.ArcforgeConfig.PVC_LINING_SHEETS.getAsInt();
+        if (!player.getAbilities().instabuild && itemStack.getCount() < sheets) {
+            player.sendOverlayMessage(Component.translatable("message.arcforge.pressurized_cylinder.needs_sheets", sheets));
+            return InteractionResult.SUCCESS;
+        }
+        itemStack.consume(sheets, player);
+        cylinder.line();
+        level.playSound(null, pos, SoundEvents.ARMOR_EQUIP_LEATHER.value(), SoundSource.BLOCKS, 0.8F, 1.2F);
+        player.sendOverlayMessage(Component.translatable("message.arcforge.pressurized_cylinder.lined"));
+        return InteractionResult.SUCCESS;
     }
 
     @Override

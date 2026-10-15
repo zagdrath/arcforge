@@ -1,0 +1,15 @@
+{
+  "title": "Depleted Uranium",
+  "icon": "arcforge:depleted_uranium_ingot",
+  "items": [
+    "arcforge:depleted_uranium_dust",
+    "arcforge:depleted_uranium_ingot",
+    "arcforge:depleted_uranium_block"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The cascade's tails, made solid.\n- 100 mB Depleted Uranium Hexafluoride + 100 mB Hydrogen + 100 mB Steam in the Chemical Reactor gives Depleted Uranium Dust and 200 mB Hydrofluoric Acid back.\n- Smelt the dust into ingots, and nine ingots into a block.\nA Block of Depleted Uranium lets only 5% of radiation through, the best shield there is, though it's a little radioactive itself. Its ingots can stand in for lead in shielding recipes."
+    }
+  ]
+}

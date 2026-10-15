@@ -540,6 +540,16 @@ public final class ModCapabilities {
             var array = net.zagdrath.arcforge.multiblock.BatteryArrayStructure.findController(level, pos);
             return array != null ? array.energyHandlerAt(pos, side) : null;
         }, batteryArrayParts);
+        // The Gas Centrifuge Cascade: UF6 feed in (Input), enriched product (Output) and tails (Tails) out, FE in (Energy).
+        Block[] cascadeParts = { ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get(), ModBlocks.CENTRIFUGE_CASCADE_CASING.get() };
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var cascade = net.zagdrath.arcforge.multiblock.CentrifugeCascadeStructure.findController(level, pos);
+            return cascade != null && cascade.isPart(pos) ? cascade.fluidHandlerAt(pos, side) : null;
+        }, cascadeParts);
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var cascade = net.zagdrath.arcforge.multiblock.CentrifugeCascadeStructure.findController(level, pos);
+            return cascade != null && cascade.isPart(pos) ? cascade.energyHandlerAt(pos, side) : null;
+        }, cascadeParts);
         // The Thermal Evaporator Array: Seawater or Brine in, heat in, Brine, Salt and Water out, through its ports.
         Block[] evaporatorParts = { ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get(), ModBlocks.THERMAL_EVAPORATOR_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {

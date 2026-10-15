@@ -1,0 +1,58 @@
+{
+  "values": {
+    "arcforge:uraninite_ore": {
+      "dose_rate": 0.2
+    },
+    "arcforge:deepslate_uraninite_ore": {
+      "dose_rate": 0.2
+    },
+    "arcforge:raw_uraninite": {
+      "dose_rate": 0.1
+    },
+    "arcforge:raw_uraninite_block": {
+      "dose_rate": 0.9
+    },
+    "arcforge:uraninite_dust": {
+      "dose_rate": 0.1
+    },
+    "arcforge:ammonium_diuranate": {
+      "dose_rate": 0.15
+    },
+    "arcforge:yellowcake": {
+      "dose_rate": 0.2
+    },
+    "arcforge:uranium_dioxide": {
+      "dose_rate": 0.2
+    },
+    "arcforge:uranium_tetrafluoride": {
+      "dose_rate": 0.2
+    },
+    "arcforge:uranyl_sulfate_solution_bucket": {
+      "dose_rate": 0.2
+    },
+    "arcforge:depleted_uranium_dust": {
+      "dose_rate": 0.005
+    },
+    "arcforge:depleted_uranium_ingot": {
+      "dose_rate": 0.005
+    },
+    "arcforge:depleted_uranium_block": {
+      "dose_rate": 0.045
+    },
+    "arcforge:monazite": {
+      "dose_rate": 0.03
+    },
+    "arcforge:monazite_dust": {
+      "dose_rate": 0.03
+    },
+    "arcforge:zircon": {
+      "dose_rate": 0.005
+    },
+    "arcforge:zircon_dust": {
+      "dose_rate": 0.005
+    },
+    "arcforge:heavy_mineral_sand": {
+      "dose_rate": 0.02
+    }
+  }
+}

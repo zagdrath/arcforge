@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "III",
+    "ICI",
+    "III"
+  ],
+  "key": {
+    "I": "#arcforge:shielding_metals",
+    "C": "#c:chests"
+  },
+  "result": {
+    "id": "arcforge:lead_box",
+    "count": 1
+  }
+}

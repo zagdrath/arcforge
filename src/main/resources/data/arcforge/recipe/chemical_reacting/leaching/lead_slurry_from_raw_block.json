@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "category": "leaching",
+  "item_input": {
+    "ingredient": "#c:storage_blocks/raw_lead",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "arcforge:leaching_acids",
+      "amount": 2250
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:lead_slurry",
+    "amount": 2700
+  },
+  "time": 1200
+}

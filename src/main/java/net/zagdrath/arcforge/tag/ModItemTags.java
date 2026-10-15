@@ -41,6 +41,9 @@ public final class ModItemTags {
 
     // The Foundry Suit's pieces, and what repairs them (Rock Wool).
     public static final TagKey<Item> FOUNDRY_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "foundry_suit"));
+    // The Hazmat Suit's pieces and what repairs them (see HazmatSuit).
+    public static final TagKey<Item> HAZMAT_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "hazmat_suit"));
+    public static final TagKey<Item> REPAIRS_HAZMAT_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "repairs_hazmat_suit"));
     public static final TagKey<Item> REPAIRS_FOUNDRY_SUIT = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "repairs_foundry_suit"));
 
     // Fuel whose burnt-out items leave Wood Ash in a Firebox or Combustion Plant (charcoal by default).

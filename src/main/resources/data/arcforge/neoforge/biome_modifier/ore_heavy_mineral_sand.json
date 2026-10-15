@@ -1,0 +1,12 @@
+{
+  "type": "neoforge:add_features",
+  "biomes": "#arcforge:has_heavy_mineral_sand",
+  "features": "arcforge:ore_heavy_mineral_sand",
+  "step": "underground_ores",
+  "neoforge:conditions": [
+    {
+      "type": "arcforge:ore_enabled",
+      "ore": "heavyMineralSand"
+    }
+  ]
+}

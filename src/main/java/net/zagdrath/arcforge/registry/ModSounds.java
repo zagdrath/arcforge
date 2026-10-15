@@ -62,6 +62,11 @@ public final class ModSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> PUMPJACK_RUN = loop("pumpjack_run", 20.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> DISTILLATION_ARRAY_RUN = loop("distillation_array_run", 20.0F);
 
+    // The Gas Centrifuge Cascade's faint hum (louder with more centrifuges, see CentrifugeCascadeSound), and the Geiger
+    // Counter's click (see GeigerClient).
+    public static final DeferredHolder<SoundEvent, SoundEvent> CENTRIFUGE_CASCADE_RUN = loop("centrifuge_cascade_run", 24.0F);
+    public static final DeferredHolder<SoundEvent, SoundEvent> GEIGER_CLICK = loop("geiger_click", 8.0F);
+
     private ModSounds() {}
 
     private static DeferredHolder<SoundEvent, SoundEvent> loop(String name, float range) {

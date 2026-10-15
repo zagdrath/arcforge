@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "misc",
+  "cookingtime": 200,
+  "experience": 0.5,
+  "ingredient": "#c:dusts/depleted_uranium",
+  "result": {
+    "id": "arcforge:depleted_uranium_ingot"
+  }
+}

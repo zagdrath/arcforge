@@ -7,6 +7,8 @@
     "arcforge:bismuth_ore",
     "arcforge:arcite_ore",
     "arcforge:halite_ore",
-    "arcforge:spodumene_ore"
+    "arcforge:spodumene_ore",
+    "arcforge:uraninite_ore",
+    "arcforge:galena_ore"
   ]
 }

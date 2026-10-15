@@ -1571,3 +1571,60 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   (Hydrogen) and a fourth product tank at x 137; the Coker gains a second product tank (Heavy Oil) at x 105, copied from
   its first, and its coke slot moves 16 px right to x 125 (a refining machine's item slot sits 4 px right of its last
   product tank).
+
+## Nuclear tier
+- **Natural materials** (the ore method, "Natural materials" above: Cody's ore, raw item, raw block, dust, crystal,
+  ingot, plate and block textures recoloured by brightness onto each ramp). New ramps:
+  - Uraninite (pitchblende): pitch black with a greasy dark green sheen, `#090B08 #151C12 #23301C #506440`.
+    Keep it dark and green: browner, it reads olive; brighter, it reads as moss.
+  - Galena: metallic blue-grey cubes, `#2A303A #5A6474 #94A0B2 #D8E0EC`.
+  - Lead (metal): a dull blue-grey, `#2E3440 #4C5462 #717A8A #A2AAB8`; its block is the banded block smoothed.
+  - Monazite honey-brown (`#5A2E10 … #F8D890`) and Zircon pale gold-brown (`#6A4A2A … #FFF0D0`). Their crystal items
+    are the Iolite Crystal's own shape (`iolite_crystal.py`: the long shard, the short point and the clustered base),
+    its seven tones on each one's ramp; not the shared crystal item.
+  - Depleted Uranium: a dark green-tinted gunmetal, `#1C2620 #324236 #4E6854 #82A088`.
+  - The uranium line's powders as dusts: Ammonium Diuranate orange-yellow, Yellowcake a green-leaning yellow
+    (`#6A6008 … #F6FAA6`), Uranium Dioxide green-black (`#12160E … #687C52`), Uranium Tetrafluoride (green salt)
+    green. Everything uranium leans green.
+  - **Heavy Mineral Sand**: the ore method on sand. Cody's iridescent ore's clumps, the stone bevels dropped, each clump
+    black, garnet-red or honey, laid over the real vanilla sand. Its particle is a dark sand of flat blotches.
+- **Fluids**: Uranyl Sulfate Solution (a bright uranium yellow) and Hydrofluoric Acid (water-clear with a cold grey
+  tint) are Hydrochloric Acid's frames re-toned by rank, keeping its alpha and `.mcmeta`. The gases are tints
+  (GasTints): Fluorine a pale yellow, UF6 an off-white, depleted UF6 a grey.
+- **Building blocks**: Lead Bricks are the Arcforge Furnace bricks recoloured by rank onto the lead ramp (the mortar
+  its two darkest tones). Concrete Shielding is concrete in three close light greys as flat blotches, with the rebar
+  ends showing on an 8 px grid (a rust square, lit top-left).
+- **Items** (outline `#0C0D0F`, 4–6 flat tones): the Geiger Counter (a hazard-yellow case, its dial, the probe on its
+  cord), the Dosimeter (a steel badge with a clip and a cyan readout), the Lead Box (a lead case with latches and a
+  hazard label) and the Gas Centrifuge (a slim column on its foot with three connections).
+- **Hazmat Suit**: Cody's steel armour items and worn layers recoloured onto a safety-orange rubber ramp of close,
+  even steps (`#7A3E10 #94501A #AC6220 #C27426 #D4862E #E29A3C #EEAE52 #F6C470`), each colour placed by its
+  brightness (not its rank), so the steel's soft shading carries over and no step jumps. No near-black: items take a
+  dark-orange outline (`#4A2408`) and the worn layers the ramp from its second tone up. Never yellow-gold, or it reads
+  as gold armour. The helmet item has a dark visor; the worn head layer is a full hood (top and four sides closed,
+  flat, its lowest row a step darker) with the visor across the face.
+- **Gas Centrifuge Cascade blocks**: the casing is the wall plate with a recessed louvre band (the plenum under the
+  raised floor), its top the tread deck with perforations. The controller is the casing with a screen recess: the
+  status LED and three cyan centrifuge columns. The loose Gas Centrifuge is a 16×16 sheet for its block model at 1:1
+  (the casing's column bands in the round-part profile, a dark band near its foot, the cap, the foot's deck).
+- **Port: Tails**: the output ring with the depleted gas's grey chip, and its Ports-tab face icon.
+- **Gas Centrifuge Cascade model** (a large model, "Large model texturing", on the refinery sheet; CentrifugeCascadeMesh
+  from CentrifugeCascadeLayout). Formed, the hall's blocks hide and the renderer draws:
+  - the raised floor: a deep FOOTING plinth under a 2 px DECK, with a perforated grating tile under each centrifuge;
+  - each centrifuge, a slim column: a square foot, the motor housing, a POLISHED rotor casing (radius 4 px) up to its
+    cap, and a band round it low down (y 25–27) that shows a spinning glow mark while the cascade runs (45° a tick,
+    each column a little out of step with the next);
+  - header pipework along the top of each row: three pipes (feed, product, tails) at y 46 running across the row with
+    capped ends, a riser from each cap up into each;
+  - the control panel on the controller's block at the front edge: a GEN_PLAIN cabinet on a sill, VENT louvres low on
+    its front and a lit screen (M_SCREEN, in the glow list) facing out of the hall;
+  - the port nozzles on the casings set as ports.
+  - Its sound is a faint, low hum while it runs.
+- **GUIs**:
+  - Gas Centrifuge Cascade (`gui/container/centrifuge_cascade`, 176×186, the inventory 104 down): the Battery Array's
+    frame. The FE gauge on the left, the house screen in the middle (status, feed, target and tails with − / +
+    buttons, the feed and SWU a mB takes), and the feed, product and tails tanks (12×72) on the right. Sprites: the
+    Diesel Generator's energy bar and LEDs, a 72-tall tank gauge, a gas fill, and the 7×7 − / + buttons (hovered: a
+    teal face with a cyan glyph).
+  - Lead Box (`gui/container/lead_box`, 176×166): a 3×3 grid of slots in a lead-grey tray (`#3D4451`) over the player
+    inventory.

@@ -1,0 +1,16 @@
+{
+  "variants": {
+    "formed=false,half=lower": {
+      "model": "arcforge:block/nuclear/gas_centrifuge_lower"
+    },
+    "formed=false,half=upper": {
+      "model": "arcforge:block/nuclear/gas_centrifuge_upper"
+    },
+    "formed=true,half=lower": {
+      "model": "arcforge:block/nuclear/centrifuge_cascade_hidden"
+    },
+    "formed=true,half=upper": {
+      "model": "arcforge:block/nuclear/centrifuge_cascade_hidden"
+    }
+  }
+}

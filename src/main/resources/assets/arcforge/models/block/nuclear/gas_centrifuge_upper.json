@@ -1,0 +1,304 @@
+{
+  "parent": "minecraft:block/block",
+  "textures": {
+    "particle": "arcforge:block/nuclear/gas_centrifuge",
+    "casing": "arcforge:block/nuclear/gas_centrifuge"
+  },
+  "elements": [
+    {
+      "from": [
+        3.5,
+        0,
+        3.5
+      ],
+      "to": [
+        12.5,
+        10,
+        12.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            0,
+            0,
+            9,
+            10
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            0,
+            0,
+            9,
+            10
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            0,
+            0,
+            9,
+            10
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            0,
+            0,
+            9,
+            10
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        4.5,
+        10,
+        4.5
+      ],
+      "to": [
+        11.5,
+        12,
+        11.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            9,
+            7,
+            16,
+            9
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            9,
+            7,
+            16,
+            9
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            9,
+            7,
+            16,
+            9
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            9,
+            7,
+            16,
+            9
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            9,
+            0,
+            16,
+            7
+          ]
+        },
+        "down": {
+          "texture": "#casing",
+          "uv": [
+            9,
+            0,
+            16,
+            7
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        5,
+        12,
+        7.5
+      ],
+      "to": [
+        6,
+        15,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        7.5,
+        12,
+        7.5
+      ],
+      "to": [
+        8.5,
+        15,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        }
+      }
+    },
+    {
+      "from": [
+        10,
+        12,
+        7.5
+      ],
+      "to": [
+        11,
+        15,
+        8.5
+      ],
+      "faces": {
+        "north": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "south": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "east": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "west": {
+          "texture": "#casing",
+          "uv": [
+            3,
+            0,
+            4,
+            3
+          ]
+        },
+        "up": {
+          "texture": "#casing",
+          "uv": [
+            4,
+            0,
+            5,
+            1
+          ]
+        }
+      }
+    }
+  ]
+}

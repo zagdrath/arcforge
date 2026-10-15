@@ -493,6 +493,87 @@ public final class ModItems {
     public static final DeferredItem<Item> THERMOCOUPLE = ITEMS.registerSimpleItem("thermocouple");
     public static final DeferredItem<Item> ARCITE_TUNGSTEN_COMPOSITE = ITEMS.registerSimpleItem("arcite_tungsten_composite");
 
+    // --- Nuclear (see the Nuclear chapter of the Handbook; all on the Nuclear creative tab) ---
+
+    // Uraninite, Galena and lead, Heavy Mineral Sand and what the Sifter finds in it.
+    public static final DeferredItem<BlockItem> URANINITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.URANINITE_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_URANINITE_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_URANINITE_ORE);
+    public static final DeferredItem<Item> RAW_URANINITE = ITEMS.registerSimpleItem("raw_uraninite");
+    public static final DeferredItem<BlockItem> RAW_URANINITE_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_URANINITE_BLOCK);
+    public static final DeferredItem<Item> URANINITE_DUST = ITEMS.registerSimpleItem("uraninite_dust");
+    public static final DeferredItem<BlockItem> GALENA_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.GALENA_ORE);
+    public static final DeferredItem<BlockItem> DEEPSLATE_GALENA_ORE = ITEMS.registerSimpleBlockItem(ModBlocks.DEEPSLATE_GALENA_ORE);
+    public static final DeferredItem<Item> RAW_GALENA = ITEMS.registerSimpleItem("raw_galena");
+    public static final DeferredItem<BlockItem> RAW_GALENA_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RAW_GALENA_BLOCK);
+    public static final DeferredItem<Item> LEAD_DUST = ITEMS.registerSimpleItem("lead_dust");
+    public static final DeferredItem<Item> LEAD_INGOT = ITEMS.registerSimpleItem("lead_ingot");
+    public static final DeferredItem<BlockItem> LEAD_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.LEAD_BLOCK);
+    public static final DeferredItem<Item> LEAD_PLATE = ITEMS.registerSimpleItem("lead_plate");
+    public static final DeferredItem<BlockItem> HEAVY_MINERAL_SAND = ITEMS.registerSimpleBlockItem(ModBlocks.HEAVY_MINERAL_SAND);
+    public static final DeferredItem<Item> MONAZITE = ITEMS.registerSimpleItem("monazite");
+    public static final DeferredItem<Item> MONAZITE_DUST = ITEMS.registerSimpleItem("monazite_dust");
+    public static final DeferredItem<Item> ZIRCON = ITEMS.registerSimpleItem("zircon");
+    public static final DeferredItem<Item> ZIRCON_DUST = ITEMS.registerSimpleItem("zircon_dust");
+
+    // The uranium line: leached, precipitated, calcined and converted (see the chemistry recipes), and the fluids'
+    // buckets.
+    public static final DeferredItem<Item> AMMONIUM_DIURANATE = ITEMS.registerSimpleItem("ammonium_diuranate");
+    public static final DeferredItem<Item> YELLOWCAKE = ITEMS.registerSimpleItem("yellowcake");
+    public static final DeferredItem<Item> URANIUM_DIOXIDE = ITEMS.registerSimpleItem("uranium_dioxide");
+    public static final DeferredItem<Item> URANIUM_TETRAFLUORIDE = ITEMS.registerSimpleItem("uranium_tetrafluoride");
+    public static final DeferredItem<BucketItem> URANYL_SULFATE_SOLUTION_BUCKET = ITEMS.registerItem("uranyl_sulfate_solution_bucket",
+            p -> new BucketItem(ModFluids.URANYL_SULFATE_SOLUTION.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> HYDROFLUORIC_ACID_BUCKET = ITEMS.registerItem("hydrofluoric_acid_bucket",
+            p -> new BucketItem(ModFluids.HYDROFLUORIC_ACID.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+
+    // Depleted uranium, from the cascade's tails.
+    public static final DeferredItem<Item> DEPLETED_URANIUM_DUST = ITEMS.registerSimpleItem("depleted_uranium_dust");
+    public static final DeferredItem<Item> DEPLETED_URANIUM_INGOT = ITEMS.registerSimpleItem("depleted_uranium_ingot");
+    public static final DeferredItem<BlockItem> DEPLETED_URANIUM_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.DEPLETED_URANIUM_BLOCK);
+
+    // Radiation protection: the meters, the Hazmat Suit (see HazmatSuit), the Lead Box and the shielding blocks.
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.GeigerCounterItem> GEIGER_COUNTER = ITEMS.registerItem("geiger_counter",
+            net.zagdrath.arcforge.item.tool.GeigerCounterItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.DosimeterItem> DOSIMETER = ITEMS.registerItem("dosimeter",
+            net.zagdrath.arcforge.item.tool.DosimeterItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<Item> HAZMAT_HELMET = hazmat("hazmat_helmet", ArmorType.HELMET);
+    public static final DeferredItem<Item> HAZMAT_CHESTPLATE = hazmat("hazmat_chestplate", ArmorType.CHESTPLATE);
+    public static final DeferredItem<Item> HAZMAT_LEGGINGS = hazmat("hazmat_leggings", ArmorType.LEGGINGS);
+    public static final DeferredItem<Item> HAZMAT_BOOTS = hazmat("hazmat_boots", ArmorType.BOOTS);
+    public static final DeferredItem<net.zagdrath.arcforge.item.storage.LeadBoxItem> LEAD_BOX = ITEMS.registerItem("lead_box",
+            net.zagdrath.arcforge.item.storage.LeadBoxItem::new, p -> p.stacksTo(1)
+                    .component(net.minecraft.core.component.DataComponents.CONTAINER, net.minecraft.world.item.component.ItemContainerContents.EMPTY));
+    public static final DeferredItem<BlockItem> LEAD_BRICKS = ITEMS.registerSimpleBlockItem(ModBlocks.LEAD_BRICKS);
+    public static final DeferredItem<BlockItem> CONCRETE_SHIELDING = ITEMS.registerSimpleBlockItem(ModBlocks.CONCRETE_SHIELDING);
+
+    // The Gas Centrifuge Cascade (a Gas Centrifuge places both its blocks).
+    public static final DeferredItem<BlockItem> CENTRIFUGE_CASCADE_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER);
+    public static final DeferredItem<BlockItem> CENTRIFUGE_CASCADE_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CENTRIFUGE_CASCADE_CASING);
+    public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> GAS_CENTRIFUGE = ITEMS.registerItem("gas_centrifuge",
+            p -> new net.minecraft.world.item.DoubleHighBlockItem(ModBlocks.GAS_CENTRIFUGE.get(), p), p -> p.useBlockDescriptionPrefix());
+
+    private static DeferredItem<Item> hazmat(String name, ArmorType type) {
+        return ITEMS.registerItem(name, p -> new Item(p) {
+            @Override
+            public void appendHoverText(ItemStack stack, Item.TooltipContext context, net.minecraft.world.item.component.TooltipDisplay display,
+                    java.util.function.Consumer<net.minecraft.network.chat.Component> builder, net.minecraft.world.item.TooltipFlag flag) {
+                builder.accept(net.minecraft.network.chat.Component.translatable("tooltip.arcforge.hazmat.piece").withStyle(net.minecraft.ChatFormatting.GRAY));
+                builder.accept(net.minecraft.network.chat.Component.translatable("tooltip.arcforge.hazmat.set").withStyle(net.minecraft.ChatFormatting.DARK_GRAY));
+            }
+        }, p -> p.humanoidArmor(net.zagdrath.arcforge.nuclear.HazmatSuit.ARMOR, type));
+    }
+
+    // Everything on the Nuclear creative tab, in order.
+    public static List<DeferredItem<? extends Item>> nuclear() {
+        return List.of(URANINITE_ORE, DEEPSLATE_URANINITE_ORE, RAW_URANINITE, RAW_URANINITE_BLOCK, URANINITE_DUST,
+                GALENA_ORE, DEEPSLATE_GALENA_ORE, RAW_GALENA, RAW_GALENA_BLOCK, LEAD_DUST, LEAD_INGOT, LEAD_BLOCK, LEAD_PLATE,
+                HEAVY_MINERAL_SAND, MONAZITE, MONAZITE_DUST, ZIRCON, ZIRCON_DUST,
+                URANYL_SULFATE_SOLUTION_BUCKET, AMMONIUM_DIURANATE, YELLOWCAKE, URANIUM_DIOXIDE, HYDROFLUORIC_ACID_BUCKET, URANIUM_TETRAFLUORIDE,
+                CENTRIFUGE_CASCADE_CONTROLLER, CENTRIFUGE_CASCADE_CASING, GAS_CENTRIFUGE,
+                DEPLETED_URANIUM_DUST, DEPLETED_URANIUM_INGOT, DEPLETED_URANIUM_BLOCK,
+                GEIGER_COUNTER, DOSIMETER, HAZMAT_HELMET, HAZMAT_CHESTPLATE, HAZMAT_LEGGINGS, HAZMAT_BOOTS, LEAD_BOX, LEAD_BRICKS, CONCRETE_SHIELDING);
+    }
+
     // The ore items in creative tab order: per ore its ore, deepslate ore, raw item, raw block, dust,
     // ingot or crystal and block; then Invar's dust and ingot.
     // Sulfuric Acid and the slurries, for the Fluids tab.

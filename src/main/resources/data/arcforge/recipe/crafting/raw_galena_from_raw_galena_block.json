@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:storage_blocks/raw_lead"
+  ],
+  "result": {
+    "id": "arcforge:raw_galena",
+    "count": 9
+  }
+}

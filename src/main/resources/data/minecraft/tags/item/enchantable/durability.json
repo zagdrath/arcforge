@@ -18,6 +18,7 @@
     "arcforge:foundry_boots",
     "arcforge:steel_mesh",
     "arcforge:invar_mesh",
-    "arcforge:tungsten_mesh"
+    "arcforge:tungsten_mesh",
+    "#arcforge:hazmat_suit"
   ]
 }

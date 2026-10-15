@@ -1,0 +1,44 @@
+{
+  "parent": "arcforge:nuclear/geiger_counter",
+  "display": {
+    "icon": {
+      "id": "arcforge:hazmat_helmet"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.hazmat_suit.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.hazmat_suit.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:hazmat_helmet"
+          },
+          {
+            "items": "arcforge:hazmat_chestplate"
+          },
+          {
+            "items": "arcforge:hazmat_leggings"
+          },
+          {
+            "items": "arcforge:hazmat_boots"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

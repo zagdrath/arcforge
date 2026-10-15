@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "arcforge:block/depleted_uranium_block"
+    }
+  }
+}

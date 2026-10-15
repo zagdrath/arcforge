@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RIR",
+    "RGR"
+  ],
+  "key": {
+    "R": "#c:rubbers",
+    "I": "#arcforge:shielding_metals",
+    "G": "minecraft:glass_pane"
+  },
+  "result": {
+    "id": "arcforge:hazmat_helmet",
+    "count": 1
+  }
+}

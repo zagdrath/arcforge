@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "R R",
+    "I I"
+  ],
+  "key": {
+    "R": "#c:rubbers",
+    "I": "#arcforge:shielding_metals"
+  },
+  "result": {
+    "id": "arcforge:hazmat_boots",
+    "count": 1
+  }
+}

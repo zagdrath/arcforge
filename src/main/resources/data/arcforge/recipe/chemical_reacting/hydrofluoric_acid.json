@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#c:dusts/fluorite",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "c:sulfuric_acid",
+      "amount": 500
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:hydrofluoric_acid",
+    "amount": 500
+  },
+  "time": 120
+}

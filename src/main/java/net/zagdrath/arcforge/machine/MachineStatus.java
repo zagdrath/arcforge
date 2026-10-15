@@ -159,7 +159,12 @@ public enum MachineStatus {
     NO_HYDROGEN("no_hydrogen", "led_blocked"),
     NO_OXYGEN("no_oxygen", "led_blocked"),
     // The Steam Cracker at work.
-    STEAM_CRACKING("steam_cracking", "led_running");
+    STEAM_CRACKING("steam_cracking", "led_running"),
+    // The Gas Centrifuge Cascade at work, with feed it can't enrich to its target (already as rich, or no richer than
+    // its tails), and with product or tails of another assay still in its tanks.
+    ENRICHING("enriching", "led_running"),
+    FEED_TOO_RICH("feed_too_rich", "led_blocked"),
+    ASSAY_MISMATCH("assay_mismatch", "led_blocked");
 
     private final String name;
     private final String led;

@@ -1,0 +1,22 @@
+{
+  "values": {
+    "arcforge:uraninite_ore": {
+      "dose_rate": 0.2
+    },
+    "arcforge:deepslate_uraninite_ore": {
+      "dose_rate": 0.2
+    },
+    "arcforge:raw_uraninite_block": {
+      "dose_rate": 0.9
+    },
+    "arcforge:depleted_uranium_block": {
+      "dose_rate": 0.045
+    },
+    "arcforge:heavy_mineral_sand": {
+      "dose_rate": 0.02
+    },
+    "arcforge:uranyl_sulfate_solution": {
+      "dose_rate": 0.2
+    }
+  }
+}

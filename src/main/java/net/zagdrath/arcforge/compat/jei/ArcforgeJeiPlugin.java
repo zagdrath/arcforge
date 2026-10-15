@@ -146,6 +146,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.BurnerFuels(gui),
                 new MachineCategories.GasTurbineFuels(gui),
                 new MachineCategories.EngineFuels(gui),
+                new MachineCategories.Enriching(gui),
                 new MachineCategories.BatteryComponents(gui),
                 new MultiblockCategory(gui));
     }
@@ -227,6 +228,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
             }
         });
         registration.addRecipes(MachineCategories.EngineFuels.TYPE, engineFuels);
+        // The Gas Centrifuge Cascade's enrichment at a few common targets (3%, 5% and 20%, low-enriched fuel).
+        registration.addRecipes(MachineCategories.Enriching.TYPE, List.of(new MachineCategories.EnrichmentRecipe(3_000),
+                new MachineCategories.EnrichmentRecipe(5_000), new MachineCategories.EnrichmentRecipe(net.zagdrath.arcforge.nuclear.Enrichment.MAX_PCM)));
         List<MachineCategories.BatteryComponentRecipe> batteryParts = new ArrayList<>();
         for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.values()) {
             batteryParts.add(new MachineCategories.BatteryComponentRecipe(ModBlocks.lithiumCell(tier).get().asItem(), tier, true));
@@ -384,6 +388,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.STEAM_CRACKING), ModBlocks.STEAM_CRACKER_CONTROLLER.get(),
                 ModBlocks.STEAM_CRACKER_CASING.get());
         registration.addCraftingStation(MachineCategories.EngineFuels.TYPE, ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), ModBlocks.DIESEL_GENERATOR_CASING.get());
+        registration.addCraftingStation(MachineCategories.Enriching.TYPE, ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get(), ModBlocks.CENTRIFUGE_CASCADE_CASING.get(),
+                ModBlocks.GAS_CENTRIFUGE.get());
         registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
         registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());
         registration.addCraftingStation(MachineCategories.AirSeparating.TYPE, ModBlocks.AIR_SEPARATOR.get());

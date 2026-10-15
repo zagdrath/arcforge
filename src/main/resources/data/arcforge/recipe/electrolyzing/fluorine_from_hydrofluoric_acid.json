@@ -1,0 +1,16 @@
+{
+  "type": "arcforge:electrolyzing",
+  "input": {
+    "fluid": "arcforge:hydrofluoric_acid",
+    "amount": 100
+  },
+  "primary": {
+    "id": "arcforge:hydrogen",
+    "amount": 50
+  },
+  "secondary": {
+    "id": "arcforge:fluorine",
+    "amount": 50
+  },
+  "energy": 40000
+}

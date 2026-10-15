@@ -1,0 +1,14 @@
+{
+  "title": "Uranium Hexafluoride",
+  "icon": "arcforge:hardened_pressurized_cylinder",
+  "items": [
+    "arcforge:wrought_pressurized_cylinder",
+    "arcforge:pvc_sheet"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "UF₆ is a gas, toxic and corrosive. Only Pressurized Conduits and a PVC-lined Pressurized Cylinder hold it: Gas Cartridges, Jetpacks, the Gas Reservoir, the Quantum Tunnel and the Flare Stack refuse it.\n- Line a cylinder by using 4 PVC Sheets on it; it keeps its lining when broken.\n- UF₆ carries its U-235 assay, shown in its name. Tanks and conduits never mix two assays: a cylinder of 4.5% won't take natural UF₆, and conduits of different assays don't join."
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "IBI",
+    "BIB",
+    "IBI"
+  ],
+  "key": {
+    "I": "#arcforge:shielding_metals",
+    "B": "minecraft:bricks"
+  },
+  "result": {
+    "id": "arcforge:lead_bricks",
+    "count": 4
+  }
+}
