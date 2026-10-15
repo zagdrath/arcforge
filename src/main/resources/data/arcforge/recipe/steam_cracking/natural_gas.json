@@ -1,0 +1,28 @@
+{
+  "type": "arcforge:steam_cracking",
+  "input": {
+    "fluid": "arcforge:natural_gas",
+    "amount": 100
+  },
+  "second_input": {
+    "fluid": "arcforge:steam",
+    "amount": 50
+  },
+  "fluids": [
+    {
+      "id": "arcforge:ethylene",
+      "amount": 35
+    },
+    {
+      "id": "arcforge:propylene",
+      "amount": 5
+    },
+    {
+      "id": "arcforge:hydrogen",
+      "amount": 30
+    }
+  ],
+  "time": 20,
+  "heat_per_tick": 60,
+  "min_temp": 800
+}

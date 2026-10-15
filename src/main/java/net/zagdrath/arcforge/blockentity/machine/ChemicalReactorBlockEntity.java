@@ -311,10 +311,15 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         List<ChemicalReactingRecipe.ItemInput> needed = recipe.itemInputs();
         int itemsUsed = 0;
         for (int i = 0; i < slots.length; i++) {
+            ChemicalReactingRecipe.ItemInput wanted = needed.get(i);
+            // A catalyst (consume_chance under 1) is used up only that often.
+            if (wanted.isCatalyst() && level.getRandom().nextFloat() >= wanted.consumeChance()) {
+                continue;
+            }
             int slot = INPUT_SLOTS[slots[i]];
             ItemStack stack = items.getStack(slot);
-            items.setStack(slot, stack.copyWithCount(stack.getCount() - needed.get(i).count()));
-            itemsUsed += needed.get(i).count();
+            items.setStack(slot, stack.copyWithCount(stack.getCount() - wanted.count()));
+            itemsUsed += wanted.count();
         }
         int fluidUsed = 0;
         List<FluidStack> madeFluids = new ArrayList<>();

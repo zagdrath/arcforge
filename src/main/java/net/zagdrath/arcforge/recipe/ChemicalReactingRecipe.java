@@ -44,7 +44,10 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 // an optional byproduct rolled once per operation (Slag, when precipitating), and an optional fluid_byproduct that always
 // comes (the Water left when Ethanol is dehydrated into Ethylene), into the reactor's by-product tank. The items are
 // item_input, second_item_input and third_item_input, each drawn from a different input slot; each fluid input from a
-// different input tank. "category" only labels the recipe in JEI: general, leaching or precipitating.
+// different input tank. An item input with a "consume_chance" below 1 is a catalyst: it must be there, but is used up
+// only that often (0.02: about one in 50 operations; only the Chemical Reactor reads it, the other machines that share
+// ItemInput use their inputs up every time). "category" only labels the recipe in JEI: general, leaching or
+// precipitating.
 public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<ItemInput> secondItemInput, List<FluidInput> fluidInputs,
         Optional<ItemStackTemplate> itemOutput,
         Optional<FluidStackTemplate> fluidOutput, Optional<ItemStackTemplate> byproduct, float byproductChance, int time,
@@ -53,17 +56,28 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
     public static final int DEFAULT_TIME = 100;
     public static final int MAX_FLUID_INPUTS = ChemicalReactorInput.TANKS;
 
-    // {"ingredient": ..., "count": 1..64}
-    public record ItemInput(Ingredient ingredient, int count) {
+    // {"ingredient": ..., "count": 1..64, "consume_chance": 0..1 (1 when left out)}
+    public record ItemInput(Ingredient ingredient, int count, float consumeChance) {
         public static final Codec<ItemInput> CODEC = RecordCodecBuilder.create(i -> i.group(
                 Ingredient.CODEC.fieldOf("ingredient").forGetter(ItemInput::ingredient),
-                Codec.intRange(1, 64).optionalFieldOf("count", 1).forGetter(ItemInput::count))
+                Codec.intRange(1, 64).optionalFieldOf("count", 1).forGetter(ItemInput::count),
+                Codec.floatRange(0.0F, 1.0F).optionalFieldOf("consume_chance", 1.0F).forGetter(ItemInput::consumeChance))
                 .apply(i, ItemInput::new));
 
         public static final StreamCodec<RegistryFriendlyByteBuf, ItemInput> STREAM_CODEC = StreamCodec.composite(
                 Ingredient.CONTENTS_STREAM_CODEC, ItemInput::ingredient,
                 ByteBufCodecs.VAR_INT, ItemInput::count,
+                ByteBufCodecs.FLOAT, ItemInput::consumeChance,
                 ItemInput::new);
+
+        public ItemInput(Ingredient ingredient, int count) {
+            this(ingredient, count, 1.0F);
+        }
+
+        // Whether it's a catalyst: needed, but not always used up.
+        public boolean isCatalyst() {
+            return consumeChance < 1.0F;
+        }
 
         public boolean test(ItemStack stack) {
             return ingredient.test(stack) && stack.getCount() >= count;

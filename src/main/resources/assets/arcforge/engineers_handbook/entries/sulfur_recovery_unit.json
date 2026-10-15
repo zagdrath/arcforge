@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Turns Hydrogen Sulfide back into Sulfur, the way refineries do it (the Claus process): it burns the gas with Oxygen into Sulfur and water, which leaves as steam.\n- 500 mB Hydrogen Sulfide and 250 mB Oxygen make a Sulfur Dust and 500 mB Steam in 2 seconds, using 15 HU/t at 250°C or hotter.\n- Hydrogen Sulfide in the top, Oxygen in the back, heat into the bottom. Sulfur Dust leaves by the left, Steam by the right; it pushes both out on its own.\n- Speed Upgrades make it faster.\nOxygen comes from the Electrolyzer or the Air Separator."
+      "text": "Turns Hydrogen Sulfide back into Sulfur, the way refineries do it (the Claus process): it burns the gas with Oxygen into Sulfur and water, which leaves as steam.\n- 100 mB Hydrogen Sulfide and 50 mB Oxygen make a Sulfur Dust and 100 mB Steam in half a second, using 15 HU/t at 250°C or hotter.\n- Hydrogen Sulfide in the top, Oxygen in the back, heat into the bottom. Sulfur Dust leaves by the left, Steam by the right; it pushes both out on its own.\n- Speed Upgrades make it faster.\nOxygen comes from the Electrolyzer or the Air Separator. A bucket of Sour Crude Oil, distilled and both its sour cuts treated, gives about one Sulfur Dust."
     }
   ]
 }

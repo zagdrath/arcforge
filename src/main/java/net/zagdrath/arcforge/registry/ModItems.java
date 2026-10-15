@@ -282,6 +282,9 @@ public final class ModItems {
     // Rubber: Raw Rubber (Latex dried in the Grain Dryer) cured with Sulfur in the Vulcanizer. Gaskets seal the
     // pressurized conduits, cylinders, cartridges and jetpacks.
     public static final DeferredItem<Item> RAW_RUBBER = ITEMS.registerSimpleItem("raw_rubber");
+    // EPDM: Ethylene and Propylene over a Cracking Catalyst in the Chemical Reactor. It cures in the Vulcanizer as Raw
+    // Rubber does (both are in arcforge:raw_rubber).
+    public static final DeferredItem<Item> SYNTHETIC_RUBBER = ITEMS.registerSimpleItem("synthetic_rubber");
     public static final DeferredItem<Item> RUBBER = ITEMS.registerSimpleItem("rubber");
     public static final DeferredItem<BlockItem> RUBBER_BLOCK = ITEMS.registerSimpleBlockItem(ModBlocks.RUBBER_BLOCK);
     public static final DeferredItem<Item> RUBBER_GASKET = ITEMS.registerSimpleItem("rubber_gasket");

@@ -339,8 +339,16 @@ public final class MachineRecipes {
 
     // --- The refinery's downstream units ---
 
+    // The first recipe of this process for the feed; cracking recipes only in catalytic mode (see the overload).
     public static Optional<RecipeHolder<RefiningRecipe>> refining(@Nullable Level level, RefiningProcess process, RefiningRecipe.Input input) {
+        return refining(level, process, input, CrackingMode.CATALYTIC);
+    }
+
+    // The same, with cracking recipes only in this mode (the Cracking Unit's; the other processes ignore it).
+    public static Optional<RecipeHolder<RefiningRecipe>> refining(@Nullable Level level, RefiningProcess process, RefiningRecipe.Input input,
+            CrackingMode mode) {
         return recipes(level).byType(process.type()).stream()
+                .filter(holder -> process != RefiningProcess.CRACKING || holder.value().mode() == mode)
                 .filter(holder -> holder.value().matches(input, level))
                 .findFirst();
     }
@@ -401,6 +409,14 @@ public final class MachineRecipes {
     public static boolean isVulcanizerInput(@Nullable Level level, ItemStack stack) {
         return !stack.isEmpty() && recipes(level).byType(ModRecipes.VULCANIZING.get()).stream()
                 .anyMatch(holder -> holder.value().takes(stack));
+    }
+
+    // Whether two different items fill the same input of some vulcanizing recipe (Raw Rubber and Synthetic Rubber): the
+    // Vulcanizer's slots never take both at once, or there'd be no room for the Sulfur.
+    public static boolean vulcanizeAlike(@Nullable Level level, ItemStack a, ItemStack b) {
+        return !a.isEmpty() && !b.isEmpty() && recipes(level).byType(ModRecipes.VULCANIZING.get()).stream().anyMatch(holder ->
+                holder.value().input().ingredient().test(a) && holder.value().input().ingredient().test(b)
+                        || holder.value().secondInput().ingredient().test(a) && holder.value().secondInput().ingredient().test(b));
     }
 
     // --- Farm chemistry ---

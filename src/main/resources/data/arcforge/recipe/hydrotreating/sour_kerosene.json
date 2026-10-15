@@ -6,7 +6,7 @@
   },
   "second_input": {
     "fluid": "arcforge:hydrogen",
-    "amount": 25
+    "amount": 30
   },
   "fluids": [
     {
@@ -15,7 +15,7 @@
     },
     {
       "id": "arcforge:hydrogen_sulfide",
-      "amount": 25
+      "amount": 30
     }
   ],
   "time": 40,

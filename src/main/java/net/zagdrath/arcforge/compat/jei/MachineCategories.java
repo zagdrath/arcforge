@@ -736,9 +736,13 @@ final class MachineCategories {
 
     // --- Cracking Unit, Catalytic Reformer, Coker, Lubricant Blender ---
 
-    // One category per refining process: the feed (and the catalyst, worn slowly, for cracking) in, the arrow, the
-    // products out (and the Coker's coke); the time with its FE, or the heat and the least temperature, below.
+    // One category per refining process (cracking split by its two modes: catalytic cracking under the recipe type's own
+    // uid, hydrocracking under arcforge:hydrocracking): the feed (and the catalyst, worn slowly, or the second fluid) in,
+    // the arrow, the products out (and the Coker's coke); the time with its FE, or the heat and the least temperature,
+    // below.
     static final class Refining extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.RefiningRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.RefiningRecipe> HYDROCRACKING =
+                IRecipeHolderType.create(net.minecraft.resources.Identifier.fromNamespaceAndPath(Arcforge.MODID, "hydrocracking"));
         private final net.zagdrath.arcforge.recipe.RefiningProcess process;
 
         Refining(IGuiHelper gui, net.zagdrath.arcforge.recipe.RefiningProcess process) {
@@ -746,8 +750,24 @@ final class MachineCategories {
             this.process = process;
         }
 
+        // The Cracking Unit's hydrocracking recipes.
+        private Refining(IGuiHelper gui) {
+            super(HYDROCRACKING, "hydrocracking", icon(net.zagdrath.arcforge.recipe.RefiningProcess.CRACKING), gui, 150, 50);
+            this.process = net.zagdrath.arcforge.recipe.RefiningProcess.CRACKING;
+        }
+
+        static Refining hydrocracking(IGuiHelper gui) {
+            return new Refining(gui);
+        }
+
         static IRecipeHolderType<net.zagdrath.arcforge.recipe.RefiningRecipe> type(net.zagdrath.arcforge.recipe.RefiningProcess process) {
             return IRecipeHolderType.create(process.type());
+        }
+
+        // The category a recipe shows in: hydrocracking recipes get their own.
+        static IRecipeHolderType<net.zagdrath.arcforge.recipe.RefiningRecipe> typeOf(net.zagdrath.arcforge.recipe.RefiningRecipe recipe) {
+            return recipe.process() == net.zagdrath.arcforge.recipe.RefiningProcess.CRACKING
+                    && recipe.mode() == net.zagdrath.arcforge.recipe.CrackingMode.HYDROCRACKING ? HYDROCRACKING : type(recipe.process());
         }
 
         static net.minecraft.world.level.block.Block icon(net.zagdrath.arcforge.recipe.RefiningProcess process) {
@@ -1327,8 +1347,14 @@ final class MachineCategories {
             ChemicalReactingRecipe recipe = holder.value();
             int x = 1;
             for (ChemicalReactingRecipe.ItemInput input : recipe.itemInputs()) {
-                builder.addInputSlot(x, 5).setStandardSlotBackground()
+                var slot = builder.addInputSlot(x, 5).setStandardSlotBackground()
                         .addItemStacks(input.ingredient().items().map(item -> new ItemStack(item, input.count())).toList());
+                if (input.isCatalyst()) {
+                    slot.addRichTooltipCallback((view, tooltip) -> tooltip.add((input.consumeChance() <= 0.0F
+                            ? Component.translatable("jei.arcforge.chemical_reacting.catalyst_kept")
+                            : Component.translatable("jei.arcforge.chemical_reacting.catalyst", String.format(Locale.ROOT, "%.0f", input.consumeChance() * 100),
+                                    Math.round(1.0F / input.consumeChance()))).withStyle(ChatFormatting.GRAY)));
+                }
                 x += 20;
             }
             // Recipes with one item keep their fluids where they always were.

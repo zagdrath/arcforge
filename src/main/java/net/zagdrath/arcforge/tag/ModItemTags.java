@@ -33,6 +33,9 @@ public final class ModItemTags {
     // Plastic (Plastic Sheets), for Conduit Filters and Storage Upgrades.
     public static final TagKey<Item> PLASTICS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "plastics"));
 
+    // What the Vulcanizer cures into Rubber: Raw Rubber (from Latex) and Synthetic Rubber (EPDM, from the Steam Cracker's olefins).
+    public static final TagKey<Item> RAW_RUBBER = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(Arcforge.MODID, "raw_rubber"));
+
     // Steel ingots: what steel tools and armour repair with.
     public static final TagKey<Item> STEEL_INGOTS = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath("c", "ingots/steel"));
 

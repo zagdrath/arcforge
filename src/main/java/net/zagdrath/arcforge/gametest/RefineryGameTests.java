@@ -11,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.ItemStack;
@@ -21,6 +22,8 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.storage.TagValueInput;
+import net.minecraft.world.level.storage.TagValueOutput;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
@@ -38,9 +41,12 @@ import net.zagdrath.arcforge.item.tool.JetpackFuel;
 import net.zagdrath.arcforge.item.tool.JetpackItem;
 import net.zagdrath.arcforge.machine.EngineFuel;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.refining.RefiningCore;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.multiblock.PlantKind;
+import net.zagdrath.arcforge.recipe.CrackingMode;
+import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.recipe.RefiningProcess;
 import net.zagdrath.arcforge.recipe.RefiningRecipe;
@@ -52,9 +58,10 @@ import net.zagdrath.arcforge.steam.Lubricant;
 import net.zagdrath.arcforge.tag.ModItemTags;
 
 // The refinery's downstream units: the recipes; the Catalytic Reformer, Coker and Lubricant Blender running; the
-// Cracking Unit forming and cracking with its catalyst; the Diesel Generator forming, spinning up and throttling when
-// full; the Flare Stack burning gas; and the fuels, Lubricant, Petroleum Coke, Kerosene in the Jetpack and asphalt from
-// Bitumen.
+// Cracking Unit forming and cracking with its catalyst, and hydrocracking in the mode set for it; the Steam Cracker on
+// Naphtha and on Natural Gas; Light Oil on the crude chain and the sulfur sour crude gives; the Diesel Generator
+// forming, spinning up and throttling when full; the Flare Stack burning gas; and the fuels, Lubricant, Petroleum Coke,
+// Kerosene in the Jetpack and asphalt from Bitumen.
 final class RefineryGameTests {
     private RefineryGameTests() {}
 
@@ -102,7 +109,7 @@ final class RefineryGameTests {
         RefiningRecipe cracking = recipe(helper, RefiningProcess.CRACKING, ModFluids.HEAVY_OIL.get());
         helper.assertTrue(cracking.usesCatalyst() && cracking.isCatalyst(new ItemStack(ModItems.CRACKING_CATALYST.get())),
                 "Cracking doesn't wear the Cracking Catalyst");
-        helper.assertTrue(cracking.fluids().size() == 3, "Cracking makes " + cracking.fluids().size() + " fluids");
+        helper.assertTrue(cracking.fluids().size() == 4 && cracking.mode() == CrackingMode.CATALYTIC, "Cracking makes " + cracking.fluids().size() + " fluids");
         RefiningRecipe reforming = recipe(helper, RefiningProcess.REFORMING, ModFluids.NAPHTHA.get());
         helper.assertTrue(reforming.fluids().get(0).fluid().value() == ModFluids.GASOLINE.get(), "Reforming doesn't make Gasoline first");
         RefiningRecipe coking = recipe(helper, RefiningProcess.COKING, ModFluids.BITUMEN.get());
@@ -217,7 +224,7 @@ final class RefineryGameTests {
                 .thenSucceed();
     }
 
-    // The Coker turns Bitumen into Petroleum Coke (into its slot) and Refinery Gas.
+    // The Coker turns Bitumen into Petroleum Coke (into its slot), Refinery Gas and a little Heavy Oil.
     static void cokerCokes(GameTestHelper helper) {
         BlockPos pos = new BlockPos(0, 1, 0);
         helper.setBlock(pos, ModBlocks.COKER.get());
@@ -229,8 +236,12 @@ final class RefineryGameTests {
         helper.startSequence()
                 .thenWaitUntil(() -> helper.assertTrue(coker.getItems().getStack(0).is(ModItems.PETROLEUM_COKE.get()),
                         "No Petroleum Coke yet (" + coker.getStatus() + ")"))
-                .thenExecute(() -> helper.assertTrue(core.product(0).getResource(0).getFluid() == ModFluids.REFINERY_GAS.get()
-                        && core.product(0).getAmount() == recipe.fluids().get(0).amount(), "No Refinery Gas"))
+                .thenExecute(() -> {
+                    helper.assertTrue(core.product(0).getResource(0).getFluid() == ModFluids.REFINERY_GAS.get()
+                            && core.product(0).getAmount() == recipe.fluids().get(0).amount(), "No Refinery Gas");
+                    helper.assertTrue(core.product(1).getResource(0).getFluid() == ModFluids.HEAVY_OIL.get()
+                            && core.product(1).getAmount() == recipe.fluids().get(1).amount(), "No Heavy Oil");
+                })
                 .thenSucceed();
     }
 
@@ -254,8 +265,8 @@ final class RefineryGameTests {
                 .thenSucceed();
     }
 
-    // A 3x3x5 Cracking Unit forms; it won't crack without its catalyst, then cracks Heavy Oil into Naphtha, Diesel and
-    // Refinery Gas and wears the catalyst by one batch.
+    // A 3x3x5 Cracking Unit forms; it won't crack without its catalyst, then cracks Heavy Oil into Naphtha, Diesel,
+    // Refinery Gas and Light Oil and wears the catalyst by one batch.
     static void crackingUnitCracks(GameTestHelper helper) {
         BlockPos front = new BlockPos(1, 1, 3);
         buildPlant(helper, PlantKind.CRACKING_UNIT, front);
@@ -282,7 +293,7 @@ final class RefineryGameTests {
                 })
                 .thenExecute(() -> {
                     RefiningCore core = helper.getBlockEntity(front, CrackingUnitBlockEntity.class).getCore();
-                    for (int i = 0; i < 3; i++) {
+                    for (int i = 0; i < recipe.fluids().size(); i++) {
                         helper.assertTrue(core.product(i).getResource(0).getFluid() == recipe.fluids().get(i).fluid().value()
                                 && core.product(i).getAmount() == recipe.fluids().get(i).amount(), "Product " + i + " is wrong");
                     }
@@ -403,6 +414,160 @@ final class RefineryGameTests {
                 .thenSucceed();
     }
 
+    // The Cracking Unit cracks in the mode set for it, never the one its tanks suggest: in catalytic mode, Heavy Oil and
+    // Hydrogen (in through a Hydrogen port) still wait for a catalyst. Switched to hydrocracking it needs no catalyst,
+    // runs hotter and turns them into mostly Diesel and Kerosene (out of a Kerosene port), and the mode is saved.
+    static void crackingModes(GameTestHelper helper) {
+        BlockPos front = new BlockPos(1, 1, 3);
+        buildPlant(helper, PlantKind.CRACKING_UNIT, front);
+        RefiningRecipe catalytic = recipe(helper, RefiningProcess.CRACKING, ModFluids.HEAVY_OIL.get());
+        RefiningRecipe hydro = hydrocracking(helper);
+        helper.assertTrue(!hydro.usesCatalyst() && hydro.secondInput().map(second -> second.test(FluidResource.of(ModFluids.HYDROGEN.get()))).orElse(false),
+                "Hydrocracking isn't Hydrogen without a catalyst");
+        helper.assertTrue(hydro.minTemp() > catalytic.minTemp() && hydro.heatPerTick() > catalytic.heatPerTick(), "Hydrocracking doesn't need more heat");
+        helper.assertTrue(amount(hydro, ModFluids.DIESEL.get()) > amount(catalytic, ModFluids.DIESEL.get())
+                && amount(hydro, ModFluids.KEROSENE.get()) > 0 && amount(catalytic, ModFluids.KEROSENE.get()) == 0
+                && amount(hydro, ModFluids.NAPHTHA.get()) < amount(catalytic, ModFluids.NAPHTHA.get())
+                && amount(hydro, ModFluids.REFINERY_GAS.get()) < amount(catalytic, ModFluids.REFINERY_GAS.get()), "The modes' products don't differ as they should");
+        int hydrogen = hydro.secondInput().orElseThrow().amount();
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    CrackingUnitBlockEntity cracker = helper.getBlockEntity(front, CrackingUnitBlockEntity.class);
+                    helper.assertTrue(cracker.isFormed() && cracker.getMode() == CrackingMode.CATALYTIC, "A new unit isn't catalytic");
+                    helper.assertTrue(fill(cracker.getCore().feed(), ModFluids.HEAVY_OIL.get(), hydro.input().amount()) == hydro.input().amount(),
+                            "It refused Heavy Oil");
+                    helper.assertTrue(fill(cracker.getFluidHandler(SideMode.HYDROGEN), ModFluids.HYDROGEN.get(), hydrogen) == hydrogen,
+                            "Its Hydrogen port refused Hydrogen");
+                    heat(cracker.getCore(), hydro.minTemp() + 100);
+                })
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    CrackingUnitBlockEntity cracker = helper.getBlockEntity(front, CrackingUnitBlockEntity.class);
+                    helper.assertTrue(cracker.getStatus() == MachineStatus.NO_CATALYST, "With Hydrogen in catalytic mode it's " + cracker.getStatus());
+                    cracker.setMode(CrackingMode.HYDROCRACKING);
+                })
+                .thenWaitUntil(() -> {
+                    CrackingUnitBlockEntity cracker = helper.getBlockEntity(front, CrackingUnitBlockEntity.class);
+                    helper.assertTrue(cracker.getCore().product(1).getAmount() == amount(hydro, ModFluids.DIESEL.get()),
+                            "No Diesel yet (" + cracker.getStatus() + ")");
+                })
+                .thenExecute(() -> {
+                    CrackingUnitBlockEntity cracker = helper.getBlockEntity(front, CrackingUnitBlockEntity.class);
+                    RefiningCore core = cracker.getCore();
+                    for (int i = 0; i < hydro.fluids().size(); i++) {
+                        helper.assertTrue(core.product(i).getResource(0).getFluid() == hydro.fluids().get(i).fluid().value()
+                                && core.product(i).getAmount() == hydro.fluids().get(i).amount(), "Product " + i + " is wrong");
+                    }
+                    helper.assertTrue(core.feed().getAmount() == 0 && core.secondFeed().getAmount() == 0, "It didn't use its Heavy Oil and Hydrogen");
+                    try (Transaction tx = Transaction.openRoot()) {
+                        helper.assertTrue(cracker.getFluidHandler(SideMode.KEROSENE).extract(FluidResource.of(ModFluids.KEROSENE.get()), 1_000, tx)
+                                == amount(hydro, ModFluids.KEROSENE.get()), "The Kerosene port doesn't give the Kerosene");
+                        helper.assertTrue(cracker.getFluidHandler(SideMode.REFINERY_GAS).extract(FluidResource.of(ModFluids.KEROSENE.get()), 1_000, tx) == 0,
+                                "The Refinery Gas port gives Kerosene");
+                    }
+                    // Saved and loaded, it stays hydrocracking.
+                    var registries = helper.getLevel().registryAccess();
+                    TagValueOutput output = TagValueOutput.createWithContext(ProblemReporter.DISCARDING, registries);
+                    core.save(output);
+                    cracker.setMode(CrackingMode.CATALYTIC);
+                    core.load(TagValueInput.create(ProblemReporter.DISCARDING, registries, output.buildResult()));
+                    helper.assertTrue(cracker.getMode() == CrackingMode.HYDROCRACKING, "The mode wasn't saved");
+                })
+                .thenSucceed();
+    }
+
+    private static RefiningRecipe hydrocracking(GameTestHelper helper) {
+        var holder = MachineRecipes.refining(helper.getLevel(), RefiningProcess.CRACKING,
+                new RefiningRecipe.Input(FluidResource.of(ModFluids.HEAVY_OIL.get()), 16_000), CrackingMode.HYDROCRACKING);
+        helper.assertTrue(holder.isPresent() && holder.get().value().mode() == CrackingMode.HYDROCRACKING, "No hydrocracking recipe for Heavy Oil");
+        return holder.orElseThrow().value();
+    }
+
+    // What a recipe makes of this fluid, in mB.
+    private static int amount(RefiningRecipe recipe, Fluid fluid) {
+        return recipe.fluids().stream().filter(made -> made.fluid().value() == fluid).mapToInt(made -> made.amount()).sum();
+    }
+
+    // The Steam Cracker cracks Natural Gas too: less Ethylene than from Naphtha, more Hydrogen, hardly any Propylene.
+    static void steamCrackerNaturalGas(GameTestHelper helper) {
+        BlockPos front = new BlockPos(1, 1, 3);
+        buildPlant(helper, PlantKind.STEAM_CRACKER, front);
+        RefiningRecipe naphtha = recipe(helper, RefiningProcess.STEAM_CRACKING, ModFluids.NAPHTHA.get());
+        RefiningRecipe gas = recipe(helper, RefiningProcess.STEAM_CRACKING, ModFluids.NATURAL_GAS.get());
+        helper.assertTrue(amount(gas, ModFluids.ETHYLENE.get()) < amount(naphtha, ModFluids.ETHYLENE.get())
+                && amount(gas, ModFluids.HYDROGEN.get()) > amount(naphtha, ModFluids.HYDROGEN.get())
+                && amount(gas, ModFluids.PROPYLENE.get()) * 4 <= amount(naphtha, ModFluids.PROPYLENE.get()), "Natural Gas cracks like Naphtha");
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    var cracker = helper.getBlockEntity(front, net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity.class);
+                    helper.assertTrue(cracker.isFormed(), "The Steam Cracker didn't form");
+                    RefiningCore core = cracker.getCore();
+                    helper.assertTrue(fill(core.feed(), ModFluids.NATURAL_GAS.get(), gas.input().amount()) == gas.input().amount(), "It refused Natural Gas");
+                    fill(core.secondFeed(), ModFluids.STEAM.get(), gas.secondInput().orElseThrow().amount());
+                    heat(core, gas.minTemp() + 150);
+                })
+                .thenWaitUntil(() -> {
+                    var cracker = helper.getBlockEntity(front, net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity.class);
+                    helper.assertTrue(cracker.getCore().product(0).getAmount() == amount(gas, ModFluids.ETHYLENE.get()),
+                            "No Ethylene yet (" + cracker.getStatus() + ")");
+                })
+                .thenExecute(() -> {
+                    RefiningCore core = helper.getBlockEntity(front, net.zagdrath.arcforge.blockentity.multiblock.SteamCrackerBlockEntity.class).getCore();
+                    for (int i = 0; i < gas.fluids().size(); i++) {
+                        helper.assertTrue(core.product(i).getResource(0).getFluid() == gas.fluids().get(i).fluid().value()
+                                && core.product(i).getAmount() == gas.fluids().get(i).amount(), "Product " + i + " is wrong");
+                    }
+                    helper.assertTrue(core.feed().getAmount() == 0, "It didn't use the Natural Gas");
+                })
+                .thenSucceed();
+    }
+
+    // Light Oil is on the crude chain: Crude and Sour Crude give it 10 and 14 high (taken from the Diesel and Heavy Oil,
+    // so each height makes as much as before), both cracking modes give a little, and the Chemical Reactor still makes
+    // Plastic Sheet from it.
+    static void lightOilOnCrudeChain(GameTestHelper helper) {
+        int[][] expected = { { 10, 80, 950 }, { 14, 100, 970 } };
+        for (Fluid crude : List.of(ModFluids.CRUDE_OIL.get(), ModFluids.SOUR_CRUDE_OIL.get())) {
+            var holder = MachineRecipes.distilling(helper.getLevel(), FluidResource.of(crude));
+            helper.assertTrue(holder.isPresent(), "No distilling recipe for " + crude);
+            DistillingRecipe distilling = holder.orElseThrow().value();
+            for (int[] row : expected) {
+                var outputs = distilling.outputs(row[0], 0.0F);
+                int light = outputs.getOrDefault(ModFluids.LIGHT_OIL.get(), 0);
+                int total = outputs.values().stream().mapToInt(Integer::intValue).sum();
+                helper.assertTrue(light == row[1] && total == row[2], crude + " " + row[0] + " high makes " + light + " Light Oil of " + total + " mB");
+            }
+            helper.assertTrue(!distilling.outputs(6, 0.0F).containsKey(ModFluids.LIGHT_OIL.get()), crude + " gives Light Oil 6 high");
+        }
+        RefiningRecipe catalytic = recipe(helper, RefiningProcess.CRACKING, ModFluids.HEAVY_OIL.get());
+        helper.assertTrue(amount(catalytic, ModFluids.LIGHT_OIL.get()) > 0 && amount(hydrocracking(helper), ModFluids.LIGHT_OIL.get()) > 0,
+                "Cracking gives no Light Oil");
+        helper.assertTrue(MachineRecipes.isReactorFluid(helper.getLevel(), FluidResource.of(ModFluids.LIGHT_OIL.get())), "Nothing in the reactor takes Light Oil");
+        helper.succeed();
+    }
+
+    // Sour Crude is a real sulfur source: 1,000 mB distilled 14 high, both sour cuts hydrotreated and the Hydrogen Sulfide
+    // burnt in the Sulfur Recovery Unit, gives about one Sulfur Dust; the unit's Steam stays 1 mB per mB of feed.
+    static void sourCrudeSulfurYield(GameTestHelper helper) {
+        DistillingRecipe distilling = MachineRecipes.distilling(helper.getLevel(), FluidResource.of(ModFluids.SOUR_CRUDE_OIL.get())).orElseThrow().value();
+        var cuts = distilling.outputs(14, 0.0F);
+        double sulfide = 0;
+        for (Fluid sour : List.of(ModFluids.SOUR_DIESEL.get(), ModFluids.SOUR_KEROSENE.get())) {
+            int cut = cuts.getOrDefault(sour, 0);
+            helper.assertTrue(cut > 0, "Sour Crude gives no " + sour + " 14 high");
+            RefiningRecipe treating = recipe(helper, RefiningProcess.HYDROTREATING, sour);
+            sulfide += cut * (double) amount(treating, ModFluids.HYDROGEN_SULFIDE.get()) / treating.input().amount();
+        }
+        RefiningRecipe recovery = recipe(helper, RefiningProcess.SULFUR_RECOVERY, ModFluids.HYDROGEN_SULFIDE.get());
+        double dust = sulfide / recovery.input().amount() * recovery.itemResult().getCount();
+        helper.assertTrue(recovery.itemResult().is(ModItems.SULFUR_DUST.get()) && dust >= 0.9 && dust <= 1.2,
+                String.format(java.util.Locale.ROOT, "A bucket of Sour Crude gives %.2f Sulfur Dust", dust));
+        helper.assertTrue(amount(recovery, ModFluids.STEAM.get()) == recovery.input().amount(), "The Steam isn't 1 mB per mB of Hydrogen Sulfide");
+        helper.succeed();
+    }
+
     // The Flare Stack takes gases (not liquids) through its sides and burns them, lit while it does.
     static void flareStackBurns(GameTestHelper helper) {
         BlockPos pos = new BlockPos(0, 1, 0);
@@ -421,7 +586,8 @@ final class RefineryGameTests {
                 .thenSucceed();
     }
 
-    // The refinery fuels burn at their config values; Gasoline, Diesel, Biodiesel and Refinery Gas fuel the generator;
+    // The refinery fuels burn at their config values; Gasoline, Diesel, Biodiesel, Refinery Gas and Kerosene fuel the
+    // generator;
     // Refinery Gas is a gas; Lubricant lubricates at the premium bonus.
     static void fuelsAndLubricant(GameTestHelper helper) {
         Object[][] fuels = { { ModFluids.GASOLINE.get(), ArcforgeConfig.GASOLINE_HU_PER_MB.getAsInt(), ArcforgeConfig.GASOLINE_BURN_TEMPERATURE.getAsInt() },
@@ -434,7 +600,8 @@ final class RefineryGameTests {
             helper.assertTrue(fuel != null && fuel.huPerMb() == (int) row[1] && fuel.burnTemperature(Integer.MAX_VALUE) == (int) row[2] && fuel.gasTurbine(),
                     row[0] + " doesn't burn as configured");
         }
-        for (Fluid fluid : List.of(ModFluids.DIESEL.get(), ModFluids.GASOLINE.get(), ModFluids.BIODIESEL.get(), ModFluids.REFINERY_GAS.get())) {
+        for (Fluid fluid : List.of(ModFluids.DIESEL.get(), ModFluids.GASOLINE.get(), ModFluids.BIODIESEL.get(), ModFluids.REFINERY_GAS.get(),
+                ModFluids.KEROSENE.get())) {
             helper.assertTrue(EngineFuel.of(fluid) != null, fluid + " doesn't fuel the Diesel Generator");
         }
         helper.assertTrue(EngineFuel.of(ModFluids.NAPHTHA.get()) == null, "Naphtha fuels the Diesel Generator");

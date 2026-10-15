@@ -4,12 +4,13 @@
   "items": [
     "arcforge:coker",
     "arcforge:petroleum_coke",
-    "arcforge:bitumen_bucket"
+    "arcforge:bitumen_bucket",
+    "arcforge:heavy_oil_bucket"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Cooks Bitumen, the bottom of the barrel, down into Petroleum Coke and Refinery Gas.\n- 250 mB Bitumen makes 1 Petroleum Coke and 50 mB Refinery Gas in 3 seconds, using 25 HU/t at 420°C or hotter.\n- Bitumen in the top, heat into the bottom, the coke out of the left (with auto-eject) and the gas out of the right.\n# Petroleum Coke\nIt works as Coal Coke everywhere: Arcforge Furnace fuel and reagent, Graphite, the Gasifier, the Firebox Array, and furnaces. It's tagged c:coal_coke."
+      "text": "Cooks Bitumen, the bottom of the barrel, down into Petroleum Coke, Refinery Gas and a little Heavy Oil.\n- 250 mB Bitumen makes 1 Petroleum Coke, 50 mB Refinery Gas and 50 mB Heavy Oil in 3 seconds, using 25 HU/t at 420°C or hotter.\n- Bitumen in the top, heat into the bottom, the coke (with auto-eject) and the Heavy Oil out of the left and the gas out of the right. The Heavy Oil goes back to the Cracking Unit.\n# Petroleum Coke\nIt works as Coal Coke everywhere: Arcforge Furnace fuel and reagent, Graphite, the Gasifier, the Firebox Array, and furnaces. It's tagged c:coal_coke."
     }
   ]
 }

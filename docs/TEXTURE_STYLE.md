@@ -1554,3 +1554,20 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - Diesel Generator (`gui/container/diesel_generator`): the Pumpjack's frame without its bucket slots. The screen runs
     across to the fuel tank, with a speed bar under it in the accent colour. The tank fill falls back to an amber
     hatch (`fuel_fill`) when the fluid sprite isn't there.
+
+## Hydrocracking, Synthetic Rubber and the Coker's Heavy Oil
+- **Synthetic Rubber** (`item/synthetic_rubber`): Raw Rubber's crepe sheet (its diagonal ribs and turned-up corner) with
+  its four tones moved by rank onto a cool slate (`#8C93A3 #636A79 #4E5462 #3A3F4B`) in the item outline, so it reads as
+  the same uncured sheet, made rather than tapped, and apart from cured Rubber's grey slab.
+- **Cracking Unit Mode tab** (GUI icons, 16×16: flat fills with a hue-matched 1 px outline, drawn on the widget/button
+  nine-slice as the Redstone tab's, the selected one pressed with the ACCENT outline):
+  - `icon_cracking_mode` (the tab): a steel cracking column (the Pressure icon's steel: `#9AA0A8` lit, `#646A72` body,
+    `#3E444B` shade, `#16181B` outline) with a sight window in the Heat row (`#FFB02E` / `#F26A16`) and two draw-offs.
+  - `cracking_catalytic`: three zeolite pellets as on the Cracking Catalyst (`#FFF6D8 #E8DDB8 #B8A878`, outline
+    `#4A3E22`), each lit top-left with a shade step bottom-right.
+  - `cracking_hydrocracking`: a hydrogen molecule, two 6×6 atoms (`#E2EEFF #A8CCF2 #6A9AD2`, outline `#1E3A66`) joined
+    by a 2 px bond (`#4A78B2`).
+- **GUIs** (cut from existing backgrounds): the Cracking Unit gains the Steam Cracker's second feed tank frame at x 25
+  (Hydrogen) and a fourth product tank at x 137; the Coker gains a second product tank (Heavy Oil) at x 105, copied from
+  its first, and its coke slot moves 16 px right to x 125 (a refining machine's item slot sits 4 px right of its last
+  product tank).

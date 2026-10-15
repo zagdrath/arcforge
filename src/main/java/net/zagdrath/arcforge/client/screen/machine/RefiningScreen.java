@@ -19,6 +19,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.HeatScale;
+import net.zagdrath.arcforge.client.gui.tab.CrackingModeTab;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.gui.tab.HeatTab;
 import net.zagdrath.arcforge.client.gui.tab.SideTab;
@@ -29,9 +30,10 @@ import net.zagdrath.arcforge.recipe.RefiningProcess;
 // The refinery units' screen, 176x186 (the inventory 104 down), laid out like the Fischer-Tropsch Reactor's: FE (the
 // Blender, the Hydrotreater) and the feed tank on the left, then the second feed tank where the unit has one, the
 // catalyst slot (the Cracking Unit, with the operations its item has left under it), the arrow, the product tanks (and
-// the Coker's coke slot), and the heat buffer on the right. Under them the status, the temperature and the heat bar
-// with a tick at the least temperature the recipe needs. Each unit's background (gui/container/<unit>.png) shows only
-// the parts it has.
+// the Coker's coke slot or the Sulfur Recovery Unit's Sulfur slot after them), and the heat buffer on the right. Under
+// them the status, the temperature and the heat bar with a tick at the least temperature the recipe needs. Each unit's
+// background (gui/container/<unit>.png) shows only the parts it has. The Cracking Unit has a Mode tab (catalytic or
+// hydrocracking); its empty tanks show what that mode makes.
 public class RefiningScreen extends MachineScreen<RefiningMenu> {
     private static final int HEIGHT = 186;
     private static final int ENERGY_X = 9, GAUGE_Y = 19;
@@ -68,6 +70,14 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
             tabs.add(new HeatTab(menu::getHeat, Component.translatable("gui.arcforge.usage"),
                     () -> Component.translatable("gui.arcforge.hu_per_tick_loss", menu.getHeatUsage())));
         }
+        if (menu.getProcess() == RefiningProcess.CRACKING) {
+            tabs.add(new CrackingModeTab(menu::getMode, mode -> {
+                var minecraft = net.minecraft.client.Minecraft.getInstance();
+                if (minecraft.gameMode != null) {
+                    minecraft.gameMode.handleInventoryButtonClick(menu.containerId, RefiningMenu.BUTTON_MODE + mode.ordinal());
+                }
+            }));
+        }
         return tabs;
     }
 
@@ -81,7 +91,10 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
 
     private Fluid productShown(int i) {
         Fluid held = menu.getProductFluid(i);
-        return held != Fluids.EMPTY ? held : process.products().get(i);
+        if (held != Fluids.EMPTY) {
+            return held;
+        }
+        return process == RefiningProcess.CRACKING ? menu.getMode().products().get(i) : process.products().get(i);
     }
 
     @Override
@@ -110,7 +123,9 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         if (process.catalysed()) {
-            ghost(graphics, ghostCatalyst, !menu.getSlot(0).hasItem(), RefiningMenu.CATALYST_X, RefiningMenu.CATALYST_Y);
+            // Hydrocracking takes no catalyst, so the slot shows no ghost then.
+            ghost(graphics, ghostCatalyst, !menu.getSlot(0).hasItem() && menu.getMode() == net.zagdrath.arcforge.recipe.CrackingMode.CATALYTIC,
+                    RefiningMenu.CATALYST_X, RefiningMenu.CATALYST_Y);
         }
         if (process.powered()) {
             drawGauge(graphics, energyBar, x, y, ENERGY_X, GAUGE_Y, menu.getEnergy(), menu.getCapacity());

@@ -2441,9 +2441,10 @@ public class ArcforgeConfig {
     }
 
     static {
-        BUILDER.comment("Cracking Unit: a 3x3 multiblock five tall that cracks Heavy Oil with heat over a catalyst into Naphtha, Diesel",
-                "and Refinery Gas. Recipes are data-driven (arcforge:cracking: the feed, products, heat, min_temp, the catalyst and",
-                "how many operations one catalyst item lasts).").push("crackingUnit");
+        BUILDER.comment("Cracking Unit: a 3x3 multiblock five tall that cracks Heavy Oil with heat in the mode set in its GUI: catalytic",
+                "(over a catalyst, into Naphtha, Diesel, Refinery Gas and Light Oil) or hydrocracking (with Hydrogen, into mostly Diesel",
+                "and Kerosene). Recipes are data-driven (arcforge:cracking: the mode, the feed, a second_input, products, heat, min_temp,",
+                "the catalyst and how many operations one catalyst item lasts).").push("crackingUnit");
     }
 
     public static final ModConfigSpec.IntValue CRACKING_HEAT_CAPACITY = BUILDER
@@ -2461,6 +2462,10 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue CRACKING_FEED_CAPACITY = BUILDER
             .comment("Heavy Oil (feed) tank size in mB.")
             .defineInRange("feedTankCapacity", 32_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue CRACKING_SECOND_FEED_CAPACITY = BUILDER
+            .comment("Hydrogen tank size in mB (hydrocracking takes it).")
+            .defineInRange("secondFeedTankCapacity", 16_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.IntValue CRACKING_PRODUCT_CAPACITY = BUILDER
             .comment("Each product tank's size in mB.")

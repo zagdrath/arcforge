@@ -40,11 +40,12 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 // an optional item ("item"), over "time" ticks, drawing "heat_per_tick" HU/t at "min_temp" °C or hotter and
 // "energy_per_tick" FE/t (each 0 when left out, and the machine's own config fills in time when that's left out). An
 // optional catalyst ("catalyst", an ingredient) sits in the machine's catalyst slot; one item lasts "catalyst_uses"
-// operations.
+// operations. A cracking recipe also names the mode it runs in ("mode": catalytic, the default, or hydrocracking; see
+// CrackingMode); the other processes ignore it.
 public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.FluidInput input,
         Optional<ChemicalReactingRecipe.FluidInput> secondInput, List<FluidStackTemplate> fluids,
         Optional<ItemStackTemplate> item, Optional<Integer> time, int heatPerTick, int minTemp, int energyPerTick, Optional<Ingredient> catalyst,
-        int catalystUses) implements Recipe<RefiningRecipe.Input> {
+        int catalystUses, CrackingMode mode) implements Recipe<RefiningRecipe.Input> {
     public static final int MAX_FLUIDS = 4;
 
     public static MapCodec<RefiningRecipe> mapCodec(RefiningProcess process) {
@@ -58,9 +59,10 @@ public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.Flu
                 Codec.intRange(0, 100_000).optionalFieldOf("min_temp", 0).forGetter(RefiningRecipe::minTemp),
                 ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("energy_per_tick", 0).forGetter(RefiningRecipe::energyPerTick),
                 Ingredient.CODEC.optionalFieldOf("catalyst").forGetter(RefiningRecipe::catalyst),
-                ExtraCodecs.POSITIVE_INT.optionalFieldOf("catalyst_uses", 1).forGetter(RefiningRecipe::catalystUses))
-                .apply(i, (input, second, fluids, item, time, heat, minTemp, energy, catalyst, uses) ->
-                        new RefiningRecipe(process, input, second, fluids, item, time, heat, minTemp, energy, catalyst, uses)));
+                ExtraCodecs.POSITIVE_INT.optionalFieldOf("catalyst_uses", 1).forGetter(RefiningRecipe::catalystUses),
+                CrackingMode.CODEC.optionalFieldOf("mode", CrackingMode.CATALYTIC).forGetter(RefiningRecipe::mode))
+                .apply(i, (input, second, fluids, item, time, heat, minTemp, energy, catalyst, uses, mode) ->
+                        new RefiningRecipe(process, input, second, fluids, item, time, heat, minTemp, energy, catalyst, uses, mode)));
     }
 
     private static final StreamCodec<io.netty.buffer.ByteBuf, Optional<Integer>> OPTIONAL_INT = ByteBufCodecs.optional(ByteBufCodecs.VAR_INT);
@@ -84,10 +86,12 @@ public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.Flu
                     ByteBufCodecs.VAR_INT.encode(buf, recipe.energyPerTick());
                     OPTIONAL_INGREDIENT.encode(buf, recipe.catalyst());
                     ByteBufCodecs.VAR_INT.encode(buf, recipe.catalystUses());
+                    ByteBufCodecs.VAR_INT.encode(buf, recipe.mode().ordinal());
                 },
                 buf -> new RefiningRecipe(process, ChemicalReactingRecipe.FluidInput.STREAM_CODEC.decode(buf), OPTIONAL_INPUT.decode(buf), FLUIDS.decode(buf),
                         OPTIONAL_ITEM.decode(buf), OPTIONAL_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
-                        ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INGREDIENT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf)));
+                        ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INGREDIENT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
+                        CrackingMode.byOrdinal(ByteBufCodecs.VAR_INT.decode(buf))));
     }
 
     // What the machine's feed tank holds.

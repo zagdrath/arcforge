@@ -13,7 +13,7 @@
     },
     {
       "type": "text",
-      "text": "# Diesel Generator\nThe Diesel Generator burns Diesel, Gasoline, Biodiesel or Refinery Gas straight to FE (see Diesel Generator), but not sour fuels.\n# Jetpack\nKerosene fuels the Jetpack: 0.18 thrust for 2 mB/t, a long burn. Click a Kerosene Canister or bucket onto it in your inventory.\n# Where they come from\n- Gasoline: the Catalytic Reformer, from Naphtha.\n- Diesel: the Distillation Array and the Cracking Unit.\n- Kerosene: the Distillation Array, 10 or more tall.\n- Refinery Gas: the Distillation Array, the Cracking Unit and the Coker."
+      "text": "# Diesel Generator\nThe Diesel Generator burns Diesel, Gasoline, Kerosene, Biodiesel or Refinery Gas straight to FE (see Diesel Generator), but not sour fuels.\n# Jetpack\nKerosene fuels the Jetpack: 0.18 thrust for 2 mB/t, a long burn. Click a Kerosene Canister or bucket onto it in your inventory.\n# Where they come from\n- Gasoline: the Catalytic Reformer, from Naphtha.\n- Diesel: the Distillation Array and the Cracking Unit.\n- Kerosene: the Distillation Array, 10 or more tall, and the Cracking Unit hydrocracking.\n- Refinery Gas: the Distillation Array, the Cracking Unit and the Coker."
     }
   ]
 }

@@ -15,14 +15,16 @@ import net.minecraft.world.level.material.Fluid;
 import net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
+import net.zagdrath.arcforge.recipe.CrackingMode;
 import net.zagdrath.arcforge.recipe.RefiningProcess;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
 // The refinery units' menu (176x186, the inventory 104 down), one for all of them (see RefiningProcess): FE, heat and
-// the least temperature the recipe needs, the feed tank (and the second feed tank where the unit has one), up to three
-// product tanks, and the catalyst and item output slots where the unit has them.
+// the least temperature the recipe needs, the feed tank (and the second feed tank where the unit has one), up to four
+// product tanks, the catalyst and item output slots where the unit has them (the item slot right of the last tank), and
+// the Cracking Unit's mode, set by its buttons.
 public class RefiningMenu extends MachineMenu {
     public static final int PRODUCTS = 4;
     public static final int DATA_ENERGY = 0;
@@ -49,10 +51,13 @@ public class RefiningMenu extends MachineMenu {
     public static final int DATA_SECOND_FLUID = DATA_SIDE_CONFIG + 1;
     public static final int DATA_SECOND = DATA_SECOND_FLUID + 1;
     public static final int DATA_SECOND_CAPACITY = DATA_SECOND + 1;
-    public static final int DATA_VALUES = DATA_SECOND_CAPACITY + 1;
+    public static final int DATA_MODE = DATA_SECOND_CAPACITY + 1;
+    public static final int DATA_VALUES = DATA_MODE + 1;
     public static final int INVENTORY_Y = 104;
     public static final int CATALYST_X = 44, CATALYST_Y = 35;
-    public static final int ITEM_X = 109, ITEM_Y = 35;
+    public static final int ITEM_Y = 35;
+    // The Cracking Unit's mode buttons: BUTTON_MODE + the CrackingMode's ordinal.
+    public static final int BUTTON_MODE = 200;
 
     private final RefiningProcess process;
 
@@ -68,9 +73,28 @@ public class RefiningMenu extends MachineMenu {
             addMachineSlot(CrackingUnitBlockEntity.SLOT_CATALYST, CATALYST_X, CATALYST_Y);
         }
         if (process.makesItem()) {
-            addOutputSlot(0, ITEM_X, ITEM_Y, player -> {});
+            addOutputSlot(0, itemX(process), ITEM_Y, player -> {});
         }
         finish(inventory, INVENTORY_Y);
+    }
+
+    // The item output slot sits 4 px right of the last product tank (tanks at x 89 + 16k, 12 wide).
+    public static int itemX(RefiningProcess process) {
+        return 89 + 16 * process.tanks() + 4;
+    }
+
+    @Override
+    public boolean clickMenuButton(net.minecraft.world.entity.player.Player player, int buttonId) {
+        if (process == RefiningProcess.CRACKING && buttonId >= BUTTON_MODE && buttonId < BUTTON_MODE + CrackingMode.values().length) {
+            CrackingMode mode = CrackingMode.byOrdinal(buttonId - BUTTON_MODE);
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof CrackingUnitBlockEntity cracker) {
+                    cracker.setMode(mode);
+                }
+            });
+            return true;
+        }
+        return super.clickMenuButton(player, buttonId);
     }
 
     private static MachineItemHandler clientItems(RefiningProcess process) {
@@ -205,5 +229,10 @@ public class RefiningMenu extends MachineMenu {
 
     public int getCatalystLife() {
         return value(DATA_CATALYST_LIFE);
+    }
+
+    // The Cracking Unit's mode (catalytic for the other units).
+    public CrackingMode getMode() {
+        return CrackingMode.byOrdinal(value(DATA_MODE));
     }
 }

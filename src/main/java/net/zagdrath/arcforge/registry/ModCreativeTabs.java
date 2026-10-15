@@ -164,6 +164,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.GRAPHITE_BLOCK.get());
                 output.accept(ModItems.DEEPSLATE_GRAVEL.get());
                 output.accept(ModItems.RAW_RUBBER.get());
+                output.accept(ModItems.SYNTHETIC_RUBBER.get());
                 output.accept(ModItems.RUBBER.get());
                 output.accept(ModItems.RUBBER_BLOCK.get());
             }).build());

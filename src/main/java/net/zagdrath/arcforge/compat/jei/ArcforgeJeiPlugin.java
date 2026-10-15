@@ -116,6 +116,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Gasifying(gui),
                 new MachineCategories.FischerTropsch(gui),
                 new MachineCategories.Refining(gui, RefiningProcess.CRACKING),
+                MachineCategories.Refining.hydrocracking(gui),
                 new MachineCategories.Refining(gui, RefiningProcess.REFORMING),
                 new MachineCategories.Refining(gui, RefiningProcess.COKING),
                 new MachineCategories.Refining(gui, RefiningProcess.BLENDING),
@@ -170,7 +171,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Gasifying.TYPE, recipes(ModRecipes.GASIFYING.get()));
         registration.addRecipes(MachineCategories.FischerTropsch.TYPE, recipes(ModRecipes.FISCHER_TROPSCH.get()));
         for (RefiningProcess process : RefiningProcess.values()) {
-            registration.addRecipes(MachineCategories.Refining.type(process), recipes(process.type()));
+            for (RecipeHolder<net.zagdrath.arcforge.recipe.RefiningRecipe> holder : recipes(process.type())) {
+                registration.addRecipes(MachineCategories.Refining.typeOf(holder.value()), List.of(holder));
+            }
         }
         // Every sapling; its log and leaves found by name (oak_sapling: oak_log, oak_leaves), where they exist.
         List<MachineCategories.TreeCuttingRecipe> trees = new ArrayList<>();
@@ -302,7 +305,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 MachineCategories.FischerTropsch.TYPE);
         // The refining machines share a screen: its arrow shows every process.
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.RefiningScreen.class, 64, 35, ARROW_W, ARROW_H,
-                MachineCategories.Refining.type(RefiningProcess.CRACKING), MachineCategories.Refining.type(RefiningProcess.REFORMING),
+                MachineCategories.Refining.type(RefiningProcess.CRACKING), MachineCategories.Refining.HYDROCRACKING,
+                MachineCategories.Refining.type(RefiningProcess.REFORMING),
                 MachineCategories.Refining.type(RefiningProcess.COKING), MachineCategories.Refining.type(RefiningProcess.BLENDING),
                 MachineCategories.Refining.type(RefiningProcess.HYDROTREATING), MachineCategories.Refining.type(RefiningProcess.SULFUR_RECOVERY),
                 MachineCategories.Refining.type(RefiningProcess.STEAM_REFORMING), MachineCategories.Refining.type(RefiningProcess.STEAM_CRACKING));
@@ -369,6 +373,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.FischerTropsch.TYPE, ModBlocks.FISCHER_TROPSCH_REACTOR.get());
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.CRACKING), ModBlocks.CRACKING_UNIT_CONTROLLER.get(),
                 ModBlocks.CRACKING_UNIT_CASING.get(), ModItems.CRACKING_CATALYST.get());
+        registration.addCraftingStation(MachineCategories.Refining.HYDROCRACKING, ModBlocks.CRACKING_UNIT_CONTROLLER.get(),
+                ModBlocks.CRACKING_UNIT_CASING.get());
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.REFORMING), ModBlocks.CATALYTIC_REFORMER.get());
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.COKING), ModBlocks.COKER.get());
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.BLENDING), ModBlocks.LUBRICANT_BLENDER.get());

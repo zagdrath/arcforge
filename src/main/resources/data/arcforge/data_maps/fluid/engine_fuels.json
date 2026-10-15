@@ -9,6 +9,9 @@
     "arcforge:biodiesel": {
       "fe_per_mb": 340
     },
+    "arcforge:kerosene": {
+      "fe_per_mb": 360
+    },
     "arcforge:refinery_gas": {
       "fe_per_mb": 240
     }

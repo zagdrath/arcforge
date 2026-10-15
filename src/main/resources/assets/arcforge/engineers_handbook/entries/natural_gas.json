@@ -12,7 +12,7 @@
     },
     {
       "type": "text",
-      "text": "# Gas Wellhead\nThe gas flows under its own pressure, with no FE: 200 mB/t from a full cap, slowing in a straight line to 15% of that as the cap empties, then a trickle of 40 mB a second once it's spent (all in config).\n- It faces the way you were facing when you placed it; its flow line comes out of that side and pushes the gas out on its own, into a Pressurized Conduit.\n# Burning it\nNatural Gas burns in the Fuel Burner, the Firebox Array and the Gas Turbine Array: 55 HU/mB at 1 mB/t, up to 1,250°C ({fe:83} FE per mB in the Gas Turbine Array). Or turn it into cheap Hydrogen in a Steam Methane Reformer."
+      "text": "# Gas Wellhead\nThe gas flows under its own pressure, with no FE: 200 mB/t from a full cap, slowing in a straight line to 15% of that as the cap empties, then a trickle of 40 mB a second once it's spent (all in config).\n- It faces the way you were facing when you placed it; its flow line comes out of that side and pushes the gas out on its own, into a Pressurized Conduit.\n# Burning it\nNatural Gas burns in the Fuel Burner, the Firebox Array and the Gas Turbine Array: 55 HU/mB at 1 mB/t, up to 1,250°C ({fe:83} FE per mB in the Gas Turbine Array). Or turn it into cheap Hydrogen in a Steam Methane Reformer, or crack it into Ethylene and Hydrogen in a Steam Cracker."
     }
   ]
 }

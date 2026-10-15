@@ -26,15 +26,17 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 // and the products it's laid out for (its tanks show these while empty). The Cracking Unit and the Steam Cracker are
 // multiblocks; the others are single blocks.
 public enum RefiningProcess implements StringRepresentable {
-    // Heavy Oil + heat + a catalyst -> Naphtha, Diesel and Refinery Gas.
-    CRACKING("cracking", true, false, true, false, MachineStatus.CRACKING,
-            () -> List.of(ModFluids.NAPHTHA.get(), ModFluids.DIESEL.get(), ModFluids.REFINERY_GAS.get()), ArcforgeConfig.CRACKING_TIME::getAsInt),
+    // Heavy Oil + heat, in the mode the player picks (CrackingMode): over a catalyst -> Naphtha, Diesel, Refinery Gas and
+    // Light Oil; or with Hydrogen (its second feed) -> mostly Diesel and Kerosene. Its tanks are laid out for catalytic
+    // cracking; the third holds Kerosene while it hydrocracks.
+    CRACKING("cracking", true, false, true, false, MachineStatus.CRACKING, CrackingMode.CATALYTIC::products, ArcforgeConfig.CRACKING_TIME::getAsInt,
+            SideMode.HYDROGEN),
     // Naphtha + heat -> Gasoline + Hydrogen.
     REFORMING("reforming", true, false, false, false, MachineStatus.REFORMING,
             () -> List.of(ModFluids.GASOLINE.get(), ModFluids.HYDROGEN.get()), ArcforgeConfig.REFORMER_TIME::getAsInt),
-    // Bitumen + heat -> Petroleum Coke + Refinery Gas.
+    // Bitumen + heat -> Petroleum Coke, Refinery Gas and a little Heavy Oil.
     COKING("coking", true, false, false, true, MachineStatus.COKING,
-            () -> List.of(ModFluids.REFINERY_GAS.get()), ArcforgeConfig.COKER_TIME::getAsInt),
+            () -> List.of(ModFluids.REFINERY_GAS.get(), ModFluids.HEAVY_OIL.get()), ArcforgeConfig.COKER_TIME::getAsInt),
     // Heavy Oil + FE -> Lubricant.
     BLENDING("lubricant_blending", false, true, false, false, MachineStatus.BLENDING,
             () -> List.of(ModFluids.LUBRICANT.get()), ArcforgeConfig.BLENDER_TIME::getAsInt),
@@ -47,7 +49,8 @@ public enum RefiningProcess implements StringRepresentable {
     // Natural Gas + Steam + heat -> Hydrogen and Carbon Dioxide.
     STEAM_REFORMING("steam_reforming", true, false, false, false, MachineStatus.STEAM_REFORMING,
             () -> List.of(ModFluids.HYDROGEN.get(), ModFluids.CARBON_DIOXIDE.get()), ArcforgeConfig.SMR_TIME::getAsInt, SideMode.STEAM),
-    // Naphtha or Refinery Gas + Steam + heat -> Ethylene, Propylene, a little Hydrogen and a trickle of Heavy Oil.
+    // Naphtha, Refinery Gas or Natural Gas + Steam + heat -> Ethylene, Propylene, a little Hydrogen and a trickle of
+    // Heavy Oil (Natural Gas: less Ethylene, more Hydrogen, hardly any Propylene).
     STEAM_CRACKING("steam_cracking", true, false, false, false, MachineStatus.STEAM_CRACKING,
             () -> List.of(ModFluids.ETHYLENE.get(), ModFluids.PROPYLENE.get(), ModFluids.HYDROGEN.get(), ModFluids.HEAVY_OIL.get()),
             ArcforgeConfig.STEAM_CRACKER_TIME::getAsInt, SideMode.STEAM);

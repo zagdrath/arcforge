@@ -27,7 +27,7 @@
     },
     {
       "type": "text",
-      "text": "# Liquid by-products\nA recipe can leave a liquid by-product as well as its output: Water, when Ethanol becomes Ethylene (see Bio-Plastics). It fills the reactor's by-product tank, beside the output tank, and leaves by By-product faces (with auto-eject on). Buckets take from it too."
+      "text": "# Liquid by-products\nAn item can be a catalyst: it must be in a slot but is used up only now and then (the Cracking Catalyst for Synthetic Rubber, about once in 50). A recipe can leave a liquid by-product as well as its output: Water, when Ethanol becomes Ethylene (see Bio-Plastics). It fills the reactor's by-product tank, beside the output tank, and leaves by By-product faces (with auto-eject on). Buckets take from it too."
     }
   ]
 }

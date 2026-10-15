@@ -4,16 +4,21 @@
   "items": [
     "arcforge:plastic_sheet",
     "arcforge:pvc_sheet",
-    "arcforge:polypropylene_sheet"
+    "arcforge:polypropylene_sheet",
+    "arcforge:synthetic_rubber"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Plastic without oil, from the Fermenter's Ethanol, all in the Chemical Reactor.\n# Ethylene\n- 100 mB Ethanol + 5 mB Sulfuric Acid (the catalyst) make 60 mB Ethylene (a gas) and 40 mB Water.\n- The Water goes into the reactor's by-product tank and leaves by By-product faces.\n# Plastic Sheet\n- 120 mB Ethylene make 2 Plastic Sheets (bio-polyethylene). The Light Oil + Hydrogen recipe still works."
+      "text": "Plastic without oil, from the Fermenter's Ethanol, all in the Chemical Reactor.\n# Ethylene\n- 100 mB Ethanol + 5 mB Sulfuric Acid (the catalyst) make 40 mB Ethylene (a gas) and 60 mB Water in 5 seconds. It works, but slowly: the Steam Cracker makes Ethylene by the bucket.\n- The Water goes into the reactor's by-product tank and leaves by By-product faces.\n# Plastic Sheet\n- 120 mB Ethylene make 2 Plastic Sheets (bio-polyethylene). The Light Oil + Hydrogen recipe still works."
     },
     {
       "type": "text",
-      "text": "# PVC Sheet\n- 60 mB Ethylene + 60 mB Chlorine make 2 PVC Sheets.\n- Hardened and Arcforged Fluid Conduits and the Arcforged Fluid Tank take one, an acid-proof lining.\n# #arcforge:plastics\nPlastic Sheet and PVC Sheet are both plastics: every recipe that took Plastic Sheet takes either.\n# Polypropylene Sheet\n- 120 mB Propylene (from the Steam Cracker) makes 2 Polypropylene Sheets in the Chemical Reactor.\n- A plastic: any recipe that takes plastic (arcforge:plastics) takes it."
+      "text": "# PVC Sheet\n- 60 mB Ethylene + 60 mB Chlorine make 2 PVC Sheets.\n- Hardened and Arcforged Fluid Conduits and the Arcforged Fluid Tank take one, an acid-proof lining.\n# #arcforge:plastics\nPlastic, PVC and Polypropylene Sheet are all plastics: up to the Hardened tier, a recipe that takes plastic takes any of them.\n# Polypropylene Sheet\n- 120 mB Propylene (from the Steam Cracker) makes 2 Polypropylene Sheets in the Chemical Reactor.\n- A plastic: any recipe that takes plastic (arcforge:plastics) takes it."
+    },
+    {
+      "type": "text",
+      "text": "# Plastics by tier\nArcforged gear wants a particular sheet:\n- PVC Sheet: the Arcforged Fluid Conduit and Fluid Tank (and the Hardened Fluid Conduit).\n- Polypropylene Sheet: the Arcforged crate, vault and Storage Upgrade, and the Arcforged Jetpack.\n- Plastic Sheet: the Arcforged Arc Drill and Arc Saw (and the Link Conduit and Battery Array Casing).\nPropylene only comes from the Steam Cracker, so the top tier needs a refinery.\n# Synthetic Rubber\n- 60 mB Ethylene + 40 mB Propylene, over a Cracking Catalyst (used up about once in 50), make 1 Synthetic Rubber (EPDM) in 5 seconds.\n- It cures in the Vulcanizer as Raw Rubber does."
     }
   ]
 }

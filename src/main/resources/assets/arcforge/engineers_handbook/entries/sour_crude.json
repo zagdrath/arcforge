@@ -14,7 +14,11 @@
     },
     {
       "type": "text",
-      "text": "# Hydrotreater\nTreats sour fuel with Hydrogen to take the sulfur out.\n- 100 mB Sour Diesel or Sour Kerosene and 25 mB Hydrogen make 100 mB Diesel or Kerosene and 25 mB Hydrogen Sulfide in 2 seconds, using 20 HU/t at 300°C or hotter and 20 FE/t.\n- Sour fuel and Hydrogen in the top, heat into the bottom, FE in the back. The clean fuel leaves by the left, the Hydrogen Sulfide by the right; it pushes both out on its own.\n- Speed Upgrades make it faster, drawing heat and FE that much faster.\nHydrogen Sulfide is a poisonous gas: send it to a Sulfur Recovery Unit, or burn it off in a Flare Stack."
+      "text": "# Hydrotreater\nTreats sour fuel with Hydrogen to take the sulfur out.\n- 100 mB Sour Diesel or Sour Kerosene and 30 mB Hydrogen make 100 mB Diesel or Kerosene and 30 mB Hydrogen Sulfide in 2 seconds, using 20 HU/t at 300°C or hotter and 20 FE/t.\n- Sour fuel and Hydrogen in the top, heat into the bottom, FE in the back. The clean fuel leaves by the left, the Hydrogen Sulfide by the right; it pushes both out on its own.\n- Speed Upgrades make it faster, drawing heat and FE that much faster.\nHydrogen Sulfide is a poisonous gas: send it to a Sulfur Recovery Unit, or burn it off in a Flare Stack."
+    },
+    {
+      "type": "text",
+      "text": "# Sulfur\nSour crude is a real source of Sulfur. 1,000 mB distilled 14 high gives 190 mB Sour Kerosene and 155 mB Sour Diesel; hydrotreated, they give off about 104 mB Hydrogen Sulfide, and the Sulfur Recovery Unit turns that into about one Sulfur Dust (10 high: 102 mB, the same). Sulfur cures Rubber and makes Sulfuric Acid."
     }
   ]
 }

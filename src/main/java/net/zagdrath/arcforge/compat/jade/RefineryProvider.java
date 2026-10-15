@@ -34,7 +34,7 @@ import snownee.jade.api.StreamServerDataProvider;
 import snownee.jade.api.config.IPluginConfig;
 
 // The refinery's downstream units in Jade. On a single-block unit or any block of a Cracking Unit or Steam Cracker: the
-// operation's progress, the temperature it needs, the catalyst left and the status (HeatProvider shows the heat, Jade's
+// Cracking Unit's mode, the operation's progress, the temperature it needs, the catalyst left and the status (HeatProvider shows the heat, Jade's
 // own views the tanks). On any block of a Diesel Generator: its engine, FE/t against its full output, its speed, the
 // fuel it burns and the status. On a Gas Wellhead: its flow and the gas left. On a Flare Stack: what it burns. The
 // server builds the lines; Client draws them.
@@ -114,6 +114,17 @@ public enum RefineryProvider implements StreamServerDataProvider<BlockAccessor, 
     }
 
     private static void refining(List<Component> lines, RefiningCore core, MachineStatus status) {
+        if (core.process() == net.zagdrath.arcforge.recipe.RefiningProcess.CRACKING) {
+            lines.add(Component.translatable("jade.arcforge.cracking_unit.mode", core.mode().getDescription()).withStyle(ChatFormatting.AQUA));
+            // After a switch, the other mode's product in a tank holds it up until it's drained.
+            for (int i = 0; i < core.productCount(); i++) {
+                var tank = core.product(i);
+                if (tank.getAmount() > 0 && tank.getResource(0).getFluid() != core.layoutProducts().get(i)) {
+                    lines.add(Component.translatable("jade.arcforge.cracking_unit.leftover", tank.getResource(0).getFluid().getFluidType().getDescription())
+                            .withStyle(ChatFormatting.RED));
+                }
+            }
+        }
         if (core.total() > 0) {
             lines.add(Component.translatable("jade.arcforge.refining.progress", Math.round(100.0F * core.progress() / core.total())));
         }

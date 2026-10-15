@@ -10,7 +10,7 @@
     "A": "arcforge:arcforged_alloy",
     "C": "#c:gems/arcite",
     "K": "#c:chests/wooden",
-    "P": "#arcforge:plastics"
+    "P": "arcforge:polypropylene_sheet"
   },
   "result": {
     "id": "arcforge:arcforged_storage_upgrade",

@@ -12,11 +12,11 @@
   ],
   "fluid_output": {
     "id": "arcforge:ethylene",
-    "amount": 60
+    "amount": 40
   },
   "fluid_byproduct": {
     "id": "minecraft:water",
-    "amount": 40
+    "amount": 60
   },
-  "time": 60
+  "time": 100
 }

@@ -5,6 +5,7 @@
 
 package net.zagdrath.arcforge.transfer.item;
 
+import java.util.function.BiPredicate;
 import java.util.function.IntPredicate;
 
 import net.minecraft.world.item.ItemStack;
@@ -16,10 +17,12 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 // than one item): an item put in through an input face goes to the slot already holding it, otherwise into an empty slot,
 // but never into an empty one while another of the slots holds it. So a hopper feeding Basic Slag and Wood Ash fills one
 // slot with each, one item is never split across slots, and one kind too many waits while every slot is in use. Like
-// InputTankRouter for fluids.
+// InputTankRouter for fluids. An optional rule keeps out an item that would only crowd another slot's (two kinds that
+// fill the same recipe input, like Raw and Synthetic Rubber in the Vulcanizer).
 public class PairedItemInput extends AutomationResourceHandler<ItemResource> {
     private final FilteredItemHandler items;
     private final int[] slots;
+    private BiPredicate<ItemStack, ItemResource> crowds = (held, incoming) -> false;
 
     public PairedItemInput(FilteredItemHandler items, int slotA, int slotB) {
         this(items, slotA, slotB, slot -> false);
@@ -34,6 +37,12 @@ public class PairedItemInput extends AutomationResourceHandler<ItemResource> {
         super(items, slot -> contains(slots, slot), canExtract);
         this.items = items;
         this.slots = slots.clone();
+    }
+
+    // An item is kept out of an empty slot while another slot holds an item this says it crowds.
+    public PairedItemInput crowding(BiPredicate<ItemStack, ItemResource> crowds) {
+        this.crowds = crowds;
+        return this;
     }
 
     private static boolean contains(int[] slots, int slot) {
@@ -52,7 +61,7 @@ public class PairedItemInput extends AutomationResourceHandler<ItemResource> {
             return resource.matches(held);
         }
         for (int other : slots) {
-            if (other != slot && !items.getStack(other).isEmpty() && resource.matches(items.getStack(other))) {
+            if (other != slot && !items.getStack(other).isEmpty() && (resource.matches(items.getStack(other)) || crowds.test(items.getStack(other), resource))) {
                 return false;
             }
         }

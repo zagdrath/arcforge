@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
@@ -38,6 +39,7 @@ import net.zagdrath.arcforge.menu.machine.RefiningMenu;
 import net.zagdrath.arcforge.multiblock.CrackingUnitLayout;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.PlantKind;
+import net.zagdrath.arcforge.recipe.CrackingMode;
 import net.zagdrath.arcforge.recipe.RefiningProcess;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModFluids;
@@ -45,22 +47,26 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// The Cracking Unit (see OilfieldStructures.PlantBox), run by its controller: it cracks Heavy Oil over a catalyst with
-// heat into Naphtha, Diesel and Refinery Gas (arcforge:cracking recipes; see RefiningCore for how it runs). Through its
-// ports: Heavy Oil and catalyst in (Input), heat in (Heat), the liquids out of Output ports or each out of its own
-// (Naphtha, Diesel) and the gas out of Refinery Gas ports, pushed every few ticks. Speed upgrades make it faster. Its
-// regenerator's sight port glows as hot as the unit is (see CrackingUnitRenderer).
+// The Cracking Unit (see OilfieldStructures.PlantBox), run by its controller: it cracks Heavy Oil with heat in the mode
+// set in its GUI (CrackingMode, saved with it): over a catalyst into Naphtha, Diesel, Refinery Gas and Light Oil, or with
+// Hydrogen into mostly Diesel and Kerosene (arcforge:cracking recipes; see RefiningCore for how it runs). Through its
+// ports: Heavy Oil, Hydrogen and catalyst in (Input; Hydrogen also through Hydrogen ports), heat in (Heat), the liquids
+// out of Output ports or each out of its own (Naphtha, Diesel, Kerosene, Light Oil) and the gas out of Refinery Gas
+// ports, pushed every few ticks. Speed upgrades make it faster. Its regenerator's sight port glows as hot as the unit is
+// (see CrackingUnitRenderer).
 public class CrackingUnitBlockEntity extends PlantControllerBlockEntity {
     public static final int SLOT_CATALYST = 0;
     public static final int MACHINE_SLOTS = 1;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.NAPHTHA, SideMode.DIESEL,
-            SideMode.REFINERY_GAS, SideMode.HEAT);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.HYDROGEN, SideMode.OUTPUT, SideMode.NAPHTHA,
+            SideMode.DIESEL, SideMode.KEROSENE, SideMode.LIGHT_OIL, SideMode.REFINERY_GAS, SideMode.HEAT);
     // The glow is synced to clients when it moves by this much; it starts at GLOW_FROM °C and is full GLOW_SPAN hotter.
     private static final float GLOW_STEP = 0.05F, GLOW_FROM = 150.0F, GLOW_SPAN = 450.0F;
 
     private final RefiningCore core;
     private final ResourceHandler<ItemResource> catalystInput;
+    // What Input ports take: Heavy Oil and Hydrogen.
+    private final ResourceHandler<FluidResource> inputs;
     private final ContainerData data;
     private float glow;
     private float syncedGlow = -1.0F;
@@ -71,8 +77,11 @@ public class CrackingUnitBlockEntity extends PlantControllerBlockEntity {
                 SIDE_MODES);
         this.core = new RefiningCore(RefiningProcess.CRACKING, new RefiningCore.Layout(SLOT_CATALYST, -1, 0, 0,
                 ArcforgeConfig.CRACKING_HEAT_CAPACITY.getAsInt(), ArcforgeConfig.CRACKING_MAX_TEMPERATURE.getAsInt(),
-                ArcforgeConfig.CRACKING_FEED_CAPACITY.getAsInt(), ArcforgeConfig.CRACKING_PRODUCT_CAPACITY.getAsInt()), items, () -> level, this::setChanged);
+                ArcforgeConfig.CRACKING_FEED_CAPACITY.getAsInt(), ArcforgeConfig.CRACKING_PRODUCT_CAPACITY.getAsInt(),
+                ArcforgeConfig.CRACKING_SECOND_FEED_CAPACITY.getAsInt()), items, () -> level, this::setChanged);
         this.catalystInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_CATALYST, slot -> false);
+        ResourceHandler<FluidResource> hydrogen = core.secondFeedInput();
+        this.inputs = hydrogen != null ? new CombinedResourceHandler<>(core.feedInput(), hydrogen) : core.feedInput();
         this.data = RefiningMachineBlockEntity.menuData(core, new RefiningMachineBlockEntity.MachineBlockEntityAccess() {
             @Override
             public int statusOrdinal() {
@@ -103,6 +112,15 @@ public class CrackingUnitBlockEntity extends PlantControllerBlockEntity {
 
     public RefiningCore getCore() {
         return core;
+    }
+
+    public CrackingMode getMode() {
+        return core.mode();
+    }
+
+    // From the GUI's Mode tab (or a test).
+    public void setMode(CrackingMode mode) {
+        core.setMode(mode);
     }
 
     public void serverTick(ServerLevel level) {
@@ -144,11 +162,14 @@ public class CrackingUnitBlockEntity extends PlantControllerBlockEntity {
             return core.all();
         }
         return switch (mode) {
-            case INPUT -> core.feedInput();
+            case INPUT -> inputs;
+            case HYDROGEN -> core.secondFeedInput();
             case OUTPUT -> core.liquidOutputs();
-            case NAPHTHA -> core.outputFor(ModFluids.NAPHTHA.get());
-            case DIESEL -> core.outputFor(ModFluids.DIESEL.get());
-            case REFINERY_GAS -> core.outputFor(ModFluids.REFINERY_GAS.get());
+            case NAPHTHA -> core.outputHolding(ModFluids.NAPHTHA.get());
+            case DIESEL -> core.outputHolding(ModFluids.DIESEL.get());
+            case KEROSENE -> core.outputHolding(ModFluids.KEROSENE.get());
+            case LIGHT_OIL -> core.outputHolding(ModFluids.LIGHT_OIL.get());
+            case REFINERY_GAS -> core.outputHolding(ModFluids.REFINERY_GAS.get());
             default -> null;
         };
     }
@@ -165,8 +186,11 @@ public class CrackingUnitBlockEntity extends PlantControllerBlockEntity {
     public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
         return switch (type) {
             case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT
-                    : mode == SideMode.OUTPUT || mode == SideMode.NAPHTHA || mode == SideMode.DIESEL ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case GAS -> mode == SideMode.REFINERY_GAS ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+                    : mode == SideMode.OUTPUT || mode == SideMode.NAPHTHA || mode == SideMode.DIESEL || mode == SideMode.KEROSENE
+                            || mode == SideMode.LIGHT_OIL ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            // Hydrogen is a gas: it comes in through Hydrogen (and Input) ports on gas conduits.
+            case GAS -> mode == SideMode.REFINERY_GAS ? ConnectionMode.OUTPUT
+                    : mode == SideMode.INPUT || mode == SideMode.HYDROGEN ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.INPUT : ConnectionMode.NONE;
             default -> ConnectionMode.NONE;

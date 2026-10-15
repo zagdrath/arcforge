@@ -1,7 +1,7 @@
 {
   "type": "arcforge:vulcanizing",
   "input": {
-    "ingredient": "arcforge:raw_rubber",
+    "ingredient": "#arcforge:raw_rubber",
     "count": 2
   },
   "second_input": {

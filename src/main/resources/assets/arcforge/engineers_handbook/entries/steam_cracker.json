@@ -10,15 +10,15 @@
   "pages": [
     {
       "type": "text",
-      "text": "Cracks Naphtha or Refinery Gas with steam into olefins, the start of plastics.\n# Building\nA solid 3x3x3 box of Steam Cracker Casings, with the Steam Cracker Controller in the middle of the bottom of one side, facing out. Formed, it becomes a cracking furnace: a refractory-lined box with the fire glowing at its peep holes, its radiant tubes rising into headers on the roof, a transfer line to the quench drum, and a short stack."
+      "text": "Cracks Naphtha, Refinery Gas or Natural Gas with steam into olefins, the start of plastics.\n# Building\nA solid 3x3x3 box of Steam Cracker Casings, with the Steam Cracker Controller in the middle of the bottom of one side, facing out. Formed, it becomes a cracking furnace: a refractory-lined box with the fire glowing at its peep holes, its radiant tubes rising into headers on the roof, a transfer line to the quench drum, and a short stack."
     },
     {
       "type": "text",
-      "text": "# Cracking\n100 mB Naphtha and 50 mB Steam make 50 mB Ethylene, 25 mB Propylene, 10 mB Hydrogen and 5 mB Heavy Oil a second, using 60 HU/t at 800°C or hotter. Refinery Gas gives more Ethylene and Hydrogen and less Propylene. Speed Upgrades make it faster.\n# Ports\n- Input: the feed (and steam) in. Steam: steam only.\n- Heat: heat in (a Fuel Burner on Naphtha, or a Firebox Array, gets it hot enough).\n- Output: Heavy Oil out. Gas Output: all three gases, or Ethylene, Propylene and Hydrogen each out of its own port.\nThe recipes are data-driven (arcforge:steam_cracking)."
+      "text": "# Cracking\n100 mB Naphtha and 50 mB Steam make 50 mB Ethylene, 25 mB Propylene, 10 mB Hydrogen and 5 mB Heavy Oil a second, using 60 HU/t at 800°C or hotter. Refinery Gas gives more Ethylene and Hydrogen and less Propylene. 100 mB Natural Gas gives 35 mB Ethylene, 5 mB Propylene and 30 mB Hydrogen: less Ethylene, more Hydrogen, hardly any Propylene. Speed Upgrades make it faster.\n# Ports\n- Input: the feed (and steam) in. Steam: steam only.\n- Heat: heat in (a Fuel Burner on Naphtha, or a Firebox Array, gets it hot enough).\n- Output: Heavy Oil out. Gas Output: all three gases, or Ethylene, Propylene and Hydrogen each out of its own port.\nThe recipes are data-driven (arcforge:steam_cracking)."
     },
     {
       "type": "text",
-      "text": "# Propylene\nA new gas. The Chemical Reactor turns 120 mB of it into 2 Polypropylene Sheets, a plastic any recipe that takes arcforge:plastics accepts."
+      "text": "# Propylene\nA new gas. The Chemical Reactor turns 120 mB of it into 2 Polypropylene Sheets, a plastic any recipe that takes arcforge:plastics accepts, and the one the Arcforged crates, vaults, Storage Upgrade and Jetpack need. With Ethylene it makes Synthetic Rubber (see Bio-Plastics)."
     },
     {
       "type": "multiblock",

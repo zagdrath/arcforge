@@ -48,7 +48,7 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The refinery's single-block downstream units (see RefiningCore for how they work): the Catalytic Reformer (Naphtha +
-// heat -> Gasoline + Hydrogen), the Coker (Bitumen + heat -> Petroleum Coke + Refinery Gas) and the Lubricant Blender
+// heat -> Gasoline + Hydrogen), the Coker (Bitumen + heat -> Petroleum Coke, Refinery Gas and Heavy Oil) and the Lubricant Blender
 // (Heavy Oil + FE -> Lubricant), the Hydrotreater (Sour Kerosene or Sour Diesel + Hydrogen + heat + FE -> clean fuel +
 // Hydrogen Sulfide), the Sulfur Recovery Unit (Hydrogen Sulfide + Oxygen + heat -> Sulfur + Steam) and the Steam
 // Methane Reformer (Natural Gas + Steam + heat -> Hydrogen + Carbon Dioxide). The feeds go in through Input faces (both
@@ -191,6 +191,7 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
                     case RefiningMenu.DATA_SECOND_FLUID -> core.secondFeed() != null ? RefiningCore.fluidId(core.secondFeed()) : -1;
                     case RefiningMenu.DATA_SECOND -> core.secondFeed() != null ? core.secondFeed().getAmount() : 0;
                     case RefiningMenu.DATA_SECOND_CAPACITY -> core.secondFeed() != null ? core.secondFeed().getCapacity() : 0;
+                    case RefiningMenu.DATA_MODE -> core.mode().ordinal();
                     default -> 0;
                 };
             }

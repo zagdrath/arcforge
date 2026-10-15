@@ -1,0 +1,33 @@
+{
+  "parent": "arcforge:chemistry/polypropylene",
+  "display": {
+    "icon": {
+      "id": "arcforge:synthetic_rubber"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.synthetic_rubber.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.synthetic_rubber.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "item": {
+          "items": "arcforge:synthetic_rubber"
+        }
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

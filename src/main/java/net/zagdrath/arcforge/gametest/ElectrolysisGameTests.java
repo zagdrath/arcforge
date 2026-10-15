@@ -377,21 +377,28 @@ public final class ElectrolysisGameTests {
                 Map.of('A', tempered, 'K', chest), tempered, null);
         assertNeedsPlastic(helper, "crafting/hardened_storage_upgrade", new String[] { "APA", "K K", "AAA" },
                 Map.of('A', hardened, 'K', chest), hardened, null);
+        // The Arcforged tier needs Polypropylene Sheet: a Plastic Sheet won't do.
         assertNeedsPlastic(helper, "crafting/arcforged_storage_upgrade", new String[] { "ACA", "K K", "APA" },
-                Map.of('A', arcforged, 'K', chest, 'C', arcite), arcforged, null);
+                Map.of('A', arcforged, 'K', chest, 'C', arcite), new ItemStack(ModItems.PLASTIC_SHEET.get()), null,
+                new ItemStack(ModItems.POLYPROPYLENE_SHEET.get()));
         helper.succeed();
     }
 
     // The recipe matches with a Plastic Sheet at every P, and not with `instead` there.
     private static void assertNeedsPlastic(GameTestHelper helper, String path, String[] rows, Map<Character, ItemStack> key, ItemStack instead,
             ItemStack expected) {
+        assertNeedsPlastic(helper, path, rows, key, instead, expected, new ItemStack(ModItems.PLASTIC_SHEET.get()));
+    }
+
+    // The same with this sheet at every P.
+    private static void assertNeedsPlastic(GameTestHelper helper, String path, String[] rows, Map<Character, ItemStack> key, ItemStack instead,
+            ItemStack expected, ItemStack plastic) {
         RecipeHolder<?> holder = helper.getLevel().recipeAccess().recipeMap()
                 .byKey(ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(Arcforge.MODID, path)));
         helper.assertTrue(holder != null && holder.value() instanceof CraftingRecipe, path + " isn't a crafting recipe");
         CraftingRecipe recipe = (CraftingRecipe) holder.value();
-        ItemStack plastic = new ItemStack(ModItems.PLASTIC_SHEET.get());
         CraftingInput with = grid(rows, key, plastic);
-        helper.assertTrue(recipe.matches(with, helper.getLevel()), path + " doesn't craft with a Plastic Sheet");
+        helper.assertTrue(recipe.matches(with, helper.getLevel()), path + " doesn't craft with " + plastic);
         if (expected != null) {
             helper.assertTrue(recipe.assemble(with).is(expected.getItem()), path + " makes " + recipe.assemble(with));
         }

@@ -1,0 +1,21 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:cracking_catalyst",
+    "consume_chance": 0.02
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:ethylene",
+      "amount": 60
+    },
+    {
+      "fluid": "arcforge:propylene",
+      "amount": 40
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:synthetic_rubber"
+  },
+  "time": 100
+}

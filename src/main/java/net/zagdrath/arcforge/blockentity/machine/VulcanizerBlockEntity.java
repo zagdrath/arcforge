@@ -78,9 +78,9 @@ public class VulcanizerBlockEntity extends MachineBlockEntity {
         this.heat = new HeatBuffer(ArcforgeConfig.VULCANIZER_HEAT_CAPACITY.getAsInt(), ArcforgeConfig.VULCANIZER_MAX_TEMPERATURE.getAsInt(),
                 this::setChanged);
         this.heatInput = heat.input(Integer.MAX_VALUE);
-        this.itemInput = new PairedItemInput(items, SLOT_INPUT, SLOT_INPUT_B);
+        this.itemInput = new PairedItemInput(items, SLOT_INPUT, SLOT_INPUT_B).crowding(this::crowds);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT);
-        this.itemAutomation = new PairedItemInput(items, SLOT_INPUT, SLOT_INPUT_B, slot -> slot == SLOT_OUTPUT);
+        this.itemAutomation = new PairedItemInput(items, SLOT_INPUT, SLOT_INPUT_B, slot -> slot == SLOT_OUTPUT).crowding(this::crowds);
         this.data = new WideIntContainerData(VulcanizerMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -99,6 +99,11 @@ public class VulcanizerBlockEntity extends MachineBlockEntity {
                 };
             }
         };
+    }
+
+    // Raw Rubber and Synthetic Rubber (or any two items for one recipe input) never fill both slots.
+    private boolean crowds(ItemStack held, ItemResource incoming) {
+        return MachineRecipes.vulcanizeAlike(level, held, incoming.toStack(1));
     }
 
     public static boolean isItemValid(@Nullable Level level, int slot, ItemResource resource) {

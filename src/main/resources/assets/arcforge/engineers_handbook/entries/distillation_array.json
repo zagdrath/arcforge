@@ -17,7 +17,7 @@
     },
     {
       "type": "text",
-      "text": "# Crude Oil (1,000 mB, 5,000 HU, 380°C)\n- 6 high: 100 Refinery Gas, 200 Naphtha, 350 Diesel, 250 Bitumen.\n- 10 high: also 150 Kerosene and 150 Heavy Oil (100 Refinery Gas, 200 Naphtha, 250 Diesel, 100 Bitumen).\n- 14 high and up: more of the light cuts: 130 Refinery Gas, 270 Naphtha, 190 Kerosene, 230 Diesel, 90 Heavy Oil, 60 Bitumen.\nBelow 6 it's too short for Crude Oil."
+      "text": "# Crude Oil (1,000 mB, 5,000 HU, 380°C)\n- 6 high: 100 Refinery Gas, 200 Naphtha, 350 Diesel, 250 Bitumen.\n- 10 high: also 150 Kerosene, 80 Light Oil and 130 Heavy Oil (100 Refinery Gas, 200 Naphtha, 190 Diesel, 100 Bitumen).\n- 14 high and up: more of the light cuts: 130 Refinery Gas, 270 Naphtha, 190 Kerosene, 100 Light Oil, 155 Diesel, 65 Heavy Oil, 60 Bitumen.\nBelow 6 it's too short for Crude Oil."
     },
     {
       "type": "text",

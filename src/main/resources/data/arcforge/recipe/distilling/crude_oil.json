@@ -20,8 +20,9 @@
         "arcforge:refinery_gas": 100,
         "arcforge:naphtha": 200,
         "arcforge:kerosene": 150,
-        "arcforge:diesel": 250,
-        "arcforge:heavy_oil": 150,
+        "arcforge:light_oil": 80,
+        "arcforge:diesel": 190,
+        "arcforge:heavy_oil": 130,
         "arcforge:bitumen": 100
       }
     },
@@ -30,8 +31,9 @@
         "arcforge:refinery_gas": 130,
         "arcforge:naphtha": 270,
         "arcforge:kerosene": 190,
-        "arcforge:diesel": 230,
-        "arcforge:heavy_oil": 90,
+        "arcforge:light_oil": 100,
+        "arcforge:diesel": 155,
+        "arcforge:heavy_oil": 65,
         "arcforge:bitumen": 60
       }
     }

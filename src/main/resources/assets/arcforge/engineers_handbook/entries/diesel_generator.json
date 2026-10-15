@@ -5,7 +5,8 @@
     "arcforge:diesel_generator_controller",
     "arcforge:diesel_generator_casing",
     "arcforge:diesel_bucket",
-    "arcforge:gasoline_bucket"
+    "arcforge:gasoline_bucket",
+    "arcforge:kerosene_bucket"
   ],
   "pages": [
     {
@@ -18,7 +19,7 @@
     },
     {
       "type": "text",
-      "text": "# Running\nIt runs up to speed over 3 seconds, then makes its engine's full output. When its FE buffer fills it throttles back to what's drawn, burning only the fuel for that. Sour fuels are refused.\n| Fuel | FE/mB (V8 / V12 / V16) | mB/t at full power |\n| Diesel | 420 / 441 / 462 | 7.1 / 18.1 / 32.5 |\n| Gasoline | 400 / 420 / 440 | 7.5 / 19.0 / 34.1 |\n| Biodiesel | 340 / 357 / 374 | 8.8 / 22.4 / 40.1 |\n| Refinery Gas | 240 / 252 / 264 | 12.5 / 31.7 / 56.8 |\n# Ports\n- Input: fuel in (liquid or gas).\n- Energy: FE out, pushed to what it touches (16,384 FE/t a port).\nThe fuels are data-driven (arcforge:engine_fuels); the outputs and efficiencies are in config."
+      "text": "# Running\nIt runs up to speed over 3 seconds, then makes its engine's full output. When its FE buffer fills it throttles back to what's drawn, burning only the fuel for that. Sour fuels are refused.\n| Fuel | FE/mB (V8 / V12 / V16) | mB/t at full power |\n| Diesel | 420 / 441 / 462 | 7.1 / 18.1 / 32.5 |\n| Gasoline | 400 / 420 / 440 | 7.5 / 19.0 / 34.1 |\n| Kerosene | 360 / 378 / 396 | 8.3 / 21.2 / 37.9 |\n| Biodiesel | 340 / 357 / 374 | 8.8 / 22.4 / 40.1 |\n| Refinery Gas | 240 / 252 / 264 | 12.5 / 31.7 / 56.8 |\n# Ports\n- Input: fuel in (liquid or gas).\n- Energy: FE out, pushed to what it touches (16,384 FE/t a port).\nThe fuels are data-driven (arcforge:engine_fuels); the outputs and efficiencies are in config."
     },
     {
       "type": "multiblock",

@@ -22,8 +22,9 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units and a scaling Diesel
-Generator; worlds load, but Diesel Generators and Oil Derricks need their new layers, see Upgrading).
+Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units, a scaling Diesel
+Generator, hydrocracking and Synthetic Rubber, and a retuned oil line; worlds load, but Diesel Generators and Oil
+Derricks need their new layers and some refinery lines need a new port, see Upgrading).
 
 ### Added
 
@@ -46,10 +47,11 @@ Generator; worlds load, but Diesel Generators and Oil Derricks need their new la
   like Crude Oil, but its Diesel and Kerosene come out as **Sour Diesel** and **Sour Kerosene**. The Fuel Burner and
   Firebox Array burn them at 75% of the heat and 100°C cooler; the Diesel Generator, Gas Turbine Array and Jetpack
   refuse them.
-  - **Hydrotreater** (a single block, heat and FE): 100 mB Sour Diesel or Sour Kerosene and 25 mB Hydrogen make 100 mB
-    Diesel or Kerosene and 25 mB **Hydrogen Sulfide** (a new gas) in 2 seconds, at 300°C or hotter, 20 HU/t and 20 FE/t.
-  - **Sulfur Recovery Unit** (a single block, heat): the Claus process. 500 mB Hydrogen Sulfide and 250 mB Oxygen make
-    a Sulfur Dust and 500 mB Steam in 2 seconds, at 250°C or hotter and 15 HU/t.
+  - **Hydrotreater** (a single block, heat and FE): 100 mB Sour Diesel or Sour Kerosene and 30 mB Hydrogen make 100 mB
+    Diesel or Kerosene and 30 mB **Hydrogen Sulfide** (a new gas) in 2 seconds, at 300°C or hotter, 20 HU/t and 20 FE/t.
+  - **Sulfur Recovery Unit** (a single block, heat): the Claus process. 100 mB Hydrogen Sulfide and 50 mB Oxygen make
+    a Sulfur Dust and 100 mB Steam in half a second, at 250°C or hotter and 15 HU/t. Sour crude is a real sulfur
+    source: a bucket distilled 14 high, both sour cuts treated, gives about one Sulfur Dust.
 - **Natural gas.** About a third of deposits have a gas cap: an empty dome at the top of the cavern (about its top
   fifth), holding 2,000 mB of **Natural Gas** (a new gas) per block. An Oil Derrick that drills into the dome makes a
   gas well.
@@ -83,7 +85,46 @@ Generator; worlds load, but Diesel Generators and Oil Derricks need their new la
 - Handbook page (Steam Cracker), JEI category (Steam Cracking), Jade tooltips, the machine control API, GameTests and
   the advancements Crack of Dawn (goal) and Plastic Fantastic.
 
+- **Hydrocracking.** The Cracking Unit has two modes, picked in its GUI's new Mode tab, saved with it and shown in Jade
+  (it never switches by itself, whatever is in its tanks). Catalytic cracking works as before, over the Cracking
+  Catalyst. Hydrocracking takes Hydrogen instead of a catalyst and a little more heat (520°C, 36 HU/t): 100 mB Heavy Oil
+  and 30 mB Hydrogen make 10 mB Naphtha, 50 mB Diesel, 30 mB Kerosene and 10 mB Light Oil a second. The unit has a
+  Hydrogen tank and the new port modes Hydrogen, Kerosene and Light Oil; its third tank holds Refinery Gas or Kerosene by
+  mode. Cracking recipes take a `mode` (`catalytic`, the default, or `hydrocracking`) and a `second_input`. JEI has a
+  category for each mode.
+- **Synthetic Rubber** (EPDM): 60 mB Ethylene and 40 mB Propylene over a Cracking Catalyst make one in the Chemical
+  Reactor, the catalyst used up about one time in 50 (a Chemical Reactor item input can now set a `consume_chance`;
+  other machines' recipes ignore it). It's in the new item tag `arcforge:raw_rubber`, which the Vulcanizer's recipe now
+  reads, so it cures into Rubber exactly as Raw Rubber does; hoppers never put Raw and Synthetic Rubber in its two slots
+  at once, so there's always room for the Sulfur. A second use for Propylene, with the advancement Rubber Without Roots.
+- Jade warns when a Cracking Unit's tank still holds the other mode's product after a switch (it waits until that's
+  drained).
+- **Natural Gas in the Steam Cracker**: 100 mB with 50 mB Steam make 35 mB Ethylene, 5 mB Propylene and 30 mB Hydrogen
+  (less Ethylene than Naphtha, more Hydrogen, hardly any Propylene).
+- **Kerosene fuels the Diesel Generator**: 360 FE per mB (378 in the V12, 396 in the V16), on JEI's fuel page.
+- GameTests for the cracking modes, Natural Gas cracking, Light Oil from crude, the sulfur sour crude gives and
+  Synthetic Rubber in the Vulcanizer.
+
 ### Changed
+
+- **Light Oil from Crude Oil.** A Distillation Array 10 or more tall gives Light Oil from Crude and Sour Crude Oil, out
+  of the Diesel and Heavy Oil, so each height makes as much as before: 10 high 80 mB Light Oil (190 Diesel, 130 Heavy
+  Oil), 14 high 100 mB (155 Diesel, 65 Heavy Oil). Plastic Sheet (Light Oil and Hydrogen) is now on the main oil line.
+- **Catalytic cracking** gives a little Light Oil: 100 mB Heavy Oil makes 40 mB Naphtha, 40 mB Diesel, 55 mB Refinery
+  Gas and 10 mB Light Oil (was 40, 45 and 60). The Cracking Unit has a fourth product tank.
+- **The Coker** also gives 50 mB Heavy Oil for every 250 mB of Bitumen, from a second product tank (its coke slot moves
+  right to make room).
+- **The top tier needs oil.** Up to Hardened, any plastic still does. The Arcforged crate, vault, Storage Upgrade and
+  Jetpack now need Polypropylene Sheet, and the Arcforged Arc Drill and Arc Saw Plastic Sheet (the Arcforged Fluid
+  Conduit and Fluid Tank already took PVC).
+- **Bio-ethylene is the slow route**: 100 mB Ethanol now makes 40 mB Ethylene (and 60 mB Water) in 5 seconds (was 60 mB
+  in 3 seconds). The Steam Cracker makes Ethylene in bulk.
+- The Cracking Unit, Distillation Array, Sour Crude, Sulfur Recovery Unit, Coker, Steam Cracker, Diesel Generator,
+  Refinery Fuels, Natural Gas, Vulcanizer, Rubber Dandelion, Bio-Plastics (with a new Plastics by tier page), Crates and
+  Vaults, Hydrogen and Oxygen, Oils and Pitch and Chemical Reactor Handbook pages cover these changes.
+- Balance check (a bucket of Crude Oil distilled 14 high, Heavy Oil cracked, Bitumen coked, Naphtha reformed, all burnt
+  in a V16): 291,000 FE before, 322,000 now (+11%, mostly Kerosene now counting); a full V16 takes 1.55 full-rate
+  Pumpjacks (was 1.72).
 
 - The Crude Oil, Oil Derrick, Pumpjack, Fuel Burner, Oils and Pitch, Jetpack, Gas Turbine Array and Refinery Fuels
   Handbook pages cover caverns, sour fuels and Natural Gas. The Seismic Survey Tool also says whether a deposit is
@@ -118,6 +159,18 @@ Generator; worlds load, but Diesel Generators and Oil Derricks need their new la
 - **Oil Derricks** are now 9 tall: an existing rig won't form until its legs are built up to seven Derrick Frames (37
   frames in all); its old crown blocks are shown again when it first rechecks. A rig mid-way through a hole carries on
   from where it was once rebuilt.
+- **Retuned recipes** (Crude and Sour Crude distilling at 10 and 14 high, `cracking/heavy_oil`, `coking/bitumen`,
+  `chemical_reacting/ethylene_from_ethanol`, `vulcanizing/rubber`, the Arcforged crate, vault, Storage Upgrade, Jetpack,
+  Arc Drill and Arc Saw): a data pack overriding them keeps its own numbers; one replacing `cracking/heavy_oil` should
+  add `"mode": "catalytic"` only if it wants to be explicit (it's the default).
+- **New products need somewhere to go.** A Distillation Array 10 or more tall on Crude Oil, a Cracking Unit and a Coker
+  each make something they didn't before (Light Oil, Light Oil, Heavy Oil) and stop when its tank fills. A column with
+  only per-product ports needs a Light Oil port; a Cracking Unit with only Naphtha and Diesel ports needs a Light Oil
+  port (or an Output port); a Coker pushes its Heavy Oil out of its Output face (the left, by default), so give that
+  face somewhere to put a liquid. Existing Cracking Units start in catalytic mode and run as before.
+- New config value: `multiblocks.crackingUnit.secondFeedTankCapacity` (the Hydrogen tank, 16,000 mB).
+- **Machine control API:** the Cracking Unit lists its Hydrogen tank after its feed, so its product tanks now start at
+  index 2 (and there are four). The Coker has a second product tank (Heavy Oil). The mode isn't exposed through the API.
 - New config values: `world.oilDeposits` (`caverns`, `sourChance`, `sourRichChance`, `gasCapChance`, `gasPerBlock`,
   `surfaceSeepChance`, `cavernCheckInterval`), `power.burners.refineryFuels` (Natural Gas and sour fuel values) and new
   sections for the Hydrotreater, Sulfur Recovery Unit, Steam Methane Reformer, Gas Wellhead and Steam Cracker.

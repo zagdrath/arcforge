@@ -6,7 +6,9 @@
 package net.zagdrath.arcforge.machine.refining;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.jspecify.annotations.Nullable;
 
@@ -30,6 +32,7 @@ import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.recipe.CrackingMode;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.recipe.RefiningProcess;
 import net.zagdrath.arcforge.recipe.RefiningRecipe;
@@ -48,7 +51,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // or Steam). Each tick it finds the recipe for the feed, checks the second feed, heat (at least the recipe's min_temp
 // and a tick's heat), FE, the catalyst and room for every product, and runs the recipe's time; the catalyst
 // item in the slot is used up after catalyst_uses operations. Speed upgrades shorten the time and draw FE and heat that
-// much faster (an operation takes the same); Energy upgrades cut the FE.
+// much faster (an operation takes the same); Energy upgrades cut the FE. The Cracking Unit's core also holds its
+// CrackingMode, which picks the recipes it runs and is saved with it.
 public final class RefiningCore {
     // How the owner's items and settings are laid out.
     public record Layout(int catalystSlot, int itemSlot, int energyCapacity, int maxInput, int heatCapacity, int maxTemperature, int feedCapacity,
@@ -77,6 +81,8 @@ public final class RefiningCore {
     private final ResourceHandler<FluidResource> allOutputs;
     private final ResourceHandler<FluidResource> all;
     private final ResourceHandler<FluidResource> interaction;
+    // Per fluid: what a port for that one product drains (see outputHolding).
+    private final Map<Fluid, ResourceHandler<FluidResource>> holding = new HashMap<>();
 
     private int progress;
     private int total;
@@ -86,6 +92,7 @@ public final class RefiningCore {
     private @Nullable Item catalystItem;
     private @Nullable Identifier current;
     private @Nullable RefiningRecipe recipe;
+    private CrackingMode mode = CrackingMode.CATALYTIC;
 
     @SuppressWarnings("unchecked")
     public RefiningCore(RefiningProcess process, Layout layout, MachineItemHandler items, java.util.function.Supplier<@Nullable Level> level,
@@ -140,6 +147,24 @@ public final class RefiningCore {
         return layout;
     }
 
+    // The Cracking Unit's mode (catalytic for every other process).
+    public CrackingMode mode() {
+        return mode;
+    }
+
+    // Sets the mode; the batch under way starts over, as for any change of recipe.
+    public void setMode(CrackingMode mode) {
+        if (process == RefiningProcess.CRACKING && this.mode != mode) {
+            this.mode = mode;
+            changed.run();
+        }
+    }
+
+    // The products its tanks are laid out for, in order: the process's, or for the Cracking Unit its mode's.
+    public List<Fluid> layoutProducts() {
+        return process == RefiningProcess.CRACKING ? mode.products() : process.products();
+    }
+
     // --- Running ---
 
     // One tick; runs is whether redstone lets it; the Speed and Energy upgrades installed. Gives the status.
@@ -157,7 +182,7 @@ public final class RefiningCore {
             }
         }
         RecipeHolder<RefiningRecipe> holder = feed.getAmount() > 0
-                ? MachineRecipes.refining(level, process, new RefiningRecipe.Input(feed.getResource(0), feed.getAmount())).orElse(null)
+                ? MachineRecipes.refining(level, process, new RefiningRecipe.Input(feed.getResource(0), feed.getAmount()), mode).orElse(null)
                 : null;
         Identifier id = holder != null ? holder.id().identifier() : null;
         if (id == null || !id.equals(current)) {
@@ -330,6 +355,19 @@ public final class RefiningCore {
         return index >= 0 && index < productOutputs.length ? productOutputs[index] : null;
     }
 
+    // What a port for one product drains: whichever product tank holds that fluid (the Cracking Unit's third tank holds
+    // Refinery Gas or Kerosene by its mode).
+    @SuppressWarnings("unchecked")
+    public ResourceHandler<FluidResource> outputHolding(Fluid fluid) {
+        return holding.computeIfAbsent(fluid, key -> {
+            List<ResourceHandler<FluidResource>> tanks = new ArrayList<>();
+            for (FilteredFluidTank tank : products) {
+                tanks.add(new AutomationResourceHandler<>(tank, index -> false, index -> tank.getAmount() > 0 && tank.getResource(0).getFluid() == key));
+            }
+            return new CombinedResourceHandler<>(tanks.toArray(ResourceHandler[]::new));
+        });
+    }
+
     public ResourceHandler<FluidResource> all() {
         return all;
     }
@@ -394,6 +432,8 @@ public final class RefiningCore {
         catalystItem = input.getString("catalyst").map(Identifier::tryParse)
                 .flatMap(id -> id == null ? java.util.Optional.empty() : BuiltInRegistries.ITEM.getOptional(id)).orElse(null);
         current = input.getString("recipe").map(Identifier::tryParse).orElse(null);
+        mode = process == RefiningProcess.CRACKING ? CrackingMode.byName(input.getStringOr("mode", CrackingMode.CATALYTIC.getSerializedName()))
+                : CrackingMode.CATALYTIC;
     }
 
     public void save(ValueOutput output) {
@@ -418,12 +458,16 @@ public final class RefiningCore {
         if (current != null) {
             output.putString("recipe", current.toString());
         }
+        if (process == RefiningProcess.CRACKING) {
+            output.putString("mode", mode.getSerializedName());
+        }
     }
 
     // A product tank's fluid for display: what's in it, or what it's laid out for.
     public Fluid shownProduct(int index) {
         FilteredFluidTank tank = products[index];
-        return tank.getAmount() > 0 ? tank.getResource(0).getFluid() : index < process.tanks() ? process.products().get(index) : Fluids.EMPTY;
+        List<Fluid> laidOut = layoutProducts();
+        return tank.getAmount() > 0 ? tank.getResource(0).getFluid() : index < laidOut.size() ? laidOut.get(index) : Fluids.EMPTY;
     }
 
     // Whether this item can go in the catalyst slot.

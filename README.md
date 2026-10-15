@@ -504,7 +504,7 @@ walking beam nods on its post, slower as the pumping slows.
 
 ```
 creosote + heat (+ steam) --[Distillation Array]--> Naphtha, Light Oil, Heavy Oil, Pitch
-Crude Oil + heat (+ steam) --[Distillation Array, 6+ tall]--> Refinery Gas, Naphtha, Kerosene, Diesel, Heavy Oil, Bitumen
+Crude Oil + heat (+ steam) --[Distillation Array, 6+ tall]--> Refinery Gas, Naphtha, Kerosene, Light Oil, Diesel, Heavy Oil, Bitumen
 pitch --[Fiberizer, 1,000°C]--> Carbon Fiber --> Arcforged Alloy
 8 gravel + 1 pitch --> 8 Asphalt
 ```
@@ -531,13 +531,13 @@ height. Creosote takes 4,000 HU a batch at 350°C or hotter:
 
 Crude Oil takes 5,000 HU a batch at 380°C or hotter, and a column under 6 tall can't distil it (it makes no Pitch):
 
-| Height | Refinery Gas | Naphtha | Kerosene | Diesel | Heavy Oil | Bitumen |
-|---|---|---|---|---|---|---|
-| 6–9 | 100 | 200 | – | 350 | – | 250 |
-| 10–13 | 100 | 200 | 150 | 250 | 150 | 100 |
-| 14–16 | 130 | 270 | 190 | 230 | 90 | 60 |
+| Height | Refinery Gas | Naphtha | Kerosene | Light Oil | Diesel | Heavy Oil | Bitumen |
+|---|---|---|---|---|---|---|---|
+| 6–9 | 100 | 200 | – | – | 350 | – | 250 |
+| 10–13 | 100 | 200 | 150 | 80 | 190 | 130 | 100 |
+| 14–16 | 130 | 270 | 190 | 100 | 155 | 65 | 60 |
 
-It stops when a product it makes is full. **Steam stripping:** steam in its steam tank raises each batch's Naphtha by
+Sour Crude Oil splits the same way, its Kerosene and Diesel coming out sour. It stops when a product it makes is full. **Steam stripping:** steam in its steam tank raises each batch's Naphtha by
 the grade (Steam +15%, High-Pressure +30%, Superheated +50%), out of the Heavy Oil on creosote (a straight bonus at 4
 high) and out of the Bitumen on Crude Oil, using 100 mB a batch. Its ports take the modes Input (creosote or Crude
 Oil), Steam, Heat, Refinery Gas, Naphtha, Kerosene, Light Oil, Diesel, Heavy Oil, Bitumen and Pitch, with auto-eject; a
@@ -571,30 +571,45 @@ Carbon Fiber. **Asphalt** (and its slab and stairs) speeds up walking, running a
 ### Refinery units
 
 ```
-Heavy Oil + heat + Cracking Catalyst --[Cracking Unit]--> Naphtha, Diesel, Refinery Gas
+100 Heavy Oil + heat + Cracking Catalyst --[Cracking Unit, catalytic]--> 40 Naphtha, 40 Diesel, 55 Refinery Gas, 10 Light Oil
+100 Heavy Oil + 30 Hydrogen + heat --[Cracking Unit, hydrocracking]--> 10 Naphtha, 50 Diesel, 30 Kerosene, 10 Light Oil
 Naphtha + heat --[Catalytic Reformer]--> Gasoline + Hydrogen
-Bitumen + heat --[Coker]--> Petroleum Coke + Refinery Gas
+250 Bitumen + heat --[Coker]--> Petroleum Coke + 50 Refinery Gas + 50 Heavy Oil
 Heavy Oil + FE --[Lubricant Blender]--> Lubricant
+100 Sour Diesel or Sour Kerosene + 30 Hydrogen + heat + FE --[Hydrotreater]--> 100 Diesel or Kerosene + 30 Hydrogen Sulfide
+100 Hydrogen Sulfide + 50 Oxygen + heat --[Sulfur Recovery Unit]--> Sulfur Dust + 100 Steam
 Naphtha or Refinery Gas + Steam + heat (800°C+) --[Steam Cracker]--> Ethylene, Propylene, Hydrogen, a little Heavy Oil
+100 Natural Gas + 50 Steam + heat (800°C+) --[Steam Cracker]--> 35 Ethylene, 5 Propylene, 30 Hydrogen
 Propylene --[Chemical Reactor]--> Polypropylene Sheet (arcforge:plastics)
+60 Ethylene + 40 Propylene + Cracking Catalyst (used now and then) --[Chemical Reactor]--> Synthetic Rubber
 8 gravel + Bitumen bucket --> 8 Asphalt
 ```
 
 They take what the Distillation Array draws off Crude Oil. The **Cracking Unit** is a fixed 3×3×5 multiblock
-(Cracking Unit Casings round a controller in the middle of the bottom of one side), drawn as a fluid catalytic cracker;
-its Cracking Catalyst wears out slowly (one lasts 50 batches). The **Steam Cracker** is a fixed 3×3×3 multiblock drawn as
-a cracking furnace with glowing peep holes, headers, a quench drum and a stack (`arcforge:steam_cracking` recipes, with
-steam as their `second_input`). The others are single blocks. **Petroleum Coke**
-works as Coal Coke everywhere (`#c:coal_coke`), and **Lubricant** lubricates the turbine arrays at +12% instead of
-Heavy Oil's +8%. Recipes are data-driven (`arcforge:cracking`, `arcforge:reforming`, `arcforge:coking`,
-`arcforge:lubricant_blending`: `input`, `fluids`, `item`, `time`, `heat_per_tick`, `min_temp`, `energy_per_tick`,
-`catalyst`, `catalyst_uses`).
+(Cracking Unit Casings round a controller in the middle of the bottom of one side), drawn as a fluid catalytic cracker.
+It runs in the mode set in its GUI's Mode tab (shown in Jade too), saved with it and never taken from what's in its
+tanks: **catalytic** cracking wears its Cracking Catalyst slowly (one lasts 50 batches) and makes more Naphtha and
+Refinery Gas; **hydrocracking** takes Hydrogen instead (a Hydrogen tank, and Hydrogen or Input ports), needs 520°C and
+36 HU/t, and makes mostly Diesel and Kerosene. Its third tank holds Refinery Gas or Kerosene by mode. The **Steam
+Cracker** is a fixed 3×3×3 multiblock drawn as a cracking furnace with glowing peep holes, headers, a quench drum and a
+stack (`arcforge:steam_cracking` recipes, with steam as their `second_input`). The others are single blocks.
+**Petroleum Coke** works as Coal Coke everywhere (`#c:coal_coke`), and **Lubricant** lubricates the turbine arrays at
++12% instead of Heavy Oil's +8%. Recipes are data-driven (`arcforge:cracking`, `arcforge:reforming`, `arcforge:coking`,
+`arcforge:lubricant_blending`, `arcforge:hydrotreating`, `arcforge:sulfur_recovery`: `input`, optional `second_input`,
+`fluids`, `item`, `time`, `heat_per_tick`, `min_temp`, `energy_per_tick`, `catalyst`, `catalyst_uses`, and for
+cracking `mode`: `catalytic` or `hydrocracking`).
+
+**Sour crude and sulfur.** Hydrotreating both sour cuts of 1,000 mB of Sour Crude Oil (14 high: 190 Sour Kerosene and
+155 Sour Diesel) gives off about 104 mB of Hydrogen Sulfide, which the Sulfur Recovery Unit turns into about one Sulfur
+Dust.
 
 **Diesel Generator** (3 wide, 3 tall and 5, 7 or 9 long: a V8, V12 or V16, drawn as a large genset with its radiator,
-V engine, turbochargers and alternator, its fan and coupling turning). Burns Diesel, Gasoline, Biodiesel or Refinery Gas
-straight to FE (the `arcforge:engine_fuels` data map, `fe_per_mb`: 420, 400, 340 and 240 by default; the V12 gets 5%
-and the V16 10% more from each mB), up to 3,000, 8,000 or 15,000 FE/t after a 3-second spin-up, and throttles back when
-full. Its fuel tank and FE buffer grow with it.
+V engine, turbochargers and alternator, its fan and coupling turning). Burns Diesel, Gasoline, Kerosene, Biodiesel or
+Refinery Gas straight to FE (the `arcforge:engine_fuels` data map, `fe_per_mb`: 420, 400, 360, 340 and 240 by default;
+the V12 gets 5% and the V16 10% more from each mB), up to 3,000, 8,000 or 15,000 FE/t after a 3-second spin-up, and
+throttles back when full. Its fuel tank and FE buffer grow with it. A bucket of Crude Oil distilled 14 high, its Heavy
+Oil cracked (catalytic), its Bitumen coked and its Naphtha reformed, gives about 322,000 FE in a V16, so a V16 at full
+power takes about 47 mB/t of crude: one full-rate Pumpjack and a half.
 
 **Flare Stack.** A block with a tall stack drawn above it: gas pushed into it burns off, up to 1,000 mB/t, with a
 flame at the top as big as what it burns, so a refinery never stalls on a full gas tank.
@@ -605,7 +620,7 @@ flame at the top as big as what it burns, so a refinery never stalls on a full g
 100 mB water --[Electrolyzer]--> 200 mB Hydrogen + 100 mB Oxygen   (120,000 FE)
 100 mB Brine --[Electrolyzer]--> 50 mB Hydrogen + 50 mB Chlorine + 100 mB Lye   (60,000 FE)
 100 mB Light Oil + 50 mB Hydrogen --[Chemical Reactor]--> 2 Plastic Sheet
-100 mB Ethanol + 5 mB Sulfuric Acid --[Chemical Reactor]--> 60 mB Ethylene + 40 mB Water (by-product tank)
+100 mB Ethanol + 5 mB Sulfuric Acid --[Chemical Reactor]--> 40 mB Ethylene + 60 mB Water (by-product tank)
 120 mB Ethylene --[Chemical Reactor]--> 2 Plastic Sheet (bio-polyethylene)
 60 mB Ethylene + 60 mB Chlorine --[Chemical Reactor]--> 2 PVC Sheet
 ```
@@ -637,11 +652,14 @@ that starts with 50 mB in the furnace's 4,000 mB tank uses it and runs 1.5× as 
 Graphite. Coal Coke coming in through a port goes to the fuel slot unless the metal slot already holds Coal Coke, so a
 Graphite line starts with one coke put in the metal slot by hand.
 
-**Plastic Sheet** and **PVC Sheet** (`#arcforge:plastics`) go into Conduit Filters, Storage Upgrades, the crafted crate
-and vault upgrades, the Settings Card, the Security Terminal, the Fermenter, dyed conduits and the Gas Turbine Array
-Casing. Plastic Sheet comes from Light Oil and Hydrogen, or from Ethylene (bio-plastic); **Ethylene** is a gas, made from
-Ethanol over a little Sulfuric Acid, with its Water going to the reactor's by-product tank (By-product faces). **PVC
-Sheet** (Ethylene and Chlorine) also lines the Hardened and Arcforged Fluid Conduits and the Arcforged Fluid Tank.
+**Plastic Sheet**, **PVC Sheet** and **Polypropylene Sheet** (`#arcforge:plastics`) go into Conduit Filters, Storage
+Upgrades, the crafted crate and vault upgrades, the Settings Card, the Security Terminal, the Fermenter, dyed conduits,
+the modules and the Gas Turbine Array Casing; up to the Hardened tier any of them does. The **Arcforged tier** wants a
+particular sheet: PVC for its Fluid Conduit and Fluid Tank, Polypropylene (from the Steam Cracker's Propylene, so it
+needs a refinery) for its crate, vault, Storage Upgrade and Jetpack, and Plastic Sheet for its Arc Drill and Arc Saw.
+Plastic Sheet comes from Light Oil and Hydrogen, or from Ethylene (bio-plastic); **Ethylene** is a gas, from the Steam
+Cracker or, slowly, from Ethanol over a little Sulfuric Acid, with its Water going to the reactor's by-product tank
+(By-product faces). **PVC Sheet** (Ethylene and Chlorine) also lines the Hardened Fluid Conduit.
 
 ### Carbon capture and Syngas
 
@@ -801,6 +819,7 @@ Rubber Dandelion Roots --[Oil Press]--> 100 mB Latex
 Resin Tap on a living jungle tree --> 25 mB Latex every 10 s
 250 mB Latex --[Grain Dryer, heat]--> Raw Rubber
 2 Raw Rubber + 1 Sulfur Dust --[Vulcanizer, 140°C+]--> 2 Rubber
+60 mB Ethylene + 40 mB Propylene + Cracking Catalyst --[Chemical Reactor]--> Synthetic Rubber (cures as Raw Rubber)
 4 Rubber --[crafting]--> 8 Rubber Gaskets
 ```
 
@@ -812,8 +831,10 @@ jungle log, 25 mB of Latex into its 1,000 mB tank; on a spruce log, a 50% chance
 15% chance (it holds 16). Buckets, an empty hand, a hopper under it or a conduit empty it. Pine Resin goes in the
 Infuser's additive slot in place of Creosote (one per plank, four per log or wood). Config `farming.cropProcessing.resinTap`.
 
-**Vulcanizer.** A single-block heat machine (HU, no FE) that only works at 140°C or hotter: 2 Raw Rubber + 1 Sulfur
-Dust cure into 2 Rubber at 12 HU/t (`arcforge:vulcanizing`). Input on top, output underneath and heat at the back by
+**Vulcanizer.** A single-block heat machine (HU, no FE) that only works at 140°C or hotter: 2 Raw Rubber (or Synthetic
+Rubber: both are `#arcforge:raw_rubber`) + 1 Sulfur Dust cure into 2 Rubber at 12 HU/t (`arcforge:vulcanizing`).
+**Synthetic Rubber** (EPDM) comes from the Chemical Reactor, its Cracking Catalyst used up only one time in 50 (an item
+input's `consume_chance`). Input on top, output underneath and heat at the back by
 default; Speed and Heat upgrades. Config `farming.cropProcessing.vulcanizer`.
 
 **Rubber Gaskets** seal Tempered and better Pressurized Conduits, Pressurized Cylinders and Gas Cartridges, the Hardened

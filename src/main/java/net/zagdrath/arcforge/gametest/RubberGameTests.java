@@ -41,8 +41,8 @@ import net.zagdrath.arcforge.registry.ModItems;
 
 // Rubber and bio-plastics: the Rubber Dandelion (drops, farms, Latex from the Oil Press), the Resin Tap (Latex on a living
 // jungle tree, Pine Resin on spruce, nothing on a dead log, and it drops with its log), Pine Resin in the Infuser, Latex
-// dried into Raw Rubber, the Vulcanizer (needs 140°C), Ethylene with its Water by-product, bio Plastic and PVC Sheet, and
-// the plastics tag and the gasket and PVC recipe changes.
+// dried into Raw Rubber, the Vulcanizer (needs 140°C), Synthetic Rubber (EPDM) made and cured, Ethylene with its Water
+// by-product, bio Plastic and PVC Sheet, and the plastics tag and the gasket and PVC recipe changes.
 public final class RubberGameTests {
     private RubberGameTests() {}
 
@@ -179,6 +179,43 @@ public final class RubberGameTests {
                 .thenSucceed();
     }
 
+    // Synthetic Rubber (EPDM): Ethylene and Propylene over a Cracking Catalyst in the Chemical Reactor, the catalyst not
+    // used up every time; it's in #arcforge:raw_rubber, so 2 of it and a Sulfur Dust cure into 2 Rubber as Raw Rubber
+    // does.
+    static void syntheticRubber(GameTestHelper helper) {
+        helper.assertTrue(new ItemStack(ModItems.SYNTHETIC_RUBBER.get()).is(net.zagdrath.arcforge.tag.ModItemTags.RAW_RUBBER)
+                && new ItemStack(ModItems.RAW_RUBBER.get()).is(net.zagdrath.arcforge.tag.ModItemTags.RAW_RUBBER), "The rubbers aren't #arcforge:raw_rubber");
+        ChemicalReactorBlockEntity reactor = reactor(helper, new BlockPos(2, 1, 0));
+        fill(reactor.getRouter(), ModFluids.ETHYLENE.get(), 60);
+        fill(reactor.getRouter(), ModFluids.PROPYLENE.get(), 40);
+        reactor.getItems().setStack(ChemicalReactorBlockEntity.SLOT_INPUT, new ItemStack(ModItems.CRACKING_CATALYST.get(), 4));
+        helper.setBlock(POS, ModBlocks.VULCANIZER.get());
+        VulcanizerBlockEntity vulcanizer = helper.getBlockEntity(POS, VulcanizerBlockEntity.class);
+        helper.assertTrue(CrushingGameTests.insert(vulcanizer.getItemHandler(Direction.UP), ModItems.SULFUR_DUST.get(), 1) == 1, "It refused Sulfur");
+        helper.assertTrue(CrushingGameTests.insert(vulcanizer.getItemHandler(Direction.UP), ModItems.SYNTHETIC_RUBBER.get(), 2) == 2,
+                "It refused Synthetic Rubber");
+        vulcanizer.getHeat().add(vulcanizer.getHeat().getCapacity());
+        // Raw Rubber and Synthetic Rubber never fill both slots, so the Sulfur always has one.
+        BlockPos mixedPos = new BlockPos(4, 1, 0);
+        helper.setBlock(mixedPos, ModBlocks.VULCANIZER.get());
+        VulcanizerBlockEntity mixed = helper.getBlockEntity(mixedPos, VulcanizerBlockEntity.class);
+        helper.assertTrue(CrushingGameTests.insert(mixed.getItemHandler(Direction.UP), ModItems.RAW_RUBBER.get(), 2) == 2, "It refused Raw Rubber");
+        helper.assertTrue(CrushingGameTests.insert(mixed.getItemHandler(Direction.UP), ModItems.SYNTHETIC_RUBBER.get(), 2) == 0,
+                "It took Synthetic Rubber beside Raw Rubber");
+        helper.assertTrue(CrushingGameTests.insert(mixed.getItemHandler(Direction.UP), ModItems.SULFUR_DUST.get(), 1) == 1, "No room for Sulfur");
+        helper.startSequence()
+                .thenWaitUntil(() -> helper.assertTrue(reactor.getItems().getStack(ChemicalReactorBlockEntity.SLOT_OUTPUT).is(ModItems.SYNTHETIC_RUBBER.get()),
+                        "No Synthetic Rubber yet"))
+                .thenExecute(() -> {
+                    ItemStack catalyst = reactor.getItems().getStack(ChemicalReactorBlockEntity.SLOT_INPUT);
+                    helper.assertTrue(catalyst.is(ModItems.CRACKING_CATALYST.get()) && catalyst.getCount() >= 3, "The catalyst went: " + catalyst);
+                    helper.assertTrue(reactor.getOutputTank().getAmount() == 0, "It made a fluid");
+                })
+                .thenWaitUntil(() -> helper.assertTrue(vulcanizer.getItems().getStack(VulcanizerBlockEntity.SLOT_OUTPUT).getCount() == 2
+                        && vulcanizer.getItems().getStack(VulcanizerBlockEntity.SLOT_OUTPUT).is(ModItems.RUBBER.get()), "No Rubber from Synthetic Rubber yet"))
+                .thenSucceed();
+    }
+
     private static ChemicalReactorBlockEntity reactor(GameTestHelper helper, BlockPos pos) {
         helper.setBlock(pos, ModBlocks.CHEMICAL_REACTOR.get());
         ChemicalReactorBlockEntity reactor = helper.getBlockEntity(pos, ChemicalReactorBlockEntity.class);
@@ -198,9 +235,9 @@ public final class RubberGameTests {
         fill(pvc.getRouter(), ModFluids.ETHYLENE.get(), 60);
         fill(pvc.getRouter(), ModFluids.CHLORINE.get(), 60);
         helper.startSequence()
-                .thenWaitUntil(() -> helper.assertTrue(ethylene.getOutputTank().contains(ModFluids.ETHYLENE.get()) && ethylene.getOutputTank().getAmount() == 60,
+                .thenWaitUntil(() -> helper.assertTrue(ethylene.getOutputTank().contains(ModFluids.ETHYLENE.get()) && ethylene.getOutputTank().getAmount() == 40,
                         "No Ethylene yet"))
-                .thenExecute(() -> helper.assertTrue(ethylene.getByproductTank().contains(Fluids.WATER) && ethylene.getByproductTank().getAmount() == 40,
+                .thenExecute(() -> helper.assertTrue(ethylene.getByproductTank().contains(Fluids.WATER) && ethylene.getByproductTank().getAmount() == 60,
                         "By-product tank holds " + ethylene.getByproductTank().getAmount() + " mB of " + ethylene.getByproductTank().getResource(0)))
                 .thenWaitUntil(() -> helper.assertTrue(plastic.getItems().getStack(ChemicalReactorBlockEntity.SLOT_OUTPUT).is(ModItems.PLASTIC_SHEET.get()),
                         "No bio Plastic Sheet yet"))

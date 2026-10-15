@@ -1,0 +1,33 @@
+{
+  "type": "arcforge:cracking",
+  "mode": "hydrocracking",
+  "input": {
+    "fluid": "arcforge:heavy_oil",
+    "amount": 100
+  },
+  "second_input": {
+    "fluid": "arcforge:hydrogen",
+    "amount": 30
+  },
+  "fluids": [
+    {
+      "id": "arcforge:naphtha",
+      "amount": 10
+    },
+    {
+      "id": "arcforge:diesel",
+      "amount": 50
+    },
+    {
+      "id": "arcforge:kerosene",
+      "amount": 30
+    },
+    {
+      "id": "arcforge:light_oil",
+      "amount": 10
+    }
+  ],
+  "time": 20,
+  "heat_per_tick": 36,
+  "min_temp": 520
+}

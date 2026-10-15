@@ -8,7 +8,7 @@
   ],
   "key": {
     "A": "arcforge:arcforged_alloy",
-    "P": "#arcforge:plastics",
+    "P": "arcforge:polypropylene_sheet",
     "E": "arcforge:arcforged_gas_cartridge",
     "X": "arcforge:hardened_jetpack",
     "C": "#c:gems/arcite",

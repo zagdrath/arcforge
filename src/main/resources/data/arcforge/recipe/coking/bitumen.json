@@ -8,6 +8,10 @@
     {
       "id": "arcforge:refinery_gas",
       "amount": 50
+    },
+    {
+      "id": "arcforge:heavy_oil",
+      "amount": 50
     }
   ],
   "item": {

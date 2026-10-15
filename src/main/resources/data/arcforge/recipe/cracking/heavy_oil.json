@@ -1,5 +1,6 @@
 {
   "type": "arcforge:cracking",
+  "mode": "catalytic",
   "input": {
     "fluid": "arcforge:heavy_oil",
     "amount": 100
@@ -11,11 +12,15 @@
     },
     {
       "id": "arcforge:diesel",
-      "amount": 45
+      "amount": 40
     },
     {
       "id": "arcforge:refinery_gas",
-      "amount": 60
+      "amount": 55
+    },
+    {
+      "id": "arcforge:light_oil",
+      "amount": 10
     }
   ],
   "time": 20,

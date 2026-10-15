@@ -180,8 +180,8 @@ final class DistillationGameTests {
 
     private static final FluidResource CRUDE = FluidResource.of(ModFluids.CRUDE_OIL.get());
 
-    // Crude Oil needs 6 blocks: 6 high makes Refinery Gas, Naphtha, Diesel and Bitumen; 10 high adds Kerosene and Heavy
-    // Oil; 5 high is too short for it.
+    // Crude Oil needs 6 blocks: 6 high makes Refinery Gas, Naphtha, Diesel and Bitumen; 10 high adds Kerosene, Light Oil
+    // and Heavy Oil; 5 high is too short for it.
     static void crudeOilFractions(GameTestHelper helper) {
         BlockPos six = new BlockPos(0, 1, 0), ten = new BlockPos(3, 1, 0), five = new BlockPos(6, 1, 0);
         buildColumn(helper, six, 6, 1, Direction.NORTH);
@@ -203,8 +203,11 @@ final class DistillationGameTests {
                             && short6.getProduct(Product.DIESEL).getAmount() == 350 && short6.getProduct(Product.BITUMEN).getAmount() == 250
                             && short6.getProduct(Product.KEROSENE).getAmount() == 0, "6 high made the wrong fractions");
                     DistillationArrayBlockEntity tall = controller(helper, ten, 1);
-                    helper.assertTrue(tall.getProduct(Product.KEROSENE).getAmount() == 150 && tall.getProduct(Product.HEAVY_OIL).getAmount() == 150,
-                            "10 high made " + tall.getProduct(Product.KEROSENE).getAmount() + " kerosene");
+                    helper.assertTrue(tall.getProduct(Product.KEROSENE).getAmount() == 150 && tall.getProduct(Product.HEAVY_OIL).getAmount() == 130
+                            && tall.getProduct(Product.LIGHT_OIL).getAmount() == 80 && tall.getProduct(Product.DIESEL).getAmount() == 190,
+                            "10 high made " + tall.getProduct(Product.KEROSENE).getAmount() + " kerosene, " + tall.getProduct(Product.LIGHT_OIL).getAmount()
+                                    + " light oil");
+                    helper.assertTrue(short6.getProduct(Product.LIGHT_OIL).getAmount() == 0, "6 high made Light Oil");
                     DistillationArrayBlockEntity stub = controller(helper, five, 1);
                     helper.assertTrue(stub.getStatus() == MachineStatus.TOO_SHORT && stub.getFeed().getAmount() == 1_000,
                             "A 5-high column with Crude Oil is " + stub.getStatus());
@@ -227,7 +230,8 @@ final class DistillationGameTests {
                 .thenIdle(90)
                 .thenExecute(() -> {
                     DistillationArrayBlockEntity column = controller(helper, ten, 1);
-                    helper.assertTrue(column.getProduct(Product.DIESEL).getAmount() == 250 && column.getProduct(Product.KEROSENE).getAmount() == 150
+                    helper.assertTrue(column.getProduct(Product.DIESEL).getAmount() == 190 && column.getProduct(Product.KEROSENE).getAmount() == 150
+                            && column.getProduct(Product.LIGHT_OIL).getAmount() == 80
                             && column.getProduct(Product.NAPHTHA).getAmount() == 200, "Sour Crude made the wrong fractions");
                     helper.assertTrue(column.getProduct(Product.DIESEL).getResource(0).is(ModFluids.SOUR_DIESEL.get())
                             && column.getProduct(Product.KEROSENE).getResource(0).is(ModFluids.SOUR_KEROSENE.get())

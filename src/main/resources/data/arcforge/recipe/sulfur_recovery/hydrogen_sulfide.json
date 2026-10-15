@@ -2,22 +2,22 @@
   "type": "arcforge:sulfur_recovery",
   "input": {
     "fluid": "arcforge:hydrogen_sulfide",
-    "amount": 500
+    "amount": 100
   },
   "second_input": {
     "fluid": "arcforge:oxygen",
-    "amount": 250
+    "amount": 50
   },
   "fluids": [
     {
       "id": "arcforge:steam",
-      "amount": 500
+      "amount": 100
     }
   ],
   "item": {
     "id": "arcforge:sulfur_dust"
   },
-  "time": 40,
+  "time": 10,
   "heat_per_tick": 15,
   "min_temp": 250
 }

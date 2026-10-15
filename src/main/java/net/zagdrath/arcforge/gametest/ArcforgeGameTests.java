@@ -306,6 +306,7 @@ public final class ArcforgeGameTests {
         TESTS.put("rubber_infuser_pine_resin", RubberGameTests::infuserPineResin);
         TESTS.put("rubber_dryer_latex", RubberGameTests::dryerLatex);
         TESTS.put("rubber_vulcanizer", RubberGameTests::vulcanizer);
+        TESTS.put("rubber_synthetic_vulcanizes", RubberGameTests::syntheticRubber);
         TESTS.put("rubber_bio_plastics", RubberGameTests::bioPlastics);
         TESTS.put("rubber_plastics_tag", RubberGameTests::plastics);
         TESTS.put("reservoir_one_tank", ExtendedLogisticsGameTests::reservoir);
@@ -474,6 +475,10 @@ public final class ArcforgeGameTests {
         TESTS.put("refinery_coker_cokes", RefineryGameTests::cokerCokes);
         TESTS.put("refinery_blender_blends", RefineryGameTests::blenderBlends);
         TESTS.put("refinery_cracking_unit_cracks", RefineryGameTests::crackingUnitCracks);
+        TESTS.put("refinery_cracking_modes", RefineryGameTests::crackingModes);
+        TESTS.put("refinery_steam_cracker_natural_gas", RefineryGameTests::steamCrackerNaturalGas);
+        TESTS.put("refinery_light_oil_on_crude_chain", RefineryGameTests::lightOilOnCrudeChain);
+        TESTS.put("refinery_sour_crude_sulfur_yield", RefineryGameTests::sourCrudeSulfurYield);
         TESTS.put("refinery_diesel_generator_generates", RefineryGameTests::dieselGeneratorGenerates);
         TESTS.put("refinery_diesel_engines_scale", RefineryGameTests::dieselEnginesScale);
         TESTS.put("refinery_steam_cracker_cracks", RefineryGameTests::steamCrackerCracks);
