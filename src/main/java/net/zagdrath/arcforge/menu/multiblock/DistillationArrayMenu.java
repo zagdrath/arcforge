@@ -41,7 +41,9 @@ public class DistillationArrayMenu extends MachineMenu {
     public static final int DATA_STATUS = 23;
     public static final int DATA_REDSTONE_MODE = 24;
     public static final int DATA_SIDE_CONFIG = 25;
-    public static final int DATA_VALUES = 26;
+    // A bit per product whose tank holds its sour form.
+    public static final int DATA_SOUR = 26;
+    public static final int DATA_VALUES = 27;
 
     public static final int PITCH_X = 41, PITCH_Y = 55;
 
@@ -111,6 +113,11 @@ public class DistillationArrayMenu extends MachineMenu {
 
     public int getProduct(DistillationArrayBlockEntity.Product product) {
         return value(DATA_PRODUCTS + product.ordinal());
+    }
+
+    // What a product's tank holds: its sour form (Sour Kerosene, Sour Diesel) or its own.
+    public Fluid getProductFluid(DistillationArrayBlockEntity.Product product) {
+        return product.fluid((value(DATA_SOUR) & 1 << product.ordinal()) != 0);
     }
 
     // Whether the column's recipe makes this product at its height.

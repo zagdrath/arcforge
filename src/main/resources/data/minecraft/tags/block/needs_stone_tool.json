@@ -75,6 +75,10 @@
     "arcforge:cracking_unit_controller",
     "arcforge:diesel_generator_casing",
     "arcforge:diesel_generator_controller",
-    "arcforge:flare_stack"
+    "arcforge:flare_stack",
+    "arcforge:hydrotreater",
+    "arcforge:sulfur_recovery_unit",
+    "arcforge:steam_methane_reformer",
+    "arcforge:gas_wellhead"
   ]
 }

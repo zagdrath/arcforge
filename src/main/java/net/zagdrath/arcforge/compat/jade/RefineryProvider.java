@@ -58,6 +58,22 @@ public enum RefineryProvider implements StreamServerDataProvider<BlockAccessor, 
                     : Component.translatable("jade.arcforge.flare_stack.idle").withStyle(ChatFormatting.GRAY));
             return lines;
         }
+        if (target instanceof net.zagdrath.arcforge.blockentity.machine.GasWellheadBlockEntity wellhead) {
+            if (!wellhead.isOnWell()) {
+                lines.add(Component.translatable("jade.arcforge.gas_wellhead.no_well").withStyle(ChatFormatting.RED));
+                return lines;
+            }
+            lines.add(Component.translatable("jade.arcforge.gas_wellhead.rate", String.format(Locale.ROOT, "%.1f", wellhead.getRate()))
+                    .withStyle(ChatFormatting.GOLD));
+            net.zagdrath.arcforge.oil.OilDeposits.Deposit deposit = net.zagdrath.arcforge.oil.OilDeposits.at(level, wellhead.getBlockPos().below());
+            if (deposit != null) {
+                long left = net.zagdrath.arcforge.oil.OilDeposits.get(level.getServer()).gasRemaining(deposit, level.getSeed());
+                lines.add(left > 0 ? Component.translatable("jade.arcforge.gas_wellhead.left",
+                        String.format(Locale.ROOT, "%,d", net.zagdrath.arcforge.oil.OilDeposits.roughBuckets(left)))
+                        .withStyle(ChatFormatting.GRAY) : Component.translatable("jade.arcforge.gas_wellhead.spent").withStyle(ChatFormatting.GRAY));
+            }
+            return lines;
+        }
         if (target instanceof RefiningMachineBlockEntity machine) {
             refining(lines, machine.getCore(), machine.getStatus());
             return lines;

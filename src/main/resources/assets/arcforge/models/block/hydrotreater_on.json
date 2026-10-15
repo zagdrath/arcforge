@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/hydrotreater_front_on",
+    "south": "arcforge:block/hydrotreater_back",
+    "east": "arcforge:block/hydrotreater_left",
+    "west": "arcforge:block/hydrotreater_right",
+    "up": "arcforge:block/hydrotreater_top",
+    "down": "arcforge:block/hydrotreater_bottom",
+    "particle": "arcforge:block/hydrotreater_back"
+  }
+}

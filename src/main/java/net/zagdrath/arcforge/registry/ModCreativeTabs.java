@@ -63,12 +63,16 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.PUMPJACK_CONTROLLER.get());
                 output.accept(ModItems.PUMPJACK_CASING.get());
                 output.accept(ModItems.WELL_HEAD.get());
+                output.accept(ModItems.GAS_WELLHEAD.get());
                 output.accept(ModItems.CRACKING_UNIT_CONTROLLER.get());
                 output.accept(ModItems.CRACKING_UNIT_CASING.get());
                 output.accept(ModItems.CATALYTIC_REFORMER.get());
                 output.accept(ModItems.COKER.get());
                 output.accept(ModItems.LUBRICANT_BLENDER.get());
                 output.accept(ModItems.FLARE_STACK.get());
+                output.accept(ModItems.HYDROTREATER.get());
+                output.accept(ModItems.SULFUR_RECOVERY_UNIT.get());
+                output.accept(ModItems.STEAM_METHANE_REFORMER.get());
                 output.accept(ModItems.DIESEL_GENERATOR_CONTROLLER.get());
                 output.accept(ModItems.DIESEL_GENERATOR_CASING.get());
                 output.accept(ModItems.ASSEMBLER.get());
@@ -218,8 +222,11 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.LIGHT_OIL_BUCKET.get());
                 output.accept(ModItems.HEAVY_OIL_BUCKET.get());
                 output.accept(ModItems.CRUDE_OIL_BUCKET.get());
+                output.accept(ModItems.SOUR_CRUDE_OIL_BUCKET.get());
                 output.accept(ModItems.KEROSENE_BUCKET.get());
+                output.accept(ModItems.SOUR_KEROSENE_BUCKET.get());
                 output.accept(ModItems.DIESEL_BUCKET.get());
+                output.accept(ModItems.SOUR_DIESEL_BUCKET.get());
                 output.accept(ModItems.BITUMEN_BUCKET.get());
                 output.accept(ModItems.GASOLINE_BUCKET.get());
                 output.accept(ModItems.LUBRICANT_BUCKET.get());
@@ -251,6 +258,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ENGINEERS_HANDBOOK.get());
                 output.accept(ModItems.WRENCH.get());
                 output.accept(ModItems.SEISMIC_SURVEY_TOOL.get());
+                output.accept(ModItems.SURVEY_RECORD.get());
                 output.accept(ModItems.THROTTLE_LEVER.get());
                 output.accept(ModItems.SETTINGS_CARD.get());
                 for (var item : List.of(ModItems.STEEL_SWORD, ModItems.STEEL_PICKAXE, ModItems.STEEL_AXE, ModItems.STEEL_SHOVEL, ModItems.STEEL_HOE,

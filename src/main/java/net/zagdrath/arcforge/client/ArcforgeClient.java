@@ -231,6 +231,9 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.PUMPJACK.get(), net.zagdrath.arcforge.client.screen.multiblock.PumpjackScreen::new);
         event.register(ModMenuTypes.CRACKING_UNIT.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.CATALYTIC_REFORMER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
+        event.register(ModMenuTypes.HYDROTREATER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
+        event.register(ModMenuTypes.SULFUR_RECOVERY_UNIT.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
+        event.register(ModMenuTypes.STEAM_METHANE_REFORMER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.COKER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.LUBRICANT_BLENDER.get(), net.zagdrath.arcforge.client.screen.machine.RefiningScreen::new);
         event.register(ModMenuTypes.DIESEL_GENERATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.DieselGeneratorScreen::new);
@@ -311,8 +314,11 @@ public class ArcforgeClient {
         event.register(liquidModel("light_oil"), ModFluids.LIGHT_OIL, ModFluids.FLOWING_LIGHT_OIL);
         event.register(liquidModel("heavy_oil"), ModFluids.HEAVY_OIL, ModFluids.FLOWING_HEAVY_OIL);
         event.register(liquidModel("crude_oil"), ModFluids.CRUDE_OIL, ModFluids.FLOWING_CRUDE_OIL);
+        event.register(liquidModel("sour_crude_oil"), ModFluids.SOUR_CRUDE_OIL, ModFluids.FLOWING_SOUR_CRUDE_OIL);
         event.register(liquidModel("kerosene"), ModFluids.KEROSENE, ModFluids.FLOWING_KEROSENE);
+        event.register(liquidModel("sour_kerosene"), ModFluids.SOUR_KEROSENE, ModFluids.FLOWING_SOUR_KEROSENE);
         event.register(liquidModel("diesel"), ModFluids.DIESEL, ModFluids.FLOWING_DIESEL);
+        event.register(liquidModel("sour_diesel"), ModFluids.SOUR_DIESEL, ModFluids.FLOWING_SOUR_DIESEL);
         event.register(liquidModel("bitumen"), ModFluids.BITUMEN, ModFluids.FLOWING_BITUMEN);
         event.register(liquidModel("gasoline"), ModFluids.GASOLINE, ModFluids.FLOWING_GASOLINE);
         event.register(liquidModel("lubricant"), ModFluids.LUBRICANT, ModFluids.FLOWING_LUBRICANT);
@@ -359,6 +365,8 @@ public class ArcforgeClient {
         event.register(gasModel(ETHYLENE_TINT), ModFluids.ETHYLENE, ModFluids.FLOWING_ETHYLENE);
         event.register(gasModel(SYNGAS_TINT), ModFluids.SYNGAS, ModFluids.FLOWING_SYNGAS);
         event.register(gasModel(REFINERY_GAS_TINT), ModFluids.REFINERY_GAS, ModFluids.FLOWING_REFINERY_GAS);
+        event.register(gasModel(NATURAL_GAS_TINT), ModFluids.NATURAL_GAS, ModFluids.FLOWING_NATURAL_GAS);
+        event.register(gasModel(HYDROGEN_SULFIDE_TINT), ModFluids.HYDROGEN_SULFIDE, ModFluids.FLOWING_HYDROGEN_SULFIDE);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -383,6 +391,8 @@ public class ArcforgeClient {
     public static final int ETHYLENE_TINT = GasTints.ETHYLENE;
     public static final int SYNGAS_TINT = GasTints.SYNGAS;
     public static final int REFINERY_GAS_TINT = GasTints.REFINERY_GAS;
+    public static final int NATURAL_GAS_TINT = GasTints.NATURAL_GAS;
+    public static final int HYDROGEN_SULFIDE_TINT = GasTints.HYDROGEN_SULFIDE;
 
     private static FluidModel.Unbaked gasModel(int tint) {
         return new FluidModel.Unbaked(
@@ -419,6 +429,9 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0x2A1A0C, 2.0F), ModFluids.HEAVY_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0x0E0C0A, 1.5F), ModFluids.CRUDE_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0xDCE0C8, 9.0F), ModFluids.KEROSENE_TYPE.get());
+        event.registerFluidType(liquidFog(0x15110A, 1.5F), ModFluids.SOUR_CRUDE_OIL_TYPE.get());
+        event.registerFluidType(liquidFog(0xB8BC98, 8.0F), ModFluids.SOUR_KEROSENE_TYPE.get());
+        event.registerFluidType(liquidFog(0x9E9A48, 5.0F), ModFluids.SOUR_DIESEL_TYPE.get());
         event.registerFluidType(liquidFog(0xC8A848, 6.0F), ModFluids.DIESEL_TYPE.get());
         event.registerFluidType(liquidFog(0x08080A, 1.0F), ModFluids.BITUMEN_TYPE.get());
         event.registerFluidType(liquidFog(0xE8A850, 9.0F), ModFluids.GASOLINE_TYPE.get());
@@ -436,6 +449,8 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(ETHYLENE_TINT & 0xFFFFFF, 6.0F), ModFluids.ETHYLENE_TYPE.get());
         event.registerFluidType(liquidFog(SYNGAS_TINT & 0xFFFFFF, 6.0F), ModFluids.SYNGAS_TYPE.get());
         event.registerFluidType(liquidFog(REFINERY_GAS_TINT & 0xFFFFFF, 6.0F), ModFluids.REFINERY_GAS_TYPE.get());
+        event.registerFluidType(liquidFog(NATURAL_GAS_TINT & 0xFFFFFF, 6.0F), ModFluids.NATURAL_GAS_TYPE.get());
+        event.registerFluidType(liquidFog(HYDROGEN_SULFIDE_TINT & 0xFFFFFF, 5.0F), ModFluids.HYDROGEN_SULFIDE_TYPE.get());
         event.registerFluidType(liquidFog(0xE8E4D6, 2.0F), ModFluids.LATEX_TYPE.get());
         event.registerFluidType(liquidFog(0xB6F07A, 6.0F), ModFluids.LIQUID_EXPERIENCE_TYPE.get());
         event.registerFluidType(liquidFog(SEAWATER_TINT & 0xFFFFFF, 12.0F), ModFluids.SEAWATER_TYPE.get());

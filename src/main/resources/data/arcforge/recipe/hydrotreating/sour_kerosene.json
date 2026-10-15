@@ -1,0 +1,25 @@
+{
+  "type": "arcforge:hydrotreating",
+  "input": {
+    "fluid": "arcforge:sour_kerosene",
+    "amount": 100
+  },
+  "second_input": {
+    "fluid": "arcforge:hydrogen",
+    "amount": 25
+  },
+  "fluids": [
+    {
+      "id": "arcforge:kerosene",
+      "amount": 100
+    },
+    {
+      "id": "arcforge:hydrogen_sulfide",
+      "amount": 25
+    }
+  ],
+  "time": 40,
+  "heat_per_tick": 20,
+  "min_temp": 300,
+  "energy_per_tick": 20
+}

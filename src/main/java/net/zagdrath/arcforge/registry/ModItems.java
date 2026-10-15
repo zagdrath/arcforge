@@ -325,6 +325,12 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.DIESEL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> BITUMEN_BUCKET = ITEMS.registerItem("bitumen_bucket",
             p -> new BucketItem(ModFluids.BITUMEN.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> SOUR_CRUDE_OIL_BUCKET = ITEMS.registerItem("sour_crude_oil_bucket",
+            p -> new BucketItem(ModFluids.SOUR_CRUDE_OIL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> SOUR_KEROSENE_BUCKET = ITEMS.registerItem("sour_kerosene_bucket",
+            p -> new BucketItem(ModFluids.SOUR_KEROSENE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> SOUR_DIESEL_BUCKET = ITEMS.registerItem("sour_diesel_bucket",
+            p -> new BucketItem(ModFluids.SOUR_DIESEL.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SULFURIC_ACID_BUCKET = ITEMS.registerItem("sulfuric_acid_bucket",
             p -> new BucketItem(ModFluids.SULFURIC_ACID.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SEED_OIL_BUCKET = ITEMS.registerItem("seed_oil_bucket",
@@ -364,9 +370,15 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> DIESEL_GENERATOR_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.DIESEL_GENERATOR_CASING);
     public static final DeferredItem<BlockItem> DIESEL_GENERATOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.DIESEL_GENERATOR_CONTROLLER);
     public static final DeferredItem<BlockItem> FLARE_STACK = ITEMS.registerSimpleBlockItem(ModBlocks.FLARE_STACK);
+    public static final DeferredItem<BlockItem> HYDROTREATER = ITEMS.registerSimpleBlockItem(ModBlocks.HYDROTREATER);
+    public static final DeferredItem<BlockItem> SULFUR_RECOVERY_UNIT = ITEMS.registerSimpleBlockItem(ModBlocks.SULFUR_RECOVERY_UNIT);
+    public static final DeferredItem<BlockItem> STEAM_METHANE_REFORMER = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_METHANE_REFORMER);
+    public static final DeferredItem<BlockItem> GAS_WELLHEAD = ITEMS.registerSimpleBlockItem(ModBlocks.GAS_WELLHEAD);
     public static final DeferredItem<Item> STEEL_PIPE = ITEMS.registerSimpleItem("steel_pipe");
     public static final DeferredItem<net.zagdrath.arcforge.item.tool.SeismicSurveyToolItem> SEISMIC_SURVEY_TOOL = ITEMS.registerItem(
             "seismic_survey_tool", net.zagdrath.arcforge.item.tool.SeismicSurveyToolItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.SurveyRecordItem> SURVEY_RECORD = ITEMS.registerItem(
+            "survey_record", net.zagdrath.arcforge.item.tool.SurveyRecordItem::new, p -> p.stacksTo(1));
     public static final DeferredItem<BucketItem> LATEX_BUCKET = ITEMS.registerItem("latex_bucket",
             p -> new BucketItem(ModFluids.LATEX.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> SEAWATER_BUCKET = ITEMS.registerItem("seawater_bucket",

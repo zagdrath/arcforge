@@ -127,6 +127,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         // their blocks) and the Flare Stack.
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity.class);
+        registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.GasWellheadBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.CrackingUnitBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.class);
         registration.registerBlockDataProvider(RefineryProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class);
@@ -277,7 +278,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.machine.RefiningMachineBlock.class,
                 net.zagdrath.arcforge.block.machine.FlareStackBlock.class, net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock.class,
-                net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class)) {
+                net.zagdrath.arcforge.block.multiblock.OilfieldCasingBlock.class, net.zagdrath.arcforge.block.machine.GasWellheadBlock.class)) {
             registration.registerBlockComponent(RefineryProvider.Client.INSTANCE, type);
         }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock.class,

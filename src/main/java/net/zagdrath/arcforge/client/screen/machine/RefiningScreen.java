@@ -27,10 +27,11 @@ import net.zagdrath.arcforge.menu.machine.RefiningMenu;
 import net.zagdrath.arcforge.recipe.RefiningProcess;
 
 // The refinery units' screen, 176x186 (the inventory 104 down), laid out like the Fischer-Tropsch Reactor's: FE (the
-// Blender) and the feed tank on the left, the catalyst slot (the Cracking Unit, with the operations its item has left
-// under it), the arrow, the product tanks (and the Coker's coke slot), and the heat buffer on the right. Under them the
-// status, the temperature and the heat bar with a tick at the least temperature the recipe needs. Each unit's
-// background (gui/container/<unit>.png) shows only the parts it has.
+// Blender, the Hydrotreater) and the feed tank on the left, then the second feed tank where the unit has one, the
+// catalyst slot (the Cracking Unit, with the operations its item has left under it), the arrow, the product tanks (and
+// the Coker's coke slot), and the heat buffer on the right. Under them the status, the temperature and the heat bar
+// with a tick at the least temperature the recipe needs. Each unit's background (gui/container/<unit>.png) shows only
+// the parts it has.
 public class RefiningScreen extends MachineScreen<RefiningMenu> {
     private static final int HEIGHT = 186;
     private static final int ENERGY_X = 9, GAUGE_Y = 19;
@@ -74,6 +75,10 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
         return process.powered() ? 25 : 9;
     }
 
+    private int secondX() {
+        return feedX() + 16;
+    }
+
     private Fluid productShown(int i) {
         Fluid held = menu.getProductFluid(i);
         return held != Fluids.EMPTY ? held : process.products().get(i);
@@ -85,7 +90,17 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
             case ENERGY -> sideModeName("energy_input");
             case HEAT -> sideModeName("heat_input");
             case INPUT -> sideModeName("feed_input");
-            case GAS_OUTPUT -> process == RefiningProcess.REFORMING ? sideModeName("hydrogen") : sideModeName("refinery_gas");
+            case GAS_OUTPUT -> switch (process) {
+                case REFORMING -> sideModeName("hydrogen");
+                case HYDROTREATING -> sideModeName("hydrogen_sulfide");
+                case SULFUR_RECOVERY -> sideModeName("steam_output");
+                case STEAM_REFORMING -> sideModeName("carbon_dioxide");
+                default -> sideModeName("refinery_gas");
+            };
+            case HYDROGEN -> process == RefiningProcess.STEAM_REFORMING ? sideModeName("hydrogen") : sideModeName("hydrogen_input");
+            case OXYGEN -> sideModeName("oxygen_input");
+            case STEAM -> sideModeName("steam_input");
+            case OUTPUT -> process == RefiningProcess.SULFUR_RECOVERY ? sideModeName("sulfur_output") : super.sideModeName(mode);
             default -> super.sideModeName(mode);
         };
     }
@@ -103,6 +118,10 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
         }
         Fluid feed = menu.getFeedFluid();
         drawFluidTank(graphics, feed, menu.getFeed(), menu.getFeedCapacity(), tankGauge, tankGauge, x, y, feedX(), TANK_Y, TANK_W, TANK_H);
+        if (process.secondFeed() != null) {
+            drawFluidTank(graphics, menu.getSecondFluid(), menu.getSecond(), menu.getSecondCapacity(), tankGauge, tankGauge, x, y, secondX(), TANK_Y, TANK_W,
+                    TANK_H);
+        }
         for (int i = 0; i < process.tanks(); i++) {
             drawFluidTank(graphics, productShown(i), menu.getProduct(i), menu.getProductCapacity(), tankGauge, tankGauge, x, y, PRODUCT_X[i], TANK_Y,
                     TANK_W, TANK_H);
@@ -149,6 +168,11 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
         }
         if (isHovering(feedX() - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, menu.getFeedFluid(), Component.translatable("gui.arcforge.refining.feed"), menu.getFeed(), menu.getFeedCapacity());
+            return;
+        }
+        if (process.secondFeed() != null && isHovering(secondX() - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
+            addFluidTooltip(lines, menu.getSecondFluid(), Component.translatable("gui.arcforge.refining.second_feed." + process.secondFeed().getSerializedName()),
+                    menu.getSecond(), menu.getSecondCapacity());
             return;
         }
         for (int i = 0; i < process.tanks(); i++) {

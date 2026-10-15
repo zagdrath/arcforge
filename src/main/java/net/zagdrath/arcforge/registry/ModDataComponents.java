@@ -101,6 +101,17 @@ public final class ModDataComponents {
             DATA_COMPONENTS.registerComponentType("meter_settings", b -> b.persistent(net.zagdrath.arcforge.machine.meter.MeterSettings.CODEC)
                     .networkSynchronized(net.zagdrath.arcforge.machine.meter.MeterSettings.STREAM_CODEC));
 
+    // A Survey Record's survey (see SurveyRecord).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.zagdrath.arcforge.oil.SurveyRecord>> SURVEY_RECORD =
+            DATA_COMPONENTS.registerComponentType("survey_record", b -> b.persistent(net.zagdrath.arcforge.oil.SurveyRecord.CODEC)
+                    .networkSynchronized(net.zagdrath.arcforge.oil.SurveyRecord.STREAM_CODEC));
+
+    // The oil deposits marked on a filled map from Survey Records, named in its tooltip (the markers themselves are
+    // vanilla map decorations).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<java.util.List<net.zagdrath.arcforge.oil.SurveyRecord>>> OIL_MARKERS =
+            DATA_COMPONENTS.registerComponentType("oil_markers", b -> b.persistent(net.zagdrath.arcforge.oil.SurveyRecord.CODEC.listOf())
+                    .networkSynchronized(net.zagdrath.arcforge.oil.SurveyRecord.STREAM_CODEC.apply(ByteBufCodecs.list())));
+
     private ModDataComponents() {}
 
     public static void register(IEventBus modEventBus) {

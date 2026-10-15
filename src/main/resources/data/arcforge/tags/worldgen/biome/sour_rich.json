@@ -1,0 +1,12 @@
+{
+  "values": [
+    {
+      "id": "#c:is_desert",
+      "required": false
+    },
+    {
+      "id": "#minecraft:is_badlands",
+      "required": false
+    }
+  ]
+}

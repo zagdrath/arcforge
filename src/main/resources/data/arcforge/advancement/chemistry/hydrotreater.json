@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/sour_crude",
+  "display": {
+    "icon": {
+      "id": "arcforge:hydrotreater"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.hydrotreater.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.hydrotreater.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "hydrotreating"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

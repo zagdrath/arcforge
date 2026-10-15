@@ -25,8 +25,9 @@ import net.zagdrath.arcforge.registry.ModFluids;
 // optionally how hot it burns (°C; the burner can't get hotter than that, and without it the burner's own
 // maximum). Set per fluid in the arcforge:burner_fuels data map
 // (data/<namespace>/data_maps/fluid/burner_fuels.json), so fuels can be added without code. Fluids not in
-// the map aren't fuel. Gasoline, Diesel, Kerosene and Refinery Gas take their heat and burn temperature from the
-// refineryFuels config instead of the map.
+// the map aren't fuel. Gasoline, Diesel, Kerosene, Refinery Gas and Natural Gas take their heat and burn temperature
+// from the refineryFuels config instead of the map; Sour Kerosene and Sour Diesel take their clean fuel's, scaled by
+// sourFuelHeatShare and sourFuelTemperatureDrop.
 public record BurnerFuel(int huPerMb, float mbPerTick, Optional<Integer> burnTemperature, boolean gasTurbine) {
     public static final Codec<BurnerFuel> CODEC = RecordCodecBuilder.create(i -> i.group(
             ExtraCodecs.POSITIVE_INT.fieldOf("hu_per_mb").forGetter(BurnerFuel::huPerMb),
@@ -60,6 +61,16 @@ public record BurnerFuel(int huPerMb, float mbPerTick, Optional<Integer> burnTem
         } else if (fluid == ModFluids.REFINERY_GAS.get()) {
             heat = ArcforgeConfig.REFINERY_GAS_HU_PER_MB;
             temperature = ArcforgeConfig.REFINERY_GAS_BURN_TEMPERATURE;
+        } else if (fluid == ModFluids.NATURAL_GAS.get()) {
+            heat = ArcforgeConfig.NATURAL_GAS_HU_PER_MB;
+            temperature = ArcforgeConfig.NATURAL_GAS_BURN_TEMPERATURE;
+        } else if (fluid == ModFluids.SOUR_DIESEL.get() || fluid == ModFluids.SOUR_KEROSENE.get()) {
+            boolean diesel = fluid == ModFluids.SOUR_DIESEL.get();
+            int clean = (diesel ? ArcforgeConfig.DIESEL_HU_PER_MB : ArcforgeConfig.KEROSENE_HU_PER_MB).getAsInt();
+            int celsius = (diesel ? ArcforgeConfig.DIESEL_BURN_TEMPERATURE : ArcforgeConfig.KEROSENE_BURN_TEMPERATURE).getAsInt();
+            int sourHeat = Math.max(1, (int) Math.round(clean * ArcforgeConfig.SOUR_FUEL_HEAT_SHARE.getAsDouble()));
+            int sourCelsius = Math.max(100, celsius - ArcforgeConfig.SOUR_FUEL_TEMPERATURE_DROP.getAsInt());
+            return new BurnerFuel(sourHeat, fuel.mbPerTick(), Optional.of(sourCelsius), false);
         } else {
             return fuel;
         }

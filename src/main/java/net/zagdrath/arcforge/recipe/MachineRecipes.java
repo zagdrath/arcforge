@@ -356,6 +356,11 @@ public final class MachineRecipes {
                 .anyMatch(holder -> holder.value().fluids().size() > index && holder.value().fluids().get(index).fluid().value() == fluid.getFluid());
     }
 
+    // Whether some recipe of this process takes this fluid as its second input.
+    public static boolean isRefiningSecondInput(@Nullable Level level, RefiningProcess process, FluidResource fluid) {
+        return !fluid.isEmpty() && recipes(level).byType(process.type()).stream().anyMatch(holder -> holder.value().takesSecond(fluid));
+    }
+
     // Items some recipe of this process uses as its catalyst.
     public static boolean isRefiningCatalyst(@Nullable Level level, RefiningProcess process, ItemStack stack) {
         return !stack.isEmpty() && recipes(level).byType(process.type()).stream().anyMatch(holder -> holder.value().isCatalyst(stack));

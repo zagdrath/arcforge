@@ -1,0 +1,25 @@
+{
+  "values": [
+    "#minecraft:base_stone_overworld",
+    "#c:ores",
+    "#minecraft:dirt",
+    "minecraft:gravel",
+    "minecraft:clay",
+    "minecraft:sand",
+    "minecraft:red_sand",
+    "minecraft:sandstone",
+    "minecraft:calcite",
+    "minecraft:dripstone_block",
+    "minecraft:smooth_basalt",
+    "minecraft:cobblestone",
+    "minecraft:cobbled_deepslate",
+    "minecraft:magma_block",
+    "minecraft:obsidian",
+    "minecraft:amethyst_block",
+    "minecraft:budding_amethyst",
+    "minecraft:sculk",
+    "minecraft:moss_block",
+    "minecraft:raw_iron_block",
+    "minecraft:raw_copper_block"
+  ]
+}

@@ -20,9 +20,9 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 
-// The refinery units' menu (176x186, the inventory 104 down), one for all four (see RefiningProcess): FE, heat and the
-// least temperature the recipe needs, the feed tank, up to three product tanks, and the catalyst and item output slots
-// where the unit has them.
+// The refinery units' menu (176x186, the inventory 104 down), one for all of them (see RefiningProcess): FE, heat and
+// the least temperature the recipe needs, the feed tank (and the second feed tank where the unit has one), up to three
+// product tanks, and the catalyst and item output slots where the unit has them.
 public class RefiningMenu extends MachineMenu {
     public static final int PRODUCTS = 3;
     public static final int DATA_ENERGY = 0;
@@ -46,7 +46,10 @@ public class RefiningMenu extends MachineMenu {
     public static final int DATA_STATUS = DATA_CATALYST_LIFE + 1;
     public static final int DATA_REDSTONE_MODE = DATA_STATUS + 1;
     public static final int DATA_SIDE_CONFIG = DATA_REDSTONE_MODE + 1;
-    public static final int DATA_VALUES = DATA_SIDE_CONFIG + 1;
+    public static final int DATA_SECOND_FLUID = DATA_SIDE_CONFIG + 1;
+    public static final int DATA_SECOND = DATA_SECOND_FLUID + 1;
+    public static final int DATA_SECOND_CAPACITY = DATA_SECOND + 1;
+    public static final int DATA_VALUES = DATA_SECOND_CAPACITY + 1;
     public static final int INVENTORY_Y = 104;
     public static final int CATALYST_X = 44, CATALYST_Y = 35;
     public static final int ITEM_X = 109, ITEM_Y = 35;
@@ -80,6 +83,9 @@ public class RefiningMenu extends MachineMenu {
             case REFORMING -> ModMenuTypes.CATALYTIC_REFORMER.get();
             case COKING -> ModMenuTypes.COKER.get();
             case BLENDING -> ModMenuTypes.LUBRICANT_BLENDER.get();
+            case HYDROTREATING -> ModMenuTypes.HYDROTREATER.get();
+            case SULFUR_RECOVERY -> ModMenuTypes.SULFUR_RECOVERY_UNIT.get();
+            case STEAM_REFORMING -> ModMenuTypes.STEAM_METHANE_REFORMER.get();
         };
     }
 
@@ -89,6 +95,9 @@ public class RefiningMenu extends MachineMenu {
             case REFORMING -> ModBlocks.CATALYTIC_REFORMER.get();
             case COKING -> ModBlocks.COKER.get();
             case BLENDING -> ModBlocks.LUBRICANT_BLENDER.get();
+            case HYDROTREATING -> ModBlocks.HYDROTREATER.get();
+            case SULFUR_RECOVERY -> ModBlocks.SULFUR_RECOVERY_UNIT.get();
+            case STEAM_REFORMING -> ModBlocks.STEAM_METHANE_REFORMER.get();
         };
     }
 
@@ -161,6 +170,18 @@ public class RefiningMenu extends MachineMenu {
 
     public int getFeedCapacity() {
         return value(DATA_FEED_CAPACITY);
+    }
+
+    public Fluid getSecondFluid() {
+        return ElectricPumpMenu.fluid(value(DATA_SECOND_FLUID));
+    }
+
+    public int getSecond() {
+        return value(DATA_SECOND);
+    }
+
+    public int getSecondCapacity() {
+        return value(DATA_SECOND_CAPACITY);
     }
 
     // What product tank i holds (Fluids.EMPTY when it's empty).

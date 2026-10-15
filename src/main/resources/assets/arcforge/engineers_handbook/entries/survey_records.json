@@ -1,0 +1,15 @@
+{
+  "title": "Survey Records",
+  "icon": "arcforge:survey_record",
+  "items": [
+    "arcforge:survey_record",
+    "arcforge:seismic_survey_tool",
+    "minecraft:paper"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Use the Seismic Survey Tool with Paper in your inventory and it uses one sheet to write a Survey Record of that chunk: its dimension and coordinates, the deposit's kind, the oil left at the time, whether it's sweet or sour and whether it has a gas cap. Hover over it to read it.\n# On a map\nRight-click a filled map with a Survey Record (pick the record up and right-click it onto the map in your inventory) to mark the spot with a small oil derrick, sized by the deposit's kind. The map's tooltip lists the marked deposits by kind and place."
+    }
+  ]
+}

@@ -210,6 +210,21 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity>> DIESEL_GENERATOR =
             BLOCK_ENTITY_TYPES.register("diesel_generator", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity::new, ModBlocks.DIESEL_GENERATOR_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity>> HYDROTREATER =
+            BLOCK_ENTITY_TYPES.register("hydrotreater", () -> new BlockEntityType<>((pos, state) ->
+                    new net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity(net.zagdrath.arcforge.recipe.RefiningProcess.HYDROTREATING, pos,
+                            state), ModBlocks.HYDROTREATER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity>> SULFUR_RECOVERY_UNIT =
+            BLOCK_ENTITY_TYPES.register("sulfur_recovery_unit", () -> new BlockEntityType<>((pos, state) ->
+                    new net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity(net.zagdrath.arcforge.recipe.RefiningProcess.SULFUR_RECOVERY, pos,
+                            state), ModBlocks.SULFUR_RECOVERY_UNIT.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity>> STEAM_METHANE_REFORMER =
+            BLOCK_ENTITY_TYPES.register("steam_methane_reformer", () -> new BlockEntityType<>((pos, state) ->
+                    new net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity(net.zagdrath.arcforge.recipe.RefiningProcess.STEAM_REFORMING, pos,
+                            state), ModBlocks.STEAM_METHANE_REFORMER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.GasWellheadBlockEntity>> GAS_WELLHEAD =
+            BLOCK_ENTITY_TYPES.register("gas_wellhead", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.machine.GasWellheadBlockEntity::new, ModBlocks.GAS_WELLHEAD.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity>> FLARE_STACK =
             BLOCK_ENTITY_TYPES.register("flare_stack", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity::new, ModBlocks.FLARE_STACK.get()));

@@ -37,6 +37,8 @@ public final class ItemInfoTooltips {
 
     @SubscribeEvent
     static void onTooltip(ItemTooltipEvent event) {
+        // A filled map names the oil deposits marked on it from Survey Records.
+        net.zagdrath.arcforge.item.tool.SurveyRecordItem.mapTooltip(event.getItemStack(), event.getToolTip());
         Identifier id = BuiltInRegistries.ITEM.getKey(event.getItemStack().getItem());
         if (!Arcforge.MODID.equals(id.getNamespace())) {
             return;

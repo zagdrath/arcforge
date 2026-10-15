@@ -1,0 +1,13 @@
+{
+  "title": "Steam Methane Reformer",
+  "icon": "arcforge:steam_methane_reformer",
+  "items": [
+    "arcforge:steam_methane_reformer"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Makes Hydrogen from Natural Gas and steam, far cheaper than the Electrolyzer.\n- 100 mB Natural Gas and 100 mB Steam make 100 mB Hydrogen and 25 mB Carbon Dioxide in 1 second, using 40 HU/t at 700°C or hotter.\n- Natural Gas and Steam in the top, heat into the bottom. Hydrogen leaves by the left, Carbon Dioxide by the right (a gas port); it pushes both out on its own.\n- Speed Upgrades make it faster.\nThe Carbon Dioxide can go to the Carbon Reclaimer or the Greenhouse, or a Flare Stack burns it off."
+    }
+  ]
+}

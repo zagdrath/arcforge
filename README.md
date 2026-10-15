@@ -395,7 +395,7 @@ straight to FE.
   both are open); the other is the exhaust. Block the intake and it shuts down. The intake's middle can't
   hold a port.
 - **Fuel.** Any `arcforge:burner_fuels` fuel not marked `"gas_turbine": false`: Naphtha, Light Oil, Kerosene,
-  Diesel, Ethanol, Hydrogen and Refinery Gas (Heavy Oil and Creosote are refused). 32,000 mB of tank per block of length, one fuel at a time;
+  Diesel, Ethanol, Hydrogen, Refinery Gas and Natural Gas (Heavy Oil, Creosote and the sour fuels are refused). 32,000 mB of tank per block of length, one fuel at a time;
   liquids through fluid conduits, Hydrogen through Pressurized Conduits.
 - **Output.** It burns up to 2,500 HU/t per block of length, at 1.5 FE per HU times the fuel's burn temperature
   over 1,200°C (at most 1). Its output cap is its full-throttle lubricated output, and its FE buffer 400 ticks of that:
@@ -406,6 +406,7 @@ straight to FE.
   | Light Oil | 312.5 | 28,125 | 90 |
   | Ethanol | 337.5 | 25,313 | 75 |
   | Hydrogen | 90 | 33,750 | 375 |
+  | Natural Gas | 82.5 | 33,750 | 409.1 |
 
 - **Throttle.** In the **Throttle** redstone mode the signal strength sets the fuel burned (signal 5 burns a
   third); the other modes run it flat out.

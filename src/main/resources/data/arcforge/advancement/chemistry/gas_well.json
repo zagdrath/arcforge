@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:chemistry/struck_oil",
+  "display": {
+    "icon": {
+      "id": "arcforge:gas_wellhead"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.gas_well.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.gas_well.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "gas_well"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

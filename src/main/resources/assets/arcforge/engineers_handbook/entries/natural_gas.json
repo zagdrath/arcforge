@@ -1,0 +1,18 @@
+{
+  "title": "Natural Gas",
+  "icon": "arcforge:gas_wellhead",
+  "items": [
+    "arcforge:gas_wellhead",
+    "arcforge:well_head"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "About a third of deposits (in config) have a gas cap: Natural Gas in an empty dome at the top of the cavern, over the oil. It holds 2,000 mB of gas for every block of the dome (in config). The Seismic Survey Tool tells you whether a deposit has one.\n# Gas wells\nAn Oil Derrick whose bore comes down into the dome strikes gas, not oil: its Well Head is a gas well. Put a Gas Wellhead on top of it; a Pumpjack can't go on a gas well."
+    },
+    {
+      "type": "text",
+      "text": "# Gas Wellhead\nThe gas flows under its own pressure, with no FE: 200 mB/t from a full cap, slowing in a straight line to 15% of that as the cap empties, then a trickle of 40 mB a second once it's spent (all in config).\n- It faces the way you were facing when you placed it; its flow line comes out of that side and pushes the gas out on its own, into a Pressurized Conduit.\n# Burning it\nNatural Gas burns in the Fuel Burner, the Firebox Array and the Gas Turbine Array: 55 HU/mB at 1 mB/t, up to 1,250°C ({fe:83} FE per mB in the Gas Turbine Array). Or turn it into cheap Hydrogen in a Steam Methane Reformer."
+    }
+  ]
+}

@@ -27,6 +27,10 @@ public final class GasTints {
     public static final int SYNGAS = 0xFFE2CCA4;
     // Refinery Gas: a faint dusty blue-grey, cooler than Syngas and warmer than Carbon Dioxide.
     public static final int REFINERY_GAS = 0xFFC2CCDA;
+    // Natural Gas: clear, so a clean pale blue, bluer and lighter than Refinery Gas. Hydrogen Sulfide: a sickly
+    // yellow-green, yellower than Chlorine and duller than Ammonia.
+    public static final int NATURAL_GAS = 0xFFC8E4F6;
+    public static final int HYDROGEN_SULFIDE = 0xFFC4CC6A;
 
     private GasTints() {}
 }

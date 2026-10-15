@@ -119,6 +119,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Refining(gui, RefiningProcess.REFORMING),
                 new MachineCategories.Refining(gui, RefiningProcess.COKING),
                 new MachineCategories.Refining(gui, RefiningProcess.BLENDING),
+                new MachineCategories.Refining(gui, RefiningProcess.HYDROTREATING),
+                new MachineCategories.Refining(gui, RefiningProcess.SULFUR_RECOVERY),
+                new MachineCategories.Refining(gui, RefiningProcess.STEAM_REFORMING),
                 new MachineCategories.Vulcanizing(gui),
                 new MachineCategories.ResinTap(gui),
                 new MachineCategories.AirSeparating(gui),
@@ -133,6 +136,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.ArcforgeSmelting(gui),
                 new MachineCategories.Distilling(gui),
                 new MachineCategories.OilDeposits(gui),
+                new MachineCategories.GasWells(gui),
                 new MachineCategories.OilDrilling(gui),
                 new MachineCategories.Steam(gui),
                 new MachineCategories.Superheating(gui),
@@ -194,6 +198,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.ArcforgeSmelting.TYPE, recipes(ModRecipes.ARCFORGE_SMELTING.get()));
         registration.addRecipes(MachineCategories.Distilling.TYPE, recipes(ModRecipes.DISTILLING.get()).stream()
                 .flatMap(holder -> MachineCategories.DistillingPage.of(holder).stream()).toList());
+        registration.addRecipes(MachineCategories.GasWells.TYPE, List.of(new MachineCategories.GasWellPage()));
         registration.addRecipes(MachineCategories.OilDeposits.TYPE,
                 java.util.Arrays.stream(net.zagdrath.arcforge.oil.DepositKind.values()).map(MachineCategories.DepositPage::new).toList());
         registration.addRecipes(MachineCategories.OilDrilling.TYPE, List.of(new MachineCategories.DrillingPage(64)));
@@ -294,10 +299,12 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 MachineCategories.Gasifying.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.FischerTropschReactorScreen.class, 64, 35, ARROW_W, ARROW_H,
                 MachineCategories.FischerTropsch.TYPE);
-        // The refining machines share a screen: its arrow shows all four processes.
+        // The refining machines share a screen: its arrow shows every process.
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.RefiningScreen.class, 64, 35, ARROW_W, ARROW_H,
                 MachineCategories.Refining.type(RefiningProcess.CRACKING), MachineCategories.Refining.type(RefiningProcess.REFORMING),
-                MachineCategories.Refining.type(RefiningProcess.COKING), MachineCategories.Refining.type(RefiningProcess.BLENDING));
+                MachineCategories.Refining.type(RefiningProcess.COKING), MachineCategories.Refining.type(RefiningProcess.BLENDING),
+                MachineCategories.Refining.type(RefiningProcess.HYDROTREATING), MachineCategories.Refining.type(RefiningProcess.SULFUR_RECOVERY),
+                MachineCategories.Refining.type(RefiningProcess.STEAM_REFORMING));
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.DieselGeneratorScreen.class, 31, 50, 114, 7,
                 MachineCategories.EngineFuels.TYPE);
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.machine.AirSeparatorScreen.class, 114, 35, ARROW_W, ARROW_H,
@@ -364,6 +371,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.REFORMING), ModBlocks.CATALYTIC_REFORMER.get());
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.COKING), ModBlocks.COKER.get());
         registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.BLENDING), ModBlocks.LUBRICANT_BLENDER.get());
+        registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.HYDROTREATING), ModBlocks.HYDROTREATER.get());
+        registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.SULFUR_RECOVERY), ModBlocks.SULFUR_RECOVERY_UNIT.get());
+        registration.addCraftingStation(MachineCategories.Refining.type(RefiningProcess.STEAM_REFORMING), ModBlocks.STEAM_METHANE_REFORMER.get());
         registration.addCraftingStation(MachineCategories.EngineFuels.TYPE, ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), ModBlocks.DIESEL_GENERATOR_CASING.get());
         registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
         registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());
@@ -388,6 +398,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.BatteryComponents.TYPE, ModBlocks.BATTERY_ARRAY_CONTROLLER.get(), ModBlocks.BATTERY_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.OilDeposits.TYPE, ModItems.SEISMIC_SURVEY_TOOL.get(), ModBlocks.PUMPJACK_CONTROLLER.get(),
                 ModBlocks.OIL_DERRICK_CONTROLLER.get());
+        registration.addCraftingStation(MachineCategories.GasWells.TYPE, ModBlocks.GAS_WELLHEAD.get(), ModItems.SEISMIC_SURVEY_TOOL.get());
         registration.addCraftingStation(MachineCategories.OilDrilling.TYPE, ModBlocks.OIL_DERRICK_CONTROLLER.get(), ModBlocks.DERRICK_CASING.get(),
                 ModBlocks.DERRICK_FRAME.get());
         registration.addCraftingStation(MachineCategories.Distilling.TYPE, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get(),

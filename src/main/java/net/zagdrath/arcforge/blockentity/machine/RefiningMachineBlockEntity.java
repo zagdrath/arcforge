@@ -49,14 +49,20 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The refinery's single-block downstream units (see RefiningCore for how they work): the Catalytic Reformer (Naphtha +
 // heat -> Gasoline + Hydrogen), the Coker (Bitumen + heat -> Petroleum Coke + Refinery Gas) and the Lubricant Blender
-// (Heavy Oil + FE -> Lubricant). The feed goes in through Input faces; liquid products (and the Coker's coke) come out
-// of Output faces and gases out of Gas Output faces, pushed out every tick (items with auto-eject); heat goes in
-// through Heat faces and FE through Energy faces. Speed upgrades make them faster; the Blender also takes Energy
-// upgrades.
+// (Heavy Oil + FE -> Lubricant), the Hydrotreater (Sour Kerosene or Sour Diesel + Hydrogen + heat + FE -> clean fuel +
+// Hydrogen Sulfide), the Sulfur Recovery Unit (Hydrogen Sulfide + Oxygen + heat -> Sulfur + Steam) and the Steam
+// Methane Reformer (Natural Gas + Steam + heat -> Hydrogen + Carbon Dioxide). The feeds go in through Input faces (both
+// feeds, where there are two; the second also through its own Hydrogen, Oxygen or Steam faces); liquid products (and
+// the Coker's coke, the Sulfur) come out of Output faces and gases out of Gas Output faces (the Steam Methane
+// Reformer's Hydrogen out of Hydrogen faces and only its Carbon Dioxide out of Gas Output faces), pushed out every tick
+// (items with auto-eject); heat goes in through Heat faces and FE through Energy faces. Speed upgrades make them
+// faster; the powered ones also take Energy upgrades.
 public class RefiningMachineBlockEntity extends MachineBlockEntity implements FluidInteractable {
     private final RefiningProcess process;
     private final RefiningCore core;
     private final ResourceHandler<ItemResource> itemOutput;
+    // What Input faces take: the feed, and the second feed where there is one.
+    private final ResourceHandler<FluidResource> inputs;
     private final ContainerData data;
 
     public RefiningMachineBlockEntity(RefiningProcess process, BlockPos pos, BlockState state) {
@@ -66,6 +72,8 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
         this.core = new RefiningCore(process, layout(process), items, () -> level, this::setChanged);
         int itemSlot = layout(process).itemSlot();
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == itemSlot);
+        ResourceHandler<FluidResource> second = core.secondFeedInput();
+        this.inputs = second != null ? new net.neoforged.neoforge.transfer.CombinedResourceHandler<>(core.feedInput(), second) : core.feedInput();
         this.data = menuData(core, access());
     }
 
@@ -74,6 +82,9 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
             case REFORMING -> ModBlockEntityTypes.CATALYTIC_REFORMER.get();
             case COKING -> ModBlockEntityTypes.COKER.get();
             case BLENDING -> ModBlockEntityTypes.LUBRICANT_BLENDER.get();
+            case HYDROTREATING -> ModBlockEntityTypes.HYDROTREATER.get();
+            case SULFUR_RECOVERY -> ModBlockEntityTypes.SULFUR_RECOVERY_UNIT.get();
+            case STEAM_REFORMING -> ModBlockEntityTypes.STEAM_METHANE_REFORMER.get();
             case CRACKING -> throw new IllegalArgumentException("The Cracking Unit is a multiblock");
         };
     }
@@ -91,6 +102,16 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
                     ArcforgeConfig.COKER_FEED_CAPACITY.getAsInt(), ArcforgeConfig.COKER_PRODUCT_CAPACITY.getAsInt());
             case BLENDING -> new RefiningCore.Layout(-1, -1, ArcforgeConfig.BLENDER_ENERGY_CAPACITY.getAsInt(), ArcforgeConfig.BLENDER_MAX_INPUT.getAsInt(),
                     0, 0, ArcforgeConfig.BLENDER_FEED_CAPACITY.getAsInt(), ArcforgeConfig.BLENDER_PRODUCT_CAPACITY.getAsInt());
+            case HYDROTREATING -> new RefiningCore.Layout(-1, -1, ArcforgeConfig.HYDROTREATER_ENERGY_CAPACITY.getAsInt(),
+                    ArcforgeConfig.HYDROTREATER_MAX_INPUT.getAsInt(), ArcforgeConfig.HYDROTREATER_HEAT_CAPACITY.getAsInt(),
+                    ArcforgeConfig.HYDROTREATER_MAX_TEMPERATURE.getAsInt(), ArcforgeConfig.HYDROTREATER_FEED_CAPACITY.getAsInt(),
+                    ArcforgeConfig.HYDROTREATER_PRODUCT_CAPACITY.getAsInt(), ArcforgeConfig.HYDROTREATER_SECOND_FEED_CAPACITY.getAsInt());
+            case SULFUR_RECOVERY -> new RefiningCore.Layout(-1, 0, 0, 0, ArcforgeConfig.SULFUR_RECOVERY_HEAT_CAPACITY.getAsInt(),
+                    ArcforgeConfig.SULFUR_RECOVERY_MAX_TEMPERATURE.getAsInt(), ArcforgeConfig.SULFUR_RECOVERY_FEED_CAPACITY.getAsInt(),
+                    ArcforgeConfig.SULFUR_RECOVERY_PRODUCT_CAPACITY.getAsInt(), ArcforgeConfig.SULFUR_RECOVERY_SECOND_FEED_CAPACITY.getAsInt());
+            case STEAM_REFORMING -> new RefiningCore.Layout(-1, -1, 0, 0, ArcforgeConfig.SMR_HEAT_CAPACITY.getAsInt(),
+                    ArcforgeConfig.SMR_MAX_TEMPERATURE.getAsInt(), ArcforgeConfig.SMR_FEED_CAPACITY.getAsInt(), ArcforgeConfig.SMR_PRODUCT_CAPACITY.getAsInt(),
+                    ArcforgeConfig.SMR_SECOND_FEED_CAPACITY.getAsInt());
             case CRACKING -> throw new IllegalArgumentException("The Cracking Unit is a multiblock");
         };
     }
@@ -99,18 +120,34 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
         return process.powered() ? EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY) : EnumSet.of(UpgradeType.SPEED);
     }
 
-    // Defaults (top, bottom, left, right, back, front): the feed into the top, heat into the bottom (FE into the back
-    // for the Blender), liquids and items out of the left, gases out of the right.
+    // Defaults (top, bottom, left, right, back, front): the feeds into the top, heat into the bottom (FE into the back
+    // for the Blender and the Hydrotreater, Oxygen into the back of the Sulfur Recovery Unit), liquids and items out of
+    // the left (the Steam Methane Reformer's Hydrogen), gases out of the right.
     private static SideConfig defaultSides(RefiningProcess process) {
         return switch (process) {
             case REFORMING, COKING -> new SideConfig(SideMode.INPUT, SideMode.HEAT, SideMode.OUTPUT, SideMode.GAS_OUTPUT, SideMode.NONE, SideMode.NONE);
+            case HYDROTREATING -> new SideConfig(SideMode.INPUT, SideMode.HEAT, SideMode.OUTPUT, SideMode.GAS_OUTPUT, SideMode.ENERGY, SideMode.NONE);
+            case SULFUR_RECOVERY -> new SideConfig(SideMode.INPUT, SideMode.HEAT, SideMode.OUTPUT, SideMode.GAS_OUTPUT, SideMode.OXYGEN, SideMode.NONE);
+            case STEAM_REFORMING -> new SideConfig(SideMode.INPUT, SideMode.HEAT, SideMode.HYDROGEN, SideMode.GAS_OUTPUT, SideMode.NONE, SideMode.NONE);
             default -> new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.OUTPUT, SideMode.NONE, SideMode.ENERGY, SideMode.NONE);
         };
     }
 
     private static List<SideMode> sideModes(RefiningProcess process) {
-        return process.powered() ? List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY)
-                : List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.GAS_OUTPUT, SideMode.HEAT);
+        return switch (process) {
+            case HYDROTREATING -> List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.GAS_OUTPUT, SideMode.HEAT, SideMode.ENERGY,
+                    SideMode.HYDROGEN);
+            case SULFUR_RECOVERY -> List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.GAS_OUTPUT, SideMode.HEAT, SideMode.OXYGEN);
+            case STEAM_REFORMING -> List.of(SideMode.NONE, SideMode.INPUT, SideMode.HYDROGEN, SideMode.GAS_OUTPUT, SideMode.HEAT, SideMode.STEAM);
+            default -> process.powered() ? List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY)
+                    : List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.GAS_OUTPUT, SideMode.HEAT);
+        };
+    }
+
+    // The Steam Methane Reformer gives its Hydrogen (product 0) out of Hydrogen faces and only its Carbon Dioxide out of
+    // Gas Output faces.
+    private boolean splitsHydrogen() {
+        return process == RefiningProcess.STEAM_REFORMING;
     }
 
     // A client-side copy of the slots, for the menu.
@@ -151,6 +188,9 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
                     case RefiningMenu.DATA_STATUS -> machine.statusOrdinal();
                     case RefiningMenu.DATA_REDSTONE_MODE -> machine.redstoneOrdinal();
                     case RefiningMenu.DATA_SIDE_CONFIG -> machine.sides();
+                    case RefiningMenu.DATA_SECOND_FLUID -> core.secondFeed() != null ? RefiningCore.fluidId(core.secondFeed()) : -1;
+                    case RefiningMenu.DATA_SECOND -> core.secondFeed() != null ? core.secondFeed().getAmount() : 0;
+                    case RefiningMenu.DATA_SECOND_CAPACITY -> core.secondFeed() != null ? core.secondFeed().getCapacity() : 0;
                     default -> 0;
                 };
             }
@@ -192,10 +232,16 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
         int rate = switch (process) {
             case REFORMING -> ArcforgeConfig.REFORMER_OUTPUT_RATE.getAsInt();
             case COKING -> ArcforgeConfig.COKER_OUTPUT_RATE.getAsInt();
+            case HYDROTREATING -> ArcforgeConfig.HYDROTREATER_OUTPUT_RATE.getAsInt();
+            case SULFUR_RECOVERY -> ArcforgeConfig.SULFUR_RECOVERY_OUTPUT_RATE.getAsInt();
+            case STEAM_REFORMING -> ArcforgeConfig.SMR_OUTPUT_RATE.getAsInt();
             default -> ArcforgeConfig.BLENDER_OUTPUT_RATE.getAsInt();
         };
-        for (SideMode mode : new SideMode[] { SideMode.OUTPUT, SideMode.GAS_OUTPUT }) {
-            ResourceHandler<FluidResource> source = mode == SideMode.OUTPUT ? core.liquidOutputs() : core.gasOutputs();
+        for (SideMode mode : new SideMode[] { SideMode.OUTPUT, SideMode.GAS_OUTPUT, SideMode.HYDROGEN }) {
+            ResourceHandler<FluidResource> source = output(mode);
+            if (source == null) {
+                continue;
+            }
             int budget = rate;
             for (Direction direction : Direction.values()) {
                 if (budget <= 0) {
@@ -206,6 +252,16 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
                 }
             }
         }
+    }
+
+    // What faces in an output mode give out, or null when that mode gives nothing out here.
+    private @Nullable ResourceHandler<FluidResource> output(SideMode mode) {
+        return switch (mode) {
+            case OUTPUT -> core.liquidOutputs();
+            case GAS_OUTPUT -> splitsHydrogen() ? core.productOutput(1) : core.gasOutputs();
+            case HYDROGEN -> splitsHydrogen() ? core.productOutput(0) : null;
+            default -> null;
+        };
     }
 
     // --- Capabilities. A null side is an internal/unsided query and sees the full automation view. ---
@@ -223,12 +279,13 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
         if (mode == null) {
             return core.all();
         }
-        return switch (mode) {
-            case INPUT -> core.feedInput();
-            case OUTPUT -> core.liquidOutputs();
-            case GAS_OUTPUT -> core.gasOutputs();
-            default -> null;
-        };
+        if (mode == SideMode.INPUT) {
+            return inputs;
+        }
+        if (mode == process.secondFeed()) {
+            return core.secondFeedInput();
+        }
+        return output(mode);
     }
 
     @Override
@@ -257,7 +314,11 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
         SideMode mode = modeFor(side);
         return switch (type) {
             case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case GAS -> mode == SideMode.GAS_OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            // Gases: on the units that take one (those with a second feed), the feeds come in through Input faces and the
+            // second feed's own faces.
+            case GAS -> mode == SideMode.GAS_OUTPUT || mode == SideMode.HYDROGEN && splitsHydrogen() ? ConnectionMode.OUTPUT
+                    : process.secondFeed() != null && (mode == SideMode.INPUT || mode == process.secondFeed()) ? ConnectionMode.INPUT
+                    : ConnectionMode.NONE;
             case ITEM -> process.makesItem() && mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY && core.energy() != null ? ConnectionMode.INPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT && core.heat() != null ? ConnectionMode.INPUT : ConnectionMode.NONE;
@@ -287,6 +348,9 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
             case REFORMING -> "catalytic_reformer";
             case COKING -> "coker";
             case BLENDING -> "lubricant_blender";
+            case HYDROTREATING -> "hydrotreater";
+            case SULFUR_RECOVERY -> "sulfur_recovery_unit";
+            case STEAM_REFORMING -> "steam_methane_reformer";
             case CRACKING -> "cracking_unit";
         };
     }

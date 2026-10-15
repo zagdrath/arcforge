@@ -11,6 +11,9 @@
     "arcforge:kerosene",
     "arcforge:diesel",
     "arcforge:refinery_gas",
-    "arcforge:gasoline"
+    "arcforge:gasoline",
+    "arcforge:sour_kerosene",
+    "arcforge:sour_diesel",
+    "arcforge:natural_gas"
   ]
 }

@@ -94,6 +94,39 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(lubricantProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LUBRICANT = FLUIDS.register("flowing_lubricant",
             () -> new BaseFlowingFluid.Flowing(lubricantProperties()));
+    // Sour crude: a deposit's sulfur shows in its oil. Sour Crude Oil is crude's dark brown with a yellowish cast, a
+    // little heavier; the Distillation Array splits it like Crude Oil, but its Kerosene and Diesel come out sour, to be
+    // cleaned in the Hydrotreater. Sour fuels burn poorly (see BurnerFuel) and engines refuse them.
+    public static final DeferredHolder<FluidType, FluidType> SOUR_CRUDE_OIL_TYPE = liquidType("sour_crude_oil", 920, 5_200, 0.015F, 0.55, 0.65);
+    public static final DeferredHolder<FluidType, FluidType> SOUR_KEROSENE_TYPE = liquidType("sour_kerosene", 810, 1_150, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<FluidType, FluidType> SOUR_DIESEL_TYPE = liquidType("sour_diesel", 850, 1_900, 0.02F, 0.75, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SOUR_CRUDE_OIL = FLUIDS.register("sour_crude_oil",
+            () -> new BaseFlowingFluid.Source(sourCrudeOilProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SOUR_CRUDE_OIL = FLUIDS.register("flowing_sour_crude_oil",
+            () -> new BaseFlowingFluid.Flowing(sourCrudeOilProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SOUR_KEROSENE = FLUIDS.register("sour_kerosene",
+            () -> new BaseFlowingFluid.Source(sourKeroseneProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SOUR_KEROSENE = FLUIDS.register("flowing_sour_kerosene",
+            () -> new BaseFlowingFluid.Flowing(sourKeroseneProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SOUR_DIESEL = FLUIDS.register("sour_diesel",
+            () -> new BaseFlowingFluid.Source(sourDieselProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SOUR_DIESEL = FLUIDS.register("flowing_sour_diesel",
+            () -> new BaseFlowingFluid.Flowing(sourDieselProperties()));
+    // Natural Gas, flowing from a deposit's gas cap through a Gas Wellhead: a fuel, and the Steam Methane Reformer's
+    // feed. Hydrogen Sulfide, what the Hydrotreater takes out of sour fuels: the Sulfur Recovery Unit turns it into
+    // Sulfur.
+    public static final DeferredHolder<FluidType, FluidType> NATURAL_GAS_TYPE = gasType("natural_gas", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> NATURAL_GAS = FLUIDS.register("natural_gas",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.NATURAL_GAS_TYPE, ModFluids.NATURAL_GAS, ModFluids.FLOWING_NATURAL_GAS)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NATURAL_GAS = FLUIDS.register("flowing_natural_gas",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.NATURAL_GAS_TYPE, ModFluids.NATURAL_GAS, ModFluids.FLOWING_NATURAL_GAS)));
+    public static final DeferredHolder<FluidType, FluidType> HYDROGEN_SULFIDE_TYPE = gasType("hydrogen_sulfide", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HYDROGEN_SULFIDE = FLUIDS.register("hydrogen_sulfide",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HYDROGEN_SULFIDE_TYPE, ModFluids.HYDROGEN_SULFIDE,
+                    ModFluids.FLOWING_HYDROGEN_SULFIDE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HYDROGEN_SULFIDE = FLUIDS.register("flowing_hydrogen_sulfide",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HYDROGEN_SULFIDE_TYPE, ModFluids.HYDROGEN_SULFIDE,
+                    ModFluids.FLOWING_HYDROGEN_SULFIDE)));
     // Refinery Gas: the lightest cut of Crude Oil, off the top of the column. A gas that burns in the Fuel Burner and
     // the Gas Turbine Array.
     public static final DeferredHolder<FluidType, FluidType> REFINERY_GAS_TYPE = gasType("refinery_gas", 293);
@@ -452,6 +485,39 @@ public final class ModFluids {
                 .slopeFindDistance(2)
                 .levelDecreasePerBlock(2)
                 .tickRate(25)
+                .explosionResistance(100.0F);
+    }
+
+    // As Crude Oil: spreads 2 blocks, every 25 ticks.
+    private static BaseFlowingFluid.Properties sourCrudeOilProperties() {
+        return new BaseFlowingFluid.Properties(SOUR_CRUDE_OIL_TYPE, SOUR_CRUDE_OIL, FLOWING_SOUR_CRUDE_OIL)
+                .bucket(ModItems.SOUR_CRUDE_OIL_BUCKET)
+                .block(ModBlocks.SOUR_CRUDE_OIL)
+                .slopeFindDistance(2)
+                .levelDecreasePerBlock(2)
+                .tickRate(25)
+                .explosionResistance(100.0F);
+    }
+
+    // As Kerosene.
+    private static BaseFlowingFluid.Properties sourKeroseneProperties() {
+        return new BaseFlowingFluid.Properties(SOUR_KEROSENE_TYPE, SOUR_KEROSENE, FLOWING_SOUR_KEROSENE)
+                .bucket(ModItems.SOUR_KEROSENE_BUCKET)
+                .block(ModBlocks.SOUR_KEROSENE)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
+    // As Diesel.
+    private static BaseFlowingFluid.Properties sourDieselProperties() {
+        return new BaseFlowingFluid.Properties(SOUR_DIESEL_TYPE, SOUR_DIESEL, FLOWING_SOUR_DIESEL)
+                .bucket(ModItems.SOUR_DIESEL_BUCKET)
+                .block(ModBlocks.SOUR_DIESEL)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
                 .explosionResistance(100.0F);
     }
 

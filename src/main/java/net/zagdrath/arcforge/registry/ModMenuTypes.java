@@ -164,6 +164,12 @@ public final class ModMenuTypes {
             net.zagdrath.arcforge.recipe.RefiningProcess.COKING);
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> LUBRICANT_BLENDER = refining("lubricant_blender",
             net.zagdrath.arcforge.recipe.RefiningProcess.BLENDING);
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> HYDROTREATER = refining("hydrotreater",
+            net.zagdrath.arcforge.recipe.RefiningProcess.HYDROTREATING);
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> SULFUR_RECOVERY_UNIT = refining("sulfur_recovery_unit",
+            net.zagdrath.arcforge.recipe.RefiningProcess.SULFUR_RECOVERY);
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.RefiningMenu>> STEAM_METHANE_REFORMER = refining("steam_methane_reformer",
+            net.zagdrath.arcforge.recipe.RefiningProcess.STEAM_REFORMING);
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.DieselGeneratorMenu>> DIESEL_GENERATOR =
             MENU_TYPES.register("diesel_generator", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.DieselGeneratorMenu::new));
 

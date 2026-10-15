@@ -212,6 +212,30 @@ final class DistillationGameTests {
                 .thenSucceed();
     }
 
+    // Sour Crude Oil distils like Crude Oil, but its Diesel and Kerosene come out sour.
+    static void sourCrudeFractions(GameTestHelper helper) {
+        BlockPos ten = new BlockPos(0, 1, 0);
+        buildColumn(helper, ten, 10, 1, Direction.NORTH);
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    DistillationArrayBlockEntity column = controller(helper, ten, 1);
+                    helper.assertTrue(SteamGameTests.fill(column.getFluidHandler(null), FluidResource.of(ModFluids.SOUR_CRUDE_OIL.get()), 1_000) == 1_000,
+                            "The column didn't take Sour Crude Oil");
+                    column.getHeat().add(column.getHeat().getCapacity());
+                })
+                .thenIdle(90)
+                .thenExecute(() -> {
+                    DistillationArrayBlockEntity column = controller(helper, ten, 1);
+                    helper.assertTrue(column.getProduct(Product.DIESEL).getAmount() == 250 && column.getProduct(Product.KEROSENE).getAmount() == 150
+                            && column.getProduct(Product.NAPHTHA).getAmount() == 200, "Sour Crude made the wrong fractions");
+                    helper.assertTrue(column.getProduct(Product.DIESEL).getResource(0).is(ModFluids.SOUR_DIESEL.get())
+                            && column.getProduct(Product.KEROSENE).getResource(0).is(ModFluids.SOUR_KEROSENE.get())
+                            && column.getProduct(Product.NAPHTHA).getResource(0).is(ModFluids.NAPHTHA.get()), "Its Diesel and Kerosene aren't sour");
+                })
+                .thenSucceed();
+    }
+
     // Superheated steam raises naphtha by 50%, out of the heavy oil (6 high: 375 / 325), and uses 100 mB a batch.
     static void steamStripping(GameTestHelper helper) {
         BlockPos min = new BlockPos(0, 1, 0);

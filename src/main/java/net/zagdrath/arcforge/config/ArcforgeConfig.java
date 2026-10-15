@@ -373,8 +373,8 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.comment("The refinery's fuels in the Fuel Burner, Firebox Array and Gas Turbine Array: the heat each mB gives (HU) and",
-                "how hot it burns (°C). These override the arcforge:burner_fuels data map for these four fluids (how fast",
-                "they burn still comes from it).").push("refineryFuels");
+                "how hot it burns (°C). These override the arcforge:burner_fuels data map for these fluids (how fast they",
+                "burn still comes from it).").push("refineryFuels");
     }
 
     public static final ModConfigSpec.IntValue GASOLINE_HU_PER_MB = BUILDER
@@ -408,6 +408,23 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue REFINERY_GAS_BURN_TEMPERATURE = BUILDER
             .comment("Refinery Gas: burn temperature in °C.")
             .defineInRange("refineryGasBurnTemperature", 1_200, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue NATURAL_GAS_HU_PER_MB = BUILDER
+            .comment("Natural Gas (from a Gas Wellhead): HU per mB. It burns 1 mB/t in the Fuel Burner, as a gas.")
+            .defineInRange("naturalGasHeatPerMb", 55, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue NATURAL_GAS_BURN_TEMPERATURE = BUILDER
+            .comment("Natural Gas: burn temperature in °C.")
+            .defineInRange("naturalGasBurnTemperature", 1_250, 100, 10_000);
+
+    public static final ModConfigSpec.DoubleValue SOUR_FUEL_HEAT_SHARE = BUILDER
+            .comment("Sour Kerosene and Sour Diesel give this share of their clean fuel's heat per mB in burners (the Gas Turbine",
+                    "Array, the Diesel Generator and the Jetpack refuse them).")
+            .defineInRange("sourFuelHeatShare", 0.75, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue SOUR_FUEL_TEMPERATURE_DROP = BUILDER
+            .comment("...and burn this many °C cooler than it.")
+            .defineInRange("sourFuelTemperatureDrop", 100, 0, 10_000);
 
     static {
         BUILDER.pop();
@@ -1612,6 +1629,125 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Hydrotreater: Sour Kerosene or Sour Diesel + Hydrogen + heat + FE -> clean Kerosene or Diesel and Hydrogen Sulfide.",
+                "Recipes are data-driven (arcforge:hydrotreating). Fuels come out of Output faces, Hydrogen Sulfide out of Gas Output faces.").push("hydrotreater");
+    }
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 50_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 10_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 20_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full heat buffer.")
+            .defineInRange("bufferMaxTemperature", 700, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_TIME = BUILDER
+            .comment("Ticks per operation for recipes that don't set their own time, before Speed upgrades.")
+            .defineInRange("time", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_FEED_CAPACITY = BUILDER
+            .comment("Feed tank size in mB.")
+            .defineInRange("feedTankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_SECOND_FEED_CAPACITY = BUILDER
+            .comment("Hydrogen tank size in mB.")
+            .defineInRange("secondFeedTankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_PRODUCT_CAPACITY = BUILDER
+            .comment("Each product tank's size in mB.")
+            .defineInRange("productTankCapacity", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue HYDROTREATER_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each product it pushes out of its faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Sulfur Recovery Unit (the Claus process): Hydrogen Sulfide + Oxygen + heat -> Sulfur and Steam. Recipes are",
+                "data-driven (arcforge:sulfur_recovery). The Sulfur comes out of Output faces, the Steam out of Gas Output faces.").push("sulfurRecoveryUnit");
+    }
+
+    public static final ModConfigSpec.IntValue SULFUR_RECOVERY_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 20_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SULFUR_RECOVERY_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full heat buffer.")
+            .defineInRange("bufferMaxTemperature", 700, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue SULFUR_RECOVERY_TIME = BUILDER
+            .comment("Ticks per operation for recipes that don't set their own time, before Speed upgrades.")
+            .defineInRange("time", 40, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue SULFUR_RECOVERY_FEED_CAPACITY = BUILDER
+            .comment("Feed tank size in mB.")
+            .defineInRange("feedTankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SULFUR_RECOVERY_SECOND_FEED_CAPACITY = BUILDER
+            .comment("Oxygen tank size in mB.")
+            .defineInRange("secondFeedTankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SULFUR_RECOVERY_PRODUCT_CAPACITY = BUILDER
+            .comment("Each product tank's size in mB.")
+            .defineInRange("productTankCapacity", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SULFUR_RECOVERY_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each product it pushes out of its faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Steam Methane Reformer: Natural Gas + Steam + heat (700°C or hotter) -> Hydrogen and Carbon Dioxide, much cheaper",
+                "Hydrogen than the Electrolyzer. Recipes are data-driven (arcforge:steam_reforming). Both gases come out of Gas Output faces.").push("steamMethaneReformer");
+    }
+
+    public static final ModConfigSpec.IntValue SMR_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size in HU.")
+            .defineInRange("heatCapacity", 20_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SMR_MAX_TEMPERATURE = BUILDER
+            .comment("°C of a full heat buffer.")
+            .defineInRange("bufferMaxTemperature", 1000, 100, 10_000);
+
+    public static final ModConfigSpec.IntValue SMR_TIME = BUILDER
+            .comment("Ticks per operation for recipes that don't set their own time, before Speed upgrades.")
+            .defineInRange("time", 20, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue SMR_FEED_CAPACITY = BUILDER
+            .comment("Feed tank size in mB.")
+            .defineInRange("feedTankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SMR_SECOND_FEED_CAPACITY = BUILDER
+            .comment("Steam tank size in mB.")
+            .defineInRange("secondFeedTankCapacity", 16_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SMR_PRODUCT_CAPACITY = BUILDER
+            .comment("Each product tank's size in mB.")
+            .defineInRange("productTankCapacity", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue SMR_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of each product it pushes out of its faces.")
+            .defineInRange("fluidOutputRate", 500, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.comment("Flare Stack: burns off any gas pushed into it (through any face but the top), so a refinery never stalls when a",
                 "gas tank fills. Its flame shows at the top of its stack, as big as it burns.").push("flareStack");
     }
@@ -1623,6 +1759,36 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue FLARE_TANK_CAPACITY = BUILDER
             .comment("Its gas tank (what's waiting to burn), in mB.")
             .defineInRange("tankCapacity", 4_000, 100, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Gas Wellhead: fitted on a Well Head drilled into a deposit's gas cap, it flows Natural Gas under the cap's own",
+                "pressure, with no FE: fastest from a full cap, slower as it empties, and a trickle once it's spent.").push("gasWellhead");
+    }
+
+    public static final ModConfigSpec.IntValue GAS_WELLHEAD_RATE = BUILDER
+            .comment("Natural Gas it flows from a full gas cap, in mB/t.")
+            .defineInRange("flowPerTick", 200, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue GAS_WELLHEAD_MIN_SHARE = BUILDER
+            .comment("The share of that rate it still flows from a cap that's nearly spent (it slows in a straight line from full to",
+                    "this).")
+            .defineInRange("minShare", 0.15, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue GAS_WELLHEAD_TRICKLE = BUILDER
+            .comment("Natural Gas per second a spent gas cap still gives, in mB.")
+            .defineInRange("tricklePerSecond", 40, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue GAS_WELLHEAD_TANK_CAPACITY = BUILDER
+            .comment("Its gas tank, in mB.")
+            .defineInRange("tankCapacity", 8_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue GAS_WELLHEAD_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t it pushes out of its flow line.")
+            .defineInRange("outputRate", 1_000, 1, 1_000_000);
 
     static {
         BUILDER.pop();
@@ -3456,6 +3622,40 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue SURVEY_COOLDOWN = BUILDER
             .comment("Ticks before the Seismic Survey Tool can be used again.")
             .defineInRange("surveyCooldown", 40, 0, 1_200);
+
+    public static final ModConfigSpec.BooleanValue OIL_CAVERNS = BUILDER
+            .comment("Whether deposits are real caverns of oil underground in newly generated chunks: a sealed, flattened cavern",
+                    "(about twice as wide as it is tall) inside a 2-block shell of stone or deepslate, holding roughly a Crude Oil",
+                    "source block per bucket the deposit holds, its level falling as it's drained. Off, deposits stay invisible, as",
+                    "in chunks generated before caverns existed.")
+            .define("caverns", true);
+
+    public static final ModConfigSpec.DoubleValue OIL_SOUR_CHANCE = BUILDER
+            .comment("Chance that a deposit is sour (high in sulfur): it gives Sour Crude Oil.")
+            .defineInRange("sourChance", 0.3, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue OIL_SOUR_RICH_CHANCE = BUILDER
+            .comment("The same in regions whose middle is in an arcforge:sour_rich biome (badlands and deserts).")
+            .defineInRange("sourRichChance", 0.6, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue OIL_GAS_CAP_CHANCE = BUILDER
+            .comment("Chance that a deposit has a gas cap: Natural Gas in an empty dome over the oil (the top fifth of its",
+                    "cavern), tapped by drilling into it and fitting a Gas Wellhead.")
+            .defineInRange("gasCapChance", 0.35, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue OIL_GAS_PER_BLOCK = BUILDER
+            .comment("Natural Gas a gas cap holds per block of its dome, in mB (times amountMultiplier).")
+            .defineInRange("gasPerBlock", 2_000, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue OIL_SEEP_CHANCE = BUILDER
+            .comment("Chance that an Oil Seep or Oil Pocket under a desert or badlands shows itself at the surface with a small",
+                    "tar pit of Crude Oil.")
+            .defineInRange("surfaceSeepChance", 0.5, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue OIL_CAVERN_CHECK_INTERVAL = BUILDER
+            .comment("Ticks between checks of each loaded cavern chunk for oil taken out of it by other means (buckets, other mods'",
+                    "pumps), which the deposit loses at 1,000 mB a source block.")
+            .defineInRange("cavernCheckInterval", 100, 20, 12_000);
 
     static {
         BUILDER.pop();

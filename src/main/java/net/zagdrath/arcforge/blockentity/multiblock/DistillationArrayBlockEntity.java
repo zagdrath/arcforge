@@ -103,24 +103,41 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
     public enum Product {
         REFINERY_GAS("refinery_gas", SideMode.REFINERY_GAS, ModFluids.REFINERY_GAS),
         NAPHTHA("naphtha", SideMode.NAPHTHA, ModFluids.NAPHTHA),
-        KEROSENE("kerosene", SideMode.KEROSENE, ModFluids.KEROSENE),
+        KEROSENE("kerosene", SideMode.KEROSENE, ModFluids.KEROSENE, ModFluids.SOUR_KEROSENE),
         LIGHT_OIL("light_oil", SideMode.LIGHT_OIL, ModFluids.LIGHT_OIL),
-        DIESEL("diesel", SideMode.DIESEL, ModFluids.DIESEL),
+        DIESEL("diesel", SideMode.DIESEL, ModFluids.DIESEL, ModFluids.SOUR_DIESEL),
         HEAVY_OIL("heavy_oil", SideMode.HEAVY_OIL, ModFluids.HEAVY_OIL),
         BITUMEN("bitumen", SideMode.BITUMEN, ModFluids.BITUMEN);
 
         public final String key;
         public final SideMode mode;
         private final Supplier<? extends Fluid> fluid;
+        // Kerosene and Diesel come out sour from Sour Crude Oil, into the same tank (one at a time).
+        private final @Nullable Supplier<? extends Fluid> sour;
 
         Product(String key, SideMode mode, Supplier<? extends Fluid> fluid) {
+            this(key, mode, fluid, null);
+        }
+
+        Product(String key, SideMode mode, Supplier<? extends Fluid> fluid, @Nullable Supplier<? extends Fluid> sour) {
             this.key = key;
             this.mode = mode;
             this.fluid = fluid;
+            this.sour = sour;
         }
 
         public Fluid fluid() {
             return fluid.get();
+        }
+
+        // The sour form when sour and it has one, else its own.
+        public Fluid fluid(boolean sour) {
+            return sour && this.sour != null ? this.sour.get() : fluid.get();
+        }
+
+        // Whether its tank takes this fluid: its own, or its sour form.
+        public boolean accepts(Fluid other) {
+            return other.isSame(fluid()) || sour != null && other.isSame(sour.get());
         }
 
         // A gas: it leaves the top of the column for the condensers, not a tray.
@@ -130,7 +147,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
 
         public static @Nullable Product of(Fluid fluid) {
             for (Product product : values()) {
-                if (fluid.isSame(product.fluid())) {
+                if (product.accepts(fluid)) {
                     return product;
                 }
             }
@@ -199,7 +216,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         all.add(feedInput);
         all.add(steamInput);
         for (Product product : Product.values()) {
-            FilteredFluidTank tank = new FilteredFluidTank(output, resource -> resource.is(product.fluid()), this::setChanged);
+            FilteredFluidTank tank = new FilteredFluidTank(output, resource -> !resource.isEmpty() && product.accepts(resource.getFluid()), this::setChanged);
             products.put(product, tank);
             ResourceHandler<FluidResource> out = new AutomationResourceHandler<>(tank, index -> false, index -> true);
             productOutputs.put(product, out);
@@ -236,6 +253,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
                     case DistillationArrayMenu.DATA_STATUS -> status.ordinal();
                     case DistillationArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case DistillationArrayMenu.DATA_SIDE_CONFIG -> packedSides();
+                    case DistillationArrayMenu.DATA_SOUR -> sourBits();
                     default -> 0;
                 };
             }
@@ -434,6 +452,25 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         key[all.length + 1] = makes();
         key[all.length + 2] = heat.getTemperature() / 25;
         return key;
+    }
+
+    // A bit per product whose tank holds its sour form (see Product), for the GUI.
+    private int sourBits() {
+        int bits = 0;
+        for (Product product : Product.values()) {
+            FilteredFluidTank tank = products.get(product);
+            if (tank.getAmount() > 0 && !tank.getResource(0).getFluid().isSame(product.fluid())) {
+                bits |= 1 << product.ordinal();
+            }
+        }
+        return bits;
+    }
+
+    // What a product's tank shows: what's in it, or the product's own fluid while it's empty (the client knows the
+    // tanks from the update tag).
+    public Fluid shownFluid(Product product) {
+        FilteredFluidTank tank = products.get(product);
+        return tank.getAmount() > 0 ? tank.getResource(0).getFluid() : product.fluid();
     }
 
     // Client side: a product's pool fill (0..1) to draw this frame, closing share of the gap to the synced amount.

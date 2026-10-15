@@ -64,12 +64,13 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
-// The Pumpjack (see OilfieldStructures.Unit), run by its controller. Built on a Well Head, it pumps Crude Oil out of
-// the deposit under it (see OilDeposits) with pumpjack.energyPerTick FE/t: pumpPerTick mB/t from a full deposit,
-// slowing in a straight line to minShare of that as it drains; a drained deposit still gives tricklePerSecond mB/s, for
-// good. Several pumpjacks on one deposit share it. Its Crude Oil leaves through Output ports (pushed every few ticks)
-// or into buckets in its bucket slot; FE comes in through Energy ports. The beam rocks as fast as it pumps (see
-// PumpjackRenderer).
+// The Pumpjack (see OilfieldStructures.Unit), run by its controller. Built on a Well Head (not a gas well), it pumps
+// Crude Oil (Sour Crude Oil from a sour deposit, in chunks generated with caverns) out of the deposit under it (see
+// OilDeposits): from the whole deposit, so from all of a cavern, whose oil level falls to match (see OilCaverns). It
+// takes pumpjack.energyPerTick FE/t: pumpPerTick mB/t from a full deposit, slowing in a straight line to minShare of
+// that as it drains; a drained deposit still gives tricklePerSecond mB/s, for good. Several pumpjacks on one deposit
+// share it. Its Crude Oil leaves through Output ports (pushed every few ticks) or into buckets in its bucket slot; FE
+// comes in through Energy ports. The beam rocks as fast as it pumps (see PumpjackRenderer).
 public class PumpjackBlockEntity extends MachineBlockEntity implements ShapedPlant {
     public static final int SLOT_BUCKET_IN = 0, SLOT_BUCKET_OUT = 1;
     public static final int MACHINE_SLOTS = 2;
@@ -109,7 +110,7 @@ public class PumpjackBlockEntity extends MachineBlockEntity implements ShapedPla
                 new SideConfig(SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE), SIDE_MODES);
         this.energy = new ConsumerEnergyHandler(ArcforgeConfig.PUMPJACK_ENERGY_CAPACITY.getAsInt(), ArcforgeConfig.PUMPJACK_MAX_INPUT.getAsInt(),
                 this::setChanged);
-        this.crude = new FilteredFluidTank(ArcforgeConfig.PUMPJACK_TANK_CAPACITY.getAsInt(), resource -> resource.is(ModFluids.CRUDE_OIL.get()),
+        this.crude = new FilteredFluidTank(ArcforgeConfig.PUMPJACK_TANK_CAPACITY.getAsInt(), resource -> resource.is(ModFluids.CRUDE_OIL.get()) || resource.is(ModFluids.SOUR_CRUDE_OIL.get()),
                 this::setChanged);
         this.crudeOutput = new AutomationResourceHandler<>(crude, index -> false, index -> true);
         this.bucketAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_BUCKET_IN, slot -> slot == SLOT_BUCKET_OUT);
@@ -129,6 +130,7 @@ public class PumpjackBlockEntity extends MachineBlockEntity implements ShapedPla
                     case PumpjackMenu.DATA_STATUS -> status.ordinal();
                     case PumpjackMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case PumpjackMenu.DATA_SIDE_CONFIG -> packedSides();
+                    case PumpjackMenu.DATA_SOUR -> oil() == ModFluids.SOUR_CRUDE_OIL.get() ? 1 : 0;
                     default -> 0;
                 };
             }
@@ -142,6 +144,21 @@ public class PumpjackBlockEntity extends MachineBlockEntity implements ShapedPla
     // A client-side copy of the slots, for the menu.
     public static MachineItemHandler clientItems() {
         return new MachineItemHandler(MACHINE_SLOTS, PumpjackBlockEntity::isItemValid, UPGRADES, () -> {});
+    }
+
+    // What it pumps (or has in its tank): Sour Crude Oil from a sour deposit in chunks generated with caverns, else
+    // Crude Oil.
+    private net.minecraft.world.level.material.Fluid oil() {
+        if (crude.getAmount() > 0) {
+            return crude.getResource(0).getFluid();
+        }
+        if (level instanceof ServerLevel serverLevel && unit != null) {
+            OilDeposits.Deposit deposit = OilDeposits.at(serverLevel, unit.well());
+            if (deposit != null) {
+                return OilDeposits.oilAt(serverLevel, deposit, unit.well());
+            }
+        }
+        return ModFluids.CRUDE_OIL.get();
     }
 
     // The deposit under it, for the GUI: {kind + 1 (0 for none), buckets left (rounded up, so 0 means drained), buckets
@@ -325,12 +342,13 @@ public class PumpjackBlockEntity extends MachineBlockEntity implements ShapedPla
                 long taken = deposits.take(deposit, whole);
                 whole = (int) Math.max(taken, Math.min(whole, Math.round(trickle)));
             }
+            net.minecraft.world.level.material.Fluid oil = OilDeposits.oilAt(level, deposit, unit.well());
             try (Transaction tx = Transaction.openRoot()) {
-                whole = crude.insert(0, FluidResource.of(ModFluids.CRUDE_OIL.get()), whole, tx);
+                whole = crude.insert(0, FluidResource.of(oil), whole, tx);
                 tx.commit();
             }
-            controlState.completed(List.of(), List.of(new FluidStack(ModFluids.CRUDE_OIL.get(), whole)), 0, 0);
-            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.CRUDE_OIL.get(), null);
+            controlState.completed(List.of(), List.of(new FluidStack(oil, whole)), 0, 0);
+            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, oil, null);
         }
         setChanged();
         return MachineStatus.PUMPING;

@@ -68,7 +68,7 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
                 x, y, STEAM_X, TANK_Y, TANK_W, TANK_H);
         for (Product product : Product.values()) {
             int tankX = productX(product);
-            drawFluidTank(graphics, product.fluid(), menu.getProduct(product), menu.getOutputCapacity(), productFill, productGauge,
+            drawFluidTank(graphics, menu.getProductFluid(product), menu.getProduct(product), menu.getOutputCapacity(), productFill, productGauge,
                     x, y, tankX, TANK_Y, PRODUCT_W, TANK_H);
             if (!menu.makes(product) && menu.getProduct(product) <= 0) {
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, locked, x + tankX, y + TANK_Y, PRODUCT_W, TANK_H);
@@ -141,7 +141,7 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
 
     // A product the column doesn't make (at its height, from its feed) says so instead of showing an empty tank.
     private void addOutputTooltip(List<Component> lines, Product product) {
-        Fluid fluid = product.fluid();
+        Fluid fluid = menu.getProductFluid(product);
         int amount = menu.getProduct(product);
         addFluidTooltip(lines, fluid, fluid.getFluidType().getDescription(), amount, menu.getOutputCapacity());
         if (!menu.makes(product)) {

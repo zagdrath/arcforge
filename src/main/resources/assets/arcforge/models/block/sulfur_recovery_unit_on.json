@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/sulfur_recovery_unit_front_on",
+    "south": "arcforge:block/sulfur_recovery_unit_back",
+    "east": "arcforge:block/sulfur_recovery_unit_left",
+    "west": "arcforge:block/sulfur_recovery_unit_right",
+    "up": "arcforge:block/sulfur_recovery_unit_top",
+    "down": "arcforge:block/sulfur_recovery_unit_bottom",
+    "particle": "arcforge:block/sulfur_recovery_unit_back"
+  }
+}

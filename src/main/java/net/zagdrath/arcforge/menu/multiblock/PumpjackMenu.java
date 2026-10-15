@@ -36,7 +36,9 @@ public class PumpjackMenu extends MachineMenu {
     public static final int DATA_STATUS = 9;
     public static final int DATA_REDSTONE_MODE = 10;
     public static final int DATA_SIDE_CONFIG = 11;
-    public static final int DATA_VALUES = 12;
+    // 1 when its tank holds (or, empty, its deposit gives) Sour Crude Oil.
+    public static final int DATA_SOUR = 12;
+    public static final int DATA_VALUES = 13;
 
     // Slot positions as the Electric Pump's.
     public static final int BUCKET_IN_X = 133, BUCKET_IN_Y = 19;
@@ -91,6 +93,11 @@ public class PumpjackMenu extends MachineMenu {
 
     public int getCrudeCapacity() {
         return value(DATA_CRUDE_CAPACITY);
+    }
+
+    // What it pumps: Crude Oil or Sour Crude Oil.
+    public net.minecraft.world.level.material.Fluid getOil() {
+        return value(DATA_SOUR) != 0 ? net.zagdrath.arcforge.registry.ModFluids.SOUR_CRUDE_OIL.get() : net.zagdrath.arcforge.registry.ModFluids.CRUDE_OIL.get();
     }
 
     public double getRate() {

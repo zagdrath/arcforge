@@ -671,6 +671,37 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> BITUMEN = BLOCKS.registerBlock("bitumen",
             p -> new LiquidBlock(ModFluids.BITUMEN.get(), p) {},
             p -> liquidProperties(p, MapColor.COLOR_BLACK));
+    // Sour Crude Oil, like Crude Oil, never burns (so an oil cavern can't set a cave system alight); the sour fuels burn
+    // where they lie, a little less readily than the clean ones.
+    public static final DeferredBlock<LiquidBlock> SOUR_CRUDE_OIL = BLOCKS.registerBlock("sour_crude_oil",
+            p -> new LiquidBlock(ModFluids.SOUR_CRUDE_OIL.get(), p) {},
+            p -> liquidProperties(p, MapColor.COLOR_BLACK));
+    public static final DeferredBlock<LiquidBlock> SOUR_KEROSENE = BLOCKS.registerBlock("sour_kerosene",
+            p -> new LiquidBlock(ModFluids.SOUR_KEROSENE.get(), p) {
+                @Override
+                public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 200;
+                }
+
+                @Override
+                public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 40;
+                }
+            },
+            p -> liquidProperties(p, MapColor.TERRACOTTA_LIGHT_GREEN));
+    public static final DeferredBlock<LiquidBlock> SOUR_DIESEL = BLOCKS.registerBlock("sour_diesel",
+            p -> new LiquidBlock(ModFluids.SOUR_DIESEL.get(), p) {
+                @Override
+                public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 150;
+                }
+
+                @Override
+                public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
+                    return 20;
+                }
+            },
+            p -> liquidProperties(p, MapColor.TERRACOTTA_GREEN));
     // Gasoline burns where it lies, faster than anything; Lubricant doesn't.
     public static final DeferredBlock<LiquidBlock> GASOLINE = BLOCKS.registerBlock("gasoline",
             p -> new LiquidBlock(ModFluids.GASOLINE.get(), p) {
@@ -784,6 +815,22 @@ public final class ModBlocks {
             "diesel_generator_controller",
             p -> new net.zagdrath.arcforge.block.multiblock.OilfieldControllerBlock(p, net.zagdrath.arcforge.multiblock.PlantKind.DIESEL_GENERATOR),
             p -> columnProperties(p).dynamicShape().forceSolidOn());
+    // Sour crude and natural gas: the Hydrotreater, the Sulfur Recovery Unit and the Steam Methane Reformer (single
+    // refining blocks), and the Gas Wellhead, fitted on a gas well.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.RefiningMachineBlock> HYDROTREATER = BLOCKS.registerBlock(
+            "hydrotreater", p -> new net.zagdrath.arcforge.block.machine.RefiningMachineBlock(p, net.zagdrath.arcforge.recipe.RefiningProcess.HYDROTREATING),
+            p -> machineProperties(p, 6));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.RefiningMachineBlock> SULFUR_RECOVERY_UNIT = BLOCKS.registerBlock(
+            "sulfur_recovery_unit",
+            p -> new net.zagdrath.arcforge.block.machine.RefiningMachineBlock(p, net.zagdrath.arcforge.recipe.RefiningProcess.SULFUR_RECOVERY),
+            p -> machineProperties(p, 9));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.RefiningMachineBlock> STEAM_METHANE_REFORMER = BLOCKS.registerBlock(
+            "steam_methane_reformer",
+            p -> new net.zagdrath.arcforge.block.machine.RefiningMachineBlock(p, net.zagdrath.arcforge.recipe.RefiningProcess.STEAM_REFORMING),
+            p -> machineProperties(p, 10));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.GasWellheadBlock> GAS_WELLHEAD = BLOCKS.registerBlock("gas_wellhead",
+            net.zagdrath.arcforge.block.machine.GasWellheadBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL).noOcclusion());
     public static final DeferredBlock<net.zagdrath.arcforge.block.machine.FlareStackBlock> FLARE_STACK = BLOCKS.registerBlock("flare_stack",
             net.zagdrath.arcforge.block.machine.FlareStackBlock::new,
             p -> p.mapColor(MapColor.METAL).strength(3.5F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)

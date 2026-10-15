@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PBP",
+    "CKT",
+    "PFP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "B": "minecraft:bricks",
+    "C": "arcforge:wrought_pressurized_cylinder",
+    "K": "arcforge:thermocouple",
+    "T": "arcforge:wrought_fluid_tank",
+    "F": "arcforge:firebox"
+  },
+  "result": {
+    "id": "arcforge:sulfur_recovery_unit",
+    "count": 1
+  }
+}

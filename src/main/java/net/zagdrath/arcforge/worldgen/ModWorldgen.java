@@ -44,6 +44,8 @@ import net.zagdrath.arcforge.machine.ClimateHelper;
 //   placement arcforge:config_height        "ore", "shape" (uniform or trapezoid), "default_min", "default_max":
 //                                           a height between the config's minY and maxY
 //   condition arcforge:ore_enabled          "ore": whether the config lets that ore generate
+//   feature arcforge:oil_cavern             no fields: the oil deposits' caverns and surface seeps in a chunk (see
+//                                           OilCaverns), placed once per chunk, last
 // Each falls back to its JSON values for an ore the config doesn't know (or before the config loads).
 public final class ModWorldgen {
     private static final DeferredRegister<MapCodec<? extends Feature>> FEATURE_TYPES = DeferredRegister.create(Registries.FEATURE_TYPE, Arcforge.MODID);
@@ -55,6 +57,7 @@ public final class ModWorldgen {
     static {
         FEATURE_TYPES.register("config_ore", () -> ConfigOre.CODEC);
         FEATURE_TYPES.register("config_bed", () -> ConfigBed.CODEC);
+        FEATURE_TYPES.register("oil_cavern", () -> OilCavernFeature.CODEC);
         PLACEMENT_TYPES.register("config_count", () -> ConfigCount.CODEC);
         PLACEMENT_TYPES.register("config_height", () -> ConfigHeight.CODEC);
         CONDITIONS.register("ore_enabled", () -> OreEnabled.CODEC);
@@ -144,6 +147,23 @@ public final class ModWorldgen {
                 }
             }
             return placed;
+        }
+    }
+
+    // --- Oil caverns ---
+
+    public record OilCavernFeature() implements Feature {
+        public static final MapCodec<OilCavernFeature> CODEC = MapCodec.unit(OilCavernFeature::new);
+
+        @Override
+        public MapCodec<OilCavernFeature> codec() {
+            return CODEC;
+        }
+
+        // origin is the chunk's corner: the caverns in this chunk (see OilCaverns.place).
+        @Override
+        public boolean place(WorldGenLevel level, ChunkGenerator generator, RandomSource random, BlockPos origin) {
+            return net.zagdrath.arcforge.oil.OilCaverns.place(level, origin);
         }
     }
 

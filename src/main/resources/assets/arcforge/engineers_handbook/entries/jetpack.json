@@ -13,7 +13,7 @@
     },
     {
       "type": "text",
-      "text": "# Fuels\n| Fuel | Thrust | mB/t |\n| Steam | 0.10 | 10 |\n| High-Pressure Steam | 0.13 | 8 |\n| Superheated Steam | 0.16 | 6 |\n| Hydrogen | 0.20 | 4 |\n| Kerosene | 0.18 | 2 |\nGravity pulls 0.08, so every fuel can lift you; better fuels climb faster and last longer. Steam fuels puff white steam, Hydrogen and Kerosene burn with a blue flame."
+      "text": "# Fuels\n| Fuel | Thrust | mB/t |\n| Steam | 0.10 | 10 |\n| High-Pressure Steam | 0.13 | 8 |\n| Superheated Steam | 0.16 | 6 |\n| Hydrogen | 0.20 | 4 |\n| Kerosene | 0.18 | 2 |\nGravity pulls 0.08, so every fuel can lift you; better fuels climb faster and last longer. Steam fuels puff white steam, Hydrogen and Kerosene burn with a blue flame. It won't take Sour Kerosene: hydrotreat it first."
     },
     {
       "type": "text",

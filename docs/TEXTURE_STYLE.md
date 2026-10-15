@@ -1210,8 +1210,9 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 ## Crude oil and the oilfield
 - **Fluids** (`block/fluid/<name>_still` / `_flow`, each keeping its source's `.mcmeta`): re-toned by rank from an
   existing fluid's frames, never repainted, so they move like their source.
-  - Crude Oil: Heavy Oil's frames on a warm black with a brown-grey sheen (`#0D0C0B #121110 #181614 #201D1A`; the flow
-    adds `#0A0908` and the sheen up to `#4A4238`). Its fog is near-black.
+  - Crude Oil: Heavy Oil's frames on a warm black with a faint brown-grey sheen (`#0D0C0B #131210 #1A1815 #2E2A25`; the
+    flow adds `#0A0908` and the sheen up to `#4C443A`). Thick and slow: frametime 8 still, 5 flowing, since caverns
+    and surface seeps show it as a block. Its fog is near-black.
   - Bitumen: Heavy Oil's frames on a cold blue-black (`#060607` to `#141418`; the flow up to `#30303A`).
   - Kerosene: Light Oil's frames (keeping its alpha) in a pale water-white straw (`#C8C6AA` to `#FBFAEE`).
   - Diesel: Light Oil's frames in amber (`#9C8418` to `#F6E6AA`).
@@ -1238,6 +1239,52 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   (Steel Pipes, with a white Steel Pipe ghost at the pump's ghost alphas `0x69` rim / `0x37` body) and drops the arrow
   and output slot; the Pumpjack keeps both bucket slots. The tank fill falls back to a dark Crude Oil hatch
   (`#1A1613` / `#241E19`, `#2E2620` top row) when the fluid sprite isn't there.
+
+## Oil caverns, sour crude and natural gas
+- **Fluids** (re-toned by rank, keeping the source's alpha; see Fluids):
+  - Sour Crude Oil: Crude Oil's frames and timing, its blacks pulled toward a yellowish brown
+    (`#100E09 #17140D #1F1B11 #36301E`; the flow `#0C0A06` up to a `#58502E` sheen), so a sour cavern reads as
+    crude with a sickly cast beside a sweet one. Both have still and flowing block textures; neither burns.
+  - Sour Diesel and Sour Kerosene: their clean fuel's ramps on Light Oil's frames, each tone pulled half way toward an
+    olive of its own lightness (hue 58°, 0.82 of its lightness, saturation 0.42), so they read as the same fuel gone
+    off.
+  - Natural Gas (`#C8E4F6`, a clear pale blue) and Hydrogen Sulfide (`#C4CC6A`, a sickly yellow-green): the gas model
+    tinted (GasTints, matched by `gas_properties.json`).
+- **Port chips:** Sour Diesel `#D4C76E` / `#A59532`, Sour Kerosene `#E5E4BF` / `#CECC98`, Hydrogen Sulfide `#D4DA80` /
+  `#A4AC48`, Natural Gas `#DCEEFA` / `#A8C8E2`, Carbon Dioxide `#C8D0D8` / `#94A0AC`, Steam `#E4E8EE` / `#B4BCC8`,
+  Sulfur `#F0E070` / `#C8B02C`.
+- **Single-block units** (the machine casing, ports at their default faces with each fluid's chip, `_on` animated):
+  - Hydrotreater: a reactor window of three catalyst beds (two-tone pellet rows `#B4A884` / `#7E7458` over `#5E5642`)
+    between support grids. `_on` bubbles Hydrogen (`#EAF2FA`) up through them.
+  - Sulfur Recovery Unit: a furnace with its burner at the back over a pit of molten sulfur (the Sulfur chip's tones
+    with a `#FFF4A8` glint). `_on` lights the burner and moves the glint.
+  - Steam Methane Reformer: a furnace box lined with firebrick (`#553F34 #3A2C23 #2B211B`), three reformer tubes
+    hanging close-packed from a lit inlet header to an outlet collector. `_on` glows the tubes white-hot to orange with
+    a bright band moving down each. It must never read as the Catalytic Reformer's tube window: the brick lining down
+    both sides, the header and collector across, and no casing gaps between its tubes.
+- **Gas Wellhead** (`block/gas_wellhead`, its own model by `tools/GasWellheadModelGen`, on the large-model rules like
+  the Well Head): a flanged casing head, a spool, the master valve body, a swab cap with its flange and stem, a wing
+  (round along its length) out to the flow line's flange, a choke on the wing with its stem and handwheel, and a
+  pressure gauge on a stand-off.
+  - Every element face is its own region, packed into 16×16 sheets (`block/gas_wellhead/sheet_N`) and painted to its
+    size: round parts carry the steel ramp across them (on a band 2 px high or less, across its height), flat faces 1 px
+    lit top/left and dark bottom/right.
+  - The handwheel is the only red (`#5E1712` to `#D8573E`): the ramp round its rim on the sides, and from above a red
+    rim (lit far edge, dark near edge) round dark gaps, with spokes in to a steel hub, so it reads as a wheel.
+  - The flow line's flange carries the output port: the orange ring round a Natural Gas chip. The gauge's east face is
+    a white dial in a steel bezel, its needle dark and a red mark low left.
+  - Its hitbox is the elements, rotated with its facing.
+- **Items:**
+  - Sour buckets: the fluid bucket model with the fluid's still frame (`neoforge:fluid_container`).
+  - Survey Record: a folded paper chart (`#F6F2E4` lit, `#E4DCC6` body, `#C8BEA2` shaded right leaf, `#A69C80` fold),
+    the top right corner dog-eared, a seismograph trace (`#2B2F34`) across both leaves with spikes in the middle, and a
+    red mark (`#C0392B`) where the oil lies.
+- **Map markers** (`map/decorations/oil_<kind>.png`, 8×8): a small derrick outlined like vanilla's markers: two legs
+  (`#8A6236`) splaying from a lit crown (`#C89A5C`) to the ground with girts between, a `#1A120A` outline, standing in
+  a black pool. Taller for bigger deposits (Seep shortest, Giant the full height).
+- **GUIs** (`gui/container/hydrotreater`, `sulfur_recovery_unit`, `steam_methane_reformer`): the refining machines'
+  frame with a second feed tank recess beside the feed (Hydrogen, Oxygen or Steam), its tooltip naming that feed.
+- **Surface seeps:** a small pit of the deposit's oil sunk in the ground with a coarse-dirt rim; no texture of its own.
 
 ## Refinery tower model
 - Formed, the Distillation Array's casings, tray levels and controller draw nothing (`distillation_array/hidden`, with

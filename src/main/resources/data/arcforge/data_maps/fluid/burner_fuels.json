@@ -67,6 +67,23 @@
       "hu_per_mb": 450,
       "mb_per_tick": 0.5,
       "burn_temperature": 1250
+    },
+    "arcforge:sour_kerosene": {
+      "hu_per_mb": 285,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1050,
+      "gas_turbine": false
+    },
+    "arcforge:sour_diesel": {
+      "hu_per_mb": 315,
+      "mb_per_tick": 0.5,
+      "burn_temperature": 1050,
+      "gas_turbine": false
+    },
+    "arcforge:natural_gas": {
+      "hu_per_mb": 55,
+      "mb_per_tick": 1.0,
+      "burn_temperature": 1250
     }
   }
 }

@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/steam_methane_reformer_front_on",
+    "south": "arcforge:block/steam_methane_reformer_back",
+    "east": "arcforge:block/steam_methane_reformer_left",
+    "west": "arcforge:block/steam_methane_reformer_right",
+    "up": "arcforge:block/steam_methane_reformer_top",
+    "down": "arcforge:block/steam_methane_reformer_bottom",
+    "particle": "arcforge:block/steam_methane_reformer_back"
+  }
+}

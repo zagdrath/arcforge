@@ -756,6 +756,9 @@ final class MachineCategories {
                 case REFORMING -> ModBlocks.CATALYTIC_REFORMER.get();
                 case COKING -> ModBlocks.COKER.get();
                 case BLENDING -> ModBlocks.LUBRICANT_BLENDER.get();
+                case HYDROTREATING -> ModBlocks.HYDROTREATER.get();
+                case SULFUR_RECOVERY -> ModBlocks.SULFUR_RECOVERY_UNIT.get();
+                case STEAM_REFORMING -> ModBlocks.STEAM_METHANE_REFORMER.get();
             };
         }
 
@@ -766,6 +769,12 @@ final class MachineCategories {
             var slot = builder.addInputSlot(1, 5).setStandardSlotBackground()
                     .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, input.amount()), false, 16, 16);
             input.fluids().forEach(fluid -> slot.add(fluid, input.amount()));
+            // The second fluid (Hydrogen, Oxygen or Steam) where the process takes one; no process has both it and a catalyst.
+            recipe.secondInput().ifPresent(second -> {
+                var secondSlot = builder.addInputSlot(21, 5).setStandardSlotBackground()
+                        .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, second.amount()), false, 16, 16);
+                second.fluids().forEach(fluid -> secondSlot.add(fluid, second.amount()));
+            });
             recipe.catalyst().ifPresent(catalyst -> builder.addInputSlot(21, 5).setStandardSlotBackground().add(catalyst)
                     .addRichTooltipCallback((view, tooltip) -> tooltip.add(Component.translatable("jei.arcforge.refining.catalyst",
                             recipe.catalystUses()).withStyle(ChatFormatting.GRAY))));
@@ -1588,20 +1597,54 @@ final class MachineCategories {
 
     // --- Crude oil: the deposits (what a Pumpjack can get from each kind), and drilling for them ---
 
+    record GasWellPage() {}
+
+    // A gas well: a Gas Wellhead on a Well Head drilled into a gas cap, flowing Natural Gas with no FE.
+    static final class GasWells extends ArcforgeCategory<GasWellPage> {
+        static final IRecipeType<GasWellPage> TYPE = IRecipeType.create(Arcforge.MODID, "gas_well", GasWellPage.class);
+
+        GasWells(IGuiHelper gui) {
+            super(TYPE, "gas_well", ModBlocks.GAS_WELLHEAD.get(), gui, 160, 48);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, GasWellPage page, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(new ItemStack(ModItems.GAS_WELLHEAD.get()));
+            builder.addInputSlot(21, 5).setStandardSlotBackground().add(new ItemStack(ModItems.WELL_HEAD.get()));
+            fluid(builder, false, 81, 5, ModFluids.NATURAL_GAS.get(), ArcforgeConfig.GAS_WELLHEAD_RATE.getAsInt() * 20);
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, GasWellPage page, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(20).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(GasWellPage page, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.gas_well.rate", ArcforgeConfig.GAS_WELLHEAD_RATE.getAsInt(),
+                    Math.round(ArcforgeConfig.GAS_WELLHEAD_MIN_SHARE.getAsDouble() * 100), ArcforgeConfig.GAS_WELLHEAD_TRICKLE.getAsInt()), 0, 26);
+            text(graphics, Component.translatable("jei.arcforge.gas_well.cap", Math.round(ArcforgeConfig.OIL_GAS_CAP_CHANCE.getAsDouble() * 100),
+                    String.format(Locale.ROOT, "%,d", ArcforgeConfig.OIL_GAS_PER_BLOCK.getAsInt())), 0, 36);
+        }
+    }
+
     record DepositPage(DepositKind kind) {}
 
     static final class OilDeposits extends ArcforgeCategory<DepositPage> {
         static final IRecipeType<DepositPage> TYPE = IRecipeType.create(Arcforge.MODID, "oil_deposit", DepositPage.class);
 
         OilDeposits(IGuiHelper gui) {
-            super(TYPE, "oil_deposit", ModItems.SEISMIC_SURVEY_TOOL.get(), gui, 160, 58);
+            super(TYPE, "oil_deposit", ModItems.SEISMIC_SURVEY_TOOL.get(), gui, 160, 68);
         }
 
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, DepositPage page, IFocusGroup focuses) {
             builder.addInputSlot(1, 5).setStandardSlotBackground().add(new ItemStack(ModItems.WELL_HEAD.get()));
             long most = Math.round(page.kind().maxBuckets * 1_000L * ArcforgeConfig.OIL_AMOUNT_MULTIPLIER.getAsDouble());
-            fluid(builder, false, 61, 5, ModFluids.CRUDE_OIL.get(), (int) Math.min(Integer.MAX_VALUE, most));
+            int amount = (int) Math.min(Integer.MAX_VALUE, most);
+            // Crude Oil, or Sour Crude Oil from a sour deposit.
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, amount), false, 16, 16)
+                    .add(ModFluids.CRUDE_OIL.get(), amount).add(ModFluids.SOUR_CRUDE_OIL.get(), amount);
         }
 
         @Override
@@ -1619,6 +1662,8 @@ final class MachineCategories {
             text(graphics, Component.translatable("jei.arcforge.oil_deposit.odds", share(kind, false), share(kind, true)), 0, 36);
             text(graphics, Component.translatable("jei.arcforge.oil_deposit.rate", ArcforgeConfig.PUMPJACK_RATE.getAsInt(),
                     Math.round(ArcforgeConfig.PUMPJACK_MIN_SHARE.getAsDouble() * 100), ArcforgeConfig.PUMPJACK_TRICKLE.getAsInt()), 0, 46);
+            text(graphics, Component.translatable("jei.arcforge.oil_deposit.traits", Math.round(ArcforgeConfig.OIL_SOUR_CHANCE.getAsDouble() * 100),
+                    Math.round(ArcforgeConfig.OIL_SOUR_RICH_CHANCE.getAsDouble() * 100), Math.round(ArcforgeConfig.OIL_GAS_CAP_CHANCE.getAsDouble() * 100)), 0, 56);
         }
 
         // The chance a region holds this kind of deposit, in percent.

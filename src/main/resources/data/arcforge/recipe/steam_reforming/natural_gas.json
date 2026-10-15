@@ -1,0 +1,24 @@
+{
+  "type": "arcforge:steam_reforming",
+  "input": {
+    "fluid": "arcforge:natural_gas",
+    "amount": 100
+  },
+  "second_input": {
+    "fluid": "arcforge:steam",
+    "amount": 100
+  },
+  "fluids": [
+    {
+      "id": "arcforge:hydrogen",
+      "amount": 100
+    },
+    {
+      "id": "arcforge:carbon_dioxide",
+      "amount": 25
+    }
+  ],
+  "time": 20,
+  "heat_per_tick": 40,
+  "min_temp": 700
+}

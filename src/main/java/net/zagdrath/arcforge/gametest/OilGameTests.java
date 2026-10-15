@@ -69,11 +69,11 @@ final class OilGameTests {
     static void surveyTool(GameTestHelper helper) {
         BlockPos here = helper.absolutePos(new BlockPos(1, 1, 1));
         OilDeposits.Deposit deposit = OilDeposits.putTestDeposit(helper.getLevel(), here, DepositKind.FIELD, 18_400_000L, -20);
-        helper.assertTrue(key(SeismicSurveyToolItem.report(helper.getLevel(), here)).equals("message.arcforge.survey.found"), "The survey found nothing");
+        helper.assertTrue(key(SeismicSurveyToolItem.report(SeismicSurveyToolItem.survey(helper.getLevel(), here))).equals("message.arcforge.survey.found"), "The survey found nothing");
         helper.assertTrue(OilDeposits.roughBuckets(18_437_000L) == 18_000 && OilDeposits.roughBuckets(56_000L) == 56,
                 "Rough amounts: " + OilDeposits.roughBuckets(18_437_000L));
         OilDeposits.get(helper.getLevel().getServer()).setExtracted(deposit, deposit.amount());
-        helper.assertTrue(key(SeismicSurveyToolItem.report(helper.getLevel(), here)).equals("message.arcforge.survey.drained"),
+        helper.assertTrue(key(SeismicSurveyToolItem.report(SeismicSurveyToolItem.survey(helper.getLevel(), here))).equals("message.arcforge.survey.drained"),
                 "A drained deposit doesn't read as drained");
         OilDeposits.clearTestDeposit(helper.getLevel(), here);
         helper.succeed();

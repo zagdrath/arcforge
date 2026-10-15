@@ -137,6 +137,83 @@ final class RefineryGameTests {
                 .thenSucceed();
     }
 
+    // The Hydrotreater needs Hydrogen, heat and FE, then treats Sour Diesel into Diesel, giving off Hydrogen Sulfide.
+    static void hydrotreaterTreats(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(0, 1, 0);
+        helper.setBlock(pos, ModBlocks.HYDROTREATER.get());
+        RefiningMachineBlockEntity unit = helper.getBlockEntity(pos, RefiningMachineBlockEntity.class);
+        RefiningRecipe recipe = recipe(helper, RefiningProcess.HYDROTREATING, ModFluids.SOUR_DIESEL.get());
+        RefiningCore core = unit.getCore();
+        helper.assertTrue(fill(core.feed(), ModFluids.SOUR_DIESEL.get(), recipe.input().amount()) == recipe.input().amount(), "It refused Sour Diesel");
+        helper.assertTrue(fill(core.feed(), ModFluids.DIESEL.get(), 100) == 0, "Its feed took clean Diesel");
+        heat(core, recipe.minTemp() + 150);
+        CrushingGameTests.charge(core.energy(), ArcforgeConfig.HYDROTREATER_ENERGY_CAPACITY.getAsInt());
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.assertTrue(unit.getStatus() == MachineStatus.NO_HYDROGEN, "Without Hydrogen it's " + unit.getStatus());
+                    int hydrogen = recipe.secondInput().orElseThrow().amount();
+                    helper.assertTrue(fill(core.secondFeed(), ModFluids.HYDROGEN.get(), hydrogen) == hydrogen, "It refused Hydrogen");
+                })
+                .thenWaitUntil(() -> helper.assertTrue(core.product(0).getAmount() == recipe.fluids().get(0).amount(),
+                        "No Diesel yet (" + unit.getStatus() + ")"))
+                .thenExecute(() -> {
+                    helper.assertTrue(core.product(0).getResource(0).getFluid() == ModFluids.DIESEL.get(), "The first tank isn't Diesel");
+                    helper.assertTrue(core.product(1).getResource(0).getFluid() == ModFluids.HYDROGEN_SULFIDE.get()
+                            && core.product(1).getAmount() == recipe.fluids().get(1).amount(), "No Hydrogen Sulfide");
+                    helper.assertTrue(core.feed().getAmount() == 0 && core.secondFeed().getAmount() == 0, "It didn't use its feeds");
+                })
+                .thenSucceed();
+    }
+
+    // The Sulfur Recovery Unit burns Hydrogen Sulfide with Oxygen into Sulfur Dust (into its slot) and Steam.
+    static void sulfurRecoveryRecovers(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(0, 1, 0);
+        helper.setBlock(pos, ModBlocks.SULFUR_RECOVERY_UNIT.get());
+        RefiningMachineBlockEntity unit = helper.getBlockEntity(pos, RefiningMachineBlockEntity.class);
+        RefiningRecipe recipe = recipe(helper, RefiningProcess.SULFUR_RECOVERY, ModFluids.HYDROGEN_SULFIDE.get());
+        RefiningCore core = unit.getCore();
+        fill(core.feed(), ModFluids.HYDROGEN_SULFIDE.get(), recipe.input().amount());
+        heat(core, recipe.minTemp() + 150);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.assertTrue(unit.getStatus() == MachineStatus.NO_OXYGEN, "Without Oxygen it's " + unit.getStatus());
+                    fill(core.secondFeed(), ModFluids.OXYGEN.get(), recipe.secondInput().orElseThrow().amount());
+                })
+                .thenWaitUntil(() -> helper.assertTrue(unit.getItems().getStack(0).is(ModItems.SULFUR_DUST.get()),
+                        "No Sulfur Dust yet (" + unit.getStatus() + ")"))
+                .thenExecute(() -> helper.assertTrue(core.product(0).getResource(0).getFluid() == ModFluids.STEAM.get()
+                        && core.product(0).getAmount() == recipe.fluids().get(0).amount(), "No Steam"))
+                .thenSucceed();
+    }
+
+    // The Steam Methane Reformer needs 700°C, then makes Hydrogen and Carbon Dioxide from Natural Gas and Steam.
+    static void steamReformerReforms(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(0, 1, 0);
+        helper.setBlock(pos, ModBlocks.STEAM_METHANE_REFORMER.get());
+        RefiningMachineBlockEntity unit = helper.getBlockEntity(pos, RefiningMachineBlockEntity.class);
+        RefiningRecipe recipe = recipe(helper, RefiningProcess.STEAM_REFORMING, ModFluids.NATURAL_GAS.get());
+        helper.assertTrue(recipe.minTemp() >= 700, "It reforms at " + recipe.minTemp() + "°C");
+        RefiningCore core = unit.getCore();
+        fill(core.feed(), ModFluids.NATURAL_GAS.get(), recipe.input().amount());
+        fill(core.secondFeed(), ModFluids.STEAM.get(), recipe.secondInput().orElseThrow().amount());
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    helper.assertTrue(unit.getStatus() == MachineStatus.TOO_COLD, "Cold, it's " + unit.getStatus());
+                    heat(core, recipe.minTemp() + 100);
+                })
+                .thenWaitUntil(() -> helper.assertTrue(core.product(0).getAmount() == recipe.fluids().get(0).amount(),
+                        "No Hydrogen yet (" + unit.getStatus() + ")"))
+                .thenExecute(() -> {
+                    helper.assertTrue(core.product(0).getResource(0).getFluid() == ModFluids.HYDROGEN.get(), "The first tank isn't Hydrogen");
+                    helper.assertTrue(core.product(1).getResource(0).getFluid() == ModFluids.CARBON_DIOXIDE.get()
+                            && core.product(1).getAmount() == recipe.fluids().get(1).amount(), "No Carbon Dioxide");
+                })
+                .thenSucceed();
+    }
+
     // The Coker turns Bitumen into Petroleum Coke (into its slot) and Refinery Gas.
     static void cokerCokes(GameTestHelper helper) {
         BlockPos pos = new BlockPos(0, 1, 0);

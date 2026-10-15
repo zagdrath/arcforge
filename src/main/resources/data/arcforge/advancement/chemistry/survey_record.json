@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:chemistry/oil_survey",
+  "display": {
+    "icon": {
+      "id": "arcforge:survey_record"
+    },
+    "title": {
+      "translate": "advancements.arcforge.chemistry.survey_record.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.chemistry.survey_record.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:survey_record"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

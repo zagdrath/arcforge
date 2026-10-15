@@ -30,6 +30,9 @@ public final class RefineryMachineSpecs {
         refining(ModBlockEntityTypes.CATALYTIC_REFORMER, RefiningProcess.REFORMING);
         refining(ModBlockEntityTypes.COKER, RefiningProcess.COKING);
         refining(ModBlockEntityTypes.LUBRICANT_BLENDER, RefiningProcess.BLENDING);
+        refining(ModBlockEntityTypes.HYDROTREATER, RefiningProcess.HYDROTREATING);
+        refining(ModBlockEntityTypes.SULFUR_RECOVERY_UNIT, RefiningProcess.SULFUR_RECOVERY);
+        refining(ModBlockEntityTypes.STEAM_METHANE_REFORMER, RefiningProcess.STEAM_REFORMING);
 
         // Progress: ticks into the batch. The catalyst slot, the feed and the three product tanks.
         MachineControlSpec.Builder<CrackingUnitBlockEntity> cracking = MachineControlSpec.builder(CrackingUnitBlockEntity.class)
@@ -67,6 +70,9 @@ public final class RefineryMachineSpecs {
         }
         spec.items(RefiningMachineBlockEntity::getItems, process.makesItem() ? be -> be.getItemHandler(null) : null)
                 .tank(SlotRole.INPUT, be -> be.getCore().feed());
+        if (process.secondFeed() != null) {
+            spec.tank(SlotRole.INPUT, be -> be.getCore().secondFeed());
+        }
         for (int i = 0; i < process.tanks(); i++) {
             int index = i;
             spec.tank(SlotRole.OUTPUT, be -> be.getCore().product(index));

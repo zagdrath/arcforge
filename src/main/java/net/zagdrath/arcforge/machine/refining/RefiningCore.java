@@ -44,14 +44,20 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // (RefiningMachineBlockEntity) and the Cracking Unit (CrackingUnitBlockEntity), which give it their slots and settings:
 // a feed tank (whatever the process's recipes take), one product tank per product (the recipe's fluids fill them in
 // order), a heat buffer and an FE buffer when the process uses them, and a catalyst slot and an item output slot in the
-// owner's items when it has them. Each tick it finds the recipe for the feed, checks heat (at least the recipe's
-// min_temp and a tick's heat), FE, the catalyst and room for every product, and runs the recipe's time; the catalyst
+// owner's items when it has them, and a second feed tank for the processes that take a second fluid (Hydrogen, Oxygen
+// or Steam). Each tick it finds the recipe for the feed, checks the second feed, heat (at least the recipe's min_temp
+// and a tick's heat), FE, the catalyst and room for every product, and runs the recipe's time; the catalyst
 // item in the slot is used up after catalyst_uses operations. Speed upgrades shorten the time and draw FE and heat that
 // much faster (an operation takes the same); Energy upgrades cut the FE.
 public final class RefiningCore {
     // How the owner's items and settings are laid out.
     public record Layout(int catalystSlot, int itemSlot, int energyCapacity, int maxInput, int heatCapacity, int maxTemperature, int feedCapacity,
-            int productCapacity) {}
+            int productCapacity, int secondFeedCapacity) {
+        public Layout(int catalystSlot, int itemSlot, int energyCapacity, int maxInput, int heatCapacity, int maxTemperature, int feedCapacity,
+                int productCapacity) {
+            this(catalystSlot, itemSlot, energyCapacity, maxInput, heatCapacity, maxTemperature, feedCapacity, productCapacity, 0);
+        }
+    }
 
     private final RefiningProcess process;
     private final Layout layout;
@@ -61,6 +67,8 @@ public final class RefiningCore {
     private final @Nullable HeatBuffer heat;
     private final @Nullable HeatHandler heatInput;
     private final FilteredFluidTank feed;
+    private final @Nullable FilteredFluidTank secondFeed;
+    private final @Nullable ResourceHandler<FluidResource> secondFeedInput;
     private final FilteredFluidTank[] products;
     private final ResourceHandler<FluidResource>[] productOutputs;
     private final ResourceHandler<FluidResource> feedInput;
@@ -90,6 +98,9 @@ public final class RefiningCore {
         this.heat = process.heated() ? new HeatBuffer(layout.heatCapacity(), layout.maxTemperature(), changed) : null;
         this.heatInput = heat != null ? heat.input(Integer.MAX_VALUE) : null;
         this.feed = new FilteredFluidTank(layout.feedCapacity(), resource -> MachineRecipes.isRefiningInput(level.get(), process, resource), changed);
+        this.secondFeed = process.secondFeed() != null ? new FilteredFluidTank(Math.max(1, layout.secondFeedCapacity()),
+                resource -> MachineRecipes.isRefiningSecondInput(level.get(), process, resource), changed) : null;
+        this.secondFeedInput = secondFeed != null ? new AutomationResourceHandler<>(secondFeed, index -> true, index -> false) : null;
         int tanks = process.tanks();
         this.products = new FilteredFluidTank[tanks];
         this.productOutputs = new ResourceHandler[tanks];
@@ -108,13 +119,17 @@ public final class RefiningCore {
         this.liquidOutputs = new CombinedResourceHandler<>(liquids.toArray(ResourceHandler[]::new));
         this.gasOutputs = new CombinedResourceHandler<>(gases.toArray(ResourceHandler[]::new));
         this.allOutputs = new CombinedResourceHandler<>(productOutputs);
-        // With no side: the feed takes fills, the products only drain.
+        // With no side: the feeds take fills, the products only drain.
         List<ResourceHandler<FluidResource>> every = new ArrayList<>();
         every.add(feedInput);
+        if (secondFeedInput != null) {
+            every.add(secondFeedInput);
+        }
         every.addAll(List.of(productOutputs));
         this.all = new CombinedResourceHandler<>(every.toArray(ResourceHandler[]::new));
-        // Buckets and cartridges: fill from the products, empty the feed in.
-        this.interaction = new CombinedResourceHandler<>(allOutputs, feedInput);
+        // Buckets and cartridges: fill from the products, empty the feeds in.
+        this.interaction = secondFeedInput != null ? new CombinedResourceHandler<>(allOutputs, feedInput, secondFeedInput)
+                : new CombinedResourceHandler<>(allOutputs, feedInput);
     }
 
     public RefiningProcess process() {
@@ -159,6 +174,10 @@ public final class RefiningCore {
         }
         if (recipe == null) {
             return feed.getAmount() > 0 ? MachineStatus.MISSING_FLUID : MachineStatus.IDLE;
+        }
+        if (recipe.secondInput().isPresent()
+                && (secondFeed == null || secondFeed.getAmount() <= 0 || !recipe.hasSecond(secondFeed.getResource(0), secondFeed.getAmount()))) {
+            return process.missingSecond();
         }
         if (recipe.usesCatalyst() && !recipe.isCatalyst(catalystStack())) {
             return MachineStatus.NO_CATALYST;
@@ -217,6 +236,9 @@ public final class RefiningCore {
     private void finish(RefiningRecipe recipe) {
         try (Transaction tx = Transaction.openRoot()) {
             feed.extract(0, feed.getResource(0), recipe.input().amount(), tx);
+            if (secondFeed != null && recipe.secondInput().isPresent()) {
+                secondFeed.extract(0, secondFeed.getResource(0), recipe.secondInput().get().amount(), tx);
+            }
             List<FluidStackTemplate> made = recipe.fluids();
             for (int i = 0; i < made.size(); i++) {
                 products[i].insert(0, FluidResource.of(made.get(i).fluid().value()), made.get(i).amount(), tx);
@@ -262,6 +284,15 @@ public final class RefiningCore {
 
     public FilteredFluidTank feed() {
         return feed;
+    }
+
+    // The second feed tank (Hydrogen, Oxygen or Steam), or null for a process that takes one fluid.
+    public @Nullable FilteredFluidTank secondFeed() {
+        return secondFeed;
+    }
+
+    public @Nullable ResourceHandler<FluidResource> secondFeedInput() {
+        return secondFeedInput;
     }
 
     public FilteredFluidTank product(int index) {
@@ -352,6 +383,9 @@ public final class RefiningCore {
             heat.deserialize(input);
         }
         feed.deserialize(input.childOrEmpty("feed"));
+        if (secondFeed != null) {
+            secondFeed.deserialize(input.childOrEmpty("second_feed"));
+        }
         for (int i = 0; i < products.length; i++) {
             products[i].deserialize(input.childOrEmpty("product_" + i));
         }
@@ -370,6 +404,9 @@ public final class RefiningCore {
             heat.serialize(output);
         }
         feed.serialize(output.child("feed"));
+        if (secondFeed != null) {
+            secondFeed.serialize(output.child("second_feed"));
+        }
         for (int i = 0; i < products.length; i++) {
             products[i].serialize(output.child("product_" + i));
         }

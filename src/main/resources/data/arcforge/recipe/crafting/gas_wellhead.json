@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    " Q ",
+    "RGR",
+    " P "
+  ],
+  "key": {
+    "Q": "minecraft:comparator",
+    "R": "arcforge:steel_pipe",
+    "G": "#c:gears/steel",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:gas_wellhead",
+    "count": 1
+  }
+}

@@ -30,15 +30,19 @@ import net.neoforged.neoforge.fluids.FluidStackTemplate;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
-// The refinery's downstream processes, one shape for four recipe types (see RefiningProcess): arcforge:cracking (the
-// Cracking Unit), arcforge:reforming (the Catalytic Reformer), arcforge:coking (the Coker) and
-// arcforge:lubricant_blending (the Lubricant Blender). One fluid input (with its amount) becomes up to three fluids
+// The refinery's downstream processes, one shape for every refining recipe type (see RefiningProcess): arcforge:cracking
+// (the Cracking Unit), arcforge:reforming (the Catalytic Reformer), arcforge:coking (the Coker),
+// arcforge:lubricant_blending (the Lubricant Blender), arcforge:hydrotreating (the Hydrotreater), arcforge:sulfur_recovery
+// (the Sulfur Recovery Unit) and arcforge:steam_reforming (the Steam Methane Reformer). One fluid input (with its amount),
+// and for the processes that take one a second fluid ("second_input", in the machine's second feed tank: Hydrogen,
+// Oxygen or Steam), becomes up to three fluids
 // ("fluids", each {"id", "amount"}; gases and liquids alike, in the machine's product tanks in that order) and an
 // optional item ("item"), over "time" ticks, drawing "heat_per_tick" HU/t at "min_temp" °C or hotter and
 // "energy_per_tick" FE/t (each 0 when left out, and the machine's own config fills in time when that's left out). An
 // optional catalyst ("catalyst", an ingredient) sits in the machine's catalyst slot; one item lasts "catalyst_uses"
 // operations.
-public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.FluidInput input, List<FluidStackTemplate> fluids,
+public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.FluidInput input,
+        Optional<ChemicalReactingRecipe.FluidInput> secondInput, List<FluidStackTemplate> fluids,
         Optional<ItemStackTemplate> item, Optional<Integer> time, int heatPerTick, int minTemp, int energyPerTick, Optional<Ingredient> catalyst,
         int catalystUses) implements Recipe<RefiningRecipe.Input> {
     public static final int MAX_FLUIDS = 3;
@@ -46,6 +50,7 @@ public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.Flu
     public static MapCodec<RefiningRecipe> mapCodec(RefiningProcess process) {
         return RecordCodecBuilder.mapCodec(i -> i.group(
                 ChemicalReactingRecipe.FluidInput.CODEC.fieldOf("input").forGetter(RefiningRecipe::input),
+                ChemicalReactingRecipe.FluidInput.CODEC.optionalFieldOf("second_input").forGetter(RefiningRecipe::secondInput),
                 FluidStackTemplate.CODEC.listOf(0, MAX_FLUIDS).optionalFieldOf("fluids", List.of()).forGetter(RefiningRecipe::fluids),
                 ItemStackTemplate.CODEC.optionalFieldOf("item").forGetter(RefiningRecipe::item),
                 ExtraCodecs.POSITIVE_INT.optionalFieldOf("time").forGetter(RefiningRecipe::time),
@@ -54,20 +59,23 @@ public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.Flu
                 ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("energy_per_tick", 0).forGetter(RefiningRecipe::energyPerTick),
                 Ingredient.CODEC.optionalFieldOf("catalyst").forGetter(RefiningRecipe::catalyst),
                 ExtraCodecs.POSITIVE_INT.optionalFieldOf("catalyst_uses", 1).forGetter(RefiningRecipe::catalystUses))
-                .apply(i, (input, fluids, item, time, heat, minTemp, energy, catalyst, uses) ->
-                        new RefiningRecipe(process, input, fluids, item, time, heat, minTemp, energy, catalyst, uses)));
+                .apply(i, (input, second, fluids, item, time, heat, minTemp, energy, catalyst, uses) ->
+                        new RefiningRecipe(process, input, second, fluids, item, time, heat, minTemp, energy, catalyst, uses)));
     }
 
     private static final StreamCodec<io.netty.buffer.ByteBuf, Optional<Integer>> OPTIONAL_INT = ByteBufCodecs.optional(ByteBufCodecs.VAR_INT);
     private static final StreamCodec<RegistryFriendlyByteBuf, List<FluidStackTemplate>> FLUIDS =
             FluidStackTemplate.STREAM_CODEC.apply(ByteBufCodecs.list(MAX_FLUIDS));
     private static final StreamCodec<RegistryFriendlyByteBuf, Optional<ItemStackTemplate>> OPTIONAL_ITEM = ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<ChemicalReactingRecipe.FluidInput>> OPTIONAL_INPUT =
+            ByteBufCodecs.optional(ChemicalReactingRecipe.FluidInput.STREAM_CODEC);
     private static final StreamCodec<RegistryFriendlyByteBuf, Optional<Ingredient>> OPTIONAL_INGREDIENT = ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC);
 
     public static StreamCodec<RegistryFriendlyByteBuf, RefiningRecipe> streamCodec(RefiningProcess process) {
         return StreamCodec.of(
                 (buf, recipe) -> {
                     ChemicalReactingRecipe.FluidInput.STREAM_CODEC.encode(buf, recipe.input());
+                    OPTIONAL_INPUT.encode(buf, recipe.secondInput());
                     FLUIDS.encode(buf, recipe.fluids());
                     OPTIONAL_ITEM.encode(buf, recipe.item());
                     OPTIONAL_INT.encode(buf, recipe.time());
@@ -77,7 +85,7 @@ public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.Flu
                     OPTIONAL_INGREDIENT.encode(buf, recipe.catalyst());
                     ByteBufCodecs.VAR_INT.encode(buf, recipe.catalystUses());
                 },
-                buf -> new RefiningRecipe(process, ChemicalReactingRecipe.FluidInput.STREAM_CODEC.decode(buf), FLUIDS.decode(buf),
+                buf -> new RefiningRecipe(process, ChemicalReactingRecipe.FluidInput.STREAM_CODEC.decode(buf), OPTIONAL_INPUT.decode(buf), FLUIDS.decode(buf),
                         OPTIONAL_ITEM.decode(buf), OPTIONAL_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf),
                         ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INGREDIENT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf)));
     }
@@ -103,6 +111,16 @@ public record RefiningRecipe(RefiningProcess process, ChemicalReactingRecipe.Flu
     // Whether it takes this fluid at all (what the feed tank accepts).
     public boolean takes(FluidResource fluid) {
         return input.test(fluid);
+    }
+
+    // Whether its second input is this fluid (what the second feed tank accepts).
+    public boolean takesSecond(FluidResource fluid) {
+        return secondInput.map(second -> second.test(fluid)).orElse(false);
+    }
+
+    // Whether a second feed tank holding this much of that fluid supplies it (always, when it takes none).
+    public boolean hasSecond(FluidResource fluid, int amount) {
+        return secondInput.map(second -> second.test(fluid, amount)).orElse(true);
     }
 
     public boolean usesCatalyst() {

@@ -202,7 +202,7 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
             int color = -1;
             float[] pool = EMPTY;
             if (product != null && fill > 0.005F) {
-                Fluid fluid = product.fluid();
+                Fluid fluid = column.shownFluid(product);
                 var fluidModel = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(fluid.defaultFluidState());
                 sprite = fluidModel.stillMaterial().sprite();
                 color = (fluidModel.fluidTintSource() != null ? fluidModel.fluidTintSource().colorAsStack(new FluidStack(fluid, 1)) : -1) | 0xFF000000;

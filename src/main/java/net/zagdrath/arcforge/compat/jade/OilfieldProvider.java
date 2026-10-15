@@ -101,10 +101,15 @@ public enum OilfieldProvider implements StreamServerDataProvider<BlockAccessor, 
             return;
         }
         long left = OilDeposits.get(level.getServer()).remaining(deposit);
+        // Where the chunk was generated with caverns, whether it's sweet or sour and has a gas cap.
+        net.minecraft.network.chat.MutableComponent kind = deposit.kind().getDescription().copy();
+        if (OilDeposits.generatedWithCaverns(level, pos)) {
+            kind.append(" (").append(net.zagdrath.arcforge.item.tool.SeismicSurveyToolItem.traits(
+                    net.zagdrath.arcforge.item.tool.SeismicSurveyToolItem.survey(level, pos))).append(")");
+        }
         lines.add(left > 0
-                ? Component.translatable("jade.arcforge.oil.deposit", deposit.kind().getDescription(),
-                        String.format(Locale.ROOT, "%,d", OilDeposits.roughBuckets(left)))
-                : Component.translatable("jade.arcforge.oil.drained", deposit.kind().getDescription()));
+                ? Component.translatable("jade.arcforge.oil.deposit", kind, String.format(Locale.ROOT, "%,d", OilDeposits.roughBuckets(left)))
+                : Component.translatable("jade.arcforge.oil.drained", kind));
     }
 
     @Override

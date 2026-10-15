@@ -194,7 +194,9 @@ public final class OilfieldStructures {
     }
 
     private static boolean isValid(Level level, Unit unit, BlockPos controller, @Nullable Unit current) {
-        if (!level.isLoaded(unit.well()) || !level.getBlockState(unit.well()).is(ModBlocks.WELL_HEAD.get())) {
+        // A gas well takes a Gas Wellhead, not a Pumpjack.
+        if (!level.isLoaded(unit.well()) || !level.getBlockState(unit.well()).is(ModBlocks.WELL_HEAD.get())
+                || net.zagdrath.arcforge.block.multiblock.WellHeadBlock.isGasWell(level.getBlockState(unit.well()))) {
             return false;
         }
         for (BlockPos pos : unit.parts()) {

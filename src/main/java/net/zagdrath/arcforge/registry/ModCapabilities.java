@@ -300,12 +300,16 @@ public final class ModCapabilities {
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.FISCHER_TROPSCH_REACTOR.get(),
                 net.zagdrath.arcforge.blockentity.machine.FischerTropschReactorBlockEntity::getHeatHandler);
         // The refinery's single-block units: the Catalytic Reformer, Coker and Lubricant Blender.
-        for (var type : List.of(ModBlockEntityTypes.CATALYTIC_REFORMER.get(), ModBlockEntityTypes.COKER.get(), ModBlockEntityTypes.LUBRICANT_BLENDER.get())) {
+        for (var type : List.of(ModBlockEntityTypes.CATALYTIC_REFORMER.get(), ModBlockEntityTypes.COKER.get(), ModBlockEntityTypes.LUBRICANT_BLENDER.get(),
+                ModBlockEntityTypes.HYDROTREATER.get(), ModBlockEntityTypes.SULFUR_RECOVERY_UNIT.get(), ModBlockEntityTypes.STEAM_METHANE_REFORMER.get())) {
             event.registerBlockEntity(Capabilities.Item.BLOCK, type, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity::getItemHandler);
             event.registerBlockEntity(Capabilities.Fluid.BLOCK, type, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity::getFluidHandler);
             event.registerBlockEntity(Capabilities.Energy.BLOCK, type, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity::getEnergyHandler);
             event.registerBlockEntity(HEAT, type, net.zagdrath.arcforge.blockentity.machine.RefiningMachineBlockEntity::getHeatHandler);
         }
+        // The Gas Wellhead gives Natural Gas out of its flow line.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GAS_WELLHEAD.get(),
+                net.zagdrath.arcforge.blockentity.machine.GasWellheadBlockEntity::getFluidHandler);
         // The Flare Stack takes gas in through every face but the top.
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.FLARE_STACK.get(),
                 net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity::getFluidHandler);

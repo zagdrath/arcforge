@@ -14,7 +14,7 @@
     },
     {
       "type": "text",
-      "text": "# Drilling\nIt drills a block every 2 seconds, using 120 FE/t and 10 mB/t of Water (drilling mud), and a Steel Pipe for every 4 blocks of hole, from its floor down to the deposit's depth. Over no oil it won't start. Broken and rebuilt over the same hole, it carries on from where it was. The GUI shows how deep it is and how many pipes are still to come.\n# Ports\nA new rig has no ports: set them on its Derrick Casings with the Wrench in Port mode.\n- Input: Water and Steel Pipes in.\n- Energy: FE in.\n# Striking oil\nWhen it reaches the oil, the rig comes down: a Well Head caps the hole and the rig's blocks are left there to pick up, ready for the next hole. A Well Head can't be moved: broken, it's gone."
+      "text": "# Drilling\nIt drills a block every 2 seconds, using 120 FE/t and 10 mB/t of Water (drilling mud), and a Steel Pipe for every 4 blocks of hole, from its floor down to the deposit: to the top of its cavern under the bore, or to the deposit's depth in older chunks. Over no oil it won't start. Broken and rebuilt over the same hole, it carries on from where it was. The GUI shows how deep it is and how many pipes are still to come.\n# Ports\nA new rig has no ports: set them on its Derrick Casings with the Wrench in Port mode.\n- Input: Water and Steel Pipes in.\n- Energy: FE in.\n# Striking oil\nWhen it reaches the oil, the rig comes down: a Well Head caps the hole (drilled into a gas cap's dome, it's a gas well, for a Gas Wellhead instead of a Pumpjack) and the rig's blocks are left there to pick up, ready for the next hole. A Well Head can't be moved: broken, it's gone."
     },
     {
       "type": "multiblock",

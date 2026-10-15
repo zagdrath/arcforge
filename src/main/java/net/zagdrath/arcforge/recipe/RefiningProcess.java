@@ -9,18 +9,22 @@ import java.util.List;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.material.Fluid;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
 // The refinery's downstream processes (see RefiningRecipe and RefiningCore) and what each machine is built with:
-// whether it draws heat, FE, wears a catalyst or makes an item, and the products it's laid out for (its tanks show
-// these while empty). The Cracking Unit is a multiblock; the other three are single blocks.
+// whether it draws heat, FE, wears a catalyst or makes an item, the second fluid it takes (and through which faces),
+// and the products it's laid out for (its tanks show these while empty). The Cracking Unit is a multiblock; the others
+// are single blocks.
 public enum RefiningProcess implements StringRepresentable {
     // Heavy Oil + heat + a catalyst -> Naphtha, Diesel and Refinery Gas.
     CRACKING("cracking", true, false, true, false, MachineStatus.CRACKING,
@@ -33,16 +37,31 @@ public enum RefiningProcess implements StringRepresentable {
             () -> List.of(ModFluids.REFINERY_GAS.get()), ArcforgeConfig.COKER_TIME::getAsInt),
     // Heavy Oil + FE -> Lubricant.
     BLENDING("lubricant_blending", false, true, false, false, MachineStatus.BLENDING,
-            () -> List.of(ModFluids.LUBRICANT.get()), ArcforgeConfig.BLENDER_TIME::getAsInt);
+            () -> List.of(ModFluids.LUBRICANT.get()), ArcforgeConfig.BLENDER_TIME::getAsInt),
+    // Sour Kerosene or Sour Diesel + Hydrogen + heat + FE -> Kerosene or Diesel and Hydrogen Sulfide.
+    HYDROTREATING("hydrotreating", true, true, false, false, MachineStatus.HYDROTREATING,
+            () -> List.of(ModFluids.DIESEL.get(), ModFluids.HYDROGEN_SULFIDE.get()), ArcforgeConfig.HYDROTREATER_TIME::getAsInt, SideMode.HYDROGEN),
+    // Hydrogen Sulfide + Oxygen + heat -> Sulfur and Steam (the Claus process).
+    SULFUR_RECOVERY("sulfur_recovery", true, false, false, true, MachineStatus.RECOVERING_SULFUR,
+            () -> List.of(ModFluids.STEAM.get()), ArcforgeConfig.SULFUR_RECOVERY_TIME::getAsInt, SideMode.OXYGEN),
+    // Natural Gas + Steam + heat -> Hydrogen and Carbon Dioxide.
+    STEAM_REFORMING("steam_reforming", true, false, false, false, MachineStatus.STEAM_REFORMING,
+            () -> List.of(ModFluids.HYDROGEN.get(), ModFluids.CARBON_DIOXIDE.get()), ArcforgeConfig.SMR_TIME::getAsInt, SideMode.STEAM);
 
     private final String name;
     private final boolean heated, powered, catalysed, makesItem;
     private final MachineStatus running;
     private final Supplier<List<Fluid>> products;
     private final IntSupplier defaultTime;
+    private final @Nullable SideMode secondFeed;
 
     RefiningProcess(String name, boolean heated, boolean powered, boolean catalysed, boolean makesItem, MachineStatus running,
             Supplier<List<Fluid>> products, IntSupplier defaultTime) {
+        this(name, heated, powered, catalysed, makesItem, running, products, defaultTime, null);
+    }
+
+    RefiningProcess(String name, boolean heated, boolean powered, boolean catalysed, boolean makesItem, MachineStatus running,
+            Supplier<List<Fluid>> products, IntSupplier defaultTime, @Nullable SideMode secondFeed) {
         this.name = name;
         this.heated = heated;
         this.powered = powered;
@@ -51,6 +70,18 @@ public enum RefiningProcess implements StringRepresentable {
         this.running = running;
         this.products = products;
         this.defaultTime = defaultTime;
+        this.secondFeed = secondFeed;
+    }
+
+    // The face mode its second feed comes in through (Hydrogen, Oxygen or Steam), or null when it takes only one fluid.
+    public @Nullable SideMode secondFeed() {
+        return secondFeed;
+    }
+
+    // What it shows while its second feed runs short.
+    public MachineStatus missingSecond() {
+        return secondFeed == SideMode.HYDROGEN ? MachineStatus.NO_HYDROGEN : secondFeed == SideMode.OXYGEN ? MachineStatus.NO_OXYGEN
+                : secondFeed == SideMode.STEAM ? MachineStatus.NO_STEAM : MachineStatus.MISSING_FLUID;
     }
 
     @Override
@@ -101,6 +132,9 @@ public enum RefiningProcess implements StringRepresentable {
             case REFORMING -> ModRecipes.REFORMING.get();
             case COKING -> ModRecipes.COKING.get();
             case BLENDING -> ModRecipes.LUBRICANT_BLENDING.get();
+            case HYDROTREATING -> ModRecipes.HYDROTREATING.get();
+            case SULFUR_RECOVERY -> ModRecipes.SULFUR_RECOVERY.get();
+            case STEAM_REFORMING -> ModRecipes.STEAM_REFORMING.get();
         };
     }
 
@@ -110,6 +144,9 @@ public enum RefiningProcess implements StringRepresentable {
             case REFORMING -> ModRecipes.REFORMING_SERIALIZER.get();
             case COKING -> ModRecipes.COKING_SERIALIZER.get();
             case BLENDING -> ModRecipes.LUBRICANT_BLENDING_SERIALIZER.get();
+            case HYDROTREATING -> ModRecipes.HYDROTREATING_SERIALIZER.get();
+            case SULFUR_RECOVERY -> ModRecipes.SULFUR_RECOVERY_SERIALIZER.get();
+            case STEAM_REFORMING -> ModRecipes.STEAM_REFORMING_SERIALIZER.get();
         };
     }
 }

@@ -59,6 +59,8 @@ import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.OilfieldController;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
+import net.zagdrath.arcforge.oil.OilCavern;
+import net.zagdrath.arcforge.oil.OilCaverns;
 import net.zagdrath.arcforge.oil.OilDeposits;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -70,11 +72,13 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The Oil Derrick (see OilfieldStructures.Rig), run by its controller. Built over an oil deposit (see OilDeposits), it
-// drills down from its floor to the depth the deposit lies at: a block every oilDerrick.ticksPerBlock ticks, using
-// energyPerTick FE and waterPerTick mB of Water (drilling mud) a tick, and a Steel Pipe for every blocksPerPipe blocks
-// of hole (taken as each length starts). With no deposit under it, it won't drill. When it reaches the oil it strikes
-// it: the rig comes down, its blocks (and whatever it held) are handed back at the hole, and a Well Head caps it, ready
-// for a Pumpjack. It does IO through its ports: Water and Steel Pipes in (Input), FE in (Energy).
+// drills down from its floor to the deposit (the top of its cavern under the bore, where the chunk was generated with
+// caverns; else the depth the deposit lies at): a block every oilDerrick.ticksPerBlock ticks, using energyPerTick FE
+// and waterPerTick mB of Water (drilling mud) a tick, and a Steel Pipe for every blocksPerPipe blocks of hole (taken as
+// each length starts). With no deposit under it, it won't drill. When it reaches the oil it strikes it: the rig comes
+// down, its blocks (and whatever it held) are handed back at the hole, and a Well Head caps it, ready for a Pumpjack;
+// drilled into a gas cap, the Well Head is a gas well, for a Gas Wellhead. It does IO through its ports: Water and
+// Steel Pipes in (Input), FE in (Energy).
 public class OilDerrickBlockEntity extends MachineBlockEntity implements OilfieldController {
     public static final int SLOT_PIPES = 0;
     public static final int MACHINE_SLOTS = 1;
@@ -259,9 +263,21 @@ public class OilDerrickBlockEntity extends MachineBlockEntity implements Oilfiel
             target = 0;
             return MachineStatus.NO_OIL;
         }
-        target = Math.max(1, rig.bore().getY() - deposit.y());
+        // Over a cavern (in chunks generated with them), down to the top of the cavern under the bore: into the gas cap's
+        // dome when it reaches the bore and still holds gas, which makes a gas well. Elsewhere, down to the deposit's
+        // depth, as it always was.
+        BlockPos bore = rig.bore();
+        OilCavern cavern = OilCaverns.cavernAt(level, deposit, bore);
+        int top = cavern != null ? cavern.topAt(bore.getX(), bore.getZ()) : Integer.MIN_VALUE;
+        boolean gas = false;
+        if (top != Integer.MIN_VALUE && top < bore.getY()) {
+            target = Math.max(1, bore.getY() - top);
+            gas = deposit.gasCap() && !cavern.holdsOil(top) && OilDeposits.get(level.getServer()).gasRemaining(deposit, level.getSeed()) > 0;
+        } else {
+            target = Math.max(1, bore.getY() - deposit.y());
+        }
         if (depth >= target) {
-            strike(level);
+            strike(level, gas);
             return MachineStatus.FINISHED;
         }
         if (!controlState.isEnabled() || !redstoneMode.canRun(powered)) {
@@ -305,15 +321,18 @@ public class OilDerrickBlockEntity extends MachineBlockEntity implements Oilfiel
 
     // The hole reaches the oil: the rig comes down and hands its blocks back at the hole, a Well Head caps it, and a
     // spurt of oil shows it. (The controller's slots drop as it goes, like any machine's.)
-    private void strike(ServerLevel level) {
+    private void strike(ServerLevel level, boolean gas) {
         OilfieldStructures.Rig struck = rig;
         if (struck == null) {
             return;
         }
-        ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.CRUDE_OIL.get(), "struck_oil");
         BlockPos bore = struck.bore();
+        ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.CRUDE_OIL.get(), "struck_oil");
+        if (gas) {
+            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.NATURAL_GAS.get(), "struck_gas");
+        }
         for (ServerPlayer player : ArcforgeAdvancements.nearby(level, bore)) {
-            player.sendSystemMessage(Component.translatable("message.arcforge.oil_derrick.struck"));
+            player.sendSystemMessage(Component.translatable(gas ? "message.arcforge.oil_derrick.struck_gas" : "message.arcforge.oil_derrick.struck"));
         }
         rig = null;
         List<ItemStack> handedBack = new ArrayList<>();
@@ -333,14 +352,15 @@ public class OilDerrickBlockEntity extends MachineBlockEntity implements Oilfiel
         handedBack.add(new ItemStack(ModItems.DERRICK_CASING.get(), casings));
         handedBack.add(new ItemStack(ModItems.DERRICK_FRAME.get(), frames));
         handedBack.add(new ItemStack(ModItems.OIL_DERRICK_CONTROLLER.get()));
-        level.setBlock(bore, ModBlocks.WELL_HEAD.get().defaultBlockState(), Block.UPDATE_ALL);
+        level.setBlock(bore, ModBlocks.WELL_HEAD.get().defaultBlockState().setValue(net.zagdrath.arcforge.block.multiblock.WellHeadBlock.GAS, gas),
+                Block.UPDATE_ALL);
         for (ItemStack stack : handedBack) {
             if (!stack.isEmpty()) {
                 Block.popResource(level, bore.above(), stack);
             }
         }
         level.playSound(null, bore, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.6F, 0.6F);
-        level.sendParticles(ParticleTypes.SQUID_INK, bore.getX() + 0.5, bore.getY() + 1.2, bore.getZ() + 0.5, 40, 0.2, 1.2, 0.2, 0.15);
+        level.sendParticles(gas ? ParticleTypes.CLOUD : ParticleTypes.SQUID_INK, bore.getX() + 0.5, bore.getY() + 1.2, bore.getZ() + 0.5, 40, 0.2, 1.2, 0.2, 0.15);
         // Last, the controller itself: its slots drop where it stood.
         level.setBlock(worldPosition, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
     }

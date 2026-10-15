@@ -41,6 +41,12 @@
     },
     "arcforge:refinery_gas": {
       "color": "#C2CCDA"
+    },
+    "arcforge:natural_gas": {
+      "color": "#C8E4F6"
+    },
+    "arcforge:hydrogen_sulfide": {
+      "color": "#C4CC6A"
     }
   }
 }

@@ -22,6 +22,75 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells and three new refinery units; worlds and
+configs carry over).
+
+### Added
+
+- **Oil caverns.** In newly generated chunks every oil deposit is a real cavern full of oil: a sealed, flattened,
+  roughly round chamber (an ellipsoid about twice as wide as it is tall, its edge slightly uneven) under the middle of
+  its patch, between the deposit heights, holding one source block of Crude Oil per bucket of the deposit. A Seep is
+  about 1,000–3,000 blocks, a Giant up to 100,000 and about 70 blocks across. A 2-block shell of stone or deepslate,
+  laid after caves are carved, keeps caves, aquifers and lava out and the oil in; ores and other features don't
+  generate inside it.
+  - **One amount.** The deposit's tracked amount is still the truth. Pumping takes from it, and so does anything that
+    removes the oil's source blocks (buckets, other mods' pumps) at 1,000 mB a block. The oil in the cavern falls to
+    match, a layer at a time from the top down; chunks that weren't loaded catch up when they load.
+  - The **Oil Derrick** drills down to the top of the cavern under its bore, and a **Pumpjack** draws on the whole
+    cavern. The Seismic Survey Tool gives the cavern's depth.
+  - **Surface seeps**: above some Seeps and Pockets in deserts and badlands, a small tar pit of Crude Oil marks the
+    deposit below.
+  - Crude Oil and Sour Crude Oil source blocks don't burn or spread fire.
+- **Sour crude.** Every deposit is sweet or sour: 30% sour, 60% in badlands and deserts (the biome tag
+  `arcforge:sour_rich`). Sour deposits give **Sour Crude Oil** (with its bucket), which the Distillation Array refines
+  like Crude Oil, but its Diesel and Kerosene come out as **Sour Diesel** and **Sour Kerosene**. The Fuel Burner and
+  Firebox Array burn them at 75% of the heat and 100°C cooler; the Diesel Generator, Gas Turbine Array and Jetpack
+  refuse them.
+  - **Hydrotreater** (a single block, heat and FE): 100 mB Sour Diesel or Sour Kerosene and 25 mB Hydrogen make 100 mB
+    Diesel or Kerosene and 25 mB **Hydrogen Sulfide** (a new gas) in 2 seconds, at 300°C or hotter, 20 HU/t and 20 FE/t.
+  - **Sulfur Recovery Unit** (a single block, heat): the Claus process. 500 mB Hydrogen Sulfide and 250 mB Oxygen make
+    a Sulfur Dust and 500 mB Steam in 2 seconds, at 250°C or hotter and 15 HU/t.
+- **Natural gas.** About a third of deposits have a gas cap: an empty dome at the top of the cavern (about its top
+  fifth), holding 2,000 mB of **Natural Gas** (a new gas) per block. An Oil Derrick that drills into the dome makes a
+  gas well.
+  - **Gas Wellhead**, placed on a gas well: the gas flows under its own pressure with no FE, 200 mB/t from a full cap,
+    slowing to 15% of that as it empties, then a trickle of 40 mB a second. Its flow line faces the way it was placed.
+    Modelled on a real gas well's tree: a flanged casing head, master valve, swab cap, a wing with an adjustable choke
+    (red handwheel), a pressure gauge and the flow line's flange.
+  - Natural Gas burns in the Fuel Burner, the Firebox Array and the Gas Turbine Array: 55 HU/mB, up to 1,250°C
+    (`arcforge:burner_fuels`).
+  - **Steam Methane Reformer** (a single block, heat at 700°C or hotter): 100 mB Natural Gas and 100 mB Steam make 100
+    mB Hydrogen and 25 mB Carbon Dioxide in a second at 40 HU/t: Hydrogen far cheaper than the Electrolyzer's. Its
+    Carbon Dioxide leaves through a gas port, for the Carbon Reclaimer or the Greenhouse.
+- **Survey Records.** Using the Seismic Survey Tool with Paper in your inventory uses a sheet and gives a Survey Record
+  of the chunk: dimension, coordinates, the deposit's kind, the oil left at the time, sweet or sour, and whether it has
+  a gas cap, in its tooltip. Right-click one onto a filled map in your inventory to mark the spot with a small oil
+  derrick (one per deposit kind); the map's tooltip lists its marked deposits.
+- Handbook pages (Sour Crude, Sulfur Recovery Unit, Natural Gas, Steam Methane Reformer, Survey Records), JEI categories
+  (Hydrotreating, Sulfur Recovery, Steam Reforming, Gas Wells), Jade tooltips (the Gas Wellhead's flow and gas left,
+  the deposit's sulfur and gas cap), the machine control API for the three units, GameTests, and the advancements
+  Black Gold Below (swim in a cavern), For the Records, Rotten Eggs, Desulfurized, Claus and Effect (goal), Under
+  Pressure (goal) and Hydrogen the Cheap Way.
+
+### Changed
+
+- The Crude Oil, Oil Derrick, Pumpjack, Fuel Burner, Oils and Pitch, Jetpack, Gas Turbine Array and Refinery Fuels
+  Handbook pages cover caverns, sour fuels and Natural Gas. The Seismic Survey Tool also says whether a deposit is
+  sour and has a gas cap.
+- Crude Oil's still and flowing textures are thicker and slower, with a faint oily sheen.
+- Refining recipes (`arcforge:hydrotreating`, `arcforge:sulfur_recovery`, `arcforge:steam_reforming`) can take a second
+  fluid input (`second_input`).
+
+### Upgrading
+
+- Caverns, sour deposits and gas caps only come in chunks generated after this update. The first time a world loads
+  with it, the chunks it already has are noted (from its region files); a deposit reaching any of them gets no cavern
+  and works exactly as before everywhere (invisible, always sweet, no gas cap), so no cavern is ever cut off against
+  old ground. Turn caverns off with `world.oilDeposits.caverns`.
+- New config values: `world.oilDeposits` (`caverns`, `sourChance`, `sourRichChance`, `gasCapChance`, `gasPerBlock`,
+  `surfaceSeepChance`, `cavernCheckInterval`), `power.burners.refineryFuels` (Natural Gas and sour fuel values) and new
+  sections for the Hydrotreater, Sulfur Recovery Unit, Steam Methane Reformer and Gas Wellhead.
+
 ## [2.7.0] - 2026-10-14
 
 ### Added

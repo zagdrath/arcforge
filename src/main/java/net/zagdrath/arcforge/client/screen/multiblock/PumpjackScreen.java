@@ -55,7 +55,7 @@ public class PumpjackScreen extends MachineScreen<PumpjackMenu> {
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
         drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.getEnergy(), menu.getCapacity());
-        drawFluidTank(graphics, ModFluids.CRUDE_OIL.get(), menu.getCrude(), menu.getCrudeCapacity(), crudeFill, tankGauge,
+        drawFluidTank(graphics, menu.getOil(), menu.getCrude(), menu.getCrudeCapacity(), crudeFill, tankGauge,
                 x, y, TANK_X, TANK_Y, TANK_W, TANK_H);
         graphics.fill(x + BAR_X, y + BAR_Y, x + BAR_X + BAR_W, y + BAR_Y + BAR_H, BAR_EMPTY);
         if (menu.getKind() != null) {
@@ -90,7 +90,7 @@ public class PumpjackScreen extends MachineScreen<PumpjackMenu> {
                     .withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.arcforge.fe_per_tick_loss", menu.getUsage()).withStyle(ChatFormatting.RED));
         } else if (isHovering(TANK_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
-            addFluidTooltip(lines, ModFluids.CRUDE_OIL.get(), ModFluids.CRUDE_OIL_TYPE.get().getDescription(), menu.getCrude(), menu.getCrudeCapacity());
+            addFluidTooltip(lines, menu.getOil(), menu.getOil().getFluidType().getDescription(), menu.getCrude(), menu.getCrudeCapacity());
         } else if (isHovering(BAR_X, BAR_Y - 2, BAR_W, BAR_H + 4, mouseX, mouseY) && menu.getKind() != null) {
             lines.add(menu.getLeft() > 0
                     ? Component.translatable("gui.arcforge.pumpjack.left", ArcforgeGui.grouped(menu.getLeft()), ArcforgeGui.grouped(menu.getAmount()))

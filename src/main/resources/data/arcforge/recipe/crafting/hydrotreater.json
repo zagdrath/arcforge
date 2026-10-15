@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PCP",
+    "TKT",
+    "PEP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "C": "arcforge:wrought_pressurized_cylinder",
+    "T": "arcforge:wrought_fluid_tank",
+    "K": "arcforge:thermocouple",
+    "E": "arcforge:wrought_energy_conduit"
+  },
+  "result": {
+    "id": "arcforge:hydrotreater",
+    "count": 1
+  }
+}

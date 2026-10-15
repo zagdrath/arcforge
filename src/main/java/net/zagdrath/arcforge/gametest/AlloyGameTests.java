@@ -181,7 +181,7 @@ final class AlloyGameTests {
         // Derrick Controller, Pumpjack Casing and Controller), and the refinery units' ten (Catalytic Reformer, Coker,
         // Lubricant Blender, Cracking Catalyst, Cracking Unit Casing and Controller, Diesel Generator Casing and Controller,
         // Flare Stack, and Asphalt from Bitumen).
-        helper.assertTrue(crafting == 281, crafting + " crafting/ recipes, not 281");
+        helper.assertTrue(crafting == 285, crafting + " crafting/ recipes, not 285");
         // Plus the fluorite-fluxed steel, and Graphite from Coal Coke and from Carbon Dust.
         helper.assertTrue(smelting == 8, smelting + " arcforge_smelting/ recipes, not 8");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {

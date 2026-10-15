@@ -3,7 +3,9 @@
   "icon": "arcforge:seismic_survey_tool",
   "items": [
     "arcforge:seismic_survey_tool",
+    "arcforge:survey_record",
     "arcforge:crude_oil_bucket",
+    "arcforge:sour_crude_oil_bucket",
     "arcforge:steel_pipe",
     "arcforge:well_head"
   ],
@@ -14,7 +16,15 @@
     },
     {
       "type": "text",
-      "text": "# Seismic Survey Tool\nUse it on the ground: it tells you whether there's oil under this chunk, what kind of deposit it is, roughly how many buckets are left in it, and how deep it lies. Walk the region to find its edges.\n# Getting it out\nBuild an Oil Derrick over the deposit to drill down to it; it leaves a Well Head. Build a Pumpjack round the Well Head to pump the oil out. Several pumpjacks can share one deposit.\n# Running dry\nA Pumpjack slows as its deposit drains, down to a quarter of its full rate. A drained deposit never quite runs dry: every pumpjack on it still gets a trickle of 40 mB a second."
+      "text": "# Oil caverns\nIn newly generated chunks every deposit is a real cavern full of oil: a sealed, flattened, roughly round chamber about twice as wide as it is tall, under the middle of its patch, one Crude Oil source block for every bucket it holds. A Giant Oil Field can be 70 blocks across.\nA 2-block shell of stone or deepslate seals it, so caves, aquifers and lava never break in and the oil never leaks out. Crude Oil doesn't burn, so a cavern can't set a cave alight.\nSome deposits are sour (see Sour Crude) and some have a gas cap: an empty dome at the top of the cavern, full of Natural Gas (see Natural Gas)."
+    },
+    {
+      "type": "text",
+      "text": "# One amount\nThe deposit's amount is what counts. Pumping takes from it, and so does anything that takes the oil's source blocks: a bucket, another mod's pump. Each source block is 1,000 mB. The oil in the cavern falls to match, a layer at a time from the top down, even in chunks that weren't loaded when it was pumped.\n# Surface seeps\nAbove some Oil Seeps and Pockets in deserts and badlands, a small tar pit of Crude Oil marks the deposit below.\n# Older chunks\nA deposit reaching any chunk generated before caverns came in has no cavern: it stays invisible and works as it always has."
+    },
+    {
+      "type": "text",
+      "text": "# Seismic Survey Tool\nUse it on the ground: it tells you whether there's oil under this chunk, what kind of deposit it is, roughly how many buckets are left in it, how deep it lies, and in a cavern whether it's sour and has a gas cap. Walk the region to find its edges. With Paper in your inventory it also writes a Survey Record (see Survey Records).\n# Getting it out\nBuild an Oil Derrick over the deposit: it drills down until it reaches the cavern, then leaves a Well Head. Build a Pumpjack round the Well Head to pump the oil out; it draws on the whole cavern. Several pumpjacks can share one deposit.\n# Running dry\nA Pumpjack slows as its deposit drains, down to a quarter of its full rate. A drained deposit never quite runs dry: every pumpjack on it still gets a trickle of 40 mB a second."
     }
   ]
 }

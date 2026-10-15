@@ -57,6 +57,7 @@ public class Arcforge {
         PortStore.register(modEventBus);
         FoundrySuit.register(modEventBus);
         ModDataComponents.register(modEventBus);
+        net.zagdrath.arcforge.registry.ModMapDecorations.register(modEventBus);
         ModCapabilities.register(modEventBus);
         MachineControls.register(modEventBus);
         GasHandlers.register(modEventBus);

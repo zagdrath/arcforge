@@ -150,7 +150,14 @@ public enum MachineStatus {
     COKING("coking", "led_running"),
     BLENDING("blending", "led_running"),
     FLARING("flaring", "led_running"),
-    THROTTLED("throttled", "led_idle");
+    THROTTLED("throttled", "led_idle"),
+    // Sour crude and natural gas: the Hydrotreater, the Sulfur Recovery Unit and the Steam Methane Reformer at work, and
+    // the second feeds they can lack.
+    HYDROTREATING("hydrotreating", "led_running"),
+    RECOVERING_SULFUR("recovering_sulfur", "led_running"),
+    STEAM_REFORMING("steam_reforming", "led_running"),
+    NO_HYDROGEN("no_hydrogen", "led_blocked"),
+    NO_OXYGEN("no_oxygen", "led_blocked");
 
     private final String name;
     private final String led;
