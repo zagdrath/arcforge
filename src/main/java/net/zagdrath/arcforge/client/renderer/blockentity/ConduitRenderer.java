@@ -21,6 +21,7 @@ import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.item.ItemModelResolver;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.Direction;
@@ -133,7 +134,7 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
     @Override
     public void submit(ConduitRenderState state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         if (state.fluidSprite != null && state.fill > 0.0F) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(state.fluidSprite.atlasLocation()),
+            collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(state.fluidSprite.atlasLocation()),
                     (pose, buffer) -> drawFluid(state, pose, buffer));
         }
         for (ConduitRenderState.Item item : state.items) {

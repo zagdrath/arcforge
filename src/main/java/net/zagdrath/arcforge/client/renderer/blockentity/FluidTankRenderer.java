@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.util.LightCoordsUtil;
@@ -70,7 +70,7 @@ public class FluidTankRenderer implements BlockEntityRenderer<FluidTankBlockEnti
             return;
         }
         float[] box = fluidBox(state.fill, state.gaseous);
-        collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()),
+        collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(sprite.atlasLocation()),
                 (pose, buffer) -> FluidBoxes.box(pose, buffer, sprite, state.color, state.light, box[0], box[1], box[2], box[3], box[4], box[5]));
     }
 

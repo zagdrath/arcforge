@@ -15,6 +15,8 @@ import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.Codec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -67,8 +69,10 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 //    area, or else plants one sapling from its sapling slots on an empty spot where it can grow. It plants in 2x2 patches
 //    with a gap between them, so 2x2 spruce, jungle and dark oak saplings stand together and grow into big trees.
 //  - A tree is a column of logs standing on its area with natural (not player-placed) leaves: it takes every log joined
-//    to it (diagonals too, so branches and 2x2 trunks, and the whole trunk of a neighbour a branch has grown into), up to
-//    maxLogsPerTree (a bigger one is left standing), and every natural leaf round them. Logs drop as an axe would;
+//    to it (diagonals too, so branches and 2x2 trunks, and the whole trunk of a neighbour a branch has grown into), and
+//    every natural leaf round them. Trees grown together into more than maxLogsPerTree logs come down maxLogsPerTree
+//    at a time, the highest logs first; it remembers the trunks of one it has started, so they still count as a tree
+//    once their leaves are gone. Logs drop as an axe would;
 //    leaves drop their saplings, sticks and apples, and themselves too with collectLeaves. Saplings go back into its
 //    sapling slots first (so it replants), everything else into its 9 output slots. A tree whose drops won't all fit waits.
 //  - Felling costs energyPerLog FE a log, planting energyPerPlant, both cut by Energy upgrades.
@@ -90,6 +94,8 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
     private static final int LEAF_REACH = 6;
     // Most leaves it takes from one tree: a safety cap well above any vanilla tree's crown.
     private static final int MAX_LEAVES = 8_192;
+    // Most logs it follows from one base: a safety cap on the search, well above any forest its reach takes in.
+    private static final int MAX_CLUSTER_LOGS = 65_536;
 
     private final ConsumerEnergyHandler energy;
     private final ResourceHandler<ItemResource> itemInput;
@@ -105,6 +111,8 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
     // The last tree felled (logs) and how many it has felled, for the GUI, Jade and tests.
     private int lastLogs;
     private int felled;
+    // The ground logs of trees it has started felling a piece at a time: they're felled even with no leaves left.
+    private final Set<BlockPos> unfinished = new HashSet<>();
 
     public TreeCutterBlockEntity(BlockPos pos, BlockState state) {
         // Defaults: top input (saplings and bone meal), bottom output, back energy.
@@ -234,20 +242,29 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         boolean waitingOnPower = false;
         boolean waitingOnRoom = false;
         Set<BlockPos> seen = new HashSet<>();
+        if (unfinished.removeIf(pos -> !isTreeBase(level, pos))) {
+            setChanged();
+        }
         for (BlockPos base : area) {
             if (seen.contains(base) || !isTreeBase(level, base)) {
                 continue;
             }
-            Tree tree = findTree(level, base, r, centre);
+            Tree tree = findTree(level, base, r, centre, unfinished.contains(base));
             if (tree == null) {
                 continue;
             }
             seen.addAll(tree.logs());
+            seen.addAll(tree.bases());
             if (!ownerMayBreak(level, base)) {
                 continue;
             }
             MachineStatus result = fell(level, base, tree);
             if (result == MachineStatus.FELLING) {
+                if (tree.partial()) {
+                    unfinished.addAll(tree.bases());
+                } else {
+                    tree.bases().forEach(unfinished::remove);
+                }
                 return result;
             }
             waitingOnPower |= result == MachineStatus.NO_POWER;
@@ -271,24 +288,30 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         return state.is(BlockTags.LEAVES) && !(state.hasProperty(LeavesBlock.PERSISTENT) && state.getValue(LeavesBlock.PERSISTENT));
     }
 
-    // A tree's blocks: its logs (bottom first) and its natural leaves.
-    public record Tree(List<BlockPos> logs, List<BlockPos> leaves) {}
+    // A tree's blocks: the logs to fell (bottom first) and its natural leaves; whether those logs are only the top of it
+    // (it's bigger than maxLogsPerTree), and the ground logs of all of it.
+    public record Tree(List<BlockPos> logs, List<BlockPos> leaves, boolean partial, List<BlockPos> bases) {}
 
-    // The tree whose trunk stands at base, or null if it isn't a grown tree (no natural leaves: a log post or a house) or
-    // has more than maxLogsPerTree logs. Logs are joined on any side or diagonal, up or down but not below base, within the
+    public static @Nullable Tree findTree(Level level, BlockPos base, int radius, BlockPos centre) {
+        return findTree(level, base, radius, centre, false);
+    }
+
+    // The tree whose trunk stands at base, or null if it isn't a grown tree (no natural leaves: a log post or a house,
+    // unless started is set: the rest of a tree it has begun felling). One of more than maxLogsPerTree logs gives its
+    // highest maxLogsPerTree, partial, and the leaves that would decay once they're gone. Logs are joined on any side or diagonal, up or down but not below base, within the
     // tree's reach of the area; a trunk beside it on the ground is only taken when they're joined above the ground. Its leaves are every natural leaf joined (on a side) to its logs or to each other that would decay
     // once those logs are gone: the ones no other log keeps within LEAF_REACH steps, as vanilla leaf decay counts. So the
     // whole crown comes down with the tree and nothing is left to rot into saplings, sticks and apples, while leaves a
     // neighbouring trunk still holds stay on the neighbour (which would otherwise be left a bare post that never counts as
     // a tree). It works from the blocks themselves, not the leaves' stored distance, which lags behind a freshly grown tree.
-    public static @Nullable Tree findTree(Level level, BlockPos base, int radius, BlockPos centre) {
+    public static @Nullable Tree findTree(Level level, BlockPos base, int radius, BlockPos centre, boolean started) {
         int maxLogs = ArcforgeConfig.TREE_CUTTER_MAX_LOGS.getAsInt();
         int top = base.getY() + ArcforgeConfig.TREE_CUTTER_MAX_HEIGHT.getAsInt();
         // Branches and crowns may reach this far past the area.
         int reach = radius + 8;
-        Set<BlockPos> logs = new LinkedHashSet<>();
+        Set<BlockPos> cluster = new LinkedHashSet<>();
         ArrayDeque<BlockPos> queue = new ArrayDeque<>();
-        logs.add(base);
+        cluster.add(base);
         queue.add(base);
         while (!queue.isEmpty()) {
             BlockPos pos = queue.poll();
@@ -296,7 +319,7 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
             // down with the rest (left standing, it would be a bare stump that never counts as a tree).
             for (BlockPos next : BlockPos.betweenClosed(pos.offset(-1, -1, -1), pos.offset(1, 1, 1))) {
                 if (next.getY() < base.getY() || next.getY() > top || Math.abs(next.getX() - centre.getX()) > reach
-                        || Math.abs(next.getZ() - centre.getZ()) > reach || logs.contains(next)) {
+                        || Math.abs(next.getZ() - centre.getZ()) > reach || cluster.contains(next)) {
                     continue;
                 }
                 if (!level.isLoaded(next) || !level.getBlockState(next).is(BlockTags.LOGS)) {
@@ -308,12 +331,28 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
                     continue;
                 }
                 BlockPos found = next.immutable();
-                logs.add(found);
-                if (logs.size() > maxLogs) {
+                cluster.add(found);
+                if (cluster.size() > MAX_CLUSTER_LOGS) {
                     return null;
                 }
                 queue.add(found);
             }
+        }
+        List<BlockPos> bases = new ArrayList<>();
+        for (BlockPos pos : cluster) {
+            if (pos.getY() == base.getY()) {
+                bases.add(pos);
+            }
+        }
+        // Too big to take at once: its highest logs, so what's left still stands on its trunks.
+        boolean partial = cluster.size() > maxLogs;
+        Set<BlockPos> logs = cluster;
+        if (partial) {
+            List<BlockPos> highest = new ArrayList<>(cluster);
+            highest.sort((a, b) -> Integer.compare(b.getY(), a.getY()));
+            List<BlockPos> taken = new ArrayList<>(highest.subList(0, maxLogs));
+            java.util.Collections.reverse(taken);
+            logs = new LinkedHashSet<>(taken);
         }
         // The crown: natural leaves within LEAF_REACH steps of the logs (through leaves), as far as a vanilla tree's leaves
         // ever reach; anything further is decaying already, and in a forest it would be the neighbours' canopy. The search
@@ -368,7 +407,9 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
                 leaves.add(pos);
             }
         }
-        return leaves.isEmpty() ? null : new Tree(new ArrayList<>(logs), leaves);
+        // Leaves round it show it's a tree, even where the rest of it holds them all.
+        boolean tree = !leaves.isEmpty() || started || (partial && !crown.isEmpty());
+        return tree ? new Tree(new ArrayList<>(logs), leaves, partial, bases) : null;
     }
 
     // Whether two ground-level logs side by side or corner to corner belong to one 2x2 trunk.
@@ -653,6 +694,8 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         energy.deserialize(input.childOrEmpty("energy"));
         lastLogs = input.getIntOr("last_logs", 0);
         fertilizeCursor = input.getIntOr("fertilize_cursor", 0);
+        unfinished.clear();
+        input.read("unfinished", Codec.LONG.listOf()).ifPresent(list -> list.forEach(pos -> unfinished.add(BlockPos.of(pos))));
     }
 
     @Override
@@ -661,6 +704,9 @@ public class TreeCutterBlockEntity extends MachineBlockEntity {
         energy.serialize(output.child("energy"));
         output.putInt("last_logs", lastLogs);
         output.putInt("fertilize_cursor", fertilizeCursor);
+        if (!unfinished.isEmpty()) {
+            output.store("unfinished", Codec.LONG.listOf(), unfinished.stream().map(BlockPos::asLong).toList());
+        }
     }
 
     @Override

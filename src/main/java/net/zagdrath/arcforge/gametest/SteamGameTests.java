@@ -265,6 +265,49 @@ public final class SteamGameTests {
                 .thenSucceed();
     }
 
+    // Set to Superheated at 1,000°C with its tank holding High-Pressure Steam that a turbine keeps drawing (so it never
+    // empties), a boiler array lifts the stored steam to Superheated, paying 4 HU per mB (5 x 0.8), then makes it.
+    static void boilerLiftsStoredGrade(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 0);
+        boilerArray(helper, min);
+        boolean[] started = { false };
+        int[] heatBefore = { 0 };
+        helper.onEachTick(() -> {
+            if (started[0]) {
+                SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
+                boiler.getHeat().add(1_800);
+                FluidResource stored = boiler.getSteam().getResource(0);
+                boiler.getSteam().set(0, stored, Math.max(0, boiler.getSteam().getAmount() - 50));
+            }
+        });
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
+                    helper.assertTrue(boiler.isMaster(), "Boiler array did not form");
+                    fill(boiler.getWater(), WATER, 40_000);
+                    boiler.getSteam().set(0, SteamGrade.HIGH_PRESSURE.resource(), 8_000);
+                    boiler.setPressure(BoilerPressure.SUPERHEATED);
+                    FiberGameTests.heatTo(boiler.getHeat(), 1_000);
+                    heatBefore[0] = boiler.getHeat().getStored();
+                    started[0] = true;
+                })
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
+                    helper.assertTrue(SteamGrade.of(boiler.getSteam().getResource(0)) == SteamGrade.HIGH_PRESSURE,
+                            "The stored steam turned to " + boiler.getSteam().getResource(0) + " for free");
+                })
+                .thenWaitUntil(() -> helper.assertTrue(SteamGrade.of(boilerAt(helper, min).getSteam().getResource(0)) == SteamGrade.SUPERHEATED,
+                        "Still holds " + boilerAt(helper, min).getSteam().getResource(0)))
+                .thenExecute(() -> {
+                    SteamBoilerArrayBlockEntity boiler = boilerAt(helper, min);
+                    helper.assertTrue(boiler.getSteam().getAmount() > 0, "The tank emptied before it switched");
+                    helper.assertTrue(boiler.getStatus() == MachineStatus.BOILING, "The boiler is " + boiler.getStatus());
+                })
+                .thenSucceed();
+    }
+
     // Set to Steam, a boiler array climbs to the top of Steam's band, 499°C, and holds there boiling all its heat at
     // 6.4 HU/mB (10 x 0.8, less the 20% saved at the top): 200 HU/t makes 31.25 mB/t.
     static void boilerPressureHolds(GameTestHelper helper) {

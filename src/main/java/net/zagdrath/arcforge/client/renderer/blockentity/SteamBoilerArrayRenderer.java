@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -207,7 +208,7 @@ public class SteamBoilerArrayRenderer implements ShellMultiblockRenderer<SteamBo
                             DRUM_INSET, DRUM_INSET, DRUM_INSET, state.sizeX - DRUM_INSET, state.sizeY - DRUM_INSET, state.sizeZ - DRUM_INSET, false);
                     TiledBoxes.lining(pose, buffer, liner, jamb, -1, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows);
                 });
-        collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(water.atlasLocation()), (pose, buffer) -> {
+        collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(water.atlasLocation()), (pose, buffer) -> {
             TiledBoxes.box(pose, buffer, water, state.waterColor, state.light, x0, y0, z0, x1, waterTop, z1, false);
             TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light, x0, steamFloor, z0, x1, y1, z1, false, steamSkip);
         });

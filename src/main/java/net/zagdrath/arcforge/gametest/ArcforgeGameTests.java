@@ -180,6 +180,7 @@ public final class ArcforgeGameTests {
         TESTS.put("boiler_array_grades", SteamGameTests::boilerGrades);
         TESTS.put("boiler_array_pressure_holds", SteamGameTests::boilerPressureHolds);
         TESTS.put("boiler_array_boils_while_climbing", SteamGameTests::boilerBoilsWhileClimbing);
+        TESTS.put("boiler_array_lifts_stored_grade", SteamGameTests::boilerLiftsStoredGrade);
         TESTS.put("boiler_array_vents", SteamGameTests::boilerVents);
         TESTS.put("boiler_array_bigger_is_cheaper", SteamGameTests::boilerBiggerIsCheaper);
         TESTS.put("boiler_array_auto_holds_boiling", SteamGameTests::boilerAutoHoldsBoiling);
@@ -337,6 +338,7 @@ public final class ArcforgeGameTests {
         TESTS.put("tree_cutter_takes_whole_crown", RenewableCoalGameTests::treeCutterTakesWholeCrown);
         TESTS.put("tree_cutter_fells_huge_crown", RenewableCoalGameTests::treeCutterFellsHugeCrown);
         TESTS.put("tree_cutter_takes_joined_trunk", RenewableCoalGameTests::treeCutterTakesJoinedTrunk);
+        TESTS.put("tree_cutter_fells_merged_trees", RenewableCoalGameTests::treeCutterFellsMergedTrees);
         TESTS.put("hydrothermal_discards_water", RenewableCoalGameTests::hydrothermalDiscardsWater);
         TESTS.put("carbon_capture_recipes", CarbonCaptureGameTests::recipes);
         TESTS.put("carbon_reclaimer_balance", CarbonCaptureGameTests::reclaimerBalance);

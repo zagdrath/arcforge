@@ -21,6 +21,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -266,7 +267,7 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
             TextureAtlasSprite sprite = tray.sprite();
             if (sprite != null && tray.pool().length > 0) {
                 int color = tray.color();
-                collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()),
+                collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(sprite.atlasLocation()),
                         (pose, buffer) -> emit(pose, buffer, tray.pool(), sprite, color, light));
             }
         }
@@ -275,7 +276,7 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
             int color = ARGB.color(Math.round(255 * VAPOUR_ALPHA), state.vapourColor);
             for (Tray tray : state.trays) {
                 if (tray.vapour().length > 0) {
-                    collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(vapour.atlasLocation()),
+                    collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(vapour.atlasLocation()),
                             (pose, buffer) -> emitLit(pose, buffer, tray.vapour(), vapour, color, LightCoordsUtil.FULL_BRIGHT));
                 }
             }

@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -180,7 +181,7 @@ public class ThermalEvaporatorRenderer implements BlockEntityRenderer<ThermalEva
         if (fluid != null) {
             float bottom = bed ? bedTop : floor;
             float top = Math.max(bottom + 1.0F / 64.0F, floor + (height - 2 * VOLUME_INSET) * state.level);
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(fluid.atlasLocation()), (pose, buffer) ->
+            collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(fluid.atlasLocation()), (pose, buffer) ->
                     TiledBoxes.box(pose, buffer, fluid, state.fluidColor, state.light, x0, bottom, z0, x1, top, z1, false,
                             bed ? Direction.DOWN : null));
         }

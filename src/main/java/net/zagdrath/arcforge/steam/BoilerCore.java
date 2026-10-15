@@ -34,8 +34,9 @@ import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 // vented, up to maxHeatPerTick HU a tick.
 //
 // The steam tank holds one grade. If the boiler cools into a lower grade, the stored steam drops to it
-// (the pressure falls, the amount stays). If it heats into a higher grade, it keeps making the stored
-// grade until the tank empties, then switches.
+// (the pressure falls, the amount stays). If it heats into a higher grade, it first lifts the stored steam to it,
+// paying the difference in heat per mB out of the heat it would boil with (meanwhile it gives out what it holds), then
+// makes the new grade. So a big tank kept from emptying by a turbine still switches.
 public class BoilerCore {
     public enum State { BOILING, HEATING, NO_WATER, VENTING }
 
@@ -71,6 +72,9 @@ public class BoilerCore {
     private State lastState = State.HEATING;
     private double lastHeatPerMb;
     private boolean ventedSteam;
+    // How much of the stored steam it has paid to lift to a higher grade so far (mB), and whether it lifted any this tick.
+    private double lifted;
+    private boolean lifting;
     // mB/t made and HU/t used, smoothed, for the GUI.
     private double rate;
     private double heatUsed;
@@ -141,7 +145,7 @@ public class BoilerCore {
         rate += (boil - rate) * RATE_SMOOTHING;
         heatUsed += (lastHeatPerMb * boil - heatUsed) * RATE_SMOOTHING;
         State state;
-        if (boil > 0) {
+        if (boil > 0 || lifting) {
             boilingGrace = BOILING_GRACE_TICKS;
             state = State.BOILING;
         } else if (lastState != State.BOILING) {
@@ -162,6 +166,7 @@ public class BoilerCore {
     private double boil(int incoming, int maxHeatPerTick, double costMultiplier, double hotSaving) {
         lastState = State.HEATING;
         ventedSteam = false;
+        lifting = false;
         int temperature = heat.getTemperature();
         SteamGrade grade = SteamGrade.forTemperature(temperature);
         if (grade == null) {
@@ -170,15 +175,14 @@ public class BoilerCore {
         // A set grade is made once the boiler is hot enough for it; until then, the grade it's hot enough for.
         SteamGrade set = pressure.grade();
         boolean atSet = set != null && grade.ordinal() >= set.ordinal();
-        SteamGrade making = gradeToMake(atSet ? set : grade);
+        SteamGrade target = atSet ? set : grade;
+        SteamGrade making = gradeToMake(target);
         if (water.getAmount() <= 0) {
             lastState = State.NO_WATER;
             return 0;
         }
         lastState = State.BOILING;
 
-        double huPerMb = making.huPerMb() * costMultiplier * (1.0 - hotSaving * bandPosition(making, temperature));
-        lastHeatPerMb = huPerMb;
         int top = topCelsius();
         // At the top of its band it boils all the heat above it; under it, what came in less the share it climbs on.
         // Without heat this tick, what it holds at the rate heat had been coming in. It never boils itself below 100°C,
@@ -193,7 +197,26 @@ public class BoilerCore {
         } else {
             usable = Math.max(aboveTop, temperature < top ? incoming * (1.0 - climbShare) : 0.0);
         }
-        double possible = Math.max(0, Math.min(maxHeatPerTick, Math.min(usable, aboveFloor))) / huPerMb;
+        double budget = Math.max(0, Math.min(maxHeatPerTick, Math.min(usable, aboveFloor)));
+        // Stored steam of a lower grade is lifted to the one it's hot enough for before any more is boiled.
+        if (making != target) {
+            double liftPerMb = (target.huPerMb() - making.huPerMb()) * costMultiplier;
+            double spend = Math.min(budget, Math.max(0, steam.getAmount() - lifted) * liftPerMb);
+            lifted += spend / liftPerMb;
+            pendingHeat += spend;
+            budget -= spend;
+            lifting = spend > 0;
+            if (lifted >= steam.getAmount()) {
+                steam.set(0, target.resource(), steam.getAmount());
+                making = target;
+                lifted = 0;
+            }
+        } else {
+            lifted = 0;
+        }
+        double huPerMb = making.huPerMb() * costMultiplier * (1.0 - hotSaving * bandPosition(making, temperature));
+        lastHeatPerMb = huPerMb;
+        double possible = budget / huPerMb;
         double boil = Math.max(0, Math.min(possible, water.getAmount() - pendingSteam));
         pendingSteam += boil;
         pendingHeat += boil * huPerMb;
@@ -223,8 +246,10 @@ public class BoilerCore {
         return heat.bleed(Math.min(excess, max)) > 0;
     }
 
-    // Applies the grade rules to the stored steam and returns the grade to make this tick.
+    // Drops the stored steam to a lower grade and returns the grade to make this tick: the stored one while it's
+    // still being lifted to a higher grade.
     private SteamGrade gradeToMake(SteamGrade grade) {
+        lifted = Math.min(lifted, steam.getAmount());
         SteamGrade stored = steam.getAmount() > 0 ? SteamGrade.of(steam.getResource(0)) : null;
         if (stored == null) {
             return grade;
@@ -239,12 +264,14 @@ public class BoilerCore {
     public void serialize(ValueOutput output) {
         output.putDouble("pending_steam", pendingSteam);
         output.putDouble("pending_heat", pendingHeat);
+        output.putDouble("lifted", lifted);
         output.putInt("pressure", pressure.ordinal());
     }
 
     public void deserialize(ValueInput input) {
         pendingSteam = input.getDoubleOr("pending_steam", 0.0);
         pendingHeat = input.getDoubleOr("pending_heat", 0.0);
+        lifted = input.getDoubleOr("lifted", 0.0);
         pressure = BoilerPressure.byId(input.getIntOr("pressure", 0));
     }
 }

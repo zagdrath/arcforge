@@ -269,6 +269,60 @@ public final class RenewableCoalGameTests {
         helper.succeed();
     }
 
+    // Four 2x2 dark oak trunks grown together under a shared canopy, more logs than maxLogsPerTree, come down a piece at
+    // a time: first the highest maxLogsPerTree logs with the leaves only they hold, then the trunks, which no longer
+    // count as a tree on their own (no leaves) but do once it has started on them.
+    static void treeCutterFellsMergedTrees(GameTestHelper helper) {
+        BlockPos base = new BlockPos(2, 1, 2);
+        int logs = 0;
+        for (int tx = 0; tx <= 3; tx += 3) {
+            for (int tz = 0; tz <= 3; tz += 3) {
+                for (int dx = 0; dx < 2; dx++) {
+                    for (int dz = 0; dz < 2; dz++) {
+                        for (int y = 0; y < 14; y++) {
+                            helper.setBlock(base.offset(tx + dx, y, tz + dz), Blocks.DARK_OAK_LOG);
+                            logs++;
+                        }
+                    }
+                }
+            }
+        }
+        for (int y = 14; y < 16; y++) {
+            for (int dx = 0; dx <= 4; dx++) {
+                for (int dz = 0; dz <= 4; dz++) {
+                    helper.setBlock(base.offset(dx, y, dz), Blocks.DARK_OAK_LOG);
+                    logs++;
+                }
+            }
+        }
+        for (int dx = -1; dx <= 5; dx++) {
+            for (int dz = -1; dz <= 5; dz++) {
+                helper.setBlock(base.offset(dx, 16, dz), Blocks.DARK_OAK_LEAVES);
+            }
+        }
+        int maxLogs = net.zagdrath.arcforge.config.ArcforgeConfig.TREE_CUTTER_MAX_LOGS.getAsInt();
+        helper.assertTrue(logs > maxLogs, "The trees aren't big enough to test: " + logs + " logs");
+        var level = helper.getLevel();
+        BlockPos at = helper.absolutePos(base);
+        TreeCutterBlockEntity.Tree top = TreeCutterBlockEntity.findTree(level, at, 3, at);
+        helper.assertTrue(top != null && top.partial() && top.logs().size() == maxLogs,
+                "Merged trees: " + (top == null ? "none" : top.logs().size() + " logs, partial " + top.partial()));
+        helper.assertTrue(top.bases().size() == 16, top.bases().size() + " ground logs, not 16");
+        helper.assertFalse(top.leaves().isEmpty(), "The canopy wasn't taken");
+        helper.assertTrue(top.logs().contains(helper.absolutePos(base.offset(4, 15, 4))), "The top logs weren't taken first");
+        for (BlockPos pos : top.leaves()) {
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
+        for (BlockPos pos : top.logs()) {
+            level.setBlock(pos, Blocks.AIR.defaultBlockState(), net.minecraft.world.level.block.Block.UPDATE_CLIENTS);
+        }
+        helper.assertTrue(TreeCutterBlockEntity.findTree(level, at, 3, at) == null, "A leafless trunk counted as a tree by itself");
+        TreeCutterBlockEntity.Tree rest = TreeCutterBlockEntity.findTree(level, at, 3, at, true);
+        helper.assertTrue(rest != null && !rest.partial() && rest.logs().contains(at),
+                "The started trunk: " + (rest == null ? "none" : rest.logs().size() + " logs, partial " + rest.partial()));
+        helper.succeed();
+    }
+
     // With Discard returned Water on, a batch gives back no water, and water already in the returned tank is emptied.
     // The setting survives a save and load.
     static void hydrothermalDiscardsWater(GameTestHelper helper) {

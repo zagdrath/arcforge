@@ -121,6 +121,19 @@ Suggested version: **2.7.0** (minor: new content and a rebuilt Distillation Arra
   turbine, so its model lingered and rebuilding it was slow.
 - **Steam Turbine Array windows no longer fill with slats at a slant.** The stage rings now only line the lower half of
   the casing, so the upper panes show the blades from low and side angles.
+- **A Steam Boiler Array set to Superheated makes Superheated Steam again.** A boiler that had made a lower grade
+  (climbing from cold, or after a dip in heat) kept making that grade until its steam tank emptied, and a tank that
+  turbines keep drawing from never empties, so it stayed on High-Pressure at 1,300°C until its redstone was toggled.
+  Once hot enough for a higher grade, it now lifts the stored steam to it, paying the difference in heat per mB
+  (it gives out what it holds meanwhile), then makes the new grade.
+- **The Tree Cutter fells trees grown together into huge clumps.** Trees joined into more than `maxLogsPerTree` logs
+  (256) were left standing. They now come down `maxLogsPerTree` logs at a time, the highest first, and the trunks
+  left after their leaves are gone still count as part of the tree.
+- **Glass conduits show through tanks and windows.** The gas or fluid in a Reservoir or Fluid Tank, the contents of a
+  glass conduit, and what shows through the windows of a Steam Boiler, Firebox, Distillation or Thermal Evaporator
+  Array or an Arcforge Furnace hid the glass of any conduit (and any glass or water) behind it, leaving only the
+  conduit's contents floating there.
+- **The Industrial Water Intake's pipe has a proper end cap.** Its ends showed a scrap of the pipe's side texture.
 
 ### Upgrading
 

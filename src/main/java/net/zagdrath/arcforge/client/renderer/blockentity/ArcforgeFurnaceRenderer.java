@@ -16,6 +16,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -65,7 +66,7 @@ public class ArcforgeFurnaceRenderer implements BlockEntityRenderer<ArcforgeFurn
         // The pool sits on the hearth brick at the bottom of the stack: one block behind the port and one up.
         poseStack.pushPose();
         poseStack.translate(-state.facing.getStepX(), 1.0F, -state.facing.getStepZ());
-        collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()),
+        collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(sprite.atlasLocation()),
                 (pose, buffer) -> FluidBoxes.box(pose, buffer, sprite, 0xFFFFFFFF, LightCoordsUtil.FULL_BRIGHT,
                         INSET, 0.0F, INSET, 1.0F - INSET, DEPTH, 1.0F - INSET));
         poseStack.popPose();

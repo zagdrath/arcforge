@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -167,7 +168,7 @@ public class FireboxArrayRenderer implements BlockEntityRenderer<FireboxArrayBlo
         });
         if (state.burning) {
             TextureAtlasSprite flame = state.flame;
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(flame.atlasLocation()),
+            collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(flame.atlasLocation()),
                     (pose, buffer) -> flames(pose, buffer, flame, state, bedTop));
         }
         poseStack.popPose();
