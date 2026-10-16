@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#c:dusts/zircon",
+    "count": 1
+  },
+  "second_item_input": {
+    "ingredient": "arcforge:coal_coke",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:chlorine",
+      "amount": 200
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:zirconium_tetrachloride",
+    "count": 1
+  },
+  "time": 120
+}

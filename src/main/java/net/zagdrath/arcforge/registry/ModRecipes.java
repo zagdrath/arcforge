@@ -65,6 +65,11 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("distilling")));
     public static final Supplier<RecipeType<ElectrolyzingRecipe>> ELECTROLYZING = RECIPE_TYPES.register("electrolyzing",
             () -> RecipeType.simple(id("electrolyzing")));
+    // The nuclear tier: sintering in the Induction Furnace, and the Heavy Water Tower's isotope exchange.
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.SinteringRecipe>> SINTERING = RECIPE_TYPES.register("sintering",
+            () -> RecipeType.simple(id("sintering")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe>> ISOTOPE_EXCHANGING = RECIPE_TYPES.register(
+            "isotope_exchanging", () -> RecipeType.simple(id("isotope_exchanging")));
     public static final Supplier<RecipeType<FiberizingRecipe>> FIBERIZING = RECIPE_TYPES.register("fiberizing",
             () -> RecipeType.simple(id("fiberizing")));
     public static final Supplier<RecipeType<InfusingRecipe>> INFUSING = RECIPE_TYPES.register("infusing",
@@ -217,6 +222,17 @@ public final class ModRecipes {
     public static final Supplier<RecipeSerializer<TierUpgradeRecipe>> TIER_UPGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("tier_upgrade",
             () -> new RecipeSerializer<>(TierUpgradeRecipe.MAP_CODEC, TierUpgradeRecipe.STREAM_CODEC));
 
+    // A Fuel Rod (a crafting recipe of vanilla's type) at its pellets' enrichment; sintering; isotope exchange.
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.FuelRodRecipe>> FUEL_ROD_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "fuel_rod", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.FuelRodRecipe.MAP_CODEC,
+                    net.zagdrath.arcforge.recipe.FuelRodRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.SinteringRecipe>> SINTERING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "sintering", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.SinteringRecipe.MAP_CODEC,
+                    net.zagdrath.arcforge.recipe.SinteringRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe>> ISOTOPE_EXCHANGING_SERIALIZER =
+            RECIPE_SERIALIZERS.register("isotope_exchanging", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe.MAP_CODEC,
+                    net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe.STREAM_CODEC));
+
     // Sheathing conduits in coloured plastic, and stripping it (a crafting recipe of vanilla's type).
     public static final Supplier<RecipeSerializer<ConduitDyeingRecipe>> CONDUIT_DYEING_SERIALIZER = RECIPE_SERIALIZERS.register("conduit_dyeing",
             () -> new RecipeSerializer<>(ConduitDyeingRecipe.MAP_CODEC, ConduitDyeingRecipe.STREAM_CODEC));
@@ -251,6 +267,7 @@ public final class ModRecipes {
                 MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(), VULCANIZING.get(),
                 HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
                 SIFTING.get(), DIAMOND_PRESSING.get(), CRACKING.get(), REFORMING.get(), COKING.get(), LUBRICANT_BLENDING.get(),
-                HYDROTREATING.get(), SULFUR_RECOVERY.get(), STEAM_REFORMING.get(), STEAM_CRACKING.get(), RecipeType.SMELTING);
+                HYDROTREATING.get(), SULFUR_RECOVERY.get(), STEAM_REFORMING.get(), STEAM_CRACKING.get(), SINTERING.get(), ISOTOPE_EXCHANGING.get(),
+                RecipeType.SMELTING);
     }
 }

@@ -1,0 +1,23 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:zirconium_tetrachloride",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:hydrogen",
+      "amount": 200
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:zirconium_dust",
+    "count": 1
+  },
+  "fluid_output": {
+    "id": "arcforge:hydrochloric_acid",
+    "amount": 200
+  },
+  "time": 200,
+  "energy_per_tick": 160
+}

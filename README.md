@@ -766,8 +766,8 @@ charge. Config `power.batteryArray`.
 
 ### Nuclear
 
-The nuclear tier is for **civil power only**: nothing in it makes a weapon, and enrichment stops at 20% U-235. This
-first part covers the ores, radiation, uranium chemistry and enrichment; reactors come later. Everything is in the
+The nuclear tier is for **civil power only**: nothing in it makes a weapon, and enrichment stops at 20% U-235. It
+covers the ores, radiation, uranium chemistry and enrichment, fuel fabrication and the Fission Reactor. Everything is in the
 **Arcforge: Nuclear** creative tab and the Handbook's Nuclear chapter.
 
 **Ores.** *Uraninite* (pitchblende) is rare, in small veins mostly below Y 0, and needs an iron pickaxe. It drops Raw
@@ -825,6 +825,52 @@ feed, target and tails with the feed and SWU each mB of product takes.
 **Depleted Uranium.** Depleted UF6 + Hydrogen + Steam give Depleted Uranium Dust (and Hydrofluoric Acid back), which
 smelts into ingots and blocks: the best shield (0.05), a little radioactive, and it can stand in for lead in the
 shielding recipes (`arcforge:shielding_metals`).
+
+**Fuel fabrication** (every step keeps the uranium's enrichment):
+
+```
+UF6 + Steam + Hydrogen --[Chemical Reactor]--> Uranium Dioxide (+ Hydrofluoric Acid)
+Uranium Dioxide --[Metal Press, Pellet Die]--> 2 Green Fuel Pellets --[Induction Furnace]--> Fuel Pellet
+Zircon Dust + Coal Coke + Chlorine --> Zirconium Tetrachloride;  + Hydrogen (160 FE/t) --> Zirconium Dust (+ HCl)
+4 Zirconium + Nickel --[Arcforge Furnace]--> 4 Zircaloy --[Metal Press, Rod Die]--> Zircaloy Tube
+Zircaloy Tube + 8 Fuel Pellets of one enrichment --[crafting]--> Fuel Rod
+```
+
+A **Fuel Rod** records its fuel (uranium oxide for now), enrichment, burnup, the plutonium and fission products it has
+built up, and its decay heat when it comes out. Fresh rods are mildly radioactive (0.05 mSv/h); spent ones up to 60 and
+too hot to hold until their decay heat fades. **Control Rods** are silver between steel rods. **Graphite Moderator** and
+**Steel Reflectors** fill cells of a core; **Heavy Water** comes from the **Heavy Water Tower**: a square box of casing
+3 to 5 across and 4 to 8 tall with Exchange Trays inside, each tray taking 1,000 mB of Water, 10 mB of Hydrogen Sulfide
+and 100 mB of Steam every 2 seconds for 5 mB of Heavy Water at 30 FE/t (the Girdler sulfide process).
+
+**Fission Reactor.** Walls of Reactor Casing (Reactor Glass allowed), 3 to 7 across and 3 to 9 tall, the controller in
+a wall, any casing a port. Inside, each block is a cell: a **Fuel Channel** (holds a rod), a **Control Rod Channel**
+(holds a Control Rod; one of four banks, wrench to change), Graphite Moderator, a Steel Reflector, or nothing (coolant).
+Light or Heavy Water fills every empty cell and channel.
+
+- **Physics.** Each second a one-group neutron diffusion over the grid gives each channel's flux and the core's
+  k-effective: moderators (water, Heavy Water, graphite) slow neutrons for more fission in U-235; control rods, fission
+  products, xenon and a little water absorb; reflectors return neutrons at the edges. Delayed neutrons (β 0.65%) give a
+  smooth reactor period up to k = 1.0065; above it the core is prompt critical. Fuel temperature always lowers
+  reactivity (Doppler); boiling lowers it in a water-moderated core and raises it in a graphite-moderated, water-cooled
+  one. Iodine-135 decays into Xenon-135 (half-lives scaled in config), which builds up after power drops. Decay heat
+  is 6.5% of the last power, fading over in-game hours. Fuel burns up its U-235 (a rod lasts about four hours at full
+  power).
+- **Heat and steam.** Fuel, cladding and coolant temperatures and vessel pressure are tracked. A **Hot Leg** port
+  makes it a pressurized core: its coolant stays liquid at 155 bar and leaves as Hot Coolant (60 HU a mB) for a
+  **Steam Generator** (a square box 3 to 7 across and 4 to 12 tall with Steam Generator Tubes inside; each tube block
+  cools 200 mB a tick into High-Pressure Steam, the cooled water going back out). With Steam ports alone it's a boiling
+  core at 70 bar sending **Contaminated Steam** straight to Steam Turbine Arrays, which run on it as High-Pressure Steam
+  and turn slightly radioactive. A channel gives 4,000 HU/t at full power; around 90 channels pass 1,000,000 FE/t
+  through four to six full-size turbine arrays.
+- **Control.** The GUI shows thermal power, k-effective, reactivity, period, the four banks, temperatures, pressure,
+  xenon and decay heat, trends of the last minute, and the protection page. Banks move from the GUI, by redstone (a
+  stop signal SCRAMs it; *Redstone drives rods* holds every bank at least signal/15 in) and by the machine control API
+  (`bank_a`..`bank_d` 0-100, `scram`; switched off, every bank drives in). Trips on high power, short period, high fuel
+  temperature, high pressure and low coolant flow SCRAM it (every rod in within two seconds); RESET clears a trip.
+  Rods load from the nine input slots and spent ones come out to the nine output slots only while it's shut down.
+- **Radiation.** A running core is a strong source through its vessel (`runningDoseRate` scaled by power and decay
+  heat): build concrete, lead or water round it.
 
 ### Fermenting
 

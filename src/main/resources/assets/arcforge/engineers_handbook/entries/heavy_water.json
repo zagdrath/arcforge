@@ -1,0 +1,24 @@
+{
+  "title": "Heavy Water",
+  "icon": "arcforge:heavy_water_bucket",
+  "items": [
+    "arcforge:heavy_water_tower_controller",
+    "arcforge:heavy_water_tower_casing",
+    "arcforge:exchange_tray",
+    "arcforge:heavy_water_bucket"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Heavy Water moderates almost as well as light water but absorbs far fewer neutrons, so a heavy-water core runs on poorer fuel.\n# The Heavy Water Tower\nA square box of Heavy Water Tower Casing, 3 to 5 blocks across and 4 to 8 tall, the controller in a wall, Exchange Trays inside (the rest may be air)."
+    },
+    {
+      "type": "multiblock",
+      "structure": "heavy_water_tower"
+    },
+    {
+      "type": "text",
+      "text": "# The Girdler sulfide process\nWater and Hydrogen Sulfide trade deuterium between a cold and a hot section. Each Exchange Tray takes 1,000 mB of Water, 10 mB of Hydrogen Sulfide and 100 mB of Steam every 2 seconds and makes 5 mB of Heavy Water, using 30 FE/t. Every tray works at once, so more trays make more.\nPorts: Input for the three fluids, Output for the Heavy Water, Energy."
+    }
+  ]
+}

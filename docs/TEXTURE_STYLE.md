@@ -1634,3 +1634,54 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     (hovered: a teal face with a cyan glyph).
   - Lead Box (`gui/container/lead_box`, 176×166): a 3×3 grid of slots in a lead-grey tray (`#3D4451`) over the player
     inventory.
+
+## Fuel fabrication and the Fission Reactor
+- **Natural materials** (the ore method): Zirconium Dust and Zirconium Tetrachloride as Cody's dust, Zirconium and Zircaloy
+  ingots as his ingot. Zirconium a silvery grey with a faint warm cast (`#3E3C3A #6E6C68 #AAA8A2 #ECEAE4`); Zircaloy a
+  step cooler (`#30363C #5A646C #929CA4 #D6DEE4`); the tetrachloride a white powder (`#8C8C86 … #FAFAF4`).
+- **Rods** use the rod level map (`rod_levels`): the Zircaloy Tube on the Zircaloy item ramp (`#3A4046 #4E565E #6E7880
+  #98A2AA #C8D0D6`) with a dark bore at its cut end; the Fuel Rod the same with a uranium-green band near its top and
+  a dark end plug collar; the Control Rod on the silver ramp with two dark absorber bands.
+- **Pellets**: three small cylinders (two standing, one in front), each lit on its top face and down its left, outline
+  `#0C0D0F`. Green (pressed) pellets a dull green-grey (`#3E4A3A … #A8B6A0`); sintered Fuel Pellets a dark glossy
+  green-black (`#121A12 … #7A9A62`). The **Pellet Die** is the plate die with four round pellet cavities engraved in its
+  face (the die engraving rules) and its strip uranium green.
+- **Blocks** (machine steel ramp, `oil.casing`): Reactor Casing has a recessed centre panel with a hazard-yellow plate and
+  the black trefoil; its top is the plain recessed panel. Reactor Glass: the casing's 2 px bevel frame round a translucent
+  cold blue-grey pane (alpha ~92) with an inner lip and glints top-left. Controllers are the casing with a screen recess
+  (the cyan LED, then a k-meter bar, a power trace and a red SCRAM button; a drum level glass and a pressure dial; a
+  tray column and assay bars) over a louvre band. Fuel and Control Rod Channels are an open lattice frame (2 px posts and
+  rails, a spacer grid across the middle) round what stands in it: a Zircaloy tube, or a dark absorber rod with a band in
+  its bank's colour (A red `#C83A2A`, B amber `#E0A020`, C green `#3AA058`, D blue `#3A78D0`); their tops a tube-sheet
+  ring round the bore. Graphite Moderator: stacked bricks in three close near-black matte greys (`#26292C … #42474C`),
+  each lit top-left; its top bored through. Steel Reflector: a machined face turned in concentric rings. Steam Generator
+  Tubes: close pale Inconel tubes behind a support plate; their top a tube sheet of holes. Exchange Tray: a tray deck
+  recess with its weir and downcomer slot; its top the perforated deck.
+- **Fluids**: Heavy Water (a deeper, cooler blue than water), Hot Coolant (a pale steamy blue) and Hot Heavy Water are
+  Hydrochloric Acid's frames re-toned by rank. Contaminated Steam is a gas tint, `#DCF0EC` (a faint green cast on white).
+- **Port: Hot Leg**: the output ring with an orange-red chip (`#F49A6A` / `#C04A2A`) and its face icon.
+- **Large models** ("Large model texturing", on the refinery sheet; VesselMesh). Formed, the vessels' walls and the blocks
+  inside them hide and the renderer draws:
+  - every vessel stands on a plinth (FOOTING under a 2 px DECK); the reactor and Steam Generator stand in a casing frame of
+    4 px plain posts up the corners and beams along the top edges. Round shells are CASING (plated unrolled, riveted),
+    tapering heads bare grain, flanges banded with a plated ring top. The controller's block carries a GEN_PLAIN control
+    cabinet with VENT louvres and a lit M_SCREEN.
+  - **Fission Reactor**: a skirt, the bottom head, the plated shell, a bolted flange pair, a 2:1 elliptical closure head
+    and control-rod drive housings in a 6 px grid on it (slim banded housings, POLISHED latch housings with flat caps), a
+    seismic support ring round them. Each pane of Reactor Glass in the side walls is a viewport in the shell facing it: a
+    bolted boss with the core seen dark through it (M_CORE_DARK, 40..55×96: blue-black water between two fuel channels),
+    and while the reactor is critical the Cherenkov glow over it (M_CORE_LIT, 24..39×96, full-bright: the water stepping
+    up from the channels' edges to a pale blue middle, the channels a deeper blue, spacer grids a step lighter; both tiles
+    seamless and never dithered). Roof and floor glass have no viewport.
+  - **Steam Generator**: a skirt, a hemispherical channel head, the tubesheet flange, the tube-bundle shell, a conical
+    transition out to the wider steam drum (with a manway boss facing front), a girth band, the elliptical top head and
+    the steam outlet standing on its crown.
+  - **Heavy Water Tower**: squat, filling most of its footprint: a skirt, the bottom head, the shell in plated sections a
+    block tall with a flange at each tray seam, the top head and gas outlet, and the hydrogen sulfide loop pipe down its
+    back left (seen from the front), in at the lowest and highest sections.
+- **GUIs**: Fission Reactor (`gui/container/fission_reactor`, 176×254, the inventory 172 down): one big screen
+  (6..169×15..119) and the nine rod input and nine output slots under it. Sprites: the bank fill (a steel bar with dark
+  absorber lines) and target marker (cyan), the − / + buttons, SCRAM (red), RESET and the page arrow (each hovered, the
+  cascade's button style), toggles on (teal) and off. Steam Generator (176×166): four 12×52 tank recesses and the screen
+  between. Heavy Water Tower (176×166): the FE gauge, three input tanks, the screen with a progress track, the output
+  tank. Tank gauges 52 tall, a water and a gas fill, the Diesel Generator's LEDs and energy bar.

@@ -552,6 +552,40 @@ public final class ModItems {
     public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> GAS_CENTRIFUGE = ITEMS.registerItem("gas_centrifuge",
             p -> new net.minecraft.world.item.DoubleHighBlockItem(ModBlocks.GAS_CENTRIFUGE.get(), p), p -> p.useBlockDescriptionPrefix());
 
+    // Fuel fabrication: enriched UO2 (a Uranium Dioxide carrying its assay) pressed into green pellets with the Pellet
+    // Die, sintered into Fuel Pellets in the Induction Furnace; Zirconium from Zircon, alloyed into Zircaloy and drawn
+    // into tubes; a Fuel Rod is a Zircaloy Tube of Fuel Pellets (see FuelRod). Control Rods (silver alloy), and Heavy
+    // Water.
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.DieItem> PELLET_DIE = ITEMS.registerItem("pellet_die",
+            net.zagdrath.arcforge.item.tool.DieItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<Item> GREEN_FUEL_PELLET = ITEMS.registerSimpleItem("green_fuel_pellet");
+    public static final DeferredItem<Item> FUEL_PELLET = ITEMS.registerSimpleItem("fuel_pellet");
+    public static final DeferredItem<Item> ZIRCONIUM_TETRACHLORIDE = ITEMS.registerSimpleItem("zirconium_tetrachloride");
+    public static final DeferredItem<Item> ZIRCONIUM_DUST = ITEMS.registerSimpleItem("zirconium_dust");
+    public static final DeferredItem<Item> ZIRCONIUM_INGOT = ITEMS.registerSimpleItem("zirconium_ingot");
+    public static final DeferredItem<Item> ZIRCALOY_INGOT = ITEMS.registerSimpleItem("zircaloy_ingot");
+    public static final DeferredItem<Item> ZIRCALOY_TUBE = ITEMS.registerSimpleItem("zircaloy_tube");
+    public static final DeferredItem<net.zagdrath.arcforge.item.nuclear.FuelRodItem> FUEL_ROD = ITEMS.registerItem("fuel_rod",
+            net.zagdrath.arcforge.item.nuclear.FuelRodItem::new, p -> p.stacksTo(1));
+    public static final DeferredItem<Item> CONTROL_ROD = ITEMS.registerSimpleItem("control_rod");
+    public static final DeferredItem<BucketItem> HEAVY_WATER_BUCKET = ITEMS.registerItem("heavy_water_bucket",
+            p -> new BucketItem(ModFluids.HEAVY_WATER.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+
+    // The Fission Reactor, the Steam Generator and the Heavy Water Tower.
+    public static final DeferredItem<BlockItem> REACTOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.REACTOR_CONTROLLER);
+    public static final DeferredItem<BlockItem> REACTOR_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.REACTOR_CASING);
+    public static final DeferredItem<BlockItem> REACTOR_GLASS = ITEMS.registerSimpleBlockItem(ModBlocks.REACTOR_GLASS);
+    public static final DeferredItem<BlockItem> FUEL_CHANNEL = ITEMS.registerSimpleBlockItem(ModBlocks.FUEL_CHANNEL);
+    public static final DeferredItem<BlockItem> CONTROL_ROD_CHANNEL = ITEMS.registerSimpleBlockItem(ModBlocks.CONTROL_ROD_CHANNEL);
+    public static final DeferredItem<BlockItem> GRAPHITE_MODERATOR = ITEMS.registerSimpleBlockItem(ModBlocks.GRAPHITE_MODERATOR);
+    public static final DeferredItem<BlockItem> STEEL_REFLECTOR = ITEMS.registerSimpleBlockItem(ModBlocks.STEEL_REFLECTOR);
+    public static final DeferredItem<BlockItem> STEAM_GENERATOR_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_GENERATOR_CONTROLLER);
+    public static final DeferredItem<BlockItem> STEAM_GENERATOR_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_GENERATOR_CASING);
+    public static final DeferredItem<BlockItem> STEAM_GENERATOR_TUBES = ITEMS.registerSimpleBlockItem(ModBlocks.STEAM_GENERATOR_TUBES);
+    public static final DeferredItem<BlockItem> HEAVY_WATER_TOWER_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.HEAVY_WATER_TOWER_CONTROLLER);
+    public static final DeferredItem<BlockItem> HEAVY_WATER_TOWER_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.HEAVY_WATER_TOWER_CASING);
+    public static final DeferredItem<BlockItem> EXCHANGE_TRAY = ITEMS.registerSimpleBlockItem(ModBlocks.EXCHANGE_TRAY);
+
     private static DeferredItem<Item> hazmat(String name, ArmorType type) {
         return ITEMS.registerItem(name, p -> new Item(p) {
             @Override
@@ -571,7 +605,12 @@ public final class ModItems {
                 URANYL_SULFATE_SOLUTION_BUCKET, AMMONIUM_DIURANATE, YELLOWCAKE, URANIUM_DIOXIDE, HYDROFLUORIC_ACID_BUCKET, URANIUM_TETRAFLUORIDE,
                 CENTRIFUGE_CASCADE_CONTROLLER, CENTRIFUGE_CASCADE_CASING, GAS_CENTRIFUGE,
                 DEPLETED_URANIUM_DUST, DEPLETED_URANIUM_INGOT, DEPLETED_URANIUM_BLOCK,
-                GEIGER_COUNTER, DOSIMETER, HAZMAT_HELMET, HAZMAT_CHESTPLATE, HAZMAT_LEGGINGS, HAZMAT_BOOTS, LEAD_BOX, LEAD_BRICKS, CONCRETE_SHIELDING);
+                GEIGER_COUNTER, DOSIMETER, HAZMAT_HELMET, HAZMAT_CHESTPLATE, HAZMAT_LEGGINGS, HAZMAT_BOOTS, LEAD_BOX, LEAD_BRICKS, CONCRETE_SHIELDING,
+                PELLET_DIE, GREEN_FUEL_PELLET, FUEL_PELLET, ZIRCONIUM_TETRACHLORIDE, ZIRCONIUM_DUST, ZIRCONIUM_INGOT, ZIRCALOY_INGOT, ZIRCALOY_TUBE,
+                FUEL_ROD, CONTROL_ROD, HEAVY_WATER_BUCKET,
+                HEAVY_WATER_TOWER_CONTROLLER, HEAVY_WATER_TOWER_CASING, EXCHANGE_TRAY,
+                REACTOR_CONTROLLER, REACTOR_CASING, REACTOR_GLASS, FUEL_CHANNEL, CONTROL_ROD_CHANNEL, GRAPHITE_MODERATOR, STEEL_REFLECTOR,
+                STEAM_GENERATOR_CONTROLLER, STEAM_GENERATOR_CASING, STEAM_GENERATOR_TUBES);
     }
 
     // The ore items in creative tab order: per ore its ore, deepslate ore, raw item, raw block, dust,

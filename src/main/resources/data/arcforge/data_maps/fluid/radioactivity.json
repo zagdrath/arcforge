@@ -17,6 +17,24 @@
     },
     "arcforge:flowing_depleted_uranium_hexafluoride": {
       "dose_rate": 0.18
+    },
+    "arcforge:hot_coolant": {
+      "dose_rate": 0.3
+    },
+    "arcforge:flowing_hot_coolant": {
+      "dose_rate": 0.3
+    },
+    "arcforge:hot_heavy_water": {
+      "dose_rate": 0.3
+    },
+    "arcforge:flowing_hot_heavy_water": {
+      "dose_rate": 0.3
+    },
+    "arcforge:contaminated_steam": {
+      "dose_rate": 0.3
+    },
+    "arcforge:flowing_contaminated_steam": {
+      "dose_rate": 0.3
     }
   }
 }

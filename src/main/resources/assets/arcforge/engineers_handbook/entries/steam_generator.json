@@ -1,0 +1,23 @@
+{
+  "title": "Steam Generator",
+  "icon": "arcforge:steam_generator_controller",
+  "items": [
+    "arcforge:steam_generator_controller",
+    "arcforge:steam_generator_casing",
+    "arcforge:steam_generator_tubes"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A vertical heat exchanger for a pressurized core.\n# Building it\nA square box of Steam Generator Casing 3 to 7 blocks across and 4 to 12 tall, the controller in a wall, Steam Generator Tubes inside (the rest may be air)."
+    },
+    {
+      "type": "multiblock",
+      "structure": "steam_generator"
+    },
+    {
+      "type": "text",
+      "text": "# Running it\nHot Coolant (or Hot Heavy Water) and feedwater come in through Input ports. Each tube block cools up to 200 mB of hot coolant a tick; each mB carries 60 HU, which boils feedwater into High-Pressure Steam (12 HU a mB) for the Steam Turbine Arrays. The cooled coolant goes back out of Output ports to the reactor, steam out of Steam ports."
+    }
+  ]
+}

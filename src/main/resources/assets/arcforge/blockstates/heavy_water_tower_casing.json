@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_casing"
+    },
+    "formed=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    }
+  }
+}

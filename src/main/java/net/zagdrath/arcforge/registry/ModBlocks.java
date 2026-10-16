@@ -807,6 +807,60 @@ public final class ModBlocks {
             "gas_centrifuge", net.zagdrath.arcforge.block.multiblock.GasCentrifugeBlock::new,
             p -> columnProperties(p).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
 
+    // --- The Fission Reactor and what feeds and serves it (see VesselStructures; the Nuclear chapter of the Handbook) ---
+    public static final DeferredBlock<LiquidBlock> HEAVY_WATER = BLOCKS.registerBlock("heavy_water",
+            p -> new LiquidBlock(ModFluids.HEAVY_WATER.get(), p) {},
+            p -> liquidProperties(p, MapColor.WATER));
+    // The reactor vessel's walls: casings (any can be a port), leaded glass windows, and the controller.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> REACTOR_CASING = BLOCKS.registerBlock("reactor_casing",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR, p),
+            p -> columnProperties(p).strength(5.0F, 24.0F).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselGlassBlock> REACTOR_GLASS = BLOCKS.registerBlock("reactor_glass",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselGlassBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR, p),
+            p -> p.mapColor(MapColor.NONE).strength(3.0F, 18.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS).noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false).isRedstoneConductor((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false).isViewBlocking((state, level, pos, box) -> false));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity>> REACTOR_CONTROLLER = BLOCKS.registerBlock(
+            "reactor_controller", p -> new net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<>(() -> net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR,
+                    ModBlockEntityTypes.FISSION_REACTOR, net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity::new, p),
+            p -> columnProperties(p).strength(5.0F, 24.0F).forceSolidOn()
+                    .lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.VesselControllerBlock.LIT) ? 9 : 0));
+    // Inside the vessel.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock> FUEL_CHANNEL = BLOCKS.registerBlock("fuel_channel",
+            p -> new net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR, p),
+            p -> columnProperties(p).noOcclusion());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.ControlRodChannelBlock> CONTROL_ROD_CHANNEL = BLOCKS.registerBlock("control_rod_channel",
+            p -> new net.zagdrath.arcforge.block.nuclear.ControlRodChannelBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR, p),
+            p -> columnProperties(p).noOcclusion());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock> GRAPHITE_MODERATOR = BLOCKS.registerBlock("graphite_moderator",
+            p -> new net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR, p),
+            p -> p.mapColor(MapColor.COLOR_BLACK).strength(3.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.STONE));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock> STEEL_REFLECTOR = BLOCKS.registerBlock("steel_reflector",
+            p -> new net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR, p),
+            p -> columnProperties(p).strength(5.0F, 12.0F));
+    // The Steam Generator: casings round a bundle of Steam Generator Tubes.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> STEAM_GENERATOR_CASING = BLOCKS.registerBlock("steam_generator_casing",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.STEAM_GENERATOR, p),
+            p -> columnProperties(p).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity>> STEAM_GENERATOR_CONTROLLER = BLOCKS.registerBlock(
+            "steam_generator_controller", p -> new net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<>(() -> net.zagdrath.arcforge.multiblock.VesselStructures.STEAM_GENERATOR,
+                    ModBlockEntityTypes.STEAM_GENERATOR, net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity::new, p),
+            p -> columnProperties(p).forceSolidOn().lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.VesselControllerBlock.LIT) ? 7 : 0));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock> STEAM_GENERATOR_TUBES = BLOCKS.registerBlock("steam_generator_tubes",
+            p -> new net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.STEAM_GENERATOR, p),
+            p -> columnProperties(p).noOcclusion());
+    // The Heavy Water Tower: casings round its Exchange Trays.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> HEAVY_WATER_TOWER_CASING = BLOCKS.registerBlock("heavy_water_tower_casing",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.HEAVY_WATER_TOWER, p),
+            p -> columnProperties(p).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity>> HEAVY_WATER_TOWER_CONTROLLER = BLOCKS.registerBlock(
+            "heavy_water_tower_controller", p -> new net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<>(() -> net.zagdrath.arcforge.multiblock.VesselStructures.HEAVY_WATER_TOWER,
+                    ModBlockEntityTypes.HEAVY_WATER_TOWER, net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity::new, p),
+            p -> columnProperties(p).forceSolidOn().lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.VesselControllerBlock.LIT) ? 7 : 0));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock> EXCHANGE_TRAY = BLOCKS.registerBlock("exchange_tray",
+            p -> new net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.HEAVY_WATER_TOWER, p),
+            p -> columnProperties(p).noOcclusion());
+
     // The Thermal Evaporator Array: a 3x3x9 steel tower (see ThermalEvaporatorStructure), like the other arrays'
     // casings.
     public static final DeferredBlock<ThermalEvaporatorCasingBlock> THERMAL_EVAPORATOR_CASING = BLOCKS.registerBlock("thermal_evaporator_casing",

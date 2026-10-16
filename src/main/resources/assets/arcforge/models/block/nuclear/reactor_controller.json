@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "top": "arcforge:block/nuclear/reactor_casing_top",
+    "bottom": "arcforge:block/nuclear/reactor_casing_top",
+    "side": "arcforge:block/nuclear/reactor_casing",
+    "front": "arcforge:block/nuclear/reactor_controller"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "title": "Reactor Control and Protection",
+  "icon": "arcforge:control_rod",
+  "items": [
+    "arcforge:control_rod_channel"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Rod banks\nEach Control Rod Channel belongs to one of four banks (A to D; wrench it to change). Banks drive in from the top. Move them with the GUI's − / + buttons (shift for 10%), by redstone or through the machine control API (bank_a to bank_d, 0 to 100%).\n- Redstone that tells the reactor to stop SCRAMs it.\n- With Redstone drives rods on, a signal holds every bank at least signal/15 in.\n- Switched off through the API, every bank drives all the way in."
+    },
+    {
+      "type": "text",
+      "text": "# Protection\nTrip points, each switched on or off and set on the Protection page: high power, short period, high fuel temperature, high pressure and low coolant flow. A trip SCRAMs the reactor: every rod falls in within two seconds. The SCRAM button does the same. RESET clears a trip once its cause has gone; the rods stay in.\nIf the cladding fails the reactor SCRAMs for good; if the fuel melts, every rod in the core is ruined."
+    },
+    {
+      "type": "text",
+      "text": "# Radiation\nA running core is a strong source through its vessel, and spent rods are worse. Build shielding round it: concrete, lead and water."
+    }
+  ]
+}

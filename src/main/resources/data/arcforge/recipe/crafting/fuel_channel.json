@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S S",
+    "TZT",
+    "S S"
+  ],
+  "key": {
+    "S": "#c:rods/steel",
+    "T": "#c:plates/steel",
+    "Z": "arcforge:zircaloy_tube"
+  },
+  "result": {
+    "id": "arcforge:fuel_channel",
+    "count": 2
+  }
+}

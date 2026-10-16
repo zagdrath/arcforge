@@ -38,6 +38,8 @@ public final class GasTints {
     public static final int FLUORINE = 0xFFE6E49A;
     public static final int URANIUM_HEXAFLUORIDE = 0xFFDCE0D0;
     public static final int DEPLETED_URANIUM_HEXAFLUORIDE = 0xFFB4B8AC;
+    // A boiling reactor's steam: steam with the faintest blue-green cast.
+    public static final int CONTAMINATED_STEAM = 0xFFDCF0EC;
 
     private GasTints() {}
 }

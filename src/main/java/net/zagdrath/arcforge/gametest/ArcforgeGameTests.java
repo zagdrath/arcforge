@@ -592,6 +592,14 @@ public final class ArcforgeGameTests {
         TESTS.put("nuclear_cascade_enriches", NuclearGameTests::cascadeEnriches);
         TESTS.put("nuclear_cascade_forms_whole_floor", NuclearGameTests::cascadeFormsWholeFloor);
         TESTS.put("nuclear_corrosive_storage", NuclearGameTests::corrosiveStorage);
+        TESTS.put("fission_reactor_physics", FissionGameTests::reactorPhysics);
+        TESTS.put("fission_fuel_rods", FissionGameTests::fuelRods);
+        TESTS.put("fission_fuel_fabrication", FissionGameTests::fuelFabrication);
+        TESTS.put("fission_contaminated_steam", FissionGameTests::contaminatedSteam);
+        TESTS.put("fission_reactor_model", FissionGameTests::reactorModel);
+        TESTS.put("fission_steam_generator", FissionGameTests::steamGenerator);
+        TESTS.put("fission_heavy_water_tower", FissionGameTests::heavyWaterTower);
+        LONG_TESTS.put("fission_reactor_forms", FissionGameTests::reactorForms);
         RADIATION_TESTS.put("nuclear_radiation_field", NuclearGameTests::radiationField);
         RADIATION_TESTS.put("nuclear_hazmat_and_dose", NuclearGameTests::hazmatAndDose);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));

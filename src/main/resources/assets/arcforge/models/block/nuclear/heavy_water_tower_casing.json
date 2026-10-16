@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "arcforge:block/nuclear/heavy_water_tower_casing_top",
+    "bottom": "arcforge:block/nuclear/heavy_water_tower_casing_top",
+    "side": "arcforge:block/nuclear/heavy_water_tower_casing"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "title": "Fuel Rods",
+  "icon": "arcforge:fuel_rod",
+  "items": [
+    "arcforge:fuel_rod",
+    "arcforge:control_rod"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Fuel Rod\nA Zircaloy Tube in the middle of a crafting grid with eight Fuel Pellets round it, all of one enrichment. A rod records its fuel (uranium oxide for now), its enrichment, its burnup, the plutonium and fission products it has built up, and its decay heat.\nFresh rods are only mildly radioactive."
+    },
+    {
+      "type": "text",
+      "text": "# Burnup\nIn the core a rod uses up its U-235 and builds up fission products, which absorb neutrons, and some plutonium, which fissions too. At full power a rod lasts about four hours. Spent rods come out intensely radioactive and hot: their decay heat burns bare hands until it fades. Keep them in a Lead Box.\n# Control Rod\nSilver between steel rods: a strong neutron absorber, for Control Rod Channels."
+    }
+  ]
+}

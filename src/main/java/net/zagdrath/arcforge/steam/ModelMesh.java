@@ -53,6 +53,9 @@ public abstract class ModelMesh {
         M_HAZARD(112, 104, 8, 4, Kind.TILED), RAMPS(0, 112, 104, 8, Kind.TILED), M_FIRE(0, 120, 8, 6, Kind.MODULE),
         // A furnace's refractory firebrick and a control panel's lit screen (drawn in the glow list).
         M_BRICK(0, 96, 16, 8, Kind.MODULE), M_SCREEN(16, 96, 8, 6, Kind.MODULE),
+        // A fission core seen through a reactor viewport: running (the Cherenkov glow, drawn in the glow list) and shut
+        // down (dark water between the fuel channels).
+        M_CORE_LIT(24, 96, 16, 16, Kind.MODULE), M_CORE_DARK(40, 96, 16, 16, Kind.MODULE),
         POLISHED(104, 112, 4, 8, Kind.BANDED),
         PLATE(0, 8, 16, 16, true, Cuts.SPLIT, Cuts.CORNERS),
         PLAIN(16, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),

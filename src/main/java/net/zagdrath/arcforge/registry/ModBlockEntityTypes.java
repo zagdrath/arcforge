@@ -178,6 +178,15 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity>> CENTRIFUGE_CASCADE =
             BLOCK_ENTITY_TYPES.register("centrifuge_cascade", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::new, ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity>> FISSION_REACTOR =
+            BLOCK_ENTITY_TYPES.register("fission_reactor", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity::new, ModBlocks.REACTOR_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity>> STEAM_GENERATOR =
+            BLOCK_ENTITY_TYPES.register("steam_generator", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity::new, ModBlocks.STEAM_GENERATOR_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity>> HEAVY_WATER_TOWER =
+            BLOCK_ENTITY_TYPES.register("heavy_water_tower", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity::new, ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity>> LITHIUM_CELL =
             BLOCK_ENTITY_TYPES.register("lithium_cell", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity::new, tierBlocks(ModBlocks::lithiumCell)));

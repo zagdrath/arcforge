@@ -220,7 +220,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         } else {
             ChemicalReactingRecipe recipe = holder.value();
             total = ticksFor(recipe);
-            makingItem = recipe.itemOutput().map(template -> template.create()).orElse(ItemStack.EMPTY);
+            makingItem = recipe.itemOutput().map(template -> product(recipe, template.create())).orElse(ItemStack.EMPTY);
             makingFluid = recipe.fluidOutput().map(template -> template.create()).orElse(FluidStack.EMPTY);
         }
 
@@ -272,7 +272,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     // Whether everything the recipe makes fits right now: the item in the output slot, the fluid in the output
     // tank, and the byproduct (if it could come) in its slot.
     private boolean fits(ChemicalReactingRecipe recipe) {
-        if (recipe.itemOutput().isPresent() && !fits(items.getStack(SLOT_OUTPUT), recipe.itemOutput().get().create())) {
+        if (recipe.itemOutput().isPresent() && !fits(items.getStack(SLOT_OUTPUT), product(recipe, recipe.itemOutput().get().create()))) {
             return false;
         }
         if (recipe.byproduct().isPresent() && !fits(items.getStack(SLOT_BYPRODUCT), recipe.byproduct().get().create())) {
@@ -322,6 +322,8 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             itemsUsed += wanted.count();
         }
         int fluidUsed = 0;
+        // Made before the inputs go, so it takes their U-235 assay (enriched UF6 into enriched Uranium Dioxide).
+        ItemStack product = recipe.itemOutput().map(template -> product(recipe, template.create())).orElse(ItemStack.EMPTY);
         List<FluidStack> madeFluids = new ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
             for (int i = 0; i < tanks.length; i++) {
@@ -341,11 +343,10 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             tx.commit();
         }
         List<ItemStack> madeItems = new ArrayList<>();
-        recipe.itemOutput().ifPresent(template -> {
-            ItemStack product = template.create();
+        if (!product.isEmpty()) {
             madeItems.add(product.copy());
             add(SLOT_OUTPUT, product);
-        });
+        }
         if (recipe.byproduct().isPresent() && level.getRandom().nextFloat() < recipe.byproductChance()) {
             ItemStack byproduct = recipe.byproduct().get().create();
             madeItems.add(byproduct.copy());
@@ -354,6 +355,17 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         controlState.completed(madeItems, madeFluids, itemsUsed, fluidUsed);
         ArcforgeAdvancements.produced(this, recipe.itemOutput().map(template -> template.create()).orElse(ItemStack.EMPTY),
                 recipe.fluidOutput().map(template -> template.create().getFluid()).orElse(null), recipe.category());
+    }
+
+    // An item the reactor makes, carrying the U-235 assay of an input tank holding an assayed gas (UF6) the recipe uses.
+    private ItemStack product(ChemicalReactingRecipe recipe, ItemStack made) {
+        for (int tank = 0; tank < 3; tank++) {
+            FilteredFluidTank input = inputTank(tank);
+            if (input.getAmount() > 0 && recipe.fluidInputs().stream().anyMatch(in -> in.fluids().contains(input.getResource(0).getFluid()))) {
+                net.zagdrath.arcforge.nuclear.Enrichment.carry(input.getResource(0), made);
+            }
+        }
+        return made;
     }
 
     private void add(int slot, ItemStack product) {

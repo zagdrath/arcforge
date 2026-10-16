@@ -145,6 +145,11 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(NuclearProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeCasingBlock.class);
         registration.registerBlockDataProvider(NuclearProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.GasCentrifugeBlock.class);
         registration.registerBlockDataProvider(NuclearProvider.INSTANCE, net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity.class);
+        // The Fission Reactor, the Steam Generator and the Heavy Water Tower, from any block of them.
+        registration.registerBlockDataProvider(VesselProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.VesselControllerBlockEntity.class);
+        registration.registerBlockDataProvider(VesselProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.VesselCasingBlock.class);
+        registration.registerBlockDataProvider(VesselProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.VesselGlassBlock.class);
+        registration.registerBlockDataProvider(VesselProvider.INSTANCE, net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity.class);
         registration.registerBlockDataProvider(BatteryArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.BatteryArrayCasingBlock.class);
@@ -276,6 +281,11 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.block.multiblock.CentrifugeCascadeCasingBlock.class, net.zagdrath.arcforge.block.multiblock.GasCentrifugeBlock.class,
                 net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock.class)) {
             registration.registerBlockComponent(NuclearProvider.Client.INSTANCE, type);
+        }
+        for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.VesselControllerBlock.class,
+                net.zagdrath.arcforge.block.multiblock.VesselCasingBlock.class, net.zagdrath.arcforge.block.multiblock.VesselGlassBlock.class,
+                net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock.class)) {
+            registration.registerBlockComponent(VesselProvider.Client.INSTANCE, type);
         }
         for (Class<? extends Block> type : List.of(net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.class,
                 net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class, PressureGlassBlock.class)) {

@@ -1,0 +1,28 @@
+{
+  "variants": {
+    "bank=0,formed=false": {
+      "model": "arcforge:block/nuclear/control_rod_channel_a"
+    },
+    "bank=0,formed=true": {
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "bank=1,formed=false": {
+      "model": "arcforge:block/nuclear/control_rod_channel_b"
+    },
+    "bank=1,formed=true": {
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "bank=2,formed=false": {
+      "model": "arcforge:block/nuclear/control_rod_channel_c"
+    },
+    "bank=2,formed=true": {
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "bank=3,formed=false": {
+      "model": "arcforge:block/nuclear/control_rod_channel_d"
+    },
+    "bank=3,formed=true": {
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    }
+  }
+}

@@ -23,9 +23,12 @@ import net.zagdrath.arcforge.blockentity.multiblock.BiogasDigesterBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.OilDerrickBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.control.MachineControlSpec;
@@ -89,6 +92,32 @@ public final class ControllerMultiblockSpecs {
                         .tank(SlotRole.OUTPUT, net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity::getTails)
                         .fluidAutomation(be -> be.getFluidHandler(null))
                         .build());
+
+        // The Fission Reactor: its rod slots, its coolant intake, hot leg and steam, each rod bank's target insertion
+        // (0-100%, as the GUI sets it) and the SCRAM (on drops every rod in; off resets the trip once its cause is
+        // gone). Switched off through the API, its banks are driven all the way in.
+        MachineControls.register(ModBlockEntityTypes.FISSION_REACTOR.get(), reactor());
+
+        // The Steam Generator: its hot leg and feedwater in, its cold leg and High-Pressure Steam out.
+        MachineControls.register(ModBlockEntityTypes.STEAM_GENERATOR.get(), MachineControlSpec.builder(SteamGeneratorBlockEntity.class)
+                .primary(SteamGeneratorBlockEntity::isFormed)
+                .tank(SlotRole.INPUT, SteamGeneratorBlockEntity::getHot)
+                .tank(SlotRole.INPUT, SteamGeneratorBlockEntity::getFeed)
+                .tank(SlotRole.OUTPUT, SteamGeneratorBlockEntity::getCooled)
+                .tank(SlotRole.OUTPUT, SteamGeneratorBlockEntity::getSteam)
+                .fluidAutomation(be -> be.getFluidHandler(null))
+                .build());
+
+        // The Heavy Water Tower: its three input tanks, its Heavy Water, and the FE its trays use.
+        MachineControls.register(ModBlockEntityTypes.HEAVY_WATER_TOWER.get(), MachineControlSpec.builder(HeavyWaterTowerBlockEntity.class)
+                .primary(HeavyWaterTowerBlockEntity::isFormed)
+                .energy(EnergyRole.CONSUMER, HeavyWaterTowerBlockEntity::getEnergy, be -> be.energyPerTick())
+                .tank(SlotRole.INPUT, be -> be.getInput(0))
+                .tank(SlotRole.INPUT, be -> be.getInput(1))
+                .tank(SlotRole.INPUT, be -> be.getInput(2))
+                .tank(SlotRole.OUTPUT, HeavyWaterTowerBlockEntity::getOutput)
+                .fluidAutomation(be -> be.getFluidHandler(null))
+                .build());
 
         // Progress: mB evaporated towards the next result; it evaporates rate mB/t, so the time left follows from that.
         MachineControls.register(ModBlockEntityTypes.THERMAL_EVAPORATOR.get(), MachineControlSpec.builder(ThermalEvaporatorBlockEntity.class)
@@ -235,5 +264,29 @@ public final class ControllerMultiblockSpecs {
                 .heat(HeatRole.CONSUMER, GreenhouseBlockEntity::getHeat, GreenhouseBlockEntity::getHeatUsage,
                         be -> be.heatHandlerAt(be.getBlockPos(), null))
                 .build());
+    }
+
+    private static MachineControlSpec<FissionReactorBlockEntity> reactor() {
+        MachineControlSpec.Builder<FissionReactorBlockEntity> spec = MachineControlSpec.builder(FissionReactorBlockEntity.class)
+                .primary(FissionReactorBlockEntity::isFormed)
+                .slots(0, FissionReactorBlockEntity.INPUT_SLOTS, SlotRole.INPUT)
+                .slots(FissionReactorBlockEntity.INPUT_SLOTS, FissionReactorBlockEntity.MACHINE_SLOTS, SlotRole.OUTPUT)
+                .items(FissionReactorBlockEntity::getItems, be -> be.getItemHandler(null))
+                .tank(SlotRole.INPUT, FissionReactorBlockEntity::getIntake)
+                .tank(SlotRole.OUTPUT, FissionReactorBlockEntity::getHotLeg)
+                .tank(SlotRole.OUTPUT, FissionReactorBlockEntity::getSteam)
+                .fluidAutomation(be -> be.getFluidHandler(null));
+        String[] banks = { "bank_a", "bank_b", "bank_c", "bank_d" };
+        for (int i = 0; i < banks.length; i++) {
+            int bank = i;
+            spec.intOption(banks[i], 0, 100, be -> be.getBankTarget(bank), (be, percent) -> be.setBankTarget(bank, percent));
+        }
+        return spec.booleanOption("scram", FissionReactorBlockEntity::isScrammed, (be, on) -> {
+            if (on) {
+                be.scram();
+            } else {
+                be.resetTrip();
+            }
+        }).build();
     }
 }

@@ -1,0 +1,20 @@
+{
+  "title": "Fuel Fabrication",
+  "icon": "arcforge:fuel_pellet",
+  "items": [
+    "arcforge:uranium_dioxide",
+    "arcforge:pellet_die",
+    "arcforge:green_fuel_pellet",
+    "arcforge:fuel_pellet"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Enriched UF₆ becomes ceramic fuel pellets. Every step keeps the uranium's enrichment.\n# Uranium Dioxide\nIn the Chemical Reactor: 100 mB of UF₆, 200 mB of Steam and 100 mB of Hydrogen give a Uranium Dioxide powder at the gas's enrichment, and 400 mB of Hydrofluoric Acid back for the fluorine line."
+    },
+    {
+      "type": "text",
+      "text": "# Pellets\n- The Metal Press with a Pellet Die presses the powder into two Green Fuel Pellets.\n- The Induction Furnace (or its array) sinters each into a Fuel Pellet. Sintering is the furnace's own recipe, so it shows under Sintering in JEI.\nPellets carry their enrichment; hover one to see it."
+    }
+  ]
+}

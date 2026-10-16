@@ -896,6 +896,147 @@ final class MachineCategories {
         }
     }
 
+    // --- Fuel fabrication, the Heavy Water Tower and the Fission Reactor ---
+
+    // A green pellet sintered into a Fuel Pellet (the Induction Furnace and its array), its assay kept.
+    static final class Sintering extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.SinteringRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.SinteringRecipe> TYPE = IRecipeHolderType.create(ModRecipes.SINTERING.get());
+
+        Sintering(IGuiHelper gui) {
+            super(TYPE, "sintering", ModBlocks.INDUCTION_FURNACE.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.SinteringRecipe> holder, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(holder.value().result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.SinteringRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.SinteringRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.sintering.time", seconds(holder.value().time())), 0, 30);
+        }
+    }
+
+    // The Girdler sulfide exchange: the fluids each Exchange Tray takes and the Heavy Water it makes, per operation.
+    static final class IsotopeExchanging extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.ISOTOPE_EXCHANGING.get());
+
+        IsotopeExchanging(IGuiHelper gui) {
+            super(TYPE, "isotope_exchanging", ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get(), gui, 130, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            for (int i = 0; i < recipe.inputs().size(); i++) {
+                ChemicalReactingRecipe.FluidInput input = recipe.inputs().get(i);
+                var slot = builder.addInputSlot(1 + 20 * i, 5).setStandardSlotBackground()
+                        .setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, input.amount()), false, 16, 16);
+                input.fluids().forEach(fluid -> slot.add(fluid, input.amount()));
+            }
+            fluid(builder, false, 101, 5, recipe.output());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe> holder,
+                IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(66, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            int time = holder.value().time();
+            text(graphics, Component.translatable("jei.arcforge.isotope_exchanging.tray", seconds(time),
+                    String.format(Locale.ROOT, "%,d", time * net.zagdrath.arcforge.config.ArcforgeConfig.HEAVY_WATER_ENERGY_PER_TRAY.getAsInt())), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.isotope_exchanging.trays"), 0, 40);
+        }
+    }
+
+    // A fresh Fuel Rod burned to spent in a Fission Reactor channel: the heat it gives at full power and how long it lasts.
+    record FissionRecipe(int pcm) {}
+
+    static final class Fission extends ArcforgeCategory<FissionRecipe> {
+        static final IRecipeType<FissionRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "fission", FissionRecipe.class);
+
+        Fission(IGuiHelper gui) {
+            super(TYPE, "fission", ModBlocks.REACTOR_CONTROLLER.get(), gui, 150, 50);
+        }
+
+        private static ItemStack rod(net.zagdrath.arcforge.nuclear.FuelRod rod) {
+            ItemStack stack = new ItemStack(net.zagdrath.arcforge.registry.ModItems.FUEL_ROD.get());
+            stack.set(net.zagdrath.arcforge.registry.ModDataComponents.FUEL_ROD.get(), rod);
+            return stack;
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, FissionRecipe recipe, IFocusGroup focuses) {
+            var fresh = net.zagdrath.arcforge.nuclear.FuelRod.fresh(recipe.pcm());
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(rod(fresh));
+            var spent = new net.zagdrath.arcforge.nuclear.FuelRod(fresh.type(), fresh.enrichment(), 1.0F, 0.01F, 1.0F, 0.0F, 0L, false);
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(rod(spent));
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, FissionRecipe recipe, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(FissionRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.fission.heat", String.format(Locale.ROOT, "%,.0f",
+                    net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_CHANNEL_HEAT.getAsDouble())), 0, 28);
+            text(graphics, Component.translatable("jei.arcforge.fission.life", String.format(Locale.ROOT, "%.0f",
+                    net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_ROD_LIFE.getAsDouble() / 1_200.0)), 0, 38);
+        }
+    }
+
+    // The Steam Generator: Hot Coolant from a pressurized core boils feedwater into High-Pressure Steam and goes back
+    // cooled, at the heat each carries.
+    record SteamGeneratingRecipe(Fluid hot, Fluid cooled) {}
+
+    static final class SteamGenerating extends ArcforgeCategory<SteamGeneratingRecipe> {
+        static final IRecipeType<SteamGeneratingRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "steam_generating", SteamGeneratingRecipe.class);
+
+        SteamGenerating(IGuiHelper gui) {
+            super(TYPE, "steam_generating", ModBlocks.STEAM_GENERATOR_CONTROLLER.get(), gui, 150, 50);
+        }
+
+        private static int steam() {
+            double hot = net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble();
+            double each = net.zagdrath.arcforge.config.ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble();
+            return (int) Math.floor(100 * hot / Math.max(1.0, each));
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, SteamGeneratingRecipe recipe, IFocusGroup focuses) {
+            fluid(builder, true, 1, 5, recipe.hot(), 100);
+            fluid(builder, true, 21, 5, net.minecraft.world.level.material.Fluids.WATER, steam());
+            fluid(builder, false, 81, 5, recipe.cooled(), 100);
+            fluid(builder, false, 101, 5, ModFluids.HIGH_PRESSURE_STEAM.get(), steam());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, SteamGeneratingRecipe recipe, IFocusGroup focuses) {
+            builder.addRecipeArrowWidget().setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(SteamGeneratingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.steam_generating.heat", String.format(Locale.ROOT, "%,.0f",
+                    net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble())), 0, 28);
+            text(graphics, Component.translatable("jei.arcforge.steam_generating.tubes", String.format(Locale.ROOT, "%,d",
+                    net.zagdrath.arcforge.config.ArcforgeConfig.STEAM_GENERATOR_TUBE_RATE.getAsInt())), 0, 38);
+        }
+    }
+
     // --- Tree Cutter ---
 
     // A sapling the Tree Cutter plants (with Bone Meal to speed it), and the log and leaves of its tree.

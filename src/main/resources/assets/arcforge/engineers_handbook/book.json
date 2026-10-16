@@ -215,7 +215,7 @@
       "id": "nuclear",
       "title": "Nuclear",
       "icon": "arcforge:yellowcake",
-      "description": "Uranium for civil power: its ores, radiation, the chemistry and enrichment.",
+      "description": "Uranium for civil power: its ores, radiation, the chemistry and enrichment, fuel and the Fission Reactor.",
       "entries": [
         "nuclear_overview",
         "uraninite",
@@ -226,7 +226,15 @@
         "uranium_chemistry",
         "uranium_hexafluoride",
         "centrifuge_cascade",
-        "depleted_uranium"
+        "depleted_uranium",
+        "fuel_fabrication",
+        "zirconium_and_zircaloy",
+        "fuel_rods",
+        "heavy_water",
+        "fission_reactor",
+        "reactor_physics",
+        "reactor_control",
+        "steam_generator"
       ]
     }
   ]

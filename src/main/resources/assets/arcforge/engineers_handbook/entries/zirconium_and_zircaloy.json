@@ -1,0 +1,21 @@
+{
+  "title": "Zirconium and Zircaloy",
+  "icon": "arcforge:zircaloy_tube",
+  "items": [
+    "arcforge:zirconium_tetrachloride",
+    "arcforge:zirconium_dust",
+    "arcforge:zirconium_ingot",
+    "arcforge:zircaloy_ingot",
+    "arcforge:zircaloy_tube"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Fuel is clad in Zircaloy, a zirconium alloy that barely absorbs neutrons.\n# Zirconium\n- Zircon Dust, Coal Coke and 200 mB of Chlorine in the Chemical Reactor make Zirconium Tetrachloride.\n- Reduced with 200 mB of Hydrogen at high heat (an electrically heated charge: 160 FE/t) it gives Zirconium Dust and Hydrochloric Acid.\n- Smelt the dust into Zirconium Ingots."
+    },
+    {
+      "type": "text",
+      "text": "# Zircaloy\nIn the Arcforge Furnace, four Zirconium Ingots with one Nickel Ingot and a little coke make four Zircaloy Ingots. The Metal Press with a Rod Die draws each into a Zircaloy Tube."
+    }
+  ]
+}

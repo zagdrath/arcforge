@@ -119,6 +119,24 @@
     },
     "#c:ores_in_ground/deepslate": {
       "transmission": 0.6
+    },
+    "arcforge:reactor_casing": {
+      "transmission": 0.25
+    },
+    "arcforge:reactor_controller": {
+      "transmission": 0.25
+    },
+    "arcforge:reactor_glass": {
+      "transmission": 0.5
+    },
+    "arcforge:graphite_moderator": {
+      "transmission": 0.7
+    },
+    "arcforge:steel_reflector": {
+      "transmission": 0.4
+    },
+    "arcforge:heavy_water": {
+      "transmission": 0.5
     }
   }
 }

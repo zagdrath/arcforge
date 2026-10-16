@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NNN",
+    "NPN",
+    "NNN"
+  ],
+  "key": {
+    "N": "#c:rods/nickel",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:steam_generator_tubes",
+    "count": 2
+  }
+}

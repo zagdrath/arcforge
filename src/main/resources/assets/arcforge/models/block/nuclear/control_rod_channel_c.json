@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column",
+  "textures": {
+    "end": "arcforge:block/nuclear/control_rod_channel_top",
+    "side": "arcforge:block/nuclear/control_rod_channel_c"
+  }
+}

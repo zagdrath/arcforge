@@ -63,7 +63,10 @@ public enum SideMode implements StringRepresentable {
     ETHYLENE("ethylene"),
     PROPYLENE("propylene"),
     // The Gas Centrifuge Cascade's depleted UF6 out (its enriched product goes out of OUTPUT faces). Ports only.
-    TAILS("tails");
+    TAILS("tails"),
+    // The Fission Reactor's hot leg: a pressurized core's Hot Coolant out, to a Steam Generator. Ports only; the
+    // reactor pushes it itself (its Steam ports give a boiling core's steam).
+    HOT_LEG("hot_leg");
 
     private final String name;
 

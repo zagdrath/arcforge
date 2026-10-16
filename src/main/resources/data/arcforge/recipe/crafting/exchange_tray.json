@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "B B",
+    "SSS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "B": "minecraft:iron_bars"
+  },
+  "result": {
+    "id": "arcforge:exchange_tray",
+    "count": 2
+  }
+}

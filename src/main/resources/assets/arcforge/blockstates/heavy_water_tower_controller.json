@@ -1,0 +1,66 @@
+{
+  "variants": {
+    "facing=north,formed=false,lit=false": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_controller"
+    },
+    "facing=north,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "facing=north,formed=false,lit=true": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_controller"
+    },
+    "facing=north,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "facing=east,formed=false,lit=false": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_controller",
+      "y": 90
+    },
+    "facing=east,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "facing=east,formed=false,lit=true": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_controller",
+      "y": 90
+    },
+    "facing=east,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "facing=south,formed=false,lit=false": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_controller",
+      "y": 180
+    },
+    "facing=south,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "facing=south,formed=false,lit=true": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_controller",
+      "y": 180
+    },
+    "facing=south,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "facing=west,formed=false,lit=false": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_controller",
+      "y": 270
+    },
+    "facing=west,formed=true,lit=false": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    },
+    "facing=west,formed=false,lit=true": {
+      "model": "arcforge:block/nuclear/heavy_water_tower_controller",
+      "y": 270
+    },
+    "facing=west,formed=true,lit=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    }
+  }
+}

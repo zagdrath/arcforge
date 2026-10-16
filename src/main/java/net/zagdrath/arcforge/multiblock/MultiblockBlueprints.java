@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+
+import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -24,6 +27,7 @@ import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock;
+import net.zagdrath.arcforge.block.multiblock.VesselControllerBlock;
 import net.zagdrath.arcforge.registry.ModBlocks;
 
 // An example build of every Arcforge multiblock, for the JEI build viewer and the Engineer's Handbook: which block
@@ -89,7 +93,12 @@ public final class MultiblockBlueprints {
                 thermalEvaporator(),
                 fireboxArray(),
                 batteryArray(),
-                centrifugeCascade());
+                centrifugeCascade(),
+                fissionReactor(),
+                vessel("steam_generator", new BlockPos(3, 5, 3), ModBlocks.STEAM_GENERATOR_CASING.get(), ModBlocks.STEAM_GENERATOR_CONTROLLER.get(),
+                        pos -> ModBlocks.STEAM_GENERATOR_TUBES.get().defaultBlockState()),
+                vessel("heavy_water_tower", new BlockPos(3, 5, 3), ModBlocks.HEAVY_WATER_TOWER_CASING.get(),
+                        ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get(), pos -> ModBlocks.EXCHANGE_TRAY.get().defaultBlockState()));
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -473,5 +482,50 @@ public final class MultiblockBlueprints {
             placements.add(end == null ? placement : new Placement(placement.pos(), placement.state().setValue(GasTurbineArrayCasingBlock.END, end)));
         }
         return new Blueprint("gas_turbine_array", placements, size);
+    }
+
+    // A walled vessel (VesselStructure): casing walls round its inside, the controller in the middle of the front's
+    // lowest wall row above the floor, facing south (the front), and inside(pos) in every inside block.
+    private static Blueprint vessel(String id, BlockPos size, Block casing, Block controller,
+            Function<BlockPos, @Nullable BlockState> inside) {
+        return vessel(id, size, casing, controller, List.of(), null, inside);
+    }
+
+    private static Blueprint vessel(String id, BlockPos size, Block casing, Block controller, List<BlockPos> glass,
+            @Nullable Block glassBlock, Function<BlockPos, @Nullable BlockState> inside) {
+        BlockPos at = new BlockPos(size.getX() / 2, 1, size.getZ() - 1);
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < size.getY(); y++) {
+            for (int z = 0; z < size.getZ(); z++) {
+                for (int x = 0; x < size.getX(); x++) {
+                    BlockPos pos = new BlockPos(x, y, z);
+                    boolean wall = x == 0 || y == 0 || z == 0 || x == size.getX() - 1 || y == size.getY() - 1 || z == size.getZ() - 1;
+                    BlockState state;
+                    if (!wall) {
+                        state = inside.apply(pos);
+                    } else if (pos.equals(at)) {
+                        state = controller.defaultBlockState().setValue(VesselControllerBlock.FACING, Direction.SOUTH);
+                    } else if (glassBlock != null && glass.contains(pos)) {
+                        state = glassBlock.defaultBlockState();
+                    } else {
+                        state = casing.defaultBlockState();
+                    }
+                    if (state != null) {
+                        placements.add(new Placement(pos, state));
+                    }
+                }
+            }
+        }
+        return new Blueprint(id, sorted(placements), size);
+    }
+
+    // A small 5x5x5 core (up to 7x7 and 9 tall work): a 3x3 lattice of Fuel Channels round a column of Control Rod
+    // Channels, Reactor Glass either side of the controller.
+    private static Blueprint fissionReactor() {
+        BlockPos size = new BlockPos(5, 5, 5);
+        return vessel("fission_reactor", size, ModBlocks.REACTOR_CASING.get(), ModBlocks.REACTOR_CONTROLLER.get(),
+                List.of(new BlockPos(1, 2, 4), new BlockPos(3, 2, 4)), ModBlocks.REACTOR_GLASS.get(),
+                pos -> pos.getX() == 2 && pos.getZ() == 2 ? ModBlocks.CONTROL_ROD_CHANNEL.get().defaultBlockState()
+                        : ModBlocks.FUEL_CHANNEL.get().defaultBlockState());
     }
 }

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SSS",
+    "SXS",
+    "BBB"
+  ],
+  "key": {
+    "S": "#c:ingots/steel",
+    "X": "#c:gears/steel",
+    "B": "#c:storage_blocks/steel"
+  },
+  "result": {
+    "id": "arcforge:pellet_die",
+    "count": 1
+  }
+}

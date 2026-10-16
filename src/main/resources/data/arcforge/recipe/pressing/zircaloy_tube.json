@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:rod_die",
+  "ingredient": "#c:ingots/zircaloy",
+  "count": 1,
+  "result": {
+    "id": "arcforge:zircaloy_tube",
+    "count": 1
+  },
+  "time": 100
+}

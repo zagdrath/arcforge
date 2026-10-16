@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/nuclear/reactor_glass"
+    },
+    "formed=true": {
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    }
+  }
+}

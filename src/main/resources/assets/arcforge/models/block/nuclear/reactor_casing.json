@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "top": "arcforge:block/nuclear/reactor_casing_top",
+    "bottom": "arcforge:block/nuclear/reactor_casing_top",
+    "side": "arcforge:block/nuclear/reactor_casing"
+  }
+}

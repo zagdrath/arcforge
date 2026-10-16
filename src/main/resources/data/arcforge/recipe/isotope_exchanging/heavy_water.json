@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:isotope_exchanging",
+  "inputs": [
+    {
+      "tag": "minecraft:water",
+      "amount": 1000
+    },
+    {
+      "fluid": "arcforge:hydrogen_sulfide",
+      "amount": 10
+    },
+    {
+      "tag": "c:steam",
+      "amount": 100
+    }
+  ],
+  "output": {
+    "id": "arcforge:heavy_water",
+    "amount": 5
+  },
+  "time": 40
+}

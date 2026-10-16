@@ -1,5 +1,6 @@
 {
   "values": [
-    "arcforge:radiation"
+    "arcforge:radiation",
+    "arcforge:hot_fuel"
   ]
 }

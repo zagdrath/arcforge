@@ -11,6 +11,8 @@
     "#c:ingots/bismuth",
     "#c:ingots/invar",
     "#c:ingots/lead",
-    "#c:ingots/depleted_uranium"
+    "#c:ingots/depleted_uranium",
+    "#c:ingots/zirconium",
+    "#c:ingots/zircaloy"
   ]
 }

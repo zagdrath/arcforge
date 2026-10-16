@@ -550,6 +550,34 @@ public final class ModCapabilities {
             var cascade = net.zagdrath.arcforge.multiblock.CentrifugeCascadeStructure.findController(level, pos);
             return cascade != null && cascade.isPart(pos) ? cascade.energyHandlerAt(pos, side) : null;
         }, cascadeParts);
+        // The Fission Reactor: rods and coolant in (Input), rods out (Output), Hot Coolant (Hot Leg) and Contaminated Steam
+        // (Steam) out, through ports on its casings and controller (never its glass).
+        Block[] reactorParts = { ModBlocks.REACTOR_CONTROLLER.get(), ModBlocks.REACTOR_CASING.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var reactor = net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR.findController(level, pos);
+            return reactor != null && reactor.isPart(pos) ? reactor.itemHandlerAt(pos, side) : null;
+        }, reactorParts);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var reactor = net.zagdrath.arcforge.multiblock.VesselStructures.REACTOR.findController(level, pos);
+            return reactor != null && reactor.isPart(pos) ? reactor.fluidHandlerAt(pos, side) : null;
+        }, reactorParts);
+        // The Steam Generator: Hot Coolant and feedwater in, cooled coolant and High-Pressure Steam out.
+        Block[] generatorParts = { ModBlocks.STEAM_GENERATOR_CONTROLLER.get(), ModBlocks.STEAM_GENERATOR_CASING.get() };
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var generator = net.zagdrath.arcforge.multiblock.VesselStructures.STEAM_GENERATOR.findController(level, pos);
+            return generator != null && generator.isPart(pos) ? generator.fluidHandlerAt(pos, side) : null;
+        }, generatorParts);
+        // The Heavy Water Tower: Water, Hydrogen Sulfide and Steam in, Heavy Water out, FE in.
+        Block[] towerParts = { ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get(), ModBlocks.HEAVY_WATER_TOWER_CASING.get() };
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var tower = net.zagdrath.arcforge.multiblock.VesselStructures.HEAVY_WATER_TOWER.findController(level, pos);
+            return tower != null && tower.isPart(pos) ? tower.fluidHandlerAt(pos, side) : null;
+        }, towerParts);
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var tower = net.zagdrath.arcforge.multiblock.VesselStructures.HEAVY_WATER_TOWER.findController(level, pos);
+            return tower instanceof net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity heavyWater && tower.isPart(pos)
+                    ? heavyWater.energyHandlerAt(pos, side) : null;
+        }, towerParts);
         // The Thermal Evaporator Array: Seawater or Brine in, heat in, Brine, Salt and Water out, through its ports.
         Block[] evaporatorParts = { ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get(), ModBlocks.THERMAL_EVAPORATOR_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {

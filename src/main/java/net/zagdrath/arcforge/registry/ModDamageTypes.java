@@ -22,6 +22,9 @@ public final class ModDamageTypes {
     // Radiation sickness (see RadiationDose): goes through armour.
     public static final ResourceKey<DamageType> RADIATION = ResourceKey.create(Registries.DAMAGE_TYPE,
             Identifier.fromNamespaceAndPath(Arcforge.MODID, "radiation"));
+    // A discharged Fuel Rod still hot with decay heat, carried (see FuelRodItem).
+    public static final ResourceKey<DamageType> HOT_FUEL = ResourceKey.create(Registries.DAMAGE_TYPE,
+            Identifier.fromNamespaceAndPath(Arcforge.MODID, "hot_fuel"));
     public static final ResourceKey<DamageType> HYDROCHLORIC_ACID = ResourceKey.create(Registries.DAMAGE_TYPE,
             Identifier.fromNamespaceAndPath(Arcforge.MODID, "hydrochloric_acid"));
     public static final ResourceKey<DamageType> LYE = ResourceKey.create(Registries.DAMAGE_TYPE,

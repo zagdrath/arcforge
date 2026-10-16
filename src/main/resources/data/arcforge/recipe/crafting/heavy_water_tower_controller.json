@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "RGR",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "arcforge:heavy_water_tower_casing",
+    "R": "#c:dusts/redstone",
+    "G": "minecraft:glass_pane"
+  },
+  "result": {
+    "id": "arcforge:heavy_water_tower_controller",
+    "count": 1
+  }
+}

@@ -103,9 +103,24 @@ public final class MachineRecipes {
         return level.recipeAccess().getRecipeFor(RecipeType.SMELTING, new SingleRecipeInput(input), level);
     }
 
+    // The sintering recipe for this item (the Induction Furnace's own), if any.
+    public static Optional<RecipeHolder<SinteringRecipe>> sintering(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.SINTERING.get()).stream().filter(holder -> holder.value().ingredient().test(input)).findFirst();
+    }
+
+    // The isotope exchange recipe for what the Heavy Water Tower holds, if any.
+    public static Optional<RecipeHolder<IsotopeExchangingRecipe>> isotopeExchanging(@Nullable Level level, IsotopeExchangingRecipe.Input input) {
+        return recipes(level).byType(ModRecipes.ISOTOPE_EXCHANGING.get()).stream().filter(holder -> holder.value().matches(input, level)).findFirst();
+    }
+
+    public static boolean isIsotopeExchangeInput(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.ISOTOPE_EXCHANGING.get()).stream().anyMatch(holder -> holder.value().takes(fluid));
+    }
+
+    // What the Induction Furnaces take: a furnace recipe's input, or a sintering recipe's.
     public static boolean isSmeltingInput(@Nullable Level level, ItemStack stack) {
-        return recipes(level).byType(RecipeType.SMELTING).stream()
-                .anyMatch(holder -> holder.value().input().test(stack));
+        return recipes(level).byType(RecipeType.SMELTING).stream().anyMatch(holder -> holder.value().input().test(stack))
+                || recipes(level).byType(ModRecipes.SINTERING.get()).stream().anyMatch(holder -> holder.value().ingredient().test(stack));
     }
 
     public static boolean isCrusherInput(@Nullable Level level, ItemStack stack) {

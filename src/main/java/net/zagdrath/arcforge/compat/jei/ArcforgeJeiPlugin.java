@@ -29,6 +29,7 @@ import net.zagdrath.arcforge.recipe.RefiningProcess;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModDataMaps;
+import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.registry.ModRecipes;
 import net.zagdrath.arcforge.steam.SteamGrade;
@@ -147,6 +148,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.GasTurbineFuels(gui),
                 new MachineCategories.EngineFuels(gui),
                 new MachineCategories.Enriching(gui),
+                new MachineCategories.Sintering(gui),
+                new MachineCategories.IsotopeExchanging(gui),
+                new MachineCategories.Fission(gui),
+                new MachineCategories.SteamGenerating(gui),
                 new MachineCategories.BatteryComponents(gui),
                 new MultiblockCategory(gui));
     }
@@ -229,6 +234,15 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         });
         registration.addRecipes(MachineCategories.EngineFuels.TYPE, engineFuels);
         // The Gas Centrifuge Cascade's enrichment at a few common targets (3%, 5% and 20%, low-enriched fuel).
+        registration.addRecipes(MachineCategories.Sintering.TYPE, recipes(ModRecipes.SINTERING.get()));
+        registration.addRecipes(MachineCategories.IsotopeExchanging.TYPE, recipes(ModRecipes.ISOTOPE_EXCHANGING.get()));
+        // Fuel Rods at a few common enrichments (natural, 3%, 5% and 20%), and the Steam Generator's two coolants.
+        registration.addRecipes(MachineCategories.Fission.TYPE, List.of(new MachineCategories.FissionRecipe(net.zagdrath.arcforge.nuclear.Enrichment.NATURAL_PCM),
+                new MachineCategories.FissionRecipe(3_000), new MachineCategories.FissionRecipe(5_000),
+                new MachineCategories.FissionRecipe(net.zagdrath.arcforge.nuclear.Enrichment.MAX_PCM)));
+        registration.addRecipes(MachineCategories.SteamGenerating.TYPE, List.of(
+                new MachineCategories.SteamGeneratingRecipe(ModFluids.HOT_COOLANT.get(), net.minecraft.world.level.material.Fluids.WATER),
+                new MachineCategories.SteamGeneratingRecipe(ModFluids.HOT_HEAVY_WATER.get(), ModFluids.HEAVY_WATER.get())));
         registration.addRecipes(MachineCategories.Enriching.TYPE, List.of(new MachineCategories.EnrichmentRecipe(3_000),
                 new MachineCategories.EnrichmentRecipe(5_000), new MachineCategories.EnrichmentRecipe(net.zagdrath.arcforge.nuclear.Enrichment.MAX_PCM)));
         List<MachineCategories.BatteryComponentRecipe> batteryParts = new ArrayList<>();
@@ -390,6 +404,13 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.EngineFuels.TYPE, ModBlocks.DIESEL_GENERATOR_CONTROLLER.get(), ModBlocks.DIESEL_GENERATOR_CASING.get());
         registration.addCraftingStation(MachineCategories.Enriching.TYPE, ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get(), ModBlocks.CENTRIFUGE_CASCADE_CASING.get(),
                 ModBlocks.GAS_CENTRIFUGE.get());
+        registration.addCraftingStation(MachineCategories.Sintering.TYPE, ModBlocks.INDUCTION_FURNACE.get(), ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get());
+        registration.addCraftingStation(MachineCategories.IsotopeExchanging.TYPE, ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get(),
+                ModBlocks.HEAVY_WATER_TOWER_CASING.get(), ModBlocks.EXCHANGE_TRAY.get());
+        registration.addCraftingStation(MachineCategories.Fission.TYPE, ModBlocks.REACTOR_CONTROLLER.get(), ModBlocks.REACTOR_CASING.get(),
+                ModBlocks.FUEL_CHANNEL.get());
+        registration.addCraftingStation(MachineCategories.SteamGenerating.TYPE, ModBlocks.STEAM_GENERATOR_CONTROLLER.get(), ModBlocks.STEAM_GENERATOR_CASING.get(),
+                ModBlocks.STEAM_GENERATOR_TUBES.get());
         registration.addCraftingStation(MachineCategories.Vulcanizing.TYPE, ModBlocks.VULCANIZER.get());
         registration.addCraftingStation(MachineCategories.ResinTap.TYPE, ModBlocks.RESIN_TAP.get());
         registration.addCraftingStation(MachineCategories.AirSeparating.TYPE, ModBlocks.AIR_SEPARATOR.get());

@@ -97,6 +97,7 @@ public final class GasApiGameTests {
         gases.put(ModFluids.FLUORINE.get(), GasTints.FLUORINE);
         gases.put(ModFluids.URANIUM_HEXAFLUORIDE.get(), GasTints.URANIUM_HEXAFLUORIDE);
         gases.put(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE.get(), GasTints.DEPLETED_URANIUM_HEXAFLUORIDE);
+        gases.put(ModFluids.CONTAMINATED_STEAM.get(), GasTints.CONTAMINATED_STEAM);
         return gases;
     }
 

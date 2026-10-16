@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "GGG",
+    "G G",
+    "GGG"
+  ],
+  "key": {
+    "G": "arcforge:graphite"
+  },
+  "result": {
+    "id": "arcforge:graphite_moderator",
+    "count": 2
+  }
+}

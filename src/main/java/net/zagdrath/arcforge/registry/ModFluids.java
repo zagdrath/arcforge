@@ -401,6 +401,43 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE_TYPE, ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE,
                     ModFluids.FLOWING_DEPLETED_URANIUM_HEXAFLUORIDE)));
 
+    // --- Nuclear: the Fission Reactor (see the Nuclear chapter of the Handbook) --- Heavy Water (D2O): from the Heavy
+    // Water Tower; a moderator that absorbs far fewer neutrons than water, and a coolant. Hot Coolant and Hot Heavy
+    // Water: a pressurized core's coolant on its way to the Steam Generator, carrying its heat (reactor.hotCoolantHeat
+    // HU a mB); they can't be placed or carried in buckets. Contaminated Steam: a boiling core's steam, made from its
+    // coolant; turbines run on it as High-Pressure Steam, and it's a little radioactive.
+    public static final DeferredHolder<FluidType, FluidType> HEAVY_WATER_TYPE = liquidType("heavy_water", 1_107, 1_100, 0.014F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HEAVY_WATER = FLUIDS.register("heavy_water",
+            () -> new BaseFlowingFluid.Source(heavyWaterProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HEAVY_WATER = FLUIDS.register("flowing_heavy_water",
+            () -> new BaseFlowingFluid.Flowing(heavyWaterProperties()));
+    public static final DeferredHolder<FluidType, FluidType> HOT_COOLANT_TYPE = liquidType("hot_coolant", 750, 900, 0.014F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HOT_COOLANT = FLUIDS.register("hot_coolant",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HOT_COOLANT_TYPE, ModFluids.HOT_COOLANT, ModFluids.FLOWING_HOT_COOLANT)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HOT_COOLANT = FLUIDS.register("flowing_hot_coolant",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HOT_COOLANT_TYPE, ModFluids.HOT_COOLANT, ModFluids.FLOWING_HOT_COOLANT)));
+    public static final DeferredHolder<FluidType, FluidType> HOT_HEAVY_WATER_TYPE = liquidType("hot_heavy_water", 830, 900, 0.014F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HOT_HEAVY_WATER = FLUIDS.register("hot_heavy_water",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HOT_HEAVY_WATER_TYPE, ModFluids.HOT_HEAVY_WATER, ModFluids.FLOWING_HOT_HEAVY_WATER)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HOT_HEAVY_WATER = FLUIDS.register("flowing_hot_heavy_water",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HOT_HEAVY_WATER_TYPE, ModFluids.HOT_HEAVY_WATER, ModFluids.FLOWING_HOT_HEAVY_WATER)));
+    public static final DeferredHolder<FluidType, FluidType> CONTAMINATED_STEAM_TYPE = gasType("contaminated_steam", 560);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CONTAMINATED_STEAM = FLUIDS.register("contaminated_steam",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.CONTAMINATED_STEAM_TYPE, ModFluids.CONTAMINATED_STEAM, ModFluids.FLOWING_CONTAMINATED_STEAM)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CONTAMINATED_STEAM = FLUIDS.register("flowing_contaminated_steam",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.CONTAMINATED_STEAM_TYPE, ModFluids.CONTAMINATED_STEAM, ModFluids.FLOWING_CONTAMINATED_STEAM)));
+
+    // Moves like water.
+    private static BaseFlowingFluid.Properties heavyWaterProperties() {
+        return new BaseFlowingFluid.Properties(HEAVY_WATER_TYPE, HEAVY_WATER, FLOWING_HEAVY_WATER)
+                .bucket(ModItems.HEAVY_WATER_BUCKET)
+                .block(ModBlocks.HEAVY_WATER)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
     // Spreads 3 blocks, every 10 ticks, like the acids.
     private static BaseFlowingFluid.Properties uranylSulfateProperties() {
         return new BaseFlowingFluid.Properties(URANYL_SULFATE_SOLUTION_TYPE, URANYL_SULFATE_SOLUTION, FLOWING_URANYL_SULFATE_SOLUTION)

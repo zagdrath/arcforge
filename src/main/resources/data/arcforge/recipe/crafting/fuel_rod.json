@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:fuel_rod",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "PTP",
+    "PPP"
+  ],
+  "key": {
+    "P": "arcforge:fuel_pellet",
+    "T": "arcforge:zircaloy_tube"
+  },
+  "result": {
+    "id": "arcforge:fuel_rod",
+    "count": 1
+  }
+}

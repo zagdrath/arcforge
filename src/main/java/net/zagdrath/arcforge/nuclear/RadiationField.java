@@ -103,6 +103,11 @@ public final class RadiationField {
         }
         Radioactivity radioactivity = BuiltInRegistries.ITEM.wrapAsHolder(stack.getItem()).getData(ModDataMaps.RADIOACTIVE_ITEMS);
         double total = radioactivity != null ? (double) radioactivity.doseRate() * stack.getCount() : 0.0;
+        // A Fuel Rod's own: fresh a little, irradiated far more (see FuelRod.doseRate).
+        FuelRod rod = stack.get(ModDataComponents.FUEL_ROD.get());
+        if (rod != null) {
+            total += rod.doseRate() * stack.getCount();
+        }
         if (depth >= MAX_DEPTH) {
             return total;
         }
@@ -378,6 +383,11 @@ public final class RadiationField {
     // (unsided).
     private static @Nullable Source source(ServerLevel level, BlockEntity blockEntity) {
         BlockPos pos = blockEntity.getBlockPos();
+        if (blockEntity instanceof RadiationSource own) {
+            double rate = own.radiationRate();
+            Vec3 at = own.radiationCentre();
+            return rate > 0.0 ? new Source(at.x, at.y, at.z, rate, blockEntity) : null;
+        }
         double rate = 0.0;
         Object owner = blockEntity;
         if (blockEntity instanceof Container container) {

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PPP",
+    "PBP",
+    "PPP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "B": "#c:storage_blocks/steel"
+  },
+  "result": {
+    "id": "arcforge:steel_reflector",
+    "count": 2
+  }
+}

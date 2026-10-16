@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S S",
+    "TGT",
+    "S S"
+  ],
+  "key": {
+    "S": "#c:rods/steel",
+    "T": "#c:plates/steel",
+    "G": "#c:gears/steel"
+  },
+  "result": {
+    "id": "arcforge:control_rod_channel",
+    "count": 2
+  }
+}

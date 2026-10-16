@@ -31,6 +31,19 @@
     "arcforge:uraninite_ore",
     "arcforge:deepslate_uraninite_ore",
     "arcforge:raw_uraninite_block",
-    "arcforge:depleted_uranium_block"
+    "arcforge:depleted_uranium_block",
+    "arcforge:reactor_casing",
+    "arcforge:reactor_glass",
+    "arcforge:reactor_controller",
+    "arcforge:fuel_channel",
+    "arcforge:control_rod_channel",
+    "arcforge:graphite_moderator",
+    "arcforge:steel_reflector",
+    "arcforge:steam_generator_casing",
+    "arcforge:steam_generator_controller",
+    "arcforge:steam_generator_tubes",
+    "arcforge:heavy_water_tower_casing",
+    "arcforge:heavy_water_tower_controller",
+    "arcforge:exchange_tray"
   ]
 }

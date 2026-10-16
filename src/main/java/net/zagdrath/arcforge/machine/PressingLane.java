@@ -77,7 +77,8 @@ public class PressingLane {
         }
         PressingRecipe recipe = holder.value();
         total = Math.max(1, (int) Math.round(recipe.time() * settings.timeMultiplier()));
-        ItemStack result = recipe.result().create();
+        // Pressed from an enriched item (Uranium Dioxide into green pellets), it keeps its assay.
+        ItemStack result = net.zagdrath.arcforge.nuclear.Enrichment.carry(input, recipe.result().create());
         if (!fits(items.getStack(outputSlot), result)) {
             return State.OUTPUT_FULL;
         }

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SCS",
+    "RGR",
+    "SCS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "C": "arcforge:reactor_casing",
+    "R": "#c:dusts/redstone",
+    "G": "arcforge:control_rod"
+  },
+  "result": {
+    "id": "arcforge:reactor_controller",
+    "count": 1
+  }
+}

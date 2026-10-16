@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "S",
+    "A",
+    "S"
+  ],
+  "key": {
+    "S": "#c:rods/steel",
+    "A": "#c:ingots/silver"
+  },
+  "result": {
+    "id": "arcforge:control_rod",
+    "count": 1
+  }
+}

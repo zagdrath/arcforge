@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "P P",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "#c:ingots/steel"
+  },
+  "result": {
+    "id": "arcforge:steam_generator_casing",
+    "count": 4
+  }
+}

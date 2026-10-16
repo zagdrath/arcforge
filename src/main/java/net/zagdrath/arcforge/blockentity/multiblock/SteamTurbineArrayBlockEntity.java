@@ -49,13 +49,15 @@ import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.PowerGeneration;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
+import net.zagdrath.arcforge.machine.output.OutputLimit;
+import net.zagdrath.arcforge.machine.output.OutputLimited;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
+import net.zagdrath.arcforge.nuclear.ReactorSteam;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModFluids;
-import net.zagdrath.arcforge.steam.BoilerCore;
 import net.zagdrath.arcforge.steam.Lubricant;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.steam.TurbineLayout;
@@ -63,8 +65,6 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.GeneratorEnergyHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
-import net.zagdrath.arcforge.machine.output.OutputLimit;
-import net.zagdrath.arcforge.machine.output.OutputLimited;
 
 // The Steam Turbine Array (see ShellMultiblockBlockEntity): a turbine L blocks long with a rotor of L - 2 blade sets,
 // sized to its cross-section's shorter side. It grows with its sections s = width x height / 9 x L (a 3x3x3 is 3, a
@@ -131,7 +131,9 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imp
                 new SideConfig(SideMode.INPUT, SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.NONE, SideMode.NONE),
                 SIDE_MODES);
         this.energy = newEnergy(3.0);
-        this.steam = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_SECTION.getAsInt() * 3, BoilerCore::isSteam, this::setChanged);
+        // Any steam grade, and a boiling reactor's Contaminated Steam (run as High-Pressure Steam, see ReactorSteam).
+        this.steam = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_TANK_PER_SECTION.getAsInt() * 3, ReactorSteam::isTurbineSteam,
+                this::setChanged);
         this.steamInput = new AutomationResourceHandler<>(steam, index -> true, index -> false);
         this.lubricant = new FilteredFluidTank(ArcforgeConfig.TURBINE_ARRAY_LUBRICANT_CAPACITY.getAsInt(), Lubricant::isLubricant, this::setChanged);
         this.lubricantInput = new AutomationResourceHandler<>(lubricant, index -> true, index -> false);
@@ -327,7 +329,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imp
         }
         flow = 0;
         fePerTick = 0;
-        SteamGrade grade = SteamGrade.of(steam.getResource(0));
+        SteamGrade grade = ReactorSteam.turbineGrade(steam.getResource(0));
         int maxFlow = maxFlow();
         boolean running = canRun(level);
         int steamBefore = steam.getAmount();

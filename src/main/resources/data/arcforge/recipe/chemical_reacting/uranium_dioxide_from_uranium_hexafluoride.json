@@ -1,0 +1,26 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:uranium_hexafluoride",
+      "amount": 100
+    },
+    {
+      "tag": "c:steam",
+      "amount": 200
+    },
+    {
+      "fluid": "arcforge:hydrogen",
+      "amount": 100
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:uranium_dioxide",
+    "count": 1
+  },
+  "fluid_output": {
+    "id": "arcforge:hydrofluoric_acid",
+    "amount": 400
+  },
+  "time": 120
+}

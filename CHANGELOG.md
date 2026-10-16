@@ -24,8 +24,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units, a scaling Diesel
 Generator, hydrocracking and Synthetic Rubber, a retuned oil line, running sounds and model fixes for the oilfield, and
-the start of the nuclear tier; worlds load, but Diesel Generators and Oil Derricks need their new layers and some
-refinery lines need a new port, see Upgrading).
+the nuclear tier up to the Fission Reactor; worlds load, but Diesel Generators and Oil Derricks need their new layers
+and some refinery lines need a new port, see Upgrading).
 
 ### Added
 
@@ -61,6 +61,41 @@ refinery lines need a new port, see Upgrading).
   - JEI shows the enrichment (at 3%, 5% and 20%) and every new recipe; Jade shows the cascade's target, tails, SWU
     and status and a cylinder's lining and UF6 enrichment. New config: `ores.uraninite`, `ores.galena`,
     `ores.heavyMineralSand` and the `nuclear` section (radiation, the cascade and PVC lining).
+
+- **The nuclear tier, part two: fuel fabrication and the Fission Reactor.** Civil power only. Eight more Handbook
+  entries in the Nuclear chapter and eight more advancements.
+  - **Fuel.** Enriched UF6, Steam and Hydrogen make Uranium Dioxide at the gas's enrichment; the Metal Press with a new
+    **Pellet Die** presses it into Green Fuel Pellets, which the Induction Furnace sinters (`arcforge:sintering`) into
+    **Fuel Pellets**, keeping the enrichment throughout. **Zirconium** by the Kroll route (Zircon Dust, Coal Coke and
+    Chlorine to Zirconium Tetrachloride, reduced with Hydrogen in an electrically heated charge), alloyed with Nickel
+    in the Arcforge Furnace into **Zircaloy** and drawn into **Zircaloy Tubes**. A **Fuel Rod** is a tube and eight
+    pellets of one enrichment (`arcforge:fuel_rod`); it records its fuel type, enrichment, burnup, plutonium, fission
+    products and decay heat. Fresh rods are mildly radioactive; spent ones intensely, and hot enough to burn.
+  - **Control Rods** (silver), **Graphite Moderator**, **Steel Reflectors**, and **Heavy Water** from the new **Heavy Water
+    Tower** (3x4x3 to 5x8x5) by the Girdler sulfide exchange (`arcforge:isotope_exchanging`: Water, Hydrogen Sulfide and
+    Steam in each Exchange Tray).
+  - **Fission Reactor.** A vessel of Reactor Casing (Reactor Glass allowed), 3 to 7 across and 3 to 9 tall, with a grid
+    of Fuel Channels, Control Rod Channels in four banks, moderators, reflectors and coolant (Light or Heavy Water)
+    inside. Each second a one-group neutron diffusion over the grid gives k-effective and each channel's power; point
+    kinetics with delayed neutrons (a reactor period below prompt critical, seconds above), Doppler and void feedback
+    (negative in a water-moderated core, positive in a graphite one), iodine and xenon, decay heat (6.5% fading over
+    in-game hours) and burnup with fission products and plutonium. Fuel, cladding and coolant temperatures and vessel
+    pressure are tracked; overheated cladding fails and melted fuel ruins the core.
+  - **Heat.** A Hot Leg port makes a pressurized core: Hot Coolant goes to the new **Steam Generator** (a 3x4x3 to 7x12x7
+    vertical heat exchanger) for High-Pressure Steam. Steam ports alone make a boiling core: **Contaminated Steam** straight
+    to Steam Turbine Arrays, which run on it as High-Pressure Steam and turn slightly radioactive. Each channel gives
+    4,000 HU/t at full power; a big core passes 1,000,000 FE/t through four to six full-size turbine arrays.
+  - **Control and protection.** A three-page GUI (core readouts and rod banks; power, coolant and k-effective trends;
+    trip points, pump and options), bank moves from the GUI, redstone (a stop signal SCRAMs; optionally a signal holds
+    every bank in) and the machine control API (`bank_a`..`bank_d`, `scram`). Five player-set trips SCRAM the core;
+    rods load and unload only while it's shut down. A running core is a strong radiation source through its vessel.
+  - **Models.** The reactor: a heavy pressure vessel in a casing frame, a domed closure head with control-rod drive
+    housings, coolant nozzles at its ports, and a viewport for each pane of Reactor Glass that glows Cherenkov blue
+    (full-bright) while it's critical. The Steam Generator: a tall shell under a wider steam drum. The Heavy Water Tower:
+    a squat tower of tray sections. Their blocks (inside too) hide when formed.
+  - JEI: Sintering, Isotope Exchange, Fission (rods at 0.711%, 3%, 5% and 20%) and the Steam Generator; Jade: the
+    reactor's power, k, temperatures, rods and trips, a channel's rod or bank, the Steam Generator and the tower. New
+    config: `nuclear.fissionReactor`, `nuclear.steamGenerator` and `nuclear.heavyWaterTower`.
 
 - **Oil caverns.** In newly generated chunks every oil deposit is a real cavern full of oil: a sealed, flattened,
   roughly round chamber (an ellipsoid about twice as wide as it is tall, its edge slightly uneven) under the middle of

@@ -122,6 +122,11 @@ public final class ModDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Unit>> PVC_LINED =
             DATA_COMPONENTS.registerComponentType("pvc_lined", b -> b.persistent(Unit.CODEC).networkSynchronized(Unit.STREAM_CODEC));
 
+    // A Fuel Rod: its fuel, enrichment, burnup, what it has built up and its decay heat (see FuelRod).
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.zagdrath.arcforge.nuclear.FuelRod>> FUEL_ROD =
+            DATA_COMPONENTS.registerComponentType("fuel_rod", b -> b.persistent(net.zagdrath.arcforge.nuclear.FuelRod.CODEC)
+                    .networkSynchronized(net.zagdrath.arcforge.nuclear.FuelRod.STREAM_CODEC));
+
     private ModDataComponents() {}
 
     public static void register(IEventBus modEventBus) {

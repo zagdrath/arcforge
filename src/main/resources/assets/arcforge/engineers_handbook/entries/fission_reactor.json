@@ -1,0 +1,31 @@
+{
+  "title": "Fission Reactor",
+  "icon": "arcforge:reactor_controller",
+  "items": [
+    "arcforge:reactor_controller",
+    "arcforge:reactor_casing",
+    "arcforge:reactor_glass",
+    "arcforge:fuel_channel",
+    "arcforge:control_rod_channel",
+    "arcforge:graphite_moderator",
+    "arcforge:steel_reflector"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A civil power reactor: a pressure vessel of Reactor Casing with fuel inside.\n# Building it\n- A box of Reactor Casing 3 to 7 blocks each way and 3 to 9 tall. Reactor Glass may stand in the walls: formed, each pane is a viewport in the vessel that glows Cherenkov blue while it runs.\n- The controller in a wall. Any casing can be a port.\n- Inside, a grid of cells: Fuel Channels, Control Rod Channels, Graphite Moderator, Steel Reflectors, or nothing (coolant fills it). At least one Fuel Channel."
+    },
+    {
+      "type": "multiblock",
+      "structure": "fission_reactor"
+    },
+    {
+      "type": "text",
+      "text": "# Coolant and steam\nLight or Heavy Water comes in through Input ports and fills every empty cell and channel.\n- Pressurized: give it a Hot Leg port. The coolant stays liquid under pressure and leaves as Hot Coolant for a Steam Generator, which sends it back cooled.\n- Boiling: give it Steam ports only. The core boils its own coolant and sends Contaminated Steam straight to Steam Turbine Arrays, which run on it as High-Pressure Steam but turn slightly radioactive."
+    },
+    {
+      "type": "text",
+      "text": "# Fuel\nPut fresh Fuel Rods in the nine input slots: they load into empty Fuel Channels, and only while the reactor is shut down (every bank all the way in). Spent rods come out to the output slots while shut down, by themselves if you choose, still hot.\n# Power\nEach fuel channel gives up to 4,000 HU/t at full power. A big core (around 90 channels) makes over 350,000 HU/t, more than 1,000,000 FE/t through four to six full-size Steam Turbine Arrays."
+    }
+  ]
+}

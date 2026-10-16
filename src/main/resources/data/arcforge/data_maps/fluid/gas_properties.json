@@ -59,6 +59,9 @@
     },
     "arcforge:depleted_uranium_hexafluoride": {
       "color": "#B4B8AC"
+    },
+    "arcforge:contaminated_steam": {
+      "color": "#DCF0EC"
     }
   }
 }

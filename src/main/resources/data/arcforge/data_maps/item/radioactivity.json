@@ -53,6 +53,12 @@
     },
     "arcforge:heavy_mineral_sand": {
       "dose_rate": 0.02
+    },
+    "arcforge:green_fuel_pellet": {
+      "dose_rate": 0.2
+    },
+    "arcforge:fuel_pellet": {
+      "dose_rate": 0.2
     }
   }
 }

@@ -17,18 +17,16 @@ import javax.imageio.ImageIO;
 //
 // Large faces aren't tiled: ModelMesh paints each as a few big plates, sampling a window of a grain field per plate and
 // laying edge strips and rivets round it (see ModelMesh.plating). This paints what that samples, and the small parts'
-// tiles:
-//   rows 96-111: the furnace's refractory brick (0, 96, 16x8: buff firebrick in staggered courses, recessed mortar),
-//     the control panel's lit screen (16, 96, 8x6: cyan readouts on a dark glass), the motor's ribbed plate (64, 96),
-//     a seamless grating (80, 96), the girder flange (96, 104: seamless, a rivet every 4 px) and the hazard edge
-//     (112, 104);
-//   rows 112-119: the round parts' ramps, 2 to 14 px across, side by side, then the polished rod's bright ramp (104);
-//   rows 120-125: the burner fire (8x6), from the sheet's glow ramp at (40, 48);
-//   rows 128-191: the machine steel's grain field (116x64), then its edge columns (x 116-118: lit, dark, seam) and the
-//     generator steel's (x 119-121), 64 tall;
-//   rows 192-223: the generator steel's grain field (116x32);
-//   rows 224-229: the edge rows, 128 long: machine steel lit, dark, seam, then generator steel lit, dark, seam;
-//   rows 232-233: the rivet heads, 2x2: machine steel (0, 232), generator steel (2, 232).
+// tiles: rows 96-111: the furnace's refractory brick (0, 96, 16x8: buff firebrick in staggered courses, recessed
+// mortar), the control panel's lit screen (16, 96, 8x6: cyan readouts on a dark glass), the motor's ribbed plate (64,
+// 96), a seamless grating (80, 96), the girder flange (96, 104: seamless, a rivet every 4 px) and the hazard edge (112,
+// 104); a fission core seen through a viewport, running (24, 96: the Cherenkov glow, full-bright) and shut down (40,
+// 96: dark water between the fuel channels), both 16x16 and seamless; rows 112-119: the round parts' ramps, 2 to 14 px
+// across, side by side, then the polished rod's bright ramp (104); rows 120-125: the burner fire (8x6), from the
+// sheet's glow ramp at (40, 48); rows 128-191: the machine steel's grain field (116x64), then its edge columns (x
+// 116-118: lit, dark, seam) and the generator steel's (x 119-121), 64 tall; rows 192-223: the generator steel's grain
+// field (116x32); rows 224-229: the edge rows, 128 long: machine steel lit, dark, seam, then generator steel lit, dark,
+// seam; rows 232-233: the rivet heads, 2x2: machine steel (0, 232), generator steel (2, 232).
 public class LargeModelTextureGen {
     static final String[] SHEETS = { "src/main/resources/assets/arcforge/textures/block/pumpjack/pumpjack.png",
             "src/main/resources/assets/arcforge/textures/block/distillation_array/refinery.png",
@@ -63,6 +61,8 @@ public class LargeModelTextureGen {
         }
         brick(0, 96);
         screen(16, 96);
+        core(24, 96, true);
+        core(40, 96, false);
         motor(64, 96);
         grating(80, 96);
         flange(96, 104);
@@ -158,6 +158,30 @@ public class LargeModelTextureGen {
         for (int x = 5; x < 7; x++) {
             out.setRGB(x0 + x, y0 + 1, 0xFF000000 | mid);
             out.setRGB(x0 + x, y0 + 3, 0xFF000000 | dim);
+        }
+    }
+
+    // A fission core 16x16 seen through a reactor viewport, seamless both ways: two fuel channels 2 px wide upright in
+    // the water at x 2-3 and 10-11. Running, the water glows Cherenkov blue (drawn full-bright), stepping one tone at a
+    // time from the channels' edges up to a pale middle, never dithered; the channels stay a deeper blue, a step lighter
+    // where their spacer grids sit (rows 4 and 12). Shut down it is the same core dark: deep blue-black water, the
+    // channels a few steps lighter with a lit left edge.
+    static void core(int x0, int y0, boolean running) {
+        int[] glow = { 0x2A5CC8, 0x3A72DC, 0x4C88EC, 0x64A0F6, 0x82B8FC, 0xA2CEFF, 0xC4E2FF };
+        int[] dark = { 0x0C121A, 0x0F1620, 0x121B27, 0x16212F, 0x1B2838, 0x223246, 0x2A3C52 };
+        // By column, within each 8 px repeat starting at a channel's left edge: the channel, then the water out to its
+        // middle and back.
+        int[] glowSteps = { 1, 0, 2, 3, 5, 6, 5, 3 }, darkSteps = { 5, 4, 1, 0, 0, 0, 0, 1 };
+        for (int y = 0; y < 16; y++) {
+            boolean grid = y % 8 == 4;
+            for (int x = 0; x < 16; x++) {
+                int c = (x - 2 + 16) % 8;
+                int step = running ? glowSteps[c] : darkSteps[c];
+                if (grid && c < 2) {
+                    step = Math.min(6, step + 1);
+                }
+                out.setRGB(x0 + x, y0 + y, 0xFF000000 | (running ? glow : dark)[step]);
+            }
         }
     }
 

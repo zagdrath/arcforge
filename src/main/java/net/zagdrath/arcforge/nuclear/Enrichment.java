@@ -78,6 +78,34 @@ public final class Enrichment {
     }
 
     // "0.711%", "4.5%", "20%": up to three decimals, no trailing zeros.
+    // --- Items that carry an assay (enriched Uranium Dioxide, its pellets) ---
+
+    // An item's assay: its U-235 assay component, or natural without one.
+    public static int assay(net.minecraft.world.item.ItemStack stack) {
+        return stack.getOrDefault(net.zagdrath.arcforge.registry.ModDataComponents.U235_ASSAY.get(), NATURAL_PCM);
+    }
+
+    // The result of working an item keeps its assay (the Metal Press, sintering, the Chemical Reactor making UO2 from
+    // UF6): from's assay component, if it has one, onto to.
+    public static net.minecraft.world.item.ItemStack carry(net.minecraft.world.item.ItemStack from, net.minecraft.world.item.ItemStack to) {
+        Integer assay = from.get(net.zagdrath.arcforge.registry.ModDataComponents.U235_ASSAY.get());
+        if (assay != null && !to.isEmpty()) {
+            to.set(net.zagdrath.arcforge.registry.ModDataComponents.U235_ASSAY.get(), Math.max(1, Math.min(MAX_PCM, assay)));
+        }
+        return to;
+    }
+
+    // The same from a fluid (UF6 into UO2): only an enriched or depleted one marks the item; natural stays unmarked.
+    public static net.minecraft.world.item.ItemStack carry(FluidResource from, net.minecraft.world.item.ItemStack to) {
+        if (!from.isEmpty() && hasAssay(from.getFluid()) && !to.isEmpty()) {
+            int assay = assay(from);
+            if (assay != NATURAL_PCM) {
+                to.set(net.zagdrath.arcforge.registry.ModDataComponents.U235_ASSAY.get(), Math.max(1, Math.min(MAX_PCM, assay)));
+            }
+        }
+        return to;
+    }
+
     public static String percent(int pcm) {
         String text = String.format(Locale.ROOT, "%.3f", pcm / 1000.0);
         text = text.replaceAll("0+$", "");

@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/nuclear/steam_generator_tubes"
+    },
+    "formed=true": {
+      "model": "arcforge:block/nuclear/vessel_hidden"
+    }
+  }
+}

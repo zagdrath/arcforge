@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "PRP",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "#c:ingots/steel",
+    "R": "arcforge:pvc_sheet"
+  },
+  "result": {
+    "id": "arcforge:heavy_water_tower_casing",
+    "count": 4
+  }
+}

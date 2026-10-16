@@ -3997,6 +3997,127 @@ public class ArcforgeConfig {
 
     static {
         BUILDER.pop();
+        BUILDER.comment("The Fission Reactor: a pressure vessel (3x3x3 to 7x9x7) of Fuel Channels, Control Rod Channels, moderators and",
+                "reflectors in coolant. Its physics (neutron diffusion, delayed neutrons, feedback, xenon, decay heat, burnup) is",
+                "fixed; these set its size of output, its rates and its limits. Civil power only.").push("fissionReactor");
+    }
+
+    public static final ModConfigSpec.DoubleValue REACTOR_CHANNEL_HEAT = BUILDER
+            .comment("HU/t one fuel channel gives at full power (100%). A full core's output is its rods times this.")
+            .defineInRange("channelHeat", 4_000.0, 10.0, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_HOT_COOLANT_HEAT = BUILDER
+            .comment("HU each mB of Hot Coolant (or Hot Heavy Water) carries from a pressurized core to the Steam Generator.")
+            .defineInRange("hotCoolantHeat", 60.0, 1.0, 10_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_BOILING_HEAT = BUILDER
+            .comment("HU a boiling core spends on each mB of Contaminated Steam it makes.")
+            .defineInRange("boilingHeat", 12.0, 1.0, 1_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_COOLANT_PER_BLOCK = BUILDER
+            .comment("mB of coolant each empty cell inside the vessel holds (a channel holds 70% of that).")
+            .defineInRange("coolantPerBlock", 2_000.0, 100.0, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_VESSEL_HEAT_CAPACITY = BUILDER
+            .comment("HU to warm the coolant and steel of one block of the inside by 1 °C.")
+            .defineInRange("vesselHeatCapacity", 2_000.0, 10.0, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_ROD_LIFE = BUILDER
+            .comment("Ticks a Fuel Rod lasts at full power before it's spent (288000 = four real hours).")
+            .defineInRange("rodLifeTicks", 288_000.0, 1_000.0, 1.0E9);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_ROD_SPEED = BUILDER
+            .comment("How fast a control rod bank moves, in insertion (0 to 1) a second.")
+            .defineInRange("rodSpeed", 0.02, 0.001, 1.0);
+
+    public static final ModConfigSpec.IntValue REACTOR_SCRAM_TICKS = BUILDER
+            .comment("Ticks for the rods to fall all the way in on a SCRAM.")
+            .defineInRange("scramTicks", 40, 1, 400);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_IODINE_HALF_LIFE = BUILDER
+            .comment("Iodine-135's half-life, in seconds (real: 6.6 hours; scaled).")
+            .defineInRange("iodineHalfLife", 400.0, 1.0, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_XENON_HALF_LIFE = BUILDER
+            .comment("Xenon-135's half-life, in seconds (real: 9.1 hours; scaled).")
+            .defineInRange("xenonHalfLife", 546.0, 1.0, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_DECAY_FRACTION = BUILDER
+            .comment("Decay heat just after shutdown, as a fraction of the power it ran at.")
+            .defineInRange("decayHeatFraction", 0.065, 0.0, 0.5);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_DECAY_TIME = BUILDER
+            .comment("How long decay heat takes to fade, in ticks: its three parts fade over this, ten times and sixty times it.")
+            .defineInRange("decayHeatTicks", 1_200.0, 20.0, 10_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_PROMPT_GENERATION = BUILDER
+            .comment("Prompt neutron generation time, in seconds (game-scaled; smaller makes a prompt-critical core climb faster).")
+            .defineInRange("promptGenerationTime", 0.02, 0.001, 1.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_CLAD_FAILURE = BUILDER
+            .comment("Cladding temperature (°C) at which the rods fail: a SCRAM that can't be turned off.")
+            .defineInRange("claddingFailureTemperature", 1_200.0, 400.0, 3_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_FUEL_MELT = BUILDER
+            .comment("Fuel temperature (°C) at which the core is damaged: every rod in it is ruined.")
+            .defineInRange("fuelMeltTemperature", 2_400.0, 800.0, 5_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_RUNNING_DOSE = BUILDER
+            .comment("Dose rate (mSv/h at a block from the vessel's middle) of a core at full power; it scales with the power",
+                    "and its decay heat.")
+            .defineInRange("runningDoseRate", 4_000.0, 0.0, 1.0E7);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_FRESH_ROD_DOSE = BUILDER
+            .comment("Dose rate of a fresh 0.711% Fuel Rod (richer ones a little more).")
+            .defineInRange("freshRodDoseRate", 0.05, 0.0, 1_000.0);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_SPENT_ROD_DOSE = BUILDER
+            .comment("Dose rate of a spent Fuel Rod (partly used ones less).")
+            .defineInRange("spentRodDoseRate", 60.0, 0.0, 1.0E6);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_SPENT_FUEL_COOLING = BUILDER
+            .comment("Ticks a discharged rod's decay heat takes to fall to about a third (then far more slowly).")
+            .defineInRange("spentRodCoolingTicks", 24_000.0, 20.0, 1.0E8);
+
+    public static final ModConfigSpec.DoubleValue REACTOR_HOT_ROD_HEAT = BUILDER
+            .comment("A discharged rod giving off more decay heat than this (HU/t) burns whoever holds it.")
+            .defineInRange("hotRodHeat", 20.0, 0.0, 1.0E6);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("The Steam Generator: a vertical heat exchanger (3x3 to 7x7, 4 to 12 tall) of Steam Generator Tubes that boils",
+                "feedwater into High-Pressure Steam with the heat a pressurized core's Hot Coolant brings, and sends the coolant",
+                "back.").push("steamGenerator");
+    }
+
+    public static final ModConfigSpec.IntValue STEAM_GENERATOR_TUBE_RATE = BUILDER
+            .comment("mB of Hot Coolant each Steam Generator Tubes block cools a tick.")
+            .defineInRange("hotCoolantPerTube", 200, 1, 100_000);
+
+    public static final ModConfigSpec.DoubleValue STEAM_GENERATOR_STEAM_HEAT = BUILDER
+            .comment("HU each mB of High-Pressure Steam takes.")
+            .defineInRange("steamHeat", 12.0, 1.0, 1_000.0);
+
+    public static final ModConfigSpec.IntValue STEAM_GENERATOR_TANK_PER_BLOCK = BUILDER
+            .comment("mB each tank (hot coolant, cooled coolant, feedwater, steam) holds per block of the vessel's inside.")
+            .defineInRange("tankPerBlock", 2_000, 100, 1_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("The Heavy Water Tower: the Girdler sulfide process. Water and Hydrogen Sulfide exchange deuterium on its",
+                "Exchange Trays (3x3 to 5x5, 4 to 8 tall); the recipes are arcforge:isotope_exchanging.").push("heavyWaterTower");
+    }
+
+    public static final ModConfigSpec.IntValue HEAVY_WATER_ENERGY_PER_TRAY = BUILDER
+            .comment("FE/t each tray uses while it works (the tower's pumps and compressors).")
+            .defineInRange("energyPerTray", 30, 0, 100_000);
+
+    public static final ModConfigSpec.IntValue HEAVY_WATER_TANK_PER_BLOCK = BUILDER
+            .comment("mB each tank holds per block of the tower's inside.")
+            .defineInRange("towerTankPerBlock", 4_000, 100, 1_000_000);
+
+    static {
+        BUILDER.pop();
         BUILDER.pop();
     }
 

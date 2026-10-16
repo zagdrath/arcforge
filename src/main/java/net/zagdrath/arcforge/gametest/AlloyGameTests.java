@@ -182,10 +182,13 @@ final class AlloyGameTests {
         // Lubricant Blender, Cracking Catalyst, Cracking Unit Casing and Controller, Diesel Generator Casing and Controller,
         // Flare Stack, and Asphalt from Bitumen), and the nuclear tier's twenty (Raw Uraninite, Raw Galena, Lead and Depleted
         // Uranium blocks both ways, Lead Bricks, Concrete Shielding, Geiger Counter, Dosimeter, Lead Box, the four Hazmat
-        // pieces, Gas Centrifuge, and the Centrifuge Cascade Casing and Controller).
-        helper.assertTrue(crafting == 307, crafting + " crafting/ recipes, not 307");
-        // Plus the fluorite-fluxed steel, and Graphite from Coal Coke and from Carbon Dust.
-        helper.assertTrue(smelting == 8, smelting + " arcforge_smelting/ recipes, not 8");
+        // pieces, Gas Centrifuge, and the Centrifuge Cascade Casing and Controller), and the Fission Reactor drop's sixteen
+        // (Pellet Die, Fuel Rod, Control Rod, Control Rod Channel, Fuel Channel, Graphite Moderator, Steel Reflector, Exchange
+        // Tray, Reactor Casing, Glass and Controller, Heavy Water Tower Casing and Controller, Steam Generator Casing, Tubes
+        // and Controller).
+        helper.assertTrue(crafting == 323, crafting + " crafting/ recipes, not 323");
+        // Plus the fluorite-fluxed steel, Graphite from Coal Coke and from Carbon Dust, and Zircaloy.
+        helper.assertTrue(smelting == 9, smelting + " arcforge_smelting/ recipes, not 9");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
             helper.assertTrue(recipe(helper, old) == null, "Old recipe " + old + " is still there");
         }
