@@ -239,6 +239,12 @@ and some refinery lines need a new port, see Upgrading).
   back on the pipe, about three times a second at low speed and six flat out, higher the faster it runs.
 - **The Distillation Array's GUI is wider** (like the Gas Centrifuge Cascade's), so its temperature, status and output
   lines have room; the inventory sits centred under it.
+- **The Fission Reactor's windows show its core.** Reactor Glass that touches (side by side or one above another in a
+  wall) makes one window in the vessel with one frame round it, and the glass is clear: inside are the core support
+  plate, the upper core plate and the core as you built it (fuel assemblies, control rod channels with their drive
+  lines, graphite and reflectors), its fuel glowing Cherenkov blue while the reactor is critical. A see-through line
+  round the vessel under the head flange is gone, and the large models draw their round parts with fewer quads (the
+  same look), so many of them lag less.
 
 ### Fixed
 

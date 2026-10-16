@@ -26,7 +26,8 @@ import javax.imageio.ImageIO;
 // sheet's glow ramp at (40, 48); rows 128-191: the machine steel's grain field (116x64), then its edge columns (x
 // 116-118: lit, dark, seam) and the generator steel's (x 119-121), 64 tall; rows 192-223: the generator steel's grain
 // field (116x32); rows 224-229: the edge rows, 128 long: machine steel lit, dark, seam, then generator steel lit, dark,
-// seam; rows 232-233: the rivet heads, 2x2: machine steel (0, 232), generator steel (2, 232).
+// seam; rows 232-233: the rivet heads, 2x2: machine steel (0, 232), generator steel (2, 232); rows 240-255: a reactor's
+// core seen through its windows, 16x16 and seamless: the fuel assemblies' tops (0, 240) and graphite moderator (16, 240).
 public class LargeModelTextureGen {
     static final String[] SHEETS = { "src/main/resources/assets/arcforge/textures/block/pumpjack/pumpjack.png",
             "src/main/resources/assets/arcforge/textures/block/distillation_array/refinery.png",
@@ -86,6 +87,8 @@ public class LargeModelTextureGen {
         set(3, 232, GEN, 106);
         set(2, 233, GEN, 106);
         set(3, 233, GEN, 60);
+        fuelTops(0, 240);
+        graphite(16, 240);
         ImageIO.write(out, "png", new File(sheet));
         System.out.println("Wrote " + sheet);
     }
@@ -181,6 +184,49 @@ public class LargeModelTextureGen {
                     step = Math.min(6, step + 1);
                 }
                 out.setRGB(x0 + x, y0 + y, 0xFF000000 | (running ? glow : dark)[step]);
+            }
+        }
+    }
+
+    // The fuel assemblies' tops 16x16, seamless, on the same 8 px pitch as the core's fuel channels: each a 7x7 top
+    // nozzle plate (lit top and left edge, dark bottom and right) with its flow hole recessed in the middle (shadowed top
+    // and left lip, lit bottom and right, the water in it), the dark water of the core between them.
+    static void fuelTops(int x0, int y0) {
+        int water = 0x0F1620, hole = 0x16212F;
+        for (int y = 0; y < 16; y++) {
+            for (int x = 0; x < 16; x++) {
+                int cx = x % 8, cy = y % 8, c;
+                if (cx == 7 || cy == 7) {
+                    c = water;
+                } else if (cy == 0 || cx == 0) {
+                    c = cx == 6 || cy == 6 ? 0x383C42 : 0x575D65;
+                } else if (cy == 6 || cx == 6) {
+                    c = 0x2B2F34;
+                } else if (cx >= 2 && cx <= 4 && cy >= 2 && cy <= 4) {
+                    c = cx == 3 && cy == 3 ? hole : cy == 2 || cx == 2 ? (cx == 4 || cy == 4 ? 0x383C42 : 0x16181B) : 0x727982;
+                } else {
+                    c = cx < 4 ? 0x474C53 : 0x40454C;
+                }
+                out.setRGB(x0 + x, y0 + y, 0xFF000000 | c);
+            }
+        }
+    }
+
+    // Graphite moderator 16x16, seamless: dark matte blocks 8x4 in courses, each offset half a block from the one
+    // below, a 1 px seam above and left of each block and a lighter top edge under it; no grain (graphite isn't steel).
+    static void graphite(int x0, int y0) {
+        for (int y = 0; y < 16; y++) {
+            int course = y / 4, row = y % 4, shift = course % 2 == 1 ? 4 : 0;
+            for (int x = 0; x < 16; x++) {
+                int col = (x + shift) % 8, c;
+                if (row == 0 || col == 0) {
+                    c = 0x16181B;
+                } else if (row == 1) {
+                    c = 0x383C42;
+                } else {
+                    c = col < 5 ? 0x2B2F34 : 0x272A2F;
+                }
+                out.setRGB(x0 + x, y0 + y, 0xFF000000 | c);
             }
         }
     }

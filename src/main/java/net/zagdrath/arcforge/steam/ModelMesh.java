@@ -56,6 +56,9 @@ public abstract class ModelMesh {
         // A fission core seen through a reactor viewport: running (the Cherenkov glow, drawn in the glow list) and shut
         // down (dark water between the fuel channels).
         M_CORE_LIT(24, 96, 16, 16, Kind.MODULE), M_CORE_DARK(40, 96, 16, 16, Kind.MODULE),
+        // A reactor's core seen through its windows (rows 240-255): the fuel assemblies' top nozzles in the dark water
+        // and stacked graphite moderator.
+        M_FUEL_TOP(0, 240, 16, 16, Kind.MODULE), M_GRAPHITE(16, 240, 16, 16, Kind.MODULE),
         POLISHED(104, 112, 4, 8, Kind.BANDED),
         PLATE(0, 8, 16, 16, true, Cuts.SPLIT, Cuts.CORNERS),
         PLAIN(16, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),
@@ -788,12 +791,21 @@ public abstract class ModelMesh {
     // A strip of a curved shell (p0 p1 across it, s0 to s1 round the shell; p0 p3 up it, 0 to height) plated as the
     // shell's unrolled layout lays it out (rects in the shell's s and t), so its plates carry on from facet to facet.
     void plateStrip(float[] p0, float[] p1, float[] p2, float[] p3, float s0, float s1, float height, List<float[]> rects) {
+        plateStrip(p0, p1, p2, p3, s0, s1, height, rects, s0, s1, 0.0F, height);
+    }
+
+    // The same, only the part of the strip from sa to sb round it and t0 to t1 up it (a shell with openings cut in it).
+    void plateStrip(float[] p0, float[] p1, float[] p2, float[] p3, float s0, float s1, float height, List<float[]> rects, float sa, float sb,
+            float t0, float t1) {
         for (float[] rect : rects) {
-            float a = Math.max(s0, rect[0]), b = Math.min(s1, rect[1]);
+            float a = Math.max(Math.max(s0, sa), rect[0]), b = Math.min(Math.min(s1, sb), rect[1]);
             if (b - a <= 1.0E-4F) {
                 continue;
             }
-            float c = rect[2], d = rect[3];
+            float c = Math.max(t0, rect[2]), d = Math.min(t1, rect[3]);
+            if (d - c <= 1.0E-4F) {
+                continue;
+            }
             float fa = (a - s0) / (s1 - s0), fb = (b - s0) / (s1 - s0), fc = c / height, fd = d / height;
             float u0 = (rect[4] + a - rect[0]) / sheetW, u1 = (rect[4] + b - rect[0]) / sheetW;
             float vTop = (rect[5] + rect[3] - d) / sheetH, vBottom = (rect[5] + rect[3] - c) / sheetH;
@@ -878,7 +890,7 @@ public abstract class ModelMesh {
     // A flat convex polygon (st: its points across and up a plane from base) cut by rectangles {s0, s1, t0, t1, u, v},
     // each piece showing the sheet at 1:1 with texel (u, v) at its rectangle's top left (s0, t1); to the glass list when
     // glass is set.
-    private void paintPlane(List<float[]> st, float[] base, float[] right, float[] up, List<float[]> rects, boolean glass) {
+    void paintPlane(List<float[]> st, float[] base, float[] right, float[] up, List<float[]> rects, boolean glass) {
         float area = 0;
         for (int i = 0; i < st.size(); i++) {
             float[] a = st.get(i), b = st.get((i + 1) % st.size());
@@ -985,15 +997,13 @@ public abstract class ModelMesh {
     }
 
     // A strip (p0 p1 across it, p0 p3 along it, length px long) showing s0 to s1 of a ramp period px across that repeats
-    // round the part, at 1 texel per px both ways (the ramp's rows repeat every 8 px along).
+    // round the part, at 1 texel per px across. Each of the ramp's columns is one tone all along it, so one cell runs
+    // the strip's whole length on the middle of a texel row: the same pixels as laying its rows every 8 px, in a
+    // fraction of the quads (these models are drawn vertex by vertex every frame).
     void rampFacet(float[] p0, float[] p1, float[] p2, float[] p3, float s0, float s1, int period, float length, int rx) {
         for (float s = s0; s < s1 - 1.0E-5F;) {
             float k = (float) Math.floor(s / period + 1.0E-5F) * period, end = Math.min(s1, k + period);
-            for (float t = 0; t < length - 1.0E-5F; t += 8.0F) {
-                float t1 = Math.min(length, t + 8.0F);
-                cell(p0, p1, p2, p3, (s - s0) / (s1 - s0), (end - s0) / (s1 - s0), t / length, t1 / length, Paint.RAMPS, rx + s - k, 0,
-                        rx + end - k, t1 - t, false);
-            }
+            cell(p0, p1, p2, p3, (s - s0) / (s1 - s0), (end - s0) / (s1 - s0), 0.0F, 1.0F, Paint.RAMPS, rx + s - k, 4.5F, rx + end - k, 4.5F, false);
             s = end;
         }
     }
