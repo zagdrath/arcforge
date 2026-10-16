@@ -1,17 +1,18 @@
-"""Draws the Fission Reactor's GUI background (300x216) and its 36-px RESET/SCRAM buttons.
+"""Draws the Fission Reactor's GUI background (300x288) and its 36-px RESET/SCRAM buttons.
 
 The frame is the 176-px machine panel stretched (its 4-px corners and edges kept), the desk screen an inset across the
-top, the rod input slots a 3x3 grid left of the player inventory and the output slots one right of it. Positions match
-FissionReactorScreen and FissionReactorMenu. Run from the repo root: python tools/fission_reactor_gui_gen.py
+top, under it the rod input slots in a 3x3 grid over the player inventory's left end and the output slots in one over
+its right end, and the player inventory at the bottom. Positions match FissionReactorScreen and FissionReactorMenu. Run from the repo root: python tools/fission_reactor_gui_gen.py
 """
 
 from PIL import Image
 
 GUI = "src/main/resources/assets/arcforge/textures/gui/"
-W, H = 300, 216
+W, H = 300, 288
 FILL, DARK, LIGHT, INSET = (49, 49, 49, 255), (14, 14, 14, 255), (92, 92, 92, 255), (31, 31, 31, 255)
 SCREEN = (7, 15, W - 8, 118)  # dark top-left corner, light bottom-right corner
-SLOT_X, SLOT_Y, OUTPUT_X, INVENTORY_X = 8, 134, 240, 70
+INVENTORY_X, INVENTORY_Y = 70, 206
+SLOT_X, SLOT_Y, OUTPUT_X = INVENTORY_X, 134, INVENTORY_X + 6 * 18
 
 
 def panel(source):
@@ -50,8 +51,8 @@ def slot(img, x, y):
 
 def main():
     source = Image.open(GUI + "container/fission_reactor.png").convert("RGBA")
-    # The old 176x254 panel on a 256 sheet, or this one again on its 512x256 sheet.
-    source = source.crop((0, 0, 176, 254) if source.width == 256 else (0, 0, W, H))
+    # Only the frame is read: the old 176x254 panel on a 256 sheet, the 300x216 one on a 512x256 sheet, or this one.
+    source = source.crop((0, 0, 176, 254) if source.width == 256 else (0, 0, W, 216) if source.height == 256 else (0, 0, W, H))
     img = panel(source)
     inset(img, *SCREEN)
     for row in range(3):
@@ -60,10 +61,10 @@ def main():
             slot(img, OUTPUT_X + col * 18, SLOT_Y + row * 18)
     for row in range(3):
         for col in range(9):
-            slot(img, INVENTORY_X + col * 18, SLOT_Y + row * 18)
+            slot(img, INVENTORY_X + col * 18, INVENTORY_Y + row * 18)
     for col in range(9):
-        slot(img, INVENTORY_X + col * 18, SLOT_Y + 58)
-    sheet = Image.new("RGBA", (512, 256), (0, 0, 0, 0))
+        slot(img, INVENTORY_X + col * 18, INVENTORY_Y + 58)
+    sheet = Image.new("RGBA", (512, 512), (0, 0, 0, 0))
     sheet.paste(img, (0, 0))
     sheet.save(GUI + "container/fission_reactor.png")
 

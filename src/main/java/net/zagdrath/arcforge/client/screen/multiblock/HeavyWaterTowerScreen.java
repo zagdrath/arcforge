@@ -24,8 +24,9 @@ import net.zagdrath.arcforge.registry.ModFluids;
 // The Heavy Water Tower (176×166): the FE gauge, three input tanks, the house screen (its trays, the progress of the
 // operation they're all doing, what the last one made, the status) and the Heavy Water tank.
 public class HeavyWaterTowerScreen extends MachineScreen<HeavyWaterTowerMenu> {
-    private static final int ENERGY_X = 9, ENERGY_Y = 19;
+    // Every gauge and the house screen share one top and bottom (insets y 16..69, insets' insides 17..68).
     private static final int TANK_Y = 17, TANK_W = 12, TANK_H = 52;
+    private static final int ENERGY_X = 9, ENERGY_Y = TANK_Y, ENERGY_H = TANK_H;
     private static final int[] INPUT_X = { 24, 40, 56 };
     private static final int OUTPUT_X = 155;
     private static final int LEFT = 74, RIGHT = 150, ROW = 10;
@@ -55,7 +56,12 @@ public class HeavyWaterTowerScreen extends MachineScreen<HeavyWaterTowerMenu> {
 
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
-        drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.get(HeavyWaterTowerMenu.DATA_ENERGY), menu.get(HeavyWaterTowerMenu.DATA_ENERGY_CAPACITY));
+        // The energy bar is as tall as the tanks (its sprite is GAUGE_W×ENERGY_H), cropped from the bottom.
+        int energy = scaled(menu.get(HeavyWaterTowerMenu.DATA_ENERGY), menu.get(HeavyWaterTowerMenu.DATA_ENERGY_CAPACITY), ENERGY_H);
+        if (energy > 0) {
+            graphics.blitSprite(net.minecraft.client.renderer.RenderPipelines.GUI_TEXTURED, energyBar, GAUGE_W, ENERGY_H, 0, ENERGY_H - energy,
+                    x + ENERGY_X, y + ENERGY_Y + ENERGY_H - energy, GAUGE_W, energy);
+        }
         int capacity = menu.get(HeavyWaterTowerMenu.DATA_CAPACITY);
         for (int i = 0; i < 3; i++) {
             Fluid fluid = input(i);
@@ -85,7 +91,7 @@ public class HeavyWaterTowerScreen extends MachineScreen<HeavyWaterTowerMenu> {
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
         int capacity = menu.get(HeavyWaterTowerMenu.DATA_CAPACITY);
-        if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
+        if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, ENERGY_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.get(HeavyWaterTowerMenu.DATA_ENERGY)),
                     ArcforgeGui.grouped(menu.get(HeavyWaterTowerMenu.DATA_ENERGY_CAPACITY))).withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.arcforge.fe_per_tick_loss", ArcforgeGui.grouped(menu.get(HeavyWaterTowerMenu.DATA_ENERGY_USE)))

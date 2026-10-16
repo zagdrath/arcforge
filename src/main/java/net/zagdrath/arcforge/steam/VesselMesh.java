@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.steam;
 
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 
 // What the walled vessels' large models share (the Fission Reactor, the Steam Generator and the Heavy Water Tower; see
@@ -169,12 +171,11 @@ public abstract class VesselMesh extends ModelMesh {
     // standing just inside the wall's face, VENT louvres low on its front and a lit screen (M_SCREEN, in the glow list)
     // facing out.
     void panel(int bx, int by) {
-        float x0 = bx * PX + 3.0F, x1 = bx * PX + 13.0F;
-        float y0 = Math.max(by * PX + 1.0F, PLINTH), y1 = Math.min(by * PX + 15.0F, height - POST);
-        if (y1 - y0 < 10.0F) {
+        float[] cabinet = panelBox(bx, by);
+        if (cabinet == null) {
             return;
         }
-        float u0 = 0.5F, u1 = 3.5F;
+        float x0 = cabinet[0], y0 = cabinet[1], u0 = cabinet[2], x1 = cabinet[3], y1 = cabinet[4], u1 = cabinet[5];
         box(x0, y0, u0, x1, y1, u1, Paint.GEN_PLAIN, Paint.GEN_PLAIN, Paint.GEN_PLAIN, SKIP_UP);
         box(x0 - 0.5F, y1 - 1.0F, u0 - 0.4F, x1 + 0.5F, y1, u1 + 0.5F, Paint.GEN_MID, Paint.GEN_LIT, Paint.GEN_DARK, 0);
         solidBoxes.add(new float[] { x0, y0, u0, x1, y1, u1 });
@@ -185,6 +186,16 @@ public abstract class VesselMesh extends ModelMesh {
         glowing = true;
         face(new float[] { sx1, sy0, u0 - 0.65F }, right, up, sx1 - sx0, sy1 - sy0, Paint.M_SCREEN, false);
         glowing = false;
+    }
+
+    // The control panel's cabinet on the controller's block {x0, y0, u0, x1, y1, u1} (its sill aside), or null when the
+    // block has no room for it.
+    float @Nullable [] panelBox(int bx, int by) {
+        float y0 = Math.max(by * PX + 1.0F, PLINTH), y1 = Math.min(by * PX + 15.0F, height - POST);
+        if (y1 - y0 < 10.0F) {
+            return null;
+        }
+        return new float[] { bx * PX + 3.0F, y0, 0.5F, bx * PX + 13.0F, y1, 3.5F };
     }
 
     // The port nozzles, then the lists: {solid, cutout, glow}.

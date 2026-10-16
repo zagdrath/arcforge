@@ -16,7 +16,6 @@ import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
-import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.nuclear.ControlRodChannelBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
@@ -25,8 +24,8 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.FissionReactorMenu;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorSim;
 
-// The Fission Reactor's control desk (300×216: the desk across the top, under it the nine rod input slots in a 3×3 grid,
-// the player inventory 134 down and the nine output slots in a 3×3 grid), three pages on its screen:
+// The Fission Reactor's control desk (300×288: the desk across the top, under it the nine rod input slots and the nine
+// output slots in 3×3 grids over the ends of the player inventory, which is at the bottom), three pages on its screen:
 //  - Core: the readings down the left (thermal power, k-effective, reactivity, period, the hottest fuel and cladding,
 //    the coolant, pressure, xenon, decay heat), the four rod banks and All on the right (each a bar of how far in it
 //    is with a marker at its target, - out / + in buttons, shift for 10%, and how far in, with the target while it
@@ -85,6 +84,11 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
 
     @Override
     protected int textureWidth() {
+        return 512;
+    }
+
+    @Override
+    protected int textureHeight() {
         return 512;
     }
 
@@ -227,9 +231,9 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
             graphics.text(font, clipped(Component.translatable("gui.arcforge.fission_reactor.shift_hint"), SHIFT_W), SHIFT_X, CONTROL_Y + 2,
                     ArcforgeGui.LABEL, false);
         }
-        graphics.text(font, Component.translatable("gui.arcforge.fission_reactor.rods_in"), FissionReactorMenu.INPUT_X, inventoryLabelY, ArcforgeGui.LABEL,
-                false);
-        textRight(graphics, Component.translatable("gui.arcforge.fission_reactor.rods_out"), FissionReactorMenu.OUTPUT_X + SLOTS_W - 2, inventoryLabelY,
+        int labelY = FissionReactorMenu.SLOTS_Y - 11;
+        graphics.text(font, Component.translatable("gui.arcforge.fission_reactor.rods_in"), FissionReactorMenu.INPUT_X, labelY, ArcforgeGui.LABEL, false);
+        textRight(graphics, Component.translatable("gui.arcforge.fission_reactor.rods_out"), FissionReactorMenu.OUTPUT_X + SLOTS_W - 2, labelY,
                 ArcforgeGui.LABEL);
     }
 
@@ -450,32 +454,37 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
         return -1;
     }
 
-    // TEMPORARY: the click as NeoForge's event saw it, after every other listener (cancelled = something took it first).
-    public static void traceClick(net.neoforged.neoforge.client.event.ScreenEvent.MouseButtonPressed.Pre event) {
-        if (event.getScreen() instanceof FissionReactorScreen) {
-            Arcforge.LOGGER.info("Fission Reactor desk: click event at {}, {} button {}, cancelled {}", event.getMouseX(), event.getMouseY(),
-                    event.getButton(), event.isCanceled());
+    // A left click on the desk's controls: pages through the screen or sends the button to the server. Run from a
+    // highest-priority ScreenEvent.MouseButtonPressed.Pre listener (see ArcforgeClient) as well as mouseClicked, so a
+    // click on the desk reaches it before any other mod's screen listener can take it.
+    public static void deskClick(net.neoforged.neoforge.client.event.ScreenEvent.MouseButtonPressed.Pre event) {
+        if (event.getScreen() instanceof FissionReactorScreen screen && event.getButton() == 0 && screen.deskClick(event.getMouseX(), event.getMouseY())) {
+            event.setCanceled(true);
         }
+    }
+
+    private boolean deskClick(double mx, double my) {
+        if (minecraft.gameMode == null || !menu.getCarried().isEmpty()) {
+            return false;
+        }
+        if (isHovering(PAGE_X, CONTROL_Y, PAGE_W, CONTROL_H, mx, my)) {
+            shown = Page.values()[(shown.ordinal() + 1) % Page.values().length];
+            ArcforgeGui.playClickSound();
+            return true;
+        }
+        int id = buttonAt(mx, my, Minecraft.getInstance().hasShiftDown());
+        if (id < 0) {
+            return false;
+        }
+        minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);
+        ArcforgeGui.playClickSound();
+        return true;
     }
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        // TEMPORARY: where the click landed on the desk and what it hit.
-        Arcforge.LOGGER.info("Fission Reactor desk: mouseClicked at {}, {} button {}, GUI at {}, {}, page {}, button id {}, game mode {}", event.x(),
-                event.y(), event.button(), leftPos, topPos, shown, buttonAt(event.x(), event.y(), false), minecraft.gameMode != null);
-        if (event.button() == 0 && minecraft.gameMode != null) {
-            double mx = event.x(), my = event.y();
-            if (isHovering(PAGE_X, CONTROL_Y, PAGE_W, CONTROL_H, mx, my)) {
-                shown = Page.values()[(shown.ordinal() + 1) % Page.values().length];
-                ArcforgeGui.playClickSound();
-                return true;
-            }
-            int id = buttonAt(mx, my, Minecraft.getInstance().hasShiftDown());
-            if (id >= 0) {
-                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, id);
-                ArcforgeGui.playClickSound();
-                return true;
-            }
+        if (event.button() == 0 && deskClick(event.x(), event.y())) {
+            return true;
         }
         return super.mouseClicked(event, doubleClick);
     }

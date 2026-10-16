@@ -71,10 +71,10 @@ public class FissionReactorMenu extends MachineMenu {
 
     public static final int FLAG_REDSTONE_RODS = 32, FLAG_AUTO_UNLOAD = 64, FLAG_UNLOADING = 128, FLAG_CAN_REFUEL = 256, FLAG_DAMAGED = 512;
 
-    // Layout (300 wide): the desk across the top; under it the rod input slots in a 3x3 grid on the left, the player
-    // inventory in the middle and the output slots in a 3x3 grid on the right.
-    public static final int WIDTH = 300, HEIGHT = 216;
-    public static final int INPUT_X = 8, OUTPUT_X = 240, SLOTS_Y = 134, INVENTORY_X = 70, INVENTORY_Y = 134;
+    // Layout (300x288): the desk across the top; under it the rod input slots in a 3x3 grid over the player
+    // inventory's left end and the output slots in a 3x3 grid over its right end; the player inventory at the bottom.
+    public static final int WIDTH = 300, HEIGHT = 288;
+    public static final int INVENTORY_X = 70, INVENTORY_Y = 206, INPUT_X = INVENTORY_X, OUTPUT_X = INVENTORY_X + 6 * 18, SLOTS_Y = 134;
 
     // Buttons (each machine's own range is the 200s; the 300s are the Security tab's): bank b down (out) or up (in) a
     // step (1%) or a big step (10%): 200 + b * 4 + {0 out, 1 in, 2 out big, 3 in big}; every bank at once the same:

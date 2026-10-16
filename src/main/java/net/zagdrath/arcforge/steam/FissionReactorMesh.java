@@ -18,8 +18,9 @@ import net.zagdrath.arcforge.multiblock.ModelFrame;
 //
 // The Reactor Glass in the side walls opens windows in the shell: each piece of glass marks the shell's facets facing it
 // at its row's height (the rows of glass spread over the straight shell), and glass that touches, across or up, opens
-// one window with one raised frame round it and no bars between. The glass is the glass tile's rim and glints, its
-// middle clear, so the inside shows (seen from inside, a window is the inner wall, so none shows out through another):
+// one window with one raised frame round it and no bars between. The glass is the glass tile's rim and glints over a
+// light grey tint pane (drawn translucent), so the inside shows through it (seen from inside, a window is the inner
+// wall, so none shows out through another):
 // the shell's inner wall, the core support plate and the upper core plate, and the
 // core between them built from what's in the vessel (see Core): fuel assemblies, control rod channels with their drive
 // lines up to the upper plate, graphite and reflector, packed in a square lattice scaled to fit the shell. While the
@@ -33,6 +34,9 @@ public final class FissionReactorMesh extends VesselMesh {
     static final float WALL = 2.0F, FRAME = 2.0F, FRAME_OUT = 1.5F, FLANGE_GAP = 0.25F;
     // How much of the inside's height the core takes (the upper plenum above it), and its lattice's widest pitch (px).
     static final float CORE_HEIGHT = 0.68F, CORE_PITCH = 14.0F;
+    // How far the glass's tint pane sits in behind its rim, and how far the control panel's mount reaches into the
+    // vessel's skin behind it (px).
+    static final float TINT_IN = 0.1F, MOUNT_IN = 0.5F;
     // What a piece of the windowed shell is.
     private static final int SOLID = 0, FRAMED = 1, OPEN = 2;
 
@@ -90,6 +94,8 @@ public final class FissionReactorMesh extends VesselMesh {
     private final float lo, hi, rowH, floorY, ceilY, facetW;
     // The fuel's faces seen through the windows {origin, right, up, {w, h}, normal}, for the running glow.
     private final List<float[][]> fuelFaces = new ArrayList<>();
+    // The glass's tint panes {p0, p1, p2, p3} (counter-clockwise seen from outside), for the translucent list.
+    private final List<float[][]> tintPanes = new ArrayList<>();
 
     public FissionReactorMesh(ModelFrame frame, List<Viewport> viewports, int panelX, int panelY) {
         this(frame, viewports, Core.generic(frame), panelX, panelY);
@@ -129,10 +135,12 @@ public final class FissionReactorMesh extends VesselMesh {
     }
 
     // The still parts and the nozzles of these ports: {solid, cutout (the windows' glass), glow (the panel's screen),
-    // running (the fuel's Cherenkov glow, drawn only while the reactor runs)}.
+    // running (the fuel's Cherenkov glow, drawn only while the reactor runs), tint (the glass's light grey tint, drawn
+    // translucent)}.
     public float[][] buildStatic(List<Port> ports) {
         startStatic();
         fuelFaces.clear();
+        tintPanes.clear();
         plinth();
         casingFrame();
         vessel();
@@ -141,6 +149,7 @@ public final class FissionReactorMesh extends VesselMesh {
             inside();
         }
         panel(panelX, panelY);
+        panelMount(panelX, panelY);
         float[][] parts = finish(ports);
         // The Cherenkov glow over the fuel, a hair out from it.
         glow = new Floats();
@@ -149,8 +158,92 @@ public final class FissionReactorMesh extends VesselMesh {
             float[] n = f[4], origin = { f[0][0] + n[0] * 0.1F, f[0][1] + n[1] * 0.1F, f[0][2] + n[2] * 0.1F };
             face(origin, f[1], f[2], f[3][0], f[3][1], Paint.M_CORE_LIT, false);
         }
+        float[] running = glow.toArray();
+        // The tint: each pane one flat tone (the light steel of a rivet head), its see-through set by the renderer.
+        glow = new Floats();
+        float tu = (Paint.RIVET.x + 2.0F) / SHEET_W, tv = (Paint.RIVET.y + 2.0F) / SHEET_H;
+        for (float[][] p : tintPanes) {
+            quad(p[0], p[1], p[2], p[3], new float[] { tu, tv, tu, tv, tu, tv, tu, tv }, false);
+        }
         glowing = false;
-        return new float[][] { parts[0], parts[1], parts[2], glow.toArray() };
+        return new float[][] { parts[0], parts[1], parts[2], running, glow.toArray() };
+    }
+
+    // The control panel's mount: a block from the cabinet's back into the vessel's skin behind it, so the panel stands
+    // on the vessel instead of floating in front of it. It's cut where the vessel's outline changes (the skirt, the
+    // bottom head, the shell, the flanges, the closure head), each piece reaching MOUNT_IN into the deepest point of the
+    // skin behind it; where the skin comes further forward the piece ends inside the bottom head, the wall or the
+    // flanges, never through the shell's wall into the inside the windows show.
+    private void panelMount(int bx, int by) {
+        float[] cabinet = panelBox(bx, by);
+        if (cabinet == null) {
+            return;
+        }
+        float x0 = cabinet[0] + 1.0F, x1 = cabinet[3] - 1.0F, ya = cabinet[1] + 1.0F, yb = cabinet[4] - 2.0F, u0 = cabinet[5] - 0.25F;
+        float dx = Math.max(Math.abs(x0 - cx), Math.abs(x1 - cx));
+        float mid = skirtTop + (bottomHeadTop - skirtTop) * 0.55F;
+        float[] bands = { PLINTH, skirtTop, mid, bottomHeadTop, flangeY - 2.0F, headY, crown };
+        float[][] head = head(headY, radius, headHeight, true);
+        // The pieces, bottom up {y0, y1, depth}; null where nothing of the vessel is behind it.
+        List<float[]> pieces = new ArrayList<>();
+        for (int i = 0; i + 1 < bands.length; i++) {
+            float p = Math.max(ya, bands[i]), q = Math.min(yb, bands[i + 1]);
+            if (q - p < 0.01F) {
+                continue;
+            }
+            float least = Float.MAX_VALUE;
+            for (int k = 0; k <= 16; k++) {
+                least = Math.min(least, outerRadius(p + (q - p) * k / 16.0F, mid, head));
+            }
+            // The facets' middles are the nearest the skin comes in to the axis.
+            float rin = least * (float) Math.cos(Math.PI / SHELL_SIDES);
+            if (rin - dx < 1.0F) {
+                continue;
+            }
+            float depth = cu - (float) Math.sqrt(rin * rin - dx * dx) + MOUNT_IN;
+            if (depth > u0 + 0.01F) {
+                pieces.add(new float[] { p, q, depth });
+            }
+        }
+        for (int i = 0; i < pieces.size(); i++) {
+            float[] piece = pieces.get(i);
+            // Faces shared with the piece above or below are inside the two, and the back is inside the vessel.
+            boolean below = i > 0 && pieces.get(i - 1)[1] >= piece[0] - 0.01F, above = i + 1 < pieces.size() && pieces.get(i + 1)[0] <= piece[1] + 0.01F;
+            int skip = SKIP_NEG_U | SKIP_POS_U | (below ? SKIP_DOWN : 0) | (above ? SKIP_UP : 0);
+            box(x0, piece[0], u0, x1, piece[1], piece[2], Paint.PLAIN, Paint.PLAIN, Paint.PLAIN, skip);
+        }
+    }
+
+    // The vessel's outer radius at height y (px), mid where the bottom head's taper bends and head its closure head's
+    // outline: the skirt, the bottom head, the shell, the gasket between the flanges (their narrowest) and the head's
+    // facets; 0 under the skirt and over the crown.
+    private float outerRadius(float y, float mid, float[][] head) {
+        float r = radius;
+        if (y < PLINTH || y > crown) {
+            return 0.0F;
+        }
+        if (y <= skirtTop) {
+            return r - 4.0F;
+        }
+        if (y <= mid) {
+            return r - 4.0F + 3.0F * (y - skirtTop) / (mid - skirtTop);
+        }
+        if (y <= bottomHeadTop) {
+            return r - 1.0F + (y - mid) / (bottomHeadTop - mid);
+        }
+        if (y <= flangeY - 2.0F) {
+            return r;
+        }
+        if (y <= headY) {
+            return r + 1.0F;
+        }
+        for (int i = 0; i + 1 < head.length; i++) {
+            if (y <= head[i + 1][0]) {
+                float t = (y - head[i][0]) / Math.max(1.0E-4F, head[i + 1][0] - head[i][0]);
+                return head[i][1] + (head[i + 1][1] - head[i][1]) * t;
+            }
+        }
+        return 0.0F;
     }
 
     // The skirt, the bottom head, the shell up to the flange (windowed when there's glass), the flange pair with the
@@ -452,7 +545,7 @@ public final class FissionReactorMesh extends VesselMesh {
 
     // The windows' glass, in the cutout list, halfway through the wall: the glass tile's 1 px rim (lit top and left,
     // dark bottom and right, in runs of up to 10 px) only round each window's outside, never between its facets or
-    // rows, and the glints once, in each window's top-left corner. Its clear middle isn't drawn.
+    // rows, and the glints once, in each window's top-left corner; behind them the tint panes (see buildStatic).
     private void glass() {
         int sides = SHELL_SIDES, gx = Paint.GLASS.x, gy = Paint.GLASS.y;
         float fw = facetW, h = rowH, rg = radius - WALL / 2.0F;
@@ -487,6 +580,22 @@ public final class FissionReactorMesh extends VesselMesh {
                 }
                 List<float[]> st = List.of(new float[] { 0, 0 }, new float[] { fw, 0 }, new float[] { fw, h }, new float[] { 0, h });
                 paintPlane(st, at(f, 0.0F, lo + j * h, rg), across(f), new float[] { 0, 1, 0 }, rects, true);
+            }
+            // The tint: one pane up each run of open rows, TINT_IN behind the rim so the rim and glints stay crisp over
+            // it, meeting the next facet's at their shared edge.
+            float rt = rg - TINT_IN;
+            for (int j = 0; j < rows;) {
+                if (!open[f][j]) {
+                    j++;
+                    continue;
+                }
+                int j1 = j + 1;
+                while (j1 < rows && open[f][j1]) {
+                    j1++;
+                }
+                float t0 = lo + j * h, t1 = lo + j1 * h;
+                tintPanes.add(new float[][] { at(f, 0.0F, t0, rt), at(f, fw, t0, rt), at(f, fw, t1, rt), at(f, 0.0F, t1, rt) });
+                j = j1;
             }
         }
     }

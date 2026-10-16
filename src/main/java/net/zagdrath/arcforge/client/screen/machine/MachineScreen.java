@@ -171,6 +171,11 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         return 256;
     }
 
+    // Its height: 256, or 512 for a GUI taller than 256.
+    protected int textureHeight() {
+        return 256;
+    }
+
     protected abstract void drawContents(GuiGraphicsExtractor graphics, int x, int y);
 
     // Screen text, relative to the GUI's corner.
@@ -181,7 +186,7 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractBackground(graphics, mouseX, mouseY, partialTick);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos, 0.0F, 0.0F, imageWidth, imageHeight, textureWidth(), 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos, 0.0F, 0.0F, imageWidth, imageHeight, textureWidth(), textureHeight());
         drawContents(graphics, leftPos, topPos);
         // Tabs overlap the panel edge, so they are drawn after the background.
         tabs.render(graphics, font, leftPos, topPos, mouseX, mouseY);

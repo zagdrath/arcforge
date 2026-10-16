@@ -165,10 +165,8 @@ public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCa
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
         float[] solid = state.solid, glass = state.glass, glow = state.glow, marks = state.marks;
         int light = state.light;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> MeshRendering.emit(pose, buffer, solid, sheet, light));
-        if (glass.length > 0) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), (pose, buffer) -> MeshRendering.emit(pose, buffer, glass, sheet, light));
-        }
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
         // The panel's screen always, the bands' marks while it runs: full-bright.
         if (glow.length > 0 || marks.length > 0) {
             collector.submitCustomGeometry(poseStack, RenderTypes.eyes(sheet.atlasLocation()), (pose, buffer) -> {

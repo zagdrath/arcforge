@@ -163,13 +163,11 @@ public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamT
         }
         float[] solid = state.solid, rotor = state.rotor, glass = state.glass;
         int light = state.light;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> {
-            emit(pose, buffer, solid, sheet, light);
-            emit(pose, buffer, rotor, sheet, light);
-        });
-        if (glass.length > 0) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, glass, sheet, light));
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
+        if (rotor.length > 0) {
+            collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, rotor, sheet, light));
         }
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
     }
 
     // TurbineMesh's vertices (x, y, z, u, v across the sheet, normal), the sheet's UVs mapped into the atlas. Each face

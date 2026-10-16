@@ -404,7 +404,9 @@ the same layout on all of them); ModelMesh `modules` and `plating` lay them.
    at them: `tools/WellHeadModelGen.java` writes both together.
 7. **Glass** on a large model is laid at 1:1 too: the GLASS tile's 1 px frame (lit top and left, dark bottom and
    right) runs round the pane's edge in runs of up to 10 px, its glints sit once in the top-left corner (on a pane 8 px
-   or more each way), and the clear middle isn't drawn at all.
+   or more each way), and the clear middle isn't drawn at all. A window meant to read as a pane over what's behind it
+   (the Fission Reactor's) adds one flat light grey tint pane (the rivet tone, about 35% opaque, drawn translucent) a
+   hair behind the frame and glints: smoky, still clearly see-through, never a gradient.
 8. **Round caps and discs** (pipe ends, flywheel faces, a casing's end rings) are plated as one surface across their
    wedges, never wedge by wedge.
 

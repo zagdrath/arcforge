@@ -26,6 +26,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity;
+import net.zagdrath.arcforge.client.renderer.StaticMeshes;
 import net.zagdrath.arcforge.steam.FlareStackMesh;
 
 // Draws the Flare Stack's stack over its base block (FlareStackMesh, built once, on the refinery tower's sheet) and its
@@ -76,7 +77,8 @@ public class FlareStackRenderer implements BlockEntityRenderer<FlareStackBlockEn
         }
         float[] stack = state.stack;
         int light = state.light;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> {
+        // The stack is the same for every Flare Stack: those at the same light share one copy on the GPU.
+        StaticMeshes.submit(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), stack, sheet, light, (pose, buffer) -> {
             for (int i = 0; i + 7 < stack.length; i += 8) {
                 buffer.addVertex(pose, stack[i], stack[i + 1], stack[i + 2])
                         .setColor(-1)

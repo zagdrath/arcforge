@@ -45,7 +45,9 @@ public class DistillationArrayMenu extends MachineMenu {
     public static final int DATA_SOUR = 26;
     public static final int DATA_VALUES = 27;
 
+    public static final int WIDTH = 232, HEIGHT = 172;
     public static final int PITCH_X = 41, PITCH_Y = 55;
+    private static final int INVENTORY_X = (WIDTH - 176) / 2 + 8, INVENTORY_Y = HEIGHT - 82;
 
     // Client constructor, called with the controller's position written by the server.
     public DistillationArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -57,8 +59,9 @@ public class DistillationArrayMenu extends MachineMenu {
     public DistillationArrayMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.DISTILLATION_ARRAY.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get());
         addMachineSlot(DistillationArrayBlockEntity.SLOT_PITCH, PITCH_X, PITCH_Y);
-        // The GUI is 216 wide: the player inventory centred, 20 px further in.
-        finish(inventory, 28, 84);
+        // The GUI is 232x172 (tools/distillation_array_gui_gen.py): the player inventory centred, 28 px further in, and
+        // 6 px lower so the Pitch slot clears its label.
+        finish(inventory, INVENTORY_X, INVENTORY_Y);
     }
 
     @Override

@@ -37,10 +37,13 @@ import net.zagdrath.arcforge.steam.ModelMesh;
 // Draws a formed walled vessel (the Fission Reactor, the Steam Generator, the Heavy Water Tower) from its VesselMesh on
 // the refinery tower's sheet; its walls' blocks draw nothing but their port plates. The model is built once, and again
 // when its ports or what the subclass lays it out from change (checked every second). Its lists: solid, cutout, the
-// glow (full-bright, always) and the running glow (full-bright, only while the controller is lit).
+// glow (full-bright, always), the running glow (full-bright, only while the controller is lit) and the tint (glass's
+// tint, translucent).
 public abstract class VesselRenderer<B extends VesselControllerBlockEntity> implements StructureRenderer<B, VesselRenderer.State> {
     private static final int SCAN_INTERVAL = 20;
     private static final float[] EMPTY = new float[0];
+    // How opaque the tint list is drawn (of 255): a light smoky glass the inside still shows clearly through.
+    private static final int TINT_ALPHA = 0x5A;
 
     private final Map<B, Built> built = new WeakHashMap<>();
 
@@ -63,7 +66,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
     public static class State extends BlockEntityRenderState {
         public boolean formed, running;
         public int offsetX, offsetY, offsetZ;
-        public float[] solid = EMPTY, glass = EMPTY, glow = EMPTY, runningGlow = EMPTY;
+        public float[] solid = EMPTY, glass = EMPTY, glow = EMPTY, runningGlow = EMPTY, tint = EMPTY;
         public @Nullable TextureAtlasSprite sheet;
         public int light;
     }
@@ -83,7 +86,8 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
     // What the model is laid out from besides its box and ports (compared with equals to tell when to rebuild).
     protected abstract Object layout(Level level, B vessel, VesselStructure.Box box, ModelFrame frame);
 
-    // The model's lists for this layout: {solid, cutout, glow} and, optionally, the glow drawn only while running.
+    // The model's lists for this layout: {solid, cutout, glow} and, optionally, the glow drawn only while running and
+    // the tint drawn translucent.
     protected abstract float[][] build(ModelFrame frame, Object layout, List<ModelMesh.Port> ports);
 
     // The controller's block {x, y, u} in the frame.
@@ -131,6 +135,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         state.glow = parts[2];
         state.running = vessel.isLit();
         state.runningGlow = state.running && parts.length > 3 ? parts[3] : EMPTY;
+        state.tint = parts.length > 4 ? parts[4] : EMPTY;
         state.sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
         // The light just above the box's top middle.
         state.light = LightCoordsUtil.getLightCoords(level, box.centre().atY(box.max().getY() + 1));
@@ -155,19 +160,35 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         }
         poseStack.pushPose();
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
-        float[] solid = state.solid, glass = state.glass, glow = state.glow, lit = state.runningGlow;
+        float[] solid = state.solid, glass = state.glass, glow = state.glow, lit = state.runningGlow, tint = state.tint;
         int light = state.light;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> MeshRendering.emit(pose, buffer, solid, sheet, light));
-        if (glass.length > 0) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), (pose, buffer) -> MeshRendering.emit(pose, buffer, glass, sheet, light));
-        }
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
         if (glow.length > 0 || lit.length > 0) {
             collector.submitCustomGeometry(poseStack, RenderTypes.eyes(sheet.atlasLocation()), (pose, buffer) -> {
                 emitLit(pose, buffer, glow, sheet);
                 emitLit(pose, buffer, lit, sheet);
             });
         }
+        // Last, so the glow behind the glass is drawn before the tint goes over it.
+        if (tint.length > 0) {
+            collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucentCull(sheet.atlasLocation()), (pose, buffer) -> emitTint(pose, buffer, tint, sheet, light));
+        }
         poseStack.popPose();
+    }
+
+    // The tint list shaded as MeshRendering.emit does, at TINT_ALPHA.
+    private static void emitTint(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet, int light) {
+        for (int i = 0; i + 7 < data.length; i += 8) {
+            float nx = data[i + 5], ny = data[i + 6], nz = data[i + 7];
+            int shade = Math.round(255.0F * (nx * nx * 0.6F + ny * ny * (ny > 0.0F ? 1.0F : 0.5F) + nz * nz * 0.8F));
+            buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
+                    .setColor(TINT_ALPHA << 24 | shade << 16 | shade << 8 | shade)
+                    .setUv(sheet.getU(data[i + 3]), sheet.getV(data[i + 4]))
+                    .setOverlay(OverlayTexture.NO_OVERLAY)
+                    .setLight(light)
+                    .setNormal(pose, 0.0F, 1.0F, 0.0F);
+        }
     }
 
     private static void emitLit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet) {

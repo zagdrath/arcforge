@@ -12,12 +12,15 @@ import java.util.function.Predicate;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.zagdrath.arcforge.client.renderer.StaticMeshes;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
@@ -54,6 +57,12 @@ public final class MeshRendering {
             }
         }
         return ports;
+    }
+
+    // A still list (built once, not each frame) drawn as emit draws it, from its copy on the GPU (StaticMeshes).
+    public static void submitStill(SubmitNodeCollector collector, PoseStack poseStack, RenderType renderType, float[] data, TextureAtlasSprite sheet,
+            int light) {
+        StaticMeshes.submit(collector, poseStack, renderType, data, sheet, light, (pose, buffer) -> emit(pose, buffer, data, sheet, light));
     }
 
     // Each face shaded as a block face turned its way is, its normal straight up.

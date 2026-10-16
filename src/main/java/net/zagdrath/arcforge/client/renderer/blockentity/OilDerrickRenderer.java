@@ -146,10 +146,11 @@ public class OilDerrickRenderer implements StructureRenderer<OilDerrickBlockEnti
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
         float[] solid = state.solid, moving = state.moving;
         int light = state.light;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> {
-            PlantRenderer.emit(pose, buffer, solid, sheet, light);
-            PlantRenderer.emit(pose, buffer, moving, sheet, light);
-        });
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
+        if (moving.length > 0) {
+            collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()),
+                    (pose, buffer) -> PlantRenderer.emit(pose, buffer, moving, sheet, light));
+        }
         poseStack.popPose();
     }
 

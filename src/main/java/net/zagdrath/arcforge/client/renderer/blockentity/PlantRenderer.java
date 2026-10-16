@@ -185,13 +185,11 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
         float[] solid = state.solid, moving = state.moving, glass = state.glass, glow = state.glow;
         int light = state.light;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> {
-            emit(pose, buffer, solid, sheet, light);
-            emit(pose, buffer, moving, sheet, light);
-        });
-        if (glass.length > 0) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, glass, sheet, light));
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
+        if (moving.length > 0) {
+            collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, moving, sheet, light));
         }
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
         if (glow.length > 0 && state.brightness > 0.01F) {
             int level = Math.round(255 * Math.min(1.0F, state.brightness));
             int color = ARGB.color(level, level, level, level);

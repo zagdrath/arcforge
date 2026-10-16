@@ -26,11 +26,11 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 // Feed and steam tanks on the left, the screen (temperature, heat bar, steam stripping, status), the Pitch slot and the
 // column's size and feed rate under it, then a narrow tank for each product, lightest first (Refinery Gas, Naphtha,
 // Kerosene, Light Oil, Diesel, Heavy Oil, Bitumen); a product the column's recipe doesn't make at its height is locked.
-// All positions are relative to leftPos/topPos; the background is 216×166, the player inventory centred.
+// All positions are relative to leftPos/topPos; the background is 232×172 (tools/distillation_array_gui_gen.py), the
+// player inventory centred.
 public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu> {
-    private static final int WIDTH = 216;
-    private static final int FEED_X = 9, STEAM_X = 25, PRODUCT_X = 137, PRODUCT_PITCH = 10;
-    private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50, PRODUCT_W = 6;
+    private static final int FEED_X = 9, STEAM_X = 25, PRODUCT_X = 137, PRODUCT_PITCH = 13;
+    private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50, PRODUCT_W = 8;
     // The screen recess is x40..133, y18..52 (inner 41..132 x 19..51); text keeps 2 px off its inner edges.
     private static final int SCREEN_X = 43, TEMP_RIGHT = 132, TEMP_Y = 21, HEAT_X = 45, HEAT_Y = 31, HEAT_W = 84, BONUS_Y = 36;
     private static final int LED_X = 43, LED_Y = 44, STATUS_X = 51, STATUS_Y = 44, STATUS_W = TEMP_RIGHT - STATUS_X;
@@ -47,7 +47,8 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
                 Component.translatable("gui.arcforge.usage"),
                 () -> Component.translatable("gui.arcforge.hu_per_tick_loss", menu.getHeatPerTick()),
                 Component.translatable("gui.arcforge.temp"),
-                () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())))), true, WIDTH, 166, true);
+                () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())))), true,
+                DistillationArrayMenu.WIDTH, DistillationArrayMenu.HEIGHT, true);
         enableAutoEject();
     }
 

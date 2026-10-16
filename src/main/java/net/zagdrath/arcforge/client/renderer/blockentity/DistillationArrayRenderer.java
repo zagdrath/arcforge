@@ -22,6 +22,7 @@ import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
+import net.zagdrath.arcforge.client.renderer.StaticMeshes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -259,10 +260,11 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
         float[] solid = state.solid, fans = state.fans, glass = state.glass, glow = state.glow;
         int light = state.light;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> {
-            emit(pose, buffer, solid, sheet, -1, light);
-            emit(pose, buffer, fans, sheet, -1, light);
-        });
+        StaticMeshes.submit(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light,
+                (pose, buffer) -> emit(pose, buffer, solid, sheet, -1, light));
+        if (fans.length > 0) {
+            collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, fans, sheet, -1, light));
+        }
         for (Tray tray : state.trays) {
             TextureAtlasSprite sprite = tray.sprite();
             if (sprite != null && tray.pool().length > 0) {
@@ -281,9 +283,8 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
                 }
             }
         }
-        if (glass.length > 0) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, glass, sheet, -1, light));
-        }
+        StaticMeshes.submit(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light,
+                (pose, buffer) -> emit(pose, buffer, glass, sheet, -1, light));
         if (glow.length > 0 && state.brightness > 0.01F) {
             int level = Math.round(255 * state.brightness);
             int color = ARGB.color(level, level, level, level);

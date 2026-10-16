@@ -87,11 +87,12 @@ and some refinery lines need a new port, see Upgrading).
     4,000 HU/t at full power; a big core passes 1,000,000 FE/t through four to six full-size turbine arrays.
   - **Control and protection.** A wide three-page control desk (core readouts and the four rod banks plus All, each
     showing where its rods are and where they're headed; power, coolant and k-effective trends; trip points, pump and
-    options), with the rod slots in 3x3 grids either side of the inventory. Bank moves from the GUI, redstone (a stop signal SCRAMs; optionally a signal holds
-    every bank in) and the machine control API (`bank_a`..`bank_d`, `scram`). Five player-set trips SCRAM the core;
+    options), with the rod input and output slots in 3x3 grids between the desk and the inventory. Its buttons take
+    a click before other mods' screen handlers can. Bank moves from the GUI, redstone (a stop signal SCRAMs; optionally
+    a signal holds every bank in) and the machine control API (`bank_a`..`bank_d`, `scram`). Five player-set trips SCRAM the core;
     rods load and unload only while it's shut down. A running core is a strong radiation source through its vessel.
   - **Models.** The reactor: a heavy pressure vessel in a casing frame, a domed closure head with control-rod drive
-    housings, coolant nozzles at its ports, and a viewport for each pane of Reactor Glass that glows Cherenkov blue
+    housings, the control panel on a mount against the vessel, coolant nozzles at its ports, and a viewport for each pane of Reactor Glass that glows Cherenkov blue
     (full-bright) while it's critical. The Steam Generator: a tall shell under a wider steam drum. The Heavy Water Tower:
     a squat tower of tray sections. Their blocks (inside too) hide when formed.
   - JEI: Sintering, Isotope Exchange, Fission (rods at 0.711%, 3%, 5% and 20%) and the Steam Generator; Jade: the
@@ -237,10 +238,12 @@ and some refinery lines need a new port, see Upgrading).
   the least up to three and a half at full burn.
 - **The Diesel Generator's rain flap is round and flaps**: while it runs, each exhaust pulse throws it up and it drops
   back on the pipe, about three times a second at low speed and six flat out, higher the faster it runs.
-- **The Distillation Array's GUI is wider** (like the Gas Centrifuge Cascade's), so its temperature, status and output
-  lines have room; the inventory sits centred under it.
+- **The Distillation Array's GUI is wider and taller** (like the Gas Centrifuge Cascade's), so its temperature, status
+  and output lines have room, the Pitch slot sits clear of the inventory and the product tanks are wider with their
+  lock icons in full; the inventory sits centred under it.
 - **The Fission Reactor's windows show its core.** Reactor Glass that touches (side by side or one above another in a
-  wall) makes one window in the vessel with one frame round it, and the glass is clear: inside are the core support
+  wall) makes one window in the vessel with one frame round it, glazed in a light smoky grey you see clearly through:
+  inside are the core support
   plate, the upper core plate and the core as you built it (fuel assemblies, control rod channels with their drive
   lines, graphite and reflectors), its fuel glowing Cherenkov blue while the reactor is critical. A see-through line
   round the vessel under the head flange is gone, and the large models draw their round parts with fewer quads (the
@@ -248,6 +251,11 @@ and some refinery lines need a new port, see Upgrading).
 
 ### Fixed
 
+- **Large models no longer tank the frame rate.** The still parts of the big multiblock models (Distillation Arrays,
+  the Cracking Unit, Steam Cracker and Diesel Generator, the Fission Reactor, Steam Generator and Heavy Water Tower, the
+  Gas Centrifuge Cascade, Flare Stacks, Pumpjacks, Oil Derricks and Steam Turbine Arrays) are built once and kept on the
+  graphics card instead of being sent to it again every frame, so a dozen in view cost almost nothing. They look the
+  same; only their moving parts, glow and fluids are still drawn frame by frame.
 - The Flare Stack's flame drew as a black square: its texture now has a clear background.
 - The Diesel Generator GUI's output (8,192 / 15,000 FE/t) ran into its label; a wide value now shows short (8.2k /
   15k FE/t), in full on hover.
