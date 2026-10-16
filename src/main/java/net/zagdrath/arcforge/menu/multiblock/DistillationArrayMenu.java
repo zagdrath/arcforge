@@ -57,7 +57,8 @@ public class DistillationArrayMenu extends MachineMenu {
     public DistillationArrayMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.DISTILLATION_ARRAY.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.DISTILLATION_ARRAY_CONTROLLER.get());
         addMachineSlot(DistillationArrayBlockEntity.SLOT_PITCH, PITCH_X, PITCH_Y);
-        finish(inventory);
+        // The GUI is 216 wide: the player inventory centred, 20 px further in.
+        finish(inventory, 28, 84);
     }
 
     @Override

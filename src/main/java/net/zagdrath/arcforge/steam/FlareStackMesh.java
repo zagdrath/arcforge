@@ -26,8 +26,15 @@ public final class FlareStackMesh extends ModelMesh {
     // Built once: {solid}.
     public float[] build() {
         startStatic();
-        // The seat on the base, the stack in three lengths with flanges between, and the tip.
-        uprightTube(CX, CU, new float[][] { { BOTTOM, R + 2.0F }, { BOTTOM + 2.0F, R + 2.0F } }, 12, 0.0, Paint.BANDED, Paint.MID);
+        // A square base flange over the base block's socket (a round seat alone left the socket's corners showing),
+        // bolted at its corners; on it the round seat, the stack in three lengths with flanges between, and the tip.
+        box(1.5F, BOTTOM, 1.5F, 14.5F, BOTTOM + 1.0F, 14.5F, Paint.MID, Paint.PLAIN, null, SKIP_DOWN);
+        for (float bx : new float[] { 2.5F, 12.5F }) {
+            for (float bu : new float[] { 2.5F, 12.5F }) {
+                box(bx, BOTTOM + 1.0F, bu, bx + 1.0F, BOTTOM + 1.6F, bu + 1.0F, Paint.RIVET, Paint.RIVET, null, SKIP_DOWN);
+            }
+        }
+        uprightTube(CX, CU, new float[][] { { BOTTOM + 1.0F, R + 2.0F }, { BOTTOM + 2.5F, R + 2.0F } }, 12, 0.0, Paint.BANDED, Paint.MID);
         uprightTube(CX, CU, new float[][] { { BOTTOM + 2.0F, R }, { TIP, R } }, 12, 0.0, Paint.BANDED, null);
         for (float y : new float[] { 34.0F, 52.0F }) {
             uprightTube(CX, CU, new float[][] { { y - 0.75F, R + 0.8F }, { y + 0.75F, R + 0.8F } }, 12, 0.0, Paint.BANDED, Paint.MID);
@@ -42,30 +49,36 @@ public final class FlareStackMesh extends ModelMesh {
         // The service platform: a grating square with a kick plate and railings, its ladder up the south side.
         float p0 = 1.0F, p1 = 15.0F, d = 1.5F;
         box(p0, PLATFORM - d, p0, p1, PLATFORM, p1, Paint.MID, Paint.GRATE, Paint.SHADE, 0);
-        for (float[] rail : new float[][] { { p0, p0, p1, p0 + 0.8F }, { p0, p1 - 0.8F, LADDER_X - LADDER_HALF - 0.5F, p1 }, { p0, p0, p0 + 0.8F, p1 }, { p1 - 0.8F, p0, p1, p1 } }) {
+        // The front and back rails (the back only to the ladder's gap) run to the corners; the sides run between them
+        // (the right one on to the back corner, where the gap leaves no back rail), so no two overlap.
+        for (float[] rail : new float[][] { { p0, p0, p1, p0 + 0.8F }, { p0, p1 - 0.8F, LADDER_X - LADDER_HALF - 0.5F, p1 }, { p0, p0 + 0.8F, p0 + 0.8F, p1 - 0.8F },
+                { p1 - 0.8F, p0 + 0.8F, p1, p1 } }) {
             box(rail[0], PLATFORM + 7.0F, rail[1], rail[2], PLATFORM + 8.0F, rail[3], Paint.MID, Paint.LIT, Paint.SHADE, 0);
             box(rail[0], PLATFORM, rail[1], rail[2], PLATFORM + 1.5F, rail[3], Paint.FACE, Paint.LIT, null, SKIP_DOWN);
         }
         for (float[] post : new float[][] { { p0, p0 }, { p1 - 0.8F, p0 }, { p0, p1 - 0.8F }, { p1 - 0.8F, p1 - 0.8F }, { LADDER_X - LADDER_HALF - 1.3F, p1 - 0.8F } }) {
             box(post[0], PLATFORM + 1.5F, post[1], post[0] + 0.8F, PLATFORM + 7.0F, post[1] + 0.8F, Paint.FACE, null, null, SKIP_UP | SKIP_DOWN);
         }
-        // Struts from the stack out to the platform's corners.
+        // Struts from the stack out to the platform's corners. Their open ends are buried: low down well inside the stack
+        // (a slanted pipe ended near its skin pokes out of it), up top inside the platform's deck.
         for (float[] corner : new float[][] { { p0 + 1.0F, p0 + 1.0F }, { p1 - 1.0F, p0 + 1.0F }, { p0 + 1.0F, p1 - 1.0F }, { p1 - 1.0F, p1 - 1.0F } }) {
-            tube(new float[] { CX + Math.signum(corner[0] - CX) * R * 0.7F, PLATFORM - 9.0F, CU + Math.signum(corner[1] - CU) * R * 0.7F },
-                    new float[] { corner[0], PLATFORM - d, corner[1] }, 0.45F, 4, Paint.SHADE);
+            tube(new float[] { CX + Math.signum(corner[0] - CX) * R * 0.4F, PLATFORM - 9.0F, CU + Math.signum(corner[1] - CU) * R * 0.4F },
+                    new float[] { corner[0], PLATFORM - d / 2.0F, corner[1] }, 0.45F, 4, Paint.SHADE);
         }
-        // The ladder: two 1 px stiles 9 px apart and a 1 px rung every 4 px, from the base's top to the platform, on the
-        // south side.
-        float lu = 14.0F;
+        // The ladder: two 0.8 px square stiles 9 px apart, closed at the top, and a rung every 4 px, from the base's top
+        // to the platform, on the south side. The rungs are thinner than the stiles and end inside them, so no face of
+        // one shares a plane with the other.
+        float lu = 14.0F, stile = 0.4F, rung = 0.3F;
         for (float x : new float[] { LADDER_X - LADDER_HALF, LADDER_X + LADDER_HALF }) {
-            tube(new float[] { x, BOTTOM, lu }, new float[] { x, PLATFORM + 8.0F, lu }, 0.5F, 4, Paint.BANDED);
+            box(x - stile, BOTTOM, lu - stile, x + stile, PLATFORM + 8.0F, lu + stile, Paint.MID, Paint.LIT, null, SKIP_DOWN);
         }
         for (float y = BOTTOM + 3.0F; y < PLATFORM; y += 4.0F) {
-            tube(new float[] { LADDER_X - LADDER_HALF, y, lu }, new float[] { LADDER_X + LADDER_HALF, y, lu }, 0.5F, 4, Paint.BANDED);
+            box(LADDER_X - LADDER_HALF, y - rung, lu - rung, LADDER_X + LADDER_HALF, y + rung, lu + rung, Paint.MID, Paint.LIT, Paint.SHADE,
+                    SKIP_NEG_X | SKIP_POS_X);
         }
-        // Ladder stand-offs to the stack.
-        for (float y : new float[] { 30.0F, 48.0F }) {
-            tube(new float[] { CX + R * 0.5F, y, CU + R * 0.8F }, new float[] { LADDER_X, y, lu }, 0.35F, 4, Paint.SHADE);
+        // Ladder stand-offs from inside the stack to the middle of a rung (rungs every 4 px from BOTTOM + 3).
+        for (float y : new float[] { BOTTOM + 15.0F, BOTTOM + 31.0F }) {
+            tube(new float[] { CX + R * 0.3F, y, CU + R * 0.4F }, new float[] { LADDER_X, y, lu }, 0.25F, 4, Paint.SHADE);
         }
         return solid.toArray();
     }

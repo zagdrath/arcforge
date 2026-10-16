@@ -1341,6 +1341,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - **Caged ladder** up the front left corner, as wide as a ladder block: two 1 px stiles 11 px apart (`LADDER_HALF`
   either side of its middle, 3 px out from the shell) and a 1 px rung every 4 px, from the ground to above the top
   deck; from 24 px up, a cage of 1 px hoops every 10 px, bowing out round it a px wider than the ladder, joined by bars.
+  The stiles are square bars closed at the top and the rungs thinner, ending inside them; each hoop has a knuckle at
+  every bend and a bracket from each end back to its stile (no open pipe end shows anywhere on it).
 - **Top:** the condenser bank on legs: the tube bundle in the VENT louvre tile with a GRATE top, PLATE headers at both
   ends, one or two fan shrouds (banded, a DARK inner wall so the opening reads as a well, two MID guard bars) with the
   fan blades in BLADE / BLADE_BACK turning while it runs. The vapour line (banded, PLAIN elbows) rises from the head
@@ -1448,8 +1450,9 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   floor, so the tops of the drawworks and engine house have none. The blocks the ladder runs through are climbable.
 
 ## Distillation Array GUI (seven products)
-- The screen is shortened to y 18–52 (x 40–93) with the Pitch output slot frame under it at (40, 54); right of it, seven
-  narrow product tanks (6 px inside, the turbines' lubricant gauge), at x 97 + 10k, lightest product on the left.
+- 216×166, the inventory centred with 20 px of plain panel each side. The screen is shortened to y 18–52 (x 40–133)
+  with the Pitch output slot frame under it at (40, 54); right of it, seven narrow product tanks (6 px inside, the
+  turbines' lubricant gauge), at x 137 + 10k, lightest product on the left. The heat bar is the Firebox's (84×4).
   A product the column doesn't make at its height shows `product_locked`; the fallback fill is `#4E5258` with a `#6A6E74` top row.
 
 ## Refinery units, fuels and generators
@@ -1505,7 +1508,8 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     bolts; the intake manifold down the V; an exhaust manifold along the outside of each bank (round) with a runner to
     each cylinder; the turbochargers over the banks at the flywheel end (two, four on the V16: a turbine scroll and a
     smaller compressor, round), piped into the aftercooler (a PLATE box across the V) and up through risers into the
-    silencer (round, flanged bands near its ends) along the top, its outlet capped by a rain flap propped open.
+    silencer (round, flanged bands near its ends) along the top, its outlet capped by a round rain flap hinged at its
+    back, which flaps up and down on the exhaust pulses while it runs.
   - The flywheel housing (round, a tapered front, a bolt circle) and the coupling.
   - The alternator in the generator steel (GEN_PLATE, GEN_PLAIN) with two banks of louvres down each side, the FE
     band round its middle and lips round its ends, its end bell and bearing cap, a terminal box on top with three FE red
@@ -1531,11 +1535,12 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - **Hitbox:** the still parts only.
 - **Flare Stack** (`block/flare_stack/side`, `top`, `bottom`): the base block, with Input ports (Refinery Gas chip) on
   its sides and bottom and the stack's seat (a recessed ring) on top.
-  - FlareStackMesh (on the refinery sheet) draws the stack above it: a banded pipe in three flanged lengths up to 74 px,
-    and the tip up to 80 px in a wind shield of plates.
+  - FlareStackMesh (on the refinery sheet) draws the stack above it: a square base flange over the socket (bolted at
+    its corners, covering the socket's square recess), a round seat on it, a banded pipe in three flanged lengths up to
+    74 px, and the tip up to 80 px in a wind shield of plates.
   - The pilot line runs up the north side. A GRATE service platform at 62 px has a kick plate, railings and struts to
-    its corners, with a ladder up the south side on stand-offs: two 1 px stiles 9 px apart and a 1 px rung every 4 px,
-    the railing open above it.
+    its corners, with a ladder up the south side on stand-offs: two 0.8 px square stiles 9 px apart, closed at the top,
+    and a thinner rung every 4 px, the railing open above it.
 - **Flare flame** (`block/flare_stack/flame`, 8 frames): a tongue of fire in the Heat row with a pale core, on black.
   - It is drawn additively and full-bright on two crossed sheets (RenderTypes.eyes), from a 5 px pilot up to 32 px
     as the stack burns more.
@@ -1621,10 +1626,11 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - the port nozzles on the casings set as ports.
   - Its sound is a faint, low hum while it runs.
 - **GUIs**:
-  - Gas Centrifuge Cascade (`gui/container/centrifuge_cascade`, 176×186, the inventory 104 down): the Battery Array's
-    frame. The FE gauge on the left, the house screen in the middle (status, feed, target and tails with − / +
-    buttons, the feed and SWU a mB takes), and the feed, product and tails tanks (12×72) on the right. Sprites: the
-    Diesel Generator's energy bar and LEDs, a 72-tall tank gauge, a gas fill, and the 7×7 − / + buttons (hovered: a
-    teal face with a cyan glyph).
+  - Gas Centrifuge Cascade (`gui/container/centrifuge_cascade`, 216×186, the inventory 104 down, centred with 20 px of
+    plain panel each side): the Battery Array's frame, widened. The FE gauge on the left, the house screen in the
+    middle (status, feed, target and tails with − / + buttons, the feed and SWU a mB takes), and the feed, product and
+    tails tanks (12×72) on the right; the FE gauge is as tall as the tanks. Sprites: the Diesel Generator's energy bar
+    carried up to 10×72 (its stripes repeated) and LEDs, a 72-tall tank gauge, a gas fill, and the 7×7 − / + buttons
+    (hovered: a teal face with a cyan glyph).
   - Lead Box (`gui/container/lead_box`, 176×166): a 3×3 grid of slots in a lead-grey tray (`#3D4451`) over the player
     inventory.

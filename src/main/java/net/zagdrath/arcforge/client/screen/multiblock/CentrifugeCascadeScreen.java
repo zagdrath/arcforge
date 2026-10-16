@@ -25,18 +25,18 @@ import net.zagdrath.arcforge.registry.ModFluids;
 
 // The FE gauge on the left; the house screen with the centrifuges and the separative work they do, the target and tails
 // assays with - and + buttons (shift for a bigger step), the feed and SWU each mB of product takes, and the status; and
-// the feed, product and tails tanks on the right. All positions are relative to leftPos/topPos; the background is
-// 176×186, the player inventory 104 down.
+// the feed, product and tails tanks on the right, all the full height of the top. All positions are relative to
+// leftPos/topPos; the background is 216×186, the player inventory 104 down and centred.
 public class CentrifugeCascadeScreen extends MachineScreen<CentrifugeCascadeMenu> {
-    private static final int HEIGHT = 186;
-    private static final int ENERGY_X = 9, ENERGY_Y = 19;
+    private static final int WIDTH = 216, HEIGHT = 186;
+    private static final int ENERGY_X = 9, ENERGY_Y = 19, ENERGY_H = 72;
     private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 72;
-    private static final int[] TANK_X = { 123, 139, 155 };
-    private static final int LEFT = 27, RIGHT = 115;
+    private static final int[] TANK_X = { 163, 179, 195 };
+    private static final int LEFT = 27, RIGHT = 155;
     private static final int CENTRIFUGES_Y = 21, WORK_Y = 31, TARGET_Y = 43, TAILS_Y = 55, COST_Y = 67;
-    private static final int LED_X = 27, LED_Y = 81, STATUS_X = 35, STATUS_Y = 81, STATUS_W = 80;
+    private static final int LED_X = 27, LED_Y = 81, STATUS_X = 35, STATUS_Y = 81, STATUS_W = 120;
     // The - and + buttons, 7 px square, either side of the value.
-    private static final int MINUS_X = 74, PLUS_X = 108, BUTTON = 7;
+    private static final int MINUS_X = 114, PLUS_X = 148, BUTTON = 7;
 
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier tankGauge = sprite("tank_gauge");
@@ -48,7 +48,7 @@ public class CentrifugeCascadeScreen extends MachineScreen<CentrifugeCascadeMenu
     private int mouseX, mouseY;
 
     public CentrifugeCascadeScreen(CentrifugeCascadeMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "centrifuge_cascade", List.of(), false, HEIGHT);
+        super(menu, inventory, title, "centrifuge_cascade", List.of(), false, WIDTH, HEIGHT, true);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class CentrifugeCascadeScreen extends MachineScreen<CentrifugeCascadeMenu
 
     @Override
     protected void drawContents(GuiGraphicsExtractor graphics, int x, int y) {
-        drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.getEnergy(), menu.getEnergyCapacity());
+        drawEnergy(graphics, x, y);
         drawFluidTank(graphics, ModFluids.URANIUM_HEXAFLUORIDE.get(), menu.getFeed(), menu.getFeedCapacity(), gasFill, tankGauge,
                 x, y, TANK_X[0], TANK_Y, TANK_W, TANK_H);
         drawFluidTank(graphics, ModFluids.URANIUM_HEXAFLUORIDE.get(), menu.getProduct(), menu.getProductCapacity(), gasFill, tankGauge,
@@ -82,6 +82,15 @@ public class CentrifugeCascadeScreen extends MachineScreen<CentrifugeCascadeMenu
             button(graphics, x, y, PLUS_X, rowY, plus, plusHover);
         }
         drawLed(graphics, x, y, LED_X, LED_Y);
+    }
+
+    // The FE gauge, as tall as the tanks (its sprite is too), filled from the bottom.
+    private void drawEnergy(GuiGraphicsExtractor graphics, int x, int y) {
+        int height = scaled(menu.getEnergy(), menu.getEnergyCapacity(), ENERGY_H);
+        if (height > 0) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, energyBar, GAUGE_W, ENERGY_H, 0, ENERGY_H - height, x + ENERGY_X, y + ENERGY_Y + ENERGY_H - height,
+                    GAUGE_W, height);
+        }
     }
 
     private void button(GuiGraphicsExtractor graphics, int x, int y, int buttonX, int rowY, Identifier normal, Identifier hovered) {
@@ -120,7 +129,7 @@ public class CentrifugeCascadeScreen extends MachineScreen<CentrifugeCascadeMenu
 
     @Override
     protected void addTooltip(List<Component> lines, int mouseX, int mouseY) {
-        if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
+        if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, ENERGY_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getEnergyCapacity()))
                     .withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.arcforge.fe_per_tick_loss", ArcforgeGui.grouped(menu.getEnergyUse())).withStyle(ChatFormatting.RED));

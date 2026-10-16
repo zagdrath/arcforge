@@ -44,8 +44,8 @@ public class CentrifugeCascadeMenu extends MachineMenu {
     public static final int DATA_SIDE_CONFIG = 19;
     public static final int DATA_VALUES = 20;
 
-    // The player inventory's top row: the screen is taller than the standard one.
-    public static final int INVENTORY_Y = 104;
+    // The player inventory's corner: the screen is taller than the standard one, and 40 px wider (the inventory centred).
+    public static final int INVENTORY_X = 28, INVENTORY_Y = 104;
 
     // Buttons: the target down or up a small or a large step, the tails the same. In the 200s, each machine's own range
     // (the 300s are the Security tab's).
@@ -60,7 +60,7 @@ public class CentrifugeCascadeMenu extends MachineMenu {
 
     public CentrifugeCascadeMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.CENTRIFUGE_CASCADE.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get());
-        finish(inventory, INVENTORY_Y);
+        finish(inventory, INVENTORY_X, INVENTORY_Y);
     }
 
     @Override

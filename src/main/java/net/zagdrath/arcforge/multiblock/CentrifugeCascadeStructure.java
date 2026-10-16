@@ -179,12 +179,13 @@ public final class CentrifugeCascadeStructure {
     }
 
     // The floor's front edge runs left and right of the controller, so only casings there are tried as its ends; then
-    // each depth back from it.
+    // each depth back from it. The biggest first: a smaller hall inside the floor is valid too, and would leave the
+    // centrifuges round it loose.
     private static @Nullable Box find(Level level, BlockPos controller, Direction front, @Nullable Box current) {
         Direction along = front.getClockWise();
         Direction in = front.getOpposite();
-        List<Integer> lefts = casings(level, controller, along.getOpposite(), MAX_SIZE - 2);
-        List<Integer> rights = casings(level, controller, along, MAX_SIZE - 2);
+        List<Integer> lefts = casings(level, controller, along.getOpposite(), MAX_SIZE - 2).reversed();
+        List<Integer> rights = casings(level, controller, along, MAX_SIZE - 2).reversed();
         for (int left : lefts) {
             for (int right : rights) {
                 int width = left + right + 1;
@@ -193,7 +194,7 @@ public final class CentrifugeCascadeStructure {
                 }
                 BlockPos a = controller.relative(along.getOpposite(), left);
                 BlockPos b = controller.relative(along, right).above(HEIGHT - 1);
-                for (int depth = MIN_SIZE; depth <= MAX_SIZE; depth++) {
+                for (int depth = MAX_SIZE; depth >= MIN_SIZE; depth--) {
                     BlockPos far = a.relative(in, depth - 1);
                     if (!level.isLoaded(far) || !isCasing(level.getBlockState(far))) {
                         continue;

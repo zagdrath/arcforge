@@ -1363,8 +1363,20 @@ public abstract class ModelMesh {
         }
         if (cap != null) {
             float[] last = profile[profile.length - 1];
-            disc(new float[] { x, last[0], u }, new float[] { 0, 1, 0 }, last[1], sides, cap, cap);
+            uprightDisc(x, last[0], u, last[1], sides, start, true, cap);
         }
+    }
+
+    // A flat disc across an upright tube's end at y (facing up or down), its corners on the tube's own (start + f x
+    // step round from +x), so it closes the end with no gap at any facet.
+    void uprightDisc(float x, float y, float u, float r, int sides, double start, boolean up, Paint paint) {
+        double step = 2.0 * Math.PI / sides;
+        List<float[]> rim = new ArrayList<>();
+        for (int f = 0; f < sides; f++) {
+            double a = start + f * step;
+            rim.add(new float[] { x + (float) Math.cos(a) * r, y, u + (float) Math.sin(a) * r });
+        }
+        discRim(new float[] { x, y, u }, new float[] { 0, up ? 1 : -1, 0 }, rim, r, paint, paint);
     }
 
     // The inside of an upright ring (a fan shroud), its facets facing in, in one paint.
@@ -1391,16 +1403,22 @@ public abstract class ModelMesh {
         for (int f = 0; f < sides; f++) {
             rim.add(at(centre, right, up, (float) Math.cos(f * step) * radius, (float) Math.sin(f * step) * radius));
         }
+        discRim(centre, normal, rim, radius, lit, shade);
+    }
+
+    // A flat disc facing normal from centre out to rim (its corners in order round it), plated on a large model, else a
+    // wedge to each edge, those on the top-left half (seen from outside) in lit, the rest in shade.
+    private void discRim(float[] centre, float[] normal, List<float[]> rim, float radius, Paint lit, Paint shade) {
         PlateFrame frame = roundFace(rim, normal, lit, 2.0F * radius);
         if (frame != null) {
             plateIn(frame, rim);
             return;
         }
-        for (int f = 0; f < sides; f++) {
-            double a0 = f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
-            float[] e0 = at(centre, right, up, (float) Math.cos(a0) * radius, (float) Math.sin(a0) * radius);
-            float[] e1 = at(centre, right, up, (float) Math.cos(a1) * radius, (float) Math.sin(a1) * radius);
-            boolean topLeft = Math.sin(mid) - Math.cos(mid) > 0;
+        float[][] axes = plane(normal);
+        for (int f = 0; f < rim.size(); f++) {
+            float[] e0 = rim.get(f), e1 = rim.get((f + 1) % rim.size());
+            float[] mid = sub(new float[] { (e0[0] + e1[0]) / 2.0F, (e0[1] + e1[1]) / 2.0F, (e0[2] + e1[2]) / 2.0F }, centre);
+            boolean topLeft = dot(mid, axes[1]) - dot(mid, axes[0]) > 0;
             orient(centre, e0, e1, centre, normal, topLeft ? lit : shade);
         }
     }

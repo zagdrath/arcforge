@@ -54,7 +54,8 @@ refinery lines need a new port, see Upgrading).
     UF6 to the target set in its GUI (1% to 20%) with depleted tails (0.25% by default), by the real separative-work
     formula, at 0.02 SWU a tick per centrifuge. UF6 carries its enrichment as a component; tanks only mix the same
     enrichment, and tooltips and Jade show it. Its model: slim columns in rows, header pipework along each row, a
-    control panel, a spinning band on each column while it runs and a faint hum.
+    control panel, a spinning band on each column while it runs and a faint hum. A floor bigger than 3x3 forms as one
+    hall (the biggest its casings allow). Its GUI is wider than most, with the FE gauge as tall as the three tanks.
   - **Depleted Uranium.** Depleted UF6, Hydrogen and Steam give Depleted Uranium Dust, smelted into ingots and blocks:
     the best shield, a little radioactive, and a stand-in for lead in the shielding recipes.
   - JEI shows the enrichment (at 3%, 5% and 20%) and every new recipe; Jade shows the cascade's target, tails, SWU
@@ -196,6 +197,10 @@ refinery lines need a new port, see Upgrading).
   back to the top). Its ladder is nearly twice as wide (11 px), with thicker stiles and rungs.
 - **The Flare Stack's flame burns only while it flares**, with no pilot flame, and is much bigger: from a block tall at
   the least up to three and a half at full burn.
+- **The Diesel Generator's rain flap is round and flaps**: while it runs, each exhaust pulse throws it up and it drops
+  back on the pipe, about three times a second at low speed and six flat out, higher the faster it runs.
+- **The Distillation Array's GUI is wider** (like the Gas Centrifuge Cascade's), so its temperature, status and output
+  lines have room; the inventory sits centred under it.
 
 ### Fixed
 
@@ -214,6 +219,17 @@ refinery lines need a new port, see Upgrading).
     were open at the top.
   - The round ends of horizontal pipes on large models (the Diesel Generator's header tanks, the Derrick's sheaves and
     drum bearings, the Pumpjack's gearbox) faced inward, so they couldn't be seen from outside.
+  - The flat tops of upright round parts on large models (vessels, stacks, filler necks) sat half a facet round from
+    their sides, leaving thin see-through wedges round the rim.
+  - **Diesel Generator** (more): the turbochargers' feed and outlet pipes could be seen into where they met the
+    turbos, the engine mounts flickered against the crankcase's pan rail, the exhaust outlet's collar stood clear of the
+    round silencer at its sides, and the fan guard flickered where its rings and spokes cross.
+  - **Flare Stack**: its ladder flickered where the rungs met the stiles (and the stiles were open at the top), the
+    platform's railings overlapped at its corners, its struts' ends poked out of the stack and under the platform, and
+    the round seat left the corners of the base block's square socket showing (it now stands on a bolted square flange).
+  - **Distillation Array**: the railings round every platform and the top deck overlapped at their corners and their
+    knee rails flickered against the posts; the caged ladder's rungs flickered against its stiles (open at the top), and
+    the cage's hoops stopped in mid air with open ends: they're now joined at each bend and bracketed to the stiles.
 - Conduits and other glass behind an opaque fluid (Crude Oil, Sour Crude, Heavy Oil) in a Fluid Reservoir, Fluid Tank
   or fluid conduit showed through it. Clear fluids still show what's behind them.
 

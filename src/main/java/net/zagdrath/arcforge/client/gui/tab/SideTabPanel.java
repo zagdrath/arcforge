@@ -32,8 +32,7 @@ public class SideTabPanel {
     private static final Identifier TAB_PANEL = ArcforgeGui.widget("tab_panel");
     private static final Identifier TAB_LEFT_PANEL = ArcforgeGui.widget("tab_left_panel");
 
-    // Right tabs start 4 px inside the GUI's 176 px width, left tabs overlap its left edge by as much.
-    private static final int RIGHT_X = 172;
+    // Right tabs start 4 px inside the GUI's width (176 px unless set), left tabs overlap its left edge by as much.
     private static final int LEFT_EDGE = 4;
     private static final int TABS_Y = 6;
     private static final int GAP = 1;
@@ -42,7 +41,14 @@ public class SideTabPanel {
     private static final float ANIMATION_MILLIS = 300.0F;
 
     private final List<SideTab> tabs = new ArrayList<>();
+    private int guiWidth = 176;
     private long lastUpdate = Util.getMillis();
+
+    // For GUIs wider than the standard 176 px.
+    public SideTabPanel width(int guiWidth) {
+        this.guiWidth = guiWidth;
+        return this;
+    }
 
     private List<SideTab> visible() {
         return tabs.stream().filter(SideTab::isVisible).toList();
@@ -64,7 +70,7 @@ public class SideTabPanel {
                 tab.y = leftY;
                 leftY += tab.getHeight() + GAP;
             } else {
-                tab.x = guiLeft + RIGHT_X;
+                tab.x = guiLeft + guiWidth - LEFT_EDGE;
                 tab.y = rightY;
                 rightY += tab.getHeight() + GAP;
             }

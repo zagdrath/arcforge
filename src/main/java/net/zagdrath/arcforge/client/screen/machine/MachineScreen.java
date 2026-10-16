@@ -79,10 +79,18 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     // sideTab: false for machines whose faces are fixed (the Glass Cloche); they get no Sides tab.
     protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs, boolean upgrades,
             int height, boolean sideTab) {
-        super(menu, inventory, title, 176, height);
+        this(menu, inventory, title, machine, machineTabs, upgrades, 176, height, sideTab);
+    }
+
+    // width: of the background, for GUIs wider than 176 (the player inventory centred in it, see MachineMenu.finish).
+    protected MachineScreen(M menu, Inventory inventory, Component title, String machine, List<SideTab> machineTabs, boolean upgrades,
+            int width, int height, boolean sideTab) {
+        super(menu, inventory, title, width, height);
         if (height != 166) {
             this.inventoryLabelY = height - 93;
         }
+        this.inventoryLabelX += (width - 176) / 2;
+        tabs.width(width);
         this.machine = machine;
         this.background = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/" + machine + ".png");
         machineTabs.forEach(tabs::add);

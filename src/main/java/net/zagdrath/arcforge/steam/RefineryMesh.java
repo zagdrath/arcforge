@@ -228,13 +228,13 @@ public final class RefineryMesh extends ModelMesh {
     }
 
     // The kick plate and railings along each edge of a deck at y (the front and left stop short of the ladder's
-    // corner).
+    // corner). The front and back run the full width; the sides run between them, so no two overlap at a corner.
     private void railings(float y) {
         float s = layout.size, n = layout.notch;
         rail(n, 0.5F, s - 0.5F, 0.5F, y);
         rail(0.5F, s - 0.5F, s - 0.5F, s - 0.5F, y);
-        rail(0.5F, n, 0.5F, s - 0.5F, y);
-        rail(s - 0.5F, 0.5F, s - 0.5F, s - 0.5F, y);
+        rail(0.5F, n, 0.5F, s - 1.5F, y);
+        rail(s - 0.5F, 1.5F, s - 0.5F, s - 1.5F, y);
     }
 
     private boolean nearLadder(double angle, double step) {
@@ -254,12 +254,13 @@ public final class RefineryMesh extends ModelMesh {
         if (alongX) {
             box(lo, y, t0, lo + length, y + 2.0F, t1, Paint.MID, Paint.LIT, Paint.SHADE, 0);
             box(lo, y + RefineryLayout.RAIL - 1.0F, t0, lo + length, y + RefineryLayout.RAIL, t1, Paint.MID, Paint.LIT, Paint.SHADE, 0);
-            box(lo, y + RefineryLayout.RAIL / 2.0F, t0, lo + length, y + RefineryLayout.RAIL / 2.0F + 1.0F, t1,
+            // The knee rail a little thinner than the posts it runs through, so its faces sit just inside theirs.
+            box(lo, y + RefineryLayout.RAIL / 2.0F, t0 + 0.1F, lo + length, y + RefineryLayout.RAIL / 2.0F + 1.0F, t1 - 0.1F,
                     Paint.FACE, Paint.MID, Paint.SHADE, 0);
         } else {
             box(t0, y, lo, t1, y + 2.0F, lo + length, Paint.MID, Paint.LIT, Paint.SHADE, 0);
             box(t0, y + RefineryLayout.RAIL - 1.0F, lo, t1, y + RefineryLayout.RAIL, lo + length, Paint.MID, Paint.LIT, Paint.SHADE, 0);
-            box(t0, y + RefineryLayout.RAIL / 2.0F, lo, t1, y + RefineryLayout.RAIL / 2.0F + 1.0F, lo + length,
+            box(t0 + 0.1F, y + RefineryLayout.RAIL / 2.0F, lo, t1 - 0.1F, y + RefineryLayout.RAIL / 2.0F + 1.0F, lo + length,
                     Paint.FACE, Paint.MID, Paint.SHADE, 0);
         }
         int posts = Math.max(1, (int) Math.ceil(length / 8.0F));
@@ -281,12 +282,15 @@ public final class RefineryMesh extends ModelMesh {
         double a = RefineryLayout.LADDER_ANGLE;
         float ox = (float) Math.cos(a), ou = (float) Math.sin(a), tx = -ou, tu = ox, half = RefineryLayout.LADDER_HALF;
         float top = layout.deckTop + RefineryLayout.RAIL;
+        // The stiles: square bars, closed at the top. The rungs are thinner and end inside them, so no face of one
+        // shares a plane with the other.
+        float stile = 0.4F;
         for (int side = -1; side <= 1; side += 2) {
             float rx = c[0] + tx * half * side, ru = c[1] + tu * half * side;
-            tube(new float[] { rx, 0.0F, ru }, new float[] { rx, top, ru }, 0.5F, 4, Paint.BANDED);
+            box(rx - stile, 0.0F, ru - stile, rx + stile, top, ru + stile, Paint.MID, Paint.LIT, null, SKIP_DOWN);
         }
         for (float y = 2.0F; y < top - 1.0F; y += 4.0F) {
-            tube(new float[] { c[0] - tx * half, y, c[1] - tu * half }, new float[] { c[0] + tx * half, y, c[1] + tu * half }, 0.5F, 4, Paint.BANDED);
+            tube(new float[] { c[0] - tx * half, y, c[1] - tu * half }, new float[] { c[0] + tx * half, y, c[1] + tu * half }, 0.3F, 4, Paint.BANDED);
         }
         float cageX = c[0] + ox * 1.0F, cageU = c[1] + ou * 1.0F, cageR = half + 1.0F, cageBottom = 24.0F;
         int segments = 8;
@@ -303,14 +307,32 @@ public final class RefineryMesh extends ModelMesh {
                 point[1] = 2 * cageU - point[1];
             }
         }
+        // Each hoop: its segments, a knuckle over each joint (the segments' open ends meet at an angle there), and a
+        // bracket from each end back to its stile (the hoop stands a px clear of it).
+        float lastHoop = cageBottom;
         for (float y = cageBottom; y <= top - 0.5F; y += 10.0F) {
             for (int i = 0; i < segments; i++) {
                 tube(new float[] { hoop[i][0], y, hoop[i][1] }, new float[] { hoop[i + 1][0], y, hoop[i + 1][1] }, 0.5F, 4, Paint.BANDED);
             }
+            for (float[] point : hoop) {
+                knuckle(point[0], y, point[1]);
+            }
+            for (int end : new int[] { 0, segments }) {
+                float[] point = hoop[end];
+                float near = (point[0] - c[0]) * tx + (point[1] - c[1]) * tu < 0 ? -1.0F : 1.0F;
+                tube(new float[] { point[0], y, point[1] }, new float[] { c[0] + tx * half * near, y, c[1] + tu * half * near }, 0.3F, 4, Paint.BANDED);
+            }
+            lastHoop = y;
         }
+        // The bars up the cage, from the lowest hoop to the highest, so both ends are in its knuckles.
         for (int i = 1; i < segments; i += 2) {
-            tube(new float[] { hoop[i][0], cageBottom, hoop[i][1] }, new float[] { hoop[i][0], top, hoop[i][1] }, 0.5F, 4, Paint.BANDED);
+            tube(new float[] { hoop[i][0], cageBottom, hoop[i][1] }, new float[] { hoop[i][0], lastHoop, hoop[i][1] }, 0.5F, 4, Paint.BANDED);
         }
+    }
+
+    // A small block over a joint in the ladder's cage, closing the pipes' ends that meet there.
+    private void knuckle(float x, float y, float u) {
+        box(x - 0.55F, y - 0.55F, u - 0.55F, x + 0.55F, y + 0.55F, u + 0.55F, Paint.MID, Paint.LIT, Paint.SHADE, 0);
     }
 
     // --- The top: vapour line, condenser bank and reflux ---

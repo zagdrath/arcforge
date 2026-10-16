@@ -317,6 +317,37 @@ public final class NuclearGameTests {
                 .thenSucceed();
     }
 
+    // A 5x4 floor forms as one 5x4 hall, not a 3x3 inside it: the centrifuges on its outer column and back row form too.
+    static void cascadeFormsWholeFloor(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 1);
+        for (int x = 0; x < 5; x++) {
+            for (int z = 0; z < 4; z++) {
+                helper.setBlock(min.offset(x, 0, z), ModBlocks.CENTRIFUGE_CASCADE_CASING.get());
+            }
+        }
+        BlockPos controller = min.offset(2, 0, 0);
+        helper.setBlock(controller, ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get().defaultBlockState()
+                .setValue(CentrifugeCascadeControllerBlock.FACING, Direction.NORTH));
+        List<BlockPos> centrifuges = List.of(min.offset(1, 1, 1), min.offset(4, 1, 0), min.offset(4, 1, 2), min.offset(0, 1, 3), min.offset(4, 1, 3));
+        for (BlockPos at : centrifuges) {
+            helper.setBlock(at, ModBlocks.GAS_CENTRIFUGE.get().defaultBlockState().setValue(GasCentrifugeBlock.HALF, DoubleBlockHalf.LOWER));
+            helper.setBlock(at.above(), ModBlocks.GAS_CENTRIFUGE.get().defaultBlockState().setValue(GasCentrifugeBlock.HALF, DoubleBlockHalf.UPPER));
+        }
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    CentrifugeCascadeBlockEntity cascade = helper.getBlockEntity(controller, CentrifugeCascadeBlockEntity.class);
+                    helper.assertTrue(cascade.isFormed(), "The 5x4 hall didn't form");
+                    helper.assertTrue(cascade.getBox().sizeX() == 5 && cascade.getBox().sizeZ() == 4, "It formed " + cascade.getBox().sizeText());
+                    helper.assertTrue(cascade.getCentrifuges() == centrifuges.size(), cascade.getCentrifuges() + " centrifuges");
+                    for (BlockPos at : centrifuges) {
+                        helper.assertTrue(helper.getBlockState(at).getValue(CentrifugeCascadePart.FORMED), "The centrifuge at " + at + " is loose");
+                    }
+                    helper.assertTrue(helper.getBlockState(min.offset(4, 0, 3)).getValue(CentrifugeCascadePart.FORMED), "The far corner isn't formed");
+                })
+                .thenSucceed();
+    }
+
     // --- Corrosive gases and storage ---
 
     // UF6 is corrosive: a Gas Reservoir, a Gas Cartridge and an unlined Pressurized Cylinder refuse it; lined, the cylinder

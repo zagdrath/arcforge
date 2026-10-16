@@ -87,10 +87,13 @@ public final class CentrifugeCascadeMesh extends ModelMesh {
                 { CentrifugeCascadeLayout.MOTOR_TOP, CentrifugeCascadeLayout.MOTOR_R } }, CASING_SIDES, start, Paint.BANDED, Paint.MID);
         uprightTube(cx, cu, new float[][] { { CentrifugeCascadeLayout.MOTOR_TOP, CentrifugeCascadeLayout.CASING_R },
                 { CentrifugeCascadeLayout.CASING_TOP, CentrifugeCascadeLayout.CASING_R } }, CASING_SIDES, start, Paint.POLISHED, null);
+        // The band and the cap stand proud of the casing, so each is closed underneath too (or you'd see into them).
         uprightTube(cx, cu, new float[][] { { CentrifugeCascadeLayout.BAND_Y0, CentrifugeCascadeLayout.BAND_R },
                 { CentrifugeCascadeLayout.BAND_Y1, CentrifugeCascadeLayout.BAND_R } }, CASING_SIDES, start, Paint.BANDED, Paint.DARK);
+        uprightDisc(cx, CentrifugeCascadeLayout.BAND_Y0, cu, CentrifugeCascadeLayout.BAND_R, CASING_SIDES, start, false, Paint.DARK);
         uprightTube(cx, cu, new float[][] { { CentrifugeCascadeLayout.CASING_TOP, CentrifugeCascadeLayout.CAP_R },
                 { CentrifugeCascadeLayout.CAP_TOP, CentrifugeCascadeLayout.CAP_R } }, CASING_SIDES, start, Paint.BANDED, Paint.MID);
+        uprightDisc(cx, CentrifugeCascadeLayout.CASING_TOP, cu, CentrifugeCascadeLayout.CAP_R, CASING_SIDES, start, false, Paint.SHADE);
         uprights.add(new float[] { cx, cu, CentrifugeCascadeLayout.MOTOR_R, CentrifugeCascadeLayout.FLOOR_TOP, CentrifugeCascadeLayout.CAP_TOP });
         for (float du : CentrifugeCascadeLayout.HEADER_U) {
             tube(new float[] { cx, CentrifugeCascadeLayout.CAP_TOP, cu + du }, new float[] { cx, CentrifugeCascadeLayout.HEADER_Y, cu + du },
@@ -114,7 +117,8 @@ public final class CentrifugeCascadeMesh extends ModelMesh {
         float[] p = CentrifugeCascadeLayout.PANEL;
         float ox = layout.panelX * 16.0F;
         float x0 = ox + p[0], x1 = ox + p[3], y0 = p[1], y1 = p[4], u0 = p[2], u1 = p[5];
-        box(x0, y0, u0, x1, y1, u1, Paint.GEN_PLAIN, Paint.GEN_PLAIN, null, SKIP_DOWN);
+        // Its top is the lip's (below), which covers it: one surface there, not two in the same plane.
+        box(x0, y0, u0, x1, y1 - 1.0F, u1, Paint.GEN_PLAIN, null, null, SKIP_DOWN | SKIP_UP);
         box(x0 - 0.5F, y1 - 1.0F, u0 - 0.5F, x1 + 0.5F, y1, u1 + 0.5F, Paint.GEN_MID, Paint.GEN_LIT, Paint.GEN_DARK, 0);
         solidBoxes.add(new float[] { x0, y0, u0, x1, y1, u1 });
         // Facing -u (out of the hall's front): right runs toward -x.

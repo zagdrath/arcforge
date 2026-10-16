@@ -91,8 +91,8 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
     // Client side: the flywheel's angle (degrees) and when it was last moved on.
     private float angle;
     private float lastFrame = -1.0F;
-    // Client side: the rain flap's lift (degrees) and where it flutters to next.
-    private float flap;
+    // Client side: how far the rain flap is into its flapping (0 at rest, 1 running), easing in and out.
+    private float flapRun;
     private float lastFlapFrame = -1.0F;
     // The engine the tank and buffer are sized for: the one it was last formed as, kept while it's broken so a
     // half-built or damaged V16 doesn't lose what it holds.
@@ -312,16 +312,17 @@ public class DieselGeneratorBlockEntity extends PlantControllerBlockEntity imple
         return angle;
     }
 
-    // Client side: the outlet's rain flap this frame (degrees up from shut): lying shut while it stands, lifted as far as
-    // the exhaust pushes it (30 to 70 degrees with its speed) and fluttering with the firing pulses; it eases up and falls
-    // back.
+    // Client side: the outlet's rain flap this frame (degrees up from shut): lying shut while it stands; running, each
+    // exhaust pulse throws it up and it drops back on the pipe, faster and higher with its speed (about 3 flaps a second
+    // slow, 6 flat out, up to 25 to 65 degrees). It eases into and out of flapping as the engine starts and stops.
     public float flap(float now) {
         float speed = getShownSpeed();
-        float target = speed > 0.0F ? 30.0F + 40.0F * speed + speed * (5.0F * (float) Math.sin(now * 2.3F) + 3.0F * (float) Math.sin(now * 5.9F)) : 0.0F;
         float step = lastFlapFrame >= 0.0F ? Math.max(0.0F, Math.min(20.0F, now - lastFlapFrame)) : 20.0F;
         lastFlapFrame = now;
-        flap += (target - flap) * Math.min(1.0F, step * (target > flap ? 0.35F : 0.15F));
-        return flap;
+        float target = speed > 0.0F ? 1.0F : 0.0F;
+        flapRun += (target - flapRun) * Math.min(1.0F, step * 0.1F);
+        float pulse = Math.abs((float) Math.sin(now * (0.5F + 0.5F * speed)));
+        return flapRun * (25.0F + 40.0F * speed) * pulse;
     }
 
     // The client sets the hook (to DieselGeneratorSound.clientTick: its running sound and exhaust smoke), so this class

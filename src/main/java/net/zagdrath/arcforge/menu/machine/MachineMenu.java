@@ -116,6 +116,11 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
 
     // For taller GUIs: the player inventory's top row at inventoryY (the hotbar 58 below it).
     protected void finish(Inventory inventory, int inventoryY) {
+        finish(inventory, 8, inventoryY);
+    }
+
+    // For wider GUIs too: the player inventory's left edge at inventoryX (8 on a 176-wide GUI).
+    protected void finish(Inventory inventory, int inventoryX, int inventoryY) {
         for (int i = 0; i < MachineBlockEntity.UPGRADE_SLOTS; i++) {
             ToggleableSlot slot = new ToggleableSlot(items, items::set, items.getFirstUpgradeSlot() + i, UPGRADE_SLOT_X + i * UPGRADE_SLOT_PITCH,
                     UPGRADE_SLOT_Y);
@@ -123,7 +128,7 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
             addSlot(slot);
         }
         machineSlots = slots.size();
-        addStandardInventorySlots(inventory, 8, inventoryY);
+        addStandardInventorySlots(inventory, inventoryX, inventoryY);
         addDataSlots(data);
         if (!inventory.player.level().isClientSide() && inventory.player.level().getBlockEntity(pos) instanceof OutputLimited limited) {
             outputLimit = limited.getOutputLimit().data(inventory.player.level()::getGameTime);

@@ -77,11 +77,14 @@ public final class DieselGeneratorMesh extends ModelMesh {
         float gu = layout.length / 2.0F;
         box(1.4F, 1.5F, gu - 4.0F, 2.0F, top - 1.5F, gu + 4.0F, Paint.LIT, null, null, SKIP_POS_X);
         box(1.2F, 2.5F, gu - 3.0F, 1.5F, top - 2.5F, gu + 3.0F, Paint.DEEP, null, null, SKIP_POS_X);
-        // The engine's mounts: brackets from the crankcase's sides down to the rails.
+        // The engine's mounts: brackets from the rails in under the crankcase's pan rail to the oil pan's sides (up to the
+        // rail's underside, so no face shares a plane with it; closed underneath, where they bridge the gap off the rails).
         float[][] rails = DieselGeneratorLayout.RAILS;
         for (float u : new float[] { layout.engineU0 + 4.0F, layout.engineU1 - 4.0F }) {
-            box(rails[0][0] + 1.0F, rail, u - 2.0F, DieselGeneratorLayout.CASE_X0, rail + 3.0F, u + 2.0F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
-            box(DieselGeneratorLayout.CASE_X1, rail, u - 2.0F, rails[1][1] - 1.0F, rail + 3.0F, u + 2.0F, Paint.PLAIN, Paint.MID, null, SKIP_DOWN);
+            box(rails[0][0] + 1.0F, rail, u - 2.0F, DieselGeneratorLayout.PAN_X0, DieselGeneratorLayout.CASE_Y0, u + 2.0F, Paint.PLAIN, Paint.MID, Paint.SHADE,
+                    SKIP_POS_X);
+            box(DieselGeneratorLayout.PAN_X1, rail, u - 2.0F, rails[1][1] - 1.0F, DieselGeneratorLayout.CASE_Y0, u + 2.0F, Paint.PLAIN, Paint.MID, Paint.SHADE,
+                    SKIP_NEG_X);
         }
         // The alternator's feet.
         for (float u : new float[] { layout.altU0 + 3.0F, layout.altU1 - 3.0F }) {
@@ -135,10 +138,11 @@ public final class DieselGeneratorMesh extends ModelMesh {
                         new float[] { CX + (float) Math.cos(a1) * rr, SY + (float) Math.sin(a1) * rr, gu }, 0.35F, 4, Paint.BANDED);
             }
         }
+        // The spokes a little thinner than the rings and a hair behind them, so where they cross no faces share a plane.
         for (int i = 0; i < 8; i++) {
             double a = 2.0 * Math.PI * (i + 0.5) / 8.0;
-            tube(new float[] { CX + (float) Math.cos(a) * 2.5F, SY + (float) Math.sin(a) * 2.5F, gu },
-                    new float[] { CX + (float) Math.cos(a) * fr, SY + (float) Math.sin(a) * fr, gu }, 0.35F, 4, Paint.BANDED);
+            tube(new float[] { CX + (float) Math.cos(a) * 2.5F, SY + (float) Math.sin(a) * 2.5F, gu - 0.1F },
+                    new float[] { CX + (float) Math.cos(a) * fr, SY + (float) Math.sin(a) * fr, gu - 0.1F }, 0.3F, 4, Paint.BANDED);
         }
         solidCylinders.add(new float[] { CX, SY, fr, s0, s1 });
         // The radiator's stays to the engine's front, along the top.
@@ -250,13 +254,14 @@ public final class DieselGeneratorMesh extends ModelMesh {
             prismU(x, ty, new float[][] { { u - tl / 2.0F, tr - 0.8F }, { u, tr - 0.8F } }, 12, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
             prismU(x, ty, new float[][] { { u - 0.4F, tr + 0.4F }, { u + 0.4F, tr + 0.4F } }, 12, 0.0, Paint.BANDED, Paint.MID, Paint.SHADE, null);
             solidCylinders.add(new float[] { x, ty, tr, u - tl / 2.0F, u + tl / 2.0F });
-            // Fed up from the manifold under it.
+            // Fed up from the manifold under it. The pipes come in at a slant, so each runs on to the turbo's middle: an
+            // end stopped just inside its round shell would poke out of it, open.
             float[] m = manifold(side);
-            tube(new float[] { m[0], m[1], u + tl / 4.0F }, new float[] { x, ty - tr + 0.3F, u + tl / 4.0F }, 1.2F, PIPE_SIDES, Paint.BANDED);
+            tube(new float[] { m[0], m[1], u + tl / 4.0F }, new float[] { x, ty, u + tl / 4.0F }, 1.2F, PIPE_SIDES, Paint.BANDED);
             // The compressor's outlet into the aftercooler's side.
             float acx = (side < 0 ? ac[0] : ac[3]) - side * 1.5F;
-            tube(new float[] { x - side * (tr - 1.2F), ty - 1.0F, u - tl / 4.0F }, new float[] { acx, ty - 1.0F, Math.min(u - tl / 4.0F, ac[5] - 2.0F) }, 0.9F,
-                    PIPE_SIDES, Paint.BANDED);
+            tube(new float[] { x, ty - 1.0F, u - tl / 4.0F }, new float[] { acx, ty - 1.0F, Math.min(u - tl / 4.0F, ac[5] - 2.0F) }, 0.9F, PIPE_SIDES,
+                    Paint.BANDED);
             // The riser: from the turbine's top up and in to the silencer's side.
             tube(new float[] { x, ty + tr - 0.3F, u + tl / 4.0F }, new float[] { x, sy, u + tl / 4.0F }, 1.0F, PIPE_SIDES, Paint.BANDED);
             tube(new float[] { x, sy, u + tl / 4.0F }, new float[] { CX + side * (sr - 0.3F), sy, u + tl / 4.0F }, 1.0F, PIPE_SIDES, Paint.BANDED);
@@ -275,13 +280,14 @@ public final class DieselGeneratorMesh extends ModelMesh {
         }
         // The outlet near its front end, up to the rain cap (a flap hinged at the back, which the exhaust lifts: see
         // buildMoving): its mouth open, sooted inside, and the hinge's lug at the back.
-        float ou = layout.outletU(), or = DieselGeneratorLayout.OUTLET_R, otop = DieselGeneratorLayout.OUTLET_TOP;
-        uprightTube(CX, ou, new float[][] { { sy + sr - 0.5F, or }, { otop, or } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, null);
-        uprightTube(CX, ou, new float[][] { { sy + sr - 0.5F, or + 0.6F }, { sy + sr + 1.0F, or + 0.6F } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED,
-                Paint.MID);
-        disc(new float[] { CX, sy + sr - 0.5F, ou }, new float[] { 0, -1, 0 }, or + 0.6F, PIPE_SIDES, Paint.SHADE, Paint.SHADE);
+        // The pipe and its collar start well down in the silencer: it's round, so its top falls away under the collar's
+        // sides, and a collar set on its top line would stand clear of it there.
+        float ou = layout.outletU(), or = DieselGeneratorLayout.OUTLET_R, otop = DieselGeneratorLayout.OUTLET_TOP, foot = sy + sr - 2.5F;
+        uprightTube(CX, ou, new float[][] { { foot, or }, { otop, or } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, null);
+        uprightTube(CX, ou, new float[][] { { foot, or + 0.6F }, { sy + sr + 1.0F, or + 0.6F } }, PIPE_SIDES, Math.PI / PIPE_SIDES, Paint.BANDED, Paint.MID);
         mouth(CX, ou, otop, or, or - 0.35F, 3.0F);
-        box(CX - 0.6F, otop - 1.0F, ou + or - 0.2F, CX + 0.6F, otop + 0.2F, ou + or + 0.6F, Paint.MID, Paint.LIT, Paint.SHADE, 0);
+        // The hinge's lug, its top a little under the flap lying shut.
+        box(CX - 0.6F, otop - 1.0F, ou + or - 0.2F, CX + 0.6F, otop + 0.1F, ou + or + 0.6F, Paint.MID, Paint.LIT, Paint.SHADE, 0);
         uprights.add(new float[] { CX, ou, or, sy, otop });
     }
 
@@ -449,17 +455,40 @@ public final class DieselGeneratorMesh extends ModelMesh {
         return solid.toArray();
     }
 
-    // The rain flap over the outlet: a plate hinged across its back edge, lifted lift degrees from lying shut, with its
-    // hinge pin.
+    // The rain flap over the outlet: a round plate a little wider than the pipe, hinged at its back edge on the lug,
+    // lifted lift degrees from lying shut, with its hinge pin.
     private void rainFlap(float lift) {
         float or = DieselGeneratorLayout.OUTLET_R, otop = DieselGeneratorLayout.OUTLET_TOP, ou = layout.outletU();
-        float w = 2.0F * or + 1.0F, reach = 2.0F * or + 1.0F, thick = 0.4F;
+        float r = or + 0.5F, thick = 0.4F;
         double a = Math.toRadians(lift);
         float[] across = { 1, 0, 0 }, along = { 0, (float) Math.sin(a), -(float) Math.cos(a) }, normal = { 0, (float) Math.cos(a), (float) Math.sin(a) };
-        float[] hinge = { CX - w / 2.0F, otop + 0.2F, ou + or + 0.4F };
-        obox(hinge, across, normal, along, w, thick, reach, Paint.SHADE, Paint.MID);
-        tube(new float[] { CX - w / 2.0F - 0.3F, otop + 0.4F, ou + or + 0.4F }, new float[] { CX + w / 2.0F + 0.3F, otop + 0.4F, ou + or + 0.4F }, 0.35F, 4,
-                Paint.BANDED);
+        float[] hinge = { CX, otop + 0.2F, ou + or + 0.4F };
+        roundPlate(new float[] { hinge[0] + along[0] * r, hinge[1] + along[1] * r, hinge[2] + along[2] * r }, across, along, normal, r, thick, Paint.MID,
+                Paint.SHADE, Paint.DARK);
+        tube(new float[] { CX - 1.2F, otop + 0.4F, ou + or + 0.4F }, new float[] { CX + 1.2F, otop + 0.4F, ou + or + 0.4F }, 0.35F, 4, Paint.BANDED);
+    }
+
+    // A round plate thick px thick on centre (its underside), across and along it, normal up out of it: its top, its
+    // underside and its rim, each corner shared, so it's closed all round.
+    private void roundPlate(float[] centre, float[] across, float[] along, float[] normal, float r, float thick, Paint top, Paint under, Paint rim) {
+        int sides = PIPE_SIDES * 2;
+        double step = 2.0 * Math.PI / sides;
+        float[] down = { -normal[0], -normal[1], -normal[2] };
+        float[] lid = { centre[0] + normal[0] * thick, centre[1] + normal[1] * thick, centre[2] + normal[2] * thick };
+        for (int f = 0; f < sides; f++) {
+            double a0 = f * step, a1 = a0 + step, mid = (a0 + a1) / 2.0;
+            float[] p0 = rimPoint(centre, across, along, r, a0), p1 = rimPoint(centre, across, along, r, a1);
+            float[] q0 = rimPoint(lid, across, along, r, a0), q1 = rimPoint(lid, across, along, r, a1);
+            orient(lid, q0, q1, lid, normal, top);
+            orient(centre, p0, p1, centre, down, under);
+            float c = (float) Math.cos(mid), s = (float) Math.sin(mid);
+            orient(p0, p1, q1, q0, new float[] { across[0] * c + along[0] * s, across[1] * c + along[1] * s, across[2] * c + along[2] * s }, rim);
+        }
+    }
+
+    private static float[] rimPoint(float[] centre, float[] across, float[] along, float r, double a) {
+        float c = (float) Math.cos(a) * r, s = (float) Math.sin(a) * r;
+        return new float[] { centre[0] + across[0] * c + along[0] * s, centre[1] + across[1] * c + along[1] * s, centre[2] + across[2] * c + along[2] * s };
     }
 
     // Turning parts turn about the shaft line.

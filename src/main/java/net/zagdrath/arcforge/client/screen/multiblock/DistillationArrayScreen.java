@@ -26,14 +26,15 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 // Feed and steam tanks on the left, the screen (temperature, heat bar, steam stripping, status), the Pitch slot and the
 // column's size and feed rate under it, then a narrow tank for each product, lightest first (Refinery Gas, Naphtha,
 // Kerosene, Light Oil, Diesel, Heavy Oil, Bitumen); a product the column's recipe doesn't make at its height is locked.
-// All positions are relative to leftPos/topPos.
+// All positions are relative to leftPos/topPos; the background is 216×166, the player inventory centred.
 public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu> {
-    private static final int FEED_X = 9, STEAM_X = 25, PRODUCT_X = 97, PRODUCT_PITCH = 10;
+    private static final int WIDTH = 216;
+    private static final int FEED_X = 9, STEAM_X = 25, PRODUCT_X = 137, PRODUCT_PITCH = 10;
     private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50, PRODUCT_W = 6;
-    // The screen recess is x40..93, y18..52 (inner 41..92 x 19..51); text keeps 2 px off its inner edges.
-    private static final int SCREEN_X = 43, TEMP_RIGHT = 92, TEMP_Y = 21, HEAT_X = 46, HEAT_Y = 31, HEAT_W = 42, BONUS_Y = 36;
+    // The screen recess is x40..133, y18..52 (inner 41..132 x 19..51); text keeps 2 px off its inner edges.
+    private static final int SCREEN_X = 43, TEMP_RIGHT = 132, TEMP_Y = 21, HEAT_X = 45, HEAT_Y = 31, HEAT_W = 84, BONUS_Y = 36;
     private static final int LED_X = 43, LED_Y = 44, STATUS_X = 51, STATUS_Y = 44, STATUS_W = TEMP_RIGHT - STATUS_X;
-    private static final int INFO_X = 61, SIZE_Y = 56, RATE_Y = 65, INFO_W = 32;
+    private static final int INFO_X = 61, SIZE_Y = 56, RATE_Y = 65, INFO_W = TEMP_RIGHT - INFO_X;
     private static final int NO_STEAM_COLOR = 0xFF707070;
 
     private final Identifier tankGauge = sprite("tank_gauge");
@@ -46,7 +47,7 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
                 Component.translatable("gui.arcforge.usage"),
                 () -> Component.translatable("gui.arcforge.hu_per_tick_loss", menu.getHeatPerTick()),
                 Component.translatable("gui.arcforge.temp"),
-                () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())))), true);
+                () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())))), true, WIDTH, 166, true);
         enableAutoEject();
     }
 
@@ -87,9 +88,10 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
         textRight(graphics, Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())), TEMP_RIGHT, TEMP_Y, ArcforgeGui.TEXT);
         SteamGrade grade = SteamGrade.of(menu.getSteam());
         if (menu.getBonus() > 0 && grade != null) {
-            graphics.text(font, Component.translatable("gui.arcforge.naphtha_bonus_short", menu.getBonus()), SCREEN_X, BONUS_Y, grade.guiColor(), false);
+            graphics.text(font, clipped(Component.translatable("gui.arcforge.naphtha_bonus_short", menu.getBonus()), TEMP_RIGHT - SCREEN_X), SCREEN_X,
+                    BONUS_Y, grade.guiColor(), false);
         } else {
-            graphics.text(font, Component.translatable("gui.arcforge.no_steam"), SCREEN_X, BONUS_Y, NO_STEAM_COLOR, false);
+            graphics.text(font, clipped(Component.translatable("gui.arcforge.no_steam"), TEMP_RIGHT - SCREEN_X), SCREEN_X, BONUS_Y, NO_STEAM_COLOR, false);
         }
         graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
         graphics.text(font, clipped(sizeText(), INFO_W), INFO_X, SIZE_Y, ArcforgeGui.LABEL, false);
