@@ -600,6 +600,7 @@ public final class ArcforgeGameTests {
         TESTS.put("fission_steam_generator", FissionGameTests::steamGenerator);
         TESTS.put("fission_heavy_water_tower", FissionGameTests::heavyWaterTower);
         LONG_TESTS.put("fission_reactor_forms", FissionGameTests::reactorForms);
+        TESTS.put("fission_reactor_buttons", FissionGameTests::reactorButtons);
         RADIATION_TESTS.put("nuclear_radiation_field", NuclearGameTests::radiationField);
         RADIATION_TESTS.put("nuclear_hazmat_and_dose", NuclearGameTests::hazmatAndDose);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));

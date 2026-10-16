@@ -191,6 +191,9 @@ public class ArcforgeClient {
             }
         });
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut event) -> PortStore.clearClient());
+        // TEMPORARY: traces clicks on the Fission Reactor's desk (whether they arrive or something cancels them first).
+        NeoForge.EVENT_BUS.addListener(net.neoforged.bus.api.EventPriority.LOWEST, true, net.neoforged.neoforge.client.event.ScreenEvent.MouseButtonPressed.Pre.class,
+                net.zagdrath.arcforge.client.screen.multiblock.FissionReactorScreen::traceClick);
         // Canister and cartridge fill bars take the fluid's colour from its model.
         PortableStorageItem.fluidTint = stack -> {
             var model = Minecraft.getInstance().getModelManager().getFluidStateModelSet().get(stack.getFluid().defaultFluidState());

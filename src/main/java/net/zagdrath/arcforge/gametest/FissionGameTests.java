@@ -315,6 +315,40 @@ public final class FissionGameTests {
                 .thenSucceed();
     }
 
+    // The control desk's bank buttons through the menu, as the server handles the client's button packet: bank A out 10%
+    // sets its target and the rods follow; SCRAM drives them all in.
+    @SuppressWarnings("removal")
+    static void reactorButtons(GameTestHelper helper) {
+        BlockPos min = new BlockPos(1, 1, 1);
+        BlockPos controller = vessel(helper, min, 5, 5, 5, ModBlocks.REACTOR_CASING.get(), ModBlocks.REACTOR_CONTROLLER.get(),
+                (x, z) -> x == 2 && z == 2 ? ModBlocks.CONTROL_ROD_CHANNEL.get() : ModBlocks.FUEL_CHANNEL.get());
+        net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        BlockPos absolute = helper.absolutePos(controller.north());
+        player.snapTo(absolute.getX() + 0.5, absolute.getY(), absolute.getZ() + 0.5);
+        FissionReactorMenu[] menu = new FissionReactorMenu[1];
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    FissionReactorBlockEntity reactor = helper.getBlockEntity(controller, FissionReactorBlockEntity.class);
+                    reactor.checkNow();
+                    helper.assertTrue(reactor.isFormed(), "The reactor didn't form");
+                    menu[0] = (FissionReactorMenu) reactor.createMenu(1, player.getInventory(), player);
+                    helper.assertTrue(menu[0].stillValid(player), "The menu isn't valid for a player at the controller");
+                    // What handleContainerButtonClick does; the mock connection can't take the ports payload its broadcast sends.
+                    helper.assertTrue(menu[0].clickMenuButton(player, FissionReactorMenu.bankButton(0, false, true)), "The bank button wasn't taken");
+                    helper.assertTrue(reactor.getBankTarget(0) == 90, "Bank A's target is " + reactor.getBankTarget(0) + ", expected 90");
+                })
+                .thenIdle(40)
+                .thenExecute(() -> {
+                    FissionReactorBlockEntity reactor = helper.getBlockEntity(controller, FissionReactorBlockEntity.class);
+                    helper.assertTrue(reactor.getBankInsertion(0) < 100, "Bank A didn't move: " + reactor.getBankInsertion(0));
+                    helper.assertTrue(menu[0].target(0) < 0.95, "The menu still shows bank A's target at " + menu[0].target(0));
+                    helper.assertTrue(menu[0].clickMenuButton(player, FissionReactorMenu.SCRAM), "SCRAM wasn't taken");
+                    helper.assertTrue(reactor.isScrammed(), "SCRAM didn't trip it");
+                })
+                .thenSucceed();
+    }
+
     // A 3x4x3 Steam Generator: Hot Coolant and feedwater in, High-Pressure Steam and cooled water out.
     static void steamGenerator(GameTestHelper helper) {
         BlockPos min = new BlockPos(1, 1, 1);

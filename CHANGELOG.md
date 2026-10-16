@@ -85,8 +85,9 @@ and some refinery lines need a new port, see Upgrading).
     vertical heat exchanger) for High-Pressure Steam. Steam ports alone make a boiling core: **Contaminated Steam** straight
     to Steam Turbine Arrays, which run on it as High-Pressure Steam and turn slightly radioactive. Each channel gives
     4,000 HU/t at full power; a big core passes 1,000,000 FE/t through four to six full-size turbine arrays.
-  - **Control and protection.** A three-page GUI (core readouts and rod banks; power, coolant and k-effective trends;
-    trip points, pump and options), bank moves from the GUI, redstone (a stop signal SCRAMs; optionally a signal holds
+  - **Control and protection.** A wide three-page control desk (core readouts and the four rod banks plus All, each
+    showing where its rods are and where they're headed; power, coolant and k-effective trends; trip points, pump and
+    options), with the rod slots in 3x3 grids either side of the inventory. Bank moves from the GUI, redstone (a stop signal SCRAMs; optionally a signal holds
     every bank in) and the machine control API (`bank_a`..`bank_d`, `scram`). Five player-set trips SCRAM the core;
     rods load and unload only while it's shut down. A running core is a strong radiation source through its vessel.
   - **Models.** The reactor: a heavy pressure vessel in a casing frame, a domed closure head with control-rod drive
@@ -184,6 +185,8 @@ and some refinery lines need a new port, see Upgrading).
 
 ### Changed
 
+- A machine GUI taller than the game window keeps its top (title and controls) on screen instead of centring off the
+  top edge.
 - **Light Oil from Crude Oil.** A Distillation Array 10 or more tall gives Light Oil from Crude and Sour Crude Oil, out
   of the Diesel and Heavy Oil, so each height makes as much as before: 10 high 80 mB Light Oil (190 Diesel, 130 Heavy
   Oil), 14 high 100 mB (155 Diesel, 65 Heavy Oil). Plastic Sheet (Light Oil and Hydrogen) is now on the main oil line.

@@ -160,8 +160,15 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
             securityTabAdded = true;
             tabs.add(new SecurityTab(() -> menu.containerId, this::sendButton));
         }
+        // A GUI taller than the window keeps its top (the title and the machine's controls) on screen.
+        topPos = Math.max(0, topPos);
         titleLabelX = (imageWidth - font.width(title)) / 2;
         tabs.layout(leftPos, topPos);
+    }
+
+    // The background texture's width: 256, or 512 for a GUI wider than 256 (the panel in its top-left corner).
+    protected int textureWidth() {
+        return 256;
     }
 
     protected abstract void drawContents(GuiGraphicsExtractor graphics, int x, int y);
@@ -174,7 +181,7 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractBackground(graphics, mouseX, mouseY, partialTick);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos, 0.0F, 0.0F, imageWidth, imageHeight, 256, 256);
+        graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos, 0.0F, 0.0F, imageWidth, imageHeight, textureWidth(), 256);
         drawContents(graphics, leftPos, topPos);
         // Tabs overlap the panel edge, so they are drawn after the background.
         tabs.render(graphics, font, leftPos, topPos, mouseX, mouseY);

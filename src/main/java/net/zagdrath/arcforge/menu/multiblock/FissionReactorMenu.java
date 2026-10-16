@@ -71,8 +71,10 @@ public class FissionReactorMenu extends MachineMenu {
 
     public static final int FLAG_REDSTONE_RODS = 32, FLAG_AUTO_UNLOAD = 64, FLAG_UNLOADING = 128, FLAG_CAN_REFUEL = 256, FLAG_DAMAGED = 512;
 
-    // Layout: slot rows under the desk, the player inventory under them.
-    public static final int SLOT_X = 8, INPUT_Y = 124, OUTPUT_Y = 142, INVENTORY_Y = 172, HEIGHT = 254;
+    // Layout (300 wide): the desk across the top; under it the rod input slots in a 3x3 grid on the left, the player
+    // inventory in the middle and the output slots in a 3x3 grid on the right.
+    public static final int WIDTH = 300, HEIGHT = 216;
+    public static final int INPUT_X = 8, OUTPUT_X = 240, SLOTS_Y = 134, INVENTORY_X = 70, INVENTORY_Y = 134;
 
     // Buttons (each machine's own range is the 200s; the 300s are the Security tab's): bank b down (out) or up (in) a
     // step (1%) or a big step (10%): 200 + b * 4 + {0 out, 1 in, 2 out big, 3 in big}; every bank at once the same:
@@ -88,12 +90,12 @@ public class FissionReactorMenu extends MachineMenu {
     public FissionReactorMenu(int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items, ContainerData data) {
         super(ModMenuTypes.FISSION_REACTOR.get(), containerId, inventory, pos, items, data, DATA_VALUES, ModBlocks.REACTOR_CONTROLLER.get());
         for (int i = 0; i < FissionReactorBlockEntity.INPUT_SLOTS; i++) {
-            addMachineSlot(i, SLOT_X + i * 18, INPUT_Y);
+            addMachineSlot(i, INPUT_X + i % 3 * 18, SLOTS_Y + i / 3 * 18);
         }
         for (int i = 0; i < FissionReactorBlockEntity.OUTPUT_SLOTS; i++) {
-            addMachineSlot(FissionReactorBlockEntity.INPUT_SLOTS + i, SLOT_X + i * 18, OUTPUT_Y);
+            addMachineSlot(FissionReactorBlockEntity.INPUT_SLOTS + i, OUTPUT_X + i % 3 * 18, SLOTS_Y + i / 3 * 18);
         }
-        finish(inventory, INVENTORY_Y);
+        finish(inventory, INVENTORY_X, INVENTORY_Y);
     }
 
     @Override
@@ -163,6 +165,10 @@ public class FissionReactorMenu extends MachineMenu {
 
     public static int bankButton(int bank, boolean in, boolean big) {
         return BANK_FIRST + bank * 4 + (big ? 2 : 0) + (in ? 1 : 0);
+    }
+
+    public static int allBanksButton(boolean in, boolean big) {
+        return ALL_BANKS + (big ? 2 : 0) + (in ? 1 : 0);
     }
 
     // --- Readings ---
