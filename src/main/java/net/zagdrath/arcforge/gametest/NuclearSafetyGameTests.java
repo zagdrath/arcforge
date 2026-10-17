@@ -282,4 +282,22 @@ public final class NuclearSafetyGameTests {
         helper.assertTrue(helper.getBlockEntity(pos, FreezePlugBlockEntity.class).isMelted(), "It didn't melt when the salt overheated");
         helper.succeed();
     }
+
+    // Fallout lies in layers like snow: it stands on a solid face or a full stack of itself, not on a partial one, and
+    // its collision is a layer lower than it looks.
+    static void falloutLayers(GameTestHelper helper) {
+        BlockPos floor = new BlockPos(1, 1, 1);
+        helper.setBlock(floor, Blocks.STONE);
+        BlockState three = ModBlocks.FALLOUT.get().defaultBlockState().setValue(net.zagdrath.arcforge.block.nuclear.FalloutBlock.LAYERS, 3);
+        var level = helper.getLevel();
+        BlockPos above = helper.absolutePos(floor.above());
+        helper.assertTrue(three.canSurvive(level, above), "Fallout won't lie on stone");
+        helper.setBlock(floor.above(), three);
+        helper.assertFalse(three.canSurvive(level, above.above()), "Fallout lies on a partial layer");
+        helper.assertTrue(three.getShape(level, above).max(net.minecraft.core.Direction.Axis.Y) > three.getCollisionShape(level, above)
+                .max(net.minecraft.core.Direction.Axis.Y), "Its collision isn't a layer lower");
+        helper.setBlock(floor.above(), three.setValue(net.zagdrath.arcforge.block.nuclear.FalloutBlock.LAYERS, 8));
+        helper.assertTrue(three.canSurvive(level, above.above()), "Fallout won't lie on a full block of itself");
+        helper.succeed();
+    }
 }

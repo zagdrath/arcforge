@@ -130,7 +130,9 @@ public final class ModDataComponents {
     // Radioactive dust on an item, per item (mSv/h at a block; see Contamination).
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> CONTAMINATED =
             DATA_COMPONENTS.registerComponentType("contaminated", b -> b.persistent(com.mojang.serialization.Codec.FLOAT)
-                    .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.FLOAT));
+                    .networkSynchronized(net.minecraft.network.codec.ByteBufCodecs.FLOAT)
+                    // It grows on the held item at every dose check while there's fallout about: don't re-equip it each time.
+                    .ignoreSwapAnimation());
 
     // A Vitrified Waste Log's radioactivity when it was poured, and when (see WasteLog).
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<net.zagdrath.arcforge.nuclear.WasteLog>> WASTE_LOG =

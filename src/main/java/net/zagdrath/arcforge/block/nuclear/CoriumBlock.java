@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.FlowingFluid;
 import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.nuclear.safety.Fallout;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDamageTypes;
 import net.zagdrath.arcforge.tag.ModBlockTags;
@@ -59,6 +60,8 @@ public class CoriumBlock extends LiquidBlock {
         if (state.getValue(LEVEL) != 0) {
             return;
         }
+        // Loose in the world it contaminates the ground round it (see Fallout.seep).
+        Fallout.seep(level, pos, ArcforgeConfig.CORIUM_SEEP.getAsDouble());
         int cooling = state.getValue(COOLING);
         BlockPos below = pos.below();
         BlockState under = level.getBlockState(below);

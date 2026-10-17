@@ -33,15 +33,18 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.registry.ModDamageTypes;
 import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.registry.ModMobEffects;
 
 // A living entity's radiation exposure (EXPOSURE, saved on it, not kept through death, synced to its own player for the
 // Geiger Counter's clicks): the dose rate it last took (mSv/h, see RadiationField) and the dose it has built up (mSv).
 //  - Every radiation.doseCheckInterval ticks the dose grows by the rate for that time (an hour is radiation.ticksPerHour
 //    ticks, an in-game hour by default) and falls by radiation.recoveryPerHour. Creative and spectator players take none.
-//  - From nauseaDose (1,000 mSv) Nausea, from weaknessDose (2,000) Weakness and Hunger, from witherDose (4,000) Wither,
-//    and from lethalDose (8,000) radiation sickness every 2 seconds (lethalDamage, through armour) until it falls or they
-//    die. Dying resets it. radiation.playerEffects turns these off (the dose still shows); mobs only take a dose with
-//    radiation.affectMobs.
+//  - Radiation Poisoning (RadiationPoisoningEffect) from the dose: I from poisoningDose1 (50 mSv; half a heart every 30
+//    seconds), II from poisoningDose2 (500; every 10 seconds, Hunger), III from poisoningDose3 (2,000; every 4 seconds,
+//    Hunger and Weakness), IV from poisoningDose4 (4,000; a heart every 2 seconds, Hunger, Weakness and Nausea), all
+//    through armour. A dose rate of acuteRate (100 mSv/h) or more makes it a level worse while it lasts, at least I: any
+//    strong field hurts at once. Dying resets the dose. radiation.playerEffects turns this off for players (the dose
+//    still shows); mobs only take a dose with radiation.affectMobs.
 //  - A player carrying a Dosimeter is warned each time their dose crosses a threshold on the way up.
 public final class RadiationDose {
     public record Exposure(double dose, float rate) {
@@ -63,10 +66,11 @@ public final class RadiationDose {
                     .sync((holder, player) -> holder == player, Exposure.STREAM_CODEC)
                     .build());
 
-    // The thresholds, lowest first: 1 Nausea, 2 Weakness and Hunger, 3 Wither, 4 lethal.
+    // Radiation Poisoning's levels, I to IV.
     public static final int LEVELS = 4;
     private static final int EFFECT_TICKS = 100;
-    private static final int LETHAL_INTERVAL = 40;
+    // Ticks between hurts at each level.
+    private static final int[] HURT_INTERVAL = { 600, 200, 80, 40 };
     // How much the synced rate or dose must move before the client is told again.
     // (a twentieth of the rate, or a thousandth of a mSv/h near nothing; a mSv of dose).
     private static final double SYNC_RATE_STEP = 0.05, SYNC_DOSE_STEP = 1.0;
@@ -89,18 +93,24 @@ public final class RadiationDose {
         return live != null ? live : entity.getData(EXPOSURE);
     }
 
-    // Which threshold a dose has reached (0: none).
+    // The Radiation Poisoning a dose has brought on (0: none, else I to IV).
     public static int level(double dose) {
-        if (dose >= ArcforgeConfig.RADIATION_LETHAL_DOSE.getAsDouble()) {
+        if (dose >= ArcforgeConfig.RADIATION_POISONING_4.getAsDouble()) {
             return 4;
         }
-        if (dose >= ArcforgeConfig.RADIATION_WITHER_DOSE.getAsDouble()) {
+        if (dose >= ArcforgeConfig.RADIATION_POISONING_3.getAsDouble()) {
             return 3;
         }
-        if (dose >= ArcforgeConfig.RADIATION_WEAKNESS_DOSE.getAsDouble()) {
+        if (dose >= ArcforgeConfig.RADIATION_POISONING_2.getAsDouble()) {
             return 2;
         }
-        return dose >= ArcforgeConfig.RADIATION_NAUSEA_DOSE.getAsDouble() ? 1 : 0;
+        return dose >= ArcforgeConfig.RADIATION_POISONING_1.getAsDouble() ? 1 : 0;
+    }
+
+    // With the dose rate now: a level worse (at least I) in an acute field.
+    public static int level(double dose, double rate) {
+        int level = level(dose);
+        return rate >= ArcforgeConfig.RADIATION_ACUTE_RATE.getAsDouble() ? Math.min(LEVELS, level + 1) : level;
     }
 
     // One check, every radiation.doseCheckInterval ticks (see RadiationEvents).
@@ -129,26 +139,33 @@ public final class RadiationDose {
         if (entity instanceof ServerPlayer player) {
             warn(player, dose);
         }
-        if (ArcforgeConfig.RADIATION_PLAYER_EFFECTS.getAsBoolean() || !(entity instanceof Player)) {
-            effects(level, entity, dose);
+        if (!immune && ArcforgeConfig.RADIATION_ENABLED.getAsBoolean() && (ArcforgeConfig.RADIATION_PLAYER_EFFECTS.getAsBoolean() || !(entity instanceof Player))) {
+            effects(level, entity, level(dose, rate), interval);
         }
     }
 
-    // The sickness for the dose reached (renewed while it lasts).
-    private static void effects(ServerLevel level, LivingEntity entity, double dose) {
-        int reached = level(dose);
-        if (reached >= 1) {
+    // Radiation Poisoning at its level (renewed while it lasts), its side effects, and its harm on its own clock.
+    private static void effects(ServerLevel level, LivingEntity entity, int poisoning, int checkInterval) {
+        if (poisoning <= 0) {
+            return;
+        }
+        entity.addEffect(new MobEffectInstance(ModMobEffects.RADIATION_POISONING, EFFECT_TICKS, poisoning - 1, false, true, true));
+        if (poisoning >= 2) {
+            entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, EFFECT_TICKS, poisoning >= 4 ? 1 : 0, true, false, true));
+        }
+        if (poisoning >= 3) {
+            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, EFFECT_TICKS, 0, true, false, true));
+        }
+        if (poisoning >= 4) {
             entity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, EFFECT_TICKS, 0, true, false, true));
         }
-        if (reached >= 2) {
-            entity.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, EFFECT_TICKS, 0, true, false, true));
-            entity.addEffect(new MobEffectInstance(MobEffects.HUNGER, EFFECT_TICKS, 0, true, false, true));
-        }
-        if (reached >= 3) {
-            entity.addEffect(new MobEffectInstance(MobEffects.WITHER, EFFECT_TICKS, 0, true, false, true));
-        }
-        if (reached >= 4 && entity.tickCount % LETHAL_INTERVAL < ArcforgeConfig.RADIATION_CHECK_INTERVAL.getAsInt()) {
-            entity.hurtServer(level, ModDamageTypes.source(level, ModDamageTypes.RADIATION), (float) ArcforgeConfig.RADIATION_LETHAL_DAMAGE.getAsDouble());
+        int interval = HURT_INTERVAL[poisoning - 1];
+        // Checked every checkInterval ticks: hurt on the one check in each interval.
+        if (entity.tickCount % interval < checkInterval) {
+            float damage = (float) ArcforgeConfig.RADIATION_POISONING_DAMAGE.getAsDouble() * (poisoning >= 4 ? 2.0F : 1.0F);
+            if (damage > 0.0F) {
+                entity.hurtServer(level, ModDamageTypes.source(level, ModDamageTypes.RADIATION), damage);
+            }
         }
     }
 

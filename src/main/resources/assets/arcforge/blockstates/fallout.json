@@ -1,7 +1,28 @@
 {
   "variants": {
-    "": {
-      "model": "arcforge:block/nuclear/fallout"
+    "layers=1": {
+      "model": "arcforge:block/nuclear/fallout_height2"
+    },
+    "layers=2": {
+      "model": "arcforge:block/nuclear/fallout_height4"
+    },
+    "layers=3": {
+      "model": "arcforge:block/nuclear/fallout_height6"
+    },
+    "layers=4": {
+      "model": "arcforge:block/nuclear/fallout_height8"
+    },
+    "layers=5": {
+      "model": "arcforge:block/nuclear/fallout_height10"
+    },
+    "layers=6": {
+      "model": "arcforge:block/nuclear/fallout_height12"
+    },
+    "layers=7": {
+      "model": "arcforge:block/nuclear/fallout_height14"
+    },
+    "layers=8": {
+      "model": "arcforge:block/nuclear/fallout_height16"
     }
   }
 }

@@ -3917,28 +3917,35 @@ public class ArcforgeConfig {
             .comment("mSv the accumulated dose falls by each hour (as ticksPerHour).")
             .defineInRange("recoveryPerHour", 10.0, 0.0, 10_000.0);
 
-    public static final ModConfigSpec.DoubleValue RADIATION_NAUSEA_DOSE = BUILDER
-            .comment("Accumulated dose (mSv) from which the player feels sick (Nausea).")
-            .defineInRange("nauseaDose", 1_000.0, 1.0, 1_000_000.0);
+    public static final ModConfigSpec.DoubleValue RADIATION_POISONING_1 = BUILDER
+            .comment("Accumulated dose (mSv) from which they have Radiation Poisoning I: half a heart every 30 seconds.")
+            .defineInRange("poisoningDose1", 50.0, 1.0, 1_000_000.0);
 
-    public static final ModConfigSpec.DoubleValue RADIATION_WEAKNESS_DOSE = BUILDER
-            .comment("Accumulated dose (mSv) from which they're weak and hungry (Weakness and Hunger).")
-            .defineInRange("weaknessDose", 2_000.0, 1.0, 1_000_000.0);
+    public static final ModConfigSpec.DoubleValue RADIATION_POISONING_2 = BUILDER
+            .comment("Accumulated dose (mSv) from which they have Radiation Poisoning II: half a heart every 10 seconds, and Hunger.")
+            .defineInRange("poisoningDose2", 500.0, 1.0, 1_000_000.0);
 
-    public static final ModConfigSpec.DoubleValue RADIATION_WITHER_DOSE = BUILDER
-            .comment("Accumulated dose (mSv) from which they wither (Wither).")
-            .defineInRange("witherDose", 4_000.0, 1.0, 1_000_000.0);
+    public static final ModConfigSpec.DoubleValue RADIATION_POISONING_3 = BUILDER
+            .comment("Accumulated dose (mSv) from which they have Radiation Poisoning III: half a heart every 4 seconds, Hunger and",
+                    "Weakness.")
+            .defineInRange("poisoningDose3", 2_000.0, 1.0, 1_000_000.0);
 
-    public static final ModConfigSpec.DoubleValue RADIATION_LETHAL_DOSE = BUILDER
-            .comment("Accumulated dose (mSv) from which radiation sickness hurts them every 2 seconds until they recover or die.")
-            .defineInRange("lethalDose", 8_000.0, 1.0, 1_000_000.0);
+    public static final ModConfigSpec.DoubleValue RADIATION_POISONING_4 = BUILDER
+            .comment("Accumulated dose (mSv) from which they have Radiation Poisoning IV: a heart every 2 seconds, Hunger, Weakness and",
+                    "Nausea, until it falls or they die.")
+            .defineInRange("poisoningDose4", 4_000.0, 1.0, 1_000_000.0);
 
-    public static final ModConfigSpec.DoubleValue RADIATION_LETHAL_DAMAGE = BUILDER
-            .comment("Damage (half hearts) each 2 seconds past lethalDose.")
-            .defineInRange("lethalDamage", 2.0, 0.0, 100.0);
+    public static final ModConfigSpec.DoubleValue RADIATION_ACUTE_RATE = BUILDER
+            .comment("A dose rate (mSv/h) from which the poisoning is a level worse while they're in it (at least I): acute",
+                    "exposure hurts at once, whatever the dose so far.")
+            .defineInRange("acuteRate", 100.0, 0.1, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue RADIATION_POISONING_DAMAGE = BUILDER
+            .comment("Damage (half hearts) each time Radiation Poisoning hurts (twice this at IV); through armour.")
+            .defineInRange("poisoningDamage", 1.0, 0.0, 100.0);
 
     public static final ModConfigSpec.BooleanValue RADIATION_PLAYER_EFFECTS = BUILDER
-            .comment("Whether the dose thresholds give players their effects and damage (off: the dose only shows on the Dosimeter).")
+            .comment("Whether Radiation Poisoning gives players its effects and damage (off: the dose only shows on the Dosimeter).")
             .define("playerEffects", true);
 
     public static final ModConfigSpec.BooleanValue RADIATION_AFFECTS_MOBS = BUILDER
@@ -4202,8 +4209,18 @@ public class ArcforgeConfig {
             .defineInRange("falloutRadius", 3, 0, 16);
 
     public static final ModConfigSpec.DoubleValue FALLOUT_SPREAD_RATE = BUILDER
-            .comment("Share of a chunk's contamination blown to the chunk downwind every 10 seconds.")
-            .defineInRange("falloutSpreadRate", 0.004, 0.0, 0.5);
+            .comment("Share of a chunk's contamination that spreads to the chunks round it each minute (most downwind, some to",
+                    "every side), unless it's inside a sealed containment.")
+            .defineInRange("falloutSpreadRate", 0.02, 0.0, 0.5);
+
+    public static final ModConfigSpec.DoubleValue CORIUM_SEEP = BUILDER
+            .comment("Contamination (mSv/h at the ground) a block of Corium outside a sealed containment adds to its chunk each",
+                    "time it's randomly ticked (about once a minute); Solidified Corium seeps a quarter of it.")
+            .defineInRange("coriumSeep", 1.0, 0.0, 1_000.0);
+
+    public static final ModConfigSpec.BooleanValue FALLOUT_PARTICLES = BUILDER
+            .comment("Whether contaminated chunks show green motes in their air (and falling ash where it's heavy), on each client.")
+            .define("falloutParticles", true);
 
     public static final ModConfigSpec.DoubleValue FALLOUT_SHORT_HALF_LIFE = BUILDER
             .comment("Half-life of Fallout's short-lived part (iodine and the like), in in-game days.")

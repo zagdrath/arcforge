@@ -14,11 +14,14 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.levelgen.Heightmap;
@@ -33,6 +36,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.block.nuclear.FalloutBlock;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.nuclear.WasteLog;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -44,8 +48,12 @@ import net.zagdrath.arcforge.registry.ModBlocks;
 //  - A release (release) inside a sealed containment stays in its air (see Containment.activity). Anywhere else it
 //    settles over the chunks within falloutRadius chunks, most near the release and more downwind; Fallout dust
 //    blocks settle on the ground of each (falloutBlocks).
-//  - The wind: a direction for each in-game day, from the world's seed. Every minute a little of each contaminated
-//    chunk's fallout blows on to its downwind neighbour (falloutSpreads, falloutSpreadRate), settling there.
+//  - Spreading: every minute a share of each contaminated chunk's fallout (falloutSpreadRate) spreads to the four
+//    chunks round it, most to the one downwind (the wind: a direction for each in-game day, from the world's seed),
+//    settling there as dust too (falloutSpreads). Radioactive blocks loose in the world (Corium, Solidified Corium)
+//    seep into their chunk's ground (seep, coriumSeep), unless a sealed containment holds them.
+//  - Dust (FalloutBlock) lies in layers like snow, drifted to different heights; a chunk's ground is synced to the
+//    players watching it, whose clients show its air glowing with green motes (client.FalloutParticles).
 //  - Standing in it: the ground's dose rate, under cover a tenth of it (see ambient and RadiationField), and a share
 //    of it picked up on the skin and gear (see Contamination).
 // nuclear.failures.fallout turns all of it off.
@@ -60,6 +68,11 @@ public final class Fallout {
                 Codec.FLOAT.optionalFieldOf("long", 0.0F).forGetter(Ground::longLived),
                 Codec.LONG.optionalFieldOf("time", 0L).forGetter(Ground::time))
                 .apply(i, Ground::new));
+        public static final StreamCodec<io.netty.buffer.ByteBuf, Ground> STREAM_CODEC = StreamCodec.composite(
+                ByteBufCodecs.FLOAT, Ground::shortLived,
+                ByteBufCodecs.FLOAT, Ground::longLived,
+                ByteBufCodecs.VAR_LONG, Ground::time,
+                Ground::new);
 
         public boolean isEmpty() {
             return shortLived <= 0.0F && longLived <= 0.0F;
@@ -95,12 +108,15 @@ public final class Fallout {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<Ground>> GROUND = ATTACHMENT_TYPES.register("fallout",
             () -> AttachmentType.builder(() -> Ground.NONE)
                     .serialize(Ground.CODEC.fieldOf("fallout"), ground -> !ground.isEmpty())
+                    // Every player watching the chunk sees it, for the air's motes (see client.FalloutParticles).
+                    .sync((holder, player) -> true, Ground.STREAM_CODEC)
                     .build());
 
     // Below this a chunk counts as clean (its dust can go).
     public static final double CLEAN = 0.05;
     private static final int SPREAD_INTERVAL = 1_200;
-    private static final int MAX_DUST_PER_CHUNK = 32;
+    // Dust deposits on a chunk at once, and the layers one deposit can add.
+    private static final int MAX_DUST_PER_CHUNK = 96, MAX_LAYERS_PER_DEPOSIT = 3;
     // The loaded chunks with fallout, per level (what the wind works on).
     private static final Map<Level, LongOpenHashSet> CONTAMINATED = new WeakHashMap<>();
 
@@ -210,18 +226,55 @@ public final class Fallout {
         }
     }
 
-    // Fallout dust on the chunk's ground: a few blocks for every 2 mSv/h, up to MAX_DUST_PER_CHUNK at once.
+    // Fallout dust on the chunk's ground, like snow: a deposit for every 0.7 mSv/h (up to MAX_DUST_PER_CHUNK at once),
+    // each one to three layers (more for a heavier fall) on the top surface at a random spot, piling onto dust already
+    // there up to a full block, so the ground ends up drifted at different heights.
     private static void dust(ServerLevel level, ChunkPos pos, double amount) {
-        int count = Math.min(MAX_DUST_PER_CHUNK, (int) (amount / 2.0) + (level.getRandom().nextDouble() < (amount / 2.0) % 1.0 ? 1 : 0));
         RandomSource random = level.getRandom();
-        BlockState dust = ModBlocks.FALLOUT.get().defaultBlockState();
+        double deposits = amount / 0.7;
+        int count = Math.min(MAX_DUST_PER_CHUNK, (int) deposits + (random.nextDouble() < deposits % 1.0 ? 1 : 0));
+        int heaviest = (int) Math.max(1, Math.min(MAX_LAYERS_PER_DEPOSIT, Math.round(amount / 8.0)));
         for (int i = 0; i < count; i++) {
             int x = (pos.x() << 4) + random.nextInt(16), z = (pos.z() << 4) + random.nextInt(16);
-            BlockPos top = new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z);
-            if (level.getBlockState(top).isAir() && dust.canSurvive(level, top)) {
-                level.setBlock(top, dust, 3);
-            }
+            settleDust(level, new BlockPos(x, level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, x, z), z), 1 + random.nextInt(heaviest));
         }
+    }
+
+    // Layers of dust onto the top surface at pos (onto dust already below or there, up to 8 layers).
+    private static void settleDust(ServerLevel level, BlockPos pos, int layers) {
+        BlockState below = level.getBlockState(pos.below());
+        if (below.is(ModBlocks.FALLOUT.get()) && below.getValue(FalloutBlock.LAYERS) < FalloutBlock.MAX_LAYERS) {
+            pos = pos.below();
+        }
+        BlockState there = level.getBlockState(pos);
+        if (there.is(ModBlocks.FALLOUT.get())) {
+            int now = there.getValue(FalloutBlock.LAYERS);
+            if (now < FalloutBlock.MAX_LAYERS) {
+                level.setBlock(pos, there.setValue(FalloutBlock.LAYERS, Math.min(FalloutBlock.MAX_LAYERS, now + layers)), Block.UPDATE_ALL);
+            }
+            return;
+        }
+        BlockState dust = ModBlocks.FALLOUT.get().defaultBlockState().setValue(FalloutBlock.LAYERS, Math.min(FalloutBlock.MAX_LAYERS, layers));
+        if (there.isAir() && dust.canSurvive(level, pos)) {
+            level.setBlock(pos, dust, Block.UPDATE_ALL);
+        }
+    }
+
+    // A radioactive block's slow seep (Corium, Solidified Corium) into its chunk's ground: into a sealed containment's
+    // air instead, if it's in one. No new dust (it seeps, it doesn't fall).
+    public static void seep(ServerLevel level, BlockPos pos, double amount) {
+        if (!enabled() || amount <= 0.0) {
+            return;
+        }
+        Containment containment = Containments.at(level, pos);
+        if (containment != null) {
+            containment.activity += airDose(containment, amount);
+            return;
+        }
+        LevelChunk chunk = level.getChunk(pos.getX() >> 4, pos.getZ() >> 4);
+        chunk.setData(GROUND, chunk.getData(GROUND).plus(amount, level.getGameTime()));
+        chunk.markUnsaved();
+        CONTAMINATED.computeIfAbsent(level, key -> new LongOpenHashSet()).add(ChunkPos.pack(pos.getX() >> 4, pos.getZ() >> 4));
     }
 
     // --- The wind ---
@@ -241,8 +294,16 @@ public final class Fallout {
         }
         long now = level.getGameTime();
         double wind = wind(level);
-        int stepX = (int) Math.round(Math.cos(wind)), stepZ = (int) Math.round(Math.sin(wind));
+        double wx = Math.cos(wind), wz = Math.sin(wind);
         double rate = ArcforgeConfig.FALLOUT_SPREADS.getAsBoolean() ? ArcforgeConfig.FALLOUT_SPREAD_RATE.getAsDouble() : 0.0;
+        // Each side's share of what spreads: the downwind side three times a still day's share, the upwind side least.
+        int[][] sides = { { 1, 0 }, { -1, 0 }, { 0, 1 }, { 0, -1 } };
+        double[] share = new double[4];
+        double sum = 0.0;
+        for (int i = 0; i < 4; i++) {
+            share[i] = 1.0 + 2.0 * Math.max(0.0, sides[i][0] * wx + sides[i][1] * wz);
+            sum += share[i];
+        }
         for (long key : set.toLongArray()) {
             ChunkPos at = ChunkPos.unpack(key);
             int x = at.x(), z = at.z();
@@ -258,22 +319,28 @@ public final class Fallout {
                 set.remove(key);
                 continue;
             }
-            if (rate <= 0.0 || stepX == 0 && stepZ == 0) {
+            if (rate <= 0.0) {
+                // Still written back decayed, so the clients' motes follow it.
+                chunk.setData(GROUND, ground);
                 continue;
             }
-            LevelChunk downwind = level.getChunkSource().getChunkNow(x + stepX, z + stepZ);
-            if (downwind == null) {
-                continue;
+            double spread = ground.total() * rate, moved = 0.0;
+            for (int i = 0; i < 4; i++) {
+                LevelChunk side = level.getChunkSource().getChunkNow(x + sides[i][0], z + sides[i][1]);
+                if (side == null) {
+                    continue;
+                }
+                double part = spread * share[i] / sum;
+                side.setData(GROUND, side.getData(GROUND).plus(part, now));
+                side.markUnsaved();
+                set.add(ChunkPos.pack(x + sides[i][0], z + sides[i][1]));
+                moved += part;
+                if (ArcforgeConfig.FALLOUT_BLOCKS.getAsBoolean() && part >= CLEAN && level.getRandom().nextDouble() < Math.min(1.0, part)) {
+                    dust(level, new ChunkPos(x + sides[i][0], z + sides[i][1]), Math.max(0.7, part));
+                }
             }
-            double moved = ground.total() * rate;
-            chunk.setData(GROUND, ground.scaled(1.0 - rate, now));
+            chunk.setData(GROUND, ground.scaled(1.0 - moved / ground.total(), now));
             chunk.markUnsaved();
-            downwind.setData(GROUND, downwind.getData(GROUND).plus(moved, now));
-            downwind.markUnsaved();
-            set.add(ChunkPos.pack(x + stepX, z + stepZ));
-            if (ArcforgeConfig.FALLOUT_BLOCKS.getAsBoolean() && level.getRandom().nextDouble() < moved) {
-                dust(level, new ChunkPos(x + stepX, z + stepZ), 2.0);
-            }
         }
     }
 

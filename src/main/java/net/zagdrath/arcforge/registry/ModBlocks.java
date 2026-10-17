@@ -898,12 +898,12 @@ public final class ModBlocks {
     public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.CoriumBlock> CORIUM = BLOCKS.registerBlock("corium",
             p -> new net.zagdrath.arcforge.block.nuclear.CoriumBlock(ModFluids.CORIUM.get(), p),
             p -> liquidProperties(p, MapColor.COLOR_ORANGE).lightLevel(state -> 15 - 2 * state.getValue(net.zagdrath.arcforge.block.nuclear.CoriumBlock.COOLING)));
-    public static final DeferredBlock<Block> SOLIDIFIED_CORIUM = BLOCKS.registerSimpleBlock("solidified_corium",
-            p -> p.mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).strength(10.0F, 600.0F).requiresCorrectToolForDrops()
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.SolidifiedCoriumBlock> SOLIDIFIED_CORIUM = BLOCKS.registerBlock("solidified_corium",
+            net.zagdrath.arcforge.block.nuclear.SolidifiedCoriumBlock::new, p -> p.mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).strength(10.0F, 600.0F).requiresCorrectToolForDrops()
                     .sound(SoundType.BASALT).lightLevel(state -> 3));
     public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.FalloutBlock> FALLOUT = BLOCKS.registerBlock("fallout", net.zagdrath.arcforge.block.nuclear.FalloutBlock::new,
-            p -> p.mapColor(MapColor.COLOR_GRAY).replaceable().noCollision().instabreak().noLootTable().sound(SoundType.SAND)
-                    .pushReaction(PushReaction.POPPED));
+            p -> p.mapColor(MapColor.COLOR_GRAY).replaceable().strength(0.1F).noLootTable().sound(SoundType.SAND).pushReaction(PushReaction.POPPED)
+                    .isViewBlocking((state, level, pos, box) -> state.getValue(net.zagdrath.arcforge.block.nuclear.FalloutBlock.LAYERS) >= 8));
     public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.DecontaminationShowerBlock> DECONTAMINATION_SHOWER = BLOCKS.registerBlock("decontamination_shower",
             p -> new net.zagdrath.arcforge.block.nuclear.DecontaminationShowerBlock(ModBlockEntityTypes.DECONTAMINATION_SHOWER, p), p -> columnProperties(p).noOcclusion());
     // Spent fuel: the Spent Fuel Rack (in a pool), the Dry Cask; waste: the Geological Repository, the Low-Level Waste

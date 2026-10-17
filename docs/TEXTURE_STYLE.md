@@ -1705,11 +1705,18 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   white decon band, its underside a grid of nozzles; Low-Level Waste Drum: a painted drum on the round-part profile in
   `#6A5208 … #F0CC50` with two hoops and a label; Dry Cask: concrete with a steel lid band and inlet vents).
 - **Core Catcher**: the furnace bricks re-toned by rank to a refractory cream (`#6A4A30 … #EED8BA`).
-- **Corium and fallout** (the natural-block rule: flat blotches, no single-pixel noise). Solidified Corium is a dark glassy
-  slag (`#16120F … #4A3A2C`) with dark cracks, three holding a dull ember. Fallout is a fine grey ash with a faint green
-  cast (`#5E625A … #A0A496`). Corium the fluid is Hydrochloric Acid's frames re-toned to a molten orange-red
-  (`#7A1E08 … #FFC060`), opaque, with dark crust plates (`#2A1C14`, lit top row `#3E2A1C`) drifting a px every other frame;
-  the block's light falls as it cools.
+- **Corium and fallout** (natural materials, vanilla's language). Corium the fluid is Cody's lava texture pixel for pixel
+  (the 16x16 under his reference), each pixel recoloured by a gradient map, not a tint: its brightness (normalised
+  over the tile) picks a colour on a brown ramp warming as it brightens (`#4A2410 #663218 #80431E #9A5726 #B46E30
+  #CE8C40 #EAB660`), so the pattern and its shading are exactly his. It
+  animates by scrolling that exact tile down a px a frame (still: 16 frames, frametime 4, interpolated; flow: the tile
+  2x2 at 32x32, 16 frames, frametime 2); the block's light falls as it cools. Solidified Corium is a dark glassy slag (`#16120F … #4A3A2C`) with dark
+  cracks, three holding a dull ember. Fallout is grey ash in vanilla sand's grain (`#5C5C58 … #A3A39C`: a mid-grey field
+  of single grains and small clumps, a few lighter and darker specks), laid as snow layers (2 px a layer, the full block
+  at 8), the same texture on every face.
+- **Radiation Poisoning icon** (18x18): Cody's pixel trefoil (a disc, three blades round a diamond hub, black outline) in
+  green, the disc lit top-left (`#96E848`) and a step darker bottom-right (`#6CC832`), flat. The air over contaminated
+  ground shows vanilla dust particles tinted radiation green (`#7CFF4A`, `#5FE03A`, `#A8FF7A`), and vanilla ash.
 - **Spent Fuel Rack** model: a 2 px base plate and 1 px stainless walls round four cells, the walls' faces holding two
   dark neutron-absorber panel slots. The rods and their glow are SpentFuelRackRenderer's, laid at 1:1: `rack_rod` (columns
   0-2 the Zircaloy ramp across the rod, a darker end-plug collar and a spacer band; its top the plug) and `cherenkov`

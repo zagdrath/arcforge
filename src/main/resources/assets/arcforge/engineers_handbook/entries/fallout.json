@@ -9,7 +9,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "A failure without a sealed containment releases Fallout: radioactive dust that settles on the blocks round the reactor and drifts a little downwind each day, contaminating chunks. The dose is full under open sky and a tenth under a roof.\nContamination decays over in-game days: most of it within a few days, a long-lived share over a month (half-lives in the config)."
+      "text": "A failure without a sealed containment releases Fallout: radioactive ash that settles like snow over the chunks round the reactor, in layers at different heights. Every minute some of each contaminated chunk's fallout spreads to the chunks round it, most downwind, and Corium or Solidified Corium left in the open seeps more into the ground. Contaminated chunks glow with green motes in the air, thicker the worse they are, and ash falls where it's heavy.\nThe dose is full under open sky and a tenth under a roof. Contamination decays over in-game days: most within a few days, a long-lived share over a month, and the ash weathers away with it."
     },
     {
       "type": "text",

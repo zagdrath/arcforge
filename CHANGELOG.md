@@ -30,6 +30,20 @@ Upgrading).
 
 ### Added
 
+- **Radiation Poisoning.** Radiation now does harm at every level: a dose of 50 mSv brings Radiation Poisoning I (half a
+  heart every 30 seconds, through armour), 500 II (every 10 seconds, and Hunger), 2,000 III (every 4 seconds, Hunger and
+  Weakness) and 4,000 IV (a heart every 2 seconds, with Nausea), and standing in a field of 100 mSv/h or more makes it a
+  level worse at once. Its icon is a green trefoil. The old Nausea / Weakness / Wither / lethal thresholds are replaced
+  (config `poisoningDose1` to `poisoningDose4`, `acuteRate`, `poisoningDamage`).
+- **Contaminated chunks glow** with green motes in their air, like Mekanism's radiation, thicker the more contaminated
+  they are, with ash falling where it's heavy (`falloutParticles`). Each chunk's fallout is synced to the players
+  watching it.
+- **Fallout spreads**: every minute 2% of each chunk's contamination (`falloutSpreadRate`, was 0.4% downwind only) goes to
+  the four chunks round it, most downwind, and Corium and Solidified Corium left outside a sealed containment seep into
+  their chunk's ground (`coriumSeep`).
+- **Fallout ash lies like snow**: grey ash in vanilla sand's grain, in layers of 1 to 8, piling into drifts at different
+  heights (far more of it than before), walkable like snow, weathering away a layer at a time as the chunk decays.
+- **Corium** uses the lava texture recoloured to a molten brown, pixel for pixel, slowly rolling as it flows.
 - **The nuclear tier, part one: ores, radiation, uranium chemistry and enrichment.** Civil power only: nothing in it
   makes a weapon, and enrichment stops at 20% U-235. A new **Arcforge: Nuclear** creative tab, a Nuclear chapter in the
   Handbook (ten entries) and a Nuclear advancement branch (ten advancements).

@@ -788,10 +788,13 @@ iron and steel 0.4, water 0.5, stone and deepslate 0.6, any other solid block 0.
 things count, as do items on the ground and in other players' inventories; what you carry counts as half a block
 away. Sources are looked up per chunk and kept for 2 seconds.
 
-The dose (mSv) builds up while you're exposed and slowly recovers (10 mSv an in-game hour). From 1,000 mSv you feel sick
-(Nausea), from 2,000 weak and hungry, from 4,000 you wither, and from 8,000 radiation sickness hurts you until you
-recover or die; dying resets it. All the thresholds are config values, `playerEffects` turns the effects off, and
-`affectMobs` (off by default) gives mobs a dose too.
+The dose (mSv) builds up while you're exposed and slowly recovers (10 mSv an in-game hour), and it brings **Radiation
+Poisoning**, which hurts through armour: I from 50 mSv (half a heart every 30 seconds), II from 500 (every 10 seconds,
+and Hunger), III from 2,000 (every 4 seconds, Hunger and Weakness) and IV from 4,000 (a heart every 2 seconds, with
+Nausea) until you recover or die. Standing in a field of 100 mSv/h or more (`acuteRate`) makes it a level worse at once,
+at least I, so any strong source hurts. Dying resets the dose. The levels are config values (`poisoningDose1` to
+`poisoningDose4`, `poisoningDamage`), `playerEffects` turns the effects off, and `affectMobs` (off by default) gives
+mobs a dose too.
 
 - **Geiger Counter**: held, it clicks faster as the rate rises and shows the rate in mSv/h; with a Dosimeter in the other
   hand it shows your dose too.
@@ -892,12 +895,16 @@ stops it until a new alarm sounds).
 - Explosion size grows with the energy and pressure stored (`explosionScale`, `hydrogenExplosionScale`) up to
   `explosionMaxRadius`. `explosionsBreakBlocks`, `meltdownMeltsBlocks`, `fallout`, `falloutBlocks` and `falloutSpreads`
   turn each kind of damage off.
-- **Fallout.** Without a sealed containment, failures release radioactive dust that settles on the blocks round the
-  reactor and spreads a little downwind each in-game day, contaminating chunks (full dose under open sky, a tenth under
-  cover). It decays over in-game days: most with a 2-day half-life, a fifth with 30 (`falloutShortHalfLife`,
-  `falloutLongHalfLife`, `falloutLongShare`). Players and what they hold pick up contamination (a hazmat suit takes most
-  of it); the **Decontamination Shower** (mounted overhead, with water and a HEPA Filter) washes the players under it
-  and what they carry.
+- **Fallout.** Without a sealed containment, failures release radioactive ash that settles over the chunks round the
+  reactor like snow, in layers drifted to different heights. Every minute a share of each contaminated chunk's fallout
+  (`falloutSpreadRate`, 2%) spreads to the four chunks round it, most downwind (the wind turns each in-game day),
+  settling there too; Corium and Solidified Corium loose in the world seep into their chunk's ground (`coriumSeep`).
+  Contaminated chunks glow: green motes hang in their air, more the worse it is, with ash falling where it's heavy
+  (`falloutParticles`). The dose is full under open sky and a tenth under cover. It decays over in-game days: most with
+  a 2-day half-life, a fifth with 30 (`falloutShortHalfLife`, `falloutLongHalfLife`, `falloutLongShare`), and the ash
+  weathers away as it does. Players and what they hold pick up contamination (a hazmat suit takes most of it); the
+  **Decontamination Shower** (mounted overhead, with water and a HEPA Filter) washes the players under it and what they
+  carry.
 
 **Containment and safety.**
 

@@ -607,6 +607,7 @@ public final class ArcforgeGameTests {
         TESTS.put("nuclear_waste_recipes", NuclearSafetyGameTests::wasteRecipes);
         TESTS.put("nuclear_advanced_cores", NuclearSafetyGameTests::advancedCores);
         TESTS.put("nuclear_freeze_plug", NuclearSafetyGameTests::freezePlug);
+        TESTS.put("nuclear_fallout_layers", NuclearSafetyGameTests::falloutLayers);
         LONG_TESTS.put("nuclear_containment_scan", NuclearSafetyGameTests::containmentScan);
         RADIATION_TESTS.put("nuclear_radiation_field", NuclearGameTests::radiationField);
         RADIATION_TESTS.put("nuclear_hazmat_and_dose", NuclearGameTests::hazmatAndDose);

@@ -428,11 +428,16 @@ public final class NuclearGameTests {
         double inside = RadiationField.doseRate(level, suited);
         helper.assertTrue(outside > 0.0 && Math.abs(inside / outside - ArcforgeConfig.HAZMAT_TRANSMISSION.getAsDouble()) < 0.01,
                 "Suited " + inside + ", bare " + outside);
-        helper.assertTrue(RadiationDose.level(ArcforgeConfig.RADIATION_NAUSEA_DOSE.getAsDouble() - 1) == 0
-                && RadiationDose.level(ArcforgeConfig.RADIATION_NAUSEA_DOSE.getAsDouble()) == 1
-                && RadiationDose.level(ArcforgeConfig.RADIATION_WEAKNESS_DOSE.getAsDouble()) == 2
-                && RadiationDose.level(ArcforgeConfig.RADIATION_WITHER_DOSE.getAsDouble()) == 3
-                && RadiationDose.level(ArcforgeConfig.RADIATION_LETHAL_DOSE.getAsDouble()) == 4, "The dose thresholds are wrong");
+        helper.assertTrue(RadiationDose.level(ArcforgeConfig.RADIATION_POISONING_1.getAsDouble() - 1) == 0
+                && RadiationDose.level(ArcforgeConfig.RADIATION_POISONING_1.getAsDouble()) == 1
+                && RadiationDose.level(ArcforgeConfig.RADIATION_POISONING_2.getAsDouble()) == 2
+                && RadiationDose.level(ArcforgeConfig.RADIATION_POISONING_3.getAsDouble()) == 3
+                && RadiationDose.level(ArcforgeConfig.RADIATION_POISONING_4.getAsDouble()) == 4, "The poisoning levels are wrong");
+        // An acute field: a level worse, at least I, never past IV.
+        double acute = ArcforgeConfig.RADIATION_ACUTE_RATE.getAsDouble();
+        helper.assertTrue(RadiationDose.level(0.0, acute) == 1 && RadiationDose.level(0.0, acute * 0.5) == 0
+                && RadiationDose.level(ArcforgeConfig.RADIATION_POISONING_2.getAsDouble(), acute) == 3
+                && RadiationDose.level(ArcforgeConfig.RADIATION_POISONING_4.getAsDouble(), acute) == 4, "Acute exposure doesn't step the level");
         helper.succeed();
     }
 }

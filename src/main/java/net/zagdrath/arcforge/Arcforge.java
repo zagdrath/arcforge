@@ -54,6 +54,7 @@ public class Arcforge {
         ModCreativeTabs.register(modEventBus);
         ModSounds.register(modEventBus);
         ModParticleTypes.register(modEventBus);
+        net.zagdrath.arcforge.registry.ModMobEffects.register(modEventBus);
         PortStore.register(modEventBus);
         FoundrySuit.register(modEventBus);
         net.zagdrath.arcforge.nuclear.RadiationDose.register(modEventBus);
