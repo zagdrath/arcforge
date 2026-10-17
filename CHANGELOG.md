@@ -22,6 +22,13 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Changed
+
+- **New textures for materials.** 86 textures are redrawn: the metal storage blocks (lead, nickel, silver, steel,
+  tungsten and bismuth), every raw ore block and raw ore, the dusts (metals, ores, nuclear compounds, flour, seed meal,
+  salt and wood ash), the plates and gears, and the alloys (Wrought, Tempered, Hardened and Arcforged, and the
+  Arcite-Tungsten Composite).
+
 ## [2.8.0] - 2026-10-16
 
 ### Added
