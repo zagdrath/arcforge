@@ -32,7 +32,15 @@ public final class CoreLattice {
         STEEL
     }
 
-    public enum Coolant { LIGHT_WATER, HEAVY_WATER }
+    // What fills the core. Lead-bismuth barely moderates (a fast core); a molten salt reactor's Fuel Salt is both its
+    // coolant and its fuel (see saltCore).
+    public enum Coolant {
+        LIGHT_WATER, HEAVY_WATER, LEAD_BISMUTH, FUEL_SALT;
+
+        public boolean isWater() {
+            return this == LIGHT_WATER || this == HEAVY_WATER;
+        }
+    }
 
     public final int nx, ny, nz, size;
     final Cell[] cells;
@@ -46,6 +54,9 @@ public final class CoreLattice {
     final double[] flux;
     final double[] fission;      // ν Σf φ: where the power comes from
     private final double[] work;
+    // A molten salt core: its fuel cells are cells of Fuel Salt (no rod, the whole cell salt), moderated by the graphite
+    // round them.
+    public boolean saltCore;
 
     public CoreLattice(int nx, int ny, int nz) {
         this.nx = nx;
@@ -147,14 +158,20 @@ public final class CoreLattice {
         double wet = (1.0 - voids[i]) * c.waterDensity();
         return switch (cells[i]) {
             case COOLANT -> wet;
-            case FUEL, CONTROL -> wet * (moderating ? p.channelModeration : p.channelWater);
+            case FUEL -> saltCore ? wet : wet * (moderating ? p.channelModeration : p.channelWater);
+            case CONTROL -> wet * (moderating ? p.channelModeration : p.channelWater);
             default -> 0.0;
         };
     }
 
     // Moderating power a cell gives itself or a neighbour.
     private double moderating(int i, Conditions c, ReactorParams p) {
-        double water = water(i, c, p, true) * (c.coolant() == Coolant.HEAVY_WATER ? p.heavyWaterModeration : 1.0);
+        double water = water(i, c, p, true) * switch (c.coolant()) {
+            case LIGHT_WATER -> 1.0;
+            case HEAVY_WATER -> p.heavyWaterModeration;
+            case LEAD_BISMUTH -> p.leadBismuthModeration;
+            case FUEL_SALT -> p.saltModeration;
+        };
         return switch (cells[i]) {
             case GRAPHITE -> p.graphiteModeration;
             default -> water;
@@ -178,17 +195,24 @@ public final class CoreLattice {
         return 1.0 + p.doppler * (Math.sqrt(c.fuelCelsius() + 273.0) - Math.sqrt(293.0));
     }
 
+    // Fast neutrons (a lead-bismuth core) travel further between collisions.
     double diffusion(int i, Conditions c, ReactorParams p) {
+        double fast = c.coolant() == Coolant.LEAD_BISMUTH ? p.fastDiffusion : 1.0;
         return switch (cells[i]) {
             case GRAPHITE -> p.graphiteDiffusion;
-            case STEEL -> p.steelDiffusion;
-            case COOLANT -> p.diffusion * (1.0 + p.voidStreaming * voids[i]);
-            default -> p.diffusion;
+            case STEEL -> p.steelDiffusion * fast;
+            case COOLANT -> p.diffusion * fast * (1.0 + p.voidStreaming * voids[i]);
+            default -> p.diffusion * fast;
         };
     }
 
     double absorption(int i, Conditions c, ReactorParams p) {
-        double waterAbs = water(i, c, p, false) * (c.coolant() == Coolant.HEAVY_WATER ? p.heavyWaterAbsorption : p.lightWaterAbsorption);
+        double waterAbs = water(i, c, p, false) * switch (c.coolant()) {
+            case LIGHT_WATER -> p.lightWaterAbsorption;
+            case HEAVY_WATER -> p.heavyWaterAbsorption;
+            case LEAD_BISMUTH -> p.leadBismuthAbsorption;
+            case FUEL_SALT -> p.saltAbsorption;
+        };
         return switch (cells[i]) {
             case COOLANT -> waterAbs;
             case GRAPHITE -> p.graphiteAbsorption;
@@ -196,8 +220,13 @@ public final class CoreLattice {
             case CONTROL -> waterAbs + p.controlAbsorption * rodCover(i, c.insertion(), p);
             case FUEL -> {
                 double th = thermal(i, c, p);
-                double capture = p.u238Capture * (p.captureBase + p.resonance * (1.0 - th)) * doppler(c, p);
-                double fissileAbs = p.fissionCross * fissile[i] * (th + p.fastFission * (1.0 - th)) * (1.0 + p.captureToFission);
+                // In a fast core (lead-bismuth) the neutrons stay above U-238's resonances: far less capture, and the
+                // fissile atoms fission a fast neutron less readily (but more than a slowed one would miss them).
+                boolean fastCore = c.coolant() == Coolant.LEAD_BISMUTH;
+                double resonance = p.resonance * (fastCore ? p.fastResonance : 1.0);
+                double fertile = saltCore ? p.saltFertile * saltShare(i, c) : 1.0;
+                double capture = p.u238Capture * fertile * (p.captureBase + resonance * (1.0 - th)) * doppler(c, p);
+                double fissileAbs = p.fissionCross * fuelIn(i, c) * (th + fastShare(c, p) * (1.0 - th)) * (1.0 + p.captureToFission);
                 yield waterAbs + capture + fissileAbs + poison[i] + p.xenonWorth * xenon[i];
             }
         };
@@ -208,7 +237,21 @@ public final class CoreLattice {
             return 0.0;
         }
         double th = thermal(i, c, p);
-        return p.nu * p.fissionCross * fissile[i] * (th + p.fastFission * (1.0 - th));
+        return p.nu * p.fissionCross * fuelIn(i, c) * (th + fastShare(c, p) * (1.0 - th));
+    }
+
+    // A salt cell's fuel is in its salt: less of it as the salt boils off, drains or expands.
+    private double saltShare(int i, Conditions c) {
+        return (1.0 - voids[i]) * c.waterDensity();
+    }
+
+    private double fuelIn(int i, Conditions c) {
+        return saltCore ? fissile[i] * saltShare(i, c) : fissile[i];
+    }
+
+    // How readily a fissile atom fissions an unslowed neutron, against a slowed one.
+    private static double fastShare(Conditions c, ReactorParams p) {
+        return c.coolant() == Coolant.LEAD_BISMUTH ? p.fastCoreFission : p.fastFission;
     }
 
     // --- The solve ---

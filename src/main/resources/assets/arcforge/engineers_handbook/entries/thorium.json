@@ -1,0 +1,23 @@
+{
+  "title": "Thorium",
+  "icon": "arcforge:thorium_blanket_rod",
+  "items": [
+    "arcforge:thorium_dioxide",
+    "arcforge:rare_earth_dust",
+    "arcforge:thorium_pellet",
+    "arcforge:thorium_blanket_rod",
+    "arcforge:uranium_233_oxide",
+    "arcforge:u233_fuel_blend",
+    "arcforge:u233_fuel_rod"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Thorium Dioxide\nMonazite Dust cracked in 250 mB of Lye in the Chemical Reactor gives Thorium Dioxide, and usually Rare Earth Dust.\n# Breeding\nThorium Blanket Rods (thorium pellets in a Zircaloy Tube) don't fission much themselves: in the core, thorium absorbs neutrons and breeds Uranium-233."
+    },
+    {
+      "type": "text",
+      "text": "# THOREX\nSwitch the PUREX Plant to THOREX and spent blanket rods give Thorium Dioxide back and Uranium-233 Oxide.\n# U-233 fuel\nOne Uranium-233 Oxide and three Thorium Dioxide make four U-233 Fuel Blend: pressed, sintered and rodded into U-233 Fuel Rods, which breed more U-233 as they burn."
+    }
+  ]
+}

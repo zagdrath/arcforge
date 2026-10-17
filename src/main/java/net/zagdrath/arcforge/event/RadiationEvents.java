@@ -22,8 +22,10 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.nuclear.RadiationDose;
 import net.zagdrath.arcforge.nuclear.RadiationField;
+import net.zagdrath.arcforge.nuclear.safety.Contamination;
 
-// Radiation (see RadiationField and RadiationDose): each server player's dose every radiation.doseCheckInterval ticks, mobs'
+// Radiation (see RadiationField and RadiationDose): each server player's dose (and the fallout they pick up, see
+// Contamination) every radiation.doseCheckInterval ticks, mobs'
 // (with radiation.affectMobs) eight times less often, the dose reset on death and the chunk caches dropped as chunks and
 // levels unload.
 @EventBusSubscriber(modid = Arcforge.MODID)
@@ -38,6 +40,7 @@ public final class RadiationEvents {
         if (event.getEntity() instanceof ServerPlayer player && player.level() instanceof ServerLevel level) {
             int interval = ArcforgeConfig.RADIATION_CHECK_INTERVAL.getAsInt();
             if (player.tickCount % interval == 0) {
+                Contamination.tick(level, player, interval / 20.0);
                 RadiationDose.tick(level, player, interval);
             }
         }
@@ -59,6 +62,7 @@ public final class RadiationEvents {
         LivingEntity entity = event.getEntity();
         if (entity instanceof Player player && !entity.level().isClientSide()) {
             RadiationDose.reset(player);
+            Contamination.setSkin(player, 0.0);
         }
     }
 

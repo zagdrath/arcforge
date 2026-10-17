@@ -17,6 +17,15 @@
     },
     "arcforge:uranyl_sulfate_solution": {
       "dose_rate": 0.2
+    },
+    "arcforge:low_level_waste_drum": {
+      "dose_rate": 0.1
+    },
+    "arcforge:solidified_corium": {
+      "dose_rate": 5.0
+    },
+    "arcforge:fallout": {
+      "dose_rate": 0.3
     }
   }
 }

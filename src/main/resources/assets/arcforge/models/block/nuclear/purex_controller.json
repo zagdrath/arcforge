@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/orientable_with_bottom",
+  "textures": {
+    "top": "arcforge:block/nuclear/hot_cell_casing",
+    "bottom": "arcforge:block/nuclear/hot_cell_casing",
+    "side": "arcforge:block/nuclear/hot_cell_casing",
+    "front": "arcforge:block/nuclear/purex_controller"
+  }
+}

@@ -25,6 +25,11 @@ public final class ModDamageTypes {
     // A discharged Fuel Rod still hot with decay heat, carried (see FuelRodItem).
     public static final ResourceKey<DamageType> HOT_FUEL = ResourceKey.create(Registries.DAMAGE_TYPE,
             Identifier.fromNamespaceAndPath(Arcforge.MODID, "hot_fuel"));
+    // Corium: a melted core's molten fuel (see CoriumBlock).
+    public static final ResourceKey<DamageType> CORIUM = ResourceKey.create(Registries.DAMAGE_TYPE,
+            Identifier.fromNamespaceAndPath(Arcforge.MODID, "corium"));
+    public static final ResourceKey<DamageType> NITRIC_ACID = ResourceKey.create(Registries.DAMAGE_TYPE,
+            Identifier.fromNamespaceAndPath(Arcforge.MODID, "nitric_acid"));
     public static final ResourceKey<DamageType> HYDROCHLORIC_ACID = ResourceKey.create(Registries.DAMAGE_TYPE,
             Identifier.fromNamespaceAndPath(Arcforge.MODID, "hydrochloric_acid"));
     public static final ResourceKey<DamageType> LYE = ResourceKey.create(Registries.DAMAGE_TYPE,

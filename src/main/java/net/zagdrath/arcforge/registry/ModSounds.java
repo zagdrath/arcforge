@@ -69,6 +69,9 @@ public final class ModSounds {
     // The Fission Reactor's coolant pumps (louder with its power, see FissionReactorSound).
     public static final DeferredHolder<SoundEvent, SoundEvent> FISSION_REACTOR_RUN = loop("fission_reactor_run", 24.0F);
 
+    // A Fission Reactor's alarm klaxon (see ReactorAlarm): heard a long way off.
+    public static final DeferredHolder<SoundEvent, SoundEvent> REACTOR_ALARM = loop("reactor_alarm", 48.0F);
+
     private ModSounds() {}
 
     private static DeferredHolder<SoundEvent, SoundEvent> loop(String name, float range) {

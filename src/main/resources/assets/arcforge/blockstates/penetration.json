@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=up": {
+      "model": "arcforge:block/nuclear/penetration"
+    },
+    "facing=down": {
+      "model": "arcforge:block/nuclear/penetration",
+      "x": 180
+    },
+    "facing=north": {
+      "model": "arcforge:block/nuclear/penetration",
+      "x": 90
+    },
+    "facing=south": {
+      "model": "arcforge:block/nuclear/penetration",
+      "x": 90,
+      "y": 180
+    },
+    "facing=east": {
+      "model": "arcforge:block/nuclear/penetration",
+      "x": 90,
+      "y": 90
+    },
+    "facing=west": {
+      "model": "arcforge:block/nuclear/penetration",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

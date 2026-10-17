@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "HGH",
+    "BFB",
+    "HTH"
+  ],
+  "key": {
+    "H": "arcforge:hardened_alloy",
+    "G": "#c:glass_blocks",
+    "B": "arcforge:arcforge_furnace_bricks",
+    "F": "minecraft:blast_furnace",
+    "T": "arcforge:thermocouple"
+  },
+  "result": {
+    "id": "arcforge:vitrification_plant",
+    "count": 1
+  }
+}

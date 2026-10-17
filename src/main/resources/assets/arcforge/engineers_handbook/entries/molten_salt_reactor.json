@@ -1,0 +1,25 @@
+{
+  "title": "Molten Salt Reactor",
+  "icon": "arcforge:freeze_plug",
+  "items": [
+    "arcforge:lithium_fluoride",
+    "arcforge:thorium_tetrafluoride",
+    "arcforge:salt_processing_unit",
+    "arcforge:freeze_plug",
+    "arcforge:drain_tank"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "The fuel is dissolved in the coolant. Fuel Salt is made in the Chemical Reactor: one Uranium Tetrafluoride (its enrichment carried in), four Lithium Fluoride (Lithium Hydroxide and Hydrofluoric Acid) and two Thorium Tetrafluoride (Thorium Dioxide and Hydrofluoric Acid) give 1,000 mB.\nFill the vessel with it instead of water; only Control Rod Channels go in it. Build enough of them, in graphite, to hold the core subcritical with every rod in before you fill it: about one channel in three."
+    },
+    {
+      "type": "text",
+      "text": "# Running it\nIt runs at about 700 °C. Hot Fuel Salt goes to a Steam Generator, which makes High-Pressure Steam from it.\nFission products build up in the salt. Salt Processing Units touching the vessel remove them online (using FE), as High-Level Liquid Waste."
+    },
+    {
+      "type": "text",
+      "text": "# The Freeze Plug\nPut a Freeze Plug under the vessel's floor and a Drain Tank under it. Powered and cool, the plug stays frozen. If the salt overheats, or power is lost, it melts and the salt drains into the shielded tank: the core shuts down by itself. It can't melt down the way solid fuel does. Even a prompt-critical power spike only melts the plug and drains the core. The plug refreezes once it's powered and cool again."
+    }
+  ]
+}

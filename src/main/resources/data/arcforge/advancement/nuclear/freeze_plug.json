@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/molten_salt_reactor",
+  "display": {
+    "icon": {
+      "id": "arcforge:drain_tank"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.freeze_plug.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.freeze_plug.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "freeze_plug"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

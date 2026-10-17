@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:compacting",
+  "input": {
+    "ingredient": "#arcforge:hazmat_suit",
+    "count": 1
+  },
+  "result": {
+    "id": "arcforge:low_level_waste_drum",
+    "count": 1
+  },
+  "time": 200
+}

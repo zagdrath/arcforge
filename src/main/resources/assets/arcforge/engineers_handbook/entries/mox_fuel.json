@@ -1,0 +1,17 @@
+{
+  "title": "MOX Fuel",
+  "icon": "arcforge:mox_fuel_rod",
+  "items": [
+    "arcforge:depleted_uranium_dioxide",
+    "arcforge:mox_blend",
+    "arcforge:green_mox_pellet",
+    "arcforge:mox_fuel_pellet",
+    "arcforge:mox_fuel_rod"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Plutonium only ever becomes fuel: Plutonium Oxide has no other use.\n- Depleted Uranium Dust and Oxygen in the Chemical Reactor make Depleted Uranium Dioxide.\n- Five Plutonium Oxide and three Depleted Uranium Dioxide make two MOX Blend (a rod's worth of plutonium is ten).\n- Press it with a Pellet Die, sinter it, and rod it in a Zircaloy Tube like uranium fuel.\nMOX Fuel Rods run in the reactor like uranium rods, and in the fast reactor."
+    }
+  ]
+}

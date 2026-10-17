@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "L L",
+    "PPP",
+    "L L"
+  ],
+  "key": {
+    "L": "arcforge:steel_liner",
+    "P": "arcforge:steel_pipe"
+  },
+  "result": {
+    "id": "arcforge:penetration",
+    "count": 2
+  }
+}

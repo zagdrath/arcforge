@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "PCP",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "#c:ingots/silver",
+    "C": "arcforge:cracking_catalyst"
+  },
+  "result": {
+    "id": "arcforge:hydrogen_recombiner",
+    "count": 1
+  }
+}

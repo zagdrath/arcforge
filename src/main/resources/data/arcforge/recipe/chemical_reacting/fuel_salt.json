@@ -1,0 +1,21 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:uranium_tetrafluoride",
+    "count": 1
+  },
+  "second_item_input": {
+    "ingredient": "arcforge:lithium_fluoride",
+    "count": 4
+  },
+  "third_item_input": {
+    "ingredient": "arcforge:thorium_tetrafluoride",
+    "count": 2
+  },
+  "fluid_output": {
+    "id": "arcforge:fuel_salt",
+    "amount": 1000
+  },
+  "time": 200,
+  "energy_per_tick": 80
+}

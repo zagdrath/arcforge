@@ -1,0 +1,35 @@
+{
+  "parent": "arcforge:nuclear/thorex",
+  "display": {
+    "icon": {
+      "id": "arcforge:u233_fuel_rod"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.u233_fuel_rod.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.u233_fuel_rod.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": "arcforge:u233_fuel_rod"
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

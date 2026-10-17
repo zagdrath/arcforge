@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/waste_compactor_front",
+    "particle": "arcforge:block/waste_compactor_side",
+    "south": "arcforge:block/waste_compactor_back",
+    "east": "arcforge:block/waste_compactor_side",
+    "west": "arcforge:block/waste_compactor_side",
+    "up": "arcforge:block/waste_compactor_top",
+    "down": "arcforge:block/waste_compactor_bottom"
+  }
+}

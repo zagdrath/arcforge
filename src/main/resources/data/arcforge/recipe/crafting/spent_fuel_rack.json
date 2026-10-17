@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "R R",
+    "RPR",
+    "PPP"
+  ],
+  "key": {
+    "R": "#c:rods/steel",
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:spent_fuel_rack",
+    "count": 2
+  }
+}

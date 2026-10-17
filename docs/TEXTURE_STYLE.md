@@ -1687,3 +1687,70 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   cascade's button style), toggles on (teal) and off. Steam Generator (176×166): four 12×52 tank recesses and the screen
   between. Heavy Water Tower (176×166): the FE gauge, three input tanks, the screen with a progress track, the output
   tank. Tank gauges 52 tall, a water and a gas fill, the Diesel Generator's LEDs and energy bar.
+
+## Containment, waste and reprocessing
+- **Concrete**: Containment Concrete is poured concrete a step darker and cooler than Concrete Shielding (`#8E908C …
+  #AEB0AC`, flat blotches), with the formwork's tie holes on an 8 px grid (a dark socket lit on its bottom-right lip) and a
+  faint board-form joint across the middle; no rebar. The Containment Dome is stairs on it whose step is a quarter round
+  (four 4 px bands rising 6, 11, 14, 16 px), plain geometry, no painted curve.
+- **Steel faces** (`oil.casing`, the machine steel ramp). The Steel Liner is one stainless plate with a weld bead across
+  it (a run of lit scallops over its shadow) and two leak-chase test points. The Airlock is a thick door slab: the lower
+  half has a handwheel and a hazard band at its foot, the upper a bolted round porthole of amber lead glass with its glint.
+  The Penetration's face is the sleeve plate with a flanged pipe through it (bolt circle, flange ring lit top-left, dark
+  bore); its sides the liner with a raised collar band. Drain Tank and Geological Repository tops take the hazard casing.
+- **Shaped blocks** paint each face to the region their element shows, so the block UVs lay it at 1:1 (Hydrogen
+  Recombiner: a housing with catalyst plates in pale platinum greys over inlet louvres, its top an outlet grille; Relief
+  Valve: a steel body under a red spring bonnet `#5A1A12 … #EC8A62` with its lever; ECCS Accumulator: a plated tank with
+  a water sight glass and the ECCS green band `#1E5A34 #2E7A48 #46A060`; Decontamination Shower: a box with a green and
+  white decon band, its underside a grid of nozzles; Low-Level Waste Drum: a painted drum on the round-part profile in
+  `#6A5208 … #F0CC50` with two hoops and a label; Dry Cask: concrete with a steel lid band and inlet vents).
+- **Core Catcher**: the furnace bricks re-toned by rank to a refractory cream (`#6A4A30 … #EED8BA`).
+- **Corium and fallout** (the natural-block rule: flat blotches, no single-pixel noise). Solidified Corium is a dark glassy
+  slag (`#16120F … #4A3A2C`) with dark cracks, three holding a dull ember. Fallout is a fine grey ash with a faint green
+  cast (`#5E625A … #A0A496`). Corium the fluid is Hydrochloric Acid's frames re-toned to a molten orange-red
+  (`#7A1E08 … #FFC060`), opaque, with dark crust plates (`#2A1C14`, lit top row `#3E2A1C`) drifting a px every other frame;
+  the block's light falls as it cools.
+- **Spent Fuel Rack** model: a 2 px base plate and 1 px stainless walls round four cells, the walls' faces holding two
+  dark neutron-absorber panel slots. The rods and their glow are SpentFuelRackRenderer's, laid at 1:1: `rack_rod` (columns
+  0-2 the Zircaloy ramp across the rod, a darker end-plug collar and a spacer band; its top the plug) and `cherenkov`
+  (columns 0-5 blue `#123A78 #2A64C0 #4C8EEA` brightest in the middle, its ends a step dimmer, drawn with the eyes type so
+  black adds nothing).
+- **Machines** (the Metal Press's front casing, its window repainted): the Waste Compactor's ram over a crushed yellow
+  drum (running, the ram strokes down and up over 8 frames); the Vitrification Plant's refractory melter over a steel
+  canister, its pour stream glowing (running, flickering). Their other faces are the Metal Press's and the Chemical
+  Reactor's.
+- **PUREX blocks**: Hot Cell Casing is the containment concrete in the casing's 2 px bevel frame with corner rivets; the
+  Hot Cell Window a deep stepped steel frame (3 px) round a warm amber lead-glass pane (`#B08A3A`, alpha ~120) with its
+  inner lip and glints; the controller the casing's screen recess with four cyan contactor columns and the split bars.
+- **Salt reactor blocks**: the Freeze Plug is a pipe section wound with blue cooling coils (dark and its seam glowing
+  orange when melted), its end the bore holding pale green frozen salt (`#5E7A5A … #E6F2DC`) or glowing orange; the
+  Salt Processing Unit the strapped casing with a small amber viewing port; the Drain Tank the hazard casing with the
+  trefoil.
+- **Fluids** (Hydrochloric Acid's frames re-toned by rank): Nitric Acid a pale fuming yellow; High-Level Liquid Waste a
+  dark brown liquor; Lead-Bismuth a molten blue-grey and hot, a dull red-orange; Fuel Salt a pale green and hot, a warm
+  amber; the metals and the waste opaque. Nitrogen Dioxide is a gas tint, `#C8743C` (brown-orange).
+- **Items** (outline `#0C0D0F`): MOX, Thorium Blanket and U-233 rods are the Fuel Rod with an olive-khaki band, two pale
+  bands, or a teal band; pellets are the Fuel Pellet's shape in green-then-sintered pairs (MOX olive to near-black,
+  thorium pale grey to ivory, U-233 grey-teal to dark teal). The powders are Cody's dust by the ore method (Recovered
+  Uranium olive, Plutonium Oxide olive-khaki, Depleted UO2 dark gunmetal, MOX Blend olive, Thorium Dioxide and the
+  fluorides near-white, Rare Earth Dust a pinkish grey, U-233 Oxide teal-green), Lead-Bismuth his ingot (`#2E3038 …
+  #C4C2CE`). The HEPA Filter is pleated white media in a steel frame (used: grey-brown with a yellow tag); the Waste Drum a
+  steel drum; the Vitrified Waste Log a tall stainless canister with a yellow label band and its dark glass at the fill
+  port; the Airlock and Equipment Hatch flat icons of their doors.
+- **Large models** ("Large model texturing"):
+  - **Equipment Hatch** (on the refinery sheet, 3x3 across a block-thick wall): the plated steel sleeve round the
+    opening, a banded flange ring proud of each face with a bolt circle outside, the hinge's knuckles on brackets; the
+    door a thick round plate (PLATE face, banded edge) with a handwheel on its boss, swung open about its hinge.
+  - **PUREX Plant**: its walls stay blocks; through its windows the cell is drawn full-bright: a deck floor, a lamp over
+    every block of ceiling (M_LAMP, 16x8 at 96,96, in the glow list: two warm-white tubes, a bright core row over a
+    softer one, between a light reflector, dark rims and tube holders, laid from the face's top-left), the plated
+    dissolver with its domed head, a bank of banded contactors and three pipework lines on brackets along the back wall.
+    At each window a master-slave manipulator: a banded tube through the wall above it, inside a polished slave arm with
+    its tongs, outside the master arm and a generator-steel grip with a red trigger.
+  - **Spent Fuel Pool racks**: the rack model above, its rods' Cherenkov glow full-bright while hot.
+  - **Corium**: the fluid above, glowing orange-red with its dark crust.
+- **GUIs**: Waste Compactor and Vitrification Plant (176x166) from the Metal Press's pieces (its FE recess, blue input and
+  grey slots, the arrow and orange output); the Vitrification Plant adds a 12x50 tank. PUREX Plant (176x204, inventory 122
+  down): FE gauge, acid and solvent tanks, the screen with its mode button (42x12, the reactor's button style) and progress
+  track, the waste tank, 2x2 blue rod inputs and 3x2 orange outputs. Geological Repository (176x166): a screen and one
+  blue slot. Ghost sprites (a drum, a glass pane) in the Metal Press's ghost tone; the reactor's Silence button amber.

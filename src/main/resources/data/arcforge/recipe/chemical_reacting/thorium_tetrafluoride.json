@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:thorium_dioxide",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:hydrofluoric_acid",
+      "amount": 400
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:thorium_tetrafluoride",
+    "count": 1
+  },
+  "time": 100
+}

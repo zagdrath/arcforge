@@ -427,6 +427,119 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CONTAMINATED_STEAM = FLUIDS.register("flowing_contaminated_steam",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.CONTAMINATED_STEAM_TYPE, ModFluids.CONTAMINATED_STEAM, ModFluids.FLOWING_CONTAMINATED_STEAM)));
 
+    // --- Nuclear: failures, waste, reprocessing and the advanced reactors (the Nuclear chapter of the Handbook) ---
+    // Nitrogen Dioxide (a brown gas: ammonia burned over a catalyst, the Ostwald process) and Nitric Acid (it in water;
+    // what dissolves spent fuel in the PUREX Plant, caustic in the world like the other acids). High-Level Liquid Waste:
+    // the fission products the PUREX Plant and the Salt Processing Unit separate, intensely radioactive and kept in
+    // tanks (no block, no bucket) until the Vitrification Plant sets it in glass.
+    public static final DeferredHolder<FluidType, FluidType> NITROGEN_DIOXIDE_TYPE = gasType("nitrogen_dioxide", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> NITROGEN_DIOXIDE = FLUIDS.register("nitrogen_dioxide",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.NITROGEN_DIOXIDE_TYPE, ModFluids.NITROGEN_DIOXIDE, ModFluids.FLOWING_NITROGEN_DIOXIDE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NITROGEN_DIOXIDE = FLUIDS.register("flowing_nitrogen_dioxide",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.NITROGEN_DIOXIDE_TYPE, ModFluids.NITROGEN_DIOXIDE, ModFluids.FLOWING_NITROGEN_DIOXIDE)));
+    public static final DeferredHolder<FluidType, FluidType> NITRIC_ACID_TYPE = liquidType("nitric_acid", 1_410, 1_100, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> NITRIC_ACID = FLUIDS.register("nitric_acid",
+            () -> new BaseFlowingFluid.Source(nitricAcidProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_NITRIC_ACID = FLUIDS.register("flowing_nitric_acid",
+            () -> new BaseFlowingFluid.Flowing(nitricAcidProperties()));
+    public static final DeferredHolder<FluidType, FluidType> HIGH_LEVEL_WASTE_TYPE = liquidType("high_level_waste", 1_300, 1_400, 0.014F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HIGH_LEVEL_WASTE = FLUIDS.register("high_level_waste",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HIGH_LEVEL_WASTE_TYPE, ModFluids.HIGH_LEVEL_WASTE, ModFluids.FLOWING_HIGH_LEVEL_WASTE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HIGH_LEVEL_WASTE = FLUIDS.register("flowing_high_level_waste",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HIGH_LEVEL_WASTE_TYPE, ModFluids.HIGH_LEVEL_WASTE, ModFluids.FLOWING_HIGH_LEVEL_WASTE)));
+    // Lead-Bismuth Eutectic: lead and bismuth melted together (it melts at 125 °C), a lead-bismuth fast reactor's
+    // coolant; Hot Lead-Bismuth is it on its way to the Steam Generator at about 900 °C. Fuel Salt: Lithium Fluoride
+    // carrying thorium and uranium fluorides, a molten salt reactor's fuel and coolant at once, and carrying its
+    // uranium's U-235 assay (as UF6 does); Hot Fuel Salt is it on its way to the Steam Generator. Kept in tanks and
+    // pipes only.
+    public static final DeferredHolder<FluidType, FluidType> LEAD_BISMUTH_TYPE = liquidType("lead_bismuth", 10_400, 1_800, 0.004F, 0.4, 0.5);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> LEAD_BISMUTH = FLUIDS.register("lead_bismuth",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.LEAD_BISMUTH_TYPE, ModFluids.LEAD_BISMUTH, ModFluids.FLOWING_LEAD_BISMUTH)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_LEAD_BISMUTH = FLUIDS.register("flowing_lead_bismuth",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.LEAD_BISMUTH_TYPE, ModFluids.LEAD_BISMUTH, ModFluids.FLOWING_LEAD_BISMUTH)));
+    public static final DeferredHolder<FluidType, FluidType> HOT_LEAD_BISMUTH_TYPE = liquidType("hot_lead_bismuth", 10_000, 1_500, 0.004F, 0.4, 0.5);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HOT_LEAD_BISMUTH = FLUIDS.register("hot_lead_bismuth",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HOT_LEAD_BISMUTH_TYPE, ModFluids.HOT_LEAD_BISMUTH, ModFluids.FLOWING_HOT_LEAD_BISMUTH)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HOT_LEAD_BISMUTH = FLUIDS.register("flowing_hot_lead_bismuth",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HOT_LEAD_BISMUTH_TYPE, ModFluids.HOT_LEAD_BISMUTH, ModFluids.FLOWING_HOT_LEAD_BISMUTH)));
+    public static final DeferredHolder<FluidType, FluidType> FUEL_SALT_TYPE = assayLiquidType("fuel_salt", 2_000, 2_000);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> FUEL_SALT = FLUIDS.register("fuel_salt",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.FUEL_SALT_TYPE, ModFluids.FUEL_SALT, ModFluids.FLOWING_FUEL_SALT)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_FUEL_SALT = FLUIDS.register("flowing_fuel_salt",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.FUEL_SALT_TYPE, ModFluids.FUEL_SALT, ModFluids.FLOWING_FUEL_SALT)));
+    public static final DeferredHolder<FluidType, FluidType> HOT_FUEL_SALT_TYPE = liquidType("hot_fuel_salt", 1_950, 1_700, 0.01F, 0.6, 0.7);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> HOT_FUEL_SALT = FLUIDS.register("hot_fuel_salt",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.HOT_FUEL_SALT_TYPE, ModFluids.HOT_FUEL_SALT, ModFluids.FLOWING_HOT_FUEL_SALT)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HOT_FUEL_SALT = FLUIDS.register("flowing_hot_fuel_salt",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.HOT_FUEL_SALT_TYPE, ModFluids.HOT_FUEL_SALT, ModFluids.FLOWING_HOT_FUEL_SALT)));
+    // Corium: a melted core (see CoriumBlock). It glows (light 15), runs like slow lava, can't be picked up in a bucket.
+    public static final DeferredHolder<FluidType, FluidType> CORIUM_TYPE = FLUID_TYPES.register("corium", () -> new LiquidType(FluidType.Properties.create()
+            .descriptionId("fluid_type.arcforge.corium")
+            .density(8_000)
+            .viscosity(20_000)
+            .temperature(3_000)
+            .lightLevel(15)
+            .motionScale(0.002)
+            .canSwim(false)
+            .canDrown(false)
+            .canPushEntity(true)
+            .canExtinguish(false)
+            .canConvertToSource(false)
+            .supportsBoating(false)
+            .fallDistanceModifier(0.0F)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA), 0.002F, 0.3, 0.3));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CORIUM = FLUIDS.register("corium",
+            () -> new BaseFlowingFluid.Source(coriumProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CORIUM = FLUIDS.register("flowing_corium",
+            () -> new BaseFlowingFluid.Flowing(coriumProperties()));
+
+    // Spreads 3 blocks, every 10 ticks, like the acids.
+    private static BaseFlowingFluid.Properties nitricAcidProperties() {
+        return new BaseFlowingFluid.Properties(NITRIC_ACID_TYPE, NITRIC_ACID, FLOWING_NITRIC_ACID)
+                .bucket(ModItems.NITRIC_ACID_BUCKET)
+                .block(ModBlocks.NITRIC_ACID)
+                .slopeFindDistance(3)
+                .levelDecreasePerBlock(1)
+                .tickRate(10)
+                .explosionResistance(100.0F);
+    }
+
+    // Slower than lava: a block or two from where it pours, every 40 ticks.
+    private static BaseFlowingFluid.Properties coriumProperties() {
+        return new BaseFlowingFluid.Properties(CORIUM_TYPE, CORIUM, FLOWING_CORIUM)
+                .block(ModBlocks.CORIUM)
+                .slopeFindDistance(1)
+                .levelDecreasePerBlock(3)
+                .tickRate(40)
+                .explosionResistance(100.0F);
+    }
+
+    // A liquid (as liquidType, but kept in tanks) whose stacks carry a U-235 assay, shown in its name.
+    private static DeferredHolder<FluidType, FluidType> assayLiquidType(String name, int density, int viscosity) {
+        return FLUID_TYPES.register(name, () -> new LiquidType(FluidType.Properties.create()
+                .descriptionId("fluid_type.arcforge." + name)
+                .density(density)
+                .viscosity(viscosity)
+                .temperature(900)
+                .motionScale(0.007)
+                .canSwim(false)
+                .canDrown(true)
+                .canPushEntity(true)
+                .canExtinguish(false)
+                .canConvertToSource(false)
+                .supportsBoating(false)
+                .fallDistanceModifier(0.0F), 0.01F, 0.6, 0.7) {
+            @Override
+            public net.minecraft.network.chat.Component getDescription(net.neoforged.neoforge.fluids.FluidStack stack) {
+                Integer assay = stack.get(ModDataComponents.U235_ASSAY.get());
+                net.minecraft.network.chat.Component base = super.getDescription(stack);
+                return assay != null ? net.minecraft.network.chat.Component.translatable("fluid_type.arcforge.with_assay", base,
+                        net.zagdrath.arcforge.nuclear.Enrichment.percent(assay)) : base;
+            }
+        });
+    }
+
     // Moves like water.
     private static BaseFlowingFluid.Properties heavyWaterProperties() {
         return new BaseFlowingFluid.Properties(HEAVY_WATER_TYPE, HEAVY_WATER, FLOWING_HEAVY_WATER)

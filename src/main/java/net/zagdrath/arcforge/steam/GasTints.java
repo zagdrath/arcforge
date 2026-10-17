@@ -40,6 +40,8 @@ public final class GasTints {
     public static final int DEPLETED_URANIUM_HEXAFLUORIDE = 0xFFB4B8AC;
     // A boiling reactor's steam: steam with the faintest blue-green cast.
     public static final int CONTAMINATED_STEAM = 0xFFDCF0EC;
+    // Nitrogen Dioxide: the Ostwald process's reddish-brown gas.
+    public static final int NITROGEN_DIOXIDE = 0xFFC8743C;
 
     private GasTints() {}
 }

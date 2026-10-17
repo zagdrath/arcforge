@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "#c:ingots/lead",
+    "count": 2
+  },
+  "additive": {
+    "ingredient": "#c:ingots/bismuth",
+    "count": 2
+  },
+  "coke": 0,
+  "result": {
+    "id": "arcforge:lead_bismuth_ingot",
+    "count": 4
+  },
+  "time": 200,
+  "min_temp": 600
+}

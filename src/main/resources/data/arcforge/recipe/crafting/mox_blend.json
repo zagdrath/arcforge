@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "arcforge:plutonium_oxide",
+    "arcforge:plutonium_oxide",
+    "arcforge:plutonium_oxide",
+    "arcforge:plutonium_oxide",
+    "arcforge:plutonium_oxide",
+    "arcforge:depleted_uranium_dioxide",
+    "arcforge:depleted_uranium_dioxide",
+    "arcforge:depleted_uranium_dioxide"
+  ],
+  "result": {
+    "id": "arcforge:mox_blend",
+    "count": 2
+  }
+}

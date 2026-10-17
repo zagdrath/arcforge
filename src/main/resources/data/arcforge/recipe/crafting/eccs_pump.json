@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SDS",
+    "SES",
+    "SRS"
+  ],
+  "key": {
+    "D": "#c:dyes/green",
+    "S": "#c:plates/steel",
+    "E": "arcforge:electric_pump",
+    "R": "#c:storage_blocks/redstone"
+  },
+  "result": {
+    "id": "arcforge:eccs_pump",
+    "count": 1
+  }
+}

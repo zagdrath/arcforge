@@ -55,7 +55,9 @@ public final class AdvancementGameTests {
             "nuclear/uraninite", "nuclear/geiger_counter", "nuclear/hazmat_suit", "nuclear/lead_box", "nuclear/yellowcake",
             "nuclear/uranium_hexafluoride", "nuclear/centrifuge_cascade", "nuclear/enriched", "nuclear/full_hall", "nuclear/depleted_uranium",
             "nuclear/fuel_pellet", "nuclear/zircaloy", "nuclear/fuel_rod", "nuclear/heavy_water", "nuclear/fission_reactor", "nuclear/critical",
-            "nuclear/steam_generator", "nuclear/full_power");
+            "nuclear/steam_generator", "nuclear/full_power", "nuclear/containment", "nuclear/spent_fuel_pool", "nuclear/purex",
+            "nuclear/mox_fuel_rod", "nuclear/vitrifying", "nuclear/repository", "nuclear/compacting", "nuclear/thorium_blanket_rod", "nuclear/thorex",
+            "nuclear/u233_fuel_rod", "nuclear/fast_reactor", "nuclear/molten_salt_reactor", "nuclear/freeze_plug");
 
     @SuppressWarnings("removal")
     private static ServerPlayer player(GameTestHelper helper, BlockPos standRelative) {

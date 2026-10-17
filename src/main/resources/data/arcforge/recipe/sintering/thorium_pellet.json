@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:sintering",
+  "ingredient": "arcforge:green_thorium_pellet",
+  "result": {
+    "id": "arcforge:thorium_pellet"
+  },
+  "time": 200,
+  "experience": 0.2
+}

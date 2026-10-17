@@ -26,9 +26,12 @@ import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.FissionReactorMenu;
+import net.zagdrath.arcforge.nuclear.reactor.CoreLattice;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorParams;
 import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorSim;
+import net.zagdrath.arcforge.nuclear.safety.Containment;
+import net.zagdrath.arcforge.nuclear.safety.ReactorAlarm;
 
 // The Fission Reactor's control desk (300×288: the desk across the top, under it the nine rod input slots and the nine
 // output slots in 3×3 grids over the ends of the player inventory, which is at the bottom), three pages on its screen:
@@ -37,11 +40,15 @@ import net.zagdrath.arcforge.nuclear.reactor.ReactorSim;
 //    is with a marker at its target, - out / + in buttons, shift for 10%, and how far in, with the target while it
 //    moves);
 //  - Trends: the last minute of power (log scale), coolant temperature and k-effective;
-//  - Protection: each trip point on or off with - and +, the coolant pump, Redstone Rods, auto-unload and Unload All.
+//  - Protection: each trip point on or off with - and +, the coolant pump, Redstone Rods, auto-unload and Unload All;
+//  - Safety: the containment (sealed or why not, its air's Hydrogen and radioactivity, the Suppression Pool), the
+//    Relief Valves, Emergency Core Cooling and recombiners, the cladding and coolant (or a salt core's processing and
+//    Freeze Plug) down the left; the alarms up on the right (red while sounding, amber once silenced), and Silence in
+//    the bottom right where the Core page's shift hint goes.
 // The status, Page, Reset and SCRAM stay in the desk's bottom right on every page. All positions are relative to
 // leftPos/topPos.
 public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
-    private enum Page { CORE, TRENDS, PROTECTION }
+    private enum Page { CORE, TRENDS, PROTECTION, SAFETY }
 
     private static final int LEFT = 10, VALUE_RIGHT = 128, LINE = 10, TOP = 19;
     // The Core page's readings, 9 apart to fit eleven on the screen.
@@ -67,6 +74,10 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
     private static final int XENON_SAMPLE = 200;
     private static final int TRACK = 0xFF161616, TRACK_DARK = 0xFF0E0E0E, TRACK_LIGHT = 0xFF3A3A3A;
     private static final int[] TRIP_COLORS ={ 0xFF5FD4C4, 0xFFFF9A3C, 0xFFE0E0E0 };
+    // The Safety page: nine readings down the left (the Core page's spacing), the alarms from BANK_X, above the status.
+    private static final int SAFETY_LINES = 9, ALARM_X = BANK_X, ALARM_W = 290 - BANK_X, ALARM_LINES = 8;
+    private static final int SILENCE_X = SHIFT_X, SILENCE_W = SHIFT_W;
+    private static final int ALARM_RED = 0xFFE8483A, ALARM_AMBER = 0xFFE0A020;
 
     private final Identifier bankFill = sprite("bank_fill");
     private final Identifier bankMarker = sprite("bank_marker");
@@ -85,6 +96,8 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
     private final Identifier tankGauge = sprite("tank_gauge");
     private final Identifier liquidFill = sprite("liquid_fill");
     private final Identifier gasFill = sprite("gas_fill");
+    private final Identifier silence = sprite("silence");
+    private final Identifier silenceHover = sprite("silence_hover");
     private Page shown = Page.CORE;
     // Xenon a while ago and which way it has gone since (+1 building, -1 burning away, 0 steady), sampled every
     // XENON_SAMPLE ticks.
@@ -203,6 +216,16 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
                 graphics.blitSprite(RenderPipelines.GUI_TEXTURED, menu.flag(FissionReactorMenu.FLAG_UNLOADING) ? toggleOn : toggleOff,
                         x + TOGGLE_X, y + pumpY + 3 * LINE, BUTTON, BUTTON);
             }
+            case SAFETY -> {
+                List<ReactorAlarm> up = ReactorAlarm.of(menu.alarms());
+                for (int i = 0; i < Math.min(ALARM_LINES, up.size()); i++) {
+                    ReactorAlarm alarm = up.get(i);
+                    int color = !alarm.klaxon() ? ArcforgeGui.ACCENT : alarm.in(menu.silenced()) ? ALARM_AMBER : ALARM_RED;
+                    int ly = y + TOP + i * READING_LINE + 1;
+                    graphics.fill(x + ALARM_X, ly, x + ALARM_X + 5, ly + 5, color);
+                }
+                blit(graphics, silence, silenceHover, x, y, SILENCE_X, CONTROL_Y, SILENCE_W, CONTROL_H);
+            }
         }
         for (int tank = 0; tank < TANKS.length; tank++) {
             drawFluidTank(graphics, tankFluid(tank), tankAmount(tank), tankCapacity(tank), tank == 3 ? gasFill : liquidFill, tankGauge, x, y,
@@ -244,9 +267,19 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
         }
     }
 
-    // Pressurized and below the Hot Leg's flow temperature: the core's heat stays in the vessel.
+    // Pressurized and below the Hot Leg's flow temperature (water's, or the hotter lead-bismuth's or salt's): the core's
+    // heat stays in the vessel.
     private boolean warmingUp() {
-        return menu.mode() == ReactorSim.Mode.PRESSURIZED && menu.coolantTemp() < ReactorParams.defaults().pwrInletCelsius;
+        return menu.mode() == ReactorSim.Mode.PRESSURIZED && menu.coolantTemp() < inletCelsius();
+    }
+
+    private double inletCelsius() {
+        ReactorParams p = ReactorParams.defaults();
+        return switch (menu.coolantType()) {
+            case LEAD_BISMUTH -> p.leadBismuthInletCelsius;
+            case FUEL_SALT -> p.saltInletCelsius;
+            default -> p.pwrInletCelsius;
+        };
     }
 
     private Component number(String format, double value) {
@@ -273,6 +306,7 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
             case CORE -> drawCore(graphics);
             case TRENDS -> drawTrends(graphics);
             case PROTECTION -> drawProtection(graphics);
+            case SAFETY -> drawSafety(graphics);
         }
         // Rods waiting that can't load yet say why, over the status they'd otherwise hide behind ("No fuel").
         boolean waiting = rodsWaiting() && !menu.flag(FissionReactorMenu.FLAG_CAN_REFUEL);
@@ -298,7 +332,7 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
     }
 
     // Between the rod grids: fuel rods loaded of the Fuel Channels, control rods of the Control Rod Channels (yellow while
-    // any channel is empty).
+    // any channel is empty). A salt core's fuel is in its salt.
     private void drawRodCounts(GuiGraphicsExtractor graphics) {
         int centre = COUNTS_X + COUNTS_W / 2;
         int[][] counts = { { menu.rods(), menu.channels() }, { menu.controlRods(), menu.controlChannels() } };
@@ -307,6 +341,11 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
             int y = FissionReactorMenu.SLOTS_Y + 2 + i * 26;
             Component label = clipped(Component.translatable("gui.arcforge.fission_reactor." + keys[i]), COUNTS_W);
             graphics.text(font, label, centre - font.width(label) / 2, y, ArcforgeGui.LABEL, false);
+            if (i == 0 && menu.coolantType() == CoreLattice.Coolant.FUEL_SALT) {
+                Component salt = clipped(Component.translatable("gui.arcforge.fission_reactor.fuel_in_salt"), COUNTS_W);
+                graphics.text(font, salt, centre - font.width(salt) / 2, y + 10, ArcforgeGui.TEXT, false);
+                continue;
+            }
             String value = counts[i][0] + " / " + counts[i][1];
             graphics.text(font, value, centre - font.width(value) / 2, y + 10, counts[i][0] < counts[i][1] ? ArcforgeGui.WARNING : ArcforgeGui.TEXT,
                     false);
@@ -316,10 +355,20 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
     // A tank's fluid, amount and size: the coolant coming in, the coolant in the vessel, the Hot Coolant going out, the
     // steam a boiling core makes.
     private Fluid tankFluid(int tank) {
-        boolean heavy = menu.heavyWater();
+        CoreLattice.Coolant coolant = menu.coolantType();
         return switch (tank) {
-            case 0, 1 -> heavy ? ModFluids.HEAVY_WATER.get() : Fluids.WATER;
-            case 2 -> heavy ? ModFluids.HOT_HEAVY_WATER.get() : ModFluids.HOT_COOLANT.get();
+            case 0, 1 -> switch (coolant) {
+                case HEAVY_WATER -> ModFluids.HEAVY_WATER.get();
+                case LEAD_BISMUTH -> ModFluids.LEAD_BISMUTH.get();
+                case FUEL_SALT -> ModFluids.FUEL_SALT.get();
+                default -> Fluids.WATER;
+            };
+            case 2 -> switch (coolant) {
+                case HEAVY_WATER -> ModFluids.HOT_HEAVY_WATER.get();
+                case LEAD_BISMUTH -> ModFluids.HOT_LEAD_BISMUTH.get();
+                case FUEL_SALT -> ModFluids.HOT_FUEL_SALT.get();
+                default -> ModFluids.HOT_COOLANT.get();
+            };
             default -> ModFluids.CONTAMINATED_STEAM.get();
         };
     }
@@ -471,6 +520,7 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
                     lines.add(Component.translatable("gui.arcforge.fission_reactor.trend_hint"));
                 }
             }
+            case SAFETY -> safetyTooltip(lines, mouseX, mouseY);
             case PROTECTION -> {
                 for (int trip = 0; trip < 5; trip++) {
                     if (isHovering(TOGGLE_X, TRIP_Y + trip * LINE - 1, TRIP_PLUS + BUTTON - TOGGLE_X, LINE, mouseX, mouseY)) {
@@ -489,6 +539,94 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
                 }
             }
         }
+    }
+
+    private static final String[] SAFETY_HINTS = { "containment", "hydrogen", "air", "pool", "relief", "eccs", "recombiners" };
+
+    private void safetyLine(GuiGraphicsExtractor graphics, int line, String key, Component value, int color) {
+        int y = TOP + line * READING_LINE;
+        int room = VALUE_RIGHT - LEFT - font.width(value) - 4;
+        graphics.text(font, clipped(Component.translatable("gui.arcforge.fission_reactor.safety." + key), room), LEFT, y, ArcforgeGui.LABEL, false);
+        textRight(graphics, value, VALUE_RIGHT, y, color);
+    }
+
+    private void drawSafety(GuiGraphicsExtractor graphics) {
+        int containment = menu.get(FissionReactorMenu.DATA_CONTAINMENT);
+        boolean sealed = containment == Containment.Status.SEALED.ordinal() + 1;
+        Component state = containment == 0 ? Component.translatable("gui.arcforge.fission_reactor.safety.none")
+                : Component.translatable("gui.arcforge.containment." + Containment.Status.values()[containment - 1].key());
+        safetyLine(graphics, 0, "containment", state, sealed ? ArcforgeGui.ACCENT : ArcforgeGui.WARNING);
+        double hydrogen = menu.get(FissionReactorMenu.DATA_HYDROGEN) / 100.0;
+        safetyLine(graphics, 1, "hydrogen", number("%.2f%%", hydrogen), hydrogen >= 2.0 ? ArcforgeGui.HEAT : ArcforgeGui.TEXT);
+        double air = menu.get(FissionReactorMenu.DATA_AIR_ACTIVITY) / 10.0;
+        safetyLine(graphics, 2, "air", number("%.1f mSv/h", air), air > 0.0 ? ArcforgeGui.WARNING : ArcforgeGui.TEXT);
+        int pool = menu.get(FissionReactorMenu.DATA_POOL);
+        safetyLine(graphics, 3, "pool", pool > 0 ? number("%.0f°C", menu.get(FissionReactorMenu.DATA_POOL_TEMP) / 10.0)
+                : Component.literal("—"), ArcforgeGui.TEXT);
+        safetyLine(graphics, 4, "relief", Component.literal(Integer.toString(menu.get(FissionReactorMenu.DATA_VALVES))), ArcforgeGui.TEXT);
+        safetyLine(graphics, 5, "eccs", Component.literal(Integer.toString(menu.get(FissionReactorMenu.DATA_ECCS_UNITS))), ArcforgeGui.TEXT);
+        safetyLine(graphics, 6, "recombiners", Component.literal(Integer.toString(menu.get(FissionReactorMenu.DATA_RECOMBINERS))), ArcforgeGui.TEXT);
+        int plug = menu.get(FissionReactorMenu.DATA_FREEZE_PLUG);
+        if (menu.coolantType() == CoreLattice.Coolant.FUEL_SALT) {
+            safetyLine(graphics, 7, "salt_fission", number("%.1f%%", menu.get(FissionReactorMenu.DATA_SALT_FISSION) / 10.0), ArcforgeGui.TEXT);
+            safetyLine(graphics, 8, "freeze_plug", Component.translatable("gui.arcforge.fission_reactor.safety.plug_" + plug),
+                    plug == 2 ? ArcforgeGui.HEAT : ArcforgeGui.TEXT);
+        } else {
+            double oxidised = menu.get(FissionReactorMenu.DATA_OXIDISED) / 10.0;
+            safetyLine(graphics, 7, "oxidised", number("%.1f%%", oxidised), oxidised > 0.0 ? ArcforgeGui.HEAT : ArcforgeGui.TEXT);
+            double activity = menu.get(FissionReactorMenu.DATA_COOLANT_ACTIVITY) / 10.0;
+            safetyLine(graphics, 8, "coolant_activity", number("%.1f%%", activity), activity > 0.0 ? ArcforgeGui.WARNING : ArcforgeGui.TEXT);
+        }
+        List<ReactorAlarm> up = ReactorAlarm.of(menu.alarms());
+        if (up.isEmpty()) {
+            graphics.text(font, Component.translatable("gui.arcforge.fission_reactor.safety.no_alarms"), ALARM_X, TOP, ArcforgeGui.LABEL, false);
+        }
+        for (int i = 0; i < Math.min(ALARM_LINES, up.size()); i++) {
+            ReactorAlarm alarm = up.get(i);
+            int color = !alarm.klaxon() ? ArcforgeGui.TEXT : alarm.in(menu.silenced()) ? ALARM_AMBER : ALARM_RED;
+            graphics.text(font, clipped(Component.translatable("gui.arcforge.alarm." + alarm.key()), ALARM_W - 8), ALARM_X + 8, TOP + i * READING_LINE,
+                    color, false);
+        }
+        textCentred(graphics, Component.translatable("gui.arcforge.fission_reactor.silence"), SILENCE_X, SILENCE_W, CONTROL_Y + 2, ArcforgeGui.TEXT);
+    }
+
+    private void safetyTooltip(List<Component> lines, int mouseX, int mouseY) {
+        if (isHovering(SILENCE_X, CONTROL_Y, SILENCE_W, CONTROL_H, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.fission_reactor.silence_hint"));
+            return;
+        }
+        int line = (mouseY - topPos - TOP + 1) / READING_LINE;
+        if (isHovering(LEFT, TOP - 1, VALUE_RIGHT - LEFT, SAFETY_LINES * READING_LINE, mouseX, mouseY) && line >= 0 && line < SAFETY_LINES) {
+            if (line < SAFETY_HINTS.length) {
+                lines.add(Component.translatable("gui.arcforge.fission_reactor.safety." + SAFETY_HINTS[line] + "_hint"));
+            }
+            switch (line) {
+                case 0 -> lines.add(Component.translatable("gui.arcforge.fission_reactor.safety.volume", ArcforgeGui.grouped(menu.get(FissionReactorMenu.DATA_AIR_VOLUME)))
+                        .withStyle(ChatFormatting.GRAY));
+                case 3 -> lines.add(Component.translatable("gui.arcforge.fission_reactor.safety.pool_blocks", menu.get(FissionReactorMenu.DATA_POOL))
+                        .withStyle(ChatFormatting.GRAY));
+                case 5 -> lines.add(Component.translatable("gui.arcforge.fission_reactor.safety.eccs_water", ArcforgeGui.grouped(menu.get(FissionReactorMenu.DATA_ECCS_WATER)))
+                        .withStyle(ChatFormatting.GRAY));
+                case 7, 8 -> lines.add(Component.translatable(menu.coolantType() == CoreLattice.Coolant.FUEL_SALT
+                        ? "gui.arcforge.fission_reactor.safety.salt_hint" : "gui.arcforge.fission_reactor.safety.cladding_hint"));
+                default -> {
+                }
+            }
+            return;
+        }
+        List<ReactorAlarm> up = ReactorAlarm.of(menu.alarms());
+        if (isHovering(ALARM_X, TOP - 1, ALARM_W, ALARM_LINES * READING_LINE, mouseX, mouseY) && line >= 0 && line < Math.min(ALARM_LINES, up.size())) {
+            lines.add(Component.translatable("gui.arcforge.alarm." + up.get(line).key() + ".hint"));
+        }
+    }
+
+    private static String coolantName(CoreLattice.Coolant coolant) {
+        return switch (coolant) {
+            case HEAVY_WATER -> "fluid_type.arcforge.heavy_water";
+            case LEAD_BISMUTH -> "fluid_type.arcforge.lead_bismuth";
+            case FUEL_SALT -> "fluid_type.arcforge.fuel_salt";
+            default -> "block.minecraft.water";
+        };
     }
 
     private void coreTooltip(List<Component> lines, int mouseX, int mouseY) {
@@ -517,11 +655,11 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
                 case 7, 8 -> {
                     lines.add(Component.translatable("gui.arcforge.fission_reactor.mode." + menu.mode().name().toLowerCase(Locale.ROOT)));
                     if (warmingUp()) {
-                        lines.add(Component.translatable("gui.arcforge.fission_reactor.warming_up", Math.round(ReactorParams.defaults().pwrInletCelsius))
+                        lines.add(Component.translatable("gui.arcforge.fission_reactor.warming_up", Math.round(inletCelsius()))
                                 .withStyle(ChatFormatting.YELLOW));
                     }
                     lines.add(Component.translatable("gui.arcforge.fission_reactor.coolant_hint",
-                            Component.translatable(menu.heavyWater() ? "fluid_type.arcforge.heavy_water" : "block.minecraft.water"),
+                            Component.translatable(coolantName(menu.coolantType())),
                             ArcforgeGui.grouped(menu.coolant()), ArcforgeGui.grouped(menu.coolantCapacity())).withStyle(ChatFormatting.GRAY));
                     lines.add(Component.translatable("gui.arcforge.fission_reactor.flow_hint", Math.round(menu.flow() * 100.0),
                             Math.round(menu.voidFraction() * 100.0)).withStyle(ChatFormatting.GRAY));
@@ -561,6 +699,9 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
         }
         if (isHovering(RESET_X, CONTROL_Y, WIDE, CONTROL_H, mx, my)) {
             return FissionReactorMenu.RESET;
+        }
+        if (shown == Page.SAFETY && isHovering(SILENCE_X, CONTROL_Y, SILENCE_W, CONTROL_H, mx, my)) {
+            return FissionReactorMenu.SILENCE;
         }
         if (shown == Page.CORE) {
             for (int column = 0; column < COLUMNS; column++) {

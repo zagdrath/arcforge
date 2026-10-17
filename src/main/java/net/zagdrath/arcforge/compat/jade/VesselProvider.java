@@ -27,9 +27,12 @@ import net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.VesselControllerBlockEntity;
+import net.zagdrath.arcforge.item.nuclear.FuelRodItem;
 import net.zagdrath.arcforge.nuclear.Enrichment;
 import net.zagdrath.arcforge.nuclear.FuelRod;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorSim;
+import net.zagdrath.arcforge.nuclear.safety.Containment;
+import net.zagdrath.arcforge.nuclear.safety.ReactorAlarm;
 import net.zagdrath.arcforge.registry.ModItems;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -41,7 +44,9 @@ import snownee.jade.api.config.IPluginConfig;
 // thermal power, k-effective, the fuel, cladding and coolant temperatures and pressure, its rods loaded, its mode, and
 // a trip if one has scrammed it; looking at a Fuel Channel, the rod in it, and at a Control Rod Channel, its bank and
 // how far that bank is in. The Steam Generator: its tubes and the steam it made last tick. The Heavy Water Tower: its
-// trays and the Heavy Water it holds. The server builds the lines; Client draws them.
+// trays and the Heavy Water it holds. The reactor also shows its containment (sealed or why not, and its air's
+// Hydrogen) and each alarm that's up; the PUREX Plant its setting and its waste. The server builds the lines; Client
+// draws them.
 public enum VesselProvider implements StreamServerDataProvider<BlockAccessor, List<Component>> {
     INSTANCE;
 
@@ -75,6 +80,9 @@ public enum VesselProvider implements StreamServerDataProvider<BlockAccessor, Li
                     String.format(Locale.ROOT, "%,d", generator.getLastSteam())).withStyle(ChatFormatting.GRAY));
             case HeavyWaterTowerBlockEntity tower -> lines.add(Component.translatable("jade.arcforge.heavy_water_tower.trays", tower.getTrays(),
                     String.format(Locale.ROOT, "%,d", tower.getOutput().getAmount())).withStyle(ChatFormatting.GRAY));
+            case net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity plant -> lines.add(Component.translatable("jade.arcforge.purex_plant.mode",
+                    Component.translatable("gui.arcforge.purex_plant." + plant.getMode().getSerializedName()),
+                    String.format(Locale.ROOT, "%,d", plant.getWaste().getAmount())).withStyle(ChatFormatting.GRAY));
             default -> {}
         }
         lines.add(vessel.getStatus().getDescription());
@@ -98,6 +106,18 @@ public enum VesselProvider implements StreamServerDataProvider<BlockAccessor, Li
         if (core.scrammed && core.trip != ReactorSim.Trip.NONE) {
             lines.add(Component.translatable("gui.arcforge.fission_reactor.trip." + core.trip.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.RED));
         }
+        if (!core.coolantType.isWater()) {
+            lines.add(Component.translatable("jade.arcforge.fission_reactor.core." + core.coolantType.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.GOLD));
+        }
+        // The containment, and every alarm up (red while it sounds).
+        Containment containment = reactor.getContainment();
+        lines.add(Component.translatable("jade.arcforge.fission_reactor.containment", Component.translatable("gui.arcforge.containment." + containment.status().key()),
+                String.format(Locale.ROOT, "%.2f", containment.hydrogenPercent())).withStyle(containment.sealed() ? ChatFormatting.DARK_AQUA : ChatFormatting.GOLD));
+        for (ReactorAlarm alarm : ReactorAlarm.of(reactor.getAlarms())) {
+            boolean sounding = alarm.klaxon() && !alarm.in(reactor.getSilenced());
+            lines.add(Component.translatable("jade.arcforge.alarm", Component.translatable("gui.arcforge.alarm." + alarm.key()))
+                    .withStyle(sounding ? ChatFormatting.RED : alarm.klaxon() ? ChatFormatting.GOLD : ChatFormatting.GRAY));
+        }
         // The cell looked at.
         var state = accessor.getBlockState();
         if (state.getBlock() instanceof ControlRodChannelBlock) {
@@ -106,7 +126,7 @@ public enum VesselProvider implements StreamServerDataProvider<BlockAccessor, Li
                     .withStyle(ChatFormatting.YELLOW));
         } else {
             var rod = reactor.rods().get(accessor.getPosition());
-            if (rod != null && rod.is(ModItems.FUEL_ROD.get())) {
+            if (rod != null && FuelRodItem.isFuelRod(rod)) {
                 FuelRod fuel = FuelRod.of(rod);
                 lines.add(Component.translatable("jade.arcforge.fission_reactor.channel", Enrichment.percent(fuel.enrichment()), fuel.burnupText())
                         .withStyle(ChatFormatting.GREEN));

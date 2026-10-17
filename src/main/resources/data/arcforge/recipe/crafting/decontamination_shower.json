@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "SBS",
+    "I I"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "arcforge:steel_pipe",
+    "B": "minecraft:water_bucket",
+    "I": "minecraft:iron_bars"
+  },
+  "result": {
+    "id": "arcforge:decontamination_shower",
+    "count": 1
+  }
+}

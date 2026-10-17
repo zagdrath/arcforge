@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SLS",
+    "LCL",
+    "SLS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "L": "#arcforge:shielding_metals",
+    "C": "arcforge:containment_concrete"
+  },
+  "result": {
+    "id": "arcforge:hot_cell_casing",
+    "count": 4
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PP",
+    "PP"
+  ],
+  "key": {
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:steel_liner",
+    "count": 2
+  }
+}

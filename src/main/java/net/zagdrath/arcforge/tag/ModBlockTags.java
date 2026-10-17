@@ -32,5 +32,12 @@ public final class ModBlockTags {
     // Legume crops (Soybeans): see ModItemTags.LEGUMES and CropRotation.
     public static final TagKey<Block> LEGUMES = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Arcforge.MODID, "legumes"));
 
+    // What Corium can't melt through (obsidian, bedrock, Containment Concrete, the Core Catcher; see CoriumBlock).
+    public static final TagKey<Block> CORIUM_RESISTANT = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Arcforge.MODID, "corium_resistant"));
+
+    // What lights Hydrogen in a containment's air (open flame and red-hot blocks; any lit block counts too, see
+    // Containment).
+    public static final TagKey<Block> HYDROGEN_IGNITERS = TagKey.create(Registries.BLOCK, Identifier.fromNamespaceAndPath(Arcforge.MODID, "hydrogen_igniters"));
+
     private ModBlockTags() {}
 }

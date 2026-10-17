@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "C  ",
+    "CC ",
+    "CCC"
+  ],
+  "key": {
+    "C": "arcforge:containment_concrete"
+  },
+  "result": {
+    "id": "arcforge:containment_dome",
+    "count": 4
+  }
+}

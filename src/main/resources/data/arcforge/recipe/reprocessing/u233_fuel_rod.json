@@ -1,0 +1,26 @@
+{
+  "type": "arcforge:reprocessing",
+  "mode": "thorex",
+  "ingredient": "arcforge:u233_fuel_rod",
+  "acid": {
+    "fluid": "arcforge:nitric_acid",
+    "amount": 500
+  },
+  "solvent": {
+    "fluid": "arcforge:kerosene",
+    "amount": 100
+  },
+  "heavy_metal": {
+    "id": "arcforge:thorium_dioxide",
+    "count": 4
+  },
+  "fissile": {
+    "id": "arcforge:uranium_233_oxide",
+    "count": 1
+  },
+  "waste": {
+    "id": "arcforge:high_level_waste",
+    "amount": 1000
+  },
+  "time": 400
+}

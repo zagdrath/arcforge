@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "GAG",
+    "SDS"
+  ],
+  "key": {
+    "S": "#c:ingots/steel",
+    "P": "minecraft:piston",
+    "G": "#c:gears/steel",
+    "A": "minecraft:anvil",
+    "D": "arcforge:waste_drum"
+  },
+  "result": {
+    "id": "arcforge:waste_compactor",
+    "count": 1
+  }
+}

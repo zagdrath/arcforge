@@ -586,6 +586,71 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> HEAVY_WATER_TOWER_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.HEAVY_WATER_TOWER_CASING);
     public static final DeferredItem<BlockItem> EXCHANGE_TRAY = ITEMS.registerSimpleBlockItem(ModBlocks.EXCHANGE_TRAY);
 
+    // Phase three of the nuclear tier. Reprocessing and MOX: Nitric Acid, Recovered Uranium, Plutonium Oxide (only ever
+    // made into MOX fuel), Depleted Uranium Dioxide, the MOX chain. Thorium: Thorium Dioxide (with Rare Earth Dust from
+    // Monazite), Thorium Blanket Rods, U-233 Oxide bred in them and the U-233 fuel chain. The advanced cores: Lead-Bismuth
+    // Ingots, Lithium Fluoride and Thorium Tetrafluoride (for Fuel Salt). Waste: HEPA Filters, Waste Drums, Vitrified
+    // Waste Logs.
+    public static final DeferredItem<BucketItem> NITRIC_ACID_BUCKET = ITEMS.registerItem("nitric_acid_bucket",
+            p -> new BucketItem(ModFluids.NITRIC_ACID.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<Item> RECOVERED_URANIUM = ITEMS.registerSimpleItem("recovered_uranium");
+    public static final DeferredItem<Item> PLUTONIUM_OXIDE = ITEMS.registerSimpleItem("plutonium_oxide");
+    public static final DeferredItem<Item> DEPLETED_URANIUM_DIOXIDE = ITEMS.registerSimpleItem("depleted_uranium_dioxide");
+    public static final DeferredItem<Item> MOX_BLEND = ITEMS.registerSimpleItem("mox_blend");
+    public static final DeferredItem<Item> GREEN_MOX_PELLET = ITEMS.registerSimpleItem("green_mox_pellet");
+    public static final DeferredItem<Item> MOX_FUEL_PELLET = ITEMS.registerSimpleItem("mox_fuel_pellet");
+    public static final DeferredItem<net.zagdrath.arcforge.item.nuclear.FuelRodItem> MOX_FUEL_ROD = ITEMS.registerItem("mox_fuel_rod",
+            p -> new net.zagdrath.arcforge.item.nuclear.FuelRodItem(net.zagdrath.arcforge.nuclear.FuelRod.FuelType.MOX, p));
+    public static final DeferredItem<Item> THORIUM_DIOXIDE = ITEMS.registerSimpleItem("thorium_dioxide");
+    public static final DeferredItem<Item> RARE_EARTH_DUST = ITEMS.registerSimpleItem("rare_earth_dust");
+    public static final DeferredItem<Item> GREEN_THORIUM_PELLET = ITEMS.registerSimpleItem("green_thorium_pellet");
+    public static final DeferredItem<Item> THORIUM_PELLET = ITEMS.registerSimpleItem("thorium_pellet");
+    public static final DeferredItem<net.zagdrath.arcforge.item.nuclear.FuelRodItem> THORIUM_BLANKET_ROD = ITEMS.registerItem("thorium_blanket_rod",
+            p -> new net.zagdrath.arcforge.item.nuclear.FuelRodItem(net.zagdrath.arcforge.nuclear.FuelRod.FuelType.THORIUM, p));
+    public static final DeferredItem<Item> URANIUM_233_OXIDE = ITEMS.registerSimpleItem("uranium_233_oxide");
+    public static final DeferredItem<Item> U233_FUEL_BLEND = ITEMS.registerSimpleItem("u233_fuel_blend");
+    public static final DeferredItem<Item> GREEN_U233_PELLET = ITEMS.registerSimpleItem("green_u233_pellet");
+    public static final DeferredItem<Item> U233_FUEL_PELLET = ITEMS.registerSimpleItem("u233_fuel_pellet");
+    public static final DeferredItem<net.zagdrath.arcforge.item.nuclear.FuelRodItem> U233_FUEL_ROD = ITEMS.registerItem("u233_fuel_rod",
+            p -> new net.zagdrath.arcforge.item.nuclear.FuelRodItem(net.zagdrath.arcforge.nuclear.FuelRod.FuelType.U233, p));
+    public static final DeferredItem<Item> LEAD_BISMUTH_INGOT = ITEMS.registerSimpleItem("lead_bismuth_ingot");
+    public static final DeferredItem<Item> LITHIUM_FLUORIDE = ITEMS.registerSimpleItem("lithium_fluoride");
+    public static final DeferredItem<Item> THORIUM_TETRAFLUORIDE = ITEMS.registerSimpleItem("thorium_tetrafluoride");
+    public static final DeferredItem<Item> HEPA_FILTER = ITEMS.registerSimpleItem("hepa_filter");
+    public static final DeferredItem<Item> USED_HEPA_FILTER = ITEMS.registerSimpleItem("used_hepa_filter");
+    public static final DeferredItem<Item> WASTE_DRUM = ITEMS.registerSimpleItem("waste_drum");
+    public static final DeferredItem<net.zagdrath.arcforge.item.nuclear.WasteLogItem> VITRIFIED_WASTE_LOG = ITEMS.registerItem("vitrified_waste_log",
+            net.zagdrath.arcforge.item.nuclear.WasteLogItem::new, p -> p.stacksTo(1));
+
+    // The containment, the safety systems, spent fuel and waste storage, the waste and reprocessing machines.
+    public static final DeferredItem<BlockItem> CONTAINMENT_CONCRETE = ITEMS.registerSimpleBlockItem(ModBlocks.CONTAINMENT_CONCRETE);
+    public static final DeferredItem<BlockItem> STEEL_LINER = ITEMS.registerSimpleBlockItem(ModBlocks.STEEL_LINER);
+    public static final DeferredItem<BlockItem> CONTAINMENT_DOME = ITEMS.registerSimpleBlockItem(ModBlocks.CONTAINMENT_DOME);
+    public static final DeferredItem<net.minecraft.world.item.DoubleHighBlockItem> AIRLOCK = ITEMS.registerItem("airlock",
+            p -> new net.minecraft.world.item.DoubleHighBlockItem(ModBlocks.AIRLOCK.get(), p), p -> p.useBlockDescriptionPrefix());
+    public static final DeferredItem<BlockItem> EQUIPMENT_HATCH = ITEMS.registerSimpleBlockItem(ModBlocks.EQUIPMENT_HATCH);
+    public static final DeferredItem<BlockItem> PENETRATION = ITEMS.registerSimpleBlockItem(ModBlocks.PENETRATION);
+    public static final DeferredItem<BlockItem> CORE_CATCHER = ITEMS.registerSimpleBlockItem(ModBlocks.CORE_CATCHER);
+    public static final DeferredItem<BlockItem> HYDROGEN_RECOMBINER = ITEMS.registerSimpleBlockItem(ModBlocks.HYDROGEN_RECOMBINER);
+    public static final DeferredItem<BlockItem> RELIEF_VALVE = ITEMS.registerSimpleBlockItem(ModBlocks.RELIEF_VALVE);
+    public static final DeferredItem<BlockItem> ECCS_ACCUMULATOR = ITEMS.registerSimpleBlockItem(ModBlocks.ECCS_ACCUMULATOR);
+    public static final DeferredItem<BlockItem> ECCS_PUMP = ITEMS.registerSimpleBlockItem(ModBlocks.ECCS_PUMP);
+    public static final DeferredItem<BlockItem> SOLIDIFIED_CORIUM = ITEMS.registerSimpleBlockItem(ModBlocks.SOLIDIFIED_CORIUM);
+    public static final DeferredItem<BlockItem> DECONTAMINATION_SHOWER = ITEMS.registerSimpleBlockItem(ModBlocks.DECONTAMINATION_SHOWER);
+    public static final DeferredItem<BlockItem> SPENT_FUEL_RACK = ITEMS.registerSimpleBlockItem(ModBlocks.SPENT_FUEL_RACK);
+    public static final DeferredItem<BlockItem> DRY_CASK = ITEMS.registerItem("dry_cask", p -> new BlockItem(ModBlocks.DRY_CASK.get(), p),
+            p -> p.useBlockDescriptionPrefix().stacksTo(1));
+    public static final DeferredItem<BlockItem> GEOLOGICAL_REPOSITORY = ITEMS.registerSimpleBlockItem(ModBlocks.GEOLOGICAL_REPOSITORY);
+    public static final DeferredItem<BlockItem> LOW_LEVEL_WASTE_DRUM = ITEMS.registerSimpleBlockItem(ModBlocks.LOW_LEVEL_WASTE_DRUM);
+    public static final DeferredItem<BlockItem> WASTE_COMPACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.WASTE_COMPACTOR);
+    public static final DeferredItem<BlockItem> VITRIFICATION_PLANT = ITEMS.registerSimpleBlockItem(ModBlocks.VITRIFICATION_PLANT);
+    public static final DeferredItem<BlockItem> PUREX_CONTROLLER = ITEMS.registerSimpleBlockItem(ModBlocks.PUREX_CONTROLLER);
+    public static final DeferredItem<BlockItem> HOT_CELL_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.HOT_CELL_CASING);
+    public static final DeferredItem<BlockItem> HOT_CELL_WINDOW = ITEMS.registerSimpleBlockItem(ModBlocks.HOT_CELL_WINDOW);
+    public static final DeferredItem<BlockItem> SALT_PROCESSING_UNIT = ITEMS.registerSimpleBlockItem(ModBlocks.SALT_PROCESSING_UNIT);
+    public static final DeferredItem<BlockItem> FREEZE_PLUG = ITEMS.registerSimpleBlockItem(ModBlocks.FREEZE_PLUG);
+    public static final DeferredItem<BlockItem> DRAIN_TANK = ITEMS.registerSimpleBlockItem(ModBlocks.DRAIN_TANK);
+
     private static DeferredItem<Item> hazmat(String name, ArmorType type) {
         return ITEMS.registerItem(name, p -> new Item(p) {
             @Override
@@ -610,7 +675,17 @@ public final class ModItems {
                 FUEL_ROD, CONTROL_ROD, HEAVY_WATER_BUCKET,
                 HEAVY_WATER_TOWER_CONTROLLER, HEAVY_WATER_TOWER_CASING, EXCHANGE_TRAY,
                 REACTOR_CONTROLLER, REACTOR_CASING, REACTOR_GLASS, FUEL_CHANNEL, CONTROL_ROD_CHANNEL, GRAPHITE_MODERATOR, STEEL_REFLECTOR,
-                STEAM_GENERATOR_CONTROLLER, STEAM_GENERATOR_CASING, STEAM_GENERATOR_TUBES);
+                STEAM_GENERATOR_CONTROLLER, STEAM_GENERATOR_CASING, STEAM_GENERATOR_TUBES,
+                CONTAINMENT_CONCRETE, STEEL_LINER, CONTAINMENT_DOME, AIRLOCK, EQUIPMENT_HATCH, PENETRATION,
+                RELIEF_VALVE, ECCS_ACCUMULATOR, ECCS_PUMP, HYDROGEN_RECOMBINER, CORE_CATCHER, SOLIDIFIED_CORIUM,
+                DECONTAMINATION_SHOWER, HEPA_FILTER, USED_HEPA_FILTER,
+                SPENT_FUEL_RACK, DRY_CASK,
+                NITRIC_ACID_BUCKET, PUREX_CONTROLLER, HOT_CELL_CASING, HOT_CELL_WINDOW, RECOVERED_URANIUM, PLUTONIUM_OXIDE,
+                DEPLETED_URANIUM_DIOXIDE, MOX_BLEND, GREEN_MOX_PELLET, MOX_FUEL_PELLET, MOX_FUEL_ROD,
+                RARE_EARTH_DUST, THORIUM_DIOXIDE, GREEN_THORIUM_PELLET, THORIUM_PELLET, THORIUM_BLANKET_ROD,
+                URANIUM_233_OXIDE, U233_FUEL_BLEND, GREEN_U233_PELLET, U233_FUEL_PELLET, U233_FUEL_ROD,
+                VITRIFICATION_PLANT, VITRIFIED_WASTE_LOG, GEOLOGICAL_REPOSITORY, WASTE_COMPACTOR, WASTE_DRUM, LOW_LEVEL_WASTE_DRUM,
+                LEAD_BISMUTH_INGOT, LITHIUM_FLUORIDE, THORIUM_TETRAFLUORIDE, SALT_PROCESSING_UNIT, FREEZE_PLUG, DRAIN_TANK);
     }
 
     // The ore items in creative tab order: per ore its ore, deepslate ore, raw item, raw block, dust,

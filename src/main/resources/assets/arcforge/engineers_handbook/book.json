@@ -215,7 +215,7 @@
       "id": "nuclear",
       "title": "Nuclear",
       "icon": "arcforge:yellowcake",
-      "description": "Uranium for civil power: its ores, radiation, the chemistry and enrichment, fuel and the Fission Reactor.",
+      "description": "Uranium and thorium for civil power: ores, radiation, chemistry and enrichment, fuel, the Fission Reactor and its advanced cores, containment and safety, spent fuel, reprocessing and waste.",
       "entries": [
         "nuclear_overview",
         "uraninite",
@@ -234,7 +234,18 @@
         "fission_reactor",
         "reactor_physics",
         "reactor_control",
-        "steam_generator"
+        "steam_generator",
+        "reactor_failures",
+        "containment",
+        "safety_systems",
+        "fallout",
+        "spent_fuel",
+        "reprocessing",
+        "mox_fuel",
+        "nuclear_waste",
+        "thorium",
+        "fast_reactor",
+        "molten_salt_reactor"
       ]
     }
   ]

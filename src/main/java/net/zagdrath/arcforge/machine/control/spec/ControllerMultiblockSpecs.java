@@ -119,6 +119,26 @@ public final class ControllerMultiblockSpecs {
                 .fluidAutomation(be -> be.getFluidHandler(null))
                 .build());
 
+        // The PUREX Plant: its rods in and products out, its acid and solvent in and waste out, its FE, and its setting
+        // (thorex: on for THOREX, off for PUREX).
+        MachineControls.register(ModBlockEntityTypes.PUREX_PLANT.get(), MachineControlSpec.builder(net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity.class)
+                .primary(net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::isFormed)
+                .energy(EnergyRole.CONSUMER, net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::getEnergy,
+                        net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::getUsage)
+                .slots(0, net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity.INPUT_SLOTS, SlotRole.INPUT)
+                .slots(net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity.INPUT_SLOTS,
+                        net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity.MACHINE_SLOTS, SlotRole.OUTPUT)
+                .items(net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::getItems, be -> be.getItemHandler(null))
+                .tank(SlotRole.INPUT, net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::getAcid)
+                .tank(SlotRole.INPUT, net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::getSolvent)
+                .tank(SlotRole.OUTPUT, net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::getWaste)
+                .fluidAutomation(be -> be.getFluidHandler(null))
+                .progress(net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::getProgress,
+                        net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::getTotal)
+                .booleanOption("thorex", be -> be.getMode() == net.zagdrath.arcforge.recipe.ReprocessingRecipe.Mode.THOREX,
+                        (be, on) -> be.setMode(on ? net.zagdrath.arcforge.recipe.ReprocessingRecipe.Mode.THOREX : net.zagdrath.arcforge.recipe.ReprocessingRecipe.Mode.PUREX))
+                .build());
+
         // Progress: mB evaporated towards the next result; it evaporates rate mB/t, so the time left follows from that.
         MachineControls.register(ModBlockEntityTypes.THERMAL_EVAPORATOR.get(), MachineControlSpec.builder(ThermalEvaporatorBlockEntity.class)
                 .slot(ThermalEvaporatorBlockEntity.SLOT_SALT, SlotRole.OUTPUT)

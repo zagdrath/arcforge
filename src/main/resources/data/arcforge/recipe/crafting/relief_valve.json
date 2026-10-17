@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "RGR",
+    "SPS",
+    " S "
+  ],
+  "key": {
+    "R": "#c:dyes/red",
+    "G": "#c:gears/steel",
+    "S": "#c:plates/steel",
+    "P": "arcforge:steel_pipe"
+  },
+  "result": {
+    "id": "arcforge:relief_valve",
+    "count": 1
+  }
+}

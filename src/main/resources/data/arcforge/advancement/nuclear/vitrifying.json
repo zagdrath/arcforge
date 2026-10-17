@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/purex",
+  "display": {
+    "icon": {
+      "id": "arcforge:vitrified_waste_log"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.vitrifying.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.vitrifying.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "vitrifying"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

@@ -59,6 +59,8 @@ public abstract class ModelMesh {
         // A reactor's core seen through its windows (rows 240-255): the fuel assemblies' top nozzles in the dark water
         // and stacked graphite moderator.
         M_FUEL_TOP(0, 240, 16, 16, Kind.MODULE), M_GRAPHITE(16, 240, 16, 16, Kind.MODULE),
+        // A hot cell's ceiling lamp (two warm-white tubes in a reflector; drawn in the glow list).
+        M_LAMP(96, 96, 16, 8, Kind.MODULE),
         POLISHED(104, 112, 4, 8, Kind.BANDED),
         PLATE(0, 8, 16, 16, true, Cuts.SPLIT, Cuts.CORNERS),
         PLAIN(16, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),

@@ -1,0 +1,22 @@
+{
+  "title": "Reactor Failures",
+  "icon": "arcforge:solidified_corium",
+  "items": [
+    "arcforge:solidified_corium",
+    "arcforge:core_catcher"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A reactor fails the way a real one does, and always warns first: alarms on the Safety page of its screen, on Jade, and a klaxon. Silence stops the klaxon until a new alarm sounds.\n# Cladding failure\nAbove about 1,200 °C the Zircaloy cladding reacts with steam. It makes Hydrogen and lets fission products into the coolant: the coolant, and the containment's air, turn radioactive."
+    },
+    {
+      "type": "text",
+      "text": "# Hydrogen\nHydrogen builds up in the containment's air. Above 4% a spark or heat source (fire, lava, a torch, a lit machine, Corium) ignites it in an explosion. Hydrogen Recombiners remove it without a flame.\n# Meltdown\nAbove about 2,800 °C the fuel melts into Corium: a glowing, intensely radioactive molten fluid. It melts down through blocks, but not obsidian, Containment Concrete or a Core Catcher, and slowly cools (faster beside water) into Solidified Corium, still radioactive."
+    },
+    {
+      "type": "text",
+      "text": "# Overpressure\nPast the vessel's limit (130% of its design pressure) a steam explosion ruptures it. Relief Valves vent steam first.\n# Prompt-critical excursion\nIf reactivity jumps past prompt critical with nothing to stop it, power spikes in seconds and the explosion destroys the vessel.\n# Explosions\nTheir size grows with the energy and pressure stored, up to a cap in the config. Explosions, meltdowns and fallout can each be kept from damaging blocks in the config."
+    }
+  ]
+}

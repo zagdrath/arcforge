@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "melted=false": {
+      "model": "arcforge:block/nuclear/freeze_plug"
+    },
+    "melted=true": {
+      "model": "arcforge:block/nuclear/freeze_plug_melted"
+    }
+  }
+}

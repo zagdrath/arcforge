@@ -286,5 +286,14 @@
         "stream": false
       }
     ]
+  },
+  "reactor_alarm": {
+    "subtitle": "subtitles.arcforge.reactor_alarm",
+    "sounds": [
+      {
+        "name": "arcforge:reactor_alarm",
+        "stream": false
+      }
+    ]
   }
 }

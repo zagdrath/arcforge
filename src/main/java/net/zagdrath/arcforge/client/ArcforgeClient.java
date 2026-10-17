@@ -210,6 +210,10 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.FISSION_REACTOR.get(), net.zagdrath.arcforge.client.screen.multiblock.FissionReactorScreen::new);
         event.register(ModMenuTypes.STEAM_GENERATOR.get(), net.zagdrath.arcforge.client.screen.multiblock.SteamGeneratorScreen::new);
         event.register(ModMenuTypes.HEAVY_WATER_TOWER.get(), net.zagdrath.arcforge.client.screen.multiblock.HeavyWaterTowerScreen::new);
+        event.register(ModMenuTypes.PUREX_PLANT.get(), net.zagdrath.arcforge.client.screen.multiblock.PurexScreen::new);
+        event.register(ModMenuTypes.WASTE_COMPACTOR.get(), net.zagdrath.arcforge.client.screen.machine.WasteCompactorScreen::new);
+        event.register(ModMenuTypes.VITRIFICATION_PLANT.get(), net.zagdrath.arcforge.client.screen.machine.VitrificationPlantScreen::new);
+        event.register(ModMenuTypes.GEOLOGICAL_REPOSITORY.get(), net.zagdrath.arcforge.client.screen.nuclear.GeologicalRepositoryScreen::new);
         event.register(ModMenuTypes.SECURITY_TERMINAL.get(), SecurityTerminalScreen::new);
         event.register(ModMenuTypes.METER.get(), net.zagdrath.arcforge.client.screen.logistics.MeterScreen::new);
         event.register(ModMenuTypes.QUANTUM_TUNNEL.get(), QuantumTunnelScreen::new);
@@ -356,6 +360,13 @@ public class ArcforgeClient {
         event.register(liquidModel("heavy_water"), ModFluids.HEAVY_WATER, ModFluids.FLOWING_HEAVY_WATER);
         event.register(liquidModel("hot_coolant"), ModFluids.HOT_COOLANT, ModFluids.FLOWING_HOT_COOLANT);
         event.register(liquidModel("hot_heavy_water"), ModFluids.HOT_HEAVY_WATER, ModFluids.FLOWING_HOT_HEAVY_WATER);
+        event.register(liquidModel("nitric_acid"), ModFluids.NITRIC_ACID, ModFluids.FLOWING_NITRIC_ACID);
+        event.register(liquidModel("high_level_waste"), ModFluids.HIGH_LEVEL_WASTE, ModFluids.FLOWING_HIGH_LEVEL_WASTE);
+        event.register(liquidModel("lead_bismuth"), ModFluids.LEAD_BISMUTH, ModFluids.FLOWING_LEAD_BISMUTH);
+        event.register(liquidModel("hot_lead_bismuth"), ModFluids.HOT_LEAD_BISMUTH, ModFluids.FLOWING_HOT_LEAD_BISMUTH);
+        event.register(liquidModel("fuel_salt"), ModFluids.FUEL_SALT, ModFluids.FLOWING_FUEL_SALT);
+        event.register(liquidModel("hot_fuel_salt"), ModFluids.HOT_FUEL_SALT, ModFluids.FLOWING_HOT_FUEL_SALT);
+        event.register(liquidModel("corium"), ModFluids.CORIUM, ModFluids.FLOWING_CORIUM);
         // The slurries share one greyscale texture, tinted per metal.
         for (OreSlurry slurry : OreSlurry.values()) {
             ModFluids.Slurry fluids = ModFluids.slurry(slurry);
@@ -389,6 +400,7 @@ public class ArcforgeClient {
         event.register(gasModel(DEPLETED_URANIUM_HEXAFLUORIDE_TINT), ModFluids.DEPLETED_URANIUM_HEXAFLUORIDE, ModFluids.FLOWING_DEPLETED_URANIUM_HEXAFLUORIDE);
         event.register(gasModel(CONTAMINATED_STEAM_TINT), ModFluids.CONTAMINATED_STEAM, ModFluids.FLOWING_CONTAMINATED_STEAM);
         event.register(gasModel(HYDROGEN_SULFIDE_TINT), ModFluids.HYDROGEN_SULFIDE, ModFluids.FLOWING_HYDROGEN_SULFIDE);
+        event.register(gasModel(GasTints.NITROGEN_DIOXIDE), ModFluids.NITROGEN_DIOXIDE, ModFluids.FLOWING_NITROGEN_DIOXIDE);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -495,6 +507,13 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0x2E5CB8, 12.0F), ModFluids.HEAVY_WATER_TYPE.get());
         event.registerFluidType(liquidFog(0xB8D6E8, 6.0F), ModFluids.HOT_COOLANT_TYPE.get());
         event.registerFluidType(liquidFog(0x9CB8E0, 6.0F), ModFluids.HOT_HEAVY_WATER_TYPE.get());
+        event.registerFluidType(liquidFog(0xE8D070, 6.0F), ModFluids.NITRIC_ACID_TYPE.get());
+        event.registerFluidType(liquidFog(0x3A4A20, 2.0F), ModFluids.HIGH_LEVEL_WASTE_TYPE.get());
+        event.registerFluidType(liquidFog(0x50565E, 1.0F), ModFluids.LEAD_BISMUTH_TYPE.get());
+        event.registerFluidType(liquidFog(0xC04820, 1.0F), ModFluids.HOT_LEAD_BISMUTH_TYPE.get());
+        event.registerFluidType(liquidFog(0x7ED0B0, 3.0F), ModFluids.FUEL_SALT_TYPE.get());
+        event.registerFluidType(liquidFog(0xE88A40, 3.0F), ModFluids.HOT_FUEL_SALT_TYPE.get());
+        event.registerFluidType(liquidFog(0xF06020, 0.5F), ModFluids.CORIUM_TYPE.get());
         event.registerFluidType(liquidFog(0x7FB84A, 5.0F), ModFluids.NUTRIENT_SOLUTION_TYPE.get());
         event.registerFluidType(liquidFog(0xD8A838, 4.0F), ModFluids.BIODIESEL_TYPE.get());
         for (OreSlurry slurry : OreSlurry.values()) {
@@ -673,6 +692,13 @@ public class ArcforgeClient {
                 net.zagdrath.arcforge.client.renderer.blockentity.SteamGeneratorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.HEAVY_WATER_TOWER.get(),
                 net.zagdrath.arcforge.client.renderer.blockentity.HeavyWaterTowerRenderer::new);
+        // The PUREX Plant's hot cell, seen through its windows; the Equipment Hatch's door; hot rods in a Spent Fuel Rack.
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.PUREX_PLANT.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.PurexRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.EQUIPMENT_HATCH.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.EquipmentHatchRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.SPENT_FUEL_RACK.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.SpentFuelRackRenderer::new);
         // The automated farms draw the soil and the plant growing inside.
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GLASS_CLOCHE.get(), ClocheRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GROW_CHAMBER.get(), ClocheRenderer::new);

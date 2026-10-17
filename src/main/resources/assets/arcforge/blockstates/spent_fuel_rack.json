@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "waterlogged=false": {
+      "model": "arcforge:block/nuclear/spent_fuel_rack"
+    },
+    "waterlogged=true": {
+      "model": "arcforge:block/nuclear/spent_fuel_rack"
+    }
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "arcforge:block/nuclear/low_level_waste_drum"
+    }
+  }
+}

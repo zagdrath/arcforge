@@ -137,6 +137,48 @@
     },
     "arcforge:heavy_water": {
       "transmission": 0.5
+    },
+    "arcforge:containment_concrete": {
+      "transmission": 0.1
+    },
+    "arcforge:containment_dome": {
+      "transmission": 0.1
+    },
+    "arcforge:steel_liner": {
+      "transmission": 0.5
+    },
+    "arcforge:airlock": {
+      "transmission": 0.3
+    },
+    "arcforge:equipment_hatch": {
+      "transmission": 0.3
+    },
+    "arcforge:penetration": {
+      "transmission": 0.4
+    },
+    "arcforge:core_catcher": {
+      "transmission": 0.3
+    },
+    "arcforge:hot_cell_casing": {
+      "transmission": 0.05
+    },
+    "arcforge:hot_cell_window": {
+      "transmission": 0.15
+    },
+    "arcforge:purex_controller": {
+      "transmission": 0.05
+    },
+    "arcforge:dry_cask": {
+      "transmission": 0.1
+    },
+    "arcforge:drain_tank": {
+      "transmission": 0.05
+    },
+    "arcforge:solidified_corium": {
+      "transmission": 0.5
+    },
+    "arcforge:geological_repository": {
+      "transmission": 0.01
     }
   }
 }

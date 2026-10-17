@@ -4055,12 +4055,13 @@ public class ArcforgeConfig {
             .defineInRange("promptGenerationTime", 0.02, 0.001, 1.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_CLAD_FAILURE = BUILDER
-            .comment("Cladding temperature (°C) at which the rods fail: a SCRAM that can't be turned off.")
+            .comment("Cladding temperature (°C) at which the rods fail: a SCRAM that can't be turned off, and zirconium burning in",
+                    "steam (Hydrogen and fission products into the coolant).")
             .defineInRange("claddingFailureTemperature", 1_200.0, 400.0, 3_000.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_FUEL_MELT = BUILDER
-            .comment("Fuel temperature (°C) at which the core is damaged: every rod in it is ruined.")
-            .defineInRange("fuelMeltTemperature", 2_400.0, 800.0, 5_000.0);
+            .comment("Fuel temperature (°C) at which the core melts into Corium: every rod in it is ruined.")
+            .defineInRange("fuelMeltTemperature", 2_800.0, 800.0, 5_000.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_RUNNING_DOSE = BUILDER
             .comment("Dose rate (mSv/h at a block from the vessel's middle) of a core at full power; it scales with the power",
@@ -4115,6 +4116,231 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue HEAVY_WATER_TANK_PER_BLOCK = BUILDER
             .comment("mB each tank holds per block of the tower's inside.")
             .defineInRange("towerTankPerBlock", 4_000, 100, 1_000_000);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Reactor failures: cladding failure (zirconium and steam give Hydrogen), hydrogen burns, meltdown into Corium,",
+                "vessel bursts and prompt-critical excursions, and the Fallout they release without a sealed containment.").push("failures");
+    }
+
+    public static final ModConfigSpec.DoubleValue HYDROGEN_IGNITION = BUILDER
+            .comment("Hydrogen concentration (% of a containment's air) at which a spark or a hot surface sets it off.")
+            .defineInRange("hydrogenIgnition", 4.0, 0.5, 75.0);
+
+    public static final ModConfigSpec.DoubleValue ZIRCONIUM_HYDROGEN = BUILDER
+            .comment("mB of Hydrogen a fuel channel's cladding gives off when it's all oxidised by steam.")
+            .defineInRange("zirconiumHydrogen", 6_000.0, 0.0, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue VESSEL_BURST_FACTOR = BUILDER
+            .comment("The vessel bursts in a steam explosion at its relief pressure times this.")
+            .defineInRange("vesselBurstFactor", 1.3, 1.01, 10.0);
+
+    public static final ModConfigSpec.DoubleValue EXCURSION_POWER = BUILDER
+            .comment("Relative power (1 is full) past which a prompt-critical excursion blows the vessel apart.")
+            .defineInRange("excursionPower", 8.0, 1.5, 1_000.0);
+
+    public static final ModConfigSpec.DoubleValue EXPLOSION_SCALE = BUILDER
+            .comment("Explosion radius per cube root of the energy stored (thousands of HU) when a vessel bursts.")
+            .defineInRange("explosionScale", 0.3, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue HYDROGEN_EXPLOSION_SCALE = BUILDER
+            .comment("Hydrogen burn radius per cube root of the Hydrogen (mB) that burns.")
+            .defineInRange("hydrogenExplosionScale", 0.12, 0.0, 10.0);
+
+    public static final ModConfigSpec.DoubleValue EXPLOSION_MAX_RADIUS = BUILDER
+            .comment("The largest explosion any failure makes, in blocks.")
+            .defineInRange("explosionMaxRadius", 20.0, 1.0, 64.0);
+
+    public static final ModConfigSpec.BooleanValue EXPLOSIONS_BREAK_BLOCKS = BUILDER
+            .comment("Whether failure explosions break blocks (off: they still hurt).")
+            .define("explosionsBreakBlocks", true);
+
+    public static final ModConfigSpec.BooleanValue MELTDOWN_MELTS_BLOCKS = BUILDER
+            .comment("Whether Corium melts down through blocks (off: it pools where it lands).")
+            .define("meltdownMeltsBlocks", true);
+
+    public static final ModConfigSpec.DoubleValue CORIUM_COOLING = BUILDER
+            .comment("Chance each random tick that a block of Corium cools a step (four steps to Solidified Corium); water beside it",
+                    "cools it four times as fast.")
+            .defineInRange("coriumCooling", 0.06, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue CORIUM_MELT_DEPTH = BUILDER
+            .comment("How many blocks down a block of Corium can melt before it has cooled too far.")
+            .defineInRange("coriumMeltDepth", 12, 0, 256);
+
+    public static final ModConfigSpec.IntValue CONTAINMENT_MAX_VOLUME = BUILDER
+            .comment("The most blocks a containment may hold (its room is found by flood fill; a bigger or open room isn't sealed).")
+            .defineInRange("containmentMaxVolume", 32_768, 64, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue CONTAINMENT_STRENGTH = BUILDER
+            .comment("The explosion radius a sealed containment's walls take without breaching.")
+            .defineInRange("containmentStrength", 12.0, 0.0, 64.0);
+
+    public static final ModConfigSpec.DoubleValue AIR_ACTIVITY_HALF_LIFE = BUILDER
+            .comment("Half-life of the radioactivity in a containment's air, in in-game hours.")
+            .defineInRange("airActivityHalfLife", 8.0, 0.1, 10_000.0);
+
+    public static final ModConfigSpec.BooleanValue FALLOUT_ENABLED = BUILDER
+            .comment("Whether failures outside a sealed containment release Fallout.")
+            .define("fallout", true);
+
+    public static final ModConfigSpec.BooleanValue FALLOUT_BLOCKS = BUILDER
+            .comment("Whether Fallout settles on blocks as a layer of radioactive dust (off: it only contaminates the chunks).")
+            .define("falloutBlocks", true);
+
+    public static final ModConfigSpec.BooleanValue FALLOUT_SPREADS = BUILDER
+            .comment("Whether contamination spreads a little on the wind to the chunks downwind.")
+            .define("falloutSpreads", true);
+
+    public static final ModConfigSpec.DoubleValue FALLOUT_PER_CHANNEL = BUILDER
+            .comment("Contamination (mSv/h at the ground, spread over the chunks round it) a core releases per fuel channel when",
+                    "its vessel is destroyed (a vented or leaking one lets out a share of it).")
+            .defineInRange("falloutPerChannel", 40.0, 0.0, 100_000.0);
+
+    public static final ModConfigSpec.IntValue FALLOUT_RADIUS = BUILDER
+            .comment("How far Fallout reaches, in chunks.")
+            .defineInRange("falloutRadius", 3, 0, 16);
+
+    public static final ModConfigSpec.DoubleValue FALLOUT_SPREAD_RATE = BUILDER
+            .comment("Share of a chunk's contamination blown to the chunk downwind every 10 seconds.")
+            .defineInRange("falloutSpreadRate", 0.004, 0.0, 0.5);
+
+    public static final ModConfigSpec.DoubleValue FALLOUT_SHORT_HALF_LIFE = BUILDER
+            .comment("Half-life of Fallout's short-lived part (iodine and the like), in in-game days.")
+            .defineInRange("falloutShortHalfLife", 2.0, 0.01, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue FALLOUT_LONG_HALF_LIFE = BUILDER
+            .comment("Half-life of Fallout's long-lived part (caesium and the like), in in-game days.")
+            .defineInRange("falloutLongHalfLife", 30.0, 0.01, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue FALLOUT_LONG_SHARE = BUILDER
+            .comment("Share of Fallout that's long-lived.")
+            .defineInRange("falloutLongShare", 0.2, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Safety systems inside a containment: Emergency Core Cooling, Hydrogen Recombiners, Relief Valves, the",
+                "Decontamination Shower.").push("safety");
+    }
+
+    public static final ModConfigSpec.IntValue ECCS_ACCUMULATOR_CAPACITY = BUILDER
+            .comment("mB of water an Emergency Core Cooling Accumulator holds.")
+            .defineInRange("accumulatorCapacity", 64_000, 1_000, 10_000_000);
+
+    public static final ModConfigSpec.IntValue ECCS_ACCUMULATOR_RATE = BUILDER
+            .comment("mB a tick an accumulator injects while the core's coolant is low.")
+            .defineInRange("accumulatorRate", 400, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue ECCS_PUMP_RATE = BUILDER
+            .comment("mB a tick an Emergency Core Cooling Pump injects (from the tanks or water beside it) while the coolant is low.")
+            .defineInRange("eccsPumpRate", 200, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue ECCS_PUMP_ENERGY = BUILDER
+            .comment("FE a tick the pump uses while it injects.")
+            .defineInRange("eccsPumpEnergy", 80, 0, 100_000);
+
+    public static final ModConfigSpec.DoubleValue ECCS_LEVEL = BUILDER
+            .comment("Coolant level (of full) below which Emergency Core Cooling starts injecting.")
+            .defineInRange("eccsLevel", 0.75, 0.0, 1.0);
+
+    public static final ModConfigSpec.DoubleValue RECOMBINER_RATE = BUILDER
+            .comment("mB of Hydrogen a Hydrogen Recombiner removes from the containment's air a tick.")
+            .defineInRange("recombinerRate", 25.0, 0.0, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue RELIEF_PER_VALVE = BUILDER
+            .comment("Relief capacity a Relief Valve on the vessel gives, as a share of full power vented as steam.")
+            .defineInRange("reliefPerValve", 0.4, 0.0, 100.0);
+
+    public static final ModConfigSpec.IntValue SHOWER_WATER = BUILDER
+            .comment("mB of water the Decontamination Shower uses a second while it washes someone.")
+            .defineInRange("showerWater", 100, 0, 100_000);
+
+    public static final ModConfigSpec.DoubleValue SHOWER_RATE = BUILDER
+            .comment("Share of a person's (and their items') contamination a second under the shower washes off.")
+            .defineInRange("showerRate", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue FILTER_USES = BUILDER
+            .comment("Seconds of washing a HEPA Filter takes before it's used up.")
+            .defineInRange("filterUses", 120, 1, 100_000);
+
+    public static final ModConfigSpec.DoubleValue CONTAMINATION_PICKUP = BUILDER
+            .comment("Share of the ground's contamination a person standing in it picks up on their skin and gear each second.")
+            .defineInRange("contaminationPickup", 0.01, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Spent fuel: the Spent Fuel Pool's racks and Dry Casks.").push("spentFuel");
+    }
+
+    public static final ModConfigSpec.IntValue POOL_DEPTH = BUILDER
+            .comment("Blocks of water a Spent Fuel Rack needs over it to cool and shield its rods.")
+            .defineInRange("poolDepth", 3, 0, 32);
+
+    public static final ModConfigSpec.DoubleValue RACK_HEAT_CAPACITY = BUILDER
+            .comment("HU to warm a rack and its rods by 1 °C, out of the water.")
+            .defineInRange("rackHeatCapacity", 2_000.0, 1.0, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue RACK_AIR_COOLING = BUILDER
+            .comment("HU a tick a dry rack loses to the air per °C above 20 °C.")
+            .defineInRange("rackAirCooling", 0.05, 0.0, 1_000.0);
+
+    public static final ModConfigSpec.DoubleValue RACK_GLOW_HEAT = BUILDER
+            .comment("Decay heat (HU/t, all its rods) above which a rack's rods glow Cherenkov blue under water.")
+            .defineInRange("rackGlowHeat", 2.0, 0.0, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue DRY_CASK_MAX_HEAT = BUILDER
+            .comment("A rod's decay heat (HU/t) must be under this to go in a Dry Cask.")
+            .defineInRange("dryCaskMaxHeat", 3.0, 0.0, 100_000.0);
+
+    public static final ModConfigSpec.DoubleValue DRY_CASK_TRANSMISSION = BUILDER
+            .comment("Share of its rods' radiation a Dry Cask lets out.")
+            .defineInRange("dryCaskTransmission", 0.002, 0.0, 1.0);
+
+    static {
+        BUILDER.pop();
+        BUILDER.comment("Reprocessing and waste: the PUREX Plant, the Vitrification Plant, the Waste Compactor, the Geological",
+                "Repository, and the molten salt reactor's Salt Processing Unit and Freeze Plug.").push("reprocessing");
+    }
+
+    public static final ModConfigSpec.IntValue PUREX_ENERGY = BUILDER
+            .comment("FE a tick the PUREX Plant uses while it works.")
+            .defineInRange("purexEnergy", 200, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue PUREX_PLUTONIUM = BUILDER
+            .comment("Plutonium Oxide (items) separated per unit of a rod's plutonium fraction (a spent 3% rod holds about 0.007).")
+            .defineInRange("plutoniumPerFraction", 140.0, 0.0, 10_000.0);
+
+    public static final ModConfigSpec.DoubleValue THOREX_URANIUM_233 = BUILDER
+            .comment("U-233 Oxide (items) separated per unit of a thorium blanket rod's bred U-233 fraction.")
+            .defineInRange("uranium233PerFraction", 160.0, 0.0, 10_000.0);
+
+    public static final ModConfigSpec.IntValue REPOSITORY_MAX_Y = BUILDER
+            .comment("A Geological Repository works only below this height (and in deepslate).")
+            .defineInRange("repositoryMaxY", -40, -2_048, 2_048);
+
+    public static final ModConfigSpec.DoubleValue WASTE_LOG_HALF_LIFE = BUILDER
+            .comment("Half-life of a Vitrified Waste Log's radioactivity and warmth, in in-game days.")
+            .defineInRange("wasteLogHalfLife", 30.0, 0.01, 1_000_000.0);
+
+    public static final ModConfigSpec.DoubleValue SALT_PROCESSING_RATE = BUILDER
+            .comment("Share of a molten salt core's fission products a Salt Processing Unit takes out a tick.")
+            .defineInRange("saltProcessingRate", 0.0002, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue SALT_PROCESSING_ENERGY = BUILDER
+            .comment("FE a tick a Salt Processing Unit uses while it works.")
+            .defineInRange("saltProcessingEnergy", 120, 0, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue FREEZE_PLUG_MELT = BUILDER
+            .comment("Fuel Salt temperature (°C) at which a molten salt core's Freeze Plug melts and drains it.")
+            .defineInRange("freezePlugMelt", 780.0, 100.0, 5_000.0);
+
+    public static final ModConfigSpec.IntValue COMPACTOR_ENERGY = BUILDER
+            .comment("FE a tick the Waste Compactor uses while it works.")
+            .defineInRange("compactorEnergy", 40, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CONTAMINATED_PER_DRUM = BUILDER
+            .comment("Contaminated items (any item with fallout on it) the Waste Compactor packs into one Low-Level Waste Drum.")
+            .defineInRange("contaminatedPerDrum", 16, 1, 64);
 
     static {
         BUILDER.pop();

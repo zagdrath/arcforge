@@ -171,7 +171,20 @@ public enum MachineStatus {
     SUBCRITICAL("subcritical", "led_idle"),
     SCRAMMED("scrammed", "led_blocked"),
     CORE_DAMAGED("core_damaged", "led_blocked"),
-    EXCHANGING("exchanging", "led_running");
+    EXCHANGING("exchanging", "led_running"),
+    // The waste and reprocessing machines: the Waste Compactor (without an empty Waste Drum), the Vitrification Plant
+    // (without glass), the PUREX Plant (without acid or solvent, with a rod for the other mode, with a rod still too hot
+    // to dissolve). A reactor's core destroyed (its vessel burst or blown apart).
+    COMPACTING("compacting", "led_running"),
+    NO_DRUM("no_drum", "led_blocked"),
+    VITRIFYING("vitrifying", "led_running"),
+    NO_GLASS("no_glass", "led_blocked"),
+    REPROCESSING("reprocessing", "led_running"),
+    NO_ACID("no_acid", "led_blocked"),
+    NO_SOLVENT("no_solvent", "led_blocked"),
+    WRONG_MODE("wrong_mode", "led_blocked"),
+    ROD_TOO_HOT("rod_too_hot", "led_blocked"),
+    DESTROYED("destroyed", "led_blocked");
 
     private final String name;
     private final String led;

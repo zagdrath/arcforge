@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "DSD",
+    "STS",
+    "DSD"
+  ],
+  "key": {
+    "D": "#c:dyes/green",
+    "S": "#c:plates/steel",
+    "T": "arcforge:hardened_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:eccs_accumulator",
+    "count": 1
+  }
+}

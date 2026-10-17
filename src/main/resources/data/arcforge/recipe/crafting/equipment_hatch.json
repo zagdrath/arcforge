@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LBL",
+    "BGB",
+    "LBL"
+  ],
+  "key": {
+    "L": "arcforge:steel_liner",
+    "B": "#c:storage_blocks/steel",
+    "G": "#c:gears/steel"
+  },
+  "result": {
+    "id": "arcforge:equipment_hatch",
+    "count": 1
+  }
+}

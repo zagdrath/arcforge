@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:pellet_die",
+  "ingredient": "arcforge:thorium_dioxide",
+  "count": 1,
+  "result": {
+    "id": "arcforge:green_thorium_pellet",
+    "count": 2
+  },
+  "time": 80
+}

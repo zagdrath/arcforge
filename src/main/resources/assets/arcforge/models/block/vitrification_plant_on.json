@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/vitrification_plant_front_on",
+    "particle": "arcforge:block/vitrification_plant_side",
+    "south": "arcforge:block/vitrification_plant_back",
+    "east": "arcforge:block/vitrification_plant_left",
+    "west": "arcforge:block/vitrification_plant_right",
+    "up": "arcforge:block/vitrification_plant_top",
+    "down": "arcforge:block/vitrification_plant_bottom"
+  }
+}

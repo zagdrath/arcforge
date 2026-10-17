@@ -107,6 +107,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         // The camera in the model's frame (blocks from the box's minimum corner), to cull the water's back faces.
         public float cameraX, cameraY, cameraZ;
         public @Nullable TextureAtlasSprite sheet, waterSprite;
+        public int waterColor = WATER_COLOR;
         public int light;
     }
 
@@ -185,7 +186,9 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         state.glowLevel = vessel.glowLevel();
         state.tint = parts.length > 4 ? parts[4] : EMPTY;
         state.water = model.water(vessel.waterLevel());
-        state.waterSprite = state.water.length > 0 ? SteamBoilerArrayRenderer.sprite(WATER_STILL) : null;
+        Identifier coolant = vessel.coolantTexture();
+        state.waterSprite = state.water.length > 0 ? SteamBoilerArrayRenderer.sprite(coolant != null ? coolant : WATER_STILL) : null;
+        state.waterColor = vessel.coolantColor();
         state.cameraX = (float) (cameraPosition.x - min.getX());
         state.cameraY = (float) (cameraPosition.y - min.getY());
         state.cameraZ = (float) (cameraPosition.z - min.getZ());
@@ -229,8 +232,9 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         TextureAtlasSprite waterSprite = state.waterSprite;
         if (water.length > 0 && waterSprite != null) {
             float camX = state.cameraX, camY = state.cameraY, camZ = state.cameraZ;
+            int waterColor = state.waterColor;
             collector.order(WATER_ORDER).submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(waterSprite.atlasLocation()),
-                    (pose, buffer) -> emitWater(pose, buffer, water, waterSprite, light, camX, camY, camZ));
+                    (pose, buffer) -> emitWater(pose, buffer, water, waterSprite, waterColor, light, camX, camY, camZ));
         }
         if (tint.length > 0) {
             collector.order(TINT_ORDER).submitCustomGeometry(poseStack, RenderTypes.entityTranslucentCull(sheet.atlasLocation()),
@@ -253,9 +257,10 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         }
     }
 
-    // The water in its sprite, tinted WATER_COLOR, only the quads facing the camera: its pipeline draws both sides, and a
-    // face seen from behind is one across the vessel, behind the water already drawn in front of it.
-    private static void emitWater(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sprite, int light,
+    // The water (or the vessel's other coolant) in its sprite, tinted its colour (WATER_COLOR for water), only the quads
+    // facing the camera: its pipeline draws both sides, and a face seen from behind is one across the vessel, behind the
+    // water already drawn in front of it.
+    private static void emitWater(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sprite, int color, int light,
             float camX, float camY, float camZ) {
         for (int q = 0; q + 31 < data.length; q += 32) {
             float nx = data[q + 5], ny = data[q + 6], nz = data[q + 7];
@@ -264,7 +269,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
             }
             for (int i = q; i < q + 32; i += 8) {
                 buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
-                        .setColor(WATER_COLOR)
+                        .setColor(color)
                         .setUv(sprite.getU(data[i + 3]), sprite.getV(data[i + 4]))
                         .setOverlay(OverlayTexture.NO_OVERLAY)
                         .setLight(light)

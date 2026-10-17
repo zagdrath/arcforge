@@ -178,7 +178,7 @@ public final class FissionGameTests {
         FuelRod fresh = FuelRod.fresh(5_000);
         helper.assertTrue(fresh.isFresh() && !fresh.isSpent() && fresh.enrichment() == 5_000, "A fresh rod is wrong: " + fresh);
         helper.assertTrue(FuelRod.fresh(90_000).enrichment() <= Enrichment.MAX_PCM, "A rod went over 20%");
-        FuelRod spent = new FuelRod(fresh.type(), fresh.enrichment(), 1.0F, 0.01F, 1.0F, 0.0F, 0L, false);
+        FuelRod spent = fresh.burnt(1.0F);
         helper.assertTrue(spent.isSpent() && spent.doseRate() > fresh.doseRate() * 100.0, "Spent " + spent.doseRate() + " against fresh " + fresh.doseRate());
         ItemStack rod = new ItemStack(ModItems.FUEL_ROD.get());
         rod.set(ModDataComponents.FUEL_ROD.get(), spent);

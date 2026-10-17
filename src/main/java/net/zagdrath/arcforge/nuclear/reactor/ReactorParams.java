@@ -38,6 +38,17 @@ public final class ReactorParams {
     public double voidStreaming = 1.0;
     public double xenonWorth = 0.001;
     public double fissionProductWorth = 0.003;
+    // A lead-bismuth (fast) core and a molten salt core.
+    public double leadBismuthModeration = 0.02;
+    public double leadBismuthAbsorption = 0.002;
+    public double fastDiffusion = 1.5;          // fast neutrons travel this much further
+    public double fastResonance = 0.4;         // of U-238's resonance capture left in a fast spectrum
+    public double fastCoreFission = 0.089;       // a fissile atom's fast fission, against thermal, in a fast core
+    public double saltModeration = 0.10;
+    public double saltAbsorption = 0.004;
+    public double saltFertile = 0.35;           // the salt's fertile (thorium) capture, against a fuel rod's U-238
+    public double saltCellShare = 0.5;          // a salt cell's full power, against a fuel channel's
+    public double saltXenonRemoval = 0.01;      // of the salt's xenon bubbled off a tick (off-gas)
     public int outerIterations = 80;
     public int innerIterations = 4;
     public double tolerance = 2.0E-6;
@@ -66,6 +77,12 @@ public final class ReactorParams {
     public double reliefCapacity = 1.2;         // of full power the relief valve can vent (as steam)
     public double coolantPerBlock = 2_000.0;    // mB of coolant an empty cell holds (a channel holds channelWater of it)
     public double voidPerBoil = 0.55;           // core void at full boiling (rises up the core)
+    // Liquid-metal and salt cores: no boiling, near atmospheric pressure, hot.
+    public double leadBismuthInletCelsius = 450.0, leadBismuthHotCelsius = 900.0;
+    public double saltInletCelsius = 560.0, saltHotCelsius = 700.0;
+    public double liquidPressure = 2.0;         // bar: a lead-bismuth or salt core's pump head
+    public double leadBismuthBoil = 1_670.0;    // °C
+    public double saltBoil = 1_430.0;
 
     // --- Xenon (half-lives in seconds, scaled) ---
     public double iodineHalfLife = 800.0;
@@ -81,14 +98,30 @@ public final class ReactorParams {
     public double rodLifeTicks = 1_152_000.0;   // full-power ticks a rod lasts (16 real hours, 48 in-game days)
     public double u235Use = 0.45;               // of its U-235 used when spent
     public double plutoniumMade = 0.40;         // fissile plutonium made, against the U-235 it started with
+    public double plutoniumUse = 0.40;          // of a MOX rod's plutonium used when spent
+    public double breeding = 0.06;              // fissile bred in a blanket rod at full flux over a rod's life
+    public double fastBreeding = 2.5;           // breeding's multiple in a fast core (more neutrons spare)
 
     // --- Rods ---
     public double rodSpeed = 0.02;              // insertion a second
     public double scramTicks = 40.0;            // all the way in
 
-    // --- Limits ---
-    public double fuelMelt = 2_400.0;
+    // --- Limits and failures ---
+    public double fuelMelt = 2_800.0;
     public double cladFail = 1_200.0;
+    // Zirconium and steam: the cladding's oxidation per tick at cladFail (doubling every zrDoubling °C above it), the
+    // Hydrogen (mB) and heat (HU) a channel's cladding gives when it's all oxidised.
+    public double zrRate = 0.0004;
+    public double zrDoubling = 120.0;
+    public double zrHydrogen = 6_000.0;
+    public double zrHeat = 400_000.0;
+    // The vessel bursts at its relief pressure times this; a core above excursionPower (relative) blows apart.
+    public double burstFactor = 1.3;
+    public double excursionPower = 8.0;
+    // Relief capacity (of full power, as steam) a Relief Valve gives.
+    public double reliefPerValve = 0.4;
+    // Whether the fuel is solid (it can melt into corium); a molten salt core's isn't.
+    public boolean solidFuel = true;
 
     public static ReactorParams defaults() {
         return new ReactorParams();

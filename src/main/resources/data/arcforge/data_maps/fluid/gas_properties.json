@@ -62,6 +62,9 @@
     },
     "arcforge:contaminated_steam": {
       "color": "#DCF0EC"
+    },
+    "arcforge:nitrogen_dioxide": {
+      "color": "#C8743C"
     }
   }
 }

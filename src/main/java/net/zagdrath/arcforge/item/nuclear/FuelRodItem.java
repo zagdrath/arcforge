@@ -30,8 +30,25 @@ import net.zagdrath.arcforge.registry.ModDataComponents;
 // bar shows its burnup. Fresh it's mildly radioactive; once it has been in a running core it's intensely radioactive
 // (see RadiationField) and, until its decay heat fades, too hot to hold: it burns whoever carries it.
 public class FuelRodItem extends Item {
-    public FuelRodItem(Item.Properties properties) {
+    private final FuelRod.FuelType type;
+
+    public FuelRodItem(FuelRod.FuelType type, Item.Properties properties) {
         super(properties);
+        this.type = type;
+    }
+
+    public FuelRodItem(Item.Properties properties) {
+        this(FuelRod.FuelType.UOX, properties);
+    }
+
+    // The fuel this item is made as (a Fuel Rod, MOX Fuel Rod, Thorium Blanket Rod or U-233 Fuel Rod).
+    public FuelRod.FuelType type() {
+        return type;
+    }
+
+    // Whether a stack is any kind of fuel rod.
+    public static boolean isFuelRod(ItemStack stack) {
+        return stack.getItem() instanceof FuelRodItem;
     }
 
     @Override

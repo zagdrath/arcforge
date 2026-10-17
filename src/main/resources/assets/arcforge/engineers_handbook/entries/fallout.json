@@ -1,0 +1,19 @@
+{
+  "title": "Fallout and Decontamination",
+  "icon": "arcforge:decontamination_shower",
+  "items": [
+    "arcforge:decontamination_shower",
+    "arcforge:hepa_filter",
+    "arcforge:used_hepa_filter"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A failure without a sealed containment releases Fallout: radioactive dust that settles on the blocks round the reactor and drifts a little downwind each day, contaminating chunks. The dose is full under open sky and a tenth under a roof.\nContamination decays over in-game days: most of it within a few days, a long-lived share over a month (half-lives in the config)."
+    },
+    {
+      "type": "text",
+      "text": "# Contamination\nWalking through contaminated ground or air contaminates you and what you hold; a hazmat suit takes most of it.\n# Decontamination Shower\nMounted overhead, it washes players under it (two blocks below) and what they carry, using water and wearing out its HEPA Filter. Used filters are low-level waste."
+    }
+  ]
+}

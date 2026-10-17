@@ -1,0 +1,17 @@
+{
+  "type": "arcforge:vitrifying",
+  "fluid": {
+    "fluid": "arcforge:high_level_waste",
+    "amount": 1000
+  },
+  "glass": {
+    "ingredient": "#c:glass_blocks",
+    "count": 4
+  },
+  "result": {
+    "id": "arcforge:vitrified_waste_log",
+    "count": 1
+  },
+  "time": 400,
+  "energy": 120
+}

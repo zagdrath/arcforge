@@ -1,0 +1,21 @@
+{
+  "title": "Safety Systems",
+  "icon": "arcforge:eccs_accumulator",
+  "items": [
+    "arcforge:eccs_accumulator",
+    "arcforge:eccs_pump",
+    "arcforge:relief_valve",
+    "arcforge:hydrogen_recombiner",
+    "arcforge:core_catcher"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Emergency Core Cooling\nECCS Accumulators (tanks of water, 64,000 mB) and ECCS Pumps (powered, drawing water from tanks beside them or from the Suppression Pool) touching the vessel inject water when its coolant falls below 75%.\n# Relief Valves\nTouching the vessel, each lets more steam out before it bursts. Inside a containment with a Suppression Pool (water in the containment), they vent into the pool; otherwise into the air."
+    },
+    {
+      "type": "text",
+      "text": "# Hydrogen Recombiners\nPlaced anywhere in the containment, each removes Hydrogen from its air without a flame.\n# Core Catcher\nA refractory basin under the vessel: Corium stops on it and cools faster there."
+    }
+  ]
+}

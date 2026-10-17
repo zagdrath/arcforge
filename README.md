@@ -766,9 +766,10 @@ charge. Config `power.batteryArray`.
 
 ### Nuclear
 
-The nuclear tier is for **civil power only**: nothing in it makes a weapon, and enrichment stops at 20% U-235. It
-covers the ores, radiation, uranium chemistry and enrichment, fuel fabrication and the Fission Reactor. Everything is in the
-**Arcforge: Nuclear** creative tab and the Handbook's Nuclear chapter.
+The nuclear tier is for **civil power only**: nothing in it makes a weapon, and enrichment stops at 20% U-235. It covers
+the ores, radiation, uranium chemistry and enrichment, fuel fabrication, the Fission Reactor and its advanced cores,
+failures and containment, spent fuel, reprocessing, waste and thorium. Everything is in the **Arcforge: Nuclear**
+creative tab and the Handbook's Nuclear chapter.
 
 **Ores.** *Uraninite* (pitchblende) is rare, in small veins mostly below Y 0, and needs an iron pickaxe. It drops Raw
 Uraninite (Fortune works); the Arc Crusher gives 2 Uraninite Dust an ore (the Arc Crushing Array 4), 1 a raw (+25%) and
@@ -776,7 +777,7 @@ Uraninite (Fortune works); the Arc Crusher gives 2 Uraninite Dust an ore (the Ar
 ingot, storage block, plate, and the leach-and-precipitate chain), with a 10% chance of Silver Dust when crushed.
 *Heavy Mineral Sand* lies in patches in the sand and gravel of beaches, rivers and deserts (Y 40 to 90, a shovel mines
 it); the Sifter separates it into sand, Monazite (30%), Zircon (40%) and iron dust (15%), and the Arc Crusher turns
-Monazite and Zircon into dust (kept for later reactors). Everything has its `c:` tags.
+Monazite and Zircon into dust (for thorium and zirconium). Everything has its `c:` tags.
 
 **Radiation.** Radioactive items, blocks and fluids have a dose rate in mSv/h at one block, from the
 `arcforge:radioactivity` data maps (Raw Uraninite 0.1, Uraninite Ore 0.2, a Raw Uraninite block 0.9, UF6 0.4 a bucket, a
@@ -836,12 +837,13 @@ Zircon Dust + Coal Coke + Chlorine --> Zirconium Tetrachloride;  + Hydrogen (160
 Zircaloy Tube + 8 Fuel Pellets of one enrichment --[crafting]--> Fuel Rod
 ```
 
-A **Fuel Rod** records its fuel (uranium oxide for now), enrichment, burnup, the plutonium and fission products it has
-built up, and its decay heat when it comes out. Fresh rods are mildly radioactive (0.05 mSv/h); spent ones up to 60 and
-too hot to hold until their decay heat fades. **Control Rods** are silver between steel rods. **Graphite Moderator** and
-**Steel Reflectors** fill cells of a core; **Heavy Water** comes from the **Heavy Water Tower**: a square box of casing
-3 to 5 across and 4 to 8 tall with Exchange Trays inside, each tray taking 1,000 mB of Water, 10 mB of Hydrogen Sulfide
-and 100 mB of Steam every 2 seconds for 5 mB of Heavy Water at 30 FE/t (the Girdler sulfide process).
+A **Fuel Rod** records its fuel (uranium oxide, MOX, thorium or U-233), enrichment, burnup, the fissile and fission
+products it has built up, and its decay heat when it comes out. Fresh rods are mildly radioactive (0.05 mSv/h); spent
+ones up to 60 and too hot to hold until their decay heat fades. **Control Rods** are silver between steel rods.
+**Graphite Moderator** and **Steel Reflectors** fill cells of a core; **Heavy Water** comes from the **Heavy Water
+Tower**: a square box of casing 3 to 5 across and 4 to 8 tall with Exchange Trays inside, each tray taking 1,000 mB of
+Water, 10 mB of Hydrogen Sulfide and 100 mB of Steam every 2 seconds for 5 mB of Heavy Water at 30 FE/t (the Girdler
+sulfide process).
 
 **Fission Reactor.** Walls of Reactor Casing (Reactor Glass allowed), 3 to 7 across and 3 to 9 tall, the controller in
 a wall, any casing a port. Inside, each block is a cell: a **Fuel Channel** (holds a rod), a **Control Rod Channel**
@@ -850,12 +852,12 @@ Light or Heavy Water fills every empty cell and channel.
 
 - **Physics.** Each second a one-group neutron diffusion over the grid gives each channel's flux and the core's
   k-effective: moderators (water, Heavy Water, graphite) slow neutrons for more fission in U-235; control rods, fission
-  products, xenon and a little water absorb; reflectors return neutrons at the edges. Delayed neutrons (β 0.65%) give a
-  smooth reactor period up to k = 1.0065; above it the core is prompt critical. Fuel temperature always lowers
-  reactivity (Doppler); boiling lowers it in a water-moderated core and raises it in a graphite-moderated, water-cooled
-  one. Iodine-135 decays into Xenon-135 (half-lives scaled in config), which builds up after power drops. Decay heat
-  is 6.5% of the last power, fading over in-game hours. Fuel burns up its U-235 (a rod lasts about four hours at full
-  power).
+  products, xenon and a little water absorb; reflectors return neutrons at the edges. Delayed neutrons (β 1%,
+  game-scaled) give a smooth reactor period up to k = 1.01; above it the core is prompt critical. Fuel temperature
+  always lowers reactivity (Doppler); boiling lowers it in a water-moderated core and raises it in a graphite-moderated,
+  water-cooled one. Iodine-135 decays into Xenon-135 (half-lives scaled in config), which builds up after power drops.
+  Decay heat is 6.5% of the last power, fading over in-game hours. Fuel burns up its U-235 (a rod lasts about 16 hours
+  of full power, 48 in-game days).
 - **Heat and steam.** Fuel, cladding and coolant temperatures and vessel pressure are tracked. A **Hot Leg** port
   makes it a pressurized core: its coolant stays liquid at 155 bar and leaves as Hot Coolant (60 HU a mB) for a
   **Steam Generator** (a square box 3 to 7 across and 4 to 12 tall with Steam Generator Tubes inside; each tube block
@@ -871,6 +873,93 @@ Light or Heavy Water fills every empty cell and channel.
   Rods load from the nine input slots and spent ones come out to the nine output slots only while it's shut down.
 - **Radiation.** A running core is a strong source through its vessel (`runningDoseRate` scaled by power and decay
   heat): build concrete, lead or water round it.
+
+**Failures.** Every failure warns first: an alarm list on the reactor GUI's Safety page, on Jade, and a klaxon (Silence
+stops it until a new alarm sounds).
+
+- **Cladding failure** above about 1,200 °C (`claddingFailureTemperature`): zirconium reacts with steam, making Hydrogen
+  (`zirconiumHydrogen`) and letting fission products into the coolant, so the coolant and the containment's air turn
+  radioactive.
+- **Hydrogen** builds up in the containment's air; above 4% (`hydrogenIgnition`) a spark or heat source (fire, lava,
+  torches, a lit machine, Corium) ignites it in an explosion.
+- **Meltdown** above about 2,800 °C (`fuelMeltTemperature`): the core becomes **Corium**, a glowing, intensely
+  radioactive molten fluid that pours out and melts down through blocks (up to `coriumMeltDepth`), but not obsidian,
+  Containment Concrete or a Core Catcher (`arcforge:corium_resistant`). It slowly cools, faster beside water, into
+  **Solidified Corium**, still radioactive.
+- **Overpressure**: past 130% of the vessel's pressure (`vesselBurstFactor`) a steam explosion ruptures it.
+- **Prompt-critical excursion**: a power spike in seconds (`excursionPower`) ends in an explosion that destroys the
+  vessel.
+- Explosion size grows with the energy and pressure stored (`explosionScale`, `hydrogenExplosionScale`) up to
+  `explosionMaxRadius`. `explosionsBreakBlocks`, `meltdownMeltsBlocks`, `fallout`, `falloutBlocks` and `falloutSpreads`
+  turn each kind of damage off.
+- **Fallout.** Without a sealed containment, failures release radioactive dust that settles on the blocks round the
+  reactor and spreads a little downwind each in-game day, contaminating chunks (full dose under open sky, a tenth under
+  cover). It decays over in-game days: most with a 2-day half-life, a fifth with 30 (`falloutShortHalfLife`,
+  `falloutLongHalfLife`, `falloutLongShare`). Players and what they hold pick up contamination (a hazmat suit takes most
+  of it); the **Decontamination Shower** (mounted overhead, with water and a HEPA Filter) washes the players under it
+  and what they carry.
+
+**Containment and safety.**
+
+- **Containment Building**: any sealed room built of **Containment Concrete** with **Steel Liner** on its inside face
+  (the lined **Containment Dome** for a domed roof), round the reactor and its steam generators, found by flood fill
+  from the vessel up to 32,768 blocks of air (`containmentMaxVolume`). **Airlocks** are interlocked doors for people
+  (build them in pairs: an open one with no shut partner breaks the seal); the **Equipment Hatch** is a 3x3 bolted round
+  door for machines (open, the containment isn't sealed); rows of **Penetrations** carry pipes, conduits and cables
+  through the wall. Sealed, its walls absorb explosions up to `containmentStrength` (a bigger blast breaches the nearest
+  wall) and fallout stays in its air.
+- **Emergency Core Cooling**: **ECCS Accumulators** (64,000 mB of water) and powered **ECCS Pumps** touching the vessel
+  inject water when coolant falls below 75%; pumps draw from tanks beside them or the Suppression Pool.
+- **Relief Valves** touching the vessel let more steam out before it bursts, into the **Suppression Pool** (water inside
+  the containment) when there is one.
+- **Hydrogen Recombiners** in the containment remove Hydrogen without a flame; a **Core Catcher** under the vessel stops
+  Corium.
+
+**Spent fuel.** **Spent Fuel Racks** hold four rods and must stand under at least 3 blocks of water (`poolDepth`): the
+water cools and shields them, and hot rods glow Cherenkov blue. A drained rack heats up until its rods' cladding fails.
+Once a rod's decay heat is below 3 (`dryCaskMaxHeat`), a **Dry Cask** (concrete over steel) holds seven and shields them
+anywhere, keeping them when broken.
+
+**Reprocessing and waste** (Chemical Reactor unless noted):
+
+```
+100 Ammonia + 200 Oxygen --> 100 Nitrogen Dioxide;  150 Nitrogen Dioxide + 50 Water --> 100 Nitric Acid
+spent rod + 500 Nitric Acid + 100 Kerosene --[PUREX Plant]--> 4 Recovered Uranium + Plutonium Oxide + HLW
+Recovered Uranium + 400 Hydrofluoric Acid + 100 Fluorine --> 100 UF6 (at its enrichment)
+Depleted Uranium Dust + 100 Oxygen --> Depleted Uranium Dioxide
+5 Plutonium Oxide + 3 Depleted Uranium Dioxide --[crafting]--> 2 MOX Blend
+MOX Blend --[Metal Press, Pellet Die]--> 2 Green MOX Pellets --[Induction Furnace]--> MOX Fuel Pellet
+Zircaloy Tube + 8 MOX Fuel Pellets --[crafting]--> MOX Fuel Rod
+1,000 High-Level Liquid Waste + 4 glass --[Vitrification Plant]--> Vitrified Waste Log
+4 used HEPA Filters / a hazmat piece / 16 contaminated items + Waste Drum --[Waste Compactor]--> Low-Level Waste Drum
+```
+
+The **PUREX Plant** is an empty hot cell of **Hot Cell Casing** with lead-glass **Hot Cell Windows**, 3 to 9 across and
+3 to 6 tall (200 FE/t). Rods must have cooled first. Plutonium Oxide comes from the plutonium a rod bred (fractions
+carried between rods) and has no use but MOX; a MOX rod holds ten. **High-Level Liquid Waste** (HLW) goes to the
+**Vitrification Plant**: **Vitrified Waste Logs** are radioactive and warm, their activity halving every 30 in-game days
+(`wasteLogHalfLife`). The **Geological Repository**, placed below Y -40 (`repositoryMaxY`) with deepslate round it,
+takes logs and Dry Casks and stores them safely. Low-Level Waste Drums can be stored anywhere shielded.
+
+**Thorium.** Monazite Dust + 250 mB Lye gives **Thorium Dioxide** (75% Rare Earth Dust too), pressed and sintered into
+Thorium Pellets for **Thorium Blanket Rods**, which breed U-233 in the core. Switched to **THOREX**, the PUREX Plant
+gives back Thorium Dioxide and **Uranium-233 Oxide**; one U-233 Oxide and three Thorium Dioxide make four **U-233 Fuel
+Blend** for **U-233 Fuel Rods**.
+
+**Advanced cores** (in the same vessel, by the coolant you fill it with):
+
+- **Lead-bismuth fast reactor**: two Lead and two Bismuth ingots in the Arcforge Furnace give four **Lead-Bismuth
+  Ingots**, melted in the Arc Melter into **Lead-Bismuth Eutectic**. No moderator; 15-20% fuel or MOX; thorium blankets
+  round it breed. It runs at 900 °C and more at low pressure, and the Steam Generator makes **Superheated Steam** from
+  its hot metal. It freezes below 125 °C.
+- **Molten salt reactor**: **Fuel Salt** (one Uranium Tetrafluoride, four **Lithium Fluoride** and two **Thorium
+  Tetrafluoride** for 1,000 mB, the uranium's enrichment carried in) fills the core, with Control Rod Channels only:
+  build enough of them (about one cell in three) to hold it subcritical with every rod in before filling it. **Salt
+  Processing Units** touching the vessel remove fission products online as High-Level Liquid Waste. A **Freeze Plug**
+  under the floor, with a shielded **Drain Tank** below it, stays frozen while powered and cool; if the salt overheats
+  (780 °C, `freezePlugMelt`) or power is lost it melts and the salt drains, so the core can't melt down, and even a
+  prompt-critical spike only melts the plug. It runs at about 700 °C, and the Steam Generator makes High-Pressure Steam
+  from it.
 
 ### Fermenting
 

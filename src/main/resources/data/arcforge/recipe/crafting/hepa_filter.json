@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "PWP",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:rods/steel",
+    "P": "minecraft:paper",
+    "W": "#minecraft:wool"
+  },
+  "result": {
+    "id": "arcforge:hepa_filter",
+    "count": 2
+  }
+}

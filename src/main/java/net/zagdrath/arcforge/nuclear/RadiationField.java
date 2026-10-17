@@ -108,13 +108,17 @@ public final class RadiationField {
         if (rod != null) {
             total += rod.doseRate() * stack.getCount();
         }
+        // A Vitrified Waste Log's, decaying (see WasteLog), and dust on a contaminated item (see Contamination).
+        total += (WasteLog.doseRate(stack) + net.zagdrath.arcforge.nuclear.safety.Contamination.of(stack)) * stack.getCount();
         if (depth >= MAX_DEPTH) {
             return total;
         }
         ItemContainerContents container = stack.get(DataComponents.CONTAINER);
         if (container != null) {
+            // A Dry Cask's overpack lets only a little of its rods' out.
+            double shield = stack.is(net.zagdrath.arcforge.registry.ModItems.DRY_CASK.get()) ? ArcforgeConfig.DRY_CASK_TRANSMISSION.getAsDouble() : 1.0;
             for (ItemStack held : (Iterable<ItemStack>) container.nonEmptyItemCopyStream()::iterator) {
-                total += rate(held, depth + 1);
+                total += rate(held, depth + 1) * shield;
             }
         }
         BundleContents bundle = stack.get(DataComponents.BUNDLE_CONTENTS);
@@ -160,6 +164,8 @@ public final class RadiationField {
             for (int i = 0; i < inventory.getContainerSize(); i++) {
                 total += rate(inventory.getItem(i));
             }
+            // Fallout on their skin (see Contamination).
+            total += net.zagdrath.arcforge.nuclear.safety.Contamination.skin(player);
         } else {
             for (EquipmentSlot slot : EquipmentSlot.values()) {
                 total += rate(entity.getItemBySlot(slot));
@@ -246,8 +252,15 @@ public final class RadiationField {
         return outside + carried(entity) / Math.max(MIN_DISTANCE_SQR, distance * distance);
     }
 
-    // The dose rate at a point from everything round it (not counting what self carries; self may be null).
+    // The dose rate at a point from everything round it (not counting what self carries; self may be null): the
+    // sources round it, the fallout on the ground there (see Fallout) and a containment's radioactive air (see
+    // Containments).
     public static double doseRateAt(ServerLevel level, Vec3 at, @Nullable LivingEntity self) {
+        return sourcesAt(level, at, self) + net.zagdrath.arcforge.nuclear.safety.Fallout.ambient(level, at)
+                + net.zagdrath.arcforge.nuclear.safety.Containments.airDose(level, BlockPos.containing(at));
+    }
+
+    private static double sourcesAt(ServerLevel level, Vec3 at, @Nullable LivingEntity self) {
         int radius = ArcforgeConfig.RADIATION_RADIUS.getAsInt();
         double radiusSqr = (double) radius * radius;
         List<Source> sources = new ArrayList<>();

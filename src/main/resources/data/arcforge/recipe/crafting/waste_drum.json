@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "P P",
+    "P P",
+    "PPP"
+  ],
+  "key": {
+    "P": "#c:plates/steel"
+  },
+  "result": {
+    "id": "arcforge:waste_drum",
+    "count": 2
+  }
+}

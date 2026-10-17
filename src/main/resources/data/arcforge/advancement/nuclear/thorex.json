@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/purex",
+  "display": {
+    "icon": {
+      "id": "arcforge:uranium_233_oxide"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.thorex.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.thorex.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "thorex"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

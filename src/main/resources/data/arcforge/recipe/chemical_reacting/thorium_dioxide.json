@@ -1,0 +1,24 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:monazite_dust",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:lye",
+      "amount": 250
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:thorium_dioxide",
+    "count": 1
+  },
+  "byproduct": {
+    "id": "arcforge:rare_earth_dust",
+    "count": 1
+  },
+  "byproduct_chance": 0.75,
+  "time": 160,
+  "energy_per_tick": 40
+}

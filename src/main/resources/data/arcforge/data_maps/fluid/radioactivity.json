@@ -35,6 +35,36 @@
     },
     "arcforge:flowing_contaminated_steam": {
       "dose_rate": 0.3
+    },
+    "arcforge:high_level_waste": {
+      "dose_rate": 2.0
+    },
+    "arcforge:flowing_high_level_waste": {
+      "dose_rate": 2.0
+    },
+    "arcforge:corium": {
+      "dose_rate": 20.0
+    },
+    "arcforge:flowing_corium": {
+      "dose_rate": 20.0
+    },
+    "arcforge:hot_fuel_salt": {
+      "dose_rate": 4.0
+    },
+    "arcforge:flowing_hot_fuel_salt": {
+      "dose_rate": 4.0
+    },
+    "arcforge:fuel_salt": {
+      "dose_rate": 0.2
+    },
+    "arcforge:flowing_fuel_salt": {
+      "dose_rate": 0.2
+    },
+    "arcforge:hot_lead_bismuth": {
+      "dose_rate": 0.3
+    },
+    "arcforge:flowing_hot_lead_bismuth": {
+      "dose_rate": 0.3
     }
   }
 }

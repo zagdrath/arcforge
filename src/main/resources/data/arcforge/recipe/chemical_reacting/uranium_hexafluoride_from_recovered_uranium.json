@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:recovered_uranium",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:hydrofluoric_acid",
+      "amount": 400
+    },
+    {
+      "fluid": "arcforge:fluorine",
+      "amount": 100
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:uranium_hexafluoride",
+    "amount": 100
+  },
+  "time": 120
+}

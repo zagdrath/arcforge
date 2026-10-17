@@ -1,0 +1,12 @@
+{
+  "type": "arcforge:compacting",
+  "input": {
+    "ingredient": "arcforge:used_hepa_filter",
+    "count": 4
+  },
+  "result": {
+    "id": "arcforge:low_level_waste_drum",
+    "count": 1
+  },
+  "time": 200
+}

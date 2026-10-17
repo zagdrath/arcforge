@@ -1,6 +1,8 @@
 {
   "values": [
     "arcforge:radiation",
-    "arcforge:hot_fuel"
+    "arcforge:hot_fuel",
+    "arcforge:corium",
+    "arcforge:nitric_acid"
   ]
 }

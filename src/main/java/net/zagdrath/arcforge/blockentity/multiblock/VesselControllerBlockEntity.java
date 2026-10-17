@@ -18,6 +18,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -192,6 +193,15 @@ public abstract class VesselControllerBlockEntity extends MachineBlockEntity imp
     // How full of water the vessel is, 0..1, for its renderer (none unless the vessel says otherwise).
     public float waterLevel() {
         return 0.0F;
+    }
+
+    // The still texture its windows show that coolant with (null: water) and its colour (ARGB, multiplied over it).
+    public @Nullable Identifier coolantTexture() {
+        return null;
+    }
+
+    public int coolantColor() {
+        return 0xA03F76E4;
     }
 
     protected void setLit(boolean lit) {

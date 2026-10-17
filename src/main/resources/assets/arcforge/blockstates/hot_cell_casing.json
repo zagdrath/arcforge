@@ -1,0 +1,11 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/nuclear/hot_cell_casing"
+    },
+    "formed=true": {
+      "type": "arcforge:ported",
+      "model": "arcforge:block/nuclear/hot_cell_casing"
+    }
+  }
+}

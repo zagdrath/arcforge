@@ -26,7 +26,7 @@ import net.zagdrath.arcforge.registry.ModDataComponents;
 import net.zagdrath.arcforge.registry.ModRecipes;
 
 // A Fuel Rod: a shaped recipe (a Zircaloy Tube and Fuel Pellets) whose result is a fresh rod at the pellets' enrichment
-// (see FuelRod). Every pellet in the grid must be of the same enrichment, so a rod is never a mix. Shown in JEI as the
+// (see FuelRod); a MOX, Thorium Blanket or U-233 rod (by its result item's fuel type) is fresh of its type. Every pellet in the grid must be of the same enrichment, so a rod is never a mix. Shown in JEI as the
 // shaped recipe it is.
 public class FuelRodRecipe extends ShapedRecipe {
     private record Json(Recipe.CommonInfo commonInfo, CraftingRecipe.CraftingBookInfo bookInfo, ShapedRecipePattern.Data pattern,
@@ -95,7 +95,9 @@ public class FuelRodRecipe extends ShapedRecipe {
     public ItemStack assemble(CraftingInput input) {
         ItemStack rod = super.assemble(input);
         int assay = sharedAssay(input);
-        rod.set(ModDataComponents.FUEL_ROD.get(), FuelRod.fresh(assay > 0 ? assay : Enrichment.NATURAL_PCM));
+        // A uranium rod at its pellets' enrichment; MOX, thorium and U-233 rods as their item's usual make-up.
+        FuelRod.FuelType type = rod.getItem() instanceof net.zagdrath.arcforge.item.nuclear.FuelRodItem item ? item.type() : FuelRod.FuelType.UOX;
+        rod.set(ModDataComponents.FUEL_ROD.get(), type == FuelRod.FuelType.UOX ? FuelRod.fresh(assay > 0 ? assay : Enrichment.NATURAL_PCM) : FuelRod.of(rod));
         return rod;
     }
 

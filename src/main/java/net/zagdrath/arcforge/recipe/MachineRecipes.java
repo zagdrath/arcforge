@@ -117,6 +117,43 @@ public final class MachineRecipes {
         return recipes(level).byType(ModRecipes.ISOTOPE_EXCHANGING.get()).stream().anyMatch(holder -> holder.value().takes(fluid));
     }
 
+    // --- The nuclear waste and reprocessing machines ---
+
+    public static Optional<RecipeHolder<CompactingRecipe>> compacting(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.COMPACTING.get()).stream().filter(holder -> holder.value().input().ingredient().test(input)).findFirst();
+    }
+
+    public static boolean isCompactorInput(@Nullable Level level, ItemStack stack) {
+        return compacting(level, stack).isPresent();
+    }
+
+    public static Optional<RecipeHolder<VitrifyingRecipe>> vitrifying(@Nullable Level level, FluidResource fluid, ItemStack glass) {
+        return recipes(level).byType(ModRecipes.VITRIFYING.get()).stream()
+                .filter(holder -> holder.value().takes(fluid) && holder.value().glass().ingredient().test(glass)).findFirst();
+    }
+
+    public static boolean isVitrifyingGlass(@Nullable Level level, ItemStack stack) {
+        return recipes(level).byType(ModRecipes.VITRIFYING.get()).stream().anyMatch(holder -> holder.value().glass().ingredient().test(stack));
+    }
+
+    public static boolean isVitrifyingFluid(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.VITRIFYING.get()).stream().anyMatch(holder -> holder.value().takes(fluid));
+    }
+
+    // The PUREX Plant's recipe for a rod in a mode (or any mode, mode null).
+    public static Optional<RecipeHolder<ReprocessingRecipe>> reprocessing(@Nullable Level level, ItemStack rod, ReprocessingRecipe.@Nullable Mode mode) {
+        return recipes(level).byType(ModRecipes.REPROCESSING.get()).stream()
+                .filter(holder -> holder.value().ingredient().test(rod) && (mode == null || holder.value().mode() == mode)).findFirst();
+    }
+
+    public static boolean isReprocessingInput(@Nullable Level level, ItemStack stack) {
+        return reprocessing(level, stack, null).isPresent();
+    }
+
+    public static boolean isReprocessingFluid(@Nullable Level level, FluidResource fluid) {
+        return recipes(level).byType(ModRecipes.REPROCESSING.get()).stream().anyMatch(holder -> holder.value().acid().test(fluid) || holder.value().solvent().test(fluid));
+    }
+
     // What the Induction Furnaces take: a furnace recipe's input, or a sintering recipe's.
     public static boolean isSmeltingInput(@Nullable Level level, ItemStack stack) {
         return recipes(level).byType(RecipeType.SMELTING).stream().anyMatch(holder -> holder.value().input().test(stack))

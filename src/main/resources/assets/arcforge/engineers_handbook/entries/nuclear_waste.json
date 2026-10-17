@@ -1,0 +1,22 @@
+{
+  "title": "Nuclear Waste",
+  "icon": "arcforge:vitrified_waste_log",
+  "items": [
+    "arcforge:vitrification_plant",
+    "arcforge:vitrified_waste_log",
+    "arcforge:geological_repository",
+    "arcforge:waste_compactor",
+    "arcforge:waste_drum",
+    "arcforge:low_level_waste_drum"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Vitrification\nThe Vitrification Plant melts 1,000 mB of High-Level Liquid Waste with four glass blocks into a Vitrified Waste Log in a steel canister. Logs are radioactive and warm, and their activity halves every 30 in-game days.\n# Geological Repository\nA vault below Y -40, set in deepslate. It takes Vitrified Waste Logs and Dry Casks and stores them safely, showing what it holds."
+    },
+    {
+      "type": "text",
+      "text": "# Low-level waste\nContaminated items, used hazmat pieces and used HEPA Filters go into the Waste Compactor with an empty Waste Drum, which comes out a Low-Level Waste Drum. Store drums anywhere shielded."
+    }
+  ]
+}

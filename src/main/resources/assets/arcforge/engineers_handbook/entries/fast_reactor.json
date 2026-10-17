@@ -1,0 +1,17 @@
+{
+  "title": "Lead-Bismuth Fast Reactor",
+  "icon": "arcforge:lead_bismuth_ingot",
+  "items": [
+    "arcforge:lead_bismuth_ingot"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A new core type in the same vessel. Fill it with Lead-Bismuth Eutectic instead of water: two Lead and two Bismuth ingots smelted together in the Arcforge Furnace make four Lead-Bismuth Ingots, melted in the Arc Melter.\n- No moderator: leave out graphite, so the neutrons stay fast.\n- Fuel it with 15 to 20% enriched rods or MOX. Thorium Blanket Rods round the edge breed fuel."
+    },
+    {
+      "type": "text",
+      "text": "It runs hot, at 900 °C and more, at low pressure: the metal never boils. Hot lead-bismuth goes out of the Hot Leg to a Steam Generator, which makes Superheated Steam from it.\nLead-bismuth freezes below 125 °C: keep the core warm."
+    }
+  ]
+}

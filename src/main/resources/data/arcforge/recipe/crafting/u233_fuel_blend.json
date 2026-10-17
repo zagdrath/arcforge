@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "arcforge:uranium_233_oxide",
+    "arcforge:thorium_dioxide",
+    "arcforge:thorium_dioxide",
+    "arcforge:thorium_dioxide"
+  ],
+  "result": {
+    "id": "arcforge:u233_fuel_blend",
+    "count": 4
+  }
+}

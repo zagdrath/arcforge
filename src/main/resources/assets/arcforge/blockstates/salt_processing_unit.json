@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "arcforge:block/nuclear/salt_processing_unit"
+    }
+  }
+}

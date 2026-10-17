@@ -960,8 +960,13 @@ final class MachineCategories {
         }
     }
 
-    // A fresh Fuel Rod burned to spent in a Fission Reactor channel: the heat it gives at full power and how long it lasts.
-    record FissionRecipe(int pcm) {}
+    // A fresh fuel rod (of any fuel) burned to spent in a Fission Reactor channel: the heat it gives at full power and how
+    // long it lasts.
+    record FissionRecipe(net.minecraft.world.item.Item item, net.zagdrath.arcforge.nuclear.FuelRod fresh) {
+        FissionRecipe(int pcm) {
+            this(net.zagdrath.arcforge.registry.ModItems.FUEL_ROD.get(), net.zagdrath.arcforge.nuclear.FuelRod.fresh(pcm));
+        }
+    }
 
     static final class Fission extends ArcforgeCategory<FissionRecipe> {
         static final IRecipeType<FissionRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "fission", FissionRecipe.class);
@@ -970,18 +975,18 @@ final class MachineCategories {
             super(TYPE, "fission", ModBlocks.REACTOR_CONTROLLER.get(), gui, 150, 50);
         }
 
-        private static ItemStack rod(net.zagdrath.arcforge.nuclear.FuelRod rod) {
-            ItemStack stack = new ItemStack(net.zagdrath.arcforge.registry.ModItems.FUEL_ROD.get());
+        private static ItemStack rod(net.minecraft.world.item.Item item, net.zagdrath.arcforge.nuclear.FuelRod rod) {
+            ItemStack stack = new ItemStack(item);
             stack.set(net.zagdrath.arcforge.registry.ModDataComponents.FUEL_ROD.get(), rod);
             return stack;
         }
 
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, FissionRecipe recipe, IFocusGroup focuses) {
-            var fresh = net.zagdrath.arcforge.nuclear.FuelRod.fresh(recipe.pcm());
-            builder.addInputSlot(1, 5).setStandardSlotBackground().add(rod(fresh));
-            var spent = new net.zagdrath.arcforge.nuclear.FuelRod(fresh.type(), fresh.enrichment(), 1.0F, 0.01F, 1.0F, 0.0F, 0L, false);
-            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(rod(spent));
+            var fresh = recipe.fresh();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(rod(recipe.item(), fresh));
+            var spent = fresh.burnt(1.0F);
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(rod(recipe.item(), spent));
         }
 
         @Override
@@ -1000,7 +1005,11 @@ final class MachineCategories {
 
     // The Steam Generator: Hot Coolant from a pressurized core boils feedwater into High-Pressure Steam and goes back
     // cooled, at the heat each carries.
-    record SteamGeneratingRecipe(Fluid hot, Fluid cooled) {}
+    record SteamGeneratingRecipe(Fluid hot, Fluid cooled, Fluid steam) {
+        SteamGeneratingRecipe(Fluid hot, Fluid cooled) {
+            this(hot, cooled, ModFluids.HIGH_PRESSURE_STEAM.get());
+        }
+    }
 
     static final class SteamGenerating extends ArcforgeCategory<SteamGeneratingRecipe> {
         static final IRecipeType<SteamGeneratingRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "steam_generating", SteamGeneratingRecipe.class);
@@ -1009,18 +1018,19 @@ final class MachineCategories {
             super(TYPE, "steam_generating", ModBlocks.STEAM_GENERATOR_CONTROLLER.get(), gui, 150, 50);
         }
 
-        private static int steam() {
+        private static int steam(Fluid steam) {
             double hot = net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble();
-            double each = net.zagdrath.arcforge.config.ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble();
+            double each = net.zagdrath.arcforge.config.ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble()
+                    * (steam == ModFluids.SUPERHEATED_STEAM.get() ? net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity.SUPERHEATED_FACTOR : 1.0);
             return (int) Math.floor(100 * hot / Math.max(1.0, each));
         }
 
         @Override
         public void setRecipe(IRecipeLayoutBuilder builder, SteamGeneratingRecipe recipe, IFocusGroup focuses) {
             fluid(builder, true, 1, 5, recipe.hot(), 100);
-            fluid(builder, true, 21, 5, net.minecraft.world.level.material.Fluids.WATER, steam());
+            fluid(builder, true, 21, 5, net.minecraft.world.level.material.Fluids.WATER, steam(recipe.steam()));
             fluid(builder, false, 81, 5, recipe.cooled(), 100);
-            fluid(builder, false, 101, 5, ModFluids.HIGH_PRESSURE_STEAM.get(), steam());
+            fluid(builder, false, 101, 5, recipe.steam(), steam(recipe.steam()));
         }
 
         @Override
@@ -1034,6 +1044,108 @@ final class MachineCategories {
                     net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble())), 0, 28);
             text(graphics, Component.translatable("jei.arcforge.steam_generating.tubes", String.format(Locale.ROOT, "%,d",
                     net.zagdrath.arcforge.config.ArcforgeConfig.STEAM_GENERATOR_TUBE_RATE.getAsInt())), 0, 38);
+        }
+    }
+
+    // --- Spent fuel, reprocessing and waste ---
+
+    // The Waste Compactor: low-level waste and an empty Waste Drum into a Low-Level Waste Drum.
+    static final class Compacting extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.CompactingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.CompactingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.COMPACTING.get());
+
+        Compacting(IGuiHelper gui) {
+            super(TYPE, "compacting", ModBlocks.WASTE_COMPACTOR.get(), gui, 116, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.CompactingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().addItemStacks(recipe.input().ingredient().items().map(item -> new ItemStack(item, recipe.input().count())).toList());
+            builder.addInputSlot(21, 5).setStandardSlotBackground().add(new ItemStack(net.zagdrath.arcforge.registry.ModItems.WASTE_DRUM.get()));
+            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(recipe.result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.CompactingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.CompactingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.compacting.time", seconds(holder.value().time())), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.compacting.contaminated",
+                    net.zagdrath.arcforge.config.ArcforgeConfig.CONTAMINATED_PER_DRUM.getAsInt()), 0, 40);
+        }
+    }
+
+    // The Vitrification Plant: High-Level Liquid Waste and glass into a Vitrified Waste Log.
+    static final class Vitrifying extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.VitrifyingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.VitrifyingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.VITRIFYING.get());
+
+        Vitrifying(IGuiHelper gui) {
+            super(TYPE, "vitrifying", ModBlocks.VITRIFICATION_PLANT.get(), gui, 116, 50);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.VitrifyingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            var waste = builder.addInputSlot(1, 5).setStandardSlotBackground().setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, recipe.fluid().amount()), false, 16, 16);
+            recipe.fluid().fluids().forEach(fluid -> waste.add(fluid, recipe.fluid().amount()));
+            builder.addInputSlot(21, 5).setStandardSlotBackground().addItemStacks(recipe.glass().ingredient().items().map(item -> new ItemStack(item, recipe.glass().count())).toList());
+            builder.addOutputSlot(81, 5).setStandardSlotBackground().add(recipe.result());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.VitrifyingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(46, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.VitrifyingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            var recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.vitrifying.time", seconds(recipe.time()), recipe.energy()), 0, 30);
+            text(graphics, Component.translatable("jei.arcforge.vitrifying.decay",
+                    String.format(Locale.ROOT, "%.0f", net.zagdrath.arcforge.config.ArcforgeConfig.WASTE_LOG_HALF_LIFE.getAsDouble())), 0, 40);
+        }
+    }
+
+    // The PUREX Plant: a spent rod dissolved in acid and separated by the solvent, into its heavy metal, its fissile
+    // oxide (per whole fraction of fissile in the rod) and High-Level Liquid Waste.
+    static final class Reprocessing extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.ReprocessingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.ReprocessingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.REPROCESSING.get());
+
+        Reprocessing(IGuiHelper gui) {
+            super(TYPE, "reprocessing", ModBlocks.PUREX_CONTROLLER.get(), gui, 160, 60);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.ReprocessingRecipe> holder, IFocusGroup focuses) {
+            var recipe = holder.value();
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(recipe.ingredient());
+            var acid = builder.addInputSlot(21, 5).setStandardSlotBackground().setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, recipe.acid().amount()), false, 16, 16);
+            recipe.acid().fluids().forEach(fluid -> acid.add(fluid, recipe.acid().amount()));
+            var solvent = builder.addInputSlot(41, 5).setStandardSlotBackground().setFluidRenderer(Math.max(FLUID_SLOT_CAPACITY, recipe.solvent().amount()), false, 16, 16);
+            recipe.solvent().fluids().forEach(fluid -> solvent.add(fluid, recipe.solvent().amount()));
+            builder.addOutputSlot(101, 5).setStandardSlotBackground().add(recipe.heavyMetal());
+            builder.addOutputSlot(121, 5).setStandardSlotBackground().add(recipe.fissile());
+            fluid(builder, false, 141, 5, recipe.waste());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.ReprocessingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(66, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.ReprocessingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            var recipe = holder.value();
+            text(graphics, Component.translatable("jei.arcforge.reprocessing.mode", Component.translatable("gui.arcforge.purex_plant." + recipe.mode().getSerializedName()),
+                    seconds(recipe.time())), 0, 28);
+            text(graphics, Component.translatable("jei.arcforge.reprocessing.fissile", String.format(Locale.ROOT, "%.0f", recipe.perFraction())), 0, 38);
+            text(graphics, Component.translatable("jei.arcforge.reprocessing.cool"), 0, 48);
         }
     }
 

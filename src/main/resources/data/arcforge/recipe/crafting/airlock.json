@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LL",
+    "LG",
+    "LL"
+  ],
+  "key": {
+    "L": "arcforge:steel_liner",
+    "G": "arcforge:reactor_glass"
+  },
+  "result": {
+    "id": "arcforge:airlock",
+    "count": 1
+  }
+}

@@ -23,6 +23,7 @@
     "#c:dusts/monazite",
     "#c:dusts/zircon",
     "#c:dusts/depleted_uranium",
-    "#c:dusts/zirconium"
+    "#c:dusts/zirconium",
+    "#c:dusts/rare_earth"
   ]
 }

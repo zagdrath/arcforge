@@ -33,12 +33,16 @@ public final class ReactorSim {
     public enum Trip { NONE, MANUAL, HIGH_POWER, SHORT_PERIOD, HIGH_FUEL_TEMPERATURE, HIGH_PRESSURE, LOW_COOLANT_FLOW, CLADDING_FAILURE, REDSTONE }
 
     // One fuel rod in a fuel channel: its enrichment (U-235 fraction it started with) and what it's been through.
+    // A MOX rod also starts with plutonium (plutonium0); a thorium rod is fertile thorium that breeds U-233 (kept in
+    // plutonium: the fissile it has bred) in a neutron flux, as does a molten salt core's thorium.
     public static final class Rod {
         public double enrichment;
         public double burnup;          // 0 fresh .. 1 spent
-        public double plutonium;       // fissile Pu made (fraction, like enrichment)
+        public double plutonium;       // fissile Pu made (fraction, like enrichment), or U-233 bred in thorium
+        public double plutonium0;      // the plutonium it started with (MOX)
         public double fissionProducts; // 0 .. 1 (their absorption scales with it)
         public double power;           // its relative power now (for decay heat when it comes out)
+        public boolean thorium;
 
         public Rod(double enrichment) {
             this.enrichment = enrichment;
@@ -96,6 +100,15 @@ public final class ReactorSim {
     public Trip trip = Trip.NONE;
     // The fuel melted: the rods are ruined and it can't start again until they're all out (see the block entity).
     public boolean coreDamaged;
+    // Failures, for the block entity to act on: the cladding oxidised by steam (0..1), the Hydrogen it gave off last
+    // tick (mB), the share of the fission products let into the coolant (0..1), the fuel melted (into corium), the
+    // vessel burst, a prompt-critical excursion.
+    public double oxidised;
+    public double hydrogenMade;
+    public double coolantActivity;
+    public boolean melted, ruptured, excursion;
+    // Relief capacity (of full power, as steam) from the vessel's Relief Valves; nothing vents without one.
+    public double reliefCapacity;
 
     // Results, for the GUI.
     public double k, rho, period = Double.POSITIVE_INFINITY;
@@ -142,7 +155,8 @@ public final class ReactorSim {
         for (int i = 0; i < lattice.size; i++) {
             capacity += switch (lattice.cell(i)) {
                 case COOLANT -> p.coolantPerBlock;
-                case FUEL, CONTROL -> p.coolantPerBlock * p.channelWater;
+                case FUEL -> lattice.saltCore ? p.coolantPerBlock : p.coolantPerBlock * p.channelWater;
+                case CONTROL -> p.coolantPerBlock * p.channelWater;
                 default -> 0.0;
             };
         }
@@ -150,6 +164,7 @@ public final class ReactorSim {
         blockCount[0] = lattice.size;
         Arrays.fill(insertion, 1.0);
         Arrays.fill(target, 1.0);
+        reliefCapacity = p.reliefCapacity;
     }
 
     // --- Rods ---
@@ -217,6 +232,9 @@ public final class ReactorSim {
     }
 
     public double operatingPressure() {
+        if (!coolantType.isWater()) {
+            return p.liquidPressure;
+        }
         return switch (mode) {
             case PRESSURIZED -> p.pwrPressure;
             case BOILING -> p.bwrPressure;
@@ -225,7 +243,20 @@ public final class ReactorSim {
     }
 
     public double reliefPressure() {
+        if (!coolantType.isWater()) {
+            return p.liquidPressure + 8.0;
+        }
         return mode == Mode.BOILING ? p.bwrPressure + 20.0 : p.reliefPressure;
+    }
+
+    // Past this the vessel bursts.
+    public double burstPressure() {
+        return reliefPressure() * p.burstFactor;
+    }
+
+    // The boiling point of a liquid-metal or salt coolant (water boils by the steam tables).
+    private double liquidBoil() {
+        return coolantType == CoreLattice.Coolant.LEAD_BISMUTH ? p.leadBismuthBoil : p.saltBoil;
     }
 
     public double level() {
@@ -233,7 +264,28 @@ public final class ReactorSim {
     }
 
     private double waterDensity() {
+        if (!coolantType.isWater()) {
+            // Lead-bismuth and salt expand only a little as they heat.
+            return Math.max(0.85, 1.0 - 0.0001 * (coolantTemp - AMBIENT));
+        }
         return Math.max(0.6, 1.0 - 0.0006 * (Math.min(coolantTemp, 374.0) - AMBIENT));
+    }
+
+    // Full power (HU/t) of one fuel cell: a fuel channel's, or a share of it for a salt cell.
+    public double cellHeat() {
+        return p.channelHeat * (lattice.saltCore ? p.saltCellShare : 1.0);
+    }
+
+    // Cold coolant forced in (Emergency Core Cooling): mB at a temperature, mixing with what's there.
+    public double inject(double amount, double celsius) {
+        double room = Math.max(0.0, coolantCapacity - coolant);
+        double added = Math.min(room, amount);
+        if (added > 0.0) {
+            double share = added / Math.max(1.0, coolantCapacity);
+            coolantTemp += (celsius - coolantTemp) * Math.min(1.0, share * 1.5);
+            coolant += added;
+        }
+        return added;
     }
 
     public double vesselCapacity() {
@@ -246,7 +298,7 @@ public final class ReactorSim {
 
     // Full-power thermal output (HU/t) for this core: every loaded channel at channelHeat.
     public double ratedPower() {
-        return Math.max(1, loadedRods()) * p.channelHeat;
+        return Math.max(1, loadedRods()) * cellHeat();
     }
 
     private CoreLattice.Conditions conditions(double fuel, double water, double[] banks) {
@@ -347,9 +399,14 @@ public final class ReactorSim {
         }
         peaking = count > 0 && mean > 0.0 ? max : 1.0;
         meanFission = mean;
+        double fluxSum = 0.0;
+        for (int cell : fuelCells) {
+            fluxSum += lattice.flux(cell);
+        }
+        meanFlux = fuelCells.length > 0 ? fluxSum / fuelCells.length : 0.0;
     }
 
-    private double meanFission;
+    private double meanFission, meanFlux;
     private double steamWanted;
 
     // A channel's power share (1 = average).
@@ -431,7 +488,7 @@ public final class ReactorSim {
 
     private void heat(double hotLegRoom, double steamRoom) {
         int channels = Math.max(1, loadedRods());
-        double fission = power * channels * p.channelHeat;
+        double fission = power * channels * cellHeat();
         decayPower = 0.0;
         for (int g = 0; g < decay.length; g++) {
             decay[g] += (p.decayShares[g] * p.decayFraction * fission - decay[g]) / p.decayTicks[g];
@@ -454,32 +511,56 @@ public final class ReactorSim {
         // Past melting the fuel slumps rather than heating on.
         fuelTemp = Math.min(fuelTemp, p.fuelMelt + 600.0);
         cladTemp = Math.min(cladTemp, p.fuelMelt + 600.0);
+        oxidise(channels, cc);
         // Heat lost to the surroundings.
         coolantTemp -= p.ambientLoss * (coolantTemp - AMBIENT);
         hotLeg = steamMade = vented = 0.0;
         double demand = 0.0;
-        switch (mode) {
-            case PRESSURIZED -> {
-                double ramp = Math.max(0.0, Math.min(1.0, (coolantTemp - p.pwrInletCelsius) / (p.pwrHotCelsius - p.pwrInletCelsius)));
-                double capacity = channels * p.channelHeat * 1.5 / p.hotCoolantHeat * pumpSetting;
+        if (!coolantType.isWater()) {
+            // Lead-bismuth or salt: no boiling, the pump sends the hot liquid out of the hot leg. (Both freeze when cold,
+            // lead-bismuth at 125 °C and the salt at about 460 °C: below its inlet temperature nothing flows out, so a
+            // cold core sends nothing until it has warmed up.)
+            double inlet = coolantType == CoreLattice.Coolant.LEAD_BISMUTH ? p.leadBismuthInletCelsius : p.saltInletCelsius;
+            double hot = coolantType == CoreLattice.Coolant.LEAD_BISMUTH ? p.leadBismuthHotCelsius : p.saltHotCelsius;
+            if (mode == Mode.PRESSURIZED) {
+                double ramp = Math.max(0.0, Math.min(1.0, (coolantTemp - inlet) / (hot - inlet)));
+                double capacity = channels * cellHeat() * 1.5 / p.hotCoolantHeat * pumpSetting;
                 demand = capacity * ramp;
                 double out = Math.min(Math.min(demand, hotLegRoom), coolant);
                 hotLeg = out;
                 coolant -= out;
                 coolantTemp -= out * p.hotCoolantHeat / cw;
-                boil(p.pwrPressure, 0.0);
             }
-            case BOILING -> {
-                boil(p.bwrPressure, steamRoom);
-                demand = steamWanted;
+            pressure = p.liquidPressure + Math.max(0.0, coolantTemp - liquidBoil()) * 0.5;
+            relieve(cw);
+            boilVoid *= 0.95;
+        } else {
+            switch (mode) {
+                case PRESSURIZED -> {
+                    double ramp = Math.max(0.0, Math.min(1.0, (coolantTemp - p.pwrInletCelsius) / (p.pwrHotCelsius - p.pwrInletCelsius)));
+                    double capacity = channels * cellHeat() * 1.5 / p.hotCoolantHeat * pumpSetting;
+                    demand = capacity * ramp;
+                    double out = Math.min(Math.min(demand, hotLegRoom), coolant);
+                    hotLeg = out;
+                    coolant -= out;
+                    coolantTemp -= out * p.hotCoolantHeat / cw;
+                    boil(p.pwrPressure, 0.0);
+                }
+                case BOILING -> {
+                    boil(p.bwrPressure, steamRoom);
+                    demand = steamWanted;
+                }
+                case NONE -> boil(1.013, 0.0);
             }
-            case NONE -> boil(1.013, 0.0);
         }
         // Flow: what left against what it wanted to send (1 when nothing needed to leave).
         double ratio = demand > 1.0E-3 ? Math.min(1.0, (hotLeg + steamMade) / demand) : 1.0;
         flowRatio = 0.9 * flowRatio + 0.1 * ratio;
-        double heatShare = thermalPower > 0 ? Math.min(1.0, toCoolant / Math.max(1.0, channels * p.channelHeat)) : 0.0;
-        boilVoid = mode == Mode.BOILING ? p.voidPerBoil * Math.min(1.0, steamMade * p.boilingHeat / Math.max(1.0, channels * p.channelHeat)) : boilVoid * 0.95;
+        if (!coolantType.isWater()) {
+            return;
+        }
+        double heatShare = thermalPower > 0 ? Math.min(1.0, toCoolant / Math.max(1.0, channels * cellHeat())) : 0.0;
+        boilVoid = mode == Mode.BOILING ? p.voidPerBoil * Math.min(1.0, steamMade * p.boilingHeat / Math.max(1.0, channels * cellHeat())) : boilVoid * 0.95;
         if (mode != Mode.BOILING && coolantTemp > saturationCelsius(operatingPressure())) {
             boilVoid = Math.min(p.voidPerBoil, boilVoid + 0.02 * heatShare + 0.005);
         }
@@ -501,18 +582,67 @@ public final class ReactorSim {
         if (mode == Mode.NONE) {
             pressure = Math.max(1.013, saturationPressure(coolantTemp));
         }
+        relieve(cw);
+    }
+
+    // Above the relief pressure the Relief Valves vent steam (as much as their capacity), which brings the pressure
+    // down; without valves nothing vents, and the pressure climbs on.
+    private void relieve(double cw) {
         double relief = reliefPressure();
-        if (pressure > relief && coolant > 0.0) {
-            double limit = saturationCelsius(relief);
-            double capacity = p.reliefCapacity * ratedPower() / p.boilingHeat;
-            double steam = Math.min(Math.min((coolantTemp - limit) * cw / p.boilingHeat, coolant), capacity);
-            if (steam > 0.0) {
-                vented = steam;
-                coolant -= steam;
-                coolantTemp -= steam * p.boilingHeat / cw;
+        if (pressure > relief && coolant > 0.0 && reliefCapacity > 0.0) {
+            double operating = operatingPressure();
+            double capacity = reliefCapacity * ratedPower() / p.boilingHeat;
+            if (coolantType.isWater()) {
+                double limit = saturationCelsius(relief);
+                double steam = Math.min(Math.min((coolantTemp - limit) * cw / p.boilingHeat, coolant), capacity);
+                if (steam > 0.0) {
+                    vented = steam;
+                    coolant -= steam;
+                    coolantTemp -= steam * p.boilingHeat / cw;
+                }
+                pressure = Math.max(operating, saturationPressure(coolantTemp));
+            } else {
+                // Liquid-metal or salt vapour: vented (and lost) until the core is back under its boiling point.
+                double vapour = Math.min(Math.min((coolantTemp - liquidBoil()) * cw / p.boilingHeat, coolant), capacity);
+                if (vapour > 0.0) {
+                    vented = vapour;
+                    coolant -= vapour;
+                    coolantTemp -= vapour * p.boilingHeat / cw;
+                }
+                pressure = p.liquidPressure + Math.max(0.0, coolantTemp - liquidBoil()) * 0.5;
             }
-            pressure = Math.max(operating, saturationPressure(coolantTemp));
         }
+    }
+
+    // Zirconium cladding above cladFail reacts with the steam round it: it oxidises (faster the hotter, doubling every
+    // zrDoubling °C), giving off Hydrogen and heat (which drives it on), and its failed cladding lets the fission
+    // products into the coolant. A salt core has no cladding.
+    private void oxidise(int channels, double cc) {
+        hydrogenMade = 0.0;
+        if (lattice.saltCore || loadedRods() == 0) {
+            return;
+        }
+        double clad = hottestCladding();
+        if (clad <= p.cladFail || oxidised >= 1.0 || !coolantType.isWater() && clad < p.fuelMelt) {
+            return;
+        }
+        // Steam to react with: water in the vessel (or what boils off it); a dry core still has some.
+        double steam = Math.max(0.2, level());
+        double rate = Math.min(1.0 - oxidised, p.zrRate * Math.pow(2.0, (clad - p.cladFail) / p.zrDoubling) * (1.0 - oxidised) * steam);
+        oxidised += rate;
+        hydrogenMade = coolantType.isWater() ? rate * channels * p.zrHydrogen : 0.0;
+        cladTemp += rate * channels * p.zrHeat / cc;
+        double inventory = 0.2;
+        int count = 0;
+        double fp = 0.0;
+        for (int cell : fuelCells) {
+            if (rods[cell] != null) {
+                fp += rods[cell].fissionProducts;
+                count++;
+            }
+        }
+        inventory += count > 0 ? fp / count : 0.0;
+        coolantActivity = Math.max(coolantActivity, Math.min(1.0, oxidised * inventory));
     }
 
     private void xenonAndBurnup() {
@@ -522,6 +652,8 @@ public final class ReactorSim {
         double gain = (lambdaX + sigma) / (1.05 * lambdaI);
         double xenonSum = 0.0;
         int count = 0;
+        // A salt core's cells share one Rod (the salt circulates through them all), so each takes its share.
+        double each = lattice.saltCore ? 1.0 / Math.max(1, loadedRods()) : 1.0;
         for (int cell : fuelCells) {
             Rod rod = rods[cell];
             if (rod == null) {
@@ -536,11 +668,25 @@ public final class ReactorSim {
             lattice.setXenon(cell, Math.max(0.0, x));
             xenonSum += x;
             count++;
+            if (lattice.saltCore) {
+                // Xenon bubbles out of circulating salt.
+                lattice.setXenon(cell, lattice.xenon(cell) * (1.0 - p.saltXenonRemoval));
+            }
             if (q > 0.0 && !rod.isSpent()) {
-                double db = q / p.rodLifeTicks;
+                double db = q / p.rodLifeTicks * each;
                 rod.burnup = Math.min(1.0, rod.burnup + db);
-                rod.plutonium = p.plutoniumMade * rod.enrichment * rod.burnup * (1.0 - 0.4 * rod.burnup);
-                rod.fissionProducts = rod.burnup;
+                if (!rod.thorium) {
+                    rod.plutonium = rod.plutonium0 * (1.0 - p.plutoniumUse * rod.burnup)
+                            + p.plutoniumMade * Math.max(rod.enrichment, 0.0025) * rod.burnup * (1.0 - 0.4 * rod.burnup);
+                }
+                // A rod's fission products stay in it; a salt's build up until the Salt Processing Unit takes them out.
+                rod.fissionProducts = lattice.saltCore ? Math.min(1.0, rod.fissionProducts + db) : rod.burnup;
+            }
+            // Thorium breeds U-233 from the flux it sits in (more in a fast core), up to a few percent.
+            if (rod.thorium && power > 0.0) {
+                double flux = meanFlux > 0.0 ? lattice.flux(cell) / meanFlux : 0.0;
+                double bred = p.breeding * (coolantType == CoreLattice.Coolant.LEAD_BISMUTH ? p.fastBreeding : 1.0) * power * flux / p.rodLifeTicks * each;
+                rod.plutonium = Math.min(0.08, rod.plutonium + bred * (1.0 - rod.plutonium / 0.08));
             }
         }
         meanXenon = count > 0 ? xenonSum / count : 0.0;
@@ -557,8 +703,15 @@ public final class ReactorSim {
     }
 
     private void protect() {
-        if (hottestFuel() > p.fuelMelt && !coreDamaged) {
+        if (p.solidFuel && hottestFuel() > p.fuelMelt && !coreDamaged) {
             coreDamaged = true;
+            melted = true;
+        }
+        if (pressure > burstPressure()) {
+            ruptured = true;
+        }
+        if (power > p.excursionPower) {
+            excursion = true;
         }
         if (coreDamaged) {
             scram(Trip.CLADDING_FAILURE);
@@ -604,6 +757,28 @@ public final class ReactorSim {
         }
         trip = Trip.NONE;
         return was != Trip.NONE;
+    }
+
+    // The energy (HU) a burst vessel lets go: its coolant's heat above boiling, its pressure, and in an excursion the
+    // fission energy of the spike. What sizes the explosion (see the block entity).
+    public double storedEnergy() {
+        double heat = Math.max(0.0, coolantTemp - 100.0) * vesselCapacity();
+        double squeeze = Math.max(0.0, pressure - 1.0) * lattice.size * 400.0;
+        double spike = excursion ? power * ratedPower() * 400.0 : 0.0;
+        return heat + squeeze + spike;
+    }
+
+    // With every fuel rod out of a damaged core it can be started again: its damage, oxidation and failures are
+    // cleared (the coolant stays as radioactive until it's drained).
+    public void clearDamage() {
+        coreDamaged = false;
+        melted = false;
+        ruptured = false;
+        excursion = false;
+        oxidised = 0.0;
+        if (trip == Trip.CLADDING_FAILURE) {
+            trip = Trip.MANUAL;
+        }
     }
 
     // Shut down: every rod in and the power down to decay heat.

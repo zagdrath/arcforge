@@ -221,7 +221,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             ChemicalReactingRecipe recipe = holder.value();
             total = ticksFor(recipe);
             makingItem = recipe.itemOutput().map(template -> product(recipe, template.create())).orElse(ItemStack.EMPTY);
-            makingFluid = recipe.fluidOutput().map(template -> template.create()).orElse(FluidStack.EMPTY);
+            makingFluid = recipe.fluidOutput().map(template -> fluidProduct(recipe, template.create())).orElse(FluidStack.EMPTY);
         }
 
         if (!canRun(level)) {
@@ -279,7 +279,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             return false;
         }
         if (recipe.fluidOutput().isPresent()) {
-            FluidStack fluid = recipe.fluidOutput().get().create();
+            FluidStack fluid = fluidProduct(recipe, recipe.fluidOutput().get().create());
             try (Transaction tx = Transaction.openRoot()) {
                 if (output.insert(0, FluidResource.of(fluid), fluid.getAmount(), tx) != fluid.getAmount()) {
                     return false;
@@ -309,6 +309,10 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             return;
         }
         List<ChemicalReactingRecipe.ItemInput> needed = recipe.itemInputs();
+        // Made before the inputs go, so they take the inputs' U-235 assay (enriched UF6 into enriched Uranium Dioxide,
+        // enriched Uranium Tetrafluoride into Fuel Salt).
+        ItemStack product = recipe.itemOutput().map(template -> product(recipe, template.create())).orElse(ItemStack.EMPTY);
+        FluidStack fluidMade = recipe.fluidOutput().map(template -> fluidProduct(recipe, template.create())).orElse(FluidStack.EMPTY);
         int itemsUsed = 0;
         for (int i = 0; i < slots.length; i++) {
             ChemicalReactingRecipe.ItemInput wanted = needed.get(i);
@@ -322,19 +326,16 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             itemsUsed += wanted.count();
         }
         int fluidUsed = 0;
-        // Made before the inputs go, so it takes their U-235 assay (enriched UF6 into enriched Uranium Dioxide).
-        ItemStack product = recipe.itemOutput().map(template -> product(recipe, template.create())).orElse(ItemStack.EMPTY);
         List<FluidStack> madeFluids = new ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
             for (int i = 0; i < tanks.length; i++) {
                 FilteredFluidTank tank = inputTank(tanks[i]);
                 fluidUsed += tank.extract(0, tank.getResource(0), recipe.fluidInputs().get(i).amount(), tx);
             }
-            recipe.fluidOutput().ifPresent(template -> {
-                FluidStack fluid = template.create();
-                output.insert(0, FluidResource.of(fluid), fluid.getAmount(), tx);
-                madeFluids.add(fluid);
-            });
+            if (!fluidMade.isEmpty()) {
+                output.insert(0, FluidResource.of(fluidMade), fluidMade.getAmount(), tx);
+                madeFluids.add(fluidMade);
+            }
             recipe.fluidByproduct().ifPresent(template -> {
                 FluidStack fluid = template.create();
                 byproductTank.insert(0, FluidResource.of(fluid), fluid.getAmount(), tx);
@@ -357,7 +358,8 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
                 recipe.fluidOutput().map(template -> template.create().getFluid()).orElse(null), recipe.category());
     }
 
-    // An item the reactor makes, carrying the U-235 assay of an input tank holding an assayed gas (UF6) the recipe uses.
+    // An item the reactor makes, carrying the U-235 assay of an input tank holding an assayed gas (UF6) the recipe uses,
+    // or of an input item carrying one (enriched Uranium Dioxide into Uranium Tetrafluoride).
     private ItemStack product(ChemicalReactingRecipe recipe, ItemStack made) {
         for (int tank = 0; tank < 3; tank++) {
             FilteredFluidTank input = inputTank(tank);
@@ -365,7 +367,30 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
                 net.zagdrath.arcforge.nuclear.Enrichment.carry(input.getResource(0), made);
             }
         }
+        ItemStack assayed = assayedInput(recipe);
+        if (!assayed.isEmpty()) {
+            net.zagdrath.arcforge.nuclear.Enrichment.carry(assayed, made);
+        }
         return made;
+    }
+
+    // A fluid the reactor makes: UF6 (from Recovered Uranium) takes its item's assay; Fuel Salt always carries its
+    // uranium's (natural without one), which marks it fresh (see FissionReactorBlockEntity).
+    private FluidStack fluidProduct(ChemicalReactingRecipe recipe, FluidStack made) {
+        ItemStack assayed = assayedInput(recipe);
+        return net.zagdrath.arcforge.nuclear.Enrichment.carry(assayed, made);
+    }
+
+    // The first input item the recipe uses that carries a U-235 assay (empty if none).
+    private ItemStack assayedInput(ChemicalReactingRecipe recipe) {
+        for (int slot : INPUT_SLOTS) {
+            ItemStack stack = items.getStack(slot);
+            if (!stack.isEmpty() && stack.has(net.zagdrath.arcforge.registry.ModDataComponents.U235_ASSAY.get())
+                    && recipe.itemInputs().stream().anyMatch(in -> in.ingredient().test(stack))) {
+                return stack;
+            }
+        }
+        return ItemStack.EMPTY;
     }
 
     private void add(int slot, ItemStack product) {

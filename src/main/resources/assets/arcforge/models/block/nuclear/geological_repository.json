@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "arcforge:block/nuclear/geological_repository",
+    "top": "arcforge:block/nuclear/geological_repository_top",
+    "bottom": "arcforge:block/nuclear/containment_concrete"
+  }
+}

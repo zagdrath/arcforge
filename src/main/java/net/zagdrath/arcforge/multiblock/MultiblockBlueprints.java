@@ -18,7 +18,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
@@ -98,7 +100,9 @@ public final class MultiblockBlueprints {
                 vessel("steam_generator", new BlockPos(3, 5, 3), ModBlocks.STEAM_GENERATOR_CASING.get(), ModBlocks.STEAM_GENERATOR_CONTROLLER.get(),
                         pos -> ModBlocks.STEAM_GENERATOR_TUBES.get().defaultBlockState()),
                 vessel("heavy_water_tower", new BlockPos(3, 5, 3), ModBlocks.HEAVY_WATER_TOWER_CASING.get(),
-                        ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get(), pos -> ModBlocks.EXCHANGE_TRAY.get().defaultBlockState()));
+                        ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get(), pos -> ModBlocks.EXCHANGE_TRAY.get().defaultBlockState()),
+                purexPlant(),
+                containment());
     }
 
     // A solid 3x3x3 cube of one casing.
@@ -527,5 +531,48 @@ public final class MultiblockBlueprints {
                 List.of(new BlockPos(1, 2, 4), new BlockPos(3, 2, 4)), ModBlocks.REACTOR_GLASS.get(),
                 pos -> pos.getX() == 2 && pos.getZ() == 2 ? ModBlocks.CONTROL_ROD_CHANNEL.get().defaultBlockState()
                         : ModBlocks.FUEL_CHANNEL.get().defaultBlockState());
+    }
+
+    // A small hot cell 5x4x4 (up to 9 across and 6 tall work): Hot Cell Casing, a Hot Cell Window either side of the
+    // controller (its master-slave manipulators reach through over them), empty inside.
+    private static Blueprint purexPlant() {
+        return vessel("purex_plant", new BlockPos(5, 4, 4), ModBlocks.HOT_CELL_CASING.get(), ModBlocks.PUREX_CONTROLLER.get(),
+                List.of(new BlockPos(1, 2, 3), new BlockPos(3, 2, 3)), ModBlocks.HOT_CELL_WINDOW.get(), pos -> null);
+    }
+
+    // A containment building, cut down to show how it's built (a real one is round a reactor and its steam generators):
+    // walls two thick, Containment Concrete outside and the Steel Liner on its inner face, floor and roof the same; an
+    // Airlock through the front's liner (the concrete open in front of it) and a Penetration through the left wall (two
+    // in a row, as thick as the wall). Inside, 3x3x3 of air.
+    private static Blueprint containment() {
+        BlockPos size = new BlockPos(7, 7, 7);
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < size.getY(); y++) {
+            for (int z = 0; z < size.getZ(); z++) {
+                for (int x = 0; x < size.getX(); x++) {
+                    int depth = Math.min(Math.min(Math.min(x, size.getX() - 1 - x), Math.min(z, size.getZ() - 1 - z)), Math.min(y, size.getY() - 1 - y));
+                    BlockPos pos = new BlockPos(x, y, z);
+                    BlockState state = null;
+                    if (x == 3 && z >= 5 && (y == 2 || y == 3)) {
+                        // The doorway: the airlock in the liner, the concrete open in front of it.
+                        if (z == 5) {
+                            state = ModBlocks.AIRLOCK.get().defaultBlockState().setValue(DoorBlock.FACING, Direction.SOUTH)
+                                    .setValue(DoorBlock.HALF, y == 2 ? DoubleBlockHalf.LOWER : DoubleBlockHalf.UPPER);
+                        }
+                    } else if (z == 3 && y == 3 && x <= 1) {
+                        state = ModBlocks.PENETRATION.get().defaultBlockState().setValue(net.zagdrath.arcforge.block.nuclear.PenetrationBlock.FACING,
+                                Direction.WEST);
+                    } else if (depth == 0) {
+                        state = ModBlocks.CONTAINMENT_CONCRETE.get().defaultBlockState();
+                    } else if (depth == 1) {
+                        state = ModBlocks.STEEL_LINER.get().defaultBlockState();
+                    }
+                    if (state != null) {
+                        placements.add(new Placement(pos, state));
+                    }
+                }
+            }
+        }
+        return new Blueprint("containment", sorted(placements), size);
     }
 }

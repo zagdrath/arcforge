@@ -1,0 +1,11 @@
+{
+  "type": "arcforge:pressing",
+  "die": "arcforge:pellet_die",
+  "ingredient": "arcforge:u233_fuel_blend",
+  "count": 1,
+  "result": {
+    "id": "arcforge:green_u233_pellet",
+    "count": 2
+  },
+  "time": 80
+}

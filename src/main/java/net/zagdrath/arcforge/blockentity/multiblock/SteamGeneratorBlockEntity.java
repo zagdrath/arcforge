@@ -53,7 +53,10 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 // Input ports with feedwater (Water); each Steam Generator Tubes block cools hotCoolantPerTube mB of it a tick, its
 // heat (fissionReactor.hotCoolantHeat HU a mB) boiling feedwater into High-Pressure Steam at steamHeat HU a mB. The
 // cooled coolant (Water or Heavy Water again) goes back out of Output ports to the reactor's cold leg, the steam out of
-// Steam ports to Steam Turbine Arrays. Both are pushed into what touches the ports.
+// Steam ports to Steam Turbine Arrays. Both are pushed into what touches the ports. The advanced cores' loops work it
+// the same way: a lead-bismuth fast reactor's Hot Lead-Bismuth (about 900 °C) boils it into Superheated Steam
+// (SUPERHEATED_FACTOR times the heat a mB), and a molten salt reactor's Hot Fuel Salt into High-Pressure Steam, each
+// going back out as Lead-Bismuth or Fuel Salt.
 public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.STEAM);
     private static final Set<SideMode> PUSHED = EnumSet.of(SideMode.OUTPUT, SideMode.STEAM);
@@ -78,11 +81,12 @@ public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
     public SteamGeneratorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.STEAM_GENERATOR.get(), pos, state, 0, (slot, resource) -> false, SIDE_MODES);
         int tank = ArcforgeConfig.STEAM_GENERATOR_TANK_PER_BLOCK.getAsInt();
-        this.hot = new FilteredFluidTank(tank, resource -> resource.is(ModFluids.HOT_COOLANT.get()) || resource.is(ModFluids.HOT_HEAVY_WATER.get()),
-                this::setChanged);
+        this.hot = new FilteredFluidTank(tank, SteamGeneratorBlockEntity::isHot, this::setChanged);
         this.feed = new FilteredFluidTank(tank, resource -> resource.is(Fluids.WATER), this::setChanged);
-        this.cooled = new FilteredFluidTank(tank, resource -> resource.is(Fluids.WATER) || resource.is(ModFluids.HEAVY_WATER.get()), this::setChanged);
-        this.steam = new FilteredFluidTank(tank * 4, resource -> resource.is(ModFluids.HIGH_PRESSURE_STEAM.get()), this::setChanged);
+        this.cooled = new FilteredFluidTank(tank, resource -> resource.is(Fluids.WATER) || resource.is(ModFluids.HEAVY_WATER.get())
+                || resource.is(ModFluids.LEAD_BISMUTH.get()) || resource.is(ModFluids.FUEL_SALT.get()), this::setChanged);
+        this.steam = new FilteredFluidTank(tank * 4, resource -> resource.is(ModFluids.HIGH_PRESSURE_STEAM.get()) || resource.is(ModFluids.SUPERHEATED_STEAM.get()),
+                this::setChanged);
         this.input = new CombinedResourceHandler<>(new SidedResourceHandler<>(hot, true, false, Integer.MAX_VALUE),
                 new SidedResourceHandler<>(feed, true, false, Integer.MAX_VALUE));
         this.cooledOutput = new SidedResourceHandler<>(cooled, false, true, Integer.MAX_VALUE);
@@ -112,6 +116,34 @@ public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
                 };
             }
         };
+    }
+
+    // A Superheated Steam mB takes this many times a High-Pressure Steam mB's heat.
+    public static final double SUPERHEATED_FACTOR = 1.6;
+
+    // What comes in hot: a pressurized core's coolant, or an advanced core's loop.
+    public static boolean isHot(FluidResource resource) {
+        return resource.is(ModFluids.HOT_COOLANT.get()) || resource.is(ModFluids.HOT_HEAVY_WATER.get()) || resource.is(ModFluids.HOT_LEAD_BISMUTH.get())
+                || resource.is(ModFluids.HOT_FUEL_SALT.get());
+    }
+
+    // What a hot fluid goes back out as, cooled.
+    public static Fluid cooledFrom(Fluid hot) {
+        if (hot.isSame(ModFluids.HOT_HEAVY_WATER.get())) {
+            return ModFluids.HEAVY_WATER.get();
+        }
+        if (hot.isSame(ModFluids.HOT_LEAD_BISMUTH.get())) {
+            return ModFluids.LEAD_BISMUTH.get();
+        }
+        if (hot.isSame(ModFluids.HOT_FUEL_SALT.get())) {
+            return ModFluids.FUEL_SALT.get();
+        }
+        return Fluids.WATER;
+    }
+
+    // The steam a hot fluid boils feedwater into: Superheated from lead-bismuth, else High-Pressure.
+    public static Fluid steamFrom(Fluid hot) {
+        return hot.isSame(ModFluids.HOT_LEAD_BISMUTH.get()) ? ModFluids.SUPERHEATED_STEAM.get() : ModFluids.HIGH_PRESSURE_STEAM.get();
     }
 
     public static MachineItemHandler clientItems() {
@@ -203,12 +235,17 @@ public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
         if (feed.getAmount() <= 0) {
             return MachineStatus.NO_WATER;
         }
-        Fluid back = hot.getResource(0).is(ModFluids.HOT_HEAVY_WATER.get()) ? ModFluids.HEAVY_WATER.get() : Fluids.WATER;
+        Fluid hotFluid = hot.getResource(0).getFluid();
+        Fluid back = cooledFrom(hotFluid);
+        Fluid made = steamFrom(hotFluid);
         if (cooled.getAmount() > 0 && !cooled.getResource(0).is(back) || cooled.getSpace() <= 0) {
             return MachineStatus.OUTPUT_FULL;
         }
+        if (steam.getAmount() > 0 && !steam.getResource(0).is(made)) {
+            return MachineStatus.STEAM_FULL;
+        }
         double perHot = ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble();
-        double perSteam = ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble();
+        double perSteam = ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble() * (made == ModFluids.SUPERHEATED_STEAM.get() ? SUPERHEATED_FACTOR : 1.0);
         int amount = Math.min(Math.min(hot.getAmount(), maxHotPerTick()), cooled.getSpace());
         // Only as much as the feedwater and the steam tank can take.
         double heat = heatLeft + amount * perHot;
@@ -223,7 +260,7 @@ public class SteamGeneratorBlockEntity extends VesselControllerBlockEntity {
         take(hot, cooledMb);
         take(feed, steamMade);
         cooled.set(0, FluidResource.of(back), cooled.getAmount() + cooledMb);
-        steam.set(0, FluidResource.of(ModFluids.HIGH_PRESSURE_STEAM.get()), steam.getAmount() + steamMade);
+        steam.set(0, FluidResource.of(made), steam.getAmount() + steamMade);
         lastHot = cooledMb;
         lastSteam = steamMade;
         return MachineStatus.BOILING;

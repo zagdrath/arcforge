@@ -187,6 +187,33 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity>> HEAVY_WATER_TOWER =
             BLOCK_ENTITY_TYPES.register("heavy_water_tower", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity::new, ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get()));
+    // The nuclear tier's containment, safety, spent fuel, waste and reprocessing blocks.
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.EquipmentHatchBlockEntity>> EQUIPMENT_HATCH =
+            BLOCK_ENTITY_TYPES.register("equipment_hatch", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.EquipmentHatchBlockEntity::new, ModBlocks.EQUIPMENT_HATCH.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.EccsAccumulatorBlockEntity>> ECCS_ACCUMULATOR =
+            BLOCK_ENTITY_TYPES.register("eccs_accumulator", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.EccsAccumulatorBlockEntity::new, ModBlocks.ECCS_ACCUMULATOR.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.EccsPumpBlockEntity>> ECCS_PUMP =
+            BLOCK_ENTITY_TYPES.register("eccs_pump", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.EccsPumpBlockEntity::new, ModBlocks.ECCS_PUMP.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.DecontaminationShowerBlockEntity>> DECONTAMINATION_SHOWER =
+            BLOCK_ENTITY_TYPES.register("decontamination_shower", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.DecontaminationShowerBlockEntity::new, ModBlocks.DECONTAMINATION_SHOWER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.SpentFuelRackBlockEntity>> SPENT_FUEL_RACK =
+            BLOCK_ENTITY_TYPES.register("spent_fuel_rack", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.SpentFuelRackBlockEntity::new, ModBlocks.SPENT_FUEL_RACK.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.DryCaskBlockEntity>> DRY_CASK =
+            BLOCK_ENTITY_TYPES.register("dry_cask", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.DryCaskBlockEntity::new, ModBlocks.DRY_CASK.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.GeologicalRepositoryBlockEntity>> GEOLOGICAL_REPOSITORY =
+            BLOCK_ENTITY_TYPES.register("geological_repository", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.GeologicalRepositoryBlockEntity::new, ModBlocks.GEOLOGICAL_REPOSITORY.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.DrainTankBlockEntity>> DRAIN_TANK =
+            BLOCK_ENTITY_TYPES.register("drain_tank", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.DrainTankBlockEntity::new, ModBlocks.DRAIN_TANK.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.FreezePlugBlockEntity>> FREEZE_PLUG =
+            BLOCK_ENTITY_TYPES.register("freeze_plug", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.FreezePlugBlockEntity::new, ModBlocks.FREEZE_PLUG.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.nuclear.SaltProcessingUnitBlockEntity>> SALT_PROCESSING_UNIT =
+            BLOCK_ENTITY_TYPES.register("salt_processing_unit", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.nuclear.SaltProcessingUnitBlockEntity::new, ModBlocks.SALT_PROCESSING_UNIT.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity>> WASTE_COMPACTOR =
+            BLOCK_ENTITY_TYPES.register("waste_compactor", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::new, ModBlocks.WASTE_COMPACTOR.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity>> VITRIFICATION_PLANT =
+            BLOCK_ENTITY_TYPES.register("vitrification_plant", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::new, ModBlocks.VITRIFICATION_PLANT.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity>> PUREX_PLANT =
+            BLOCK_ENTITY_TYPES.register("purex_plant", () -> new BlockEntityType<>(net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::new, ModBlocks.PUREX_CONTROLLER.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity>> LITHIUM_CELL =
             BLOCK_ENTITY_TYPES.register("lithium_cell", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.LithiumCellBlockEntity::new, tierBlocks(ModBlocks::lithiumCell)));

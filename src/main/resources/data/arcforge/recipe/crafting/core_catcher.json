@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "ZBZ",
+    "BCB",
+    "ZBZ"
+  ],
+  "key": {
+    "Z": "#c:dusts/zircon",
+    "B": "arcforge:arcforge_furnace_bricks",
+    "C": "arcforge:containment_concrete"
+  },
+  "result": {
+    "id": "arcforge:core_catcher",
+    "count": 4
+  }
+}

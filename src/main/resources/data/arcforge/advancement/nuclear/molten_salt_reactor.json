@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/critical",
+  "display": {
+    "icon": {
+      "id": "arcforge:freeze_plug"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.molten_salt_reactor.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.molten_salt_reactor.description"
+    },
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "molten_salt_reactor"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

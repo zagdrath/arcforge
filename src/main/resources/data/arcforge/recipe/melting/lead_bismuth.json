@@ -1,0 +1,8 @@
+{
+  "type": "arcforge:melting",
+  "ingredient": "#c:ingots/lead_bismuth",
+  "result": {
+    "id": "arcforge:lead_bismuth",
+    "amount": 250
+  }
+}

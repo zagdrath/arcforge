@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/spent_fuel_pool",
+  "display": {
+    "icon": {
+      "id": "arcforge:purex_controller"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.purex.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.purex.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "purex"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

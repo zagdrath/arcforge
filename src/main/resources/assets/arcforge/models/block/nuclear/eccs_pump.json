@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "side": "arcforge:block/nuclear/eccs_pump",
+    "top": "arcforge:block/nuclear/eccs_pump_top",
+    "bottom": "arcforge:block/nuclear/drain_tank_top"
+  }
+}

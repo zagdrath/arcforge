@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/vitrifying",
+  "display": {
+    "icon": {
+      "id": "arcforge:geological_repository"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.repository.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.repository.description"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "repository"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

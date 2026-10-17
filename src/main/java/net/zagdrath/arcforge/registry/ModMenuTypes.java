@@ -155,6 +155,14 @@ public final class ModMenuTypes {
             MENU_TYPES.register("steam_generator", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.SteamGeneratorMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.HeavyWaterTowerMenu>> HEAVY_WATER_TOWER =
             MENU_TYPES.register("heavy_water_tower", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.HeavyWaterTowerMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.PurexMenu>> PUREX_PLANT =
+            MENU_TYPES.register("purex_plant", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.PurexMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.WasteCompactorMenu>> WASTE_COMPACTOR =
+            MENU_TYPES.register("waste_compactor", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.WasteCompactorMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.machine.VitrificationPlantMenu>> VITRIFICATION_PLANT =
+            MENU_TYPES.register("vitrification_plant", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.machine.VitrificationPlantMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.nuclear.GeologicalRepositoryMenu>> GEOLOGICAL_REPOSITORY =
+            MENU_TYPES.register("geological_repository", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.nuclear.GeologicalRepositoryMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu>> THERMAL_EVAPORATOR =
             MENU_TYPES.register("thermal_evaporator",
                     () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.ThermalEvaporatorMenu::new));

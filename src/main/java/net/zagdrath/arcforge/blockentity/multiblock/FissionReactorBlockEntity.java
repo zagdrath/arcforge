@@ -21,7 +21,9 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -29,6 +31,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.storage.ValueInput;
@@ -43,6 +46,7 @@ import net.zagdrath.arcforge.block.nuclear.ControlRodChannelBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.item.nuclear.FuelRodItem;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
@@ -51,12 +55,24 @@ import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.VesselStructure;
 import net.zagdrath.arcforge.multiblock.VesselStructures;
+import net.zagdrath.arcforge.nuclear.Enrichment;
 import net.zagdrath.arcforge.nuclear.FuelRod;
 import net.zagdrath.arcforge.nuclear.RadiationField;
 import net.zagdrath.arcforge.nuclear.RadiationSource;
 import net.zagdrath.arcforge.nuclear.reactor.CoreLattice;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorParams;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorSim;
+import net.zagdrath.arcforge.nuclear.safety.Containment;
+import net.zagdrath.arcforge.nuclear.safety.Containments;
+import net.zagdrath.arcforge.nuclear.safety.Fallout;
+import net.zagdrath.arcforge.nuclear.safety.ReactorAlarm;
+import net.zagdrath.arcforge.nuclear.safety.ReactorExplosions;
+import net.zagdrath.arcforge.blockentity.nuclear.DrainTankBlockEntity;
+import net.zagdrath.arcforge.blockentity.nuclear.EccsAccumulatorBlockEntity;
+import net.zagdrath.arcforge.blockentity.nuclear.EccsPumpBlockEntity;
+import net.zagdrath.arcforge.blockentity.nuclear.FreezePlugBlockEntity;
+import net.zagdrath.arcforge.blockentity.nuclear.SaltProcessingUnitBlockEntity;
+import net.zagdrath.arcforge.registry.ModSounds;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModDataComponents;
@@ -83,6 +99,19 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 //    SCRAMs it when it says to stop; switching it off through the API drives every rod in.
 //  - Protection (ReactorSim.Trips) is set in the GUI; a SCRAM button trips it by hand, Reset clears a trip.
 //  - It's a radiation source while it runs and after (see RadiationSource): its walls and what's round them shield.
+//  - Advanced cores: Lead-Bismuth through the intake makes a fast reactor (no moderator; 15–20% fuel or MOX, a blanket
+//    of Thorium Blanket Rods breeding U-233), pumped out of its Hot Leg as Hot Lead-Bismuth at about 900 °C; Fuel Salt
+//    makes a molten salt reactor: every open cell (air or an empty Fuel Channel) between its graphite holds the salt,
+//    which is its fuel (its make-up is the core's own, mixed with fresh salt as it comes in), pumped out as Hot Fuel
+//    Salt at about 700 °C. Its Salt Processing Units (against the vessel) take the fission products out online, and
+//    its Freeze Plug (under the vessel's floor, a Drain Tank under that) drains the salt away when it overheats.
+//  - Safety (see the Safety page): it finds its containment every SCAN_INTERVAL ticks (see Containment), and the
+//    Relief Valves, ECCS Accumulators and Pumps, Salt Processing Units round its vessel and the Freeze Plug under it.
+//    Failures each come with warnings first (ReactorAlarm: lit on the Safety page, listed by Jade, the klaxon sounding
+//    until silenced): cladding failure (Hydrogen and fission products into the coolant and the containment's air), a
+//    Hydrogen burn when the air's Hydrogen reaches nuclear.failures.hydrogenIgnition with something to light it, a
+//    meltdown (the core becomes Corium), a burst vessel and a prompt-critical excursion (explosions sized by what they
+//    let go; see ReactorExplosions). Outside a sealed containment they let fallout out (see Fallout).
 public class FissionReactorBlockEntity extends VesselControllerBlockEntity implements RadiationSource {
     public static final int INPUT_SLOTS = 9, OUTPUT_SLOTS = 9, MACHINE_SLOTS = INPUT_SLOTS + OUTPUT_SLOTS;
     // The intake and Hot Leg tanks' size; the steam tank holds four times as much.
@@ -91,6 +120,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.HOT_LEG, SideMode.STEAM);
     private static final Set<SideMode> PUSHED = EnumSet.of(SideMode.HOT_LEG, SideMode.STEAM);
     private static final int MOVE_INTERVAL = 5;
+    private static final int SCAN_INTERVAL = 100;
+    private static final int KLAXON_INTERVAL = 40;
 
     // The rods in the channels, by the channel's position.
     private final Map<BlockPos, ItemStack> rods = new HashMap<>();
@@ -109,6 +140,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     // show.
     private static final int WATER_STEPS = 32;
     private int water;
+    // Set by a failure that destroyed the fuel this tick, so the damage isn't cleared at once.
+    private boolean failedThisTick;
     // The core's state, kept for when the vessel is rebuilt (or unformed and formed again) and for saving.
     private final Saved saved = new Saved();
     private ReactorSim.Mode mode = ReactorSim.Mode.NONE;
@@ -117,6 +150,21 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     private boolean unloadAll;
     private boolean damageMarked;
     private boolean wasCritical;
+    // The containment (its air's Hydrogen and radioactivity are kept here and saved), and what's round the vessel.
+    private final Containment containment;
+    private final List<BlockPos> reliefValves = new ArrayList<>();
+    private final List<BlockPos> accumulators = new ArrayList<>();
+    private final List<BlockPos> pumps = new ArrayList<>();
+    private final List<BlockPos> processors = new ArrayList<>();
+    private @Nullable BlockPos freezePlug;
+    private @Nullable BlockPos drainTank;
+    private boolean scanned;
+    private boolean everSealed;
+    // The alarms up now, and those silenced (a new one sounds again).
+    private int alarms;
+    private int silenced;
+    // The molten salt core's salt, shared by every salt cell.
+    private ReactorSim.@Nullable Rod salt;
 
     private final FilteredFluidTank intake;
     private final FilteredFluidTank hotLeg;
@@ -136,8 +184,9 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         super(ModBlockEntityTypes.FISSION_REACTOR.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> slot < INPUT_SLOTS && isLoadable(resource.toStack(1)),
                 SIDE_MODES);
         this.intake = new FilteredFluidTank(TANK, FissionReactorBlockEntity::isCoolant, this::setChanged);
-        this.hotLeg = new FilteredFluidTank(TANK, resource -> resource.is(ModFluids.HOT_COOLANT.get()) || resource.is(ModFluids.HOT_HEAVY_WATER.get()),
-                this::setChanged);
+        this.hotLeg = new FilteredFluidTank(TANK, resource -> resource.is(ModFluids.HOT_COOLANT.get()) || resource.is(ModFluids.HOT_HEAVY_WATER.get())
+                || resource.is(ModFluids.HOT_LEAD_BISMUTH.get()) || resource.is(ModFluids.HOT_FUEL_SALT.get()), this::setChanged);
+        this.containment = new Containment(pos);
         this.steam = new FilteredFluidTank(STEAM_TANK, resource -> resource.is(ModFluids.CONTAMINATED_STEAM.get()), this::setChanged);
         this.intakeInput = new SidedResourceHandler<>(intake, true, false, Integer.MAX_VALUE);
         this.hotLegOutput = new SidedResourceHandler<>(hotLeg, false, true, Integer.MAX_VALUE);
@@ -165,10 +214,40 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         double pump = 1.0;
         CoreLattice.Coolant coolantType = CoreLattice.Coolant.LIGHT_WATER;
         final Map<BlockPos, double[]> xenon = new HashMap<>();
+        // Failures, and what was done about them.
+        double oxidised, coolantActivity;
+        boolean ruptured;
+        // The salt's make-up: its fissile uranium (fraction), burnup, bred U-233 and fission products.
+        double saltEnrichment, saltBurnup, saltBred, saltFission;
     }
 
     public static boolean isCoolant(FluidResource resource) {
-        return resource.is(net.minecraft.world.level.material.Fluids.WATER) || resource.is(ModFluids.HEAVY_WATER.get());
+        return resource.is(net.minecraft.world.level.material.Fluids.WATER) || resource.is(ModFluids.HEAVY_WATER.get())
+                || resource.is(ModFluids.LEAD_BISMUTH.get()) || resource.is(ModFluids.FUEL_SALT.get());
+    }
+
+    // What fills the core for a coolant fluid.
+    public static CoreLattice.Coolant coolantOf(FluidResource resource) {
+        if (resource.is(ModFluids.HEAVY_WATER.get())) {
+            return CoreLattice.Coolant.HEAVY_WATER;
+        }
+        if (resource.is(ModFluids.LEAD_BISMUTH.get())) {
+            return CoreLattice.Coolant.LEAD_BISMUTH;
+        }
+        if (resource.is(ModFluids.FUEL_SALT.get())) {
+            return CoreLattice.Coolant.FUEL_SALT;
+        }
+        return CoreLattice.Coolant.LIGHT_WATER;
+    }
+
+    // The fluid each coolant leaves the hot leg as.
+    public static Fluid hotFluid(CoreLattice.Coolant coolant) {
+        return switch (coolant) {
+            case HEAVY_WATER -> ModFluids.HOT_HEAVY_WATER.get();
+            case LEAD_BISMUTH -> ModFluids.HOT_LEAD_BISMUTH.get();
+            case FUEL_SALT -> ModFluids.HOT_FUEL_SALT.get();
+            default -> ModFluids.HOT_COOLANT.get();
+        };
     }
 
     // What goes in its input slots: Fuel Rods (not damaged ones) and Control Rods.
@@ -177,7 +256,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             return true;
         }
         FuelRod rod = stack.get(ModDataComponents.FUEL_ROD.get());
-        return stack.is(ModItems.FUEL_ROD.get()) && (rod == null || !rod.damaged());
+        return FuelRodItem.isFuelRod(stack) && (rod == null || !rod.damaged());
     }
 
     public static MachineItemHandler clientItems() {
@@ -207,6 +286,10 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         p.generationTime = ArcforgeConfig.REACTOR_PROMPT_GENERATION.getAsDouble();
         p.cladFail = ArcforgeConfig.REACTOR_CLAD_FAILURE.getAsDouble();
         p.fuelMelt = ArcforgeConfig.REACTOR_FUEL_MELT.getAsDouble();
+        p.zrHydrogen = ArcforgeConfig.ZIRCONIUM_HYDROGEN.getAsDouble();
+        p.burstFactor = ArcforgeConfig.VESSEL_BURST_FACTOR.getAsDouble();
+        p.excursionPower = ArcforgeConfig.EXCURSION_POWER.getAsDouble();
+        p.reliefPerValve = ArcforgeConfig.RELIEF_PER_VALVE.getAsDouble();
         return p;
     }
 
@@ -223,11 +306,22 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         layoutDirty = true;
     }
 
-    // What each cell inside is, and its bank; and whether it has its rod.
-    private CoreLattice.Cell cellOf(BlockState state, BlockPos pos) {
+    // What each cell inside is, and its bank; and whether it has its rod. In a molten salt core every open cell (air,
+    // or a Fuel Channel, whatever's in it) holds the salt: a fuel cell.
+    private CoreLattice.Cell cellOf(BlockState state, BlockPos pos, boolean saltCore) {
+        if (saltCore) {
+            if (state.is(ModBlocks.CONTROL_ROD_CHANNEL.get())) {
+                ItemStack rod = rods.get(pos);
+                return rod != null && rod.is(ModItems.CONTROL_ROD.get()) ? CoreLattice.Cell.CONTROL : CoreLattice.Cell.FUEL;
+            }
+            if (state.is(ModBlocks.GRAPHITE_MODERATOR.get())) {
+                return CoreLattice.Cell.GRAPHITE;
+            }
+            return state.is(ModBlocks.STEEL_REFLECTOR.get()) ? CoreLattice.Cell.STEEL : CoreLattice.Cell.FUEL;
+        }
         if (state.is(ModBlocks.FUEL_CHANNEL.get())) {
             ItemStack rod = rods.get(pos);
-            return rod != null && rod.is(ModItems.FUEL_ROD.get()) && !FuelRod.of(rod).damaged() ? CoreLattice.Cell.FUEL : CoreLattice.Cell.COOLANT;
+            return rod != null && FuelRodItem.isFuelRod(rod) && !FuelRod.of(rod).damaged() ? CoreLattice.Cell.FUEL : CoreLattice.Cell.COOLANT;
         }
         if (state.is(ModBlocks.CONTROL_ROD_CHANNEL.get())) {
             ItemStack rod = rods.get(pos);
@@ -251,7 +345,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
                 continue;
             }
             BlockState state = level.getBlockState(pos);
-            boolean fits = entry.getValue().is(ModItems.FUEL_ROD.get()) ? state.is(ModBlocks.FUEL_CHANNEL.get())
+            boolean fits = FuelRodItem.isFuelRod(entry.getValue()) ? state.is(ModBlocks.FUEL_CHANNEL.get())
                     : state.is(ModBlocks.CONTROL_ROD_CHANNEL.get());
             if (!fits) {
                 gone.add(pos);
@@ -285,6 +379,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         layoutDirty = false;
         int nx = box.size(Direction.Axis.X) - 2, ny = box.size(Direction.Axis.Y) - 2, nz = box.size(Direction.Axis.Z) - 2;
         CoreLattice lattice = new CoreLattice(nx, ny, nz);
+        boolean saltCore = (sim != null ? sim.coolantType : saved.coolantType) == CoreLattice.Coolant.FUEL_SALT;
+        lattice.saltCore = saltCore;
         BlockPos[] positions = new BlockPos[lattice.size];
         int channelBlocks = 0, controlBlocks = 0;
         long key = 1469598103934665603L;
@@ -298,7 +394,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
                     } else if (state.is(ModBlocks.CONTROL_ROD_CHANNEL.get())) {
                         controlBlocks++;
                     }
-                    CoreLattice.Cell cell = cellOf(state, pos);
+                    CoreLattice.Cell cell = cellOf(state, pos, saltCore);
                     int bank = state.is(ModBlocks.CONTROL_ROD_CHANNEL.get()) ? state.getValue(ControlRodChannelBlock.BANK) : -1;
                     int i = lattice.index(x, y, z);
                     lattice.set(i, cell, bank);
@@ -311,7 +407,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         }
         fuelChannelBlocks = channelBlocks;
         controlChannelBlocks = controlBlocks;
-        key ^= box.min().asLong() * 31 + box.max().asLong();
+        key ^= box.min().asLong() * 31 + box.max().asLong() + (saltCore ? 7 : 0);
         if (sim != null && key == layoutKey) {
             return;
         }
@@ -320,9 +416,19 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         }
         layoutKey = key;
         cellPos = positions;
-        ReactorSim next = new ReactorSim(params(), lattice);
-        for (int cell : next.fuelCells()) {
-            next.setRod(cell, FuelRod.of(rods.get(positions[cell])).toSim());
+        ReactorParams p = params();
+        p.solidFuel = !saltCore;
+        ReactorSim next = new ReactorSim(p, lattice);
+        if (saltCore) {
+            salt = saltRod();
+            for (int cell : next.fuelCells()) {
+                next.setRod(cell, salt);
+            }
+        } else {
+            salt = null;
+            for (int cell : next.fuelCells()) {
+                next.setRod(cell, FuelRod.of(rods.get(positions[cell])).toSim());
+            }
         }
         restore(next);
         sim = next;
@@ -349,6 +455,15 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         saved.coreDamaged = sim.coreDamaged;
         saved.pump = sim.pumpSetting;
         saved.coolantType = sim.coolantType;
+        saved.oxidised = sim.oxidised;
+        saved.coolantActivity = sim.coolantActivity;
+        saved.ruptured = sim.ruptured;
+        if (salt != null) {
+            saved.saltEnrichment = salt.enrichment;
+            saved.saltBurnup = salt.burnup;
+            saved.saltBred = salt.plutonium;
+            saved.saltFission = salt.fissionProducts;
+        }
         saved.xenon.clear();
         for (int cell : sim.fuelCells()) {
             if (sim.rod(cell) != null) {
@@ -367,6 +482,9 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         next.coreDamaged = saved.coreDamaged;
         next.pumpSetting = saved.pump;
         next.coolantType = saved.coolantType;
+        next.oxidised = saved.oxidised;
+        next.coolantActivity = saved.coolantActivity;
+        next.ruptured = saved.ruptured;
         next.mode = mode;
         for (int cell : next.fuelCells()) {
             double[] xe = saved.xenon.get(cellPos[cell]);
@@ -377,6 +495,16 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         if (next.precursors() <= 0.0 && next.power > 0.0) {
             next.settlePrecursors();
         }
+    }
+
+    // The salt's make-up as one Rod, shared by every salt cell (its fertile thorium breeding U-233).
+    private ReactorSim.Rod saltRod() {
+        ReactorSim.Rod rod = new ReactorSim.Rod(saved.saltEnrichment);
+        rod.burnup = saved.saltBurnup;
+        rod.plutonium = saved.saltBred;
+        rod.fissionProducts = saved.saltFission;
+        rod.thorium = true;
+        return rod;
     }
 
     private static void copyTrips(ReactorSim.Trips from, ReactorSim.Trips to) {
@@ -392,15 +520,15 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         to.lowFlowPercent = from.lowFlowPercent;
     }
 
-    // The model's rods' burnup back into the rod items.
+    // The model's rods' burnup back into the rod items (a salt core's rods take no part).
     private void writeBack(long now) {
-        if (sim == null) {
+        if (sim == null || sim.lattice.saltCore) {
             return;
         }
         for (int cell : sim.fuelCells()) {
             ReactorSim.Rod rod = sim.rod(cell);
             ItemStack stack = rods.get(cellPos[cell]);
-            if (rod != null && stack != null && stack.is(ModItems.FUEL_ROD.get())) {
+            if (rod != null && stack != null && FuelRodItem.isFuelRod(stack)) {
                 FuelRod was = FuelRod.of(stack);
                 stack.set(ModDataComponents.FUEL_ROD.get(), FuelRod.fromSim(was, rod, was.dischargeHeat(), was.discharged(), sim.coreDamaged));
             }
@@ -430,26 +558,50 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         if (now % 20 == 0) {
             mode = modeFromPorts(level);
         }
-        core.mode = mode;
+        if (!scanned || now % SCAN_INTERVAL == 0) {
+            scan(level);
+        }
+        // A lead-bismuth or salt core doesn't boil: without a Hot Leg it only heats.
+        core.mode = !core.coolantType.isWater() && mode == ReactorSim.Mode.BOILING ? ReactorSim.Mode.NONE : mode;
+        core.reliefCapacity = core.p.reliefCapacity + reliefValves.size() * core.p.reliefPerValve;
         control(core);
         takeCoolant(core);
-        Fluid hotFluid = core.coolantType == CoreLattice.Coolant.HEAVY_WATER ? ModFluids.HOT_HEAVY_WATER.get() : ModFluids.HOT_COOLANT.get();
-        double hotRoom = hotLeg.getAmount() > 0 && !hotLeg.getResource(0).is(hotFluid) ? 0.0 : hotLeg.getSpace();
-        core.tick(hotRoom, steam.getSpace());
+        Fluid hotFluid = hotFluid(core.coolantType);
+        double hotRoom = core.ruptured ? 0.0 : hotLeg.getAmount() > 0 && !hotLeg.getResource(0).is(hotFluid) ? 0.0 : hotLeg.getSpace();
+        failedThisTick = false;
+        double oxidisedBefore = core.oxidised;
+        core.tick(hotRoom, core.coolantType.isWater() ? steam.getSpace() : 0.0);
         add(hotLeg, FluidResource.of(hotFluid), core.hotLeg);
         add(steam, FluidResource.of(ModFluids.CONTAMINATED_STEAM.get()), core.steamMade);
         MultiblockAutomation.pushFluids(level, this, PUSHED, 64_000);
         MultiblockAutomation.pushOutputs(level, this);
+        safety(level, core, oxidisedBefore);
+        if (sim != core || isRemoved()) {
+            // The vessel was blown apart this tick.
+            return;
+        }
         if (core.coreDamaged && !damageMarked) {
             damageMarked = true;
             writeBack(now);
             for (ItemStack stack : rods.values()) {
-                if (stack.is(ModItems.FUEL_ROD.get())) {
+                if (FuelRodItem.isFuelRod(stack)) {
                     FuelRod rod = FuelRod.of(stack);
-                    stack.set(ModDataComponents.FUEL_ROD.get(), new FuelRod(rod.type(), rod.enrichment(), rod.burnup(), rod.plutonium(), rod.fissionProducts(),
-                            rod.dischargeHeat(), rod.discharged(), true));
+                    stack.set(ModDataComponents.FUEL_ROD.get(), rod.damage());
                 }
             }
+        }
+        // With every fuel rod out (or a salt core drained), a damaged core can be started again (not on the tick it
+        // failed). Unloaded, its cladding's oxidation goes with the rods; drained, the coolant's activity with it.
+        if (!core.lattice.saltCore && loadedFuel() == 0) {
+            core.oxidised = 0.0;
+        }
+        if (core.coolant < 1.0) {
+            core.coolantActivity = 0.0;
+        }
+        if (core.coreDamaged && !failedThisTick && (core.lattice.saltCore ? core.coolant < 1.0 : loadedFuel() == 0)) {
+            core.clearDamage();
+            saved.ruptured = false;
+            damageMarked = false;
         }
         if (now % MOVE_INTERVAL == 0) {
             moveRods(level, core);
@@ -465,13 +617,439 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         if (critical && !wasCritical) {
             ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.HOT_COOLANT.get(), "critical");
         }
+        if (critical && now % 20 == 0) {
+            if (core.coolantType == CoreLattice.Coolant.LEAD_BISMUTH) {
+                ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.HOT_LEAD_BISMUTH.get(), "fast_reactor");
+            } else if (core.coolantType == CoreLattice.Coolant.FUEL_SALT) {
+                ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.HOT_FUEL_SALT.get(), "molten_salt_reactor");
+            }
+        }
         if (core.power >= 0.95 && now % 20 == 0) {
             ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.HOT_COOLANT.get(), "full_power");
         }
         wasCritical = critical;
     }
 
+    // --- Safety: the containment, Emergency Core Cooling, the failures and the alarms ---
+
+    // Finds the containment round the vessel and what stands against the vessel (and under it).
+    private void scan(ServerLevel level) {
+        scanned = true;
+        reliefValves.clear();
+        accumulators.clear();
+        pumps.clear();
+        processors.clear();
+        freezePlug = null;
+        drainTank = null;
+        if (box == null) {
+            return;
+        }
+        containment.scan(level, box.min(), box.max(), ArcforgeConfig.CONTAINMENT_MAX_VOLUME.getAsInt());
+        Containments.put(level, containment);
+        if (containment.sealed() && !everSealed) {
+            everSealed = true;
+            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, null, "containment");
+        }
+        BlockPos min = box.min(), max = box.max();
+        for (BlockPos pos : BlockPos.betweenClosed(min.offset(-1, -1, -1), max.offset(1, 1, 1))) {
+            if (box.contains(pos)) {
+                continue;
+            }
+            // Against a face of the vessel (not round its edges).
+            int outside = (pos.getX() < min.getX() || pos.getX() > max.getX() ? 1 : 0) + (pos.getY() < min.getY() || pos.getY() > max.getY() ? 1 : 0)
+                    + (pos.getZ() < min.getZ() || pos.getZ() > max.getZ() ? 1 : 0);
+            if (outside != 1) {
+                continue;
+            }
+            BlockState state = level.getBlockState(pos);
+            BlockEntity there = level.getBlockEntity(pos);
+            if (state.is(ModBlocks.RELIEF_VALVE.get())) {
+                reliefValves.add(pos.immutable());
+            } else if (there instanceof EccsAccumulatorBlockEntity) {
+                accumulators.add(pos.immutable());
+            } else if (there instanceof EccsPumpBlockEntity) {
+                pumps.add(pos.immutable());
+            } else if (there instanceof SaltProcessingUnitBlockEntity) {
+                processors.add(pos.immutable());
+            } else if (there instanceof FreezePlugBlockEntity && pos.getY() < min.getY() && freezePlug == null) {
+                freezePlug = pos.immutable();
+                if (level.getBlockEntity(pos.below()) instanceof DrainTankBlockEntity) {
+                    drainTank = pos.below().immutable();
+                }
+            }
+        }
+    }
+
+    // One tick of everything that keeps it safe, and of what happens when that isn't enough.
+    private void safety(ServerLevel level, ReactorSim core, double oxidisedBefore) {
+        long now = level.getGameTime();
+        Vec3 centre = box != null ? box.aabb().getCenter() : Vec3.atCenterOf(worldPosition);
+        int channels = Math.max(1, core.fuelChannels());
+        double perChannel = ArcforgeConfig.FALLOUT_PER_CHANNEL.getAsDouble();
+        // Emergency Core Cooling: the accumulators, then the pumps, while a water core's coolant is low.
+        if (core.coolantType.isWater() && !core.ruptured && core.level() < ArcforgeConfig.ECCS_LEVEL.getAsDouble()) {
+            double room = core.coolantCapacity - core.coolant;
+            for (BlockPos pos : accumulators) {
+                if (room > 1.0 && level.getBlockEntity(pos) instanceof EccsAccumulatorBlockEntity accumulator) {
+                    room -= core.inject(accumulator.discharge((int) room), 20.0);
+                }
+            }
+            for (BlockPos pos : pumps) {
+                if (room > 1.0 && level.getBlockEntity(pos) instanceof EccsPumpBlockEntity pump) {
+                    room -= core.inject(pump.pump(level, (int) room, nearestWall(pos), containment), 20.0);
+                }
+            }
+        }
+        // Cladding failure: Hydrogen into the containment's air, fission products into the coolant and (a share) the air.
+        if (core.hydrogenMade > 0.0 && containment.sealed()) {
+            containment.hydrogen += core.hydrogenMade;
+        }
+        if (core.oxidised > oxidisedBefore) {
+            release(level, centre, (core.oxidised - oxidisedBefore) * channels * perChannel * 0.05);
+        }
+        // What the Relief Valves vent goes to the Suppression Pool (warming it; once it boils, into the air), the vessel's
+        // own relief into the containment's air, or outside with no containment, carrying the coolant's activity.
+        if (core.vented > 0.0) {
+            double heat = core.vented * core.p.boilingHeat;
+            boolean pool = !reliefValves.isEmpty() && containment.sealed() && containment.poolBlocks() > 0;
+            if (pool) {
+                double capacity = containment.poolBlocks() * Containment.POOL_HEAT_PER_BLOCK;
+                containment.poolTemp = Math.min(100.0, containment.poolTemp + heat / capacity);
+            }
+            if (!pool || containment.poolTemp >= 100.0) {
+                release(level, centre, core.vented * core.coolantActivity * perChannel * 2.0E-4);
+            }
+        }
+        if (containment.poolBlocks() > 0) {
+            containment.poolTemp -= (containment.poolTemp - 20.0) * 0.0005;
+        }
+        // The air: Hydrogen taken out by the recombiners; radioactivity decaying, and leaking out of an open containment.
+        if (containment.hydrogen > 0.0) {
+            if (!containment.sealed()) {
+                containment.hydrogen = 0.0;
+            } else {
+                containment.hydrogen = Math.max(0.0, containment.hydrogen - containment.recombiners().size() * ArcforgeConfig.RECOMBINER_RATE.getAsDouble());
+            }
+        }
+        if (containment.activity > 0.0) {
+            double ticksPerHour = ArcforgeConfig.RADIATION_TICKS_PER_HOUR.getAsInt();
+            containment.activity *= Math.pow(0.5, 1.0 / (ArcforgeConfig.AIR_ACTIVITY_HALF_LIFE.getAsDouble() * ticksPerHour));
+            if (!containment.sealed() && now % 20 == 0) {
+                double leak = containment.activity * 0.05;
+                containment.activity -= leak;
+                Fallout.settle(level, centre, leak * Math.max(64, containment.airVolume()) / 64.0);
+            }
+            if (containment.activity < 1.0E-3) {
+                containment.activity = 0.0;
+            }
+        }
+        // A Hydrogen burn: enough in the air and something to light it (a flame, a spark, Corium, glowing fuel).
+        boolean hotFuel = core.hottestCladding() > 900.0 && (core.ruptured || core.level() < 0.5);
+        if (containment.sealed() && containment.hydrogenPercent() >= ArcforgeConfig.HYDROGEN_IGNITION.getAsDouble()
+                && (containment.hasIgniter() || hotFuel)) {
+            double radius = ReactorExplosions.hydrogenRadius(containment.hydrogen);
+            containment.hydrogen = 0.0;
+            Vec3 at = box != null ? new Vec3(centre.x, box.max().getY() + 1.5, centre.z) : centre;
+            if (!ReactorExplosions.explode(level, at, radius, containment)) {
+                Fallout.settle(level, at, containment.activity * Math.max(64, containment.airVolume()) / 64.0);
+                containment.activity = 0.0;
+            }
+            scanned = false;
+        }
+        // The molten salt core: its online processing, and its Freeze Plug draining it into the Drain Tank.
+        if (core.lattice.saltCore && salt != null) {
+            for (BlockPos pos : processors) {
+                if (level.getBlockEntity(pos) instanceof SaltProcessingUnitBlockEntity unit) {
+                    salt.fissionProducts = Math.max(0.0, salt.fissionProducts - unit.process(salt.fissionProducts));
+                }
+            }
+        }
+        if (freezePlug != null && core.coolantType == CoreLattice.Coolant.FUEL_SALT && level.getBlockEntity(freezePlug) instanceof FreezePlugBlockEntity plug) {
+            plug.watch(level, core.coolant >= 1.0 ? core.coolantTemp : -1.0);
+            if (plug.isMelted() && core.coolant >= 1.0) {
+                int moved = (int) Math.min(core.coolant, 4_000.0);
+                if (drainTank != null && level.getBlockEntity(drainTank) instanceof DrainTankBlockEntity tank) {
+                    moved = tank.fill(moved);
+                }
+                core.coolant -= moved;
+                if (moved > 0 && now % 40 == 0) {
+                    ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.FUEL_SALT.get(), "freeze_plug");
+                }
+            }
+        }
+        // The failures.
+        if (core.melted) {
+            core.melted = false;
+            meltdown(level, core, centre, channels, perChannel);
+        }
+        if (core.ruptured && !saved.ruptured) {
+            saved.ruptured = true;
+            rupture(level, core, centre, channels, perChannel);
+        }
+        if (core.excursion) {
+            core.excursion = false;
+            // A salt core's passive safety: the power spike overheats the salt, its Freeze Plug melts and the salt
+            // drains away from the moderator before the vessel can go. Without a plug it goes like any core.
+            if (core.lattice.saltCore && freezePlug != null && level.getBlockEntity(freezePlug) instanceof FreezePlugBlockEntity plug) {
+                plug.melt(level);
+                core.scram(ReactorSim.Trip.HIGH_POWER);
+            } else {
+                excursion(level, core, centre, channels, perChannel);
+                return;
+            }
+        }
+        alarms(level, core, now);
+    }
+
+    // The vessel wall block nearest pos (what a pump against it must not draw from).
+    private @Nullable BlockPos nearestWall(BlockPos pos) {
+        if (box == null) {
+            return null;
+        }
+        BlockPos min = box.min(), max = box.max();
+        return new BlockPos(Mth.clamp(pos.getX(), min.getX(), max.getX()), Mth.clamp(pos.getY(), min.getY(), max.getY()),
+                Mth.clamp(pos.getZ(), min.getZ(), max.getZ()));
+    }
+
+    // Fission products let out of the vessel: into a sealed containment's air (the vessel itself isn't one of its
+    // cells), or onto the ground round it.
+    private void release(ServerLevel level, Vec3 centre, double amount) {
+        if (amount <= 0.0) {
+            return;
+        }
+        if (containment.sealed()) {
+            containment.activity += Fallout.airDose(containment, amount);
+        } else {
+            Fallout.release(level, centre, amount);
+        }
+    }
+
+    // The fuel melted: it slumps to the vessel's floor as Corium (with block damage from meltdowns on; else the rods are
+    // only ruined), letting fission products out.
+    private void meltdown(ServerLevel level, ReactorSim core, Vec3 centre, int channels, double perChannel) {
+        release(level, centre, channels * perChannel * 0.15);
+        if (box == null || !ArcforgeConfig.MELTDOWN_MELTS_BLOCKS.getAsBoolean() || core.lattice.saltCore) {
+            return;
+        }
+        int fuel = loadedFuel();
+        writeBack(level.getGameTime());
+        rods.entrySet().removeIf(entry -> FuelRodItem.isFuelRod(entry.getValue()));
+        pourCorium(level, Math.max(1, (fuel + 1) / 2), ModBlocks.CORIUM.get().defaultBlockState());
+        layoutDirty = true;
+        failedThisTick = true;
+        setChanged();
+    }
+
+    // The bottom layer inside the vessel, from its middle out, as Corium (or what's given).
+    private void pourCorium(ServerLevel level, int count, BlockState state) {
+        if (box == null) {
+            return;
+        }
+        BlockPos min = box.min(), max = box.max();
+        int y = min.getY() + 1;
+        List<BlockPos> floor = new ArrayList<>();
+        for (int x = min.getX() + 1; x < max.getX(); x++) {
+            for (int z = min.getZ() + 1; z < max.getZ(); z++) {
+                floor.add(new BlockPos(x, y, z));
+            }
+        }
+        BlockPos middle = new BlockPos((min.getX() + max.getX()) / 2, y, (min.getZ() + max.getZ()) / 2);
+        floor.sort(java.util.Comparator.comparingDouble(pos -> pos.distSqr(middle)));
+        for (int i = 0; i < Math.min(count, floor.size()); i++) {
+            level.setBlock(floor.get(i), state, Block.UPDATE_ALL);
+        }
+    }
+
+    // The vessel burst: a steam explosion sized by what it held, its coolant gone, its rods ruined.
+    private void rupture(ServerLevel level, ReactorSim core, Vec3 centre, int channels, double perChannel) {
+        double radius = ReactorExplosions.vesselRadius(core.storedEnergy());
+        boolean held = ReactorExplosions.explode(level, centre, radius, containment);
+        double released = channels * perChannel * (0.1 + 0.3 * core.oxidised) + core.coolant * core.coolantActivity * perChannel * 2.0E-4;
+        if (held) {
+            containment.activity += Fallout.airDose(containment, released);
+        } else {
+            Fallout.settle(level, centre, released);
+        }
+        core.coolant = 0.0;
+        core.coreDamaged = true;
+        core.scram(ReactorSim.Trip.HIGH_PRESSURE);
+        scanned = false;
+        setChanged();
+    }
+
+    // A prompt-critical excursion: the core's power spikes and blows the vessel apart (with block damage from
+    // explosions on, every block of it goes), its fuel scattered as Corium on the floor where it stood.
+    private void excursion(ServerLevel level, ReactorSim core, Vec3 centre, int channels, double perChannel) {
+        double radius = ReactorExplosions.vesselRadius(core.storedEnergy());
+        boolean held = ReactorExplosions.explode(level, centre, radius, containment);
+        double released = channels * perChannel;
+        if (held) {
+            containment.activity += Fallout.airDose(containment, released);
+        } else {
+            Fallout.settle(level, centre, released);
+        }
+        core.coreDamaged = true;
+        core.ruptured = true;
+        saved.ruptured = true;
+        core.coolant = 0.0;
+        core.scram(ReactorSim.Trip.HIGH_POWER);
+        int fuel = loadedFuel();
+        rods.entrySet().removeIf(entry -> FuelRodItem.isFuelRod(entry.getValue()));
+        layoutDirty = true;
+        failedThisTick = true;
+        if (box == null || !ArcforgeConfig.EXPLOSIONS_BREAK_BLOCKS.getAsBoolean()) {
+            damageMarked = false;
+            setChanged();
+            return;
+        }
+        VesselStructure.Box was = box;
+        BlockState debris = ArcforgeConfig.MELTDOWN_MELTS_BLOCKS.getAsBoolean() ? ModBlocks.CORIUM.get().defaultBlockState()
+                : ModBlocks.SOLIDIFIED_CORIUM.get().defaultBlockState();
+        for (BlockPos pos : was.positions()) {
+            if (!pos.equals(worldPosition)) {
+                level.setBlock(pos, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SUPPRESS_DROPS);
+            }
+        }
+        List<BlockPos> floor = new ArrayList<>();
+        for (BlockPos pos : BlockPos.betweenClosed(was.min(), new BlockPos(was.max().getX(), was.min().getY(), was.max().getZ()))) {
+            floor.add(pos.immutable());
+        }
+        java.util.Collections.shuffle(floor, new java.util.Random(level.getRandom().nextLong()));
+        for (int i = 0; i < Math.min(floor.size(), Math.max(1, (fuel + 1) / 2)); i++) {
+            level.setBlock(floor.get(i), debris, Block.UPDATE_ALL);
+        }
+        // Last of all the controller itself (and this block entity with it).
+        Containments.remove(level, worldPosition);
+        level.setBlock(worldPosition, net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+    }
+
+    // Each warning, worked out from the core and the containment; the klaxon while any unsilenced one is up.
+    private void alarms(ServerLevel level, ReactorSim core, long now) {
+        int flags = 0;
+        double cladFail = core.p.cladFail, melt = core.p.fuelMelt;
+        double clad = core.hottestCladding(), fuel = core.hottestFuel();
+        if (core.lattice.saltCore) {
+            if (freezePlug != null && level.getBlockEntity(freezePlug) instanceof FreezePlugBlockEntity plug && plug.isMelted()) {
+                flags |= ReactorAlarm.SALT_DRAINED.bit();
+            }
+            if (core.coolantTemp > ArcforgeConfig.FREEZE_PLUG_MELT.getAsDouble() - 50.0) {
+                flags |= ReactorAlarm.FUEL_HOT.bit();
+            }
+        } else {
+            if (clad > cladFail - 200.0) {
+                flags |= ReactorAlarm.CLADDING_HOT.bit();
+            }
+            if (core.oxidised > 0.0) {
+                flags |= ReactorAlarm.CLADDING_FAILED.bit();
+            }
+            if (fuel > melt - 400.0) {
+                flags |= ReactorAlarm.FUEL_HOT.bit();
+            }
+            if (core.coreDamaged && core.p.solidFuel && fuel > melt - 100.0) {
+                flags |= ReactorAlarm.CORE_MELT.bit();
+            }
+        }
+        if (core.pressure > core.reliefPressure()) {
+            flags |= ReactorAlarm.HIGH_PRESSURE.bit();
+        }
+        if (core.pressure > core.burstPressure() * 0.9) {
+            flags |= ReactorAlarm.OVERPRESSURE.bit();
+        }
+        if (core.power > 0.05 && core.period > 0.0 && core.period < 5.0) {
+            flags |= ReactorAlarm.POWER_RISE.bit();
+        }
+        if (core.power > Math.min(2.0, core.p.excursionPower * 0.25) || core.rho > core.p.beta) {
+            flags |= ReactorAlarm.EXCURSION.bit();
+        }
+        if (core.coolantType.isWater() && core.loadedRods() > 0 && core.level() < ArcforgeConfig.ECCS_LEVEL.getAsDouble()) {
+            flags |= ReactorAlarm.LOW_COOLANT.bit();
+        }
+        if (core.coolantActivity > 0.0) {
+            flags |= ReactorAlarm.COOLANT_ACTIVITY.bit();
+        }
+        if (containment.sealed() && containment.hydrogenPercent() >= ArcforgeConfig.HYDROGEN_IGNITION.getAsDouble() * 0.5) {
+            flags |= ReactorAlarm.HYDROGEN.bit();
+        }
+        if (containment.activity > 0.01) {
+            flags |= ReactorAlarm.AIR_ACTIVITY.bit();
+        }
+        if (!containment.sealed()) {
+            flags |= ReactorAlarm.NO_CONTAINMENT.bit();
+        }
+        if (core.ruptured) {
+            flags |= ReactorAlarm.RUPTURED.bit();
+        }
+        alarms = flags;
+        silenced &= flags;
+        int sounding = flags & ReactorAlarm.klaxonMask() & ~silenced;
+        if (sounding != 0 && now % KLAXON_INTERVAL == 0) {
+            level.playSound(null, worldPosition, ModSounds.REACTOR_ALARM.get(), SoundSource.BLOCKS, 2.0F, 1.0F);
+        }
+    }
+
+    // Silences the alarms up now (a new one sounds again).
+    public void silence() {
+        silenced = alarms;
+        setChanged();
+    }
+
+    public int getAlarms() {
+        return alarms;
+    }
+
+    public int getSilenced() {
+        return silenced;
+    }
+
+    public Containment getContainment() {
+        return containment;
+    }
+
+    public int reliefValves() {
+        return reliefValves.size();
+    }
+
+    public int eccsUnits() {
+        return accumulators.size() + pumps.size();
+    }
+
+    // Water ready in the ECCS Accumulators (mB).
+    public int eccsWater() {
+        int total = 0;
+        if (level != null) {
+            for (BlockPos pos : accumulators) {
+                if (level.getBlockEntity(pos) instanceof EccsAccumulatorBlockEntity accumulator) {
+                    total += accumulator.getTank().getAmount();
+                }
+            }
+        }
+        return total;
+    }
+
+    // The Freeze Plug: 0 none, 1 frozen, 2 melted.
+    public int freezePlugState() {
+        if (freezePlug == null || level == null || !(level.getBlockEntity(freezePlug) instanceof FreezePlugBlockEntity plug)) {
+            return 0;
+        }
+        return plug.isMelted() ? 2 : 1;
+    }
+
+    public ReactorSim.@Nullable Rod salt() {
+        return salt;
+    }
+
+    @Override
+    public void setRemoved() {
+        if (level != null) {
+            Containments.remove(level, worldPosition);
+        }
+        super.setRemoved();
+    }
+
     private MachineStatus statusOf(ReactorSim core) {
+        if (core.ruptured) {
+            return MachineStatus.DESTROYED;
+        }
         if (core.coreDamaged) {
             return MachineStatus.CORE_DAMAGED;
         }
@@ -512,22 +1090,46 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         core.redstoneFloor = redstoneRods ? redstone / 15.0 : 0.0;
     }
 
-    // Coolant from the intake into the vessel: one kind at a time (it changes only once the vessel has drained).
+    // Coolant from the intake into the vessel: one kind at a time (it changes only once the vessel has drained; a burst
+    // vessel holds none). Changing to or from Fuel Salt rebuilds the core. Fresh Fuel Salt (carrying an assay) mixes
+    // its uranium into the salt already in the core; salt without one is the core's own coming back round its loop.
     private void takeCoolant(ReactorSim core) {
-        if (intake.getAmount() <= 0) {
+        if (intake.getAmount() <= 0 || core.ruptured) {
             return;
         }
-        CoreLattice.Coolant kind = intake.getResource(0).is(ModFluids.HEAVY_WATER.get()) ? CoreLattice.Coolant.HEAVY_WATER : CoreLattice.Coolant.LIGHT_WATER;
+        FluidResource resource = intake.getResource(0);
+        CoreLattice.Coolant kind = coolantOf(resource);
         if (core.coolant >= 1.0 && kind != core.coolantType) {
             return;
         }
-        core.coolantType = kind;
+        if (kind != core.coolantType) {
+            boolean rebuild = kind == CoreLattice.Coolant.FUEL_SALT || core.coolantType == CoreLattice.Coolant.FUEL_SALT;
+            core.coolantType = kind;
+            saved.coolantType = kind;
+            // The client's windows show the new coolant.
+            sync();
+            if (rebuild) {
+                if (kind == CoreLattice.Coolant.FUEL_SALT) {
+                    saved.saltEnrichment = saved.saltBurnup = saved.saltBred = saved.saltFission = 0.0;
+                }
+                layoutDirty = true;
+                return;
+            }
+        }
         int room = (int) Math.floor(core.coolantCapacity - core.coolant);
         int moved = Math.min(room, intake.getAmount());
         if (moved > 0) {
+            Integer fresh = kind == CoreLattice.Coolant.FUEL_SALT ? Enrichment.saltAssay(resource) : null;
+            if (fresh != null && salt != null) {
+                double had = Math.max(0.0, core.coolant), total = had + moved;
+                salt.enrichment = (salt.enrichment * (1.0 - core.p.u235Use * salt.burnup) * had + fresh / 100_000.0 * moved) / total;
+                salt.plutonium = salt.plutonium * had / total;
+                salt.fissionProducts = salt.fissionProducts * had / total;
+                salt.burnup = 0.0;
+            }
             core.coolant += moved;
             int left = intake.getAmount() - moved;
-            intake.set(0, left > 0 ? intake.getResource(0) : FluidResource.EMPTY, left);
+            intake.set(0, left > 0 ? resource : FluidResource.EMPTY, left);
         }
     }
 
@@ -538,14 +1140,15 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         }
     }
 
-    // Loading and unloading rods, a rod each time, only while shut down.
+    // Loading and unloading rods, a rod each time, only while shut down. A salt core takes Control Rods only.
     private void moveRods(ServerLevel level, ReactorSim core) {
         if (!canRefuel()) {
             return;
         }
+        boolean saltCore = core.lattice.saltCore;
         long now = level.getGameTime();
         // Out first: spent and damaged rods (with auto-unload), or every rod when asked.
-        for (int cell : core.fuelCells()) {
+        for (int cell : saltCore ? new int[0] : core.fuelCells()) {
             ItemStack stack = rods.get(cellPos[cell]);
             if (stack == null) {
                 continue;
@@ -564,7 +1167,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         if (autoUnload) {
             for (Map.Entry<BlockPos, ItemStack> entry : List.copyOf(rods.entrySet())) {
                 ItemStack stack = entry.getValue();
-                if (stack.is(ModItems.FUEL_ROD.get()) && FuelRod.of(stack).damaged()) {
+                if (FuelRodItem.isFuelRod(stack) && FuelRod.of(stack).damaged()) {
                     if (unload(entry.getKey(), stack, null, core, now)) {
                         return;
                     }
@@ -594,14 +1197,17 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             if (waiting.isEmpty() || !isLoadable(waiting)) {
                 continue;
             }
-            boolean fuel = waiting.is(ModItems.FUEL_ROD.get());
+            boolean fuel = FuelRodItem.isFuelRod(waiting);
+            if (fuel && saltCore) {
+                continue;
+            }
             Block channel = fuel ? ModBlocks.FUEL_CHANNEL.get() : ModBlocks.CONTROL_ROD_CHANNEL.get();
             for (int c = 0; c < cellPos.length; c++) {
                 BlockPos pos = cellPos[fuel ? c : cellPos.length - 1 - c];
                 if (pos != null && !rods.containsKey(pos) && level.getBlockState(pos).is(channel)) {
                     ItemStack one = waiting.copyWithCount(1);
                     if (fuel && !one.has(ModDataComponents.FUEL_ROD.get())) {
-                        one.set(ModDataComponents.FUEL_ROD.get(), FuelRod.fresh(net.zagdrath.arcforge.nuclear.Enrichment.NATURAL_PCM));
+                        one.set(ModDataComponents.FUEL_ROD.get(), FuelRod.of(one));
                     }
                     rods.put(pos, one);
                     items.setStack(slot, waiting.copyWithCount(waiting.getCount() - 1));
@@ -620,7 +1226,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             return false;
         }
         ItemStack out = stack.copy();
-        if (live != null && stack.is(ModItems.FUEL_ROD.get())) {
+        if (live != null && FuelRodItem.isFuelRod(stack)) {
             double total = 0.0;
             for (int cell : core.fuelCells()) {
                 ReactorSim.Rod other = core.rod(cell);
@@ -787,7 +1393,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     public int loadedFuel() {
         int count = 0;
         for (ItemStack stack : rods.values()) {
-            count += stack.is(ModItems.FUEL_ROD.get()) ? 1 : 0;
+            count += FuelRodItem.isFuelRod(stack) ? 1 : 0;
         }
         return count;
     }
@@ -827,7 +1433,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             rate += ArcforgeConfig.REACTOR_RUNNING_DOSE.getAsDouble() * (sim.power + sim.decayPower / rated);
         }
         for (ItemStack stack : rods.values()) {
-            if (stack.is(ModItems.FUEL_ROD.get())) {
+            if (FuelRodItem.isFuelRod(stack)) {
                 rate += FuelRod.of(stack).doseRate();
             }
         }
@@ -839,6 +1445,10 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             if (tank.getAmount() > 0) {
                 rate += RadiationField.rate(tank.getResource(0).toStack(tank.getAmount()));
             }
+        }
+        // Coolant carrying fission products from failed cladding.
+        if (sim != null && sim.coolantActivity > 0.0) {
+            rate += sim.coolant / 1_000.0 * sim.coolantActivity * ArcforgeConfig.FALLOUT_PER_CHANNEL.getAsDouble() * 0.5;
         }
         return rate;
     }
@@ -970,6 +1580,24 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             case FissionReactorMenu.DATA_PEAKING -> core != null ? (int) Math.round(core.peaking * 100.0) : 100;
             case FissionReactorMenu.DATA_HISTORY_HEAD -> historyHead;
             case FissionReactorMenu.DATA_VOID_FRACTION -> core != null ? (int) Math.round(core.coreVoid * 1000.0) : 0;
+            case FissionReactorMenu.DATA_ALARMS -> alarms;
+            case FissionReactorMenu.DATA_SILENCED -> silenced;
+            case FissionReactorMenu.DATA_CONTAINMENT -> box != null && scanned ? containment.status().ordinal() + 1 : 0;
+            case FissionReactorMenu.DATA_HYDROGEN -> (int) Math.round(containment.hydrogenPercent() * 100.0);
+            case FissionReactorMenu.DATA_AIR_ACTIVITY -> (int) Math.min(Integer.MAX_VALUE, Math.round(containment.activity * 10.0));
+            case FissionReactorMenu.DATA_POOL -> containment.poolBlocks();
+            case FissionReactorMenu.DATA_POOL_TEMP -> (int) Math.round(containment.poolTemp * 10.0);
+            case FissionReactorMenu.DATA_VALVES -> reliefValves.size();
+            case FissionReactorMenu.DATA_ECCS_UNITS -> eccsUnits();
+            case FissionReactorMenu.DATA_ECCS_WATER -> eccsWater();
+            case FissionReactorMenu.DATA_RECOMBINERS -> containment.recombiners().size();
+            case FissionReactorMenu.DATA_OXIDISED -> core != null ? (int) Math.round(core.oxidised * 1000.0) : (int) Math.round(saved.oxidised * 1000.0);
+            case FissionReactorMenu.DATA_COOLANT_ACTIVITY -> core != null ? (int) Math.round(core.coolantActivity * 1000.0) : 0;
+            case FissionReactorMenu.DATA_SALT_FISSION -> salt != null ? (int) Math.round(salt.fissionProducts * 1000.0) : 0;
+            case FissionReactorMenu.DATA_FREEZE_PLUG -> freezePlugState();
+            case FissionReactorMenu.DATA_AIR_VOLUME -> containment.airVolume();
+            case FissionReactorMenu.DATA_SALT_FISSILE -> salt != null ? (int) Math.round(salt.fissile(core != null ? core.p : params()) * 100_000.0) : 0;
+            case FissionReactorMenu.DATA_BURST_PRESSURE -> core != null ? (int) Math.round(core.burstPressure() * 10.0) : 0;
             default -> 0;
         };
     }
@@ -1036,7 +1664,20 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         saved.trip = ReactorSim.Trip.values()[Mth.clamp(in.getIntOr("trip", 0), 0, ReactorSim.Trip.values().length - 1)];
         saved.coreDamaged = in.getBooleanOr("core_damaged", false);
         saved.pump = in.getDoubleOr("pump", 1.0);
-        saved.coolantType = in.getIntOr("coolant_type", 0) == 1 ? CoreLattice.Coolant.HEAVY_WATER : CoreLattice.Coolant.LIGHT_WATER;
+        saved.coolantType = CoreLattice.Coolant.values()[Mth.clamp(in.getIntOr("coolant_type", 0), 0, CoreLattice.Coolant.values().length - 1)];
+        saved.oxidised = in.getDoubleOr("oxidised", 0.0);
+        saved.coolantActivity = in.getDoubleOr("coolant_activity", 0.0);
+        saved.ruptured = in.getBooleanOr("ruptured", false);
+        saved.saltEnrichment = in.getDoubleOr("salt_enrichment", 0.0);
+        saved.saltBurnup = in.getDoubleOr("salt_burnup", 0.0);
+        saved.saltBred = in.getDoubleOr("salt_bred", 0.0);
+        saved.saltFission = in.getDoubleOr("salt_fission", 0.0);
+        containment.hydrogen = in.getDoubleOr("hydrogen", 0.0);
+        containment.activity = in.getDoubleOr("air_activity", 0.0);
+        containment.poolTemp = in.getDoubleOr("pool_temp", 20.0);
+        everSealed = in.getBooleanOr("ever_sealed", false);
+        silenced = in.getIntOr("silenced", 0);
+        scanned = false;
         saved.xenon.clear();
         in.read("xenon", XenonEntry.CODEC.listOf()).ifPresent(list -> list.forEach(entry -> saved.xenon.put(BlockPos.of(entry.pos()),
                 new double[] { entry.iodine(), entry.xenon() })));
@@ -1091,6 +1732,18 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         out.putBoolean("core_damaged", saved.coreDamaged);
         out.putDouble("pump", saved.pump);
         out.putInt("coolant_type", saved.coolantType.ordinal());
+        out.putDouble("oxidised", saved.oxidised);
+        out.putDouble("coolant_activity", saved.coolantActivity);
+        out.putBoolean("ruptured", saved.ruptured);
+        out.putDouble("salt_enrichment", saved.saltEnrichment);
+        out.putDouble("salt_burnup", saved.saltBurnup);
+        out.putDouble("salt_bred", saved.saltBred);
+        out.putDouble("salt_fission", saved.saltFission);
+        out.putDouble("hydrogen", containment.hydrogen);
+        out.putDouble("air_activity", containment.activity);
+        out.putDouble("pool_temp", containment.poolTemp);
+        out.putBoolean("ever_sealed", everSealed);
+        out.putInt("silenced", silenced);
         List<XenonEntry> xenonList = new ArrayList<>();
         saved.xenon.forEach((pos, values) -> xenonList.add(new XenonEntry(pos.asLong(), values[0], values[1])));
         out.store("xenon", XenonEntry.CODEC.listOf(), xenonList);
@@ -1147,6 +1800,25 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     @Override
     public float waterLevel() {
         return water / (float) WATER_STEPS;
+    }
+
+    // Water (light or heavy) shows as water; lead-bismuth as its opaque molten metal; fuel salt as its pale green salt.
+    @Override
+    public @Nullable Identifier coolantTexture() {
+        return switch (saved.coolantType) {
+            case LEAD_BISMUTH -> Identifier.fromNamespaceAndPath(net.zagdrath.arcforge.Arcforge.MODID, "block/fluid/lead_bismuth_still");
+            case FUEL_SALT -> Identifier.fromNamespaceAndPath(net.zagdrath.arcforge.Arcforge.MODID, "block/fluid/fuel_salt_still");
+            default -> null;
+        };
+    }
+
+    @Override
+    public int coolantColor() {
+        return switch (saved.coolantType) {
+            case LEAD_BISMUTH -> 0xFFFFFFFF;
+            case FUEL_SALT -> 0xD0FFFFFF;
+            default -> super.coolantColor();
+        };
     }
 
     // The controller's own client sound and glow come from its renderer; nothing more to tick there.

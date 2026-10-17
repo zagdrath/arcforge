@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SGS",
+    "GLG",
+    "SGS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "G": "arcforge:reactor_glass",
+    "L": "#arcforge:shielding_metals"
+  },
+  "result": {
+    "id": "arcforge:hot_cell_window",
+    "count": 4
+  }
+}

@@ -601,6 +601,13 @@ public final class ArcforgeGameTests {
         TESTS.put("fission_heavy_water_tower", FissionGameTests::heavyWaterTower);
         LONG_TESTS.put("fission_reactor_forms", FissionGameTests::reactorForms);
         TESTS.put("fission_reactor_buttons", FissionGameTests::reactorButtons);
+        TESTS.put("nuclear_failures", NuclearSafetyGameTests::failures);
+        TESTS.put("nuclear_decay", NuclearSafetyGameTests::decay);
+        TESTS.put("nuclear_spent_fuel", NuclearSafetyGameTests::spentFuel);
+        TESTS.put("nuclear_waste_recipes", NuclearSafetyGameTests::wasteRecipes);
+        TESTS.put("nuclear_advanced_cores", NuclearSafetyGameTests::advancedCores);
+        TESTS.put("nuclear_freeze_plug", NuclearSafetyGameTests::freezePlug);
+        LONG_TESTS.put("nuclear_containment_scan", NuclearSafetyGameTests::containmentScan);
         RADIATION_TESTS.put("nuclear_radiation_field", NuclearGameTests::radiationField);
         RADIATION_TESTS.put("nuclear_hazmat_and_dose", NuclearGameTests::hazmatAndDose);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));

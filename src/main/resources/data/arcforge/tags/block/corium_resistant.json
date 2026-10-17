@@ -1,0 +1,13 @@
+{
+  "values": [
+    "minecraft:obsidian",
+    "minecraft:crying_obsidian",
+    "minecraft:bedrock",
+    "minecraft:reinforced_deepslate",
+    "minecraft:barrier",
+    "arcforge:containment_concrete",
+    "arcforge:containment_dome",
+    "arcforge:core_catcher",
+    "arcforge:solidified_corium"
+  ]
+}

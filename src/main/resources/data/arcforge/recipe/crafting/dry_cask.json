@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CCC",
+    "CBC",
+    "CCC"
+  ],
+  "key": {
+    "C": "arcforge:containment_concrete",
+    "B": "#c:storage_blocks/steel"
+  },
+  "result": {
+    "id": "arcforge:dry_cask",
+    "count": 1
+  }
+}

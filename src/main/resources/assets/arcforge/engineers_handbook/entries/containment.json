@@ -1,0 +1,26 @@
+{
+  "title": "Containment Building",
+  "icon": "arcforge:containment_concrete",
+  "items": [
+    "arcforge:containment_concrete",
+    "arcforge:steel_liner",
+    "arcforge:containment_dome",
+    "arcforge:airlock",
+    "arcforge:equipment_hatch",
+    "arcforge:penetration"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Any sealed room round the reactor (and its steam generators) built of Containment Concrete with Steel Liner on its inside face. The reactor finds it by flood fill from its vessel, up to 32,768 blocks of air.\n- Every inner face must be liner backed by concrete (or the lined Containment Dome, for a domed roof).\n- Airlocks are doors for people. Build them in pairs: two near each other are interlocked, so only one opens at a time, and an open one with no shut partner breaks the seal.\n- The Equipment Hatch is a 3x3 bolted door for machines. Open, the containment isn't sealed."
+    },
+    {
+      "type": "text",
+      "text": "- Penetrations carry pipes, conduits and cables through the wall: place a row of them through its thickness, each facing along it.\n# Sealed\nInside a sealed containment, explosions are absorbed by the walls up to their strength (a blast bigger than that breaches the nearest wall), and fallout stays in its air instead of settling outside. The Safety page shows whether it's sealed, and why not."
+    },
+    {
+      "type": "multiblock",
+      "structure": "containment"
+    }
+  ]
+}

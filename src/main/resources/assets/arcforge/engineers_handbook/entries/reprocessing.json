@@ -1,0 +1,26 @@
+{
+  "title": "PUREX Plant",
+  "icon": "arcforge:purex_controller",
+  "items": [
+    "arcforge:purex_controller",
+    "arcforge:hot_cell_casing",
+    "arcforge:hot_cell_window",
+    "arcforge:nitric_acid_bucket",
+    "arcforge:recovered_uranium",
+    "arcforge:plutonium_oxide"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Nitric Acid\nThe Ostwald process, in the Chemical Reactor: 100 mB of Ammonia burnt in 200 mB of Oxygen gives Nitrogen Dioxide; 150 mB of it in 50 mB of Water gives 100 mB of Nitric Acid.\n# The hot cell\nAn empty box of Hot Cell Casing, 3 to 9 across and 3 to 6 tall, lead-glass Hot Cell Windows in its walls, the controller in a wall. Formed, you see its dissolver and contactors through the windows, its master-slave manipulators reaching through over them."
+    },
+    {
+      "type": "multiblock",
+      "structure": "purex_plant"
+    },
+    {
+      "type": "text",
+      "text": "# Reprocessing\nSpent rods, cooled until their decay heat has fallen, go in. Each is dissolved in 500 mB of Nitric Acid and separated with 100 mB of Kerosene (the solvent's diluent), using 200 FE/t:\n- Recovered Uranium, at what's left of its enrichment: back to UF6 in the Chemical Reactor and on to the Gas Centrifuge Cascade.\n- Plutonium Oxide, from the plutonium the rod bred, carried over between rods.\n- High-Level Liquid Waste, more for a more spent rod."
+    }
+  ]
+}

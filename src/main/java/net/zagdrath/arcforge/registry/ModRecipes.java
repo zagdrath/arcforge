@@ -70,6 +70,13 @@ public final class ModRecipes {
             () -> RecipeType.simple(id("sintering")));
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe>> ISOTOPE_EXCHANGING = RECIPE_TYPES.register(
             "isotope_exchanging", () -> RecipeType.simple(id("isotope_exchanging")));
+    // Waste and reprocessing: the Waste Compactor, the Vitrification Plant and the PUREX Plant.
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.CompactingRecipe>> COMPACTING = RECIPE_TYPES.register("compacting",
+            () -> RecipeType.simple(id("compacting")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.VitrifyingRecipe>> VITRIFYING = RECIPE_TYPES.register("vitrifying",
+            () -> RecipeType.simple(id("vitrifying")));
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.ReprocessingRecipe>> REPROCESSING = RECIPE_TYPES.register("reprocessing",
+            () -> RecipeType.simple(id("reprocessing")));
     public static final Supplier<RecipeType<FiberizingRecipe>> FIBERIZING = RECIPE_TYPES.register("fiberizing",
             () -> RecipeType.simple(id("fiberizing")));
     public static final Supplier<RecipeType<InfusingRecipe>> INFUSING = RECIPE_TYPES.register("infusing",
@@ -233,6 +240,16 @@ public final class ModRecipes {
             RECIPE_SERIALIZERS.register("isotope_exchanging", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe.MAP_CODEC,
                     net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe.STREAM_CODEC));
 
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.CompactingRecipe>> COMPACTING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "compacting", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.CompactingRecipe.MAP_CODEC,
+                    net.zagdrath.arcforge.recipe.CompactingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.VitrifyingRecipe>> VITRIFYING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "vitrifying", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.VitrifyingRecipe.MAP_CODEC,
+                    net.zagdrath.arcforge.recipe.VitrifyingRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.ReprocessingRecipe>> REPROCESSING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "reprocessing", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.ReprocessingRecipe.MAP_CODEC,
+                    net.zagdrath.arcforge.recipe.ReprocessingRecipe.STREAM_CODEC));
+
     // Sheathing conduits in coloured plastic, and stripping it (a crafting recipe of vanilla's type).
     public static final Supplier<RecipeSerializer<ConduitDyeingRecipe>> CONDUIT_DYEING_SERIALIZER = RECIPE_SERIALIZERS.register("conduit_dyeing",
             () -> new RecipeSerializer<>(ConduitDyeingRecipe.MAP_CODEC, ConduitDyeingRecipe.STREAM_CODEC));
@@ -268,6 +285,6 @@ public final class ModRecipes {
                 HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
                 SIFTING.get(), DIAMOND_PRESSING.get(), CRACKING.get(), REFORMING.get(), COKING.get(), LUBRICANT_BLENDING.get(),
                 HYDROTREATING.get(), SULFUR_RECOVERY.get(), STEAM_REFORMING.get(), STEAM_CRACKING.get(), SINTERING.get(), ISOTOPE_EXCHANGING.get(),
-                RecipeType.SMELTING);
+                COMPACTING.get(), VITRIFYING.get(), REPROCESSING.get(), RecipeType.SMELTING);
     }
 }

@@ -861,6 +861,93 @@ public final class ModBlocks {
             p -> new net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.HEAVY_WATER_TOWER, p),
             p -> columnProperties(p).noOcclusion());
 
+    // --- Containment, failures, spent fuel, waste and reprocessing (the Nuclear chapter of the Handbook) ---
+    // The containment building: Containment Concrete lined with Steel Liner (or the lined Containment Dome), its
+    // personnel Airlocks, the Equipment Hatch and Penetrations (see Containment). Blast-proof (Containment Concrete and
+    // the liner take what a vanilla explosion can throw at them; see ReactorExplosions for a breach).
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.ContainmentBlock> CONTAINMENT_CONCRETE = BLOCKS.registerBlock("containment_concrete",
+            net.zagdrath.arcforge.block.nuclear.ContainmentBlock::new, p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY).instrument(NoteBlockInstrument.BASEDRUM).strength(8.0F, 1_200.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.ContainmentBlock> STEEL_LINER = BLOCKS.registerBlock("steel_liner",
+            net.zagdrath.arcforge.block.nuclear.ContainmentBlock::new, p -> columnProperties(p).strength(6.0F, 1_200.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.ContainmentDomeBlock> CONTAINMENT_DOME = BLOCKS.registerBlock("containment_dome",
+            p -> new net.zagdrath.arcforge.block.nuclear.ContainmentDomeBlock(CONTAINMENT_CONCRETE.get().defaultBlockState(), p),
+            p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY).instrument(NoteBlockInstrument.BASEDRUM).strength(8.0F, 1_200.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.AirlockBlock> AIRLOCK = BLOCKS.registerBlock("airlock", net.zagdrath.arcforge.block.nuclear.AirlockBlock::new,
+            p -> columnProperties(p).strength(6.0F, 1_200.0F).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.EquipmentHatchBlock> EQUIPMENT_HATCH = BLOCKS.registerBlock("equipment_hatch", net.zagdrath.arcforge.block.nuclear.EquipmentHatchBlock::new,
+            p -> columnProperties(p).strength(6.0F, 1_200.0F).noOcclusion().pushReaction(PushReaction.IMMOVEABLE));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.PenetrationBlock> PENETRATION = BLOCKS.registerBlock("penetration", net.zagdrath.arcforge.block.nuclear.PenetrationBlock::new,
+            p -> columnProperties(p).strength(6.0F, 1_200.0F));
+    // Safety systems: the Core Catcher (a refractory basin under the vessel that stops Corium), Hydrogen Recombiners,
+    // Relief Valves, the ECCS Accumulator and Pump.
+    public static final DeferredBlock<Block> CORE_CATCHER = BLOCKS.registerSimpleBlock("core_catcher",
+            p -> p.mapColor(MapColor.TERRACOTTA_ORANGE).instrument(NoteBlockInstrument.BASEDRUM).strength(8.0F, 1_200.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.ShapedBlock> HYDROGEN_RECOMBINER = BLOCKS.registerBlock("hydrogen_recombiner",
+            p -> new net.zagdrath.arcforge.block.nuclear.ShapedBlock(Block.box(2, 0, 3, 14, 15, 13), p), p -> columnProperties(p).noOcclusion());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.ShapedBlock> RELIEF_VALVE = BLOCKS.registerBlock("relief_valve",
+            p -> new net.zagdrath.arcforge.block.nuclear.ShapedBlock(net.minecraft.world.phys.shapes.Shapes.or(Block.box(4, 0, 4, 12, 9, 12), Block.box(3, 9, 3, 13, 16, 13)), p),
+            p -> columnProperties(p).noOcclusion());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock> ECCS_ACCUMULATOR = BLOCKS.registerBlock("eccs_accumulator",
+            p -> new net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock(ModBlockEntityTypes.ECCS_ACCUMULATOR, Block.box(1, 0, 1, 15, 16, 15), p), p -> columnProperties(p).noOcclusion());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock> ECCS_PUMP = BLOCKS.registerBlock("eccs_pump",
+            p -> new net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock(ModBlockEntityTypes.ECCS_PUMP, p), p -> columnProperties(p));
+    // Corium (a melted core, molten), Solidified Corium (set, and still radioactive), Fallout dust.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.CoriumBlock> CORIUM = BLOCKS.registerBlock("corium",
+            p -> new net.zagdrath.arcforge.block.nuclear.CoriumBlock(ModFluids.CORIUM.get(), p),
+            p -> liquidProperties(p, MapColor.COLOR_ORANGE).lightLevel(state -> 15 - 2 * state.getValue(net.zagdrath.arcforge.block.nuclear.CoriumBlock.COOLING)));
+    public static final DeferredBlock<Block> SOLIDIFIED_CORIUM = BLOCKS.registerSimpleBlock("solidified_corium",
+            p -> p.mapColor(MapColor.COLOR_BLACK).instrument(NoteBlockInstrument.BASEDRUM).strength(10.0F, 600.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.BASALT).lightLevel(state -> 3));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.FalloutBlock> FALLOUT = BLOCKS.registerBlock("fallout", net.zagdrath.arcforge.block.nuclear.FalloutBlock::new,
+            p -> p.mapColor(MapColor.COLOR_GRAY).replaceable().noCollision().instabreak().noLootTable().sound(SoundType.SAND)
+                    .pushReaction(PushReaction.POPPED));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.DecontaminationShowerBlock> DECONTAMINATION_SHOWER = BLOCKS.registerBlock("decontamination_shower",
+            p -> new net.zagdrath.arcforge.block.nuclear.DecontaminationShowerBlock(ModBlockEntityTypes.DECONTAMINATION_SHOWER, p), p -> columnProperties(p).noOcclusion());
+    // Spent fuel: the Spent Fuel Rack (in a pool), the Dry Cask; waste: the Geological Repository, the Low-Level Waste
+    // Drum, the Waste Compactor and the Vitrification Plant.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.SpentFuelRackBlock> SPENT_FUEL_RACK = BLOCKS.registerBlock("spent_fuel_rack",
+            p -> new net.zagdrath.arcforge.block.nuclear.SpentFuelRackBlock(ModBlockEntityTypes.SPENT_FUEL_RACK, p), p -> columnProperties(p).noOcclusion());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.DryCaskBlock> DRY_CASK = BLOCKS.registerBlock("dry_cask",
+            p -> new net.zagdrath.arcforge.block.nuclear.DryCaskBlock(ModBlockEntityTypes.DRY_CASK, p),
+            p -> p.mapColor(MapColor.COLOR_LIGHT_GRAY).instrument(NoteBlockInstrument.BASEDRUM).strength(6.0F, 60.0F).requiresCorrectToolForDrops()
+                    .sound(SoundType.STONE).noOcclusion());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.GeologicalRepositoryBlock> GEOLOGICAL_REPOSITORY = BLOCKS.registerBlock("geological_repository",
+            p -> new net.zagdrath.arcforge.block.nuclear.GeologicalRepositoryBlock(ModBlockEntityTypes.GEOLOGICAL_REPOSITORY, p),
+            p -> columnProperties(p).strength(30.0F, 1_200.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.ShapedBlock> LOW_LEVEL_WASTE_DRUM = BLOCKS.registerBlock("low_level_waste_drum",
+            p -> new net.zagdrath.arcforge.block.nuclear.ShapedBlock(Block.box(2, 0, 2, 14, 15, 14), p), p -> columnProperties(p).strength(2.5F, 6.0F).noOcclusion());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.WasteCompactorBlock> WASTE_COMPACTOR = BLOCKS.registerBlock("waste_compactor",
+            net.zagdrath.arcforge.block.machine.WasteCompactorBlock::new, p -> machineProperties(p, 0));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.machine.VitrificationPlantBlock> VITRIFICATION_PLANT = BLOCKS.registerBlock(
+            "vitrification_plant", net.zagdrath.arcforge.block.machine.VitrificationPlantBlock::new, p -> machineProperties(p, 9));
+    // The PUREX Plant: its hot cell's walls, lead-glass windows and controller.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> HOT_CELL_CASING = BLOCKS.registerBlock("hot_cell_casing",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.PUREX, p),
+            p -> columnProperties(p).strength(6.0F, 24.0F).forceSolidOn());
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselGlassBlock> HOT_CELL_WINDOW = BLOCKS.registerBlock("hot_cell_window",
+            p -> new net.zagdrath.arcforge.block.multiblock.VesselGlassBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.PUREX, p),
+            p -> p.mapColor(MapColor.NONE).strength(4.0F, 18.0F).requiresCorrectToolForDrops().sound(SoundType.GLASS).noOcclusion()
+                    .isValidSpawn((state, level, pos, type) -> false).isRedstoneConductor((state, level, pos) -> false)
+                    .isSuffocating((state, level, pos) -> false).isViewBlocking((state, level, pos, box) -> false));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity>> PUREX_CONTROLLER = BLOCKS.registerBlock(
+            "purex_controller", p -> new net.zagdrath.arcforge.block.multiblock.VesselControllerBlock<>(() -> net.zagdrath.arcforge.multiblock.VesselStructures.PUREX,
+                    ModBlockEntityTypes.PUREX_PLANT, net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity::new, p),
+            p -> columnProperties(p).strength(6.0F, 24.0F).forceSolidOn()
+                    .lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.multiblock.VesselControllerBlock.LIT) ? 7 : 0));
+    // The molten salt reactor's: the Salt Processing Unit, the Freeze Plug and the Drain Tank.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock> SALT_PROCESSING_UNIT = BLOCKS.registerBlock("salt_processing_unit",
+            p -> new net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock(ModBlockEntityTypes.SALT_PROCESSING_UNIT, p), p -> columnProperties(p));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.FreezePlugBlock> FREEZE_PLUG = BLOCKS.registerBlock("freeze_plug",
+            p -> new net.zagdrath.arcforge.block.nuclear.FreezePlugBlock(ModBlockEntityTypes.FREEZE_PLUG, p), p -> columnProperties(p).strength(5.0F, 24.0F));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock> DRAIN_TANK = BLOCKS.registerBlock("drain_tank",
+            p -> new net.zagdrath.arcforge.block.nuclear.NuclearEntityBlock(ModBlockEntityTypes.DRAIN_TANK, p), p -> columnProperties(p).strength(6.0F, 60.0F));
+    public static final DeferredBlock<LiquidBlock> NITRIC_ACID = BLOCKS.registerBlock("nitric_acid",
+            p -> new SulfuricAcidBlock(ModFluids.NITRIC_ACID.get(), ModDamageTypes.NITRIC_ACID, p),
+            p -> liquidProperties(p, MapColor.COLOR_YELLOW));
+
     // The Thermal Evaporator Array: a 3x3x9 steel tower (see ThermalEvaporatorStructure), like the other arrays'
     // casings.
     public static final DeferredBlock<ThermalEvaporatorCasingBlock> THERMAL_EVAPORATOR_CASING = BLOCKS.registerBlock("thermal_evaporator_casing",

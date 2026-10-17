@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:ammonia",
+      "amount": 100
+    },
+    {
+      "fluid": "arcforge:oxygen",
+      "amount": 200
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:nitrogen_dioxide",
+    "amount": 100
+  },
+  "time": 80,
+  "energy_per_tick": 40
+}

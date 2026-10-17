@@ -59,6 +59,57 @@
     },
     "arcforge:fuel_pellet": {
       "dose_rate": 0.2
+    },
+    "arcforge:recovered_uranium": {
+      "dose_rate": 0.15
+    },
+    "arcforge:plutonium_oxide": {
+      "dose_rate": 0.6
+    },
+    "arcforge:depleted_uranium_dioxide": {
+      "dose_rate": 0.045
+    },
+    "arcforge:mox_blend": {
+      "dose_rate": 0.3
+    },
+    "arcforge:green_mox_pellet": {
+      "dose_rate": 0.3
+    },
+    "arcforge:mox_fuel_pellet": {
+      "dose_rate": 0.3
+    },
+    "arcforge:uranium_233_oxide": {
+      "dose_rate": 0.5
+    },
+    "arcforge:u233_fuel_blend": {
+      "dose_rate": 0.2
+    },
+    "arcforge:green_u233_pellet": {
+      "dose_rate": 0.2
+    },
+    "arcforge:u233_fuel_pellet": {
+      "dose_rate": 0.2
+    },
+    "arcforge:thorium_dioxide": {
+      "dose_rate": 0.03
+    },
+    "arcforge:green_thorium_pellet": {
+      "dose_rate": 0.03
+    },
+    "arcforge:thorium_pellet": {
+      "dose_rate": 0.03
+    },
+    "arcforge:thorium_tetrafluoride": {
+      "dose_rate": 0.03
+    },
+    "arcforge:used_hepa_filter": {
+      "dose_rate": 0.1
+    },
+    "arcforge:low_level_waste_drum": {
+      "dose_rate": 0.1
+    },
+    "arcforge:solidified_corium": {
+      "dose_rate": 5.0
     }
   }
 }

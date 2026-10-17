@@ -66,7 +66,30 @@ public class FissionReactorMenu extends MachineMenu {
     public static final int DATA_PEAKING = 47;         // x 100
     public static final int DATA_HISTORY_HEAD = 48;
     public static final int DATA_VOID_FRACTION = 49;   // x 1000
-    public static final int DATA_HISTORY = 50;         // 3 series x HISTORY
+    // Safety: the alarms up and those silenced (ReactorAlarm bits), the containment (0 none, else its status + 1), the
+    // Hydrogen in its air (% x 100), its air's radioactivity (mSv/h x 10), the Suppression Pool (blocks, °C x 10), Relief
+    // Valves, ECCS units and their water, recombiners, the cladding oxidised and the coolant's activity (x 1000), a salt
+    // core's fission products (x 1000), its Freeze Plug (0 none, 1 frozen, 2 melted), the air's volume, the salt's
+    // fissile (pcm) and the vessel's burst pressure (bar x 10).
+    public static final int DATA_ALARMS = 50;
+    public static final int DATA_SILENCED = 51;
+    public static final int DATA_CONTAINMENT = 52;
+    public static final int DATA_HYDROGEN = 53;
+    public static final int DATA_AIR_ACTIVITY = 54;
+    public static final int DATA_POOL = 55;
+    public static final int DATA_POOL_TEMP = 56;
+    public static final int DATA_VALVES = 57;
+    public static final int DATA_ECCS_UNITS = 58;
+    public static final int DATA_ECCS_WATER = 59;
+    public static final int DATA_RECOMBINERS = 60;
+    public static final int DATA_OXIDISED = 61;
+    public static final int DATA_COOLANT_ACTIVITY = 62;
+    public static final int DATA_SALT_FISSION = 63;
+    public static final int DATA_FREEZE_PLUG = 64;
+    public static final int DATA_AIR_VOLUME = 65;
+    public static final int DATA_SALT_FISSILE = 66;
+    public static final int DATA_BURST_PRESSURE = 67;
+    public static final int DATA_HISTORY = 70;         // 3 series x HISTORY
     public static final int DATA_CONTROL_CHANNELS = DATA_HISTORY + 3 * FissionReactorBlockEntity.HISTORY; // loaded or not
     public static final int DATA_VALUES = DATA_CONTROL_CHANNELS + 1;
 
@@ -81,9 +104,9 @@ public class FissionReactorMenu extends MachineMenu {
     // step (1%) or a big step (10%): 200 + b * 4 + {0 out, 1 in, 2 out big, 3 in big}; every bank at once the same:
     // 216..219; SCRAM 220; Reset 221; trip i on/off 222 + i; trip i down/up 227 + 2i / 228 + 2i; pump down/up 237/238;
     // Redstone Rods 239; auto-unload 240; unload every rod 241; bank b down or up a fine step (0.1%): 242 + b * 2 + {0 out,
-    // 1 in}, every bank at once 250/251.
+    // 1 in}, every bank at once 250/251; silence the alarms 252.
     public static final int BANK_FIRST = 200, ALL_BANKS = 216, SCRAM = 220, RESET = 221, TRIP_TOGGLE = 222, TRIP_STEP = 227, PUMP_DOWN = 237,
-            PUMP_UP = 238, REDSTONE_RODS = 239, AUTO_UNLOAD = 240, UNLOAD_ALL = 241, FINE = 242, LAST = 251;
+            PUMP_UP = 238, REDSTONE_RODS = 239, AUTO_UNLOAD = 240, UNLOAD_ALL = 241, FINE = 242, SILENCE = 252, LAST = 252;
 
     public FissionReactorMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(), FissionReactorBlockEntity.clientItems(), WideIntContainerData.client(DATA_VALUES));
@@ -129,7 +152,9 @@ public class FissionReactorMenu extends MachineMenu {
     }
 
     public static void apply(FissionReactorBlockEntity reactor, int id) {
-        if (id >= FINE) {
+        if (id == SILENCE) {
+            reactor.silence();
+        } else if (id >= FINE) {
             int bank = (id - FINE) / 2;
             double by = (id - FINE) % 2 == 1 ? 0.001 : -0.001;
             for (int b = 0; b < ReactorSim.BANKS; b++) {
@@ -187,6 +212,18 @@ public class FissionReactorMenu extends MachineMenu {
     }
 
     // --- Readings ---
+
+    public int get(int index) {
+        return value(index);
+    }
+
+    public int alarms() {
+        return value(DATA_ALARMS);
+    }
+
+    public int silenced() {
+        return value(DATA_SILENCED);
+    }
 
     public boolean isFormed() {
         return value(DATA_FORMED) != 0;
@@ -256,6 +293,11 @@ public class FissionReactorMenu extends MachineMenu {
 
     public boolean heavyWater() {
         return value(DATA_COOLANT_TYPE) == 1;
+    }
+
+    public net.zagdrath.arcforge.nuclear.reactor.CoreLattice.Coolant coolantType() {
+        net.zagdrath.arcforge.nuclear.reactor.CoreLattice.Coolant[] values = net.zagdrath.arcforge.nuclear.reactor.CoreLattice.Coolant.values();
+        return values[Math.max(0, Math.min(values.length - 1, value(DATA_COOLANT_TYPE)))];
     }
 
     public ReactorSim.Mode mode() {

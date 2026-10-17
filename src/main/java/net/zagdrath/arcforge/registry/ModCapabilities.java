@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.jspecify.annotations.Nullable;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
@@ -578,6 +579,59 @@ public final class ModCapabilities {
             return tower instanceof net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity heavyWater && tower.isPart(pos)
                     ? heavyWater.energyHandlerAt(pos, side) : null;
         }, towerParts);
+        // The PUREX Plant: rods, Nitric Acid and solvent in (Input), products and waste out (Output), FE in.
+        Block[] purexParts = { ModBlocks.PUREX_CONTROLLER.get(), ModBlocks.HOT_CELL_CASING.get() };
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var plant = net.zagdrath.arcforge.multiblock.VesselStructures.PUREX.findController(level, pos);
+            return plant != null && plant.isPart(pos) ? plant.itemHandlerAt(pos, side) : null;
+        }, purexParts);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var plant = net.zagdrath.arcforge.multiblock.VesselStructures.PUREX.findController(level, pos);
+            return plant != null && plant.isPart(pos) ? plant.fluidHandlerAt(pos, side) : null;
+        }, purexParts);
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
+            var plant = net.zagdrath.arcforge.multiblock.VesselStructures.PUREX.findController(level, pos);
+            return plant instanceof net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity purex && plant.isPart(pos)
+                    ? purex.energyHandlerAt(pos, side) : null;
+        }, purexParts);
+        // The waste machines.
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.WASTE_COMPACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.WASTE_COMPACTOR.get(),
+                net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.VITRIFICATION_PLANT.get(),
+                net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.VITRIFICATION_PLANT.get(),
+                net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.VITRIFICATION_PLANT.get(),
+                net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getFluidHandler);
+        // The safety systems and spent fuel and waste storage (any face).
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ECCS_ACCUMULATOR.get(), (accumulator, side) -> accumulator.getFluidHandler());
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ECCS_PUMP.get(), (pump, side) -> pump.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.DECONTAMINATION_SHOWER.get(), (shower, side) -> shower.getFluidHandler());
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.GEOLOGICAL_REPOSITORY.get(), (vault, side) -> vault.getSlot());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.DRAIN_TANK.get(), (tank, side) -> tank.getFluidHandler());
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.FREEZE_PLUG.get(), (plug, side) -> plug.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.SALT_PROCESSING_UNIT.get(), (unit, side) -> unit.getEnergyHandler());
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.SALT_PROCESSING_UNIT.get(), (unit, side) -> unit.getFluidHandler());
+        // A containment Penetration passes items, fluids, FE and heat straight through along its axis (see PenetrationBlock).
+        Block penetration = ModBlocks.PENETRATION.get();
+        event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {
+            BlockPos far = net.zagdrath.arcforge.block.nuclear.PenetrationBlock.through(level, pos, state, side);
+            return far != null ? level.getCapability(Capabilities.Item.BLOCK, far, side) : null;
+        }, penetration);
+        event.registerBlock(Capabilities.Fluid.BLOCK, (level, pos, state, blockEntity, side) -> {
+            BlockPos far = net.zagdrath.arcforge.block.nuclear.PenetrationBlock.through(level, pos, state, side);
+            return far != null ? level.getCapability(Capabilities.Fluid.BLOCK, far, side) : null;
+        }, penetration);
+        event.registerBlock(Capabilities.Energy.BLOCK, (level, pos, state, blockEntity, side) -> {
+            BlockPos far = net.zagdrath.arcforge.block.nuclear.PenetrationBlock.through(level, pos, state, side);
+            return far != null ? level.getCapability(Capabilities.Energy.BLOCK, far, side) : null;
+        }, penetration);
+        event.registerBlock(HEAT, (level, pos, state, blockEntity, side) -> {
+            BlockPos far = net.zagdrath.arcforge.block.nuclear.PenetrationBlock.through(level, pos, state, side);
+            return far != null ? level.getCapability(HEAT, far, side) : null;
+        }, penetration);
         // The Thermal Evaporator Array: Seawater or Brine in, heat in, Brine, Salt and Water out, through its ports.
         Block[] evaporatorParts = { ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get(), ModBlocks.THERMAL_EVAPORATOR_CASING.get() };
         event.registerBlock(Capabilities.Item.BLOCK, (level, pos, state, blockEntity, side) -> {

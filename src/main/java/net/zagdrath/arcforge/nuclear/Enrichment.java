@@ -106,6 +106,27 @@ public final class Enrichment {
         return to;
     }
 
+    // A fluid made from an item (in the Chemical Reactor): UF6 takes an enriched or depleted item's assay (Recovered
+    // Uranium back into UF6); Fuel Salt always carries one, its uranium's (natural without), which marks it as fresh
+    // salt to a molten salt reactor (salt without one is its own, come back round its loop).
+    public static FluidStack carry(net.minecraft.world.item.ItemStack from, FluidStack to) {
+        if (to.isEmpty()) {
+            return to;
+        }
+        Integer assay = from.isEmpty() ? null : from.get(net.zagdrath.arcforge.registry.ModDataComponents.U235_ASSAY.get());
+        if (to.getFluid().isSame(ModFluids.FUEL_SALT.get())) {
+            FluidStack copy = to.copy();
+            copy.set(net.zagdrath.arcforge.registry.ModDataComponents.U235_ASSAY.get(), Math.max(1, Math.min(MAX_PCM, assay != null ? assay : NATURAL_PCM)));
+            return copy;
+        }
+        return assay != null && hasAssay(to.getFluid()) ? withAssay(to, assay) : to;
+    }
+
+    // Fresh Fuel Salt's assay (pcm), or null for salt without one (a reactor's own).
+    public static @org.jspecify.annotations.Nullable Integer saltAssay(FluidResource resource) {
+        return resource.isEmpty() ? null : resource.toStack(1).get(net.zagdrath.arcforge.registry.ModDataComponents.U235_ASSAY.get());
+    }
+
     public static String percent(int pcm) {
         String text = String.format(Locale.ROOT, "%.3f", pcm / 1000.0);
         text = text.replaceAll("0+$", "");

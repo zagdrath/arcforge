@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "PCP",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:plates/steel",
+    "P": "arcforge:steel_pipe",
+    "C": "arcforge:chemical_reactor"
+  },
+  "result": {
+    "id": "arcforge:salt_processing_unit",
+    "count": 1
+  }
+}

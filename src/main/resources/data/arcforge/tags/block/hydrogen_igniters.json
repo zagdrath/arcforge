@@ -1,0 +1,15 @@
+{
+  "values": [
+    "#minecraft:fire",
+    "#minecraft:campfires",
+    "minecraft:lava",
+    "minecraft:torch",
+    "minecraft:wall_torch",
+    "minecraft:soul_torch",
+    "minecraft:soul_wall_torch",
+    "minecraft:magma_block",
+    "minecraft:redstone_torch",
+    "minecraft:redstone_wall_torch",
+    "arcforge:corium"
+  ]
+}

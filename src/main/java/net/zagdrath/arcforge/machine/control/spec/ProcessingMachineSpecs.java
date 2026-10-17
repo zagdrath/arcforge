@@ -188,6 +188,31 @@ public final class ProcessingMachineSpecs {
                         .map(holder -> holder.value().result().create())))
                 .build());
 
+        // The Waste Compactor: waste and an empty drum in, a Low-Level Waste Drum out.
+        MachineControls.register(ModBlockEntityTypes.WASTE_COMPACTOR.get(), MachineControlSpec.builder(net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity.class)
+                .energy(EnergyRole.CONSUMER, net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::getEnergy,
+                        net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::getUsage)
+                .slot(net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity.SLOT_INPUT, SlotRole.INPUT)
+                .slot(net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity.SLOT_DRUM, SlotRole.INPUT)
+                .slot(net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity.SLOT_OUTPUT, SlotRole.OUTPUT)
+                .items(net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::getItems, be -> be.getItemHandler(null))
+                .progress(net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::getProgress,
+                        net.zagdrath.arcforge.blockentity.machine.WasteCompactorBlockEntity::getTotal)
+                .build());
+
+        // The Vitrification Plant: High-Level Liquid Waste and glass in, a Vitrified Waste Log out.
+        MachineControls.register(ModBlockEntityTypes.VITRIFICATION_PLANT.get(), MachineControlSpec.builder(net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity.class)
+                .energy(EnergyRole.CONSUMER, net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getEnergy,
+                        net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getUsage)
+                .slot(net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity.SLOT_GLASS, SlotRole.INPUT)
+                .slot(net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity.SLOT_OUTPUT, SlotRole.OUTPUT)
+                .items(net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getItems, be -> be.getItemHandler(null))
+                .tank(SlotRole.INPUT, net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getTank)
+                .fluidAutomation(be -> be.getFluidHandler(null))
+                .progress(net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getProgress,
+                        net.zagdrath.arcforge.blockentity.machine.VitrificationPlantBlockEntity::getTotal)
+                .build());
+
         MachineControls.register(ModBlockEntityTypes.INFUSER.get(), MachineControlSpec.builder(InfuserBlockEntity.class)
                 .energy(EnergyRole.CONSUMER, InfuserBlockEntity::getEnergy, InfuserBlockEntity::getUsage)
                 .slot(InfuserBlockEntity.SLOT_BUCKET_IN, SlotRole.INPUT)

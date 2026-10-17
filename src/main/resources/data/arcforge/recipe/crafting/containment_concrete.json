@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CCC",
+    "CRC",
+    "CCC"
+  ],
+  "key": {
+    "C": "arcforge:concrete_shielding",
+    "R": "#c:rods/steel"
+  },
+  "result": {
+    "id": "arcforge:containment_concrete",
+    "count": 8
+  }
+}

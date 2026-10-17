@@ -23,9 +23,10 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 ## [Unreleased]
 
 Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units, a scaling Diesel
-Generator, hydrocracking and Synthetic Rubber, a retuned oil line, running sounds and model fixes for the oilfield, and
-the nuclear tier up to the Fission Reactor; worlds load, but Diesel Generators and Oil Derricks need their new layers
-and some refinery lines need a new port, see Upgrading).
+Generator, hydrocracking and Synthetic Rubber, a retuned oil line, running sounds and model fixes for the oilfield,
+and the nuclear tier up to the Fission Reactor, its failures, containment, reprocessing and advanced cores; worlds
+load, but Diesel Generators and Oil Derricks need their new layers and some refinery lines need a new port, see
+Upgrading).
 
 ### Added
 
@@ -107,6 +108,52 @@ and some refinery lines need a new port, see Upgrading).
   - JEI: Sintering, Isotope Exchange, Fission (rods at 0.711%, 3%, 5% and 20%) and the Steam Generator; Jade: the
     reactor's power, k, temperatures, rods and trips, a channel's rod or bank, the Steam Generator and the tower. New
     config: `nuclear.fissionReactor`, `nuclear.steamGenerator` and `nuclear.heavyWaterTower`.
+- **The nuclear tier, part three: failures, containment, spent fuel, reprocessing, thorium and two advanced reactors.**
+  Civil power only: plutonium only ever becomes MOX fuel. Eleven more Handbook entries in the Nuclear chapter
+  (with build views of a containment and the PUREX Plant), thirteen more advancements.
+  - **Failures, each with warnings first** (an alarm list on a new Safety page of the reactor's GUI, on Jade, and a
+    klaxon you can silence): cladding failure above about 1,200 °C (zirconium and steam make **Hydrogen** and let
+    fission products into the coolant, making it and the containment's air radioactive); hydrogen igniting above 4% in
+    the containment's air (a spark, fire, lava, a lit machine or Corium sets it off); fuel melting above about 2,800 °C
+    into **Corium**, a glowing molten fluid that melts down through blocks (not obsidian, Containment Concrete or a
+    Core Catcher) and cools into radioactive **Solidified Corium**; overpressure bursting the vessel in a steam
+    explosion; and a prompt-critical excursion destroying it. Explosions scale with the energy and pressure stored, up
+    to a cap.
+  - **Fallout.** Without a sealed containment, failures release radioactive dust that settles round the reactor,
+    drifts a little downwind each day and contaminates chunks, decaying over in-game days (two half-lives). Players and
+    what they carry pick up contamination; the **Decontamination Shower** (with HEPA Filters) washes it off.
+  - **Containment.** Any sealed room of **Containment Concrete** lined with **Steel Liner** (or the lined **Containment
+    Dome**) round the reactor, found by flood fill, with interlocked **Airlocks**, a 3x3 **Equipment Hatch** (a large
+    model with a swinging round door) and **Penetrations** for pipes, conduits and cables. Sealed, it absorbs
+    explosions up to its strength and keeps fallout in its air.
+  - **Safety systems.** **ECCS Accumulators** and **Pumps** inject water when coolant is lost; **Relief Valves** vent steam
+    into a Suppression Pool (water in the containment); **Hydrogen Recombiners** remove hydrogen; a **Core Catcher**
+    stops Corium.
+  - **Spent fuel.** **Spent Fuel Racks** under at least 3 blocks of water cool and shield rods, glowing Cherenkov blue
+    (full-bright) while they're hot; drained, the rods heat up and can fail. Cooled rods go into a **Dry Cask** (seven
+    rods, shielded, kept when broken).
+  - **Reprocessing.** **Nitric Acid** by the Ostwald process (Ammonia and Oxygen to Nitrogen Dioxide, then Water). The
+    **PUREX Plant** (a hot cell of Hot Cell Casing with lead-glass Hot Cell Windows, 3x3x3 to 9x6x9; its model shows the
+    lit cell's dissolver, contactors and pipework through its windows and master-slave manipulators over them) dissolves
+    cooled rods in Nitric Acid and separates them with Kerosene into **Recovered Uranium** (at its remaining enrichment,
+    back to UF6), **Plutonium Oxide** and **High-Level Liquid Waste** (`arcforge:reprocessing`). Plutonium Oxide and
+    Depleted Uranium Dioxide make **MOX** pellets and **MOX Fuel Rods**.
+  - **Waste.** The **Vitrification Plant** turns High-Level Liquid Waste and glass into **Vitrified Waste Logs**
+    (`arcforge:vitrifying`), radioactive, warm and decaying; the **Geological Repository** (below Y -40 in deepslate)
+    stores logs and Dry Casks. The **Waste Compactor** packs contaminated items, used hazmat pieces and filters into
+    **Low-Level Waste Drums** (`arcforge:compacting`).
+  - **Thorium.** Monazite Dust and Lye give **Thorium Dioxide** (and Rare Earth Dust). **Thorium Blanket Rods** breed
+    U-233 in the core; the PUREX Plant's **THOREX** setting separates it into Uranium-233 Oxide for **U-233 Fuel Rods**.
+  - **Advanced cores** in the same vessel: a **lead-bismuth fast reactor** (Lead-Bismuth Eutectic coolant, no moderator,
+    15-20% fuel or MOX, about 900 °C at low pressure, Superheated Steam from the Steam Generator, breeding in its
+    blanket) and a **molten salt reactor** (Fuel Salt of Lithium Fluoride with thorium and uranium fluorides, Salt
+    Processing Units removing fission products online, a **Freeze Plug** that drains the salt into a shielded **Drain
+    Tank** if the core overheats, about 700 °C, High-Pressure Steam). The reactor's windows show the coolant that's in
+    it: the molten metal, or the pale green salt.
+  - JEI: Compacting, Vitrifying and Reprocessing, MOX, thorium and U-233 rods under Fission, and the new Steam Generator
+    fluids; Jade for every new block and the reactor's containment and alarms. New config: `nuclear.failures`,
+    `nuclear.safety`, `nuclear.spentFuel` and `nuclear.reprocessing` (explosion, meltdown, fallout and fallout spread
+    damage can each be turned off).
 
 - **Oil caverns.** In newly generated chunks every oil deposit is a real cavern full of oil: a sealed, flattened,
   roughly round chamber (an ellipsoid about twice as wide as it is tall, its edge slightly uneven) under the middle of

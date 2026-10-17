@@ -1,0 +1,26 @@
+{
+  "type": "arcforge:reprocessing",
+  "mode": "purex",
+  "ingredient": "arcforge:fuel_rod",
+  "acid": {
+    "fluid": "arcforge:nitric_acid",
+    "amount": 500
+  },
+  "solvent": {
+    "fluid": "arcforge:kerosene",
+    "amount": 100
+  },
+  "heavy_metal": {
+    "id": "arcforge:recovered_uranium",
+    "count": 4
+  },
+  "fissile": {
+    "id": "arcforge:plutonium_oxide",
+    "count": 1
+  },
+  "waste": {
+    "id": "arcforge:high_level_waste",
+    "amount": 1000
+  },
+  "time": 400
+}

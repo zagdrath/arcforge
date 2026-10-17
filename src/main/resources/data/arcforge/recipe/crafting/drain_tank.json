@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "LSL",
+    "STS",
+    "LSL"
+  ],
+  "key": {
+    "L": "#arcforge:shielding_metals",
+    "S": "#c:plates/steel",
+    "T": "arcforge:hardened_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:drain_tank",
+    "count": 1
+  }
+}

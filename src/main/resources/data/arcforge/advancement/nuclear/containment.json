@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/fission_reactor",
+  "display": {
+    "icon": {
+      "id": "arcforge:containment_concrete"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.containment.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.containment.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "containment"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

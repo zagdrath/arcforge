@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "formed=false": {
+      "model": "arcforge:block/nuclear/hot_cell_window"
+    },
+    "formed=true": {
+      "model": "arcforge:block/nuclear/hot_cell_window"
+    }
+  }
+}

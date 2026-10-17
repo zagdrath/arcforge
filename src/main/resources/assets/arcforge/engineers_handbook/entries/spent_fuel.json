@@ -1,0 +1,18 @@
+{
+  "title": "Spent Fuel",
+  "icon": "arcforge:spent_fuel_rack",
+  "items": [
+    "arcforge:spent_fuel_rack",
+    "arcforge:dry_cask"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Spent Fuel Pool\nSpent Fuel Racks hold four rods each and must sit underwater with at least 3 blocks of water above them: the water cools the rods and shields them. While the rods are hot they glow Cherenkov blue.\nIf the pool drains, the rods heat up and, past about 1,200 °C, their cladding fails like a core's, releasing fallout."
+    },
+    {
+      "type": "text",
+      "text": "# Dry Cask Storage\nOnce a rod's decay heat has fallen (its tooltip shows it), a Dry Cask holds seven, concrete over steel, and shields them anywhere. Broken, it keeps its rods. A Dry Cask can go to a Geological Repository."
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+{
+  "parent": "arcforge:nuclear/hazmat_suit",
+  "display": {
+    "icon": {
+      "id": "arcforge:low_level_waste_drum"
+    },
+    "title": {
+      "translate": "advancements.arcforge.nuclear.compacting.title"
+    },
+    "description": {
+      "translate": "advancements.arcforge.nuclear.compacting.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "c": {
+      "trigger": "arcforge:machine_produced",
+      "conditions": {
+        "recipe_category": "compacting"
+      }
+    }
+  },
+  "requirements": [
+    [
+      "c"
+    ]
+  ]
+}

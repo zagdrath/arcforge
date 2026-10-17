@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "SPS",
+    "IPI",
+    "SPS"
+  ],
+  "key": {
+    "S": "#c:plates/nickel",
+    "P": "arcforge:steel_pipe",
+    "I": "minecraft:packed_ice"
+  },
+  "result": {
+    "id": "arcforge:freeze_plug",
+    "count": 1
+  }
+}

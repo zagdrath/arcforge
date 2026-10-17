@@ -62,6 +62,7 @@ public class LargeModelTextureGen {
         }
         brick(0, 96);
         screen(16, 96);
+        lamp(96, 96);
         core(24, 96, true);
         core(40, 96, false);
         motor(64, 96);
@@ -138,6 +139,30 @@ public class LargeModelTextureGen {
                     if (row == 2 && bx % 8 == 6) {
                         c = scale(tones[brick], 0.9);
                     }
+                }
+                out.setRGB(x0 + x, y0 + y, 0xFF000000 | c);
+            }
+        }
+    }
+
+    // A hot cell's ceiling lamp 16x8, drawn full-bright, laid on a 10x8 face from its top-left: two warm-white tubes
+    // (rows 1-2 and 5-6, each a bright core row over a softer one) between the reflector's light grey rows, a dark rim at
+    // the top and bottom and the tube holders (darker) at columns 0 and 9; past them the bare reflector.
+    static void lamp(int x0, int y0) {
+        int rim = 0x6E7276, reflector = 0xC8C6BE, holder = 0x8A8E92, core = 0xFFFBEA, soft = 0xF2E2B8;
+        for (int y = 0; y < 8; y++) {
+            for (int x = 0; x < 16; x++) {
+                int c;
+                if (y == 0 || y == 7) {
+                    c = rim;
+                } else if (x == 0 || x == 9) {
+                    c = holder;
+                } else if (x < 9 && (y == 1 || y == 5)) {
+                    c = core;
+                } else if (x < 9 && (y == 2 || y == 6)) {
+                    c = soft;
+                } else {
+                    c = reflector;
                 }
                 out.setRGB(x0 + x, y0 + y, 0xFF000000 | c);
             }
