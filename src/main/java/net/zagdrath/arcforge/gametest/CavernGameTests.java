@@ -120,6 +120,15 @@ final class CavernGameTests {
         OilDeposits.clearTestDeposit(helper.getLevel(), test.centre());
     }
 
+    // Fills the cavern's bounds (shell included) with stone, so carving it doesn't depend on the generated ground where the
+    // test lands: a chest, spawner or other block a cavern may not replace there would leave a cell without oil.
+    private static void solidGround(ServerLevel level, OilCavern cavern) {
+        int[] b = cavern.bounds();
+        for (BlockPos pos : BlockPos.betweenClosed(b[0], b[1], b[2], b[3], b[4], b[5])) {
+            level.setBlock(pos, Blocks.STONE.defaultBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
     // {oil sources in the cavern, the highest y holding one (or minY - 1)}.
     private static int[] oil(ServerLevel level, OilCavern cavern, net.minecraft.world.level.material.Fluid fluid) {
         int sources = 0, top = cavern.minY - 1;
@@ -150,6 +159,7 @@ final class CavernGameTests {
         long full = cavern.capacity() * 1_000L;
         OilDeposits deposits = OilDeposits.get(level.getServer());
         deposits.setExtracted(test.deposit(), test.deposit().amount() - full);
+        solidGround(level, cavern);
         helper.assertTrue(OilCaverns.place(level, test.centre()), "Nothing was carved");
         var sour = ModFluids.SOUR_CRUDE_OIL.get();
         int[] start = oil(level, cavern, sour);
