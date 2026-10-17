@@ -30,20 +30,21 @@ public final class ReactorParams {
     public double graphiteAbsorption = 0.0009;
     public double steelAbsorption = 0.030;
     public double controlAbsorption = 2.0;
+    public double rodFluxRatio = 0.15;          // flux in a rodded cell against an unrodded one (partial cells)
     public double diffusion = 0.12;
     public double graphiteDiffusion = 0.18;
     public double steelDiffusion = 0.08;
     public double wallLeakage = 0.4;
     public double voidStreaming = 1.0;
-    public double xenonWorth = 0.010;
+    public double xenonWorth = 0.001;
     public double fissionProductWorth = 0.003;
     public int outerIterations = 80;
     public int innerIterations = 4;
     public double tolerance = 2.0E-6;
 
     // --- Kinetics ---
-    public double beta = 0.0065;
-    public double precursorDecay = 0.08;        // λ, per second
+    public double beta = 0.010;
+    public double precursorDecay = 0.05;        // λ, per second
     public double generationTime = 0.02;        // Λ, seconds (game-scaled: prompt critical climbs in seconds)
     public double sourceStrength = 2.0E-7;      // the start-up source, as power fraction per second
 
@@ -56,7 +57,7 @@ public final class ReactorParams {
     public double vesselCapacity = 2_000.0;     // HU/°C per block inside the vessel (water and steel)
     public double ambientLoss = 0.0002;         // of the coolant's heat above 20 °C, per tick
     public double hotCoolantHeat = 60.0;        // HU a mB of Hot Coolant carries to the Steam Generator
-    public double pwrInletCelsius = 250.0;      // below this the hot leg sends nothing; full flow by pwrHotCelsius
+    public double pwrInletCelsius = 100.0;      // below this the hot leg sends nothing; full flow by pwrHotCelsius
     public double pwrHotCelsius = 300.0;
     public double boilingHeat = 12.0;           // HU per mB of steam a boiling core makes
     public double pwrPressure = 155.0;          // bar, held by the pressurizer
@@ -67,8 +68,8 @@ public final class ReactorParams {
     public double voidPerBoil = 0.55;           // core void at full boiling (rises up the core)
 
     // --- Xenon (half-lives in seconds, scaled) ---
-    public double iodineHalfLife = 400.0;
-    public double xenonHalfLife = 546.0;
+    public double iodineHalfLife = 800.0;
+    public double xenonHalfLife = 1_100.0;
     public double xenonBurnout = 4.0;           // burn-out at full flux, as a multiple of xenon's decay
 
     // --- Decay heat ---
@@ -77,7 +78,7 @@ public final class ReactorParams {
     public double[] decayTicks = { 1_200.0, 12_000.0, 72_000.0 };
 
     // --- Burnup ---
-    public double rodLifeTicks = 288_000.0;     // full-power ticks a rod lasts (12 in-game days)
+    public double rodLifeTicks = 1_152_000.0;   // full-power ticks a rod lasts (16 real hours, 48 in-game days)
     public double u235Use = 0.45;               // of its U-235 used when spent
     public double plutoniumMade = 0.40;         // fissile plutonium made, against the U-235 it started with
 

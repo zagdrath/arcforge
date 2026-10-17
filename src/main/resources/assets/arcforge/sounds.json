@@ -269,6 +269,15 @@
       }
     ]
   },
+  "fission_reactor_run": {
+    "subtitle": "subtitles.arcforge.fission_reactor_run",
+    "sounds": [
+      {
+        "name": "arcforge:fission_reactor_run",
+        "stream": false
+      }
+    ]
+  },
   "geiger_click": {
     "subtitle": "subtitles.arcforge.geiger_click",
     "sounds": [

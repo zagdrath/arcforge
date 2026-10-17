@@ -129,13 +129,16 @@ public final class CoreLattice {
 
     // --- Cross sections ---
 
-    // How far a control rod in cell i is in: banks go in from the top.
-    double rodCover(int i, double[] insertion) {
+    // How much of a control rod's absorption cell i has: banks go in from the top. A cell the rod tip is part way into
+    // is flux-weighted (the flux is lower round the rod), not volume-weighted, so its first few percent don't take most
+    // of the cell's worth: the bank's worth then grows smoothly instead of jumping each time its tip enters a cell.
+    double rodCover(int i, double[] insertion, ReactorParams p) {
         int b = bank[i];
         double in = b >= 0 && b < insertion.length ? insertion[b] : 0.0;
         double depth = in * ny;
         double fromTop = ny - 1 - y(i);
-        return Math.max(0.0, Math.min(1.0, depth - fromTop));
+        double f = Math.max(0.0, Math.min(1.0, depth - fromTop));
+        return f * p.rodFluxRatio / (f * p.rodFluxRatio + 1.0 - f);
     }
 
     // Water in a cell (0..1 of a full water cell): a channel holds a little round its rod, which moderates less than
@@ -190,7 +193,7 @@ public final class CoreLattice {
             case COOLANT -> waterAbs;
             case GRAPHITE -> p.graphiteAbsorption;
             case STEEL -> p.steelAbsorption;
-            case CONTROL -> waterAbs + p.controlAbsorption * rodCover(i, c.insertion());
+            case CONTROL -> waterAbs + p.controlAbsorption * rodCover(i, c.insertion(), p);
             case FUEL -> {
                 double th = thermal(i, c, p);
                 double capture = p.u238Capture * (p.captureBase + p.resonance * (1.0 - th)) * doppler(c, p);

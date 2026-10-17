@@ -184,6 +184,16 @@ public abstract class VesselControllerBlockEntity extends MachineBlockEntity imp
         return redstone;
     }
 
+    // How bright the running glow is, 0..1 (full while lit, unless the vessel says otherwise).
+    public float glowLevel() {
+        return 1.0F;
+    }
+
+    // How full of water the vessel is, 0..1, for its renderer (none unless the vessel says otherwise).
+    public float waterLevel() {
+        return 0.0F;
+    }
+
     protected void setLit(boolean lit) {
         BlockState state = getBlockState();
         if (level != null && state.hasProperty(VesselControllerBlock.LIT) && state.getValue(VesselControllerBlock.LIT) != lit) {

@@ -165,12 +165,12 @@ public class LargeModelTextureGen {
     }
 
     // A fission core 16x16 seen through a reactor viewport, seamless both ways: two fuel channels 2 px wide upright in
-    // the water at x 2-3 and 10-11. Running, the water glows Cherenkov blue (drawn full-bright), stepping one tone at a
+    // the water at x 2-3 and 10-11. Running, the water glows Cherenkov blue-cyan (drawn full-bright), stepping one tone at a
     // time from the channels' edges up to a pale middle, never dithered; the channels stay a deeper blue, a step lighter
     // where their spacer grids sit (rows 4 and 12). Shut down it is the same core dark: deep blue-black water, the
     // channels a few steps lighter with a lit left edge.
     static void core(int x0, int y0, boolean running) {
-        int[] glow = { 0x2A5CC8, 0x3A72DC, 0x4C88EC, 0x64A0F6, 0x82B8FC, 0xA2CEFF, 0xC4E2FF };
+        int[] glow = { 0x0A6FB8, 0x0E8AD2, 0x16A4E6, 0x2ABCF2, 0x4CD2FA, 0x7EE4FF, 0xB8F4FF };
         int[] dark = { 0x0C121A, 0x0F1620, 0x121B27, 0x16212F, 0x1B2838, 0x223246, 0x2A3C52 };
         // By column, within each 8 px repeat starting at a channel's left edge: the channel, then the water out to its
         // middle and back.

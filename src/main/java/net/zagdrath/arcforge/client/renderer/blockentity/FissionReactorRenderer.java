@@ -22,7 +22,8 @@ import net.zagdrath.arcforge.steam.ModelMesh;
 
 // Draws a formed Fission Reactor (FissionReactorMesh): the pressure vessel in its casing frame, windows in the shell
 // facing the Reactor Glass in the side walls (glass that touches makes one window), and through them the core as it's
-// built inside, its fuel glowing Cherenkov blue (full-bright) while the reactor is critical.
+// built inside, its fuel glowing Cherenkov blue (full-bright) while the reactor is critical, and the coolant in front of
+// it up to the vessel's level.
 public class FissionReactorRenderer extends VesselRenderer<FissionReactorBlockEntity> {
     public FissionReactorRenderer(BlockEntityRendererProvider.Context context) {}
 
@@ -61,7 +62,15 @@ public class FissionReactorRenderer extends VesselRenderer<FissionReactorBlockEn
 
     @Override
     protected float[][] build(ModelFrame frame, Object layout, List<ModelMesh.Port> ports) {
+        return model(frame, layout, ports).parts();
+    }
+
+    // With the coolant its windows show (cut to the vessel's level as it changes).
+    @Override
+    protected Model model(ModelFrame frame, Object layout, List<ModelMesh.Port> ports) {
         Layout l = (Layout) layout;
-        return new FissionReactorMesh(frame, l.viewports(), l.core(), l.panelX(), l.panelY()).buildStatic(ports);
+        FissionReactorMesh mesh = new FissionReactorMesh(frame, l.viewports(), l.core(), l.panelX(), l.panelY());
+        float[][] parts = mesh.buildStatic(ports);
+        return new Model(parts, mesh.water());
     }
 }

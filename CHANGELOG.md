@@ -70,7 +70,8 @@ and some refinery lines need a new port, see Upgrading).
     Chlorine to Zirconium Tetrachloride, reduced with Hydrogen in an electrically heated charge), alloyed with Nickel
     in the Arcforge Furnace into **Zircaloy** and drawn into **Zircaloy Tubes**. A **Fuel Rod** is a tube and eight
     pellets of one enrichment (`arcforge:fuel_rod`); it records its fuel type, enrichment, burnup, plutonium, fission
-    products and decay heat. Fresh rods are mildly radioactive; spent ones intensely, and hot enough to burn.
+    products and decay heat. Fresh rods of one enrichment stack to 64; spent ones, each with its own burnup, don't. Fresh
+    rods are mildly radioactive; spent ones intensely, and hot enough to burn.
   - **Control Rods** (silver), **Graphite Moderator**, **Steel Reflectors**, and **Heavy Water** from the new **Heavy Water
     Tower** (3x4x3 to 5x8x5) by the Girdler sulfide exchange (`arcforge:isotope_exchanging`: Water, Hydrogen Sulfide and
     Steam in each Exchange Tray).
@@ -87,14 +88,22 @@ and some refinery lines need a new port, see Upgrading).
     4,000 HU/t at full power; a big core passes 1,000,000 FE/t through four to six full-size turbine arrays.
   - **Control and protection.** A wide three-page control desk (core readouts and the four rod banks plus All, each
     showing where its rods are and where they're headed; power, coolant and k-effective trends; trip points, pump and
-    options), with the rod input and output slots in 3x3 grids between the desk and the inventory. Its buttons take
-    a click before other mods' screen handlers can. Bank moves from the GUI, redstone (a stop signal SCRAMs; optionally
-    a signal holds every bank in) and the machine control API (`bank_a`..`bank_d`, `scram`). Five player-set trips SCRAM the core;
-    rods load and unload only while it's shut down. A running core is a strong radiation source through its vessel.
+    options), with the rod input and output slots in 3x3 grids between the desk and the inventory and, between them,
+    how many fuel and control rods are loaded of the channels for them, with its intake, vessel, Hot Leg and steam
+    tanks either side; control rods load from the top layer down, where the banks enter. Its buttons (and the Gas
+    Centrifuge Cascade's) answer a left or a right click; a bank moves 1% a click, 10% with Shift or 0.1% with Ctrl,
+    and its worth grows smoothly as it goes in, so the core can be held just critical. Bank moves from the GUI,
+    redstone (a stop signal SCRAMs; optionally a signal holds every bank in) and the machine control API
+    (`bank_a`..`bank_d`, `scram`). Five player-set trips SCRAM the core; rods load and unload only while it's shut
+    down. A running core is a strong radiation source through its vessel. It's tuned to be run by hand: heat starts
+    leaving through the Hot Leg at 100 °C, a 1% rod step gives a period of about 40 s, and xenon and burnup drift it
+    slowly enough to trim every few minutes; the Core page colours the period by how fast it is, marks xenon building
+    up and the coolant still warming, and shows the thermal power in HU/t.
   - **Models.** The reactor: a heavy pressure vessel in a casing frame, a domed closure head with control-rod drive
-    housings, the control panel on a mount against the vessel, coolant nozzles at its ports, and a viewport for each pane of Reactor Glass that glows Cherenkov blue
-    (full-bright) while it's critical. The Steam Generator: a tall shell under a wider steam drum. The Heavy Water Tower:
-    a squat tower of tray sections. Their blocks (inside too) hide when formed.
+    housings, the control panel on a mount against the vessel, coolant nozzles at its ports, and a viewport for each
+    pane of Reactor Glass that glows Cherenkov blue (full-bright) while it's critical. The Steam Generator: a tall
+    shell under a wider steam drum. The Heavy Water Tower: a squat tower of tray sections. Their blocks (inside too)
+    hide when formed.
   - JEI: Sintering, Isotope Exchange, Fission (rods at 0.711%, 3%, 5% and 20%) and the Steam Generator; Jade: the
     reactor's power, k, temperatures, rods and trips, a channel's rod or bank, the Steam Generator and the tower. New
     config: `nuclear.fissionReactor`, `nuclear.steamGenerator` and `nuclear.heavyWaterTower`.
@@ -243,11 +252,12 @@ and some refinery lines need a new port, see Upgrading).
   lock icons in full; the inventory sits centred under it.
 - **The Fission Reactor's windows show its core.** Reactor Glass that touches (side by side or one above another in a
   wall) makes one window in the vessel with one frame round it, glazed in a light smoky grey you see clearly through:
-  inside are the core support
-  plate, the upper core plate and the core as you built it (fuel assemblies, control rod channels with their drive
-  lines, graphite and reflectors), its fuel glowing Cherenkov blue while the reactor is critical. A see-through line
-  round the vessel under the head flange is gone, and the large models draw their round parts with fewer quads (the
-  same look), so many of them lag less.
+  inside are the core support plate, the upper core plate and the core as you built it (fuel assemblies, control rod
+  channels with their drive lines, graphite and reflectors), its fuel glowing Cherenkov blue once the reactor passes
+  0.1% power, faint at first and brighter up to full power. In front of it the coolant shows as rippling water up to
+  the vessel's actual level, its waterline rising and falling as it fills and drains. While it runs its coolant pumps
+  hum, louder with its power. A see-through line round the vessel under the head flange is gone, and the large models
+  draw their round parts with fewer quads (the same look), so many of them lag less.
 
 ### Fixed
 
@@ -259,6 +269,8 @@ and some refinery lines need a new port, see Upgrading).
 - The Flare Stack's flame drew as a black square: its texture now has a clear background.
 - The Diesel Generator GUI's output (8,192 / 15,000 FE/t) ran into its label; a wide value now shows short (8.2k /
   15k FE/t), in full on hover.
+- The Condenser Array GUI's cooling rate (10,163 mB/t) ran into its label; a wide value now shows short (10.2k mB/t), in
+  full on hover.
 - Flickering and see-through spots on the large models:
   - **Diesel Generator**: the terminal box's lid, the aftercooler's top, the intake manifold's top and the alternator's
     ends flickered; the turbo exhaust risers' elbows, the radiator core's top, the shroud's ends, the FE cable glands,

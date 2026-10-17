@@ -12,7 +12,7 @@
     },
     {
       "type": "text",
-      "text": "# Burnup\nIn the core a rod uses up its U-235 and builds up fission products, which absorb neutrons, and some plutonium, which fissions too. At full power a rod lasts about four hours. Spent rods come out intensely radioactive and hot: their decay heat burns bare hands until it fades. Keep them in a Lead Box.\n# Control Rod\nSilver between steel rods: a strong neutron absorber, for Control Rod Channels."
+      "text": "# Burnup\nIn the core a rod uses up its U-235 and builds up fission products, which absorb neutrons, and some plutonium, which fissions too. At full power a rod lasts about sixteen hours. Spent rods come out intensely radioactive and hot: their decay heat burns bare hands until it fades. Keep them in a Lead Box.\n# Control Rod\nSilver between steel rods: a strong neutron absorber, for Control Rod Channels."
     }
   ]
 }

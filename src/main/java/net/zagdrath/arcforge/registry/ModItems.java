@@ -566,7 +566,7 @@ public final class ModItems {
     public static final DeferredItem<Item> ZIRCALOY_INGOT = ITEMS.registerSimpleItem("zircaloy_ingot");
     public static final DeferredItem<Item> ZIRCALOY_TUBE = ITEMS.registerSimpleItem("zircaloy_tube");
     public static final DeferredItem<net.zagdrath.arcforge.item.nuclear.FuelRodItem> FUEL_ROD = ITEMS.registerItem("fuel_rod",
-            net.zagdrath.arcforge.item.nuclear.FuelRodItem::new, p -> p.stacksTo(1));
+            net.zagdrath.arcforge.item.nuclear.FuelRodItem::new);
     public static final DeferredItem<Item> CONTROL_ROD = ITEMS.registerSimpleItem("control_rod");
     public static final DeferredItem<BucketItem> HEAVY_WATER_BUCKET = ITEMS.registerItem("heavy_water_bucket",
             p -> new BucketItem(ModFluids.HEAVY_WATER.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));

@@ -87,12 +87,13 @@ public enum VesselProvider implements StreamServerDataProvider<BlockAccessor, Li
             return;
         }
         lines.add(Component.translatable("jade.arcforge.fission_reactor.power", String.format(Locale.ROOT, "%,.0f", core.thermalPower),
-                String.format(Locale.ROOT, "%.1f", core.power * 100.0), String.format(Locale.ROOT, "%.4f", core.k))
+                ReactorSim.percent(core.power), String.format(Locale.ROOT, "%.4f", core.k))
                 .withStyle(core.power > 0.01 ? ChatFormatting.AQUA : ChatFormatting.GRAY));
         lines.add(Component.translatable("jade.arcforge.fission_reactor.temperatures", String.format(Locale.ROOT, "%.0f", core.hottestFuel()),
                 String.format(Locale.ROOT, "%.0f", core.hottestCladding()), String.format(Locale.ROOT, "%.0f", core.coolantTemp),
                 String.format(Locale.ROOT, "%.1f", core.pressure)).withStyle(ChatFormatting.GRAY));
-        lines.add(Component.translatable("jade.arcforge.fission_reactor.rods", reactor.loadedFuel(), core.fuelCells().length,
+        lines.add(Component.translatable("jade.arcforge.fission_reactor.rods", reactor.loadedFuel(), reactor.fuelChannelBlocks(),
+                core.controlCells().length, reactor.controlChannelBlocks(),
                 Component.translatable("jade.arcforge.fission_reactor.mode." + core.mode.name().toLowerCase(Locale.ROOT))).withStyle(ChatFormatting.GRAY));
         if (core.scrammed && core.trip != ReactorSim.Trip.NONE) {
             lines.add(Component.translatable("gui.arcforge.fission_reactor.trip." + core.trip.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.RED));

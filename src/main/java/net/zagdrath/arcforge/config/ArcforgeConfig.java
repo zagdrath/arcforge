@@ -4023,8 +4023,8 @@ public class ArcforgeConfig {
             .defineInRange("vesselHeatCapacity", 2_000.0, 10.0, 1_000_000.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_ROD_LIFE = BUILDER
-            .comment("Ticks a Fuel Rod lasts at full power before it's spent (288000 = four real hours).")
-            .defineInRange("rodLifeTicks", 288_000.0, 1_000.0, 1.0E9);
+            .comment("Ticks a Fuel Rod lasts at full power before it's spent (1152000 = sixteen real hours).")
+            .defineInRange("rodLifeTicks", 1_152_000.0, 1_000.0, 1.0E9);
 
     public static final ModConfigSpec.DoubleValue REACTOR_ROD_SPEED = BUILDER
             .comment("How fast a control rod bank moves, in insertion (0 to 1) a second.")
@@ -4036,11 +4036,11 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.DoubleValue REACTOR_IODINE_HALF_LIFE = BUILDER
             .comment("Iodine-135's half-life, in seconds (real: 6.6 hours; scaled).")
-            .defineInRange("iodineHalfLife", 400.0, 1.0, 100_000.0);
+            .defineInRange("iodineHalfLife", 800.0, 1.0, 100_000.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_XENON_HALF_LIFE = BUILDER
             .comment("Xenon-135's half-life, in seconds (real: 9.1 hours; scaled).")
-            .defineInRange("xenonHalfLife", 546.0, 1.0, 100_000.0);
+            .defineInRange("xenonHalfLife", 1_100.0, 1.0, 100_000.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_DECAY_FRACTION = BUILDER
             .comment("Decay heat just after shutdown, as a fraction of the power it ran at.")

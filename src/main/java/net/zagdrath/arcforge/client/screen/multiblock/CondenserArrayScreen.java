@@ -57,8 +57,14 @@ public class CondenserArrayScreen extends MachineScreen<CondenserArrayMenu> {
 
     @Override
     protected void drawText(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Component.translatable("gui.arcforge.condenser.cooling"), TEXT_X, RATE_Y, ArcforgeGui.LABEL, false);
-        textRight(graphics, Component.translatable("gui.arcforge.mb_per_tick", ArcforgeGui.grouped(menu.getRate())), VALUE_RIGHT, RATE_Y, ArcforgeGui.TEXT);
+        // The rate in full while it fits beside its label, else short (10,163 reads 10.2k); in full on hover.
+        Component label = Component.translatable("gui.arcforge.condenser.cooling");
+        Component rate = Component.translatable("gui.arcforge.mb_per_tick", ArcforgeGui.grouped(menu.getRate()));
+        if (font.width(label) + 4 + font.width(rate) > VALUE_RIGHT - TEXT_X) {
+            rate = Component.translatable("gui.arcforge.mb_per_tick", ArcforgeGui.compact(menu.getRate()));
+        }
+        graphics.text(font, label, TEXT_X, RATE_Y, ArcforgeGui.LABEL, false);
+        textRight(graphics, rate, VALUE_RIGHT, RATE_Y, ArcforgeGui.TEXT);
         // "Air 120 · Water 40" (water left out when there is none), then "Ice 70" and the climate multiplier.
         MutableComponent parts = Component.translatable("gui.arcforge.condenser.air", menu.getAir());
         if (menu.getWaterBonus() > 0) {
@@ -95,6 +101,9 @@ public class CondenserArrayScreen extends MachineScreen<CondenserArrayMenu> {
                     menu.getExhaust(), menu.getTankCapacity());
         } else if (isHovering(OUT_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
             addFluidTooltip(lines, Fluids.WATER, Component.translatable("gui.arcforge.water"), menu.getWater(), menu.getTankCapacity());
+        } else if (isHovering(TEXT_X, RATE_Y - 1, VALUE_RIGHT - TEXT_X, 10, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.condenser.cooling").append(" ")
+                    .append(Component.translatable("gui.arcforge.mb_per_tick", ArcforgeGui.grouped(menu.getRate()))));
         } else if (isHovering(TEXT_X, ICE_Y - 1, VALUE_RIGHT - TEXT_X, 10, mouseX, mouseY) && menu.getMultiplierPercent() != 100) {
             int percent = menu.getMultiplierPercent();
             lines.add(Component.translatable(percent > 100 ? "gui.arcforge.condenser.cold.hint" : "gui.arcforge.condenser.nether.hint", multiplier(percent)));

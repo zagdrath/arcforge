@@ -13,11 +13,11 @@
     },
     {
       "type": "text",
-      "text": "# Delayed neutrons\nAbout 0.65% of neutrons come late. While k-effective stays under 1.0065 power changes smoothly, at a reactor period you can watch. Above that the core is prompt critical and power climbs in seconds: the protection system will trip on a short period, if it's on.\n# Feedback\n- Hotter fuel always lowers reactivity (Doppler).\n- Boiling lowers it in a water-moderated core and raises it in a graphite-moderated, water-cooled one. A positive void coefficient makes a core unstable: the GUI shows it."
+      "text": "# Delayed neutrons\nAbout 1% of neutrons come late. While k-effective stays under 1.01 power changes smoothly, at a reactor period you can watch. Above that the core is prompt critical and power climbs in seconds: the protection system will trip on a short period, if it's on.\n# Feedback\n- Hotter fuel always lowers reactivity (Doppler).\n- Boiling lowers it in a water-moderated core and raises it in a graphite-moderated, water-cooled one. A positive void coefficient makes a core unstable: the GUI shows it."
     },
     {
       "type": "text",
-      "text": "# Xenon\nIodine-135 from fission decays into Xenon-135, a strong poison that burns away at power. After power drops, xenon builds up for a while and can stop a restart until it decays.\n# Decay heat\nAfter shutdown the core keeps giving off about 6.5% of its last power, fading over in-game hours. Keep the coolant coming."
+      "text": "# Xenon\nIodine-135 from fission decays into Xenon-135, a poison that burns away at power: as it builds after a power rise, power drifts down slowly and wants a small trim out now and then. After a big drop it builds up for a while and can delay a restart.\n# Decay heat\nAfter shutdown the core keeps giving off about 6.5% of its last power, fading over in-game hours. Keep the coolant coming."
     }
   ]
 }

@@ -2,7 +2,7 @@
 
 The frame is the 176-px machine panel stretched (its 4-px corners and edges kept), the desk screen an inset across the
 top, under it the rod input slots in a 3x3 grid over the player inventory's left end and the output slots in one over
-its right end, and the player inventory at the bottom. Positions match FissionReactorScreen and FissionReactorMenu. Run from the repo root: python tools/fission_reactor_gui_gen.py
+its right end, the coolant tanks either side of them, and the player inventory at the bottom. Positions match FissionReactorScreen and FissionReactorMenu. Run from the repo root: python tools/fission_reactor_gui_gen.py
 """
 
 from PIL import Image
@@ -13,6 +13,8 @@ FILL, DARK, LIGHT, INSET = (49, 49, 49, 255), (14, 14, 14, 255), (92, 92, 92, 25
 SCREEN = (7, 15, W - 8, 118)  # dark top-left corner, light bottom-right corner
 INVENTORY_X, INVENTORY_Y = 70, 206
 SLOT_X, SLOT_Y, OUTPUT_X = INVENTORY_X, 134, INVENTORY_X + 6 * 18
+# The four 12x52 tanks either side of the rod grids: intake and vessel on the left, hot leg and steam on the right.
+TANK_XS, TANK_Y, TANK_W, TANK_H = (20, 40, 248, 268), 134, 12, 52
 
 
 def panel(source):
@@ -64,6 +66,8 @@ def main():
             slot(img, INVENTORY_X + col * 18, INVENTORY_Y + row * 18)
     for col in range(9):
         slot(img, INVENTORY_X + col * 18, INVENTORY_Y + 58)
+    for x in TANK_XS:
+        inset(img, x - 1, TANK_Y - 1, x + TANK_W, TANK_Y + TANK_H)
     sheet = Image.new("RGBA", (512, 512), (0, 0, 0, 0))
     sheet.paste(img, (0, 0))
     sheet.save(GUI + "container/fission_reactor.png")

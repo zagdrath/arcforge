@@ -8,6 +8,8 @@ package net.zagdrath.arcforge.client.screen.multiblock;
 import java.util.List;
 import java.util.Locale;
 
+import com.mojang.blaze3d.platform.InputConstants;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -161,7 +163,8 @@ public class CentrifugeCascadeScreen extends MachineScreen<CentrifugeCascadeMenu
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
-        if (event.button() == 0 && minecraft.gameMode != null) {
+        // Left or right click, as on a Sides tab.
+        if ((event.button() == InputConstants.MOUSE_BUTTON_LEFT || event.button() == InputConstants.MOUSE_BUTTON_RIGHT) && minecraft.gameMode != null) {
             boolean big = Minecraft.getInstance().hasShiftDown();
             int id = -1;
             if (isHovering(MINUS_X, TARGET_Y, BUTTON, BUTTON, event.x(), event.y())) {

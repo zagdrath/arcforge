@@ -12,7 +12,7 @@ import java.util.Arrays;
 //  - Neutronics: the core's k-effective and power shape from CoreLattice, solved each second (every quarter second
 //    while the rods move or the power changes fast). Between solves the reactivity follows the fuel temperature, the
 //    coolant's temperature and the void through coefficients found by solving the core again a little perturbed.
-//  - Kinetics: point kinetics with one group of delayed neutrons (β 0.65%), so below prompt critical the power
+//  - Kinetics: point kinetics with one group of delayed neutrons (β 1%, scaled), so below prompt critical the power
 //    changes smoothly with a period, and above it climbs in seconds. A start-up source keeps a shut-down core's
 //    power just above zero, so a start-up shows on the log scale.
 //  - Heat: fission heat plus decay heat (three groups, about 6.5% of the power it ran at, fading over in-game hours)
@@ -388,6 +388,12 @@ public final class ReactorSim {
         voidCoefficient = (voided - base) / 0.1;
         System.arraycopy(flux, 0, lattice.flux, 0, lattice.size);
         System.arraycopy(fission, 0, lattice.fission, 0, lattice.size);
+    }
+
+    // Power as a percentage of rated, for the GUI and Jade alike (no % sign): to 0.1% from 0.1% up, else to two figures
+    // like 4.3e-03, so a climb from the source level shows.
+    public static String percent(double power) {
+        return power >= 0.001 ? String.format(java.util.Locale.ROOT, "%.1f", power * 100.0) : String.format(java.util.Locale.ROOT, "%.1e", power * 100.0);
     }
 
     private static double reactivity(double k) {

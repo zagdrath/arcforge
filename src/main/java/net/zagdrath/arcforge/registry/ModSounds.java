@@ -66,6 +66,8 @@ public final class ModSounds {
     // Counter's click (see GeigerClient).
     public static final DeferredHolder<SoundEvent, SoundEvent> CENTRIFUGE_CASCADE_RUN = loop("centrifuge_cascade_run", 24.0F);
     public static final DeferredHolder<SoundEvent, SoundEvent> GEIGER_CLICK = loop("geiger_click", 8.0F);
+    // The Fission Reactor's coolant pumps (louder with its power, see FissionReactorSound).
+    public static final DeferredHolder<SoundEvent, SoundEvent> FISSION_REACTOR_RUN = loop("fission_reactor_run", 24.0F);
 
     private ModSounds() {}
 

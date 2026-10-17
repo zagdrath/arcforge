@@ -51,9 +51,9 @@ public class FissionReactorMenu extends MachineMenu {
     public static final int DATA_TRIP_FUEL = 32;
     public static final int DATA_TRIP_PRESSURE = 33;   // bar, absolute
     public static final int DATA_TRIP_FLOW = 34;
-    public static final int DATA_RODS = 35;
-    public static final int DATA_CHANNELS = 36;
-    public static final int DATA_CONTROL_RODS = 37;
+    public static final int DATA_RODS = 35;           // fuel rods loaded
+    public static final int DATA_CHANNELS = 36;       // Fuel Channels, loaded or not
+    public static final int DATA_CONTROL_RODS = 37;   // control rods loaded
     public static final int DATA_BURNUP = 38;          // mean, x 1000
     public static final int DATA_DOPPLER = 39;         // pcm/°C x 100
     public static final int DATA_VOID = 40;            // pcm per % void x 100
@@ -67,7 +67,8 @@ public class FissionReactorMenu extends MachineMenu {
     public static final int DATA_HISTORY_HEAD = 48;
     public static final int DATA_VOID_FRACTION = 49;   // x 1000
     public static final int DATA_HISTORY = 50;         // 3 series x HISTORY
-    public static final int DATA_VALUES = DATA_HISTORY + 3 * FissionReactorBlockEntity.HISTORY;
+    public static final int DATA_CONTROL_CHANNELS = DATA_HISTORY + 3 * FissionReactorBlockEntity.HISTORY; // loaded or not
+    public static final int DATA_VALUES = DATA_CONTROL_CHANNELS + 1;
 
     public static final int FLAG_REDSTONE_RODS = 32, FLAG_AUTO_UNLOAD = 64, FLAG_UNLOADING = 128, FLAG_CAN_REFUEL = 256, FLAG_DAMAGED = 512;
 
@@ -79,9 +80,10 @@ public class FissionReactorMenu extends MachineMenu {
     // Buttons (each machine's own range is the 200s; the 300s are the Security tab's): bank b down (out) or up (in) a
     // step (1%) or a big step (10%): 200 + b * 4 + {0 out, 1 in, 2 out big, 3 in big}; every bank at once the same:
     // 216..219; SCRAM 220; Reset 221; trip i on/off 222 + i; trip i down/up 227 + 2i / 228 + 2i; pump down/up 237/238;
-    // Redstone Rods 239; auto-unload 240; unload every rod 241.
+    // Redstone Rods 239; auto-unload 240; unload every rod 241; bank b down or up a fine step (0.1%): 242 + b * 2 + {0 out,
+    // 1 in}, every bank at once 250/251.
     public static final int BANK_FIRST = 200, ALL_BANKS = 216, SCRAM = 220, RESET = 221, TRIP_TOGGLE = 222, TRIP_STEP = 227, PUMP_DOWN = 237,
-            PUMP_UP = 238, REDSTONE_RODS = 239, AUTO_UNLOAD = 240, UNLOAD_ALL = 241, LAST = 241;
+            PUMP_UP = 238, REDSTONE_RODS = 239, AUTO_UNLOAD = 240, UNLOAD_ALL = 241, FINE = 242, LAST = 251;
 
     public FissionReactorMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(), FissionReactorBlockEntity.clientItems(), WideIntContainerData.client(DATA_VALUES));
@@ -127,7 +129,15 @@ public class FissionReactorMenu extends MachineMenu {
     }
 
     public static void apply(FissionReactorBlockEntity reactor, int id) {
-        if (id < ALL_BANKS) {
+        if (id >= FINE) {
+            int bank = (id - FINE) / 2;
+            double by = (id - FINE) % 2 == 1 ? 0.001 : -0.001;
+            for (int b = 0; b < ReactorSim.BANKS; b++) {
+                if (bank == b || bank == ReactorSim.BANKS) {
+                    reactor.moveBank(b, by);
+                }
+            }
+        } else if (id < ALL_BANKS) {
             int bank = (id - BANK_FIRST) / 4, step = (id - BANK_FIRST) % 4;
             reactor.moveBank(bank, stepSize(step));
         } else if (id < SCRAM) {
@@ -169,6 +179,11 @@ public class FissionReactorMenu extends MachineMenu {
 
     public static int allBanksButton(boolean in, boolean big) {
         return ALL_BANKS + (big ? 2 : 0) + (in ? 1 : 0);
+    }
+
+    // A fine step (0.1%) of bank b, or of every bank for b == ReactorSim.BANKS.
+    public static int fineButton(int bank, boolean in) {
+        return FINE + bank * 2 + (in ? 1 : 0);
     }
 
     // --- Readings ---
@@ -277,6 +292,10 @@ public class FissionReactorMenu extends MachineMenu {
 
     public int controlRods() {
         return value(DATA_CONTROL_RODS);
+    }
+
+    public int controlChannels() {
+        return value(DATA_CONTROL_CHANNELS);
     }
 
     public double burnup() {

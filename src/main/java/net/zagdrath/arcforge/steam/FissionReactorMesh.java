@@ -6,7 +6,11 @@
 package net.zagdrath.arcforge.steam;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import org.jspecify.annotations.Nullable;
 
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 
@@ -25,7 +29,8 @@ import net.zagdrath.arcforge.multiblock.ModelFrame;
 // core between them built from what's in the vessel (see Core): fuel assemblies, control rod channels with their drive
 // lines up to the upper plate, graphite and reflector, packed in a square lattice scaled to fit the shell. While the
 // reactor runs the fuel glows Cherenkov blue (full-bright, in its own list, drawn only then). Nothing inside is built
-// without a window to see it through.
+// without a window to see it through. The coolant shows through the windows too, up to the vessel's level (see Water):
+// drawn every frame, so it's kept out of the still lists.
 public final class FissionReactorMesh extends VesselMesh {
     // The drive housings' pitch on the head and their radius (px), and how far out the grid reaches (of the vessel's).
     static final float CRDM_PITCH = 6.0F, CRDM_R = 1.25F, CRDM_LATCH_R = 2.0F, CRDM_REACH = 0.62F;
@@ -37,6 +42,9 @@ public final class FissionReactorMesh extends VesselMesh {
     // How far the glass's tint pane sits in behind its rim, and how far the control panel's mount reaches into the
     // vessel's skin behind it (px).
     static final float TINT_IN = 0.1F, MOUNT_IN = 0.5F;
+    // How far in from the shell's inner wall the water's face behind each window is, and how far the waterline keeps
+    // off a core top it would lie in (px).
+    static final float WATER_IN = 0.1F, WATER_CLEAR = 0.1F;
     // What a piece of the windowed shell is.
     private static final int SOLID = 0, FRAMED = 1, OPEN = 2;
 
@@ -96,6 +104,10 @@ public final class FissionReactorMesh extends VesselMesh {
     private final List<float[][]> fuelFaces = new ArrayList<>();
     // The glass's tint panes {p0, p1, p2, p3} (counter-clockwise seen from outside), for the translucent list.
     private final List<float[][]> tintPanes = new ArrayList<>();
+    // The heights of the core's tops (px), which the waterline keeps off, and the water the windows show (null when
+    // there are none).
+    private final List<Float> coreLevels = new ArrayList<>();
+    private @Nullable Water water;
 
     public FissionReactorMesh(ModelFrame frame, List<Viewport> viewports, int panelX, int panelY) {
         this(frame, viewports, Core.generic(frame), panelX, panelY);
@@ -141,6 +153,8 @@ public final class FissionReactorMesh extends VesselMesh {
         startStatic();
         fuelFaces.clear();
         tintPanes.clear();
+        coreLevels.clear();
+        water = null;
         plinth();
         casingFrame();
         vessel();
@@ -165,8 +179,201 @@ public final class FissionReactorMesh extends VesselMesh {
         for (float[][] p : tintPanes) {
             quad(p[0], p[1], p[2], p[3], new float[] { tu, tv, tu, tv, tu, tv, tu, tv }, false);
         }
+        float[] tint = glow.toArray();
+        if (windowed) {
+            water = buildWater();
+        }
         glowing = false;
-        return new float[][] { parts[0], parts[1], parts[2], running, glow.toArray() };
+        return new float[][] { parts[0], parts[1], parts[2], running, tint };
+    }
+
+    // The water the windows show, from the last buildStatic (null when there are no windows).
+    public @Nullable Water water() {
+        return water;
+    }
+
+    // The coolant as the windows show it, cut to the vessel's level by Water.at: behind each run of open rows a face of
+    // water WATER_IN in from the inner wall (meeting the next facet's where they touch), and its surface across the
+    // inside in the same polygon, so the two close on each other, drawn from above and below. The water's sprite (UVs
+    // over the sprite, 0..1) is laid once a block on the block grid, never stretched: the faces are cut at the blocks'
+    // rows and where the facets run round past a block's width, the surface into the blocks' columns.
+    private Water buildWater() {
+        float rw = radius - WALL - WATER_IN, fw = facetW, top = 0.0F;
+        glow = new Floats();
+        for (int f = 0; f < SHELL_SIDES; f++) {
+            float s0 = (SHELL_SIDES - 1 - f) * fw;
+            for (int j = 0; j < rows;) {
+                if (!open[f][j]) {
+                    j++;
+                    continue;
+                }
+                int j1 = j + 1;
+                while (j1 < rows && open[f][j1]) {
+                    j1++;
+                }
+                float t0 = lo + j * rowH, t1 = lo + j1 * rowH;
+                top = Math.max(top, t1);
+                for (float sa = 0.0F; sa < fw - 1.0E-4F;) {
+                    float sb = Math.min(fw, nextBlock(s0 + sa) - s0);
+                    float ua = tile(s0 + sa), ub = ua + (sb - sa) / PX;
+                    for (float ta = t0; ta < t1 - 1.0E-4F;) {
+                        float tb = Math.min(t1, nextBlock(ta));
+                        float va = 1.0F - tile(ta), vb = va - (tb - ta) / PX;
+                        // Bottom left, bottom right, top right, top left (seen from outside), as Water.at cuts them.
+                        quad(at(f, sa, ta, rw), at(f, sb, ta, rw), at(f, sb, tb, rw), at(f, sa, tb, rw), new float[] { ua, va, ub, va, ub, vb, ua, vb }, false);
+                        ta = tb;
+                    }
+                    sa = sb;
+                }
+                j = j1;
+            }
+        }
+        float[] faces = glow.toArray();
+        // The surface, at height 0 until Water.at sets it.
+        glow = new Floats();
+        List<float[]> rim = new ArrayList<>();
+        double step = 2.0 * Math.PI / SHELL_SIDES;
+        for (int f = 0; f < SHELL_SIDES; f++) {
+            double a = Math.PI / SHELL_SIDES + f * step;
+            rim.add(new float[] { cx + (float) Math.cos(a) * rw, cu + (float) Math.sin(a) * rw });
+        }
+        for (int bx = (int) Math.floor((cx - rw) / PX); bx * PX < cx + rw; bx++) {
+            for (int bu = (int) Math.floor((cu - rw) / PX); bu * PX < cu + rw; bu++) {
+                List<float[]> cell = clip(rim, bx * PX, bu * PX, (bx + 1) * PX, (bu + 1) * PX);
+                if (cell.size() >= 3) {
+                    surfaceCell(cell, bx * PX, bu * PX, true);
+                    surfaceCell(cell, bx * PX, bu * PX, false);
+                }
+            }
+        }
+        float[] surface = glow.toArray();
+        float[] levels = new float[coreLevels.size()];
+        for (int i = 0; i < levels.length; i++) {
+            levels[i] = coreLevels.get(i) / PX;
+        }
+        return new Water(floorY / PX, ceilY / PX, top / PX, WATER_CLEAR / PX, faces, surface, levels);
+    }
+
+    // The next block edge above px.
+    private static float nextBlock(float px) {
+        return (float) (Math.floor(px / PX + 1.0E-4) + 1.0) * PX;
+    }
+
+    // Where px is across its block, 0..1.
+    private static float tile(float px) {
+        return Math.max(0.0F, px / PX - (float) Math.floor(px / PX + 1.0E-4));
+    }
+
+    // A cell of the surface (its corners {x, u} in order round it, convex) facing up or down, as a fan of quads, its UVs
+    // across the block from (x0, u0).
+    private void surfaceCell(List<float[]> cell, float x0, float u0, boolean up) {
+        List<float[]> points = new ArrayList<>(cell);
+        float area = 0.0F;
+        for (int i = 0; i < points.size(); i++) {
+            float[] a = points.get(i), b = points.get((i + 1) % points.size());
+            area += a[0] * b[1] - b[0] * a[1];
+        }
+        // Turning from +x toward +u is clockwise seen from above (it faces down by quad's normal).
+        if (area > 0.0F == up) {
+            Collections.reverse(points);
+        }
+        for (int i = 1; i + 1 < points.size(); i += 2) {
+            float[][] q = { points.get(0), points.get(i), points.get(i + 1), points.get(Math.min(i + 2, points.size() - 1)) };
+            float[][] p = new float[4][];
+            float[] uv = new float[8];
+            for (int k = 0; k < 4; k++) {
+                p[k] = new float[] { q[k][0], 0.0F, q[k][1] };
+                uv[2 * k] = (q[k][0] - x0) / PX;
+                uv[2 * k + 1] = (q[k][1] - u0) / PX;
+            }
+            quad(p[0], p[1], p[2], p[3], uv, false);
+        }
+    }
+
+    // A convex polygon {x, u} cut to the rectangle x0..x1, u0..u1, corners the cuts left on top of each other dropped.
+    private static List<float[]> clip(List<float[]> polygon, float x0, float u0, float x1, float u1) {
+        List<float[]> out = polygon;
+        float[][] edges = { { 0, x0, 1 }, { 0, x1, -1 }, { 1, u0, 1 }, { 1, u1, -1 } };
+        for (float[] e : edges) {
+            int axis = (int) e[0];
+            List<float[]> next = new ArrayList<>();
+            for (int i = 0; i < out.size(); i++) {
+                float[] a = out.get(i), b = out.get((i + 1) % out.size());
+                float da = (a[axis] - e[1]) * e[2], db = (b[axis] - e[1]) * e[2];
+                if (da >= 0.0F) {
+                    next.add(a);
+                }
+                if (da >= 0.0F != db >= 0.0F) {
+                    float t = da / (da - db);
+                    next.add(new float[] { a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t });
+                }
+            }
+            out = next;
+            if (out.size() < 3) {
+                return out;
+            }
+        }
+        List<float[]> kept = new ArrayList<>();
+        for (float[] p : out) {
+            float[] last = kept.isEmpty() ? null : kept.get(kept.size() - 1);
+            if (last == null || Math.abs(last[0] - p[0]) > 1.0E-4F || Math.abs(last[1] - p[1]) > 1.0E-4F) {
+                kept.add(p);
+            }
+        }
+        if (kept.size() > 1) {
+            float[] a = kept.get(0), b = kept.get(kept.size() - 1);
+            if (Math.abs(a[0] - b[0]) <= 1.0E-4F && Math.abs(a[1] - b[1]) <= 1.0E-4F) {
+                kept.remove(kept.size() - 1);
+            }
+        }
+        return kept;
+    }
+
+    // The coolant the windows show (see buildWater), in blocks from the model's minimum corner as the other lists: the
+    // inside's floor and the upper core plate (empty to full), the highest window's top, how far the waterline keeps off
+    // the core's tops (levels), the faces behind the windows (each quad bottom left, bottom right, top right, top left,
+    // within one row of blocks) and the surface (at height 0); 8 floats a vertex, UVs over the water's sprite.
+    public record Water(float floor, float ceiling, float top, float clear, float[] faces, float[] surface, float[] levels) {
+        // The water at fill (0..1): the faces cut at the waterline, and its surface while a window shows it from level or
+        // above (so not when full: it meets the upper core plate, above every window). Nothing when empty.
+        public float[] at(float fill) {
+            if (fill <= 0.0F) {
+                return new float[0];
+            }
+            float y = floor + (ceiling - floor) * Math.min(1.0F, fill);
+            for (float level : levels) {
+                if (Math.abs(y - level) < clear) {
+                    y = level + clear;
+                }
+            }
+            Floats out = new Floats();
+            float[] q = new float[32];
+            for (int i = 0; i + 31 < faces.length; i += 32) {
+                float y0 = faces[i + 1], y1 = faces[i + 17];
+                if (y0 >= y - 1.0E-5F) {
+                    continue;
+                }
+                System.arraycopy(faces, i, q, 0, 32);
+                if (y1 > y) {
+                    // The top right and top left down to the waterline, their v with them.
+                    float t = (y - y0) / (y1 - y0);
+                    for (int k = 2; k <= 3; k++) {
+                        int high = 8 * k, low = 8 * (3 - k);
+                        q[high + 1] = y;
+                        q[high + 4] = q[low + 4] + (q[high + 4] - q[low + 4]) * t;
+                    }
+                }
+                out.add(q);
+            }
+            if (y < top) {
+                for (int i = 0; i + 7 < surface.length; i += 8) {
+                    float[] v = Arrays.copyOfRange(surface, i, i + 8);
+                    v[1] = y;
+                    out.add(v);
+                }
+            }
+            return out.toArray();
+        }
     }
 
     // The control panel's mount: a block from the cabinet's back into the vessel's skin behind it, so the panel stands
@@ -687,6 +894,9 @@ public final class FissionReactorMesh extends VesselMesh {
         }
         float pitch = Math.min(CORE_PITCH, 2.0F * (ri - 2.0F) / (float) Math.hypot(w, l));
         float coreTop = floorY + (ceilY - floorY) * CORE_HEIGHT, step = (coreTop - floorY) / h;
+        for (int y = 1; y <= h; y++) {
+            coreLevels.add(floorY + y * step);
+        }
         float[][] edges = new float[3][];
         edges[0] = lattice(cx - w * pitch / 2.0F, pitch, w);
         edges[1] = lattice(floorY, step, h);

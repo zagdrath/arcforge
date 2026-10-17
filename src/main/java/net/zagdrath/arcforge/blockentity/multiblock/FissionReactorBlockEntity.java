@@ -85,6 +85,8 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 //  - It's a radiation source while it runs and after (see RadiationSource): its walls and what's round them shield.
 public class FissionReactorBlockEntity extends VesselControllerBlockEntity implements RadiationSource {
     public static final int INPUT_SLOTS = 9, OUTPUT_SLOTS = 9, MACHINE_SLOTS = INPUT_SLOTS + OUTPUT_SLOTS;
+    // The intake and Hot Leg tanks' size; the steam tank holds four times as much.
+    public static final int TANK = 64_000, STEAM_TANK = 4 * TANK;
     public static final int HISTORY = 60;
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.HOT_LEG, SideMode.STEAM);
     private static final Set<SideMode> PUSHED = EnumSet.of(SideMode.HOT_LEG, SideMode.STEAM);
@@ -95,7 +97,18 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     private @Nullable ReactorSim sim;
     private BlockPos[] cellPos = new BlockPos[0];
     private long layoutKey;
+    // Fuel Channel blocks in the vessel, loaded or not (the core counts only loaded ones).
+    private int fuelChannelBlocks;
+    // Control Rod Channel blocks in the vessel, loaded or not.
+    private int controlChannelBlocks;
     private boolean layoutDirty = true;
+    // The Cherenkov glow's step (see glowOf), synced to the client.
+    private static final int GLOW_STEPS = 16;
+    private int glow;
+    // How full of coolant the vessel is, in WATER_STEPS (see setWater), synced to the client for the water its windows
+    // show.
+    private static final int WATER_STEPS = 32;
+    private int water;
     // The core's state, kept for when the vessel is rebuilt (or unformed and formed again) and for saving.
     private final Saved saved = new Saved();
     private ReactorSim.Mode mode = ReactorSim.Mode.NONE;
@@ -122,11 +135,10 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     public FissionReactorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.FISSION_REACTOR.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> slot < INPUT_SLOTS && isLoadable(resource.toStack(1)),
                 SIDE_MODES);
-        int tank = 64_000;
-        this.intake = new FilteredFluidTank(tank, FissionReactorBlockEntity::isCoolant, this::setChanged);
-        this.hotLeg = new FilteredFluidTank(tank, resource -> resource.is(ModFluids.HOT_COOLANT.get()) || resource.is(ModFluids.HOT_HEAVY_WATER.get()),
+        this.intake = new FilteredFluidTank(TANK, FissionReactorBlockEntity::isCoolant, this::setChanged);
+        this.hotLeg = new FilteredFluidTank(TANK, resource -> resource.is(ModFluids.HOT_COOLANT.get()) || resource.is(ModFluids.HOT_HEAVY_WATER.get()),
                 this::setChanged);
-        this.steam = new FilteredFluidTank(tank * 4, resource -> resource.is(ModFluids.CONTAMINATED_STEAM.get()), this::setChanged);
+        this.steam = new FilteredFluidTank(STEAM_TANK, resource -> resource.is(ModFluids.CONTAMINATED_STEAM.get()), this::setChanged);
         this.intakeInput = new SidedResourceHandler<>(intake, true, false, Integer.MAX_VALUE);
         this.hotLegOutput = new SidedResourceHandler<>(hotLeg, false, true, Integer.MAX_VALUE);
         this.steamOutput = new SidedResourceHandler<>(steam, false, true, Integer.MAX_VALUE);
@@ -274,12 +286,18 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         int nx = box.size(Direction.Axis.X) - 2, ny = box.size(Direction.Axis.Y) - 2, nz = box.size(Direction.Axis.Z) - 2;
         CoreLattice lattice = new CoreLattice(nx, ny, nz);
         BlockPos[] positions = new BlockPos[lattice.size];
+        int channelBlocks = 0, controlBlocks = 0;
         long key = 1469598103934665603L;
         for (int y = 0; y < ny; y++) {
             for (int z = 0; z < nz; z++) {
                 for (int x = 0; x < nx; x++) {
                     BlockPos pos = box.min().offset(x + 1, y + 1, z + 1);
                     BlockState state = level.getBlockState(pos);
+                    if (state.is(ModBlocks.FUEL_CHANNEL.get())) {
+                        channelBlocks++;
+                    } else if (state.is(ModBlocks.CONTROL_ROD_CHANNEL.get())) {
+                        controlBlocks++;
+                    }
                     CoreLattice.Cell cell = cellOf(state, pos);
                     int bank = state.is(ModBlocks.CONTROL_ROD_CHANNEL.get()) ? state.getValue(ControlRodChannelBlock.BANK) : -1;
                     int i = lattice.index(x, y, z);
@@ -291,6 +309,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
                 }
             }
         }
+        fuelChannelBlocks = channelBlocks;
+        controlChannelBlocks = controlBlocks;
         key ^= box.min().asLong() * 31 + box.max().asLong();
         if (sim != null && key == layoutKey) {
             return;
@@ -392,6 +412,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     @Override
     protected void idle(ServerLevel level) {
         super.idle(level);
+        setGlow(0);
         ensureCore(level);
         status = MachineStatus.NOT_FORMED;
     }
@@ -401,6 +422,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         ensureCore(level);
         ReactorSim core = sim;
         if (core == null) {
+            setGlow(0);
+            setWater(0);
             return;
         }
         long now = level.getGameTime();
@@ -437,7 +460,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         }
         status = statusOf(core);
         boolean critical = core.power > 0.01;
-        setLit(critical);
+        setGlow(glowOf(core.power));
+        setWater(waterOf(core.level()));
         if (critical && !wasCritical) {
             ArcforgeAdvancements.produced(this, ItemStack.EMPTY, ModFluids.HOT_COOLANT.get(), "critical");
         }
@@ -460,7 +484,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         if (core.level() < 0.5) {
             return MachineStatus.NO_WATER;
         }
-        return core.power > 0.01 ? MachineStatus.CRITICAL : MachineStatus.SUBCRITICAL;
+        // Critical once k-effective reaches 1, even while the power is still climbing from the source level.
+        return core.power > 0.01 || core.k >= 1.0 ? MachineStatus.CRITICAL : MachineStatus.SUBCRITICAL;
     }
 
     // Pressurized with a Hot Leg port, boiling with only Steam ports.
@@ -561,7 +586,9 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             }
             unloadAll = false;
         }
-        // In: the first rod waiting goes into the first empty channel for it.
+        // In: the first rod waiting goes into the first empty channel for it. The cells run from the bottom layer up;
+        // control rods fill from the top down, as the banks enter from the top, so a part-loaded set still covers the
+        // top of the core.
         for (int slot = 0; slot < INPUT_SLOTS; slot++) {
             ItemStack waiting = items.getStack(slot);
             if (waiting.isEmpty() || !isLoadable(waiting)) {
@@ -569,7 +596,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             }
             boolean fuel = waiting.is(ModItems.FUEL_ROD.get());
             Block channel = fuel ? ModBlocks.FUEL_CHANNEL.get() : ModBlocks.CONTROL_ROD_CHANNEL.get();
-            for (BlockPos pos : cellPos) {
+            for (int c = 0; c < cellPos.length; c++) {
+                BlockPos pos = cellPos[fuel ? c : cellPos.length - 1 - c];
                 if (pos != null && !rods.containsKey(pos) && level.getBlockState(pos).is(channel)) {
                     ItemStack one = waiting.copyWithCount(1);
                     if (fuel && !one.has(ModDataComponents.FUEL_ROD.get())) {
@@ -746,6 +774,16 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         setChanged();
     }
 
+    // Fuel Channel blocks in the vessel, loaded or not.
+    public int fuelChannelBlocks() {
+        return fuelChannelBlocks;
+    }
+
+    // Control Rod Channel blocks in the vessel, loaded or not.
+    public int controlChannelBlocks() {
+        return controlChannelBlocks;
+    }
+
     public int loadedFuel() {
         int count = 0;
         for (ItemStack stack : rods.values()) {
@@ -917,7 +955,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             case FissionReactorMenu.DATA_TRIP_PRESSURE -> (int) Math.round(trips.highPressureMargin + (core != null ? core.operatingPressure() : 0.0));
             case FissionReactorMenu.DATA_TRIP_FLOW -> (int) trips.lowFlowPercent;
             case FissionReactorMenu.DATA_RODS -> core != null ? core.loadedRods() : loadedFuel();
-            case FissionReactorMenu.DATA_CHANNELS -> core != null ? core.fuelChannels() : 0;
+            case FissionReactorMenu.DATA_CHANNELS -> fuelChannelBlocks;
+            case FissionReactorMenu.DATA_CONTROL_CHANNELS -> controlChannelBlocks;
             case FissionReactorMenu.DATA_CONTROL_RODS -> core != null ? core.controlCells().length : 0;
             case FissionReactorMenu.DATA_BURNUP -> meanBurnup(core);
             case FissionReactorMenu.DATA_DOPPLER -> core != null ? (int) Math.round(core.dopplerCoefficient * 1.0E7) : 0;
@@ -1004,6 +1043,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         mode = ReactorSim.Mode.values()[Mth.clamp(in.getIntOr("mode", 0), 0, ReactorSim.Mode.values().length - 1)];
         redstoneRods = in.getBooleanOr("redstone_rods", false);
         autoUnload = in.getBooleanOr("auto_unload", true);
+        glow = in.getIntOr("glow", 0);
+        water = Mth.clamp(in.getIntOr("water", 0), 0, WATER_STEPS);
         damageMarked = saved.coreDamaged;
         intake.deserialize(in.childOrEmpty("intake"));
         hotLeg.deserialize(in.childOrEmpty("hot_leg"));
@@ -1056,9 +1097,56 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         out.putInt("mode", mode.ordinal());
         out.putBoolean("redstone_rods", redstoneRods);
         out.putBoolean("auto_unload", autoUnload);
+        out.putInt("glow", glow);
+        out.putInt("water", water);
         intake.serialize(out.child("intake"));
         hotLeg.serialize(out.child("hot_leg"));
         steam.serialize(out.child("steam"));
+    }
+
+    // The Cherenkov glow's step, 0 (dark, under 0.1% power) or 1..GLOW_STEPS on a log scale up to full power.
+    private static int glowOf(double power) {
+        if (power < 0.001) {
+            return 0;
+        }
+        double t = Math.min(1.0, (Math.log10(power) + 3.0) / 3.0);
+        return 1 + (int) Math.round(t * (GLOW_STEPS - 1));
+    }
+
+    // Lights the controller (the glow and the pumps' hum) and sends the client a new step when it changes.
+    private void setGlow(int step) {
+        setLit(step > 0);
+        if (step != glow) {
+            glow = step;
+            sync();
+        }
+    }
+
+    // From faint at 0.1% power to full at 100%.
+    @Override
+    public float glowLevel() {
+        return glow <= 0 ? 0.0F : 0.25F + 0.75F * (glow - 1) / (GLOW_STEPS - 1.0F);
+    }
+
+    // The vessel's coolant level (0..1) in WATER_STEPS: none only when it's empty, full only when it's full.
+    private static int waterOf(double level) {
+        if (level <= 0.0) {
+            return 0;
+        }
+        return level >= 1.0 ? WATER_STEPS : Mth.clamp((int) Math.round(level * WATER_STEPS), 1, WATER_STEPS - 1);
+    }
+
+    // Sends the client a new water step when it changes.
+    private void setWater(int step) {
+        if (step != water) {
+            water = step;
+            sync();
+        }
+    }
+
+    @Override
+    public float waterLevel() {
+        return water / (float) WATER_STEPS;
     }
 
     // The controller's own client sound and glow come from its renderer; nothing more to tick there.
