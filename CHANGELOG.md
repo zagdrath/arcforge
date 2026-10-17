@@ -22,11 +22,7 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units, a scaling Diesel
-Generator, hydrocracking and Synthetic Rubber, a retuned oil line, running sounds and model fixes for the oilfield,
-the nuclear tier up to the Fission Reactor, its failures, containment, reprocessing and advanced cores, and a
-Hibiscus Quests questline in place of the advancement tab; worlds load, but Diesel Generators and Oil Derricks need their new layers and some refinery lines need a new port, see
-Upgrading).
+## [2.8.0] - 2026-10-16
 
 ### Added
 
@@ -1942,7 +1938,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.7.0+26.3...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.8.0+26.3...HEAD
+[2.8.0]: https://github.com/zagdrath/arcforge/compare/v2.7.0+26.3...v2.8.0+26.3
 [2.7.0]: https://github.com/zagdrath/arcforge/compare/v2.6.1+26.3...v2.7.0+26.3
 [2.6.1]: https://github.com/zagdrath/arcforge/compare/v2.6.0+26.3...v2.6.1+26.3
 [2.6.0]: https://github.com/zagdrath/arcforge/compare/v2.5.1+26.3...v2.6.0+26.3
