@@ -35,6 +35,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -369,6 +370,9 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
             items.setStack(SLOT_BYPRODUCT, held.isEmpty() ? byproduct : held.copyWithCount(held.getCount() + byproduct.getCount()));
         }
         controlState.completed(madeItems, made, itemsUsed, waterUsed);
+        if (!made.get(0).isEmpty()) {
+            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, made.get(0).getFluid(), null);
+        }
     }
 
     // The Carbon Dioxide given off with this much Ethanol.

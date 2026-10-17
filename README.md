@@ -17,6 +17,23 @@ Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Ma
 the creative-only [Creative Fluid Tank, Pressurized Cylinder and Energy Cell](#creative-storage). The Creative Vault is in
 **Arcforge: Logistics**.
 
+## Questline
+
+With [Hibiscus Quests](https://github.com/hibiscus-software/hibiscus-quests) installed (optional), its quest book has
+Arcforge's questline: 20 chapters in six groups (Foundations, Power Generation, Petroleum, Chemistry, Agriculture and
+Nuclear) and 272 quests that follow the recipes from the Wrench to molten salt reactors, covering every item you can
+get in survival. Later chapters open as you reach the alloys and parts they need. Every quest is listed in
+[docs/QUESTLINE.md](docs/QUESTLINE.md). A modpack can change or replace the chapters in its own Hibiscus Quests files,
+or hide them with `disabled_sources: ["arcforge"]`.
+
+The chapters ship as data in `data/arcforge/hibiscusquests/`, generated from `tools/hibiscusquests/` (one Python
+module per chapter): edit a module, then run `python tools/hibiscusquests/export_hibiscus.py .`, which checks every
+item, dependency and gate and that every survival item is covered (`--check-only` to just check). Quest tasks use
+Arcforge's triggers: `arcforge:multiblock_formed` (`multiblock`, optional `min_length`), `arcforge:machine_produced`
+(optional `item`, `fluid`, `recipe_category`), `arcforge:turbine_full_speed` (`multiblock`, optional `min_length`,
+`min_signal`), `arcforge:oxy_fuel` (`min_temperature`) and `arcforge:machine_linked` (optional `multiblock`,
+`min_distance`).
+
 ## Machines
 
 ### Power and heat

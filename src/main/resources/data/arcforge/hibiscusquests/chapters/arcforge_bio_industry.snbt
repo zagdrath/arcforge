@@ -1,0 +1,802 @@
+{
+    id: "arcforge_bio_industry",
+    group: "arcforge_agriculture",
+    order: 14,
+    title: "Bio-Industry",
+    subtitle: "Fermenting, biofuels, greenhouses and rubber",
+    icon: "arcforge:fermenter",
+    default_shape: "circle",
+    requires: ["arcforge_steelmaking/tempered_alloy"],
+    quests: [
+        {
+            id: "fermenter",
+            title: "Fermenter",
+            icon: "arcforge:fermenter",
+            description: [
+                "Tempered Alloy, plastic, glass, a cauldron and steel plates. A crop and 100 mB of water ferment into Ethanol (20 to 80 mB; Sorghum is best) for 10 FE/t, giving off Carbon Dioxide. Slimeball, sugar and kelp make a slime culture. Ethanol burns at 900°C, runs the Gas Turbine, makes Biodiesel and Ethylene.",
+                "",
+                "**Covers:** {item:arcforge:fermenter}, {item:arcforge:ethanol_bucket}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:ethanol"
+                        }
+                    },
+                    title: "Ferment Ethanol",
+                    icon: "arcforge:ethanol_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sorghum_seeds",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "air_separator",
+            title: "Air Separator",
+            icon: "arcforge:air_separator",
+            description: [
+                "Tempered Alloy, iron bars, nickel gears, a Wrought Fluid Tank: it pulls 80 Nitrogen and 20 Oxygen out of the air every two seconds for 80 FE/t (not in the End). Nitrogen is half of Ammonia; the Oxygen runs oxy-fuel burners.",
+                "",
+                "**Covers:** {item:arcforge:air_separator}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:nitrogen"
+                        }
+                    },
+                    title: "Separate Nitrogen",
+                    icon: "arcforge:air_separator"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:nickel_gear",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "haber",
+            title: "Haber Reactor",
+            icon: "arcforge:haber_reactor",
+            description: [
+                "Invar plates, a thermocouple, nickel rods and a Wrought Fluid Tank. 60 Hydrogen and 20 Nitrogen at 450°C become 40 Ammonia a second for 60 FE/t. Ammonia makes NPK Fertilizer and precipitates uranium.",
+                "",
+                "**Covers:** {item:arcforge:haber_reactor}"
+            ],
+            x: 1.5d,
+            y: 5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["air_separator"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:ammonia"
+                        }
+                    },
+                    title: "Make Ammonia",
+                    icon: "arcforge:haber_reactor"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:invar_plate",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "npk",
+            title: "NPK Fertilizer",
+            icon: "arcforge:npk_fertilizer",
+            description: [
+                "Basic Slag, Wood Ash and 100 mB of Ammonia in the Chemical Reactor give two NPK Fertilizer: +15 nutrients, and it enriches Loam to grow at 2×. One NPK and 1,000 mB of water make 1,000 mB of Nutrient Solution for the Hydroponic Cell and Greenhouse.",
+                "",
+                "**Covers:** {item:arcforge:npk_fertilizer}, {item:arcforge:nutrient_solution_bucket}"
+            ],
+            x: 3d,
+            y: 6.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["haber"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:npk_fertilizer"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:nutrient_solution_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:npk_fertilizer",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "biodiesel",
+            title: "Biodiesel",
+            icon: "arcforge:biodiesel_bucket",
+            description: [
+                "100 Seed Oil and 25 Ethanol give 100 Biodiesel; add 10 mB of Lye and get 150. It burns at 1,000°C and runs the Diesel Generator at 340 FE/mB (not the Gas Turbine).",
+                "",
+                "**Covers:** {item:arcforge:biodiesel_bucket}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["fermenter"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:biodiesel"
+                        }
+                    },
+                    title: "Make Biodiesel",
+                    icon: "arcforge:biodiesel_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:biodiesel_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "biogas_digester",
+            title: "Biogas Digester",
+            icon: "arcforge:biogas_digester_controller",
+            description: [
+                "A 3×3×3 of Biogas Digester Casings (steel and copper plates, Wrought Fluid Tank) and a Controller, kept above 35°C. Plant matter and water digest into Biogas (a turbine fuel) and Digestate (+4 fertilizer), and it scrubs the Sulfur Dust out of the gas.",
+                "",
+                "**Covers:** {item:arcforge:digester_casing}, {item:arcforge:biogas_digester_controller}, {item:arcforge:digestate}"
+            ],
+            x: 1.5d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["fermenter"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:biogas_digester"
+                        }
+                    },
+                    title: "Form the Biogas Digester",
+                    icon: "arcforge:biogas_digester_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:digester_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "biogas_sulfur",
+            title: "Scrubbed",
+            icon: "arcforge:sulfur_dust",
+            description: ["Take the Sulfur Dust the digester scrubs out of its Biogas."],
+            x: 3d,
+            y: 3.75d,
+            dependencies: ["biogas_digester"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "biogas_sulfur"
+                        }
+                    },
+                    title: "Scrub sulfur from Biogas",
+                    icon: "arcforge:sulfur_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:digestate",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "bio_coal",
+            title: "Renewable Coal",
+            icon: "arcforge:bio_coal",
+            description: [
+                "The Hydrothermal Carbonizer (steel plates, bucket, Rubber Gaskets, a Grain Dryer, copper) cooks 8 biomass and 500 mB of water at 200°C into Bio-Coal, heat only. Bio-Coal is coal: burner fuel, Carbonizer feed for coke and creosote, Carbon Dust, Syngas. Nine make a block that carbonizes straight into a Block of Coal Coke.",
+                "",
+                "**Covers:** {item:arcforge:hydrothermal_carbonizer}, {item:arcforge:bio_coal}, {item:arcforge:bio_coal_block}"
+            ],
+            x: 3d,
+            y: 5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["biogas_digester"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            item: {
+                                items: "arcforge:bio_coal"
+                            }
+                        }
+                    },
+                    title: "Make Bio-Coal",
+                    icon: "arcforge:bio_coal"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:bio_coal",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "rubber_dandelion",
+            title: "Rubber Dandelion",
+            icon: "arcforge:rubber_dandelion_roots",
+            description: [
+                "Wild Rubber Dandelions grow in meadows, plains and taiga; their seeds plant on farmland and in every automated farm. A ripe plant gives 1–3 Rubber Dandelion Roots, and the Oil Press squeezes 100 mB of Latex out of each.",
+                "",
+                "**Covers:** {item:arcforge:rubber_dandelion_seeds}, {item:arcforge:rubber_dandelion_roots}, {item:arcforge:wild_rubber_dandelion}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:rubber_dandelion_roots"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:rubber_dandelion_seeds",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "resin_tap",
+            title: "Resin Tap",
+            icon: "arcforge:resin_tap",
+            description: [
+                "An iron nugget, a copper ingot and treated planks. On a living jungle log it drips 25 mB of Latex every 10 seconds; on spruce it gives Pine Resin half the time (15% on other logs). Pine Resin replaces Creosote in the Infuser, and two with kelp make a slimeball.",
+                "",
+                "**Covers:** {item:arcforge:resin_tap}, {item:arcforge:pine_resin}, {item:arcforge:latex_bucket}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["rubber_dandelion"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "resin_tap"
+                        }
+                    },
+                    title: "Tap a tree",
+                    icon: "arcforge:resin_tap"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:resin_tap",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "raw_rubber",
+            title: "Raw Rubber",
+            icon: "arcforge:raw_rubber",
+            description: [
+                "Dry 250 mB of Latex in a Grain Dryer for a Raw Rubber. Latex with lime dye also makes two slimeballs.",
+                "",
+                "**Covers:** {item:arcforge:raw_rubber}"
+            ],
+            x: 3d,
+            y: 0d,
+            dependencies: ["resin_tap"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:raw_rubber"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:raw_rubber",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "vulcanizer",
+            title: "Vulcanised",
+            icon: "arcforge:vulcanizer",
+            description: [
+                "The Vulcanizer (steel plates, heavy weighted pressure plates, copper, a smoker) cures 2 Raw or Synthetic Rubber with a Sulfur Dust into 2 Rubber at 140°C, heat only. Four Rubber make eight Rubber Gaskets, which seal every Tempered or better Pressurized Conduit, Cylinder and Gas Cartridge, the Hardened Fluid Tank, Jetpacks, the Gasifier and the Hydrothermal Carbonizer.",
+                "",
+                "**Covers:** {item:arcforge:vulcanizer}, {item:arcforge:rubber}, {item:arcforge:rubber_block}, {item:arcforge:rubber_gasket}"
+            ],
+            x: 4.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["raw_rubber"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            item: {
+                                items: "arcforge:rubber"
+                            }
+                        }
+                    },
+                    title: "Cure Rubber",
+                    icon: "arcforge:rubber"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:rubber_gasket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:rubber_gasket",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "glass_cloche",
+            title: "Glass Cloche",
+            icon: "arcforge:glass_cloche",
+            description: [
+                "Glass panes over treated planks. One crop under glass, 100 mB of water a harvest, about two minutes a crop, no power.",
+                "",
+                "**Covers:** {item:arcforge:glass_cloche}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["rubber_dandelion"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:glass_cloche"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Glass Cloche",
+                    icon: "arcforge:glass_cloche"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:glass_pane",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "grow_chamber",
+            title: "Grow Chamber",
+            icon: "arcforge:grow_chamber",
+            description: [
+                "Steel plates, a redstone lamp, Pressure Glass and a Glass Cloche: three times the cloche's speed on 24 FE/t and water, with configurable sides.",
+                "",
+                "**Covers:** {item:arcforge:grow_chamber}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            dependencies: ["glass_cloche"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:grow_chamber"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Grow Chamber",
+                    icon: "arcforge:grow_chamber"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:pressure_glass",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "hydroponic_cell",
+            title: "Hydroponic Cell",
+            icon: "arcforge:hydroponic_cell",
+            description: [
+                "Tempered Alloy, a Grow Chamber, Pressure Glass and a Wrought Fluid Tank. Six times a cloche on 48 FE/t and Nutrient Solution (7.5× with Carbon Dioxide), and it grows saplings, flowers and hops without a trellis.",
+                "",
+                "**Covers:** {item:arcforge:hydroponic_cell}"
+            ],
+            x: 4.5d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["grow_chamber", "npk"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:hydroponic_cell"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Hydroponic Cell",
+                    icon: "arcforge:hydroponic_cell"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:nutrient_solution_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "greenhouse_parts",
+            title: "Glasshouse Parts",
+            icon: "arcforge:planting_bed",
+            description: [
+                "Greenhouse Frames are steel plates and rods. Planting Beds are plates round a frame: right-click one with soil, then a seed. A Grow Lamp (steel rods and plate, glass panes, a redstone lamp) hangs under the roof and lights beds within three blocks at night for 16 FE/t.",
+                "",
+                "**Covers:** {item:arcforge:greenhouse_frame}, {item:arcforge:planting_bed}, {item:arcforge:grow_lamp}"
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            dependencies: ["grow_chamber"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:greenhouse_frame"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:planting_bed"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:grow_lamp"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:greenhouse_frame",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "greenhouse",
+            title: "Greenhouse Array",
+            icon: "arcforge:greenhouse_controller",
+            description: [
+                "A glass building 5×5×4 to 11×11×8: frames on the edges, Pressure Glass walls and roof, Planting Beds on the floor, the Controller (a frame with a thermocouple, Pressure Glass and a comparator) in a wall. It grows, harvests and replants every bed, fed with water, nutrients, Carbon Dioxide, heat and Grow Lamps.",
+                "",
+                "**Covers:** {item:arcforge:greenhouse_controller}"
+            ],
+            x: 6d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["greenhouse_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:greenhouse"
+                        }
+                    },
+                    title: "Form the Greenhouse",
+                    icon: "arcforge:greenhouse_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:pressure_glass",
+                    count: 32
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "night_shift",
+            title: "Night Shift",
+            icon: "arcforge:grow_lamp",
+            description: ["Harvest from a Greenhouse lit by Grow Lamps at night."],
+            x: 7.5d,
+            y: 1.25d,
+            dependencies: ["greenhouse"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "greenhouse_lamps"
+                        }
+                    },
+                    title: "Harvest under lamps",
+                    icon: "arcforge:grow_lamp"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:grow_lamp",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "fully_fed",
+            title: "Fully Fed",
+            icon: "arcforge:greenhouse_controller",
+            description: [
+                "A Greenhouse harvest with water, Nutrient Solution, Carbon Dioxide and heat all supplied at once."
+            ],
+            x: 7.5d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["greenhouse"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "greenhouse_fully_fed"
+                        }
+                    },
+                    title: "Harvest fully fed",
+                    icon: "arcforge:greenhouse_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:npk_fertilizer",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        },
+        {
+            id: "agronomist",
+            title: "Agronomist",
+            icon: "arcforge:greenhouse_controller",
+            description: ["Fuel, fertilizer and rubber from plants, and a glasshouse that farms itself."],
+            x: 7.5d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["biodiesel", "npk", "vulcanizer", "bio_coal", "greenhouse", "hydroponic_cell"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:biodiesel"
+                        }
+                    },
+                    title: "Biodiesel",
+                    icon: "arcforge:biodiesel_bucket"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:npk_fertilizer"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:rubber_gasket"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            item: {
+                                items: "arcforge:bio_coal"
+                            }
+                        }
+                    },
+                    title: "Bio-Coal",
+                    icon: "arcforge:bio_coal"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:greenhouse"
+                        }
+                    },
+                    title: "Form the Greenhouse",
+                    icon: "arcforge:greenhouse_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        }
+    ]
+}

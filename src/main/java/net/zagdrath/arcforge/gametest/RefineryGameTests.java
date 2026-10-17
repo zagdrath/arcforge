@@ -353,6 +353,9 @@ final class RefineryGameTests {
                         DieselGeneratorBlockEntity generator = helper.getBlockEntity(fronts[i], DieselGeneratorBlockEntity.class);
                         helper.assertTrue(generator.isFormed() && generator.getEngine() == engines[i], "The " + engines[i].length + "-long generator is "
                                 + generator.getEngine() + (generator.isFormed() ? "" : ", unformed"));
+                        // multiblock_formed reports it, for the V16 quest's min_length.
+                        helper.assertTrue(generator.length() == engines[i].length, "The " + engines[i].length + "-long generator reports length "
+                                + generator.length());
                         helper.assertTrue(generator.getFuel().getCapacity() == DieselGeneratorBlockEntity.tankCapacity(engines[i])
                                 && generator.getEnergy().getCapacityAsInt() == DieselGeneratorBlockEntity.energyCapacity(engines[i]),
                                 engines[i] + "'s tank or buffer is the wrong size");

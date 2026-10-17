@@ -1,0 +1,1051 @@
+{
+    id: "arcforge_farming",
+    group: "arcforge_agriculture",
+    order: 13,
+    title: "Farming",
+    subtitle: "Loam, fertilizer, new crops and mills",
+    icon: "arcforge:compost_bin",
+    default_shape: "circle",
+    quests: [
+        {
+            id: "infuser",
+            title: "The Infuser",
+            icon: "arcforge:infuser",
+            description: [
+                "Steel and copper plates, steel rods, a redstone block and a Wrought Fluid Tank. It soaks planks, logs and wood in Creosote (200 mB a log, 50 a plank) or Pine Resin and makes them fireproof treated wood, with FE.",
+                "",
+                "**Covers:** {item:arcforge:infuser}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:infuser"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Infuser",
+                    icon: "arcforge:infuser"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:creosote_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "treated_wood",
+            title: "Treated Wood",
+            icon: "arcforge:treated_planks",
+            description: [
+                "Treated Planks are the farm's timber: the Glass Cloche, Planter, Harvester, Millstone, Resin Tap and Solar casings all use them, and their slabs make the Compost Bin and Trellis. Treated Logs, Stripped Treated Logs, Treated Wood and Stripped Treated Wood come from soaking the matching vanilla block.",
+                "",
+                "**Covers:** {item:arcforge:treated_planks}, {item:arcforge:treated_log}, {item:arcforge:stripped_treated_log}, {item:arcforge:treated_wood}, {item:arcforge:stripped_treated_wood}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["infuser"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:treated_planks"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:treated_log",
+                                        "arcforge:stripped_treated_log",
+                                        "arcforge:treated_wood",
+                                        "arcforge:stripped_treated_wood"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Treat a log or wood block",
+                    icon: "arcforge:treated_log"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:treated_planks",
+                    count: 32
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "treated_set",
+            title: "Fireproof Carpentry",
+            icon: "arcforge:treated_stairs",
+            description: [
+                "Treated Planks craft like any planks: stairs, slabs, fence, fence gate, door, trapdoor, pressure plate and button, none of which burn. Make a slab; you'll need seven for a Compost Bin and five for a Trellis.",
+                "",
+                "**Covers:** {item:arcforge:treated_stairs}, {item:arcforge:treated_slab}, {item:arcforge:treated_fence}, {item:arcforge:treated_fence_gate}, {item:arcforge:treated_door}, {item:arcforge:treated_trapdoor}, {item:arcforge:treated_pressure_plate}, {item:arcforge:treated_button}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            dependencies: ["treated_wood"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:treated_slab"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:treated_stairs",
+                                        "arcforge:treated_fence",
+                                        "arcforge:treated_fence_gate",
+                                        "arcforge:treated_door",
+                                        "arcforge:treated_trapdoor",
+                                        "arcforge:treated_pressure_plate",
+                                        "arcforge:treated_button"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Craft another treated-wood shape",
+                    icon: "arcforge:treated_stairs"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:treated_slab",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "compost_bin",
+            title: "Compost Bin",
+            icon: "arcforge:compost_bin",
+            description: [
+                "Seven Treated Slabs. Throw in plant matter (seeds, leaves, Press Cake, crop waste) and it fills by the composter's chances into Compost: a +2 fertilizer, the half of Loam, a Mixed Fertilizer ingredient and digester feed. No power.",
+                "",
+                "**Covers:** {item:arcforge:compost_bin}, {item:arcforge:compost}"
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["treated_set"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:compost_bin"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Compost Bin",
+                    icon: "arcforge:compost_bin"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:compost"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:compost",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "loam",
+            title: "Loam",
+            icon: "arcforge:loam",
+            description: [
+                "Dirt and Compost, shapeless. Till it with a hoe for Loam Farmland: it holds 0 to 15 nutrients, grows crops 1.5× as fast, can't be trampled, and counts as 1.25× soil in a Planting Bed. Four Loam round a Copper Plate make four Irrigated Loam Farmland, always moist, never reverting.",
+                "",
+                "**Covers:** {item:arcforge:loam}, {item:arcforge:irrigated_loam_farmland}"
+            ],
+            x: 6d,
+            y: 1.25d,
+            dependencies: ["compost_bin"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:item_used_on_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:all_of",
+                                terms: [
+                                    {
+                                        type: "minecraft:location_check",
+                                        predicate: {
+                                            block: {
+                                                blocks: "arcforge:loam_farmland"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        type: "minecraft:match_tool",
+                                        predicate: {
+                                            items: "#minecraft:hoes"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    title: "Till Loam into Loam Farmland",
+                    icon: "arcforge:loam"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:loam",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "fertilizers",
+            title: "Feed the Soil",
+            icon: "arcforge:mixed_fertilizer",
+            description: [
+                "Use a fertilizer on Loam Farmland. Compost +2, Seed Meal +1, Wood Ash +3 (from burning charcoal), Basic Slag +3 (crushed furnace Slag), Digestate +4, Mixed Fertilizer +8 (Compost, Wood Ash and Basic Slag together), NPK +15. Nutrients drain as crops grow.",
+                "",
+                "**Covers:** {item:arcforge:mixed_fertilizer}, {item:arcforge:wood_ash}, {item:arcforge:basic_slag}, {item:arcforge:compost}, {item:arcforge:seed_meal}"
+            ],
+            x: 7.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["loam"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:item_used_on_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:all_of",
+                                terms: [
+                                    {
+                                        type: "minecraft:location_check",
+                                        predicate: {
+                                            block: {
+                                                blocks: ["arcforge:loam_farmland", "arcforge:irrigated_loam_farmland"]
+                                            }
+                                        }
+                                    },
+                                    {
+                                        type: "minecraft:match_tool",
+                                        predicate: {
+                                            items: "#arcforge:fertilizers"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    },
+                    title: "Fertilize Loam Farmland",
+                    icon: "arcforge:mixed_fertilizer"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:mixed_fertilizer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:mixed_fertilizer",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "irrigation",
+            title: "Irrigation",
+            icon: "arcforge:copper_sprinkler",
+            description: [
+                "A Copper Sprinkler (four copper round a bucket) keeps a 9×9 moist and adds growth ticks for 1 mB/t of water. A Scarecrow (hay, Linen, wooden rods on a Stripped Treated Log) stops mobs trampling within 9 blocks. The Fertilizer Spreader (treated planks and fence, hopper, iron) feeds a 5×5 from its hopper when nutrients drop below 4.",
+                "",
+                "**Covers:** {item:arcforge:copper_sprinkler}, {item:arcforge:fertilizer_spreader}, {item:arcforge:scarecrow}"
+            ],
+            x: 9d,
+            y: 1.25d,
+            dependencies: ["fertilizers"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: ["arcforge:copper_sprinkler", "arcforge:fertilizer_spreader", "arcforge:scarecrow"]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Copper Sprinkler or Fertilizer Spreader or Scarecrow",
+                    icon: "arcforge:copper_sprinkler"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:copper_sprinkler",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "new_crops",
+            title: "Wild Harvest",
+            icon: "arcforge:flax_seeds",
+            description: [
+                "Five wild plants grow in the world and their seeds drop from grass. Wild Flax in plains, Wild Rapeseed in meadows, Wild Sorghum in savannas, Wild Hops in forests and taigas, Wild Soybeans in plains and forests, and the Wild Rubber Dandelion in meadows and taiga. Pick up the seeds of flax, rapeseed, sorghum and hops.",
+                "",
+                "**Covers:** {item:arcforge:flax_seeds}, {item:arcforge:wild_flax}, {item:arcforge:rapeseeds}, {item:arcforge:wild_rapeseed}, {item:arcforge:sorghum_seeds}, {item:arcforge:wild_sorghum}, {item:arcforge:hop_seeds}, {item:arcforge:wild_hops}"
+            ],
+            x: 7.5d,
+            y: 2.5d,
+            dependencies: ["loam"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:flax_seeds"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:rapeseeds"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:sorghum_seeds"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hop_seeds"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:flax_seeds",
+                    count: 4
+                },
+                {
+                    type: "item",
+                    item: "arcforge:rapeseeds",
+                    count: 4
+                },
+                {
+                    type: "item",
+                    item: "arcforge:sorghum_seeds",
+                    count: 4
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hop_seeds",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "flax",
+            title: "Flax and Linen",
+            icon: "arcforge:linen",
+            description: [
+                "Flax grows two tall and gives Flax Fibre. One fibre is a String; four are Linen for the Scarecrow. Flax Seeds press to 80 mB of Seed Oil, and a Seed Extractor gets seeds back out of fibre.",
+                "",
+                "**Covers:** {item:arcforge:flax_fibre}, {item:arcforge:linen}"
+            ],
+            x: 9d,
+            y: 2.5d,
+            dependencies: ["new_crops"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:flax_fibre"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:linen"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:string",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "sorghum",
+            title: "Sorghum",
+            icon: "arcforge:sorghum_stalks",
+            description: [
+                "Two-tall Sorghum gives Sorghum Stalks: the best ethanol crop (80 mB in the Fermenter), dried in a Grain Dryer to Dried Sorghum that ferments in half the time.",
+                "",
+                "**Covers:** {item:arcforge:sorghum_stalks}"
+            ],
+            x: 9d,
+            y: 3.75d,
+            dependencies: ["new_crops"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:sorghum_stalks"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sorghum_seeds",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "hops",
+            title: "Hops on the Trellis",
+            icon: "arcforge:hop_cones",
+            description: [
+                "Five Treated Slabs make a Trellis; stand it on farmland (two can stack) and use Hop Seeds on the bottom one. A bearing vine gives 1–3 Hop Cones and keeps growing. Dried Hops in the Fermenter add 20% to four batches.",
+                "",
+                "**Covers:** {item:arcforge:trellis}, {item:arcforge:hop_cones}"
+            ],
+            x: 9d,
+            y: 5d,
+            dependencies: ["new_crops"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:trellis"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Trellis",
+                    icon: "arcforge:trellis"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hop_cones"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:trellis",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "soybeans",
+            title: "Soybeans",
+            icon: "arcforge:soybeans",
+            description: [
+                "A legume: it restores Loam nutrients instead of using them, and a non-legume harvested after it gets a crop-rotation bonus. Soybeans press to 150 mB of Seed Oil, the richest seed.",
+                "",
+                "**Covers:** {item:arcforge:soybeans}, {item:arcforge:wild_soybeans}"
+            ],
+            x: 9d,
+            y: 0d,
+            dependencies: ["new_crops"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:soybeans"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:soybeans",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "crop_rotation",
+            title: "Crop Rotation",
+            icon: "arcforge:soybeans",
+            description: ["Harvest a non-legume from Loam that just grew Soybeans and take the rotation bonus."],
+            x: 10.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["soybeans"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "crop_rotation"
+                        }
+                    },
+                    title: "Harvest with the rotation bonus",
+                    icon: "minecraft:wheat"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:npk_fertilizer",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "every_crop",
+            title: "Every Crop",
+            icon: "arcforge:rapeseeds",
+            description: ["Flax Fibre, Rapeseeds, Sorghum Stalks, Hop Cones and Soybeans, all from your own fields."],
+            x: 10.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["flax", "sorghum", "hops", "soybeans"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:flax_fibre"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:rapeseeds"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:sorghum_stalks"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hop_cones"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:soybeans"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:irrigated_loam_farmland",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "sickles",
+            title: "Sickle and Scythe",
+            icon: "arcforge:steel_scythe",
+            description: [
+                "An Iron Sickle (2 iron on a wooden rod, 250 uses) or Steel Sickle (500) harvests and replants a 3×3. The Steel Scythe (3 steel, 2 rods, 1,000 uses) does a 5×5.",
+                "",
+                "**Covers:** {item:arcforge:iron_sickle}, {item:arcforge:steel_sickle}, {item:arcforge:steel_scythe}"
+            ],
+            x: 9d,
+            y: 6.25d,
+            dependencies: ["new_crops"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:iron_sickle", "arcforge:steel_sickle", "arcforge:steel_scythe"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Make a sickle or scythe",
+                    icon: "arcforge:iron_sickle"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_sickle"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "hands_free",
+            title: "Hands Free",
+            icon: "arcforge:harvester",
+            description: [
+                "The Planter (treated planks and fence, hopper, copper) plants the 3×3 ahead of it on redstone or every 5 seconds, hops on trellises included. The Harvester (with shears and iron) harvests and replants the same 3×3 into 18 slots, picking hop cones too. Neither needs power.",
+                "",
+                "**Covers:** {item:arcforge:planter}, {item:arcforge:harvester}"
+            ],
+            x: 10.5d,
+            y: 6.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["sickles"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:planter"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Planter",
+                    icon: "arcforge:planter"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:harvester"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Harvester",
+                    icon: "arcforge:harvester"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_item_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "millstone",
+            title: "Millstone and Mill",
+            icon: "arcforge:millstone",
+            description: [
+                "The Millstone (wooden rod, smooth stone slabs, grindstone, treated planks) turns by hand or redstone: wheat to Flour (bakes into bread, 25% extra), seeds to Seed Meal, bone to four bone meal, cane to two sugar. The Mill is a Millstone with steel plates and gears: three lanes at 8 FE/t each, half the time.",
+                "",
+                "**Covers:** {item:arcforge:millstone}, {item:arcforge:mill}, {item:arcforge:flour}, {item:arcforge:seed_meal}"
+            ],
+            x: 12d,
+            y: 2.5d,
+            dependencies: ["every_crop"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: ["arcforge:millstone", "arcforge:mill"]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Millstone or Mill",
+                    icon: "arcforge:millstone"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:flour",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "seed_extractor",
+            title: "Seed Extractor",
+            icon: "arcforge:seed_extractor",
+            description: [
+                "Steel plates and gears, a hopper, shears and a redstone block. It threshes wheat, beetroot, melon, pumpkin, sorghum, hops and flax into seeds for 10 FE/t, so a harvest always replants itself.",
+                "",
+                "**Covers:** {item:arcforge:seed_extractor}"
+            ],
+            x: 12d,
+            y: 3.75d,
+            dependencies: ["every_crop"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:seed_extractor"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Seed Extractor",
+                    icon: "arcforge:seed_extractor"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sorghum_seeds",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "oil_press",
+            title: "Oil Press",
+            icon: "arcforge:oil_press",
+            description: [
+                "Steel plates and gears, a piston, a cauldron and a redstone block. Seeds give Seed Oil and Press Cake for 16 FE/t: Soybeans 150 mB, Rapeseeds 125, Flax 80, other seeds 25. Seed Oil is half of Biodiesel and a turbine lubricant like Heavy Oil; Press Cake goes to the Compost Bin or digester.",
+                "",
+                "**Covers:** {item:arcforge:oil_press}, {item:arcforge:seed_oil_bucket}, {item:arcforge:press_cake}"
+            ],
+            x: 12d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["every_crop"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:oil_press"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Oil Press",
+                    icon: "arcforge:oil_press"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:seed_oil_bucket"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:press_cake"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:rapeseeds",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "grain_dryer",
+            title: "Grain Dryer",
+            icon: "arcforge:grain_dryer",
+            description: [
+                "Steel plates, iron bars, a barrel and copper. Heat only, 60°C is enough: Hop Cones to Dried Hops, wheat to Dried Grain, Sorghum Stalks to Dried Sorghum (each ferments in half the time), and 250 mB of Latex to Raw Rubber.",
+                "",
+                "**Covers:** {item:arcforge:grain_dryer}, {item:arcforge:dried_hops}, {item:arcforge:dried_grain}, {item:arcforge:dried_sorghum}"
+            ],
+            x: 10.5d,
+            y: 3.75d,
+            dependencies: ["hops", "sorghum"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:grain_dryer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Grain Dryer",
+                    icon: "arcforge:grain_dryer"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:dried_hops", "arcforge:dried_grain", "arcforge:dried_sorghum"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Dry a crop",
+                    icon: "arcforge:dried_hops"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_thermal_capsule"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "farmstead",
+            title: "Farmstead",
+            icon: "arcforge:planter",
+            description: [
+                "Soil, water, five crops, and machines that need no power at all. The Bio-Industry chapter takes it from here."
+            ],
+            x: 13.5d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["hands_free", "oil_press", "grain_dryer", "millstone", "seed_extractor", "irrigation"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:planter"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Planter",
+                    icon: "arcforge:planter"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:harvester"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Harvester",
+                    icon: "arcforge:harvester"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:oil_press"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Oil Press",
+                    icon: "arcforge:oil_press"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:grain_dryer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Grain Dryer",
+                    icon: "arcforge:grain_dryer"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:mixed_fertilizer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        }
+    ]
+}

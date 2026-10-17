@@ -1,0 +1,851 @@
+{
+    id: "arcforge_getting_started",
+    group: "arcforge_foundations",
+    order: 0,
+    title: "Getting Started",
+    subtitle: "From bare hands to steel and a working grid",
+    icon: "arcforge:steel_ingot",
+    default_shape: "circle",
+    quests: [
+        {
+            id: "handbook",
+            title: "Read the Manual",
+            icon: "arcforge:engineers_handbook",
+            description: [
+                "The Engineer's Handbook is the reference: every machine, every multiblock with a step-by-step build view, every recipe link (click an item to open JEI). Craft it from a Book and a Copper Ingot and keep it next to your quest book.",
+                "",
+                "**Covers:** {item:arcforge:engineers_handbook}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:engineers_handbook"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:book"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 1
+                }
+            ]
+        },
+        {
+            id: "wrench",
+            title: "Turn of the Wrench",
+            icon: "arcforge:wrench",
+            description: [
+                "Three iron and a copper. Sneak-scroll to switch modes: Configure opens side settings, Rotate turns a machine, Port sets a multiblock's ports (every array starts with none), Dismantle picks a machine up with its contents. You'll use it on every structure in this book.",
+                "",
+                "**Covers:** {item:arcforge:wrench}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:wrench"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:copper_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 1
+                }
+            ]
+        },
+        {
+            id: "combustion_plant",
+            title: "Burn Something",
+            icon: "arcforge:combustion_plant",
+            description: [
+                "The Combustion Plant burns coal, charcoal, coal blocks or Bio-Coal straight to FE: 40 FE/t, 32,000 FE per coal. It's the simplest generator and the least efficient. Place one: it needs no steel, so it is your first power, and it will run the Metal Press later in this chapter.",
+                "",
+                "**Covers:** {item:arcforge:combustion_plant}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["wrench"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:combustion_plant"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Combustion Plant",
+                    icon: "arcforge:combustion_plant"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:coal",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "furnace_bricks",
+            title: "Firebrick",
+            icon: "arcforge:arcforge_furnace_bricks",
+            description: [
+                "Two bricks and two nether bricks make four Arcforge Furnace Bricks. They line the Firebox, build the Carbonizer and the Arcforge Furnace, and are the heat-proof block in every early recipe.",
+                "",
+                "**Covers:** {item:arcforge:arcforge_furnace_bricks}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["wrench"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforge_furnace_bricks"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:nether_brick",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 1
+                }
+            ]
+        },
+        {
+            id: "carbonizer",
+            title: "The Carbonizer",
+            icon: "arcforge:carbonizer",
+            description: [
+                "A Carbonizer is a slice 1 wide, 2 to 3 tall and 2 to 3 deep; up to 8 slices side by side share one GUI. It needs no fuel and no power: it bakes coal (600 ticks), Carbon Dust, logs or Bio-Coal into Coal Coke and drips Creosote into its tank. Set an Output port with the Wrench and let it run.",
+                "",
+                "**Covers:** {item:arcforge:carbonizer}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["furnace_bricks"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:carbonizer"
+                        }
+                    },
+                    title: "Form the Carbonizer",
+                    icon: "arcforge:carbonizer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:coal",
+                    count: 32
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "coal_coke",
+            title: "Coal Coke",
+            icon: "arcforge:coal_coke",
+            description: [
+                "Coke is coal with the tar baked out: it burns hotter (1,300°C, 1.5× a coal in a Firebox Array) and is the reducing agent the Arcforge Furnace needs for every smelt. Nine make a Block of Coal Coke, and a Block of Bio-Coal carbonizes straight into one.",
+                "",
+                "**Covers:** {item:arcforge:coal_coke}, {item:arcforge:coal_coke_block}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            dependencies: ["carbonizer"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:coal_coke"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:coal_coke",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "creosote",
+            title: "Creosote",
+            icon: "arcforge:creosote_bucket",
+            description: [
+                "250 mB per coal, 100 per log. Creosote burns in a Fuel Burner at 850°C, soaks wood in the Infuser into fireproof treated wood, and is the first feed for a Distillation Array (Naphtha, Light Oil, Heavy Oil and Pitch). Pipe it out or bucket it from the Carbonizer's tank slot.",
+                "",
+                "**Covers:** {item:arcforge:creosote_bucket}"
+            ],
+            x: 4.5d,
+            y: 3.75d,
+            dependencies: ["carbonizer"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:creosote"
+                        }
+                    },
+                    title: "Make Creosote in the Carbonizer",
+                    icon: "arcforge:creosote_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_fluid_tank"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "furnace_parts",
+            title: "Bricks and Walls",
+            icon: "arcforge:arcforge_furnace_brick_wall",
+            description: [
+                "The Arcforge Furnace is a 3×3×6 cross-shaped column: 24 Arcforge Furnace Bricks, 24 Arcforge Furnace Brick Walls on the four corners, and one Arcforge Furnace Port (bricks, a blast furnace and iron bars) as its face. Six bricks make six walls.",
+                "",
+                "**Covers:** {item:arcforge:arcforge_furnace_bricks}, {item:arcforge:arcforge_furnace_brick_wall}, {item:arcforge:arcforge_furnace_port}"
+            ],
+            x: 6d,
+            y: 2.5d,
+            dependencies: ["coal_coke"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforge_furnace_brick_wall"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforge_furnace_port"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforge_furnace_bricks",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "arcforge_furnace",
+            title: "The Arcforge Furnace",
+            icon: "arcforge:arcforge_furnace_port",
+            description: [
+                "Form the column and open the Port. It burns Coal Coke for heat and smelts by temperature: steel at 1,200°C, Tempered at 1,300°C, Hardened at 1,400°C, Arcforged and Graphite at 1,500°C. Every smelt leaves Slag. The Handbook's build view shows it layer by layer.",
+                "",
+                "**Covers:** {item:arcforge:arcforge_furnace_port}"
+            ],
+            x: 7.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["furnace_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:arcforge_furnace"
+                        }
+                    },
+                    title: "Form the Arcforge Furnace",
+                    icon: "arcforge:arcforge_furnace_port"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:coal_coke",
+                    count: 32
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "steel_ingot",
+            title: "First Steel",
+            icon: "arcforge:steel_ingot",
+            description: [
+                "One iron and one coke at 1,200°C. Add a Fluorite Crystal as flux and 4 iron + 4 coke give 4 steel in one go. Steel is the backbone of the mod: plates, gears, rods, tools, armour and nearly every machine casing.",
+                "",
+                "**Covers:** {item:arcforge:steel_ingot}, {item:arcforge:steel_block}"
+            ],
+            x: 9d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["arcforge_furnace"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_ingot"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_ingot",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "slag",
+            title: "Slag",
+            icon: "arcforge:slag",
+            description: [
+                "The furnace's by-product. Crush it in an Arc Crusher for two Basic Slag (a +3 fertilizer and an LFP Cathode ingredient), or spin it in a Fiberizer into Slag Wool for heat cells and the Foundry Suit. Don't throw it out.",
+                "",
+                "**Covers:** {item:arcforge:slag}, {item:arcforge:basic_slag}"
+            ],
+            x: 10.5d,
+            y: 3.75d,
+            dependencies: ["steel_ingot"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:slag"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:basic_slag",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "wrought_alloy",
+            title: "Wrought Alloy",
+            icon: "arcforge:wrought_alloy",
+            description: [
+                "The first tier alloy: 2 iron + 1 gold + 1 Coal Coke in the Arcforge Furnace at 1,200°C gives 2 Wrought Alloy. Every Wrought-tier conduit, tank, cell, crate and portable is made from it. (The Steelmaking chapter builds the furnace.)",
+                "",
+                "**Covers:** {item:arcforge:wrought_alloy}"
+            ],
+            x: 10.5d,
+            y: 1.25d,
+            dependencies: ["steel_ingot"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_alloy"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "metal_press",
+            title: "The Metal Press",
+            icon: "arcforge:metal_press",
+            description: [
+                "Steel, a piston, an anvil and a redstone block. It needs a die: Plate Die (1 ingot → 1 plate), Gear Die (4 → 1 gear) or Rod Die (1 → 2 rods), each three Steel Ingots and two Steel Blocks round a pressure plate, clock or lightning rod. 20 FE/t, 100 ticks a press.",
+                "",
+                "**Covers:** {item:arcforge:metal_press}, {item:arcforge:plate_die}, {item:arcforge:gear_die}, {item:arcforge:rod_die}"
+            ],
+            x: 10.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["steel_ingot", "combustion_plant"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:metal_press"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Metal Press",
+                    icon: "arcforge:metal_press"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:plate_die", "arcforge:gear_die", "arcforge:rod_die"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Make any die",
+                    icon: "arcforge:plate_die"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:plate_die"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "steel_parts",
+            title: "Plates, Gears and Rods",
+            icon: "arcforge:steel_plate",
+            description: [
+                "Steel Plates armour nearly every machine. Steel Gears drive the Arc Crusher, Assembler, turbines and pumpjack. Steel Rods make meshes, hammers, Pressure Glass and derrick frames; a plate, rod, plate crafts a Steel Pipe for the Oil Derrick's drill string. Copper Plates, Gears and Rods fill the cheaper recipes.",
+                "",
+                "**Covers:** {item:arcforge:steel_plate}, {item:arcforge:steel_gear}, {item:arcforge:steel_rod}, {item:arcforge:steel_pipe}, {item:arcforge:copper_plate}, {item:arcforge:copper_gear}, {item:arcforge:copper_rod}"
+            ],
+            x: 12d,
+            y: 3.75d,
+            dependencies: ["metal_press"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_plate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:steel_gear"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:steel_rod"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:copper_plate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:copper_rod"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_plate",
+                    count: 16
+                },
+                {
+                    type: "item",
+                    item: "arcforge:steel_gear",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "firebox",
+            title: "Heat First",
+            icon: "arcforge:firebox",
+            description: [
+                "The Firebox doesn't make FE at all: it makes heat (HU), 80 HU/t up to 1,100°C, and pushes it out of its Heat face. Heat is Arcforge's second currency; boilers, dryers and furnaces all want it. Charcoal leaves Wood Ash in the ash slot half the time, which farmers will want later.",
+                "",
+                "**Covers:** {item:arcforge:firebox}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            dependencies: ["furnace_bricks"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:firebox"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Firebox",
+                    icon: "arcforge:firebox"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:charcoal",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "thermocouple",
+            title: "Bismuth Junction",
+            icon: "arcforge:thermocouple",
+            description: [
+                "Two copper rods around a Bismuth Ingot. The Thermocouple turns a temperature difference into electricity and sits inside the Thermoelectric Plant, its upgrade, the Chemical Reactor and most refinery units. Bismuth comes from Bismuth Ore between Y 0 and 56; copper rods from the Metal Press (this chapter).",
+                "",
+                "**Covers:** {item:arcforge:thermocouple}, {item:arcforge:bismuth_ingot}"
+            ],
+            x: 13.5d,
+            y: 3.75d,
+            dependencies: ["firebox", "steel_parts"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:thermocouple"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:bismuth_ingot",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "thermoelectric_plant",
+            title: "Heat into Power",
+            icon: "arcforge:thermoelectric_plant",
+            description: [
+                "Put a Thermoelectric Plant against a Firebox's Heat face. It takes up to 80 HU/t and converts it at an efficiency set by its temperature: 0% at 100°C, 100% at 1,100°C. A Firebox gets it close to 64,000 FE per coal, twice the Combustion Plant. It takes a few minutes to warm up, so be patient.",
+                "",
+                "**Covers:** {item:arcforge:thermoelectric_plant}"
+            ],
+            x: 15d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["thermocouple"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:thermoelectric_plant"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Thermoelectric Plant",
+                    icon: "arcforge:thermoelectric_plant"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:thermoelectric_upgrade"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "wrought_conduits",
+            title: "Five Ways to Move Things",
+            icon: "arcforge:wrought_energy_conduit",
+            description: [
+                "Conduits carry one resource each. Wrought Energy Conduit: 256 FE/t. Wrought Item Conduit: 8 items a second. Wrought Fluid Conduit: 200 mB/t of liquid. Wrought Thermodynamic Conduit: 50 HU/t of heat, hot to cold only. Wrought Pressurized Conduit: 400 mB/t of gas (steam, hydrogen, oxygen...), the only pipe gases travel in. Wrench a conduit's end to set it to Insert, Extract or None.",
+                "",
+                "**Covers:** {item:arcforge:wrought_energy_conduit}, {item:arcforge:wrought_item_conduit}, {item:arcforge:wrought_fluid_conduit}, {item:arcforge:wrought_thermal_conduit}, {item:arcforge:wrought_pressurized_conduit}"
+            ],
+            x: 12d,
+            y: 1.25d,
+            dependencies: ["wrought_alloy"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_energy_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:wrought_item_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:wrought_fluid_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:wrought_thermal_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:wrought_pressurized_conduit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_energy_conduit",
+                    count: 8
+                },
+                {
+                    type: "item",
+                    item: "arcforge:wrought_item_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "wrought_energy_cell",
+            title: "Banked Power",
+            icon: "arcforge:wrought_energy_cell",
+            description: [
+                "A Wrought Energy Cell stores 500,000 FE and passes 512 FE/t. Its slots charge Batteries and FE tools. Set each face to input or output with the Wrench. Later tiers upgrade in place and keep their charge.",
+                "",
+                "**Covers:** {item:arcforge:wrought_energy_cell}"
+            ],
+            x: 12d,
+            y: 2.5d,
+            dependencies: ["wrought_alloy"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_energy_cell"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:redstone",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "wrought_fluid_tank",
+            title: "Hold That Thought",
+            icon: "arcforge:wrought_fluid_tank",
+            description: [
+                "16,000 mB of one liquid, with a bucket slot on each side. The Wrought Fluid Tank is also an ingredient: the Geothermal Plant, Fuel Burner, Infuser and most refinery units want one inside them.",
+                "",
+                "**Covers:** {item:arcforge:wrought_fluid_tank}"
+            ],
+            x: 12d,
+            y: 0d,
+            dependencies: ["wrought_alloy"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_fluid_tank"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "upgrades",
+            title: "Upgrade Cards",
+            icon: "arcforge:speed_upgrade",
+            description: [
+                "Every machine has an Upgrades tab taking up to 8 of each card. Speed: 2^(n/2)× faster, same FE per operation. Energy: FE per operation ×0.8 per card (and more FE per fuel in a Combustion Plant). Thermoelectric Efficiency: more FE per HU in a Thermoelectric Plant. All three are a Steel Plate and redstone around sugar, copper plates or thermocouples.",
+                "",
+                "**Covers:** {item:arcforge:speed_upgrade}, {item:arcforge:energy_upgrade}, {item:arcforge:thermoelectric_upgrade}"
+            ],
+            x: 13.5d,
+            y: 2.5d,
+            dependencies: ["wrought_energy_cell", "steel_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:speed_upgrade", "arcforge:energy_upgrade", "arcforge:thermoelectric_upgrade"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Speed Upgrade or Energy Upgrade or Thermoelectric Efficiency Upgrade",
+                    icon: "arcforge:speed_upgrade"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:speed_upgrade",
+                    count: 2
+                },
+                {
+                    type: "item",
+                    item: "arcforge:energy_upgrade",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "powered_up",
+            title: "Powered Up",
+            icon: "arcforge:combustion_plant",
+            description: [
+                "Generator, cell, conduit, machine: a working grid. From here the book splits into lines: Alloys & Tiers, Ore Processing and Heat & Power open first."
+            ],
+            x: 16.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["wrought_conduits", "wrought_energy_cell", "upgrades", "thermoelectric_plant"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_energy_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:wrought_energy_cell"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: ["arcforge:combustion_plant", "arcforge:firebox"]
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place a generator",
+                    icon: "arcforge:combustion_plant"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        }
+    ]
+}

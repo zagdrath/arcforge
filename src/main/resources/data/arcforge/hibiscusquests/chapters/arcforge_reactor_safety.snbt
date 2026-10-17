@@ -1,0 +1,334 @@
+{
+    id: "arcforge_reactor_safety",
+    group: "arcforge_nuclear",
+    order: 17,
+    title: "Reactor Safety",
+    subtitle: "Containment, emergency cooling and fallout",
+    icon: "arcforge:containment_concrete",
+    default_shape: "circle",
+    requires: ["arcforge_nuclear_power/fission_reactor"],
+    quests: [
+        {
+            id: "containment_materials",
+            title: "Containment Concrete",
+            icon: "arcforge:containment_concrete",
+            description: [
+                "Eight Concrete Shielding round a Steel Rod make eight Containment Concrete; four Steel Plates make two Steel Liner. A containment is any sealed room round the reactor (and its steam generators): every inside face liner backed by concrete. The Containment Dome is the lined block for a domed roof.",
+                "",
+                "**Covers:** {item:arcforge:containment_concrete}, {item:arcforge:steel_liner}, {item:arcforge:containment_dome}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:containment_concrete"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:steel_liner"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:concrete_shielding",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "airlocks",
+            title: "Airlocks and Hatches",
+            icon: "arcforge:airlock",
+            description: [
+                "Airlocks (Steel Liner round Reactor Glass) are doors for people. Build them in pairs: two near each other are interlocked, so only one opens at a time. The Equipment Hatch is a 3×3 bolted door for machines; while it's open the containment isn't sealed.",
+                "",
+                "**Covers:** {item:arcforge:airlock}, {item:arcforge:equipment_hatch}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["containment_materials"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:airlock"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:equipment_hatch"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_liner",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "penetrations",
+            title: "Through the Wall",
+            icon: "arcforge:penetration",
+            description: [
+                "Penetrations (Steel Liner and Steel Pipe) carry pipes, conduits and cables through the containment wall without breaking the seal. Place a row of them through the wall's thickness, each facing along it.",
+                "",
+                "**Covers:** {item:arcforge:penetration}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["containment_materials"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:penetration"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_pipe",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "sealed",
+            title: "Sealed",
+            icon: "arcforge:containment_dome",
+            description: [
+                "Run the reactor inside a sealed containment. The reactor finds it by flood fill from its vessel; the Safety page of its screen shows whether it's sealed, and why not. Sealed walls absorb explosions up to their strength and keep fallout in."
+            ],
+            x: 3d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["airlocks", "penetrations"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "containment"
+                        }
+                    },
+                    title: "Run a reactor inside a sealed containment",
+                    icon: "arcforge:containment_dome"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "eccs",
+            title: "Emergency Core Cooling",
+            icon: "arcforge:eccs_accumulator",
+            description: [
+                "ECCS Accumulators (a Hardened Fluid Tank in green-painted steel, 64,000 mB of water) and ECCS Pumps (an Electric Pump and a Block of Redstone, powered, drawing from tanks beside them or the Suppression Pool) touching the vessel inject water when its coolant falls below 75%.",
+                "",
+                "**Covers:** {item:arcforge:eccs_accumulator}, {item:arcforge:eccs_pump}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:eccs_accumulator"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:eccs_pump"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_fluid_tank"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "relief_valve",
+            title: "Let It Vent",
+            icon: "arcforge:relief_valve",
+            description: [
+                "A vessel ruptures past 130% of its design pressure. Each Relief Valve touching it lets more steam out first; inside a containment with a Suppression Pool (water in the containment) they vent into the pool.",
+                "",
+                "**Covers:** {item:arcforge:relief_valve}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:relief_valve"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_pipe",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "hydrogen",
+            title: "Hydrogen Recombiners",
+            icon: "arcforge:hydrogen_recombiner",
+            description: [
+                "Above about 1,200°C Zircaloy cladding reacts with steam and makes Hydrogen. Above 4% in the containment's air, a spark ignites it. Hydrogen Recombiners (silver and a Cracking Catalyst) anywhere in the containment remove it without a flame.",
+                "",
+                "**Covers:** {item:arcforge:hydrogen_recombiner}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["containment_materials"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:hydrogen_recombiner"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:silver_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "core_catcher",
+            title: "Core Catcher",
+            icon: "arcforge:core_catcher",
+            description: [
+                "Above about 2,800°C fuel melts into Corium, which melts down through blocks. A Core Catcher (Zircon Dust, furnace bricks and Containment Concrete) under the vessel stops it and cools it faster.",
+                "",
+                "**Covers:** {item:arcforge:core_catcher}"
+            ],
+            x: 1.5d,
+            y: 3.75d,
+            dependencies: ["containment_materials"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:core_catcher"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:zircon_dust",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "decontamination",
+            title: "Decontamination",
+            icon: "arcforge:decontamination_shower",
+            description: [
+                "A failure without a sealed containment releases Fallout that settles like snow and spreads downwind. Mount a Decontamination Shower overhead: it washes players two blocks below it, and what they carry, using water and wearing out its HEPA Filter (steel rods, paper and wool). Used filters are low-level waste.",
+                "",
+                "**Covers:** {item:arcforge:decontamination_shower}, {item:arcforge:hepa_filter}, {item:arcforge:used_hepa_filter}"
+            ],
+            x: 0d,
+            y: 3.75d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:decontamination_shower"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hepa_filter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hepa_filter",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "what_remains",
+            title: "What Remains",
+            icon: "arcforge:solidified_corium",
+            description: [
+                "Corium slowly cools, faster beside water, into Solidified Corium: still intensely radioactive. Hold a piece of it. Use a Lead Box.",
+                "",
+                "**Covers:** {item:arcforge:solidified_corium}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["core_catcher"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:solidified_corium"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_block",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        }
+    ]
+}

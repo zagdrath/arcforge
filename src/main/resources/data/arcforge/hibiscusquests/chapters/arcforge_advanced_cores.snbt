@@ -1,0 +1,287 @@
+{
+    id: "arcforge_advanced_cores",
+    group: "arcforge_nuclear",
+    order: 19,
+    title: "Advanced Cores",
+    subtitle: "Lead-bismuth fast reactors and molten salt",
+    icon: "arcforge:lead_bismuth_ingot",
+    default_shape: "circle",
+    requires: ["arcforge_nuclear_power/fission_reactor"],
+    quests: [
+        {
+            id: "lead_bismuth",
+            title: "Lead-Bismuth",
+            icon: "arcforge:lead_bismuth_ingot",
+            description: [
+                "Two Lead and two Bismuth Ingots smelted together in the Arcforge Furnace make four Lead-Bismuth Ingots; melt them in the Arc Melter for Lead-Bismuth Eutectic. It freezes below 125°C, so keep the core warm.",
+                "",
+                "**Covers:** {item:arcforge:lead_bismuth_ingot}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_bismuth_ingot"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:bismuth_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "fast_reactor",
+            title: "Fast Reactor",
+            icon: "arcforge:lead_bismuth_ingot",
+            description: [
+                "Fill the vessel with Lead-Bismuth Eutectic instead of water and leave out the graphite, so the neutrons stay fast. Fuel it with 15 to 20% enriched rods or MOX, with Thorium Blanket Rods round the edge to breed. It runs at 900°C and more at low pressure; hot lead-bismuth goes to a Steam Generator for Superheated Steam."
+            ],
+            x: 1.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["lead_bismuth"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "fast_reactor"
+                        }
+                    },
+                    title: "Run a lead-bismuth fast reactor at power",
+                    icon: "arcforge:reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        },
+        {
+            id: "fluoride_salts",
+            title: "Fluoride Salts",
+            icon: "arcforge:lithium_fluoride",
+            description: [
+                "Lithium Hydroxide and Hydrofluoric Acid make Lithium Fluoride; Thorium Dioxide and Hydrofluoric Acid make Thorium Tetrafluoride. Both in the Chemical Reactor.",
+                "",
+                "**Covers:** {item:arcforge:lithium_fluoride}, {item:arcforge:thorium_tetrafluoride}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            dependencies: ["arcforge_fuel_cycle/thorium"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:lithium_fluoride"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:thorium_tetrafluoride"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lithium_hydroxide",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "fuel_salt",
+            title: "Fuel Salt",
+            icon: "arcforge:thorium_tetrafluoride",
+            description: [
+                "One Uranium Tetrafluoride (its enrichment carried in), four Lithium Fluoride and two Thorium Tetrafluoride give 1,000 mB of Fuel Salt in the Chemical Reactor."
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["fluoride_salts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:fuel_salt"
+                        }
+                    },
+                    title: "Make Fuel Salt",
+                    icon: "arcforge:thorium_tetrafluoride"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lithium_fluoride",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "freeze_plug",
+            title: "Freeze Plug",
+            icon: "arcforge:freeze_plug",
+            description: [
+                "A Freeze Plug (nickel plates, Steel Pipe and packed ice) under the vessel's floor, a Drain Tank under it. Powered and cool, the plug stays frozen; if the salt overheats or the power goes, it melts and the salt drains into the shielded tank, and the core shuts down by itself.",
+                "",
+                "**Covers:** {item:arcforge:freeze_plug}, {item:arcforge:drain_tank}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            dependencies: ["fuel_salt"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:freeze_plug"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:drain_tank"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:packed_ice",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "salt_processing",
+            title: "Online Cleanup",
+            icon: "arcforge:salt_processing_unit",
+            description: [
+                "Fission products build up in the salt. Salt Processing Units (a Chemical Reactor in steel and pipe) touching the vessel take them out while it runs, using FE, as High-Level Liquid Waste.",
+                "",
+                "**Covers:** {item:arcforge:salt_processing_unit}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            dependencies: ["fuel_salt"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:salt_processing_unit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_pipe",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "molten_salt_reactor",
+            title: "Molten Salt Reactor",
+            icon: "arcforge:salt_processing_unit",
+            description: [
+                "Only Control Rod Channels go in a salt core: build enough of them, in graphite, to hold it subcritical with every rod in before you fill it (about one channel in three). It runs at about 700°C; hot Fuel Salt goes to a Steam Generator for High-Pressure Steam."
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["freeze_plug"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "molten_salt_reactor"
+                        }
+                    },
+                    title: "Run a molten salt reactor at power",
+                    icon: "arcforge:reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        },
+        {
+            id: "walk_away",
+            title: "Walk-Away Safe",
+            icon: "arcforge:freeze_plug",
+            description: [
+                "Let a salt core overheat and watch the Freeze Plug do its job: the salt drains into the tank and the core shuts itself down. It refreezes once it's powered and cool again."
+            ],
+            x: 6d,
+            y: 1.25d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["molten_salt_reactor"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "freeze_plug"
+                        }
+                    },
+                    title: "Have a Freeze Plug drain an overheating core",
+                    icon: "arcforge:freeze_plug"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        }
+    ]
+}

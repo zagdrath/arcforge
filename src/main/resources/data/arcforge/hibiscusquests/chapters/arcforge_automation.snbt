@@ -1,0 +1,428 @@
+{
+    id: "arcforge_automation",
+    group: "arcforge_foundations",
+    order: 6,
+    title: "Automation",
+    subtitle: "Machines that run themselves",
+    icon: "arcforge:arc_quarry",
+    default_shape: "circle",
+    requires: ["arcforge_getting_started/powered_up"],
+    quests: [
+        {
+            id: "block_breaker",
+            title: "Block Breaker",
+            icon: "arcforge:block_breaker",
+            description: [
+                "Wrought Alloy, an iron pickaxe, a Steel Plate and redstone. It breaks the block in front of it for 40 FE/t, as slowly as the block is hard, with a Pulse redstone mode. Point it at a cobblestone generator or a Tree Cutter's trunk.",
+                "",
+                "**Covers:** {item:arcforge:block_breaker}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:block_breaker"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Block Breaker",
+                    icon: "arcforge:block_breaker"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:iron_pickaxe"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "block_placer",
+            title: "Block Placer",
+            icon: "arcforge:block_placer",
+            description: [
+                "Wrought Alloy, a dispenser, a Steel Plate and redstone: it places blocks from its nine slots in front of it for 20 FE each.",
+                "",
+                "**Covers:** {item:arcforge:block_placer}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:block_placer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Block Placer",
+                    icon: "arcforge:block_placer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:dispenser"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "tree_cutter",
+            title: "Tree Cutter",
+            icon: "arcforge:tree_cutter",
+            description: [
+                "Steel Plates, an iron axe, saplings, a Block Breaker and Wrought Alloy. It plants and fells a 5×5 tree farm for 200 FE a log; Range Upgrades (glass panes, spyglasses, redstone, Steel Plate) add a block each side per card.",
+                "",
+                "**Covers:** {item:arcforge:tree_cutter}, {item:arcforge:range_upgrade}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["block_breaker"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "tree_cutting"
+                        }
+                    },
+                    title: "Fell a tree",
+                    icon: "arcforge:tree_cutter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:range_upgrade",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "vacuum_collector",
+            title: "Vacuum Collector",
+            icon: "arcforge:vacuum_collector",
+            description: [
+                "Tempered Alloy, an ender pearl, hoppers, a Wrought Item Conduit and a Steel Plate. It pulls drops from a 1 to 9 block cube for 10 FE an item, takes a Conduit Filter, and collects experience orbs as Liquid Experience.",
+                "",
+                "**Covers:** {item:arcforge:vacuum_collector}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["block_breaker"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:vacuum_collector"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Vacuum Collector",
+                    icon: "arcforge:vacuum_collector"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:conduit_filter"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "assembler",
+            title: "Assembler",
+            icon: "arcforge:assembler",
+            description: [
+                "Tempered Alloy, a crafting table, steel gears, redstone and steel plates. Set a 3×3 pattern, feed its 18-slot buffer through conduits, and it crafts for 400 FE a time. Automate plates into casings, dust into blocks, anything.",
+                "",
+                "**Covers:** {item:arcforge:assembler}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["block_placer"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:assembler"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Assembler",
+                    icon: "arcforge:assembler"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_gear",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "quarry_parts",
+            title: "Scanner and Drill Head",
+            icon: "arcforge:quarry_scanner",
+            description: [
+                "A Quarry Scanner is steel plates, a Silver Plate, glass panes, redstone and a comparator (also the core of the Vein Mining Module). A Tungsten Drill Head is four Tungsten Plates round an Arcite-Tungsten Composite.",
+                "",
+                "**Covers:** {item:arcforge:quarry_scanner}, {item:arcforge:tungsten_drill_head}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            dependencies: ["assembler"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:quarry_scanner"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_drill_head"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_plate",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "arc_quarry",
+            title: "Arc Quarry",
+            icon: "arcforge:arc_quarry",
+            description: [
+                "Hardened Alloy, a Quarry Scanner, steel gears and a Tungsten Drill Head. A 3×3×3 digital miner: radius up to 32, Y 0 to 60 by default, a filter for what it wants, Silk Touch, and Replace to leave the ground whole. 200 FE a block, and a toast when it finishes.",
+                "",
+                "**Covers:** {item:arcforge:arc_quarry}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["quarry_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:arc_quarry"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Arc Quarry",
+                    icon: "arcforge:arc_quarry"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_energy_cell"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "automated",
+            title: "Automated",
+            icon: "arcforge:assembler",
+            description: ["Breaker, placer, cutter, collector, assembler, quarry: a base that runs itself."],
+            x: 6d,
+            y: 1.25d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["arc_quarry", "tree_cutter", "vacuum_collector"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:block_breaker"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Block Breaker",
+                    icon: "arcforge:block_breaker"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:block_placer"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Block Placer",
+                    icon: "arcforge:block_placer"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:vacuum_collector"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Vacuum Collector",
+                    icon: "arcforge:vacuum_collector"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:assembler"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Assembler",
+                    icon: "arcforge:assembler"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:arc_quarry"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Arc Quarry",
+                    icon: "arcforge:arc_quarry"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "tree_cutting"
+                        }
+                    },
+                    title: "Fell a tree",
+                    icon: "arcforge:tree_cutter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        }
+    ]
+}

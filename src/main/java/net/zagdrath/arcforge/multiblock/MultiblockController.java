@@ -30,7 +30,7 @@ import net.zagdrath.arcforge.machine.link.LinkableMachine;
 // mode's capability on each outer face that's a port. Its side configuration is kept only for auto-eject
 // and for carrying ports over from saves made before ports.
 public interface MultiblockController extends ConfigurableMachine {
-    // Which structure this is, for advancements (arcforge:multiblock_formed): its block entity type's id, e.g.
+    // Which structure this is, for quests (arcforge:multiblock_formed): its block entity type's id, e.g.
     // arcforge:steam_turbine_array.
     default Identifier multiblockId() {
         return BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(((BlockEntity) this).getType());

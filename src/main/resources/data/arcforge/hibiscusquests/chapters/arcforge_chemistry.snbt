@@ -1,0 +1,603 @@
+{
+    id: "arcforge_chemistry",
+    group: "arcforge_chemistry",
+    order: 11,
+    title: "Chemistry & Plastics",
+    subtitle: "The Chemical Reactor, acids and plastics",
+    icon: "arcforge:chemical_reactor",
+    default_shape: "circle",
+    requires: ["arcforge_steelmaking/hardened_alloy"],
+    quests: [
+        {
+            id: "electrolyzer",
+            title: "Electrolyzer",
+            icon: "arcforge:electrolyzer",
+            description: [
+                "Tempered Alloy, glass, nickel plates and a Wrought Fluid Tank. Water splits into 2 Hydrogen and 1 Oxygen for at least 1,416 FE per mB of water, so hydrogen is a battery, never free power. It also splits Brine (Hydrogen, Chlorine, Lye) and Hydrofluoric Acid (Hydrogen, Fluorine).",
+                "",
+                "**Covers:** {item:arcforge:electrolyzer}"
+            ],
+            x: 0d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:hydrogen"
+                        }
+                    },
+                    title: "Make Hydrogen",
+                    icon: "arcforge:electrolyzer"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:oxygen"
+                        }
+                    },
+                    title: "Make Oxygen",
+                    icon: "arcforge:electrolyzer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_pressurized_cylinder",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "chemical_reactor",
+            title: "Chemical Reactor",
+            icon: "arcforge:chemical_reactor",
+            description: [
+                "Hardened Alloy, glass, Hardened Fluid Tanks, nickel plates and a thermocouple: three item and three fluid inputs. Acids, leaching and precipitating, plastics, fertilizer, lithium and every step of uranium chemistry run through it. Its recipes are tagged general, leaching or precipitating.",
+                "",
+                "**Covers:** {item:arcforge:chemical_reactor}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:chemical_reactor"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Chemical Reactor",
+                    icon: "arcforge:chemical_reactor"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_fluid_tank"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "sulfuric_acid",
+            title: "Sulfuric Acid",
+            icon: "arcforge:sulfuric_acid_bucket",
+            description: [
+                "One Sulfur Dust and 500 mB of water make 500 mB of Sulfuric Acid. It leaches ore, dissolves spodumene into Lithium Brine, makes Hydrofluoric Acid with Fluorite Dust and catalyses Ethylene from Ethanol.",
+                "",
+                "**Covers:** {item:arcforge:sulfuric_acid_bucket}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["chemical_reactor"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:sulfuric_acid"
+                        }
+                    },
+                    title: "Make Sulfuric Acid",
+                    icon: "arcforge:sulfuric_acid_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sulfur_dust",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "leaching",
+            title: "Leaching",
+            icon: "arcforge:iron_slurry_bucket",
+            description: [
+                "A raw ore piece and 250 mB of acid (Sulfuric or Hydrochloric) give 300 mB of Slurry: Iron, Copper, Gold, Silver, Nickel, Tungsten, Bismuth or Lead. Precipitate 100 mB with 100 mB of water for one dust. Three dust per raw piece, the best yield there is.",
+                "",
+                "**Covers:** {item:arcforge:iron_slurry_bucket}, {item:arcforge:copper_slurry_bucket}, {item:arcforge:gold_slurry_bucket}, {item:arcforge:silver_slurry_bucket}, {item:arcforge:nickel_slurry_bucket}, {item:arcforge:tungsten_slurry_bucket}, {item:arcforge:bismuth_slurry_bucket}, {item:arcforge:lead_slurry_bucket}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["sulfuric_acid"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "leaching"
+                        }
+                    },
+                    title: "Leach a raw ore",
+                    icon: "arcforge:iron_slurry_bucket"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "precipitating"
+                        }
+                    },
+                    title: "Precipitate a dust",
+                    icon: "arcforge:iron_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sulfuric_acid_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "plastic",
+            title: "Plastic",
+            icon: "arcforge:plastic_sheet",
+            description: [
+                "100 Light Oil and 50 Hydrogen (or 120 Ethylene) give two Plastic Sheets. Plastic is in the Conduit Filter, Storage Upgrades, every tool module, the Settings Card, Fermenter, Security Terminal, Battery Array Casing and the Arcforged Arc tools.",
+                "",
+                "**Covers:** {item:arcforge:plastic_sheet}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["chemical_reactor", "electrolyzer"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:plastic_sheet"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:plastic_sheet",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "settings_and_security",
+            title: "Cards and Keys",
+            icon: "arcforge:settings_card",
+            description: [
+                "Plastic unlocks two base tools. The Settings Card (plastic, redstone, paper) copies a machine's sides, ports, redstone and options onto another. The Security Terminal (Wrought Alloy, plastic, glass panes, comparator) sets your default Public, Trusted or Private mode and your trusted players.",
+                "",
+                "**Covers:** {item:arcforge:settings_card}, {item:arcforge:security_terminal}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            dependencies: ["plastic"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:settings_card", "arcforge:security_terminal"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Settings Card or Security Terminal",
+                    icon: "arcforge:settings_card"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:settings_card",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "steam_cracker",
+            title: "Steam Cracker",
+            icon: "arcforge:steam_cracker_controller",
+            description: [
+                "A 3×3×3 of Steam Cracker Casings (steel plates, bricks, Wrought Fluid Tank) with its Controller. Naphtha, Refinery Gas or Natural Gas plus Steam at 800°C come out as Ethylene, Propylene and Hydrogen (and some Heavy Oil): the olefins every plastic is built from.",
+                "",
+                "**Covers:** {item:arcforge:steam_cracker_casing}, {item:arcforge:steam_cracker_controller}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["plastic"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "steam_cracking"
+                        }
+                    },
+                    title: "Crack with steam",
+                    icon: "arcforge:steam_cracker_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steam_cracker_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "ethylene",
+            title: "Ethylene",
+            icon: "arcforge:steam_cracker_casing",
+            description: [
+                "Ethylene also comes from Ethanol over Sulfuric Acid. 120 mB is two Plastic Sheets, and with Chlorine it's PVC."
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            dependencies: ["steam_cracker"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:ethylene"
+                        }
+                    },
+                    title: "Make Ethylene",
+                    icon: "arcforge:plastic_sheet"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:plastic_sheet",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "pvc",
+            title: "PVC",
+            icon: "arcforge:pvc_sheet",
+            description: [
+                "60 Ethylene and 60 Chlorine give two PVC Sheets. PVC is acid-proof: it lines the Hardened and Arcforged Fluid Conduits and Fluid Tank, the Gas Centrifuge, and four sheets line a cylinder for uranium hexafluoride.",
+                "",
+                "**Covers:** {item:arcforge:pvc_sheet}"
+            ],
+            x: 6d,
+            y: 2.5d,
+            dependencies: ["ethylene"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:pvc_sheet"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:pvc_sheet",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "polypropylene",
+            title: "Polypropylene",
+            icon: "arcforge:polypropylene_sheet",
+            description: [
+                "120 Propylene gives two Polypropylene Sheets: the plastic in the Arcforged Crate, Vault, Storage Upgrade and Jetpack, and a stand-in anywhere a recipe asks for plastics.",
+                "",
+                "**Covers:** {item:arcforge:polypropylene_sheet}"
+            ],
+            x: 4.5d,
+            y: 3.75d,
+            dependencies: ["steam_cracker"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            item: {
+                                items: "arcforge:polypropylene_sheet"
+                            }
+                        }
+                    },
+                    title: "Make Polypropylene",
+                    icon: "arcforge:polypropylene_sheet"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:polypropylene_sheet",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "synthetic_rubber",
+            title: "Synthetic Rubber",
+            icon: "arcforge:synthetic_rubber",
+            description: [
+                "60 Ethylene and 40 Propylene over a Cracking Catalyst (used one time in fifty). It cures in the Vulcanizer like Raw Rubber, so you never have to farm dandelions again.",
+                "",
+                "**Covers:** {item:arcforge:synthetic_rubber}"
+            ],
+            x: 6d,
+            y: 3.75d,
+            dependencies: ["polypropylene"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            item: {
+                                items: "arcforge:synthetic_rubber"
+                            }
+                        }
+                    },
+                    title: "Make Synthetic Rubber",
+                    icon: "arcforge:synthetic_rubber"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:rubber",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "carbon_capture",
+            title: "Carbon Capture",
+            icon: "arcforge:carbon_reclaimer",
+            description: [
+                "Set a Flue Gas face on a Firebox, Combustion Plant or Fuel Burner and it gives off Carbon Dioxide while it burns carbon. The Carbon Reclaimer (Tempered Alloy, heating coil, Wrought Pressurized Cylinder) turns 250 CO2 and 500 Hydrogen back into Carbon Dust and water for 800,000 FE. It renews carbon, not energy.",
+                "",
+                "**Covers:** {item:arcforge:carbon_reclaimer}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["electrolyzer"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "carbon_reclaiming"
+                        }
+                    },
+                    title: "Reclaim carbon",
+                    icon: "arcforge:carbon_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:carbon_dust",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "gasifier",
+            title: "Syngas",
+            icon: "arcforge:gasifier",
+            description: [
+                "The Gasifier (steel plates, Rubber Gaskets, thermocouples, firebox, blast furnace) takes coal, charcoal, coke, Bio-Coal or biomass and Steam at 800°C and makes Syngas, with a chance of Wood Ash. Syngas burns in the Gas Turbine and feeds the Fischer-Tropsch Reactor.",
+                "",
+                "**Covers:** {item:arcforge:gasifier}"
+            ],
+            x: 1.5d,
+            y: 3.75d,
+            dependencies: ["chemical_reactor"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:syngas",
+                            recipe_category: "gasifying"
+                        }
+                    },
+                    title: "Make Syngas",
+                    icon: "arcforge:gasifier"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:coal_coke",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "fischer_tropsch",
+            title: "Fischer-Tropsch",
+            icon: "arcforge:fischer_tropsch_reactor",
+            description: [
+                "1,000 Syngas over an iron or nickel dust catalyst at 200–350°C gives 30 Naphtha, 50 Light Oil, 50 Heavy Oil and 200 water. Oil from coal, or from wood: a refinery that never needs a well.",
+                "",
+                "**Covers:** {item:arcforge:fischer_tropsch_reactor}"
+            ],
+            x: 3d,
+            y: 5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["gasifier"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "fischer_tropsch"
+                        }
+                    },
+                    title: "Synthesise oil",
+                    icon: "arcforge:fischer_tropsch_reactor"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:light_oil_bucket",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "petrochemist",
+            title: "Petrochemist",
+            icon: "arcforge:chemical_reactor",
+            description: [
+                "Plastic, PVC, Polypropylene and Synthetic Rubber from your own olefins, and carbon that goes round in a circle."
+            ],
+            x: 7.5d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["pvc", "synthetic_rubber", "carbon_capture", "fischer_tropsch", "leaching"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:plastic_sheet"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:pvc_sheet"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:polypropylene_sheet"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:synthetic_rubber"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        }
+    ]
+}

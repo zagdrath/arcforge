@@ -1,0 +1,848 @@
+{
+    id: "arcforge_logistics",
+    group: "arcforge_foundations",
+    order: 4,
+    title: "Logistics & Storage",
+    subtitle: "Conduits, cells, tanks and storage",
+    icon: "arcforge:arcforged_energy_conduit",
+    default_shape: "circle",
+    requires: ["arcforge_getting_started/wrought_alloy"],
+    quests: [
+        {
+            id: "tempered_conduits",
+            title: "Tempered Conduits",
+            icon: "arcforge:tempered_energy_conduit",
+            description: [
+                "Eight Wrought conduits round a Tempered Alloy. Energy 1,024 FE/t, Item 16 per half-second, Fluid 800 mB/t, Thermodynamic 200 HU/t. Dye any conduit to colour-code a run.",
+                "",
+                "**Covers:** {item:arcforge:tempered_energy_conduit}, {item:arcforge:tempered_item_conduit}, {item:arcforge:tempered_fluid_conduit}, {item:arcforge:tempered_thermal_conduit}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_energy_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tempered_item_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tempered_fluid_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tempered_thermal_conduit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_energy_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "hardened_conduits",
+            title: "Hardened Conduits",
+            icon: "arcforge:hardened_energy_conduit",
+            description: [
+                "Eight Tempered round a Hardened Alloy; fluid adds a PVC Sheet (acid-proof), thermal adds Invar Plates. Energy 8,192 FE/t, Item 32 per quarter-second, Fluid 3,200 mB/t, Thermodynamic 800 HU/t.",
+                "",
+                "**Covers:** {item:arcforge:hardened_energy_conduit}, {item:arcforge:hardened_item_conduit}, {item:arcforge:hardened_fluid_conduit}, {item:arcforge:hardened_thermal_conduit}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["tempered_conduits"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_energy_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hardened_item_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hardened_fluid_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hardened_thermal_conduit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_energy_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "arcforged_conduits",
+            title: "Arcforged Conduits",
+            icon: "arcforge:arcforged_energy_conduit",
+            description: [
+                "Eight Hardened round Arcforged Alloy and Arcite. Energy 262,144 FE/t, Item 64 every 2 ticks, Fluid 12,800 mB/t, Thermodynamic 51,200 HU/t. Nothing in the mod out-runs them.",
+                "",
+                "**Covers:** {item:arcforge:arcforged_energy_conduit}, {item:arcforge:arcforged_item_conduit}, {item:arcforge:arcforged_fluid_conduit}, {item:arcforge:arcforged_thermal_conduit}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["hardened_conduits"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_energy_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_item_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_fluid_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_thermal_conduit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_energy_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "filters_facades",
+            title: "Filters and Facades",
+            icon: "arcforge:conduit_filter",
+            description: [
+                "A Conduit Filter (plastic, Wrought Alloy, iron bars) goes on one connection of an item, fluid or gas conduit: nine slots, tags, allow or deny, direction; the Vacuum Collector takes one too. A Conduit Facade (three iron nuggets and a Steel Plate make six) hides a conduit side behind any full block.",
+                "",
+                "**Covers:** {item:arcforge:conduit_filter}, {item:arcforge:conduit_facade}"
+            ],
+            x: 1.5d,
+            y: 3.75d,
+            dependencies: ["tempered_conduits"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:conduit_filter", "arcforge:conduit_facade"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Conduit Filter or Conduit Facade",
+                    icon: "arcforge:conduit_filter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:conduit_facade",
+                    count: 12
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "fluid_tanks",
+            title: "Fluid Tanks",
+            icon: "arcforge:tempered_fluid_tank",
+            description: [
+                "Wrought 16,000 mB; Tempered 64,000; Hardened 256,000 (a Rubber Gasket; the Chemical Reactor and Distillation casings want one); Arcforged 1,024,000 (Arcite, PVC). Each upgrades the one before and keeps its fluid.",
+                "",
+                "**Covers:** {item:arcforge:wrought_fluid_tank}, {item:arcforge:tempered_fluid_tank}, {item:arcforge:hardened_fluid_tank}, {item:arcforge:arcforged_fluid_tank}"
+            ],
+            x: 0d,
+            y: 3.75d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:tempered_fluid_tank", "arcforge:hardened_fluid_tank", "arcforge:arcforged_fluid_tank"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Tempered Fluid Tank or Hardened Fluid Tank or Arcforged Fluid Tank",
+                    icon: "arcforge:tempered_fluid_tank"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_fluid_tank"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "energy_cells",
+            title: "Energy Cells",
+            icon: "arcforge:tempered_energy_cell",
+            description: [
+                "Tempered: 4,000,000 FE at 2,048 FE/t. Hardened: 32,000,000 at 16,384 FE/t. Arcforged: 256,000,000 at 262,144 FE/t. Upgrade in place with the next alloy and copper plates; the charge stays.",
+                "",
+                "**Covers:** {item:arcforge:wrought_energy_cell}, {item:arcforge:tempered_energy_cell}, {item:arcforge:hardened_energy_cell}, {item:arcforge:arcforged_energy_cell}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:tempered_energy_cell",
+                                        "arcforge:hardened_energy_cell",
+                                        "arcforge:arcforged_energy_cell"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Tempered Energy Cell or Hardened Energy Cell or Arcforged Energy Cell",
+                    icon: "arcforge:tempered_energy_cell"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_energy_cell"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "crates",
+            title: "Crates",
+            icon: "arcforge:wrought_crate",
+            description: [
+                "A Wrought Crate (Wrought Alloy, planks, chest) is a 54-slot chest with a Sides tab for conduits. Tempered 72 slots, Hardened 99, Arcforged 126. Craft the upgrade or use a Storage Upgrade on the placed block.",
+                "",
+                "**Covers:** {item:arcforge:wrought_crate}, {item:arcforge:tempered_crate}, {item:arcforge:hardened_crate}, {item:arcforge:arcforged_crate}"
+            ],
+            x: 0d,
+            y: 5d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_crate",
+                                        "arcforge:tempered_crate",
+                                        "arcforge:hardened_crate",
+                                        "arcforge:arcforged_crate"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Crate or Tempered Crate or Hardened Crate or Arcforged Crate",
+                    icon: "arcforge:wrought_crate"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_crate"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "vaults",
+            title: "Vaults",
+            icon: "arcforge:wrought_vault",
+            description: [
+                "A Vault holds one stackable item in bulk: Wrought 4,096, Tempered 16,384, Hardened 65,536, Arcforged 262,144. Lock it to its item, void the overflow, click the front to put in and take out.",
+                "",
+                "**Covers:** {item:arcforge:wrought_vault}, {item:arcforge:tempered_vault}, {item:arcforge:hardened_vault}, {item:arcforge:arcforged_vault}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_vault",
+                                        "arcforge:tempered_vault",
+                                        "arcforge:hardened_vault",
+                                        "arcforge:arcforged_vault"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Vault or Tempered Vault or Hardened Vault or Arcforged Vault",
+                    icon: "arcforge:wrought_vault"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_vault"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "storage_upgrades",
+            title: "Storage Upgrades",
+            icon: "arcforge:tempered_storage_upgrade",
+            description: [
+                "Right-click a placed Crate or Vault with a Storage Upgrade of the next tier and it grows in place with everything still inside. Tempered and Hardened are alloy, plastic and chests; Arcforged adds Arcite and Polypropylene.",
+                "",
+                "**Covers:** {item:arcforge:tempered_storage_upgrade}, {item:arcforge:hardened_storage_upgrade}, {item:arcforge:arcforged_storage_upgrade}"
+            ],
+            x: 1.5d,
+            y: 5d,
+            dependencies: ["crates", "vaults"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:tempered_storage_upgrade",
+                                        "arcforge:hardened_storage_upgrade",
+                                        "arcforge:arcforged_storage_upgrade"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Tempered Storage Upgrade or Hardened Storage Upgrade or Arcforged Storage Upgrade",
+                    icon: "arcforge:tempered_storage_upgrade"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_storage_upgrade"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "reservoirs",
+            title: "Reservoirs",
+            icon: "arcforge:fluid_reservoir",
+            description: [
+                "Touching reservoirs merge into one store. Fluid Reservoir (steel rods, glass, bucket): 32,000 mB a block, up to 4,096 blocks. Gas Reservoir: 64,000 mB a block, Pressurized Conduits only. Item Reservoir (steel, barrel): 20 slots a block in a solid box up to 3×3×3, with search.",
+                "",
+                "**Covers:** {item:arcforge:fluid_reservoir}, {item:arcforge:gas_reservoir}, {item:arcforge:item_reservoir}"
+            ],
+            x: 0d,
+            y: 6.25d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:fluid_reservoir", "arcforge:gas_reservoir", "arcforge:item_reservoir"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Fluid Reservoir or Gas Reservoir or Item Reservoir",
+                    icon: "arcforge:fluid_reservoir"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:fluid_reservoir",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "liquid_experience",
+            title: "Liquid Experience",
+            icon: "arcforge:liquid_experience_bucket",
+            description: [
+                "An XP Drain (iron bars, steel rods, hopper) is a grate on any fluid container: orbs and sneaking players drain into Liquid Experience at 20 mB a point. An XP Shower (steel plates, copper rod, iron bars) hangs under a block; sneak under it to take it back. Redstone turns the shower off.",
+                "",
+                "**Covers:** {item:arcforge:xp_drain}, {item:arcforge:xp_shower}, {item:arcforge:liquid_experience_bucket}"
+            ],
+            x: 1.5d,
+            y: 8.75d,
+            dependencies: ["reservoirs"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:xp_drain", "arcforge:xp_shower", "arcforge:liquid_experience_bucket"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain XP Drain or XP Shower or Liquid Experience Bucket",
+                    icon: "arcforge:xp_drain"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:experience_bottle",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "batteries",
+            title: "Batteries",
+            icon: "arcforge:wrought_battery",
+            description: [
+                "A copper rod, Wrought Alloy, a Silver Plate and redstone: 250,000 FE, filled in an Energy Cell's slots, charging Arc tools. Tempered 1,000,000 (the Chargepad and Tempered Arc tool ingredient), Hardened 4,000,000, Arcforged 16,000,000.",
+                "",
+                "**Covers:** {item:arcforge:wrought_battery}, {item:arcforge:tempered_battery}, {item:arcforge:hardened_battery}, {item:arcforge:arcforged_battery}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["energy_cells"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_battery",
+                                        "arcforge:tempered_battery",
+                                        "arcforge:hardened_battery",
+                                        "arcforge:arcforged_battery"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Battery or Tempered Battery or Hardened Battery or Arcforged Battery",
+                    icon: "arcforge:wrought_battery"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_battery"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "portables",
+            title: "Canisters and Cartridges",
+            icon: "arcforge:wrought_canister",
+            description: [
+                "A Canister (Steel Plate, Wrought Alloy, bucket) carries 16,000 mB of liquid, filled in a Fluid Tank's slot. A Gas Cartridge (steel rod and plates, Wrought Alloy, bucket) carries 32,000 mB of gas from a Pressurized Cylinder and refuels Jetpacks. Higher tiers hold 4× each step.",
+                "",
+                "**Covers:** {item:arcforge:wrought_canister}, {item:arcforge:tempered_canister}, {item:arcforge:hardened_canister}, {item:arcforge:arcforged_canister}, {item:arcforge:wrought_gas_cartridge}, {item:arcforge:tempered_gas_cartridge}, {item:arcforge:hardened_gas_cartridge}, {item:arcforge:arcforged_gas_cartridge}"
+            ],
+            x: 1.5d,
+            y: 7.5d,
+            dependencies: ["fluid_tanks"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_canister",
+                                        "arcforge:tempered_canister",
+                                        "arcforge:hardened_canister",
+                                        "arcforge:arcforged_canister"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Canister or Tempered Canister or Hardened Canister or Arcforged Canister",
+                    icon: "arcforge:wrought_canister"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_gas_cartridge",
+                                        "arcforge:tempered_gas_cartridge",
+                                        "arcforge:hardened_gas_cartridge",
+                                        "arcforge:arcforged_gas_cartridge"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Gas Cartridge or Tempered Gas Cartridge or Hardened Gas Cartridge or Arcforged Gas Cartridge",
+                    icon: "arcforge:wrought_gas_cartridge"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_gas_cartridge"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "meters",
+            title: "Meters",
+            icon: "arcforge:energy_meter",
+            description: [
+                "An inline gauge for a conduit run (steel plates, glass panes, comparator, redstone and a Tempered conduit of its kind): Energy up to 262,144 FE/t, Heat 51,200 HU/t, Fluid 12,800 mB/t, Gas 25,600 mB/t, each giving a redstone signal above or below a threshold.",
+                "",
+                "**Covers:** {item:arcforge:energy_meter}, {item:arcforge:heat_meter}, {item:arcforge:fluid_meter}, {item:arcforge:gas_meter}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["tempered_conduits"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:energy_meter", "arcforge:heat_meter", "arcforge:fluid_meter", "arcforge:gas_meter"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Energy Meter or Heat Meter or Fluid Meter or Gas Meter",
+                    icon: "arcforge:energy_meter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:energy_meter"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "chargepad",
+            title: "Chargepad",
+            icon: "arcforge:chargepad",
+            description: [
+                "Steel plates and ingots round a Tempered Battery. Stand on it and everything held, in the hotbar or worn charges at 2,048 FE/t each, 8,192 total.",
+                "",
+                "**Covers:** {item:arcforge:chargepad}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            dependencies: ["batteries"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:chargepad"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_battery"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "chunk_loader",
+            title: "Chunk Loader",
+            icon: "arcforge:chunk_loader",
+            description: [
+                "Steel plates, an eye of ender, redstone and a compass. It keeps a 1×1, 3×3 or 5×5 of chunks loaded so your refinery runs while you're away; 25 chunks per player.",
+                "",
+                "**Covers:** {item:arcforge:chunk_loader}"
+            ],
+            x: 1.5d,
+            y: 6.25d,
+            dependencies: ["tempered_conduits"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:chunk_loader"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:ender_eye",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "link_conduit",
+            title: "Link Conduit",
+            icon: "arcforge:link_conduit",
+            description: [
+                "Plastic Sheets, copper and an Iolite Crystal. A Link Conduit runs up to 64 blocks from a machine or multiblock face to a Wired Machine Link.",
+                "",
+                "**Covers:** {item:arcforge:link_conduit}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            dependencies: ["hardened_conduits"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:link_conduit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:link_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "wired_machine_link",
+            title: "Wired Machine Link",
+            icon: "arcforge:wired_machine_link",
+            description: [
+                "Steel plates, Iolite Crystals, Hardened Alloy and a Link Conduit: a remote port block. Each of its faces can be set to any port mode of the machine at the other end of the cable. Link one up.",
+                "",
+                "**Covers:** {item:arcforge:wired_machine_link}"
+            ],
+            x: 4.5d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["link_conduit"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_linked",
+                        conditions: {}
+                    },
+                    title: "Link a machine",
+                    icon: "arcforge:wired_machine_link"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wired_machine_link",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "quantum_tunnel",
+            title: "Quantum Tunnel",
+            icon: "arcforge:quantum_tunnel",
+            description: [
+                "Arcforged Alloy, Arcite and ender pearls. Two tunnels on the same frequency share one buffer across any distance and any dimension: 4,000,000 FE, 400,000 HU, 64,000 mB of liquid, 64,000 mB of gas and 9 item slots.",
+                "",
+                "**Covers:** {item:arcforge:quantum_tunnel}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["arcforged_conduits"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:quantum_tunnel"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:quantum_tunnel",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "quartermaster",
+            title: "Quartermaster",
+            icon: "arcforge:arcforged_vault",
+            description: ["Every tier of everything that holds or moves, and a base you can wire from anywhere."],
+            x: 6d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: [
+                "quantum_tunnel",
+                "wired_machine_link",
+                "storage_upgrades",
+                "portables",
+                "meters",
+                "liquid_experience",
+                "chargepad",
+                "chunk_loader",
+                "filters_facades"
+            ],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_energy_conduit"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_fluid_tank"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_energy_cell"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:arcforged_vault", "arcforge:arcforged_crate"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Arcforged Vault or Arcforged Crate",
+                    icon: "arcforge:arcforged_vault"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:quantum_tunnel"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_storage_upgrade",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        }
+    ]
+}

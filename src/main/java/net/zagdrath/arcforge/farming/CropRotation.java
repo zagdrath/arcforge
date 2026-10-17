@@ -32,7 +32,7 @@ import net.zagdrath.arcforge.tag.ModItemTags;
 //  - In the Glass Cloche, Grow Chamber, Hydroponic Cell and Greenhouse Array, legumes use no fertilizer or Nutrient
 //    Solution but grow as fast as if they had it.
 public final class CropRotation {
-    // The category the crop_rotation advancement listens for (arcforge:machine_produced).
+    // The category the crop_rotation quest listens for (arcforge:machine_produced).
     public static final String ADVANCEMENT_CATEGORY = "crop_rotation";
 
     private CropRotation() {}
@@ -53,7 +53,7 @@ public final class CropRotation {
 
     // A ripe crop (crop, as it was) was just harvested from cropPos, by player if one did it: the farmland under it
     // remembers whether it was a legume. A non-legume harvested with the rotation bonus counts for the crop_rotation
-    // advancement (for the player, or else everyone near it).
+    // quest (for the player, or else everyone near it).
     public static void onHarvested(ServerLevel level, BlockPos cropPos, BlockState crop, @Nullable ServerPlayer player) {
         if (!CropHarvest.isMature(crop)) {
             return;

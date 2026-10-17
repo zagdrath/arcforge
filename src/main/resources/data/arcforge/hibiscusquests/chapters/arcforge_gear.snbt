@@ -1,0 +1,474 @@
+{
+    id: "arcforge_gear",
+    group: "arcforge_foundations",
+    order: 5,
+    title: "Tools & Gear",
+    subtitle: "Steel tools, Arc Drills, armour and jetpacks",
+    icon: "arcforge:arcforged_arc_drill",
+    default_shape: "circle",
+    requires: ["arcforge_getting_started/steel_ingot"],
+    quests: [
+        {
+            id: "steel_tools",
+            title: "Steel Tools",
+            icon: "arcforge:steel_pickaxe",
+            description: [
+                "Steel crafts like iron: Sword, Pickaxe (500 uses, speed 7), Axe, Shovel and Hoe, repaired with steel. Make one.",
+                "",
+                "**Covers:** {item:arcforge:steel_sword}, {item:arcforge:steel_pickaxe}, {item:arcforge:steel_axe}, {item:arcforge:steel_shovel}, {item:arcforge:steel_hoe}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:steel_sword",
+                                        "arcforge:steel_pickaxe",
+                                        "arcforge:steel_axe",
+                                        "arcforge:steel_shovel",
+                                        "arcforge:steel_hoe"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Steel Sword or Steel Pickaxe or Steel Axe or Steel Shovel or Steel Hoe",
+                    icon: "arcforge:steel_sword"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "steel_armour",
+            title: "Steel Armour",
+            icon: "arcforge:steel_chestplate",
+            description: [
+                "Helmet 2, Chestplate 7, Leggings 5, Boots 2, with 1.0 toughness each. The Chestplate can be smithed onto a Jetpack for an Armored Jetpack.",
+                "",
+                "**Covers:** {item:arcforge:steel_helmet}, {item:arcforge:steel_chestplate}, {item:arcforge:steel_leggings}, {item:arcforge:steel_boots}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["steel_tools"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_helmet"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:steel_chestplate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:steel_leggings"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:steel_boots"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_ingot",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "hammer",
+            title: "Hammer and Excavator",
+            icon: "arcforge:steel_hammer",
+            description: [
+                "Three Steel Blocks on two Steel Rods make a Steel Hammer: a 3×3 pickaxe, 1,500 uses at 70% speed, and the core of the Area Module. One block on two rods is the Steel Excavator, a 3×3 shovel.",
+                "",
+                "**Covers:** {item:arcforge:steel_hammer}, {item:arcforge:steel_excavator}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["steel_tools"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:steel_hammer", "arcforge:steel_excavator"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Steel Hammer or Steel Excavator",
+                    icon: "arcforge:steel_hammer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_block",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "foundry_suit",
+            title: "Foundry Suit",
+            icon: "arcforge:foundry_chestplate",
+            description: [
+                "Rock Wool, Slag Wool and Steel Plates. Each piece cuts fire and magma damage 25%; the full set makes you fire immune with an 8-second lava shield, and Rock Wool repairs it. Built for walking on Geothermal lava.",
+                "",
+                "**Covers:** {item:arcforge:foundry_helmet}, {item:arcforge:foundry_chestplate}, {item:arcforge:foundry_leggings}, {item:arcforge:foundry_boots}"
+            ],
+            x: 3d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["steel_armour"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:foundry_helmet"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:foundry_chestplate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:foundry_leggings"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:foundry_boots"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:rock_wool",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "jetpack",
+            title: "Tempered Jetpack",
+            icon: "arcforge:tempered_jetpack",
+            description: [
+                "Plastic, Tempered Alloy, two Tempered Gas Cartridges, Wrought Pressurized Conduits and a Rubber Gasket. 16,000 mB of Steam (any grade), Hydrogen or Kerosene, in Normal, Hover or Off. Fill it from a Pressurized Cylinder or a Gas Cartridge.",
+                "",
+                "**Covers:** {item:arcforge:tempered_jetpack}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["steel_armour"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_jetpack"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_gas_cartridge"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "better_jetpacks",
+            title: "Higher, Faster",
+            icon: "arcforge:arcforged_jetpack",
+            description: [
+                "Upgrade the Tempered Jetpack with Hardened Alloy, plastic and Hardened Gas Cartridges for 64,000 mB and a faster climb, then with Arcforged Alloy, Arcite, Polypropylene and Arcforged Gas Cartridges for 256,000 mB.",
+                "",
+                "**Covers:** {item:arcforge:hardened_jetpack}, {item:arcforge:arcforged_jetpack}"
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            dependencies: ["jetpack"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:hardened_jetpack", "arcforge:arcforged_jetpack"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Hardened Jetpack or Arcforged Jetpack",
+                    icon: "arcforge:hardened_jetpack"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:kerosene_bucket",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "arc_tools",
+            title: "Arc Drill and Arc Saw",
+            icon: "arcforge:tempered_arc_drill",
+            description: [
+                "The Tempered Arc Drill (tungsten, Tempered Alloy, steel gears, plastic, a Tempered Battery) is an FE pickaxe and shovel: 100,000 FE, diamond level, two module slots. The Tempered Arc Saw is the axe, with a Felling toggle for whole trunks.",
+                "",
+                "**Covers:** {item:arcforge:tempered_arc_drill}, {item:arcforge:tempered_arc_saw}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["hammer"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:tempered_arc_drill", "arcforge:tempered_arc_saw"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Tempered Arc Drill or Tempered Arc Saw",
+                    icon: "arcforge:tempered_arc_drill"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_battery"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "modules",
+            title: "Tool Modules",
+            icon: "arcforge:area_module",
+            description: [
+                "Plastic and redstone around a core, slotted into an Arc tool. Area (Steel Hammer): 3×3, +25% FE. Silk Touch (emerald): +100%. Fortune I (lapis block) +50%, II (diamonds) +100%, III (Arcite) +150%. Vein Mining (Quarry Scanner): 64 ores or a whole tree. Speed (Speed Upgrade): digs 50% faster.",
+                "",
+                "**Covers:** {item:arcforge:area_module}, {item:arcforge:silk_touch_module}, {item:arcforge:fortune_i_module}, {item:arcforge:fortune_ii_module}, {item:arcforge:fortune_iii_module}, {item:arcforge:vein_module}, {item:arcforge:speed_module}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            dependencies: ["arc_tools"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:area_module",
+                                        "arcforge:silk_touch_module",
+                                        "arcforge:fortune_i_module",
+                                        "arcforge:fortune_ii_module",
+                                        "arcforge:fortune_iii_module",
+                                        "arcforge:vein_module",
+                                        "arcforge:speed_module"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Area Module or Silk Touch Module or Fortune I Module or Fortune II Module or Fortune III Module or Vein Mining Module or Speed Module",
+                    icon: "arcforge:area_module"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:speed_module"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "hardened_tools",
+            title: "Hardened Tools",
+            icon: "arcforge:hardened_arc_drill",
+            description: [
+                "Upgrade with Hardened Alloy, plastic and a Hardened Battery: 400,000 FE, netherite level, three module slots.",
+                "",
+                "**Covers:** {item:arcforge:hardened_arc_drill}, {item:arcforge:hardened_arc_saw}"
+            ],
+            x: 4.5d,
+            y: 3.75d,
+            dependencies: ["arc_tools"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:hardened_arc_drill", "arcforge:hardened_arc_saw"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Hardened Arc Drill or Hardened Arc Saw",
+                    icon: "arcforge:hardened_arc_drill"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_battery"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "arcforged_tools",
+            title: "Arcforged Tools",
+            icon: "arcforge:arcforged_arc_drill",
+            description: [
+                "Arcforged Alloy, Arcite, a Plastic Sheet and an Arcforged Battery: 1,600,000 FE, speed 14, four slots, and the Area Module digs 5×5.",
+                "",
+                "**Covers:** {item:arcforge:arcforged_arc_drill}, {item:arcforge:arcforged_arc_saw}"
+            ],
+            x: 6d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["hardened_tools"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:arcforged_arc_drill", "arcforge:arcforged_arc_saw"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Arcforged Arc Drill or Arcforged Arc Saw",
+                    icon: "arcforge:arcforged_arc_drill"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:fortune_iii_module"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "fully_equipped",
+            title: "Fully Equipped",
+            icon: "arcforge:arcforged_jetpack",
+            description: ["Foundry Suit, Arcforged Jetpack, Arcforged Drill and Saw with a full rack of modules."],
+            x: 7.5d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["foundry_suit", "better_jetpacks", "arcforged_tools", "modules"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:foundry_chestplate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_jetpack"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_arc_drill"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_arc_saw"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:fortune_iii_module"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_battery"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        }
+    ]
+}

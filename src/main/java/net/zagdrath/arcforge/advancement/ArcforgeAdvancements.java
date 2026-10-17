@@ -28,9 +28,10 @@ import net.zagdrath.arcforge.registry.ModTriggers;
 import net.zagdrath.arcforge.security.Owned;
 import net.zagdrath.arcforge.security.SecurityRules;
 
-// Fires the Arcforge advancement triggers from machines, server side. A structure forming counts for the player who
-// caused it, or else everyone near it. What a machine does counts for its owner if they're online (for a multiblock
-// that's the player who completed it), or else everyone near it. Output that happens every tick is throttled.
+// Fires the Arcforge advancement triggers (what the quest pack's criterion tasks listen to) from machines, server side.
+// A structure forming counts for the player who caused it, or else everyone near it. What a machine does counts for
+// its owner if they're online (for a multiblock that's the player who completed it), or else everyone near it. Output
+// that happens every tick is throttled.
 public final class ArcforgeAdvancements {
     // How far from a machine players count as being there.
     private static final double RANGE = 16.0;

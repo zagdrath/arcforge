@@ -38,3 +38,6 @@ run/
 **/src/generated/**/.cache/
 repo/
 !**/src/**/repo/
+
+# Python bytecode from tools/hibiscusquests
+__pycache__/

@@ -77,6 +77,11 @@ public abstract class PlantControllerBlockEntity extends MachineBlockEntity impl
     }
 
     @Override
+    public int length() {
+        return box != null ? box.length() : 0;
+    }
+
+    @Override
     public void requestCheck() {
         checkRequested = true;
     }

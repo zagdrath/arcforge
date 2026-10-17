@@ -1,0 +1,661 @@
+{
+    id: "arcforge_refinery",
+    group: "arcforge_petroleum",
+    order: 10,
+    title: "Distillation & Refinery",
+    subtitle: "Distillation, cracking and refinery units",
+    icon: "arcforge:distillation_array_controller",
+    default_shape: "circle",
+    requires: ["arcforge_steelmaking/tempered_alloy"],
+    quests: [
+        {
+            id: "distillation_parts",
+            title: "Column Parts",
+            icon: "arcforge:distillation_array_casing",
+            description: [
+                "Distillation Array Casings are Hardened Alloy, steel plates and a Hardened Fluid Tank. Tray Level Casings (a casing with glass) make the tray layers between top and bottom. The Controller is a casing with a copper gear, steel rods and a redstone block, and sits in an outside face that isn't the top or bottom layer.",
+                "",
+                "**Covers:** {item:arcforge:distillation_array_casing}, {item:arcforge:tray_level_casing}, {item:arcforge:distillation_array_controller}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:distillation_array_casing"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tray_level_casing"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:distillation_array_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_fluid_tank"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "distillation_array",
+            title: "Distillation Array",
+            icon: "arcforge:distillation_array_controller",
+            description: [
+                "A solid 2×2 or 3×3 column, 4 to 16 tall. Creosote needs 4 layers: Naphtha, Light Oil, Heavy Oil and Pitch. Crude Oil needs 6: Refinery Gas, Naphtha, Diesel, Heavy Oil and Bitumen, with Kerosene and Light Oil from 10 layers and the finest cuts at 14. Throughput scales from 10 mB/t at 2×2×4 to 90 mB/t at 3×3×16."
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["distillation_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:distillation_array"
+                        }
+                    },
+                    title: "Form the Distillation Array",
+                    icon: "arcforge:distillation_array_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:distillation_array_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "creosote_cuts",
+            title: "Creosote Cuts",
+            icon: "arcforge:naphtha_bucket",
+            description: [
+                "Distil Creosote. Naphtha is the hottest liquid burner fuel (1,200°C, makes Superheated Steam) and feeds the Catalytic Reformer and Steam Cracker. Light Oil burns at 1,000°C and, with Hydrogen, becomes Plastic. Heavy Oil lubricates turbines (+8%), feeds the Cracking Unit and Lubricant Blender. Pitch is the solid left over.",
+                "",
+                "**Covers:** {item:arcforge:naphtha_bucket}, {item:arcforge:light_oil_bucket}, {item:arcforge:heavy_oil_bucket}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            dependencies: ["distillation_array"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:naphtha"
+                        }
+                    },
+                    title: "Distil Naphtha",
+                    icon: "arcforge:naphtha_bucket"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:light_oil"
+                        }
+                    },
+                    title: "Distil Light Oil",
+                    icon: "arcforge:light_oil_bucket"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:heavy_oil"
+                        }
+                    },
+                    title: "Distil Heavy Oil",
+                    icon: "arcforge:heavy_oil_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:naphtha_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "pitch",
+            title: "Pitch and Carbon Fiber",
+            icon: "arcforge:pitch",
+            description: [
+                "Two Pitch per bucket at 4–5 layers, one when taller. Pitch is a long furnace fuel (12 items), the binder in Asphalt, and in a Fiberizer at 1,000°C it spins into Carbon Fiber: the Arcforged Alloy additive, Turbine Blade Sets and Gas Centrifuge rotors.",
+                "",
+                "**Covers:** {item:arcforge:pitch}, {item:arcforge:carbon_fiber}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["creosote_cuts"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:pitch"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:carbon_fiber"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:carbon_fiber",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "crude_cuts",
+            title: "Crude Cuts",
+            icon: "arcforge:diesel_bucket",
+            description: [
+                "Distil Crude Oil in a 6-tall column or better. Diesel: 1,150°C, 420 FE/mB in a Diesel Generator. Bitumen: the bottoms, for Coker feed and Asphalt. Refinery Gas: a gas fuel and Steam Cracker feed. Build to 10 tall and Kerosene appears: jetpack fuel and the Diesel Generator's lighter cut.",
+                "",
+                "**Covers:** {item:arcforge:diesel_bucket}, {item:arcforge:bitumen_bucket}, {item:arcforge:kerosene_bucket}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["distillation_array"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:diesel"
+                        }
+                    },
+                    title: "Distil Diesel",
+                    icon: "arcforge:diesel_bucket"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:bitumen"
+                        }
+                    },
+                    title: "Distil Bitumen",
+                    icon: "arcforge:bitumen_bucket"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:kerosene"
+                        }
+                    },
+                    title: "Distil Kerosene",
+                    icon: "arcforge:kerosene_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:diesel_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "refinery_tower",
+            title: "Refinery Tower",
+            icon: "arcforge:tray_level_casing",
+            description: ["A full 16-tall Distillation Array. Every cut, 90 mB/t."],
+            x: 4.5d,
+            y: 5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["crude_cuts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:distillation_array",
+                            min_length: 16
+                        }
+                    },
+                    title: "Form the Distillation Array (size 16+)",
+                    icon: "arcforge:distillation_array_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        },
+        {
+            id: "cracking_unit",
+            title: "Cracking Unit",
+            icon: "arcforge:cracking_unit_controller",
+            description: [
+                "A 3×3×5 of Cracking Unit Casings (steel and nickel plates, Wrought Fluid Tank) and a Controller. Catalytic mode (Cracking Catalyst: clay, sand and Nickel Dust, 50 batches) breaks Heavy Oil into Naphtha, Diesel, Refinery Gas and Light Oil at 480°C. Hydrocracking adds Hydrogen for Diesel and Kerosene at 520°C.",
+                "",
+                "**Covers:** {item:arcforge:cracking_unit_casing}, {item:arcforge:cracking_unit_controller}, {item:arcforge:cracking_catalyst}"
+            ],
+            x: 4.5d,
+            y: 6.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["crude_cuts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "cracking"
+                        }
+                    },
+                    title: "Crack Heavy Oil",
+                    icon: "arcforge:cracking_unit_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:cracking_catalyst",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "catalytic_reformer",
+            title: "Gasoline",
+            icon: "arcforge:catalytic_reformer",
+            description: [
+                "The Catalytic Reformer turns 100 Naphtha into 85 Gasoline and 60 Hydrogen at 450°C. Gasoline is the hottest fuel of all: 450 HU/mB at 1,250°C, 675 FE/mB in a Gas Turbine.",
+                "",
+                "**Covers:** {item:arcforge:catalytic_reformer}, {item:arcforge:gasoline_bucket}"
+            ],
+            x: 4.5d,
+            y: 3.75d,
+            dependencies: ["creosote_cuts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:gasoline"
+                        }
+                    },
+                    title: "Reform Gasoline",
+                    icon: "arcforge:gasoline_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:gasoline_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "coker",
+            title: "Petroleum Coke",
+            icon: "arcforge:coker",
+            description: [
+                "The Coker (bricks, Wrought Fluid Tanks, a thermocouple and a firebox) cooks 250 Bitumen into a Petroleum Coke, 50 Refinery Gas and 50 Heavy Oil at 420°C. Petroleum Coke counts as Coal Coke everywhere.",
+                "",
+                "**Covers:** {item:arcforge:coker}, {item:arcforge:petroleum_coke}"
+            ],
+            x: 4.5d,
+            y: 7.5d,
+            dependencies: ["crude_cuts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "coking"
+                        }
+                    },
+                    title: "Coke some Bitumen",
+                    icon: "arcforge:petroleum_coke"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:petroleum_coke",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "lubricant",
+            title: "Lubricant",
+            icon: "arcforge:lubricant_blender",
+            description: [
+                "100 Heavy Oil in the Lubricant Blender gives 90 Lubricant for 20 FE/t. In a turbine's lubricant tank it adds 12%, against Heavy Oil's 8%.",
+                "",
+                "**Covers:** {item:arcforge:lubricant_blender}, {item:arcforge:lubricant_bucket}"
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            dependencies: ["creosote_cuts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:lubricant"
+                        }
+                    },
+                    title: "Blend Lubricant",
+                    icon: "arcforge:lubricant_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lubricant_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "hydrotreater",
+            title: "Hydrotreating",
+            icon: "arcforge:hydrotreater",
+            description: [
+                "Sour Kerosene and Sour Diesel burn at 75%. The Hydrotreater takes 100 of either plus 30 Hydrogen at 300°C and gives the clean fuel back plus 30 Hydrogen Sulfide.",
+                "",
+                "**Covers:** {item:arcforge:hydrotreater}, {item:arcforge:sour_kerosene_bucket}, {item:arcforge:sour_diesel_bucket}"
+            ],
+            x: 4.5d,
+            y: 0d,
+            dependencies: ["crude_cuts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "hydrotreating"
+                        }
+                    },
+                    title: "Sweeten a sour fuel",
+                    icon: "arcforge:hydrotreater"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:kerosene_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "sulfur_recovery",
+            title: "Sulfur Recovery",
+            icon: "arcforge:sulfur_recovery_unit",
+            description: [
+                "100 Hydrogen Sulfide and 50 Oxygen at 250°C make a Sulfur Dust and 100 Steam. Nothing from a sour well goes to waste.",
+                "",
+                "**Covers:** {item:arcforge:sulfur_recovery_unit}"
+            ],
+            x: 6d,
+            y: 0d,
+            dependencies: ["hydrotreater"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "sulfur_recovery"
+                        }
+                    },
+                    title: "Recover sulfur",
+                    icon: "arcforge:sulfur_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sulfur_dust",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "steam_methane_reformer",
+            title: "Steam Methane Reformer",
+            icon: "arcforge:steam_methane_reformer",
+            description: [
+                "100 Natural Gas and 100 Steam at 700°C give 100 Hydrogen and 25 Carbon Dioxide: the cheapest Hydrogen in the mod, for hydrocracking, hydrotreating, plastics, ammonia and the Carbon Reclaimer.",
+                "",
+                "**Covers:** {item:arcforge:steam_methane_reformer}"
+            ],
+            x: 6d,
+            y: 6.25d,
+            dependencies: ["cracking_unit"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "steam_reforming"
+                        }
+                    },
+                    title: "Reform Natural Gas",
+                    icon: "arcforge:steam_methane_reformer"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_pressurized_cylinder"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "asphalt",
+            title: "Paving",
+            icon: "arcforge:asphalt",
+            description: [
+                "Eight gravel round a Pitch or a Bitumen Bucket make eight Asphalt. Walking, running and riding on it is about 30% faster, and it comes in slabs and stairs.",
+                "",
+                "**Covers:** {item:arcforge:asphalt}, {item:arcforge:asphalt_slab}, {item:arcforge:asphalt_stairs}"
+            ],
+            x: 6d,
+            y: 2.5d,
+            dependencies: ["pitch"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:asphalt"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:asphalt",
+                    count: 32
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "refinery_complete",
+            title: "Full Refinery",
+            icon: "arcforge:distillation_array_controller",
+            description: [
+                "Column, cracker, reformer, coker, blender, hydrotreater, sulfur plant. Every drop accounted for."
+            ],
+            x: 7.5d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["cracking_unit", "catalytic_reformer", "coker", "lubricant", "sulfur_recovery"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "cracking"
+                        }
+                    },
+                    title: "Crack",
+                    icon: "arcforge:cracking_unit_controller"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "reforming"
+                        }
+                    },
+                    title: "Reform",
+                    icon: "arcforge:catalytic_reformer"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "coking"
+                        }
+                    },
+                    title: "Coke",
+                    icon: "arcforge:coker"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "lubricant_blending"
+                        }
+                    },
+                    title: "Blend",
+                    icon: "arcforge:lubricant_blender"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "hydrotreating"
+                        }
+                    },
+                    title: "Hydrotreat",
+                    icon: "arcforge:hydrotreater"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "sulfur_recovery"
+                        }
+                    },
+                    title: "Recover sulfur",
+                    icon: "arcforge:sulfur_recovery_unit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ]
+        }
+    ]
+}

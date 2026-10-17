@@ -1,0 +1,582 @@
+{
+    id: "arcforge_heat_and_power",
+    group: "arcforge_foundations",
+    order: 3,
+    title: "Heat & Power",
+    subtitle: "Fireboxes, heat conduits and generators",
+    icon: "arcforge:geothermal_plant",
+    default_shape: "circle",
+    requires: ["arcforge_getting_started/thermoelectric_plant"],
+    quests: [
+        {
+            id: "geothermal_plant",
+            title: "Geothermal Plant",
+            icon: "arcforge:geothermal_plant",
+            description: [
+                "Lava into heat, up to 1,400°C. Fill its 8,000 mB tank with buckets or a pipe (1 mB/t, 80,000 HU a bucket), or just surround it: every touching lava source adds 40 HU/t and every magma block 16 HU/t, forever, free. Five lava sides is 200 HU/t with no fuel and no pumping.",
+                "",
+                "**Covers:** {item:arcforge:geothermal_plant}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:geothermal_plant"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Geothermal Plant",
+                    icon: "arcforge:geothermal_plant"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:lava_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "thermal_conduits",
+            title: "Move the Heat",
+            icon: "arcforge:wrought_thermal_conduit",
+            description: [
+                "Heat only flows from hotter to colder, and a touching machine takes at most 100 HU/t. Thermodynamic Conduits carry more: Wrought 50, Tempered 200, Hardened 800 (Invar Plates), Arcforged 51,200 HU/t. About 25 lava-locked Geothermal Plants on Tempered conduits run a full Steam Turbine Array.",
+                "",
+                "**Covers:** {item:arcforge:wrought_thermal_conduit}, {item:arcforge:tempered_thermal_conduit}, {item:arcforge:hardened_thermal_conduit}, {item:arcforge:arcforged_thermal_conduit}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["geothermal_plant"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_thermal_conduit",
+                                        "arcforge:tempered_thermal_conduit",
+                                        "arcforge:hardened_thermal_conduit",
+                                        "arcforge:arcforged_thermal_conduit"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Thermodynamic Conduit or Tempered Thermodynamic Conduit or Hardened Thermodynamic Conduit or Arcforged Thermodynamic Conduit",
+                    icon: "arcforge:wrought_thermal_conduit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_thermal_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "fuel_burner",
+            title: "Fuel Burner",
+            icon: "arcforge:fuel_burner",
+            description: [
+                "A Firebox for liquids and gases: each fuel burns at its own temperature and HU per mB. Creosote 850°C, Ethanol 900°C, Biodiesel 1,000°C, Light Oil 1,000°C, Kerosene and Diesel 1,150°C, Naphtha 1,200°C, Gasoline 1,250°C, Hydrogen 1,400°C. Oxygen on an Oxygen face gives oxy-fuel: +300°C and 1.25× the heat.",
+                "",
+                "**Covers:** {item:arcforge:fuel_burner}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["geothermal_plant"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:fuel_burner"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Fuel Burner",
+                    icon: "arcforge:fuel_burner"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:creosote_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "arc_melter",
+            title: "Arc Melter",
+            icon: "arcforge:arc_melter",
+            description: [
+                "Tempered Alloy and a heating coil round a blast furnace: cobblestone or stone into 250 mB of lava for 50 FE/mB. Pipe it into a Geothermal Plant when there's no lava lake nearby.",
+                "",
+                "**Covers:** {item:arcforge:arc_melter}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            dependencies: ["fuel_burner"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:arc_melter"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Arc Melter",
+                    icon: "arcforge:arc_melter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:cobblestone",
+                    count: 64
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "firebox_array",
+            title: "Firebox Array",
+            icon: "arcforge:firebox_array_controller",
+            description: [
+                "A hollow box of Firebox Array Casings, 3 to 7 on a side, with one Controller in a side wall facing out. Its walls, floor and roof may be Pressure Glass. It burns solids, liquids and gases: 3,967 HU/t at 3×3×3, 50,400 HU/t at 7×7×7, exactly what the biggest Steam Boiler Array takes. Coke burns at 1,300°C, Hydrogen at 1,400°C.",
+                "",
+                "**Covers:** {item:arcforge:firebox_array_casing}, {item:arcforge:firebox_array_controller}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["fuel_burner"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:firebox_array"
+                        }
+                    },
+                    title: "Form the Firebox Array",
+                    icon: "arcforge:firebox_array_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:firebox_array_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "roaring_inferno",
+            title: "Roaring Inferno",
+            icon: "arcforge:firebox_array_casing",
+            description: ["A full 7×7×7 Firebox Array: 343 blocks, 50,400 HU/t."],
+            x: 4.5d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["firebox_array"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:firebox_array",
+                            min_length: 343
+                        }
+                    },
+                    title: "Form the Firebox Array (size 343+)",
+                    icon: "arcforge:firebox_array_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:coal_coke_block",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        },
+        {
+            id: "oxy_fuel",
+            title: "Oxy-Fuel",
+            icon: "arcforge:firebox",
+            description: [
+                "Feed Oxygen (from an Electrolyzer or Air Separator) into a Firebox, Fuel Burner or Firebox Array through an Oxygen face: +300°C, 1.25× heat per fuel, 3.125 mB of oxygen per 100 HU. The flame turns blue-white."
+            ],
+            x: 4.5d,
+            y: 5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["firebox_array"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:oxy_fuel",
+                        conditions: {
+                            min_temperature: 1000
+                        }
+                    },
+                    title: "Burn on oxy-fuel",
+                    icon: "arcforge:firebox"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:heat_upgrade",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "white_heat",
+            title: "White Heat",
+            icon: "arcforge:fuel_burner",
+            description: ["Oxy-fuel at 1,600°C, the hottest flame in the mod: Hydrogen and Oxygen in a Firebox Array."],
+            x: 6d,
+            y: 5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["oxy_fuel"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:oxy_fuel",
+                        conditions: {
+                            min_temperature: 1600
+                        }
+                    },
+                    title: "Reach 1,600°C on oxy-fuel",
+                    icon: "arcforge:firebox"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        },
+        {
+            id: "heat_upgrades",
+            title: "Hotter, Tighter",
+            icon: "arcforge:heat_upgrade",
+            description: [
+                "The Heat Upgrade (blaze powder, magma cream, Steel Plate) gives more heat per fuel or lava and lifts a Thermoelectric Plant's efficiency. The Insulation Upgrade (Rock Wool) slows a Heat Cell's leak.",
+                "",
+                "**Covers:** {item:arcforge:heat_upgrade}, {item:arcforge:insulation_upgrade}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["geothermal_plant"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:heat_upgrade", "arcforge:insulation_upgrade"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Heat Upgrade or Insulation Upgrade",
+                    icon: "arcforge:heat_upgrade"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:heat_upgrade",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "heat_cells",
+            title: "Heat Cells",
+            icon: "arcforge:wrought_heat_cell",
+            description: [
+                "A battery for heat. Wrought (Slag Wool round a copper block): 50,000 HU, 50 HU/t, leaks 10% a minute. Tempered 200,000 HU; Hardened 800,000 HU with Invar Plates and Rock Wool, holding 1,300°C; Arcforged 3,200,000 HU at 1,400°C, 0.5% leak. Each upgrades the one before and keeps its heat.",
+                "",
+                "**Covers:** {item:arcforge:wrought_heat_cell}, {item:arcforge:tempered_heat_cell}, {item:arcforge:hardened_heat_cell}, {item:arcforge:arcforged_heat_cell}"
+            ],
+            x: 3d,
+            y: 0d,
+            dependencies: ["heat_upgrades"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_heat_cell",
+                                        "arcforge:tempered_heat_cell",
+                                        "arcforge:hardened_heat_cell",
+                                        "arcforge:arcforged_heat_cell"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Heat Cell or Tempered Heat Cell or Hardened Heat Cell or Arcforged Heat Cell",
+                    icon: "arcforge:wrought_heat_cell"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:slag_wool",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "thermal_capsules",
+            title: "Thermal Capsules",
+            icon: "arcforge:wrought_thermal_capsule",
+            description: [
+                "Portable heat: fill a capsule in a Heat Cell's slot and carry it to a Grain Dryer or Vulcanizer out in the fields. 50,000 HU Wrought to 3,200,000 HU Arcforged; it leaks while carried.",
+                "",
+                "**Covers:** {item:arcforge:wrought_thermal_capsule}, {item:arcforge:tempered_thermal_capsule}, {item:arcforge:hardened_thermal_capsule}, {item:arcforge:arcforged_thermal_capsule}"
+            ],
+            x: 4.5d,
+            y: 0d,
+            dependencies: ["heat_cells"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_thermal_capsule",
+                                        "arcforge:tempered_thermal_capsule",
+                                        "arcforge:hardened_thermal_capsule",
+                                        "arcforge:arcforged_thermal_capsule"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Thermal Capsule or Tempered Thermal Capsule or Hardened Thermal Capsule or Arcforged Thermal Capsule",
+                    icon: "arcforge:wrought_thermal_capsule"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_thermal_capsule"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "solar_parts",
+            title: "Mirrors and Tubes",
+            icon: "arcforge:trough_mirror",
+            description: [
+                "Three glass over three Silver Plates make a Trough Mirror; glass, copper rods, glass a Receiver Tube. Three mirrors, two steel rods and a tube build a Solar Collector.",
+                "",
+                "**Covers:** {item:arcforge:trough_mirror}, {item:arcforge:receiver_tube}, {item:arcforge:solar_collector}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            dependencies: ["thermal_conduits"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:trough_mirror"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:receiver_tube"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:solar_collector"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:silver_plate",
+                    count: 6
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "solar_thermal_array",
+            title: "Solar Thermal Array",
+            icon: "arcforge:solar_thermal_array_controller",
+            description: [
+                "A 2×2 tower four tall: three layers of Solar Thermal Array Casings (one is the Controller, in the bottom layer) and four Solar Collectors on top. It tracks the sun along the controller's facing (north–south full, east–west ×0.7) for up to 600 HU/t at 1,100°C at a clear noon. Nothing at night, so pair it with Heat Cells.",
+                "",
+                "**Covers:** {item:arcforge:solar_thermal_array_casing}, {item:arcforge:solar_thermal_array_controller}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["solar_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:solar_thermal_array"
+                        }
+                    },
+                    title: "Form the Solar Thermal Array",
+                    icon: "arcforge:solar_thermal_array_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_heat_cell"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "heat_pipe",
+            title: "Heat Pipe",
+            icon: "arcforge:heat_pipe",
+            description: [
+                "The Arcforged answer to long heat runs: a straight pipe up to 32 blocks of Rock Wool, Arcforged Alloy, tungsten plates and an Arcforged Thermodynamic Conduit, 262,144 HU/t with 0.5% loss per block. It only connects at its two ends.",
+                "",
+                "**Covers:** {item:arcforge:heat_pipe}"
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["thermal_conduits", "heat_cells"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:heat_pipe"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:heat_pipe",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        }
+    ]
+}

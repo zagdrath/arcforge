@@ -1,0 +1,574 @@
+{
+    id: "arcforge_salt_and_lithium",
+    group: "arcforge_chemistry",
+    order: 12,
+    title: "Salt & Lithium",
+    subtitle: "Brine, chlorine and lithium",
+    icon: "arcforge:battery_array_controller",
+    default_shape: "circle",
+    requires: ["arcforge_steelmaking/tempered_alloy"],
+    quests: [
+        {
+            id: "rock_salt",
+            title: "Rock Salt",
+            icon: "arcforge:rock_salt",
+            description: [
+                "Halite Ore lies in flat beds between Y -32 and 40, one bed in four chunks, thicker under deserts and oceans. It drops Rock Salt, which doesn't smelt: an Arc Crusher turns one into two Salt (four in the array). Nine Rock Salt pack into a block.",
+                "",
+                "**Covers:** {item:arcforge:halite_ore}, {item:arcforge:deepslate_halite_ore}, {item:arcforge:rock_salt}, {item:arcforge:raw_rock_salt_block}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:rock_salt"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:rock_salt",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "salt",
+            title: "Salt",
+            icon: "arcforge:salt",
+            description: [
+                "Crush Rock Salt, or evaporate Brine. A Salt and 250 mB of water in the Chemical Reactor is 250 mB of Brine; nine Salt make a Salt Block.",
+                "",
+                "**Covers:** {item:arcforge:salt}, {item:arcforge:salt_block}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["rock_salt"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:salt"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:salt",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "seawater",
+            title: "Seawater",
+            icon: "arcforge:seawater_bucket",
+            description: [
+                "An Electric Pump in an ocean or on a beach pumps Seawater instead of water. 1,000 mB evaporates to 250 Brine and 675 fresh water.",
+                "",
+                "**Covers:** {item:arcforge:seawater_bucket}"
+            ],
+            x: 3d,
+            y: 0d,
+            dependencies: ["salt"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:seawater"
+                        }
+                    },
+                    title: "Pump Seawater",
+                    icon: "arcforge:seawater_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:electric_pump"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "thermal_evaporator",
+            title: "Thermal Evaporator",
+            icon: "arcforge:thermal_evaporator_controller",
+            description: [
+                "A 3×3×9 tower: solid base and cap, seven ring layers (the middle of a ring side may be Pressure Glass), the Controller in the middle of a base side. Heat only, 100°C to run and 400°C for full speed: Seawater to Brine, Brine to Salt and a little Lithium Brine.",
+                "",
+                "**Covers:** {item:arcforge:thermal_evaporator_casing}, {item:arcforge:thermal_evaporator_controller}"
+            ],
+            x: 4.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["seawater"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:thermal_evaporator"
+                        }
+                    },
+                    title: "Form the Thermal Evaporator",
+                    icon: "arcforge:thermal_evaporator_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:thermal_evaporator_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "brine",
+            title: "Brine",
+            icon: "arcforge:brine_bucket",
+            description: [
+                "Brine is where the chemistry starts. 100 mB in an Electrolyzer gives 50 Hydrogen, 50 Chlorine and 100 Lye for 60,000 FE.",
+                "",
+                "**Covers:** {item:arcforge:brine_bucket}"
+            ],
+            x: 6d,
+            y: 0d,
+            dependencies: ["thermal_evaporator"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:brine"
+                        }
+                    },
+                    title: "Make Brine",
+                    icon: "arcforge:brine_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:brine_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "chlor_alkali",
+            title: "Chlor-Alkali",
+            icon: "arcforge:lye_bucket",
+            description: [
+                "Electrolyse Brine. Chlorine makes PVC and Hydrochloric Acid. Lye makes Lithium Hydroxide, and 10 mB in a biodiesel batch turns 100 mB of Seed Oil into 150 of Biodiesel.",
+                "",
+                "**Covers:** {item:arcforge:lye_bucket}"
+            ],
+            x: 7.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["brine"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:chlorine"
+                        }
+                    },
+                    title: "Make Chlorine",
+                    icon: "arcforge:electrolyzer"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:lye"
+                        }
+                    },
+                    title: "Make Lye",
+                    icon: "arcforge:lye_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lye_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "hydrochloric_acid",
+            title: "Hydrochloric Acid",
+            icon: "arcforge:hydrochloric_acid_bucket",
+            description: [
+                "50 Chlorine and 50 Hydrogen make 100 Hydrochloric Acid: a second leaching acid that costs no sulfur.",
+                "",
+                "**Covers:** {item:arcforge:hydrochloric_acid_bucket}"
+            ],
+            x: 9d,
+            y: 0d,
+            dependencies: ["chlor_alkali"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:hydrochloric_acid"
+                        }
+                    },
+                    title: "Make Hydrochloric Acid",
+                    icon: "arcforge:hydrochloric_acid_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hydrochloric_acid_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "spodumene",
+            title: "Spodumene",
+            icon: "arcforge:raw_spodumene",
+            description: [
+                "Spodumene Ore sits at Y -48..48 and in pegmatite veins up to Y 160 under mountains and badlands; a stone pickaxe will do. Raw Spodumene doesn't smelt: crush it to Spodumene Dust.",
+                "",
+                "**Covers:** {item:arcforge:spodumene_ore}, {item:arcforge:deepslate_spodumene_ore}, {item:arcforge:raw_spodumene}, {item:arcforge:raw_spodumene_block}, {item:arcforge:spodumene_dust}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:spodumene_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:spodumene_dust",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "lithium_brine",
+            title: "Lithium Brine",
+            icon: "arcforge:lithium_brine_bucket",
+            description: [
+                "Spodumene Dust and 250 mB of Sulfuric Acid give 250 mB of Lithium Brine; the Thermal Evaporator also leaves 25 mB with every Salt.",
+                "",
+                "**Covers:** {item:arcforge:lithium_brine_bucket}"
+            ],
+            x: 6d,
+            y: 1.25d,
+            dependencies: ["spodumene", "thermal_evaporator"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:lithium_brine"
+                        }
+                    },
+                    title: "Make Lithium Brine",
+                    icon: "arcforge:lithium_brine_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sulfuric_acid_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "lithium_hydroxide",
+            title: "Lithium Hydroxide",
+            icon: "arcforge:lithium_hydroxide",
+            description: [
+                "250 Lithium Brine and 100 Lye give Lithium Hydroxide and 100 Brine back.",
+                "",
+                "**Covers:** {item:arcforge:lithium_hydroxide}"
+            ],
+            x: 9d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["lithium_brine", "chlor_alkali"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:lithium_hydroxide"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lithium_hydroxide",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "cell_parts",
+            title: "Cathode, Anode, Separator",
+            icon: "arcforge:lfp_cathode",
+            description: [
+                "An LFP Cathode is Lithium Hydroxide, Iron Dust and Basic Slag in the reactor's three item slots. A Graphite Anode is Graphite under a Plate Die. Two Plastic Sheets make two Cell Separators.",
+                "",
+                "**Covers:** {item:arcforge:lfp_cathode}, {item:arcforge:graphite_anode}, {item:arcforge:cell_separator}"
+            ],
+            x: 10.5d,
+            y: 1.25d,
+            dependencies: ["lithium_hydroxide"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:lfp_cathode"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:graphite_anode"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:cell_separator"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:graphite",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "lithium_cells",
+            title: "Lithium Cells",
+            icon: "arcforge:wrought_lithium_cell",
+            description: [
+                "Cathode, separator and anode in Wrought Alloy and steel plates: a Wrought Lithium Cell holds 64,000,000 FE. Tempered 512,000,000; Hardened 4,000,000,000; Arcforged 32,000,000,000. Each upgrades the one before and keeps its charge. They only work inside a Battery Array.",
+                "",
+                "**Covers:** {item:arcforge:wrought_lithium_cell}, {item:arcforge:tempered_lithium_cell}, {item:arcforge:hardened_lithium_cell}, {item:arcforge:arcforged_lithium_cell}"
+            ],
+            x: 12d,
+            y: 1.25d,
+            dependencies: ["cell_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_lithium_cell",
+                                        "arcforge:tempered_lithium_cell",
+                                        "arcforge:hardened_lithium_cell",
+                                        "arcforge:arcforged_lithium_cell"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Lithium Cell or Tempered Lithium Cell or Hardened Lithium Cell or Arcforged Lithium Cell",
+                    icon: "arcforge:wrought_lithium_cell"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lfp_cathode",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "power_regulators",
+            title: "Power Regulators",
+            icon: "arcforge:wrought_power_regulator",
+            description: [
+                "The same parts with a redstone block. Each regulator inside the array adds throughput: Wrought 65,536 FE/t each way, Tempered 262,144, Hardened 1,048,576, Arcforged 4,194,304.",
+                "",
+                "**Covers:** {item:arcforge:wrought_power_regulator}, {item:arcforge:tempered_power_regulator}, {item:arcforge:hardened_power_regulator}, {item:arcforge:arcforged_power_regulator}"
+            ],
+            x: 12d,
+            y: 2.5d,
+            dependencies: ["cell_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_power_regulator",
+                                        "arcforge:tempered_power_regulator",
+                                        "arcforge:hardened_power_regulator",
+                                        "arcforge:arcforged_power_regulator"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Power Regulator or Tempered Power Regulator or Hardened Power Regulator or Arcforged Power Regulator",
+                    icon: "arcforge:wrought_power_regulator"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:redstone_block",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "battery_array",
+            title: "Battery Array",
+            icon: "arcforge:battery_array_controller",
+            description: [
+                "Battery Array Casings (steel plates, Plastic Sheets, redstone) make a box 3 to 5 on a side, faces of Pressure Glass if you like, with the Controller (casings round a Wrought Energy Cell) in a wall. Fill the inside with Lithium Cells and Power Regulators and set Energy Input and Output ports.",
+                "",
+                "**Covers:** {item:arcforge:battery_array_casing}, {item:arcforge:battery_array_controller}"
+            ],
+            x: 13.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["lithium_cells", "power_regulators"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:battery_array"
+                        }
+                    },
+                    title: "Form the Battery Array",
+                    icon: "arcforge:battery_array_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:battery_array_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "power_bank",
+            title: "Power Bank",
+            icon: "arcforge:arcforged_lithium_cell",
+            description: ["A full 5×5×5 Battery Array: 27 cells and regulators inside."],
+            x: 15d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["battery_array"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:battery_array",
+                            min_length: 125
+                        }
+                    },
+                    title: "Form the Battery Array (size 125+)",
+                    icon: "arcforge:battery_array_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_lithium_cell"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        }
+    ]
+}

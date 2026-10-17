@@ -1,0 +1,523 @@
+{
+    id: "arcforge_fuel_cycle",
+    group: "arcforge_nuclear",
+    order: 18,
+    title: "Fuel Cycle",
+    subtitle: "Spent fuel, PUREX, MOX, thorium and waste",
+    icon: "arcforge:purex_controller",
+    default_shape: "circle",
+    requires: ["arcforge_nuclear_power/fission_reactor"],
+    quests: [
+        {
+            id: "spent_fuel_pool",
+            title: "Spent Fuel Pool",
+            icon: "arcforge:spent_fuel_rack",
+            description: [
+                "Spent Fuel Racks (steel rods and plates) hold four rods each and must sit underwater with at least 3 blocks of water above them: the water cools and shields the rods, which glow Cherenkov blue while they're hot. If the pool drains, they heat up and their cladding fails.",
+                "",
+                "**Covers:** {item:arcforge:spent_fuel_rack}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:spent_fuel_rack"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "spent_fuel_pool"
+                        }
+                    },
+                    title: "Cool spent rods in the pool",
+                    icon: "arcforge:spent_fuel_rack"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_plate",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "dry_cask",
+            title: "Dry Cask Storage",
+            icon: "arcforge:dry_cask",
+            description: [
+                "Once a rod's decay heat has fallen (its tooltip shows it), a Dry Cask (Containment Concrete round a Block of Steel) holds seven and shields them anywhere. Broken, it keeps its rods.",
+                "",
+                "**Covers:** {item:arcforge:dry_cask}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["spent_fuel_pool", "arcforge_reactor_safety/containment_materials"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:dry_cask"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:containment_concrete",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "nitric_acid",
+            title: "Nitric Acid",
+            icon: "arcforge:nitric_acid_bucket",
+            description: [
+                "The Ostwald process in the Chemical Reactor: 100 mB of Ammonia burnt in 200 mB of Oxygen gives Nitrogen Dioxide; 150 mB of it in 50 mB of Water gives 100 mB of Nitric Acid.",
+                "",
+                "**Covers:** {item:arcforge:nitric_acid_bucket}"
+            ],
+            x: 0d,
+            y: 3.75d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:nitric_acid"
+                        }
+                    },
+                    title: "Make Nitric Acid",
+                    icon: "arcforge:nitric_acid_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "hot_cell",
+            title: "The Hot Cell",
+            icon: "arcforge:hot_cell_casing",
+            description: [
+                "Hot Cell Casing is steel plates, shielding metal and Containment Concrete; Hot Cell Windows are lead glass. Build an empty box 3 to 9 across and 3 to 6 tall, windows in its walls and the PUREX controller in one.",
+                "",
+                "**Covers:** {item:arcforge:hot_cell_casing}, {item:arcforge:hot_cell_window}, {item:arcforge:purex_controller}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            dependencies: ["arcforge_reactor_safety/containment_materials"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:hot_cell_casing"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hot_cell_window"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:purex_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_plate",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "purex",
+            title: "PUREX",
+            icon: "arcforge:purex_controller",
+            description: [
+                "Form the PUREX Plant and feed it spent rods, cooled until their decay heat has fallen. Each is dissolved in 500 mB of Nitric Acid and separated with 100 mB of Kerosene, using 200 FE/t, into Recovered Uranium (back to UF6 and the Cascade), Plutonium Oxide and High-Level Liquid Waste.",
+                "",
+                "**Covers:** {item:arcforge:recovered_uranium}, {item:arcforge:plutonium_oxide}"
+            ],
+            x: 1.5d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["hot_cell", "nitric_acid", "spent_fuel_pool"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:purex_plant"
+                        }
+                    },
+                    title: "Form the PUREX Plant",
+                    icon: "arcforge:purex_controller"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "purex"
+                        }
+                    },
+                    title: "Reprocess a spent rod",
+                    icon: "arcforge:plutonium_oxide"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "mox",
+            title: "MOX Fuel",
+            icon: "arcforge:mox_fuel_rod",
+            description: [
+                "Plutonium only ever becomes fuel. Depleted Uranium Dust and Oxygen make Depleted Uranium Dioxide; five Plutonium Oxide and three of it make two MOX Blend. Press it with the Pellet Die, sinter it and rod it in a Zircaloy Tube. MOX rods run like uranium ones, and in the fast reactor.",
+                "",
+                "**Covers:** {item:arcforge:depleted_uranium_dioxide}, {item:arcforge:mox_blend}, {item:arcforge:green_mox_pellet}, {item:arcforge:mox_fuel_pellet}, {item:arcforge:mox_fuel_rod}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            dependencies: ["purex"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:mox_fuel_rod"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:zircaloy_tube",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "vitrification",
+            title: "Vitrification",
+            icon: "arcforge:vitrified_waste_log",
+            description: [
+                "The Vitrification Plant melts 1,000 mB of High-Level Liquid Waste with four glass blocks into a Vitrified Waste Log in a steel canister. Logs are radioactive and warm; their activity halves every 30 in-game days.",
+                "",
+                "**Covers:** {item:arcforge:vitrification_plant}, {item:arcforge:vitrified_waste_log}"
+            ],
+            x: 3d,
+            y: 5d,
+            dependencies: ["purex"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "vitrifying"
+                        }
+                    },
+                    title: "Vitrify High-Level Liquid Waste",
+                    icon: "arcforge:vitrification_plant"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:glass",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "repository",
+            title: "Deep Storage",
+            icon: "arcforge:geological_repository",
+            description: [
+                "A Geological Repository is a vault below Y -40, set in deepslate. It takes Vitrified Waste Logs and Dry Casks and stores them safely, showing what it holds.",
+                "",
+                "**Covers:** {item:arcforge:geological_repository}"
+            ],
+            x: 4.5d,
+            y: 5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["vitrification"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "repository"
+                        }
+                    },
+                    title: "Store waste in a Geological Repository",
+                    icon: "arcforge:geological_repository"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_block",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "compacting",
+            title: "Low-Level Waste",
+            icon: "arcforge:low_level_waste_drum",
+            description: [
+                "Contaminated items, used hazmat pieces and used HEPA Filters go into the Waste Compactor with an empty Waste Drum (steel plates), which comes out a Low-Level Waste Drum. Store drums anywhere shielded.",
+                "",
+                "**Covers:** {item:arcforge:waste_compactor}, {item:arcforge:waste_drum}, {item:arcforge:low_level_waste_drum}"
+            ],
+            x: 0d,
+            y: 5d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "compacting"
+                        }
+                    },
+                    title: "Compact low-level waste into a drum",
+                    icon: "arcforge:waste_compactor"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:waste_drum",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "thorium",
+            title: "Thorium",
+            icon: "arcforge:thorium_dioxide",
+            description: [
+                "Monazite Dust cracked in 250 mB of Lye in the Chemical Reactor gives Thorium Dioxide, and usually Rare Earth Dust.",
+                "",
+                "**Covers:** {item:arcforge:thorium_dioxide}, {item:arcforge:rare_earth_dust}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:thorium_dioxide"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:monazite_dust",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "blanket",
+            title: "Breeding Blanket",
+            icon: "arcforge:thorium_blanket_rod",
+            description: [
+                "Press Thorium Dioxide into pellets, sinter them and rod them in a Zircaloy Tube. Thorium Blanket Rods hardly fission themselves: in the core, thorium absorbs neutrons and breeds Uranium-233.",
+                "",
+                "**Covers:** {item:arcforge:green_thorium_pellet}, {item:arcforge:thorium_pellet}, {item:arcforge:thorium_blanket_rod}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["thorium"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:thorium_blanket_rod"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:zircaloy_tube",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "thorex",
+            title: "THOREX",
+            icon: "arcforge:uranium_233_oxide",
+            description: [
+                "Switch the PUREX Plant to THOREX: spent blanket rods give Thorium Dioxide back, and Uranium-233 Oxide.",
+                "",
+                "**Covers:** {item:arcforge:uranium_233_oxide}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            dependencies: ["blanket", "purex"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "thorex"
+                        }
+                    },
+                    title: "Separate Uranium-233 from a blanket rod",
+                    icon: "arcforge:uranium_233_oxide"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:thorium_dioxide",
+                    count: 6
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "u233",
+            title: "U-233 Fuel",
+            icon: "arcforge:u233_fuel_rod",
+            description: [
+                "One Uranium-233 Oxide and three Thorium Dioxide make four U-233 Fuel Blend: pressed, sintered and rodded into U-233 Fuel Rods, which breed more U-233 as they burn.",
+                "",
+                "**Covers:** {item:arcforge:u233_fuel_blend}, {item:arcforge:green_u233_pellet}, {item:arcforge:u233_fuel_pellet}, {item:arcforge:u233_fuel_rod}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["thorex"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:u233_fuel_rod"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "closed_cycle",
+            title: "Closing the Cycle",
+            icon: "arcforge:geological_repository",
+            description: [
+                "Reprocess, refuel with MOX and U-233, and put the waste away for good: nothing left lying about."
+            ],
+            x: 6d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["mox", "u233", "repository"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:mox_fuel_rod"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:u233_fuel_rod"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "repository"
+                        }
+                    },
+                    title: "Store waste in a Geological Repository",
+                    icon: "arcforge:geological_repository"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 25
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        }
+    ]
+}

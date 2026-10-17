@@ -46,6 +46,7 @@ import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
@@ -577,6 +578,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
             }
         });
         controlState.completed(List.of(made), madeFluids, count, 0);
+        ArcforgeAdvancements.produced(this, made, madeFluids.isEmpty() ? null : madeFluids.get(0).getFluid(), null);
         chamberInput[chamber] = ItemStack.EMPTY;
         chamberProgress[chamber] = 0;
         chamberTime[chamber] = 0;

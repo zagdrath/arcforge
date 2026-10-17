@@ -24,19 +24,28 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 Suggested version: **2.8.0** (minor: oil caverns, sour crude, gas wells, four new refinery units, a scaling Diesel
 Generator, hydrocracking and Synthetic Rubber, a retuned oil line, running sounds and model fixes for the oilfield,
-and the nuclear tier up to the Fission Reactor, its failures, containment, reprocessing and advanced cores; worlds
-load, but Diesel Generators and Oil Derricks need their new layers and some refinery lines need a new port, see
+the nuclear tier up to the Fission Reactor, its failures, containment, reprocessing and advanced cores, and a
+Hibiscus Quests questline in place of the advancement tab; worlds load, but Diesel Generators and Oil Derricks need their new layers and some refinery lines need a new port, see
 Upgrading).
 
 ### Added
 
+- **A questline for Hibiscus Quests.** With [Hibiscus Quests](https://github.com/hibiscus-software/hibiscus-quests)
+  installed (optional), its quest book gets 20 Arcforge chapters in six groups and 272 quests, from the Wrench and the
+  Combustion Plant to molten salt reactors, covering every item you can get in survival. They follow the recipes:
+  Getting Started runs Combustion Plant, Carbonizer, Arcforge Furnace, first steel, Metal Press and Thermoelectric
+  Plant, and later chapters open with the alloys and parts they need (the Steam Boiler with Tempered Alloy, chemistry
+  with Hardened Alloy, uranium with Sulfuric Acid). New with the nuclear part three are Reactor Safety (containment,
+  ECCS, relief valves, recombiners, core catcher, decontamination), Fuel Cycle (spent fuel, PUREX, MOX, thorium, U-233,
+  vitrification and the repository) and Advanced Cores (lead-bismuth and molten salt). Hidden challenges show as "?"
+  until they unlock. Every quest is listed in docs/QUESTLINE.md; the chapters are generated from tools/hibiscusquests.
 - **Radiation Poisoning.** Radiation now does harm at every level: a dose of 50 mSv brings Radiation Poisoning I (half a
   heart every 30 seconds, through armour), 500 II (every 10 seconds, and Hunger), 2,000 III (every 4 seconds, Hunger and
   Weakness) and 4,000 IV (a heart every 2 seconds, with Nausea), and standing in a field of 100 mSv/h or more makes it a
   level worse at once. Its icon is a green trefoil. The old Nausea / Weakness / Wither / lethal thresholds are replaced
   (config `poisoningDose1` to `poisoningDose4`, `acuteRate`, `poisoningDamage`).
-- **Contaminated chunks glow** with green motes in their air, like Mekanism's radiation, thicker the more contaminated
-  they are, with ash falling where it's heavy (`falloutParticles`). Each chunk's fallout is synced to the players
+- **Contaminated chunks glow** with green motes in their air, thicker the
+  more contaminated they are, with ash falling where it's heavy (`falloutParticles`). Each chunk's fallout is synced to the players
   watching it.
 - **Fallout spreads**: every minute 2% of each chunk's contamination (`falloutSpreadRate`, was 0.4% downwind only) goes to
   the four chunks round it, most downwind, and Corium and Solidified Corium left outside a sealed containment seep into
@@ -320,8 +329,18 @@ Upgrading).
   hum, louder with its power. A see-through line round the vessel under the head flange is gone, and the large models
   draw their round parts with fewer quads (the same look), so many of them lag less.
 
+### Removed
+
+- **The Arcforge advancement tab** (its 138 advancements), replaced by the Hibiscus Quests questline. The triggers it
+  used (`arcforge:multiblock_formed`, `machine_produced`, `turbine_full_speed`, `oxy_fuel`, `machine_linked`) stay,
+  for quests and for data packs' own advancements.
+
 ### Fixed
 
+- **The Fermenter, Carbonizer and Electric Pump count what they make** for `arcforge:machine_produced`, so quests for
+  Ethanol, Creosote and pumped Seawater complete.
+- **Diesel Generators, Pumpjacks and Oil Derricks report their length** to `arcforge:multiblock_formed` (it was always
+  0), so a `min_length` such as the V16's 9 can be met.
 - **Large models no longer tank the frame rate.** The still parts of the big multiblock models (Distillation Arrays,
   the Cracking Unit, Steam Cracker and Diesel Generator, the Fission Reactor, Steam Generator and Heavy Water Tower, the
   Gas Centrifuge Cascade, Flare Stacks, Pumpjacks, Oil Derricks and Steam Turbine Arrays) are built once and kept on the
@@ -360,6 +379,9 @@ Upgrading).
 
 ### Upgrading
 
+- Advancement progress on the Arcforge tab is gone with the tab. Item quests count what you already carry; a structure
+  that formed before has to form again (break and replace one of its blocks) to count, and machines count what they
+  make from then on.
 - Caverns, sour deposits and gas caps only come in chunks generated after this update. The first time a world loads
   with it, the chunks it already has are noted (from its region files); a deposit reaching any of them gets no cavern
   and works exactly as before everywhere (invisible, always sweet, no gas cap), so no cavern is ever cut off against

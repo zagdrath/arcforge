@@ -1,0 +1,717 @@
+{
+    id: "arcforge_processing",
+    group: "arcforge_foundations",
+    order: 2,
+    title: "Ore Processing",
+    subtitle: "New ores, crushing, sifting, arrays and parts",
+    icon: "arcforge:arc_crusher",
+    default_shape: "circle",
+    requires: ["arcforge_getting_started/steel_parts"],
+    quests: [
+        {
+            id: "ores",
+            title: "New Veins",
+            icon: "arcforge:silver_ore",
+            description: [
+                "Arcforge adds ores to the Overworld: Silver (Y -32..64), Nickel (Y -64..16), Wolframite for tungsten (Y -64..-16), Fluorite (Y -16..48), Bismuth (Y 0..56), Galena for lead (Y -16..64), flat Halite beds, Spodumene for lithium, rare Uraninite, and glowing Arcite deep down (Y -64..-40, diamond pickaxe). Each has a deepslate variant. Dig up a raw piece of five of them.",
+                "",
+                "**Covers:** {item:arcforge:silver_ore}, {item:arcforge:deepslate_silver_ore}, {item:arcforge:raw_silver}, {item:arcforge:nickel_ore}, {item:arcforge:deepslate_nickel_ore}, {item:arcforge:raw_nickel}, {item:arcforge:wolframite_ore}, {item:arcforge:deepslate_wolframite_ore}, {item:arcforge:raw_wolframite}, {item:arcforge:fluorite_ore}, {item:arcforge:deepslate_fluorite_ore}, {item:arcforge:raw_fluorite}, {item:arcforge:bismuth_ore}, {item:arcforge:deepslate_bismuth_ore}, {item:arcforge:raw_bismuth}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:raw_silver"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:raw_nickel"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:raw_wolframite"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:raw_fluorite"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:raw_bismuth"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:iron_pickaxe"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "ingots",
+            title: "Smelt the New Metals",
+            icon: "arcforge:nickel_ingot",
+            description: [
+                "Raw Silver, Nickel, Bismuth and Wolframite smelt in any furnace to Silver, Nickel, Bismuth and Tungsten Ingots; Raw Fluorite becomes a Fluorite Crystal. Nine of each pack into a storage block, and nine raw pieces into a raw block that an Arc Crusher turns into nine dust.",
+                "",
+                "**Covers:** {item:arcforge:silver_ingot}, {item:arcforge:silver_block}, {item:arcforge:raw_silver_block}, {item:arcforge:nickel_ingot}, {item:arcforge:nickel_block}, {item:arcforge:raw_nickel_block}, {item:arcforge:tungsten_ingot}, {item:arcforge:tungsten_block}, {item:arcforge:raw_wolframite_block}, {item:arcforge:bismuth_ingot}, {item:arcforge:bismuth_block}, {item:arcforge:raw_bismuth_block}, {item:arcforge:fluorite_crystal}, {item:arcforge:fluorite_block}, {item:arcforge:raw_fluorite_block}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["ores"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:silver_ingot"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:nickel_ingot"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_ingot"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:bismuth_ingot"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:fluorite_crystal"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:nickel_ingot",
+                    count: 8
+                },
+                {
+                    type: "item",
+                    item: "arcforge:silver_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "sulfur",
+            title: "Brimstone",
+            icon: "arcforge:sulfur_dust",
+            description: [
+                "Nether Sulfur Ore (Nether, Y 10..117) drops 2–4 Sulfur Dust; crushing gunpowder gives two, netherrack a chance. Sulfur Dust plus water in a Chemical Reactor is Sulfuric Acid, and the Vulcanizer needs it to cure rubber.",
+                "",
+                "**Covers:** {item:arcforge:nether_sulfur_ore}, {item:arcforge:sulfur_dust}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["ores"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:sulfur_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sulfur_dust",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "iolite",
+            title: "Iolite",
+            icon: "arcforge:iolite_crystal",
+            description: [
+                "Iolite Ore grows in End Stone (Y 0..80) and drops Iolite Crystals (Fortune works). The crystal is the resonant part of the Link Conduit and Wired Machine Link. Crushing the ore gives two Iolite Dust, which blasts back into a crystal; nine crystals make a Block of Iolite.",
+                "",
+                "**Covers:** {item:arcforge:iolite_ore}, {item:arcforge:iolite_crystal}, {item:arcforge:iolite_dust}, {item:arcforge:iolite_block}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["ores"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:iolite_crystal"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:ender_pearl",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "arcite",
+            title: "Arcite",
+            icon: "arcforge:arcite_crystal",
+            description: [
+                "Glowing Arcite Ore sits below Y -40 in veins of four and needs a diamond pickaxe. Raw Arcite blasts into an Arcite Crystal (or crushes to Arcite Dust, which blasts to a crystal). Arcite is in every Arcforged recipe: the composite, the top-tier conduits, cells and storage, the Fortune III Module and the Quantum Tunnel. Nine make a glowing block.",
+                "",
+                "**Covers:** {item:arcforge:arcite_ore}, {item:arcforge:deepslate_arcite_ore}, {item:arcforge:raw_arcite}, {item:arcforge:raw_arcite_block}, {item:arcforge:arcite_dust}, {item:arcforge:arcite_crystal}, {item:arcforge:arcite_block}"
+            ],
+            x: 1.5d,
+            y: 3.75d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["ores"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcite_crystal"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcite_crystal",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "arc_crusher",
+            title: "The Arc Crusher",
+            icon: "arcforge:arc_crusher",
+            description: [
+                "Steel plates and gears round a grindstone. 20 FE/t: one ore gives two dust plus a 25% bonus, a raw piece one dust and a chance of a second, coal gives Carbon Dust, Slag gives two Basic Slag, cobbled deepslate gives Deepslate Gravel. Dust smelts back to ingots, so crushing doubles your ore.",
+                "",
+                "**Covers:** {item:arcforge:arc_crusher}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["ingots", "arcforge_getting_started/steel_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:arc_crusher"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Arc Crusher",
+                    icon: "arcforge:arc_crusher"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:raw_iron",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "dusts",
+            title: "Dust to Dust",
+            icon: "arcforge:iron_dust",
+            description: [
+                "Crush raw iron, copper and gold for Iron, Copper and Gold Dust; quartz for Nether Quartz Dust; coal, charcoal or Bio-Coal for Carbon Dust (a half-coal fuel and a Carbonizer feed that makes coke without creosote); Ancient Debris for Ancient Debris Dust that smelts to netherite scrap. Two Iron Dust and one Nickel Dust craft into three Invar Dust.",
+                "",
+                "**Covers:** {item:arcforge:iron_dust}, {item:arcforge:copper_dust}, {item:arcforge:gold_dust}, {item:arcforge:carbon_dust}, {item:arcforge:nether_quartz_dust}, {item:arcforge:ancient_debris_dust}, {item:arcforge:silver_dust}, {item:arcforge:nickel_dust}, {item:arcforge:tungsten_dust}, {item:arcforge:fluorite_dust}, {item:arcforge:bismuth_dust}, {item:arcforge:lead_dust}, {item:arcforge:invar_dust}"
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            dependencies: ["arc_crusher"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:iron_dust"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:copper_dust"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:gold_dust"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:carbon_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:iron_dust",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "invar",
+            title: "Invar",
+            icon: "arcforge:invar_ingot",
+            description: [
+                "Smelt Invar Dust (2 Iron Dust + 1 Nickel Dust) for Invar Ingots. Invar barely expands with heat, so its plates line the Hardened Thermodynamic Conduit and Heat Cell, the Haber Reactor and the Superheater; Invar Rods make the Sifter's second mesh.",
+                "",
+                "**Covers:** {item:arcforge:invar_ingot}, {item:arcforge:invar_plate}, {item:arcforge:invar_gear}, {item:arcforge:invar_rod}"
+            ],
+            x: 6d,
+            y: 1.25d,
+            dependencies: ["dusts"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:invar_ingot"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:invar_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "sifter",
+            title: "Sift the Fines",
+            icon: "arcforge:sifter",
+            description: [
+                "The Sifter shakes gravel, sand, Deepslate Gravel and Heavy Mineral Sand through a mesh for dusts, flint, quartz and more. Steel Mesh (8 Steel Rods) is the base: 256 blocks. Invar Mesh gives 1.25× the chances at 1.5× speed; Tungsten Mesh 1.5× and 2× speed, 1,024 blocks. Deepslate Gravel is the only sifted source of tungsten.",
+                "",
+                "**Covers:** {item:arcforge:sifter}, {item:arcforge:steel_mesh}, {item:arcforge:invar_mesh}, {item:arcforge:tungsten_mesh}, {item:arcforge:deepslate_gravel}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            dependencies: ["arc_crusher"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "sifting"
+                        }
+                    },
+                    title: "Sift something",
+                    icon: "arcforge:sifter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_mesh"
+                },
+                {
+                    type: "item",
+                    item: "minecraft:gravel",
+                    count: 32
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "meshes",
+            title: "Finer Meshes",
+            icon: "arcforge:tungsten_mesh",
+            description: [
+                "Eight Invar Rods or eight Tungsten Rods in a ring. Swap the mesh in the Sifter's mesh slot.",
+                "",
+                "**Covers:** {item:arcforge:invar_mesh}, {item:arcforge:tungsten_mesh}"
+            ],
+            x: 7.5d,
+            y: 1.25d,
+            dependencies: ["sifter", "invar"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:invar_mesh", "arcforge:tungsten_mesh"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Invar Mesh or Tungsten Mesh",
+                    icon: "arcforge:invar_mesh"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_rod",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "alloy_parts",
+            title: "Pressed Metals",
+            icon: "arcforge:nickel_plate",
+            description: [
+                "Press the new metals too. Nickel Plates go into Hardened Alloy, the Steam Turbine, Electrolyzer and Cracking Unit; Nickel Gears into the Air Separator, Nickel Rods into the Haber Reactor. Silver Plates make Batteries, Trough Mirrors and the Quarry Scanner. Tungsten Plates, Gears and Rods build heating coils, the Diamond Press and the Gas Centrifuge.",
+                "",
+                "**Covers:** {item:arcforge:nickel_plate}, {item:arcforge:nickel_gear}, {item:arcforge:nickel_rod}, {item:arcforge:silver_plate}, {item:arcforge:silver_gear}, {item:arcforge:silver_rod}, {item:arcforge:tungsten_plate}, {item:arcforge:tungsten_gear}, {item:arcforge:tungsten_rod}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            dependencies: ["arcforge_getting_started/steel_parts"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:nickel_plate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:silver_plate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_plate"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:nickel_plate",
+                    count: 8
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_plate",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "heating_coil",
+            title: "Tungsten Heating Coil",
+            icon: "arcforge:tungsten_heating_coil",
+            description: [
+                "Four Tungsten Plates round a copper rod. It's the element in the Induction Furnace, Arc Melter, Carbon Reclaimer, Combustor and Superheater casing.",
+                "",
+                "**Covers:** {item:arcforge:tungsten_heating_coil}"
+            ],
+            x: 1.5d,
+            y: 5d,
+            dependencies: ["alloy_parts"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_heating_coil"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_heating_coil",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "induction_furnace",
+            title: "Induction Furnace",
+            icon: "arcforge:induction_furnace",
+            description: [
+                "An FE furnace at twice the speed, built round a Tungsten Heating Coil and a blast furnace. It smelts everything a furnace does, and later calcines Ammonium Diuranate into Yellowcake.",
+                "",
+                "**Covers:** {item:arcforge:induction_furnace}"
+            ],
+            x: 3d,
+            y: 5d,
+            dependencies: ["heating_coil"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:induction_furnace"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Induction Furnace",
+                    icon: "arcforge:induction_furnace"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:energy_upgrade",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "fiberizer",
+            title: "Mineral Wool",
+            icon: "arcforge:fiberizer",
+            description: [
+                "The Fiberizer takes FE and heat (800°C+) and spins Slag into Slag Wool and basalt into Rock Wool: the insulation in every Heat Cell, Thermal Capsule, the Insulation Upgrade and the Foundry Suit. At 1,000°C it also spins Pitch into Carbon Fiber.",
+                "",
+                "**Covers:** {item:arcforge:fiberizer}, {item:arcforge:slag_wool}, {item:arcforge:rock_wool}"
+            ],
+            x: 4.5d,
+            y: 5d,
+            dependencies: ["induction_furnace"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:slag_wool"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:rock_wool"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:rock_wool",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "arrays",
+            title: "Three by Three",
+            icon: "arcforge:arc_crushing_array_casing",
+            description: [
+                "Each processing machine has a 3×3×3 array of 27 casings (the machine, Tempered Alloy and steel plates make four): the Arc Crushing Array (3 lanes, 2× speed, 60% less FE, double ore dust), Induction Furnace Array and Metal Pressing Array (each lane with its own die). Start with the crushers.",
+                "",
+                "**Covers:** {item:arcforge:arc_crushing_array_casing}, {item:arcforge:induction_furnace_array_casing}, {item:arcforge:metal_pressing_array_casing}"
+            ],
+            x: 4.5d,
+            y: 6.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["induction_furnace", "arcforge_getting_started/steel_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:arc_crushing_array"
+                        }
+                    },
+                    title: "Form an Arc Crushing Array",
+                    icon: "arcforge:arc_crushing_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "array_of_options",
+            title: "Array of Options",
+            icon: "arcforge:metal_pressing_array_casing",
+            description: ["All three arrays formed. Your ore line now runs at scale."],
+            x: 6d,
+            y: 6.25d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["arrays"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:arc_crushing_array"
+                        }
+                    },
+                    title: "Form the Arc Crushing Array",
+                    icon: "arcforge:arc_crushing_array_casing"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:induction_furnace_array"
+                        }
+                    },
+                    title: "Form the Induction Furnace Array",
+                    icon: "arcforge:induction_furnace_array_casing"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:metal_pressing_array"
+                        }
+                    },
+                    title: "Form the Metal Pressing Array",
+                    icon: "arcforge:metal_pressing_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:speed_upgrade",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        },
+        {
+            id: "composite",
+            title: "Arcite-Tungsten Composite",
+            icon: "arcforge:arcite_tungsten_composite",
+            description: [
+                "A Tungsten Plate and two Arcite Crystals, shapeless. It's the hard core of Arcforged Alloy and the Tungsten Drill Head (four Tungsten Plates round it) that the Arc Quarry drills with.",
+                "",
+                "**Covers:** {item:arcforge:arcite_tungsten_composite}, {item:arcforge:tungsten_drill_head}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            dependencies: ["arcite", "alloy_parts"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcite_tungsten_composite"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tungsten_plate",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "diamond_press",
+            title: "Pressure Makes Diamonds",
+            icon: "arcforge:diamond_press",
+            description: [
+                "Hardened Alloy, tungsten gears and plates round a Metal Press. Four Graphite at 1,400°C and 2,000,000 FE come out as one Diamond. Slow, hungry, and renewable.",
+                "",
+                "**Covers:** {item:arcforge:diamond_press}"
+            ],
+            x: 6d,
+            y: 7.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["arrays"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "diamond_pressing"
+                        }
+                    },
+                    title: "Press a Diamond",
+                    icon: "minecraft:diamond"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:diamond",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        }
+    ]
+}

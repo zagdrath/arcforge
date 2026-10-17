@@ -1,0 +1,434 @@
+{
+    id: "arcforge_oil_and_gas",
+    group: "arcforge_petroleum",
+    order: 9,
+    title: "Oil & Gas",
+    subtitle: "Surveys, pumpjacks, derricks and gas wells",
+    icon: "arcforge:pumpjack_controller",
+    default_shape: "circle",
+    requires: ["arcforge_steelmaking/tempered_alloy"],
+    quests: [
+        {
+            id: "survey_tool",
+            title: "Seismic Survey",
+            icon: "arcforge:seismic_survey_tool",
+            description: [
+                "A comparator on a steel rod with steel plates. Use it on the ground and it tells you what's under this chunk: the deposit kind (Seep, Pocket, Field, Giant), how many buckets are left, how deep, whether it's sour and whether it has a gas cap. About 30% of deposits are sour.",
+                "",
+                "**Covers:** {item:arcforge:seismic_survey_tool}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:item_used_on_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:match_tool",
+                                predicate: {
+                                    items: "arcforge:seismic_survey_tool"
+                                }
+                            }
+                        }
+                    },
+                    title: "Survey the ground",
+                    icon: "arcforge:seismic_survey_tool"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:paper",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "survey_record",
+            title: "Survey Record",
+            icon: "arcforge:survey_record",
+            description: [
+                "Survey with Paper in your inventory and the tool writes a Survey Record you can read later. Right-click it onto a filled map to mark the deposit.",
+                "",
+                "**Covers:** {item:arcforge:survey_record}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["survey_tool"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:survey_record"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:map"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "oil_cavern",
+            title: "Into the Cavern",
+            icon: "arcforge:crude_oil_bucket",
+            description: [
+                "Deposits are real caverns of Crude Oil deep underground (and tar pits on the surface). Find one and wade in. Oil is thick and slow; it can be bucketed straight out."
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["survey_tool"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:enter_block",
+                        conditions: {
+                            block: "arcforge:crude_oil"
+                        }
+                    },
+                    title: "Swim in Crude Oil",
+                    icon: "arcforge:crude_oil_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:crude_oil_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "derrick_parts",
+            title: "Rig Parts",
+            icon: "arcforge:derrick_frame",
+            description: [
+                "Five Steel Rods in an X make a Derrick Frame (the four legs and the crown). A ring of steel plates and rods makes a Derrick Casing (the floor). The Oil Derrick Controller is a casing with copper rods, glass and a comparator.",
+                "",
+                "**Covers:** {item:arcforge:derrick_frame}, {item:arcforge:derrick_casing}, {item:arcforge:oil_derrick_controller}"
+            ],
+            x: 3d,
+            y: 0d,
+            dependencies: ["survey_record"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:derrick_frame"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:derrick_casing"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:oil_derrick_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_rod",
+                    count: 32
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "oil_derrick",
+            title: "Oil Derrick",
+            icon: "arcforge:oil_derrick_controller",
+            description: [
+                "A 3×3 rig nine tall over a surveyed deposit: floor ring, four 7-tall legs, a 3×3 crown. Feed it 120 FE/t, 10 mB/t of water and Steel Pipes (one per four blocks) and it drills one block every two seconds down to the cavern. When it strikes, it leaves a Well Head behind that can't be moved.",
+                "",
+                "**Covers:** {item:arcforge:oil_derrick_controller}, {item:arcforge:steel_pipe}"
+            ],
+            x: 4.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["derrick_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:oil_derrick"
+                        }
+                    },
+                    title: "Form the Oil Derrick",
+                    icon: "arcforge:oil_derrick_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_pipe",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "struck_oil",
+            title: "Struck Oil",
+            icon: "arcforge:well_head",
+            description: [
+                "The derrick hits the deposit and the Well Head starts to weep. Dismantle the rig: you don't need it any more.",
+                "",
+                "**Covers:** {item:arcforge:well_head}"
+            ],
+            x: 6d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["oil_derrick"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:crude_oil",
+                            recipe_category: "struck_oil"
+                        }
+                    },
+                    title: "Strike oil",
+                    icon: "arcforge:well_head"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:pumpjack_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "pumpjack",
+            title: "Pumpjack",
+            icon: "arcforge:pumpjack_controller",
+            description: [
+                "Pumpjack Casings (steel plates and gears) make a 3×5 skid round the Well Head with a 3-tall Samson post; the Controller is a casing with copper rods and a comparator. 60 FE/t pumps Crude Oil out at up to 30 mB/t on a full deposit, through its Output port.",
+                "",
+                "**Covers:** {item:arcforge:pumpjack_casing}, {item:arcforge:pumpjack_controller}, {item:arcforge:crude_oil_bucket}"
+            ],
+            x: 7.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["struck_oil"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:pumpjack"
+                        }
+                    },
+                    title: "Form the Pumpjack",
+                    icon: "arcforge:pumpjack_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_fluid_tank",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "sour_crude",
+            title: "Sour Crude",
+            icon: "arcforge:sour_crude_oil_bucket",
+            description: [
+                "A sour deposit pumps Sour Crude Oil. It distils the same, but its Kerosene and Diesel come out sour and burn at 75% heat until a Hydrotreater cleans them with Hydrogen. The sulfur it gives up is worth having.",
+                "",
+                "**Covers:** {item:arcforge:sour_crude_oil_bucket}"
+            ],
+            x: 9d,
+            y: 0d,
+            dependencies: ["pumpjack"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:sour_crude_oil"
+                        }
+                    },
+                    title: "Pump Sour Crude Oil",
+                    icon: "arcforge:sour_crude_oil_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sulfur_dust",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "gas_well",
+            title: "Natural Gas",
+            icon: "arcforge:gas_wellhead",
+            description: [
+                "Drill a deposit with a gas cap (or a pure gas deposit) and the derrick strikes gas. A Gas Wellhead (comparator, Steel Pipes, steel gear and plate) on the Well Head gives 200 mB/t of Natural Gas for no FE at all, straight into Pressurized Conduits. It burns in the Gas Turbine and the Firebox Array, feeds the Steam Methane Reformer and the Steam Cracker.",
+                "",
+                "**Covers:** {item:arcforge:gas_wellhead}"
+            ],
+            x: 7.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["struck_oil"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "gas_well"
+                        }
+                    },
+                    title: "Produce Natural Gas",
+                    icon: "arcforge:gas_wellhead"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_pressurized_cylinder"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "flare_stack",
+            title: "Flare Stack",
+            icon: "arcforge:flare_stack",
+            description: [
+                "Flint and steel on a Wrought Pressurized Cylinder with steel rods. It burns off any gas up to 1,000 mB/t so a refinery never stalls on a by-product it can't store (it refuses uranium hexafluoride). Wasteful, but better than a dead line.",
+                "",
+                "**Covers:** {item:arcforge:flare_stack}"
+            ],
+            x: 9d,
+            y: 1.25d,
+            dependencies: ["gas_well"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "flaring"
+                        }
+                    },
+                    title: "Flare a gas",
+                    icon: "arcforge:flare_stack"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:flint_and_steel"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "oilfield",
+            title: "Oilfield",
+            icon: "arcforge:pumpjack_controller",
+            description: ["Surveyed, drilled, pumped, flared. Now refine it."],
+            x: 10.5d,
+            y: 1.25d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["pumpjack", "gas_well", "flare_stack", "oil_cavern"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:pumpjack"
+                        }
+                    },
+                    title: "Form the Pumpjack",
+                    icon: "arcforge:pumpjack_controller"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "gas_well"
+                        }
+                    },
+                    title: "Produce Natural Gas",
+                    icon: "arcforge:gas_wellhead"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:crude_oil_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        }
+    ]
+}

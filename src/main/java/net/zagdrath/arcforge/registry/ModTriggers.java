@@ -17,7 +17,8 @@ import net.zagdrath.arcforge.advancement.MultiblockFormedTrigger;
 import net.zagdrath.arcforge.advancement.OxyFuelTrigger;
 import net.zagdrath.arcforge.advancement.TurbineFullSpeedTrigger;
 
-// The advancement triggers of the Arcforge tab (data/arcforge/advancement); ArcforgeAdvancements fires them.
+// Arcforge's advancement triggers, which the quest pack's criterion tasks (data/arcforge/hibiscusquests) listen to;
+// ArcforgeAdvancements fires them.
 public final class ModTriggers {
     public static final DeferredRegister<CriterionTrigger<?>> TRIGGERS = DeferredRegister.create(Registries.TRIGGER_TYPE, Arcforge.MODID);
 

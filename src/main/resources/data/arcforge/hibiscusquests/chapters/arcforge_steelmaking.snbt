@@ -1,0 +1,189 @@
+{
+    id: "arcforge_steelmaking",
+    group: "arcforge_foundations",
+    order: 1,
+    title: "Alloys & Tiers",
+    subtitle: "The four tier alloys and Graphite",
+    icon: "arcforge:tempered_alloy",
+    default_shape: "circle",
+    requires: ["arcforge_getting_started/steel_ingot"],
+    quests: [
+        {
+            id: "tempered_alloy",
+            title: "Tempered Alloy",
+            icon: "arcforge:tempered_alloy",
+            description: [
+                "2 steel + 2 copper + 1 coke at 1,300°C gives 2. Tempered is the second tier: every 3×3×3 processing array casing, the Steam Boiler and Turbine, the Electrolyzer, Fermenter, Assembler and Arc Melter are made from it, and every Wrought block upgrades to Tempered by crafting it with Tempered Alloy, keeping its contents.",
+                "",
+                "**Covers:** {item:arcforge:tempered_alloy}"
+            ],
+            x: 0d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["arcforge_getting_started/steel_ingot"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_alloy"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "hardened_alloy",
+            title: "Hardened Alloy",
+            icon: "arcforge:hardened_alloy",
+            description: [
+                "2 steel + 2 amethyst shards + 1 Nickel Plate + 2 coke at 1,400°C gives 2. Hardened gates the Distillation Array, Superheater, Gas Turbine, Chemical Reactor, Diamond Press and Arc Quarry: most of the mid-game. Nickel Plates come from the Metal Press; amethyst from geodes.",
+                "",
+                "**Covers:** {item:arcforge:hardened_alloy}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["tempered_alloy"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "graphite",
+            title: "Graphite",
+            icon: "arcforge:graphite",
+            description: [
+                "Run the furnace up to 1,500°C with one Coal Coke or two Carbon Dust in the metal slot and it comes out as Graphite. Press it into Graphite Anodes for lithium cells, or squeeze four in a Diamond Press into a Diamond. Nine make a Block of Graphite.",
+                "",
+                "**Covers:** {item:arcforge:graphite}, {item:arcforge:graphite_block}"
+            ],
+            x: 3d,
+            y: 0d,
+            dependencies: ["hardened_alloy"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:graphite"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:graphite",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "arcforged_alloy",
+            title: "Arcforged Alloy",
+            icon: "arcforge:arcforged_alloy",
+            description: [
+                "The top tier: 2 Hardened Alloy + 2 Carbon Fiber + 1 Arcite-Tungsten Composite + 2 coke at 1,500°C gives 2. Carbon Fiber is Pitch from a creosote or crude distillation spun in a Fiberizer; the Composite is a Tungsten Plate with two Arcite Crystals from below Y -40. Arcforged conduits, cells, the Quantum Tunnel and Heat Pipe need it.",
+                "",
+                "**Covers:** {item:arcforge:arcforged_alloy}, {item:arcforge:carbon_fiber}, {item:arcforge:arcite_tungsten_composite}"
+            ],
+            x: 4.5d,
+            y: 0d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["graphite"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "steelworks",
+            title: "Steelworks",
+            icon: "arcforge:steel_block",
+            description: [
+                "Carbonizer, furnace, every alloy. Nothing in Arcforge is out of reach now; it's a matter of building it."
+            ],
+            x: 6d,
+            y: 0d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["arcforged_alloy", "arcforge_getting_started/slag"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_block"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:wrought_alloy"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tempered_alloy"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_block",
+                    count: 4
+                },
+                {
+                    type: "item",
+                    item: "arcforge:speed_upgrade",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        }
+    ]
+}

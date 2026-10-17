@@ -534,7 +534,7 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - Gas Turbine Array skin: the steam turbine's banded plates at double height with a thin Hardened-purple line; 3x3 end caps (48x48) drawn by the BER keep the outer 3 px clear for frame beams.
 - Any 3D machine with default ports follows "Ports": 8×8 plates at its default faces, on a socket to the block edge when the body is inset.
 
-## Meters, Chargepad, Conduit Facade, oxy-fuel, advancements
+## Meters, Chargepad, Conduit Facade, oxy-fuel
 - Meters (Energy / Heat / Fluid / Gas): the standard casing on every face.
   - Front: a steel bezel at x2..13, y3..10 framing a 10×6 `#16181B` LCD at x3..12, y4..9. The LCD is centred on
     the block (x 8). The renderer centres the value and unit on it by their ink width (the font's width − 1), in
@@ -569,8 +569,6 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
     - "Signal when" with two 20×20 house buttons carrying the `meter_above` / `meter_below` icons (selected =
       pressed + ACCENT outline);
     - a threshold field recess (66,100)–(168,117) holding the EditBox, with the unit right-aligned inside it.
-- Advancement tab background: the wall plate one step darker (`#40454C` / `#383C42` split at x = 10) with
-  the riveted strap on rows 13–15.
 
 ## Farming
 - Soil (Loam and its farmland) uses Cody's soil texture (his pink block), recoloured by brightness onto the loam

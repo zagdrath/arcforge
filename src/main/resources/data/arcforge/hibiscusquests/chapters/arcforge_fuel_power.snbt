@@ -1,0 +1,259 @@
+{
+    id: "arcforge_fuel_power",
+    group: "arcforge_power",
+    order: 8,
+    title: "Turbines & Engines",
+    subtitle: "Gas turbines and diesel generators",
+    icon: "arcforge:gas_turbine_array_casing",
+    default_shape: "circle",
+    requires: ["arcforge_steelmaking/hardened_alloy"],
+    quests: [
+        {
+            id: "turbine_parts",
+            title: "Blades and Combustors",
+            icon: "arcforge:turbine_blade_set",
+            description: [
+                "A Turbine Blade Set is Carbon Fiber and Hardened Alloy on a steel rod. A Combustor is Arcforge Furnace Bricks, tungsten plates and a Tungsten Heating Coil. Both go into every Gas Turbine Array Casing with Hardened Alloy and plastic.",
+                "",
+                "**Covers:** {item:arcforge:turbine_blade_set}, {item:arcforge:combustor}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:turbine_blade_set"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:combustor"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:carbon_fiber",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "gas_turbine",
+            title: "Gas Turbine Array",
+            icon: "arcforge:gas_turbine_array_casing",
+            description: [
+                "A hollow 3×3 tube 5 to 9 long (the middles of both ends are casings). It burns Naphtha, Light Oil, Kerosene, Diesel, Gasoline, Ethanol, Hydrogen, Refinery Gas, Natural Gas, Biogas or Syngas straight to FE, up to 33,750 FE/t at 9 long. Its exhaust heat comes out of a heat port for a combined cycle.",
+                "",
+                "**Covers:** {item:arcforge:gas_turbine_array_casing}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["turbine_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:gas_turbine_array"
+                        }
+                    },
+                    title: "Form the Gas Turbine Array",
+                    icon: "arcforge:gas_turbine_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:gas_turbine_array_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "throttle_lever",
+            title: "Throttle",
+            icon: "arcforge:throttle_lever",
+            description: [
+                "A lever, redstone, a comparator and a Steel Plate. Scroll or use it for a signal of 0 to 15. In the Gas Turbine's Throttle redstone mode that signal sets how hard it runs, so you burn fuel only for the power you need.",
+                "",
+                "**Covers:** {item:arcforge:throttle_lever}"
+            ],
+            x: 3d,
+            y: 0d,
+            dependencies: ["gas_turbine"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:throttle_lever"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:comparator",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "full_throttle",
+            title: "Full Throttle",
+            icon: "arcforge:throttle_lever",
+            description: ["A Gas Turbine Array at full speed on a throttle signal of 15."],
+            x: 4.5d,
+            y: 0d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["throttle_lever"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:turbine_full_speed",
+                        conditions: {
+                            multiblock: "arcforge:gas_turbine_array",
+                            min_signal: 15
+                        }
+                    },
+                    title: "Full speed at throttle 15",
+                    icon: "arcforge:gas_turbine_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:gasoline_bucket",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        },
+        {
+            id: "diesel_parts",
+            title: "Engine Block",
+            icon: "arcforge:diesel_generator_casing",
+            description: [
+                "Diesel Generator Casings are steel plates and gears, copper plates and a Wrought Energy Conduit; the Controller adds copper rods, glass and a comparator.",
+                "",
+                "**Covers:** {item:arcforge:diesel_generator_casing}, {item:arcforge:diesel_generator_controller}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:diesel_generator_casing"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:diesel_generator_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_gear",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "diesel_generator",
+            title: "Diesel Generator",
+            icon: "arcforge:diesel_generator_controller",
+            description: [
+                "A 3×3 box 5, 7 or 9 long: a V8, V12 or V16 making 3,000, 8,000 or 15,000 FE/t on Diesel, Gasoline, Kerosene, Biodiesel or Refinery Gas. Loud, simple, and it starts instantly."
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["diesel_parts"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:diesel_generator"
+                        }
+                    },
+                    title: "Form the Diesel Generator",
+                    icon: "arcforge:diesel_generator_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:diesel_bucket",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "v16",
+            title: "V16",
+            icon: "arcforge:diesel_generator_casing",
+            description: ["The 9-long Diesel Generator: 15,000 FE/t."],
+            x: 3d,
+            y: 1.25d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["diesel_generator"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:diesel_generator",
+                            min_length: 9
+                        }
+                    },
+                    title: "Form the Diesel Generator (size 9+)",
+                    icon: "arcforge:diesel_generator_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_energy_cell"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        }
+    ]
+}

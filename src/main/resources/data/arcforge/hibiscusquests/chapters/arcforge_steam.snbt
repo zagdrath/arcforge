@@ -1,0 +1,442 @@
+{
+    id: "arcforge_steam",
+    group: "arcforge_power",
+    order: 7,
+    title: "Steam Power",
+    subtitle: "Boilers, superheaters, turbines and condensers",
+    icon: "arcforge:steam_turbine_array_casing",
+    default_shape: "circle",
+    requires: ["arcforge_steelmaking/tempered_alloy"],
+    quests: [
+        {
+            id: "pressure_glass",
+            title: "Pressure Glass",
+            icon: "arcforge:pressure_glass",
+            description: [
+                "Glass braced with steel rods, plates and Fluorite Crystals. It's the window block allowed in the Boiler, Turbine, Firebox Array, Battery Array, Greenhouse and Thermal Evaporator walls, and the Grow Chamber is built from it.",
+                "",
+                "**Covers:** {item:arcforge:pressure_glass}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:pressure_glass"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:pressure_glass",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "electric_pump",
+            title: "Electric Pump",
+            icon: "arcforge:electric_pump",
+            description: [
+                "Set it over a water source and it pumps the block below: 1,000 mB every second for 10 FE/t, infinite water from an infinite source. In an ocean or on a beach it pumps Seawater instead, which is the Salt chapter's feed.",
+                "",
+                "**Covers:** {item:arcforge:electric_pump}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:electric_pump"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Electric Pump",
+                    icon: "arcforge:electric_pump"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_fluid_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 2
+                }
+            ]
+        },
+        {
+            id: "pressurized_cylinder",
+            title: "Pressurized Cylinder",
+            icon: "arcforge:wrought_pressurized_cylinder",
+            description: [
+                "Gases never go in a Fluid Tank. A Wrought Pressurized Cylinder (steel plates, Wrought Alloy and a Wrought Fluid Tank) holds 64,000 mB of one gas; Tempered 256,000 (Rubber Gaskets), Hardened 1,024,000, Arcforged 4,096,000. Its slots fill Gas Cartridges and Jetpacks. Four PVC Sheets line one for uranium hexafluoride.",
+                "",
+                "**Covers:** {item:arcforge:wrought_pressurized_cylinder}, {item:arcforge:tempered_pressurized_cylinder}, {item:arcforge:hardened_pressurized_cylinder}, {item:arcforge:arcforged_pressurized_cylinder}"
+            ],
+            x: 0d,
+            y: 0d,
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:wrought_pressurized_cylinder",
+                                        "arcforge:tempered_pressurized_cylinder",
+                                        "arcforge:hardened_pressurized_cylinder",
+                                        "arcforge:arcforged_pressurized_cylinder"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Wrought Pressurized Cylinder or Tempered Pressurized Cylinder or Hardened Pressurized Cylinder or Arcforged Pressurized Cylinder",
+                    icon: "arcforge:wrought_pressurized_cylinder"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:wrought_pressurized_cylinder"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "boiler",
+            title: "Steam Boiler Array",
+            icon: "arcforge:steam_boiler_array_casing",
+            description: [
+                "A hollow box of Tempered casings, 3×3×3 up to 7×7×16 (a 3×3 needs only corners; bigger boxes need every edge). Heat in, water in, and it boils by temperature: Steam at 100°C, High-Pressure Steam at 500°C, Superheated Steam at 900°C, chosen in its Pressure tab. The biggest wants 50,400 HU/t.",
+                "",
+                "**Covers:** {item:arcforge:steam_boiler_array_casing}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["pressure_glass", "electric_pump"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:steam_boiler_array"
+                        }
+                    },
+                    title: "Form the Steam Boiler Array",
+                    icon: "arcforge:steam_boiler_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steam_boiler_array_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "pressurized_conduits",
+            title: "Pressurized Conduits",
+            icon: "arcforge:tempered_pressurized_conduit",
+            description: [
+                "Steam travels in Pressurized Conduits only. Eight Wrought conduits round Tempered Alloy and a Rubber Gasket make Tempered: 1,600 mB/t. Hardened 6,400 mB/t, Arcforged 25,600 mB/t (with Arcite). A Gas Reservoir (steel plates, Pressure Glass, Fluid Reservoir) stores 64,000 mB per block and merges with its neighbours.",
+                "",
+                "**Covers:** {item:arcforge:tempered_pressurized_conduit}, {item:arcforge:hardened_pressurized_conduit}, {item:arcforge:arcforged_pressurized_conduit}, {item:arcforge:gas_reservoir}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["pressurized_cylinder"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: [
+                                        "arcforge:tempered_pressurized_conduit",
+                                        "arcforge:hardened_pressurized_conduit",
+                                        "arcforge:arcforged_pressurized_conduit"
+                                    ]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Tempered Pressurized Conduit or Hardened Pressurized Conduit or Arcforged Pressurized Conduit",
+                    icon: "arcforge:tempered_pressurized_conduit"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_pressurized_conduit",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "turbine",
+            title: "Steam Turbine Array",
+            icon: "arcforge:steam_turbine_array_casing",
+            description: [
+                "A hollow tube of Tempered Alloy, nickel plate and steel gear casings, 3×3 to 7×7 across and 3 to 27 long, with steam, energy and Exhaust ports on its fitted spots. 20 FE per mB of Steam, 36 for High-Pressure, 56 for Superheated. Heavy Oil in its lubricant tank adds 8%, Lubricant 12%, and an Exhaust port another 10%.",
+                "",
+                "**Covers:** {item:arcforge:steam_turbine_array_casing}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["boiler", "pressurized_conduits"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:steam_turbine_array"
+                        }
+                    },
+                    title: "Form the Steam Turbine Array",
+                    icon: "arcforge:steam_turbine_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steam_turbine_array_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "superheated",
+            title: "Superheated",
+            icon: "arcforge:steam_boiler_array_casing",
+            description: [
+                "Run the boiler at 900°C and make Superheated Steam: 56 FE/mB, nearly three times plain steam from the same water. A Firebox Array on coke, a Geothermal bank at 1,400°C, or Hydrogen will get you there."
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["turbine"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:superheated_steam"
+                        }
+                    },
+                    title: "Make Superheated Steam",
+                    icon: "arcforge:steam_boiler_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:heat_upgrade",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "superheater",
+            title: "Superheater Array",
+            icon: "arcforge:superheater_array_casing",
+            description: [
+                "A solid box 3 to 7 on a side of Hardened casings (invar plates, heating coils, Pressure Glass). It lifts steam one grade for only 3 HU per mB, as long as its heat is at least 500°C (to High-Pressure) or 900°C (to Superheated). Boil cheap, upgrade cheap.",
+                "",
+                "**Covers:** {item:arcforge:superheater_array_casing}"
+            ],
+            x: 6d,
+            y: 1.25d,
+            dependencies: ["superheated"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:superheater_array"
+                        }
+                    },
+                    title: "Form the Superheater Array",
+                    icon: "arcforge:superheater_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:superheater_array_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "condenser",
+            title: "Condenser Array",
+            icon: "arcforge:condenser_array_casing",
+            description: [
+                "Exhaust Steam from the turbine's Exhaust port goes back to water 1:1 in a solid box of Condenser casings (copper plates and rods, Tempered Alloy): 400 mB/t per 27 blocks, faster touching water or ice. Boiler, turbine, condenser: a closed loop that never needs a pump.",
+                "",
+                "**Covers:** {item:arcforge:condenser_array_casing}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["turbine"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:condenser_array"
+                        }
+                    },
+                    title: "Form the Condenser Array",
+                    icon: "arcforge:condenser_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:condenser_array_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "water_intake",
+            title: "Industrial Water Intake",
+            icon: "arcforge:water_intake_casing",
+            description: [
+                "A 3×3×3 of Water Intake casings (an Electric Pump, copper and steel plates) standing in 400 or more connected water sources: 8,000 mB/t for 0.25 FE/mB, enough for a full-size boiler without a condenser.",
+                "",
+                "**Covers:** {item:arcforge:water_intake_casing}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            dependencies: ["boiler"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:water_intake"
+                        }
+                    },
+                    title: "Form the Water Intake",
+                    icon: "arcforge:water_intake_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:electric_pump"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "nine_stage_spin",
+            title: "Nine-Stage Spin",
+            icon: "arcforge:steam_turbine_array_casing",
+            description: ["A Steam Turbine Array at least 9 long, running at full speed."],
+            x: 6d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["condenser", "superheated"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:turbine_full_speed",
+                        conditions: {
+                            multiblock: "arcforge:steam_turbine_array",
+                            min_length: 9
+                        }
+                    },
+                    title: "Run a 9-long turbine at full speed",
+                    icon: "arcforge:steam_turbine_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lubricant_bucket"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:tempered_alloy",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        }
+    ]
+}

@@ -1,0 +1,438 @@
+{
+    id: "arcforge_nuclear_power",
+    group: "arcforge_nuclear",
+    order: 16,
+    title: "Nuclear Power",
+    subtitle: "Fuel rods, the Fission Reactor and its steam",
+    icon: "arcforge:reactor_controller",
+    default_shape: "circle",
+    requires: ["arcforge_nuclear/enriched"],
+    quests: [
+        {
+            id: "zirconium",
+            title: "Zirconium",
+            icon: "arcforge:zirconium_ingot",
+            description: [
+                "Zircon Dust (from Heavy Mineral Sand), Chlorine and Coal Coke react into Zirconium Tetrachloride; reduce it with Hydrogen for Zirconium Dust, and smelt that to Zirconium Ingots. Zirconium barely absorbs neutrons, which is why it clads the fuel.",
+                "",
+                "**Covers:** {item:arcforge:zirconium_tetrachloride}, {item:arcforge:zirconium_dust}, {item:arcforge:zirconium_ingot}"
+            ],
+            x: 0d,
+            y: 1.25d,
+            dependencies: ["arcforge_nuclear/heavy_minerals"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:zirconium_tetrachloride"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:zirconium_ingot"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:zircon_dust",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "zircaloy",
+            title: "Zircaloy",
+            icon: "arcforge:zircaloy_tube",
+            description: [
+                "Four Zirconium Ingots and a Nickel Ingot in the Arcforge Furnace at 1,400°C make Zircaloy. Press it with the Rod Die into Zircaloy Tubes: the cladding of every fuel rod and the lining of every Fuel Channel.",
+                "",
+                "**Covers:** {item:arcforge:zircaloy_ingot}, {item:arcforge:zircaloy_tube}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["zirconium"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:zircaloy_ingot"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:zircaloy_tube"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:nickel_ingot",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "pellets",
+            title: "Fuel Pellets",
+            icon: "arcforge:fuel_pellet",
+            description: [
+                "Make a Pellet Die (steel round a Steel Gear and a Block of Steel). The Metal Press turns Uranium Dioxide into green pellets, and sintering bakes them into Fuel Pellets. Each pellet keeps the enrichment of the uranium it came from.",
+                "",
+                "**Covers:** {item:arcforge:pellet_die}, {item:arcforge:green_fuel_pellet}, {item:arcforge:fuel_pellet}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            dependencies: ["arcforge_nuclear/enriched"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:pellet_die"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:fuel_pellet"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "fuel_rod",
+            title: "Fuel Rods",
+            icon: "arcforge:fuel_rod",
+            description: [
+                "Fuel Pellets in a Zircaloy Tube. A rod tracks its enrichment and burnup; fresh rods are only mildly radioactive, spent ones are very hot, so handle them with shielding.",
+                "",
+                "**Covers:** {item:arcforge:fuel_rod}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["pellets", "zircaloy"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:fuel_rod"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "core_parts",
+            title: "Core Parts",
+            icon: "arcforge:control_rod",
+            description: [
+                "Control Rods are silver on steel rods: they soak up neutrons and set the power. Graphite Moderators slow neutrons down so the fuel catches more of them, and Steel Reflectors bounce strays back in at the edges of the core.",
+                "",
+                "**Covers:** {item:arcforge:control_rod}, {item:arcforge:graphite_moderator}, {item:arcforge:steel_reflector}"
+            ],
+            x: 0d,
+            y: 0d,
+            dependencies: ["arcforge_steelmaking/graphite"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:control_rod"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:graphite_moderator", "arcforge:steel_reflector"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Make a moderator or reflector",
+                    icon: "arcforge:graphite_moderator"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:silver_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "channels",
+            title: "Channels",
+            icon: "arcforge:fuel_channel",
+            description: [
+                "Steel plates and rods round a Zircaloy Tube make a Fuel Channel; with a Steel Gear instead, a Control Rod Channel. These fill the inside of the reactor. Each Control Rod Channel belongs to one of four banks you move together.",
+                "",
+                "**Covers:** {item:arcforge:fuel_channel}, {item:arcforge:control_rod_channel}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            dependencies: ["zircaloy", "core_parts"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:fuel_channel"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:control_rod_channel"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_plate",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "vessel",
+            title: "Pressure Vessel",
+            icon: "arcforge:reactor_casing",
+            description: [
+                "Reactor Casing is steel plates with shielding metal and Concrete Shielding; Reactor Glass is the shielded window. The controller takes a casing and a Control Rod. The vessel is 3 to 7 across and 3 to 9 tall.",
+                "",
+                "**Covers:** {item:arcforge:reactor_casing}, {item:arcforge:reactor_glass}, {item:arcforge:reactor_controller}"
+            ],
+            x: 4.5d,
+            y: 1.25d,
+            dependencies: ["channels", "arcforge_nuclear/shielding"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:reactor_casing"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:concrete_shielding",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "fission_reactor",
+            title: "Fission Reactor",
+            icon: "arcforge:reactor_controller",
+            description: [
+                "Build the vessel round a grid of channels, set its ports with the Wrench and form it. Load fuel and control rods, fill it with water, and pull the rods out slowly: watch k-effective and the period. The Protection System SCRAMs the core if you go too fast.",
+                "",
+                "**Covers:** {item:arcforge:fuel_channel}, {item:arcforge:control_rod_channel}"
+            ],
+            x: 6d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["vessel"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:fission_reactor"
+                        }
+                    },
+                    title: "Form the Fission Reactor",
+                    icon: "arcforge:reactor_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "steam_generator",
+            title: "Steam Generator",
+            icon: "arcforge:steam_generator_controller",
+            description: [
+                "In a pressurized-water reactor the coolant never boils; it carries heat to a Steam Generator, a tall vessel of Steam Generator Tubes (nickel rods and steel plates) that boils feedwater into High-Pressure Steam for your turbines.",
+                "",
+                "**Covers:** {item:arcforge:steam_generator_casing}, {item:arcforge:steam_generator_controller}, {item:arcforge:steam_generator_tubes}"
+            ],
+            x: 6d,
+            y: 2.5d,
+            dependencies: ["vessel", "arcforge_steam/turbine"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:steam_generator"
+                        }
+                    },
+                    title: "Form the Steam Generator",
+                    icon: "arcforge:steam_generator_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steam_generator_tubes",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "heavy_water",
+            title: "Heavy Water",
+            icon: "arcforge:heavy_water_bucket",
+            description: [
+                "The Heavy Water Tower (casings with PVC, Exchange Trays inside) runs the Girdler sulfide process: water, a little Hydrogen Sulfide and steam give Heavy Water, a moderator that absorbs almost nothing.",
+                "",
+                "**Covers:** {item:arcforge:heavy_water_tower_casing}, {item:arcforge:heavy_water_tower_controller}, {item:arcforge:exchange_tray}, {item:arcforge:heavy_water_bucket}"
+            ],
+            x: 6d,
+            y: 0d,
+            dependencies: ["vessel"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:heavy_water_tower"
+                        }
+                    },
+                    title: "Form the Heavy Water Tower",
+                    icon: "arcforge:heavy_water_tower_controller"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:heavy_water_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:pvc_sheet",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "power_plant",
+            title: "Power Plant",
+            icon: "arcforge:steam_turbine_array_casing",
+            description: [
+                "Fission Reactor, Steam Generator and a full-length Steam Turbine Array spinning at full speed: a nuclear power station. A large core can drive several turbines at once."
+            ],
+            x: 7.5d,
+            y: 1.25d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["fission_reactor", "steam_generator"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:fission_reactor"
+                        }
+                    },
+                    title: "Form the Fission Reactor",
+                    icon: "arcforge:reactor_controller"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:steam_generator"
+                        }
+                    },
+                    title: "Form the Steam Generator",
+                    icon: "arcforge:steam_generator_controller"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:turbine_full_speed",
+                        conditions: {
+                            multiblock: "arcforge:steam_turbine_array",
+                            min_length: 15
+                        }
+                    },
+                    title: "Spin a Steam Turbine Array to full speed (15+ long)",
+                    icon: "arcforge:steam_turbine_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 25
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        }
+    ]
+}

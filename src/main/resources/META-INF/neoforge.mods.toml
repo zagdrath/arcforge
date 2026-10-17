@@ -26,3 +26,11 @@ Arcforge is a technology mod built on Forge Energy (FE), compatible with any Neo
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+
+# Hibiscus Quests loads the questline in data/arcforge/hibiscusquests; without it those files are unused.
+[[dependencies.${mod_id}]]
+    modId="hibiscusquests"
+    type="optional"
+    versionRange="[1.0.0,)"
+    ordering="NONE"
+    side="BOTH"

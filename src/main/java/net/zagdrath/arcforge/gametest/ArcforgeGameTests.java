@@ -396,10 +396,10 @@ public final class ArcforgeGameTests {
         TESTS.put("greenhouse_beds_take_soil_and_seed", GreenhouseGameTests::bedsTakeSoilAndSeed);
         TESTS.put("greenhouse_temperature", GreenhouseGameTests::temperature);
         TESTS.put("greenhouse_needs_water", GreenhouseGameTests::needsWater);
-        TESTS.put("advancement_tree_loads", AdvancementGameTests::treeLoads);
-        TESTS.put("multiblock_formed_trigger", AdvancementGameTests::multiblockFormedTrigger);
-        TESTS.put("turbine_full_speed_needs_length", AdvancementGameTests::turbineFullSpeedNeedsLength);
-        TESTS.put("wrench_recipe_is_early", AdvancementGameTests::wrenchRecipeIsEarly);
+        TESTS.put("quest_pack_loads", QuestPackGameTests::packLoads);
+        TESTS.put("multiblock_formed_trigger", QuestPackGameTests::multiblockFormedTrigger);
+        TESTS.put("turbine_full_speed_needs_length", QuestPackGameTests::turbineFullSpeedNeedsLength);
+        TESTS.put("wrench_recipe_is_early", QuestPackGameTests::wrenchRecipeIsEarly);
         TESTS.put("oxy_fuel_off_is_unchanged", OxyFuelGameTests::offIsUnchanged);
         TESTS.put("oxy_fuel_firebox", OxyFuelGameTests::firebox);
         TESTS.put("oxy_fuel_hydrogen_cap", OxyFuelGameTests::hydrogenCap);

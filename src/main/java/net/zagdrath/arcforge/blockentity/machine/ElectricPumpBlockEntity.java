@@ -21,6 +21,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.BucketPickup;
 import net.minecraft.world.level.block.state.BlockState;
@@ -36,6 +37,7 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
+import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -206,6 +208,9 @@ public class ElectricPumpBlockEntity extends MachineBlockEntity {
         }
         // One bucket is one operation.
         controlState.completed(List.of(), List.of(new FluidStack(pumped, pumpedAmount)), 0, 0);
+        if (pumpedAmount > 0) {
+            ArcforgeAdvancements.produced(this, ItemStack.EMPTY, pumped, null);
+        }
     }
 
     // Water with two or more water sources beside it refills itself, as with a bucket.

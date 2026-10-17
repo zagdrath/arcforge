@@ -1,0 +1,615 @@
+{
+    id: "arcforge_nuclear",
+    group: "arcforge_nuclear",
+    order: 15,
+    title: "Nuclear Fuel",
+    subtitle: "Uranium to enriched fuel, and staying safe",
+    icon: "arcforge:yellowcake",
+    default_shape: "circle",
+    requires: ["arcforge_chemistry/sulfuric_acid"],
+    quests: [
+        {
+            id: "uraninite",
+            title: "Uraninite",
+            icon: "arcforge:raw_uraninite",
+            description: [
+                "Uraninite Ore is rare (two veins of four, Y -64..24) and radioactive: Raw Uraninite gives 0.1 mSv/h in your pocket, a block of nine 0.9. It never smelts; an Arc Crusher makes Uraninite Dust (two per ore, four in the array).",
+                "",
+                "**Covers:** {item:arcforge:uraninite_ore}, {item:arcforge:deepslate_uraninite_ore}, {item:arcforge:raw_uraninite}, {item:arcforge:raw_uraninite_block}, {item:arcforge:uraninite_dust}"
+            ],
+            x: 0d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:raw_uraninite"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "geiger",
+            title: "Geiger Counter",
+            icon: "arcforge:geiger_counter",
+            description: [
+                "Steel plates, a glass pane, redstone and copper. Held, it shows the dose rate in mSv/h and clicks faster near sources. The Dosimeter (glass pane, redstone, Steel Plate) keeps a running total of your dose and warns at each threshold.",
+                "",
+                "**Covers:** {item:arcforge:geiger_counter}, {item:arcforge:dosimeter}"
+            ],
+            x: 1.5d,
+            y: 2.5d,
+            dependencies: ["uraninite"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:geiger_counter", "arcforge:dosimeter"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Obtain Geiger Counter or Dosimeter",
+                    icon: "arcforge:geiger_counter"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:dosimeter"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "lead",
+            title: "Lead",
+            icon: "arcforge:lead_ingot",
+            description: [
+                "Galena Ore (Y -16..64) drops Raw Galena, which smelts to Lead Ingots; crushing gives Lead Dust and a 10% chance of Silver Dust. Lead is the shielding metal: a Block of Lead lets 10% of radiation through, Lead Plates build the cascade casings.",
+                "",
+                "**Covers:** {item:arcforge:galena_ore}, {item:arcforge:deepslate_galena_ore}, {item:arcforge:raw_galena}, {item:arcforge:raw_galena_block}, {item:arcforge:lead_dust}, {item:arcforge:lead_ingot}, {item:arcforge:lead_block}, {item:arcforge:lead_plate}"
+            ],
+            x: 1.5d,
+            y: 3.75d,
+            dependencies: ["uraninite"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_ingot"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_ingot",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "shielding",
+            title: "Shielding",
+            icon: "arcforge:lead_bricks",
+            description: [
+                "A Lead Box (eight shielding metal round a chest) is a nine-slot box no radiation leaves: carry ore in it. Lead Bricks (lead and bricks) let 10% through; Concrete Shielding (concrete and Steel Rods) 25%. Build walls around the hot room.",
+                "",
+                "**Covers:** {item:arcforge:lead_box}, {item:arcforge:lead_bricks}, {item:arcforge:concrete_shielding}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            dependencies: ["lead"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_box"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:lead_bricks", "arcforge:concrete_shielding"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Make a shielding block",
+                    icon: "arcforge:lead_bricks"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:lead_bricks",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "hazmat",
+            title: "Hazmat Suit",
+            icon: "arcforge:hazmat_chestplate",
+            description: [
+                "Rubber and shielding metal (glass pane for the hood): Hood, Suit, Trousers and Boots. The full set blocks 95% of radiation.",
+                "",
+                "**Covers:** {item:arcforge:hazmat_helmet}, {item:arcforge:hazmat_chestplate}, {item:arcforge:hazmat_leggings}, {item:arcforge:hazmat_boots}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["geiger"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:hazmat_helmet"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hazmat_chestplate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hazmat_leggings"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:hazmat_boots"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:rubber",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "heavy_minerals",
+            title: "Heavy Mineral Sand",
+            icon: "arcforge:heavy_mineral_sand",
+            description: [
+                "Patches in beach, river and desert sand and gravel (Y 40..90), dug with a shovel. The Sifter gives sand back plus Monazite (30%, slightly radioactive), Zircon (40%) and Iron Dust (15%). Crushed, Monazite Dust and Zircon Dust are set aside for the reactors to come.",
+                "",
+                "**Covers:** {item:arcforge:heavy_mineral_sand}, {item:arcforge:monazite}, {item:arcforge:monazite_dust}, {item:arcforge:zircon}, {item:arcforge:zircon_dust}"
+            ],
+            x: 1.5d,
+            y: 1.25d,
+            dependencies: ["uraninite"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:monazite"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:zircon"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:heavy_mineral_sand",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "uranyl",
+            title: "Uranyl Sulfate",
+            icon: "arcforge:uranyl_sulfate_solution_bucket",
+            description: [
+                "Uraninite Dust and 250 mB of Sulfuric Acid leach into 250 mB of Uranyl Sulfate Solution.",
+                "",
+                "**Covers:** {item:arcforge:uranyl_sulfate_solution_bucket}"
+            ],
+            x: 1.5d,
+            y: 5d,
+            dependencies: ["uraninite"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:uranyl_sulfate_solution"
+                        }
+                    },
+                    title: "Leach uranium",
+                    icon: "arcforge:uranyl_sulfate_solution_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:sulfuric_acid_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "yellowcake",
+            title: "Yellowcake",
+            icon: "arcforge:yellowcake",
+            description: [
+                "250 mB of the solution and 50 mB of Ammonia precipitate Ammonium Diuranate; calcine it in an Induction Furnace (or any furnace) to Yellowcake.",
+                "",
+                "**Covers:** {item:arcforge:ammonium_diuranate}, {item:arcforge:yellowcake}"
+            ],
+            x: 3d,
+            y: 5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["uranyl"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:ammonium_diuranate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:yellowcake"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:yellowcake",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "hydrofluoric_acid",
+            title: "Hydrofluoric Acid",
+            icon: "arcforge:hydrofluoric_acid_bucket",
+            description: [
+                "Fluorite Dust and 500 mB of Sulfuric Acid give 500 mB of Hydrofluoric Acid. It fluorinates uranium, and the Electrolyzer splits it into Hydrogen and Fluorine.",
+                "",
+                "**Covers:** {item:arcforge:hydrofluoric_acid_bucket}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["uraninite"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:hydrofluoric_acid"
+                        }
+                    },
+                    title: "Make Hydrofluoric Acid",
+                    icon: "arcforge:hydrofluoric_acid_bucket"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:fluorite_dust",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 6
+                }
+            ]
+        },
+        {
+            id: "conversion",
+            title: "Conversion",
+            icon: "arcforge:uranium_tetrafluoride",
+            description: [
+                "Yellowcake and 100 mB of Hydrogen make Uranium Dioxide. UO2 and 400 mB of Hydrofluoric Acid make Uranium Tetrafluoride. UF4 and 100 mB of Fluorine make 100 mB of Uranium Hexafluoride at natural 0.711% U-235, a gas that only a PVC-lined cylinder will hold.",
+                "",
+                "**Covers:** {item:arcforge:uranium_dioxide}, {item:arcforge:uranium_tetrafluoride}"
+            ],
+            x: 4.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["yellowcake", "hydrofluoric_acid"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:uranium_dioxide"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:uranium_tetrafluoride"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:uranium_hexafluoride"
+                        }
+                    },
+                    title: "Make Uranium Hexafluoride",
+                    icon: "arcforge:uranium_tetrafluoride"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:pvc_sheet",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "gas_centrifuge",
+            title: "Gas Centrifuge",
+            icon: "arcforge:gas_centrifuge",
+            description: [
+                "Steel plates, Carbon Fiber, tungsten rods, PVC Sheets and a copper gear: a two-block-tall centrifuge doing 0.02 SWU/t for 40 FE/t. Centrifuge Cascade Casings (steel plates, Lead Plates, steel gear) make the floor it stands on; the Controller is a casing with a glass pane and redstone.",
+                "",
+                "**Covers:** {item:arcforge:gas_centrifuge}, {item:arcforge:centrifuge_cascade_casing}, {item:arcforge:centrifuge_cascade_controller}"
+            ],
+            x: 6d,
+            y: 2.5d,
+            dependencies: ["conversion"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:gas_centrifuge"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:centrifuge_cascade_casing"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:centrifuge_cascade_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:carbon_fiber",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "cascade",
+            title: "Centrifuge Cascade",
+            icon: "arcforge:centrifuge_cascade_controller",
+            description: [
+                "A floor 3×3 to 7×7 of casings with Gas Centrifuges standing on it and the Controller in the edge. Input, Output, Tails and Energy ports on the outer faces. It enriches UF6 to 1–20% U-235 and leaves tails at 0.1–0.5%."
+            ],
+            x: 7.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["gas_centrifuge"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:centrifuge_cascade"
+                        }
+                    },
+                    title: "Form the Centrifuge Cascade",
+                    icon: "arcforge:centrifuge_cascade_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:centrifuge_cascade_casing",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "enriched",
+            title: "Enriched",
+            icon: "arcforge:centrifuge_cascade_controller",
+            description: ["Draw enriched Uranium Hexafluoride from the cascade's Output port."],
+            x: 9d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["cascade"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "enrichment"
+                        }
+                    },
+                    title: "Enrich UF6",
+                    icon: "arcforge:centrifuge_cascade_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:gas_centrifuge",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "full_hall",
+            title: "Full Hall",
+            icon: "arcforge:gas_centrifuge",
+            description: ["A 7×7 cascade floor carrying 24 Gas Centrifuges."],
+            x: 9d,
+            y: 3.75d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["cascade"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:centrifuge_cascade",
+                            min_length: 24
+                        }
+                    },
+                    title: "Form the Centrifuge Cascade (size 24+)",
+                    icon: "arcforge:centrifuge_cascade_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 20
+                }
+            ],
+            secret: 1b,
+            hide: "until_unlocked"
+        },
+        {
+            id: "depleted_uranium",
+            title: "Depleted Uranium",
+            icon: "arcforge:depleted_uranium_ingot",
+            description: [
+                "100 mB of depleted hexafluoride, 100 Hydrogen and 100 Steam give Depleted Uranium Dust (and 200 mB of Hydrofluoric Acid back). Blast it to Depleted Uranium Ingots, which stand in for lead in every shielding recipe; a Block of Depleted Uranium is the best shield there is, letting 5% through, and glows very faintly.",
+                "",
+                "**Covers:** {item:arcforge:depleted_uranium_dust}, {item:arcforge:depleted_uranium_ingot}, {item:arcforge:depleted_uranium_block}"
+            ],
+            x: 10.5d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["enriched"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:depleted_uranium_ingot"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:depleted_uranium_ingot",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 12
+                }
+            ]
+        },
+        {
+            id: "nuclear_engineer",
+            title: "Nuclear Engineer",
+            icon: "arcforge:yellowcake",
+            description: ["Dressed, shielded, enriched. The reactors come next."],
+            x: 12d,
+            y: 2.5d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["depleted_uranium", "hazmat", "shielding", "heavy_minerals"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:hazmat_chestplate"
+                },
+                {
+                    type: "item",
+                    item: "arcforge:depleted_uranium_block"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            recipe_category: "enrichment"
+                        }
+                    },
+                    title: "Enrich UF6",
+                    icon: "arcforge:centrifuge_cascade_controller"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:arcforged_energy_cell"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 25
+                }
+            ]
+        }
+    ]
+}
