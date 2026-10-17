@@ -127,7 +127,7 @@ ch.q("array_of_options", "Array of Options", "metal_pressing_array_casing",
      "All three arrays formed. Your ore line now runs at scale.",
      [formed("arc_crushing_array", icon="arc_crushing_array_casing"), formed("induction_furnace_array", icon="induction_furnace_array_casing"),
       formed("metal_pressing_array", icon="metal_pressing_array_casing")],
-     deps=["arrays"], rewards=[item("speed_upgrade", 8), xp(12)], frame="challenge", hidden=True)
+     deps=["arrays"], rewards=[item("speed_upgrade", 8), xp(12)], frame="challenge")
 
 ch.q("composite", "Arcite-Tungsten Composite", "arcite_tungsten_composite",
      "A Tungsten Plate and two Arcite Crystals, shapeless. It's the hard core of Arcforged Alloy and the Tungsten Drill "

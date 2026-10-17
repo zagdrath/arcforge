@@ -6,7 +6,6 @@
     subtitle: "New ores, crushing, sifting, arrays and parts",
     icon: "arcforge:arc_crusher",
     default_shape: "circle",
-    requires: ["arcforge_getting_started/steel_parts"],
     quests: [
         {
             id: "ores",
@@ -19,6 +18,7 @@
             ],
             x: 0d,
             y: 1.25d,
+            dependencies: ["arcforge_getting_started/steel_parts"],
             tasks: [
                 {
                     type: "item",
@@ -640,9 +640,7 @@
                     type: "xp_levels",
                     levels: 12
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         },
         {
             id: "composite",

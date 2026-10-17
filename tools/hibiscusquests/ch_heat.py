@@ -39,7 +39,7 @@ ch.q("firebox_array", "Firebox Array", "firebox_array_controller",
 ch.q("roaring_inferno", "Roaring Inferno", "firebox_array_casing",
      "A full 7×7×7 Firebox Array: 343 blocks, 50,400 HU/t.",
      [formed("firebox_array", min_length=343, icon="firebox_array_controller")], deps=["firebox_array"],
-     rewards=[item("coal_coke_block", 8), xp(15)], frame="challenge", hidden=True)
+     rewards=[item("coal_coke_block", 8), xp(15)], frame="challenge")
 
 ch.q("oxy_fuel", "Oxy-Fuel", "firebox",
      "Feed Oxygen (from an Electrolyzer or Air Separator) into a Firebox, Fuel Burner or Firebox Array through an Oxygen "
@@ -49,7 +49,7 @@ ch.q("oxy_fuel", "Oxy-Fuel", "firebox",
 ch.q("white_heat", "White Heat", "fuel_burner",
      "Oxy-fuel at 1,600°C, the hottest flame in the mod: Hydrogen and Oxygen in a Firebox Array.",
      [oxy(1600, label="Reach 1,600°C on oxy-fuel")], deps=["oxy_fuel"], rewards=[item("hardened_alloy", 4), xp(15)],
-     frame="challenge", hidden=True)
+     frame="challenge")
 
 ch.q("heat_upgrades", "Hotter, Tighter", "heat_upgrade",
      "The Heat Upgrade (blaze powder, magma cream, Steel Plate) gives more heat per fuel or lava and lifts a "

@@ -27,7 +27,7 @@ ch.q("throttle_lever", "Throttle", "throttle_lever",
 ch.q("full_throttle", "Full Throttle", "throttle_lever",
      "A Gas Turbine Array at full speed on a throttle signal of 15.",
      [turbine("gas_turbine_array", min_signal=15, icon="gas_turbine_array_casing", label="Full speed at throttle 15")],
-     deps=["throttle_lever"], rewards=[item("gasoline_bucket", 4), xp(15)], frame="challenge", hidden=True)
+     deps=["throttle_lever"], rewards=[item("gasoline_bucket", 4), xp(15)], frame="challenge")
 
 ch.q("diesel_parts", "Engine Block", "diesel_generator_casing",
      "Diesel Generator Casings are steel plates and gears, copper plates and a Wrought Energy Conduit; the Controller "
@@ -44,4 +44,4 @@ ch.q("diesel_generator", "Diesel Generator", "diesel_generator_controller",
 ch.q("v16", "V16", "diesel_generator_casing",
      "The 9-long Diesel Generator: 15,000 FE/t.",
      [formed("diesel_generator", min_length=9, icon="diesel_generator_controller")], deps=["diesel_generator"],
-     rewards=[item("hardened_energy_cell", 1), xp(12)], frame="challenge", hidden=True)
+     rewards=[item("hardened_energy_cell", 1), xp(12)], frame="challenge")

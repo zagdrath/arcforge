@@ -95,4 +95,4 @@ ch.q("battery_array", "Battery Array", "battery_array_controller",
 ch.q("power_bank", "Power Bank", "arcforged_lithium_cell",
      "A full 5×5×5 Battery Array: 27 cells and regulators inside.",
      [formed("battery_array", min_length=125, icon="battery_array_controller")], deps=["battery_array"],
-     rewards=[item("hardened_lithium_cell", 1), xp(20)], frame="challenge", hidden=True)
+     rewards=[item("hardened_lithium_cell", 1), xp(20)], frame="challenge")

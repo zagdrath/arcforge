@@ -6,7 +6,6 @@
     subtitle: "Spent fuel, PUREX, MOX, thorium and waste",
     icon: "arcforge:purex_controller",
     default_shape: "circle",
-    requires: ["arcforge_nuclear_power/fission_reactor"],
     quests: [
         {
             id: "spent_fuel_pool",
@@ -19,6 +18,7 @@
             ],
             x: 0d,
             y: 2.5d,
+            dependencies: ["arcforge_nuclear_power/fission_reactor"],
             tasks: [
                 {
                     type: "item",
@@ -89,6 +89,7 @@
             ],
             x: 0d,
             y: 3.75d,
+            dependencies: ["arcforge_nuclear_power/fission_reactor"],
             tasks: [
                 {
                     type: "criterion",
@@ -125,7 +126,7 @@
             ],
             x: 0d,
             y: 1.25d,
-            dependencies: ["arcforge_reactor_safety/containment_materials"],
+            dependencies: ["arcforge_reactor_safety/containment_materials", "arcforge_nuclear_power/fission_reactor"],
             tasks: [
                 {
                     type: "item",
@@ -319,6 +320,7 @@
             ],
             x: 0d,
             y: 5d,
+            dependencies: ["arcforge_nuclear_power/fission_reactor"],
             tasks: [
                 {
                     type: "criterion",
@@ -355,6 +357,7 @@
             ],
             x: 0d,
             y: 0d,
+            dependencies: ["arcforge_nuclear_power/fission_reactor"],
             tasks: [
                 {
                     type: "item",
@@ -515,9 +518,7 @@
                     type: "xp_levels",
                     levels: 25
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         }
     ]
 }

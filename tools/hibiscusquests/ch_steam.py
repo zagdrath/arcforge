@@ -75,4 +75,4 @@ ch.q("nine_stage_spin", "Nine-Stage Spin", "steam_turbine_array_casing",
      "A Steam Turbine Array at least 9 long, running at full speed.",
      [turbine("steam_turbine_array", min_length=9, icon="steam_turbine_array_casing", label="Run a 9-long turbine at full speed")],
      deps=["condenser", "superheated"], rewards=[item("lubricant_bucket", 1), item("tempered_alloy", 16), xp(15)],
-     frame="challenge", hidden=True)
+     frame="challenge")

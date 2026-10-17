@@ -6,7 +6,6 @@
     subtitle: "Fireboxes, heat conduits and generators",
     icon: "arcforge:geothermal_plant",
     default_shape: "circle",
-    requires: ["arcforge_getting_started/thermoelectric_plant"],
     quests: [
         {
             id: "geothermal_plant",
@@ -21,6 +20,7 @@
             y: 1.25d,
             shape: "hexagon",
             size: 1.5d,
+            dependencies: ["arcforge_getting_started/thermoelectric_plant"],
             tasks: [
                 {
                     type: "criterion",
@@ -260,9 +260,7 @@
                     type: "xp_levels",
                     levels: 15
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         },
         {
             id: "oxy_fuel",
@@ -334,9 +332,7 @@
                     type: "xp_levels",
                     levels: 15
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         },
         {
             id: "heat_upgrades",

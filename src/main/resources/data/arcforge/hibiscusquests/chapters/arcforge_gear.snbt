@@ -6,7 +6,6 @@
     subtitle: "Steel tools, Arc Drills, armour and jetpacks",
     icon: "arcforge:arcforged_arc_drill",
     default_shape: "circle",
-    requires: ["arcforge_getting_started/steel_ingot"],
     quests: [
         {
             id: "steel_tools",
@@ -19,6 +18,7 @@
             ],
             x: 0d,
             y: 0d,
+            dependencies: ["arcforge_getting_started/steel_ingot"],
             tasks: [
                 {
                     type: "criterion",

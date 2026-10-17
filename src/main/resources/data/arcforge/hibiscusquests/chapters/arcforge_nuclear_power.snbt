@@ -6,7 +6,6 @@
     subtitle: "Fuel rods, the Fission Reactor and its steam",
     icon: "arcforge:reactor_controller",
     default_shape: "circle",
-    requires: ["arcforge_nuclear/enriched"],
     quests: [
         {
             id: "zirconium",
@@ -19,7 +18,7 @@
             ],
             x: 0d,
             y: 1.25d,
-            dependencies: ["arcforge_nuclear/heavy_minerals"],
+            dependencies: ["arcforge_nuclear/heavy_minerals", "arcforge_nuclear/enriched"],
             tasks: [
                 {
                     type: "item",
@@ -153,7 +152,7 @@
             ],
             x: 0d,
             y: 0d,
-            dependencies: ["arcforge_steelmaking/graphite"],
+            dependencies: ["arcforge_steelmaking/graphite", "arcforge_nuclear/enriched"],
             tasks: [
                 {
                     type: "item",
@@ -430,9 +429,7 @@
                     type: "xp_levels",
                     levels: 25
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         }
     ]
 }

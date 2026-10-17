@@ -20,9 +20,10 @@ the creative-only [Creative Fluid Tank, Pressurized Cylinder and Energy Cell](#c
 ## Questline
 
 With [Hibiscus Quests](https://github.com/hibiscus-software/hibiscus-quests) installed (optional), its quest book has
-Arcforge's questline: 20 chapters in six groups (Foundations, Power Generation, Petroleum, Chemistry, Agriculture and
+Arcforge's questline: 20 chapters in six groups under an Arcforge heading (Foundations, Power Generation, Petroleum, Chemistry, Agriculture and
 Nuclear) and 272 quests that follow the recipes from the Wrench to molten salt reactors, covering every item you can
-get in survival. Later chapters open as you reach the alloys and parts they need. Every quest is listed in
+get in survival. Every chapter shows its whole map from the start; quests stay greyed out until what they need is
+done, and a chapter's first quests wait for the alloy or part it starts from. Every quest is listed in
 [docs/QUESTLINE.md](docs/QUESTLINE.md). A modpack can change or replace the chapters in its own Hibiscus Quests files,
 or hide them with `disabled_sources: ["arcforge"]`.
 

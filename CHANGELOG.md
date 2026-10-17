@@ -31,14 +31,16 @@ Upgrading).
 ### Added
 
 - **A questline for Hibiscus Quests.** With [Hibiscus Quests](https://github.com/hibiscus-software/hibiscus-quests)
-  installed (optional), its quest book gets 20 Arcforge chapters in six groups and 272 quests, from the Wrench and the
-  Combustion Plant to molten salt reactors, covering every item you can get in survival. They follow the recipes:
-  Getting Started runs Combustion Plant, Carbonizer, Arcforge Furnace, first steel, Metal Press and Thermoelectric
-  Plant, and later chapters open with the alloys and parts they need (the Steam Boiler with Tempered Alloy, chemistry
-  with Hardened Alloy, uranium with Sulfuric Acid). New with the nuclear part three are Reactor Safety (containment,
-  ECCS, relief valves, recombiners, core catcher, decontamination), Fuel Cycle (spent fuel, PUREX, MOX, thorium, U-233,
-  vitrification and the repository) and Advanced Cores (lead-bismuth and molten salt). Hidden challenges show as "?"
-  until they unlock. Every quest is listed in docs/QUESTLINE.md; the chapters are generated from tools/hibiscusquests.
+  installed (optional), its quest book gets 20 Arcforge chapters in six groups under an Arcforge heading, and 272
+  quests, from the Wrench and the Combustion Plant to molten salt reactors, covering every item you can get in survival.
+  They follow the recipes: Getting Started runs Combustion Plant, Carbonizer, Arcforge Furnace, first steel, Metal Press
+  and Thermoelectric Plant, and each later chapter's first quests unlock with the alloys and parts they need (the Steam
+  Boiler with Tempered Alloy, chemistry with Hardened Alloy, uranium with Sulfuric Acid). Every chapter and quest,
+  challenges included, can be looked at from the start, greyed out until it unlocks, so you can see what's coming. New
+  with the nuclear part three are Reactor Safety (containment, ECCS, relief valves, recombiners, core catcher,
+  decontamination), Fuel Cycle (spent fuel, PUREX, MOX, thorium, U-233, vitrification and the repository) and Advanced
+  Cores (lead-bismuth and molten salt). Every quest is listed in docs/QUESTLINE.md; the chapters are generated from
+  tools/hibiscusquests.
 - **Radiation Poisoning.** Radiation now does harm at every level: a dose of 50 mSv brings Radiation Poisoning I (half a
   heart every 30 seconds, through armour), 500 II (every 10 seconds, and Hunger), 2,000 III (every 4 seconds, Hunger and
   Weakness) and 4,000 IV (a heart every 2 seconds, with Nausea), and standing in a field of 100 mSv/h or more makes it a

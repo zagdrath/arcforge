@@ -6,7 +6,6 @@
     subtitle: "Machines that run themselves",
     icon: "arcforge:arc_quarry",
     default_shape: "circle",
-    requires: ["arcforge_getting_started/powered_up"],
     quests: [
         {
             id: "block_breaker",
@@ -19,6 +18,7 @@
             ],
             x: 0d,
             y: 0d,
+            dependencies: ["arcforge_getting_started/powered_up"],
             tasks: [
                 {
                     type: "criterion",
@@ -61,6 +61,7 @@
             ],
             x: 0d,
             y: 1.25d,
+            dependencies: ["arcforge_getting_started/powered_up"],
             tasks: [
                 {
                     type: "criterion",

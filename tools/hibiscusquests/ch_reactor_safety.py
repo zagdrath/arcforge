@@ -66,5 +66,4 @@ ch.q("decontamination", "Decontamination", "decontamination_shower",
 ch.q("what_remains", "What Remains", "solidified_corium",
      "Corium slowly cools, faster beside water, into Solidified Corium: still intensely radioactive. Hold a piece of "
      "it. Use a Lead Box.",
-     [have("solidified_corium")], deps=["core_catcher"], rewards=[item("lead_block", 8), xp(20)], frame="challenge",
-     hidden=True, items=["solidified_corium"])
+     [have("solidified_corium")], deps=["core_catcher"], rewards=[item("lead_block", 8), xp(20)], frame="challenge", items=["solidified_corium"])

@@ -6,7 +6,6 @@
     subtitle: "The four tier alloys and Graphite",
     icon: "arcforge:tempered_alloy",
     default_shape: "circle",
-    requires: ["arcforge_getting_started/steel_ingot"],
     quests: [
         {
             id: "tempered_alloy",

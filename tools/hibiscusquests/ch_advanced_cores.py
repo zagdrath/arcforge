@@ -52,4 +52,4 @@ ch.q("walk_away", "Walk-Away Safe", "freeze_plug",
      "Let a salt core overheat and watch the Freeze Plug do its job: the salt drains into the tank and the core shuts "
      "itself down. It refreezes once it's powered and cool again.",
      [produced(category="freeze_plug", icon="freeze_plug", label="Have a Freeze Plug drain an overheating core")],
-     deps=["molten_salt_reactor"], rewards=[item("arcforged_alloy", 4), xp(20)], frame="challenge", hidden=True)
+     deps=["molten_salt_reactor"], rewards=[item("arcforged_alloy", 4), xp(20)], frame="challenge")

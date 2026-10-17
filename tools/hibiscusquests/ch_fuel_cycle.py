@@ -90,4 +90,4 @@ ch.q("closed_cycle", "Closing the Cycle", "geological_repository",
      "Reprocess, refuel with MOX and U-233, and put the waste away for good: nothing left lying about.",
      [have("mox_fuel_rod"), have("u233_fuel_rod"),
       produced(category="repository", icon="geological_repository", label="Store waste in a Geological Repository")],
-     deps=["mox", "u233", "repository"], rewards=[item("arcforged_alloy", 8), xp(25)], frame="challenge", hidden=True)
+     deps=["mox", "u233", "repository"], rewards=[item("arcforged_alloy", 8), xp(25)], frame="challenge")

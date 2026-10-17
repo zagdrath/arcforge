@@ -89,7 +89,7 @@ ch.q("enriched", "Enriched", "centrifuge_cascade_controller",
 ch.q("full_hall", "Full Hall", "gas_centrifuge",
      "A 7×7 cascade floor carrying 24 Gas Centrifuges.",
      [formed("centrifuge_cascade", min_length=24, icon="centrifuge_cascade_controller")], deps=["cascade"],
-     rewards=[item("arcforged_alloy", 8), xp(20)], frame="challenge", hidden=True)
+     rewards=[item("arcforged_alloy", 8), xp(20)], frame="challenge")
 
 ch.q("depleted_uranium", "Depleted Uranium", "depleted_uranium_ingot",
      "100 mB of depleted hexafluoride, 100 Hydrogen and 100 Steam give Depleted Uranium Dust (and 200 mB of Hydrofluoric Acid "

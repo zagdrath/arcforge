@@ -6,7 +6,6 @@
     subtitle: "Boilers, superheaters, turbines and condensers",
     icon: "arcforge:steam_turbine_array_casing",
     default_shape: "circle",
-    requires: ["arcforge_steelmaking/tempered_alloy"],
     quests: [
         {
             id: "pressure_glass",
@@ -19,6 +18,7 @@
             ],
             x: 0d,
             y: 1.25d,
+            dependencies: ["arcforge_steelmaking/tempered_alloy"],
             tasks: [
                 {
                     type: "item",
@@ -48,6 +48,7 @@
             ],
             x: 0d,
             y: 2.5d,
+            dependencies: ["arcforge_steelmaking/tempered_alloy"],
             tasks: [
                 {
                     type: "criterion",
@@ -91,6 +92,7 @@
             ],
             x: 0d,
             y: 0d,
+            dependencies: ["arcforge_steelmaking/tempered_alloy"],
             tasks: [
                 {
                     type: "criterion",
@@ -434,9 +436,7 @@
                     type: "xp_levels",
                     levels: 15
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         }
     ]
 }

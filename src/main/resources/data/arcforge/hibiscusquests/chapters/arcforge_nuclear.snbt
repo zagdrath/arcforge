@@ -6,7 +6,6 @@
     subtitle: "Uranium to enriched fuel, and staying safe",
     icon: "arcforge:yellowcake",
     default_shape: "circle",
-    requires: ["arcforge_chemistry/sulfuric_acid"],
     quests: [
         {
             id: "uraninite",
@@ -21,6 +20,7 @@
             y: 2.5d,
             shape: "hexagon",
             size: 1.5d,
+            dependencies: ["arcforge_chemistry/sulfuric_acid"],
             tasks: [
                 {
                     type: "item",
@@ -533,9 +533,7 @@
                     type: "xp_levels",
                     levels: 20
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         },
         {
             id: "depleted_uranium",

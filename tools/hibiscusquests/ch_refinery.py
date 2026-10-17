@@ -49,7 +49,7 @@ ch.q("crude_cuts", "Crude Cuts", "diesel_bucket",
 ch.q("refinery_tower", "Refinery Tower", "tray_level_casing",
      "A full 16-tall Distillation Array. Every cut, 90 mB/t.",
      [formed("distillation_array", min_length=16, icon="distillation_array_controller")], deps=["crude_cuts"],
-     rewards=[item("hardened_alloy", 16), xp(15)], frame="challenge", hidden=True)
+     rewards=[item("hardened_alloy", 16), xp(15)], frame="challenge")
 
 ch.q("cracking_unit", "Cracking Unit", "cracking_unit_controller",
      "A 3×3×5 of Cracking Unit Casings (steel and nickel plates, Wrought Fluid Tank) and a Controller. Catalytic mode "

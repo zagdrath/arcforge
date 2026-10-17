@@ -6,7 +6,6 @@
     subtitle: "Lead-bismuth fast reactors and molten salt",
     icon: "arcforge:lead_bismuth_ingot",
     default_shape: "circle",
-    requires: ["arcforge_nuclear_power/fission_reactor"],
     quests: [
         {
             id: "lead_bismuth",
@@ -19,6 +18,7 @@
             ],
             x: 0d,
             y: 0d,
+            dependencies: ["arcforge_nuclear_power/fission_reactor"],
             tasks: [
                 {
                     type: "item",
@@ -85,7 +85,7 @@
             ],
             x: 0d,
             y: 1.25d,
-            dependencies: ["arcforge_fuel_cycle/thorium"],
+            dependencies: ["arcforge_fuel_cycle/thorium", "arcforge_nuclear_power/fission_reactor"],
             tasks: [
                 {
                     type: "item",
@@ -279,9 +279,7 @@
                     type: "xp_levels",
                     levels: 20
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         }
     ]
 }

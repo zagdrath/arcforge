@@ -103,7 +103,6 @@ class Quest:
     frame: str = "task"            # task | goal | challenge
     all_of: bool = True            # True: every criterion; False: any one (merged into one task: same trigger only)
     items: list = field(default_factory=list)   # items this quest covers (listed at the end of its description)
-    hidden: bool = False           # shown as "?" until unlocked (challenges)
     x: int | None = None
     y: int | None = None
 

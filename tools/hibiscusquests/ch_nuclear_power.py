@@ -74,5 +74,4 @@ ch.q("power_plant", "Power Plant", "steam_turbine_array_casing",
      "station. A large core can drive several turbines at once.",
      [formed("fission_reactor", icon="reactor_controller"), formed("steam_generator", icon="steam_generator_controller"),
       turbine("steam_turbine_array", min_length=15, icon="steam_turbine_array_casing")],
-     deps=["fission_reactor", "steam_generator"], rewards=[item("arcforged_alloy", 8), xp(25)], frame="challenge",
-     hidden=True)
+     deps=["fission_reactor", "steam_generator"], rewards=[item("arcforged_alloy", 8), xp(25)], frame="challenge")

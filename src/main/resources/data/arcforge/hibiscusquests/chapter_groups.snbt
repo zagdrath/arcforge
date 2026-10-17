@@ -1,40 +1,52 @@
 {
     groups: [
         {
+            id: "arcforge",
+            title: "Arcforge",
+            icon: "arcforge:wrench",
+            order: 0
+        },
+        {
             id: "arcforge_foundations",
             title: "Foundations",
             icon: "arcforge:steel_ingot",
-            order: 0
+            order: 0,
+            parent: "arcforge"
         },
         {
             id: "arcforge_power",
             title: "Power Generation",
             icon: "arcforge:steam_turbine_array_casing",
-            order: 1
+            order: 1,
+            parent: "arcforge"
         },
         {
             id: "arcforge_petroleum",
             title: "Petroleum",
             icon: "arcforge:pumpjack_controller",
-            order: 2
+            order: 2,
+            parent: "arcforge"
         },
         {
             id: "arcforge_chemistry",
             title: "Chemistry",
             icon: "arcforge:chemical_reactor",
-            order: 3
+            order: 3,
+            parent: "arcforge"
         },
         {
             id: "arcforge_agriculture",
             title: "Agriculture",
             icon: "arcforge:compost_bin",
-            order: 4
+            order: 4,
+            parent: "arcforge"
         },
         {
             id: "arcforge_nuclear",
             title: "Nuclear",
             icon: "arcforge:reactor_controller",
-            order: 5
+            order: 5,
+            parent: "arcforge"
         }
     ]
 }

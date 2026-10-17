@@ -6,7 +6,6 @@
     subtitle: "Brine, chlorine and lithium",
     icon: "arcforge:battery_array_controller",
     default_shape: "circle",
-    requires: ["arcforge_steelmaking/tempered_alloy"],
     quests: [
         {
             id: "rock_salt",
@@ -19,6 +18,7 @@
             ],
             x: 0d,
             y: 0d,
+            dependencies: ["arcforge_steelmaking/tempered_alloy"],
             tasks: [
                 {
                     type: "item",
@@ -277,6 +277,7 @@
             ],
             x: 0d,
             y: 1.25d,
+            dependencies: ["arcforge_steelmaking/tempered_alloy"],
             tasks: [
                 {
                     type: "item",
@@ -566,9 +567,7 @@
                     type: "xp_levels",
                     levels: 20
                 }
-            ],
-            secret: 1b,
-            hide: "until_unlocked"
+            ]
         }
     ]
 }

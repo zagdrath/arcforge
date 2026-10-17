@@ -6,7 +6,6 @@
     subtitle: "Surveys, pumpjacks, derricks and gas wells",
     icon: "arcforge:pumpjack_controller",
     default_shape: "circle",
-    requires: ["arcforge_steelmaking/tempered_alloy"],
     quests: [
         {
             id: "survey_tool",
@@ -19,6 +18,7 @@
             ],
             x: 0d,
             y: 0d,
+            dependencies: ["arcforge_steelmaking/tempered_alloy"],
             tasks: [
                 {
                     type: "criterion",

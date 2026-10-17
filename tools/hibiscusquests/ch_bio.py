@@ -119,7 +119,7 @@ ch.q("night_shift", "Night Shift", "grow_lamp",
 ch.q("fully_fed", "Fully Fed", "greenhouse_controller",
      "A Greenhouse harvest with water, Nutrient Solution, Carbon Dioxide and heat all supplied at once.",
      [produced(category="greenhouse_fully_fed", icon="greenhouse_controller", label="Harvest fully fed")], deps=["greenhouse"],
-     rewards=[item("npk_fertilizer", 16), xp(12)], frame="challenge", hidden=True)
+     rewards=[item("npk_fertilizer", 16), xp(12)], frame="challenge")
 
 ch.q("agronomist", "Agronomist", "greenhouse_controller",
      "Fuel, fertilizer and rubber from plants, and a glasshouse that farms itself.",
