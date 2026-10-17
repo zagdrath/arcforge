@@ -22,6 +22,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+## [2.8.1] - 2026-10-17
+
 ### Changed
 
 - **New textures for materials.** 86 textures are redrawn: the metal storage blocks (lead, nickel, silver, steel,
@@ -1945,7 +1947,8 @@ First version.
   Steam Turbine, and the Steam Boiler and Steam Turbine Arrays.
 - Materials: steel, coal coke, slag and rock wool, dusts, copper and steel parts, and treated wood.
 
-[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.8.0+26.3...HEAD
+[Unreleased]: https://github.com/zagdrath/arcforge/compare/v2.8.1+26.3...HEAD
+[2.8.1]: https://github.com/zagdrath/arcforge/compare/v2.8.0+26.3...v2.8.1+26.3
 [2.8.0]: https://github.com/zagdrath/arcforge/compare/v2.7.0+26.3...v2.8.0+26.3
 [2.7.0]: https://github.com/zagdrath/arcforge/compare/v2.6.1+26.3...v2.7.0+26.3
 [2.6.1]: https://github.com/zagdrath/arcforge/compare/v2.6.0+26.3...v2.6.1+26.3
