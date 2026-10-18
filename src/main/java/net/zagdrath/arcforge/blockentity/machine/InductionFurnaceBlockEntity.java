@@ -26,10 +26,12 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.machine.ExperienceBank;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.SmeltingLane;
 import net.zagdrath.arcforge.machine.StoredExperience;
@@ -45,22 +47,24 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Smelts anything with a furnace recipe (vanilla or modded) using FE: half the recipe's cooking time
-// (100 ticks for a normal recipe) at 20 FE/t, so 2,000 FE an item. Holds the recipes' XP until a player
-// takes the output, like a vanilla furnace. Speed upgrades make it faster (drawing FE just as much
-// faster), Energy upgrades cut the FE per item.
+// (100 ticks for a normal recipe) at 20 FE/t, so 2,000 FE an item. Banks the recipes' XP as Liquid Experience (see
+// ExperienceBank), drained through Experience faces; once that tank is full it holds the XP until a player takes the
+// output, like a vanilla furnace. Speed upgrades make it faster (drawing FE just as much faster), Energy upgrades cut the
+// FE per item.
 public class InductionFurnaceBlockEntity extends MachineBlockEntity {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
     public static final int MACHINE_SLOTS = 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.EXPERIENCE);
 
     private final ConsumerEnergyHandler energy;
     private final ResourceHandler<ItemResource> itemInput;
     private final ResourceHandler<ItemResource> itemOutput;
     private final ResourceHandler<ItemResource> itemAutomation;
     private final SmeltingLane lane = new SmeltingLane(SLOT_INPUT, SLOT_OUTPUT);
-    private final StoredExperience experience = new StoredExperience(this::setChanged);
+    private final ExperienceBank bank = new ExperienceBank(ArcforgeConfig.INDUCTION_EXPERIENCE_TANK.getAsInt(), this::setChanged);
+    private final StoredExperience experience = new StoredExperience(this::setChanged, bank);
     private final ContainerData data;
     private int usage;
 
@@ -87,6 +91,8 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
                     case InductionFurnaceMenu.DATA_STATUS -> status.ordinal();
                     case InductionFurnaceMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case InductionFurnaceMenu.DATA_SIDE_CONFIG -> packedSides();
+                    case InductionFurnaceMenu.DATA_XP -> bank.getAmount();
+                    case InductionFurnaceMenu.DATA_XP_CAPACITY -> bank.getCapacity();
                     default -> 0;
                 };
             }
@@ -132,6 +138,9 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         }
         setLit(status == MachineStatus.SMELTING);
         autoEject(level, itemOutput);
+        if (isAutoEject() && bank.getAmount() > 0) {
+            outputs.pushFluid(level, pos, getFacing(), sideConfig, SideMode.EXPERIENCE, bank.getOutput(), ArcforgeConfig.EXPERIENCE_OUTPUT_RATE.getAsInt());
+        }
     }
 
     // Pays the stored smelting XP out to a player who took the output.
@@ -147,6 +156,11 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
 
     public StoredExperience getExperience() {
         return experience;
+    }
+
+    // The Liquid Experience it has banked.
+    public ExperienceBank getBank() {
+        return bank;
     }
 
     public int getUsage() {
@@ -180,6 +194,12 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         };
     }
 
+    // Experience faces give the banked Liquid Experience; unsided, it's there too (for Jade).
+    public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
+        SideMode mode = modeFor(side);
+        return mode == null || mode == SideMode.EXPERIENCE ? bank.getOutput() : null;
+    }
+
     // FE goes in on energy faces.
     public @Nullable EnergyHandler getEnergyHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
@@ -192,7 +212,8 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         return switch (type) {
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
+            case FLUID -> mode == SideMode.EXPERIENCE ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case GAS, THERMAL -> ConnectionMode.NONE;
         };
     }
 
@@ -202,6 +223,7 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         energy.deserialize(input.childOrEmpty("energy"));
         lane.deserialize(input.childOrEmpty("lane"));
         experience.deserialize(input);
+        bank.deserialize(input);
     }
 
     @Override
@@ -210,6 +232,7 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         energy.serialize(output.child("energy"));
         lane.serialize(output.child("lane"));
         experience.serialize(output);
+        bank.serialize(output);
     }
 
     @Override

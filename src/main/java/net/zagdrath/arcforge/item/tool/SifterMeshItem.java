@@ -20,11 +20,11 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 
 // A Sifter Mesh: goes in the Sifter's mesh slot, which won't run without one. Each tier multiplies every output's
 // chance and the speed (machines.processing.sifter.<tier>MeshChance / <tier>MeshSpeed), and wears by a point a block sifted
-// (with meshWearChance) until it breaks: Steel 256, Invar 512, Tungsten 1,024 points. Unbreaking (from an enchanting table
+// (with meshWearChance) until it breaks: Steel 256, Invar 512, Tungsten 1,024, Silicon Carbide 2,048 points. Unbreaking (from an enchanting table
 // or an anvil) makes it last longer, as it does a tool.
 public class SifterMeshItem extends Item {
     public enum Tier {
-        STEEL(256), INVAR(512), TUNGSTEN(1_024);
+        STEEL(256), INVAR(512), TUNGSTEN(1_024), SILICON_CARBIDE(2_048);
 
         private final int durability;
 
@@ -41,6 +41,7 @@ public class SifterMeshItem extends Item {
                 case STEEL -> ArcforgeConfig.SIFTER_STEEL_CHANCE.getAsDouble();
                 case INVAR -> ArcforgeConfig.SIFTER_INVAR_CHANCE.getAsDouble();
                 case TUNGSTEN -> ArcforgeConfig.SIFTER_TUNGSTEN_CHANCE.getAsDouble();
+                case SILICON_CARBIDE -> ArcforgeConfig.SIFTER_SILICON_CARBIDE_CHANCE.getAsDouble();
             };
         }
 
@@ -49,6 +50,7 @@ public class SifterMeshItem extends Item {
                 case STEEL -> ArcforgeConfig.SIFTER_STEEL_SPEED.getAsDouble();
                 case INVAR -> ArcforgeConfig.SIFTER_INVAR_SPEED.getAsDouble();
                 case TUNGSTEN -> ArcforgeConfig.SIFTER_TUNGSTEN_SPEED.getAsDouble();
+                case SILICON_CARBIDE -> ArcforgeConfig.SIFTER_SILICON_CARBIDE_SPEED.getAsDouble();
             };
         }
     }

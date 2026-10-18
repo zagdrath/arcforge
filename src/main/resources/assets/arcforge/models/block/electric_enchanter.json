@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "north": "arcforge:block/electric_enchanter_front",
+    "south": "arcforge:block/electric_enchanter_back",
+    "east": "arcforge:block/electric_enchanter_side",
+    "west": "arcforge:block/electric_enchanter_side",
+    "up": "arcforge:block/electric_enchanter_top",
+    "down": "arcforge:block/electric_enchanter_bottom",
+    "particle": "arcforge:block/electric_enchanter_side"
+  }
+}

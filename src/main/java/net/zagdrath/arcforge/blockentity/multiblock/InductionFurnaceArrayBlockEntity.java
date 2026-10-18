@@ -6,6 +6,7 @@
 package net.zagdrath.arcforge.blockentity.multiblock;
 
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
@@ -22,12 +23,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.transfer.ResourceHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
+import net.zagdrath.arcforge.conduit.ConduitType;
+import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.machine.ExperienceBank;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.SmeltingLane;
 import net.zagdrath.arcforge.machine.StoredExperience;
+import net.zagdrath.arcforge.machine.config.SideConfig;
+import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.InductionFurnaceArrayMenu;
 import net.zagdrath.arcforge.multiblock.CubeMultiblockStructure;
@@ -38,18 +46,22 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The Induction Furnace Array (see CubeMultiblockBlockEntity). Three smelting lanes work in parallel,
 // each twice as fast as an Induction Furnace and for 60% less FE an item. Smelting never doubles
-// outputs. The recipes' XP is held until a player takes an output, like a vanilla furnace.
+// outputs. The recipes' XP is banked as Liquid Experience (see ExperienceBank), given out of Experience faces; once that
+// tank is full it's held until a player takes an output, like a vanilla furnace.
 public class InductionFurnaceArrayBlockEntity extends CubeMultiblockBlockEntity {
     public static final int LANES = 3;
     public static final int MACHINE_SLOTS = LANES * 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
+    private static final List<SideMode> MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.EXPERIENCE);
 
     private final SmeltingLane[] lanes = new SmeltingLane[LANES];
-    private final StoredExperience experience = new StoredExperience(this::setChanged);
+    private final ExperienceBank bank = new ExperienceBank(ArcforgeConfig.INDUCTION_ARRAY_EXPERIENCE_TANK.getAsInt(), this::setChanged);
+    private final StoredExperience experience = new StoredExperience(this::setChanged, bank);
     private final ContainerData data;
 
     public InductionFurnaceArrayBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.INDUCTION_FURNACE_ARRAY.get(), pos, state, MACHINE_SLOTS, InductionFurnaceArrayBlockEntity::isItemValid, UPGRADES,
+                new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.NONE, SideMode.NONE, SideMode.ENERGY, SideMode.NONE), MODES, true,
                 ArcforgeConfig.INDUCTION_ARRAY_ENERGY_CAPACITY.getAsInt(), ArcforgeConfig.INDUCTION_ARRAY_MAX_INPUT.getAsInt(),
                 new int[] { inputSlot(0), inputSlot(1), inputSlot(2) }, InductionFurnaceArrayBlockEntity::isOutputSlot);
         for (int lane = 0; lane < LANES; lane++) {
@@ -73,6 +85,8 @@ public class InductionFurnaceArrayBlockEntity extends CubeMultiblockBlockEntity 
                     case InductionFurnaceArrayMenu.DATA_STATUS -> status.ordinal();
                     case InductionFurnaceArrayMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case InductionFurnaceArrayMenu.DATA_SIDE_CONFIG -> packedSides();
+                    case InductionFurnaceArrayMenu.DATA_XP -> bank.getAmount();
+                    case InductionFurnaceArrayMenu.DATA_XP_CAPACITY -> bank.getCapacity();
                     default -> 0;
                 };
             }
@@ -183,6 +197,24 @@ public class InductionFurnaceArrayBlockEntity extends CubeMultiblockBlockEntity 
         return experience;
     }
 
+    // The Liquid Experience it has banked.
+    public ExperienceBank getBank() {
+        return bank;
+    }
+
+    // --- Capabilities: Experience faces give the banked Liquid Experience (and items and FE as the other arrays) ---
+
+    @Override
+    public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable SideMode mode) {
+        return mode == null || mode == SideMode.EXPERIENCE ? bank.getOutput() : null;
+    }
+
+    @Override
+    public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
+        return type == ConduitType.FLUID ? (mode == SideMode.EXPERIENCE ? ConnectionMode.OUTPUT : ConnectionMode.NONE)
+                : super.getConduitConnection(mode, type);
+    }
+
     // The centre broken: the XP drops where it stood.
     @Override
     public void preRemoveSideEffects(BlockPos pos, BlockState state) {
@@ -204,6 +236,7 @@ public class InductionFurnaceArrayBlockEntity extends CubeMultiblockBlockEntity 
             }
         }
         experience.deserialize(input);
+        bank.deserialize(input);
     }
 
     @Override
@@ -214,6 +247,7 @@ public class InductionFurnaceArrayBlockEntity extends CubeMultiblockBlockEntity 
             lane.serialize(list.addChild());
         }
         experience.serialize(output);
+        bank.serialize(output);
     }
 
     @Override

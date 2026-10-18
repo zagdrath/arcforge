@@ -21,7 +21,7 @@ the creative-only [Creative Fluid Tank, Pressurized Cylinder and Energy Cell](#c
 
 With [Hibiscus Quests](https://github.com/hibiscus-software/hibiscus-quests) installed (optional), its quest book has
 Arcforge's questline: 20 chapters in six groups under an Arcforge heading (Foundations, Power Generation, Petroleum, Chemistry, Agriculture and
-Nuclear) and 272 quests that follow the recipes from the Wrench to molten salt reactors, covering every item you can
+Nuclear) and 280 quests that follow the recipes from the Wrench to molten salt reactors, covering every item you can
 get in survival. Every chapter shows its whole map from the start; quests stay greyed out until what they need is
 done, and a chapter's first quests wait for the alloy or part it starts from. Every quest is listed in
 [docs/QUESTLINE.md](docs/QUESTLINE.md). A modpack can change or replace the chapters in its own Hibiscus Quests files,
@@ -271,8 +271,8 @@ Composite (1 tungsten plate + 2 arcite crystals, for Arcforged Alloy). Each ore'
 operation), with a bonus output rolled once per operation. It stores 20,000 FE and takes up to
 200 FE/t. Raw iron gives 1 iron dust (plus a 25% bonus), iron ore 2, ingots 1, and raw-ore blocks 9.
 Coal and charcoal give carbon dust, a furnace fuel (half a coal). Iron, copper, gold, ancient debris
-and quartz dust smelt back (twice as fast in a blast furnace). Recipes are data-driven
-(`arcforge:crushing`).
+and quartz dust smelt back (twice as fast in a blast furnace). Flint crushes into 2 Silica Dust and Quartz into 4
+(see Silica and silicon). Recipes are data-driven (`arcforge:crushing`).
 
 **Arc Crushing Array.** Place 27 Arc Crushing Array Casings as a solid 3x3x3 cube. It forms into one
 machine facing the player who completed it (turn it with the wrench), and any casing opens its GUI.
@@ -293,8 +293,8 @@ Cobbled deepslate --[Arc Crusher]--> Deepslate Gravel --[Sifter]--> tungsten dus
 
 **Sifter** (Wrought). Sieves a block every 5 seconds at 20 FE/t (`machines.processing.sifter`), rolling each find on its own
 (`arcforge:sifting`: `ingredient`, `outputs` of `item` and `chance`, optional `time` and `energy_per_tick`). It needs a
-**Sifter Mesh** in its mesh slot: Steel (base), Invar (chances x1.25, 1.5x as fast) or Tungsten (x1.5, 2x as fast), worn a
-point a block (`meshWearChance`) until it breaks after 256, 512 or 1,024 blocks; Unbreaking makes it last longer, as it
+**Sifter Mesh** in its mesh slot: Steel (base), Invar (chances x1.25, 1.5x as fast), Tungsten (x1.5, 2x as fast) or Silicon
+Carbide (x1.75, 2.5x as fast), worn a point a block (`meshWearChance`) until it breaks after 256, 512, 1,024 or 2,048 blocks; Unbreaking makes it last longer, as it
 does a tool. Arcite never sifts. Blocks and meshes in
 on top, finds out underneath (six slots), FE at the back; Speed and Energy upgrades.
 
@@ -680,6 +680,40 @@ needs a refinery) for its crate, vault, Storage Upgrade and Jetpack, and Plastic
 Plastic Sheet comes from Light Oil and Hydrogen, or from Ethylene (bio-plastic); **Ethylene** is a gas, from the Steam
 Cracker or, slowly, from Ethanol over a little Sulfuric Acid, with its Water going to the reactor's by-product tank
 (By-product faces). **PVC Sheet** (Ethylene and Chlorine) also lines the Hardened Fluid Conduit.
+
+**Chemical Reactor Array** (Hardened). Place 27 Chemical Reactor Array Casings (Hardened Alloy, nickel plates, glass and a
+Chemical Reactor make four) as a solid 3x3x3 cube; it forms as the other arrays do, and any casing opens its GUI. It runs
+every `arcforge:chemical_reacting` recipe in **three lanes** at once, each twice as fast as a Chemical Reactor
+(`timeMultiplier` 0.5) at 1.6x the recipe's FE/t, so 80% of the FE an operation. Each lane has three input slots, an
+output and a by-product slot; the lanes share three input tanks, an output tank and a by-product tank of 32,000 mB each,
+a 200,000 FE buffer and a heat buffer. Heated recipes (`heat_per_tick`, `min_temperature`) take HU through **Heat** ports
+and run only when it's hot enough. Ports (set with the Wrench): Input (items to the lane holding the fewest, fluids to the
+tanks as the reactor sorts them), Output, By-product, Energy and Heat. Speed and Energy upgrades. Its model is three upright
+reaction vessels in a steel frame, each with a sight glass showing its lane's liquid and an agitator that turns while
+the lane runs. Config `machines.chemistry.chemicalReactorArray`.
+
+The single **Chemical Reactor** takes heat too now: recipes with a `heat_per_tick` draw HU through its Heat faces (none
+by default) and wait, *Too cold*, under their `min_temperature`.
+
+### Silica and silicon
+
+```
+Flint --[Arc Crusher]--> 2 Silica Dust          Quartz --[Arc Crusher]--> 4 Silica Dust
+Silica Dust --[furnace]--> Glass
+Iron + 2 Silica + Coal Coke --[Arcforge Furnace, 1,300°C]--> 2 Ferrosilicon + Slag
+Silica + 250 mB Lye --[Chemical Reactor]--> 250 mB Sodium Silicate
+250 mB Sodium Silicate + 100 mB Sulfuric Acid --[Chemical Reactor]--> 2 Silica Gel + 150 mB Water
+2 Silica + Coal Coke --[crafting]--> 2 Silicon Carbide Blend --[Induction Furnace]--> Silicon Carbide
+2 Silica + 2 Coal Coke --[Arcforge Furnace, 1,500°C]--> Metallurgical Silicon + Slag
+Metallurgical Silicon + 300 mB Hydrochloric Acid --[Chemical Reactor]--> 250 mB Trichlorosilane + 100 mB Hydrogen
+250 mB Trichlorosilane + 100 mB Hydrogen --[Chemical Reactor, 40 HU/t, 1,000°C]--> Polysilicon + 250 mB Hydrochloric Acid
+```
+
+**Ferrosilicon** is a steel flux: the four-ingot steel smelt takes it or a Fluorite Crystal (`#arcforge:steel_fluxes`).
+**Silica Gel** stands in for Sand in the Cracking Catalyst. **Silicon Carbide** ringed with Tungsten Rods makes the
+Silicon Carbide Mesh, the best Sifter Mesh, which takes Unbreaking and Mending. Tags: `c:dusts/silica`, `c:silicon`,
+`c:gems/silicon_carbide`, `c:ingots/ferrosilicon`, `c:sodium_silicate`, `c:trichlorosilane`. Nether Quartz Dust still comes
+from quartz ore.
 
 ### Carbon capture and Syngas
 
@@ -1168,6 +1202,21 @@ placement per redstone pulse.
 - The range shows as an outline while you hold a Vacuum Collector, or with the eye button in its GUI.
 - It also gathers experience orbs into a Liquid Experience tank that fluid conduits drain from its Output faces.
 
+**Electric Enchanter** (Tempered). Enchants items and books with FE, Lapis Lazuli and Liquid Experience, fully automated.
+
+- **Target:** its GUI lists every enchantment the item in it supports (by the enchantment's supported items, as the anvil
+  checks; all of them with no item, or for a Book), each with a level up to its maximum. Click a name for its top level
+  or to clear it, - and + for a level at a time. Picking one drops any target it clashes with. Treasure enchantments
+  (Mending, Frost Walker, the curses) are only offered with `allowTreasure` on. The Settings Card copies the target.
+- **Each operation** gives the item every target enchantment it supports and doesn't clash with, up to the target
+  level; a Book becomes an Enchanted Book. An item that already has it all passes straight to the output.
+- **Cost per level gained:** Lapis equal to the level, and Liquid Experience worth the vanilla enchanting cost of that
+  level (its minimum cost in XP levels, as points from level 0, at 20 mB a point; `experienceCostMultiplier`). A top-up
+  pays only for the levels it gains. Costs are drawn as they're needed, so no cost is too big for its 32,000 mB tank.
+  Plus 10,000 FE an operation over 100 ticks (`energyPerOperation`, `ticksPerOperation`).
+- Sides: input (items, Lapis and Liquid Experience), output, energy. Speed and Energy upgrades. Its book floats over an
+  enchanting plate on top, turning its pages while it works. Config `machines.processing.electricEnchanter`.
+
 All four take Speed and Energy upgrades. Config: `machines.automation.assembler`, `machines.automation.blockBreaker`,
 `machines.automation.blockPlacer` and `machines.automation.vacuumCollector`.
 
@@ -1304,6 +1353,13 @@ Experience as a glowing liquid, 20 mB per point, in `c:experience` (other mods' 
 - **XP Shower:** hung under a block and fed by conduit or from a tank above it. A player sneaking under it (up
   to 3 blocks down) gains experience a level at a time; a redstone signal turns it off.
 - The **Vacuum Collector** also gathers orbs into a 16,000 mB Liquid Experience tank.
+- **Without mobs:** the Induction Furnace (8,000 mB), the Induction Furnace Array (16,000 mB) and the Arcforge Furnace
+  (16,000 mB) bank the experience of what they smelt and sinter, and the Block Breaker (8,000 mB) what the blocks it
+  breaks drop. Set a face (or a port) to **Experience** to draw it off, or let auto-eject push it (`experienceOutputRate`,
+  1,000 mB/t). A full tank only stops the banking: the machine never stalls, and the rest goes out the old way. The
+  Experience tab shows what's banked. Arcforge Furnace recipes (`arcforge:arcforge_smelting`) take an optional
+  `experience`, as sintering ones do.
+- The **Electric Enchanter** spends it (see Automation).
 
 ### Heat Pipe
 

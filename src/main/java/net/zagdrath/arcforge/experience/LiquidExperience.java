@@ -42,6 +42,15 @@ public final class LiquidExperience {
         return level >= 15 ? 37 + (level - 15) * 5 : 7 + level * 2;
     }
 
+    // Points from level 0 up to this many levels (what that many levels are worth).
+    public static int pointsForLevels(int levels) {
+        int total = 0;
+        for (int level = 0; level < levels; level++) {
+            total += pointsForLevel(level);
+        }
+        return total;
+    }
+
     // Points the player has into their current level.
     public static int pointsIntoLevel(Player player) {
         return Math.round(player.experienceProgress * player.getXpNeededForNextLevel());

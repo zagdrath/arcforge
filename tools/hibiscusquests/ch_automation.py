@@ -43,6 +43,20 @@ ch.q("arc_quarry", "Arc Quarry", "arc_quarry",
      [placed("arc_quarry")], deps=["quarry_parts"], rewards=[item("hardened_energy_cell", 1), xp(12)], frame="challenge",
      items=["arc_quarry"])
 
+ch.q("experience_banking", "Experience Without Mobs", "liquid_experience_bucket",
+     "The Induction Furnace (and its Array), the Arcforge Furnace and the Block Breaker bank the experience their work gives "
+     "as Liquid Experience, 20 mB a point. Set a face or port to Experience and pipe it off; a full tank only stops the "
+     "banking.",
+     [have("liquid_experience_bucket", label="Bottle some banked experience")], deps=["block_breaker"],
+     rewards=[item("minecraft:experience_bottle", 4), xp(4)])
+
+ch.q("electric_enchanter", "Electric Enchanter", "electric_enchanter",
+     "Tempered Alloy, a book, diamonds, an enchanting table and a Wrought Fluid Tank. Pick a target in its GUI and it "
+     "enchants anything fed to it with FE, Lapis and Liquid Experience: each level costs Lapis equal to the level and that "
+     "level's vanilla cost in experience. Top-ups pay only for what they gain.",
+     [placed("electric_enchanter")], deps=["experience_banking", "vacuum_collector"],
+     rewards=[item("minecraft:lapis_lazuli", 32), xp(10)], frame="goal", items=["electric_enchanter"])
+
 ch.q("automated", "Automated", "assembler",
      "Breaker, placer, cutter, collector, assembler, quarry: a base that runs itself.",
      [placed("block_breaker"), placed("block_placer"), placed("vacuum_collector"), placed("assembler"), placed("arc_quarry"),

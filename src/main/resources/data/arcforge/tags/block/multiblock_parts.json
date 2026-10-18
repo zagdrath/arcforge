@@ -30,6 +30,7 @@
     "arcforge:steam_cracker_controller",
     "arcforge:steam_cracker_casing",
     "arcforge:diesel_generator_casing",
-    "arcforge:diesel_generator_controller"
+    "arcforge:diesel_generator_controller",
+    "arcforge:chemical_reactor_array_casing"
   ]
 }

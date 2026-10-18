@@ -39,7 +39,11 @@ public class ChemicalReactorMenu extends MachineMenu {
     // The liquid by-product tank (added after the others).
     public static final int DATA_FLUID_BYPRODUCT = 17;
     public static final int DATA_AMOUNT_BYPRODUCT = 18;
-    public static final int DATA_VALUES = 19;
+    // Heat, for heated recipes (added after the others).
+    public static final int DATA_HEAT = 19;
+    public static final int DATA_TEMPERATURE = 20;
+    public static final int DATA_HEAT_USAGE = 21;
+    public static final int DATA_VALUES = 22;
     // Tanks 0-2 are the inputs, 3 the output, 4 the by-product.
     public static final int TANKS = 5;
     public static final int OUTPUT_TANK = 3;
@@ -126,5 +130,17 @@ public class ChemicalReactorMenu extends MachineMenu {
 
     public int getTankCapacity() {
         return value(DATA_TANK_CAPACITY);
+    }
+
+    public int getHeat() {
+        return value(DATA_HEAT);
+    }
+
+    public int getTemperature() {
+        return value(DATA_TEMPERATURE);
+    }
+
+    public int getHeatUsage() {
+        return value(DATA_HEAT_USAGE);
     }
 }

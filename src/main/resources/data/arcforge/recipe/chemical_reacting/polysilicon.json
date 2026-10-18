@@ -1,0 +1,25 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "fluid_inputs": [
+    {
+      "tag": "c:trichlorosilane",
+      "amount": 250
+    },
+    {
+      "tag": "c:hydrogen",
+      "amount": 100
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:polysilicon",
+    "count": 1
+  },
+  "fluid_output": {
+    "id": "arcforge:hydrochloric_acid",
+    "amount": 250
+  },
+  "time": 200,
+  "energy_per_tick": 120,
+  "heat_per_tick": 40,
+  "min_temperature": 1000
+}

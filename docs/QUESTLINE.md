@@ -147,6 +147,8 @@ Machines that do the chores: crafting, breaking, placing, collecting, felling, a
 - ★ **Assembler** `assembler`: Place Assembler. After: block_placer. Rewards: 8× Steel Gear, 5 lvl
 - **Scanner and Drill Head** `quarry_parts`: Obtain Quarry Scanner; Obtain Tungsten Drill Head. After: assembler. Rewards: 8× Tungsten Plate, 6 lvl
 - ◆ **Arc Quarry** `arc_quarry`: Place Arc Quarry. After: quarry_parts. Rewards: 1× Hardened Energy Cell, 12 lvl
+- **Experience Without Mobs** `experience_banking`: Bottle some banked experience. After: block_breaker. Rewards: 4× Experience Bottle, 4 lvl
+- ★ **Electric Enchanter** `electric_enchanter`: Place Electric Enchanter. After: experience_banking, vacuum_collector. Rewards: 32× Lapis Lazuli, 10 lvl
 - ◆ **Automated** `automated`: Place Block Breaker; Place Block Placer; Place Vacuum Collector; Place Assembler; Place Arc Quarry; Fell a tree. After: arc_quarry, tree_cutter, vacuum_collector. Rewards: 4× Arcforged Alloy, 15 lvl
 
 ## 8. Steam Power (`arcforge_steam`)
@@ -241,6 +243,12 @@ The Electrolyzer and the Chemical Reactor: hydrogen and oxygen, acids and leachi
 - **Carbon Capture** `carbon_capture`: Reclaim carbon. After: electrolyzer. Rewards: 16× Carbon Dust, 8 lvl
 - **Syngas** `gasifier`: Make Syngas. After: chemical_reactor. Rewards: 16× Coal Coke, 6 lvl
 - ★ **Fischer-Tropsch** `fischer_tropsch`: Synthesise oil. After: gasifier. Rewards: 4× Light Oil Bucket, 10 lvl
+- **Silica** `silica`: Obtain Silica Dust. After: chemical_reactor. Rewards: 16× Flint, 3 lvl
+- **Ferrosilicon** `ferrosilicon`: Obtain Ferrosilicon. After: silica. Rewards: 8× Coal Coke, 4 lvl
+- **Silica Gel** `silica_gel`: Make Sodium Silicate; Set Silica Gel. After: silica, sulfuric_acid. Rewards: 16× Silica Dust, 5 lvl
+- ★ **Silicon Carbide** `silicon_carbide`: Obtain Silicon Carbide Mesh. After: silica. Rewards: 4× Silicon Carbide, 8 lvl
+- ★ **Polysilicon** `polysilicon`: Obtain Metallurgical Silicon; Deposit Polysilicon. After: silica, electrolyzer. Rewards: 2× Hydrochloric Acid Bucket, 10 lvl
+- ◆ **Chemical Reactor Array** `chemical_reactor_array`: Form the Chemical Reactor Array. After: chemical_reactor. Rewards: 4× Hardened Alloy, 15 lvl
 - ◆ **Petrochemist** `petrochemist`: Obtain Plastic Sheet; Obtain PVC Sheet; Obtain Polypropylene Sheet; Obtain Synthetic Rubber. After: pvc, synthetic_rubber, carbon_capture, fischer_tropsch, leaching. Rewards: 4× Arcforged Alloy, 20 lvl
 
 ## 13. Salt & Lithium (`arcforge_salt_and_lithium`)

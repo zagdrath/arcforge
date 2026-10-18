@@ -30,9 +30,10 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 // coke -> Wrought Alloy + slag; steel + amethyst + nickel plate + coke -> Hardened Alloy + slag). Only
 // progresses while the furnace is at least minHeat °C. The additives may sit in the furnace's two additive
 // slots either way round, and an additive the recipe doesn't have needs its slot empty, so the metal of an
-// alloy never makes steel (or a lesser alloy) by accident.
+// alloy never makes steel (or a lesser alloy) by accident. "experience" (0 by default) is what a smelt banks as Liquid
+// Experience, as a vanilla furnace recipe's experience is paid.
 public record ArcforgeSmeltingRecipe(Counted metal, Optional<Counted> additive, Optional<Counted> additive2, int coke, ItemStackTemplate result,
-        Optional<ItemStackTemplate> byproduct, int time, int minHeat) implements Recipe<ArcforgeSmeltingRecipe.Input> {
+        Optional<ItemStackTemplate> byproduct, int time, int minHeat, float experience) implements Recipe<ArcforgeSmeltingRecipe.Input> {
     public static final int DEFAULT_TIME = 400;
     public static final int DEFAULT_MIN_HEAT = 1_200;
 
@@ -85,19 +86,30 @@ public record ArcforgeSmeltingRecipe(Counted metal, Optional<Counted> additive, 
             ItemStackTemplate.CODEC.fieldOf("result").forGetter(ArcforgeSmeltingRecipe::result),
             ItemStackTemplate.CODEC.optionalFieldOf("byproduct").forGetter(ArcforgeSmeltingRecipe::byproduct),
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("time", DEFAULT_TIME).forGetter(ArcforgeSmeltingRecipe::time),
-            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("min_temp", DEFAULT_MIN_HEAT).forGetter(ArcforgeSmeltingRecipe::minHeat))
+            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("min_temp", DEFAULT_MIN_HEAT).forGetter(ArcforgeSmeltingRecipe::minHeat),
+            com.mojang.serialization.Codec.floatRange(0.0F, 1_000.0F).optionalFieldOf("experience", 0.0F).forGetter(ArcforgeSmeltingRecipe::experience))
             .apply(i, ArcforgeSmeltingRecipe::new));
 
-    public static final StreamCodec<RegistryFriendlyByteBuf, ArcforgeSmeltingRecipe> STREAM_CODEC = StreamCodec.composite(
-            Counted.STREAM_CODEC, ArcforgeSmeltingRecipe::metal,
-            ByteBufCodecs.optional(Counted.STREAM_CODEC), ArcforgeSmeltingRecipe::additive,
-            ByteBufCodecs.optional(Counted.STREAM_CODEC), ArcforgeSmeltingRecipe::additive2,
-            ByteBufCodecs.VAR_INT, ArcforgeSmeltingRecipe::coke,
-            ItemStackTemplate.STREAM_CODEC, ArcforgeSmeltingRecipe::result,
-            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC), ArcforgeSmeltingRecipe::byproduct,
-            ByteBufCodecs.VAR_INT, ArcforgeSmeltingRecipe::time,
-            ByteBufCodecs.VAR_INT, ArcforgeSmeltingRecipe::minHeat,
-            ArcforgeSmeltingRecipe::new);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<Counted>> OPTIONAL_COUNTED = ByteBufCodecs.optional(Counted.STREAM_CODEC);
+    private static final StreamCodec<RegistryFriendlyByteBuf, Optional<ItemStackTemplate>> OPTIONAL_TEMPLATE =
+            ByteBufCodecs.optional(ItemStackTemplate.STREAM_CODEC);
+
+    // Written out by hand: more fields than StreamCodec.composite takes.
+    public static final StreamCodec<RegistryFriendlyByteBuf, ArcforgeSmeltingRecipe> STREAM_CODEC = StreamCodec.of(
+            (buf, recipe) -> {
+                Counted.STREAM_CODEC.encode(buf, recipe.metal());
+                OPTIONAL_COUNTED.encode(buf, recipe.additive());
+                OPTIONAL_COUNTED.encode(buf, recipe.additive2());
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.coke());
+                ItemStackTemplate.STREAM_CODEC.encode(buf, recipe.result());
+                OPTIONAL_TEMPLATE.encode(buf, recipe.byproduct());
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.time());
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.minHeat());
+                ByteBufCodecs.FLOAT.encode(buf, recipe.experience());
+            },
+            buf -> new ArcforgeSmeltingRecipe(Counted.STREAM_CODEC.decode(buf), OPTIONAL_COUNTED.decode(buf), OPTIONAL_COUNTED.decode(buf),
+                    ByteBufCodecs.VAR_INT.decode(buf), ItemStackTemplate.STREAM_CODEC.decode(buf), OPTIONAL_TEMPLATE.decode(buf),
+                    ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.FLOAT.decode(buf)));
 
     @Override
     public boolean matches(Input input, Level level) {

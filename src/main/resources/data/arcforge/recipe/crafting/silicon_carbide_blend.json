@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    "#c:dusts/silica",
+    "#c:dusts/silica",
+    "arcforge:coal_coke"
+  ],
+  "result": {
+    "id": "arcforge:silicon_carbide_blend",
+    "count": 2
+  }
+}

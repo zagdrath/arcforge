@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.zagdrath.arcforge.block.machine.MachineBlock;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
+import net.zagdrath.arcforge.client.gui.tab.ExperienceTab;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.BlockBreakerMenu;
@@ -35,7 +36,7 @@ public class BlockBreakerScreen extends MachineScreen<BlockBreakerMenu> {
     private final Identifier progressBar = sprite("progress_bar");
 
     public BlockBreakerScreen(BlockBreakerMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "block_breaker", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)));
+        super(menu, inventory, title, "block_breaker", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage), new ExperienceTab(menu::getXp, menu::getXpCapacity)));
         enableAutoEject();
     }
 

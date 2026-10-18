@@ -316,7 +316,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
                 MachineSettings.writePorts(output, level, controller);
             }
         } else {
-            output.putInt("side_config", sideConfig.pack());
+            output.putInt(SideConfig.KEY, sideConfig.pack());
         }
         if (hasOutputs()) {
             output.putBoolean("auto_eject", sideConfig.isAutoEject());
@@ -331,7 +331,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
                 skipped += MachineSettings.readPorts(input, level, controller);
             }
         } else {
-            input.getInt("side_config").ifPresent(packed -> {
+            SideConfig.readPacked(input).ifPresent(packed -> {
                 // The face a Link Conduit is on keeps its own mode.
                 RelativeSide linked = linkedSide();
                 SideMode kept = linked != null ? sideConfig.get(linked) : null;
@@ -350,7 +350,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     @Override
     public List<Component> describe(ValueInput input) {
         List<Component> lines = new ArrayList<>();
-        input.getInt("side_config").ifPresent(packed -> {
+        SideConfig.readPacked(input).ifPresent(packed -> {
             long configured = java.util.Arrays.stream(RelativeSide.values()).filter(side -> SideConfig.unpack(packed, side) != SideMode.NONE).count();
             lines.add(Component.translatable("settings.arcforge.sides", configured));
         });

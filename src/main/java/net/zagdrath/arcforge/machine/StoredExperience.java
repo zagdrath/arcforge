@@ -5,6 +5,8 @@
 
 package net.zagdrath.arcforge.machine;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.ExperienceOrb;
@@ -13,13 +15,20 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
 // Smelting XP a machine holds until a player takes its output (or it is broken), like a vanilla furnace.
-// A fractional remainder pays out one point with that chance.
+// A fractional remainder pays out one point with that chance. With a bank, the XP goes into it as Liquid Experience
+// first, and only what the bank can't take (it's full) is held this way.
 public class StoredExperience {
     private final Runnable onChanged;
+    private final @Nullable ExperienceBank bank;
     private float stored;
 
     public StoredExperience(Runnable onChanged) {
+        this(onChanged, null);
+    }
+
+    public StoredExperience(Runnable onChanged, @Nullable ExperienceBank bank) {
         this.onChanged = onChanged;
+        this.bank = bank;
     }
 
     public float get() {
@@ -27,6 +36,9 @@ public class StoredExperience {
     }
 
     public void add(float amount) {
+        if (amount > 0 && bank != null) {
+            amount = bank.bank(amount);
+        }
         if (amount > 0) {
             stored += amount;
             onChanged.run();

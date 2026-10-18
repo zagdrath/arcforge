@@ -492,6 +492,11 @@ public final class ArcforgeGameTests {
         TESTS.put("portable_capsule_heat_flows_hot_to_cold", AlloyGameTests::capsuleHeatFlowsHotToCold);
         TESTS.put("steam_copper_parts_and_upgrades", SteamGameTests::copperPartsAndUpgrades);
         TESTS.put("induction_array_casings_dont_mix", InductionGameTests::arrayCasingsDontMix);
+        TESTS.put("experience_bank_banks", ChemistryDropGameTests::experienceBankBanks);
+        TESTS.put("silica_recipes", ChemistryDropGameTests::silicaRecipes);
+        TESTS.put("enchanter_costs", ChemistryDropGameTests::enchanterCosts);
+        TESTS.put("enchanter_enchants", ChemistryDropGameTests::enchanterEnchants);
+        TESTS.put("reactor_array_runs_three_lanes", ChemistryDropGameTests::reactorArrayRunsThreeLanes);
         TESTS.put("auto_eject", InductionGameTests::autoEject);
         FLAKY_TESTS.put("creosote_moves", InductionGameTests::creosoteMoves);
         TESTS.put("carbonizer_forms", MultiblockGameTests::carbonizerForms);

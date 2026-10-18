@@ -66,7 +66,9 @@ public final class InductionGameTests {
                 .thenExecute(() -> {
                     ItemStack out = furnace.getItems().getStack(InductionFurnaceBlockEntity.SLOT_OUTPUT);
                     helper.assertTrue(out.is(Items.IRON_INGOT) && out.getCount() == 1, "Made " + out + ", expected 1 iron ingot");
-                    helper.assertTrue(furnace.getExperience().get() > 0, "No XP stored");
+                    // Its XP goes to the bank (0.7 of a point so far, toward the next 20 mB of Liquid Experience).
+                    helper.assertTrue(furnace.getBank().getAmount() > 0 || furnace.getBank().getFraction() > 0, "No XP banked");
+                    helper.assertTrue(furnace.getExperience().get() == 0, "XP held for the player though the bank has room");
                     helper.assertTrue(helper.getBlockState(pos).getValue(net.zagdrath.arcforge.block.machine.MachineBlock.LIT), "Not lit while smelting");
                 })
                 .thenSucceed();

@@ -14,6 +14,7 @@
     "#c:ingots/depleted_uranium",
     "#c:ingots/zirconium",
     "#c:ingots/zircaloy",
-    "#c:ingots/lead_bismuth"
+    "#c:ingots/lead_bismuth",
+    "#c:ingots/ferrosilicon"
   ]
 }

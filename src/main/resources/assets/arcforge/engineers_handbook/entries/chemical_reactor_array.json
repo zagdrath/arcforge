@@ -1,0 +1,21 @@
+{
+  "title": "Chemical Reactor Array",
+  "icon": "arcforge:chemical_reactor_array_casing",
+  "items": [
+    "arcforge:chemical_reactor_array_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Every Chemical Reactor recipe in three lanes at once, each twice as fast as a reactor, for 80% of the FE an operation.\nBuild a solid 3x3x3 cube of casings and set its ports with the Wrench: Input, Output, By-product, Energy and Heat."
+    },
+    {
+      "type": "text",
+      "text": "# Lanes and tanks\n- Each lane has three input slots, an output slot and a by-product slot. Items through Input ports go to the lane holding the fewest.\n- The lanes share three input tanks, an output tank and a by-product tank of 32,000 mB each, so several lanes can run on the same fluids.\n# Heat\nHeated recipes (Polysilicon) take HU through Heat ports, and only run while the array is hot enough.\nSpeed and Energy upgrades work as in the reactor."
+    },
+    {
+      "type": "multiblock",
+      "structure": "chemical_reactor_array"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "#c:ingots/iron",
+    "count": 1
+  },
+  "additive": {
+    "ingredient": "#c:dusts/silica",
+    "count": 2
+  },
+  "coke": 1,
+  "result": {
+    "id": "arcforge:ferrosilicon",
+    "count": 2
+  },
+  "byproduct": {
+    "id": "arcforge:slag",
+    "count": 1
+  },
+  "time": 400,
+  "min_temp": 1300,
+  "experience": 0.5
+}

@@ -49,7 +49,10 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu implements Secure
     // mB of oxygen in the tank, and the current smelt's oxygen speed-up x100 (0 when not boosted).
     public static final int DATA_OXYGEN = 10;
     public static final int DATA_BOOST = 11;
-    public static final int DATA_VALUES = 12;
+    // The Liquid Experience banked, and its tank.
+    public static final int DATA_XP = 12;
+    public static final int DATA_XP_CAPACITY = 13;
+    public static final int DATA_VALUES = 14;
 
     // Slot positions from arcforge_furnace_gui_layout.json.
     public static final int METAL_X = 9, METAL_Y = 23;
@@ -262,5 +265,14 @@ public class ArcforgeFurnaceMenu extends AbstractContainerMenu implements Secure
     // The current smelt's speed-up from oxygen (1.5), or 0 when it has none.
     public double getBoost() {
         return value(DATA_BOOST) / 100.0;
+    }
+
+    // The Liquid Experience banked, and its tank.
+    public int getXp() {
+        return value(DATA_XP);
+    }
+
+    public int getXpCapacity() {
+        return value(DATA_XP_CAPACITY);
     }
 }

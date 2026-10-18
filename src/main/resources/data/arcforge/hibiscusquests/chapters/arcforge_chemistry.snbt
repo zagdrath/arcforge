@@ -17,7 +17,7 @@
                 "**Covers:** {item:arcforge:electrolyzer}"
             ],
             x: 0d,
-            y: 0d,
+            y: 1.25d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["arcforge_steelmaking/hardened_alloy"],
@@ -67,7 +67,7 @@
                 "**Covers:** {item:arcforge:chemical_reactor}"
             ],
             x: 0d,
-            y: 1.25d,
+            y: 2.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["arcforge_steelmaking/hardened_alloy"],
@@ -112,7 +112,7 @@
                 "**Covers:** {item:arcforge:sulfuric_acid_bucket}"
             ],
             x: 1.5d,
-            y: 2.5d,
+            y: 3.75d,
             dependencies: ["chemical_reactor"],
             tasks: [
                 {
@@ -149,7 +149,7 @@
                 "**Covers:** {item:arcforge:iron_slurry_bucket}, {item:arcforge:copper_slurry_bucket}, {item:arcforge:gold_slurry_bucket}, {item:arcforge:silver_slurry_bucket}, {item:arcforge:nickel_slurry_bucket}, {item:arcforge:tungsten_slurry_bucket}, {item:arcforge:bismuth_slurry_bucket}, {item:arcforge:lead_slurry_bucket}"
             ],
             x: 3d,
-            y: 3.75d,
+            y: 7.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["sulfuric_acid"],
@@ -199,7 +199,7 @@
                 "**Covers:** {item:arcforge:plastic_sheet}"
             ],
             x: 1.5d,
-            y: 1.25d,
+            y: 2.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["chemical_reactor", "electrolyzer"],
@@ -231,7 +231,7 @@
                 "**Covers:** {item:arcforge:settings_card}, {item:arcforge:security_terminal}"
             ],
             x: 3d,
-            y: 1.25d,
+            y: 5d,
             dependencies: ["plastic"],
             tasks: [
                 {
@@ -272,7 +272,7 @@
                 "**Covers:** {item:arcforge:steam_cracker_casing}, {item:arcforge:steam_cracker_controller}"
             ],
             x: 3d,
-            y: 2.5d,
+            y: 6.25d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["plastic"],
@@ -309,7 +309,7 @@
                 "Ethylene also comes from Ethanol over Sulfuric Acid. 120 mB is two Plastic Sheets, and with Chlorine it's PVC."
             ],
             x: 4.5d,
-            y: 2.5d,
+            y: 6.25d,
             dependencies: ["steam_cracker"],
             tasks: [
                 {
@@ -346,7 +346,7 @@
                 "**Covers:** {item:arcforge:pvc_sheet}"
             ],
             x: 6d,
-            y: 2.5d,
+            y: 6.25d,
             dependencies: ["ethylene"],
             tasks: [
                 {
@@ -376,7 +376,7 @@
                 "**Covers:** {item:arcforge:polypropylene_sheet}"
             ],
             x: 4.5d,
-            y: 3.75d,
+            y: 7.5d,
             dependencies: ["steam_cracker"],
             tasks: [
                 {
@@ -415,7 +415,7 @@
                 "**Covers:** {item:arcforge:synthetic_rubber}"
             ],
             x: 6d,
-            y: 3.75d,
+            y: 7.5d,
             dependencies: ["polypropylene"],
             tasks: [
                 {
@@ -454,7 +454,7 @@
                 "**Covers:** {item:arcforge:carbon_reclaimer}"
             ],
             x: 1.5d,
-            y: 0d,
+            y: 1.25d,
             dependencies: ["electrolyzer"],
             tasks: [
                 {
@@ -491,7 +491,7 @@
                 "**Covers:** {item:arcforge:gasifier}"
             ],
             x: 1.5d,
-            y: 3.75d,
+            y: 5d,
             dependencies: ["chemical_reactor"],
             tasks: [
                 {
@@ -529,7 +529,7 @@
                 "**Covers:** {item:arcforge:fischer_tropsch_reactor}"
             ],
             x: 3d,
-            y: 5d,
+            y: 8.75d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["gasifier"],
@@ -559,6 +559,232 @@
             ]
         },
         {
+            id: "silica",
+            title: "Silica",
+            icon: "arcforge:silica_dust",
+            description: [
+                "Flint finally has a use: the Arc Crusher makes 2 Silica Dust from it, and 4 from Quartz. Silica smelts into Glass and starts the whole silicon line.",
+                "",
+                "**Covers:** {item:arcforge:silica_dust}"
+            ],
+            x: 1.5d,
+            y: 0d,
+            dependencies: ["chemical_reactor"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:silica_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:flint",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "ferrosilicon",
+            title: "Ferrosilicon",
+            icon: "arcforge:ferrosilicon",
+            description: [
+                "Iron, 2 Silica and Coal Coke in the Arcforge Furnace at 1,300°C. A steel flux: the four-ingot steel smelt takes it as it takes a Fluorite Crystal.",
+                "",
+                "**Covers:** {item:arcforge:ferrosilicon}"
+            ],
+            x: 3d,
+            y: 0d,
+            dependencies: ["silica"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:ferrosilicon"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:coal_coke",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
+            id: "silica_gel",
+            title: "Silica Gel",
+            icon: "arcforge:silica_gel",
+            description: [
+                "Silica in Lye gives Sodium Silicate; Sulfuric Acid sets it into Silica Gel, which the Cracking Catalyst takes in place of Sand.",
+                "",
+                "**Covers:** {item:arcforge:sodium_silicate_bucket}, {item:arcforge:silica_gel}"
+            ],
+            x: 3d,
+            y: 3.75d,
+            dependencies: ["silica", "sulfuric_acid"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:sodium_silicate"
+                        }
+                    },
+                    title: "Make Sodium Silicate",
+                    icon: "arcforge:sodium_silicate_bucket"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            item: {
+                                items: "arcforge:silica_gel"
+                            }
+                        }
+                    },
+                    title: "Set Silica Gel",
+                    icon: "arcforge:silica_gel"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:silica_dust",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 5
+                }
+            ]
+        },
+        {
+            id: "silicon_carbide",
+            title: "Silicon Carbide",
+            icon: "arcforge:silicon_carbide_mesh",
+            description: [
+                "Two Silica and Coal Coke craft into Silicon Carbide Blend; the Induction Furnace fires it into Silicon Carbide. Ringed with Tungsten Rods it is the best Sifter Mesh there is, and it takes enchantments.",
+                "",
+                "**Covers:** {item:arcforge:silicon_carbide_blend}, {item:arcforge:silicon_carbide}, {item:arcforge:silicon_carbide_mesh}"
+            ],
+            x: 3d,
+            y: 1.25d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["silica"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:silicon_carbide_mesh"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:silicon_carbide",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "polysilicon",
+            title: "Polysilicon",
+            icon: "arcforge:polysilicon",
+            description: [
+                "Silica reduced by coke at 1,500°C gives Metallurgical Silicon. Dissolve it in Hydrochloric Acid for Trichlorosilane, then deposit it with Hydrogen and heat (1,000°C through a Heat face) as Polysilicon, getting the acid back.",
+                "",
+                "**Covers:** {item:arcforge:metallurgical_silicon}, {item:arcforge:trichlorosilane_bucket}, {item:arcforge:polysilicon}"
+            ],
+            x: 3d,
+            y: 2.5d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["silica", "electrolyzer"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:metallurgical_silicon"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            item: {
+                                items: "arcforge:polysilicon"
+                            }
+                        }
+                    },
+                    title: "Deposit Polysilicon",
+                    icon: "arcforge:polysilicon"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hydrochloric_acid_bucket",
+                    count: 2
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "chemical_reactor_array",
+            title: "Chemical Reactor Array",
+            icon: "arcforge:chemical_reactor_array_casing",
+            description: [
+                "Hardened Alloy, nickel plates, glass and a Chemical Reactor make four casings; a 3×3×3 of them runs every reactor recipe in three lanes, each twice as fast, with 32,000 mB tanks and Heat ports. Set its ports with the Wrench.",
+                "",
+                "**Covers:** {item:arcforge:chemical_reactor_array_casing}"
+            ],
+            x: 1.5d,
+            y: 6.25d,
+            shape: "gear",
+            size: 1.5d,
+            dependencies: ["chemical_reactor"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:chemical_reactor_array"
+                        }
+                    },
+                    title: "Form the Chemical Reactor Array",
+                    icon: "arcforge:chemical_reactor_array_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
             id: "petrochemist",
             title: "Petrochemist",
             icon: "arcforge:chemical_reactor",
@@ -566,7 +792,7 @@
                 "Plastic, PVC, Polypropylene and Synthetic Rubber from your own olefins, and carbon that goes round in a circle."
             ],
             x: 7.5d,
-            y: 2.5d,
+            y: 6.25d,
             shape: "gear",
             size: 1.5d,
             dependencies: ["pvc", "synthetic_rubber", "carbon_capture", "fischer_tropsch", "leaching"],

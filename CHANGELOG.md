@@ -22,6 +22,55 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+Suggested version: **2.9.0** (minor: the Chemical Reactor Array, a silica line, the Electric Enchanter and Liquid
+Experience without mobs; worlds, machines and Settings Cards carry over).
+
+### Added
+
+- **Chemical Reactor Array.** A 3x3x3 cube of Chemical Reactor Array Casings (Hardened Alloy, nickel plates, glass and a
+  Chemical Reactor make four), formed and given ports with the Wrench like the other arrays. It runs every
+  `arcforge:chemical_reacting` recipe in three lanes at once, each twice as fast as a Chemical Reactor for 80% of the FE an
+  operation, sharing three input tanks, an output tank and a by-product tank of 32,000 mB each. Heated recipes take HU
+  through Heat ports. Speed and Energy upgrades. Its model is three upright reaction vessels in a steel frame, each with
+  a sight glass showing its lane's liquid in the recipe's colour and an agitator motor that turns while the lane runs.
+- **Heated chemistry.** `arcforge:chemical_reacting` recipes take an optional `heat_per_tick` and `min_temperature`; the
+  Chemical Reactor now has a heat buffer, Heat faces and a Heat tab, and JEI shows a recipe's heat.
+- **A silica line that gives Flint a use.** The Arc Crusher (and its Array) crushes Flint into 2 Silica Dust and Quartz
+  into 4; Silica smelts into Glass.
+  - **Ferrosilicon** (Iron, Silica and Coal Coke at 1,300°C in the Arcforge Furnace), a steel flux like a Fluorite
+    Crystal (the flux recipe takes `#arcforge:steel_fluxes`).
+  - **Sodium Silicate** (Silica in Lye) and **Silica Gel** (Sodium Silicate set with Sulfuric Acid), which the Cracking
+    Catalyst takes in place of Sand.
+  - **Silicon Carbide**: Silicon Carbide Blend fired in the Induction Furnace. The **Silicon Carbide Mesh** is the new
+    best Sifter Mesh (x1.75 finds, 2.5x as fast, 2,048 blocks), and takes enchantments.
+  - **Silicon**: Metallurgical Silicon from Silica and coke at 1,500°C, dissolved in Hydrochloric Acid as
+    **Trichlorosilane** (giving off Hydrogen), and deposited with Hydrogen and heat as **Polysilicon**.
+  - Tags `c:dusts/silica`, `c:silicon`, `c:gems/silicon_carbide`, `c:ingots/ferrosilicon`, and the fluids'.
+- **Electric Enchanter** (Tempered). Enchants items and books with FE, Lapis Lazuli and Liquid Experience, fully
+  automatable. Its GUI picks the target: the enchantments the item supports (as the anvil checks), up to their top
+  level, never two that clash; treasure enchantments only with `allowTreasure`. Each level gained costs Lapis equal to
+  the level and that level's vanilla enchanting cost in Liquid Experience (20 mB a point); top-ups pay only for what they
+  gain, and items that already match pass straight through. A Book becomes an Enchanted Book. The Settings Card copies
+  the target. JEI lists what each enchantment costs.
+- **Liquid Experience without mobs.** The Induction Furnace, its Array and the Arcforge Furnace bank their recipes'
+  experience (smelting, sintering, and now Arcforge Furnace recipes' optional `experience`), and the Block Breaker the
+  experience of what it breaks, as Liquid Experience in a tank of their own. A new **Experience** side mode (and port)
+  draws it off, auto-eject pushes it, and an Experience tab shows it. A full tank stops the banking and never stalls the
+  machine.
+- Handbook entries, quests (Chemistry: Silica to the Chemical Reactor Array; Automation: experience banking and the
+  Electric Enchanter), Jade lines and GameTests for all of it.
+
+### Changed
+
+- Crushing Quartz gives 4 Silica Dust instead of Nether Quartz Dust, which still comes from quartz ore.
+- Machines with a recipe XP store bank it as Liquid Experience first; the old held-for-the-player store only takes what a
+  full tank can't.
+
+### Upgrading
+
+- Side configurations now take 5 bits a face (for the Experience mode). Machines, multiblock ports and Settings Cards
+  from older versions are converted when they load; nothing needs redoing.
+
 ## [2.8.1] - 2026-10-17
 
 ### Changed

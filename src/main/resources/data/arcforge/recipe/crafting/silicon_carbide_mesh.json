@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "CRC",
+    "R R",
+    "CRC"
+  ],
+  "key": {
+    "C": "#c:gems/silicon_carbide",
+    "R": "#c:rods/tungsten"
+  },
+  "result": {
+    "id": "arcforge:silicon_carbide_mesh",
+    "count": 1
+  }
+}

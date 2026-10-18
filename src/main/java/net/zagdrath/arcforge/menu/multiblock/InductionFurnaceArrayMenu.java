@@ -31,7 +31,10 @@ public class InductionFurnaceArrayMenu extends MachineMenu {
     public static final int DATA_SIDE_CONFIG = 7;
     public static final int DATA_PROGRESS_FIRST = 8;
     public static final int DATA_TOTAL_FIRST = DATA_PROGRESS_FIRST + InductionFurnaceArrayBlockEntity.LANES;
-    public static final int DATA_VALUES = DATA_TOTAL_FIRST + InductionFurnaceArrayBlockEntity.LANES;
+    // The Liquid Experience banked, and its tank (added after the lanes).
+    public static final int DATA_XP = DATA_TOTAL_FIRST + InductionFurnaceArrayBlockEntity.LANES;
+    public static final int DATA_XP_CAPACITY = DATA_XP + 1;
+    public static final int DATA_VALUES = DATA_XP_CAPACITY + 1;
 
     // Slot positions from induction_furnace_array_gui_layout.json: one row per lane.
     public static final int INPUT_X = 31, OUTPUT_X = 83, FIRST_LANE_Y = 19, LANE_PITCH = 18;
@@ -97,5 +100,14 @@ public class InductionFurnaceArrayMenu extends MachineMenu {
 
     public int getTotal(int lane) {
         return value(DATA_TOTAL_FIRST + lane);
+    }
+
+    // The Liquid Experience banked, and its tank.
+    public int getXp() {
+        return value(DATA_XP);
+    }
+
+    public int getXpCapacity() {
+        return value(DATA_XP_CAPACITY);
     }
 }

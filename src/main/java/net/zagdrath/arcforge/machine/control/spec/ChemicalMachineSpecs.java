@@ -104,6 +104,7 @@ public final class ChemicalMachineSpecs {
                 .tank(SlotRole.OUTPUT, ChemicalReactorBlockEntity::getOutputTank)
                 .tank(SlotRole.OUTPUT, ChemicalReactorBlockEntity::getByproductTank)
                 .fluidAutomation(ChemicalReactorBlockEntity::getRouter)
+                .heat(HeatRole.CONSUMER, ChemicalReactorBlockEntity::getHeat, ChemicalReactorBlockEntity::getHeatUsage, be -> be.getHeatHandler(null))
                 .progress(ChemicalReactorBlockEntity::getProgress, ChemicalReactorBlockEntity::getTotal)
                 // The chance by-product and the liquid by-product aren't cached, so only the main products.
                 .outputs(be -> be.getProgress() > 0 ? List.of(be.getMakingItem()) : List.of())

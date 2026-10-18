@@ -1,0 +1,30 @@
+{
+  "title": "Silica and Silicon",
+  "icon": "arcforge:silica_dust",
+  "items": [
+    "arcforge:silica_dust",
+    "arcforge:ferrosilicon",
+    "arcforge:sodium_silicate_bucket",
+    "arcforge:silica_gel",
+    "arcforge:silicon_carbide_blend",
+    "arcforge:silicon_carbide",
+    "arcforge:silicon_carbide_mesh",
+    "arcforge:metallurgical_silicon",
+    "arcforge:trichlorosilane_bucket",
+    "arcforge:polysilicon"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Silica Dust\nThe Arc Crusher (and its Array) crushes Flint into 2 Silica Dust and Quartz into 4. It smelts into Glass.\n# Ferrosilicon\nIron, 2 Silica and Coal Coke in the Arcforge Furnace at 1,300°C. A steel flux: the four-ingot steel smelt takes it as it takes a Fluorite Crystal."
+    },
+    {
+      "type": "text",
+      "text": "# Sodium Silicate and Silica Gel\nSilica Dust dissolved in Lye in the Chemical Reactor gives Sodium Silicate. With Sulfuric Acid it sets into Silica Gel, which the Cracking Catalyst takes in place of Sand.\n# Silicon Carbide\nTwo Silica Dust and Coal Coke craft into Silicon Carbide Blend, which the Induction Furnace (or its Array) fires into Silicon Carbide. Ringed with Tungsten Rods it makes the Silicon Carbide Mesh, the best Sifter Mesh."
+    },
+    {
+      "type": "text",
+      "text": "# Silicon\n- 2 Silica Dust and 2 Coal Coke in the Arcforge Furnace at 1,500°C: Metallurgical Silicon, with Slag.\n- Metallurgical Silicon and Hydrochloric Acid in the Chemical Reactor: Trichlorosilane, giving off Hydrogen.\n- Trichlorosilane and Hydrogen, with heat (1,000°C, through Heat faces): Polysilicon, giving the Hydrochloric Acid back."
+    }
+  ]
+}

@@ -73,6 +73,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerItemStorage(VaultProviders.HideItems.INSTANCE, VaultBlockEntity.class);
         registration.registerBlockDataProvider(ArcMelterProvider.INSTANCE, ArcMelterBlockEntity.class);
         registration.registerBlockDataProvider(ChemicalReactorProvider.INSTANCE, ChemicalReactorBlockEntity.class);
+        registration.registerBlockDataProvider(ChemistryProviders.ReactorArray.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.ChemicalReactorArrayBlockEntity.class);
+        registration.registerBlockDataProvider(ChemistryProviders.Enchanter.INSTANCE, net.zagdrath.arcforge.blockentity.machine.ElectricEnchanterBlockEntity.class);
         registration.registerBlockDataProvider(ElectrolyzerProvider.INSTANCE, ElectrolyzerBlockEntity.class);
         registration.registerBlockDataProvider(AutomationProvider.INSTANCE, AssemblerBlockEntity.class);
         registration.registerBlockDataProvider(AutomationProvider.INSTANCE, BlockBreakerBlockEntity.class);
@@ -221,6 +223,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(VaultProviders.Info.INSTANCE, VaultBlock.class);
         registration.registerBlockComponent(ArcMelterProvider.Client.INSTANCE, ArcMelterBlock.class);
         registration.registerBlockComponent(ChemicalReactorProvider.Client.INSTANCE, ChemicalReactorBlock.class);
+        registration.registerBlockComponent(ChemistryProviders.ReactorArray.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.ChemicalReactorArrayCasingBlock.class);
+        registration.registerBlockComponent(ChemistryProviders.Enchanter.Client.INSTANCE, net.zagdrath.arcforge.block.machine.ElectricEnchanterBlock.class);
         registration.registerBlockComponent(ElectrolyzerProvider.Client.INSTANCE, ElectrolyzerBlock.class);
         registration.registerBlockComponent(AutomationProvider.Client.INSTANCE, AssemblerBlock.class);
         registration.registerBlockComponent(AutomationProvider.Client.INSTANCE, BlockBreakerBlock.class);

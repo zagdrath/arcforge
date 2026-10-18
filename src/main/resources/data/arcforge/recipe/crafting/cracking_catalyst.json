@@ -8,7 +8,10 @@
   ],
   "key": {
     "C": "minecraft:clay_ball",
-    "S": "minecraft:sand",
+    "S": [
+      "minecraft:sand",
+      "arcforge:silica_gel"
+    ],
     "N": "#c:dusts/nickel"
   },
   "result": {

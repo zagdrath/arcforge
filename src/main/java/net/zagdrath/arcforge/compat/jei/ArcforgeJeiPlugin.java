@@ -45,6 +45,7 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import net.zagdrath.arcforge.client.screen.multiblock.MetalPressingArrayScreen;
+import net.zagdrath.arcforge.client.screen.multiblock.ChemicalReactorArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.InductionFurnaceArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.ArcCrushingArrayScreen;
 import net.zagdrath.arcforge.client.screen.multiblock.CarbonizerScreen;
@@ -156,6 +157,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.Vitrifying(gui),
                 new MachineCategories.Reprocessing(gui),
                 new MachineCategories.BatteryComponents(gui),
+                new MachineCategories.ElectricEnchanting(gui),
                 new MultiblockCategory(gui));
     }
 
@@ -266,6 +268,14 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         }
         registration.addRecipes(MachineCategories.BatteryComponents.TYPE, batteryParts);
 
+        // The Electric Enchanter: each enchantment it offers, taken to its top level on a Book.
+        var level = net.minecraft.client.Minecraft.getInstance().level;
+        if (level != null) {
+            registration.addRecipes(MachineCategories.ElectricEnchanting.TYPE, net.zagdrath.arcforge.blockentity.machine.ElectricEnchanterBlockEntity
+                    .candidates(level.registryAccess(), ItemStack.EMPTY, net.zagdrath.arcforge.config.ArcforgeConfig.ENCHANTER_ALLOW_TREASURE.getAsBoolean()).stream()
+                    .map(enchantment -> new MachineCategories.EnchantingRecipe(enchantment, enchantment.value().getMaxLevel())).toList());
+        }
+
         registration.addRecipes(MultiblockCategory.TYPE, MultiblockBlueprints.all().stream().map(MultiblockCategory.Build::new).toList());
 
         // Slimeballs are vanilla, so their page names the ways Arcforge makes them.
@@ -354,6 +364,9 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipeClickArea(net.zagdrath.arcforge.client.screen.multiblock.GreenhouseScreen.class, 76, 50, 36, 10, MachineCategories.Greenhouse.TYPE);
         registration.addRecipeClickArea(AssemblerScreen.class, 88, 35, ARROW_W, ARROW_H, RecipeTypes.CRAFTING);
         registration.addRecipeClickArea(ChemicalReactorScreen.class, 90, 35, ARROW_W, ARROW_H, MachineCategories.ChemicalReacting.TYPE);
+        for (int lane = 0; lane < 3; lane++) {
+            registration.addRecipeClickArea(ChemicalReactorArrayScreen.class, 90, 75 + lane * 18, ARROW_W, ARROW_H, MachineCategories.ChemicalReacting.TYPE);
+        }
         registration.addRecipeClickArea(ElectrolyzerScreen.class, 98, 35, ARROW_W, ARROW_H, MachineCategories.Electrolyzing.TYPE);
         registration.addRecipeClickArea(FiberizerScreen.class, 68, 35, ARROW_W, ARROW_H, MachineCategories.Fiberizing.TYPE);
         registration.addRecipeClickArea(InductionFurnaceScreen.class, 78, 35, ARROW_W, ARROW_H, RecipeTypes.SMELTING);
@@ -435,7 +448,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Cloche.TYPE, ModBlocks.GLASS_CLOCHE.get(), ModBlocks.GROW_CHAMBER.get(), ModBlocks.HYDROPONIC_CELL.get());
         registration.addCraftingStation(MachineCategories.Greenhouse.TYPE, ModBlocks.GREENHOUSE_CONTROLLER.get(), ModBlocks.PLANTING_BED.get());
         registration.addCraftingStation(MachineCategories.ConduitDyeingCategory.TYPE, net.minecraft.world.level.block.Blocks.CRAFTING_TABLE);
-        registration.addCraftingStation(MachineCategories.ChemicalReacting.TYPE, ModBlocks.CHEMICAL_REACTOR.get());
+        registration.addCraftingStation(MachineCategories.ChemicalReacting.TYPE, ModBlocks.CHEMICAL_REACTOR.get(), ModBlocks.CHEMICAL_REACTOR_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.Electrolyzing.TYPE, ModBlocks.ELECTROLYZER.get());
         registration.addCraftingStation(MachineCategories.Evaporating.TYPE, ModBlocks.THERMAL_EVAPORATOR_CONTROLLER.get(),
                 ModBlocks.THERMAL_EVAPORATOR_CASING.get());
@@ -447,6 +460,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Condensing.TYPE, ModBlocks.CONDENSER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.BurnerFuels.TYPE, ModBlocks.FUEL_BURNER.get(), ModBlocks.FIREBOX_ARRAY_CONTROLLER.get());
         registration.addCraftingStation(MachineCategories.GasTurbineFuels.TYPE, ModBlocks.GAS_TURBINE_ARRAY_CASING.get());
+        registration.addCraftingStation(MachineCategories.ElectricEnchanting.TYPE, ModBlocks.ELECTRIC_ENCHANTER.get());
         registration.addCraftingStation(MachineCategories.BatteryComponents.TYPE, ModBlocks.BATTERY_ARRAY_CONTROLLER.get(), ModBlocks.BATTERY_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.OilDeposits.TYPE, ModItems.SEISMIC_SURVEY_TOOL.get(), ModBlocks.PUMPJACK_CONTROLLER.get(),
                 ModBlocks.OIL_DERRICK_CONTROLLER.get());

@@ -35,8 +35,12 @@ public enum SideMode implements StringRepresentable {
     HYDROGEN("hydrogen"),
     // A machine's own gas out, whatever it is: the Fermenter's Carbon Dioxide, the Air Separator's Nitrogen, the Haber
     // Reactor's Ammonia, the Biogas Digester's Biogas (their Sides tabs name the gas). Handled by the machine.
-    // SideConfig packs 4 bits per face and this is ordinal 15, the last that fits there.
     GAS_OUTPUT("gas_output"),
+    // Liquid Experience out: what the Induction Furnace (and its array), the Arcforge Furnace and the Block Breaker bank
+    // from their smelting and breaking. SideConfig packs 5 bits a face, so every mode a SideConfig holds must be under 32:
+    // this goes here, before the ports-only modes, which only ports (kept by name) and Settings Cards (see
+    // MachineSettings) use. Settings Cards written before it are read with the old ordinals (see SideMode.beforeExperience).
+    EXPERIENCE("experience"),
     // The Thermal Evaporator Array's ports: Brine (or what its input concentrates into) out, Salt out, and the water it
     // returns. Ports only (kept by name in PortStore): no single-block machine's SideConfig uses them, so they never
     // need to fit its 4 bits per face.
@@ -77,7 +81,7 @@ public enum SideMode implements StringRepresentable {
     // Whether faces in this mode give things out (and push them out with auto-eject).
     public boolean isOutput() {
         return switch (this) {
-            case OUTPUT, BYPRODUCT, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST, BRINE, SALT, WATER, LITHIUM_BRINE, SULFUR, REFINERY_GAS, KEROSENE,
+            case OUTPUT, BYPRODUCT, EXPERIENCE, NAPHTHA, LIGHT_OIL, HEAVY_OIL, PITCH, EXHAUST, BRINE, SALT, WATER, LITHIUM_BRINE, SULFUR, REFINERY_GAS, KEROSENE,
                     DIESEL, BITUMEN, ETHYLENE, PROPYLENE, TAILS -> true;
             default -> false;
         };
@@ -98,6 +102,11 @@ public enum SideMode implements StringRepresentable {
 
     public Component getDescription() {
         return Component.translatable("gui.arcforge.side_mode." + name);
+    }
+
+    // A mode by the ordinal it had before EXPERIENCE went in at 16 (Settings Cards written before it).
+    public static SideMode beforeExperience(int id) {
+        return byId(id >= EXPERIENCE.ordinal() ? id + 1 : id);
     }
 
     public static SideMode byId(int id) {

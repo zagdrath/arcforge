@@ -971,6 +971,11 @@ public class ArcforgeConfig {
         BUILDER.comment("Single-block processing machines.").push("machines");
     }
 
+    public static final ModConfigSpec.IntValue EXPERIENCE_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of banked Liquid Experience a single-block machine (the Induction Furnace, the Block Breaker) pushes out",
+                    "of its Experience faces with auto-eject. Multiblocks push theirs with their other outputs.")
+            .defineInRange("experienceOutputRate", 1_000, 1, 100_000);
+
     static {
         BUILDER.comment("Machines that crush, smelt, press, sift and shape materials.").push("processing");
     }
@@ -1015,6 +1020,11 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.DoubleValue INDUCTION_TIME_MULTIPLIER = BUILDER
             .comment("Multiplier on the recipe's cooking time (0.5 = 100 ticks for a normal 200-tick furnace recipe).")
             .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
+
+    public static final ModConfigSpec.IntValue INDUCTION_EXPERIENCE_TANK = BUILDER
+            .comment("Size in mB of the tank its smelting experience is banked in as Liquid Experience (20 mB a point), drained through",
+                    "Experience faces. A full tank stops banking: the rest is held for the player taking the output, as before.")
+            .defineInRange("experienceTankCapacity", 8_000, 0, 1_000_000);
 
     static {
         BUILDER.pop();
@@ -1108,6 +1118,10 @@ public class ArcforgeConfig {
             .comment("Chance multiplier of a Tungsten Mesh.")
             .defineInRange("tungstenMeshChance", 1.5, 0.0, 10.0);
 
+    public static final ModConfigSpec.DoubleValue SIFTER_SILICON_CARBIDE_CHANCE = BUILDER
+            .comment("Chance multiplier of a Silicon Carbide Mesh (the top mesh).")
+            .defineInRange("siliconCarbideMeshChance", 1.75, 0.0, 10.0);
+
     public static final ModConfigSpec.DoubleValue SIFTER_STEEL_SPEED = BUILDER
             .comment("Speed multiplier of a Steel Mesh.")
             .defineInRange("steelMeshSpeed", 1.0, 0.1, 10.0);
@@ -1120,8 +1134,13 @@ public class ArcforgeConfig {
             .comment("Speed multiplier of a Tungsten Mesh.")
             .defineInRange("tungstenMeshSpeed", 2.0, 0.1, 10.0);
 
+    public static final ModConfigSpec.DoubleValue SIFTER_SILICON_CARBIDE_SPEED = BUILDER
+            .comment("Speed multiplier of a Silicon Carbide Mesh.")
+            .defineInRange("siliconCarbideMeshSpeed", 2.5, 0.1, 10.0);
+
     public static final ModConfigSpec.DoubleValue SIFTER_MESH_WEAR_CHANCE = BUILDER
-            .comment("Chance each block sifted wears the mesh by one point (Steel lasts 256 points, Invar 512, Tungsten 1,024).")
+            .comment("Chance each block sifted wears the mesh by one point (Steel lasts 256 points, Invar 512, Tungsten 1,024, Silicon",
+                    "Carbide 2,048).")
             .defineInRange("meshWearChance", 1.0, 0.0, 1.0);
 
     static {
@@ -1225,6 +1244,44 @@ public class ArcforgeConfig {
     }
 
     static {
+        BUILDER.comment("Electric Enchanter: enchants items and books with FE, Lapis Lazuli and Liquid Experience, to a target",
+                "set in its GUI. Each level gained costs Lapis equal to the level and the vanilla enchanting cost of that level",
+                "(in XP levels, as points from level 0) in Liquid Experience, at 20 mB a point.").push("electricEnchanter");
+    }
+
+    public static final ModConfigSpec.IntValue ENCHANTER_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 50_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ENCHANTER_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 1_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ENCHANTER_ENERGY_PER_OPERATION = BUILDER
+            .comment("FE per enchanting operation, before upgrades (drawn evenly over its time).")
+            .defineInRange("energyPerOperation", 10_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue ENCHANTER_TIME = BUILDER
+            .comment("Ticks per enchanting operation, before Speed upgrades.")
+            .defineInRange("ticksPerOperation", 100, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue ENCHANTER_TANK_CAPACITY = BUILDER
+            .comment("Liquid Experience tank capacity in mB. Costs are drawn as they're needed, so any cost can be paid.")
+            .defineInRange("tankCapacity", 32_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue ENCHANTER_XP_MULTIPLIER = BUILDER
+            .comment("Multiplies the Liquid Experience each level costs.")
+            .defineInRange("experienceCostMultiplier", 1.0, 0.0, 100.0);
+
+    public static final ModConfigSpec.BooleanValue ENCHANTER_ALLOW_TREASURE = BUILDER
+            .comment("Whether it offers treasure enchantments (Mending, Frost Walker, the curses and so on).")
+            .define("allowTreasure", false);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
         BUILDER.pop();
     }
 
@@ -1306,6 +1363,55 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue REACTOR_OUTPUT_RATE = BUILDER
             .comment("Most mB/t it pushes out of its output faces with auto-eject.")
             .defineInRange("fluidOutputRate", 1_000, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue REACTOR_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU, for heated recipes (those with a heat_per_tick), taken in through Heat faces.")
+            .defineInRange("heatCapacity", 40_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue REACTOR_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_200, 21, 10_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Chemical Reactor Array: a 3x3x3 cube of Chemical Reactor Array Casings running every chemical_reacting",
+                "recipe in three lanes at once, sharing its tanks, heat and FE.").push("chemicalReactorArray");
+    }
+
+    public static final ModConfigSpec.IntValue CRA_ENERGY_CAPACITY = BUILDER
+            .comment("Internal FE buffer size.")
+            .defineInRange("energyCapacity", 200_000, 1_000, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue CRA_MAX_INPUT = BUILDER
+            .comment("Most FE/t it takes in.")
+            .defineInRange("maxEnergyInput", 4_000, 1, 1_000_000_000);
+
+    public static final ModConfigSpec.DoubleValue CRA_TIME_MULTIPLIER = BUILDER
+            .comment("Each lane's time per operation, as a fraction of a Chemical Reactor's (0.5 = twice as fast).")
+            .defineInRange("timeMultiplier", 0.5, 0.01, 10.0);
+
+    public static final ModConfigSpec.DoubleValue CRA_ENERGY_MULTIPLIER = BUILDER
+            .comment("Each working lane's FE/t, as a multiple of the recipe's (1.6 at twice the speed is 80% of the FE an operation).")
+            .defineInRange("energyMultiplier", 1.6, 0.0, 100.0);
+
+    public static final ModConfigSpec.IntValue CRA_TANK_CAPACITY = BUILDER
+            .comment("Capacity of each of its five tanks (three inputs, the output and the by-product), in mB.")
+            .defineInRange("tankCapacity", 32_000, 1_000, 1_000_000);
+
+    public static final ModConfigSpec.IntValue CRA_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t pushed out of each output or by-product port, with auto-eject on.")
+            .defineInRange("fluidOutputRate", 4_000, 1, 100_000);
+
+    public static final ModConfigSpec.IntValue CRA_HEAT_CAPACITY = BUILDER
+            .comment("Heat buffer size, in HU, for heated recipes, taken in through Heat ports.")
+            .defineInRange("heatCapacity", 160_000, 100, 1_000_000_000);
+
+    public static final ModConfigSpec.IntValue CRA_MAX_TEMPERATURE = BUILDER
+            .comment("Temperature of a full heat buffer, in °C.")
+            .defineInRange("maxTemperature", 1_200, 21, 10_000);
 
     static {
         BUILDER.pop();
@@ -1905,6 +2011,12 @@ public class ArcforgeConfig {
             .comment("Fewest ticks a break takes, before Speed upgrades.")
             .defineInRange("minBreakTicks", 4, 1, 1_000);
 
+    public static final ModConfigSpec.IntValue BREAKER_EXPERIENCE_TANK = BUILDER
+            .comment("Size in mB of the tank the experience broken blocks drop (ores and others) is banked in as Liquid Experience",
+                    "(20 mB a point) instead of spawning orbs, drained through Experience faces. A full tank stops banking: the rest drops",
+                    "as orbs.")
+            .defineInRange("experienceTankCapacity", 8_000, 0, 1_000_000);
+
     static {
         BUILDER.pop();
     }
@@ -2190,6 +2302,11 @@ public class ArcforgeConfig {
             .comment("Multiplier on the recipe's cooking time (0.25 = 50 ticks, twice as fast as the Induction Furnace).")
             .defineInRange("timeMultiplier", 0.25, 0.01, 10.0);
 
+    public static final ModConfigSpec.IntValue INDUCTION_ARRAY_EXPERIENCE_TANK = BUILDER
+            .comment("Size in mB of the tank its smelting experience is banked in as Liquid Experience (20 mB a point), drained through",
+                    "Experience faces. A full tank stops banking: the rest is held for the player taking the output, as before.")
+            .defineInRange("experienceTankCapacity", 16_000, 0, 1_000_000);
+
     static {
         BUILDER.pop();
     }
@@ -2271,6 +2388,11 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.DoubleValue FURNACE_OXYGEN_SPEED = BUILDER
             .comment("How much faster a smelt with oxygen runs (1.5: in 1/1.5 of the time).")
             .defineInRange("oxygenSpeedMultiplier", 1.5, 1.0, 100.0);
+
+    public static final ModConfigSpec.IntValue FURNACE_EXPERIENCE_TANK = BUILDER
+            .comment("Size in mB of the tank the experience of its recipes (their \"experience\") is banked in as Liquid Experience (20 mB",
+                    "a point), drained through Experience ports. A full tank stops banking until it's drained.")
+            .defineInRange("experienceTankCapacity", 16_000, 0, 1_000_000);
 
     static {
         BUILDER.pop();

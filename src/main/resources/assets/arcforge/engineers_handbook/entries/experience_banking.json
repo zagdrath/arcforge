@@ -1,0 +1,20 @@
+{
+  "title": "Experience Without Mobs",
+  "icon": "arcforge:liquid_experience_bucket",
+  "items": [
+    "arcforge:induction_furnace",
+    "arcforge:induction_furnace_array_casing",
+    "arcforge:arcforge_furnace_port",
+    "arcforge:block_breaker"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Machines bank the experience their work gives as Liquid Experience, 20 mB a point, in a tank of their own:\n- the Induction Furnace and its Array: the experience of what they smelt and sinter;\n- the Arcforge Furnace: its alloys, steel, silicon and graphite;\n- the Block Breaker: what the blocks it breaks drop (ores, mostly)."
+    },
+    {
+      "type": "text",
+      "text": "Set a face (or port) to Experience to draw it off with a fluid conduit; with auto-eject on they push it out. The Experience tab shows what's banked.\nA full tank only stops the banking: the machine keeps working, and the experience goes out as before (held for the player, or dropped as orbs)."
+    }
+  ]
+}

@@ -195,13 +195,25 @@ public final class ProcessingGameTests {
                 .thenSucceed();
     }
 
-    // GAS_OUTPUT is the last side mode that fits SideConfig's four bits a face, and survives packing.
+    // SideConfig packs five bits a face: Experience (and every mode under 32) survives packing beside auto-eject, a value
+    // packed with four bits a face (before Experience) converts, and the Wired Machine Link's face shows as such.
     static void gasOutputSideMode(GameTestHelper helper) {
-        helper.assertTrue(SideMode.GAS_OUTPUT.ordinal() == 15, "GAS_OUTPUT is ordinal " + SideMode.GAS_OUTPUT.ordinal());
-        SideConfig config = new SideConfig(SideMode.GAS_OUTPUT, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.GAS_OUTPUT);
+        helper.assertTrue(SideMode.EXPERIENCE.ordinal() < 32 && SideMode.MACHINE_LINK.ordinal() < 32, "A SideConfig mode is past five bits");
+        SideConfig config = new SideConfig(SideMode.GAS_OUTPUT, SideMode.NONE, SideMode.EXPERIENCE, SideMode.NONE, SideMode.NONE, SideMode.GAS_OUTPUT);
+        config.setAutoEject(true);
         int packed = config.pack();
-        helper.assertTrue(SideConfig.unpack(packed, RelativeSide.TOP) == SideMode.GAS_OUTPUT && SideConfig.unpack(packed, RelativeSide.FRONT) == SideMode.GAS_OUTPUT,
-                "GAS_OUTPUT doesn't survive packing");
+        helper.assertTrue(SideConfig.unpack(packed, RelativeSide.TOP) == SideMode.GAS_OUTPUT && SideConfig.unpack(packed, RelativeSide.FRONT) == SideMode.GAS_OUTPUT
+                && SideConfig.unpack(packed, RelativeSide.LEFT) == SideMode.EXPERIENCE && SideConfig.unpackAutoEject(packed),
+                "GAS_OUTPUT, EXPERIENCE or auto-eject don't survive packing");
+        // Four bits a face, auto-eject at bit 24: GAS_OUTPUT on top, ENERGY at the back.
+        int old = SideMode.GAS_OUTPUT.ordinal() | SideMode.ENERGY.ordinal() << (RelativeSide.BACK.ordinal() * 4) | 1 << 24;
+        int converted = SideConfig.fromFourBit(old);
+        helper.assertTrue(SideConfig.unpack(converted, RelativeSide.TOP) == SideMode.GAS_OUTPUT && SideConfig.unpack(converted, RelativeSide.BACK) == SideMode.ENERGY
+                && SideConfig.unpackAutoEject(converted), "A four-bit side configuration doesn't convert");
+        int linked = SideConfig.withLinkSide(packed, RelativeSide.BOTTOM);
+        helper.assertTrue(SideConfig.unpackLinkSide(linked) == RelativeSide.BOTTOM && SideConfig.unpack(linked, RelativeSide.LEFT) == SideMode.EXPERIENCE,
+                "The Wired Machine Link's face doesn't show");
+        helper.assertTrue(SideMode.beforeExperience(16) == SideMode.BRINE, "An old Settings Card's Brine port reads as " + SideMode.beforeExperience(16));
         helper.succeed();
     }
 

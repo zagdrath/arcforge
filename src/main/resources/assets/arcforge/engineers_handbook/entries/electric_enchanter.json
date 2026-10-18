@@ -1,0 +1,17 @@
+{
+  "title": "Electric Enchanter",
+  "icon": "arcforge:electric_enchanter",
+  "items": [
+    "arcforge:electric_enchanter"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "Enchants items and books with FE, Lapis Lazuli and Liquid Experience, with no table and no luck.\nPick its target in the GUI: every enchantment the item in it supports (all of them with no item, or for a Book), up to its top level. Click a name for its top level or to clear it; - and + step a level. Enchantments that clash with one you pick are dropped. Treasure enchantments are off unless the config allows them."
+    },
+    {
+      "type": "text",
+      "text": "# Costs\nEach level gained costs Lapis equal to the level, and the vanilla enchanting cost of that level in Liquid Experience (that many XP levels, at 20 mB a point). An item that already has some of the target pays only for what it gains; one that has all of it passes straight through. A Book becomes an Enchanted Book.\n# Automation\nSides: item input (items and Lapis), output, Liquid Experience in. The Settings Card copies the target. Speed and Energy upgrades."
+    }
+  ]
+}

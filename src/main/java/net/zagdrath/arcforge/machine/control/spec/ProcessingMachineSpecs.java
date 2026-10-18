@@ -21,6 +21,7 @@ import net.zagdrath.arcforge.api.machine.resource.SlotRole;
 import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.DiamondPressBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectricEnchanterBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FiberizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.GrainDryerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
@@ -61,6 +62,7 @@ public final class ProcessingMachineSpecs {
                 .slot(InductionFurnaceBlockEntity.SLOT_INPUT, SlotRole.INPUT)
                 .slot(InductionFurnaceBlockEntity.SLOT_OUTPUT, SlotRole.OUTPUT)
                 .items(InductionFurnaceBlockEntity::getItems, be -> be.getItemHandler(null))
+                .tank(SlotRole.OUTPUT, be -> be.getBank().getTank())
                 .progress(be -> be.getLane().getProgress(), be -> be.getLane().getTotal())
                 .outputs(be -> current(be, be.getLane().getProgress(), level -> {
                     ItemStack input = be.getItems().getStack(InductionFurnaceBlockEntity.SLOT_INPUT);
@@ -229,6 +231,17 @@ public final class ProcessingMachineSpecs {
                     return MachineRecipes.infusing(level, input, be.getTank().getResource(0), be.getItems().getStack(InfuserBlockEntity.SLOT_ADDITIVE))
                             .map(holder -> holder.value().assemble(new SingleRecipeInput(input)));
                 }))
+                .build());
+
+        MachineControls.register(ModBlockEntityTypes.ELECTRIC_ENCHANTER.get(), MachineControlSpec.builder(ElectricEnchanterBlockEntity.class)
+                .energy(EnergyRole.CONSUMER, ElectricEnchanterBlockEntity::getEnergy, ElectricEnchanterBlockEntity::getUsage)
+                .slot(ElectricEnchanterBlockEntity.SLOT_INPUT, SlotRole.INPUT)
+                .slot(ElectricEnchanterBlockEntity.SLOT_LAPIS, SlotRole.INPUT)
+                .slot(ElectricEnchanterBlockEntity.SLOT_OUTPUT, SlotRole.OUTPUT)
+                .items(ElectricEnchanterBlockEntity::getItems, be -> be.getItemHandler(null))
+                .tank(SlotRole.INPUT, ElectricEnchanterBlockEntity::getTank)
+                .fluidAutomation(be -> be.getFluidHandler(null))
+                .progress(ElectricEnchanterBlockEntity::getProgress, ElectricEnchanterBlockEntity::getTotal)
                 .build());
 
         MachineControls.register(ModBlockEntityTypes.ARC_MELTER.get(), MachineControlSpec.builder(ArcMelterBlockEntity.class)

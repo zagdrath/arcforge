@@ -79,6 +79,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> ARC_CRUSHING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_CRUSHING_ARRAY_CASING);
     public static final DeferredItem<BlockItem> INDUCTION_FURNACE = ITEMS.registerSimpleBlockItem(ModBlocks.INDUCTION_FURNACE);
     public static final DeferredItem<BlockItem> INDUCTION_FURNACE_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.INDUCTION_FURNACE_ARRAY_CASING);
+    public static final DeferredItem<BlockItem> CHEMICAL_REACTOR_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.CHEMICAL_REACTOR_ARRAY_CASING);
     public static final DeferredItem<BlockItem> METAL_PRESS = ITEMS.registerSimpleBlockItem(ModBlocks.METAL_PRESS);
     public static final DeferredItem<BlockItem> METAL_PRESSING_ARRAY_CASING = ITEMS.registerSimpleBlockItem(ModBlocks.METAL_PRESSING_ARRAY_CASING);
     public static final DeferredItem<BlockItem> ELECTRIC_PUMP = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTRIC_PUMP);
@@ -103,6 +104,8 @@ public final class ModItems {
             p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.INVAR, p.enchantable(10)));
     public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> TUNGSTEN_MESH = ITEMS.registerItem("tungsten_mesh",
             p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.TUNGSTEN, p.enchantable(10)));
+    public static final DeferredItem<net.zagdrath.arcforge.item.tool.SifterMeshItem> SILICON_CARBIDE_MESH = ITEMS.registerItem("silicon_carbide_mesh",
+            p -> new net.zagdrath.arcforge.item.tool.SifterMeshItem(net.zagdrath.arcforge.item.tool.SifterMeshItem.Tier.SILICON_CARBIDE, p.enchantable(12)));
     public static final DeferredItem<BlockItem> CARBON_RECLAIMER = ITEMS.registerSimpleBlockItem(ModBlocks.CARBON_RECLAIMER);
     public static final DeferredItem<BlockItem> GASIFIER = ITEMS.registerSimpleBlockItem(ModBlocks.GASIFIER);
     public static final DeferredItem<BlockItem> FISCHER_TROPSCH_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.FISCHER_TROPSCH_REACTOR);
@@ -136,6 +139,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> PRESSURE_GLASS = ITEMS.registerSimpleBlockItem(ModBlocks.PRESSURE_GLASS);
     public static final DeferredItem<BlockItem> FIBERIZER = ITEMS.registerSimpleBlockItem(ModBlocks.FIBERIZER);
     public static final DeferredItem<BlockItem> INFUSER = ITEMS.registerSimpleBlockItem(ModBlocks.INFUSER);
+    public static final DeferredItem<BlockItem> ELECTRIC_ENCHANTER = ITEMS.registerSimpleBlockItem(ModBlocks.ELECTRIC_ENCHANTER);
     public static final DeferredItem<BlockItem> FUEL_BURNER = ITEMS.registerSimpleBlockItem(ModBlocks.FUEL_BURNER);
 
     public static final DeferredItem<SettingsCardItem> SETTINGS_CARD = ITEMS.registerItem("settings_card", SettingsCardItem::new);
@@ -256,6 +260,15 @@ public final class ModItems {
     public static final DeferredItem<Item> ANCIENT_DEBRIS_DUST = ITEMS.registerSimpleItem("ancient_debris_dust");
     public static final DeferredItem<Item> CARBON_DUST = ITEMS.registerSimpleItem("carbon_dust", p -> p.cookingFuel(CARBON_DUST_BURN_TIME));
     public static final DeferredItem<Item> NETHER_QUARTZ_DUST = ITEMS.registerSimpleItem("nether_quartz_dust");
+    // The silica line: Silica Dust (crushed Flint or Quartz) into glass, Ferrosilicon (a steel flux), Silica Gel (a cracking
+    // catalyst carrier), Silicon Carbide (the top Sifter Mesh) and Silicon, refined to Polysilicon.
+    public static final DeferredItem<Item> SILICA_DUST = ITEMS.registerSimpleItem("silica_dust");
+    public static final DeferredItem<Item> FERROSILICON = ITEMS.registerSimpleItem("ferrosilicon");
+    public static final DeferredItem<Item> SILICA_GEL = ITEMS.registerSimpleItem("silica_gel");
+    public static final DeferredItem<Item> SILICON_CARBIDE_BLEND = ITEMS.registerSimpleItem("silicon_carbide_blend");
+    public static final DeferredItem<Item> SILICON_CARBIDE = ITEMS.registerSimpleItem("silicon_carbide");
+    public static final DeferredItem<Item> METALLURGICAL_SILICON = ITEMS.registerSimpleItem("metallurgical_silicon");
+    public static final DeferredItem<Item> POLYSILICON = ITEMS.registerSimpleItem("polysilicon");
     public static final DeferredItem<Item> SULFUR_DUST = ITEMS.registerSimpleItem("sulfur_dust");
 
     // --- Components ---
@@ -352,6 +365,10 @@ public final class ModItems {
             p -> new BucketItem(ModFluids.LYE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
     public static final DeferredItem<BucketItem> HYDROCHLORIC_ACID_BUCKET = ITEMS.registerItem("hydrochloric_acid_bucket",
             p -> new BucketItem(ModFluids.HYDROCHLORIC_ACID.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> SODIUM_SILICATE_BUCKET = ITEMS.registerItem("sodium_silicate_bucket",
+            p -> new BucketItem(ModFluids.SODIUM_SILICATE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
+    public static final DeferredItem<BucketItem> TRICHLOROSILANE_BUCKET = ITEMS.registerItem("trichlorosilane_bucket",
+            p -> new BucketItem(ModFluids.TRICHLOROSILANE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
 
     // --- Salt ---
 
@@ -699,6 +716,8 @@ public final class ModItems {
         buckets.add(BRINE_BUCKET);
         buckets.add(LYE_BUCKET);
         buckets.add(LITHIUM_BRINE_BUCKET);
+        buckets.add(SODIUM_SILICATE_BUCKET);
+        buckets.add(TRICHLOROSILANE_BUCKET);
         for (OreSlurry slurry : OreSlurry.values()) {
             buckets.add(slurryBucket(slurry));
         }

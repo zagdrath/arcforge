@@ -184,7 +184,12 @@ public enum MachineStatus {
     NO_SOLVENT("no_solvent", "led_blocked"),
     WRONG_MODE("wrong_mode", "led_blocked"),
     ROD_TOO_HOT("rod_too_hot", "led_blocked"),
-    DESTROYED("destroyed", "led_blocked");
+    DESTROYED("destroyed", "led_blocked"),
+    // The Electric Enchanter: at work, short of Lapis or Liquid Experience, or with no target enchantments set.
+    ENCHANTING("enchanting", "led_running"),
+    NO_LAPIS("no_lapis", "led_blocked"),
+    NO_EXPERIENCE("no_experience", "led_blocked"),
+    NO_TARGET("no_target", "led_idle");
 
     private final String name;
     private final String led;

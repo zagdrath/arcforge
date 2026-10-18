@@ -255,6 +255,8 @@
     "arcforge:purex_controller",
     "arcforge:salt_processing_unit",
     "arcforge:freeze_plug",
-    "arcforge:drain_tank"
+    "arcforge:drain_tank",
+    "arcforge:electric_enchanter",
+    "arcforge:chemical_reactor_array_casing"
   ]
 }

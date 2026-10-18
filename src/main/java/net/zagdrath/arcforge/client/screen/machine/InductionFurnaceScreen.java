@@ -14,6 +14,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
+import net.zagdrath.arcforge.client.gui.tab.ExperienceTab;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
 
@@ -28,7 +29,7 @@ public class InductionFurnaceScreen extends MachineScreen<InductionFurnaceMenu> 
     private final Identifier progress = sprite("progress");
 
     public InductionFurnaceScreen(InductionFurnaceMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "induction_furnace", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)));
+        super(menu, inventory, title, "induction_furnace", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage), new ExperienceTab(menu::getXp, menu::getXpCapacity)));
         enableAutoEject();
     }
 

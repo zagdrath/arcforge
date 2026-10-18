@@ -14,5 +14,6 @@
     "count": 4
   },
   "time": 200,
-  "min_temp": 600
+  "min_temp": 600,
+  "experience": 0.5
 }

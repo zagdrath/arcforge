@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:metallurgical_silicon",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "tag": "c:hydrochloric_acid",
+      "amount": 300
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:trichlorosilane",
+    "amount": 250
+  },
+  "fluid_byproduct": {
+    "id": "arcforge:hydrogen",
+    "amount": 100
+  },
+  "time": 140
+}

@@ -41,6 +41,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.STEEL_MESH.get());
                 output.accept(ModItems.INVAR_MESH.get());
                 output.accept(ModItems.TUNGSTEN_MESH.get());
+                output.accept(ModItems.SILICON_CARBIDE_MESH.get());
                 output.accept(ModItems.ARC_CRUSHING_ARRAY_CASING.get());
                 output.accept(ModItems.INDUCTION_FURNACE.get());
                 output.accept(ModItems.INDUCTION_FURNACE_ARRAY_CASING.get());
@@ -51,6 +52,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ARC_MELTER.get());
                 output.accept(ModItems.FERMENTER.get());
                 output.accept(ModItems.CHEMICAL_REACTOR.get());
+                output.accept(ModItems.CHEMICAL_REACTOR_ARRAY_CASING.get());
                 output.accept(ModItems.ELECTROLYZER.get());
                 output.accept(ModItems.CARBON_RECLAIMER.get());
                 output.accept(ModItems.GASIFIER.get());
@@ -79,6 +81,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.DIESEL_GENERATOR_CASING.get());
                 output.accept(ModItems.ASSEMBLER.get());
                 output.accept(ModItems.BLOCK_BREAKER.get());
+                output.accept(ModItems.ELECTRIC_ENCHANTER.get());
                 output.accept(ModItems.TREE_CUTTER.get());
                 output.accept(ModItems.BLOCK_PLACER.get());
                 output.accept(ModItems.VACUUM_COLLECTOR.get());
@@ -147,6 +150,13 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.ANCIENT_DEBRIS_DUST.get());
                 output.accept(ModItems.CARBON_DUST.get());
                 output.accept(ModItems.NETHER_QUARTZ_DUST.get());
+                output.accept(ModItems.SILICA_DUST.get());
+                output.accept(ModItems.FERROSILICON.get());
+                output.accept(ModItems.SILICA_GEL.get());
+                output.accept(ModItems.SILICON_CARBIDE_BLEND.get());
+                output.accept(ModItems.SILICON_CARBIDE.get());
+                output.accept(ModItems.METALLURGICAL_SILICON.get());
+                output.accept(ModItems.POLYSILICON.get());
                 output.accept(ModItems.SULFUR_DUST.get());
                 output.accept(ModItems.HALITE_ORE.get());
                 output.accept(ModItems.DEEPSLATE_HALITE_ORE.get());

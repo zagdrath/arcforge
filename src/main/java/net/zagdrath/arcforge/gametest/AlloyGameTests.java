@@ -185,10 +185,12 @@ final class AlloyGameTests {
         // pieces, Gas Centrifuge, and the Centrifuge Cascade Casing and Controller), and the Fission Reactor drop's sixteen
         // (Pellet Die, Fuel Rod, Control Rod, Control Rod Channel, Fuel Channel, Graphite Moderator, Steel Reflector, Exchange
         // Tray, Reactor Casing, Glass and Controller, Heavy Water Tower Casing and Controller, Steam Generator Casing, Tubes
-        // and Controller).
-        helper.assertTrue(crafting == 353, crafting + " crafting/ recipes, not 353");
-        // Plus the fluorite-fluxed steel, Graphite from Coal Coke and from Carbon Dust, Zircaloy and Lead-Bismuth.
-        helper.assertTrue(smelting == 10, smelting + " arcforge_smelting/ recipes, not 10");
+        // and Controller), and the silica drop's four (Chemical Reactor Array Casing, Electric Enchanter, Silicon Carbide
+        // Blend and Silicon Carbide Mesh).
+        helper.assertTrue(crafting == 357, crafting + " crafting/ recipes, not 357");
+        // Plus the fluorite-fluxed steel, Graphite from Coal Coke and from Carbon Dust, Zircaloy, Lead-Bismuth, Ferrosilicon
+        // and Metallurgical Silicon.
+        helper.assertTrue(smelting == 12, smelting + " arcforge_smelting/ recipes, not 12");
         for (String old : List.of("speed_upgrade", "wrought_heat_cell", "steel_ingot_from_arcforge_smelting", "thermoelectric_plant")) {
             helper.assertTrue(recipe(helper, old) == null, "Old recipe " + old + " is still there");
         }

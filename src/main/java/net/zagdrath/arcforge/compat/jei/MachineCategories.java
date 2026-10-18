@@ -1685,6 +1685,11 @@ final class MachineCategories {
                 text(graphics, Component.translatable("jei.arcforge.chemical_reacting." + recipe.category()), 0, y);
                 y += 10;
             }
+            if (recipe.isHeated()) {
+                text(graphics, Component.translatable("jei.arcforge.chemical_reacting.heat", String.format(Locale.ROOT, "%,d", recipe.heatPerTick()),
+                        String.format(Locale.ROOT, "%,d", recipe.minTemperature())), 0, y);
+                y += 10;
+            }
             int[] yield = leachingYield(recipe);
             if (yield != null) {
                 text(graphics, Component.translatable("jei.arcforge.yield", yield[0], yield[1]), 0, y);
@@ -2116,6 +2121,52 @@ final class MachineCategories {
                     Math.round(fuel.huPerMb() * ArcforgeConfig.GAS_TURBINE_EXHAUST_FRACTION.getAsDouble()),
                     GasTurbineArrayBlockEntity.exhaustCelsius(fuel)), 24, 16);
             text(graphics, Component.translatable("gui.arcforge.burns_at", celsius), 24, 27);
+        }
+    }
+
+    // --- Electric Enchanter: what taking a Book to each enchantment's top level costs ---
+
+    record EnchantingRecipe(net.minecraft.core.Holder<net.minecraft.world.item.enchantment.Enchantment> enchantment, int level) {}
+
+    static final class ElectricEnchanting extends ArcforgeCategory<EnchantingRecipe> {
+        static final IRecipeType<EnchantingRecipe> TYPE = IRecipeType.create(Arcforge.MODID, "electric_enchanting", EnchantingRecipe.class);
+
+        ElectricEnchanting(IGuiHelper gui) {
+            super(TYPE, "electric_enchanting", ModBlocks.ELECTRIC_ENCHANTER.get(), gui, 150, 40);
+        }
+
+        private static int lapis(EnchantingRecipe recipe) {
+            int lapis = 0;
+            for (int level = 1; level <= recipe.level(); level++) {
+                lapis += net.zagdrath.arcforge.blockentity.machine.ElectricEnchanterBlockEntity.lapisForLevel(level);
+            }
+            return lapis;
+        }
+
+        private static int xp(EnchantingRecipe recipe) {
+            int xp = 0;
+            for (int level = 1; level <= recipe.level(); level++) {
+                xp += net.zagdrath.arcforge.blockentity.machine.ElectricEnchanterBlockEntity.xpForLevel(recipe.enchantment(), level);
+            }
+            return xp;
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, EnchantingRecipe recipe, IFocusGroup focuses) {
+            builder.addInputSlot(1, 1).setStandardSlotBackground().add(new ItemStack(net.minecraft.world.item.Items.BOOK));
+            builder.addInputSlot(1, 21).setStandardSlotBackground().add(new ItemStack(net.minecraft.world.item.Items.LAPIS_LAZULI, Math.min(64, lapis(recipe))));
+            ItemStack book = new ItemStack(net.minecraft.world.item.Items.ENCHANTED_BOOK);
+            net.minecraft.world.item.enchantment.EnchantmentHelper.updateEnchantments(book, enchantments -> enchantments.set(recipe.enchantment(), recipe.level()));
+            builder.addOutputSlot(129, 11).setStandardSlotBackground().add(book);
+        }
+
+        @Override
+        public void draw(EnchantingRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
+            text(graphics, net.minecraft.world.item.enchantment.Enchantment.getFullname(recipe.enchantment(), recipe.level()), 24, 2);
+            text(graphics, Component.translatable("jei.arcforge.electric_enchanting.lapis", lapis(recipe)), 24, 14);
+            int xp = xp(recipe);
+            text(graphics, Component.translatable("jei.arcforge.electric_enchanting.xp", String.format(Locale.ROOT, "%,d", xp),
+                    String.format(Locale.ROOT, "%,d", xp / net.zagdrath.arcforge.experience.LiquidExperience.MB_PER_POINT)), 24, 26);
         }
     }
 }

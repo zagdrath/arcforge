@@ -277,6 +277,19 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(hydrochloricAcidProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_HYDROCHLORIC_ACID = FLUIDS.register("flowing_hydrochloric_acid",
             () -> new BaseFlowingFluid.Flowing(hydrochloricAcidProperties()));
+    // The silica line. Sodium Silicate ("water glass"): Silica Dust dissolved in Lye, thick and slow; Sulfuric Acid sets it
+    // into Silica Gel. Trichlorosilane: Metallurgical Silicon and Hydrochloric Acid, a fuming liquid that burns like the
+    // acid it gives off; with Hydrogen and heat it deposits Polysilicon.
+    public static final DeferredHolder<FluidType, FluidType> SODIUM_SILICATE_TYPE = liquidType("sodium_silicate", 1_400, 3_000, 0.012F, 0.6, 0.6);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SODIUM_SILICATE = FLUIDS.register("sodium_silicate",
+            () -> new BaseFlowingFluid.Source(sodiumSilicateProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SODIUM_SILICATE = FLUIDS.register("flowing_sodium_silicate",
+            () -> new BaseFlowingFluid.Flowing(sodiumSilicateProperties()));
+    public static final DeferredHolder<FluidType, FluidType> TRICHLOROSILANE_TYPE = liquidType("trichlorosilane", 1_340, 400, 0.02F, 0.8, 0.8);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> TRICHLOROSILANE = FLUIDS.register("trichlorosilane",
+            () -> new BaseFlowingFluid.Source(trichlorosilaneProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_TRICHLOROSILANE = FLUIDS.register("flowing_trichlorosilane",
+            () -> new BaseFlowingFluid.Flowing(trichlorosilaneProperties()));
     public static final DeferredHolder<FluidType, FluidType> CHLORINE_TYPE = gasType("chlorine", 293);
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> CHLORINE = FLUIDS.register("chlorine",
             () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.CHLORINE_TYPE, ModFluids.CHLORINE, ModFluids.FLOWING_CHLORINE)));
@@ -877,6 +890,28 @@ public final class ModFluids {
     }
 
     // Spreads 3 blocks, every 10 ticks, like Sulfuric Acid.
+    // Thick as honey: spreads 2 blocks, every 30 ticks.
+    private static BaseFlowingFluid.Properties sodiumSilicateProperties() {
+        return new BaseFlowingFluid.Properties(SODIUM_SILICATE_TYPE, SODIUM_SILICATE, FLOWING_SODIUM_SILICATE)
+                .bucket(ModItems.SODIUM_SILICATE_BUCKET)
+                .block(ModBlocks.SODIUM_SILICATE)
+                .slopeFindDistance(2)
+                .levelDecreasePerBlock(2)
+                .tickRate(30)
+                .explosionResistance(100.0F);
+    }
+
+    // Thin: spreads 4 blocks, every 5 ticks.
+    private static BaseFlowingFluid.Properties trichlorosilaneProperties() {
+        return new BaseFlowingFluid.Properties(TRICHLOROSILANE_TYPE, TRICHLOROSILANE, FLOWING_TRICHLOROSILANE)
+                .bucket(ModItems.TRICHLOROSILANE_BUCKET)
+                .block(ModBlocks.TRICHLOROSILANE)
+                .slopeFindDistance(4)
+                .levelDecreasePerBlock(1)
+                .tickRate(5)
+                .explosionResistance(100.0F);
+    }
+
     private static BaseFlowingFluid.Properties hydrochloricAcidProperties() {
         return new BaseFlowingFluid.Properties(HYDROCHLORIC_ACID_TYPE, HYDROCHLORIC_ACID, FLOWING_HYDROCHLORIC_ACID)
                 .bucket(ModItems.HYDROCHLORIC_ACID_BUCKET)

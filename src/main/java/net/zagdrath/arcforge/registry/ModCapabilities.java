@@ -19,58 +19,62 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.transfer.energy.ItemAccessEnergyHandler;
+import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.api.gas.GasCapabilities;
+import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.ChemicalReactorArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock;
 import net.zagdrath.arcforge.blockentity.experience.XpShowerBlockEntity;
+import net.zagdrath.arcforge.blockentity.farming.ClocheBlockEntity;
 import net.zagdrath.arcforge.blockentity.farming.GreenhouseBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.ChunkLoaderBlockEntity;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
-import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
-import net.zagdrath.arcforge.Arcforge;
-import net.zagdrath.arcforge.api.gas.GasCapabilities;
-import net.zagdrath.arcforge.gas.FluidGasHandler;
-import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
+import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.BlockBreakerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.BlockPlacerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectricEnchanterBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FiberizerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.InfuserBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
+import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.ChemicalReactorArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
-import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
-import net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.ArcCrusherBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.CombustionPlantBlockEntity;
-import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.FireboxBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.FuelBurnerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.FiberizerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.GeothermalPlantBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.InfuserBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.InductionFurnaceBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.ThermoelectricPlantBlockEntity;
-import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
-import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
-import net.zagdrath.arcforge.blockentity.multiblock.MetalPressingArrayBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.MetalPressBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.ChemicalReactorBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.ElectrolyzerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBoundingBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.BlockPlacerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.BlockBreakerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.AssemblerBlockEntity;
-import net.zagdrath.arcforge.blockentity.machine.ElectricPumpBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.EnergyCellBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.FluidTankBlockEntity;
-import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.HeatCellBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.PressurizedCylinderBlockEntity;
 import net.zagdrath.arcforge.blockentity.storage.StorageBlockEntity;
+import net.zagdrath.arcforge.gas.FluidGasHandler;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.item.storage.PortableFluidHandler;
 import net.zagdrath.arcforge.item.storage.PortableStorageItem;
@@ -82,7 +86,6 @@ import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.SolarThermalStructure;
-import net.zagdrath.arcforge.blockentity.farming.ClocheBlockEntity;
 
 // Exposes machine storage through NeoForge's standard capabilities, so any mod using
 // Capabilities.Energy (FE), Capabilities.Fluid or Capabilities.Item can interact with Arcforge machines.
@@ -157,6 +160,9 @@ public final class ModCapabilities {
                 InductionFurnaceBlockEntity::getEnergyHandler);
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE.get(),
                 InductionFurnaceBlockEntity::getItemHandler);
+        // Its banked Liquid Experience, out of Experience faces.
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE.get(),
+                InductionFurnaceBlockEntity::getFluidHandler);
         // Every casing of a formed Induction Furnace Array exposes the cube face it lies on (served by the centre).
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE_ARRAY.get(), (casing, side) -> {
             InductionFurnaceArrayBlockEntity array = InductionFurnaceArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
@@ -165,6 +171,27 @@ public final class ModCapabilities {
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE_ARRAY.get(), (casing, side) -> {
             InductionFurnaceArrayBlockEntity array = InductionFurnaceArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
             return array != null ? array.energyHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.INDUCTION_FURNACE_ARRAY.get(), (casing, side) -> {
+            InductionFurnaceArrayBlockEntity array = InductionFurnaceArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.fluidHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        // Every casing of a formed Chemical Reactor Array exposes the cube face it lies on (served by the centre).
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR_ARRAY.get(), (casing, side) -> {
+            ChemicalReactorArrayBlockEntity array = ChemicalReactorArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.itemHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR_ARRAY.get(), (casing, side) -> {
+            ChemicalReactorArrayBlockEntity array = ChemicalReactorArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.energyHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR_ARRAY.get(), (casing, side) -> {
+            ChemicalReactorArrayBlockEntity array = ChemicalReactorArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.fluidHandlerAt(casing.getBlockPos(), side) : null;
+        });
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.CHEMICAL_REACTOR_ARRAY.get(), (casing, side) -> {
+            ChemicalReactorArrayBlockEntity array = ChemicalReactorArrayCasingBlock.STRUCTURE.findController(casing.getLevel(), casing.getBlockPos());
+            return array != null ? array.heatHandlerAt(casing.getBlockPos(), side) : null;
         });
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.METAL_PRESS.get(),
                 MetalPressBlockEntity::getEnergyHandler);
@@ -265,6 +292,9 @@ public final class ModCapabilities {
                 ChemicalReactorBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
                 ChemicalReactorBlockEntity::getEnergyHandler);
+        // Heat for heated recipes (Polysilicon), in through Heat faces.
+        event.registerBlockEntity(HEAT, ModBlockEntityTypes.CHEMICAL_REACTOR.get(),
+                ChemicalReactorBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ELECTROLYZER.get(),
                 ElectrolyzerBlockEntity::getFluidHandler);
         // The Sifter's items and FE; the Diamond Press's items, FE and heat.
@@ -344,6 +374,8 @@ public final class ModCapabilities {
                 BlockBreakerBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.BLOCK_BREAKER.get(),
                 BlockBreakerBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.BLOCK_BREAKER.get(),
+                BlockBreakerBlockEntity::getFluidHandler);
         // The Tree Cutter: saplings and bone meal in, the trees out, FE in.
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.TREE_CUTTER.get(),
                 net.zagdrath.arcforge.blockentity.machine.TreeCutterBlockEntity::getItemHandler);
@@ -405,6 +437,12 @@ public final class ModCapabilities {
                 InfuserBlockEntity::getItemHandler);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.INFUSER.get(),
                 InfuserBlockEntity::getFluidHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.ELECTRIC_ENCHANTER.get(),
+                ElectricEnchanterBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.ELECTRIC_ENCHANTER.get(),
+                ElectricEnchanterBlockEntity::getItemHandler);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.ELECTRIC_ENCHANTER.get(),
+                ElectricEnchanterBlockEntity::getFluidHandler);
         event.registerBlockEntity(HEAT, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),
                 ThermoelectricPlantBlockEntity::getHeatHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.THERMOELECTRIC_PLANT.get(),

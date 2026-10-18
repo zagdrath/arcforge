@@ -11,6 +11,8 @@ import java.util.Optional;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.Codec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -35,24 +37,22 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
-import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.item.tool.MachineSettings;
 import net.zagdrath.arcforge.item.tool.SettingsCardData;
 import net.zagdrath.arcforge.item.tool.SettingsCopyable;
-import net.zagdrath.arcforge.registry.ModFluids;
-import net.zagdrath.arcforge.security.Owned;
-import net.zagdrath.arcforge.security.Ownership;
-import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
+import net.zagdrath.arcforge.machine.ExperienceBank;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
 import net.zagdrath.arcforge.machine.config.RelativeSide;
@@ -61,24 +61,26 @@ import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.machine.control.ControlStateHolder;
 import net.zagdrath.arcforge.machine.control.MachineControlState;
 import net.zagdrath.arcforge.machine.control.MachineControlTracker;
+import net.zagdrath.arcforge.machine.link.LinkableMachine;
+import net.zagdrath.arcforge.machine.link.MachineLinkState;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
-import net.zagdrath.arcforge.machine.link.LinkableMachine;
-import net.zagdrath.arcforge.machine.link.MachineLinkState;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
+import net.zagdrath.arcforge.security.Owned;
+import net.zagdrath.arcforge.security.Ownership;
 import net.zagdrath.arcforge.tag.ModItemTags;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
+import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
-
-import com.mojang.serialization.Codec;
 
 // The Arcforge Furnace, run from its port. Burning fuel (coal coke) heats the furnace towards its
 // maximum; with no fuel burning it cools. A smelt (metal, up to two additives and coal coke -> a result
@@ -88,7 +90,8 @@ import com.mojang.serialization.Codec;
 // keeps back what the smelt needs. A coal coke block in the coke slot is broken open into nine loose coal
 // coke when needed, which are burned and used before anything else in the slot. Oxygen piped into an Oxygen port
 // speeds smelts up: one that starts with oxygenPerSmelt in the tank uses it and runs oxygenSpeedMultiplier times as
-// fast.
+// fast. Each smelt banks its recipe's experience as Liquid Experience (see ExperienceBank), given out of Experience
+// ports; a full tank stops banking.
 public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvider, MultiblockController, LinkableMachine, Owned, SettingsCopyable,
         ControlStateHolder {
     // Its Wired Machine Link, if a Link Conduit links it to one (see LinkableMachine).
@@ -118,7 +121,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     // Coal coke in a coal coke block.
     private static final int BLOCK_COKE = 9;
 
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT, SideMode.OXYGEN);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT, SideMode.OXYGEN,
+            SideMode.EXPERIENCE);
     private static final int STRUCTURE_CHECK_INTERVAL = 20;
     private static final int REDSTONE_CHECK_INTERVAL = 4;
 
@@ -129,6 +133,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     private final ResourceHandler<ItemResource> itemAutomation;
     private final FilteredFluidTank oxygen;
     private final ResourceHandler<FluidResource> oxygenInput;
+    private final ExperienceBank bank;
+    private final ResourceHandler<FluidResource> fluidAll;
     private final SideConfig sideConfig = new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.NONE, SideMode.NONE, SideMode.BYPRODUCT, SideMode.NONE);
     private final ContainerData data;
 
@@ -161,6 +167,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         this.oxygen = new FilteredFluidTank(ArcforgeConfig.FURNACE_OXYGEN_CAPACITY.getAsInt(),
                 resource -> resource.getFluid() == ModFluids.OXYGEN.get(), this::setChanged);
         this.oxygenInput = new AutomationResourceHandler<>(oxygen, index -> true, index -> false);
+        this.bank = new ExperienceBank(ArcforgeConfig.FURNACE_EXPERIENCE_TANK.getAsInt(), this::setChanged);
+        this.fluidAll = new CombinedResourceHandler<>(oxygenInput, bank.getOutput());
         this.data = new WideIntContainerData(ArcforgeFurnaceMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -177,6 +185,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
                     case ArcforgeFurnaceMenu.DATA_SIDE_CONFIG -> sideConfig.pack();
                     case ArcforgeFurnaceMenu.DATA_OXYGEN -> oxygen.getAmount();
                     case ArcforgeFurnaceMenu.DATA_BOOST -> boosted ? (int) Math.round(oxygenSpeed() * 100.0) : 0;
+                    case ArcforgeFurnaceMenu.DATA_XP -> bank.getAmount();
+                    case ArcforgeFurnaceMenu.DATA_XP_CAPACITY -> bank.getCapacity();
                     default -> 0;
                 };
             }
@@ -201,7 +211,8 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     }
 
     // Where an item put in through an input port goes: coal coke to the coke slot, a recipe metal to the metal slot, and
-    // an additive to the additive slot already holding it, else the first empty one. -1: nowhere. Coal Coke is a metal
+    // an additive to the additive slot already holding it, else the first empty one (an item that's both goes to the
+    // metal slot unless it holds another metal). -1: nowhere. Coal Coke is a metal
     // too (it bakes into Graphite): it fills the coke slot first, and only what doesn't fit there goes on to the metal
     // slot, and only while that already holds Coal Coke (see RoutedInput). So steel lines keep feeding their fuel, and a
     // Graphite line, started by putting one coke in the metal slot by hand, keeps its fuel topped up too.
@@ -210,10 +221,16 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         if (isFuel(stack)) {
             return SLOT_COKE;
         }
+        boolean additive = MachineRecipes.isArcforgeAdditive(level, stack);
         if (MachineRecipes.isArcforgeMetal(level, stack)) {
-            return SLOT_METAL;
+            // Both (Silica Dust: the metal for Metallurgical Silicon, the additive for Ferrosilicon): an additive while the
+            // metal slot holds another metal, else the metal.
+            ItemStack metal = items.getStack(SLOT_METAL);
+            if (!additive || metal.isEmpty() || ItemStack.isSameItemSameComponents(metal, stack)) {
+                return SLOT_METAL;
+            }
         }
-        if (!MachineRecipes.isArcforgeAdditive(level, stack)) {
+        if (!additive) {
             return -1;
         }
         for (int slot : new int[] { SLOT_ADDITIVE, SLOT_ADDITIVE_2 }) {
@@ -560,6 +577,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
             made.add(slag.copy());
             addTo(SLOT_BYPRODUCT, slag);
         });
+        bank.bank(recipe.experience());
         int used = recipe.metal().count() + recipe.additive().map(additive -> additive.count()).orElse(0)
                 + recipe.additive2().map(additive -> additive.count()).orElse(0) + recipe.coke();
         // A boosted smelt used its oxygen when it started.
@@ -652,16 +670,31 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         };
     }
 
-    // Oxygen ports fill the oxygen tank (and so does an unsided query); nothing comes back out.
+    // Oxygen ports fill the oxygen tank; Experience ports give the banked Liquid Experience. Unsided, both.
     @Override
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable SideMode mode) {
-        return mode == null || mode == SideMode.OXYGEN ? oxygenInput : null;
+        if (mode == null) {
+            return fluidAll;
+        }
+        return switch (mode) {
+            case OXYGEN -> oxygenInput;
+            case EXPERIENCE -> bank.getOutput();
+            default -> null;
+        };
+    }
+
+    // The Liquid Experience it has banked.
+    public ExperienceBank getBank() {
+        return bank;
     }
 
     @Override
     public ConnectionMode getConduitConnection(SideMode mode, ConduitType type) {
         if (type == ConduitType.GAS) {
             return mode == SideMode.OXYGEN ? ConnectionMode.INPUT : ConnectionMode.NONE;
+        }
+        if (type == ConduitType.FLUID) {
+            return mode == SideMode.EXPERIENCE ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
         }
         if (type != ConduitType.ITEM) {
             return ConnectionMode.NONE;
@@ -789,6 +822,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         progress = input.getIntOr("progress", 0);
         looseCoke = input.getIntOr("loose_coke", 0);
         oxygen.deserialize(input.childOrEmpty("oxygen"));
+        bank.deserialize(input);
         boosted = input.getBooleanOr("boosted", false);
     }
 
@@ -810,6 +844,7 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
         output.putInt("progress", progress);
         output.putInt("loose_coke", looseCoke);
         oxygen.serialize(output.child("oxygen"));
+        bank.serialize(output);
         output.putBoolean("boosted", boosted);
     }
 

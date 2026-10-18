@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "NGN",
+    "HXH",
+    "NGN"
+  ],
+  "key": {
+    "N": "#c:plates/nickel",
+    "G": "#c:glass_blocks",
+    "H": "arcforge:hardened_alloy",
+    "X": "arcforge:chemical_reactor"
+  },
+  "result": {
+    "id": "arcforge:chemical_reactor_array_casing",
+    "count": 4
+  }
+}

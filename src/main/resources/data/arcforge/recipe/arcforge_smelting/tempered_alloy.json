@@ -18,5 +18,6 @@
   "additive": {
     "ingredient": "#c:ingots/copper",
     "count": 2
-  }
+  },
+  "experience": 1.0
 }

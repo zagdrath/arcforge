@@ -84,6 +84,7 @@
         "electric_pump",
         "arc_melter",
         "chemical_processing",
+        "silica",
         "electrolyzer",
         "carbon_capture",
         "syngas",
@@ -104,6 +105,7 @@
         "block_placer",
         "tree_cutter",
         "vacuum_collector",
+        "electric_enchanter",
         "arc_quarry",
         "throttle_lever"
       ]
@@ -116,6 +118,7 @@
       "entries": [
         "arc_crushing_array",
         "induction_furnace_array",
+        "chemical_reactor_array",
         "metal_pressing_array"
       ]
     },
@@ -151,6 +154,7 @@
         "gas_reservoir",
         "item_reservoir",
         "liquid_experience",
+        "experience_banking",
         "energy_cells",
         "battery_array",
         "meters",

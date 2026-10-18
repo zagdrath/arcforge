@@ -10,9 +10,11 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.resources.Identifier;
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.valueproviders.ConstantInt;
 import net.minecraft.util.valueproviders.IntProvider;
@@ -41,67 +43,78 @@ import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
+import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.experience.XpDrainBlock;
 import net.zagdrath.arcforge.block.experience.XpShowerBlock;
+import net.zagdrath.arcforge.block.farming.ArcforgeCropBlock;
+import net.zagdrath.arcforge.block.farming.ClocheBlock;
+import net.zagdrath.arcforge.block.farming.CompostBinBlock;
+import net.zagdrath.arcforge.block.farming.CopperSprinklerBlock;
+import net.zagdrath.arcforge.block.farming.FarmMachineBlock;
+import net.zagdrath.arcforge.block.farming.FertilizerSpreaderBlock;
+import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
+import net.zagdrath.arcforge.block.farming.MillstoneBlock;
+import net.zagdrath.arcforge.block.farming.ResinTapBlock;
+import net.zagdrath.arcforge.block.farming.ScarecrowBlock;
+import net.zagdrath.arcforge.block.farming.TrellisBlock;
+import net.zagdrath.arcforge.block.farming.WildCropBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseControllerBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.GreenhouseFrameBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.GrowLampBlock;
 import net.zagdrath.arcforge.block.farming.greenhouse.PlantingBedBlock;
+import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
+import net.zagdrath.arcforge.block.logistics.ChargepadBlock;
 import net.zagdrath.arcforge.block.logistics.ChunkLoaderBlock;
 import net.zagdrath.arcforge.block.logistics.HeatPipeBlock;
 import net.zagdrath.arcforge.block.logistics.LinkConduitBlock;
+import net.zagdrath.arcforge.block.logistics.MeterBlock;
 import net.zagdrath.arcforge.block.logistics.QuantumTunnelBlock;
 import net.zagdrath.arcforge.block.logistics.WiredMachineLinkBlock;
 import net.zagdrath.arcforge.block.machine.AirSeparatorBlock;
-import net.zagdrath.arcforge.block.machine.HaberReactorBlock;
-import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
-import net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
-import net.zagdrath.arcforge.Arcforge;
-import net.zagdrath.arcforge.block.conduit.ActiveConduitBlock;
-import net.zagdrath.arcforge.block.farming.ArcforgeCropBlock;
-import net.zagdrath.arcforge.block.farming.CompostBinBlock;
-import net.zagdrath.arcforge.block.farming.CopperSprinklerBlock;
-import net.zagdrath.arcforge.block.farming.ResinTapBlock;
-import net.zagdrath.arcforge.block.farming.FarmMachineBlock;
-import net.zagdrath.arcforge.block.farming.FertilizerSpreaderBlock;
-import net.zagdrath.arcforge.block.farming.MillstoneBlock;
-import net.zagdrath.arcforge.block.machine.GrainDryerBlock;
-import net.zagdrath.arcforge.block.machine.VulcanizerBlock;
-import net.zagdrath.arcforge.block.machine.MillBlock;
-import net.zagdrath.arcforge.block.machine.OilPressBlock;
-import net.zagdrath.arcforge.block.machine.SeedExtractorBlock;
-import net.zagdrath.arcforge.block.farming.LoamFarmlandBlock;
-import net.zagdrath.arcforge.block.farming.ScarecrowBlock;
-import net.zagdrath.arcforge.block.farming.TrellisBlock;
-import net.zagdrath.arcforge.block.farming.WildCropBlock;
-import net.zagdrath.arcforge.block.conduit.ConduitBlock;
-import net.zagdrath.arcforge.block.fluid.SulfuricAcidBlock;
-import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock;
+import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
+import net.zagdrath.arcforge.block.machine.ArcMelterBlock;
+import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
+import net.zagdrath.arcforge.block.machine.ArcQuarryBoundingBlock;
+import net.zagdrath.arcforge.block.machine.AssemblerBlock;
+import net.zagdrath.arcforge.block.machine.BlockBreakerBlock;
+import net.zagdrath.arcforge.block.machine.BlockPlacerBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
+import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
+import net.zagdrath.arcforge.block.machine.ElectricEnchanterBlock;
+import net.zagdrath.arcforge.block.machine.ElectricPumpBlock;
 import net.zagdrath.arcforge.block.machine.ElectrolyzerBlock;
 import net.zagdrath.arcforge.block.machine.FermenterBlock;
-import net.zagdrath.arcforge.block.machine.SecurityTerminalBlock;
-import net.zagdrath.arcforge.block.machine.VacuumCollectorBlock;
-import net.zagdrath.arcforge.block.machine.ArcQuarryBoundingBlock;
-import net.zagdrath.arcforge.block.machine.ArcQuarryBlock;
-import net.zagdrath.arcforge.block.machine.BlockPlacerBlock;
-import net.zagdrath.arcforge.block.machine.BlockBreakerBlock;
-import net.zagdrath.arcforge.block.machine.AssemblerBlock;
-import net.zagdrath.arcforge.block.storage.ItemReservoirBlock;
-import net.zagdrath.arcforge.block.storage.ReservoirBlock;
-import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
-import net.zagdrath.arcforge.chemistry.OreSlurry;
-import net.zagdrath.arcforge.block.machine.ArcCrusherBlock;
+import net.zagdrath.arcforge.block.machine.FiberizerBlock;
+import net.zagdrath.arcforge.block.machine.FireboxBlock;
+import net.zagdrath.arcforge.block.machine.FuelBurnerBlock;
+import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
+import net.zagdrath.arcforge.block.machine.GrainDryerBlock;
+import net.zagdrath.arcforge.block.machine.HaberReactorBlock;
 import net.zagdrath.arcforge.block.machine.InductionFurnaceBlock;
+import net.zagdrath.arcforge.block.machine.InfuserBlock;
+import net.zagdrath.arcforge.block.machine.MachineBlock;
 import net.zagdrath.arcforge.block.machine.MetalPressBlock;
-import net.zagdrath.arcforge.block.machine.ArcMelterBlock;
-import net.zagdrath.arcforge.block.machine.ElectricPumpBlock;
-import net.zagdrath.arcforge.block.machine.CombustionPlantBlock;
+import net.zagdrath.arcforge.block.machine.MillBlock;
+import net.zagdrath.arcforge.block.machine.OilPressBlock;
+import net.zagdrath.arcforge.block.machine.SecurityTerminalBlock;
+import net.zagdrath.arcforge.block.machine.SeedExtractorBlock;
+import net.zagdrath.arcforge.block.machine.ThermoelectricPlantBlock;
+import net.zagdrath.arcforge.block.machine.VacuumCollectorBlock;
+import net.zagdrath.arcforge.block.machine.VulcanizerBlock;
 import net.zagdrath.arcforge.block.multiblock.ArcCrushingArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock;
+import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
+import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
+import net.zagdrath.arcforge.block.multiblock.BiogasDigesterControllerBlock;
+import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
+import net.zagdrath.arcforge.block.multiblock.ChemicalReactorArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
+import net.zagdrath.arcforge.block.multiblock.GasTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.InductionFurnaceArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.MetalPressingArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
@@ -111,37 +124,26 @@ import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SteamTurbineArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
-import net.zagdrath.arcforge.block.machine.FiberizerBlock;
-import net.zagdrath.arcforge.block.machine.FireboxBlock;
-import net.zagdrath.arcforge.block.machine.FuelBurnerBlock;
-import net.zagdrath.arcforge.block.machine.GeothermalPlantBlock;
-import net.zagdrath.arcforge.block.machine.InfuserBlock;
-import net.zagdrath.arcforge.block.machine.MachineBlock;
-import net.zagdrath.arcforge.block.machine.ThermoelectricPlantBlock;
-import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock;
-import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock;
-import net.zagdrath.arcforge.block.multiblock.ArcforgeFurnacePortBlock;
-import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
-import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
-import net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorControllerBlock;
 import net.zagdrath.arcforge.block.multiblock.TrayLevelCasingBlock;
+import net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock;
+import net.zagdrath.arcforge.block.redstone.ThrottleLeverBlock;
 import net.zagdrath.arcforge.block.storage.CrateBlock;
 import net.zagdrath.arcforge.block.storage.EnergyCellBlock;
-import net.zagdrath.arcforge.block.storage.HeatCellBlock;
-import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
-import net.zagdrath.arcforge.block.redstone.ThrottleLeverBlock;
-import net.zagdrath.arcforge.block.logistics.ChargepadBlock;
-import net.zagdrath.arcforge.block.logistics.MeterBlock;
-import net.zagdrath.arcforge.machine.meter.MeterKind;
 import net.zagdrath.arcforge.block.storage.FluidTankBlock;
+import net.zagdrath.arcforge.block.storage.HeatCellBlock;
+import net.zagdrath.arcforge.block.storage.ItemReservoirBlock;
+import net.zagdrath.arcforge.block.storage.PressurizedCylinderBlock;
+import net.zagdrath.arcforge.block.storage.ReservoirBlock;
 import net.zagdrath.arcforge.block.storage.StorageBlock;
 import net.zagdrath.arcforge.block.storage.VaultBlock;
+import net.zagdrath.arcforge.blockentity.farming.ClocheBlockEntity;
+import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
+import net.zagdrath.arcforge.chemistry.OreSlurry;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
-
-import org.jspecify.annotations.Nullable;
-import net.zagdrath.arcforge.block.farming.ClocheBlock;
-import net.zagdrath.arcforge.blockentity.farming.ClocheBlockEntity;
+import net.zagdrath.arcforge.machine.meter.MeterKind;
 
 public final class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(Arcforge.MODID);
@@ -203,6 +205,13 @@ public final class ModBlocks {
                     .requiresCorrectToolForDrops()
                     .sound(SoundType.METAL)
                     .lightLevel(state -> state.getValue(InductionFurnaceArrayCasingBlock.LIT) ? 12 : 0));
+
+    public static final DeferredBlock<ChemicalReactorArrayCasingBlock> CHEMICAL_REACTOR_ARRAY_CASING = BLOCKS.registerBlock("chemical_reactor_array_casing",
+            ChemicalReactorArrayCasingBlock::new,
+            p -> p.mapColor(MapColor.METAL)
+                    .strength(3.5F, 6.0F)
+                    .requiresCorrectToolForDrops()
+                    .sound(SoundType.METAL));
 
     // --- Pressing: no glow, lit only swaps the textures ---
 
@@ -426,6 +435,9 @@ public final class ModBlocks {
 
     public static final DeferredBlock<InfuserBlock> INFUSER = BLOCKS.registerBlock("infuser",
             InfuserBlock::new, p -> machineProperties(p, 4));
+
+    public static final DeferredBlock<ElectricEnchanterBlock> ELECTRIC_ENCHANTER = BLOCKS.registerBlock("electric_enchanter",
+            ElectricEnchanterBlock::new, p -> machineProperties(p, 7));
 
     // --- Treated wood: creosote-soaked, so like crimson and warped wood it doesn't burn ---
 
@@ -786,6 +798,13 @@ public final class ModBlocks {
     public static final DeferredBlock<LiquidBlock> HYDROCHLORIC_ACID = BLOCKS.registerBlock("hydrochloric_acid",
             p -> new SulfuricAcidBlock(ModFluids.HYDROCHLORIC_ACID.get(), ModDamageTypes.HYDROCHLORIC_ACID, p),
             p -> liquidProperties(p, MapColor.COLOR_YELLOW));
+    // The silica line: Sodium Silicate is harmless; Trichlorosilane fumes Hydrochloric Acid and burns like it.
+    public static final DeferredBlock<LiquidBlock> SODIUM_SILICATE = BLOCKS.registerBlock("sodium_silicate",
+            p -> new LiquidBlock(ModFluids.SODIUM_SILICATE.get(), p) {},
+            p -> liquidProperties(p, MapColor.QUARTZ));
+    public static final DeferredBlock<LiquidBlock> TRICHLOROSILANE = BLOCKS.registerBlock("trichlorosilane",
+            p -> new SulfuricAcidBlock(ModFluids.TRICHLOROSILANE.get(), ModDamageTypes.HYDROCHLORIC_ACID, p),
+            p -> liquidProperties(p, MapColor.COLOR_LIGHT_GRAY));
 
     public static final DeferredBlock<LiquidBlock> URANYL_SULFATE_SOLUTION = BLOCKS.registerBlock("uranyl_sulfate_solution",
             p -> new LiquidBlock(ModFluids.URANYL_SULFATE_SOLUTION.get(), p) {},

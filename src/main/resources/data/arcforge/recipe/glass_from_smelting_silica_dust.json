@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "category": "blocks",
+  "cookingtime": 200,
+  "experience": 0.1,
+  "ingredient": "#c:dusts/silica",
+  "result": {
+    "id": "minecraft:glass"
+  }
+}

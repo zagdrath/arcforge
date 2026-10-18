@@ -17,6 +17,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcforgeFurnaceBlockEntity;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.HeatScale;
+import net.zagdrath.arcforge.client.gui.tab.ExperienceTab;
 import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
 
 // Layout follows arcforge_furnace_gui_layout.json. All positions are relative to leftPos/topPos.
@@ -37,6 +38,7 @@ public class ArcforgeFurnaceScreen extends MultiblockScreen<ArcforgeFurnaceMenu>
     public ArcforgeFurnaceScreen(ArcforgeFurnaceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "arcforge_furnace", menu::getRedstoneMode, menu::getPorts);
         enableAutoEject(menu::isAutoEject);
+        tabs.add(new ExperienceTab(menu::getXp, menu::getXpCapacity));
     }
 
     @Override

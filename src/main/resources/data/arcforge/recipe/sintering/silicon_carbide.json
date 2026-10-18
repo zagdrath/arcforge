@@ -1,0 +1,9 @@
+{
+  "type": "arcforge:sintering",
+  "ingredient": "arcforge:silicon_carbide_blend",
+  "result": {
+    "id": "arcforge:silicon_carbide"
+  },
+  "time": 400,
+  "experience": 0.3
+}

@@ -245,6 +245,7 @@ public final class ControllerMultiblockSpecs {
                 .slot(ArcforgeFurnaceBlockEntity.SLOT_BYPRODUCT, SlotRole.OUTPUT)
                 .items(ArcforgeFurnaceBlockEntity::getItems, be -> be.getItemHandler(null))
                 .tank(SlotRole.INPUT, ArcforgeFurnaceBlockEntity::getOxygen)
+                .tank(SlotRole.OUTPUT, be -> be.getBank().getTank())
                 .fluidAutomation(be -> be.getFluidHandler(null))
                 .progress(ArcforgeFurnaceBlockEntity::getProgress, ArcforgeFurnaceBlockEntity::getProgressTotal)
                 .outputs(be -> {

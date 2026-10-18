@@ -2,8 +2,8 @@
   "type": "arcforge:crushing",
   "ingredient": "minecraft:quartz",
   "result": {
-    "count": 1,
-    "id": "arcforge:nether_quartz_dust"
+    "count": 4,
+    "id": "arcforge:silica_dust"
   },
   "time": 200,
   "ore": false

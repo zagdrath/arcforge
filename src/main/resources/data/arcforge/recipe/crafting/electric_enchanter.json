@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "TBT",
+    "DXD",
+    "TWT"
+  ],
+  "key": {
+    "T": "arcforge:tempered_alloy",
+    "B": "minecraft:book",
+    "D": "#c:gems/diamond",
+    "X": "minecraft:enchanting_table",
+    "W": "arcforge:wrought_fluid_tank"
+  },
+  "result": {
+    "id": "arcforge:electric_enchanter",
+    "count": 1
+  }
+}

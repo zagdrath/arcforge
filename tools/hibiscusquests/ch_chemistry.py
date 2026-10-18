@@ -96,6 +96,42 @@ ch.q("fischer_tropsch", "Fischer-Tropsch", "fischer_tropsch_reactor",
      [produced(category="fischer_tropsch", icon="fischer_tropsch_reactor", label="Synthesise oil")], deps=["gasifier"],
      rewards=[item("light_oil_bucket", 4), xp(10)], frame="goal", items=["fischer_tropsch_reactor"])
 
+ch.q("silica", "Silica", "silica_dust",
+     "Flint finally has a use: the Arc Crusher makes 2 Silica Dust from it, and 4 from Quartz. Silica smelts into Glass and "
+     "starts the whole silicon line.",
+     [have("silica_dust")], deps=["chemical_reactor"], rewards=[item("minecraft:flint", 16), xp(3)], items=["silica_dust"])
+
+ch.q("ferrosilicon", "Ferrosilicon", "ferrosilicon",
+     "Iron, 2 Silica and Coal Coke in the Arcforge Furnace at 1,300°C. A steel flux: the four-ingot steel smelt takes it "
+     "as it takes a Fluorite Crystal.",
+     [have("ferrosilicon")], deps=["silica"], rewards=[item("coal_coke", 8), xp(4)], items=["ferrosilicon"])
+
+ch.q("silica_gel", "Silica Gel", "silica_gel",
+     "Silica in Lye gives Sodium Silicate; Sulfuric Acid sets it into Silica Gel, which the Cracking Catalyst takes in place "
+     "of Sand.",
+     [produced(fluid="sodium_silicate", icon="sodium_silicate_bucket", label="Make Sodium Silicate"),
+      produced(item="silica_gel", label="Set Silica Gel")], deps=["silica", "sulfuric_acid"],
+     rewards=[item("silica_dust", 16), xp(5)], items=["sodium_silicate_bucket", "silica_gel"])
+
+ch.q("silicon_carbide", "Silicon Carbide", "silicon_carbide_mesh",
+     "Two Silica and Coal Coke craft into Silicon Carbide Blend; the Induction Furnace fires it into Silicon Carbide. Ringed "
+     "with Tungsten Rods it is the best Sifter Mesh there is, and it takes enchantments.",
+     [have("silicon_carbide_mesh")], deps=["silica"], rewards=[item("silicon_carbide", 4), xp(8)], frame="goal",
+     items=["silicon_carbide_blend", "silicon_carbide", "silicon_carbide_mesh"])
+
+ch.q("polysilicon", "Polysilicon", "polysilicon",
+     "Silica reduced by coke at 1,500°C gives Metallurgical Silicon. Dissolve it in Hydrochloric Acid for Trichlorosilane, "
+     "then deposit it with Hydrogen and heat (1,000°C through a Heat face) as Polysilicon, getting the acid back.",
+     [have("metallurgical_silicon"), produced(item="polysilicon", label="Deposit Polysilicon")], deps=["silica", "electrolyzer"],
+     rewards=[item("hydrochloric_acid_bucket", 2), xp(10)], frame="goal",
+     items=["metallurgical_silicon", "trichlorosilane_bucket", "polysilicon"])
+
+ch.q("chemical_reactor_array", "Chemical Reactor Array", "chemical_reactor_array_casing",
+     "Hardened Alloy, nickel plates, glass and a Chemical Reactor make four casings; a 3×3×3 of them runs every reactor "
+     "recipe in three lanes, each twice as fast, with 32,000 mB tanks and Heat ports. Set its ports with the Wrench.",
+     [formed("chemical_reactor_array", icon="chemical_reactor_array_casing")], deps=["chemical_reactor"],
+     rewards=[item("hardened_alloy", 4), xp(15)], frame="challenge", items=["chemical_reactor_array_casing"])
+
 ch.q("petrochemist", "Petrochemist", "chemical_reactor",
      "Plastic, PVC, Polypropylene and Synthetic Rubber from your own olefins, and carbon that goes round in a circle.",
      [have("plastic_sheet"), have("pvc_sheet"), have("polypropylene_sheet"), have("synthetic_rubber")],

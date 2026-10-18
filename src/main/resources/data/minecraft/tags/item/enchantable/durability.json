@@ -19,6 +19,7 @@
     "arcforge:steel_mesh",
     "arcforge:invar_mesh",
     "arcforge:tungsten_mesh",
-    "#arcforge:hazmat_suit"
+    "#arcforge:hazmat_suit",
+    "arcforge:silicon_carbide_mesh"
   ]
 }

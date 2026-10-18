@@ -10,5 +10,6 @@
     "count": 1
   },
   "time": 400,
-  "min_temp": 1500
+  "min_temp": 1500,
+  "experience": 0.3
 }

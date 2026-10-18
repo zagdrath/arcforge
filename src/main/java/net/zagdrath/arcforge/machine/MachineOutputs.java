@@ -111,6 +111,21 @@ public class MachineOutputs {
         return max - budget;
     }
 
+    // Moves up to max mB out of faces in this mode (shared across them), as pushFluid does for OUTPUT faces: the Liquid
+    // Experience a machine banks, out of its Experience faces. Returns how much moved.
+    public int pushFluid(ServerLevel level, BlockPos pos, Direction facing, SideConfig sides, SideMode mode, ResourceHandler<FluidResource> source, int max) {
+        int budget = max;
+        for (Direction direction : Direction.values()) {
+            if (budget <= 0) {
+                break;
+            }
+            if (sides.get(facing, direction) == mode) {
+                budget -= pushFluid(level, pos, direction, source, budget);
+            }
+        }
+        return max - budget;
+    }
+
     // Moves up to max mB into the tank touching one face, whatever that face is set to.
     public int pushFluid(ServerLevel level, BlockPos pos, Direction direction, ResourceHandler<FluidResource> source, int max) {
         ResourceHandler<FluidResource> target = target(fluidTargets, Capabilities.Fluid.BLOCK, level, pos, direction);

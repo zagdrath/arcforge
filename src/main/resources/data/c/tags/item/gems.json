@@ -4,6 +4,7 @@
     "#c:gems/arcite",
     "#c:gems/iolite",
     "#c:gems/monazite",
-    "#c:gems/zircon"
+    "#c:gems/zircon",
+    "#c:gems/silicon_carbide"
   ]
 }

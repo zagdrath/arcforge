@@ -39,6 +39,8 @@ import net.zagdrath.arcforge.advancement.ArcforgeAdvancements;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
+import net.zagdrath.arcforge.heat.HeatBuffer;
+import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideConfig;
 import net.zagdrath.arcforge.machine.config.SideMode;
@@ -66,7 +68,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // fluid_byproduct, leaving by By-product faces), 8,000 mB each. The third input tank and the by-product tank came later:
 // older saves load with them empty.
 // 60 FE/t unless the recipe says otherwise. Speed upgrades make it faster (drawing FE just as much faster),
-// Energy upgrades cut the FE per operation.
+// Energy upgrades cut the FE per operation. Heated recipes (heat_per_tick) also take heat, in through Heat faces from a
+// hotter block (a Fuel Burner, a Firebox), and only run while it's at least their min_temperature.
 public class ChemicalReactorBlockEntity extends MachineBlockEntity implements FluidInteractable {
     public static final int SLOT_INPUT = 0;
     public static final int SLOT_OUTPUT = 1;
@@ -81,9 +84,12 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     // third (layout 2) had them where that one is.
     private static final int SLOT_LAYOUT = 3;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT, SideMode.ENERGY,
+            SideMode.HEAT);
 
     private final ConsumerEnergyHandler energy;
+    private final HeatBuffer heat;
+    private final HeatHandler heatInput;
     private final FilteredFluidTank inputA;
     private final FilteredFluidTank inputB;
     private final FilteredFluidTank inputC;
@@ -105,6 +111,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     private int progress;
     private int total;
     private int usage;
+    private int heatUsage;
     // The recipe running now (progress starts over when it changes), or null.
     private @Nullable Identifier current;
     // What it makes, for Jade.
@@ -119,6 +126,8 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
                 ArcforgeConfig.REACTOR_ENERGY_CAPACITY.getAsInt(),
                 ArcforgeConfig.REACTOR_MAX_INPUT.getAsInt(),
                 this::setChanged);
+        this.heat = new HeatBuffer(ArcforgeConfig.REACTOR_HEAT_CAPACITY.getAsInt(), ArcforgeConfig.REACTOR_MAX_TEMPERATURE.getAsInt(), this::setChanged);
+        this.heatInput = heat.input(Integer.MAX_VALUE);
         int capacity = ArcforgeConfig.REACTOR_TANK_CAPACITY.getAsInt();
         this.inputA = new FilteredFluidTank(capacity, resource -> MachineRecipes.isReactorFluid(level, resource), this::setChanged);
         this.inputB = new FilteredFluidTank(capacity, resource -> MachineRecipes.isReactorFluid(level, resource), this::setChanged);
@@ -160,6 +169,9 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
                     case ChemicalReactorMenu.DATA_SIDE_CONFIG -> packedSides();
                     case ChemicalReactorMenu.DATA_FLUID_BYPRODUCT -> fluidId(byproductTank);
                     case ChemicalReactorMenu.DATA_AMOUNT_BYPRODUCT -> byproductTank.getAmount();
+                    case ChemicalReactorMenu.DATA_HEAT -> heat.getStored();
+                    case ChemicalReactorMenu.DATA_TEMPERATURE -> heat.getTemperature();
+                    case ChemicalReactorMenu.DATA_HEAT_USAGE -> heatUsage;
                     default -> 0;
                 };
             }
@@ -192,6 +204,11 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
                 * UpgradeType.energyCostMultiplier(upgrades(UpgradeType.ENERGY)));
     }
 
+    // HU/t for this recipe: Speed draws it faster (an operation takes the same heat).
+    public int heatPerTick(ChemicalReactingRecipe recipe) {
+        return (int) Math.ceil(recipe.heatPerTick() * speedMultiplier());
+    }
+
     public int ticksFor(ChemicalReactingRecipe recipe) {
         return UpgradeType.time(recipe.time(), upgrades(UpgradeType.SPEED));
     }
@@ -203,6 +220,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
         usage = 0;
+        heatUsage = 0;
         ChemicalReactorInput input = input();
         RecipeHolder<ChemicalReactingRecipe> holder = MachineRecipes.chemicalReacting(level, input).orElse(null);
         Identifier id = holder != null ? holder.id().identifier() : null;
@@ -236,11 +254,17 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             status = reactive ? MachineStatus.MISSING_FLUID : MachineStatus.IDLE;
         } else if (!fits(holder.value())) {
             status = MachineStatus.OUTPUT_FULL;
+        } else if (holder.value().isHeated()
+                && (heat.getTemperature() < holder.value().minTemperature() || heat.getStored() < heatPerTick(holder.value()))) {
+            status = MachineStatus.TOO_COLD;
         } else if (!energy.consume(energyPerTick(holder.value()))) {
             status = MachineStatus.NO_POWER;
         } else {
             status = MachineStatus.REACTING;
             usage = energyPerTick(holder.value());
+            if (holder.value().isHeated()) {
+                heatUsage = heat.remove(heatPerTick(holder.value()));
+            }
             if (++progress >= total) {
                 progress = 0;
                 finish(level, holder.value(), input);
@@ -437,6 +461,16 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         return energy;
     }
 
+    // Heat for heated recipes.
+    public HeatBuffer getHeat() {
+        return heat;
+    }
+
+    // HU used last tick.
+    public int getHeatUsage() {
+        return heatUsage;
+    }
+
     public int getProgress() {
         return progress;
     }
@@ -495,6 +529,12 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         return mode == null || mode == SideMode.ENERGY ? energy : null;
     }
 
+    // Heat goes in on heat faces; nothing can draw it back out.
+    public @Nullable HeatHandler getHeatHandler(@Nullable Direction side) {
+        SideMode mode = modeFor(side);
+        return mode == null || mode == SideMode.HEAT ? heatInput : null;
+    }
+
     @Override
     public ResourceHandler<FluidResource> getInteractionFluidHandler() {
         return fluidInteraction;
@@ -511,7 +551,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
             // Gases too (Ammonia, Hydrogen), through Pressurized Conduits.
             case GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
-            case THERMAL -> ConnectionMode.NONE;
+            case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.INPUT : ConnectionMode.NONE;
         };
     }
 
@@ -519,6 +559,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         energy.deserialize(input.childOrEmpty("energy"));
+        heat.deserialize(input);
         inputA.deserialize(input.childOrEmpty("input_a"));
         inputB.deserialize(input.childOrEmpty("input_b"));
         inputC.deserialize(input.childOrEmpty("input_c"));
@@ -546,6 +587,7 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         energy.serialize(output.child("energy"));
+        heat.serialize(output);
         inputA.serialize(output.child("input_a"));
         inputB.serialize(output.child("input_b"));
         inputC.serialize(output.child("input_c"));

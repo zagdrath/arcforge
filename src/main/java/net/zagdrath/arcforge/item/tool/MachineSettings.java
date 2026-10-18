@@ -129,7 +129,9 @@ public final class MachineSettings {
         }
     }
 
-    // Every port as five ints: a, b, c (the block in the frame), the face, and the mode.
+    // Every port as five ints: a, b, c (the block in the frame), the face, and the mode, under PORTS. Cards written before
+    // Experience have them under "ports", with the mode ordinals as they were then (see SideMode.beforeExperience).
+    static final String PORTS = "ports_v2";
     public static void writePorts(ValueOutput output, Level level, MultiblockController controller) {
         Frame frame = Frame.of(controller);
         List<Integer> packed = new ArrayList<>();
@@ -141,13 +143,17 @@ public final class MachineSettings {
             packed.add(frame.localFace(port.face()));
             packed.add(port.mode().ordinal());
         }
-        output.putIntArray("ports", packed.stream().mapToInt(Integer::intValue).toArray());
+        output.putIntArray(PORTS, packed.stream().mapToInt(Integer::intValue).toArray());
     }
 
     // Replaces the structure's ports with the card's; returns how many couldn't go where they were (a block that
     // can't hold one there, or a mode this structure doesn't have).
     public static int readPorts(ValueInput input, Level level, MultiblockController controller) {
-        Optional<int[]> stored = input.getIntArray("ports");
+        Optional<int[]> stored = input.getIntArray(PORTS);
+        boolean old = stored.isEmpty();
+        if (old) {
+            stored = input.getIntArray("ports");
+        }
         if (stored.isEmpty()) {
             return 0;
         }
@@ -160,7 +166,7 @@ public final class MachineSettings {
         for (int i = 0; i + 4 < packed.length; i += 5) {
             BlockPos pos = frame.world(packed[i], packed[i + 1], packed[i + 2]);
             Direction face = frame.worldFace(packed[i + 3]);
-            SideMode mode = SideMode.byId(packed[i + 4]);
+            SideMode mode = old ? SideMode.beforeExperience(packed[i + 4]) : SideMode.byId(packed[i + 4]);
             if (!MultiblockPorts.canHold(level, controller, pos) || !MultiblockPorts.outerFaces(controller, pos).contains(face)
                     || !controller.getAllowedSideModes().contains(mode)) {
                 skipped++;
@@ -172,6 +178,7 @@ public final class MachineSettings {
     }
 
     public static void describePorts(ValueInput input, List<Component> lines) {
-        input.getIntArray("ports").ifPresent(packed -> lines.add(Component.translatable("settings.arcforge.ports", packed.length / 5)));
+        input.getIntArray(PORTS).or(() -> input.getIntArray("ports"))
+                .ifPresent(packed -> lines.add(Component.translatable("settings.arcforge.ports", packed.length / 5)));
     }
 }

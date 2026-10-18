@@ -24,6 +24,7 @@
     "#c:dusts/zircon",
     "#c:dusts/depleted_uranium",
     "#c:dusts/zirconium",
-    "#c:dusts/rare_earth"
+    "#c:dusts/rare_earth",
+    "#c:dusts/silica"
   ]
 }

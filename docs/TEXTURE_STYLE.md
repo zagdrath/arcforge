@@ -1759,3 +1759,53 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   down): FE gauge, acid and solvent tanks, the screen with its mode button (42x12, the reactor's button style) and progress
   track, the waste tank, 2x2 blue rod inputs and 3x2 orange outputs. Geological Repository (176x166): a screen and one
   blue slot. Ghost sprites (a drum, a glass pane) in the Metal Press's ghost tone; the reactor's Silence button amber.
+
+## Chemical Reactor Array, silica, Electric Enchanter and banked experience
+
+- **Silica line items** (outline `#0C0D0F`), existing Arcforge textures recoloured by brightness onto each material's
+  ramp, so they keep their shape, outline and shading (snapped to 7–9 tones): Silica Dust and Silicon Carbide Blend are the Nether Quartz Dust heap (near-white `#5E5D58 … #F6F5F0`; charcoal
+  `#18191B … #C8C6BE`); Ferrosilicon the Wrought Alloy chunk in a blue-grey steel (`#1C1E21 … #C9CDD2`); Metallurgical
+  Silicon and Polysilicon the raw galena and raw silver lumps in slate blues (`#16191F … #B9C5D6`, `#262C36 … #E8EFF8`);
+  Silicon Carbide the Arcite crystal in a dark sea-green (`#0C0F12 … #A6DCC4`), and its mesh the Tungsten Mesh in the
+  same family. Silica Gel is drawn: eight 4x4 beads (lit top-left `#D4E6EE`, a white glint, `#A9C0CC` body, `#7B8E9A`
+  shade) in a heap inside the dark outline.
+- **Fluids** (Lye's frames re-toned): Sodium Silicate a cloudy off-white (`#A8A496 … #EEECE3`), Trichlorosilane a pale
+  grey-green (`#8E9890 … #DCE4DE`).
+- **Experience port and icons**: `block/port/experience` is the Tails port with its chip in the experience greens
+  (`#B6F07A` lit, `#5E9A2E` shade); the Sides face `face_experience` the Tails face re-toned (`#C8F28C`, `#9CD45A`,
+  `#6E9E36`); the tab icon an orb (rim `#1E3A0C`, body `#4E8E1E` / `#8CD43A`, core `#CDF57A`, a `#F6FFD0` glint top-left).
+- **Electric Enchanter** (single block, Tempered): the section 3 casing on every face. Front: a recess holding a sight
+  glass on its Liquid Experience (two thirds full, `#4E8E1E` with a `#8CD43A` meniscus; lit `#8CD43A` / `#CDF57A`, a
+  cyan LED pixel), over a riveted strap in the Tempered copper tones. Sides: the 8x8 input port (chip in Lapis blues
+  `#4C78DE` / `#2F52B8` / `#22388C`); back the FE port; bottom the output port (chip in the experience greens). Top: the
+  enchanting plate, a recess with a copper ring (`#E0A062` lit, `#8A4822` dark) round a dark plate inlaid with a Lapis rune
+  circle and a diamond rune at its middle, four copper studs at the cardinals; lit, the inlay steps up one Lapis tone.
+  The floating **book** (`block/electric_enchanter/book`, 32x32, drawn by ElectricEnchanterRenderer from boxes) has its
+  regions: outer cover (0,0,6,10) leather `#7A3C26` with a 1 px bevel, copper corner pips and a clasp line; inner cover
+  (6,0,12,10) `#5E2C1E`; cover edge (12,0,13,10); page face (13,0,18,8) cream `#E3D4AA` with four ink lines `#8A7A5C` and a
+  Lapis rune; page edge (18,0,19,8) and page end (19,0,24,1) in alternating cream rows; spine (0,10,3,20) with two copper
+  bands; loose page (13,8,18,16).
+- **Chemical Reactor Array** (Hardened): the loose casing is the section 3 casing with a recess onto a small reaction
+  vessel behind glass (its shell lit left, shade right, Hardened purple bands top and bottom, a pale green liquid
+  `#3E7A5C … #8FD0A8` filling its lower half, glass glints top-left). Formed, every casing hides and the model is a
+  **large model** ("Large model texturing") on the refinery tower's sheet (ChemicalReactorArrayMesh), after a jacketed
+  stirred-tank reactor: the plinth, a slim 3 px casing frame and a gantry beam across the back; three **stainless**
+  vessels on four banded legs with foot pads, their dished bottom head, shell and dished top head in the POLISHED ramp
+  (the bright rod ramp, carried across each facet and narrowing with the heads' tapering facets, so they read as
+  polished stainless against the dark machine steel round them), two banded jacket rings round the lower shell and a
+  body flange under the top head; a lug bracket out of each vessel's back onto the gantry; a flanged manway and two
+  nozzles on each top head; a lantern of four posts round the agitator shaft under a generator-steel gearbox and a banded
+  motor with its terminal box. A sight-glass housing on each vessel's front (MID bars, the glass laid at 1:1 by
+  glassPane, a DARK back plate just proud of the shell; the liquid is drawn between them by the renderer in the lane's
+  fluid colour). The feed header low behind the vessels on stands, with a valve (red FE-tone handle) on each branch into
+  a bottom head; the vapour header hung from the back top beam, fed from a nozzle on each head; the control panel low on
+  the front middle block. The agitators' shaft and coupling (POLISHED, banded) and the four-bladed motor fan are built
+  apart and turned about each vessel's axis.
+- **GUIs**: Electric Enchanter (176x222): FE gauge, a 6 px Liquid Experience tank (the Vacuum Collector's sprites), blue
+  input and Lapis slots with ghost book and gem (white at alpha 70), the arrow, an orange output, and a 148x50 recessed
+  list well with the crate's 12 px scroller. List rows are 146x12 flat strips (`#2C2C2C` face, `#3A3A3A` top, `#1E1E1E`
+  bottom; hover one step lighter; a target row purple `#352A4A` with a 2 px `#8A55C2` bar at its left), and the - / +
+  buttons 9x9 bevelled squares with a light glyph. Chemical Reactor Array (220x222, widened like the Distillation Array's,
+  the inventory centred): FE gauge, three input tanks, a 110x52 screen (status, temperature, FE use, lanes), the output
+  and by-product tanks, then a row per lane (three blue inputs, the arrow, two orange outputs and a 38x14 recess with the
+  lane's LED and its progress or "Idle").

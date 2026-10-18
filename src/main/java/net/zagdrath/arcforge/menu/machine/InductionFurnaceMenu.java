@@ -28,7 +28,10 @@ public class InductionFurnaceMenu extends MachineMenu {
     public static final int DATA_STATUS = 5;
     public static final int DATA_REDSTONE_MODE = 6;
     public static final int DATA_SIDE_CONFIG = 7;
-    public static final int DATA_VALUES = 8;
+    // The Liquid Experience banked, and its tank.
+    public static final int DATA_XP = 8;
+    public static final int DATA_XP_CAPACITY = 9;
+    public static final int DATA_VALUES = 10;
 
     // Slot positions from induction_furnace_gui_layout.json.
     public static final int INPUT_X = 53, INPUT_Y = 35;
@@ -86,5 +89,13 @@ public class InductionFurnaceMenu extends MachineMenu {
 
     public int getUsage() {
         return value(DATA_USAGE);
+    }
+
+    public int getXp() {
+        return value(DATA_XP);
+    }
+
+    public int getXpCapacity() {
+        return value(DATA_XP_CAPACITY);
     }
 }

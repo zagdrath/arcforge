@@ -16,6 +16,7 @@ import net.zagdrath.arcforge.api.machine.resource.EnergyRole;
 import net.zagdrath.arcforge.api.machine.resource.HeatRole;
 import net.zagdrath.arcforge.api.machine.resource.SlotRole;
 import net.zagdrath.arcforge.blockentity.multiblock.ArcCrushingArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.ChemicalReactorArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.InductionFurnaceArrayBlockEntity;
@@ -57,8 +58,36 @@ public final class ArrayMultiblockSpecs {
                 .slot(InductionFurnaceArrayBlockEntity.inputSlot(1), SlotRole.INPUT)
                 .slot(InductionFurnaceArrayBlockEntity.inputSlot(2), SlotRole.INPUT)
                 .items(InductionFurnaceArrayBlockEntity::getItems, be -> be.getItemHandler(null))
+                .tank(SlotRole.OUTPUT, be -> be.getBank().getTank())
                 .progress(lanes(InductionFurnaceArrayBlockEntity.LANES, be -> lane -> be.getLane(lane).getProgress(), be -> lane -> be.getLane(lane).getTotal()))
                 .remaining(lanesRemaining(InductionFurnaceArrayBlockEntity.LANES, be -> lane -> be.getLane(lane).getProgress(), be -> lane -> be.getLane(lane).getTotal()))
+                .build());
+
+        // Item inputs go to the lane holding the fewest, fluid inputs through the router, as from input ports.
+        MachineControls.register(ModBlockEntityTypes.CHEMICAL_REACTOR_ARRAY.get(), MachineControlSpec.builder(ChemicalReactorArrayBlockEntity.class)
+                .primary(ChemicalReactorArrayBlockEntity::isFormed)
+                .energy(EnergyRole.CONSUMER, ChemicalReactorArrayBlockEntity::getEnergy, ChemicalReactorArrayBlockEntity::getUsage)
+                .slots(0, ChemicalReactorArrayBlockEntity.MACHINE_SLOTS, SlotRole.OUTPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(0, ChemicalReactorArrayBlockEntity.INPUT_A), SlotRole.INPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(0, ChemicalReactorArrayBlockEntity.INPUT_B), SlotRole.INPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(0, ChemicalReactorArrayBlockEntity.INPUT_C), SlotRole.INPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(1, ChemicalReactorArrayBlockEntity.INPUT_A), SlotRole.INPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(1, ChemicalReactorArrayBlockEntity.INPUT_B), SlotRole.INPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(1, ChemicalReactorArrayBlockEntity.INPUT_C), SlotRole.INPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(2, ChemicalReactorArrayBlockEntity.INPUT_A), SlotRole.INPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(2, ChemicalReactorArrayBlockEntity.INPUT_B), SlotRole.INPUT)
+                .slot(ChemicalReactorArrayBlockEntity.slot(2, ChemicalReactorArrayBlockEntity.INPUT_C), SlotRole.INPUT)
+                .items(ChemicalReactorArrayBlockEntity::getItems, be -> be.getItemHandler(null))
+                .tank(SlotRole.INPUT, ChemicalReactorArrayBlockEntity::getRouter, 0)
+                .tank(SlotRole.INPUT, ChemicalReactorArrayBlockEntity::getRouter, 1)
+                .tank(SlotRole.INPUT, ChemicalReactorArrayBlockEntity::getRouter, 2)
+                .tank(SlotRole.OUTPUT, be -> be.getTank(3))
+                .tank(SlotRole.OUTPUT, be -> be.getTank(4))
+                .fluidAutomation(ChemicalReactorArrayBlockEntity::getRouter)
+                .heat(HeatRole.CONSUMER, ChemicalReactorArrayBlockEntity::getHeat, ChemicalReactorArrayBlockEntity::getHeatUsage,
+                        be -> be.heatHandlerAt(be.getBlockPos(), null))
+                .progress(lanes(ChemicalReactorArrayBlockEntity.LANES, be -> lane -> be.getProgress(lane), be -> lane -> be.getTotal(lane)))
+                .remaining(lanesRemaining(ChemicalReactorArrayBlockEntity.LANES, be -> lane -> be.getProgress(lane), be -> lane -> be.getTotal(lane)))
                 .build());
 
         // The dies are never used up, and automation (so the API) can't put them in: players only.

@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -26,16 +27,19 @@ import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.FakePlayer;
 import net.neoforged.neoforge.event.level.block.BreakBlockEvent;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.ArcforgeFakePlayer;
+import net.zagdrath.arcforge.machine.ExperienceBank;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.MineRules;
 import net.zagdrath.arcforge.machine.config.RedstoneMode;
@@ -54,16 +58,19 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // right tool would, unenchanted (stone gives cobblestone, iron ore raw iron, leaves nothing), and harder blocks
 // take longer: max(minBreakTicks, hardness x ticksPerHardness) ticks at energyPerTick FE/t (stone 6 ticks, iron ore
 // 12, obsidian 200). It never breaks unbreakable blocks, fluids, #arcforge:breaker_blacklist or multiblock parts,
-// and breaks as a fake player so protection mods can refuse. A break that wouldn't fit its slots waits.
+// and breaks as a fake player so protection mods can refuse. A break that wouldn't fit its slots waits. The experience a
+// broken block drops (ores and others) is banked as Liquid Experience (see ExperienceBank) instead of spawning orbs,
+// given out of Experience faces; once that tank is full it drops as orbs again.
 public class BlockBreakerBlockEntity extends MachineBlockEntity {
     public static final int SLOTS = 9;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.OUTPUT, SideMode.ENERGY);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.OUTPUT, SideMode.ENERGY, SideMode.EXPERIENCE);
     // The tools a break is worked out with: the first that suits the block.
     private static final List<ItemStack> TOOLS = List.of(new ItemStack(Items.NETHERITE_PICKAXE), new ItemStack(Items.NETHERITE_AXE),
             new ItemStack(Items.NETHERITE_SHOVEL), new ItemStack(Items.NETHERITE_HOE), new ItemStack(Items.SHEARS));
 
     private final ConsumerEnergyHandler energy;
+    private final ExperienceBank bank;
     private final ResourceHandler<ItemResource> itemOutput;
     private final ContainerData data;
 
@@ -83,6 +90,7 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
                 ArcforgeConfig.BREAKER_ENERGY_CAPACITY.getAsInt(),
                 ArcforgeConfig.BREAKER_MAX_INPUT.getAsInt(),
                 this::setChanged);
+        this.bank = new ExperienceBank(ArcforgeConfig.BREAKER_EXPERIENCE_TANK.getAsInt(), this::setChanged);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot < SLOTS);
         this.data = new WideIntContainerData(BlockBreakerMenu.DATA_VALUES) {
             @Override
@@ -96,6 +104,8 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
                     case BlockBreakerMenu.DATA_STATUS -> status.ordinal();
                     case BlockBreakerMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case BlockBreakerMenu.DATA_SIDE_CONFIG -> packedSides();
+                    case BlockBreakerMenu.DATA_XP -> bank.getAmount();
+                    case BlockBreakerMenu.DATA_XP_CAPACITY -> bank.getCapacity();
                     default -> 0;
                 };
             }
@@ -172,6 +182,9 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
         showCrack(level, target);
         setLit(status == MachineStatus.BREAKING);
         autoEject(level, itemOutput);
+        if (isAutoEject() && bank.getAmount() > 0) {
+            outputs.pushFluid(level, pos, getFacing(), sideConfig, SideMode.EXPERIENCE, bank.getOutput(), ArcforgeConfig.EXPERIENCE_OUTPUT_RATE.getAsInt());
+        }
     }
 
     private void work(ServerLevel level, BlockPos target, BlockState targetState) {
@@ -195,8 +208,14 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
                 progress = 0;
                 return;
             }
-            targetState.spawnAfterBreak(level, target, tool, true);
+            // The experience it drops goes into the bank (orbs only for what doesn't fit).
+            int xp = targetState.getExpDrop(level, target, level.getBlockEntity(target), player, tool);
+            targetState.spawnAfterBreak(level, target, tool, false);
             level.destroyBlock(target, false, player);
+            int unbanked = Math.round(bank.bank(xp));
+            if (unbanked > 0) {
+                ExperienceOrb.award(level, Vec3.atCenterOf(target), unbanked);
+            }
             drops.forEach(this::insert);
             controlState.completed(drops, List.of(), 0, 0);
             progress = 0;
@@ -287,6 +306,11 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
         return energy;
     }
 
+    // The Liquid Experience it has banked from its blocks.
+    public ExperienceBank getBank() {
+        return bank;
+    }
+
     public int getProgress() {
         return progress;
     }
@@ -311,6 +335,12 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
         return mode == null || mode == SideMode.OUTPUT ? itemOutput : null;
     }
 
+    // Experience faces give the banked Liquid Experience; unsided, it's there too (for Jade).
+    public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
+        SideMode mode = modeFor(side);
+        return mode == null || mode == SideMode.EXPERIENCE ? bank.getOutput() : null;
+    }
+
     public @Nullable EnergyHandler getEnergyHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
         return mode == null || mode == SideMode.ENERGY ? energy : null;
@@ -322,7 +352,8 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
         return switch (type) {
             case ITEM -> mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case FLUID, GAS, THERMAL -> ConnectionMode.NONE;
+            case FLUID -> mode == SideMode.EXPERIENCE ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case GAS, THERMAL -> ConnectionMode.NONE;
         };
     }
 
@@ -331,6 +362,7 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
         super.loadAdditional(input);
         energy.deserialize(input.childOrEmpty("energy"));
         progress = input.getIntOr("progress", 0);
+        bank.deserialize(input);
     }
 
     @Override
@@ -338,6 +370,7 @@ public class BlockBreakerBlockEntity extends MachineBlockEntity {
         super.saveAdditional(output);
         energy.serialize(output.child("energy"));
         output.putInt("progress", progress);
+        bank.serialize(output);
     }
 
     @Override

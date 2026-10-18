@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#c:dusts/silica",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:lye",
+      "amount": 250
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:sodium_silicate",
+    "amount": 250
+  },
+  "time": 100
+}

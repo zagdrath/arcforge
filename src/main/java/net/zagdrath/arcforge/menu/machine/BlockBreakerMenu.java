@@ -24,7 +24,10 @@ public class BlockBreakerMenu extends MachineMenu {
     public static final int DATA_STATUS = 5;
     public static final int DATA_REDSTONE_MODE = 6;
     public static final int DATA_SIDE_CONFIG = 7;
-    public static final int DATA_VALUES = 8;
+    // The Liquid Experience banked, and its tank.
+    public static final int DATA_XP = 8;
+    public static final int DATA_XP_CAPACITY = 9;
+    public static final int DATA_VALUES = 10;
 
     // The 3x3 buffer from gui_layouts.json.
     public static final int GRID_X = 98, GRID_Y = 17;
@@ -75,5 +78,14 @@ public class BlockBreakerMenu extends MachineMenu {
 
     public int getTotal() {
         return value(DATA_TOTAL);
+    }
+
+    // The Liquid Experience banked, and its tank.
+    public int getXp() {
+        return value(DATA_XP);
+    }
+
+    public int getXpCapacity() {
+        return value(DATA_XP_CAPACITY);
     }
 }

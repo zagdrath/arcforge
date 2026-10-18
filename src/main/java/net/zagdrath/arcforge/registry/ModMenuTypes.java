@@ -12,64 +12,66 @@ import net.minecraft.world.inventory.MenuType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.registries.DeferredRegister;
+import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.menu.logistics.ChunkLoaderMenu;
+import net.zagdrath.arcforge.menu.logistics.MeterMenu;
 import net.zagdrath.arcforge.menu.logistics.QuantumTunnelMenu;
 import net.zagdrath.arcforge.menu.logistics.WiredMachineLinkMenu;
 import net.zagdrath.arcforge.menu.machine.AirSeparatorMenu;
-import net.zagdrath.arcforge.menu.machine.HaberReactorMenu;
-import net.zagdrath.arcforge.menu.multiblock.BiogasDigesterMenu;
-import net.zagdrath.arcforge.menu.multiblock.GasTurbineArrayMenu;
-import net.zagdrath.arcforge.Arcforge;
-import net.zagdrath.arcforge.menu.conduit.ConduitFilterMenu;
 import net.zagdrath.arcforge.menu.machine.ArcCrusherMenu;
-import net.zagdrath.arcforge.menu.machine.GrainDryerMenu;
-import net.zagdrath.arcforge.menu.machine.VulcanizerMenu;
-import net.zagdrath.arcforge.menu.machine.MillMenu;
-import net.zagdrath.arcforge.menu.machine.OilPressMenu;
-import net.zagdrath.arcforge.menu.machine.SeedExtractorMenu;
-import net.zagdrath.arcforge.menu.machine.FermenterMenu;
-import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
-import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
 import net.zagdrath.arcforge.menu.machine.ArcMelterMenu;
-import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
-import net.zagdrath.arcforge.menu.machine.ElectrolyzerMenu;
-import net.zagdrath.arcforge.menu.machine.SecurityTerminalMenu;
-import net.zagdrath.arcforge.menu.logistics.MeterMenu;
-import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
 import net.zagdrath.arcforge.menu.machine.ArcQuarryConfigMenu;
 import net.zagdrath.arcforge.menu.machine.ArcQuarryMenu;
-import net.zagdrath.arcforge.menu.machine.BlockPlacerMenu;
-import net.zagdrath.arcforge.menu.machine.BlockBreakerMenu;
 import net.zagdrath.arcforge.menu.machine.AssemblerMenu;
-import net.zagdrath.arcforge.menu.machine.ElectricPumpMenu;
-import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
+import net.zagdrath.arcforge.menu.machine.BlockBreakerMenu;
+import net.zagdrath.arcforge.menu.machine.BlockPlacerMenu;
 import net.zagdrath.arcforge.menu.machine.BurnerMenu;
+import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
+import net.zagdrath.arcforge.menu.machine.ClocheMenu;
+import net.zagdrath.arcforge.menu.machine.ElectricEnchanterMenu;
+import net.zagdrath.arcforge.menu.machine.ElectricPumpMenu;
+import net.zagdrath.arcforge.menu.machine.ElectrolyzerMenu;
+import net.zagdrath.arcforge.menu.machine.FermenterMenu;
 import net.zagdrath.arcforge.menu.machine.FiberizerMenu;
 import net.zagdrath.arcforge.menu.machine.FuelBurnerMenu;
+import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
+import net.zagdrath.arcforge.menu.machine.GrainDryerMenu;
+import net.zagdrath.arcforge.menu.machine.HaberReactorMenu;
+import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
+import net.zagdrath.arcforge.menu.machine.InfuserMenu;
+import net.zagdrath.arcforge.menu.machine.MetalPressMenu;
+import net.zagdrath.arcforge.menu.machine.MillMenu;
+import net.zagdrath.arcforge.menu.machine.OilPressMenu;
+import net.zagdrath.arcforge.menu.machine.SecurityTerminalMenu;
+import net.zagdrath.arcforge.menu.machine.SeedExtractorMenu;
+import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
+import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
+import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
+import net.zagdrath.arcforge.menu.machine.VulcanizerMenu;
 import net.zagdrath.arcforge.menu.multiblock.ArcCrushingArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
+import net.zagdrath.arcforge.menu.multiblock.BiogasDigesterMenu;
+import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
+import net.zagdrath.arcforge.menu.multiblock.ChemicalReactorArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.CondenserArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.DistillationArrayMenu;
+import net.zagdrath.arcforge.menu.multiblock.GasTurbineArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.GreenhouseMenu;
 import net.zagdrath.arcforge.menu.multiblock.InductionFurnaceArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.MetalPressingArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.SolarThermalArrayMenu;
 import net.zagdrath.arcforge.menu.multiblock.SteamTurbineArrayMenu;
-import net.zagdrath.arcforge.menu.multiblock.CondenserArrayMenu;
-import net.zagdrath.arcforge.menu.multiblock.WaterIntakeMenu;
 import net.zagdrath.arcforge.menu.multiblock.SuperheaterArrayMenu;
-import net.zagdrath.arcforge.menu.machine.GeothermalPlantMenu;
-import net.zagdrath.arcforge.menu.machine.InfuserMenu;
-import net.zagdrath.arcforge.menu.machine.ThermoelectricPlantMenu;
-import net.zagdrath.arcforge.menu.multiblock.ArcforgeFurnaceMenu;
-import net.zagdrath.arcforge.menu.multiblock.CarbonizerMenu;
+import net.zagdrath.arcforge.menu.multiblock.WaterIntakeMenu;
 import net.zagdrath.arcforge.menu.storage.CrateMenu;
-import net.zagdrath.arcforge.menu.storage.ItemReservoirMenu;
 import net.zagdrath.arcforge.menu.storage.EnergyCellMenu;
 import net.zagdrath.arcforge.menu.storage.FluidTankMenu;
-import net.zagdrath.arcforge.menu.storage.PressurizedCylinderMenu;
 import net.zagdrath.arcforge.menu.storage.HeatCellMenu;
+import net.zagdrath.arcforge.menu.storage.ItemReservoirMenu;
+import net.zagdrath.arcforge.menu.storage.PressurizedCylinderMenu;
 import net.zagdrath.arcforge.menu.storage.VaultMenu;
 import net.zagdrath.arcforge.menu.tool.ArcToolMenu;
-import net.zagdrath.arcforge.menu.machine.ClocheMenu;
 
 public final class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(Registries.MENU, Arcforge.MODID);
@@ -97,6 +99,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<InductionFurnaceArrayMenu>> INDUCTION_FURNACE_ARRAY = MENU_TYPES.register("induction_furnace_array",
             () -> IMenuTypeExtension.create(InductionFurnaceArrayMenu::new));
+
+    public static final Supplier<MenuType<ChemicalReactorArrayMenu>> CHEMICAL_REACTOR_ARRAY = MENU_TYPES.register("chemical_reactor_array",
+            () -> IMenuTypeExtension.create(ChemicalReactorArrayMenu::new));
 
     public static final Supplier<MenuType<MetalPressMenu>> METAL_PRESS = MENU_TYPES.register("metal_press",
             () -> IMenuTypeExtension.create(MetalPressMenu::new));
@@ -265,6 +270,9 @@ public final class ModMenuTypes {
 
     public static final Supplier<MenuType<InfuserMenu>> INFUSER = MENU_TYPES.register("infuser",
             () -> IMenuTypeExtension.create(InfuserMenu::new));
+
+    public static final Supplier<MenuType<ElectricEnchanterMenu>> ELECTRIC_ENCHANTER = MENU_TYPES.register("electric_enchanter",
+            () -> IMenuTypeExtension.create(ElectricEnchanterMenu::new));
 
     public static final Supplier<MenuType<FluidTankMenu>> FLUID_TANK = MENU_TYPES.register("fluid_tank",
             () -> IMenuTypeExtension.create(FluidTankMenu::new));

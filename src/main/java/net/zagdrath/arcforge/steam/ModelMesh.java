@@ -1360,9 +1360,10 @@ public abstract class ModelMesh {
                 if (modules && side.kind == Kind.BANDED) {
                     float chord = 2.0F * (float) Math.sin(step / 2.0), fw = chord * (ra + rb) / 2.0F;
                     float height = (float) Math.hypot(yb - ya, rb - ra);
-                    if (ra != rb) {
+                    if (ra != rb && side != Paint.POLISHED) {
                         // A tapering ring (the elliptical head) narrows to a point, so no strip ramp keeps 1:1 across
                         // it; it's one pressed piece, so its facets are bare grain (no plate edges on every facet).
+                        // A polished one (a stainless head) keeps its bright ramp instead, narrowing with the facet.
                         List<float[]> points = List.of(p0, p1, p2, p3);
                         plateIn(plateFrame(points, new Plating(Steel.MACHINE, false, false, false)), points);
                     } else if (shellPlates != null) {

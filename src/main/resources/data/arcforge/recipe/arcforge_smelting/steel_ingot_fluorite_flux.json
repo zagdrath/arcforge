@@ -5,7 +5,7 @@
     "count": 4
   },
   "additive": {
-    "ingredient": "#c:gems/fluorite",
+    "ingredient": "#arcforge:steel_fluxes",
     "count": 1
   },
   "coke": 4,
@@ -18,5 +18,6 @@
     "count": 6
   },
   "time": 1000,
-  "min_temp": 1200
+  "min_temp": 1200,
+  "experience": 2.8
 }

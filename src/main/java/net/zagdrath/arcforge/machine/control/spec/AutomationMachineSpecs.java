@@ -66,6 +66,7 @@ public final class AutomationMachineSpecs {
                 .energy(EnergyRole.CONSUMER, BlockBreakerBlockEntity::getEnergy, BlockBreakerBlockEntity::getUsage)
                 .slots(0, BlockBreakerBlockEntity.SLOTS, SlotRole.OUTPUT)
                 .items(BlockBreakerBlockEntity::getItems, be -> be.getItemHandler(null))
+                .tank(SlotRole.OUTPUT, be -> be.getBank().getTank())
                 .progress(BlockBreakerBlockEntity::getProgress, BlockBreakerBlockEntity::getTotal)
                 .build());
 

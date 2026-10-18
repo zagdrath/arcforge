@@ -90,6 +90,7 @@
     "arcforge:concrete_shielding",
     "arcforge:centrifuge_cascade_casing",
     "arcforge:centrifuge_cascade_controller",
-    "arcforge:gas_centrifuge"
+    "arcforge:gas_centrifuge",
+    "arcforge:chemical_reactor_array_casing"
   ]
 }

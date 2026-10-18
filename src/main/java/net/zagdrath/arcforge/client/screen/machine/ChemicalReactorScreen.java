@@ -14,6 +14,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
+import net.zagdrath.arcforge.client.gui.tab.HeatTab;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.ChemicalReactorMenu;
 
@@ -34,7 +35,11 @@ public class ChemicalReactorScreen extends MachineScreen<ChemicalReactorMenu> {
     private final Identifier tankGauge = sprite("tank_gauge");
 
     public ChemicalReactorScreen(ChemicalReactorMenu menu, Inventory inventory, Component title) {
-        super(menu, inventory, title, "chemical_reactor", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage)));
+        super(menu, inventory, title, "chemical_reactor", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage),
+                new HeatTab(menu::getHeat, Component.translatable("gui.arcforge.usage"),
+                        () -> Component.translatable("gui.arcforge.hu_per_tick_loss", menu.getHeatUsage()),
+                        Component.translatable("gui.arcforge.temp"),
+                        () -> Component.translatable("gui.arcforge.celsius", ArcforgeGui.grouped(menu.getTemperature())))));
         enableAutoEject();
     }
 

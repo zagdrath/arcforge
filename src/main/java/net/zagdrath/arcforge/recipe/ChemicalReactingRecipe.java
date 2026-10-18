@@ -47,11 +47,14 @@ import net.zagdrath.arcforge.registry.ModRecipes;
 // different input tank. An item input with a "consume_chance" below 1 is a catalyst: it must be there, but is used up
 // only that often (0.02: about one in 50 operations; only the Chemical Reactor reads it, the other machines that share
 // ItemInput use their inputs up every time). "category" only labels the recipe in JEI: general, leaching or
-// precipitating.
+// precipitating. "heat_per_tick" (HU/t, 0 by default) makes it a heated recipe: it only runs while the reactor's heat
+// (taken in through Heat faces or ports) is at least "min_temperature" °C, and draws that heat as it goes (Polysilicon
+// from Trichlorosilane and Hydrogen).
 public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<ItemInput> secondItemInput, List<FluidInput> fluidInputs,
         Optional<ItemStackTemplate> itemOutput,
         Optional<FluidStackTemplate> fluidOutput, Optional<ItemStackTemplate> byproduct, float byproductChance, int time,
-        Optional<Integer> energyPerTick, String category, Optional<FluidStackTemplate> fluidByproduct, Optional<ItemInput> thirdItemInput)
+        Optional<Integer> energyPerTick, String category, Optional<FluidStackTemplate> fluidByproduct, Optional<ItemInput> thirdItemInput,
+        int heatPerTick, int minTemperature)
         implements Recipe<ChemicalReactorInput> {
     public static final int DEFAULT_TIME = 100;
     public static final int MAX_FLUID_INPUTS = ChemicalReactorInput.TANKS;
@@ -128,7 +131,9 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
             ExtraCodecs.POSITIVE_INT.optionalFieldOf("energy_per_tick").forGetter(ChemicalReactingRecipe::energyPerTick),
             Codec.STRING.optionalFieldOf("category", "general").forGetter(ChemicalReactingRecipe::category),
             FluidStackTemplate.CODEC.optionalFieldOf("fluid_byproduct").forGetter(ChemicalReactingRecipe::fluidByproduct),
-            ItemInput.CODEC.optionalFieldOf("third_item_input").forGetter(ChemicalReactingRecipe::thirdItemInput))
+            ItemInput.CODEC.optionalFieldOf("third_item_input").forGetter(ChemicalReactingRecipe::thirdItemInput),
+            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("heat_per_tick", 0).forGetter(ChemicalReactingRecipe::heatPerTick),
+            ExtraCodecs.NON_NEGATIVE_INT.optionalFieldOf("min_temperature", 0).forGetter(ChemicalReactingRecipe::minTemperature))
             .apply(i, ChemicalReactingRecipe::new))
             .validate(ChemicalReactingRecipe::validate);
 
@@ -138,7 +143,7 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
     private static final StreamCodec<RegistryFriendlyByteBuf, Optional<FluidStackTemplate>> OPTIONAL_FLUID = ByteBufCodecs.optional(FluidStackTemplate.STREAM_CODEC);
     private static final StreamCodec<io.netty.buffer.ByteBuf, Optional<Integer>> OPTIONAL_INT = ByteBufCodecs.optional(ByteBufCodecs.VAR_INT);
 
-    // Written out by hand: twelve fields.
+    // Written out by hand: fourteen fields.
     public static final StreamCodec<RegistryFriendlyByteBuf, ChemicalReactingRecipe> STREAM_CODEC = StreamCodec.of(
             (buf, recipe) -> {
                 OPTIONAL_ITEM.encode(buf, recipe.itemInput());
@@ -153,11 +158,13 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
                 ByteBufCodecs.STRING_UTF8.encode(buf, recipe.category());
                 OPTIONAL_FLUID.encode(buf, recipe.fluidByproduct());
                 OPTIONAL_ITEM.encode(buf, recipe.thirdItemInput());
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.heatPerTick());
+                ByteBufCodecs.VAR_INT.encode(buf, recipe.minTemperature());
             },
             buf -> new ChemicalReactingRecipe(OPTIONAL_ITEM.decode(buf), OPTIONAL_ITEM.decode(buf), FLUID_INPUTS.decode(buf),
                     OPTIONAL_TEMPLATE.decode(buf), OPTIONAL_FLUID.decode(buf), OPTIONAL_TEMPLATE.decode(buf), buf.readFloat(),
                     ByteBufCodecs.VAR_INT.decode(buf), OPTIONAL_INT.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), OPTIONAL_FLUID.decode(buf),
-                    OPTIONAL_ITEM.decode(buf)));
+                    OPTIONAL_ITEM.decode(buf), ByteBufCodecs.VAR_INT.decode(buf), ByteBufCodecs.VAR_INT.decode(buf)));
 
     // Something goes in and something comes out.
     private static DataResult<ChemicalReactingRecipe> validate(ChemicalReactingRecipe recipe) {
@@ -174,6 +181,11 @@ public record ChemicalReactingRecipe(Optional<ItemInput> itemInput, Optional<Ite
             return DataResult.error(() -> "A chemical_reacting recipe needs an item_output or a fluid_output");
         }
         return DataResult.success(recipe);
+    }
+
+    // Whether it needs heat (see heat_per_tick).
+    public boolean isHeated() {
+        return heatPerTick > 0;
     }
 
     // FE/t before upgrades.

@@ -30,6 +30,7 @@ public final class ArcforgeNetwork {
         registrar.playToServer(ArcQuarryAreaPayload.TYPE, ArcQuarryAreaPayload.STREAM_CODEC, ArcQuarryAreaPayload::handle);
         registrar.playToServer(ItemReservoirSearchPayload.TYPE, ItemReservoirSearchPayload.STREAM_CODEC, ItemReservoirSearchPayload::handle);
         registrar.playToServer(ArcQuarryTagPayload.TYPE, ArcQuarryTagPayload.STREAM_CODEC, ArcQuarryTagPayload::handle);
+        registrar.playToServer(EnchanterTargetPayload.TYPE, EnchanterTargetPayload.STREAM_CODEC, EnchanterTargetPayload::handle);
         registrar.playToServer(GhostSlotPayload.TYPE, GhostSlotPayload.STREAM_CODEC, GhostSlotPayload::handle);
         registrar.playToServer(JetpackInputPayload.TYPE, JetpackInputPayload.STREAM_CODEC, JetpackInputPayload::handle);
         registrar.playToServer(JetpackModePayload.TYPE, JetpackModePayload.STREAM_CODEC, JetpackModePayload::handle);

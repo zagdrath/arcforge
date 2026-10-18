@@ -1,0 +1,19 @@
+{
+  "type": "arcforge:arcforge_smelting",
+  "metal": {
+    "ingredient": "#c:dusts/silica",
+    "count": 2
+  },
+  "coke": 2,
+  "result": {
+    "id": "arcforge:metallurgical_silicon",
+    "count": 1
+  },
+  "byproduct": {
+    "id": "arcforge:slag",
+    "count": 1
+  },
+  "time": 600,
+  "min_temp": 1500,
+  "experience": 0.7
+}
