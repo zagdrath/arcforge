@@ -206,6 +206,12 @@ public final class ModCapabilities {
                 casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), (casing, side) ->
                 casing.getMaster() instanceof SteamTurbineArrayBlockEntity turbine ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.NUCLEAR_STEAM_TURBINE.get(), (casing, side) ->
+                casing.getMaster() instanceof net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity turbine
+                        ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.NUCLEAR_STEAM_TURBINE.get(), (casing, side) ->
+                casing.getMaster() instanceof net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity turbine
+                        ? turbine.energyHandlerAt(casing.getBlockPos(), side) : null);
         event.registerBlockEntity(Capabilities.Fluid.BLOCK, ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), (casing, side) ->
                 casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine ? turbine.fluidHandlerAt(casing.getBlockPos(), side) : null);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), (casing, side) ->

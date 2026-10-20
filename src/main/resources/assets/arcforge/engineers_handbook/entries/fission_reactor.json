@@ -25,7 +25,15 @@
     },
     {
       "type": "text",
-      "text": "# Fuel\nPut fresh Fuel Rods in the nine input slots: they load into empty Fuel Channels, and only while the reactor is shut down (every bank all the way in). Spent rods come out to the output slots while shut down, by themselves if you choose, still hot.\n# Power\nEach fuel channel gives up to 4,000 HU/t at full power. A big core (around 90 channels) makes over 350,000 HU/t, more than 1,000,000 FE/t through four to six full-size Steam Turbine Arrays."
+      "text": "# Fuel\nPut Fuel Rods in the nine input slots: they load into empty Fuel Channels from the middle of the core outwards, and only while the reactor is shut down (every bank all the way in). Spent rods come out to the output slots while shut down, by themselves if you choose, still hot. The Fuel page's core map shows every channel's burnup and picks the rods to replace (see Fuel Rods).\n# Power\nEach fuel channel gives up to 4,000 HU/t at full power. Through a Steam Generator each HU boils a sixth of a mB of High-Pressure Steam, so a reactor's heat makes about 6 FE per HU in the turbines: about what a large Steam Boiler Array gets on High-Pressure Steam."
+    },
+    {
+      "type": "text",
+      "text": "# Sizing a plant\nPressurized cores through Steam Generators, as usually loaded and run:\n- Small (5×5×5): about 10,000 mB/t of High-Pressure Steam, for two full-size Steam Turbine Arrays: about {fe:425000} FE/t with lubricant and an Exhaust port.\n- Medium (7×7×7): about 56,700 mB/t, for one full-size Nuclear Steam Turbine: about {fe:2268000} FE/t.\n- Large (7×7×9): about 79,300 mB/t, for two Nuclear Steam Turbines (each at two-thirds of its flow, well above its 25% minimum): about {fe:3172000} FE/t.\nSize the Steam Generators to the core: each tube block turns 200 mB of Hot Coolant a tick into 2,000 mB of steam. Condense the turbines' exhaust in Condenser Arrays and send the water back as feedwater."
+    },
+    {
+      "type": "text",
+      "text": "# Superheated Steam\nTwo ways to get it from fission, for the Steam Turbine Array's 56 FE per mB:\n- Through a Superheater Array: pipe the Steam Generator's High-Pressure Steam in, give the superheater heat at 900 °C or hotter, and set it to Superheated (or Auto). It costs 3 HU per mB more, from a Firebox Array or any other heat source; a 7×7×7 superheater passes about 12,700 mB/t.\n- From a lead-bismuth fast reactor (see Lead-Bismuth Fast Reactor): its Hot Lead-Bismuth comes out at 900 °C and more, and the Steam Generator boils Superheated Steam from it directly, at 1.6 times the heat of a mB of High-Pressure Steam.\nThe Nuclear Steam Turbine runs on High-Pressure Steam only; send Superheated Steam to Steam Turbine Arrays."
     }
   ]
 }

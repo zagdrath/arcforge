@@ -158,6 +158,8 @@ public final class ModMenuTypes {
             MENU_TYPES.register("fission_reactor", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.FissionReactorMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.SteamGeneratorMenu>> STEAM_GENERATOR =
             MENU_TYPES.register("steam_generator", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.SteamGeneratorMenu::new));
+    public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.NuclearSteamTurbineMenu>> NUCLEAR_STEAM_TURBINE =
+            MENU_TYPES.register("nuclear_steam_turbine", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.NuclearSteamTurbineMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.HeavyWaterTowerMenu>> HEAVY_WATER_TOWER =
             MENU_TYPES.register("heavy_water_tower", () -> IMenuTypeExtension.create(net.zagdrath.arcforge.menu.multiblock.HeavyWaterTowerMenu::new));
     public static final Supplier<MenuType<net.zagdrath.arcforge.menu.multiblock.PurexMenu>> PUREX_PLANT =

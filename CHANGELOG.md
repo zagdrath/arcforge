@@ -22,8 +22,9 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
-Suggested version: **2.9.0** (minor: the Chemical Reactor Array, a silica line, the Electric Enchanter and Liquid
-Experience without mobs; worlds, machines and Settings Cards carry over).
+Suggested version: **2.9.0** (minor: the Chemical Reactor Array, a silica line, the Electric Enchanter, Liquid
+Experience without mobs, the Nuclear Steam Turbine, the fission rebalance and the large-model performance work; worlds,
+machines and Settings Cards carry over).
 
 ### Added
 
@@ -59,17 +60,88 @@ Experience without mobs; worlds, machines and Settings Cards carry over).
   machine.
 - Handbook entries, quests (Chemistry: Silica to the Chemical Reactor Array; Automation: experience banking and the
   Electric Enchanter), Jade lines and GameTests for all of it.
+- **Nuclear Steam Turbine** (Hardened tier). A reactor's turbine-generator: a hollow 7×7 tube of Nuclear Turbine Casings
+  (Hardened Alloy, steel plates, Turbine Blade Sets and a steel gear make eight) 21 to 45 long, formed and given ports
+  with the Wrench like the Steam Turbine Array. It takes High-Pressure Steam and a boiling core's Contaminated Steam only,
+  up to 240 mB/t a section (a 7×7×21 is 114.3 sections and takes 27,440 mB/t; a 7×7×45 245 sections and 58,800 mB/t), at
+  40 FE a mB (its reheaters make it a little more than the Steam Turbine Array's 36). Its shaft runs at its synchronous
+  speed (1,800 RPM) whatever the load, rolling up in about 15 seconds. Like a real large turbine it can't run below 25%
+  of its rated flow: under that for 2 seconds it trips (stop valves shut, its bypass dumps the steam to the condensers)
+  and coasts down, and it rolls up again once the steam coming in has held over its minimum for 5 seconds; the GUI and
+  Jade say why it tripped. Spent steam leaves as Exhaust Steam through Exhaust ports along its low-pressure section, for
+  Condenser Arrays. A new one starts with steam ports under both steam chests, an energy port under the terminal box and
+  an Exhaust port under each low-pressure cylinder, all on its underside. Config `power.steam.nuclearSteamTurbine`.
+  - Formed, it's drawn as a nuclear turbine-generator set on a raised deck, in a new pale sage-grey turbine enamel: the
+    front standard with its turning gear, the high-pressure cylinder with two steam chests, a moisture separator reheater
+    either side with its crossover pipes arching over the set into the low-pressure cylinders (one per 9 blocks of
+    length), and the generator with its hydrogen coolers, terminal box and exciter. The shaft, couplings and turning gear
+    turn, and each low-pressure cylinder's sight port shows its last-stage blades, a blur at speed. You can walk its
+    deck between the arches, up the stair at the front.
+  - Handbook entry, a JEI build preview and info page, Jade lines (section, fitted spots, minimum flow or why it
+    tripped), a Nuclear Power quest (and the Power Plant quest now asks for one at speed), machine control and GameTests
+    (forming, the steam it takes, its ports, running, tripping and rolling up again).
+- **The Fission Reactor's Fuel page.** A core map of every layer seen from above, each Fuel Channel coloured by its rod's
+  burnup, the most-burned third of the rods outlined (the batch a refuelling replaces). Click a rod, or Bring Out Third,
+  and it comes out to the output slots at the next shutdown. The Handbook's Fuel Rods entry explains refuelling by thirds.
+- **Large-model detail settings** (`arcforge-client.toml`, `largeModels`): moving parts are plain solid shapes standing
+  still past `simpleMovingPartsFrom` (48 blocks), and past `stillPartsOnlyFrom` (96) only the still parts are drawn.
 
 ### Changed
 
 - Crushing Quartz gives 4 Silica Dust instead of Nether Quartz Dust, which still comes from quartz ore.
 - Machines with a recipe XP store bank it as Liquid Experience first; the old held-for-the-player store only takes what a
   full tank can't.
+- **Balance: fission against the coal and steam line.** A reactor's heat now makes about 6 FE per HU through the
+  turbines (it made 3), close to a large Steam Boiler Array on High-Pressure Steam, so a reactor wants one or two
+  turbines instead of seven to nine.
+  - Steam Generator: `steamHeat` 12 → 6 HU per mB of High-Pressure Steam. Each tube block now boils 2,000 mB/t of steam
+    (was 1,000) from the 200 mB/t of Hot Coolant it cools (`hotCoolantPerTube` unchanged); Superheated Steam from a
+    lead-bismuth core takes 9.6 HU a mB (was 19.2).
+  - Steam Turbine Array: `maxFlowPerSection` 40 → 60 mB/t. A 7×7×27 takes 8,820 mB/t (was 5,880) and makes 493,920 FE/t
+    on Superheated Steam before its bonuses (was 329,280); its output cap (a full lubricated Superheated flow with the
+    vacuum bonus) is 602,575 FE/t (was 401,717) and its FE buffer 400 ticks of that (a 3×3×3 holds about 4.9 million FE,
+    was 3.2 million). A full-size one with its bonuses now takes three Arcforged Energy Conduits (was two).
+  - Sizing (Handbook): a 5×5×5 core, about 10,000 mB/t, runs two Steam Turbine Arrays for about 425,000 FE/t; a 7×7×7,
+    about 56,700 mB/t, one Nuclear Steam Turbine for about 2.3 million FE/t; a 7×7×9, about 79,300 mB/t, two for about
+    3.2 million.
+- **Balance: fuel lasts like real reactor fuel.** `rodLifeTicks` 1,152,000 → 8,640,000: a 5% rod now lasts about 120 real
+  hours at full power (was 16), one Minecraft year and one refuelling cycle. A rod's life now scales with its fissile
+  content over 5%, as its burnup does: 9% fuel lasts about 216 hours, 3% about 72, natural uranium about 17, MOX (7.25%
+  fissile) about 174 (every rod lasted 16 before). It still burns only in proportion to the core's power, and its
+  plutonium and fission products still follow its burnup, not time. JEI's fission page shows each fuel's life in hours.
+- Fuel Rods load into the core from its middle out (they filled from the bottom layer up), so partly burned rods loaded
+  first sit where the flux is highest and fresh ones round them.
+- The Handbook's Fission Reactor entry has the new sizing and both ways to Superheated Steam from fission (a Superheater
+  Array on the Steam Generator's High-Pressure Steam, or a lead-bismuth core); the Steam Generator, Steam Turbine Array
+  and Condenser Array entries have the new numbers.
+- **Large models are much cheaper to draw, and look the same.**
+  - Every formed model's still parts (casings, decks, pipes, frames, linings) are baked into the world's own chunk mesh
+    once, when the structure forms, and again only when it changes (its shape, ports, windows or light): the Steam
+    Turbine, Steam Boiler, Gas Turbine, Firebox and Thermal Evaporator Arrays, the Nuclear Steam Turbine, the Distillation
+    Array, the refinery units, the Pumpjack and Oil Derrick, the Flare Stack, the Fission Reactor, Steam Generator and
+    Heavy Water Tower, the Centrifuge Cascade, the Chemical Reactor Array, the PUREX plant, the Solar Thermal Array's
+    panel and the Equipment Hatch's frame. They're culled with the terrain, and seen at any distance the world is drawn
+    (they vanished past 64 blocks before).
+  - Each moving part (rotors, fans, beams, cranks, the drill string's block and drum, doors, agitators, mirrors) is built
+    once and kept on the GPU; each frame only its turn is sent. What changes shape as it moves (the Pumpjack's arms and
+    bridle, the Oil Derrick's lines and kelly) is still built each frame, a few dozen faces.
+  - Renderers now only look after what moves, glows or holds fluid, within tight boxes round those parts, and skip models
+    whose chunk sections aren't being drawn (out of view or hidden behind the terrain).
+  - Servers send a rotor's speed (the Steam Turbine Array's, the Gas Turbine Array's and the Nuclear Steam Turbine's) only
+    when it (or its flow or load) has changed by 2% of full, at most every 10 ticks (it was every 5 ticks on almost any change).
+  - Multiblocks' periodic structure checks, redstone checks and scans are spread over their interval by position, so
+    many structures no longer all do theirs on the same tick, and their port pushes each tick only look at the blocks
+    with ports instead of every face of the box.
 
 ### Upgrading
 
 - Side configurations now take 5 bits a face (for the Experience mode). Machines, multiblock ports and Settings Cards
   from older versions are converted when they load; nothing needs redoing.
+- **Changed config defaults don't reach an existing `arcforge-common.toml`**: it keeps `power.steam.steamTurbineArray
+  .maxFlowPerSection` 40, `nuclear.fissionReactor.rodLifeTicks` 1152000 and `nuclear.steamGenerator.steamHeat` 12 until
+  you change them or reset them (`/arcforge config reset <path>`). The enrichment scaling of rod life applies either way.
+- Rods already in a core keep their burnup; with the longer life they burn the rest of the way more slowly.
+- A Power Plant quest completed before keeps its completion; one in progress now needs a Nuclear Steam Turbine at speed.
 
 ## [2.8.1] - 2026-10-17
 

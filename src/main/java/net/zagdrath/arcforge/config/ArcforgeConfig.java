@@ -698,15 +698,15 @@ public class ArcforgeConfig {
     }
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_FLOW_PER_SECTION = BUILDER
-            .comment("Most steam it uses in mB/t, per section (40: a 7x7x27 takes up to 5,880 mB/t).")
-            .defineInRange("maxFlowPerSection", 40, 1, 1_000_000);
+            .comment("Most steam it uses in mB/t, per section (60: a 7x7x27 takes up to 8,820 mB/t). Its output cap and FE buffer follow it.")
+            .defineInRange("maxFlowPerSection", 60, 1, 1_000_000);
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_TANK_PER_SECTION = BUILDER
             .comment("Steam tank size in mB, per section.")
             .defineInRange("tankCapacityPerSection", 32_000, 1_000, 100_000_000);
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_ENERGY_BUFFER_TICKS = BUILDER
-            .comment("Internal FE buffer size, in ticks of its output cap (400: a 3x3x3 holds about 3.2 million FE).")
+            .comment("Internal FE buffer size, in ticks of its output cap (400: a 3x3x3 holds about 4.9 million FE, a 7x7x27 about 241 million).")
             .defineInRange("energyBufferTicks", 400, 1, 72_000);
 
     public static final ModConfigSpec.IntValue TURBINE_ARRAY_MAX_RPM = BUILDER
@@ -728,6 +728,54 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.DoubleValue TURBINE_ARRAY_VACUUM_BONUS = BUILDER
             .comment("Extra FE while an Exhaust port drains its spent steam (0.10 = +10%), on top of the lubricant bonus.")
             .defineInRange("vacuumBonus", 0.10, 0.0, 10.0);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Nuclear Steam Turbine: a reactor's turbine-generator, 7x7 across and 21 to 45 long, on High-Pressure or",
+                "Contaminated Steam only. Values are per section as for the Steam Turbine Array (width x height / 9 x length: a 7x7x21",
+                "is 114.3 sections, a 7x7x45 is 245). Below minimumFlow of its rated flow it trips and coasts down.").push("nuclearSteamTurbine");
+    }
+
+    public static final ModConfigSpec.IntValue NUCLEAR_TURBINE_FLOW_PER_SECTION = BUILDER
+            .comment("Rated steam flow in mB/t, per section (240: a 7x7x45 takes up to 58,800 mB/t). Its output cap and FE buffer follow it.")
+            .defineInRange("maxFlowPerSection", 240, 1, 1_000_000);
+
+    public static final ModConfigSpec.DoubleValue NUCLEAR_TURBINE_FE_PER_MB = BUILDER
+            .comment("FE per mB of steam at speed (times power.generationMultiplier). The reheaters make it a little more than the",
+                    "Steam Turbine Array's 36 on High-Pressure Steam.")
+            .defineInRange("fePerMb", 40.0, 1.0, 1_000.0);
+
+    public static final ModConfigSpec.DoubleValue NUCLEAR_TURBINE_MINIMUM_FLOW = BUILDER
+            .comment("Least share of its rated flow it runs on (0.25: a 7x7x45 needs 14,700 mB/t). Under it for tripSeconds it trips and",
+                    "coasts down; it rolls up again once the steam coming in has held over it for restartSeconds.")
+            .defineInRange("minimumFlow", 0.25, 0.0, 1.0);
+
+    public static final ModConfigSpec.IntValue NUCLEAR_TURBINE_TRIP_SECONDS = BUILDER
+            .comment("Seconds under the minimum flow before it trips.")
+            .defineInRange("tripSeconds", 2, 0, 600);
+
+    public static final ModConfigSpec.IntValue NUCLEAR_TURBINE_RESTART_SECONDS = BUILDER
+            .comment("Seconds of steam coming in over the minimum flow before a tripped turbine rolls up again.")
+            .defineInRange("restartSeconds", 5, 0, 600);
+
+    public static final ModConfigSpec.IntValue NUCLEAR_TURBINE_TANK_PER_SECTION = BUILDER
+            .comment("Steam tank size in mB, per section.")
+            .defineInRange("tankCapacityPerSection", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue NUCLEAR_TURBINE_EXHAUST_PER_SECTION = BUILDER
+            .comment("Exhaust Steam tank size in mB, per section (used only with an Exhaust port).")
+            .defineInRange("exhaustTankCapacityPerSection", 8_000, 1_000, 100_000_000);
+
+    public static final ModConfigSpec.IntValue NUCLEAR_TURBINE_ENERGY_BUFFER_TICKS = BUILDER
+            .comment("Internal FE buffer size, in ticks of its output cap (400: a 7x7x45 holds about 941 million FE).")
+            .defineInRange("energyBufferTicks", 400, 1, 72_000);
+
+    public static final ModConfigSpec.IntValue NUCLEAR_TURBINE_MAX_RPM = BUILDER
+            .comment("Its synchronous speed: the shaft runs at this whatever the load, as a grid turbine-generator does.")
+            .defineInRange("maxRpm", 1_800, 100, 100_000);
 
     static {
         BUILDER.pop();
@@ -4152,8 +4200,10 @@ public class ArcforgeConfig {
             .defineInRange("vesselHeatCapacity", 2_000.0, 10.0, 1_000_000.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_ROD_LIFE = BUILDER
-            .comment("Ticks a Fuel Rod lasts at full power before it's spent (1152000 = sixteen real hours).")
-            .defineInRange("rodLifeTicks", 1_152_000.0, 1_000.0, 1.0E9);
+            .comment("Ticks a 5% Fuel Rod lasts at full power before it's spent (8640000 = 120 real hours, one Minecraft year: one",
+                    "refuelling cycle). A rod lasts in proportion to its enrichment over 5% (9% fuel 1.8 times as long, 3% fuel 0.6",
+                    "times), and a core at part power burns its fuel at that part of the rate.")
+            .defineInRange("rodLifeTicks", 8_640_000.0, 1_000.0, 1.0E9);
 
     public static final ModConfigSpec.DoubleValue REACTOR_ROD_SPEED = BUILDER
             .comment("How fast a control rod bank moves, in insertion (0 to 1) a second.")
@@ -4225,8 +4275,9 @@ public class ArcforgeConfig {
             .defineInRange("hotCoolantPerTube", 200, 1, 100_000);
 
     public static final ModConfigSpec.DoubleValue STEAM_GENERATOR_STEAM_HEAT = BUILDER
-            .comment("HU each mB of High-Pressure Steam takes.")
-            .defineInRange("steamHeat", 12.0, 1.0, 1_000.0);
+            .comment("HU each mB of High-Pressure Steam takes (6: a tube block boils 2,000 mB/t from 200 mB of Hot Coolant, and a reactor's",
+                    "heat makes about 6 FE per HU through the turbines). Superheated Steam from a lead-bismuth core takes 1.6 times this.")
+            .defineInRange("steamHeat", 6.0, 1.0, 1_000.0);
 
     public static final ModConfigSpec.IntValue STEAM_GENERATOR_TANK_PER_BLOCK = BUILDER
             .comment("mB each tank (hot coolant, cooled coolant, feedwater, steam) holds per block of the vessel's inside.")

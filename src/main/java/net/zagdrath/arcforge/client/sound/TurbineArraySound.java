@@ -16,12 +16,15 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
+import net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.registry.ModSounds;
 
-// The Steam Turbine Array's running sound: a loop from the middle of the turbine whose pitch and volume
-// follow the rotor, easing as it spins up and coasts down. It starts once the rotor turns and stops when
-// the rotor stops, the turbine breaks, or the player leaves the level.
+// The Steam Turbine Array's and the Nuclear Steam Turbine's running sound: a loop from the middle of the turbine whose
+// pitch and volume follow the rotor, easing as it spins up and coasts down (the nuclear set's bigger rotor a little
+// lower). It starts once the rotor turns and stops when the rotor stops, the turbine breaks, or the player leaves the
+// level.
 public class TurbineArraySound extends AbstractTickableSoundInstance {
     private static final Map<BlockPos, TurbineArraySound> PLAYING = new HashMap<>();
     // Below this share of full speed, the rotor is silent.
@@ -31,10 +34,13 @@ public class TurbineArraySound extends AbstractTickableSoundInstance {
     // How fast pitch and volume follow the rotor (a share per tick).
     private static final float EASE = 0.15F;
 
-    private final SteamTurbineArrayBlockEntity turbine;
+    private static final float NUCLEAR_PITCH = 0.8F;
 
-    // Called every client tick by the turbine's master (see SteamTurbineArrayBlockEntity.clientSoundHook).
-    public static void keepPlaying(SteamTurbineArrayBlockEntity turbine) {
+    private final ShellMultiblockBlockEntity turbine;
+
+    // Called every client tick by the turbine's master (see SteamTurbineArrayBlockEntity.clientSoundHook and
+    // NuclearSteamTurbineBlockEntity.clientSoundHook).
+    public static void keepPlaying(ShellMultiblockBlockEntity turbine) {
         if (speed(turbine) < SILENT_BELOW) {
             return;
         }
@@ -54,7 +60,7 @@ public class TurbineArraySound extends AbstractTickableSoundInstance {
         sounds.play(sound);
     }
 
-    private TurbineArraySound(SteamTurbineArrayBlockEntity turbine) {
+    private TurbineArraySound(ShellMultiblockBlockEntity turbine) {
         super(ModSounds.TURBINE_ARRAY_RUN.get(), SoundSource.BLOCKS, SoundInstance.createUnseededRandom());
         this.turbine = turbine;
         Vec3 centre = turbine.getRenderBox().getCenter();
@@ -65,20 +71,24 @@ public class TurbineArraySound extends AbstractTickableSoundInstance {
         this.delay = 0;
         float speed = speed(turbine);
         this.volume = volumeAt(speed) * 0.5F;
-        this.pitch = pitchAt(speed);
+        this.pitch = pitchAt(turbine, speed);
     }
 
     // The rotor's share of its full speed.
-    private static float speed(SteamTurbineArrayBlockEntity turbine) {
-        return Mth.clamp(turbine.getSyncedRpm() / (float) SteamTurbineArrayBlockEntity.maxRpm(), 0.0F, 1.0F);
+    private static float speed(ShellMultiblockBlockEntity turbine) {
+        if (turbine instanceof NuclearSteamTurbineBlockEntity nuclear) {
+            return Mth.clamp(nuclear.getSyncedRpm() / (float) NuclearSteamTurbineBlockEntity.maxRpm(), 0.0F, 1.0F);
+        }
+        return turbine instanceof SteamTurbineArrayBlockEntity array
+                ? Mth.clamp(array.getSyncedRpm() / (float) SteamTurbineArrayBlockEntity.maxRpm(), 0.0F, 1.0F) : 0.0F;
     }
 
     private static float volumeAt(float speed) {
         return Mth.lerp(Mth.sqrt(speed), MIN_VOLUME, MAX_VOLUME);
     }
 
-    private static float pitchAt(float speed) {
-        return Mth.lerp(speed, MIN_PITCH, MAX_PITCH);
+    private static float pitchAt(ShellMultiblockBlockEntity turbine, float speed) {
+        return Mth.lerp(speed, MIN_PITCH, MAX_PITCH) * (turbine instanceof NuclearSteamTurbineBlockEntity ? NUCLEAR_PITCH : 1.0F);
     }
 
     @Override
@@ -91,7 +101,7 @@ public class TurbineArraySound extends AbstractTickableSoundInstance {
             return;
         }
         volume += (volumeAt(speed) - volume) * EASE;
-        pitch += (pitchAt(speed) - pitch) * EASE;
+        pitch += (pitchAt(turbine, speed) - pitch) * EASE;
     }
 
     @Override

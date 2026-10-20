@@ -58,6 +58,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.transfer.energy.LongEnergyStore;
 import net.zagdrath.arcforge.transfer.energy.SidedEnergyHandler;
@@ -447,7 +448,7 @@ public class BatteryArrayBlockEntity extends MachineBlockEntity implements Multi
     // --- Running ---
 
     public void serverTick(ServerLevel level) {
-        if (checkRequested || level.getGameTime() % STRUCTURE_CHECK_INTERVAL == 0) {
+        if (checkRequested || TickSpread.due(level, worldPosition, STRUCTURE_CHECK_INTERVAL)) {
             checkNow();
         }
         // What came in and went out since the last tick.
@@ -473,7 +474,7 @@ public class BatteryArrayBlockEntity extends MachineBlockEntity implements Multi
             targetsDirty = true;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level);
         }
         // Redstone pauses the output only; switched off through the machine control API it neither charges nor discharges.

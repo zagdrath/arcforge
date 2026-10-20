@@ -257,14 +257,63 @@ public final class PumpjackMesh extends ModelMesh {
         // The beam's flange tiles on a grid of its own, from its top edge.
         moduleOrigin = new float[] { 0, PY + PumpjackLayout.BEAM_DEPTH, PumpjackLayout.BEAM_FRONT };
         beam(phi);
+        headWires(phi);
         moduleOrigin = new float[] { 0, 0, 0 };
         cranks(theta);
+        arms(theta, phi);
+        bridle(phi);
+        return solid.toArray();
+    }
+
+    // The rigid moving parts, built once at rest and drawn turned as wholes (see PumpjackRenderer): the walking beam
+    // with its horse head and equalizer, level (turned by beamAngle(theta) about beamAxis), and the cranks (turned by
+    // theta about crankAxis). Turned so, they're the parts buildMoving builds at theta.
+    public float[] buildBeam() {
+        solid = new Floats();
+        glowing = false;
+        moduleOrigin = new float[] { 0, PY + PumpjackLayout.BEAM_DEPTH, PumpjackLayout.BEAM_FRONT };
+        beam(0.0);
+        moduleOrigin = new float[] { 0, 0, 0 };
+        return solid.toArray();
+    }
+
+    public float[] buildCranks() {
+        solid = new Floats();
+        glowing = false;
+        cranks(0.0);
+        return solid.toArray();
+    }
+
+    // What changes shape as the crank turns, built each frame: the pitman arms, the bridle, and its wire lines over the
+    // horse head (from the head's top down to where they leave it, level with the pivot).
+    public float[] buildLinks(double theta) {
+        solid = new Floats();
+        glowing = false;
+        double phi = PumpjackLayout.beamAngle(theta);
+        // The wire lines on the beam's grid, as buildMoving builds them with it.
+        moduleOrigin = new float[] { 0, PY + PumpjackLayout.BEAM_DEPTH, PumpjackLayout.BEAM_FRONT };
+        headWires(phi);
+        moduleOrigin = new float[] { 0, 0, 0 };
+        arms(theta, phi);
+        bridle(phi);
+        return solid.toArray();
+    }
+
+    // The saddle bearing's axis and the crankshaft's, across the frame.
+    public float[] beamAxis() {
+        return axis(CX, PY, PU, 1.0F, 0.0F, 0.0F);
+    }
+
+    public float[] crankAxis() {
+        return axis(CX, PumpjackLayout.CRANK_Y, PumpjackLayout.CRANK_U, 1.0F, 0.0F, 0.0F);
+    }
+
+    // The two pitman arms, from the crank pins up to the equalizer.
+    private void arms(double theta, double phi) {
         float[] pin = PumpjackLayout.crankPin(theta), eq = PumpjackLayout.equalizer(phi);
         for (float arm : new float[] { PumpjackLayout.PITMAN_X, PumpjackLayout.WIDTH - PumpjackLayout.PITMAN_X }) {
             tube(new float[] { arm, pin[0], pin[1] }, new float[] { arm, eq[0] - 2.5F, eq[1] }, 1.1F, 4, Paint.BANDED);
         }
-        bridle(phi);
-        return solid.toArray();
     }
 
     private void turnAbout(float y, float u, double angle) {
@@ -287,7 +336,7 @@ public final class PumpjackMesh extends ModelMesh {
         box(CX - h - 1.0F, PY + PumpjackLayout.BEAM_DEPTH - 1.0F, front, CX + h + 1.0F, PY + PumpjackLayout.BEAM_DEPTH,
                 PumpjackLayout.BEAM_BACK, Paint.MID, Paint.STRAP, Paint.PLAIN, SKIP_NEG_U);
         box(CX - h - 1.0F, PY, front, CX + h + 1.0F, PY + 1.0F, PumpjackLayout.BEAM_BACK, Paint.FACE_SHADE, Paint.PLAIN, Paint.STRAP, SKIP_NEG_U);
-        horseHead(phi);
+        horseHead();
         // The equalizer: a crossbar under the beam's far end, out to the arms on both sides.
         float eu = PU + PumpjackLayout.EQUALIZER;
         float ex = PumpjackLayout.PITMAN_X - 1.5F;
@@ -298,21 +347,12 @@ public final class PumpjackMesh extends ModelMesh {
     }
 
     // The horse head: its curved face (where the bridle runs) an arc about the pivot at HEAD_RADIUS, its back a flat
-    // plate across the beam's end, plated sides with a row of lightening holes, and the bridle's wire lines lying over
-    // the face from its top down to where they leave it (level with the pivot, whatever the beam's angle phi).
-    private void horseHead(double phi) {
+    // plate across the beam's end, and plated sides with a row of lightening holes (the bridle's wire lines over its
+    // face are headWires).
+    private void horseHead() {
         float outer = PumpjackLayout.HEAD_RADIUS, h = PumpjackLayout.HEAD_HALF;
         ringSector(CX - h, CX + h, PY, PU, -PumpjackLayout.HEAD_BELOW, PumpjackLayout.HEAD_ABOVE,
                 PumpjackLayout::headInner, outer, 28, Paint.PLAIN, Paint.BANDED, Paint.PLAIN);
-        double top = PumpjackLayout.HEAD_ABOVE, leave = -phi;
-        int steps = 8;
-        for (int side = -1; side <= 1; side += 2) {
-            float x = CX + side * 2.0F;
-            for (int i = 0; i < steps; i++) {
-                float[] a = at(PY, PU, top + (leave - top) * i / steps, outer + 0.3F), b = at(PY, PU, top + (leave - top) * (i + 1) / steps, outer + 0.3F);
-                tube(xyz(x, a), xyz(x, b), 0.5F, 4, Paint.BANDED);
-            }
-        }
         for (double deg : new double[] { -24.0, -12.0, 0.0, 12.0 }) {
             double a = Math.toRadians(deg);
             float r = (outer + PumpjackLayout.headInner(a)) / 2.0F;
@@ -323,6 +363,23 @@ public final class PumpjackMesh extends ModelMesh {
                         new float[] { x, c[0] - 1.0F, c[1] + 1.0F }, new float[] { side, 0, 0 }, Paint.DEEP);
             }
         }
+    }
+
+    // The bridle's wire lines lying over the horse head's face from its top down to where they leave it, turned with
+    // the beam by phi: they always leave level with the pivot.
+    private void headWires(double phi) {
+        turnAbout(PY, PU, phi);
+        float outer = PumpjackLayout.HEAD_RADIUS;
+        double top = PumpjackLayout.HEAD_ABOVE, leave = -phi;
+        int steps = 8;
+        for (int side = -1; side <= 1; side += 2) {
+            float x = CX + side * 2.0F;
+            for (int i = 0; i < steps; i++) {
+                float[] a = at(PY, PU, top + (leave - top) * i / steps, outer + 0.3F), b = at(PY, PU, top + (leave - top) * (i + 1) / steps, outer + 0.3F);
+                tube(xyz(x, a), xyz(x, b), 0.5F, 4, Paint.BANDED);
+            }
+        }
+        turning = false;
     }
 
     // The two cranks, turned by theta about the crankshaft: each an arm out past its pin, with a big counterweight on

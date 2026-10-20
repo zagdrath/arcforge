@@ -8,15 +8,16 @@ package net.zagdrath.arcforge.client.renderer.blockentity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -34,6 +35,8 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.zagdrath.arcforge.block.multiblock.CubeCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ChemicalReactorArrayBlockEntity;
 import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.LargeModels;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.steam.ChemicalReactorArrayMesh;
 
@@ -55,7 +58,9 @@ public class ChemicalReactorArrayRenderer implements StructureRenderer<ChemicalR
 
     public static class State extends BlockEntityRenderState {
         public boolean formed;
-        public float[] solid = EMPTY, cutout = EMPTY, glow = EMPTY;
+        // Up close the agitators turn; past simpleMovingPartsFrom they stand still (see LargeModels).
+        public boolean turning;
+        public float[] glow = EMPTY;
         public float[][] agitators = new float[0][];
         public float[][] axes = new float[0][];
         public final float[] angles = new float[ChemicalReactorArrayBlockEntity.LANES];
@@ -73,6 +78,16 @@ public class ChemicalReactorArrayRenderer implements StructureRenderer<ChemicalR
     @Override
     public State createRenderState() {
         return new State();
+    }
+
+    @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(ChemicalReactorArrayBlockEntity array) {
+        return ChunkMeshes.isBaked(array, MeshRendering.SOLID, MeshRendering.GLASS);
     }
 
     private static Built build(Direction facing) {
@@ -106,17 +121,31 @@ public class ChemicalReactorArrayRenderer implements StructureRenderer<ChemicalR
         Level level = array.getLevel();
         state.formed = level != null && array.isFormed() && array.getBox() == null;
         if (!state.formed) {
+            ChunkMeshes.remove(array);
             return;
         }
         Direction facing = array.getBlockState().getValue(CubeCasingBlock.FACING);
         Built built = BUILT.computeIfAbsent(facing, ChemicalReactorArrayRenderer::build);
-        state.solid = built.still()[0];
-        state.cutout = built.still()[1];
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
+        int light = LightCoordsUtil.getLightCoords(level, array.getBlockPos().above(2));
+        // The still parts into the chunk mesh, laid out from the cube's minimum corner.
+        java.util.function.BooleanSupplier stands = () -> array.isFormed() && array.getBox() == null
+                && array.getBlockState().getValue(CubeCasingBlock.FACING) == facing;
+        BlockPos min = array.getBlockPos().offset(-1, -1, -1);
+        MeshRendering.bake(array, MeshRendering.SOLID, min, ChunkSectionLayer.SOLID, built.still()[0], sheet, light, stands);
+        MeshRendering.bake(array, MeshRendering.GLASS, min, ChunkSectionLayer.CUTOUT, built.still()[1], sheet, light, stands);
+        state.sheet = sheet;
+        state.light = light;
+        LargeModels.Detail detail = LargeModels.detail(getRenderBoundingBox(array), cameraPosition);
+        if (detail == LargeModels.Detail.STILL) {
+            state.glow = EMPTY;
+            state.agitators = new float[0][];
+            return;
+        }
+        state.turning = detail == LargeModels.Detail.FULL;
         state.glow = built.still()[2];
         state.agitators = built.agitators();
         state.axes = built.axes();
-        state.sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
-        state.light = LightCoordsUtil.getLightCoords(level, array.getBlockPos().above(2));
         // Turn the agitators of the lanes that run, by the time since the last frame.
         float now = level.getGameTime() + partialTicks;
         float dt = array.agitatorTime < 0.0F ? 0.0F : Mth.clamp(now - array.agitatorTime, 0.0F, 5.0F);
@@ -159,8 +188,6 @@ public class ChemicalReactorArrayRenderer implements StructureRenderer<ChemicalR
         // From the centre to the cube's minimum corner, where the model is laid out.
         poseStack.translate(-1.0F, -1.0F, -1.0F);
         int light = state.light;
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), state.solid, sheet, light);
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), state.cutout, sheet, light);
         if (state.glow.length > 0) {
             float[] glow = state.glow;
             collector.submitCustomGeometry(poseStack, RenderTypes.eyes(sheet.atlasLocation()),
@@ -169,13 +196,13 @@ public class ChemicalReactorArrayRenderer implements StructureRenderer<ChemicalR
         for (int lane = 0; lane < state.agitators.length; lane++) {
             float[] axis = state.axes[lane];
             float[] rotor = state.agitators[lane];
-            poseStack.pushPose();
-            poseStack.translate(axis[0], 0.0F, axis[1]);
-            poseStack.rotate(Axis.YP.rotationDegrees(state.angles[lane]));
-            poseStack.translate(-axis[0], 0.0F, -axis[1]);
-            collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()),
-                    (pose, buffer) -> MeshRendering.emit(pose, buffer, rotor, sheet, light));
-            poseStack.popPose();
+            if (state.turning) {
+                Matrix4f turn = new Matrix4f().translate(axis[0], 0.0F, axis[1]).rotateY((float) Math.toRadians(state.angles[lane]))
+                        .translate(-axis[0], 0.0F, -axis[1]);
+                MeshRendering.submitTurnedAboutY(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), rotor, sheet, light, turn);
+            } else {
+                MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), rotor, sheet, light);
+            }
             TextureAtlasSprite sprite = state.liquidSprites[lane];
             float[] box = state.liquidBoxes[lane];
             if (sprite != null && box != null) {

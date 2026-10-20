@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -18,6 +19,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -33,20 +35,25 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.PumpjackBlockEntity;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.LargeModels;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.multiblock.PortFaces;
 import net.zagdrath.arcforge.multiblock.PortHolder;
+import net.zagdrath.arcforge.multiblock.PumpjackLayout;
 import net.zagdrath.arcforge.steam.ModelMesh;
 import net.zagdrath.arcforge.steam.PumpjackMesh;
 
 // Draws a formed Pumpjack (its casings draw nothing but their port plates) from PumpjackLayout, built by PumpjackMesh
 // on the sheet block/pumpjack/pumpjack, with a nozzle from the model out to each port. The still parts are built once
-// and again when the ports change (checked every second); the beam, arms, cranks and bridle each frame at the crank's
-// angle, which turns as fast as the pumpjack pumps (see PumpjackBlockEntity.advanceCrank), so it slows as its deposit
-// drains.
+// (and again when the ports change, checked every second) and baked into the chunk mesh (ChunkMeshes). The beam and the
+// cranks are built once at rest and drawn turned to the crank's angle, which turns as fast as the pumpjack pumps (see
+// PumpjackBlockEntity.advanceCrank), so it slows as its deposit drains; the pitman arms and the bridle, which change
+// shape as they move, are built each frame. Past simpleMovingPartsFrom it all stands still at rest, and past
+// stillPartsOnlyFrom only the chunk mesh's still parts show (see LargeModels).
 public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, PumpjackRenderer.State> {
     public static final Identifier SHEET = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/pumpjack/pumpjack");
     private static final int PORT_SCAN_INTERVAL = 20;
@@ -60,6 +67,9 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
         final PumpjackMesh mesh;
         List<ModelMesh.Port> ports;
         float[] solid = EMPTY, glass = EMPTY;
+        final float[] beam, cranks, rest;
+        final float[] beamAxis, crankAxis;
+        final AABB drawn;
         long scanned;
 
         Built(OilfieldStructures.Unit unit, List<ModelMesh.Port> ports) {
@@ -67,6 +77,13 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
             this.frame = PumpjackBlockEntity.frame(unit);
             this.mesh = new PumpjackMesh(frame);
             this.ports = ports;
+            this.beam = mesh.buildBeam();
+            this.cranks = mesh.buildCranks();
+            this.rest = mesh.buildMoving(0.0);
+            this.beamAxis = mesh.beamAxis();
+            this.crankAxis = mesh.crankAxis();
+            // The moving parts sweep within a block and a half of where they rest.
+            this.drawn = MeshRendering.bounds(unit.min(), rest).inflate(1.5);
             rebuild();
         }
 
@@ -80,7 +97,9 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
     public static class State extends BlockEntityRenderState {
         public boolean formed;
         public int offsetX, offsetY, offsetZ;
-        public float[] solid = EMPTY, glass = EMPTY, moving = EMPTY;
+        // Up close: the beam and cranks turned, and the links; far off, the moving parts at rest.
+        public float[] beam = EMPTY, cranks = EMPTY, links = EMPTY, rest = EMPTY;
+        public @Nullable Matrix4f beamTurn, crankTurn;
         public @Nullable TextureAtlasSprite sheet;
         public int light;
     }
@@ -93,6 +112,16 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
     }
 
     @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(PumpjackBlockEntity pumpjack) {
+        return ChunkMeshes.isBaked(pumpjack, MeshRendering.SOLID, MeshRendering.GLASS);
+    }
+
+    @Override
     public void extractRenderState(PumpjackBlockEntity pumpjack, State state, float partialTicks, Vec3 cameraPosition,
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         StructureRenderer.super.extractRenderState(pumpjack, state, partialTicks, cameraPosition, breakProgress);
@@ -101,6 +130,7 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
         state.formed = unit != null && level != null;
         if (unit == null || level == null) {
             built.remove(pumpjack);
+            ChunkMeshes.remove(pumpjack);
             return;
         }
         BlockPos min = unit.min();
@@ -121,11 +151,27 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
                 model.rebuild();
             }
         }
-        state.solid = model.solid;
-        state.glass = model.glass;
-        state.moving = model.mesh.buildMoving(Math.toRadians(pumpjack.advanceCrank(time + partialTicks)));
-        state.sheet = SteamBoilerArrayRenderer.sprite(SHEET);
-        state.light = LightCoordsUtil.getLightCoords(level, unit.at(0, 1, OilfieldStructures.POST_U).relative(unit.back().getClockWise()));
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(SHEET);
+        int light = LightCoordsUtil.getLightCoords(level, unit.at(0, 1, OilfieldStructures.POST_U).relative(unit.back().getClockWise()));
+        OilfieldStructures.Unit builtUnit = model.unit;
+        java.util.function.BooleanSupplier stands = () -> builtUnit.equals(pumpjack.getUnit());
+        MeshRendering.bake(pumpjack, MeshRendering.SOLID, min, ChunkSectionLayer.SOLID, model.solid, sheet, light, stands);
+        MeshRendering.bake(pumpjack, MeshRendering.GLASS, min, ChunkSectionLayer.CUTOUT, model.glass, sheet, light, stands);
+        state.sheet = sheet;
+        state.light = light;
+        state.beam = state.cranks = state.links = state.rest = EMPTY;
+        double theta = Math.toRadians(pumpjack.advanceCrank(time + partialTicks));
+        switch (LargeModels.detail(model.drawn, cameraPosition)) {
+            case FULL -> {
+                state.beam = model.beam;
+                state.cranks = model.cranks;
+                state.beamTurn = MeshRendering.turn(model.beamAxis, (float) Math.toDegrees(PumpjackLayout.beamAngle(theta)));
+                state.crankTurn = MeshRendering.turn(model.crankAxis, (float) Math.toDegrees(theta));
+                state.links = model.mesh.buildLinks(theta);
+            }
+            case SIMPLE -> state.rest = model.rest;
+            case STILL -> {}
+        }
     }
 
     // The ports on the pumpjack's outer faces, in the model's frame.
@@ -164,13 +210,17 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
         }
         poseStack.pushPose();
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
-        float[] solid = state.solid, moving = state.moving, glass = state.glass;
+        float[] links = state.links;
         int light = state.light;
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
-        if (moving.length > 0) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, moving, sheet, light));
+        var solid = RenderTypes.entitySolid(sheet.atlasLocation());
+        if (state.beamTurn != null && state.crankTurn != null) {
+            MeshRendering.submitMoving(collector, poseStack, solid, state.beam, sheet, light, state.beamTurn);
+            MeshRendering.submitMoving(collector, poseStack, solid, state.cranks, sheet, light, state.crankTurn);
         }
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
+        if (links.length > 0) {
+            collector.submitCustomGeometry(poseStack, solid, (pose, buffer) -> emit(pose, buffer, links, sheet, light));
+        }
+        MeshRendering.submitStill(collector, poseStack, solid, state.rest, sheet, light);
         poseStack.popPose();
     }
 
@@ -190,8 +240,10 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
         }
     }
 
+    // Only the moving parts are drawn here; the rest is in the chunk mesh.
     @Override
     public AABB getRenderBoundingBox(PumpjackBlockEntity pumpjack) {
-        return pumpjack.getRenderBox();
+        Built model = built.get(pumpjack);
+        return model != null && model.unit.equals(pumpjack.getUnit()) ? model.drawn : pumpjack.getRenderBox();
     }
 }

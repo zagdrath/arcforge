@@ -131,6 +131,14 @@ public record FuelRod(FuelType type, int enrichment, float burnup, float plutoni
         return rod;
     }
 
+    // The full-power ticks it lasts from fresh, by the config's rodLifeTicks: in proportion to its fissile content (see
+    // ReactorParams.rodLife).
+    public double lifeTicks() {
+        net.zagdrath.arcforge.nuclear.reactor.ReactorParams p = net.zagdrath.arcforge.nuclear.reactor.ReactorParams.defaults();
+        p.rodLifeTicks = ArcforgeConfig.REACTOR_ROD_LIFE.getAsDouble();
+        return toSim().life(p);
+    }
+
     public static FuelRod fromSim(FuelRod was, ReactorSim.Rod rod, double decayHeat, long now, boolean damaged) {
         return new FuelRod(was.type(), was.enrichment(), (float) Math.min(1.0, rod.burnup), (float) Math.min(1.0, rod.plutonium),
                 (float) Math.min(1.0, rod.fissionProducts), (float) Math.max(0.0, decayHeat), now, was.damaged() || damaged, was.startPlutonium());

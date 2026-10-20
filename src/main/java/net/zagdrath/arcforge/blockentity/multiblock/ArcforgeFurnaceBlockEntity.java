@@ -70,6 +70,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.recipe.ArcforgeSmeltingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -381,12 +382,12 @@ public class ArcforgeFurnaceBlockEntity extends BlockEntity implements MenuProvi
     }
 
     private void tick(ServerLevel level, BlockPos pos, BlockState state) {
-        if (checkRequested || level.getGameTime() % STRUCTURE_CHECK_INTERVAL == 0) {
+        if (checkRequested || TickSpread.due(level, worldPosition, STRUCTURE_CHECK_INTERVAL)) {
             checkRequested = false;
             updateFormed(level);
         }
         portDefaults.tick(level, this);
-        if (formed && level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (formed && TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level);
         }
 

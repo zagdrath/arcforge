@@ -426,6 +426,46 @@ public final class DieselGeneratorMesh extends ModelMesh {
     public float[] buildMoving(float angle, float flap) {
         solid = new Floats();
         glowing = false;
+        fan(angle);
+        rainFlap(flap);
+        flapPin();
+        return solid.toArray();
+    }
+
+    // The rigid moving parts, built once at rest and drawn turned as wholes (see DieselGeneratorRenderer): the fan, its
+    // shaft and the coupling (turned by the crank's angle about fanAxis), and the rain flap shut (turned up by its lift
+    // about flapAxis); its hinge pin doesn't move. Turned so, they're the parts buildMoving builds.
+    public float[] buildFan() {
+        solid = new Floats();
+        glowing = false;
+        fan(0.0F);
+        return solid.toArray();
+    }
+
+    public float[] buildFlap() {
+        solid = new Floats();
+        glowing = false;
+        rainFlap(0.0F);
+        return solid.toArray();
+    }
+
+    public float[] buildFlapPin() {
+        solid = new Floats();
+        glowing = false;
+        flapPin();
+        return solid.toArray();
+    }
+
+    // The crankshaft's axis (along u), and the rain flap's hinge (along x).
+    public float[] fanAxis() {
+        return axis(CX, SY, layout.couplingU0, 0.0F, 0.0F, 1.0F);
+    }
+
+    public float[] flapAxis() {
+        return axis(CX, DieselGeneratorLayout.OUTLET_TOP + 0.2F, layout.outletU() + DieselGeneratorLayout.OUTLET_R + 0.4F, 1.0F, 0.0F, 0.0F);
+    }
+
+    private void fan(float angle) {
         spinning = true;
         spinCos = Math.cos(Math.toRadians(angle));
         spinSin = Math.sin(Math.toRadians(angle));
@@ -451,8 +491,6 @@ public final class DieselGeneratorMesh extends ModelMesh {
             box(bx - 0.5F, by - 0.5F, bu - 0.5F, bx + 0.5F, by + 0.5F, bu + 0.5F, Paint.RIVET, Paint.RIVET, Paint.DARK, 0);
         }
         spinning = false;
-        rainFlap(flap);
-        return solid.toArray();
     }
 
     // The rain flap over the outlet: a round plate a little wider than the pipe, hinged at its back edge on the lug,
@@ -465,6 +503,11 @@ public final class DieselGeneratorMesh extends ModelMesh {
         float[] hinge = { CX, otop + 0.2F, ou + or + 0.4F };
         roundPlate(new float[] { hinge[0] + along[0] * r, hinge[1] + along[1] * r, hinge[2] + along[2] * r }, across, along, normal, r, thick, Paint.MID,
                 Paint.SHADE, Paint.DARK);
+    }
+
+    // The rain flap's hinge pin.
+    private void flapPin() {
+        float or = DieselGeneratorLayout.OUTLET_R, otop = DieselGeneratorLayout.OUTLET_TOP, ou = layout.outletU();
         tube(new float[] { CX - 1.2F, otop + 0.4F, ou + or + 0.4F }, new float[] { CX + 1.2F, otop + 0.4F, ou + or + 0.4F }, 0.35F, 4, Paint.BANDED);
     }
 

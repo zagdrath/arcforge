@@ -7,6 +7,8 @@ package net.zagdrath.arcforge.client.renderer.blockentity;
 
 import java.util.List;
 
+import org.joml.Matrix4f;
+
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.resources.Identifier;
 import net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity;
@@ -42,8 +44,22 @@ public class DieselGeneratorRenderer extends PlantRenderer<DieselGeneratorBlockE
         return 1.0F;
     }
 
+    // The fan, shaft and coupling turn with the crank and the rain flap lifts, each as a whole; the flap's hinge pin
+    // stands still.
     @Override
-    protected float[] buildMoving(DieselGeneratorMesh mesh, DieselGeneratorBlockEntity generator, float now) {
-        return mesh.buildMoving(generator.advance(now), generator.flap(now));
+    protected float[][] buildRigid(DieselGeneratorMesh mesh) {
+        return new float[][] { mesh.buildFan(), mesh.buildFlap(), mesh.buildFlapPin() };
+    }
+
+    @Override
+    protected Matrix4f[] rigidTurns(DieselGeneratorMesh mesh, DieselGeneratorBlockEntity generator, float now) {
+        return new Matrix4f[] { MeshRendering.turn(mesh.fanAxis(), generator.advance(now)), MeshRendering.turn(mesh.flapAxis(), generator.flap(now)),
+                new Matrix4f() };
+    }
+
+    // Far off: the crankshaft and flap at rest.
+    @Override
+    protected float[] buildMovingRest(DieselGeneratorMesh mesh) {
+        return mesh.buildMoving(0.0F, 0.0F);
     }
 }

@@ -161,6 +161,16 @@ public final class ArrayMultiblockSpecs {
                 .fluidAutomation(be -> be.getFluidHandler(null))
                 .build());
 
+        MachineControls.register(ModBlockEntityTypes.NUCLEAR_STEAM_TURBINE.get(),
+                MachineControlSpec.builder(net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity.class)
+                .primary(net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity::isMaster)
+                .energy(EnergyRole.GENERATOR, net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity::getEnergy,
+                        net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity::getFePerTick)
+                .tank(SlotRole.INPUT, net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity::getSteam)
+                .tank(SlotRole.OUTPUT, net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity::getExhaust)
+                .fluidAutomation(be -> be.getFluidHandler(null))
+                .build());
+
         MachineControls.register(ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), MachineControlSpec.builder(GasTurbineArrayBlockEntity.class)
                 .primary(GasTurbineArrayBlockEntity::isMaster)
                 .energy(EnergyRole.GENERATOR, GasTurbineArrayBlockEntity::getEnergy, GasTurbineArrayBlockEntity::getFePerTick)

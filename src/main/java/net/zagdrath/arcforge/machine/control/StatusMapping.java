@@ -34,7 +34,7 @@ public final class StatusMapping {
             case DISABLED, STOPPED, NO_SIGNAL, SWITCHED_OFF -> MachineStatus.DISABLED;
             case NOT_FORMED -> MachineStatus.NOT_FORMED;
             case TOO_HOT, CANNOT_BREAK, CANT_GROW, NO_SKY, FLAMEOUT, INTAKE_SHUT, WAITING_CHUNK,
-                    TOO_SHORT, FEED_TOO_RICH, SCRAMMED, CORE_DAMAGED, WRONG_MODE, ROD_TOO_HOT, DESTROYED -> MachineStatus.FAULT;
+                    TOO_SHORT, FEED_TOO_RICH, SCRAMMED, CORE_DAMAGED, WRONG_MODE, ROD_TOO_HOT, DESTROYED, TRIPPED -> MachineStatus.FAULT;
         };
     }
 }

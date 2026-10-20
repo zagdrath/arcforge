@@ -62,6 +62,12 @@ public abstract class ModelMesh {
         // A hot cell's ceiling lamp (two warm-white tubes in a reflector; drawn in the glow list).
         M_LAMP(96, 96, 16, 8, Kind.MODULE),
         POLISHED(104, 112, 4, 8, Kind.BANDED),
+        // The Nuclear Steam Turbine's sheet only (rows 352-367, tools/LargeModelTextureGen.java): the turbine enamel's
+        // round-part ramps (as RAMPS, 2 to 14 px across), its flat tone for faces too small to plate, the at-speed blur of
+        // the last-stage blades, and the markers: ENAMEL for round enamel parts (the enamel ramp across them), EN_PLAIN
+        // and EN_WORN for flat ones (plated in the enamel, or the enamel with scuffs at handrail height).
+        EN_RAMPS(0, 352, 104, 8, Kind.TILED), EN_FACE(0, 360), M_BLUR(16, 360, 8, 8, Kind.MODULE),
+        EN_PLAIN(0, 360), EN_WORN(0, 360), ENAMEL(0, 0, 0, 0, Kind.BANDED),
         PLATE(0, 8, 16, 16, true, Cuts.SPLIT, Cuts.CORNERS),
         PLAIN(16, 8, 16, 16, false, Cuts.SPLIT_PLAIN, Cuts.EDGES),
         DECK(32, 8, 16, 16, true, Cuts.RECESS, Cuts.RECESS),
@@ -474,7 +480,7 @@ public abstract class ModelMesh {
                 return;
             }
         }
-        Paint p = paint.kind == Kind.BANDED ? Paint.FACE : paint;
+        Paint p = paint.kind == Kind.BANDED ? (paint == Paint.ENAMEL ? Paint.EN_FACE : Paint.FACE) : paint;
         // A large model stretches nothing: a panel not plated (the FE band) drops to its flat colour.
         while (p.kind == Kind.PANEL && (modules && !glass || w < p.least(true) || h < p.least(false) || p.riveted && Math.min(w, h) < 9.0F)) {
             p = p.fallback();
@@ -528,7 +534,11 @@ public abstract class ModelMesh {
     // next, 128 long) and its 2x2 rivet head at RIVET_Y.
     enum Steel {
         MACHINE(0, 128, 116, 64, 116, 224, 0),
-        GENERATOR(0, 192, 116, 32, 119, 227, 2);
+        GENERATOR(0, 192, 116, 32, 119, 227, 2),
+        // The Nuclear Steam Turbine's sheet only: the pale sage turbine enamel (rows 256-319, its edge columns at x
+        // 122-124 and edge rows 234-236), and the same with a few worn scuffs (rows 320-351).
+        ENAMEL(0, 256, 116, 64, 122, 234, 4),
+        ENAMEL_WORN(0, 320, 116, 32, 122, 234, 4);
 
         final int fieldX, fieldY, fieldW, fieldH, edgeColumn, edgeRow, rivetX;
 
@@ -566,6 +576,9 @@ public abstract class ModelMesh {
             case GEN_PLAIN -> new Plating(Steel.GENERATOR, false, false);
             case DARK, SHADE, FACE_SHADE, FACE, MID, LIT, BANDED -> Math.max(w, h) > FLAT_MOST ? new Plating(Steel.MACHINE, false, false) : null;
             case GEN_DARK, GEN_FACE, GEN_MID, GEN_LIT -> Math.max(w, h) > FLAT_MOST ? new Plating(Steel.GENERATOR, false, false) : null;
+            case EN_PLAIN -> new Plating(Steel.ENAMEL, false, false);
+            case EN_WORN -> new Plating(Steel.ENAMEL_WORN, false, false);
+            case ENAMEL, EN_FACE -> Math.max(w, h) > FLAT_MOST ? new Plating(Steel.ENAMEL, false, false) : null;
             default -> null;
         };
     }
@@ -981,20 +994,22 @@ public abstract class ModelMesh {
         period = side == Paint.POLISHED ? 4 : Math.max(2, Math.min(14, period));
         // The polished rod has its own bright ramp; everything else the steel ramp its period wide.
         int rx = side == Paint.POLISHED ? Paint.POLISHED.x : rampX(period);
+        // The turbine enamel has its own ramps (the Nuclear Steam Turbine's sheet), in the same places on their row.
+        Paint ramps = side == Paint.ENAMEL ? Paint.EN_RAMPS : Paint.RAMPS;
         boolean flipped = dot(cross(sub(p2, p0), sub(p3, p1)), out) < 0;
         if (fw >= 3.0F && length < fw) {
             // A band wider round than it is long (a flange, a ring): its width is its length, so the ramp runs across
             // that, the same all the way round. The quad turned a quarter, still wound outward.
             int across = Math.max(2, Math.min(14, Math.round(length)));
             if (flipped) {
-                rampFacet(p0, p3, p2, p1, 0.0F, length, across, fw, rampX(across));
+                rampFacet(p0, p3, p2, p1, 0.0F, length, across, fw, rampX(across), ramps);
             } else {
-                rampFacet(p1, p2, p3, p0, 0.0F, length, across, fw, rampX(across));
+                rampFacet(p1, p2, p3, p0, 0.0F, length, across, fw, rampX(across), ramps);
             }
         } else if (flipped) {
-            rampFacet(p1, p0, p3, p2, -(s0 + fw), -s0, period, length, rx);
+            rampFacet(p1, p0, p3, p2, -(s0 + fw), -s0, period, length, rx, ramps);
         } else {
-            rampFacet(p0, p1, p2, p3, s0, s0 + fw, period, length, rx);
+            rampFacet(p0, p1, p2, p3, s0, s0 + fw, period, length, rx, ramps);
         }
     }
 
@@ -1003,9 +1018,14 @@ public abstract class ModelMesh {
     // the strip's whole length on the middle of a texel row: the same pixels as laying its rows every 8 px, in a
     // fraction of the quads (these models are drawn vertex by vertex every frame).
     void rampFacet(float[] p0, float[] p1, float[] p2, float[] p3, float s0, float s1, int period, float length, int rx) {
+        rampFacet(p0, p1, p2, p3, s0, s1, period, length, rx, Paint.RAMPS);
+    }
+
+    // The same from another row of ramps laid out as RAMPS is (the turbine enamel's).
+    void rampFacet(float[] p0, float[] p1, float[] p2, float[] p3, float s0, float s1, int period, float length, int rx, Paint ramps) {
         for (float s = s0; s < s1 - 1.0E-5F;) {
             float k = (float) Math.floor(s / period + 1.0E-5F) * period, end = Math.min(s1, k + period);
-            cell(p0, p1, p2, p3, (s - s0) / (s1 - s0), (end - s0) / (s1 - s0), 0.0F, 1.0F, Paint.RAMPS, rx + s - k, 4.5F, rx + end - k, 4.5F, false);
+            cell(p0, p1, p2, p3, (s - s0) / (s1 - s0), (end - s0) / (s1 - s0), 0.0F, 1.0F, ramps, rx + s - k, 4.5F, rx + end - k, 4.5F, false);
             s = end;
         }
     }
@@ -1144,7 +1164,7 @@ public abstract class ModelMesh {
                 if (modules && side.kind == Kind.BANDED) {
                     if (ra != rb) {
                         List<float[]> points = List.of(p0, p1, p2, p3);
-                        plateIn(plateFrame(points, new Plating(Steel.MACHINE, false, false, false)), points);
+                        plateIn(plateFrame(points, new Plating(side == Paint.ENAMEL ? Steel.ENAMEL : Steel.MACHINE, false, false, false)), points);
                     } else if (shellPlates != null) {
                         plateStrip(p0, p1, p2, p3, f * fw, (f + 1) * fw, length, shellPlates);
                     } else {
@@ -1365,7 +1385,7 @@ public abstract class ModelMesh {
                         // it; it's one pressed piece, so its facets are bare grain (no plate edges on every facet).
                         // A polished one (a stainless head) keeps its bright ramp instead, narrowing with the facet.
                         List<float[]> points = List.of(p0, p1, p2, p3);
-                        plateIn(plateFrame(points, new Plating(Steel.MACHINE, false, false, false)), points);
+                        plateIn(plateFrame(points, new Plating(side == Paint.ENAMEL ? Steel.ENAMEL : Steel.MACHINE, false, false, false)), points);
                     } else if (shellPlates != null) {
                         float s0 = (swapped ? f : sides - 1 - f) * fw;
                         plateStrip(p0, p1, p2, p3, s0, s0 + fw, height, shellPlates);
@@ -1475,6 +1495,28 @@ public abstract class ModelMesh {
                 out.add(x / PX, p[1] / PX, u / PX, uv[2 * i], uv[2 * i + 1], nx, ny, nu);
             }
         }
+    }
+
+    // The rotor's axis in the output's frame (blocks from the structure's minimum corner): a point on it, then the axis
+    // (world X or Z) signed so that turning by +angle about it is what startRotor(angle) builds. A rotor built once at
+    // angle 0 and turned as a whole about this is the rotor built at that angle: its ramps follow its facets, not the
+    // light, and the face shading follows its normals.
+    public float[] rotorAxis() {
+        float x = flip ? widthPx - pivotX : pivotX;
+        // Along Z, frame x is world X; along X it runs toward world -Z; flip mirrors x, which turns it the other way.
+        float sign = flip ? -1.0F : 1.0F;
+        return alongX ? new float[] { 0.0F, pivotY / PX, (widthPx - x) / PX, sign, 0.0F, 0.0F }
+                : new float[] { x / PX, pivotY / PX, 0.0F, 0.0F, 0.0F, sign };
+    }
+
+    // Any axis of the frame in the output's frame, as rotorAxis gives the rotor's: a point (px) on it and its direction.
+    // The frame is right-handed (x across, y up, u along) and the output keeps that (along X, or turned end for end,
+    // mirrors two axes at once), so a part built once at rest and turned by +angle about this is the part a mesh builds
+    // turned by a right-handed +angle about that axis of its frame.
+    public float[] axis(float x, float y, float u, float dx, float dy, float du) {
+        float px = flip ? widthPx - x : x, pu = flip ? lengthPx - u : u;
+        float ex = flip ? -dx : dx, eu = flip ? -du : du;
+        return alongX ? new float[] { pu / PX, y / PX, (widthPx - px) / PX, eu, dy, -ex } : new float[] { px / PX, y / PX, pu / PX, ex, dy, eu };
     }
 
     float[] turn(float[] p) {

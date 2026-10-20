@@ -12,7 +12,15 @@
     },
     {
       "type": "text",
-      "text": "# Burnup\nIn the core a rod uses up its U-235 and builds up fission products, which absorb neutrons, and some plutonium, which fissions too. At full power a rod lasts about sixteen hours. Spent rods come out intensely radioactive and hot: their decay heat burns bare hands until it fades. Keep them in a Lead Box.\n# Control Rod\nSilver between steel rods: a strong neutron absorber, for Control Rod Channels."
+      "text": "# Burnup\nIn the core a rod uses up its U-235 and builds up fission products, which absorb neutrons, and some plutonium, which fissions too. Spent rods come out intensely radioactive and hot: their decay heat burns bare hands until it fades. Keep them in a Lead Box.\n# Control Rod\nSilver between steel rods: a strong neutron absorber, for Control Rod Channels."
+    },
+    {
+      "type": "text",
+      "text": "# How long fuel lasts\nLike real reactor fuel, a rod stays in the core for years of game time. A 5% rod lasts about 120 real hours at full power: one Minecraft year, one refuelling cycle. A rod lasts in proportion to its enrichment: 9% fuel about 1.8 times as long, 3% about 0.6 times, natural uranium about a seventh. A rod only burns as fast as the core runs: at 30% power it lasts over three times as long. JEI shows each fuel's life."
+    },
+    {
+      "type": "text",
+      "text": "# Refuelling by thirds\nReal plants don't wait for the whole core to burn out: every 18 to 24 months they replace about a third of it, so each rod stays in for three cycles. To do the same:\n- Open the reactor's Fuel page: the core map shows each layer from above, every rod coloured by its burnup, and outlines the most-burned third.\n- Shut down, then Bring Out Third (or click single rods): they come out to the output slots.\n- Click any partly burned rods you want to move, so they come out too.\n- Load the partly burned rods first, most burned first, then the fresh rods. Rods fill the core from the middle out, so the partly burned ones go in the middle and the fresh ones round the edge, which evens out the power and keeps the edge from leaking neutrons."
     }
   ]
 }

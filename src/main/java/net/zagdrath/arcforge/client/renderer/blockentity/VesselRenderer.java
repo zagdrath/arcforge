@@ -18,6 +18,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -32,6 +33,8 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.blockentity.multiblock.VesselControllerBlockEntity;
 import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.LargeModels;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.multiblock.VesselStructure;
 import net.zagdrath.arcforge.steam.FissionReactorMesh;
@@ -39,10 +42,11 @@ import net.zagdrath.arcforge.steam.ModelMesh;
 
 // Draws a formed walled vessel (the Fission Reactor, the Steam Generator, the Heavy Water Tower) from its VesselMesh on
 // the refinery tower's sheet; its walls' blocks draw nothing but their port plates. The model is built once, and again
-// when its ports or what the subclass lays it out from change (checked every second). Its lists: solid, cutout, the
-// glow (full-bright, always), the running glow (full-bright, only while the controller is lit) and the tint (glass's
-// tint, translucent); and a vessel with windows onto its water (the Fission Reactor) adds that water, cut to the level
-// the controller reports whenever it changes.
+// when its ports or what the subclass lays it out from change (checked every second). Its lists: solid and cutout
+// (baked into the chunk mesh, see ChunkMeshes), the glow (full-bright, always), the running glow (full-bright, only
+// while the controller is lit) and the tint (glass's tint, translucent); and a vessel with windows onto its water (the
+// Fission Reactor) adds that water, cut to the level the controller reports whenever it changes. Those last are drawn
+// here, out to stillPartsOnlyFrom (see LargeModels).
 //
 // The see-through parts go in order: the glow, then the water over it, then the tint over both (glass, water, core seen
 // from outside). Render types in one order are drawn in no set order among themselves, so each goes in an order of its
@@ -71,12 +75,18 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         // The water cut to the last fill asked for.
         float waterFill = -1.0F;
         float[] waterQuads = EMPTY;
+        // The box round what this renderer draws (the glows, the tint and the water), or null when it draws nothing.
+        @Nullable AABB drawn;
         long scanned;
 
         void set(Model model) {
             parts = model.parts();
             water = model.water();
             waterFill = -1.0F;
+            FissionReactorMesh.Water w = water;
+            float[] full = w != null ? w.at(1.0F) : EMPTY;
+            float[] running = parts.length > 3 ? parts[3] : EMPTY, tint = parts.length > 4 ? parts[4] : EMPTY;
+            drawn = parts[2].length + running.length + tint.length + full.length == 0 ? null : MeshRendering.bounds(box.min(), parts[2], running, tint, full);
         }
 
         float[] water(float fill) {
@@ -102,7 +112,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
     public static class State extends BlockEntityRenderState {
         public boolean formed, running;
         public int offsetX, offsetY, offsetZ;
-        public float[] solid = EMPTY, glass = EMPTY, glow = EMPTY, runningGlow = EMPTY, tint = EMPTY, water = EMPTY;
+        public float[] glow = EMPTY, runningGlow = EMPTY, tint = EMPTY, water = EMPTY;
         public float glowLevel = 1.0F;
         // The camera in the model's frame (blocks from the box's minimum corner), to cull the water's back faces.
         public float cameraX, cameraY, cameraZ;
@@ -114,6 +124,16 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
     @Override
     public State createRenderState() {
         return new State();
+    }
+
+    @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(B vessel) {
+        return ChunkMeshes.isBaked(vessel, MeshRendering.SOLID, MeshRendering.GLASS);
     }
 
     // The model's frame: x across the front, u back from it, over the whole box.
@@ -153,6 +173,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         state.formed = box != null && level != null && vessel.isFormed();
         if (box == null || level == null || !state.formed) {
             built.remove(vessel);
+            ChunkMeshes.remove(vessel);
             return;
         }
         BlockPos min = box.min();
@@ -178,8 +199,19 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
             }
         }
         float[][] parts = model.parts;
-        state.solid = parts[0];
-        state.glass = parts[1];
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
+        // The light just above the box's top middle.
+        int light = LightCoordsUtil.getLightCoords(level, box.centre().atY(box.max().getY() + 1));
+        VesselStructure.Box builtBox = model.box;
+        java.util.function.BooleanSupplier stands = () -> vessel.isFormed() && builtBox.equals(vessel.getBox());
+        MeshRendering.bake(vessel, MeshRendering.SOLID, min, ChunkSectionLayer.SOLID, parts[0], sheet, light, stands);
+        MeshRendering.bake(vessel, MeshRendering.GLASS, min, ChunkSectionLayer.CUTOUT, parts[1], sheet, light, stands);
+        state.sheet = sheet;
+        state.light = light;
+        if (LargeModels.detail(getRenderBoundingBox(vessel), cameraPosition) == LargeModels.Detail.STILL) {
+            state.glow = state.runningGlow = state.tint = state.water = EMPTY;
+            return;
+        }
         state.glow = parts[2];
         state.running = vessel.isLit();
         state.runningGlow = state.running && parts.length > 3 ? parts[3] : EMPTY;
@@ -192,9 +224,6 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         state.cameraX = (float) (cameraPosition.x - min.getX());
         state.cameraY = (float) (cameraPosition.y - min.getY());
         state.cameraZ = (float) (cameraPosition.z - min.getZ());
-        state.sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
-        // The light just above the box's top middle.
-        state.light = LightCoordsUtil.getLightCoords(level, box.centre().atY(box.max().getY() + 1));
     }
 
     // The ports on the walls' outer faces, in the model's frame.
@@ -216,11 +245,9 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         }
         poseStack.pushPose();
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
-        float[] solid = state.solid, glass = state.glass, glow = state.glow, lit = state.runningGlow, tint = state.tint;
+        float[] glow = state.glow, lit = state.runningGlow, tint = state.tint;
         float glowLevel = state.glowLevel;
         int light = state.light;
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
         if (glow.length > 0 || lit.length > 0) {
             collector.submitCustomGeometry(poseStack, RenderTypes.eyes(sheet.atlasLocation()), (pose, buffer) -> {
                 emitLit(pose, buffer, glow, sheet, 1.0F);
@@ -292,8 +319,14 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         }
     }
 
+    // Only the glows, the tint and the water are drawn here; the rest is in the chunk mesh.
     @Override
     public AABB getRenderBoundingBox(B vessel) {
+        Built model = built.get(vessel);
+        if (model != null && model.box.equals(vessel.getBox())) {
+            AABB drawn = model.drawn;
+            return drawn != null ? drawn : new AABB(model.box.min()).deflate(0.5);
+        }
         return vessel.getRenderBox();
     }
 }

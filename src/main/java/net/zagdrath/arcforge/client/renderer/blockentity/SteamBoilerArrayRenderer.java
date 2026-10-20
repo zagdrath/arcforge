@@ -13,9 +13,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
@@ -46,8 +47,12 @@ import java.util.Set;
 // outside of the structure, so the inside of that skin is drawn here too, just inside it and cut away
 // behind the windows; see TiledBoxes.lining): an opaque dark drum just inside the walls, then water rising from the floor
 // (a full tank fills the lower 65%), and steam gathering under the roof and filling the space above the
-// water as it builds up, thicker the more there is. Levels ease toward the synced ones.
+// water as it builds up, thicker the more there is. Levels ease toward the synced ones. The drum and the lining are
+// still, so they're baked into the chunk mesh (ChunkMeshes) and baked again only when the shell or its windows change;
+// the water and steam are drawn here, out to stillPartsOnlyFrom (see LargeModels).
 public class SteamBoilerArrayRenderer implements ShellMultiblockRenderer<SteamBoilerArrayBlockEntity, SteamBoilerArrayRenderer.State> {
+    // What the drum and lining are built from, for telling when to bake them again.
+    private record Still(ShellStructure.Shell shell, Set<Long> windows, TextureAtlasSprite drum, TextureAtlasSprite liner, TextureAtlasSprite jamb) {}
     // Lining, then the water and steam, then the drum: each a little further in, so no two share a plane.
     static final float LINER_INSET = 1.0F / 16.0F;
     private static final float VOLUME_INSET = 1.5F / 16.0F, DRUM_INSET = 2.0F / 16.0F;
@@ -82,12 +87,23 @@ public class SteamBoilerArrayRenderer implements ShellMultiblockRenderer<SteamBo
     }
 
     @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(SteamBoilerArrayBlockEntity boiler) {
+        return ChunkMeshes.isBaked(boiler, MeshRendering.SOLID);
+    }
+
+    @Override
     public void extractRenderState(SteamBoilerArrayBlockEntity boiler, State state, float partialTicks, Vec3 cameraPosition,
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         ShellMultiblockRenderer.super.extractRenderState(boiler, state, partialTicks, cameraPosition, breakProgress);
         ShellStructure.Shell shell = boiler.getShell();
         state.formed = boiler.isMaster() && shell != null;
-        if (!state.formed) {
+        if (!state.formed || shell == null) {
+            ChunkMeshes.remove(boiler);
             return;
         }
         state.sizeX = shell.size(Direction.Axis.X);
@@ -117,6 +133,17 @@ public class SteamBoilerArrayRenderer implements ShellMultiblockRenderer<SteamBo
         state.light = boiler.getLevel() != null
                 ? LightCoordsUtil.getLightCoords(boiler.getLevel(), shell.centre())
                 : state.lightCoords;
+        // The drum and the lining into the chunk mesh, lit there as the entity shader lit them.
+        TextureAtlasSprite drum = state.drumSprite, liner = state.liner, jamb = state.jamb;
+        Set<Long> windows = state.windows;
+        int light = state.light;
+        float sx = state.sizeX, sy = state.sizeY, sz = state.sizeZ;
+        ChunkMeshes.bakeEntityLit(boiler, MeshRendering.SOLID, shell.min(), ChunkSectionLayer.SOLID, new Still(shell, windows, drum, liner, jamb), light,
+                () -> boiler.isMaster() && shell.equals(boiler.getShell()), (pose, buffer) -> {
+                    TiledBoxes.box(pose, buffer, drum, DRUM_COLOR, light, DRUM_INSET, DRUM_INSET, DRUM_INSET, sx - DRUM_INSET, sy - DRUM_INSET, sz - DRUM_INSET,
+                            false);
+                    TiledBoxes.lining(pose, buffer, liner, jamb, -1, light, LINER_INSET, sx, sy, sz, windows);
+                });
     }
 
     private static float fill(int amount, int capacity) {
@@ -202,12 +229,6 @@ public class SteamBoilerArrayRenderer implements ShellMultiblockRenderer<SteamBo
         float steamFloor = steamBottom;
         Direction steamSkip = touching ? Direction.DOWN : null;
 
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(drum.atlasLocation()),
-                (pose, buffer) -> {
-                    TiledBoxes.box(pose, buffer, drum, DRUM_COLOR, state.light,
-                            DRUM_INSET, DRUM_INSET, DRUM_INSET, state.sizeX - DRUM_INSET, state.sizeY - DRUM_INSET, state.sizeZ - DRUM_INSET, false);
-                    TiledBoxes.lining(pose, buffer, liner, jamb, -1, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows);
-                });
         collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(water.atlasLocation()), (pose, buffer) -> {
             TiledBoxes.box(pose, buffer, water, state.waterColor, state.light, x0, y0, z0, x1, waterTop, z1, false);
             TiledBoxes.box(pose, buffer, steam, state.steamColor, state.light, x0, steamFloor, z0, x1, y1, z1, false, steamSkip);

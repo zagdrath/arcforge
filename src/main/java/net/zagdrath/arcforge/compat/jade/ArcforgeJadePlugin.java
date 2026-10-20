@@ -88,6 +88,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, CondenserArrayBlockEntity.class);
         registration.registerBlockDataProvider(WaterIntakeProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SteamTurbineArrayBlockEntity.class);
+        registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity.class);
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, GasTurbineArrayBlockEntity.class);
         registration.registerBlockDataProvider(MeterProviders.Meter.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity.class);
@@ -237,6 +238,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, CondenserArrayCasingBlock.class);
         registration.registerBlockComponent(WaterIntakeProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SteamTurbineArrayCasingBlock.class);
+        registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.NuclearTurbineCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock.class);
         registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, GasTurbineArrayCasingBlock.class);
         registration.registerBlockComponent(MeterProviders.Meter.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.MeterBlock.class);

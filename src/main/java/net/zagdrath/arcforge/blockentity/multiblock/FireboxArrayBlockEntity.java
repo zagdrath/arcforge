@@ -65,6 +65,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModCapabilities;
 import net.zagdrath.arcforge.heat.FlueGas;
@@ -361,7 +362,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
     // --- Running ---
 
     public void serverTick(ServerLevel level) {
-        if (checkRequested || level.getGameTime() % STRUCTURE_CHECK_INTERVAL == 0) {
+        if (checkRequested || TickSpread.due(level, worldPosition, STRUCTURE_CHECK_INTERVAL)) {
             checkNow();
         }
         heatPerTick = 0;
@@ -375,7 +376,7 @@ public class FireboxArrayBlockEntity extends MachineBlockEntity implements Multi
             return;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level);
         }
         if (!controlState.isEnabled() || !redstoneMode.canRun(powered)) {

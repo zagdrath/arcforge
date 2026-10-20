@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -25,13 +26,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.Arcforge;
+import net.zagdrath.arcforge.block.machine.FlareStackBlock;
 import net.zagdrath.arcforge.blockentity.machine.FlareStackBlockEntity;
-import net.zagdrath.arcforge.client.renderer.StaticMeshes;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
 import net.zagdrath.arcforge.steam.FlareStackMesh;
 
-// Draws the Flare Stack's stack over its base block (FlareStackMesh, built once, on the refinery tower's sheet) and its
-// flame at the tip while it burns: two crossed sheets of the animated block/flare_stack/flame texture (16x32 frames on
-// a clear background), full-bright, from a block tall at the least burn to three and a half at full burn.
+// Draws the Flare Stack's stack over its base block (FlareStackMesh, built once, on the refinery tower's sheet; baked
+// into the chunk mesh, see ChunkMeshes) and its flame at the tip while it burns: two crossed sheets of the animated
+// block/flare_stack/flame texture (16x32 frames on a clear background), full-bright, from a block tall at the least burn
+// to three and a half at full burn.
 public class FlareStackRenderer implements BlockEntityRenderer<FlareStackBlockEntity, FlareStackRenderer.State> {
     public static final Identifier FLAME = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/flare_stack/flame");
     private static float @Nullable [] mesh;
@@ -67,6 +70,21 @@ public class FlareStackRenderer implements BlockEntityRenderer<FlareStackBlockEn
         state.flameSprite = SteamBoilerArrayRenderer.sprite(FLAME);
         Level level = flare.getLevel();
         state.light = level != null ? LightCoordsUtil.getLightCoords(level, flare.getBlockPos().above(4)) : LightCoordsUtil.FULL_BRIGHT;
+        // The stack into the chunk mesh, lit as the entity shader lit it (it used its real normals).
+        float[] stack = state.stack;
+        TextureAtlasSprite sheet = state.sheet;
+        int light = state.light;
+        ChunkMeshes.bakeEntityLit(flare, MeshRendering.SOLID, flare.getBlockPos(), ChunkSectionLayer.SOLID, new MeshRendering.Baked(stack, sheet), light,
+                () -> flare.getBlockState().getBlock() instanceof FlareStackBlock, (pose, buffer) -> {
+                    for (int i = 0; i + 7 < stack.length; i += 8) {
+                        buffer.addVertex(pose, stack[i], stack[i + 1], stack[i + 2])
+                                .setColor(-1)
+                                .setUv(sheet.getU(stack[i + 3]), sheet.getV(stack[i + 4]))
+                                .setOverlay(OverlayTexture.NO_OVERLAY)
+                                .setLight(light)
+                                .setNormal(pose, stack[i + 5], stack[i + 6], stack[i + 7]);
+                    }
+                });
     }
 
     @Override
@@ -75,20 +93,7 @@ public class FlareStackRenderer implements BlockEntityRenderer<FlareStackBlockEn
         if (sheet == null || flame == null) {
             return;
         }
-        float[] stack = state.stack;
-        int light = state.light;
-        // The stack is the same for every Flare Stack: those at the same light share one copy on the GPU.
-        StaticMeshes.submit(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), stack, sheet, light, (pose, buffer) -> {
-            for (int i = 0; i + 7 < stack.length; i += 8) {
-                buffer.addVertex(pose, stack[i], stack[i + 1], stack[i + 2])
-                        .setColor(-1)
-                        .setUv(sheet.getU(stack[i + 3]), sheet.getV(stack[i + 4]))
-                        .setOverlay(OverlayTexture.NO_OVERLAY)
-                        .setLight(light)
-                        .setNormal(pose, stack[i + 5], stack[i + 6], stack[i + 7]);
-            }
-        });
-        // The flame, only while it burns: 16 px tall at the least, up to 56 px at full burn, a quarter as wide each side
+        // The stack is in the chunk mesh. The flame, only while it burns: 16 px tall at the least, up to 56 px at full burn, a quarter as wide each side
         // (the texture's 1:2).
         float size = state.flame;
         if (size <= 0.0F) {

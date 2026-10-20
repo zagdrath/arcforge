@@ -77,6 +77,7 @@ public final class MultiblockBlueprints {
                 arcforgeFurnace(),
                 steamBoilerArray(),
                 steamTurbineArray(),
+                nuclearSteamTurbine(),
                 gasTurbineArray(),
                 distillationArray(),
                 refinery(),
@@ -472,6 +473,22 @@ public final class MultiblockBlueprints {
         BlockPos size = new BlockPos(5, 3, 3);
         List<BlockPos> glass = List.of(new BlockPos(1, 1, 2), new BlockPos(2, 1, 2), new BlockPos(3, 1, 2));
         return new Blueprint("steam_turbine_array", shell(size, Direction.Axis.X, ModBlocks.STEAM_TURBINE_ARRAY_CASING.get(), glass), size);
+    }
+
+    // The shortest Nuclear Steam Turbine: 7x7, 21 long along X (up to 45 works), every block of its outside a casing.
+    private static Blueprint nuclearSteamTurbine() {
+        BlockPos size = new BlockPos(net.zagdrath.arcforge.steam.NuclearTurbineLayout.MIN_LENGTH, 7, 7);
+        List<Placement> placements = new ArrayList<>();
+        for (int y = 0; y < size.getY(); y++) {
+            for (int z = 0; z < size.getZ(); z++) {
+                for (int x = 0; x < size.getX(); x++) {
+                    if (x == 0 || x == size.getX() - 1 || y == 0 || y == size.getY() - 1 || z == 0 || z == size.getZ() - 1) {
+                        placements.add(new Placement(new BlockPos(x, y, z), ModBlocks.NUCLEAR_TURBINE_CASING.get().defaultBlockState()));
+                    }
+                }
+            }
+        }
+        return new Blueprint("nuclear_steam_turbine", placements, size);
     }
 
     // 3x3, 5 long along X (5 to 9 work), with windows along the front and top, the intake at the west end and

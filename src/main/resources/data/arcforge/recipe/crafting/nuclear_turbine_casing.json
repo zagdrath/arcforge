@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "HPH",
+    "BGB",
+    "HPH"
+  ],
+  "key": {
+    "H": "arcforge:hardened_alloy",
+    "P": "#c:plates/steel",
+    "B": "arcforge:turbine_blade_set",
+    "G": "#c:gears/steel"
+  },
+  "result": {
+    "id": "arcforge:nuclear_turbine_casing",
+    "count": 8
+  }
+}

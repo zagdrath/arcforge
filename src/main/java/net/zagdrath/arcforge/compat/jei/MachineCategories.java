@@ -998,8 +998,8 @@ final class MachineCategories {
         public void draw(FissionRecipe recipe, IRecipeSlotsView slots, GuiGraphicsExtractor graphics, double mouseX, double mouseY) {
             text(graphics, Component.translatable("jei.arcforge.fission.heat", String.format(Locale.ROOT, "%,.0f",
                     net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_CHANNEL_HEAT.getAsDouble())), 0, 28);
-            text(graphics, Component.translatable("jei.arcforge.fission.life", String.format(Locale.ROOT, "%.0f",
-                    net.zagdrath.arcforge.config.ArcforgeConfig.REACTOR_ROD_LIFE.getAsDouble() / 1_200.0)), 0, 38);
+            text(graphics, Component.translatable("jei.arcforge.fission.life", String.format(Locale.ROOT, "%,.0f",
+                    recipe.fresh().lifeTicks() / 72_000.0)), 0, 38);
         }
     }
 

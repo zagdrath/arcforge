@@ -17,15 +17,16 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.data.AtlasIds;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
@@ -36,6 +37,8 @@ import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.SolarThermalArrayControllerBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.SolarThermalArrayBlockEntity;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.StaticMeshes;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.SolarModel;
 import net.zagdrath.arcforge.multiblock.SolarThermalStructure;
@@ -45,8 +48,12 @@ import net.zagdrath.arcforge.multiblock.SolarThermalStructure;
 // north-south axis; straight up by day on the east-west one) and stowed face down at night and in
 // thunderstorms, easing there at a few degrees a tick; the receiver glowing from cold steel through dull
 // red to bright orange with its temperature (full-bright once hot); and the control panel in the base's lower
-// bay on the controller's side. The tower's base and mast are baked block models.
+// bay on the controller's side. The tower's base and mast are baked block models, and the panel is baked into the chunk
+// mesh too (ChunkMeshes); the mirror and receiver are each one vertex buffer on the GPU, drawn turned (the receiver
+// tinted by its heat).
 public class SolarThermalArrayRenderer implements BlockEntityRenderer<SolarThermalArrayBlockEntity, SolarThermalArrayRenderer.State> {
+    // What the panel is built from, for telling when to bake it again.
+    private record Panel(SolarThermalStructure.Tower tower, Direction facing, boolean lit, QuadCollection model, int light) {}
     public static final StandaloneModelKey<QuadCollection> MIRROR = new StandaloneModelKey<>(() -> Arcforge.MODID + ":solar_mirror");
     public static final StandaloneModelKey<QuadCollection> RECEIVER = new StandaloneModelKey<>(() -> Arcforge.MODID + ":solar_receiver");
     public static final StandaloneModelKey<QuadCollection> PANEL = new StandaloneModelKey<>(() -> Arcforge.MODID + ":solar_control_panel");
@@ -99,7 +106,8 @@ public class SolarThermalArrayRenderer implements BlockEntityRenderer<SolarTherm
         SolarThermalStructure.Tower tower = array.getTower();
         Level level = array.getLevel();
         state.formed = tower != null && level != null;
-        if (!state.formed) {
+        if (!state.formed || tower == null) {
+            ChunkMeshes.remove(array);
             return;
         }
         BlockPos pos = array.getBlockPos();
@@ -129,6 +137,28 @@ public class SolarThermalArrayRenderer implements BlockEntityRenderer<SolarTherm
         float across = cell == 0 ? HALF_NEAR : HALF_FAR;
         state.panelX = state.facing.getAxis() == Direction.Axis.Z ? across : along;
         state.panelZ = state.facing.getAxis() == Direction.Axis.Z ? along : across;
+        // The panel into the chunk mesh, lit there as the entity shader lit it.
+        QuadCollection panel = Minecraft.getInstance().getModelManager().getStandaloneModel(state.lit ? PANEL_ON : PANEL);
+        if (panel != null) {
+            Direction facing = state.facing;
+            float panelX = state.panelX, panelZ = state.panelZ;
+            int light = state.lightCoords;
+            List<BakedQuad> panelQuads = panel.getAll();
+            ChunkMeshes.bakeEntityLit(array, 0, tower.min(), ChunkSectionLayer.CUTOUT, new Panel(tower, facing, state.lit, panel, light), light,
+                    () -> tower.equals(array.getTower()), (pose, buffer) -> {
+                        PoseStack local = new PoseStack();
+                        local.translate(panelX / 16.0F, PANEL_Y / 16.0F, panelZ / 16.0F);
+                        // The screen faces +Z in the model: turn it to face the controller's way.
+                        local.rotate(Axis.YP.rotationDegrees(switch (facing) {
+                            case EAST -> 90.0F;
+                            case NORTH -> 180.0F;
+                            case WEST -> -90.0F;
+                            default -> 0.0F;
+                        }));
+                        local.translate(-PANEL_CENTRE_X / 16.0F, -PANEL_CENTRE_Y / 16.0F, -PANEL_CENTRE_Z / 16.0F);
+                        TiledBoxes.quads(local.last(), buffer, panelQuads, -1, light);
+                    });
+        }
     }
 
     // The receiver's colour at this temperature.
@@ -160,39 +190,26 @@ public class SolarThermalArrayRenderer implements BlockEntityRenderer<SolarTherm
         var models = Minecraft.getInstance().getModelManager();
         QuadCollection mirror = models.getStandaloneModel(MIRROR);
         QuadCollection receiver = models.getStandaloneModel(RECEIVER);
-        QuadCollection panel = models.getStandaloneModel(state.lit ? PANEL_ON : PANEL);
-        RenderType cutout = RenderTypes.entityCutout(Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS).location());
-
-        if (mirror != null && receiver != null) {
-            List<BakedQuad> mirrorQuads = mirror.getAll();
-            List<BakedQuad> receiverQuads = receiver.getAll();
-            poseStack.pushPose();
-            poseStack.translate(state.minX + PIVOT_X / 16.0F, state.minY + PIVOT_Y / 16.0F, state.minZ + PIVOT_Z / 16.0F);
-            if (!state.northSouth) {
-                poseStack.rotate(Axis.YP.rotationDegrees(90.0F));
-            }
-            poseStack.rotate(Axis.ZP.rotationDegrees(state.angle));
-            poseStack.translate(-0.5F, -0.5F, -0.5F);
-            collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, mirrorQuads, -1, state.troughLight));
-            collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, receiverQuads, state.receiverColor, state.receiverLight));
-            poseStack.popPose();
+        // Any sprite of the block atlas: the meshes are told apart by their data.
+        TextureAtlasSprite atlas = SteamBoilerArrayRenderer.sprite(SteamBoilerArrayRenderer.LINER);
+        RenderType cutout = RenderTypes.entityCutout(atlas.atlasLocation());
+        if (mirror == null || receiver == null) {
+            return;
         }
-
-        if (panel != null) {
-            List<BakedQuad> panelQuads = panel.getAll();
-            poseStack.pushPose();
-            poseStack.translate(state.minX + state.panelX / 16.0F, state.minY + PANEL_Y / 16.0F, state.minZ + state.panelZ / 16.0F);
-            // The screen faces +Z in the model: turn it to face the controller's way.
-            poseStack.rotate(Axis.YP.rotationDegrees(switch (state.facing) {
-                case EAST -> 90.0F;
-                case NORTH -> 180.0F;
-                case WEST -> -90.0F;
-                default -> 0.0F;
-            }));
-            poseStack.translate(-PANEL_CENTRE_X / 16.0F, -PANEL_CENTRE_Y / 16.0F, -PANEL_CENTRE_Z / 16.0F);
-            collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, panelQuads, -1, state.lightCoords));
-            poseStack.popPose();
+        // The trough turned about its pivot: from the controller's block, as the pose stands.
+        PoseStack trough = new PoseStack();
+        trough.translate(state.minX + PIVOT_X / 16.0F, state.minY + PIVOT_Y / 16.0F, state.minZ + PIVOT_Z / 16.0F);
+        if (!state.northSouth) {
+            trough.rotate(Axis.YP.rotationDegrees(90.0F));
         }
+        trough.rotate(Axis.ZP.rotationDegrees(state.angle));
+        trough.translate(-0.5F, -0.5F, -0.5F);
+        float[] mirrorData = TiledBoxes.vertices(mirror), receiverData = TiledBoxes.vertices(receiver);
+        int troughLight = state.troughLight, receiverLight = state.receiverLight;
+        StaticMeshes.submitMovingLit(collector, poseStack, cutout, mirrorData, atlas, troughLight, trough.last().pose(),
+                (pose, buffer) -> TiledBoxes.vertices(pose, buffer, mirrorData, -1, troughLight));
+        StaticMeshes.submitMovingLit(collector, poseStack, cutout, receiverData, atlas, receiverLight, trough.last().pose(), state.receiverColor,
+                (pose, buffer) -> TiledBoxes.vertices(pose, buffer, receiverData, -1, receiverLight));
     }
 
     // The tower and a block round it, which the trough swings through.

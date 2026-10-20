@@ -8,7 +8,7 @@ package net.zagdrath.arcforge.client.renderer.blockentity;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.joml.Quaternionf;
+import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -34,14 +35,15 @@ import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.steam.EquipmentHatchMesh;
 
 // Draws an Equipment Hatch from its middle block (EquipmentHatchMesh, on the refinery tower's sheet; built once for each
-// way it can face): its frame, and its door swung about the hinge, opening outward through 100° over SWING_TICKS as the
-// hatch opens (and back as it shuts), in the light just outside it.
+// way it can face): its frame, baked into the chunk mesh (ChunkMeshes), and its door, kept on the GPU and swung about
+// the hinge, opening outward through 100° over SWING_TICKS as the hatch opens (and back as it shuts), in the light just
+// outside it.
 public class EquipmentHatchRenderer implements BlockEntityRenderer<EquipmentHatchBlockEntity, EquipmentHatchRenderer.State> {
     private static final float OPEN_DEGREES = 100.0F;
     private static final Map<Direction, float[][]> MESHES = new HashMap<>();
 
     public static class State extends BlockEntityRenderState {
-        public float[] frame = new float[0], door = new float[0];
+        public float[] door = new float[0];
         public float offsetX, offsetY, offsetZ;
         public float hingeX, hingeZ;
         public float angle;
@@ -92,7 +94,6 @@ public class EquipmentHatchRenderer implements BlockEntityRenderer<EquipmentHatc
         Direction facing = block.getValue(EquipmentHatchBlock.FACING);
         ModelFrame frame = frame(facing);
         float[][] mesh = mesh(facing);
-        state.frame = mesh[0];
         state.door = mesh[1];
         // The model's corner: the lowest of the hatch's nine blocks.
         BlockPos middle = hatch.getBlockPos();
@@ -100,6 +101,11 @@ public class EquipmentHatchRenderer implements BlockEntityRenderer<EquipmentHatc
         state.offsetX = Math.min(a.getX(), b.getX()) - middle.getX();
         state.offsetY = Math.min(a.getY(), b.getY()) - middle.getY();
         state.offsetZ = Math.min(a.getZ(), b.getZ()) - middle.getZ();
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
+        int light = LightCoordsUtil.getLightCoords(level, middle.relative(facing));
+        BlockPos corner = middle.offset((int) state.offsetX, (int) state.offsetY, (int) state.offsetZ);
+        MeshRendering.bake(hatch, MeshRendering.SOLID, corner, ChunkSectionLayer.SOLID, mesh[0], sheet, light,
+                () -> hatch.getBlockState().getBlock() instanceof EquipmentHatchBlock && hatch.getBlockState().getValue(EquipmentHatchBlock.FACING) == facing);
         float[] hinge = frame.worldPoint(EquipmentHatchMesh.HINGE_X, 0.0F, EquipmentHatchMesh.HINGE_U);
         state.hingeX = hinge[0] / 16.0F;
         state.hingeZ = hinge[2] / 16.0F;
@@ -115,8 +121,8 @@ public class EquipmentHatchRenderer implements BlockEntityRenderer<EquipmentHatc
         hatch.swungAt = now;
         float eased = hatch.swing * hatch.swing * (3.0F - 2.0F * hatch.swing);
         state.angle = openAngle(frame) * eased;
-        state.sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
-        state.light = LightCoordsUtil.getLightCoords(level, middle.relative(facing));
+        state.sheet = sheet;
+        state.light = light;
     }
 
     @Override
@@ -125,16 +131,11 @@ public class EquipmentHatchRenderer implements BlockEntityRenderer<EquipmentHatc
         if (sheet == null) {
             return;
         }
-        int light = state.light;
-        float[] frame = state.frame, door = state.door;
         poseStack.pushPose();
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
-        // The frame is still (kept on the GPU, MeshRendering.submitStill); the door turns, so it's emitted each frame.
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), frame, sheet, light);
-        poseStack.translate(state.hingeX, 0.0F, state.hingeZ);
-        poseStack.rotate(new Quaternionf().rotateY(state.angle));
-        poseStack.translate(-state.hingeX, 0.0F, -state.hingeZ);
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> MeshRendering.emit(pose, buffer, door, sheet, light));
+        // The frame is in the chunk mesh; the door, kept on the GPU, swings about the hinge.
+        Matrix4f swing = new Matrix4f().translate(state.hingeX, 0.0F, state.hingeZ).rotateY(state.angle).translate(-state.hingeX, 0.0F, -state.hingeZ);
+        MeshRendering.submitTurnedAboutY(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), state.door, sheet, state.light, swing);
         poseStack.popPose();
     }
 

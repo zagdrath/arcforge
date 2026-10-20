@@ -65,6 +65,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.recipe.DistillingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -418,7 +419,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
             return;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level);
         }
         heatPerTick = 0;

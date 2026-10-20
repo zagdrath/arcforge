@@ -63,6 +63,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.recipe.EvaporatingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -313,7 +314,7 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
             return;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level);
         }
         status = controlState.isEnabled() && redstoneMode.canRun(powered) ? evaporate(level) : stoppedStatus();

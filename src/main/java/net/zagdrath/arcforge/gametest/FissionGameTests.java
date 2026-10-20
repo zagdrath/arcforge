@@ -25,6 +25,7 @@ import net.zagdrath.arcforge.block.multiblock.VesselPart;
 import net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.menu.multiblock.FissionReactorMenu;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.nuclear.Enrichment;
@@ -171,6 +172,64 @@ public final class FissionGameTests {
         helper.assertTrue(hot.decayPower < decay && hot.decayPower > 0.0, "Decay heat didn't fade: " + decay + " then " + hot.decayPower);
         helper.assertTrue(hot.isShutDown(), "Not shut down after the SCRAM");
         helper.succeed();
+    }
+
+    // A core through a fuel cycle (rods lasting 10,000 full-power ticks at 5% here, so it runs in a moment): a rod lasts
+    // in proportion to its enrichment, burns in proportion to the power it gives (a core at a quarter power reaches the
+    // same burnup after the same energy, taking far longer), what builds up in it follows its burnup, and the banks have
+    // to come out over the cycle as the fuel's reactivity goes.
+    static void fuelCycle(GameTestHelper helper) {
+        ReactorParams p = ReactorParams.defaults();
+        helper.assertTrue(Math.abs(new ReactorSim.Rod(0.05).life(p) - p.rodLifeTicks) < 1.0, "A 5% rod doesn't last rodLifeTicks");
+        helper.assertTrue(Math.abs(new ReactorSim.Rod(0.09).life(p) / p.rodLifeTicks - 1.8) < 1.0E-9, "9% fuel doesn't last 1.8 times as long");
+        helper.assertTrue(Math.abs(new ReactorSim.Rod(0.03).life(p) / p.rodLifeTicks - 0.6) < 1.0E-9, "3% fuel doesn't last 0.6 times as long");
+        helper.assertTrue(Math.abs(FuelRod.fresh(9_000).lifeTicks() / FuelRod.fresh(5_000).lifeTicks() - 1.8) < 1.0E-6, "The item's life doesn't scale");
+        helper.assertTrue(Math.abs(ArcforgeConfig.REACTOR_ROD_LIFE.getDefault() - p.rodLifeTicks) < 1.0, "The config's default rod life and the physics' disagree");
+        // 3% rods (the test lattice's banks can only hold that much), lasting 6,000 full-power ticks; both runs give
+        // 2,400 full-power ticks of energy, a mean burnup of 0.4.
+        double life = 10_000.0, rodLife = life * 0.6;
+        double[] half = cycle(life, 0.5, 2_400.0), quarter = cycle(life, 0.25, 2_400.0);
+        // { mean burnup, energy (full-power ticks), worst gap to the burnup formulas, starting insertion, ending insertion, ticks }
+        for (double[] run : new double[][] { half, quarter }) {
+            helper.assertTrue(Math.abs(run[0] - run[1] / rodLife) < 0.01 * run[0], "Burnup " + run[0] + " isn't the energy given (" + run[1] / rodLife + ")");
+            helper.assertTrue(run[2] < 1.0E-9, "What built up in a rod doesn't follow its burnup: off by " + run[2]);
+            helper.assertTrue(run[4] < run[3] - 0.02, "The banks didn't come out over the cycle: " + run[3] + " to " + run[4]);
+        }
+        helper.assertTrue(half[0] > 0.35, "The cycle didn't burn the fuel: mean burnup " + half[0]);
+        helper.assertTrue(Math.abs(quarter[0] - half[0]) < 0.02 * half[0], "The same energy at a quarter power burned " + quarter[0] + ", not " + half[0]);
+        helper.assertTrue(quarter[5] > 1.5 * half[5], "A quarter power didn't burn the fuel slower: " + quarter[5] + " ticks against " + half[5]);
+        helper.succeed();
+    }
+
+    // A 3% light-water core held near power until it has given so much energy (full-power ticks), its 5% rods lasting
+    // life full-power ticks.
+    private static double[] cycle(double life, double power, double energyGoal) {
+        ReactorSim sim = core(PWR, 0.03, ReactorSim.Mode.PRESSURIZED);
+        sim.p.rodLifeTicks = life;
+        sim.trips.shortPeriod = false;
+        sim.trips.highPower = false;
+        sim.power = power;
+        sim.settlePrecursors();
+        banks(sim, critical(PWR, 0.03));
+        double energy = 0.0, start = Double.NaN;
+        int ticks = 0;
+        while (energy < energyGoal && ticks < 200_000) {
+            run(sim, 1);
+            hold(sim, power);
+            energy += sim.power;
+            if (++ticks == 1_200) {
+                start = sim.insertion[0];
+            }
+        }
+        double burnup = 0.0, gap = 0.0;
+        int[] cells = sim.fuelCells();
+        for (int cell : cells) {
+            ReactorSim.Rod rod = sim.rod(cell);
+            burnup += rod.burnup;
+            double pu = sim.p.plutoniumMade * Math.max(rod.enrichment, 0.0025) * rod.burnup * (1.0 - 0.4 * rod.burnup);
+            gap = Math.max(gap, Math.max(Math.abs(rod.fissionProducts - rod.burnup), Math.abs(rod.plutonium - pu)));
+        }
+        return new double[] { burnup / cells.length, energy, gap, start, sim.insertion[0], ticks };
     }
 
     // The 20% cap holds for fuel too, and a fresh rod is far less radioactive than a spent one.
@@ -371,6 +430,16 @@ public final class FissionGameTests {
                     helper.assertTrue(generator.getSteam().getResource(0).is(ModFluids.HIGH_PRESSURE_STEAM.get()), "It made the wrong steam");
                     helper.assertTrue(generator.getCooled().getAmount() > 0 && generator.getCooled().getResource(0).is(net.minecraft.world.level.material.Fluids.WATER),
                             "The coolant didn't come back cooled");
+                    // Every mB of Hot Coolant boils hotCoolantHeat / steamHeat mB of steam (60 / 6 = 10 at the defaults).
+                    double perHot = ArcforgeConfig.REACTOR_HOT_COOLANT_HEAT.getAsDouble() / ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble();
+                    int cooled = generator.getCooled().getAmount(), steam = generator.getSteam().getAmount();
+                    helper.assertTrue(Math.abs(steam - cooled * perHot) <= perHot, "Cooling " + cooled + " mB made " + steam + " mB of steam, not "
+                            + cooled * perHot);
+                    // Its steam is the boilers' High-Pressure grade, which a Superheater Array at 900 °C takes on to Superheated.
+                    SteamGrade grade = SteamGrade.of(generator.getSteam().getResource(0));
+                    helper.assertTrue(grade == SteamGrade.HIGH_PRESSURE && net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity.target(grade,
+                            net.zagdrath.arcforge.steam.BoilerPressure.SUPERHEATED, SteamGrade.SUPERHEATED.minCelsius()) == SteamGrade.SUPERHEATED,
+                            "A Superheater Array won't take the Steam Generator's steam on to Superheated");
                 })
                 .thenSucceed();
     }

@@ -25,5 +25,23 @@ public final class ArcforgeClientConfig {
         BUILDER.pop();
     }
 
+    static {
+        BUILDER.comment("How the large multiblock models are drawn. Their still parts (casings, decks, pipes, frames) are in the world's",
+                "own mesh at any distance; these set when their moving parts (rotors, fans, beams, drill strings, cranks) are simplified.")
+                .push("largeModels");
+    }
+
+    public static final ModConfigSpec.IntValue LOD_DISTANCE = BUILDER
+            .comment("Blocks away past which moving parts are drawn as plain solid shapes and stop turning.")
+            .defineInRange("simpleMovingPartsFrom", 48, 8, 1_024);
+
+    public static final ModConfigSpec.IntValue STATIC_ONLY_DISTANCE = BUILDER
+            .comment("Blocks away past which only the still parts are drawn (no moving parts at all). At least simpleMovingPartsFrom.")
+            .defineInRange("stillPartsOnlyFrom", 96, 8, 1_024);
+
+    static {
+        BUILDER.pop();
+    }
+
     public static final ModConfigSpec SPEC = BUILDER.build();
 }

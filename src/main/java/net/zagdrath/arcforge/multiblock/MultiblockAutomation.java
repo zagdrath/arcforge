@@ -5,6 +5,11 @@
 
 package net.zagdrath.arcforge.multiblock;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.WeakHashMap;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -46,7 +51,7 @@ public final class MultiblockAutomation {
         if (!force && !controller.isAutoEject()) {
             return;
         }
-        for (BlockPos pos : BlockPos.betweenClosed(controller.getMinCorner(), controller.getMaxCorner())) {
+        for (BlockPos pos : portBlocks(level, controller)) {
             if (!controller.isPart(pos)) {
                 continue;
             }
@@ -80,7 +85,7 @@ public final class MultiblockAutomation {
     // Pushes fluid out of every port in one of these modes (ones that aren't outputs for every machine, such as Gas
     // Output and Hydrogen), up to fluidPerFace mB a face.
     public static void pushFluids(ServerLevel level, MultiblockController controller, java.util.Set<SideMode> modes, int fluidPerFace) {
-        for (BlockPos pos : BlockPos.betweenClosed(controller.getMinCorner(), controller.getMaxCorner())) {
+        for (BlockPos pos : portBlocks(level, controller)) {
             if (!controller.isPart(pos)) {
                 continue;
             }
@@ -97,6 +102,36 @@ public final class MultiblockAutomation {
                 }
             }
         }
+    }
+
+    // The blocks of each structure that have ports, found again every PORT_BLOCKS_TICKS (or when its box moves) and as
+    // soon as its ports change (see forget), so the pushes each tick look at those few blocks rather than every block
+    // and face of the box (a 7x9x7 vessel's 2,646 faces), and make no garbage doing it.
+    private static final Map<MultiblockController, PortBlocks> PORT_BLOCKS = new WeakHashMap<>();
+    private static final int PORT_BLOCKS_TICKS = 20;
+
+    private record PortBlocks(BlockPos min, BlockPos max, List<BlockPos> positions, long found) {}
+
+    private static List<BlockPos> portBlocks(ServerLevel level, MultiblockController controller) {
+        BlockPos min = controller.getMinCorner(), max = controller.getMaxCorner();
+        long now = level.getGameTime();
+        PortBlocks known = PORT_BLOCKS.get(controller);
+        if (known != null && known.min().equals(min) && known.max().equals(max) && now - known.found() < PORT_BLOCKS_TICKS && now >= known.found()) {
+            return known.positions();
+        }
+        List<BlockPos> positions = new ArrayList<>();
+        for (BlockPos pos : BlockPos.betweenClosed(min, max)) {
+            if (!MultiblockPorts.faces(level, pos).isEmpty() && controller.isPart(pos)) {
+                positions.add(pos.immutable());
+            }
+        }
+        PORT_BLOCKS.put(controller, new PortBlocks(min.immutable(), max.immutable(), positions, now));
+        return positions;
+    }
+
+    // Its ports (or its shape) changed: look again on its next push.
+    public static void forget(MultiblockController controller) {
+        PORT_BLOCKS.remove(controller);
     }
 
     // Capabilities and conduit connections of every block in the box may have changed.

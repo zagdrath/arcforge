@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -19,9 +20,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.LargeModels;
 import net.zagdrath.arcforge.client.renderer.StaticMeshes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -55,10 +59,12 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 // Draws a formed Distillation Array as a refinery tower (its blocks draw nothing but their port plates): the reboiler,
 // shell, sight glasses, manways, platforms, ladder, draw-offs and condenser bank from its RefineryLayout, built by
 // RefineryMesh on the model sheet block/distillation_array/refinery, with a nozzle from the tower out to each port. The
-// still parts are built once and again when the ports (checked every second) or the products it draws off change. Each
-// frame: the condenser fans (turning while it runs), each sight glass's pool (the product its tray collects, as full as
-// that product's tank, easing toward it) and vapour rising above it while it runs (tinted by the steam when the batch
-// is stripped), and the reboiler's burner windows glowing as brightly as the column is hot (full-bright).
+// still parts are built once and again when the ports (checked every second) or the products it draws off change, and
+// baked into the chunk mesh (ChunkMeshes). Each frame, out to stillPartsOnlyFrom (see LargeModels): the condenser fans
+// (each built once and drawn turned while it runs; standing still past simpleMovingPartsFrom), each sight glass's pool
+// (the product its tray collects, as full as that product's tank, easing toward it) and vapour rising above it while it
+// runs (tinted by the steam when the batch is stripped), and the reboiler's burner windows glowing as brightly as the
+// column is hot (full-bright).
 public class DistillationArrayRenderer implements StructureRenderer<DistillationArrayBlockEntity, DistillationArrayRenderer.State> {
     public static final Identifier SHEET = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/distillation_array/refinery");
     private static final Identifier VAPOUR = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/distillation_array/vapour");
@@ -81,6 +87,10 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
         final List<Product> liquids;
         List<ModelMesh.Port> ports;
         float[] solid = EMPTY, glass = EMPTY, glow = EMPTY;
+        final float[][] fans, fanAxes;
+        final float[] fansAtRest;
+        // The box round what this renderer draws: the fans, the pools and vapour, the glow.
+        AABB drawn;
         long scanned;
         float fanAngle;
         float lastFrame = -1.0F;
@@ -94,6 +104,15 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
             this.mesh = new RefineryMesh(new RefineryLayout(column.width(), column.height()), frame, liquids.size());
             this.ports = ports;
             rebuild();
+            this.fans = mesh.buildFanParts();
+            this.fanAxes = mesh.fanAxes();
+            this.fansAtRest = mesh.buildFans(0.0F);
+            List<float[]> drawnLists = new ArrayList<>(List.of(fansAtRest, glow));
+            for (float[] window : mesh.windows) {
+                drawnLists.add(mesh.buildPool(window, 1.0F));
+                drawnLists.add(mesh.buildVapour(window, 1.0F));
+            }
+            this.drawn = MeshRendering.bounds(column.min(), drawnLists.toArray(new float[0][])).inflate(0.5);
         }
 
         void rebuild() {
@@ -111,7 +130,9 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
         public boolean formed;
         // From the controller to the column's minimum corner.
         public int offsetX, offsetY, offsetZ;
-        public float[] solid = EMPTY, glass = EMPTY, glow = EMPTY, fans = EMPTY;
+        public float[] glow = EMPTY, fansAtRest = EMPTY;
+        public float[][] fans = {};
+        public Matrix4f[] fanTurns = {};
         public final List<Tray> trays = new ArrayList<>();
         public @Nullable TextureAtlasSprite sheet, vapour;
         public int light, vapourColor;
@@ -123,6 +144,16 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
     @Override
     public State createRenderState() {
         return new State();
+    }
+
+    @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(DistillationArrayBlockEntity column) {
+        return ChunkMeshes.isBaked(column, MeshRendering.SOLID, MeshRendering.GLASS);
     }
 
     private static ModelFrame frameOf(DistillationStructure.Column column, Direction front) {
@@ -150,6 +181,7 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
         state.formed = shape != null && level != null;
         if (shape == null || level == null) {
             built.remove(column);
+            ChunkMeshes.remove(column);
             return;
         }
         BlockPos min = shape.min();
@@ -179,13 +211,25 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
             model.fanAngle = (model.fanAngle + Math.max(0.0F, Math.min(20.0F, now - model.lastFrame)) * FAN_SPEED) % 360.0F;
         }
         model.lastFrame = now;
-        state.solid = model.solid;
-        state.glass = model.glass;
-        state.glow = model.glow;
-        state.fans = model.mesh.buildFans(model.fanAngle);
-        state.sheet = SteamBoilerArrayRenderer.sprite(SHEET);
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(SHEET);
+        int light = LightCoordsUtil.getLightCoords(level, column.getBlockPos().relative(front));
+        bake(column, MeshRendering.SOLID, model, ChunkSectionLayer.SOLID, model.solid, sheet, light);
+        bake(column, MeshRendering.GLASS, model, ChunkSectionLayer.CUTOUT, model.glass, sheet, light);
+        state.sheet = sheet;
+        state.light = light;
+        LargeModels.Detail detail = LargeModels.detail(model.drawn, cameraPosition);
+        state.fans = detail == LargeModels.Detail.FULL ? model.fans : new float[0][];
+        state.fanTurns = new Matrix4f[state.fans.length];
+        for (int i = 0; i < state.fans.length; i++) {
+            state.fanTurns[i] = MeshRendering.turn(model.fanAxes[i], model.fanAngle);
+        }
+        state.fansAtRest = detail == LargeModels.Detail.SIMPLE ? model.fansAtRest : EMPTY;
+        state.glow = detail != LargeModels.Detail.STILL ? model.glow : EMPTY;
+        if (detail == LargeModels.Detail.STILL) {
+            state.vapour = null;
+            return;
+        }
         state.vapour = SteamBoilerArrayRenderer.sprite(VAPOUR);
-        state.light = LightCoordsUtil.getLightCoords(level, column.getBlockPos().relative(front));
         state.brightness = Math.max(0.0F, Math.min(1.0F, (column.temperature() - GLOW_FROM) / (float) GLOW_RANGE));
         SteamGrade grade = SteamGrade.of(column.getSteam().getResource(0));
         state.vapourColor = column.isStripping() ? (grade != null ? grade.tint() : SteamGrade.STEAM.tint()) & 0x00FFFFFF : 0x00FFFFFF;
@@ -258,13 +302,13 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
         }
         poseStack.pushPose();
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
-        float[] solid = state.solid, fans = state.fans, glass = state.glass, glow = state.glow;
+        float[] fansAtRest = state.fansAtRest, glow = state.glow;
         int light = state.light;
-        StaticMeshes.submit(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light,
-                (pose, buffer) -> emit(pose, buffer, solid, sheet, -1, light));
-        if (fans.length > 0) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, fans, sheet, -1, light));
+        for (int i = 0; i < Math.min(state.fans.length, state.fanTurns.length); i++) {
+            MeshRendering.submitMoving(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), state.fans[i], sheet, light, state.fanTurns[i]);
         }
+        StaticMeshes.submit(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), fansAtRest, sheet, light,
+                (pose, buffer) -> emit(pose, buffer, fansAtRest, sheet, -1, light));
         for (Tray tray : state.trays) {
             TextureAtlasSprite sprite = tray.sprite();
             if (sprite != null && tray.pool().length > 0) {
@@ -283,8 +327,6 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
                 }
             }
         }
-        StaticMeshes.submit(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light,
-                (pose, buffer) -> emit(pose, buffer, glass, sheet, -1, light));
         if (glow.length > 0 && state.brightness > 0.01F) {
             int level = Math.round(255 * state.brightness);
             int color = ARGB.color(level, level, level, level);
@@ -323,9 +365,22 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
         }
     }
 
-    // The whole column, so it isn't culled when the controller is off screen.
+    // A still list into the chunk mesh, shaded as emit shades it (see ChunkMeshes).
+    private static void bake(DistillationArrayBlockEntity column, int slot, Built model, ChunkSectionLayer layer, float[] data, TextureAtlasSprite sheet,
+            int light) {
+        DistillationStructure.Column shape = model.column;
+        Direction front = model.front;
+        int makes = model.makes;
+        ChunkMeshes.bake(column, slot, shape.min(), layer, new MeshRendering.Baked(data, sheet), light,
+                () -> shape.equals(column.getColumn()) && column.getFacing() == front && column.makes() == makes,
+                (pose, buffer) -> emit(pose, buffer, data, sheet, -1, light));
+    }
+
+    // What this renderer draws (the fans, the pools and vapour, the glow), not culled when the controller is off screen;
+    // the rest is in the chunk mesh.
     @Override
     public AABB getRenderBoundingBox(DistillationArrayBlockEntity column) {
-        return column.getRenderBox();
+        Built model = built.get(column);
+        return model != null && model.column.equals(column.getColumn()) ? model.drawn : column.getRenderBox();
     }
 }

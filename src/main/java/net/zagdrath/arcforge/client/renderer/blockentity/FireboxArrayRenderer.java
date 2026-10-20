@@ -17,8 +17,8 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -35,6 +35,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity;
 import net.zagdrath.arcforge.client.model.WindowQuadrants;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
 import net.zagdrath.arcforge.multiblock.FireboxArrayStructure;
 
 // Draws the inside of a formed Firebox Array, seen through its windows. Like the steam arrays, the box is a thin skin (its
@@ -43,8 +44,12 @@ import net.zagdrath.arcforge.multiblock.FireboxArrayStructure;
 // furnace brick tones, cut away behind every window with a reveal round each opening (TiledBoxes.lining). On the floor
 // lies a bed of coals, dark while it's out; while it burns the coals glow and a flame rises from every block of the floor
 // (two crossed planes of the animated flame sprite, a little taller toward the middle and swaying with the time),
-// full-bright, and the lining glows with them.
+// full-bright, and the lining glows with them. The lining and the bed are still, so they're baked into the chunk mesh
+// (ChunkMeshes), again only when the box, its windows or whether it burns change; the flames are drawn here.
 public class FireboxArrayRenderer implements BlockEntityRenderer<FireboxArrayBlockEntity, FireboxArrayRenderer.State> {
+    // What the lining and bed are built from, for telling when to bake them again.
+    private record Still(FireboxArrayStructure.Box box, Set<Long> windows, boolean burning, TextureAtlasSprite lining, TextureAtlasSprite jamb,
+            TextureAtlasSprite coals) {}
     private static final float LINER_INSET = 1.0F / 16.0F;
     private static final float BED_INSET = 1.5F / 16.0F, BED_DEPTH = 2.0F / 16.0F;
     private static final int FULL_BRIGHT = 0xF000F0;
@@ -82,6 +87,7 @@ public class FireboxArrayRenderer implements BlockEntityRenderer<FireboxArrayBlo
         FireboxArrayStructure.Box box = array.getBox();
         state.formed = box != null;
         if (box == null) {
+            ChunkMeshes.remove(array);
             return;
         }
         BlockPos rel = box.min().subtract(array.getBlockPos());
@@ -101,6 +107,17 @@ public class FireboxArrayRenderer implements BlockEntityRenderer<FireboxArrayBlo
         state.windows = array.windowQuads(found -> findWindowQuads(array.getLevel(), found));
         state.light = state.burning ? FULL_BRIGHT
                 : array.getLevel() != null ? LightCoordsUtil.getLightCoords(array.getLevel(), box.centre()) : state.lightCoords;
+        // The lining and the bed into the chunk mesh, lit there as the entity shader lit them.
+        TextureAtlasSprite lining = state.lining, jamb = state.jamb, coals = state.burning ? state.coalsLit : state.coals;
+        int tint = state.burning ? -1 : COLD_TINT, light = state.light, sx = state.sizeX, sy = state.sizeY, sz = state.sizeZ;
+        Set<Long> windows = state.windows;
+        boolean burning = state.burning;
+        ChunkMeshes.bakeEntityLit(array, MeshRendering.SOLID, box.min(), ChunkSectionLayer.SOLID, new Still(box, windows, burning, lining, jamb, coals), light,
+                () -> box.equals(array.getBox()), (pose, buffer) -> {
+                    TiledBoxes.lining(pose, buffer, lining, jamb, tint, light, LINER_INSET, sx, sy, sz, windows);
+                    TiledBoxes.box(pose, buffer, coals, tint, light, BED_INSET, BED_INSET, BED_INSET, sx - BED_INSET, BED_INSET + BED_DEPTH, sz - BED_INSET,
+                            false, Direction.DOWN);
+                });
     }
 
     // The half-block lining tiles of the box's walls that lie behind window (TiledBoxes.windowKey): those behind a Pressure
@@ -152,20 +169,10 @@ public class FireboxArrayRenderer implements BlockEntityRenderer<FireboxArrayBlo
         if (!state.formed || state.lining == null || state.jamb == null || state.coals == null || state.coalsLit == null || state.flame == null) {
             return;
         }
-        TextureAtlasSprite lining = state.lining;
-        TextureAtlasSprite jamb = state.jamb;
-        TextureAtlasSprite coals = state.burning ? state.coalsLit : state.coals;
-        int tint = state.burning ? -1 : COLD_TINT;
-        float floor = BED_INSET;
-        float bedTop = floor + BED_DEPTH;
+        float bedTop = BED_INSET + BED_DEPTH;
         poseStack.pushPose();
-        // Drawn from the box's minimum corner.
+        // Drawn from the box's minimum corner (the lining and bed are in the chunk mesh).
         poseStack.translate(state.x, state.y, state.z);
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(lining.atlasLocation()), (pose, buffer) -> {
-            TiledBoxes.lining(pose, buffer, lining, jamb, tint, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows);
-            TiledBoxes.box(pose, buffer, coals, tint, state.light, BED_INSET, floor, BED_INSET, state.sizeX - BED_INSET, bedTop,
-                    state.sizeZ - BED_INSET, false, Direction.DOWN);
-        });
         if (state.burning) {
             TextureAtlasSprite flame = state.flame;
             collector.submitCustomGeometry(poseStack, ArcforgeRenderTypes.volumeTranslucent(flame.atlasLocation()),

@@ -57,6 +57,9 @@ public final class ArcforgeGameTests {
     // reports before a retry finishes.) Fix them and move them back to TESTS.
     // creosote_moves: the armor stand sometimes never moves at all; not yet understood.
     private static final java.util.Map<String, Consumer<GameTestHelper>> FLAKY_TESTS = new java.util.LinkedHashMap<>();
+    // Tests that build a structure longer than the usual test area's padding (the Nuclear Steam Turbine): each gets room
+    // of its own, as the oil tests do.
+    private static final java.util.Map<String, Consumer<GameTestHelper>> LARGE_TESTS = new java.util.LinkedHashMap<>();
 
     static {
         TESTS.put(REDSTONE_BUTTONS, ArcforgeGameTests::redstoneButtons);
@@ -353,6 +356,11 @@ public final class ArcforgeGameTests {
         TESTS.put("diamond_press_presses", MineralsGameTests::diamondPress);
         TESTS.put("biogas_sulfur", MineralsGameTests::biogasSulfur);
         TESTS.put("steam_turbine_model_layout", TurbineModelGameTests::layoutSizes);
+        TESTS.put("steam_turbine_rotor_turns", TurbineModelGameTests::rotorTurns);
+        TESTS.put("moving_parts_pumpjack", MovingPartsGameTests::pumpjackParts);
+        TESTS.put("moving_parts_derrick", MovingPartsGameTests::derrickParts);
+        TESTS.put("moving_parts_diesel", MovingPartsGameTests::dieselParts);
+        TESTS.put("moving_parts_distillation_fans", MovingPartsGameTests::distillationFans);
         TESTS.put("steam_turbine_model_spots", TurbineModelGameTests::formedSpots);
         TESTS.put("salt_recipes", SaltGameTests::recipes);
         TESTS.put("salt_tags", SaltGameTests::saltTags);
@@ -599,6 +607,10 @@ public final class ArcforgeGameTests {
         TESTS.put("nuclear_corrosive_storage", NuclearGameTests::corrosiveStorage);
         TESTS.put("fission_reactor_physics", FissionGameTests::reactorPhysics);
         TESTS.put("fission_fuel_rods", FissionGameTests::fuelRods);
+        TESTS.put("fission_fuel_cycle", FissionGameTests::fuelCycle);
+        LARGE_TESTS.put("nuclear_turbine_forms", NuclearTurbineGameTests::forms);
+        LARGE_TESTS.put("nuclear_turbine_runs_and_trips", NuclearTurbineGameTests::runsAndTrips);
+        TESTS.put("nuclear_turbine_rotor_on_shaft", NuclearTurbineGameTests::rotorOnShaft);
         TESTS.put("fission_fuel_fabrication", FissionGameTests::fuelFabrication);
         TESTS.put("fission_contaminated_steam", FissionGameTests::contaminatedSteam);
         TESTS.put("fission_reactor_model", FissionGameTests::reactorModel);
@@ -622,6 +634,7 @@ public final class ArcforgeGameTests {
         OIL_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         FLAKY_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
+        LARGE_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
     }
 
     private ArcforgeGameTests() {}
@@ -649,7 +662,7 @@ public final class ArcforgeGameTests {
         });
         // Each oil test builds across three chunks (deposits are per chunk), so it gets room enough that no other test's
         // area or barrier walls reach into it; each radiation test gets the same, so no other test's sources are in range.
-        java.util.stream.Stream.concat(OIL_TESTS.keySet().stream(), RADIATION_TESTS.keySet().stream()).forEach(name -> {
+        java.util.stream.Stream.of(OIL_TESTS, RADIATION_TESTS, LARGE_TESTS).flatMap(tests -> tests.keySet().stream()).forEach(name -> {
             Holder<TestEnvironmentDefinition<?>> own = event.registerEnvironment(id(name));
             event.registerTest(id(name), new FunctionGameTestInstance(function(name), new TestData<>(own, Level.OVERWORLD,
                     Identifier.withDefaultNamespace("empty"), 600, 0, true, Rotation.NONE, false, 1, 1, false, 48)));

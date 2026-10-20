@@ -212,4 +212,32 @@ public final class TiledBoxes {
                 .setLight(light)
                 .setNormal(pose, nx, ny, nz);
     }
+
+    // A model's quads as vertices (x, y, z, u, v, nx, ny, nz each, for vertices above), kept for the model they
+    // were made from, so each rotor part is one vertex buffer on the GPU however many times it's drawn.
+    private static final java.util.Map<net.minecraft.client.resources.model.geometry.QuadCollection, float[]> VERTICES = new java.util.WeakHashMap<>();
+
+    public static float[] vertices(net.minecraft.client.resources.model.geometry.QuadCollection model) {
+        return VERTICES.computeIfAbsent(model, m -> {
+            List<BakedQuad> quads = m.getAll();
+            float[] out = new float[quads.size() * BakedQuad.VERTEX_COUNT * 8];
+            int n = 0;
+            for (BakedQuad quad : quads) {
+                var normal = quad.direction().getUnitVec3i();
+                for (int v = 0; v < BakedQuad.VERTEX_COUNT; v++) {
+                    Vector3fc position = quad.position(v);
+                    long uv = quad.packedUV(v);
+                    out[n++] = position.x();
+                    out[n++] = position.y();
+                    out[n++] = position.z();
+                    out[n++] = UVPair.unpackU(uv);
+                    out[n++] = UVPair.unpackV(uv);
+                    out[n++] = normal.getX();
+                    out[n++] = normal.getY();
+                    out[n++] = normal.getZ();
+                }
+            }
+            return out;
+        });
+    }
 }

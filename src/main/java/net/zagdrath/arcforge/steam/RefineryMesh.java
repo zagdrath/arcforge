@@ -417,28 +417,57 @@ public final class RefineryMesh extends ModelMesh {
     public float[] buildFans(float angle) {
         solid = new Floats();
         glowing = false;
-        float y = layout.bundle[4] + 1.6F;
         for (float[] fan : layout.fans) {
-            spinning = true;
-            spinCos = Math.cos(Math.toRadians(angle));
-            spinSin = Math.sin(Math.toRadians(angle));
-            spinX = fan[0];
-            spinU = fan[1];
-            float reach = fan[2] - 0.6F;
-            for (int blade = 0; blade < 4; blade++) {
-                double a = Math.PI / 2.0 * blade;
-                float c = (float) Math.cos(a), s = (float) Math.sin(a), w = 1.2F;
-                float[] p0 = { fan[0] + c * 1.0F - s * w, y, fan[1] + s * 1.0F + c * w };
-                float[] p1 = { fan[0] + c * reach - s * w, y, fan[1] + s * reach + c * w };
-                float[] p2 = { fan[0] + c * reach + s * w, y, fan[1] + s * reach - c * w };
-                float[] p3 = { fan[0] + c * 1.0F + s * w, y, fan[1] + s * 1.0F - c * w };
-                orient(p0, p1, p2, p3, new float[] { 0, 1, 0 }, Paint.BLADE);
-                orient(p0, p1, p2, p3, new float[] { 0, -1, 0 }, Paint.BLADE_BACK);
-            }
-            disc(new float[] { fan[0], y + 0.4F, fan[1] }, new float[] { 0, 1, 0 }, 1.4F, 8, Paint.MID, Paint.SHADE);
-            spinning = false;
+            fan(fan, angle);
         }
         return solid.toArray();
+    }
+
+    // Each fan built once at rest (see DistillationArrayRenderer), and the upright axis through its hub it spins
+    // about: turned by the fans' angle about it, it's the fan buildFans builds.
+    public float[][] buildFanParts() {
+        float[][] parts = new float[layout.fans.size()][];
+        for (int i = 0; i < parts.length; i++) {
+            solid = new Floats();
+            glowing = false;
+            fan(layout.fans.get(i), 0.0F);
+            parts[i] = solid.toArray();
+        }
+        return parts;
+    }
+
+    public float[][] fanAxes() {
+        float y = layout.bundle[4] + 1.6F;
+        float[][] axes = new float[layout.fans.size()][];
+        for (int i = 0; i < axes.length; i++) {
+            float[] fan = layout.fans.get(i);
+            // The spin turns x toward u: about the downward axis, right-handed.
+            axes[i] = axis(fan[0], y, fan[1], 0.0F, -1.0F, 0.0F);
+        }
+        return axes;
+    }
+
+    // One fan over the cooler bundle, turned to angle degrees.
+    private void fan(float[] fan, float angle) {
+        float y = layout.bundle[4] + 1.6F;
+        spinning = true;
+        spinCos = Math.cos(Math.toRadians(angle));
+        spinSin = Math.sin(Math.toRadians(angle));
+        spinX = fan[0];
+        spinU = fan[1];
+        float reach = fan[2] - 0.6F;
+        for (int blade = 0; blade < 4; blade++) {
+            double a = Math.PI / 2.0 * blade;
+            float c = (float) Math.cos(a), s = (float) Math.sin(a), w = 1.2F;
+            float[] p0 = { fan[0] + c * 1.0F - s * w, y, fan[1] + s * 1.0F + c * w };
+            float[] p1 = { fan[0] + c * reach - s * w, y, fan[1] + s * reach + c * w };
+            float[] p2 = { fan[0] + c * reach + s * w, y, fan[1] + s * reach - c * w };
+            float[] p3 = { fan[0] + c * 1.0F + s * w, y, fan[1] + s * 1.0F - c * w };
+            orient(p0, p1, p2, p3, new float[] { 0, 1, 0 }, Paint.BLADE);
+            orient(p0, p1, p2, p3, new float[] { 0, -1, 0 }, Paint.BLADE_BACK);
+        }
+        disc(new float[] { fan[0], y + 0.4F, fan[1] }, new float[] { 0, 1, 0 }, 1.4F, 8, Paint.MID, Paint.SHADE);
+        spinning = false;
     }
 
     // A sight glass's pool, fill (0-1) of its cavity's lower half, in UVs across a fluid sprite (0-1): its surface and

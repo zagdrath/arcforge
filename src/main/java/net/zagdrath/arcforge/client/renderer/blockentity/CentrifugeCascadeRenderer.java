@@ -18,6 +18,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -29,6 +30,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.LargeModels;
 import net.zagdrath.arcforge.multiblock.CentrifugeCascadeLayout;
 import net.zagdrath.arcforge.multiblock.CentrifugeCascadeStructure;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
@@ -37,8 +40,10 @@ import net.zagdrath.arcforge.steam.ModelMesh;
 
 // Draws a formed Gas Centrifuge Cascade from CentrifugeCascadeLayout, built by CentrifugeCascadeMesh on the refinery
 // tower's sheet (its blocks draw nothing but the floor's port plates). The hall is laid out from the centrifuges the
-// client sees in it; it's built once, and again when its centrifuges or ports change (checked every second). While it
-// runs the bands' marks spin (see CentrifugeCascadeBlockEntity.advance), full-bright, and the panel's screen is lit.
+// client sees in it; it's built once, and again when its centrifuges or ports change (checked every second), its still
+// parts baked into the chunk mesh (ChunkMeshes). While it runs the bands' marks spin (see
+// CentrifugeCascadeBlockEntity.advance), full-bright, and the panel's screen is lit: drawn here out to
+// stillPartsOnlyFrom, the marks standing still past simpleMovingPartsFrom (see LargeModels).
 public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCascadeBlockEntity, CentrifugeCascadeRenderer.State> {
     private static final int SCAN_INTERVAL = 20;
     private static final float[] EMPTY = new float[0];
@@ -51,7 +56,9 @@ public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCa
         CentrifugeCascadeLayout layout;
         CentrifugeCascadeMesh mesh;
         List<ModelMesh.Port> ports;
-        float[] solid = EMPTY, glass = EMPTY, glow = EMPTY;
+        float[] solid = EMPTY, glass = EMPTY, glow = EMPTY, marksAtRest = EMPTY;
+        // The box round what this renderer draws: the screen and the marks.
+        @Nullable AABB drawn;
         long scanned;
 
         Built(CentrifugeCascadeStructure.Box box, ModelFrame frame, CentrifugeCascadeLayout layout, List<ModelMesh.Port> ports) {
@@ -67,13 +74,15 @@ public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCa
             solid = parts[0];
             glass = parts[1];
             glow = parts[2];
+            marksAtRest = mesh.buildMarks(0.0F);
+            drawn = glow.length + marksAtRest.length == 0 ? null : MeshRendering.bounds(box.min(), glow, marksAtRest).inflate(0.5);
         }
     }
 
     public static class State extends BlockEntityRenderState {
         public boolean formed, running;
         public int offsetX, offsetY, offsetZ;
-        public float[] solid = EMPTY, glass = EMPTY, glow = EMPTY, marks = EMPTY;
+        public float[] glow = EMPTY, marks = EMPTY;
         public @Nullable TextureAtlasSprite sheet;
         public int light;
     }
@@ -83,6 +92,16 @@ public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCa
     @Override
     public State createRenderState() {
         return new State();
+    }
+
+    @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(CentrifugeCascadeBlockEntity cascade) {
+        return ChunkMeshes.isBaked(cascade, MeshRendering.SOLID, MeshRendering.GLASS);
     }
 
     // The model's frame: x across the front, u back from it, over the hall's three layers.
@@ -111,6 +130,7 @@ public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCa
         state.formed = box != null && level != null;
         if (box == null || level == null) {
             built.remove(cascade);
+            ChunkMeshes.remove(cascade);
             return;
         }
         BlockPos min = box.min();
@@ -136,14 +156,21 @@ public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCa
                 model.rebuild();
             }
         }
-        state.solid = model.solid;
-        state.glass = model.glass;
-        state.glow = model.glow;
-        state.running = cascade.isRunning();
-        state.marks = state.running ? model.mesh.buildMarks(cascade.advance(time + partialTicks)) : EMPTY;
-        state.sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
         // The light just above the hall's front middle.
-        state.light = LightCoordsUtil.getLightCoords(level, cascade.getBlockPos().above(CentrifugeCascadeStructure.HEIGHT));
+        int light = LightCoordsUtil.getLightCoords(level, cascade.getBlockPos().above(CentrifugeCascadeStructure.HEIGHT));
+        Built bakedModel = model;
+        java.util.function.BooleanSupplier stands = () -> bakedModel.box.equals(cascade.getBox()) && built.get(cascade) == bakedModel;
+        MeshRendering.bake(cascade, MeshRendering.SOLID, min, ChunkSectionLayer.SOLID, model.solid, sheet, light, stands);
+        MeshRendering.bake(cascade, MeshRendering.GLASS, min, ChunkSectionLayer.CUTOUT, model.glass, sheet, light, stands);
+        state.sheet = sheet;
+        state.light = light;
+        state.running = cascade.isRunning();
+        LargeModels.Detail detail = LargeModels.detail(getRenderBoundingBox(cascade), cameraPosition);
+        state.glow = detail != LargeModels.Detail.STILL ? model.glow : EMPTY;
+        float turned = state.running ? cascade.advance(time + partialTicks) : 0.0F;
+        state.marks = !state.running || detail == LargeModels.Detail.STILL ? EMPTY
+                : detail == LargeModels.Detail.FULL ? model.mesh.buildMarks(turned) : model.marksAtRest;
     }
 
     // The ports on the floor's outer faces, in the model's frame.
@@ -163,10 +190,7 @@ public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCa
         }
         poseStack.pushPose();
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
-        float[] solid = state.solid, glass = state.glass, glow = state.glow, marks = state.marks;
-        int light = state.light;
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
+        float[] glow = state.glow, marks = state.marks;
         // The panel's screen always, the bands' marks while it runs: full-bright.
         if (glow.length > 0 || marks.length > 0) {
             collector.submitCustomGeometry(poseStack, RenderTypes.eyes(sheet.atlasLocation()), (pose, buffer) -> {
@@ -188,8 +212,14 @@ public class CentrifugeCascadeRenderer implements StructureRenderer<CentrifugeCa
         }
     }
 
+    // Only the screen and the marks are drawn here; the rest is in the chunk mesh.
     @Override
     public AABB getRenderBoundingBox(CentrifugeCascadeBlockEntity cascade) {
+        Built model = built.get(cascade);
+        if (model != null && model.box.equals(cascade.getBox())) {
+            AABB drawn = model.drawn;
+            return drawn != null ? drawn : new AABB(model.box.min()).deflate(0.5);
+        }
         return cascade.getRenderBox();
     }
 }

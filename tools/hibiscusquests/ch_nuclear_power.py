@@ -69,9 +69,16 @@ ch.q("heavy_water", "Heavy Water", "heavy_water_bucket",
      rewards=[item("pvc_sheet", 8), xp(12)],
      items=["heavy_water_tower_casing", "heavy_water_tower_controller", "exchange_tray", "heavy_water_bucket"])
 
-ch.q("power_plant", "Power Plant", "steam_turbine_array_casing",
-     "Fission Reactor, Steam Generator and a full-length Steam Turbine Array spinning at full speed: a nuclear power "
-     "station. A large core can drive several turbines at once.",
+ch.q("nuclear_turbine", "Nuclear Steam Turbine", "nuclear_turbine_casing",
+     "A reactor makes far more steam than a Steam Turbine Array takes. The Nuclear Steam Turbine is built for it: a 7x7 "
+     "tube of Nuclear Turbine Casings 21 to 45 long, on High-Pressure Steam only, at up to 240 mB/t a section. It trips "
+     "under a quarter of its rated flow, so give it a reactor's steam and send its exhaust to Condenser Arrays.",
+     [formed("nuclear_steam_turbine", icon="nuclear_turbine_casing")], deps=["steam_generator"],
+     rewards=[item("hardened_alloy", 8), xp(15)], items=["nuclear_turbine_casing"])
+
+ch.q("power_plant", "Power Plant", "nuclear_turbine_casing",
+     "Fission Reactor, Steam Generator and a Nuclear Steam Turbine at its synchronous speed: a nuclear power station. A "
+     "medium core drives one turbine, a large one two.",
      [formed("fission_reactor", icon="reactor_controller"), formed("steam_generator", icon="steam_generator_controller"),
-      turbine("steam_turbine_array", min_length=15, icon="steam_turbine_array_casing")],
-     deps=["fission_reactor", "steam_generator"], rewards=[item("arcforged_alloy", 8), xp(25)], frame="challenge")
+      turbine("nuclear_steam_turbine", icon="nuclear_turbine_casing")],
+     deps=["fission_reactor", "steam_generator", "nuclear_turbine"], rewards=[item("arcforged_alloy", 8), xp(25)], frame="challenge")

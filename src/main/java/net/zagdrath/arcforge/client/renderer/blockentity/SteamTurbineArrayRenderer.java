@@ -10,18 +10,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -29,9 +29,12 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.LargeModels;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.PortFaces;
@@ -43,9 +46,11 @@ import net.zagdrath.arcforge.steam.TurbineMesh;
 // Draws a formed Steam Turbine Array as one turbine-generator set along its axis (its blocks draw nothing but their port
 // plates): the plinth, the casings, pedestals, crossover and generator from its TurbineLayout, built by TurbineMesh on
 // the model sheet block/steam_turbine_array/turbine, with a nozzle from the model out to each port. The still parts are
-// built once and again when the ports change (checked every second); the rotor (shaft, couplings and the blades seen
-// through each casing's windows) is built each frame at the rotor's angle, so the spin-up and coast-down show on it.
-// The rotor turns at up to 36° a tick (see SteamTurbineArrayBlockEntity.advanceAngle).
+// built once (and again when the ports change, checked every second) and baked into the chunk mesh (ChunkMeshes), so
+// this renderer only draws the rotor (shaft, couplings and the blades seen through each casing's windows): built once
+// at rest and drawn turned to the rotor's angle (see SteamTurbineArrayBlockEntity.advanceAngle), so the spin-up and
+// coast-down show on it. Past simpleMovingPartsFrom the rotor is a few plain discs standing still, and past
+// stillPartsOnlyFrom it isn't drawn at all (see LargeModels).
 public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamTurbineArrayBlockEntity, SteamTurbineArrayRenderer.State> {
     public static final Identifier SHEET = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/steam_turbine_array/turbine");
     // How often (ticks) the ports are looked at again.
@@ -59,6 +64,9 @@ public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamT
         final ShellStructure.Shell shell;
         final Direction front;
         final TurbineMesh mesh;
+        final float[] rotor, rotorLod;
+        final float[] axis;
+        final AABB rotorBox;
         List<TurbineMesh.Port> ports;
         float[] solid = EMPTY, glass = EMPTY;
         long scanned;
@@ -68,6 +76,10 @@ public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamT
             this.front = front;
             this.mesh = new TurbineMesh(TurbineLayout.of(shell, front), shell.axis() == Direction.Axis.X);
             this.ports = ports;
+            this.rotor = mesh.buildRotor(0.0F);
+            this.rotorLod = mesh.buildRotorLod();
+            this.axis = mesh.rotorAxis();
+            this.rotorBox = MeshRendering.bounds(shell.min(), rotor, rotorLod).inflate(0.5);
             rebuild();
         }
 
@@ -80,7 +92,8 @@ public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamT
 
     public static class State extends BlockEntityRenderState {
         public boolean formed;
-        public float[] solid = EMPTY, glass = EMPTY, rotor = EMPTY;
+        public float[] rotor = EMPTY;
+        public @Nullable Matrix4f turn;
         public @Nullable TextureAtlasSprite sheet;
         public int light;
     }
@@ -93,14 +106,33 @@ public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamT
     }
 
     @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(SteamTurbineArrayBlockEntity turbine) {
+        return ChunkMeshes.isBaked(turbine, MeshRendering.SOLID, MeshRendering.GLASS);
+    }
+
+    // Only the rotor is drawn here; the rest is in the chunk mesh.
+    @Override
+    public AABB getRenderBoundingBox(SteamTurbineArrayBlockEntity turbine) {
+        Built model = built.get(turbine);
+        return model != null && model.shell.equals(turbine.getShell()) ? model.rotorBox : turbine.getRenderBox();
+    }
+
+    @Override
     public void extractRenderState(SteamTurbineArrayBlockEntity turbine, State state, float partialTicks, Vec3 cameraPosition,
             ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         ShellMultiblockRenderer.super.extractRenderState(turbine, state, partialTicks, cameraPosition, breakProgress);
         ShellStructure.Shell shell = turbine.getShell();
         Level level = turbine.getLevel();
         state.formed = turbine.isMaster() && shell != null && level != null;
+        state.rotor = EMPTY;
         if (!state.formed || shell == null || level == null) {
             built.remove(turbine);
+            ChunkMeshes.remove(turbine);
             return;
         }
         Direction front = turbine.getFacing();
@@ -118,11 +150,27 @@ public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamT
                 model.rebuild();
             }
         }
-        state.solid = model.solid;
-        state.glass = model.glass;
-        state.rotor = model.mesh.buildRotor(turbine.advanceAngle(time + partialTicks));
-        state.sheet = SteamBoilerArrayRenderer.sprite(SHEET);
-        state.light = LightCoordsUtil.getLightCoords(level, shell.centre());
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(SHEET);
+        int light = LightCoordsUtil.getLightCoords(level, shell.centre());
+        state.sheet = sheet;
+        state.light = light;
+        // The still parts into the chunk mesh (nothing happens while they're as last baked).
+        ShellStructure.Shell builtShell = model.shell;
+        java.util.function.BooleanSupplier stands = () -> turbine.isMaster() && builtShell.equals(turbine.getShell()) && turbine.getFacing() == front;
+        MeshRendering.bake(turbine, MeshRendering.SOLID, shell.min(), ChunkSectionLayer.SOLID, model.solid, sheet, light, stands);
+        MeshRendering.bake(turbine, MeshRendering.GLASS, shell.min(), ChunkSectionLayer.CUTOUT, model.glass, sheet, light, stands);
+        float angle = turbine.advanceAngle(time + partialTicks);
+        switch (LargeModels.detail(model.rotorBox, cameraPosition)) {
+            case FULL -> {
+                state.rotor = model.rotor;
+                state.turn = MeshRendering.turn(model.axis, angle);
+            }
+            case SIMPLE -> {
+                state.rotor = model.rotorLod;
+                state.turn = null;
+            }
+            case STILL -> {}
+        }
     }
 
     // The ports on the shell's outer faces, in the turbine's frame.
@@ -158,31 +206,14 @@ public class SteamTurbineArrayRenderer implements ShellMultiblockRenderer<SteamT
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
         TextureAtlasSprite sheet = state.sheet;
-        if (!state.formed || sheet == null) {
+        if (!state.formed || sheet == null || state.rotor.length == 0) {
             return;
         }
-        float[] solid = state.solid, rotor = state.rotor, glass = state.glass;
-        int light = state.light;
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
-        if (rotor.length > 0) {
-            collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, rotor, sheet, light));
-        }
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
-    }
-
-    // TurbineMesh's vertices (x, y, z, u, v across the sheet, normal), the sheet's UVs mapped into the atlas. Each face
-    // shaded as a block face turned its way is, its normal straight up (as PumpjackRenderer.emit), so the model shades
-    // like the casing blocks round it.
-    private static void emit(PoseStack.Pose pose, VertexConsumer buffer, float[] data, TextureAtlasSprite sheet, int light) {
-        for (int i = 0; i + 7 < data.length; i += 8) {
-            float nx = data[i + 5], ny = data[i + 6], nz = data[i + 7];
-            int shade = Math.round(255.0F * (nx * nx * 0.6F + ny * ny * (ny > 0.0F ? 1.0F : 0.5F) + nz * nz * 0.8F));
-            buffer.addVertex(pose, data[i], data[i + 1], data[i + 2])
-                    .setColor(0xFF000000 | shade << 16 | shade << 8 | shade)
-                    .setUv(sheet.getU(data[i + 3]), sheet.getV(data[i + 4]))
-                    .setOverlay(OverlayTexture.NO_OVERLAY)
-                    .setLight(light)
-                    .setNormal(pose, 0.0F, 1.0F, 0.0F);
+        Matrix4f turn = state.turn;
+        if (turn != null) {
+            MeshRendering.submitMoving(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), state.rotor, sheet, state.light, turn);
+        } else {
+            MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), state.rotor, sheet, state.light);
         }
     }
 }

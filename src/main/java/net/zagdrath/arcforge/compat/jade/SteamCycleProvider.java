@@ -19,11 +19,13 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.CondenserArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.SuperheaterArrayCasingBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.CondenserArrayBlockEntity;
+import net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamBoilerArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SteamTurbineArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.SuperheaterArrayBlockEntity;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
+import net.zagdrath.arcforge.steam.NuclearTurbineLayout;
 import net.zagdrath.arcforge.steam.SteamGrade;
 import net.zagdrath.arcforge.steam.TurbineLayout;
 import snownee.jade.api.BlockAccessor;
@@ -38,19 +40,23 @@ import snownee.jade.api.ui.IDisplayHelper;
 // "Passing through (420 °C)"), a Condenser Array's "Condensing 287 mB/t", and a Steam Turbine Array's exhaust
 // ("Exhaust: 1,200 mB", "Vacuum bonus +10%"), with the part of the turbine-generator set the casing is in ("Section:
 // Low-pressure casing", or "Low-pressure casing 2 of 3" on a set with several) and, on a fitted spot, the port that
-// fits there ("Exhaust neck: fits an Exhaust port"). Their tanks and heat show through Jade's own views. This half
-// gathers the data on the server; Client draws it.
+// fits there ("Exhaust neck: fits an Exhaust port"); a Nuclear Steam Turbine's section and spots the same way, and its
+// minimum flow, or why it tripped ("Tripped: steam 3,000 of the 14,700 mB/t it needs"). Their tanks and heat show
+// through Jade's own views. This half gathers the data on the server; Client draws it.
 public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor, SteamCycleProvider.Data> {
     INSTANCE;
 
     public static final Identifier UID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "steam_cycle");
 
-    public enum Kind { SUPERHEATER, CONDENSER, TURBINE, BOILER }
+    public enum Kind { SUPERHEATER, CONDENSER, TURBINE, BOILER, NUCLEAR_TURBINE }
 
     // Superheater: a = the input grade (-1 none), b = the grade made (-1 passing through), c = mB/t, d = °C.
     // Condenser: c = mB/t condensed. Turbine: a = 1 with an Exhaust port, b = 1 with the vacuum bonus, c = mB of exhaust,
     // d = the TurbineLayout.Part the block is in, plus 1 (0 unknown), and its TurbineLayout.Spot times 16.
     // Boiler: c = HU/t it boiled with last tick, d = the most HU/t it boils with.
+    // Nuclear turbine: a = 1 with an Exhaust port, plus 2 while tripped; b = the steam coming in (mB/t), c = its minimum
+    // flow (mB/t), d = the NuclearTurbineLayout.Part the block shows, plus 1 (0 unknown), its Spot times 16, its
+    // low-pressure casing's number times 256 and how many there are times 4096.
     public record Data(int kind, int a, int b, int c, int d) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
                 ByteBufCodecs.VAR_INT, Data::kind,
@@ -92,6 +98,19 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
             }
             return new Data(Kind.TURBINE.ordinal(), turbine.hasExhaust() ? 1 : 0, turbine.isVacuum() ? 1 : 0, turbine.getExhaust().getAmount(), where);
         }
+        var nuclearMaster = blockEntity instanceof NuclearSteamTurbineBlockEntity casing ? casing.getMaster() : null;
+        if (nuclearMaster instanceof NuclearSteamTurbineBlockEntity turbine) {
+            int where = 0;
+            ShellStructure.Shell shell = turbine.getShell();
+            if (shell != null && shell.contains(accessor.getPosition())) {
+                NuclearTurbineLayout layout = NuclearTurbineLayout.of(shell, turbine.getFacing());
+                int u = TurbineLayout.blockU(shell, accessor.getPosition());
+                where = layout.partAt(shell, accessor.getPosition()).ordinal() + 1 | layout.spotAt(shell, accessor.getPosition()).ordinal() << 4
+                        | layout.lowNumberAt(u) << 8 | layout.lowPressureCount() << 12;
+            }
+            return new Data(Kind.NUCLEAR_TURBINE.ordinal(), (turbine.hasExhaust() ? 1 : 0) | (turbine.isTripped() ? 2 : 0),
+                    (int) Math.round(turbine.getInflow()), turbine.minFlow(), where);
+        }
         return null;
     }
 
@@ -130,6 +149,31 @@ public enum SteamCycleProvider implements StreamServerDataProvider<BlockAccessor
                     case BOILER -> tooltip.add(Component.translatable("jade.arcforge.boiler.heat_use", display.humanReadableNumber(data.c(), "", false),
                             display.humanReadableNumber(data.d(), "", false)).withStyle(data.c() >= data.d() ? ChatFormatting.GOLD : ChatFormatting.GRAY));
                     case CONDENSER -> tooltip.add(Component.translatable("jade.arcforge.condenser", display.humanReadableNumber(data.c(), "", false)));
+                    case NUCLEAR_TURBINE -> {
+                        int part = (data.d() & 15) - 1;
+                        if (part >= 0 && part < NuclearTurbineLayout.Part.values().length) {
+                            int number = data.d() >> 8 & 15, of = data.d() >> 12 & 15;
+                            NuclearTurbineLayout.Part named = NuclearTurbineLayout.Part.values()[part];
+                            Component name = number > 0 && of > 1 && named == NuclearTurbineLayout.Part.LOW_PRESSURE
+                                    ? Component.translatable("arcforge.nuclear_steam_turbine.part.low_pressure_numbered", number, of)
+                                    : Component.translatable(named.translationKey());
+                            tooltip.add(Component.translatable("jade.arcforge.turbine.section", name).withStyle(ChatFormatting.GRAY));
+                        }
+                        int spot = data.d() >> 4 & 15;
+                        if (spot > 0 && spot < NuclearTurbineLayout.Spot.values().length) {
+                            tooltip.add(Component.translatable(NuclearTurbineLayout.Spot.values()[spot].translationKey()).withStyle(ChatFormatting.GRAY));
+                        }
+                        if ((data.a() & 2) != 0) {
+                            tooltip.add(Component.translatable("jade.arcforge.nuclear_turbine.tripped", display.humanReadableNumber(data.b(), "", false),
+                                    display.humanReadableNumber(data.c(), "", false)).withStyle(ChatFormatting.GOLD));
+                        } else {
+                            tooltip.add(Component.translatable("jade.arcforge.nuclear_turbine.minimum", display.humanReadableNumber(data.c(), "", false))
+                                    .withStyle(ChatFormatting.GRAY));
+                        }
+                        if ((data.a() & 1) == 0) {
+                            tooltip.add(Component.translatable("gui.arcforge.turbine.venting").withStyle(ChatFormatting.GRAY));
+                        }
+                    }
                     case TURBINE -> {
                         int part = (data.d() & 15) - 1;
                         if (part >= 0 && part < TurbineLayout.Part.values().length) {

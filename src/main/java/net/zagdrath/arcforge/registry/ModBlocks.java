@@ -868,6 +868,11 @@ public final class ModBlocks {
     public static final DeferredBlock<net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock> STEAM_GENERATOR_TUBES = BLOCKS.registerBlock("steam_generator_tubes",
             p -> new net.zagdrath.arcforge.block.nuclear.VesselInteriorBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.STEAM_GENERATOR, p),
             p -> columnProperties(p).noOcclusion());
+    // The Nuclear Steam Turbine (Hardened tier). Formed, its shape follows the turbine's model (see NuclearTurbineHitbox),
+    // so it can't be cached per state; it stays solid (fluids don't wash it away) whatever its shape.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.NuclearTurbineCasingBlock> NUCLEAR_TURBINE_CASING = BLOCKS.registerBlock(
+            "nuclear_turbine_casing", net.zagdrath.arcforge.block.multiblock.NuclearTurbineCasingBlock::new,
+            p -> steamCasingProperties(p).strength(5.0F, 9.0F).dynamicShape().forceSolidOn());
     // The Heavy Water Tower: casings round its Exchange Trays.
     public static final DeferredBlock<net.zagdrath.arcforge.block.multiblock.VesselCasingBlock> HEAVY_WATER_TOWER_CASING = BLOCKS.registerBlock("heavy_water_tower_casing",
             p -> new net.zagdrath.arcforge.block.multiblock.VesselCasingBlock(() -> net.zagdrath.arcforge.multiblock.VesselStructures.HEAVY_WATER_TOWER, p),

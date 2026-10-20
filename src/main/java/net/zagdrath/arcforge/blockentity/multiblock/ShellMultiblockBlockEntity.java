@@ -36,6 +36,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
@@ -144,7 +145,7 @@ public abstract class ShellMultiblockBlockEntity extends MachineBlockEntity impl
                 }
             }
             part.portDefaults.tick(level, part);
-            if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+            if (TickSpread.due(level, pos, REDSTONE_CHECK_INTERVAL)) {
                 part.powered = part.checkPowered(level);
             }
             part.tickMaster(level);

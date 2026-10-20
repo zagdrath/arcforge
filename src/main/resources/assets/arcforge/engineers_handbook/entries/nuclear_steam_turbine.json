@@ -1,0 +1,33 @@
+{
+  "title": "Nuclear Steam Turbine",
+  "icon": "arcforge:nuclear_turbine_casing",
+  "items": [
+    "arcforge:nuclear_turbine_casing"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "A reactor's turbine-generator. One medium Fission Reactor makes about as much steam as six or seven full-size Steam Turbine Arrays take; one Nuclear Steam Turbine takes it all.\n# Building it\nA hollow 7×7 tube of Nuclear Turbine Casings (Hardened tier), 21 to 45 blocks long along either horizontal axis, every block of its outside a casing. Form it and set its ports with the Wrench, as for the Steam Turbine Array. Its front is a long side, with the walkway along it."
+    },
+    {
+      "type": "multiblock",
+      "structure": "nuclear_steam_turbine"
+    },
+    {
+      "type": "text",
+      "text": "# Steam and power\nIt takes High-Pressure Steam only, or a boiling core's Contaminated Steam (as High-Pressure): never plain or Superheated. Count its sections as for the Steam Turbine Array (a 7×7×21 is 114.3, a 7×7×45 245): it takes up to 240 mB/t a section (a 7×7×45 takes 58,800 mB/t) at {fe:40} FE a mB, a little more than the Steam Turbine Array's {fe:36}: its moisture separator reheaters dry and reheat the steam between the high- and low-pressure cylinders.\nIts FE buffer holds 400 ticks of its full output; its energy ports share that output."
+    },
+    {
+      "type": "text",
+      "text": "# Minimum flow\nLike a real large turbine it can't run on a trickle. Below a quarter of its rated flow (6,860 mB/t for a 7×7×21, 14,700 for a 7×7×45) for two seconds it trips: its stop valves shut, its bypass sends the steam straight to the condensers, and it coasts down. It rolls up again by itself once the steam coming in has held over its minimum for five seconds. The GUI and Jade say why it tripped and how much steam is coming in.\nA full Steam Boiler Array boils about 8,200 mB/t of High-Pressure Steam: just over a 7×7×21's minimum (about 30% of its rating), and under the minimum of any 26 or more long. In practice it needs a reactor."
+    },
+    {
+      "type": "text",
+      "text": "# Speed\nIts shaft runs at its synchronous speed, 1,800 RPM, whatever the load, as a grid turbine-generator does. It takes about fifteen seconds to roll up, its output rising with it, and about a minute to coast down.\n# Exhaust\nSpent steam leaves as Exhaust Steam through Exhaust ports along its low-pressure section, one under each low-pressure cylinder on a new turbine, for Condenser Arrays underneath. A full-size one exhausts up to 58,800 mB/t: six well-cooled 7×7×7 condensers. Without an Exhaust port, or with its exhaust tank full, it vents."
+    },
+    {
+      "type": "text",
+      "text": "# The turbine-generator set\nFormed, it's one set on a raised deck, from the front: the front standard with its oil lines and turning-gear motor, the high-pressure cylinder with its two steam chests (the main steam pipes rising through the deck into them), a moisture separator reheater either side with its crossover pipes arching over the set into the low-pressure cylinders (one for every nine blocks of length), and the generator with its hydrogen coolers, terminal box and exciter. A small sight port in each low-pressure cylinder shows its last-stage blades, a blur at speed.\nYou can walk its deck between the arches, up the stair at the front end.\n# Ports\nA new turbine starts with steam ports under both steam chests, an energy port under the terminal box's cable bus and an Exhaust port under each low-pressure cylinder, all on its underside."
+    }
+  ]
+}

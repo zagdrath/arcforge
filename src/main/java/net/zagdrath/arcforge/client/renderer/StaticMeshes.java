@@ -62,6 +62,10 @@ import net.zagdrath.arcforge.Arcforge;
 // model hands over a new array and gets a new mesh, and a mesh nobody has drawn for EVICT_NANOS is freed. Anything this
 // can't draw (a pose that turns or scales, a render type it has no pipeline for) goes through submitCustomGeometry as
 // before.
+//
+// Moving parts (submitMoving) are kept the same way, built once at rest with their real normals and drawn each frame
+// with the part's transform (core/moving_mesh: the transform in TextureMat, and the face shading worked out from the
+// turned normal), so a rotor or a door is never rebuilt or re-sent for turning.
 @EventBusSubscriber(modid = Arcforge.MODID, value = Dist.CLIENT)
 public final class StaticMeshes {
     private static final long EVICT_NANOS = 5_000_000_000L, SWEEP_NANOS = 1_000_000_000L;
@@ -86,9 +90,49 @@ public final class StaticMeshes {
             .withColorTargetState(ColorTargetState.DEFAULT)
             .build();
 
+    // The same with the moving_mesh vertex shader.
+    private static final RenderPipeline MOVING_SOLID = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pipeline/moving_mesh_solid"))
+            .withVertexShader(Identifier.fromNamespaceAndPath(Arcforge.MODID, "core/moving_mesh"))
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
+            .withColorTargetState(ColorTargetState.DEFAULT)
+            .build();
+    private static final RenderPipeline MOVING_CUTOUT = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pipeline/moving_mesh_cutout"))
+            .withVertexShader(Identifier.fromNamespaceAndPath(Arcforge.MODID, "core/moving_mesh"))
+            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+            .withShaderDefine("PER_FACE_LIGHTING")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
+            .withCull(false)
+            .withColorTargetState(ColorTargetState.DEFAULT)
+            .build();
+
+    // The same lit by the entity shader from the turned normals (moving_mesh with ENTITY_LIT).
+    private static final RenderPipeline LIT_SOLID = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pipeline/moving_mesh_lit_solid"))
+            .withVertexShader(Identifier.fromNamespaceAndPath(Arcforge.MODID, "core/moving_mesh"))
+            .withShaderDefine("ENTITY_LIT")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
+            .withColorTargetState(ColorTargetState.DEFAULT)
+            .build();
+    private static final RenderPipeline LIT_CUTOUT = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
+            .withLocation(Identifier.fromNamespaceAndPath(Arcforge.MODID, "pipeline/moving_mesh_lit_cutout"))
+            .withVertexShader(Identifier.fromNamespaceAndPath(Arcforge.MODID, "core/moving_mesh"))
+            .withShaderDefine("ENTITY_LIT")
+            .withShaderDefine("ALPHA_CUTOUT", 0.1F)
+            .withShaderDefine("PER_FACE_LIGHTING")
+            .withBindGroupLayout(BindGroupLayouts.SAMPLER1)
+            .withCull(false)
+            .withColorTargetState(ColorTargetState.DEFAULT)
+            .build();
+
     static final FeatureRendererType<Submit> TYPE = FeatureRendererType.create("arcforge:static_mesh");
 
-    private record Key(float[] data, TextureAtlasSprite sprite, int light, RenderType renderType) {}
+    // How a mesh is drawn: still, moving with block face shading worked out as it turns, or moving lit by the entity
+    // shader from its turned normals.
+    private enum Mode { STILL, MOVING, MOVING_LIT }
+
+    private record Key(float[] data, TextureAtlasSprite sprite, int light, RenderType renderType, Mode mode) {}
 
     private static final Map<Key, Mesh> MESHES = new HashMap<>();
     private static long lastSweep;
@@ -103,20 +147,136 @@ public final class StaticMeshes {
         if (data.length == 0) {
             return;
         }
-        RenderPipeline pipeline = pipelineFor(renderType);
+        RenderPipeline pipeline = pipelineFor(renderType, Mode.STILL);
         Matrix4fc pose = poseStack.last().pose();
         if (pipeline == null || !translationOnly(pose)) {
             collector.submitCustomGeometry(poseStack, renderType, emitter);
             return;
         }
-        Mesh mesh = MESHES.computeIfAbsent(new Key(data, sprite, light, renderType), key -> new Mesh(renderType, pipeline, emitter, data.length / 8));
+        Mesh mesh = MESHES.computeIfAbsent(new Key(data, sprite, light, renderType, Mode.STILL), key -> new Mesh(renderType, pipeline, emitter, data.length / 8));
         mesh.lastUsed = System.nanoTime();
-        collector.submitSpecial(RenderPhaseKeys.SOLID, new Submit(mesh, new Vector3f(pose.m30(), pose.m31(), pose.m32())));
+        collector.submitSpecial(RenderPhaseKeys.SOLID, new Submit(mesh, new Vector3f(pose.m30(), pose.m31(), pose.m32()), IDENTITY, WHITE));
     }
 
-    private static @Nullable RenderPipeline pipelineFor(RenderType renderType) {
+    // Draws a moving part (data, which restEmitter writes at rest: real normals, white unless tinted, the face shading
+    // left to the shader) turned by transform (in the pose's frame, blocks), from its GPU copy when it can. fallback
+    // writes the part already turned, shaded as a still part, for when it can't (a pose that turns or scales, a render
+    // type it has no pipeline for).
+    public static void submitMoving(SubmitNodeCollector collector, PoseStack poseStack, RenderType renderType, float[] data, TextureAtlasSprite sprite,
+            int light, Matrix4fc transform, SubmitNodeCollector.CustomGeometryRenderer restEmitter, SubmitNodeCollector.CustomGeometryRenderer fallback) {
+        submitMoving(collector, poseStack, renderType, data, sprite, light, transform, Mode.MOVING, restEmitter, fallback);
+    }
+
+    // The same for a part the entity shader lit from its own normals (restEmitter writes them, and no face shading),
+    // still lit so as it turns. fallback is the part drawn through submitCustomGeometry with transform in the pose.
+    public static void submitMovingLit(SubmitNodeCollector collector, PoseStack poseStack, RenderType renderType, float[] data, TextureAtlasSprite sprite,
+            int light, Matrix4fc transform, SubmitNodeCollector.CustomGeometryRenderer restEmitter) {
+        submitMovingLit(collector, poseStack, renderType, data, sprite, light, transform, -1, restEmitter);
+    }
+
+    // The same tinted (ARGB, as the shader's colour modulator), for a part whose colour changes (a receiver glowing with
+    // its heat) while its mesh stays the one built white; restEmitter writes it white.
+    public static void submitMovingLit(SubmitNodeCollector collector, PoseStack poseStack, RenderType renderType, float[] data, TextureAtlasSprite sprite,
+            int light, Matrix4fc transform, int tint, SubmitNodeCollector.CustomGeometryRenderer restEmitter) {
+        submitMoving(collector, poseStack, renderType, data, sprite, light, transform, Mode.MOVING_LIT, tint, restEmitter, (pose, buffer) -> {
+            PoseStack.Pose turned = pose.copy();
+            turned.mulPose(new Matrix4f(transform));
+            restEmitter.render(turned, new TintedConsumer(buffer, tint));
+        });
+    }
+
+    private static void submitMoving(SubmitNodeCollector collector, PoseStack poseStack, RenderType renderType, float[] data, TextureAtlasSprite sprite,
+            int light, Matrix4fc transform, Mode mode, SubmitNodeCollector.CustomGeometryRenderer restEmitter,
+            SubmitNodeCollector.CustomGeometryRenderer fallback) {
+        submitMoving(collector, poseStack, renderType, data, sprite, light, transform, mode, -1, restEmitter, fallback);
+    }
+
+    private static void submitMoving(SubmitNodeCollector collector, PoseStack poseStack, RenderType renderType, float[] data, TextureAtlasSprite sprite,
+            int light, Matrix4fc transform, Mode mode, int tint, SubmitNodeCollector.CustomGeometryRenderer restEmitter,
+            SubmitNodeCollector.CustomGeometryRenderer fallback) {
+        if (data.length == 0) {
+            return;
+        }
+        RenderPipeline pipeline = pipelineFor(renderType, mode);
+        Matrix4fc pose = poseStack.last().pose();
+        if (pipeline == null || !translationOnly(pose)) {
+            collector.submitCustomGeometry(poseStack, renderType, fallback);
+            return;
+        }
+        Mesh mesh = MESHES.computeIfAbsent(new Key(data, sprite, light, renderType, mode), key -> new Mesh(renderType, pipeline, restEmitter, data.length / 8));
+        mesh.lastUsed = System.nanoTime();
+        Vector4f color = tint == -1 ? WHITE
+                : new Vector4f((tint >> 16 & 0xFF) / 255.0F, (tint >> 8 & 0xFF) / 255.0F, (tint & 0xFF) / 255.0F, (tint >>> 24) / 255.0F);
+        collector.submitSpecial(RenderPhaseKeys.SOLID, new Submit(mesh, new Vector3f(pose.m30(), pose.m31(), pose.m32()), new Matrix4f(transform), color));
+    }
+
+    // A consumer passing everything on with the colour multiplied by a tint (for the CPU path of a tinted part).
+    private record TintedConsumer(com.mojang.blaze3d.vertex.VertexConsumer inner, int tint) implements com.mojang.blaze3d.vertex.VertexConsumer {
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer addVertex(float x, float y, float z) {
+            inner.addVertex(x, y, z);
+            return this;
+        }
+
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer setColor(int r, int g, int b, int a) {
+            return setColor(a << 24 | r << 16 | g << 8 | b);
+        }
+
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer setColor(int argb) {
+            inner.setColor(net.minecraft.util.ARGB.multiply(argb, tint));
+            return this;
+        }
+
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer setUv(float u, float v) {
+            inner.setUv(u, v);
+            return this;
+        }
+
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer setUv1(int u, int v) {
+            inner.setUv1(u, v);
+            return this;
+        }
+
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer setUv2(int u, int v) {
+            inner.setUv2(u, v);
+            return this;
+        }
+
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer setUv3(float u, float v) {
+            inner.setUv3(u, v);
+            return this;
+        }
+
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer setNormal(float x, float y, float z) {
+            inner.setNormal(x, y, z);
+            return this;
+        }
+
+        @Override
+        public com.mojang.blaze3d.vertex.VertexConsumer setLineWidth(float width) {
+            inner.setLineWidth(width);
+            return this;
+        }
+    }
+
+    private static @Nullable RenderPipeline pipelineFor(RenderType renderType, Mode mode) {
         RenderPipeline pipeline = renderType.pipeline();
-        return pipeline == RenderPipelines.ENTITY_SOLID ? SOLID : pipeline == RenderPipelines.ENTITY_CUTOUT ? CUTOUT : null;
+        boolean cutout = pipeline == RenderPipelines.ENTITY_CUTOUT;
+        if (!cutout && pipeline != RenderPipelines.ENTITY_SOLID) {
+            return null;
+        }
+        return switch (mode) {
+            case STILL -> cutout ? CUTOUT : SOLID;
+            case MOVING -> cutout ? MOVING_CUTOUT : MOVING_SOLID;
+            case MOVING_LIT -> cutout ? LIT_CUTOUT : LIT_SOLID;
+        };
     }
 
     // Whether the pose only moves (the large-model renderers only translate), so its normals are untouched and the
@@ -196,7 +356,7 @@ public final class StaticMeshes {
         }
     }
 
-    record Submit(Mesh mesh, Vector3f offset) implements SubmitNode {
+    record Submit(Mesh mesh, Vector3f offset, Matrix4f transform, Vector4f color) implements SubmitNode {
         @Override
         public FeatureRendererType<Submit> featureType() {
             return TYPE;
@@ -229,7 +389,7 @@ public final class StaticMeshes {
                     continue;
                 }
                 PreparedRenderType base = prepared.computeIfAbsent(mesh.renderType, RenderType::prepare);
-                GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, WHITE, submit.offset(), IDENTITY);
+                GpuBufferSlice transforms = RenderSystem.getDynamicUniforms().writeTransform(modelView, submit.color(), submit.offset(), submit.transform());
                 int indexCount = PrimitiveTopology.QUADS.indexCount(mesh.vertexCount);
                 indices.requestIndexCount(indexCount);
                 draws.add(new Draw(new PreparedRenderType(base.name(), mesh.pipeline, null, transforms, base.scissorState(), base.textures()), buffer,
@@ -270,6 +430,10 @@ public final class StaticMeshes {
     static void registerPipelines(RegisterRenderPipelinesEvent event) {
         event.registerPipeline(SOLID);
         event.registerPipeline(CUTOUT);
+        event.registerPipeline(MOVING_SOLID);
+        event.registerPipeline(MOVING_CUTOUT);
+        event.registerPipeline(LIT_SOLID);
+        event.registerPipeline(LIT_CUTOUT);
     }
 
     // Once for each feature dispatcher (the level's, and the hand and screen's): each gets a renderer of its own.

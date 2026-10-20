@@ -189,6 +189,9 @@ public final class ModBlockEntityTypes {
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity>> STEAM_GENERATOR =
             BLOCK_ENTITY_TYPES.register("steam_generator", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.SteamGeneratorBlockEntity::new, ModBlocks.STEAM_GENERATOR_CONTROLLER.get()));
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity>> NUCLEAR_STEAM_TURBINE =
+            BLOCK_ENTITY_TYPES.register("nuclear_steam_turbine", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity::new, ModBlocks.NUCLEAR_TURBINE_CASING.get()));
     public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity>> HEAVY_WATER_TOWER =
             BLOCK_ENTITY_TYPES.register("heavy_water_tower", () -> new BlockEntityType<>(
                     net.zagdrath.arcforge.blockentity.multiblock.HeavyWaterTowerBlockEntity::new, ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get()));

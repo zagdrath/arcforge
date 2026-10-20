@@ -54,8 +54,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // Steam Turbine Array's Exhaust ports back into water, 1 mB for 1 mB. It condenses 400 mB/t per cube (27 blocks of its
 // volume) in open air (a 7x7x7: 5,081); water sources and ice touching its outer faces add to that (20 each, ice 30,
 // packed ice 40, blue ice 60), a cold biome multiplies it by 1.25 and the Nether by 0.5, up to 800 mB/t per cube (a
-// 7x7x7: 10,163). A full-size (7x7x27) Steam Turbine Array exhausts up to 5,880 mB/t: more than a 7x7x7 takes in open
-// air, well within what one takes with water or ice round it.
+// 7x7x7: 10,163). A full-size (7x7x27) Steam Turbine Array exhausts up to 8,820 mB/t: more than a 7x7x7 takes in open
+// air, within what one takes with water or ice round it. A full-size Nuclear Steam Turbine's 58,800 mB/t takes six.
 // Its tanks hold 16,000 mB per cube. It looks around every 40 ticks.
 // Its ports push the water out on their own, each up to its rate a tick (see MultiblockAutomation).
 public class CondenserArrayBlockEntity extends CubeMultiblockBlockEntity {

@@ -8,6 +8,7 @@ package net.zagdrath.arcforge.blockentity.multiblock;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -127,6 +128,13 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     private final Map<BlockPos, ItemStack> rods = new HashMap<>();
     private @Nullable ReactorSim sim;
     private BlockPos[] cellPos = new BlockPos[0];
+    // The cells in the order fresh rods fill them: nearest the core's middle first (see moveRods).
+    private int[] loadOrder = new int[0];
+    // Rods the player asked to come out at the next shutdown, from the GUI's core map (see togglePull).
+    private final Set<BlockPos> pulls = new LinkedHashSet<>();
+    // The core map for the GUI (see FissionReactorMenu.DATA_MAP), worked out once a tick while a menu reads it.
+    private final int[] coreMap = new int[FissionReactorMenu.MAP_CELLS];
+    private long coreMapTime = Long.MIN_VALUE;
     private long layoutKey;
     // Fuel Channel blocks in the vessel, loaded or not (the core counts only loaded ones).
     private int fuelChannelBlocks;
@@ -416,6 +424,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         }
         layoutKey = key;
         cellPos = positions;
+        loadOrder = centreOut(positions, box.min(), box.max());
         ReactorParams p = params();
         p.solidFuel = !saltCore;
         ReactorSim next = new ReactorSim(p, lattice);
@@ -1175,6 +1184,24 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
                 }
             }
         }
+        // Rods asked for from the core map, one at a time.
+        for (BlockPos pos : List.copyOf(pulls)) {
+            ItemStack stack = rods.get(pos);
+            if (stack == null) {
+                pulls.remove(pos);
+                continue;
+            }
+            ReactorSim.Rod live = null;
+            for (int cell : core.fuelCells()) {
+                if (pos.equals(cellPos[cell])) {
+                    live = core.rod(cell);
+                }
+            }
+            if (unload(pos, stack, live, core, now)) {
+                pulls.remove(pos);
+            }
+            return;
+        }
         if (unloadAll) {
             for (int cell : core.controlCells()) {
                 ItemStack stack = rods.get(cellPos[cell]);
@@ -1189,9 +1216,10 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             }
             unloadAll = false;
         }
-        // In: the first rod waiting goes into the first empty channel for it. The cells run from the bottom layer up;
-        // control rods fill from the top down, as the banks enter from the top, so a part-loaded set still covers the
-        // top of the core.
+        // In: the first rod waiting goes into the first empty channel for it. Fuel fills from the core's middle out (see
+        // centreOut), so the rods loaded first sit where the flux is highest; control rods fill from the top down (the
+        // cells run from the bottom layer up), as the banks enter from the top, so a part-loaded set still covers the top
+        // of the core.
         for (int slot = 0; slot < INPUT_SLOTS; slot++) {
             ItemStack waiting = items.getStack(slot);
             if (waiting.isEmpty() || !isLoadable(waiting)) {
@@ -1203,7 +1231,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             }
             Block channel = fuel ? ModBlocks.FUEL_CHANNEL.get() : ModBlocks.CONTROL_ROD_CHANNEL.get();
             for (int c = 0; c < cellPos.length; c++) {
-                BlockPos pos = cellPos[fuel ? c : cellPos.length - 1 - c];
+                int cell = fuel ? (c < loadOrder.length ? loadOrder[c] : c) : cellPos.length - 1 - c;
+                BlockPos pos = cellPos[cell];
                 if (pos != null && !rods.containsKey(pos) && level.getBlockState(pos).is(channel)) {
                     ItemStack one = waiting.copyWithCount(1);
                     if (fuel && !one.has(ModDataComponents.FUEL_ROD.get())) {
@@ -1380,6 +1409,72 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         setChanged();
     }
 
+    // From the core map: a fuel rod to bring out at the next shutdown, or not after all.
+    public void togglePull(int cell) {
+        if (cell < 0 || cell >= cellPos.length || cellPos[cell] == null || salt != null) {
+            return;
+        }
+        BlockPos pos = cellPos[cell];
+        if (!pulls.remove(pos) && rods.get(pos) != null && FuelRodItem.isFuelRod(rods.get(pos))) {
+            pulls.add(pos);
+        }
+        setChanged();
+    }
+
+    // From the core map: the most-burned third of the fuel rods (the batch a refuelling replaces), to come out at the
+    // next shutdown.
+    public void pullBurnedThird() {
+        ReactorSim core = sim;
+        if (core == null || core.lattice.saltCore) {
+            return;
+        }
+        for (int cell : burnedThird(core)) {
+            pulls.add(cellPos[cell]);
+        }
+        setChanged();
+    }
+
+    // How many rods a third of count is (rounded up, so one rod is its own third).
+    public static int third(int count) {
+        return (count + 2) / 3;
+    }
+
+    // The cells of the most-burned third of the loaded fuel rods, most burned first.
+    private static List<Integer> burnedThird(ReactorSim core) {
+        List<Integer> loaded = new ArrayList<>();
+        for (int cell : core.fuelCells()) {
+            if (core.rod(cell) != null) {
+                loaded.add(cell);
+            }
+        }
+        loaded.sort((a, b) -> Double.compare(core.rod(b).burnup, core.rod(a).burnup));
+        return loaded.subList(0, third(loaded.size()));
+    }
+
+    // The cells nearest the core's middle first: across first (a channel's distance from the vessel's axis), then up
+    // and down from its middle layer, so partly burned rods loaded first go in the middle and fresh ones round them.
+    private static int[] centreOut(BlockPos[] positions, BlockPos min, BlockPos max) {
+        double cx = (min.getX() + max.getX()) / 2.0, cy = (min.getY() + max.getY()) / 2.0, cz = (min.getZ() + max.getZ()) / 2.0;
+        Integer[] order = new Integer[positions.length];
+        for (int i = 0; i < order.length; i++) {
+            order[i] = i;
+        }
+        java.util.function.ToDoubleFunction<Integer> distance = i -> {
+            BlockPos pos = positions[i];
+            if (pos == null) {
+                return Double.MAX_VALUE;
+            }
+            double dx = pos.getX() - cx, dz = pos.getZ() - cz;
+            return (dx * dx + dz * dz) * 1_000.0 + Math.abs(pos.getY() - cy);
+        };
+        java.util.Arrays.sort(order, java.util.Comparator.comparingDouble(distance).thenComparingInt(i -> i));
+        int[] out = new int[order.length];
+        for (int i = 0; i < out.length; i++) {
+            out[i] = order[i];
+        }
+        return out;
+    }
+
     // Fuel Channel blocks in the vessel, loaded or not.
     public int fuelChannelBlocks() {
         return fuelChannelBlocks;
@@ -1528,6 +1623,9 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             int i = index - FissionReactorMenu.DATA_HISTORY;
             return history[i / HISTORY][i % HISTORY];
         }
+        if (index >= FissionReactorMenu.DATA_MAP && index < FissionReactorMenu.DATA_MAP + FissionReactorMenu.MAP_CELLS) {
+            return coreMap()[index - FissionReactorMenu.DATA_MAP];
+        }
         ReactorSim.Trips trips = trips();
         return switch (index) {
             case FissionReactorMenu.DATA_STATUS -> status.ordinal();
@@ -1567,6 +1665,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             case FissionReactorMenu.DATA_RODS -> core != null ? core.loadedRods() : loadedFuel();
             case FissionReactorMenu.DATA_CHANNELS -> fuelChannelBlocks;
             case FissionReactorMenu.DATA_CONTROL_CHANNELS -> controlChannelBlocks;
+            case FissionReactorMenu.DATA_MAP_SIZE -> core != null ? FissionReactorMenu.packMapSize(core.lattice.nx, core.lattice.ny, core.lattice.nz) : 0;
             case FissionReactorMenu.DATA_CONTROL_RODS -> core != null ? core.controlCells().length : 0;
             case FissionReactorMenu.DATA_BURNUP -> meanBurnup(core);
             case FissionReactorMenu.DATA_DOPPLER -> core != null ? (int) Math.round(core.dopplerCoefficient * 1.0E7) : 0;
@@ -1600,6 +1699,57 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             case FissionReactorMenu.DATA_BURST_PRESSURE -> core != null ? (int) Math.round(core.burstPressure() * 10.0) : 0;
             default -> 0;
         };
+    }
+
+    // Each cell of the core for the GUI's map (see FissionReactorMenu.packCell): what's in it, and a fuel rod's burnup,
+    // enrichment and type, whether it's damaged and whether it's to come out.
+    private int[] coreMap() {
+        long now = level != null ? level.getGameTime() : 0L;
+        if (now == coreMapTime) {
+            return coreMap;
+        }
+        coreMapTime = now;
+        java.util.Arrays.fill(coreMap, 0);
+        ReactorSim core = sim;
+        if (core == null || level == null) {
+            return coreMap;
+        }
+        for (int i = 0; i < Math.min(cellPos.length, coreMap.length); i++) {
+            BlockPos pos = cellPos[i];
+            if (pos == null) {
+                continue;
+            }
+            BlockState state = level.getBlockState(pos);
+            ItemStack stack = rods.get(pos);
+            int kind;
+            FuelRod fuel = null;
+            if (state.is(ModBlocks.FUEL_CHANNEL.get())) {
+                if (core.lattice.saltCore) {
+                    kind = FissionReactorMenu.CELL_SALT;
+                } else if (stack != null && FuelRodItem.isFuelRod(stack)) {
+                    kind = FissionReactorMenu.CELL_FUEL;
+                    fuel = FuelRod.of(stack);
+                } else {
+                    kind = FissionReactorMenu.CELL_EMPTY_CHANNEL;
+                }
+            } else if (state.is(ModBlocks.CONTROL_ROD_CHANNEL.get())) {
+                kind = FissionReactorMenu.CELL_CONTROL;
+            } else {
+                kind = switch (core.lattice.cell(i)) {
+                    case GRAPHITE -> FissionReactorMenu.CELL_GRAPHITE;
+                    case STEEL -> FissionReactorMenu.CELL_STEEL;
+                    default -> FissionReactorMenu.CELL_COOLANT;
+                };
+            }
+            if (fuel == null) {
+                coreMap[i] = FissionReactorMenu.packCell(kind, 0.0, 0, 0, false, false);
+                continue;
+            }
+            ReactorSim.Rod live = core.rod(i);
+            double burnup = live != null ? live.burnup : fuel.burnup();
+            coreMap[i] = FissionReactorMenu.packCell(kind, burnup, fuel.enrichment(), fuel.type().ordinal(), fuel.damaged(), pulls.contains(pos));
+        }
+        return coreMap;
     }
 
     private int meanBurnup(@Nullable ReactorSim core) {
@@ -1684,6 +1834,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         mode = ReactorSim.Mode.values()[Mth.clamp(in.getIntOr("mode", 0), 0, ReactorSim.Mode.values().length - 1)];
         redstoneRods = in.getBooleanOr("redstone_rods", false);
         autoUnload = in.getBooleanOr("auto_unload", true);
+        pulls.clear();
+        in.read("pulls", Codec.LONG.listOf()).ifPresent(list -> list.forEach(pos -> pulls.add(BlockPos.of(pos))));
         glow = in.getIntOr("glow", 0);
         water = Mth.clamp(in.getIntOr("water", 0), 0, WATER_STEPS);
         damageMarked = saved.coreDamaged;
@@ -1750,6 +1902,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         out.putInt("mode", mode.ordinal());
         out.putBoolean("redstone_rods", redstoneRods);
         out.putBoolean("auto_unload", autoUnload);
+        out.store("pulls", Codec.LONG.listOf(), pulls.stream().map(BlockPos::asLong).toList());
         out.putInt("glow", glow);
         out.putInt("water", water);
         intake.serialize(out.child("intake"));

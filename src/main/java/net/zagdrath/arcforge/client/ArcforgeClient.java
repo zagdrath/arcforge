@@ -174,6 +174,7 @@ public class ArcforgeClient {
         container.registerExtensionPoint(IConfigScreenFactory.class, ArcforgeConfigScreen::create);
         EngineersHandbookItem.opener = EngineersHandbookScreen::open;
         SteamTurbineArrayBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
+        net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity.clientSoundHook = TurbineArraySound::keepPlaying;
         GasTurbineArrayBlockEntity.clientHook = GasTurbineArraySound::clientTick;
         net.zagdrath.arcforge.blockentity.multiblock.DieselGeneratorBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.DieselGeneratorSound::clientTick;
         net.zagdrath.arcforge.blockentity.multiblock.CentrifugeCascadeBlockEntity.clientHook = net.zagdrath.arcforge.client.sound.CentrifugeCascadeSound::clientTick;
@@ -280,6 +281,7 @@ public class ArcforgeClient {
         event.register(ModMenuTypes.ARC_QUARRY.get(), ArcQuarryScreen::new);
         event.register(ModMenuTypes.ARC_QUARRY_CONFIG.get(), ArcQuarryConfigScreen::new);
         event.register(ModMenuTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayScreen::new);
+        event.register(ModMenuTypes.NUCLEAR_STEAM_TURBINE.get(), net.zagdrath.arcforge.client.screen.multiblock.NuclearSteamTurbineScreen::new);
         event.register(ModMenuTypes.GAS_TURBINE_ARRAY.get(), GasTurbineArrayScreen::new);
         event.register(ModMenuTypes.SUPERHEATER_ARRAY.get(), SuperheaterArrayScreen::new);
         event.register(ModMenuTypes.CONDENSER_ARRAY.get(), CondenserArrayScreen::new);
@@ -669,6 +671,8 @@ public class ArcforgeClient {
         event.registerBlockEntityRenderer(ModBlockEntityTypes.CARBONIZER.get(), CarbonizerDoorRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_BOILER_ARRAY.get(), SteamBoilerArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.STEAM_TURBINE_ARRAY.get(), SteamTurbineArrayRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntityTypes.NUCLEAR_STEAM_TURBINE.get(),
+                net.zagdrath.arcforge.client.renderer.blockentity.NuclearSteamTurbineRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.GAS_TURBINE_ARRAY.get(), GasTurbineArrayRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.METER.get(), net.zagdrath.arcforge.client.renderer.blockentity.MeterRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntityTypes.DISTILLATION_ARRAY.get(), DistillationArrayRenderer::new);

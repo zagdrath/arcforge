@@ -91,7 +91,16 @@ public class FissionReactorMenu extends MachineMenu {
     public static final int DATA_BURST_PRESSURE = 67;
     public static final int DATA_HISTORY = 70;         // 3 series x HISTORY
     public static final int DATA_CONTROL_CHANNELS = DATA_HISTORY + 3 * FissionReactorBlockEntity.HISTORY; // loaded or not
-    public static final int DATA_VALUES = DATA_CONTROL_CHANNELS + 1;
+    // The core map: the core's size (see packMapSize), then each cell (see packCell), in the lattice's order (x fastest,
+    // then z, then y from the bottom).
+    public static final int DATA_MAP_SIZE = DATA_CONTROL_CHANNELS + 1;
+    public static final int DATA_MAP = DATA_MAP_SIZE + 1;
+    // The largest core inside a 7x9x7 vessel.
+    public static final int MAP_CELLS = 5 * 7 * 5;
+    public static final int DATA_VALUES = DATA_MAP + MAP_CELLS;
+
+    // What a core map cell holds.
+    public static final int CELL_COOLANT = 0, CELL_GRAPHITE = 1, CELL_STEEL = 2, CELL_CONTROL = 3, CELL_EMPTY_CHANNEL = 4, CELL_FUEL = 5, CELL_SALT = 6;
 
     public static final int FLAG_REDSTONE_RODS = 32, FLAG_AUTO_UNLOAD = 64, FLAG_UNLOADING = 128, FLAG_CAN_REFUEL = 256, FLAG_DAMAGED = 512;
 
@@ -104,9 +113,11 @@ public class FissionReactorMenu extends MachineMenu {
     // step (1%) or a big step (10%): 200 + b * 4 + {0 out, 1 in, 2 out big, 3 in big}; every bank at once the same:
     // 216..219; SCRAM 220; Reset 221; trip i on/off 222 + i; trip i down/up 227 + 2i / 228 + 2i; pump down/up 237/238;
     // Redstone Rods 239; auto-unload 240; unload every rod 241; bank b down or up a fine step (0.1%): 242 + b * 2 + {0 out,
-    // 1 in}, every bank at once 250/251; silence the alarms 252.
+    // 1 in}, every bank at once 250/251; silence the alarms 252; bring the most-burned third out 253. From the core map, a
+    // fuel rod to bring out (or not): 1000 + its cell.
     public static final int BANK_FIRST = 200, ALL_BANKS = 216, SCRAM = 220, RESET = 221, TRIP_TOGGLE = 222, TRIP_STEP = 227, PUMP_DOWN = 237,
-            PUMP_UP = 238, REDSTONE_RODS = 239, AUTO_UNLOAD = 240, UNLOAD_ALL = 241, FINE = 242, SILENCE = 252, LAST = 252;
+            PUMP_UP = 238, REDSTONE_RODS = 239, AUTO_UNLOAD = 240, UNLOAD_ALL = 241, FINE = 242, SILENCE = 252, PULL_THIRD = 253, LAST = 253,
+            PULL_CELL = 1_000;
 
     public FissionReactorMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(), FissionReactorBlockEntity.clientItems(), WideIntContainerData.client(DATA_VALUES));
@@ -140,7 +151,8 @@ public class FissionReactorMenu extends MachineMenu {
 
     @Override
     public boolean clickMenuButton(Player player, int buttonId) {
-        if (buttonId < BANK_FIRST || buttonId > LAST) {
+        boolean pull = buttonId >= PULL_CELL && buttonId < PULL_CELL + MAP_CELLS;
+        if (!pull && (buttonId < BANK_FIRST || buttonId > LAST)) {
             return super.clickMenuButton(player, buttonId);
         }
         access.execute((level, at) -> {
@@ -152,7 +164,11 @@ public class FissionReactorMenu extends MachineMenu {
     }
 
     public static void apply(FissionReactorBlockEntity reactor, int id) {
-        if (id == SILENCE) {
+        if (id >= PULL_CELL) {
+            reactor.togglePull(id - PULL_CELL);
+        } else if (id == PULL_THIRD) {
+            reactor.pullBurnedThird();
+        } else if (id == SILENCE) {
             reactor.silence();
         } else if (id >= FINE) {
             int bank = (id - FINE) / 2;
@@ -334,6 +350,53 @@ public class FissionReactorMenu extends MachineMenu {
 
     public int controlRods() {
         return value(DATA_CONTROL_RODS);
+    }
+
+    public static int packMapSize(int nx, int ny, int nz) {
+        return nx | ny << 8 | nz << 16;
+    }
+
+    // The core's size across (x), up (y) and deep (z), or 0s when it isn't formed.
+    public int[] mapSize() {
+        int packed = value(DATA_MAP_SIZE);
+        return new int[] { packed & 0xFF, packed >> 8 & 0xFF, packed >> 16 & 0xFF };
+    }
+
+    // A cell: what it holds (3 bits), and for a fuel rod its burnup in thousandths (10 bits), its enrichment in
+    // hundredths of a percent (11 bits), its fuel type (2 bits), damaged and to come out.
+    public static int packCell(int kind, double burnup, int enrichmentPcm, int type, boolean damaged, boolean pull) {
+        int permille = (int) Math.round(Math.max(0.0, Math.min(1.0, burnup)) * 1000.0);
+        int hundredths = Math.max(0, Math.min(2_047, enrichmentPcm / 10));
+        return kind | permille << 3 | hundredths << 13 | (type & 3) << 24 | (damaged ? 1 << 26 : 0) | (pull ? 1 << 27 : 0);
+    }
+
+    public int cell(int i) {
+        return value(DATA_MAP + i);
+    }
+
+    public static int cellKind(int cell) {
+        return cell & 7;
+    }
+
+    public static double cellBurnup(int cell) {
+        return (cell >> 3 & 0x3FF) / 1000.0;
+    }
+
+    // Its enrichment in pcm.
+    public static int cellEnrichment(int cell) {
+        return (cell >> 13 & 0x7FF) * 10;
+    }
+
+    public static int cellType(int cell) {
+        return cell >> 24 & 3;
+    }
+
+    public static boolean cellDamaged(int cell) {
+        return (cell & 1 << 26) != 0;
+    }
+
+    public static boolean cellPull(int cell) {
+        return (cell & 1 << 27) != 0;
     }
 
     public int controlChannels() {

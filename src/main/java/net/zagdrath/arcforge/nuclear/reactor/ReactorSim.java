@@ -55,6 +55,11 @@ public final class ReactorSim {
         public boolean isSpent() {
             return burnup >= 1.0;
         }
+
+        // The full-power ticks it lasts: in proportion to what it started with that fissions (see ReactorParams.rodLife).
+        public double life(ReactorParams p) {
+            return p.rodLife(enrichment + plutonium0);
+        }
     }
 
     // The trip points the player sets: each on or off and its value.
@@ -673,7 +678,8 @@ public final class ReactorSim {
                 lattice.setXenon(cell, lattice.xenon(cell) * (1.0 - p.saltXenonRemoval));
             }
             if (q > 0.0 && !rod.isSpent()) {
-                double db = q / p.rodLifeTicks * each;
+                // Burnup follows the energy it has given (power, not time), and what builds up follows burnup.
+                double db = q / rod.life(p) * each;
                 rod.burnup = Math.min(1.0, rod.burnup + db);
                 if (!rod.thorium) {
                     rod.plutonium = rod.plutonium0 * (1.0 - p.plutoniumUse * rod.burnup)

@@ -86,7 +86,10 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imple
     // backwards; the stagger hides most of that, and full speed turns 60° a tick.
     private static final double MAX_DEGREES_PER_TICK = 60.0;
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.LUBRICANT, SideMode.HEAT, SideMode.GAS_OUTPUT);
-    private static final int SYNC_INTERVAL = 5;
+    // The rotor's state is sent to clients at most this often, and only once it has changed noticeably: the speed or
+    // the load by SYNC_SHARE of full, the exhaust's heat by EXHAUST_SHARE of what it was (or the venting stops or starts).
+    private static final int SYNC_INTERVAL = 10;
+    private static final double SYNC_SHARE = 0.02, EXHAUST_SHARE = 0.05;
     private static final int SIGNAL_CHECK_INTERVAL = 10;
     // The hottest exhaust (Hydrogen, 1,400°C x 0.5, with room above).
     private static final int EXHAUST_MAX_CELSIUS = 1_400;
@@ -464,8 +467,9 @@ public class GasTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imple
         outputLimit.tick(level, allowed && intakeOpen && hasFuel,
                 () -> OutputLimit.anyPortTakes(level, this, SideMode.ENERGY, OutputLimit.Unit.FE),
                 energy.getAmountAsInt(), energy.getCapacityAsInt(), energy.drained(), rated);
-        boolean changed = Math.abs(rpm - syncedRpm) >= 1.0 || isVenting() != syncedVenting || Math.abs(load() - syncedLoad) >= 0.01F
-                || exhaustHu != syncedExhaustHu;
+        boolean changed = Math.abs(rpm - syncedRpm) >= SYNC_SHARE * maxRpm() || isVenting() != syncedVenting
+                || Math.abs(load() - syncedLoad) >= SYNC_SHARE + 0.01 || Math.abs(exhaustHu - syncedExhaustHu) > EXHAUST_SHARE * Math.max(syncedExhaustHu, 1)
+                || (exhaustHu == 0) != (syncedExhaustHu == 0);
         if (changed && time - lastSync >= SYNC_INTERVAL || (rpm == 0 && syncedRpm != 0)) {
             syncedRpm = (float) rpm;
             syncedLoad = load();

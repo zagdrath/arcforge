@@ -389,8 +389,8 @@ hold a gas:
 - **Single-block machines:** the Air Separator, Carbon Reclaimer, Chemical Reactor, Combustion Plant, Electrolyzer,
   Fermenter, Firebox, Fischer-Tropsch Reactor, Fuel Burner, Gasifier, Haber Reactor and Hydroponic Cell.
 - **Multiblocks:** the Arcforge Furnace, Biogas Digester, Condenser Array, Distillation Array, Firebox Array, Gas
-  Turbine Array, Greenhouse, Steam Boiler Array, Steam Turbine Array and Superheater Array. Every block of a formed
-  multiblock gives its controller's tanks, as `MACHINE_CONTROL` does.
+  Turbine Array, Greenhouse, Nuclear Steam Turbine, Steam Boiler Array, Steam Turbine Array and Superheater Array.
+  Every block of a formed multiblock gives its controller's tanks, as `MACHINE_CONTROL` does.
 - **Storage:** Pressurized Cylinders of every tier.
 
 Machines that hold only liquids don't provide it, nor do Fluid Tanks or Reservoirs. Neither do conduits, Meters or the

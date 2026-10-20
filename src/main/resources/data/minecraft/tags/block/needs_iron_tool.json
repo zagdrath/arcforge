@@ -40,6 +40,7 @@
     "arcforge:graphite_moderator",
     "arcforge:steel_reflector",
     "arcforge:steam_generator_casing",
+    "arcforge:nuclear_turbine_casing",
     "arcforge:steam_generator_controller",
     "arcforge:steam_generator_tubes",
     "arcforge:heavy_water_tower_casing",

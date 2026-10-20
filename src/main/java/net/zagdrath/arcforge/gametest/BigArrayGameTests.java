@@ -203,7 +203,7 @@ public final class BigArrayGameTests {
                     SteamTurbineArrayBlockEntity turbine = helper.getBlockEntity(turbineMin, SteamTurbineArrayBlockEntity.class);
                     helper.assertTrue(turbine.isMaster() && turbine.getShell() != null && turbine.getShell().axis() == Direction.Axis.X,
                             "The 5x4x6 turbine didn't form along X");
-                    helper.assertTrue(turbine.maxFlow() == 533, "Turbine flow " + turbine.maxFlow());
+                    helper.assertTrue(turbine.maxFlow() == 800, "Turbine flow " + turbine.maxFlow());
                     helper.assertTrue(turbine.getShell().narrowSide() == 4, "Narrow side " + turbine.getShell().narrowSide());
                     helper.assertTrue(helper.getBlockState(turbineMin.offset(5, 1, 2)).getValue(SteamTurbineArrayCasingBlock.END)
                             == SteamTurbineArrayCasingBlock.End.NONE, "An even end has a generator");

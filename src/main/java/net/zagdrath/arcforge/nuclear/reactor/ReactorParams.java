@@ -95,7 +95,8 @@ public final class ReactorParams {
     public double[] decayTicks = { 1_200.0, 12_000.0, 72_000.0 };
 
     // --- Burnup ---
-    public double rodLifeTicks = 1_152_000.0;   // full-power ticks a rod lasts (16 real hours, 48 in-game days)
+    public double rodLifeTicks = 8_640_000.0;   // full-power ticks a 5% rod lasts (120 real hours, one Minecraft year)
+    public double lifeEnrichment = 0.05;        // the fissile content rodLifeTicks is for: a rod lasts in proportion to its own
     public double u235Use = 0.45;               // of its U-235 used when spent
     public double plutoniumMade = 0.40;         // fissile plutonium made, against the U-235 it started with
     public double plutoniumUse = 0.40;          // of a MOX rod's plutonium used when spent
@@ -122,6 +123,13 @@ public final class ReactorParams {
     public double reliefPerValve = 0.4;
     // Whether the fuel is solid (it can melt into corium); a molten salt core's isn't.
     public boolean solidFuel = true;
+
+    // The full-power ticks a rod starting with this fissile content (U-235, U-233 or plutonium, as a fraction) lasts: in
+    // proportion to it, as its burnup is (9% fuel 1.8 times a 5% rod, natural uranium about a seventh). A thorium
+    // blanket, with nothing fissile to start with, lasts rodLifeTicks.
+    public double rodLife(double startFissile) {
+        return startFissile > 0.0 ? rodLifeTicks * startFissile / lifeEnrichment : rodLifeTicks;
+    }
 
     public static ReactorParams defaults() {
         return new ReactorParams();

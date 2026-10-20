@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import org.joml.Matrix4f;
 import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -17,6 +18,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -32,6 +34,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.blockentity.multiblock.PlantControllerBlockEntity;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.LargeModels;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
@@ -42,8 +46,10 @@ import net.zagdrath.arcforge.steam.ModelMesh;
 
 // Draws a formed refinery box (the Cracking Unit, the Steam Cracker or the Diesel Generator; its casings draw nothing but their port
 // plates) from its mesh on a model sheet, with a nozzle from the model out to each port. The still parts are built once
-// and again when the ports change (checked every second); the turning parts each frame; the glow list full-bright, as
-// bright as the subclass says. Shaded like the Pumpjack (see PumpjackRenderer.emit).
+// (and again when the ports change, checked every second) and baked into the chunk mesh (ChunkMeshes); this draws the
+// turning parts (each frame; past simpleMovingPartsFrom, as they stand at rest, built once) and the glow list
+// full-bright, as bright as the subclass says, out to stillPartsOnlyFrom (see LargeModels). Shaded like the Pumpjack
+// (see PumpjackRenderer.emit).
 public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> implements StructureRenderer<T, PlantRenderer.State> {
     private static final int PORT_SCAN_INTERVAL = 20;
     private static final float[] EMPTY = new float[0];
@@ -56,6 +62,11 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
         final M mesh;
         List<ModelMesh.Port> ports;
         float[] solid = EMPTY, glass = EMPTY, glow = EMPTY;
+        // The turning parts at rest (drawn still, far off), the rigid ones built once (see buildRigid), and the box round
+        // what this renderer draws.
+        float[] movingRest = EMPTY;
+        float[][] rigid = {};
+        @Nullable AABB drawn;
         long scanned;
 
         Built(OilfieldStructures.PlantBox box, ModelFrame frame, M mesh, List<ModelMesh.Port> ports) {
@@ -69,7 +80,9 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
     public static class State extends BlockEntityRenderState {
         public boolean formed;
         public int offsetX, offsetY, offsetZ;
-        public float[] solid = EMPTY, glass = EMPTY, glow = EMPTY, moving = EMPTY;
+        public float[] glow = EMPTY, moving = EMPTY, movingRest = EMPTY;
+        public float[][] rigid = {};
+        public Matrix4f[] rigidTurns = {};
         public float brightness;
         public @Nullable TextureAtlasSprite sheet;
         public int light;
@@ -86,6 +99,31 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
     // The turning parts this frame (none by default).
     protected float[] buildMoving(M mesh, T plant, float now) {
         return EMPTY;
+    }
+
+    // The turning parts at rest, drawn standing still far off (none by default).
+    protected float[] buildMovingRest(M mesh) {
+        return EMPTY;
+    }
+
+    // The turning parts that turn as wholes, built once at rest (none by default), and how each stands this frame
+    // (blocks, in the model's frame): drawn so, with buildMoving's, they're the turning parts built in place.
+    protected float[][] buildRigid(M mesh) {
+        return new float[0][];
+    }
+
+    protected Matrix4f[] rigidTurns(M mesh, T plant, float now) {
+        return new Matrix4f[0];
+    }
+
+    @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(T plant) {
+        return ChunkMeshes.isBaked(plant, MeshRendering.SOLID, MeshRendering.GLASS);
     }
 
     // How bright the glow list is (0 to 1).
@@ -106,6 +144,7 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
         state.formed = box != null && level != null;
         if (box == null || level == null) {
             built.remove(plant);
+            ChunkMeshes.remove(plant);
             return;
         }
         BlockPos min = box.min();
@@ -128,14 +167,22 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
                 rebuild(model);
             }
         }
-        state.solid = model.solid;
-        state.glass = model.glass;
-        state.glow = model.glow;
-        state.moving = buildMoving(model.mesh, plant, time + partialTicks);
-        state.brightness = brightness(plant);
-        state.sheet = SteamBoilerArrayRenderer.sprite(sheet());
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(sheet());
         // The light just above the structure's front middle (inside it is the casings' own darkness).
-        state.light = LightCoordsUtil.getLightCoords(level, box.at(0, box.height(), 0));
+        int light = LightCoordsUtil.getLightCoords(level, box.at(0, box.height(), 0));
+        OilfieldStructures.PlantBox builtBox = model.box;
+        java.util.function.BooleanSupplier stands = () -> builtBox.equals(plant.getBox());
+        MeshRendering.bake(plant, MeshRendering.SOLID, min, ChunkSectionLayer.SOLID, model.solid, sheet, light, stands);
+        MeshRendering.bake(plant, MeshRendering.GLASS, min, ChunkSectionLayer.CUTOUT, model.glass, sheet, light, stands);
+        LargeModels.Detail detail = LargeModels.detail(getRenderBoundingBox(plant), cameraPosition);
+        state.glow = detail != LargeModels.Detail.STILL ? model.glow : EMPTY;
+        state.moving = detail == LargeModels.Detail.FULL ? buildMoving(model.mesh, plant, time + partialTicks) : EMPTY;
+        state.rigid = detail == LargeModels.Detail.FULL ? model.rigid : new float[0][];
+        state.rigidTurns = detail == LargeModels.Detail.FULL ? rigidTurns(model.mesh, plant, time + partialTicks) : new Matrix4f[0];
+        state.movingRest = detail == LargeModels.Detail.SIMPLE ? model.movingRest : EMPTY;
+        state.brightness = brightness(plant);
+        state.sheet = sheet;
+        state.light = light;
     }
 
     private void rebuild(Built<M> model) {
@@ -143,6 +190,11 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
         model.solid = parts[0];
         model.glass = parts[1];
         model.glow = parts[2];
+        // What this draws: the glow and the turning parts, which stay within a block of where they rest.
+        model.movingRest = buildMovingRest(model.mesh);
+        model.rigid = buildRigid(model.mesh);
+        model.drawn = model.movingRest.length + model.glow.length == 0 ? null
+                : MeshRendering.bounds(model.box.min(), model.movingRest, model.glow).inflate(1.0);
     }
 
     // The ports on the structure's outer faces, in the model's frame.
@@ -183,13 +235,15 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
         }
         poseStack.pushPose();
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
-        float[] solid = state.solid, moving = state.moving, glass = state.glass, glow = state.glow;
+        float[] moving = state.moving, glow = state.glow;
         int light = state.light;
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), solid, sheet, light);
         if (moving.length > 0) {
             collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, moving, sheet, light));
         }
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entityCutout(sheet.atlasLocation()), glass, sheet, light);
+        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), state.movingRest, sheet, light);
+        for (int i = 0; i < Math.min(state.rigid.length, state.rigidTurns.length); i++) {
+            MeshRendering.submitMoving(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), state.rigid[i], sheet, light, state.rigidTurns[i]);
+        }
         if (glow.length > 0 && state.brightness > 0.01F) {
             int level = Math.round(255 * Math.min(1.0F, state.brightness));
             int color = ARGB.color(level, level, level, level);
@@ -225,8 +279,14 @@ public abstract class PlantRenderer<T extends PlantControllerBlockEntity, M> imp
         }
     }
 
+    // Only the turning parts and the glow are drawn here; the rest is in the chunk mesh.
     @Override
     public AABB getRenderBoundingBox(T plant) {
+        Built<M> model = built.get(plant);
+        if (model != null && model.box.equals(plant.getBox())) {
+            AABB drawn = model.drawn;
+            return drawn != null ? drawn : new AABB(model.box.min()).deflate(0.5);
+        }
         return plant.getRenderBox();
     }
 }

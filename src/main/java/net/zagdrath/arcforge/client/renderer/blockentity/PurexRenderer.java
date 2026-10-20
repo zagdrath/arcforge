@@ -19,6 +19,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -30,6 +31,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.zagdrath.arcforge.blockentity.multiblock.PurexBlockEntity;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
 import net.zagdrath.arcforge.multiblock.VesselStructure;
 import net.zagdrath.arcforge.registry.ModBlocks;
@@ -41,6 +43,8 @@ import net.zagdrath.arcforge.steam.PurexMesh;
 public class PurexRenderer implements StructureRenderer<PurexBlockEntity, PurexRenderer.State> {
     private static final float[] EMPTY = new float[0];
     private static final int SCAN_INTERVAL = 20;
+    // The chunk mesh slots of its two still lists (see ChunkMeshes): outside in the world's light, inside lit by the lamps.
+    private static final int OUTSIDE = 0, INSIDE = 1;
 
     private final Map<PurexBlockEntity, Built> built = new WeakHashMap<>();
 
@@ -60,7 +64,7 @@ public class PurexRenderer implements StructureRenderer<PurexBlockEntity, PurexR
     public static class State extends BlockEntityRenderState {
         public boolean formed;
         public int offsetX, offsetY, offsetZ;
-        public float[] inside = EMPTY, outside = EMPTY, glow = EMPTY;
+        public float[] glow = EMPTY;
         public @Nullable TextureAtlasSprite sheet;
         public int light;
     }
@@ -70,6 +74,16 @@ public class PurexRenderer implements StructureRenderer<PurexBlockEntity, PurexR
     @Override
     public State createRenderState() {
         return new State();
+    }
+
+    @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(PurexBlockEntity plant) {
+        return ChunkMeshes.isBaked(plant, OUTSIDE, INSIDE);
     }
 
     // The windows in the side walls, as frame blocks with their wall's outward normal.
@@ -103,6 +117,7 @@ public class PurexRenderer implements StructureRenderer<PurexBlockEntity, PurexR
         state.formed = box != null && level != null && plant.isFormed();
         if (box == null || level == null || !state.formed) {
             built.remove(plant);
+            ChunkMeshes.remove(plant);
             return;
         }
         BlockPos min = box.min();
@@ -125,11 +140,16 @@ public class PurexRenderer implements StructureRenderer<PurexBlockEntity, PurexR
                 model.parts = new PurexMesh(frame, windows).build();
             }
         }
-        state.inside = model.parts[0];
-        state.outside = model.parts[1];
+        TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
+        int light = LightCoordsUtil.getLightCoords(level, plant.getBlockPos().relative(plant.getFacing()));
+        // The still lists into the chunk mesh, each face shaded as a block face turned its way: the inside full-bright.
+        VesselStructure.Box builtBox = model.box;
+        java.util.function.BooleanSupplier stands = () -> plant.isFormed() && builtBox.equals(plant.getBox());
+        MeshRendering.bake(plant, INSIDE, min, ChunkSectionLayer.SOLID, model.parts[0], sheet, LightCoordsUtil.FULL_BRIGHT, stands);
+        MeshRendering.bake(plant, OUTSIDE, min, ChunkSectionLayer.SOLID, model.parts[1], sheet, light, stands);
         state.glow = model.parts[2];
-        state.sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
-        state.light = LightCoordsUtil.getLightCoords(level, plant.getBlockPos().relative(plant.getFacing()));
+        state.sheet = sheet;
+        state.light = light;
     }
 
     @Override
@@ -140,11 +160,7 @@ public class PurexRenderer implements StructureRenderer<PurexBlockEntity, PurexR
         }
         poseStack.pushPose();
         poseStack.translate(state.offsetX, state.offsetY, state.offsetZ);
-        float[] inside = state.inside, outside = state.outside, glow = state.glow;
-        int light = state.light;
-        // Still lists, kept on the GPU (MeshRendering.submitStill), each face shaded as a block face turned its way.
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), inside, sheet, LightCoordsUtil.FULL_BRIGHT);
-        MeshRendering.submitStill(collector, poseStack, RenderTypes.entitySolid(sheet.atlasLocation()), outside, sheet, light);
+        float[] glow = state.glow;
         if (glow.length > 0) {
             collector.submitCustomGeometry(poseStack, RenderTypes.eyes(sheet.atlasLocation()), (pose, buffer) -> emit(pose, buffer, glow, sheet,
                     LightCoordsUtil.FULL_BRIGHT));
@@ -163,8 +179,14 @@ public class PurexRenderer implements StructureRenderer<PurexBlockEntity, PurexR
         }
     }
 
+    // Only the lamps' glow is drawn here; the rest is in the chunk mesh.
     @Override
     public AABB getRenderBoundingBox(PurexBlockEntity plant) {
+        Built model = built.get(plant);
+        if (model != null && model.box.equals(plant.getBox())) {
+            float[] glow = model.parts[2];
+            return glow.length > 0 ? MeshRendering.bounds(model.box.min(), glow) : new AABB(model.box.min()).deflate(0.5);
+        }
         return plant.getRenderBox();
     }
 }

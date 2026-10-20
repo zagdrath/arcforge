@@ -55,6 +55,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.ShapedPlant;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.oil.OilDeposits;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModFluids;
@@ -322,7 +323,7 @@ public class PumpjackBlockEntity extends MachineBlockEntity implements ShapedPla
             return;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level);
         }
         status = controlState.isEnabled() && redstoneMode.canRun(powered) ? pump(level) : stoppedStatus();

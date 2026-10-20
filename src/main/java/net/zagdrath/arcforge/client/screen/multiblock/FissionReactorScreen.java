@@ -5,8 +5,13 @@
 
 package net.zagdrath.arcforge.client.screen.multiblock;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+
+import org.jspecify.annotations.Nullable;
 
 import com.mojang.blaze3d.platform.InputConstants;
 
@@ -26,6 +31,7 @@ import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.FissionReactorMenu;
+import net.zagdrath.arcforge.nuclear.Enrichment;
 import net.zagdrath.arcforge.nuclear.reactor.CoreLattice;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorParams;
 import net.zagdrath.arcforge.registry.ModFluids;
@@ -39,6 +45,9 @@ import net.zagdrath.arcforge.nuclear.safety.ReactorAlarm;
 //    the coolant, pressure, xenon, decay heat), the four rod banks and All on the right (each a bar of how far in it
 //    is with a marker at its target, - out / + in buttons, shift for 10%, and how far in, with the target while it
 //    moves);
+//  - Fuel: the core map, each layer seen from above (north up) from the bottom layer on the left, every Fuel Channel
+//    coloured by its rod's burnup, the most-burned third outlined (the batch a refuelling replaces), and a click on a
+//    rod (or Bring Out Third) bringing it out at the next shutdown;
 //  - Trends: the last minute of power (log scale), coolant temperature and k-effective;
 //  - Protection: each trip point on or off with - and +, the coolant pump, Redstone Rods, auto-unload and Unload All;
 //  - Safety: the containment (sealed or why not, its air's Hydrogen and radioactivity, the Suppression Pool), the
@@ -48,7 +57,7 @@ import net.zagdrath.arcforge.nuclear.safety.ReactorAlarm;
 // The status, Page, Reset and SCRAM stay in the desk's bottom right on every page. All positions are relative to
 // leftPos/topPos.
 public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
-    private enum Page { CORE, TRENDS, PROTECTION, SAFETY }
+    private enum Page { CORE, FUEL, TRENDS, PROTECTION, SAFETY }
 
     private static final int LEFT = 10, VALUE_RIGHT = 128, LINE = 10, TOP = 19;
     // The Core page's readings, 9 apart to fit eleven on the screen.
@@ -78,6 +87,12 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
     private static final int SAFETY_LINES = 9, ALARM_X = BANK_X, ALARM_W = 290 - BANK_X, ALARM_LINES = 8;
     private static final int SILENCE_X = SHIFT_X, SILENCE_W = SHIFT_W;
     private static final int ALARM_RED = 0xFFE8483A, ALARM_AMBER = 0xFFE0A020;
+    // The Fuel page: the layers' grids across the desk from MAP_Y, gaps between them; the legend and Bring Out Third under.
+    private static final int MAP_Y = 21, MAP_H = 40, MAP_GAP = 6, MAP_MAX_CELL = 9, LEGEND_Y = 66, PULL_Y = 78, RAMP_X = 60, RAMP_W = 80;
+    private static final int FRESH = 0xFF3FAF5A, HALF = 0xFFE0C040, BURNT = 0xFFD0443A, SPENT = 0xFF7A1E1E, DAMAGED = 0xFF8A4A8A,
+            THIRD = 0xFFFFE070, PULL = 0xFFFFFFFF;
+    // Each kind of cell's colour (FissionReactorMenu.CELL_*); a fuel rod's is its burnup's.
+    private static final int[] CELL_COLORS = { TRACK, 0xFF2A2A2A, 0xFF6A6A70, 0xFF3A4A66, 0xFF2E2E2E, 0, 0xFF3A7A6A };
 
     private final Identifier bankFill = sprite("bank_fill");
     private final Identifier bankMarker = sprite("bank_marker");
@@ -194,6 +209,7 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
                     blit(graphics, plus, plusHover, x, y, bx + 7, BUTTON_Y, BUTTON, BUTTON);
                 }
             }
+            case FUEL -> drawMap(graphics, x, y);
             case TRENDS -> {
                 graph(graphics, x, y, 0, GRAPH_Y, -9000, 500, TRIP_COLORS[0]);
                 graph(graphics, x, y, 1, GRAPH_Y + GRAPH_STEP, 200, 4_000, TRIP_COLORS[1]);
@@ -304,6 +320,7 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
     protected void drawText(GuiGraphicsExtractor graphics) {
         switch (shown) {
             case CORE -> drawCore(graphics);
+            case FUEL -> drawFuel(graphics);
             case TRENDS -> drawTrends(graphics);
             case PROTECTION -> drawProtection(graphics);
             case SAFETY -> drawSafety(graphics);
@@ -515,6 +532,7 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
         }
         switch (shown) {
             case CORE -> coreTooltip(lines, mouseX, mouseY);
+            case FUEL -> fuelTooltip(lines, mouseX, mouseY);
             case TRENDS -> {
                 if (isHovering(GRAPH_X, GRAPH_Y, GRAPH_W, 2 * GRAPH_STEP + GRAPH_H, mouseX, mouseY)) {
                     lines.add(Component.translatable("gui.arcforge.fission_reactor.trend_hint"));
@@ -691,6 +709,173 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
         return tenths % 10 == 0 ? Long.toString(tenths / 10) : String.format(Locale.ROOT, "%.1f", tenths / 10.0);
     }
 
+    // --- The Fuel page ---
+
+    // Where the map's grids go: the core's size, a cell's size and the first grid's left edge.
+    private record MapLayout(int nx, int ny, int nz, int cell, int left) {
+        int gridX(int layer) {
+            return left + layer * (nx * cell + MAP_GAP);
+        }
+    }
+
+    // The map's layout, or null while there's no core.
+    private @Nullable MapLayout mapLayout() {
+        int[] size = menu.mapSize();
+        int nx = size[0], ny = size[1], nz = size[2];
+        if (nx <= 0 || ny <= 0 || nz <= 0 || nx * ny * nz > FissionReactorMenu.MAP_CELLS) {
+            return null;
+        }
+        int cell = Math.max(3, Math.min(MAP_MAX_CELL, Math.min((GRAPH_W - (ny - 1) * MAP_GAP) / (ny * nx), MAP_H / nz)));
+        int width = ny * nx * cell + (ny - 1) * MAP_GAP;
+        return new MapLayout(nx, ny, nz, cell, GRAPH_X + (GRAPH_W - width) / 2);
+    }
+
+    // The cell (lattice index) at a point on the desk, or -1.
+    private int cellAt(double dx, double dy) {
+        MapLayout map = mapLayout();
+        if (map == null || dy < MAP_Y || dy >= MAP_Y + map.nz() * map.cell()) {
+            return -1;
+        }
+        for (int layer = 0; layer < map.ny(); layer++) {
+            double gx = dx - map.gridX(layer);
+            if (gx >= 0 && gx < map.nx() * map.cell()) {
+                int cx = (int) (gx / map.cell()), cz = (int) ((dy - MAP_Y) / map.cell());
+                return (layer * map.nz() + cz) * map.nx() + cx;
+            }
+        }
+        return -1;
+    }
+
+    // The most-burned third of the loaded rods (the batch a refuelling replaces), as the reactor picks it.
+    private Set<Integer> burnedThird(MapLayout map) {
+        List<Integer> loaded = new ArrayList<>();
+        for (int i = 0; i < map.nx() * map.ny() * map.nz(); i++) {
+            if (FissionReactorMenu.cellKind(menu.cell(i)) == FissionReactorMenu.CELL_FUEL) {
+                loaded.add(i);
+            }
+        }
+        loaded.sort((a, b) -> Double.compare(FissionReactorMenu.cellBurnup(menu.cell(b)), FissionReactorMenu.cellBurnup(menu.cell(a))));
+        return new HashSet<>(loaded.subList(0, FissionReactorBlockEntity.third(loaded.size())));
+    }
+
+    // Fresh green through amber to red near spent, darker once it's spent.
+    private static int burnupColor(double burnup) {
+        if (burnup >= 1.0) {
+            return SPENT;
+        }
+        return burnup < 0.5 ? lerp(FRESH, HALF, burnup * 2.0) : lerp(HALF, BURNT, burnup * 2.0 - 1.0);
+    }
+
+    private static int lerp(int from, int to, double t) {
+        int color = 0xFF000000;
+        for (int shift = 0; shift < 24; shift += 8) {
+            int a = from >> shift & 0xFF, b = to >> shift & 0xFF;
+            color |= (int) Math.round(a + (b - a) * t) << shift;
+        }
+        return color;
+    }
+
+    private void drawMap(GuiGraphicsExtractor graphics, int x, int y) {
+        MapLayout map = mapLayout();
+        if (map != null) {
+            Set<Integer> third = burnedThird(map);
+            int c = map.cell();
+            for (int layer = 0; layer < map.ny(); layer++) {
+                int gx = x + map.gridX(layer), gy = y + MAP_Y, w = map.nx() * c, h = map.nz() * c;
+                // The layer's floor in a 1 px bevel, as the bank tracks have.
+                graphics.fill(gx - 1, gy - 1, gx + w + 1, gy + h + 1, TRACK_LIGHT);
+                graphics.fill(gx - 1, gy - 1, gx + w, gy + h, TRACK_DARK);
+                graphics.fill(gx, gy, gx + w, gy + h, TRACK);
+                for (int cz = 0; cz < map.nz(); cz++) {
+                    for (int cx = 0; cx < map.nx(); cx++) {
+                        int i = (layer * map.nz() + cz) * map.nx() + cx;
+                        int cell = menu.cell(i), kind = FissionReactorMenu.cellKind(cell);
+                        int left = gx + cx * c, top = gy + cz * c;
+                        int color = kind == FissionReactorMenu.CELL_FUEL
+                                ? FissionReactorMenu.cellDamaged(cell) ? DAMAGED : burnupColor(FissionReactorMenu.cellBurnup(cell))
+                                : CELL_COLORS[Math.min(kind, CELL_COLORS.length - 1)];
+                        if (third.contains(i)) {
+                            graphics.fill(left, top, left + c, top + c, THIRD);
+                        }
+                        graphics.fill(left + 1, top + 1, left + c - 1, top + c - 1, color);
+                        if (kind == FissionReactorMenu.CELL_EMPTY_CHANNEL) {
+                            // An empty channel: its tube's dark bore.
+                            graphics.fill(left + c / 2 - 1, top + c / 2 - 1, left + c / 2 + 1, top + c / 2 + 1, TRACK_DARK);
+                        }
+                        if (FissionReactorMenu.cellPull(cell)) {
+                            graphics.fill(left + c / 2 - 1, top + c / 2 - 1, left + c / 2 + 1, top + c / 2 + 1, PULL);
+                        }
+                    }
+                }
+            }
+        }
+        // The burnup ramp, fresh to spent, and the outline the third to replace gets.
+        for (int i = 0; i < RAMP_W; i++) {
+            graphics.fill(x + RAMP_X + i, y + LEGEND_Y + 1, x + RAMP_X + i + 1, y + LEGEND_Y + 6, burnupColor(i / (double) (RAMP_W - 1) * 0.999));
+        }
+        int swatch = x + RAMP_X + RAMP_W + 30;
+        graphics.fill(swatch, y + LEGEND_Y, swatch + 7, y + LEGEND_Y + 7, THIRD);
+        graphics.fill(swatch + 1, y + LEGEND_Y + 1, swatch + 6, y + LEGEND_Y + 6, BURNT);
+        blit(graphics, toggleOff, toggleOn, x, y, TOGGLE_X, PULL_Y, BUTTON, BUTTON);
+    }
+
+    private void drawFuel(GuiGraphicsExtractor graphics) {
+        MapLayout map = mapLayout();
+        if (map == null) {
+            graphics.text(font, Component.translatable("gui.arcforge.fission_reactor.map_none"), GRAPH_X, MAP_Y + 4, ArcforgeGui.LABEL, false);
+        } else {
+            for (int layer = 0; layer < map.ny(); layer++) {
+                textCentred(graphics, Component.literal(Integer.toString(layer + 1)), map.gridX(layer), map.nx() * map.cell(),
+                        MAP_Y + map.nz() * map.cell() + 2, ArcforgeGui.LABEL);
+            }
+        }
+        graphics.text(font, Component.translatable("gui.arcforge.fission_reactor.map_burnup"), GRAPH_X, LEGEND_Y, ArcforgeGui.LABEL, false);
+        textRight(graphics, Component.literal("0%"), RAMP_X - 2, LEGEND_Y, ArcforgeGui.LABEL);
+        graphics.text(font, Component.literal("100%"), RAMP_X + RAMP_W + 2, LEGEND_Y, ArcforgeGui.LABEL, false);
+        graphics.text(font, clipped(Component.translatable("gui.arcforge.fission_reactor.map_third"), 290 - RAMP_X - RAMP_W - 40),
+                RAMP_X + RAMP_W + 40, LEGEND_Y, ArcforgeGui.LABEL, false);
+        int count = map == null ? 0 : burnedThird(map).size();
+        graphics.text(font, clipped(Component.translatable("gui.arcforge.fission_reactor.pull_third", count), 270), TOGGLE_X + 10, PULL_Y,
+                count > 0 ? ArcforgeGui.TEXT : ArcforgeGui.LABEL, false);
+    }
+
+    private void fuelTooltip(List<Component> lines, int mouseX, int mouseY) {
+        if (isHovering(TOGGLE_X, PULL_Y - 1, 280, LINE, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.fission_reactor.pull_third_hint"));
+            return;
+        }
+        if (isHovering(GRAPH_X, LEGEND_Y - 1, 280, LINE, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.fission_reactor.map_hint"));
+            return;
+        }
+        MapLayout map = mapLayout();
+        int i = cellAt(mouseX - leftPos, mouseY - topPos);
+        if (map == null || i < 0) {
+            return;
+        }
+        int cell = menu.cell(i), kind = FissionReactorMenu.cellKind(cell);
+        int cx = i % map.nx(), cz = i / map.nx() % map.nz(), layer = i / (map.nx() * map.nz());
+        lines.add(Component.translatable("gui.arcforge.fission_reactor.map_cell", layer + 1, cx + 1, cz + 1,
+                Component.translatable("gui.arcforge.fission_reactor.map_cell." + CELL_KINDS[Math.min(kind, CELL_KINDS.length - 1)])));
+        if (kind != FissionReactorMenu.CELL_FUEL) {
+            return;
+        }
+        lines.add(Component.translatable("gui.arcforge.fission_reactor.map_rod",
+                Component.translatable("tooltip.arcforge.fuel_rod.type." + FUEL_TYPES[FissionReactorMenu.cellType(cell)]),
+                Enrichment.percent(FissionReactorMenu.cellEnrichment(cell)),
+                String.format(Locale.ROOT, "%.1f", FissionReactorMenu.cellBurnup(cell) * 100.0)).withStyle(ChatFormatting.GRAY));
+        if (FissionReactorMenu.cellDamaged(cell)) {
+            lines.add(Component.translatable("tooltip.arcforge.fuel_rod.damaged").withStyle(ChatFormatting.RED));
+        } else if (burnedThird(map).contains(i)) {
+            lines.add(Component.translatable("gui.arcforge.fission_reactor.map_replace").withStyle(ChatFormatting.YELLOW));
+        }
+        lines.add(Component.translatable(FissionReactorMenu.cellPull(cell) ? "gui.arcforge.fission_reactor.map_pulling" : "gui.arcforge.fission_reactor.map_pull")
+                .withStyle(ChatFormatting.DARK_GRAY));
+    }
+
+    private static final String[] CELL_KINDS = { "coolant", "graphite", "steel", "control", "empty_channel", "fuel", "salt" };
+    private static final String[] FUEL_TYPES = { "uox", "mox", "thorium", "u233" };
+
     // The button under the mouse on the page shown, or -1; a bank button steps 1%, 10% with shift (big) or 0.1% with
     // control (fine).
     private int buttonAt(double mx, double my, boolean big, boolean fine) {
@@ -702,6 +887,13 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
         }
         if (shown == Page.SAFETY && isHovering(SILENCE_X, CONTROL_Y, SILENCE_W, CONTROL_H, mx, my)) {
             return FissionReactorMenu.SILENCE;
+        }
+        if (shown == Page.FUEL) {
+            if (isHovering(TOGGLE_X, PULL_Y, BUTTON, BUTTON, mx, my)) {
+                return FissionReactorMenu.PULL_THIRD;
+            }
+            int cell = cellAt(mx - leftPos, my - topPos);
+            return cell >= 0 && FissionReactorMenu.cellKind(menu.cell(cell)) == FissionReactorMenu.CELL_FUEL ? FissionReactorMenu.PULL_CELL + cell : -1;
         }
         if (shown == Page.CORE) {
             for (int column = 0; column < COLUMNS; column++) {

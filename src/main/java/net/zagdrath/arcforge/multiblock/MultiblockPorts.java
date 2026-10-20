@@ -109,6 +109,7 @@ public final class MultiblockPorts {
 
     private static void changed(Level level, MultiblockController controller) {
         MultiblockAutomation.refresh(level, controller.getMinCorner(), controller.getMaxCorner());
+        MultiblockAutomation.forget(controller);
         controller.onPortsChanged();
     }
 

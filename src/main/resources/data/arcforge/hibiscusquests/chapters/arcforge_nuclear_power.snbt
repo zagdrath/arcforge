@@ -372,17 +372,54 @@
             ]
         },
         {
-            id: "power_plant",
-            title: "Power Plant",
-            icon: "arcforge:steam_turbine_array_casing",
+            id: "nuclear_turbine",
+            title: "Nuclear Steam Turbine",
+            icon: "arcforge:nuclear_turbine_casing",
             description: [
-                "Fission Reactor, Steam Generator and a full-length Steam Turbine Array spinning at full speed: a nuclear power station. A large core can drive several turbines at once."
+                "A reactor makes far more steam than a Steam Turbine Array takes. The Nuclear Steam Turbine is built for it: a 7x7 tube of Nuclear Turbine Casings 21 to 45 long, on High-Pressure Steam only, at up to 240 mB/t a section. It trips under a quarter of its rated flow, so give it a reactor's steam and send its exhaust to Condenser Arrays.",
+                "",
+                "**Covers:** {item:arcforge:nuclear_turbine_casing}"
             ],
             x: 7.5d,
-            y: 1.25d,
+            y: 2.5d,
+            dependencies: ["steam_generator"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:multiblock_formed",
+                        conditions: {
+                            multiblock: "arcforge:nuclear_steam_turbine"
+                        }
+                    },
+                    title: "Form the Nuclear Steam Turbine",
+                    icon: "arcforge:nuclear_turbine_casing"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:hardened_alloy",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 15
+                }
+            ]
+        },
+        {
+            id: "power_plant",
+            title: "Power Plant",
+            icon: "arcforge:nuclear_turbine_casing",
+            description: [
+                "Fission Reactor, Steam Generator and a Nuclear Steam Turbine at its synchronous speed: a nuclear power station. A medium core drives one turbine, a large one two."
+            ],
+            x: 9d,
+            y: 2.5d,
             shape: "gear",
             size: 1.5d,
-            dependencies: ["fission_reactor", "steam_generator"],
+            dependencies: ["fission_reactor", "steam_generator", "nuclear_turbine"],
             tasks: [
                 {
                     type: "criterion",
@@ -411,12 +448,11 @@
                     criterion: {
                         trigger: "arcforge:turbine_full_speed",
                         conditions: {
-                            multiblock: "arcforge:steam_turbine_array",
-                            min_length: 15
+                            multiblock: "arcforge:nuclear_steam_turbine"
                         }
                     },
-                    title: "Spin a Steam Turbine Array to full speed (15+ long)",
-                    icon: "arcforge:steam_turbine_array_casing"
+                    title: "Spin a Nuclear Steam Turbine to full speed",
+                    icon: "arcforge:nuclear_turbine_casing"
                 }
             ],
             rewards: [

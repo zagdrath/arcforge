@@ -56,6 +56,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.nuclear.Enrichment;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModFluids;
@@ -358,7 +359,7 @@ public class CentrifugeCascadeBlockEntity extends MachineBlockEntity implements 
     // --- Running ---
 
     public void serverTick(ServerLevel level) {
-        if (checkRequested || level.getGameTime() % STRUCTURE_CHECK_INTERVAL == 0) {
+        if (checkRequested || TickSpread.due(level, worldPosition, STRUCTURE_CHECK_INTERVAL)) {
             checkNow();
         }
         lastSwu = 0.0;
@@ -369,7 +370,7 @@ public class CentrifugeCascadeBlockEntity extends MachineBlockEntity implements 
             return;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level);
         }
         status = enrich(level);

@@ -19,6 +19,7 @@ import net.minecraft.client.model.geom.builders.UVPair;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -37,6 +38,9 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.blockentity.multiblock.GasTurbineArrayBlockEntity;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
+import net.zagdrath.arcforge.client.renderer.LargeModels;
+import net.zagdrath.arcforge.client.renderer.StaticMeshes;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 
 // Draws the inside of a formed Gas Turbine Array, seen through its windows: the Steam Turbine Array's ribbed
@@ -46,7 +50,10 @@ import net.zagdrath.arcforge.multiblock.ShellStructure;
 // rotor drum and several stages of thin blades: 4 stages of 36 in a compressor block, 3 of 28 in a turbine block.
 // The compressor narrows toward the combustor and the turbine widens toward the exhaust, and neighbouring stages
 // are offset by half a blade. The rotor turns at up to 60° a tick (see GasTurbineArrayBlockEntity.advanceAngle).
-// The intake and exhaust caps are drawn over the two end faces.
+// The intake and exhaust caps are drawn over the two end faces. The lining, the combustor can, the bearings and the caps
+// are still, so they're baked into the chunk mesh (ChunkMeshes); the rotor's parts are each one vertex buffer kept on
+// the GPU, drawn turned (StaticMeshes.submitMovingLit), out to stillPartsOnlyFrom; past simpleMovingPartsFrom the
+// blades are left out and the shaft and drums stand still (see LargeModels).
 public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbineArrayBlockEntity, GasTurbineArrayRenderer.State> {
     public static final StandaloneModelKey<QuadCollection> SHAFT = key("gas_turbine_rotor_shaft");
     public static final StandaloneModelKey<QuadCollection> COMPRESSOR_BLADE = key("gas_turbine_compressor_blade");
@@ -119,6 +126,23 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
         public @Nullable TextureAtlasSprite liner, jamb;
         public int light;
         public int intakeLight, exhaustLight;
+        public LargeModels.Detail detail = LargeModels.Detail.FULL;
+
+        // What the still parts are laid out from, for an emitter that runs after this state moves on.
+        State copyShape() {
+            State copy = new State();
+            copy.axis = axis;
+            copy.length = length;
+            copy.sizeX = sizeX;
+            copy.sizeY = sizeY;
+            copy.sizeZ = sizeZ;
+            copy.windows = windows;
+            copy.intakeNegative = intakeNegative;
+            copy.light = light;
+            copy.intakeLight = intakeLight;
+            copy.exhaustLight = exhaustLight;
+            return copy;
+        }
     }
 
     public GasTurbineArrayRenderer(BlockEntityRendererProvider.Context context) {}
@@ -150,7 +174,8 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
         ShellMultiblockRenderer.super.extractRenderState(turbine, state, partialTicks, cameraPosition, breakProgress);
         ShellStructure.Shell shell = turbine.getShell();
         state.formed = turbine.isMaster() && shell != null;
-        if (!state.formed) {
+        if (!state.formed || shell == null) {
+            ChunkMeshes.remove(turbine);
             return;
         }
         state.axis = shell.axis();
@@ -177,6 +202,11 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
         } else {
             state.light = state.intakeLight = state.exhaustLight = state.lightCoords;
         }
+        Models models = Models.get();
+        if (models != null) {
+            bake(turbine, shell, state, models);
+        }
+        state.detail = LargeModels.detail(getRenderBoundingBox(turbine), cameraPosition);
     }
 
     // The light just outside an end face (what the cap there is lit by): the brightest of the 3x3 blocks in front of
@@ -196,28 +226,82 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
     }
 
     @Override
+    public boolean bakes() {
+        return true;
+    }
+
+    @Override
+    public boolean bakesStill(GasTurbineArrayBlockEntity turbine) {
+        return ChunkMeshes.isBaked(turbine, MeshRendering.SOLID, MeshRendering.GLASS);
+    }
+
+    // The still parts into the chunk mesh, lit there as the entity shader lit them: the lining (solid), and the
+    // combustor can, the bearings and the end caps (cutout). Baked again only when what they're built from changes.
+    private static void bake(GasTurbineArrayBlockEntity turbine, ShellStructure.Shell shell, State state, Models models) {
+        TextureAtlasSprite liner = state.liner, jamb = state.jamb;
+        if (liner == null || jamb == null) {
+            return;
+        }
+        java.util.function.BooleanSupplier stands = () -> turbine.isMaster() && shell.equals(turbine.getShell());
+        State still = state.copyShape();
+        ChunkMeshes.bakeEntityLit(turbine, MeshRendering.SOLID, shell.min(), ChunkSectionLayer.SOLID, new Lining(shell, state.windows, liner, jamb), state.light,
+                stands, (pose, buffer) -> TiledBoxes.lining(pose, buffer, liner, jamb, -1, still.light, LINER_INSET, still.sizeX, still.sizeY, still.sizeZ,
+                        still.windows));
+        ChunkMeshes.bakeEntityLit(turbine, MeshRendering.GLASS, shell.min(), ChunkSectionLayer.CUTOUT,
+                new Fittings(shell, state.intakeNegative, state.light, state.intakeLight, state.exhaustLight, models), state.light, stands, (pose, buffer) -> {
+                    PoseStack local = new PoseStack();
+                    int core = still.length - 2;
+                    for (int i = 1; i < still.length - 1; i++) {
+                        int fromIntake = still.intakeNegative ? i - 1 : core - i;
+                        if (section(fromIntake, core) == Section.COMBUSTOR) {
+                            local.pushPose();
+                            rotorPose(local, still, i, 0.0F);
+                            TiledBoxes.quads(local.last(), buffer, models.combustor().getAll(), -1, still.light);
+                            local.popPose();
+                        }
+                    }
+                    bearings(still, local, buffer, models.bearing());
+                    cap(still, local, buffer, models.intakeCap(), still.intakeNegative, still.intakeLight);
+                    cap(still, local, buffer, models.exhaustCap(), !still.intakeNegative, still.exhaustLight);
+                });
+    }
+
+    // What the lining and the fittings are built from, for telling when to bake them again.
+    private record Lining(ShellStructure.Shell shell, Set<Long> windows, TextureAtlasSprite liner, TextureAtlasSprite jamb) {}
+
+    private record Fittings(ShellStructure.Shell shell, boolean intakeNegative, int light, int intakeLight, int exhaustLight, Models models) {}
+
+    // The standalone models, as the model manager has them now (a reload replaces them).
+    private record Models(QuadCollection shaft, QuadCollection compressorBlade, QuadCollection turbineBlade, QuadCollection drum, QuadCollection combustor,
+            QuadCollection glow, QuadCollection bearing, QuadCollection intakeCap, QuadCollection exhaustCap) {
+        static @Nullable Models get() {
+            var manager = Minecraft.getInstance().getModelManager();
+            QuadCollection shaft = manager.getStandaloneModel(SHAFT), compressor = manager.getStandaloneModel(COMPRESSOR_BLADE),
+                    turbine = manager.getStandaloneModel(TURBINE_BLADE), drum = manager.getStandaloneModel(ROTOR_DRUM),
+                    combustor = manager.getStandaloneModel(COMBUSTOR), glow = manager.getStandaloneModel(COMBUSTOR_GLOW),
+                    bearing = manager.getStandaloneModel(BEARING), intake = manager.getStandaloneModel(INTAKE_CAP), exhaust = manager.getStandaloneModel(EXHAUST_CAP);
+            if (shaft == null || compressor == null || turbine == null || drum == null || combustor == null || glow == null || bearing == null || intake == null
+                    || exhaust == null) {
+                return null;
+            }
+            return new Models(shaft, compressor, turbine, drum, combustor, glow, bearing, intake, exhaust);
+        }
+    }
+
+    @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
-        if (!state.formed || state.liner == null || state.jamb == null) {
+        if (!state.formed || state.liner == null || state.jamb == null || state.detail == LargeModels.Detail.STILL) {
             return;
         }
         TextureAtlasSprite liner = state.liner;
-        TextureAtlasSprite jamb = state.jamb;
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(liner.atlasLocation()),
-                (pose, buffer) -> TiledBoxes.lining(pose, buffer, liner, jamb, -1, state.light, LINER_INSET, state.sizeX, state.sizeY, state.sizeZ, state.windows));
-
-        var models = Minecraft.getInstance().getModelManager();
-        QuadCollection shaft = models.getStandaloneModel(SHAFT);
-        QuadCollection compressorBlade = models.getStandaloneModel(COMPRESSOR_BLADE);
-        QuadCollection turbineBlade = models.getStandaloneModel(TURBINE_BLADE);
-        QuadCollection drum = models.getStandaloneModel(ROTOR_DRUM);
-        QuadCollection combustor = models.getStandaloneModel(COMBUSTOR);
-        QuadCollection glow = models.getStandaloneModel(COMBUSTOR_GLOW);
-        if (shaft == null || compressorBlade == null || turbineBlade == null || drum == null || combustor == null || glow == null) {
+        Models models = Models.get();
+        if (models == null) {
             return;
         }
         RenderType cutout = RenderTypes.entityCutout(liner.atlasLocation());
-        List<BakedQuad> shaftQuads = shaft.getAll();
-        List<BakedQuad> drumQuads = drum.getAll();
+        boolean turning = state.detail == LargeModels.Detail.FULL;
+        float angle = turning ? state.angle : 0.0F;
+        float[] shaft = TiledBoxes.vertices(models.shaft()), drum = TiledBoxes.vertices(models.drum());
         int core = state.length - 2;
         int compressorBlocks = (core + 2) / 3;
         int combustorBlocks = Math.max(1, core - 2 * compressorBlocks);
@@ -227,38 +311,36 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
             Section section = i == 0 || i == state.length - 1 ? null : section(fromIntake, core);
             if (section == null || section == Section.COMBUSTOR) {
                 // The bare shaft: through the end blocks and the combustor.
-                poseStack.pushPose();
-                rotorPose(poseStack, state, i, state.angle);
+                PoseStack part = new PoseStack();
+                rotorPose(part, state, i, angle);
                 if (i == 0) {
-                    poseStack.translate(0.0F, 0.0F, SHAFT_END_INSET);
-                    poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
+                    part.translate(0.0F, 0.0F, SHAFT_END_INSET);
+                    part.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
                 } else if (i == state.length - 1) {
-                    poseStack.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
+                    part.scale(1.0F, 1.0F, 1.0F - SHAFT_END_INSET);
                 }
-                collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, shaftQuads, -1, state.light));
-                poseStack.popPose();
+                submitPart(collector, poseStack, cutout, shaft, liner, state.light, part);
             }
             if (section == null) {
                 continue;
             }
             if (section == Section.COMBUSTOR) {
-                poseStack.pushPose();
-                rotorPose(poseStack, state, i, 0.0F);
-                List<BakedQuad> can = combustor.getAll();
-                collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, can, -1, state.light));
+                // The can is in the chunk mesh; its glow flickers with the fuel burned.
                 if (state.glow > 0.01F) {
+                    poseStack.pushPose();
+                    rotorPose(poseStack, state, i, 0.0F);
                     int level = Math.round(255 * state.glow);
                     int color = ARGB.color(level, level, level, level);
-                    List<BakedQuad> flame = glow.getAll();
+                    List<BakedQuad> flame = models.glow().getAll();
                     collector.submitCustomGeometry(poseStack, RenderTypes.eyes(liner.atlasLocation()),
                             (pose, buffer) -> TiledBoxes.quads(pose, buffer, flame, color, LightCoordsUtil.FULL_BRIGHT));
+                    poseStack.popPose();
                 }
-                poseStack.popPose();
                 continue;
             }
             boolean compressor = section == Section.COMPRESSOR;
             Blading blading = compressor ? Blading.COMPRESSOR : Blading.TURBINE;
-            float[] ring = blading.ring(compressor ? compressorBlade : turbineBlade);
+            float[] ring = blading.ring(compressor ? models.compressorBlade() : models.turbineBlade());
             // This block's place in its section, from the intake, and the section's stage count.
             int block = compressor ? fromIntake : fromIntake - compressorBlocks - combustorBlocks;
             int perBlock = blading.centres.length;
@@ -269,35 +351,37 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
                 int stage = block * perBlock + (state.intakeNegative ? k : perBlock - 1 - k);
                 float scale = blading.tip(stage, stages) / MODEL_TIP;
                 scaleSum += scale;
-                poseStack.pushPose();
-                axisPose(poseStack, state, i, blading.centres[k] / 16.0F - 0.5F);
-                poseStack.rotate(Axis.ZP.rotationDegrees(state.angle + (stage % 2) * 180.0F / blading.blades));
-                poseStack.scale(scale, scale, 1.0F);
-                collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.vertices(pose, buffer, ring, -1, state.light));
-                poseStack.popPose();
+                // Far off the blades are left out: the drums stand for the rotor.
+                if (turning) {
+                    PoseStack part = new PoseStack();
+                    axisPose(part, state, i, blading.centres[k] / 16.0F - 0.5F);
+                    part.rotate(Axis.ZP.rotationDegrees(angle + (stage % 2) * 180.0F / blading.blades));
+                    part.scale(scale, scale, 1.0F);
+                    submitPart(collector, poseStack, cutout, ring, liner, state.light, part);
+                }
             }
             // The drum, sized to the stages on it so the blade roots sit inside it.
             float drumScale = scaleSum / perBlock;
-            poseStack.pushPose();
-            axisPose(poseStack, state, i, 0.0F);
-            poseStack.rotate(Axis.ZP.rotationDegrees(state.angle));
-            poseStack.scale(drumScale, drumScale, 1.0F);
-            poseStack.translate(-0.5, -0.5, -0.5);
-            collector.submitCustomGeometry(poseStack, cutout, (pose, buffer) -> TiledBoxes.quads(pose, buffer, drumQuads, -1, state.light));
-            poseStack.popPose();
+            PoseStack part = new PoseStack();
+            axisPose(part, state, i, 0.0F);
+            part.rotate(Axis.ZP.rotationDegrees(angle));
+            part.scale(drumScale, drumScale, 1.0F);
+            part.translate(-0.5, -0.5, -0.5);
+            submitPart(collector, poseStack, cutout, drum, liner, state.light, part);
         }
-        submitBearings(state, poseStack, collector, models.getStandaloneModel(BEARING), cutout);
-        submitCap(state, poseStack, collector, models.getStandaloneModel(INTAKE_CAP), state.intakeNegative, state.intakeLight, cutout);
-        submitCap(state, poseStack, collector, models.getStandaloneModel(EXHAUST_CAP), !state.intakeNegative, state.exhaustLight, cutout);
+    }
+
+    // A rotor part (a model's vertices) drawn from its GPU copy where part puts it, lit as it turns (see
+    // StaticMeshes.submitMovingLit).
+    private static void submitPart(SubmitNodeCollector collector, PoseStack poseStack, RenderType renderType, float[] data, TextureAtlasSprite sheet,
+            int light, PoseStack part) {
+        StaticMeshes.submitMovingLit(collector, poseStack, renderType, data, sheet, light, part.last().pose(),
+                (pose, buffer) -> TiledBoxes.vertices(pose, buffer, data, -1, light));
     }
 
     // The bearing housings: static, in the first and last blocks along the axis, against the end walls. The model is
     // built for the -Z end; the far end's copy is turned 180° about Y so its flange sits on that wall.
-    private static void submitBearings(State state, PoseStack poseStack, SubmitNodeCollector collector, @Nullable QuadCollection bearing,
-            RenderType renderType) {
-        if (bearing == null) {
-            return;
-        }
+    private static void bearings(State state, PoseStack poseStack, com.mojang.blaze3d.vertex.VertexConsumer buffer, QuadCollection bearing) {
         List<BakedQuad> quads = bearing.getAll();
         for (int i : new int[] { 0, state.length - 1 }) {
             poseStack.pushPose();
@@ -307,17 +391,14 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
                 poseStack.rotate(Axis.YP.rotationDegrees(180.0F));
                 poseStack.translate(-0.5, -0.5, -0.5);
             }
-            collector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> TiledBoxes.quads(pose, buffer, quads, -1, state.light));
+            TiledBoxes.quads(poseStack.last(), buffer, quads, -1, state.light);
             poseStack.popPose();
         }
     }
 
     // A cap over the middle block of one end face, its model's north face turned to face out along the axis.
-    private static void submitCap(State state, PoseStack poseStack, SubmitNodeCollector collector, @Nullable QuadCollection cap, boolean negative,
-            int light, RenderType renderType) {
-        if (cap == null) {
-            return;
-        }
+    private static void cap(State state, PoseStack poseStack, com.mojang.blaze3d.vertex.VertexConsumer buffer, QuadCollection cap, boolean negative,
+            int light) {
         List<BakedQuad> quads = cap.getAll();
         int along = negative ? 0 : state.length - 1;
         float yaw = state.axis == Direction.Axis.X ? (negative ? 90.0F : -90.0F) : (negative ? 0.0F : 180.0F);
@@ -328,7 +409,7 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
                 state.axis == Direction.Axis.Z ? along + 0.5 : 1.5);
         poseStack.rotate(Axis.YP.rotationDegrees(yaw));
         poseStack.translate(-0.5, -0.5, -0.5);
-        collector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> TiledBoxes.quads(pose, buffer, quads, -1, light));
+        TiledBoxes.quads(poseStack.last(), buffer, quads, -1, light);
         poseStack.popPose();
     }
 
@@ -383,8 +464,17 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
         return out;
     }
 
+    // The rotor along the core (the rest is in the chunk mesh).
     @Override
     public AABB getRenderBoundingBox(GasTurbineArrayBlockEntity turbine) {
-        return turbine.getRenderBox().inflate(0.05);
+        ShellStructure.Shell shell = turbine.getShell();
+        if (shell == null) {
+            return turbine.getRenderBox().inflate(0.05);
+        }
+        Direction.Axis axis = shell.axis();
+        BlockPos min = shell.min(), max = shell.max();
+        // The middle row of blocks along the axis, end to end.
+        return new AABB(axis == Direction.Axis.X ? min.getX() : min.getX() + 1, min.getY() + 1, axis == Direction.Axis.Z ? min.getZ() : min.getZ() + 1,
+                axis == Direction.Axis.X ? max.getX() + 1 : max.getX(), max.getY(), axis == Direction.Axis.Z ? max.getZ() + 1 : max.getZ()).inflate(0.05);
     }
 }

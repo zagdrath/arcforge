@@ -239,6 +239,7 @@
         "reactor_physics",
         "reactor_control",
         "steam_generator",
+        "nuclear_steam_turbine",
         "reactor_failures",
         "containment",
         "safety_systems",

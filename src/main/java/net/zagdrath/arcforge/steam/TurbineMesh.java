@@ -104,6 +104,31 @@ public final class TurbineMesh extends ModelMesh {
         return solid.toArray();
     }
 
+    // A cheap stand-in for the rotor far off, where it no longer turns: the shaft and couplings as plain prisms, and in
+    // each window the blading as one solid disc out to its outlet row's tips (a few dozen faces where the rotor has
+    // thousands), all inside the casing's inner wall as the blades are.
+    public float[] buildRotorLod() {
+        startRotor(0.0F);
+        float sx = layout.shaftX(), sy = layout.shaftY(), r = layout.shaftRadius();
+        prismU(sx, sy, new float[][] { { 1.5F, r }, { layout.generator().u0() + 3.0F, r } }, 6, 0.0, Paint.MID, null, null, null);
+        List<TurbineLayout.Span> gaps = layout.gaps();
+        for (int i = 1; i < gaps.size(); i++) {
+            TurbineLayout.Span gap = gaps.get(i);
+            float cr = r * (i == gaps.size() - 1 ? 2.8F : 2.3F), half = layout.couplingHalf(i);
+            prismU(sx, sy, new float[][] { { gap.middle() - half, cr }, { gap.middle() + half, cr } }, 6, Math.PI / 6.0, Paint.MID, Paint.MID, Paint.SHADE, null);
+        }
+        for (TurbineLayout.Casing casing : layout.casings()) {
+            for (TurbineLayout.Span window : casing.windows()) {
+                float tip = Math.min(casing.tipAt(window.u0()), casing.tipAt(window.u1()));
+                if (tip > casing.hubRadius() && window.length() > 0.5F) {
+                    prismU(sx, sy, new float[][] { { window.u0() + 0.25F, tip }, { window.u1() - 0.25F, tip } }, 8, 0.0, Paint.BLADE, Paint.BLADE_BACK,
+                            Paint.BLADE_BACK, null);
+                }
+            }
+        }
+        return solid.toArray();
+    }
+
     // --- The plinth and walkway ---
 
     private void plinth() {

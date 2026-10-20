@@ -35,6 +35,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.multiblock.VesselStructure;
 import net.zagdrath.arcforge.transfer.item.FilteredItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
@@ -149,7 +150,7 @@ public abstract class VesselControllerBlockEntity extends MachineBlockEntity imp
     }
 
     public void serverTick(ServerLevel level) {
-        if (checkRequested || level.getGameTime() % STRUCTURE_CHECK_INTERVAL == 0) {
+        if (checkRequested || TickSpread.due(level, worldPosition, STRUCTURE_CHECK_INTERVAL)) {
             checkNow();
         }
         if (box == null) {
@@ -157,7 +158,7 @@ public abstract class VesselControllerBlockEntity extends MachineBlockEntity imp
             return;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             redstone = redstone(level);
         }
         work(level);

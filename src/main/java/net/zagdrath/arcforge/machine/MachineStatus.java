@@ -189,7 +189,9 @@ public enum MachineStatus {
     ENCHANTING("enchanting", "led_running"),
     NO_LAPIS("no_lapis", "led_blocked"),
     NO_EXPERIENCE("no_experience", "led_blocked"),
-    NO_TARGET("no_target", "led_idle");
+    NO_TARGET("no_target", "led_idle"),
+    // The Nuclear Steam Turbine: tripped on low steam flow, coasting down until the steam holds over its minimum.
+    TRIPPED("tripped", "led_blocked");
 
     private final String name;
     private final String led;

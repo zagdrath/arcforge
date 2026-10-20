@@ -71,6 +71,7 @@ import net.zagdrath.arcforge.machine.link.LinkableMachine;
 import net.zagdrath.arcforge.machine.link.MachineLinkState;
 import net.zagdrath.arcforge.multiblock.MultiblockController;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.recipe.CarbonizingRecipe;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
@@ -473,7 +474,7 @@ public class CarbonizerBlockEntity extends BlockEntity implements MenuProvider, 
 
     private void tick(ServerLevel level) {
         CarbonizerStructure.Formation formed = formation;
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level, formed);
         }
         tank.setCapacity(capacityFor(formed));

@@ -367,7 +367,8 @@ From enriched uranium to a running reactor: zircaloy cladding, fuel pellets and 
 - ★ **Fission Reactor** `fission_reactor`: Form the Fission Reactor. After: vessel. Rewards: 8× Hardened Alloy, 15 lvl
 - **Steam Generator** `steam_generator`: Form the Steam Generator. After: vessel, arcforge_steam/turbine. Rewards: 8× Steam Generator Tubes, 12 lvl
 - **Heavy Water** `heavy_water`: Form the Heavy Water Tower; Obtain Heavy Water Bucket. After: vessel. Rewards: 8× PVC Sheet, 12 lvl
-- ◆ **Power Plant** `power_plant`: Form the Fission Reactor; Form the Steam Generator; Spin a Steam Turbine Array to full speed (15+ long). After: fission_reactor, steam_generator. Rewards: 8× Arcforged Alloy, 25 lvl
+- **Nuclear Steam Turbine** `nuclear_turbine`: Form the Nuclear Steam Turbine. After: steam_generator. Rewards: 8× Hardened Alloy, 15 lvl
+- ◆ **Power Plant** `power_plant`: Form the Fission Reactor; Form the Steam Generator; Spin a Nuclear Steam Turbine to full speed. After: fission_reactor, steam_generator, nuclear_turbine. Rewards: 8× Arcforged Alloy, 25 lvl
 
 ## 18. Reactor Safety (`arcforge_reactor_safety`)
 

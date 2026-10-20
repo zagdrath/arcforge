@@ -377,10 +377,10 @@ turned down) is vented too. Either way its status reads Venting.
 Cooling into a lower grade turns the steam it holds into that grade.
 
 **Steam Turbine Array.** A hollow tube along either horizontal axis, built the same way: 3 to 27 long, its
-cross-section 3 to 7 wide and 3 to 7 tall. It takes up to 40 mB/t per section (width × height ÷ 9 × length:
-3 for a 3×3×3, 147 for a 7×7×27) at 20 / 36 / 56 FE per mB (a 7×7×27 takes 5,880 mB/t and on Superheated makes
-329,280 FE/t before its bonuses, about 355,600 with lubricant: more than one Arcforged Energy Conduit's 262,144, so
-give it two energy ports). Its output cap is a full flow of Superheated Steam with both bonuses (no fixed cap), its
+cross-section 3 to 7 wide and 3 to 7 tall. It takes up to 60 mB/t per section (width × height ÷ 9 × length:
+3 for a 3×3×3, 147 for a 7×7×27) at 20 / 36 / 56 FE per mB (a 7×7×27 takes 8,820 mB/t and on Superheated makes
+493,920 FE/t before its bonuses, about 553,200 with lubricant: more than two Arcforged Energy Conduits' 262,144, so
+give it three energy ports). Its output cap is a full flow of Superheated Steam with both bonuses (no fixed cap), its
 FE buffer 400 ticks of that, and its energy ports share the cap. Its rotor spins up over a few seconds when steam flows, and output rises with it; it
 coasts down when the steam stops. Its speed follows the power in the steam (flow times FE per mB), so a
 higher grade spins it faster: full speed is a full flow of Superheated Steam. A new one starts with a steam, an energy and an Exhaust port on its fitted spots (below); move or clear them with the Wrench. Heavy Oil in its 4,000 mB lubricant tank adds 8% to its output and doubles its spin-up, using 1 mB every 20 ticks per 3
@@ -471,8 +471,8 @@ like the Superheater Array. It turns Exhaust Steam back into water, 1:1.
   - each packed ice: 40;
   - each blue ice: 60.
 - Cold biomes condense ×1.25 and the Nether ×0.5, up to 800 mB/t per 27 blocks (a 7×7×7: 10,163 mB/t). A
-  7×7×7 in open air takes 5,081 of a full-size Steam Turbine Array's 5,880 mB/t of exhaust; some water or ice
-  against it makes up the rest.
+  7×7×7 in open air takes 5,081 of a full-size Steam Turbine Array's 8,820 mB/t of exhaust; some water or ice
+  against it makes up the rest. A full-size Nuclear Steam Turbine's 58,800 mB/t takes six well-cooled 7×7×7s.
 - A new one has an exhaust-in and a water-out port.
 - Boiler → turbine → condenser → back to the boiler's water port is a closed loop. The ports push on
   their own, as fast as it condenses, so it runs without a pump.
@@ -911,21 +911,34 @@ Light or Heavy Water fills every empty cell and channel.
   game-scaled) give a smooth reactor period up to k = 1.01; above it the core is prompt critical. Fuel temperature
   always lowers reactivity (Doppler); boiling lowers it in a water-moderated core and raises it in a graphite-moderated,
   water-cooled one. Iodine-135 decays into Xenon-135 (half-lives scaled in config), which builds up after power drops.
-  Decay heat is 6.5% of the last power, fading over in-game hours. Fuel burns up its U-235 (a rod lasts about 16 hours
-  of full power, 48 in-game days).
+  Decay heat is 6.5% of the last power, fading over in-game hours. Fuel burns up its U-235 in proportion to the power
+  it gives: a 5% rod lasts about 120 real hours of full power (one Minecraft year, one refuelling cycle), in proportion
+  to its enrichment (9% about 1.8 times as long, 3% 0.6 times), and plutonium and fission products build up with its
+  burnup.
 - **Heat and steam.** Fuel, cladding and coolant temperatures and vessel pressure are tracked. A **Hot Leg** port
   makes it a pressurized core: its coolant stays liquid at 155 bar and leaves as Hot Coolant (60 HU a mB) for a
   **Steam Generator** (a square box 3 to 7 across and 4 to 12 tall with Steam Generator Tubes inside; each tube block
-  cools 200 mB a tick into High-Pressure Steam, the cooled water going back out). With Steam ports alone it's a boiling
-  core at 70 bar sending **Contaminated Steam** straight to Steam Turbine Arrays, which run on it as High-Pressure Steam
-  and turn slightly radioactive. A channel gives 4,000 HU/t at full power; around 90 channels pass 1,000,000 FE/t
-  through four to six full-size turbine arrays.
+  cools 200 mB a tick into 2,000 mB/t of High-Pressure Steam at 6 HU a mB, the cooled water going back out; a Superheater
+  Array can take it on to Superheated). With Steam ports alone it's a boiling core at 70 bar sending **Contaminated
+  Steam** straight to the turbines, which run on it as High-Pressure Steam and turn slightly radioactive. A channel gives
+  4,000 HU/t at full power, about 6 FE per HU through the turbines: a 5×5×5 core (about 10,000 mB/t) runs two
+  full-size Steam Turbine Arrays for about 425,000 FE/t, a 7×7×7 (about 56,700 mB/t) one Nuclear Steam Turbine for
+  about 2.3 million, a 7×7×9 (about 79,300 mB/t) two for about 3.2 million.
+- **Nuclear Steam Turbine.** A hollow 7×7 tube of Nuclear Turbine Casings (Hardened tier) 21 to 45 long: a reactor's
+  turbine-generator on High-Pressure or Contaminated Steam only, up to 240 mB/t a section (a 7×7×45 takes 58,800 mB/t)
+  at 40 FE a mB, its shaft at its synchronous 1,800 RPM. Below a quarter of its rated flow for two seconds it trips and
+  coasts down (its bypass dumps the steam to the condensers), and it rolls up again once the steam holds over its
+  minimum for five; Jade and the GUI say why. Exhaust ports under each low-pressure cylinder send its spent steam to
+  Condenser Arrays. Formed, it's a nuclear turbine-generator set on a raised deck in a sage-grey enamel, with crossover
+  arches from its moisture separator reheaters and a sight port onto each low-pressure cylinder's last-stage blades.
 - **Control.** The GUI shows thermal power, k-effective, reactivity, period, the four banks, temperatures, pressure,
   xenon and decay heat, trends of the last minute, and the protection page. Banks move from the GUI, by redstone (a
   stop signal SCRAMs it; *Redstone drives rods* holds every bank at least signal/15 in) and by the machine control API
   (`bank_a`..`bank_d` 0-100, `scram`; switched off, every bank drives in). Trips on high power, short period, high fuel
   temperature, high pressure and low coolant flow SCRAM it (every rod in within two seconds); RESET clears a trip.
-  Rods load from the nine input slots and spent ones come out to the nine output slots only while it's shut down.
+  Rods load from the nine input slots (from the middle of the core out) and spent ones come out to the nine output
+  slots only while it's shut down. The Fuel page's core map shows each channel's burnup, outlines the most-burned third
+  to replace, and brings out the rods you pick at the next shutdown, for refuelling by thirds.
 - **Radiation.** A running core is a strong source through its vessel (`runningDoseRate` scaled by power and decay
   heat): build concrete, lead or water round it.
 

@@ -28,11 +28,19 @@ import javax.imageio.ImageIO;
 // field (116x32); rows 224-229: the edge rows, 128 long: machine steel lit, dark, seam, then generator steel lit, dark,
 // seam; rows 232-233: the rivet heads, 2x2: machine steel (0, 232), generator steel (2, 232); rows 240-255: a reactor's
 // core seen through its windows, 16x16 and seamless: the fuel assemblies' tops (0, 240) and graphite moderator (16, 240).
+//
+// The Nuclear Steam Turbine's sheet is the same 256 rows (its rows 0-95 the Steam Turbine Array's) and 128 more for the
+// pale sage turbine enamel (ModelMesh.Steel.ENAMEL, ENAMEL_WORN and the EN_ paints): its edge columns at x 122-124
+// (rows 128-191, beside the machine and generator steels') and its edge rows at 234-236; rows 256-319: the enamel's
+// grain field (116x64); rows 320-351: the same grain with a few worn, darker scuffs (116x32, for the casings' lower
+// halves at handrail height); rows 352-359: the enamel's round-part ramps, 2 to 14 px across, laid out as row 112's;
+// rows 360-367: its flat tone (0, 360) and the last-stage blades' blur at speed (16, 360: 8x8, streaks running up).
 public class LargeModelTextureGen {
     static final String[] SHEETS = { "src/main/resources/assets/arcforge/textures/block/pumpjack/pumpjack.png",
             "src/main/resources/assets/arcforge/textures/block/distillation_array/refinery.png",
             "src/main/resources/assets/arcforge/textures/block/steam_turbine_array/turbine.png" };
-    static final int W = 128, H = 256;
+    static final String NUCLEAR = "src/main/resources/assets/arcforge/textures/block/nuclear_steam_turbine/turbine.png";
+    static final int W = 128, H = 256, NUCLEAR_H = 384;
     // Each material's edges (luminance): lit, dark, seam.
     static final int[] EDGES = { 84, 54, 37 }, GEN_EDGES = { 100, 70, 54 };
 
@@ -44,17 +52,25 @@ public class LargeModelTextureGen {
     // Grain tones (luminance) for the machine steel field and the generator steel's: neighbouring steps of 3.
     static final int[] FIELD = { 63, 66, 69, 72 }, GEN_FIELD = { 79, 82, 85, 88 };
 
+    // The turbine enamel: a pale sage-grey ramp (luminance, colour), its six tones from a mid sage-grey to a near-white
+    // sage with two darker steps under them for its seams and scuffs; the grain's tones, and its edges (lit, dark, seam).
+    static final int[][] ENAMEL = { { 74, 0x444C46 }, { 97, 0x5A635B }, { 120, 0x727C73 }, { 139, 0x858F86 }, { 158, 0x98A299 },
+            { 176, 0xABB4AC }, { 195, 0xBEC6BE }, { 213, 0xD1D8D0 } };
+    static final int[] EN_FIELD = { 162, 165, 168, 171 }, EN_EDGES = { 186, 140, 118 };
+
     static BufferedImage out;
 
     public static void main(String[] args) throws Exception {
         for (String sheet : SHEETS) {
-            paint(sheet);
+            paint(sheet, sheet, H);
         }
+        paint(NUCLEAR, SHEETS[2], NUCLEAR_H);
     }
 
-    static void paint(String sheet) throws Exception {
-        BufferedImage old = ImageIO.read(new File(sheet));
-        out = new BufferedImage(W, H, BufferedImage.TYPE_INT_ARGB);
+    // Paints sheet (h rows), its rows 0-95 kept from base.
+    static void paint(String sheet, String base, int h) throws Exception {
+        BufferedImage old = ImageIO.read(new File(base));
+        out = new BufferedImage(W, h, BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < Math.min(96, old.getHeight()); y++) {
             for (int x = 0; x < W; x++) {
                 out.setRGB(x, y, old.getRGB(x, y));
@@ -90,8 +106,68 @@ public class LargeModelTextureGen {
         set(3, 233, GEN, 60);
         fuelTops(0, 240);
         graphite(16, 240);
+        if (h > H) {
+            enamel();
+        }
+        new File(sheet).getParentFile().mkdirs();
         ImageIO.write(out, "png", new File(sheet));
         System.out.println("Wrote " + sheet);
+    }
+
+    // The turbine enamel's rows (see the class comment).
+    static void enamel() {
+        for (int i = 0; i < 3; i++) {
+            edge(122 + i, 128, 1, 64, ENAMEL, EN_EDGES[i], 60 + i);
+            edge(0, 234 + i, 128, 1, ENAMEL, EN_EDGES[i], 70 + i);
+        }
+        rivet(4, 232, ENAMEL, true);
+        field(0, 256, 116, 64, ENAMEL, EN_FIELD, 33);
+        field(0, 320, 116, 32, ENAMEL, EN_FIELD, 34);
+        scuffs(0, 320, 116, 32, 35);
+        for (int p = 2; p <= 14; p++) {
+            ramp(rampX(p), 352, p, ENAMEL, new int[] { 140, 148, 156, 164, 172, 180, 188 });
+        }
+        for (int y = 0; y < 4; y++) {
+            for (int x = 0; x < 4; x++) {
+                set(x, 360 + y, ENAMEL, EN_FIELD[1 + (x + y) % 2]);
+            }
+        }
+        blur(16, 360);
+    }
+
+    // A few worn scuffs on the enamel w x h: short smears along the rows, a darker core with a rim a step lighter,
+    // where boots and tools rub the casings; well apart, and never on the field's edge rows (a plate's edge strip covers
+    // its outer pixels anyway).
+    static void scuffs(int x0, int y0, int w, int h, long seed) {
+        java.util.Random random = new java.util.Random(seed);
+        int count = 7;
+        for (int i = 0; i < count; i++) {
+            int length = 3 + random.nextInt(5), rows = 1 + random.nextInt(2);
+            int sx = 2 + (w - length - 4) * i / (count - 1) + random.nextInt(3), sy = 3 + random.nextInt(h - rows - 6);
+            for (int r = -1; r <= rows; r++) {
+                for (int c = -1; c <= length; c++) {
+                    boolean core = r >= 0 && r < rows && c >= 0 && c < length && !(r == 0 && c == length - 1 && rows == 1);
+                    boolean rim = !core && (r >= 0 && r < rows || c >= 0 && c < length);
+                    if (core) {
+                        set(x0 + sx + c, y0 + sy + r, ENAMEL, 144 + random.nextInt(2) * 3);
+                    } else if (rim) {
+                        set(x0 + sx + c, y0 + sy + r, ENAMEL, 154);
+                    }
+                }
+            }
+        }
+    }
+
+    // The last-stage blades at speed, 8x8, seamless: streaks of the blade steel running up the tile (the way they
+    // move past a sight port), each column its own tone, stepping a little every few rows.
+    static void blur(int x0, int y0) {
+        int[] columns = { 118, 146, 168, 150, 112, 134, 160, 138 };
+        for (int x = 0; x < 8; x++) {
+            for (int y = 0; y < 8; y++) {
+                int step = (y + x * 3) / 3 % 2 == 0 ? 0 : 6;
+                set(x0 + x, y0 + y, STEEL, columns[x] - step);
+            }
+        }
     }
 
     // A burner's fire 8x6, seen through its window: the glow ramp's rising half (at (40, 48): deep red, red, orange,

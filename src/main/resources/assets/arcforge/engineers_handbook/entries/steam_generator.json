@@ -17,7 +17,7 @@
     },
     {
       "type": "text",
-      "text": "# Running it\nHot Coolant (or Hot Heavy Water) and feedwater come in through Input ports. Each tube block cools up to 200 mB of hot coolant a tick; each mB carries 60 HU, which boils feedwater into High-Pressure Steam (12 HU a mB) for the Steam Turbine Arrays. The cooled coolant goes back out of Output ports to the reactor, steam out of Steam ports."
+      "text": "# Running it\nHot Coolant (or Hot Heavy Water) and feedwater come in through Input ports. Each tube block cools up to 200 mB of hot coolant a tick; each mB carries 60 HU, which boils feedwater into High-Pressure Steam (6 HU a mB): 2,000 mB/t of steam a tube block, for Steam Turbine Arrays or a Nuclear Steam Turbine. Through a Superheater Array it can go on to Superheated Steam. The cooled coolant goes back out of Output ports to the reactor, steam out of Steam ports."
     }
   ]
 }

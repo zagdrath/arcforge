@@ -68,8 +68,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The Steam Turbine Array (see ShellMultiblockBlockEntity): a turbine L blocks long with a rotor of L - 2 blade sets,
 // sized to its cross-section's shorter side. It grows with its sections s = width x height / 9 x L (a 3x3x3 is 3, a
-// 7x7x27 is 147): it takes up to 40 x s mB/t of steam at the array's FE per mB (Steam 20, High-Pressure 36, Superheated
-// 56, times power.generationMultiplier; a 7x7x27 takes 5,880 mB/t and on Superheated makes 329,280 FE/t, more with its
+// 7x7x27 is 147): it takes up to 60 x s mB/t of steam at the array's FE per mB (Steam 20, High-Pressure 36, Superheated
+// 56, times power.generationMultiplier; a 7x7x27 takes 8,820 mB/t and on Superheated makes 493,920 FE/t, more with its
 // bonuses). Its output cap is a full flow of Superheated Steam with both bonuses, its FE buffer energyBufferTicks of
 // that, and its energy ports share the cap. The rotor spins up toward a speed set
 // by the power in the steam, flow times FE per mB, so a higher grade spins it faster (full speed is a full
@@ -92,8 +92,10 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imp
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.ENERGY, SideMode.LUBRICANT, SideMode.EXHAUST);
     private static final double SPIN_UP = 0.01;
     private static final double SPIN_DOWN = 0.005;
-    // The rotor speed is sent to clients at most this often (and when it changes noticeably).
-    private static final int SYNC_INTERVAL = 5;
+    // The rotor speed is sent to clients at most this often, and only once it (or the flow) has changed by SYNC_SHARE
+    // of full (or the rotor has come to rest): it eases between, so the client needn't hear of every step.
+    private static final int SYNC_INTERVAL = 10;
+    private static final double SYNC_SHARE = 0.02;
 
     // Replaced (keeping what it holds) when the structure's size changes, since its size and rate follow it.
     private GeneratorEnergyHandler energy;
@@ -388,7 +390,7 @@ public class SteamTurbineArrayBlockEntity extends ShellMultiblockBlockEntity imp
         outputLimit.tick(level, running && grade != null && steamBefore > 0,
                 () -> OutputLimit.anyPortTakes(level, this, SideMode.ENERGY, OutputLimit.Unit.FE),
                 energy.getAmountAsInt(), energy.getCapacityAsInt(), energy.drained(), rated);
-        boolean changed = Math.abs(rpm - syncedRpm) >= 1.0 || flow != syncedFlow;
+        boolean changed = Math.abs(rpm - syncedRpm) >= SYNC_SHARE * maxRpm() || Math.abs(flow - syncedFlow) >= SYNC_SHARE * maxFlow;
         if (changed && level.getGameTime() - lastSync >= SYNC_INTERVAL || (rpm == 0 && syncedRpm != 0)) {
             syncedRpm = (float) rpm;
             syncedFlow = flow;

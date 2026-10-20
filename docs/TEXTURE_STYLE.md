@@ -68,6 +68,23 @@ texture-unification drop.
 Block textures never use near-blacks or greys off this ramp (`#0C0D0F`, the item outline, is for items
 only).
 
+### Turbine enamel (painted large models)
+
+A pale sage-grey enamel, like real turbine-hall paint, for the painted parts of the Nuclear Steam Turbine (its casings,
+hoods, reheaters, crossovers and generator). Six tones from a mid sage-grey to a near-white sage; the two darker steps
+under them are only for its plate seams and worn scuffs. Machine steel stays the deck, pedestals, railings and pipe
+flanges round it.
+
+| Role | Hex |
+|---|---|
+| Scuff core, seam shadow (never a face) | `#444C46`, `#5A635B` |
+| Tone 0: mid sage-grey (plate seam) | `#727C73` |
+| Tone 1 (plate's dark bottom/right edge, a ramp's edges) | `#858F86` |
+| Tone 2 (a ramp's shade side) | `#98A299` |
+| Tone 3: the enamel's field (grain 162–171 luminance, steps of 3) | `#ABB4AC` |
+| Tone 4 (plate's lit top/left edge, a ramp's lit middle) | `#BEC6BE` |
+| Tone 5: near-white sage (highlights only) | `#D1D8D0` |
+
 ---
 
 ## 3. Building blocks
@@ -411,8 +428,8 @@ the same layout on all of them); ModelMesh `modules` and `plating` lay them.
    wedges, never wedge by wedge.
 
 Converted: the **Pumpjack**, the **Oil Derrick**, the **refinery tower** (Distillation Array), the **Steam Turbine
-Array**, and the refinery units' models (the **Cracking Unit**, the **Steam Cracker**, the **Diesel Generator** and the
-**Flare Stack**'s stack). Their renderers shade
+Array**, the **Nuclear Steam Turbine** (built that way, in the turbine enamel), and the refinery units' models (the
+**Cracking Unit**, the **Steam Cracker**, the **Diesel Generator** and the **Flare Stack**'s stack). Their renderers shade
 each face as a block face turned its way is, so the models sit in the light like the blocks round them. Models still to
 bring into line: the **Gas Turbine Array** and the **Industrial Water Intake**.
 
@@ -984,6 +1001,45 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - Port nozzles are PLAIN collars 10 px across (the port plate's collar) from the model to the face.
 - **Hitbox** (not a texture, but it follows the model): formed, each block's shape is the model's parts in it,
   voxelized from TurbineMesh itself at 1 px (TurbineShapes), so a block's outline follows the parts a player sees.
+
+## Nuclear Steam Turbine model
+- **Loose casing** (`block/nuclear_steam_turbine/casing`, Hardened): the Gas Turbine Array casing's frame (its bevels and
+  purple tier pips) with a square recess (`#16181B` top/left lip, `#727982` bottom/right, `#383C42` corners) onto a
+  turbine-enamel panel: `#BEC6BE` lit top and left, `#ABB4AC` field, `#98A299` bottom and right, the casing's horizontal
+  joint across its middle in `#727C73` with two `#D1D8D0` bolt heads.
+- Formed, the casings draw nothing and NuclearTurbineMesh draws one turbine-generator set from NuclearTurbineLayout on its
+  own sheet, `block/nuclear_steam_turbine/turbine` (128×384): rows 0–95 the Steam Turbine Array's, rows 96–255 the
+  large-model plating as on every large model, and the turbine enamel below them (`tools/LargeModelTextureGen.java`). It's
+  a large model ("Large model texturing"), and deliberately unlike the Steam Turbine Array: angular boxes and big arches
+  instead of round casings, and a painted finish instead of bare steel.
+  - Rows 256–319: the enamel's grain field (116×64; tones 162/165/168/171, about 70% of neighbours differing by one
+    step, no checkers), its edge columns at x 122–124 (rows 128–191, beside the machine and generator steels') and edge
+    rows at 234–236 (lit `#BEC6BE`-ish 186, dark 140, seam 118). Rows 320–351: the same grain with seven worn scuffs (a
+    short smear 3–7 px long, one or two rows, its core about 145 with a rim at 154), laid on the casings' lower halves,
+    which stand at handrail height above the walkway. Rows 352–359: the enamel's round-part ramps, 2 to 14 px across,
+    laid out as row 112's (tones 140 to 188, lightest just off centre). Row 360: the enamel's flat tone (0, 360) for faces
+    too small to plate, and the last-stage blades' blur (16, 360: 8×8 seamless streaks of the blade steel running up the
+    tile, the way they sweep past a sight port).
+- **Enamel parts** (EN_PLAIN plates, the ENAMEL ramp on round ones): the low-pressure cylinders, their hoods, flare and
+  condenser necks, the high-pressure cylinder and its steam chests, stop valves and actuators, the reheaters and their
+  crossovers, the generator, its hydrogen coolers, slip-ring housing and exciter. Every big face is a few continuous
+  enamel plates with their own lit and dark edges and a seam only where two meet; a low-pressure cylinder's front wall is
+  one plated surface with its sight port cut out of it. The lower halves (under the bolted horizontal joint) are EN_WORN.
+  Domed heads (the reheaters' ends, the stator's end shields, the steam chests' tops) are bare enamel grain.
+- **Machine steel**: the deck (DECK plates, the girder-flange edge), its stepped columns, the staircase (stringers,
+  grating treads), the walkway grating and handrail, the front standard and every bearing pedestal (PLATE), the reheaters'
+  saddles, the steam and drain pipes (the steel ramp), and every pipe flange and collar. **FE red** (`FE`, `FE_LIT`
+  top, `FE_DARK` bottom) only on the generator's terminal box. Bolt heads `#959DA6`.
+- **Shapes**: the low-pressure cylinders are square boxes (much wider than the 12-sided high-pressure cylinder), with
+  1.5 px stiffening ribs down both sides every 16 px, a bolted joint flange 2.5 px proud, a two-step top cover, a
+  rupture-disc hatch with a ring of ten bolts, and the hood flaring 3 px out to the deck. The crossovers are the set's
+  signature: a cubic arch from each reheater's top, over the set's axis and down into the far half of a roof, 16 straight
+  lengths swept as one tube (its rings shared at each joint, so nothing overlaps), a flanged joint at every fourth.
+- **Sight ports**: a 6×6 opening in each low-pressure cylinder's front wall in a 1 px PLAIN frame, a `#16181B` (DEEP)
+  recess 10 px deep behind it. Through it the last-stage blades (BLADE / BLADE_BACK, 20 to a row, at the axis's 35°)
+  pass with their tip shrouds; at speed the renderer swaps them for the blur band.
+- **Hitbox**: voxelized from NuclearTurbineMesh at 1 px (NuclearTurbineShapes), as the Steam Turbine Array's; the deck,
+  the walkway along the front and the staircase are walkable, with the handrail on the deck's edge.
 
 ## Lithium and the Battery Array
 - **Spodumene** follows the ore method: Cody's green ore (as for fluorite, without the alternate purple clusters), his green

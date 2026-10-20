@@ -611,7 +611,7 @@ public final class SteamGameTests {
                             == SteamTurbineArrayCasingBlock.End.GENERATOR, "No generator at the +X end");
                     helper.assertTrue(helper.getBlockState(new BlockPos(0, 2, 1)).getValue(SteamTurbineArrayCasingBlock.END)
                             == SteamTurbineArrayCasingBlock.End.BEARING, "No bearing at the -X end");
-                    helper.assertTrue(turbine.maxFlow() == 200, "Max flow " + turbine.maxFlow());
+                    helper.assertTrue(turbine.maxFlow() == 300, "Max flow " + turbine.maxFlow());
                     turbine.getSteam().set(0, SteamGrade.SUPERHEATED.resource(), 60_000);
                 })
                 .thenIdle(20)

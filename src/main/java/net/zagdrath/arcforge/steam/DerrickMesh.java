@@ -340,7 +340,48 @@ public final class DerrickMesh extends ModelMesh {
     public float[] buildMoving(float hoist, float kellyAngle, float drumAngle) {
         solid = new Floats();
         glowing = false;
-        float block = DerrickLayout.TRAVEL_TOP - (DerrickLayout.TRAVEL_TOP - DerrickLayout.TRAVEL_BOTTOM) * Math.max(0.0F, Math.min(1.0F, hoist));
+        float block = blockAt(hoist);
+        lines(block);
+        travelling(block);
+        kelly(block, kellyAngle);
+        drum(drumAngle);
+        return solid.toArray();
+    }
+
+    // The drum, built once at rest and drawn turned by its angle about drumAxis (see OilDerrickRenderer). Turned so,
+    // it's the drum buildMoving builds.
+    public float[] buildDrum() {
+        solid = new Floats();
+        glowing = false;
+        drum(0.0F);
+        return solid.toArray();
+    }
+
+    // What moves with the block, built each frame: the hoist lines, the fast line and the kelly, which change length,
+    // and the travelling block and hook, whose faces take their texture from where they are (so they can't be moved
+    // as a whole).
+    public float[] buildLinks(float hoist, float kellyAngle) {
+        solid = new Floats();
+        glowing = false;
+        float block = blockAt(hoist);
+        lines(block);
+        travelling(block);
+        kelly(block, kellyAngle);
+        return solid.toArray();
+    }
+
+    // The drum's axis, along x.
+    public float[] drumAxis() {
+        return axis(C, DerrickLayout.DRUM_Y, DerrickLayout.DRUM_U, 1.0F, 0.0F, 0.0F);
+    }
+
+    // The travelling block's height at hoist (0 at the top of its run, 1 at the bottom).
+    private static float blockAt(float hoist) {
+        return DerrickLayout.TRAVEL_TOP - (DerrickLayout.TRAVEL_TOP - DerrickLayout.TRAVEL_BOTTOM) * Math.max(0.0F, Math.min(1.0F, hoist));
+    }
+
+    // The hoist lines from the crown block down to the travelling block, and the fast line from the drum to the crown.
+    private void lines(float block) {
         float top = DerrickLayout.SHEAVE_Y - DerrickLayout.SHEAVE_R;
         for (int i = 0; i < 4; i++) {
             float x = C - 3.75F + 2.5F * i;
@@ -348,15 +389,26 @@ public final class DerrickMesh extends ModelMesh {
         }
         float[][] fast = DerrickLayout.fastLine();
         tube(fast[0], fast[1], 0.3F, 4, Paint.DARK);
-        // The travelling block and the hook under it.
+    }
+
+    // The travelling block and the hook under it.
+    private void travelling(float block) {
         box(C - 3.5F, block, C - 2.5F, C + 3.5F, block + 6.0F, C + 2.5F, Paint.PLAIN, Paint.MID, Paint.SHADE, 0);
         prismX(C, block + 3.0F, C - 3.8F, C + 3.8F, 1.2F, Paint.BANDED, Paint.MID);
         box(C - 1.5F, block - 3.0F, C - 1.5F, C + 1.5F, block, C + 1.5F, Paint.BANDED, Paint.MID, Paint.SHADE, 0);
+    }
+
+    // The kelly from the hook through the rotary table into the hole, turned to kellyAngle degrees.
+    private void kelly(float block, float kellyAngle) {
         kellyTurning = true;
         turnCos = Math.cos(Math.toRadians(kellyAngle));
         turnSin = Math.sin(Math.toRadians(kellyAngle));
         tube(new float[] { C, block - 3.0F, C }, new float[] { C, -8.0F, C }, 1.3F, 4, Paint.BANDED);
         kellyTurning = false;
+    }
+
+    // The drawworks drum, turned to drumAngle degrees.
+    private void drum(float drumAngle) {
         drumTurning = true;
         turnCos = Math.cos(Math.toRadians(drumAngle));
         turnSin = Math.sin(Math.toRadians(drumAngle));
@@ -379,7 +431,6 @@ public final class DerrickMesh extends ModelMesh {
             }
         }
         drumTurning = false;
-        return solid.toArray();
     }
 
     // The kelly turns about the bore's upright axis; the drum about its own axis along x.

@@ -457,7 +457,8 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Steam.TYPE, ModBlocks.STEAM_BOILER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.Superheating.TYPE, ModBlocks.SUPERHEATER_ARRAY_CASING.get());
         // The turbine makes the Exhaust Steam the condenser takes.
-        registration.addCraftingStation(MachineCategories.Condensing.TYPE, ModBlocks.CONDENSER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get());
+        registration.addCraftingStation(MachineCategories.Condensing.TYPE, ModBlocks.CONDENSER_ARRAY_CASING.get(), ModBlocks.STEAM_TURBINE_ARRAY_CASING.get(),
+                ModBlocks.NUCLEAR_TURBINE_CASING.get());
         registration.addCraftingStation(MachineCategories.BurnerFuels.TYPE, ModBlocks.FUEL_BURNER.get(), ModBlocks.FIREBOX_ARRAY_CONTROLLER.get());
         registration.addCraftingStation(MachineCategories.GasTurbineFuels.TYPE, ModBlocks.GAS_TURBINE_ARRAY_CASING.get());
         registration.addCraftingStation(MachineCategories.ElectricEnchanting.TYPE, ModBlocks.ELECTRIC_ENCHANTER.get());

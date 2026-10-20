@@ -17,8 +17,8 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.zagdrath.arcforge.client.renderer.ArcforgeRenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -37,6 +37,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity;
 import net.zagdrath.arcforge.client.model.WindowQuadrants;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
 import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 
 // Draws the inside of a formed Thermal Evaporator Array, seen through its windows. Like the steam and gas turbine arrays,
@@ -45,8 +46,13 @@ import net.zagdrath.arcforge.multiblock.ThermalEvaporatorStructure;
 // a lining just inside the tower's walls in the tower's inner plate, cut away behind every window with a reveal round
 // each opening (TiledBoxes.lining). Inside it, the input (Seawater or Brine, in its own fluid sprite and colour) rises
 // from the floor with how full the input tank is (a full tank fills the tower), and, while it makes Salt, a white bed of
-// salt lies on the floor under the liquid. The level eases toward the synced one.
+// salt lies on the floor under the liquid. The level eases toward the synced one. The lining and the bed are still, so
+// they're baked into the chunk mesh (ChunkMeshes), again only when the tower, its windows or the bed change; the liquid
+// is drawn here.
 public class ThermalEvaporatorRenderer implements BlockEntityRenderer<ThermalEvaporatorBlockEntity, ThermalEvaporatorRenderer.State> {
+    // What the lining and bed are built from, for telling when to bake them again.
+    private record Still(ThermalEvaporatorStructure.Tower tower, Set<Long> windows, boolean bed, TextureAtlasSprite liner, TextureAtlasSprite jamb,
+            TextureAtlasSprite salt) {}
     // The lining, then the liquid and salt a little further in, so no two share a plane.
     private static final float LINER_INSET = 1.0F / 16.0F;
     private static final float VOLUME_INSET = 1.5F / 16.0F;
@@ -83,6 +89,7 @@ public class ThermalEvaporatorRenderer implements BlockEntityRenderer<ThermalEva
         ThermalEvaporatorStructure.Tower tower = evaporator.getTower();
         state.formed = tower != null;
         if (tower == null) {
+            ChunkMeshes.remove(evaporator);
             return;
         }
         BlockPos rel = tower.min().subtract(evaporator.getBlockPos());
@@ -106,6 +113,20 @@ public class ThermalEvaporatorRenderer implements BlockEntityRenderer<ThermalEva
         state.light = evaporator.getLevel() != null
                 ? LightCoordsUtil.getLightCoords(evaporator.getLevel(), tower.coreBottom().above(ThermalEvaporatorStructure.HEIGHT / 2 - 1))
                 : state.lightCoords;
+        // The lining and the salt bed into the chunk mesh, lit there as the entity shader lit them.
+        TextureAtlasSprite liner = state.liner, jamb = state.jamb, salt = state.saltSprite;
+        Set<Long> windows = state.windows;
+        boolean bed = state.saltBed;
+        int light = state.light;
+        float width = ThermalEvaporatorStructure.WIDTH, height = ThermalEvaporatorStructure.HEIGHT;
+        ChunkMeshes.bakeEntityLit(evaporator, MeshRendering.SOLID, tower.min(), ChunkSectionLayer.SOLID, new Still(tower, windows, bed, liner, jamb, salt),
+                light, () -> tower.equals(evaporator.getTower()), (pose, buffer) -> {
+                    TiledBoxes.lining(pose, buffer, liner, jamb, -1, light, LINER_INSET, width, height, width, windows);
+                    if (bed) {
+                        TiledBoxes.box(pose, buffer, salt, -1, light, VOLUME_INSET, VOLUME_INSET, VOLUME_INSET, width - VOLUME_INSET, VOLUME_INSET + BED,
+                                width - VOLUME_INSET, false, Direction.DOWN);
+                    }
+                });
     }
 
     // The half-block lining tiles of the tower's walls that lie behind window (TiledBoxes.windowKey): those behind a
@@ -169,14 +190,8 @@ public class ThermalEvaporatorRenderer implements BlockEntityRenderer<ThermalEva
         boolean bed = state.saltBed && salt != null;
 
         poseStack.pushPose();
-        // Drawn from the tower's minimum corner.
+        // Drawn from the tower's minimum corner (the lining and bed are in the chunk mesh).
         poseStack.translate(state.x, state.y, state.z);
-        collector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(liner.atlasLocation()), (pose, buffer) -> {
-            TiledBoxes.lining(pose, buffer, liner, jamb, -1, state.light, LINER_INSET, width, height, width, state.windows);
-            if (bed) {
-                TiledBoxes.box(pose, buffer, salt, -1, state.light, x0, floor, z0, x1, bedTop, z1, false, Direction.DOWN);
-            }
-        });
         TextureAtlasSprite fluid = state.fluidSprite;
         if (fluid != null) {
             float bottom = bed ? bedTop : floor;

@@ -40,6 +40,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.multiblock.PlantKind;
 import net.zagdrath.arcforge.multiblock.ShapedPlant;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
@@ -135,7 +136,7 @@ public abstract class PlantControllerBlockEntity extends MachineBlockEntity impl
             return false;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = false;
             for (BlockPos pos : box.parts()) {
                 if (level.hasNeighborSignal(pos)) {

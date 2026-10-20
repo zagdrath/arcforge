@@ -21,6 +21,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.steam.TurbineLayout;
+import net.zagdrath.arcforge.steam.TurbineMesh;
 import net.zagdrath.arcforge.steam.TurbineShapes;
 
 // The formed Steam Turbine Array's turbine-generator set (TurbineLayout): for every size it can be, the right casings
@@ -35,6 +36,36 @@ public final class TurbineModelGameTests {
     private TurbineModelGameTests() {}
 
     private static final float EPSILON = 0.01F;
+
+    // The rotor is built once at rest and drawn turned (SteamTurbineArrayRenderer): turned about ModelMesh.rotorAxis, it's
+    // the rotor built at that angle, every vertex where it would be, every normal turned with it and every UV the same.
+    static void rotorTurns(GameTestHelper helper) {
+        for (boolean alongX : new boolean[] { false, true }) {
+            TurbineMesh mesh = new TurbineMesh(TurbineLayout.of(21, 7, 7, alongX), alongX);
+            float[] rest = mesh.buildRotor(0.0F);
+            float[] axis = mesh.rotorAxis();
+            for (float angle : new float[] { 17.0F, 90.0F, 233.0F }) {
+                float[] turned = mesh.buildRotor(angle);
+                helper.assertTrue(turned.length == rest.length, "The rotor at " + angle + "° has " + turned.length + " floats, at rest " + rest.length);
+                org.joml.Matrix4f turn = new org.joml.Matrix4f().translate(axis[0], axis[1], axis[2])
+                        .rotate((float) Math.toRadians(angle), axis[3], axis[4], axis[5]).translate(-axis[0], -axis[1], -axis[2]);
+                org.joml.Vector3f p = new org.joml.Vector3f(), n = new org.joml.Vector3f();
+                for (int i = 0; i + 7 < rest.length; i += 8) {
+                    turn.transformPosition(rest[i], rest[i + 1], rest[i + 2], p);
+                    turn.transformDirection(rest[i + 5], rest[i + 6], rest[i + 7], n);
+                    boolean same = Math.abs(p.x - turned[i]) < 1.0E-3F && Math.abs(p.y - turned[i + 1]) < 1.0E-3F && Math.abs(p.z - turned[i + 2]) < 1.0E-3F
+                            && Math.abs(n.x - turned[i + 5]) < 1.0E-3F && Math.abs(n.y - turned[i + 6]) < 1.0E-3F && Math.abs(n.z - turned[i + 7]) < 1.0E-3F
+                            && rest[i + 3] == turned[i + 3] && rest[i + 4] == turned[i + 4];
+                    if (!same) {
+                        helper.fail("Along " + (alongX ? "X" : "Z") + " at " + angle + "°, vertex " + i / 8 + " turned is (" + p.x + ", " + p.y + ", " + p.z
+                                + "), built (" + turned[i] + ", " + turned[i + 1] + ", " + turned[i + 2] + ")");
+                        return;
+                    }
+                }
+            }
+        }
+        helper.succeed();
+    }
 
     static void layoutSizes(GameTestHelper helper) {
         for (int length = 3; length <= SteamTurbineArrayCasingBlock.MAX_LENGTH; length++) {

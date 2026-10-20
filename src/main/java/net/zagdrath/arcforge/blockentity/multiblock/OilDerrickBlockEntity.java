@@ -62,6 +62,7 @@ import net.zagdrath.arcforge.multiblock.MultiblockEffects;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.multiblock.OilfieldStructures;
 import net.zagdrath.arcforge.multiblock.ShapedPlant;
+import net.zagdrath.arcforge.multiblock.TickSpread;
 import net.zagdrath.arcforge.oil.OilCavern;
 import net.zagdrath.arcforge.oil.OilCaverns;
 import net.zagdrath.arcforge.oil.OilDeposits;
@@ -249,7 +250,7 @@ public class OilDerrickBlockEntity extends MachineBlockEntity implements ShapedP
             return;
         }
         portDefaults.tick(level, this);
-        if (level.getGameTime() % REDSTONE_CHECK_INTERVAL == 0) {
+        if (TickSpread.due(level, worldPosition, REDSTONE_CHECK_INTERVAL)) {
             powered = isPowered(level);
         }
         status = drill(level);
