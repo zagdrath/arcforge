@@ -155,6 +155,7 @@ public final class ArcforgeGameTests {
         TESTS.put("fuel_burner_burns_creosote", InfusionGameTests::fuelBurnerBurnsCreosote);
         TESTS.put("treated_wood_strips_and_resists_fire", InfusionGameTests::treatedWoodStripsAndResistsFire);
         TESTS.put("upgrade_slots", CrushingGameTests::upgradeSlots);
+        TESTS.put("unsided_slots_once", CrushingGameTests::unsidedSlotsOnce);
         TESTS.put("crusher_upgrades", CrushingGameTests::crusherUpgrades);
         TESTS.put("melter_stone", MeltingGameTests::stone);
         TESTS.put("melter_netherrack", MeltingGameTests::netherrack);

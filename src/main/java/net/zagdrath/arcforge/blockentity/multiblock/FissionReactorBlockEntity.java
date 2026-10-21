@@ -188,6 +188,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     private final ResourceHandler<FluidResource> allFluids;
     private final ResourceHandler<ItemResource> rodInput;
     private final ResourceHandler<ItemResource> rodOutput;
+    // Both at once, for an unsided query: one view of the slots (joining rodInput and rodOutput listed each slot twice).
+    private final ResourceHandler<ItemResource> rodsAll;
     private final ContainerData data;
     // The trend graphs: a reading a second (power as log10 of the fraction, coolant °C, k), in a ring.
     private final int[][] history = new int[3][HISTORY];
@@ -207,6 +209,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         this.allFluids = new CombinedResourceHandler<>(intakeInput, hotLegOutput, steamOutput);
         this.rodInput = new AutomationResourceHandler<>(items, slot -> slot < INPUT_SLOTS, slot -> false);
         this.rodOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot >= INPUT_SLOTS && slot < MACHINE_SLOTS);
+        this.rodsAll = new AutomationResourceHandler<>(items, slot -> slot < INPUT_SLOTS, slot -> slot >= INPUT_SLOTS && slot < MACHINE_SLOTS);
         this.data = new WideIntContainerData(FissionReactorMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -1594,7 +1597,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             return null;
         }
         if (mode == null) {
-            return new CombinedResourceHandler<>(rodInput, rodOutput);
+            return rodsAll;
         }
         return switch (mode) {
             case INPUT -> rodInput;

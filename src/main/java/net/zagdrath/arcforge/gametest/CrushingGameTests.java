@@ -63,6 +63,30 @@ public final class CrushingGameTests {
         }
     }
 
+    // An unsided item handler (what Jade and the control API read) lists each slot once: one Speed Upgrade in a Mill or a
+    // Fermenter reads as one, not two (their input and output views each wrap the whole inventory, and were joined).
+    static void unsidedSlotsOnce(GameTestHelper helper) {
+        BlockPos millPos = new BlockPos(0, 1, 0), fermenterPos = new BlockPos(2, 1, 0);
+        helper.setBlock(millPos, ModBlocks.MILL.get());
+        helper.setBlock(fermenterPos, ModBlocks.FERMENTER.get());
+        net.zagdrath.arcforge.blockentity.machine.MillBlockEntity mill = helper.getBlockEntity(millPos,
+                net.zagdrath.arcforge.blockentity.machine.MillBlockEntity.class);
+        net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity fermenter = helper.getBlockEntity(fermenterPos,
+                net.zagdrath.arcforge.blockentity.machine.FermenterBlockEntity.class);
+        install(mill.getItems(), ModItems.SPEED_UPGRADE.get(), 1);
+        install(fermenter.getItems(), ModItems.SPEED_UPGRADE.get(), 1);
+        for (var handler : java.util.List.of(mill.getItemHandler(null), fermenter.getItemHandler(null))) {
+            long speed = 0;
+            for (int i = 0; i < handler.size(); i++) {
+                if (handler.getResource(i).is(ModItems.SPEED_UPGRADE.get())) {
+                    speed += handler.getAmountAsLong(i);
+                }
+            }
+            helper.assertTrue(speed == 1, "One Speed Upgrade reads as " + speed + " through " + handler.getClass().getSimpleName());
+        }
+        helper.succeed();
+    }
+
     // Upgrade slots hold up to 8 of one accepted type each, and a type can't be split across slots.
     static void upgradeSlots(GameTestHelper helper) {
         BlockPos pos = new BlockPos(0, 1, 0);

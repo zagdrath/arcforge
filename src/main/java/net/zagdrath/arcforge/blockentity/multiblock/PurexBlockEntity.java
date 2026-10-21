@@ -88,6 +88,8 @@ public class PurexBlockEntity extends VesselControllerBlockEntity implements Rad
     private final ResourceHandler<FluidResource> allFluids;
     private final ResourceHandler<ItemResource> rodInput;
     private final ResourceHandler<ItemResource> productOutput;
+    // Both at once, for an unsided query: one view of the slots (joining the two listed each slot twice).
+    private final ResourceHandler<ItemResource> itemsAll;
     private final ContainerData data;
     private ReprocessingRecipe.Mode mode = ReprocessingRecipe.Mode.PUREX;
     // Fissile oxide owed (fractions of an item) for each mode.
@@ -111,6 +113,7 @@ public class PurexBlockEntity extends VesselControllerBlockEntity implements Rad
         this.allFluids = new CombinedResourceHandler<>(fluidInput, wasteOutput);
         this.rodInput = new AutomationResourceHandler<>(items, slot -> slot < INPUT_SLOTS, slot -> false);
         this.productOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot >= INPUT_SLOTS && slot < MACHINE_SLOTS);
+        this.itemsAll = new AutomationResourceHandler<>(items, slot -> slot < INPUT_SLOTS, slot -> slot >= INPUT_SLOTS && slot < MACHINE_SLOTS);
         this.data = new WideIntContainerData(PurexMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -377,7 +380,7 @@ public class PurexBlockEntity extends VesselControllerBlockEntity implements Rad
             return null;
         }
         if (mode == null) {
-            return new CombinedResourceHandler<>(rodInput, productOutput);
+            return itemsAll;
         }
         return switch (mode) {
             case INPUT -> rodInput;

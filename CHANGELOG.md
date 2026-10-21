@@ -153,6 +153,9 @@ machines and Settings Cards carry over).
   (`chemical_reactor_array/shape`) had boxes with no faces, which Minecraft 26.3 won't load.
 - Holding Shift while the creative inventory's search was being built threw an error ("Rendersystem called from wrong
   thread") from Arcforge's item descriptions, which wrapped their lines with the font off the render thread.
+- Jade (and anything else asking a machine for its items without a side) saw the Mill's, Fermenter's and PUREX
+  plant's slots twice: one Speed Upgrade read as two, and so did whatever was in them. Each machine joined an input
+  view and an output view that both wrap the whole inventory; it now hands out one view of its slots.
 
 ### Upgrading
 

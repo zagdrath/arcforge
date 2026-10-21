@@ -24,7 +24,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.item.ItemResource;
@@ -74,7 +73,8 @@ public class MillBlockEntity extends MachineBlockEntity {
         int[] inputs = { inputSlot(0), inputSlot(1), inputSlot(2) };
         this.itemInput = new BalancedLaneInput(items, inputs);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, MillBlockEntity::isProductSlot);
-        this.itemAutomation = new CombinedResourceHandler<>(itemInput, itemOutput);
+        // One view of the slots (joining itemInput and itemOutput listed each slot twice).
+        this.itemAutomation = new BalancedLaneInput(items, inputs, MillBlockEntity::isProductSlot);
         this.data = new WideIntContainerData(MillMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {

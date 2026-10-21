@@ -94,6 +94,8 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
     private final ResourceHandler<FluidResource> fluidInteraction;
     private final ResourceHandler<ItemResource> itemInput;
     private final ResourceHandler<ItemResource> itemOutput;
+    // Both at once, for an unsided query: one view of the slots (joining the two listed each slot twice).
+    private final ResourceHandler<ItemResource> itemsAll;
     private final ContainerData data;
 
     private int progress;
@@ -123,6 +125,8 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT || slot == SLOT_INPUT_2 || slot == SLOT_ADDITIVE,
                 slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_BYPRODUCT);
+        this.itemsAll = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT || slot == SLOT_INPUT_2 || slot == SLOT_ADDITIVE,
+                slot -> slot == SLOT_BYPRODUCT);
         this.data = new WideIntContainerData(FermenterMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -418,7 +422,7 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
     public @Nullable ResourceHandler<ItemResource> getItemHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
         if (mode == null) {
-            return new CombinedResourceHandler<>(itemInput, itemOutput);
+            return itemsAll;
         }
         return mode == SideMode.INPUT ? itemInput : mode == SideMode.OUTPUT ? itemOutput : null;
     }

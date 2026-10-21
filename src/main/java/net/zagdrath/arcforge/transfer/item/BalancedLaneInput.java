@@ -19,7 +19,13 @@ public class BalancedLaneInput extends AutomationResourceHandler<ItemResource> {
     private final int[] inputSlots;
 
     public BalancedLaneInput(FilteredItemHandler items, int[] inputSlots) {
-        super(items, slot -> Arrays.stream(inputSlots).anyMatch(input -> input == slot), slot -> false);
+        this(items, inputSlots, slot -> false);
+    }
+
+    // The same, also giving out the slots canExtract allows: one view of the slots for an unsided query (joining an input
+    // view and an output view, each over the whole inventory, listed every slot twice).
+    public BalancedLaneInput(FilteredItemHandler items, int[] inputSlots, java.util.function.IntPredicate canExtract) {
+        super(items, slot -> Arrays.stream(inputSlots).anyMatch(input -> input == slot), canExtract);
         this.items = items;
         this.inputSlots = inputSlots;
     }
