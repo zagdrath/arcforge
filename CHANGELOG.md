@@ -140,6 +140,8 @@ machines and Settings Cards carry over).
 
 - The Chemical Reactor Array's formed casings drew as the missing model: the shape their port collars stop at
   (`chemical_reactor_array/shape`) had boxes with no faces, which Minecraft 26.3 won't load.
+- Holding Shift while the creative inventory's search was being built threw an error ("Rendersystem called from wrong
+  thread") from Arcforge's item descriptions, which wrapped their lines with the font off the render thread.
 
 ### Upgrading
 
