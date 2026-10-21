@@ -159,6 +159,9 @@ machines and Settings Cards carry over).
 - Jade (and anything else asking a machine for its items without a side) saw the Mill's, Fermenter's and PUREX
   plant's slots twice: one Speed Upgrade read as two, and so did whatever was in them. Each machine joined an input
   view and an output view that both wrap the whole inventory; it now hands out one view of its slots.
+- A short fluid or gas conduit run moved only its own size a tick (1,000 mB of liquid or 2,000 mB of gas a conduit),
+  not its tier's rate: a 3-block Arcforged line carried 3,000 mB/t instead of 12,800. A network now always holds at least
+  a tick of its rate.
 
 ### Upgrading
 

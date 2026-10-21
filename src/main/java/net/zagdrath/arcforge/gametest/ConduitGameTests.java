@@ -342,6 +342,28 @@ final class ConduitGameTests {
                 .thenSucceed();
     }
 
+    // A short run moves its tier's full rate: three Arcforged conduits hold 3,000 mB but carry 12,800 mB in a tick.
+    static void fluidShortRunRate(GameTestHelper helper) {
+        BlockPos source = new BlockPos(0, 1, 0);
+        BlockPos sink = new BlockPos(4, 1, 0);
+        TestFixtures.reset(helper.absolutePos(source));
+        TestFixtures.reset(helper.absolutePos(sink));
+        helper.setBlock(source, Blocks.TARGET);
+        helper.setBlock(sink, Blocks.TARGET);
+        placeRun(helper, ConduitType.FLUID, ConduitTier.ARCFORGED, 3);
+        setPort(helper, new BlockPos(1, 1, 0), Direction.WEST, SideSetting.OUTPUT);
+        setPort(helper, new BlockPos(3, 1, 0), Direction.EAST, SideSetting.INPUT);
+        var from = TestFixtures.tank(helper.absolutePos(source));
+        var to = TestFixtures.tank(helper.absolutePos(sink));
+        int rate = ConduitTier.ARCFORGED.fluidPerTick();
+        helper.startSequence()
+                .thenIdle(5)
+                .thenExecute(() -> from.set(0, FluidResource.of(Fluids.WATER), TestFixtures.TANK_CAPACITY))
+                .thenIdle(1)
+                .thenExecute(() -> helper.assertTrue(fluidIn(to) >= rate, "A 3-conduit Arcforged run moved " + fluidIn(to) + " mB in a tick, not " + rate))
+                .thenSucceed();
+    }
+
     // Breaking a conduit in a filled network splits it in two without creating or losing fluid.
     static void fluidSplit(GameTestHelper helper) {
         BlockPos source = new BlockPos(0, 1, 0);

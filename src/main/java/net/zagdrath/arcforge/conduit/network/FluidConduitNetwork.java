@@ -50,11 +50,13 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
         this(level, members, memberSet, tier, ConduitTier.FLUID_CAPACITY_PER_CONDUIT, tier.fluidPerTick(), resource -> !Gases.isGas(resource));
     }
 
-    // perConduit: mB each conduit holds. rate: mB/t pulled and pushed. accepts: the fluids it carries.
+    // perConduit: mB each conduit holds. rate: mB/t pulled and pushed. accepts: the fluids it carries. A network holds at
+    // least one tick of its rate: each tick it pulls what fits and then pushes what it holds, so a short run holding less
+    // (an Arcforged line under 13 blocks long) would move only its own size a tick, not its tier's rate.
     protected FluidConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier,
             int perConduit, int rate, Predicate<FluidResource> accepts) {
         super(level, members, memberSet, tier, Capabilities.Fluid.BLOCK);
-        this.capacity = members.size() * perConduit;
+        this.capacity = Math.max(members.size() * perConduit, rate);
         this.rate = rate;
         this.accepts = accepts;
     }
