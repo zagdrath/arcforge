@@ -121,6 +121,10 @@ machines and Settings Cards carry over).
   - Steam Generator: `steamHeat` 12 → 6 HU per mB of High-Pressure Steam. Each tube block now boils 2,000 mB/t of steam
     (was 1,000) from the 200 mB/t of Hot Coolant it cools (`hotCoolantPerTube` unchanged); Superheated Steam from a
     lead-bismuth core takes 9.6 HU a mB (was 19.2).
+  - Boiling cores too: `boilingHeat` 12 → 6 HU per mB of Contaminated Steam, so a boiling core turns its heat into
+    steam (and FE) as a pressurized core does through a Steam Generator: twice the steam from the same heat. It boils
+    its coolant away twice as fast as well, so it needs twice the make-up water at the same power; its relief valves
+    vent the same heat.
   - Steam Turbine Array: `maxFlowPerSection` 40 → 60 mB/t. A 7×7×27 takes 8,820 mB/t (was 5,880) and makes 493,920 FE/t
     on Superheated Steam before its bonuses (was 329,280); its output cap (a full lubricated Superheated flow with the
     vacuum bonus) is 602,575 FE/t (was 401,717) and its FE buffer 400 ticks of that (a 3×3×3 holds about 4.9 million FE,
@@ -179,7 +183,8 @@ machines and Settings Cards carry over).
 - Side configurations now take 5 bits a face (for the Experience mode). Machines, multiblock ports and Settings Cards
   from older versions are converted when they load; nothing needs redoing.
 - **Changed config defaults don't reach an existing `arcforge-common.toml`**: it keeps `power.steam.steamTurbineArray
-  .maxFlowPerSection` 40, `nuclear.fissionReactor.rodLifeTicks` 1152000 and `nuclear.steamGenerator.steamHeat` 12 until
+  .maxFlowPerSection` 40, `nuclear.fissionReactor.rodLifeTicks` 1152000, `nuclear.fissionReactor.boilingHeat` 12 and
+  `nuclear.steamGenerator.steamHeat` 12 until
   you change them or reset them (`/arcforge config reset <path>`). The enrichment scaling of rod life applies either way.
 - Rods already in a core keep their burnup; with the longer life they burn the rest of the way more slowly.
 - A Power Plant quest completed before keeps its completion; one in progress now needs a Nuclear Steam Turbine at speed.

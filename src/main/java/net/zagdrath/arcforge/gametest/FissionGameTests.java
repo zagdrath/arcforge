@@ -542,8 +542,13 @@ public final class FissionGameTests {
                 .thenSucceed();
     }
 
-    // A boiling core's steam runs the turbines as High-Pressure Steam, and is radioactive where plain steam isn't.
+    // A boiling core's steam runs the turbines as High-Pressure Steam, and is radioactive where plain steam isn't; it spends
+    // as much heat on each mB as the Steam Generator does on High-Pressure Steam, so both make as much FE from a core's heat.
     static void contaminatedSteam(GameTestHelper helper) {
+        helper.assertTrue(ReactorParams.defaults().boilingHeat == 6.0
+                && ArcforgeConfig.REACTOR_BOILING_HEAT.getAsDouble() == ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble(),
+                "A boiling core spends " + ArcforgeConfig.REACTOR_BOILING_HEAT.getAsDouble() + " HU a mB, the Steam Generator "
+                        + ArcforgeConfig.STEAM_GENERATOR_STEAM_HEAT.getAsDouble());
         FluidResource steam = FluidResource.of(ModFluids.CONTAMINATED_STEAM.get());
         helper.assertTrue(ReactorSteam.isContaminated(steam) && ReactorSteam.isTurbineSteam(steam), "Turbines won't take Contaminated Steam");
         helper.assertTrue(ReactorSteam.turbineGrade(steam) == SteamGrade.HIGH_PRESSURE, "It isn't High-Pressure grade");

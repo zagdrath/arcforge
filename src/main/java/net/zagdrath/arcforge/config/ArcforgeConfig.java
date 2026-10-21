@@ -4192,8 +4192,9 @@ public class ArcforgeConfig {
             .defineInRange("hotCoolantHeat", 60.0, 1.0, 10_000.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_BOILING_HEAT = BUILDER
-            .comment("HU a boiling core spends on each mB of Contaminated Steam it makes.")
-            .defineInRange("boilingHeat", 12.0, 1.0, 1_000.0);
+            .comment("HU a boiling core spends on each mB of Contaminated Steam it makes (the Steam Generator's steamHeat, so a boiling",
+                    "core makes as much FE from its heat as a pressurized one).")
+            .defineInRange("boilingHeat", 6.0, 1.0, 1_000.0);
 
     public static final ModConfigSpec.DoubleValue REACTOR_COOLANT_PER_BLOCK = BUILDER
             .comment("mB of coolant each empty cell inside the vessel holds (a channel holds 70% of that).")

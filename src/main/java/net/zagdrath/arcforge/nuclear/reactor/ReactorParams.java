@@ -70,7 +70,7 @@ public final class ReactorParams {
     public double hotCoolantHeat = 60.0;        // HU a mB of Hot Coolant carries to the Steam Generator
     public double pwrInletCelsius = 100.0;      // below this the hot leg sends nothing; full flow by pwrHotCelsius
     public double pwrHotCelsius = 300.0;
-    public double boilingHeat = 12.0;           // HU per mB of steam a boiling core makes
+    public double boilingHeat = 6.0;            // HU per mB of steam a boiling core makes (as the Steam Generator's steamHeat)
     public double pwrPressure = 155.0;          // bar, held by the pressurizer
     public double bwrPressure = 70.0;
     public double reliefPressure = 175.0;       // the relief valve vents above this

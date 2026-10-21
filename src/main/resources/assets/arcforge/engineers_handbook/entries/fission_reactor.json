@@ -25,7 +25,7 @@
     },
     {
       "type": "text",
-      "text": "# Fuel\nPut Fuel Rods in the nine input slots: they load into empty Fuel Channels from the middle of the core outwards, and only while the reactor is shut down (every bank all the way in). Spent rods come out to the output slots while shut down, by themselves if you choose, still hot. The Fuel page's core map shows every channel's burnup and picks the rods to replace (see Fuel Rods).\n# Power\nEach fuel channel gives up to 4,000 HU/t at full power. Through a Steam Generator each HU boils a sixth of a mB of High-Pressure Steam, so a reactor's heat makes about 6 FE per HU in the turbines: about what a large Steam Boiler Array gets on High-Pressure Steam."
+      "text": "# Fuel\nPut Fuel Rods in the nine input slots: they load into empty Fuel Channels from the middle of the core outwards, and only while the reactor is shut down (every bank all the way in). Spent rods come out to the output slots while shut down, by themselves if you choose, still hot. The Fuel page's core map shows every channel's burnup and picks the rods to replace (see Fuel Rods).\n# Power\nEach fuel channel gives up to 4,000 HU/t at full power. Through a Steam Generator each HU boils a sixth of a mB of High-Pressure Steam (a boiling core boils its own coolant into Contaminated Steam at the same rate), so a reactor's heat makes about 6 FE per HU in the turbines: about what a large Steam Boiler Array gets on High-Pressure Steam."
     },
     {
       "type": "text",
