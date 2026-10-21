@@ -590,6 +590,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         core.tick(hotRoom, core.coolantType.isWater() ? steam.getSpace() : 0.0);
         add(hotLeg, FluidResource.of(hotFluid), core.hotLeg);
         add(steam, FluidResource.of(ModFluids.CONTAMINATED_STEAM.get()), core.steamMade);
+        // What the autopilot sees the plant take back (see ReactorAutopilot.watch), before anything takes it away.
+        autopilot.sent(intake.getAmount(), outputTank(core).getAmount(), core.hotLeg + core.steamMade);
         MultiblockAutomation.pushFluids(level, this, PUSHED, 64_000);
         MultiblockAutomation.pushOutputs(level, this);
         safety(level, core, oxidisedBefore);
@@ -1112,6 +1114,8 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     // and not stopped by redstone. It holds the rods in while fuel or control rods wait to load (they only load shut down)
     // or rods are queued to come out, and it never resets a trip.
     private void autopilot(ReactorSim core) {
+        FilteredFluidTank out = outputTank(core);
+        autopilot.watch(intake.getAmount(), intake.getCapacity(), out.getAmount(), out.getCapacity());
         if (upgrades(UpgradeType.AUTOPILOT) == 0 || !controlState.isEnabled() || level != null && !redstoneMode.canRun(redstone > 0)) {
             autopilot.state = ReactorAutopilot.State.OFF;
         } else if (core.loadedRods() == 0 || !pulls.isEmpty() || rodsWaiting(core)) {
@@ -1119,6 +1123,11 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         } else {
             autopilot.steer(core);
         }
+    }
+
+    // Where the core's heat leaves: its steam tank for a boiling core, else the Hot Leg.
+    private FilteredFluidTank outputTank(ReactorSim core) {
+        return core.mode == ReactorSim.Mode.BOILING ? steam : hotLeg;
     }
 
     // Whether a Fuel Rod or Control Rod waits in the input slots with an empty channel for it.

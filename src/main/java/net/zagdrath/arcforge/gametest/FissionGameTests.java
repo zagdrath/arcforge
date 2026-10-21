@@ -200,7 +200,44 @@ public final class FissionGameTests {
         helper.assertTrue(!limited.scrammed, "It tripped with the plant taking part: " + limited.trip);
         helper.assertTrue(limited.power > 0.4 && limited.power < 0.6 && limited.flowRatio > 0.9,
                 "It didn't settle at what the plant takes: " + limited.power + ", flow " + limited.flowRatio + ", " + pilot.state);
+        // A Steam Generator short of feedwater: it takes all the Hot Coolant it's sent into its own tank but cools (and sends
+        // back) only 800 mB/t, about 12% of this core's full flow. The core's own flow never falls short; the water just
+        // doesn't come back, and the vessel would drain and trip on low coolant if it didn't watch its intake.
+        ReactorSim fed = core(PWR, 0.03, ReactorSim.Mode.PRESSURIZED);
+        pilot = loop(fed, 800.0, 20 * 60 * 35);
+        helper.assertTrue(!fed.scrammed, "It tripped with the generator short of feedwater: " + fed.trip);
+        helper.assertTrue(fed.power > 0.05 && fed.power < 0.2 && fed.level() > 0.55,
+                "It didn't settle at what the generator cools: " + fed.power + ", vessel " + fed.level() + ", " + pilot.state);
         helper.succeed();
+    }
+
+    // The core in a loop as the block entities run it: its 64,000 mB intake and Hot Leg, a Steam Generator taking up to
+    // 108,000 mB of Hot Coolant into its own tank and cooling cools mB/t of it, and Arcforged conduits (12,800 mB/t)
+    // between; the autopilot watches the reactor's tanks as the block entity does.
+    private static ReactorAutopilot loop(ReactorSim sim, double cools, int ticks) {
+        ReactorAutopilot pilot = new ReactorAutopilot();
+        double tank = 64_000.0, generatorTank = 108_000.0, conduit = 12_800.0;
+        double intake = tank, hotLeg = 0.0, generatorHot = 0.0, generatorCooled = 0.0;
+        for (int t = 0; t < ticks && !sim.scrammed; t++) {
+            pilot.watch(intake, tank, hotLeg, tank);
+            pilot.steer(sim);
+            double moved = Math.min(sim.coolantCapacity - sim.coolant, intake);
+            sim.coolant += moved;
+            intake -= moved;
+            sim.tick(tank - hotLeg, 0.0);
+            hotLeg += sim.hotLeg;
+            pilot.sent(intake, hotLeg, sim.hotLeg);
+            double sent = Math.min(Math.min(hotLeg, conduit), generatorTank - generatorHot);
+            hotLeg -= sent;
+            generatorHot += sent;
+            double cooled = Math.min(Math.min(generatorHot, cools), generatorTank - generatorCooled);
+            generatorHot -= cooled;
+            generatorCooled += cooled;
+            double back = Math.min(Math.min(generatorCooled, conduit), tank - intake);
+            generatorCooled -= back;
+            intake += back;
+        }
+        return pilot;
     }
 
     // A core run with the Autopilot steering it for ticks, the plant taking room mB of Hot Coolant a tick.

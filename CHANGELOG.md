@@ -86,8 +86,11 @@ machines and Settings Cards carry over).
 - **Reactor Autopilot** (creative only for now: no recipe, in the Tools and Upgrades tab). An upgrade card for the
   Fission Reactor, which now has an Upgrades tab. With it in, every bank is driven together to hold the core at the most
   power its plant takes: its goal climbs to 100% and backs off whenever the hottest fuel comes within 100 °C of its trip,
-  the pressure within 3 bar of its trip, the vessel's water low, or the plant stops taking all the heat (it drops
-  straight to the share that's leaving). From cold it brings a core up at about a 40 s period, well clear of the
+  the pressure within 3 bar of its trip, the vessel's water below 75%, or the plant stops keeping up. That last it
+  watches from the reactor's own tanks: the coolant flow, and once the intake is half empty or the Hot Leg half full,
+  the coolant coming back and what the plant takes against what the core sends (a Steam Generator short of feedwater
+  still takes all its Hot Coolant into its own tank, but sends back only what it cools). It then drops 10% under what
+  the plant keeps up with, so those tanks drain back, and creeps back up past there only slowly. From cold it brings a core up at about a 40 s period, well clear of the
   short-period trip, to full power in about 15 minutes, and like an operator it pulls no rods while the period meter reads
   under 30 s (and drives them in under 20 s), so a core still warm after a trip comes back up without one.
   It holds the rods in while rods wait to load or come out, never
