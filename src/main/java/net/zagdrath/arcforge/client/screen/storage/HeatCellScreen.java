@@ -68,7 +68,7 @@ public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
         // One lit pip per insulation level, in the tier's colour.
         ConduitTier tier = menu.getTier();
         Identifier pipOn = sprite("insulation_pip_" + tier.getSerializedName());
-        for (int i = 0; i < ConduitTier.values().length; i++) {
+        for (int i = 0; i < ConduitTier.STANDARD.size(); i++) {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, i <= tier.ordinal() ? pipOn : pipOff,
                     x + PIPS_X + i * PIP_PITCH, y + PIPS_Y, PIP_SIZE, PIP_SIZE);
         }
@@ -104,7 +104,7 @@ public class HeatCellScreen extends StorageScreen<HeatCellMenu> {
         } else if (isHovering(TEXT_LEFT, IN_OUT_Y - 1, TEXT_RIGHT - TEXT_LEFT, 10, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.heat_cell.in_full", ArcforgeGui.grouped(menu.getReceivedPerTick())));
             lines.add(Component.translatable("gui.arcforge.heat_cell.out_full", ArcforgeGui.grouped(menu.getExtractedPerTick())));
-        } else if (isHovering(PIPS_X, PIPS_Y, ConduitTier.values().length * PIP_PITCH, PIP_SIZE, mouseX, mouseY)) {
+        } else if (isHovering(PIPS_X, PIPS_Y, ConduitTier.STANDARD.size() * PIP_PITCH, PIP_SIZE, mouseX, mouseY)) {
             ConduitTier tier = menu.getTier();
             int insulation = menu.getInsulation();
             String leak = HeatCellBlockEntity.leakPercentText(HeatCellBlockEntity.leakPercentPerMinute(tier, insulation));

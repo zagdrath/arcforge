@@ -260,10 +260,10 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.Enriching.TYPE, List.of(new MachineCategories.EnrichmentRecipe(3_000),
                 new MachineCategories.EnrichmentRecipe(5_000), new MachineCategories.EnrichmentRecipe(net.zagdrath.arcforge.nuclear.Enrichment.MAX_PCM)));
         List<MachineCategories.BatteryComponentRecipe> batteryParts = new ArrayList<>();
-        for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.values()) {
+        for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.STANDARD) {
             batteryParts.add(new MachineCategories.BatteryComponentRecipe(ModBlocks.lithiumCell(tier).get().asItem(), tier, true));
         }
-        for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.values()) {
+        for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.STANDARD) {
             batteryParts.add(new MachineCategories.BatteryComponentRecipe(ModBlocks.powerRegulator(tier).get().asItem(), tier, false));
         }
         registration.addRecipes(MachineCategories.BatteryComponents.TYPE, batteryParts);

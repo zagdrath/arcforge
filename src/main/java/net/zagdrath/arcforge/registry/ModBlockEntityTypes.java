@@ -441,7 +441,7 @@ public final class ModBlockEntityTypes {
     private ModBlockEntityTypes() {}
 
     private static Block[] tierBlocks(Function<ConduitTier, DeferredBlock<? extends Block>> byTier) {
-        return Arrays.stream(ConduitTier.values()).map(tier -> byTier.apply(tier).get()).toArray(Block[]::new);
+        return ConduitTier.STANDARD.stream().map(tier -> byTier.apply(tier).get()).toArray(Block[]::new);
     }
 
     // Every tier's block, then the creative one.

@@ -1242,6 +1242,9 @@ public final class ModBlocks {
         for (ConduitType type : ConduitType.values()) {
             Map<ConduitTier, DeferredBlock<ConduitBlock>> byTier = new EnumMap<>(ConduitTier.class);
             for (ConduitTier tier : ConduitTier.values()) {
+                if (!tier.hasConduit(type)) {
+                    continue;
+                }
                 byTier.put(tier, BLOCKS.registerBlock(conduitName(type, tier),
                         p -> type.hasActiveState() ? new ActiveConduitBlock(p, type, tier) : new ConduitBlock(p, type, tier),
                         ModBlocks::conduitProperties));
@@ -1261,7 +1264,7 @@ public final class ModBlocks {
             SoundEvents.METAL_PLACE, SoundEvents.METAL_HIT, SoundEvents.METAL_FALL);
 
     static {
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             FLUID_TANKS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_fluid_tank",
                     p -> new FluidTankBlock(p, tier),
                     p -> p.mapColor(MapColor.METAL)
@@ -1277,7 +1280,7 @@ public final class ModBlocks {
                             .strength(3.0F)
                             .sound(SoundType.METAL)));
         }
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             PRESSURIZED_CYLINDERS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_pressurized_cylinder",
                     p -> new PressurizedCylinderBlock(p, tier),
                     p -> p.mapColor(MapColor.METAL)
@@ -1288,7 +1291,7 @@ public final class ModBlocks {
                             .isViewBlocking((state, level, pos, box) -> false)
                             .isRedstoneConductor((state, level, pos) -> false)));
         }
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             HEAT_CELLS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_heat_cell",
                     p -> new HeatCellBlock(p, tier),
                     p -> p.mapColor(MapColor.METAL)
@@ -1449,7 +1452,9 @@ public final class ModBlocks {
         List<DeferredBlock<ConduitBlock>> all = new ArrayList<>();
         for (ConduitType type : ConduitType.values()) {
             for (ConduitTier tier : ConduitTier.values()) {
-                all.add(conduit(type, tier));
+                if (tier.hasConduit(type)) {
+                    all.add(conduit(type, tier));
+                }
             }
         }
         return all;
@@ -1466,7 +1471,7 @@ public final class ModBlocks {
             new EnumMap<>(ConduitTier.class);
 
     static {
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             LITHIUM_CELLS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_lithium_cell",
                     p -> new net.zagdrath.arcforge.block.multiblock.LithiumCellBlock(p, tier),
                     p -> p.mapColor(MapColor.METAL).strength(3.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.METAL)));
@@ -1501,12 +1506,12 @@ public final class ModBlocks {
     private static final Map<ConduitTier, DeferredBlock<VaultBlock>> VAULTS = new EnumMap<>(ConduitTier.class);
 
     static {
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             CRATES.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_crate",
                     p -> new CrateBlock(p, tier),
                     p -> p.mapColor(MapColor.METAL).strength(2.5F).sound(SoundType.METAL)));
         }
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             VAULTS.put(tier, BLOCKS.registerBlock(tier.getSerializedName() + "_vault",
                     p -> new VaultBlock(p, tier),
                     p -> p.mapColor(MapColor.METAL).strength(2.5F).sound(SoundType.METAL)));

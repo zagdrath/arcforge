@@ -165,9 +165,25 @@ public final class LithiumGameTests {
         return helper.getBlockEntity(controller, BatteryArrayBlockEntity.class);
     }
 
+    // The largest, a 7x7x7: 125 blocks inside (here 124 Arcforged cells and an Arcforged regulator) forms, holds them all
+    // (well past the int limit) and moves the regulator's rate.
+    static void batteryArrayLargest(GameTestHelper helper) {
+        BlockPos controller = buildBattery(helper, new BlockPos(0, 1, 1), 7, 7, 7, Set.of(), ConduitTier.ARCFORGED, 1, ConduitTier.ARCFORGED);
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    BatteryArrayBlockEntity battery = battery(helper, controller);
+                    helper.assertTrue(battery.isFormed(), "The 7x7x7 didn't form");
+                    helper.assertTrue(battery.getCellCount() == 124 && battery.getRegulatorCount() == 1,
+                            battery.getCellCount() + " cells, " + battery.getRegulatorCount() + " regulators");
+                    helper.assertTrue(battery.getCapacity() == 124 * ArcforgeConfig.LITHIUM_CELL_ARCFORGED.getAsLong(), "7x7x7 capacity " + battery.getCapacity());
+                })
+                .thenSucceed();
+    }
+
     // The smallest (3x3x3, one Wrought cell, no regulators) stores 64,000,000 FE and moves 16,384 FE/t; a 4x3x4 with a
     // window, three Hardened cells and a Wrought regulator stores 12,000,000,000 (past the int limit) and moves 65,536.
-    // Something else inside, or no cell, and it doesn't form; the size rule is 3 to 5 each way.
+    // Something else inside, or no cell, and it doesn't form; the size rule is 3 to 7 each way.
     static void batteryArrayForms(GameTestHelper helper) {
         BlockPos small = buildBattery(helper, new BlockPos(0, 1, 1), 3, 3, 3, Set.of(), ConduitTier.WROUGHT, 0, ConduitTier.WROUGHT);
         BlockPos bigMin = new BlockPos(4, 1, 1);
@@ -188,7 +204,7 @@ public final class LithiumGameTests {
                     helper.assertTrue(b.transfer() == ArcforgeConfig.POWER_REGULATOR_WROUGHT.getAsInt(), "4x3x4 transfer " + b.transfer());
                     helper.assertTrue(PressureGlassBlock.isFormed(helper.getBlockState(pane)), "The window isn't part of it");
                     helper.assertTrue(helper.getBlockState(bigMin.offset(1, 1, 1)).getValue(BatteryArrayPart.FORMED), "A cell isn't formed");
-                    helper.assertTrue(BatteryArrayStructure.allows(3, 5, 4) && !BatteryArrayStructure.allows(6, 3, 3) && !BatteryArrayStructure.allows(2, 3, 3),
+                    helper.assertTrue(BatteryArrayStructure.allows(3, 5, 4) && BatteryArrayStructure.allows(7, 7, 7) && !BatteryArrayStructure.allows(8, 3, 3) && !BatteryArrayStructure.allows(2, 3, 3),
                             "The size rule is wrong");
                     // Stone inside breaks the small one.
                     helper.setBlock(new BlockPos(1, 2, 2), Blocks.STONE);

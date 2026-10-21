@@ -342,7 +342,8 @@ final class ConduitGameTests {
                 .thenSucceed();
     }
 
-    // A short run moves its tier's full rate: three Arcforged conduits hold 3,000 mB but carry 12,800 mB in a tick.
+    // A short run moves its tier's full rate (three Arcforged conduits used to hold only 3,000 mB, and carry that a tick),
+    // and a network pools its conduits' buffers: three Arcforged conduits hold 38,400 mB, one 12,800.
     static void fluidShortRunRate(GameTestHelper helper) {
         BlockPos source = new BlockPos(0, 1, 0);
         BlockPos sink = new BlockPos(4, 1, 0);
@@ -360,7 +361,11 @@ final class ConduitGameTests {
                 .thenIdle(5)
                 .thenExecute(() -> from.set(0, FluidResource.of(Fluids.WATER), TestFixtures.TANK_CAPACITY))
                 .thenIdle(1)
-                .thenExecute(() -> helper.assertTrue(fluidIn(to) >= rate, "A 3-conduit Arcforged run moved " + fluidIn(to) + " mB in a tick, not " + rate))
+                .thenExecute(() -> {
+                    helper.assertTrue(fluidIn(to) >= rate, "A 3-conduit Arcforged run moved " + fluidIn(to) + " mB in a tick, not " + rate);
+                    helper.assertTrue(ConduitTier.ARCFORGED.fluidBuffer() == rate && ConduitTier.WROUGHT.fluidBuffer() == ConduitTier.FLUID_CAPACITY_PER_CONDUIT
+                            && ConduitTier.ARCFORGED.gasBuffer() == ConduitTier.ARCFORGED.gasPerTick(), "Buffers per conduit");
+                })
                 .thenSucceed();
     }
 

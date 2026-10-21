@@ -41,7 +41,7 @@ public final class HeatTransportGameTests {
     static void thermalConduitRates(GameTestHelper helper) {
         int[] conduit = { 50, 200, 800, 51_200 };
         int[] cell = { 50, 200, 800, 3_200 };
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             helper.assertTrue(tier.heatPerTick() == conduit[tier.ordinal()], tier + " conduit carries " + tier.heatPerTick() + " HU/t");
             helper.assertTrue(tier.heatCellRate() == cell[tier.ordinal()], tier + " heat cell moves " + tier.heatCellRate() + " HU/t");
             helper.assertTrue(tier.thermalCapsuleRate() == cell[tier.ordinal()], tier + " capsule moves " + tier.thermalCapsuleRate() + " HU/t");

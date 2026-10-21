@@ -19,6 +19,7 @@ import net.zagdrath.arcforge.blockentity.multiblock.CarbonizerBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.DistillationArrayBlockEntity;
 import net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity;
 import net.zagdrath.arcforge.conduit.ConduitTier;
+import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
@@ -35,10 +36,15 @@ public final class MaxScaleGameTests {
     static void energyRates(GameTestHelper helper) {
         int[] conduit = { 256, 1_024, 8_192, 262_144 };
         int[] cell = { 512, 2_048, 16_384, 262_144 };
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             helper.assertTrue(tier.energyPerTick() == conduit[tier.ordinal()], tier + " energy conduit carries " + tier.energyPerTick() + " FE/t");
             helper.assertTrue(tier.cellRate() == cell[tier.ordinal()], tier + " energy cell moves " + tier.cellRate() + " FE/t");
         }
+        // The Superconducting Energy Conduit, a power plant's trunk line: 16 Arcforged, and it comes only as an energy conduit.
+        helper.assertTrue(ConduitTier.SUPERCONDUCTING.energyPerTick() == 16 * ConduitTier.ARCFORGED.energyPerTick(),
+                "Superconducting conduit carries " + ConduitTier.SUPERCONDUCTING.energyPerTick() + " FE/t");
+        helper.assertTrue(ConduitTier.SUPERCONDUCTING.hasConduit(ConduitType.ENERGY) && !ConduitTier.SUPERCONDUCTING.hasConduit(ConduitType.FLUID)
+                && ConduitTier.ARCFORGED.next() == null, "Superconducting is energy only, past the storage tiers");
         // A 7x7x12 Steam Turbine Array (65.3 sections) on Superheated Steam with the best lubricant (Lubricant) fits
         // down one Arcforged line; a full-size 7x7x27 (147 sections) needs three.
         double perSection = ArcforgeConfig.TURBINE_ARRAY_FLOW_PER_SECTION.getAsInt() * 56 * net.zagdrath.arcforge.steam.Lubricant.best();

@@ -36,6 +36,9 @@ public final class NuclearTurbineShapes {
     private final BitSet solid;
     // Per block (see index): {x0, y0, u0, x1, y1, u1} in the block's own px (0 to 16), or null for the core.
     private final int[][][] boxes;
+    // Per block deep in the core (see isDeep), where no collision shape reaches: the model's solid there, as boxes in its
+    // own px; null elsewhere or where it holds none. NuclearTurbineHitbox.overlapsDeep keeps players out of it instead.
+    private final int[][][] deep;
 
     private NuclearTurbineShapes(NuclearTurbineLayout layout) {
         this.length = layout.length();
@@ -46,7 +49,14 @@ public final class NuclearTurbineShapes {
         this.sizeU = length * PX;
         this.solid = voxels(layout);
         BitSet[] grids = split(solid);
+        this.deep = new int[grids.length][][];
+        for (int i = 0; i < grids.length; i++) {
+            if (grids[i] != null && isDeep(i)) {
+                deep[i] = merge(grids[i]);
+            }
+        }
         cover(grids);
+        pillars(grids);
         List<List<int[]>> pieces = new ArrayList<>();
         for (int i = 0; i < grids.length; i++) {
             pieces.add(isShell(i) ? new ArrayList<>() : null);
@@ -101,6 +111,20 @@ public final class NuclearTurbineShapes {
             return null;
         }
         return boxes[index(u, y, x)];
+    }
+
+    // The model's solid in the deep core block at (u, y, x), in its own px; null if it isn't deep or holds none.
+    public int @Nullable [][] deepAt(int u, int y, int x) {
+        if (u < 0 || u >= length || y < 0 || y >= height || x < 0 || x >= width) {
+            return null;
+        }
+        return deep[index(u, y, x)];
+    }
+
+    // A block two or more in from every face of the shell: no shape can reach it (see the class comment).
+    private boolean isDeep(int index) {
+        int x = index % width, y = index / width % height, u = index / width / height;
+        return u >= 2 && u < length - 2 && y >= 2 && y < height - 2 && x >= 2 && x < width - 2;
     }
 
     private int index(int u, int y, int x) {
@@ -289,6 +313,108 @@ public final class NuclearTurbineShapes {
             }
         }
     }
+
+    // A player is this tall (px): 1.8 blocks.
+    private static final int HEADROOM = 29;
+
+    // The lid and walls cover the deep core's parts from above and from the sides, but walking the deck along the
+    // turbine a player would walk into those that hang within a player's height of it (the generator, its exciter and
+    // terminal box, the cylinders' lower halves). So under each such pixel column the walkway layer (the core's bottom
+    // layer, which the shell under it carries) is filled from the deck up to the top of the layer.
+    private void pillars(BitSet[] grids) {
+        for (int u = 2 * PX; u < (length - 2) * PX; u++) {
+            for (int x = 2 * PX; x < (width - 2) * PX; x++) {
+                int deck = -1;
+                for (int y = 2 * PX - 1; y >= 0; y--) {
+                    if (solid.get(pixel(x, y, u))) {
+                        deck = y;
+                        break;
+                    }
+                }
+                int low = -1;
+                for (int y = Math.max(2 * PX, deck + 1); y < (height - 2) * PX; y++) {
+                    if (solid.get(pixel(x, y, u))) {
+                        low = y;
+                        break;
+                    }
+                }
+                if (low < 0 || low - (deck + 1) >= HEADROOM) {
+                    continue;
+                }
+                int index = index(u / PX, 1, x / PX);
+                BitSet grid = grids[index];
+                if (grid == null) {
+                    grid = grids[index] = new BitSet(PX * PX * PX);
+                }
+                for (int y = Math.max(PX, deck + 1); y < 2 * PX; y++) {
+                    grid.set(bit(x % PX, y % PX, u % PX));
+                }
+            }
+        }
+    }
+
+    // How many pixel columns a player could stand in and be inside the model: a place to stand (the top of the collision
+    // shape, or the ground under the structure) with solid model less than a player's height over it and nothing in the
+    // collision shape between. Parts deep in the core don't count: no shape can reach them, and NuclearTurbineHitbox
+    // keeps players out of them instead. 0 when every other part is kept out by the shape (see the GameTest).
+    public int headroomGaps() {
+        BitSet shape = new BitSet(sizeX * sizeY * sizeU);
+        for (int u = 0; u < length; u++) {
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    int[][] pieces = boxes[index(u, y, x)];
+                    if (pieces == null) {
+                        continue;
+                    }
+                    for (int[] box : pieces) {
+                        for (int by = box[1]; by < box[4]; by++) {
+                            for (int bx = box[0]; bx < box[3]; bx++) {
+                                for (int bu = box[2]; bu < box[5]; bu++) {
+                                    int gx = x * PX + bx, gy = y * PX + by, gu = u * PX + bu;
+                                    if (gx >= 0 && gx < sizeX && gy >= 0 && gy < sizeY && gu >= 0 && gu < sizeU) {
+                                        shape.set(pixel(gx, gy, gu));
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        int gaps = 0;
+        java.util.Map<String, Integer> where = new java.util.TreeMap<>();
+        for (int u = 0; u < sizeU; u++) {
+            for (int x = 0; x < sizeX; x++) {
+                boolean gap = false;
+                for (int y = -1; y < sizeY && !gap; y++) {
+                    // A place to stand: the ground, or the top of the shape, with air over it (a top already inside a
+                    // part, as the walkway layer's filling under the deep parts is, can't be reached).
+                    if (y >= 0 && (!shape.get(pixel(x, y, u)) || y + 1 < sizeY && shape.get(pixel(x, y + 1, u)))) {
+                        continue;
+                    }
+                    if (y + 1 < sizeY && solid.get(pixel(x, y + 1, u))) {
+                        continue;
+                    }
+                    for (int above = y + 1; above < Math.min(sizeY, y + 1 + HEADROOM); above++) {
+                        if (shape.get(pixel(x, above, u))) {
+                            break;
+                        }
+                        if (solid.get(pixel(x, above, u)) && !isDeep(index(u / PX, above / PX, x / PX))) {
+                            gap = true;
+                            where.merge("block x" + x / PX + " u" + u / PX + " stand y" + (y + 1) + " hit y" + above, 1, Integer::sum);
+                            break;
+                        }
+                    }
+                }
+                gaps += gap ? 1 : 0;
+            }
+        }
+        lastGaps = where;
+        return gaps;
+    }
+
+    // Where headroomGaps found its gaps, by block and the heights (px) stood at and walked into.
+    public java.util.Map<String, Integer> lastGaps = java.util.Map.of();
 
     // Sets the pixel at (x, y, u) of a block of the core's first layer unless that block has something in the same
     // column (along y for a lid, across x for a wall).

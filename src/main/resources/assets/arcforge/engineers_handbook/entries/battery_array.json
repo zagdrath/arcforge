@@ -17,7 +17,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "A huge energy store, for whole bases.\n# Building\n- A box 3 to 5 blocks along each side (it needn't be a cube).\n- Its twelve edges are Battery Array Casings. Its faces are casings or Pressure Glass.\n- One Battery Array Controller sits in a side face (not on an edge), facing out. Right-click it to open its GUI, or wrench it to check the build.\n- The inside (1 to 27 blocks) is filled entirely with Lithium Cells and Power Regulators, in any mix, with at least one cell.\nBreaking any block of it un-forms it."
+      "text": "A huge energy store, for whole bases.\n# Building\n- A box 3 to 7 blocks along each side (it needn't be a cube).\n- Its twelve edges are Battery Array Casings. Its faces are casings or Pressure Glass.\n- One Battery Array Controller sits in a side face (not on an edge), facing out. Right-click it to open its GUI, or wrench it to check the build.\n- The inside (1 to 125 blocks) is filled entirely with Lithium Cells and Power Regulators, in any mix, with at least one cell.\nBreaking any block of it un-forms it."
     },
     {
       "type": "text",

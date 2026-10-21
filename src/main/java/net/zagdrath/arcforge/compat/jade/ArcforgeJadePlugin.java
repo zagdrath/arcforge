@@ -60,7 +60,9 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
     public void register(IWailaCommonRegistration registration) {
         for (net.zagdrath.arcforge.conduit.ConduitTier tier : net.zagdrath.arcforge.conduit.ConduitTier.values()) {
             for (net.zagdrath.arcforge.conduit.ConduitType type : net.zagdrath.arcforge.conduit.ConduitType.values()) {
-                registration.blockOperations().pick(net.zagdrath.arcforge.registry.ModBlocks.conduit(type, tier).getKey());
+                if (tier.hasConduit(type)) {
+                    registration.blockOperations().pick(net.zagdrath.arcforge.registry.ModBlocks.conduit(type, tier).getKey());
+                }
             }
         }
         registration.registerBlockDataProvider(HeatProvider.INSTANCE, BlockEntity.class);

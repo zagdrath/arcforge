@@ -76,10 +76,17 @@ machines and Settings Cards carry over).
     either side with its crossover pipes arching over the set into the low-pressure cylinders (one per 9 blocks of
     length), and the generator with its hydrogen coolers, terminal box and exciter. The shaft, couplings and turning gear
     turn, and each low-pressure cylinder's sight port shows its last-stage blades, a blur at speed. You can walk its
-    deck between the arches, up the stair at the front.
+    deck between the arches, up the stair at the front, and it keeps you out of all of it: where its parts hang over
+    the deck within a player's height (the generator, its exciter, the cylinders), the walkway under them is walled
+    off, and its parts deep in the core, which no block's collision can reach, put you back where you stood if you
+    get into one.
   - Handbook entry, a JEI build preview and info page, Jade lines (section, fitted spots, minimum flow or why it
     tripped), a Nuclear Power quest (and the Power Plant quest now asks for one at speed), machine control and GameTests
     (forming, the steam it takes, its ports, running, tripping and rolling up again).
+- **Superconducting Energy Conduit**: a power plant's trunk line, 4,194,304 FE/t (16 Arcforged Energy Conduits), so one
+  line carries a Nuclear Steam Turbine's output, or a whole reactor plant's. Energy only: no other conduit, storage
+  block or portable comes in its tier. Six from six Arcforged Energy Conduits round an Arcite-Tungsten Composite, with
+  Carbon Fiber above and below. Config `power.energyConduits.superconducting`.
 - **The Fission Reactor's Fuel page.** A core map of every layer seen from above, each Fuel Channel coloured by its rod's
   burnup, the most-burned third of the rods outlined (the batch a refuelling replaces). Click a rod, or Bring Out Third,
   and it comes out to the output slots at the next shutdown. The Handbook's Fuel Rods entry explains refuelling by thirds.
@@ -102,6 +109,7 @@ machines and Settings Cards carry over).
 
 ### Changed
 
+- The Battery Array builds up to 7×7×7 (it was 5×5×5): up to 125 Lithium Cells and Power Regulators inside.
 - Crushing Quartz gives 4 Silica Dust instead of Nether Quartz Dust, which still comes from quartz ore.
 - Machines with a recipe XP store bank it as Liquid Experience first; the old held-for-the-player store only takes what a
   full tank can't.
@@ -160,8 +168,9 @@ machines and Settings Cards carry over).
   plant's slots twice: one Speed Upgrade read as two, and so did whatever was in them. Each machine joined an input
   view and an output view that both wrap the whole inventory; it now hands out one view of its slots.
 - A short fluid or gas conduit run moved only its own size a tick (1,000 mB of liquid or 2,000 mB of gas a conduit),
-  not its tier's rate: a 3-block Arcforged line carried 3,000 mB/t instead of 12,800. A network now always holds at least
-  a tick of its rate.
+  not its tier's rate: a 3-block Arcforged line carried 3,000 mB/t instead of 12,800. Each conduit now holds at least a
+  tick of its tier's rate (liquid: 1,000 mB Wrought and Tempered, 3,200 Hardened, 12,800 Arcforged; gas twice that, at
+  least 2,000), and a network pools them, as energy conduits already did; the tooltip and Jade show the new amounts.
 
 ### Upgrading
 

@@ -1,0 +1,25 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "property": "minecraft:has_component",
+    "component": "arcforge:conduit_color",
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "arcforge:item/superconducting_energy_conduit_dyed",
+      "tints": [
+        {
+          "type": "minecraft:constant",
+          "value": -1
+        },
+        {
+          "type": "arcforge:conduit_color",
+          "default": -1
+        }
+      ]
+    },
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "arcforge:item/superconducting_energy_conduit"
+    }
+  }
+}

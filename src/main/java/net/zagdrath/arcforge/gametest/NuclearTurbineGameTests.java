@@ -92,6 +92,32 @@ public final class NuclearTurbineGameTests {
                     helper.assertTrue(ports.getOrDefault(SideMode.INPUT, 0L) == 2 && ports.getOrDefault(SideMode.ENERGY, 0L) == 1
                             && ports.getOrDefault(SideMode.EXHAUST, 0L) == NuclearTurbineLayout.MIN_LENGTH / 9, "Its ports: " + ports);
                     helper.assertTrue(turbine.hasExhaust(), "It didn't notice its Exhaust ports");
+                    // A part deep in the core, which no collision shape reaches, keeps players out of it; the empty core
+                    // round it doesn't.
+                    var shell = turbine.getShell();
+                    var shapes = net.zagdrath.arcforge.steam.NuclearTurbineShapes.of(NuclearTurbineLayout.of(shell, turbine.getFacing()));
+                    net.minecraft.world.phys.Vec3 inPart = null, inAir = null;
+                    for (int u = 2; u < shell.length() - 2 && (inPart == null || inAir == null); u++) {
+                        for (int y = 2; y < NuclearTurbineLayout.HEIGHT - 2; y++) {
+                            for (int x = 2; x < NuclearTurbineLayout.WIDTH - 2; x++) {
+                                int[][] boxes = shapes.deepAt(u, y, x);
+                                BlockPos pos = net.zagdrath.arcforge.steam.TurbineLayout.blockAt(shell, u, y, x);
+                                if (boxes != null && inPart == null) {
+                                    int[] box = boxes[0];
+                                    double bx = (box[0] + box[3]) / 32.0, by = (box[1] + box[4]) / 32.0, bu = (box[2] + box[5]) / 32.0;
+                                    inPart = shell.axis() == Direction.Axis.X ? new net.minecraft.world.phys.Vec3(pos.getX() + bu, pos.getY() + by, pos.getZ() + 1.0 - bx)
+                                            : new net.minecraft.world.phys.Vec3(pos.getX() + bx, pos.getY() + by, pos.getZ() + bu);
+                                } else if (boxes == null && inAir == null) {
+                                    inAir = net.minecraft.world.phys.Vec3.atCenterOf(pos);
+                                }
+                            }
+                        }
+                    }
+                    helper.assertTrue(inPart != null, "Nothing deep in the core to keep players out of");
+                    helper.assertTrue(net.zagdrath.arcforge.block.multiblock.NuclearTurbineHitbox.overlapsDeep(helper.getLevel(),
+                            net.minecraft.world.phys.AABB.ofSize(inPart, 0.05, 0.05, 0.05)), "A part deep in its core doesn't keep players out at " + inPart);
+                    helper.assertTrue(inAir == null || !net.zagdrath.arcforge.block.multiblock.NuclearTurbineHitbox.overlapsDeep(helper.getLevel(),
+                            net.minecraft.world.phys.AABB.ofSize(inAir, 0.05, 0.05, 0.05)), "The empty core keeps players out at " + inAir);
                     // The steam it takes.
                     helper.assertTrue(insert(turbine, SteamGrade.SUPERHEATED.resource(), 1_000) == 0, "It took Superheated Steam");
                     helper.assertTrue(insert(turbine, SteamGrade.STEAM.resource(), 1_000) == 0, "It took plain Steam");
@@ -138,6 +164,25 @@ public final class NuclearTurbineGameTests {
                             + turbine.getInflow());
                 })
                 .thenSucceed();
+    }
+
+    // Its collision shape keeps a player out of every part of the model: nowhere to stand (the top of the shape, or the
+    // ground) has the model less than a player's height over it with nothing in the shape between, at any length and
+    // whichever way round it stands. The parts deep in the core (the generator, its exciter, the cylinders' lower
+    // halves) are walled off down to the deck under them.
+    static void hitboxKeepsPlayersOut(GameTestHelper helper) {
+        for (int length : new int[] { NuclearTurbineLayout.MIN_LENGTH, 31, NuclearTurbineLayout.MAX_LENGTH }) {
+            for (boolean frontHigh : new boolean[] { false, true }) {
+                var shapes = net.zagdrath.arcforge.steam.NuclearTurbineShapes.of(NuclearTurbineLayout.of(length, frontHigh));
+                int gaps = shapes.headroomGaps();
+                if (gaps > 0) {
+                    var worst = shapes.lastGaps.entrySet().stream().sorted((p, q) -> q.getValue() - p.getValue()).limit(25).toList();
+                    net.zagdrath.arcforge.Arcforge.LOGGER.warn("Hitbox gaps (7x7x{} frontHigh {}): {}", length, frontHigh, worst);
+                }
+                helper.assertTrue(gaps == 0, "A 7x7x" + length + (frontHigh ? " (front high)" : "") + " can be walked into at " + gaps + " pixel columns");
+            }
+        }
+        helper.succeed();
     }
 
     // The rotor and blades are built about the shaft their renderer turns them on (ModelMesh.rotorAxis): across it, the

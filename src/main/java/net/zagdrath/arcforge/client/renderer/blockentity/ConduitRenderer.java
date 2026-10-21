@@ -100,7 +100,7 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
             if (gas) {
                 // Gas fills the whole bore; how full the conduit is shows as how dense the tint is, and gas moving
                 // through shows at least GAS_FLOWING_SHARE.
-                float share = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.GAS_CAPACITY_PER_CONDUIT);
+                float share = Math.min(1.0F, fluid.getAmount() / (float) conduit.fluidBuffer());
                 if (flowing) {
                     share = Math.max(share, GAS_FLOWING_SHARE);
                 }
@@ -108,7 +108,7 @@ public class ConduitRenderer implements BlockEntityRenderer<ConduitBlockEntity, 
                 state.fluidColor = (ConduitTints.gasColor(fluid) & 0x00FFFFFF) | (alpha << 24);
                 state.fill = 1.0F;
             } else {
-                state.fill = Math.min(1.0F, fluid.getAmount() / (float) ConduitTier.FLUID_CAPACITY_PER_CONDUIT);
+                state.fill = Math.min(1.0F, fluid.getAmount() / (float) conduit.fluidBuffer());
                 if (flowing) {
                     state.fill = Math.max(state.fill, FLUID_FLOWING_FILL);
                 }

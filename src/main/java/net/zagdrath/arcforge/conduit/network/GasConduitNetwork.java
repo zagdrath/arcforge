@@ -30,7 +30,7 @@ public class GasConduitNetwork extends FluidConduitNetwork {
     private Fluid flowing = Fluids.EMPTY;
 
     public GasConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier) {
-        super(level, members, memberSet, tier, ConduitTier.GAS_CAPACITY_PER_CONDUIT, tier.gasPerTick(), Gases::isGas);
+        super(level, members, memberSet, tier, tier.gasBuffer(), tier.gasPerTick(), Gases::isGas);
     }
 
     @Override

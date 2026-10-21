@@ -10,7 +10,8 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.StringRepresentable;
 
-// Arcforge tiers in progression order, shared by conduits and storage blocks. Different tiers of the
+// Arcforge tiers in progression order, shared by conduits and storage blocks (Superconducting is energy conduits only: see
+// STANDARD). Different tiers of the
 // same conduit type connect, and a network runs at the rate of its lowest tier. The HU/t column is the heat cell's and
 // thermal capsule's rate; the Thermodynamic Conduit's rate is in config (power.heat.thermodynamicConduits), 50 / 200 /
 // 800 / 51,200 by default, so an Arcforged conduit can carry a big multiblock's heat.
@@ -19,7 +20,13 @@ public enum ConduitTier implements StringRepresentable {
     WROUGHT("wrought", 256, 8, 20, 200, 50, 0.05F),
     TEMPERED("tempered", 1_024, 16, 10, 800, 200, 0.08F),
     HARDENED("hardened", 8_192, 32, 5, 3_200, 800, 0.12F),
-    ARCFORGED("arcforged", 262_144, 64, 2, 12_800, 3_200, 0.2F);
+    ARCFORGED("arcforged", 262_144, 64, 2, 12_800, 3_200, 0.2F),
+    // A power plant's trunk line: the Superconducting Energy Conduit, 16 times the Arcforged, so one line carries a reactor
+    // plant's output. It has no other conduit, storage block or portable (its other columns are the Arcforged's).
+    SUPERCONDUCTING("superconducting", 4_194_304, 64, 2, 12_800, 3_200, 0.2F);
+
+    // The tiers every conduit type, storage block and portable comes in.
+    public static final java.util.List<ConduitTier> STANDARD = java.util.List.of(WROUGHT, TEMPERED, HARDENED, ARCFORGED);
 
     // Fluid each conduit block can hold.
     public static final int FLUID_CAPACITY_PER_CONDUIT = 1_000;
@@ -27,6 +34,11 @@ public enum ConduitTier implements StringRepresentable {
     public static final int GAS_CAPACITY_PER_CONDUIT = 2_000;
     // Item stacks each item conduit can store while nothing will take them.
     public static final int ITEM_STORAGE_SLOTS = 4;
+
+    // Whether this tier comes as a conduit of that type (every standard tier does; Superconducting only as energy).
+    public boolean hasConduit(ConduitType type) {
+        return this != SUPERCONDUCTING || type == ConduitType.ENERGY;
+    }
 
     private final String name;
     private final int energyPerTick;
@@ -73,6 +85,17 @@ public enum ConduitTier implements StringRepresentable {
         return fluidPerTick * 2;
     }
 
+    // What each fluid (or gas) conduit of this tier holds: the base buffer, or a tick of its rate where that's more. A
+    // network pools its conduits' buffers, and each tick pulls what fits and pushes what it holds, so with less than a
+    // tick of its rate in each conduit a short run moved only its own size a tick (a 3-block Arcforged line 3,000 mB/t).
+    public int fluidBuffer() {
+        return Math.max(FLUID_CAPACITY_PER_CONDUIT, fluidPerTick());
+    }
+
+    public int gasBuffer() {
+        return Math.max(GAS_CAPACITY_PER_CONDUIT, gasPerTick());
+    }
+
     // The Thermodynamic Conduit's HU/t (and the heat each conduit holds: one tick's worth), from config.
     public int heatPerTick() {
         return net.zagdrath.arcforge.config.ArcforgeConfig.thermodynamicConduitRate(this);
@@ -84,7 +107,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 50;
             case TEMPERED -> 200;
             case HARDENED -> 800;
-            case ARCFORGED -> 51_200;
+            case ARCFORGED, SUPERCONDUCTING -> 51_200;
         };
     }
 
@@ -100,7 +123,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 16_000;
             case TEMPERED -> 64_000;
             case HARDENED -> 256_000;
-            case ARCFORGED -> 1_024_000;
+            case ARCFORGED, SUPERCONDUCTING -> 1_024_000;
         };
     }
 
@@ -110,7 +133,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 500;
             case TEMPERED -> 2_000;
             case HARDENED -> 8_000;
-            case ARCFORGED -> 32_000;
+            case ARCFORGED, SUPERCONDUCTING -> 32_000;
         };
     }
 
@@ -120,7 +143,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 500_000;
             case TEMPERED -> 4_000_000;
             case HARDENED -> 32_000_000;
-            case ARCFORGED -> 256_000_000;
+            case ARCFORGED, SUPERCONDUCTING -> 256_000_000;
         };
     }
 
@@ -135,7 +158,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 512;
             case TEMPERED -> 2_048;
             case HARDENED -> 16_384;
-            case ARCFORGED -> 262_144;
+            case ARCFORGED, SUPERCONDUCTING -> 262_144;
         };
     }
 
@@ -145,7 +168,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 64_000;
             case TEMPERED -> 256_000;
             case HARDENED -> 1_024_000;
-            case ARCFORGED -> 4_096_000;
+            case ARCFORGED, SUPERCONDUCTING -> 4_096_000;
         };
     }
 
@@ -160,7 +183,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 50_000;
             case TEMPERED -> 200_000;
             case HARDENED -> 800_000;
-            case ARCFORGED -> 3_200_000;
+            case ARCFORGED, SUPERCONDUCTING -> 3_200_000;
         };
     }
 
@@ -170,7 +193,7 @@ public enum ConduitTier implements StringRepresentable {
         return switch (this) {
             case WROUGHT, TEMPERED -> 1_100;
             case HARDENED -> 1_300;
-            case ARCFORGED -> 1_400;
+            case ARCFORGED, SUPERCONDUCTING -> 1_400;
         };
     }
 
@@ -186,7 +209,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 10.0;
             case TEMPERED -> 4.0;
             case HARDENED -> 1.5;
-            case ARCFORGED -> 0.5;
+            case ARCFORGED, SUPERCONDUCTING -> 0.5;
         };
     }
 
@@ -248,7 +271,7 @@ public enum ConduitTier implements StringRepresentable {
             case WROUGHT -> 6;
             case TEMPERED -> 8;
             case HARDENED -> 11;
-            case ARCFORGED -> 14;
+            case ARCFORGED, SUPERCONDUCTING -> 14;
         };
     }
 
@@ -261,13 +284,15 @@ public enum ConduitTier implements StringRepresentable {
         return quadrupled(4_096);
     }
 
-    // The tier before and after this one (null at either end), for Storage Upgrades.
+    // The tier before and after this one among the standard tiers (null at either end), for Storage Upgrades.
     public @Nullable ConduitTier previous() {
-        return ordinal() == 0 ? null : values()[ordinal() - 1];
+        int i = STANDARD.indexOf(this);
+        return i <= 0 ? null : STANDARD.get(i - 1);
     }
 
     public @Nullable ConduitTier next() {
-        return ordinal() == values().length - 1 ? null : values()[ordinal() + 1];
+        int i = STANDARD.indexOf(this);
+        return i < 0 || i == STANDARD.size() - 1 ? null : STANDARD.get(i + 1);
     }
 
     public static ConduitTier lowest(ConduitTier a, ConduitTier b) {

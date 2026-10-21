@@ -138,7 +138,7 @@ public final class FiberGameTests {
     // that's already at 1,100°C (about 84% full).
     static void heatCellTierTemperature(GameTestHelper helper) {
         int[] expected = { 1_100, 1_100, 1_300, 1_400 };
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             BlockPos pos = new BlockPos(tier.ordinal() * 2, 1, 2);
             helper.setBlock(pos, ModBlocks.heatCell(tier).get());
             HeatCellBlockEntity cell = helper.getBlockEntity(pos, HeatCellBlockEntity.class);

@@ -904,15 +904,15 @@ public final class ModItems {
     private static final List<DeferredItem<StorageUpgradeItem>> STORAGE_UPGRADES = new ArrayList<>();
 
     static {
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             CRATES_AND_VAULTS.add(ITEMS.registerItem(tier.getSerializedName() + "_crate",
                     p -> new CrateBlockItem(ModBlocks.crate(tier).get(), p), p -> p.useBlockDescriptionPrefix()));
         }
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             CRATES_AND_VAULTS.add(ITEMS.registerItem(tier.getSerializedName() + "_vault",
                     p -> new VaultBlockItem(ModBlocks.vault(tier).get(), p), p -> p.useBlockDescriptionPrefix()));
         }
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             if (tier.previous() != null) {
                 STORAGE_UPGRADES.add(ITEMS.registerItem(tier.getSerializedName() + "_storage_upgrade",
                         p -> new StorageUpgradeItem(tier, p), p -> p.stacksTo(16)));
@@ -934,11 +934,11 @@ public final class ModItems {
     private static final List<DeferredItem<BatteryPartItem>> BATTERY_PARTS = new ArrayList<>();
 
     static {
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             BATTERY_PARTS.add(ITEMS.registerItem(tier.getSerializedName() + "_lithium_cell",
                     p -> new BatteryPartItem(ModBlocks.lithiumCell(tier).get(), p), p -> p.useBlockDescriptionPrefix()));
         }
-        for (ConduitTier tier : ConduitTier.values()) {
+        for (ConduitTier tier : ConduitTier.STANDARD) {
             BATTERY_PARTS.add(ITEMS.registerItem(tier.getSerializedName() + "_power_regulator",
                     p -> new BatteryPartItem(ModBlocks.powerRegulator(tier).get(), p), p -> p.useBlockDescriptionPrefix()));
         }
@@ -953,7 +953,7 @@ public final class ModItems {
 
     static {
         for (PortableStorageItem.Kind kind : PortableStorageItem.Kind.values()) {
-            for (ConduitTier tier : ConduitTier.values()) {
+            for (ConduitTier tier : ConduitTier.STANDARD) {
                 String name = tier.getSerializedName() + "_" + kind.name().toLowerCase(Locale.ROOT);
                 PORTABLES.add(ITEMS.registerItem(name, p -> new PortableStorageItem(kind, tier, p)));
             }
@@ -971,7 +971,7 @@ public final class ModItems {
     }
 
     public static PortableStorageItem portable(PortableStorageItem.Kind kind, ConduitTier tier) {
-        return PORTABLES.get(kind.ordinal() * ConduitTier.values().length + tier.ordinal()).get();
+        return PORTABLES.get(kind.ordinal() * ConduitTier.STANDARD.size() + tier.ordinal()).get();
     }
 
     private static ResourceKey<ContextIntProvider> cookingTime(String name) {

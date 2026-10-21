@@ -35,14 +35,14 @@ import net.zagdrath.arcforge.block.multiblock.PowerRegulatorBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.BatteryArrayBlockEntity;
 
-// The Battery Array: a box of Battery Array Casings 3 to 5 blocks along each axis (any mix, so it needn't be a cube) with
+// The Battery Array: a box of Battery Array Casings 3 to 7 blocks along each axis (any mix, so it needn't be a cube) with
 // one Battery Array Controller in a side face (not on an edge), facing out. Its twelve edges are casings; its faces are
-// casings or Pressure Glass. The inside (1 to 27 blocks) is filled entirely with Lithium Cells and Power Regulators, in any
+// casings or Pressure Glass. The inside (1 to 125 blocks) is filled entirely with Lithium Cells and Power Regulators, in any
 // mix, and holds at least one cell. The controller's block entity runs it and decides whether it's formed; every
 // controller is kept in a per-level registry (as the Firebox Array's are), so the other parts find it without searching.
 // FORMED is set on every block of a formed box: casings, controller, panes, cells and regulators.
 public final class BatteryArrayStructure {
-    public static final int MIN_SIZE = 3, MAX_SIZE = 5;
+    public static final int MIN_SIZE = 3, MAX_SIZE = 7;
 
     // A formed or candidate box: its inclusive corners, and the side the controller faces out of.
     public record Box(BlockPos min, BlockPos max, Direction front) {

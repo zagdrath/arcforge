@@ -312,6 +312,9 @@ public class ArcforgeClient {
         List<BlockTintSource> facades = FacadeTints.sources(event.getBlockColors());
         for (ConduitTier tier : ConduitTier.values()) {
             for (ConduitType type : ConduitType.values()) {
+                if (!tier.hasConduit(type)) {
+                    continue;
+                }
                 Block conduit = ModBlocks.conduit(type, tier).get();
                 BlockTintSource glow = conduit.defaultBlockState().hasProperty(ActiveConduitBlock.ACTIVE) ? ConduitTints.INSTANCE : ConduitTints.UNLIT;
                 List<BlockTintSource> sources = new java.util.ArrayList<>(List.of(glow, ConduitDyeModel.Tint.INSTANCE));

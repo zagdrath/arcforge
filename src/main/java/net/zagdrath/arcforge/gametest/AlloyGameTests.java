@@ -187,7 +187,7 @@ final class AlloyGameTests {
         // Tray, Reactor Casing, Glass and Controller, Heavy Water Tower Casing and Controller, Steam Generator Casing, Tubes
         // and Controller), and the silica drop's four (Chemical Reactor Array Casing, Electric Enchanter, Silicon Carbide
         // Blend and Silicon Carbide Mesh), and the Nuclear Turbine Casing.
-        helper.assertTrue(crafting == 358, crafting + " crafting/ recipes, not 358");
+        helper.assertTrue(crafting == 359, crafting + " crafting/ recipes, not 359");
         // Plus the fluorite-fluxed steel, Graphite from Coal Coke and from Carbon Dust, Zircaloy, Lead-Bismuth, Ferrosilicon
         // and Metallurgical Silicon.
         helper.assertTrue(smelting == 12, smelting + " arcforge_smelting/ recipes, not 12");

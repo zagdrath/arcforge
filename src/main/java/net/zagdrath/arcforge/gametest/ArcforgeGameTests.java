@@ -339,6 +339,7 @@ public final class ArcforgeGameTests {
         TESTS.put("lithium_reactor_third_slot", LithiumGameTests::reactorThirdSlot);
         TESTS.put("lithium_evaporator_byproduct", LithiumGameTests::evaporatorLithiumBrine);
         TESTS.put("battery_array_forms", LithiumGameTests::batteryArrayForms);
+        TESTS.put("battery_array_largest", LithiumGameTests::batteryArrayLargest);
         TESTS.put("battery_array_charges", LithiumGameTests::batteryArrayCharges);
         TESTS.put("renewable_coal_recipes", RenewableCoalGameTests::recipes);
         TESTS.put("hydrothermal_makes_bio_coal", RenewableCoalGameTests::hydrothermalMakesBioCoal);
@@ -615,6 +616,7 @@ public final class ArcforgeGameTests {
         LARGE_TESTS.put("nuclear_turbine_forms_longest", NuclearTurbineGameTests::formsLongest);
         LARGE_TESTS.put("nuclear_turbine_runs_and_trips", NuclearTurbineGameTests::runsAndTrips);
         TESTS.put("nuclear_turbine_rotor_on_shaft", NuclearTurbineGameTests::rotorOnShaft);
+        TESTS.put("nuclear_turbine_hitbox_keeps_players_out", NuclearTurbineGameTests::hitboxKeepsPlayersOut);
         TESTS.put("fission_fuel_fabrication", FissionGameTests::fuelFabrication);
         TESTS.put("fission_contaminated_steam", FissionGameTests::contaminatedSteam);
         TESTS.put("fission_reactor_model", FissionGameTests::reactorModel);

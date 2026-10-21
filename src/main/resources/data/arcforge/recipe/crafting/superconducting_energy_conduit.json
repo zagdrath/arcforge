@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "XCX",
+    "XAX",
+    "XCX"
+  ],
+  "key": {
+    "X": "arcforge:arcforged_energy_conduit",
+    "A": "arcforge:arcite_tungsten_composite",
+    "C": "arcforge:carbon_fiber"
+  },
+  "result": {
+    "id": "arcforge:superconducting_energy_conduit",
+    "count": 6
+  }
+}

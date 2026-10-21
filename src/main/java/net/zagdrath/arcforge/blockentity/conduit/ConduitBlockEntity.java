@@ -137,6 +137,15 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         return ((ConduitBlock) getBlockState().getBlock()).getConduitType();
     }
 
+    public ConduitTier getTier() {
+        return ((ConduitBlock) getBlockState().getBlock()).getTier();
+    }
+
+    // The fluid (or gas) this conduit holds when full (see ConduitTier.fluidBuffer).
+    public int fluidBuffer() {
+        return getConduitType() == ConduitType.GAS ? getTier().gasBuffer() : getTier().fluidBuffer();
+    }
+
     // --- Side settings (changed with the wrench) ---
 
     public SideSetting getSetting(Direction side) {
@@ -503,8 +512,7 @@ public class ConduitBlockEntity extends BlockEntity implements SettingsCopyable 
         if (fluid.isEmpty()) {
             return -1;
         }
-        int capacity = getConduitType() == ConduitType.GAS ? ConduitTier.GAS_CAPACITY_PER_CONDUIT : ConduitTier.FLUID_CAPACITY_PER_CONDUIT;
-        return (int) Math.min(FILL_SYNC_STEPS, (long) fluid.getAmount() * FILL_SYNC_STEPS / capacity);
+        return (int) Math.min(FILL_SYNC_STEPS, (long) fluid.getAmount() * FILL_SYNC_STEPS / fluidBuffer());
     }
 
     // Client: the contents the server sent (see ConduitContentsPayload).

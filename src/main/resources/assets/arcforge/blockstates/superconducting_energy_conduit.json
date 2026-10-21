@@ -1,0 +1,1262 @@
+{
+  "multipart": [
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_core",
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_core_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "pipe",
+            "south": "pipe",
+            "east": "none",
+            "west": "none",
+            "up": "none",
+            "down": "none"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_straight",
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_straight_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "none",
+            "south": "none",
+            "east": "pipe",
+            "west": "pipe",
+            "up": "none",
+            "down": "none"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_straight",
+        "y": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_straight_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "none",
+            "south": "none",
+            "east": "none",
+            "west": "none",
+            "up": "pipe",
+            "down": "pipe"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_straight",
+        "x": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_straight_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "north": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm",
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_input",
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_input_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_output",
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_output_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "south": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_s",
+        "y": 180,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_input_s",
+        "y": 180,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_input_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_output_s",
+        "y": 180,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_output_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "east": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm",
+        "y": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_input",
+        "y": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_input_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_output",
+        "y": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_output_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "west": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_s",
+        "y": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_input_s",
+        "y": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_input_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_output_s",
+        "y": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_output_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "up": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_u",
+        "x": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_u_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_input_u",
+        "x": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_input_u_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_output_u",
+        "x": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_output_u_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "down": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm",
+        "x": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "input"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_input",
+        "x": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_input_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "output"
+          },
+          {
+            "active": "false"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_off_arm_output",
+        "x": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_off_arm_output_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_core",
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_core_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "pipe",
+            "south": "pipe",
+            "east": "none",
+            "west": "none",
+            "up": "none",
+            "down": "none"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_straight",
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_straight_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "none",
+            "south": "none",
+            "east": "pipe",
+            "west": "pipe",
+            "up": "none",
+            "down": "none"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_straight",
+        "y": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_straight_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "none",
+            "south": "none",
+            "east": "none",
+            "west": "none",
+            "up": "pipe",
+            "down": "pipe"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_straight",
+        "x": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_straight_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "north": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm",
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_input",
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_input_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "north": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_output",
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_output_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "south": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!pipe"
+                  },
+                  {
+                    "south": "!pipe"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_s",
+        "y": 180,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_input_s",
+        "y": 180,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_input_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "south": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_output_s",
+        "y": 180,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_output_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "east": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm",
+        "y": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_input",
+        "y": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_input_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "east": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_output",
+        "y": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_output_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "west": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!pipe"
+                  },
+                  {
+                    "west": "!pipe"
+                  },
+                  {
+                    "up": "!none"
+                  },
+                  {
+                    "down": "!none"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_s",
+        "y": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_input_s",
+        "y": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_input_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "west": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_output_s",
+        "y": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_output_s_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "up": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_u",
+        "x": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_u_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_input_u",
+        "x": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_input_u_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "up": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_output_u",
+        "x": 270,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_output_u_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "AND": [
+              {
+                "down": "pipe"
+              },
+              {
+                "OR": [
+                  {
+                    "north": "!none"
+                  },
+                  {
+                    "south": "!none"
+                  },
+                  {
+                    "east": "!none"
+                  },
+                  {
+                    "west": "!none"
+                  },
+                  {
+                    "up": "!pipe"
+                  },
+                  {
+                    "down": "!pipe"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm",
+        "x": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "input"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_input",
+        "x": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_input_dyed"
+      }
+    },
+    {
+      "when": {
+        "AND": [
+          {
+            "down": "output"
+          },
+          {
+            "active": "true"
+          }
+        ]
+      },
+      "apply": {
+        "type": "arcforge:dyeable",
+        "model": "arcforge:block/conduit/superconducting_energy_on_arm_output",
+        "x": 90,
+        "dyed": "arcforge:block/conduit/superconducting_energy_on_arm_output_dyed"
+      }
+    }
+  ]
+}

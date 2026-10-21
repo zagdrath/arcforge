@@ -16,6 +16,8 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.zagdrath.arcforge.blockentity.multiblock.NuclearSteamTurbineBlockEntity;
@@ -41,10 +43,13 @@ public final class NuclearTurbineHitbox {
         final NuclearTurbineShapes frame;
         final @Nullable VoxelShape[] shapes;
         final Map<Long, VoxelShape> ported = new ConcurrentHashMap<>();
+        // The model's parts in each deep core block, in the world's frame (see overlapsDeep); empty where it holds none.
+        final @Nullable VoxelShape[] deep;
 
         Built(NuclearTurbineShapes frame, int count) {
             this.frame = frame;
             this.shapes = new VoxelShape[count];
+            this.deep = new VoxelShape[count];
         }
     }
 
@@ -64,15 +69,7 @@ public final class NuclearTurbineHitbox {
             return null;
         }
         boolean alongX = shell.axis() == Direction.Axis.X;
-        Key key = new Key(shell.length(), TurbineLayout.frontIsHigh(shell.axis(), master.getFacing()), alongX);
-        Built built = CACHE.get(key);
-        if (built == null) {
-            if (CACHE.size() >= CACHE_LIMIT) {
-                CACHE.clear();
-            }
-            built = CACHE.computeIfAbsent(key, k -> new Built(NuclearTurbineShapes.of(NuclearTurbineLayout.of(k.length(), k.frontHigh())),
-                    k.length() * NuclearTurbineLayout.WIDTH * NuclearTurbineLayout.HEIGHT));
-        }
+        Built built = built(shell, master);
         int u = TurbineLayout.blockU(shell, pos), y = shell.offset(pos, Direction.Axis.Y), x = TurbineLayout.blockX(shell, pos);
         int index = (u * NuclearTurbineLayout.HEIGHT + y) * NuclearTurbineLayout.WIDTH + x;
         VoxelShape shape = built.shapes[index];
@@ -87,6 +84,58 @@ public final class NuclearTurbineHitbox {
         }
         VoxelShape base = shape;
         return built.ported.computeIfAbsent((long) index << 6 | ports, k -> TurbineHitbox.withPorts(base, ports));
+    }
+
+    private static Built built(ShellStructure.Shell shell, NuclearSteamTurbineBlockEntity master) {
+        Key key = new Key(shell.length(), TurbineLayout.frontIsHigh(shell.axis(), master.getFacing()), shell.axis() == Direction.Axis.X);
+        Built built = CACHE.get(key);
+        if (built == null) {
+            if (CACHE.size() >= CACHE_LIMIT) {
+                CACHE.clear();
+            }
+            built = CACHE.computeIfAbsent(key, k -> new Built(NuclearTurbineShapes.of(NuclearTurbineLayout.of(k.length(), k.frontHigh())),
+                    k.length() * NuclearTurbineLayout.WIDTH * NuclearTurbineLayout.HEIGHT));
+        }
+        return built;
+    }
+
+    // Whether box (a player's) overlaps a part of a formed turbine's model deep in its core: the generator, its exciter,
+    // the cylinders' middles. A collision shape reaches at most a block past its own and the core is air, so nothing
+    // there can collide; TurbineDeepCollision keeps the player out of them instead.
+    public static boolean overlapsDeep(Level level, AABB box) {
+        VoxelShape player = Shapes.create(box);
+        for (BlockPos pos : BlockPos.betweenClosed(BlockPos.containing(box.minX, box.minY, box.minZ), BlockPos.containing(box.maxX, box.maxY, box.maxZ))) {
+            if (!level.getBlockState(pos).isAir()) {
+                continue;
+            }
+            ShellStructure.Shell shell = null;
+            NuclearSteamTurbineBlockEntity master = null;
+            // The turbine's floor is under it, within its height.
+            for (int down = 1; down < NuclearTurbineLayout.HEIGHT && shell == null; down++) {
+                if (level.getBlockEntity(pos.below(down)) instanceof NuclearSteamTurbineBlockEntity part && part.getShell() != null
+                        && part.getShell().contains(pos) && part.getShell().isCore(pos)
+                        && level.getBlockEntity(part.getShell().min()) instanceof NuclearSteamTurbineBlockEntity m && part.getShell().equals(m.getShell())) {
+                    shell = part.getShell();
+                    master = m;
+                }
+            }
+            if (shell == null) {
+                continue;
+            }
+            Built built = built(shell, master);
+            int u = TurbineLayout.blockU(shell, pos), y = shell.offset(pos, Direction.Axis.Y), x = TurbineLayout.blockX(shell, pos);
+            int index = (u * NuclearTurbineLayout.HEIGHT + y) * NuclearTurbineLayout.WIDTH + x;
+            VoxelShape deep = built.deep[index];
+            if (deep == null) {
+                int[][] boxes = built.frame.deepAt(u, y, x);
+                deep = boxes != null ? toWorld(boxes, shell.axis() == Direction.Axis.X) : Shapes.empty();
+                built.deep[index] = deep;
+            }
+            if (!deep.isEmpty() && Shapes.joinIsNotEmpty(deep.move(pos.getX(), pos.getY(), pos.getZ()), player, BooleanOp.AND)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // The faces of the block at pos holding ports and facing out of the turbine, a bit per Direction.

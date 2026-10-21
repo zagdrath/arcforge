@@ -41,6 +41,9 @@ public class ArcforgeConfig {
             net.zagdrath.arcforge.conduit.ConduitTier.HARDENED.defaultEnergyPerTick(), 1, 2_000_000);
     public static final ModConfigSpec.IntValue ENERGY_CONDUIT_ARCFORGED = BUILDER.defineInRange("arcforged",
             net.zagdrath.arcforge.conduit.ConduitTier.ARCFORGED.defaultEnergyPerTick(), 1, 2_000_000);
+    // A power plant's trunk line (energy only).
+    public static final ModConfigSpec.IntValue ENERGY_CONDUIT_SUPERCONDUCTING = BUILDER.defineInRange("superconducting",
+            net.zagdrath.arcforge.conduit.ConduitTier.SUPERCONDUCTING.defaultEnergyPerTick(), 1, 100_000_000);
 
     static {
         BUILDER.pop();
@@ -67,6 +70,7 @@ public class ArcforgeConfig {
             case TEMPERED -> ENERGY_CONDUIT_TEMPERED.getAsInt();
             case HARDENED -> ENERGY_CONDUIT_HARDENED.getAsInt();
             case ARCFORGED -> ENERGY_CONDUIT_ARCFORGED.getAsInt();
+            case SUPERCONDUCTING -> ENERGY_CONDUIT_SUPERCONDUCTING.getAsInt();
         };
     }
 
@@ -76,7 +80,7 @@ public class ArcforgeConfig {
             case WROUGHT -> ENERGY_CELL_RATE_WROUGHT.getAsInt();
             case TEMPERED -> ENERGY_CELL_RATE_TEMPERED.getAsInt();
             case HARDENED -> ENERGY_CELL_RATE_HARDENED.getAsInt();
-            case ARCFORGED -> ENERGY_CELL_RATE_ARCFORGED.getAsInt();
+            case ARCFORGED, SUPERCONDUCTING -> ENERGY_CELL_RATE_ARCFORGED.getAsInt();
         };
     }
 
@@ -87,7 +91,7 @@ public class ArcforgeConfig {
             case WROUGHT -> LITHIUM_CELL_WROUGHT.getAsLong();
             case TEMPERED -> LITHIUM_CELL_TEMPERED.getAsLong();
             case HARDENED -> LITHIUM_CELL_HARDENED.getAsLong();
-            case ARCFORGED -> LITHIUM_CELL_ARCFORGED.getAsLong();
+            case ARCFORGED, SUPERCONDUCTING -> LITHIUM_CELL_ARCFORGED.getAsLong();
         };
     }
 
@@ -97,7 +101,7 @@ public class ArcforgeConfig {
             case WROUGHT -> POWER_REGULATOR_WROUGHT.getAsInt();
             case TEMPERED -> POWER_REGULATOR_TEMPERED.getAsInt();
             case HARDENED -> POWER_REGULATOR_HARDENED.getAsInt();
-            case ARCFORGED -> POWER_REGULATOR_ARCFORGED.getAsInt();
+            case ARCFORGED, SUPERCONDUCTING -> POWER_REGULATOR_ARCFORGED.getAsInt();
         };
     }
 
@@ -172,7 +176,7 @@ public class ArcforgeConfig {
             case WROUGHT -> THERMAL_CONDUIT_WROUGHT.getAsInt();
             case TEMPERED -> THERMAL_CONDUIT_TEMPERED.getAsInt();
             case HARDENED -> THERMAL_CONDUIT_HARDENED.getAsInt();
-            case ARCFORGED -> THERMAL_CONDUIT_ARCFORGED.getAsInt();
+            case ARCFORGED, SUPERCONDUCTING -> THERMAL_CONDUIT_ARCFORGED.getAsInt();
         };
     }
 
