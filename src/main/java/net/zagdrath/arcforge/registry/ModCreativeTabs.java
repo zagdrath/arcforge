@@ -291,6 +291,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.INSULATION_UPGRADE.get());
                 output.accept(ModItems.THERMOELECTRIC_UPGRADE.get());
                 output.accept(ModItems.RANGE_UPGRADE.get());
+                output.accept(ModItems.REACTOR_AUTOPILOT.get());
                 // Portable storage: Batteries, Canisters, Gas Cartridges and Thermal Capsules, empty.
                 ModItems.allPortables().forEach(item -> output.accept(item.get()));
             }).build());

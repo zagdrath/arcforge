@@ -15,6 +15,8 @@ package net.zagdrath.arcforge.upgrade;
 //  - Insulation: Heat Cells only. Each cuts the cell's heat leak to 0.8x.
 //  - Thermoelectric: the Thermoelectric Plant only. Each adds 6.25% (configurable) to the FE it makes per HU,
 //    so 8 give +50%; it stacks with Heat upgrades.
+//  - Autopilot: the Fission Reactor only (creative only for now, no recipe). One drives every bank to hold the core at
+//    the most power the plant takes (see FissionReactorBlockEntity.autopilot); more do nothing more.
 public enum UpgradeType {
     SPEED("speed"),
     ENERGY("energy"),
@@ -22,7 +24,8 @@ public enum UpgradeType {
     INSULATION("insulation"),
     THERMOELECTRIC("thermoelectric"),
     // Machines that work an area (the Tree Cutter): each widens it by treeCutter.rangePerUpgrade blocks on every side.
-    RANGE("range");
+    RANGE("range"),
+    AUTOPILOT("autopilot");
 
     public static final int MAX_PER_MACHINE = 8;
 

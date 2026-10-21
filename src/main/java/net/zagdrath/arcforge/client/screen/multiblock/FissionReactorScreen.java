@@ -27,7 +27,9 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.Fluid;
 import net.zagdrath.arcforge.block.nuclear.ControlRodChannelBlock;
 import net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity;
+import net.zagdrath.arcforge.nuclear.reactor.ReactorAutopilot;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
+import net.zagdrath.arcforge.client.gui.tab.UpgradesTab;
 import net.zagdrath.arcforge.client.screen.machine.MachineScreen;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.multiblock.FissionReactorMenu;
@@ -88,7 +90,7 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
     private static final int SILENCE_X = SHIFT_X, SILENCE_W = SHIFT_W;
     private static final int ALARM_RED = 0xFFE8483A, ALARM_AMBER = 0xFFE0A020;
     // The Fuel page: the layers' grids across the desk from MAP_Y, gaps between them; the legend and Bring Out Third under.
-    private static final int MAP_Y = 21, MAP_H = 40, MAP_GAP = 6, MAP_MAX_CELL = 9, LEGEND_Y = 66, PULL_Y = 78, RAMP_X = 60, RAMP_W = 80;
+    private static final int MAP_Y = 21, MAP_H = 40, MAP_GAP = 6, MAP_MAX_CELL = 9, LEGEND_Y = 66, PULL_Y = 78, RAMP_X = 66, RAMP_W = 80;
     private static final int FRESH = 0xFF3FAF5A, HALF = 0xFFE0C040, BURNT = 0xFFD0443A, SPENT = 0xFF7A1E1E, DAMAGED = 0xFF8A4A8A,
             THIRD = 0xFFFFE070, PULL = 0xFFFFFFFF;
     // Each kind of cell's colour (FissionReactorMenu.CELL_*); a fuel rod's is its burnup's.
@@ -123,6 +125,21 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
     public FissionReactorScreen(FissionReactorMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "fission_reactor", List.of(), false, FissionReactorMenu.WIDTH, FissionReactorMenu.HEIGHT, true);
         enableAutoEject();
+        // The Reactor Autopilot's slot, third tab after Redstone and Ports (what it's doing shows on the control row).
+        tabs.add(new UpgradesTab(menu.getUpgradeSlots()));
+    }
+
+    // The Autopilot on the control row, in place of the Shift hint: its goal, coloured by what it's doing.
+    private void drawAutopilot(GuiGraphicsExtractor graphics) {
+        ReactorAutopilot.State state = menu.autopilotState();
+        int colour = switch (state) {
+            case HOLDING -> ArcforgeGui.TEXT;
+            case TRIPPED -> ArcforgeGui.HEAT;
+            case FUEL_HOT, PRESSURE, FLOW, LEVEL, RODS_OUT -> ArcforgeGui.WARNING;
+            default -> ArcforgeGui.LABEL;
+        };
+        Component text = Component.translatable("gui.arcforge.fission_reactor.autopilot", Math.round(menu.autopilotGoal() * 100.0));
+        graphics.text(font, clipped(text, SHIFT_W), SHIFT_X, CONTROL_Y + 2, colour, false);
     }
 
     @Override
@@ -333,7 +350,10 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
                 menu.scrammed() ? ArcforgeGui.HEAT : waiting ? ArcforgeGui.WARNING : ArcforgeGui.TEXT, false);
         textCentred(graphics, Component.translatable("gui.arcforge.fission_reactor.reset"), RESET_X, WIDE, CONTROL_Y + 2, ArcforgeGui.TEXT);
         textCentred(graphics, Component.translatable("gui.arcforge.fission_reactor.scram"), SCRAM_X, WIDE, CONTROL_Y + 2, ArcforgeGui.WHITE);
-        if (shown == Page.CORE) {
+        // The Safety page has its Silence button there.
+        if (menu.hasAutopilot() && shown != Page.SAFETY) {
+            drawAutopilot(graphics);
+        } else if (shown == Page.CORE) {
             graphics.text(font, clipped(Component.translatable("gui.arcforge.fission_reactor.shift_hint"), SHIFT_W), SHIFT_X, CONTROL_Y + 2,
                     ArcforgeGui.LABEL, false);
         }
@@ -502,6 +522,14 @@ public class FissionReactorScreen extends MachineScreen<FissionReactorMenu> {
         }
         if (isHovering(RESET_X, CONTROL_Y, WIDE, CONTROL_H, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fission_reactor.reset_hint"));
+            return;
+        }
+        if (menu.hasAutopilot() && shown != Page.SAFETY && isHovering(SHIFT_X, CONTROL_Y, SHIFT_W, CONTROL_H, mouseX, mouseY)) {
+            String state = menu.autopilotState().name().toLowerCase(Locale.ROOT);
+            lines.add(Component.translatable("gui.arcforge.fission_reactor.autopilot.title"));
+            lines.add(Component.translatable("gui.arcforge.fission_reactor.autopilot." + state, Math.round(menu.autopilotGoal() * 100.0))
+                    .withStyle(ChatFormatting.GRAY));
+            lines.add(Component.translatable("gui.arcforge.fission_reactor.autopilot.hint").withStyle(ChatFormatting.DARK_GRAY));
             return;
         }
         if (isHovering(LED_X, STATUS_Y - 1, STATUS_X + STATUS_W - LED_X, 10, mouseX, mouseY)) {

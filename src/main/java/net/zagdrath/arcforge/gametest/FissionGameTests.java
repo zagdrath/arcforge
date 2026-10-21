@@ -33,6 +33,7 @@ import net.zagdrath.arcforge.nuclear.FuelRod;
 import net.zagdrath.arcforge.nuclear.RadiationField;
 import net.zagdrath.arcforge.nuclear.ReactorSteam;
 import net.zagdrath.arcforge.nuclear.reactor.CoreLattice;
+import net.zagdrath.arcforge.nuclear.reactor.ReactorAutopilot;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorParams;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorSim;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
@@ -178,6 +179,41 @@ public final class FissionGameTests {
     // in proportion to its enrichment, burns in proportion to the power it gives (a core at a quarter power reaches the
     // same burnup after the same energy, taking far longer), what builds up in it follows its burnup, and the banks have
     // to come out over the cycle as the fuel's reactivity goes.
+    // The Reactor Autopilot takes a cold, shut-down core up to full power and holds it there without a trip, and one still
+    // warm (at 1% power after a trip, its delayed neutrons with it) without a short period; with a plant that only takes
+    // part of its heat it settles at what the plant takes, still without a trip.
+    static void autopilot(GameTestHelper helper) {
+        ReactorSim open = core(PWR, 0.03, ReactorSim.Mode.PRESSURIZED);
+        ReactorAutopilot pilot = steered(open, 1.0E9, 20 * 60 * 25);
+        helper.assertTrue(!open.scrammed, "It tripped with the plant taking everything: " + open.trip);
+        helper.assertTrue(open.power > 0.97 && open.power < 1.03 && pilot.state == ReactorAutopilot.State.HOLDING,
+                "It didn't hold full power: " + open.power + ", " + pilot.state);
+        ReactorSim warm = core(PWR, 0.03, ReactorSim.Mode.PRESSURIZED);
+        warm.power = 0.01;
+        warm.settlePrecursors();
+        pilot = steered(warm, 1.0E9, 20 * 60 * 25);
+        helper.assertTrue(!warm.scrammed, "It tripped bringing a warm core up: " + warm.trip);
+        helper.assertTrue(warm.power > 0.97, "It didn't bring a warm core to full power: " + warm.power + ", " + pilot.state);
+        // A plant taking 3,000 mB/t of Hot Coolant: about 46% of this core's 6,533 at full power.
+        ReactorSim limited = core(PWR, 0.03, ReactorSim.Mode.PRESSURIZED);
+        pilot = steered(limited, 3_000.0, 20 * 60 * 25);
+        helper.assertTrue(!limited.scrammed, "It tripped with the plant taking part: " + limited.trip);
+        helper.assertTrue(limited.power > 0.4 && limited.power < 0.6 && limited.flowRatio > 0.9,
+                "It didn't settle at what the plant takes: " + limited.power + ", flow " + limited.flowRatio + ", " + pilot.state);
+        helper.succeed();
+    }
+
+    // A core run with the Autopilot steering it for ticks, the plant taking room mB of Hot Coolant a tick.
+    private static ReactorAutopilot steered(ReactorSim sim, double room, int ticks) {
+        ReactorAutopilot pilot = new ReactorAutopilot();
+        for (int t = 0; t < ticks && !sim.scrammed; t++) {
+            pilot.steer(sim);
+            sim.tick(room, 1.0E9);
+            sim.coolant = Math.min(sim.coolantCapacity, sim.coolant + sim.hotLeg + sim.steamMade);
+        }
+        return pilot;
+    }
+
     static void fuelCycle(GameTestHelper helper) {
         ReactorParams p = ReactorParams.defaults();
         helper.assertTrue(Math.abs(new ReactorSim.Rod(0.05).life(p) - p.rodLifeTicks) < 1.0, "A 5% rod doesn't last rodLifeTicks");

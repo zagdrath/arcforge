@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
 import net.zagdrath.arcforge.blockentity.multiblock.FissionReactorBlockEntity;
+import net.zagdrath.arcforge.nuclear.reactor.ReactorAutopilot;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
 import net.zagdrath.arcforge.menu.machine.MachineMenu;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorSim;
@@ -97,7 +98,9 @@ public class FissionReactorMenu extends MachineMenu {
     public static final int DATA_MAP = DATA_MAP_SIZE + 1;
     // The largest core inside a 7x9x7 vessel.
     public static final int MAP_CELLS = 5 * 7 * 5;
-    public static final int DATA_VALUES = DATA_MAP + MAP_CELLS;
+    // The Reactor Autopilot: -1 without its card, else its state (ReactorAutopilot.State) and goal (see packAutopilot).
+    public static final int DATA_AUTOPILOT = DATA_MAP + MAP_CELLS;
+    public static final int DATA_VALUES = DATA_AUTOPILOT + 1;
 
     // What a core map cell holds.
     public static final int CELL_COOLANT = 0, CELL_GRAPHITE = 1, CELL_STEEL = 2, CELL_CONTROL = 3, CELL_EMPTY_CHANNEL = 4, CELL_FUEL = 5, CELL_SALT = 6;
@@ -350,6 +353,34 @@ public class FissionReactorMenu extends MachineMenu {
 
     public int controlRods() {
         return value(DATA_CONTROL_RODS);
+    }
+
+    // The Autopilot's state (an ordinal of ReactorAutopilot.State) and its goal in tenths of a percent.
+    public static int packAutopilot(int state, double goal) {
+        return state << 16 | (int) Math.round(Math.max(0.0, Math.min(1.0, goal)) * 1000.0);
+    }
+
+    // Whether the Autopilot's card is in.
+    public boolean hasAutopilot() {
+        return value(DATA_AUTOPILOT) >= 0;
+    }
+
+    public ReactorAutopilot.State autopilotState() {
+        ReactorAutopilot.State[] states = ReactorAutopilot.State.values();
+        int packed = value(DATA_AUTOPILOT);
+        return packed < 0 ? ReactorAutopilot.State.OFF : states[Math.min(states.length - 1, packed >> 16)];
+    }
+
+    // Its goal, as a share of full power.
+    public double autopilotGoal() {
+        int packed = value(DATA_AUTOPILOT);
+        return packed < 0 ? 0.0 : (packed & 0xFFFF) / 1000.0;
+    }
+
+    // The Upgrades tab hangs off this GUI's own right edge.
+    @Override
+    protected int upgradeSlotX() {
+        return WIDTH - 4 + UPGRADE_SLOT_X - 172;
     }
 
     public static int packMapSize(int nx, int ny, int nz) {

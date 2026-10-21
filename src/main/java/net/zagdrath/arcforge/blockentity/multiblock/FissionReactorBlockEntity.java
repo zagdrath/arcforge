@@ -62,6 +62,7 @@ import net.zagdrath.arcforge.nuclear.RadiationField;
 import net.zagdrath.arcforge.nuclear.RadiationSource;
 import net.zagdrath.arcforge.nuclear.reactor.CoreLattice;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorParams;
+import net.zagdrath.arcforge.nuclear.reactor.ReactorAutopilot;
 import net.zagdrath.arcforge.nuclear.reactor.ReactorSim;
 import net.zagdrath.arcforge.nuclear.safety.Containment;
 import net.zagdrath.arcforge.nuclear.safety.Containments;
@@ -83,6 +84,7 @@ import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.SidedResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
+import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // The Fission Reactor (see VesselStructures.REACTOR), run by its controller. Its physics is ReactorSim's; this block
 // entity builds the core from the vessel (one lattice cell per block inside), keeps the rods that are in its channels,
@@ -115,6 +117,8 @@ import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 //    let go; see ReactorExplosions). Outside a sealed containment they let fallout out (see Fallout).
 public class FissionReactorBlockEntity extends VesselControllerBlockEntity implements RadiationSource {
     public static final int INPUT_SLOTS = 9, OUTPUT_SLOTS = 9, MACHINE_SLOTS = INPUT_SLOTS + OUTPUT_SLOTS;
+    // The Reactor Autopilot (creative only for now), in the Upgrades tab: see autopilot.
+    public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.AUTOPILOT);
     // The intake and Hot Leg tanks' size; the steam tank holds four times as much.
     public static final int TANK = 64_000, STEAM_TANK = 4 * TANK;
     public static final int HISTORY = 60;
@@ -154,6 +158,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     private final Saved saved = new Saved();
     private ReactorSim.Mode mode = ReactorSim.Mode.NONE;
     private boolean redstoneRods;
+    private final ReactorAutopilot autopilot = new ReactorAutopilot();
     private boolean autoUnload = true;
     private boolean unloadAll;
     private boolean damageMarked;
@@ -190,7 +195,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
 
     public FissionReactorBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.FISSION_REACTOR.get(), pos, state, MACHINE_SLOTS, (slot, resource) -> slot < INPUT_SLOTS && isLoadable(resource.toStack(1)),
-                SIDE_MODES);
+                UPGRADES, SIDE_MODES);
         this.intake = new FilteredFluidTank(TANK, FissionReactorBlockEntity::isCoolant, this::setChanged);
         this.hotLeg = new FilteredFluidTank(TANK, resource -> resource.is(ModFluids.HOT_COOLANT.get()) || resource.is(ModFluids.HOT_HEAVY_WATER.get())
                 || resource.is(ModFluids.HOT_LEAD_BISMUTH.get()) || resource.is(ModFluids.HOT_FUEL_SALT.get()), this::setChanged);
@@ -268,7 +273,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
     }
 
     public static MachineItemHandler clientItems() {
-        return new MachineItemHandler(MACHINE_SLOTS, (slot, resource) -> slot < INPUT_SLOTS, Set.of(), () -> {});
+        return new MachineItemHandler(MACHINE_SLOTS, (slot, resource) -> slot < INPUT_SLOTS, UPGRADES, () -> {});
     }
 
     @Override
@@ -1097,6 +1102,34 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
             }
         }
         core.redstoneFloor = redstoneRods ? redstone / 15.0 : 0.0;
+        autopilot(core);
+    }
+
+    // The Reactor Autopilot (see ReactorAutopilot), while its card is in the Upgrades tab and the reactor is switched on
+    // and not stopped by redstone. It holds the rods in while fuel or control rods wait to load (they only load shut down)
+    // or rods are queued to come out, and it never resets a trip.
+    private void autopilot(ReactorSim core) {
+        if (upgrades(UpgradeType.AUTOPILOT) == 0 || !controlState.isEnabled() || level != null && !redstoneMode.canRun(redstone > 0)) {
+            autopilot.state = ReactorAutopilot.State.OFF;
+        } else if (core.loadedRods() == 0 || !pulls.isEmpty() || rodsWaiting(core)) {
+            autopilot.holdIn(core);
+        } else {
+            autopilot.steer(core);
+        }
+    }
+
+    // Whether a Fuel Rod or Control Rod waits in the input slots with an empty channel for it.
+    private boolean rodsWaiting(ReactorSim core) {
+        for (int slot = 0; slot < INPUT_SLOTS; slot++) {
+            ItemStack waiting = items.getStack(slot);
+            if (waiting.isEmpty() || !isLoadable(waiting)) {
+                continue;
+            }
+            if (FuelRodItem.isFuelRod(waiting) ? core.loadedRods() < fuelChannelBlocks : core.controlCells().length < controlChannelBlocks) {
+                return true;
+            }
+        }
+        return false;
     }
 
     // Coolant from the intake into the vessel: one kind at a time (it changes only once the vessel has drained; a burst
@@ -1626,6 +1659,9 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         if (index >= FissionReactorMenu.DATA_MAP && index < FissionReactorMenu.DATA_MAP + FissionReactorMenu.MAP_CELLS) {
             return coreMap()[index - FissionReactorMenu.DATA_MAP];
         }
+        if (index == FissionReactorMenu.DATA_AUTOPILOT) {
+            return upgrades(UpgradeType.AUTOPILOT) == 0 ? -1 : FissionReactorMenu.packAutopilot(autopilot.state.ordinal(), autopilot.goal);
+        }
         ReactorSim.Trips trips = trips();
         return switch (index) {
             case FissionReactorMenu.DATA_STATUS -> status.ordinal();
@@ -1833,6 +1869,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
                 new double[] { entry.iodine(), entry.xenon() })));
         mode = ReactorSim.Mode.values()[Mth.clamp(in.getIntOr("mode", 0), 0, ReactorSim.Mode.values().length - 1)];
         redstoneRods = in.getBooleanOr("redstone_rods", false);
+        autopilot.goal = Mth.clamp(in.getDoubleOr("autopilot_goal", 1.0), ReactorAutopilot.MIN_GOAL, 1.0);
         autoUnload = in.getBooleanOr("auto_unload", true);
         pulls.clear();
         in.read("pulls", Codec.LONG.listOf()).ifPresent(list -> list.forEach(pos -> pulls.add(BlockPos.of(pos))));
@@ -1901,6 +1938,7 @@ public class FissionReactorBlockEntity extends VesselControllerBlockEntity imple
         out.store("xenon", XenonEntry.CODEC.listOf(), xenonList);
         out.putInt("mode", mode.ordinal());
         out.putBoolean("redstone_rods", redstoneRods);
+        out.putDouble("autopilot_goal", autopilot.goal);
         out.putBoolean("auto_unload", autoUnload);
         out.store("pulls", Codec.LONG.listOf(), pulls.stream().map(BlockPos::asLong).toList());
         out.putInt("glow", glow);

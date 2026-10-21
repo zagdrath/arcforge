@@ -119,10 +119,16 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
         finish(inventory, 8, inventoryY);
     }
 
+    // Where the first upgrade slot sits: in the Upgrades tab, which hangs 4 px inside the GUI's right edge (a wider GUI
+    // moves it out with its edge).
+    protected int upgradeSlotX() {
+        return UPGRADE_SLOT_X;
+    }
+
     // For wider GUIs too: the player inventory's left edge at inventoryX (8 on a 176-wide GUI).
     protected void finish(Inventory inventory, int inventoryX, int inventoryY) {
         for (int i = 0; i < MachineBlockEntity.UPGRADE_SLOTS; i++) {
-            ToggleableSlot slot = new ToggleableSlot(items, items::set, items.getFirstUpgradeSlot() + i, UPGRADE_SLOT_X + i * UPGRADE_SLOT_PITCH,
+            ToggleableSlot slot = new ToggleableSlot(items, items::set, items.getFirstUpgradeSlot() + i, upgradeSlotX() + i * UPGRADE_SLOT_PITCH,
                     UPGRADE_SLOT_Y);
             upgradeSlots.add(slot);
             addSlot(slot);

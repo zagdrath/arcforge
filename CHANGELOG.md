@@ -83,6 +83,17 @@ machines and Settings Cards carry over).
 - **The Fission Reactor's Fuel page.** A core map of every layer seen from above, each Fuel Channel coloured by its rod's
   burnup, the most-burned third of the rods outlined (the batch a refuelling replaces). Click a rod, or Bring Out Third,
   and it comes out to the output slots at the next shutdown. The Handbook's Fuel Rods entry explains refuelling by thirds.
+- **Reactor Autopilot** (creative only for now: no recipe, in the Tools and Upgrades tab). An upgrade card for the
+  Fission Reactor, which now has an Upgrades tab. With it in, every bank is driven together to hold the core at the most
+  power its plant takes: its goal climbs to 100% and backs off whenever the hottest fuel comes within 100 °C of its trip,
+  the pressure within 3 bar of its trip, the vessel's water low, or the plant stops taking all the heat (it drops
+  straight to the share that's leaving). From cold it brings a core up at about a 40 s period, well clear of the
+  short-period trip, to full power in about 15 minutes, and like an operator it pulls no rods while the period meter reads
+  under 30 s (and drives them in under 20 s), so a core still warm after a trip comes back up without one.
+  It holds the rods in while rods wait to load or come out, never
+  resets a trip, and can't save a core from a sudden loss of its whole heat sink (that still trips on low flow). The
+  control row shows "Auto" and its goal, coloured by what it's doing, with the reason on hover. A GameTest takes a core
+  from cold to full power and holds it, and settles one at what a smaller plant takes.
 - **Large-model detail settings** (`arcforge-client.toml`, `largeModels`): moving parts are plain solid shapes standing
   still past `simpleMovingPartsFrom` (48 blocks), and past `stillPartsOnlyFrom` (96) only the still parts are drawn.
 

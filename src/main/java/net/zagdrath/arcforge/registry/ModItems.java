@@ -320,6 +320,9 @@ public final class ModItems {
     public static final DeferredItem<UpgradeItem> INSULATION_UPGRADE = ITEMS.registerItem("insulation_upgrade", p -> new UpgradeItem(UpgradeType.INSULATION, p));
     public static final DeferredItem<UpgradeItem> THERMOELECTRIC_UPGRADE = ITEMS.registerItem("thermoelectric_upgrade", p -> new UpgradeItem(UpgradeType.THERMOELECTRIC, p));
     public static final DeferredItem<UpgradeItem> RANGE_UPGRADE = ITEMS.registerItem("range_upgrade", p -> new UpgradeItem(UpgradeType.RANGE, p));
+    // Creative only for now: no recipe.
+    public static final DeferredItem<UpgradeItem> REACTOR_AUTOPILOT = ITEMS.registerItem("reactor_autopilot",
+            p -> new UpgradeItem(UpgradeType.AUTOPILOT, p.stacksTo(1)));
 
     public static final DeferredItem<BucketItem> CREOSOTE_BUCKET = ITEMS.registerItem("creosote_bucket",
             p -> new BucketItem(ModFluids.CREOSOTE.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));

@@ -55,7 +55,13 @@ public abstract class VesselControllerBlockEntity extends MachineBlockEntity imp
 
     protected VesselControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots, FilteredItemHandler.SlotFilter filter,
             List<SideMode> sideModes) {
-        super(type, pos, state, machineSlots, filter, Set.<UpgradeType>of(),
+        this(type, pos, state, machineSlots, filter, Set.<UpgradeType>of(), sideModes);
+    }
+
+    // A vessel that takes upgrades (in its Upgrades tab).
+    protected VesselControllerBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int machineSlots, FilteredItemHandler.SlotFilter filter,
+            Set<UpgradeType> upgrades, List<SideMode> sideModes) {
+        super(type, pos, state, machineSlots, filter, upgrades,
                 new SideConfig(SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE, SideMode.NONE), sideModes);
     }
 
