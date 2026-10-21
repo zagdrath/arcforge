@@ -54,9 +54,10 @@ public final class ReactorAutopilot {
     static final double PLANT_MARGIN = 0.1;
     private double lastIntake = -1.0, lastOutput = -1.0, back, taken, sent;
     public double plantShare = 1.0;
-    // The goal the plant last fell behind at: above it the goal creeps up only CEILING_CREEP as fast, so a plant that
-    // can't keep up is found again gently rather than overrun each time its buffers have refilled.
-    static final double CEILING_CREEP = 0.1;
+    // The goal the plant last fell behind at: from just under it to CEILING_BAND over it the goal creeps up only
+    // CEILING_CREEP as fast, so a plant that can't keep up is found again gently rather than overrun each time its buffers
+    // have refilled; past the band (the plant has been made bigger, say) it climbs at the full rate again.
+    static final double CEILING_CREEP = 0.1, CEILING_BAND = 1.1;
     public double ceiling = 1.0;
 
     public double goal = 1.0;
@@ -114,8 +115,8 @@ public final class ReactorAutopilot {
         } else if (limit != null) {
             goal = Math.max(MIN_GOAL, Math.min(goal, core.power * (1.0 - BACK_OFF)));
         } else {
-            goal = Math.min(1.0, goal + (goal < ceiling * 0.98 ? RAISE : RAISE * CEILING_CREEP));
-            ceiling = Math.max(ceiling, goal);
+            boolean nearCeiling = goal >= ceiling * 0.98 && goal < ceiling * CEILING_BAND;
+            goal = Math.min(1.0, goal + (nearCeiling ? RAISE * CEILING_CREEP : RAISE));
         }
         double ratio = Math.max(core.power, 1.0E-9) / goal;
         double want = Math.max(-MAX_RHO, Math.min(MAX_RHO, -Math.log(ratio) * RHO));
