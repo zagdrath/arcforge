@@ -23,6 +23,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
@@ -30,6 +34,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModList;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.AddSectionGeometryEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
@@ -54,6 +59,11 @@ import net.zagdrath.arcforge.Arcforge;
 // shading in the colour, the entity shader's level light being 1 for an upward normal), so a baked model looks as it did.
 // A list the entity shader lit from its real normals (bakeEntityLit) gets that level light worked out here and put in
 // its colour instead.
+//
+// Sodium (and its forks) mesh the sections themselves and never ask for AddSectionGeometryEvent, so with one of them
+// loaded nothing is baked: each list is held here instead (as the bake would have been, made and replaced the same way)
+// and its renderer draws it every frame from the GPU copy StaticMeshes keeps (submitHeld), out to any distance the
+// world is drawn, as before the chunk mesh took them.
 @EventBusSubscriber(modid = Arcforge.MODID, value = Dist.CLIENT)
 public final class ChunkMeshes {
     // Floats a stored vertex: x, y, z (from the section's corner), u, v (in the atlas), colour and light (int bits); a
@@ -101,6 +111,22 @@ public final class ChunkMeshes {
     }
 
     private static final Map<Level, Baked> LEVELS = new WeakHashMap<>();
+
+    // Whether the sections are meshed by vanilla (so the bakes reach them), or by Sodium or a fork of it.
+    private static final boolean IN_CHUNKS = !(ModList.get().isLoaded("sodium") || ModList.get().isLoaded("embeddium")
+            || ModList.get().isLoaded("rubidium"));
+
+    // A list held for its renderer to draw (when the sections can't take it): drawn as emitter writes it at origin, from
+    // the GPU copy kept for key (an array of its size, made with it, so a new list is a new copy).
+    private record Held(WeakReference<BlockEntity> owner, BlockPos origin, ChunkSectionLayer layer, Object source, int light, BooleanSupplier valid,
+            SubmitNodeCollector.CustomGeometryRenderer emitter, float[] key) {
+        boolean isLive(Level level, BlockPos pos) {
+            BlockEntity be = owner.get();
+            return be != null && !be.isRemoved() && be.getLevel() == level && level.getBlockEntity(pos) == be && valid.getAsBoolean();
+        }
+    }
+
+    private static final Map<Level, Map<Long, Map<Integer, Held>>> HELD = new WeakHashMap<>();
     private static int sinceSweep;
 
     private ChunkMeshes() {}
@@ -129,6 +155,10 @@ public final class ChunkMeshes {
         if (level == null || !level.isClientSide()) {
             return;
         }
+        if (!IN_CHUNKS) {
+            hold(owner, slot, origin, layer, source, light, valid, emitter);
+            return;
+        }
         Baked baked = LEVELS.computeIfAbsent(level, l -> new Baked());
         Map<Integer, Bake> slots = baked.byOwner.computeIfAbsent(owner.getBlockPos().asLong(), k -> new HashMap<>());
         Bake old = slots.get(slot);
@@ -150,8 +180,49 @@ public final class ChunkMeshes {
         markDirty(level, dirty);
     }
 
+    private static void hold(BlockEntity owner, int slot, BlockPos origin, ChunkSectionLayer layer, Object source, int light, BooleanSupplier valid,
+            SubmitNodeCollector.CustomGeometryRenderer emitter) {
+        Map<Integer, Held> slots = HELD.computeIfAbsent(owner.getLevel(), l -> new HashMap<>()).computeIfAbsent(owner.getBlockPos().asLong(), k -> new HashMap<>());
+        Held old = slots.get(slot);
+        if (old != null && old.source().equals(source) && old.light() == light && old.layer() == layer && old.owner().get() == owner
+                && old.origin().equals(origin)) {
+            return;
+        }
+        Capture capture = new Capture();
+        emitter.render(IDENTITY, capture);
+        float[] key = new float[capture.vertices().length / CAPTURED * 8];
+        slots.put(slot, new Held(new WeakReference<>(owner), origin.immutable(), layer, source, light, valid, emitter, key));
+    }
+
+    // Draws what the block entity state is for holds (when the sections can't take its bakes; else nothing): called by
+    // a renderer that bakes at the start of its submit, with the pose at the block entity.
+    public static void submitHeld(BlockEntityRenderState state, PoseStack poseStack, SubmitNodeCollector collector) {
+        Level level = Minecraft.getInstance().level;
+        Map<Long, Map<Integer, Held>> held = IN_CHUNKS || level == null ? null : HELD.get(level);
+        Map<Integer, Held> slots = held != null ? held.get(state.blockPos.asLong()) : null;
+        if (slots == null) {
+            return;
+        }
+        for (Held list : slots.values()) {
+            if (list.key().length == 0 || !list.isLive(level, state.blockPos)) {
+                continue;
+            }
+            RenderType type = list.layer() == ChunkSectionLayer.CUTOUT ? RenderTypes.entityCutout(TextureAtlas.LOCATION_BLOCKS)
+                    : RenderTypes.entitySolid(TextureAtlas.LOCATION_BLOCKS);
+            poseStack.pushPose();
+            poseStack.translate(list.origin().getX() - state.blockPos.getX(), list.origin().getY() - state.blockPos.getY(),
+                    list.origin().getZ() - state.blockPos.getZ());
+            StaticMeshes.submit(collector, poseStack, type, list.key(), null, list.light(), list.emitter());
+            poseStack.popPose();
+        }
+    }
+
     // Whether owner has a live bake in every one of the slots given (its renderer needn't draw those lists itself).
+    // Never while they're held instead: its renderer draws them, out to the world's render distance.
     public static boolean isBaked(BlockEntity owner, int... slots) {
+        if (!IN_CHUNKS) {
+            return false;
+        }
         Level level = owner.getLevel();
         Baked baked = level != null ? LEVELS.get(level) : null;
         Map<Integer, Bake> mine = baked != null ? baked.byOwner.get(owner.getBlockPos().asLong()) : null;
@@ -170,6 +241,10 @@ public final class ChunkMeshes {
     // Takes everything owner baked back out (it unformed, say).
     public static void remove(BlockEntity owner) {
         Level level = owner.getLevel();
+        Map<Long, Map<Integer, Held>> held = level != null ? HELD.get(level) : null;
+        if (held != null) {
+            held.remove(owner.getBlockPos().asLong());
+        }
         Baked baked = level != null ? LEVELS.get(level) : null;
         if (baked == null) {
             return;
@@ -272,6 +347,12 @@ public final class ChunkMeshes {
             return;
         }
         sinceSweep = 0;
+        for (Map<Long, Map<Integer, Held>> held : HELD.values()) {
+            held.values().removeIf(slots -> {
+                slots.values().removeIf(list -> list.owner().get() == null || list.owner().get().isRemoved());
+                return slots.isEmpty();
+            });
+        }
         for (Baked baked : LEVELS.values()) {
             for (Iterator<Map<Integer, Bake>> it = baked.byOwner.values().iterator(); it.hasNext();) {
                 Map<Integer, Bake> slots = it.next();

@@ -290,6 +290,7 @@ public class GasTurbineArrayRenderer implements ShellMultiblockRenderer<GasTurbi
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         if (!state.formed || state.liner == null || state.jamb == null || state.detail == LargeModels.Detail.STILL) {
             return;
         }

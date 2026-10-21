@@ -207,6 +207,7 @@ public class NuclearSteamTurbineRenderer implements ShellMultiblockRenderer<Nucl
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         TextureAtlasSprite sheet = state.sheet;
         if (!state.formed || sheet == null || state.rotor.length == 0) {
             return;

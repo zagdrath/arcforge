@@ -177,6 +177,7 @@ public class ThermalEvaporatorRenderer implements BlockEntityRenderer<ThermalEva
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         if (!state.formed || state.liner == null || state.jamb == null) {
             return;
         }

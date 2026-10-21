@@ -609,6 +609,7 @@ public final class ArcforgeGameTests {
         TESTS.put("fission_fuel_rods", FissionGameTests::fuelRods);
         TESTS.put("fission_fuel_cycle", FissionGameTests::fuelCycle);
         LARGE_TESTS.put("nuclear_turbine_forms", NuclearTurbineGameTests::forms);
+        LARGE_TESTS.put("nuclear_turbine_forms_longest", NuclearTurbineGameTests::formsLongest);
         LARGE_TESTS.put("nuclear_turbine_runs_and_trips", NuclearTurbineGameTests::runsAndTrips);
         TESTS.put("nuclear_turbine_rotor_on_shaft", NuclearTurbineGameTests::rotorOnShaft);
         TESTS.put("fission_fuel_fabrication", FissionGameTests::fuelFabrication);

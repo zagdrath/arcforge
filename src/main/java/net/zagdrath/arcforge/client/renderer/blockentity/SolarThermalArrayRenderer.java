@@ -184,6 +184,7 @@ public class SolarThermalArrayRenderer implements BlockEntityRenderer<SolarTherm
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         if (!state.formed) {
             return;
         }

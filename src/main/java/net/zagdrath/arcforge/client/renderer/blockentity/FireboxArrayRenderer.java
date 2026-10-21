@@ -166,6 +166,7 @@ public class FireboxArrayRenderer implements BlockEntityRenderer<FireboxArrayBlo
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         if (!state.formed || state.lining == null || state.jamb == null || state.coals == null || state.coalsLit == null || state.flame == null) {
             return;
         }

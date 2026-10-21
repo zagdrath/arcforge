@@ -29,6 +29,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.zagdrath.arcforge.client.renderer.ChunkMeshes;
 import net.zagdrath.arcforge.block.nuclear.EquipmentHatchBlock;
 import net.zagdrath.arcforge.blockentity.nuclear.EquipmentHatchBlockEntity;
 import net.zagdrath.arcforge.multiblock.ModelFrame;
@@ -127,6 +128,7 @@ public class EquipmentHatchRenderer implements BlockEntityRenderer<EquipmentHatc
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         TextureAtlasSprite sheet = state.sheet;
         if (sheet == null) {
             return;

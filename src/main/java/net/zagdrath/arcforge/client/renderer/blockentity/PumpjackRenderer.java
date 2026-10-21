@@ -204,6 +204,7 @@ public class PumpjackRenderer implements StructureRenderer<PumpjackBlockEntity, 
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         TextureAtlasSprite sheet = state.sheet;
         if (!state.formed || sheet == null) {
             return;

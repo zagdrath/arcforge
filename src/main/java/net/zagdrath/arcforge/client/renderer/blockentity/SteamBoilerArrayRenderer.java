@@ -206,6 +206,7 @@ public class SteamBoilerArrayRenderer implements ShellMultiblockRenderer<SteamBo
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         if (!state.formed || state.drumSprite == null || state.waterSprite == null || state.steamSprite == null
                 || state.liner == null || state.jamb == null) {
             return;

@@ -122,9 +122,12 @@ machines and Settings Cards carry over).
     Heavy Water Tower, the Centrifuge Cascade, the Chemical Reactor Array, the PUREX plant, the Solar Thermal Array's
     panel and the Equipment Hatch's frame. They're culled with the terrain, and seen at any distance the world is drawn
     (they vanished past 64 blocks before).
-  - Each moving part (rotors, fans, beams, cranks, the drill string's block and drum, doors, agitators, mirrors) is built
-    once and kept on the GPU; each frame only its turn is sent. What changes shape as it moves (the Pumpjack's arms and
-    bridle, the Oil Derrick's lines and kelly) is still built each frame, a few dozen faces.
+  - With Sodium (or a fork of it), which meshes the chunks itself and has no way in for them, the still parts aren't
+    baked: each model's renderer draws them every frame from a copy kept on the GPU, out to any distance the world is
+    drawn.
+  - Each moving part (rotors, fans, beams, cranks, the drawworks drum, doors, agitators, mirrors) is built once and kept
+    on the GPU; each frame only its turn is sent. What changes as it moves (the Pumpjack's arms and bridle, the Oil
+    Derrick's lines, kelly and travelling block) is still built each frame, a few dozen faces.
   - Renderers now only look after what moves, glows or holds fluid, within tight boxes round those parts, and skip models
     whose chunk sections aren't being drawn (out of view or hidden behind the terrain).
   - Servers send a rotor's speed (the Steam Turbine Array's, the Gas Turbine Array's and the Nuclear Steam Turbine's) only
@@ -132,6 +135,11 @@ machines and Settings Cards carry over).
   - Multiblocks' periodic structure checks, redstone checks and scans are spread over their interval by position, so
     many structures no longer all do theirs on the same tick, and their port pushes each tick only look at the blocks
     with ports instead of every face of the box.
+
+### Fixed
+
+- The Chemical Reactor Array's formed casings drew as the missing model: the shape their port collars stop at
+  (`chemical_reactor_array/shape`) had boxes with no faces, which Minecraft 26.3 won't load.
 
 ### Upgrading
 

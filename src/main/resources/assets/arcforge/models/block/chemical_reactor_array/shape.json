@@ -14,7 +14,7 @@
         -11,
         32
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -27,7 +27,7 @@
         32,
         -13
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -40,7 +40,7 @@
         32,
         -13
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -53,7 +53,7 @@
         32,
         32
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -66,7 +66,7 @@
         32,
         32
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -79,7 +79,7 @@
         32,
         -13
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -92,7 +92,7 @@
         32,
         32
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -105,7 +105,7 @@
         32,
         29
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -118,7 +118,7 @@
         32,
         29
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -131,7 +131,7 @@
         21,
         16
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -144,7 +144,7 @@
         31,
         12
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -157,7 +157,7 @@
         21,
         16
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -170,7 +170,7 @@
         31,
         12
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -183,7 +183,7 @@
         21,
         16
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -196,7 +196,7 @@
         31,
         12
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -209,7 +209,7 @@
         10.5,
         19.799999999999997
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -222,7 +222,7 @@
         -6.800000000000001,
         24.700000000000003
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -235,7 +235,7 @@
         24.200000000000003,
         31.700000000000003
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     },
     {
       "from": [
@@ -248,7 +248,7 @@
         -1,
         -12.5
       ],
-      "faces": {}
+      "faces": { "down": { "texture": "#particle" } }
     }
   ]
 }

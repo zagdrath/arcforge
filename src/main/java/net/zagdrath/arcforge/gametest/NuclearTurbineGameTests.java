@@ -53,6 +53,24 @@ public final class NuclearTurbineGameTests {
         }
     }
 
+    // The longest forms (a 7x7x45, past the 28 blocks the shell search used to reach), one longer doesn't.
+    static void formsLongest(GameTestHelper helper) {
+        BlockPos min = build(helper, NuclearTurbineLayout.MAX_LENGTH);
+        BlockPos longMin = new BlockPos(0, 1, 9);
+        BigArrayGameTests.buildBox(helper, longMin, NuclearTurbineLayout.MAX_LENGTH + 1, NuclearTurbineLayout.HEIGHT, NuclearTurbineLayout.WIDTH,
+                ModBlocks.NUCLEAR_TURBINE_CASING.get(), Set.of());
+        helper.startSequence()
+                .thenIdle(5)
+                .thenExecute(() -> {
+                    NuclearSteamTurbineBlockEntity turbine = turbine(helper, min);
+                    helper.assertTrue(turbine.isMaster() && turbine.getShell() != null && turbine.getShell().length() == NuclearTurbineLayout.MAX_LENGTH,
+                            "The 7x7x45 didn't form");
+                    helper.assertTrue(turbine.maxFlow() == 58_800, "Rated " + turbine.maxFlow());
+                    helper.assertFalse(turbine(helper, longMin).isMaster(), "A 7x7x46 formed");
+                })
+                .thenSucceed();
+    }
+
     static void forms(GameTestHelper helper) {
         BlockPos min = build(helper, NuclearTurbineLayout.MIN_LENGTH);
         BlockPos shortMin = new BlockPos(0, 1, 9);

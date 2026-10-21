@@ -296,6 +296,7 @@ public class DistillationArrayRenderer implements StructureRenderer<Distillation
 
     @Override
     public void submit(State state, PoseStack poseStack, SubmitNodeCollector collector, CameraRenderState camera) {
+        ChunkMeshes.submitHeld(state, poseStack, collector);
         TextureAtlasSprite sheet = state.sheet;
         if (!state.formed || sheet == null) {
             return;

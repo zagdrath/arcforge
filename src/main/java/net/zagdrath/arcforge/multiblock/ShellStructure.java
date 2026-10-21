@@ -41,8 +41,11 @@ import net.zagdrath.arcforge.blockentity.multiblock.ShellMultiblockBlockEntity;
 public final class ShellStructure {
     // The cross-section of the original arrays, and of a shell saved before cross-sections could vary.
     public static final int WIDTH = 3;
-    // The most blocks a search follows, and how far it reaches from where it started: past the biggest box.
-    private static final int MAX_SPAN = 28;
+    // The most blocks a search follows, and how far it reaches from where it started: past the biggest box (the
+    // Nuclear Steam Turbine's 45).
+    private static final int MAX_SPAN = 46;
+    // The longest 3x3 shell tried around a casing when the casings joined to it don't make one box.
+    private static final int MAX_NARROW_LENGTH = 28;
     private static final int MAX_FLOOD = 4_096;
 
     // Which box sizes make a valid structure, by its long axis and its sizes along X, Y and Z.
@@ -245,7 +248,7 @@ public final class ShellStructure {
             }
         }
         for (Direction.Axis axis : order) {
-            for (int length = 3; length <= MAX_SPAN; length++) {
+            for (int length = 3; length <= MAX_NARROW_LENGTH; length++) {
                 for (int along = 0; along < length; along++) {
                     for (int a = 0; a < WIDTH; a++) {
                         for (int b = 0; b < WIDTH; b++) {
