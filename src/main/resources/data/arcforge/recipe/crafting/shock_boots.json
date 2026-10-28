@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "pattern": [
+    "RER",
+    "CBC"
+  ],
+  "key": {
+    "R": "arcforge:rubber_gasket",
+    "E": "arcforge:tempered_battery",
+    "C": "minecraft:copper_ingot",
+    "B": "arcforge:steel_boots"
+  },
+  "result": {
+    "id": "arcforge:shock_boots",
+    "count": 1
+  }
+}

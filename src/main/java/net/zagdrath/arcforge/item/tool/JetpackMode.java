@@ -14,11 +14,12 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 
 // How a worn Jetpack flies (see JetpackFlight), cycled with the Jetpack Mode key: Normal thrusts while jump is
-// held, Hover holds altitude in the air (jump climbs, sneak sinks), Off doesn't fire at all.
+// held, Hover holds altitude in the air (jump climbs, sneak sinks), Distance thrusts forward, Off doesn't fire.
 public enum JetpackMode implements StringRepresentable {
     NORMAL("normal"),
     HOVER("hover"),
-    OFF("off");
+    OFF("off"),
+    DISTANCE("distance");
 
     public static final Codec<JetpackMode> CODEC = StringRepresentable.fromEnum(JetpackMode::values);
     public static final StreamCodec<ByteBuf, JetpackMode> STREAM_CODEC = ByteBufCodecs.idMapper(id -> values()[id], JetpackMode::ordinal);
@@ -35,7 +36,13 @@ public enum JetpackMode implements StringRepresentable {
     }
 
     public JetpackMode next() {
-        return values()[(ordinal() + 1) % values().length];
+        // Keep the existing enum ordinals stable on the wire.
+        return switch (this) {
+            case NORMAL -> HOVER;
+            case HOVER -> DISTANCE;
+            case DISTANCE -> OFF;
+            case OFF -> NORMAL;
+        };
     }
 
     public Component displayName() {

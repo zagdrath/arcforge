@@ -22,6 +22,8 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.ShapedRecipe;
 import net.minecraft.world.item.crafting.ShapedRecipePattern;
 import net.zagdrath.arcforge.registry.ModRecipes;
+import net.zagdrath.arcforge.item.tool.JetpackItem;
+import net.zagdrath.arcforge.item.tool.LongFallBootsItem;
 
 // A shaped recipe that upgrades something to the next tier without losing what it holds: the result gets
 // every data component of the ingredient under the key named by "copy_components_from" (the previous
@@ -84,6 +86,8 @@ public class TierUpgradeRecipe extends ShapedRecipe {
         for (ItemStack stack : input.items()) {
             if (!stack.isEmpty() && copyFrom.test(stack)) {
                 upgraded.applyComponents(stack.getComponentsPatch());
+                JetpackItem.restoreArmor(upgraded);
+                LongFallBootsItem.restoreArmor(upgraded);
                 break;
             }
         }

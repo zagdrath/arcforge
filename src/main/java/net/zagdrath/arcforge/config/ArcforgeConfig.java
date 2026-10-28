@@ -3930,6 +3930,10 @@ public class ArcforgeConfig {
             .comment("Fuel used per tick in Hover mode, as a multiple of the fuel's normal rate.")
             .defineInRange("hoverFuelMultiplier", 1.5, 0.0, 100.0);
 
+    public static final ModConfigSpec.ConfigValue<List<? extends Double>> JETPACK_DISTANCE_SPEED = BUILDER
+            .comment("Maximum horizontal speed in Distance mode, in blocks per tick, per tier.")
+            .defineList("jetpackDistanceSpeed", List.of(0.8, 1.1, 1.4), () -> 0.8, value -> value instanceof Double d && d > 0);
+
     public static final ModConfigSpec.ConfigValue<List<? extends Integer>> ARC_TOOL_CAPACITY = BUILDER
             .comment("Arc Drill and Arc Saw FE capacity, per tier.")
             .defineList("arcToolCapacity", List.of(100_000, 400_000, 1_600_000), () -> 100_000, value -> value instanceof Integer i && i > 0);

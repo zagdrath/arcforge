@@ -1,0 +1,22 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "CGC",
+    "AXA",
+    "PEP"
+  ],
+  "key": {
+    "A": "arcforge:arcforged_alloy",
+    "P": "arcforge:polypropylene_sheet",
+    "E": "arcforge:arcforged_gas_cartridge",
+    "X": "arcforge:hardened_armored_jetpack",
+    "C": "#c:gems/arcite",
+    "G": "arcforge:rubber_gasket"
+  },
+  "result": {
+    "id": "arcforge:arcforged_armored_jetpack",
+    "count": 1
+  },
+  "copy_components_from": "X"
+}

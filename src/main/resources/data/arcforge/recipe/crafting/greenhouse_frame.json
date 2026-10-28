@@ -3,12 +3,13 @@
   "category": "misc",
   "pattern": [
     "PRP",
-    "R R",
+    "RGR",
     "PRP"
   ],
   "key": {
     "P": "#c:plates/steel",
-    "R": "#c:rods/steel"
+    "R": "#c:rods/steel",
+    "G": "minecraft:glass_pane"
   },
   "result": {
     "id": "arcforge:greenhouse_frame",

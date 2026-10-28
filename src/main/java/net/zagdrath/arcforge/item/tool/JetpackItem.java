@@ -8,6 +8,8 @@ package net.zagdrath.arcforge.item.tool;
 import java.util.function.Consumer;
 
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.Unit;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
@@ -25,6 +27,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 import net.minecraft.world.level.material.Fluid;
@@ -41,19 +44,49 @@ import net.zagdrath.arcforge.steam.SteamGrade;
 
 // A Jetpack, worn in the chest slot, in three tiers. It holds one gas at a time (FLUID_CONTENTS), any that is a
 // key of the arcforge:jetpack_fuels data map, and flies on it (see JetpackFlight). It's filled in a Pressurized
-// Cylinder's slots or by clicking a Gas Cartridge onto it; smithing a Steel Chestplate onto it plates it
-// (JETPACK_PLATING, see JetpackPlatingRecipe).
+// Cylinder's slots or by clicking a Gas Cartridge onto it. Each tier also has a separate armored item;
+// the legacy JETPACK_PLATING component is still recognized on old packs.
 public class JetpackItem extends Item {
     public static final ResourceKey<EquipmentAsset> HARNESS = ResourceKey.create(EquipmentAssets.ROOT_ID,
             Identifier.fromNamespaceAndPath(Arcforge.MODID, "jetpack_harness"));
     private static final int FALLBACK_COLOR = 0xFFDCEBF2;
 
     private final ConduitTier tier;
+    private final boolean armored;
 
     public JetpackItem(ConduitTier tier, Item.Properties properties) {
-        super(properties.stacksTo(1).component(net.minecraft.core.component.DataComponents.EQUIPPABLE,
-                Equippable.builder(EquipmentSlot.CHEST).setAsset(HARNESS).setEquipSound(SoundEvents.ARMOR_EQUIP_IRON).build()));
+        this(tier, false, properties);
+    }
+
+    public JetpackItem(ConduitTier tier, boolean armored, Item.Properties properties) {
+        super(properties(properties, armored));
         this.tier = tier;
+        this.armored = armored;
+    }
+
+    private static Item.Properties properties(Item.Properties properties, boolean armored) {
+        properties.stacksTo(1).component(DataComponents.EQUIPPABLE,
+                Equippable.builder(EquipmentSlot.CHEST).setAsset(armored ? SteelMaterials.STEEL_ARMOR.assetId() : HARNESS)
+                        .setEquipSound(SoundEvents.ARMOR_EQUIP_IRON).build());
+        if (armored) {
+            properties.attributes(SteelMaterials.STEEL_ARMOR.createAttributes(ArmorType.CHESTPLATE))
+                    .component(ModDataComponents.JETPACK_PLATING.get(), Unit.INSTANCE);
+        }
+        return properties;
+    }
+
+    public boolean armored() {
+        return armored;
+    }
+
+    // A component-preserving crafting upgrade must not let legacy component overrides remove its armor.
+    public static void restoreArmor(ItemStack stack) {
+        if (stack.getItem() instanceof JetpackItem jetpack && jetpack.armored()) {
+            ItemStack defaults = jetpack.getDefaultInstance();
+            stack.set(DataComponents.EQUIPPABLE, defaults.get(DataComponents.EQUIPPABLE));
+            stack.set(DataComponents.ATTRIBUTE_MODIFIERS, defaults.get(DataComponents.ATTRIBUTE_MODIFIERS));
+            stack.set(ModDataComponents.JETPACK_PLATING.get(), Unit.INSTANCE);
+        }
     }
 
     public ConduitTier tier() {

@@ -26,6 +26,7 @@ import net.zagdrath.arcforge.network.JetpackStatePayload;
 // exhaust). The local client runs the same motion from its own keys so flying doesn't rubber-band.
 // Normal: jump thrusts (up to the tier's climb speed) and steers with the movement keys.
 // Hover: while airborne it holds altitude; jump climbs, sneak sinks; it burns hoverFuelMultiplier times as much.
+// Distance: jump thrusts horizontally in the facing direction and holds altitude; sneak descends.
 public final class JetpackFlight {
     public record Input(boolean jump, boolean sneak) {
         public static final Input NONE = new Input(false, false);
@@ -112,6 +113,7 @@ public final class JetpackFlight {
             return 0.0F;
         }
         boolean hover = mode == JetpackMode.HOVER;
+        boolean distance = mode == JetpackMode.DISTANCE;
         boolean firing = hover ? !player.onGround() || jump : jump;
         if (!firing) {
             return 0.0F;
@@ -131,7 +133,9 @@ public final class JetpackFlight {
 
         Vec3 motion = player.getDeltaMovement();
         double vy = motion.y;
-        if (!hover || jump) {
+        if (distance && !player.onGround()) {
+            vy = sneak ? SINK_SPEED : 0.0;
+        } else if (!hover || jump) {
             vy = Math.min(vy + fuel.thrust(), jetpack.maxRise());
         } else if (sneak) {
             vy = Math.max(vy - GRAVITY, SINK_SPEED);
@@ -140,7 +144,19 @@ public final class JetpackFlight {
         }
         double vx = motion.x;
         double vz = motion.z;
-        if (!server) {
+        if (distance) {
+            float yaw = player.getYRot() * Mth.DEG_TO_RAD;
+            double acceleration = fuel.thrust() * 0.5 + jetpack.airSpeed();
+            vx -= Mth.sin(yaw) * acceleration;
+            vz += Mth.cos(yaw) * acceleration;
+            double speed = Math.sqrt(vx * vx + vz * vz);
+            double limit = ArcforgeConfig.perTierDouble(ArcforgeConfig.JETPACK_DISTANCE_SPEED, JetpackItem.tierIndex(jetpack.tier()));
+            if (speed > limit) {
+                vx *= limit / speed;
+                vz *= limit / speed;
+            }
+        }
+        if (!server && !distance) {
             // Steer from the movement keys, rotated to where the player faces (as vanilla's input vector is).
             double strafe = player.xxa;
             double forward = player.zza;

@@ -281,6 +281,8 @@ public final class ModCreativeTabs {
                     output.accept(item.get());
                 }
                 ModItems.jetpacks().forEach(item -> output.accept(item.get()));
+                output.accept(ModItems.LONG_FALL_BOOTS.get());
+                output.accept(ModItems.ARMORED_LONG_FALL_BOOTS.get());
                 ModItems.arcTools().forEach(item -> output.accept(item.get()));
                 for (ModuleType type : ModuleType.values()) {
                     output.accept(ModItems.toolModule(type).get());

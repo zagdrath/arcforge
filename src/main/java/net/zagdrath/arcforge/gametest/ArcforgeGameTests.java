@@ -230,6 +230,9 @@ public final class ArcforgeGameTests {
         TESTS.put("jetpack_fills_from_cartridge", ArcToolGameTests::jetpackFillsFromCartridge);
         TESTS.put("jetpack_burns_per_data_map", ArcToolGameTests::jetpackBurnsPerDataMap);
         TESTS.put("jetpack_hover_resets_fall_distance", ArcToolGameTests::jetpackHoverResetsFallDistance);
+        TESTS.put("jetpack_distance_mode", ArcToolGameTests::jetpackDistanceMode);
+        TESTS.put("armored_jetpack_items", ArcToolGameTests::armoredJetpackItems);
+        TESTS.put("shock_boots_landing_and_charging", ArcToolGameTests::longFallBootsLandingAndCharging);
         TESTS.put("jetpack_disabled_by_config", ArcToolGameTests::jetpackDisabledByConfig);
         TESTS.put("tier_upgrade_keeps_jetpack_and_tool_contents", ArcToolGameTests::tierUpgradeKeepsContents);
         TESTS.put("arc_drill_fe_per_block", ArcToolGameTests::drillFePerBlock);

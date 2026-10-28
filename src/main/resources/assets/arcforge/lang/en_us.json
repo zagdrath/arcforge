@@ -1341,7 +1341,7 @@
   "item.arcforge.fortune_iii_module": "Fortune III Module",
   "item.arcforge.vein_module": "Vein Mining Module",
   "item.arcforge.speed_module": "Speed Module",
-  "tooltip.arcforge.info.jetpack": "Worn in the chest slot. Holds one gas at a time: fill it in a Pressurized Cylinder slot, or click a Gas Cartridge onto it in your inventory. Steam, High-Pressure Steam, Superheated Steam and Hydrogen work; Hydrogen gives the most thrust for the least fuel. Press the Jetpack Mode key to switch Normal / Hover / Off. Smith a Steel Chestplate onto it for armor.",
+  "tooltip.arcforge.info.jetpack": "Worn in the chest slot. Holds one fuel at a time: fill it in a Pressurized Cylinder slot, or click a Gas Cartridge, Canister or fuel bucket onto it in your inventory. Press the Jetpack Mode key to cycle Normal / Hover / Distance / Off. Distance: hold jump for forward thrust, sneak to descend. Craft with a Steel Chestplate for an Armored Jetpack; fuel and settings carry over.",
   "tooltip.arcforge.info.arc_drill": "An electric pickaxe and shovel. It never breaks, but it needs FE: charge it in an Energy Cell or a Battery slot. About 50 FE per block, more for hard blocks and for each active module. Right-click in the air to install modules; sneak + scroll to switch them on and off.",
   "tooltip.arcforge.info.arc_saw": "An electric axe that fells whole trunks. It never breaks, but it needs FE: charge it in an Energy Cell or a Battery slot. Sneak + right-click toggles Felling mode. Right-click in the air to install modules; sneak + scroll to switch them on and off.",
   "tooltip.arcforge.info.area_module": "Arc tools mine a 3×3 area facing the side you hit, 5×5 on an Arcforged tool. Same rules as the Steel Hammer. +25% FE per block.",
@@ -3717,5 +3717,18 @@
   "arcforge.configuration.experienceTankCapacity": "Experience Tank Capacity (mB)",
   "arcforge.configuration.siliconCarbideMeshChance": "Silicon Carbide Mesh Chance",
   "arcforge.configuration.siliconCarbideMeshSpeed": "Silicon Carbide Mesh Speed",
-  "gui.arcforge.chemical_reactor_array.idle": "Idle"
+  "gui.arcforge.chemical_reactor_array.idle": "Idle",
+  "item.arcforge.tempered_armored_jetpack": "Tempered Armored Jetpack",
+  "item.arcforge.hardened_armored_jetpack": "Hardened Armored Jetpack",
+  "item.arcforge.arcforged_armored_jetpack": "Arcforged Armored Jetpack",
+  "item.arcforge.shock_boots": "Long Fall Boots",
+  "tooltip.arcforge.shock_boots.energy": "%s / %s FE",
+  "message.arcforge.jetpack.mode.distance": "Distance",
+  "arcforge.configuration.jetpackDistanceSpeed": "Jetpack distance speed (per tier)",
+  "tooltip.arcforge.info.armored_jetpack": "A Jetpack with Steel Chestplate protection: 7 armor and 1 toughness. Fill and fly it like a normal Jetpack. Normal / Hover / Distance / Off modes use the Jetpack Mode key. Hold jump in Distance mode for forward thrust; sneak to descend. Upgrade through its armored tier recipes; fuel and settings carry over.",
+  "tooltip.arcforge.info.shock_boots": "Negates all fall damage while worn with at least 1,000 FE. Uses 1,000 FE per damaging landing. Holds 100,000 FE; recharge in a charging slot or on a Chargepad. Craft beside Steel Boots to add armor, preserving stored charge.",
+  "tooltip.arcforge.shock_boots.ready": "Fall protection ready: 1,000 FE per landing",
+  "tooltip.arcforge.shock_boots.empty": "Fall protection needs at least 1,000 FE",
+  "item.arcforge.armored_long_fall_boots": "Armored Long Fall Boots",
+  "tooltip.arcforge.info.armored_long_fall_boots": "Long Fall Boots reinforced with Steel Boots: 2 armor and 1 toughness. Negates all fall damage for 1,000 FE per damaging landing. Holds 100,000 FE; recharge in a charging slot or on a Chargepad. Below 1,000 FE, fall protection stops; armor still works."
 }

@@ -78,6 +78,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         // The box round what this renderer draws (the glows, the tint and the water), or null when it draws nothing.
         @Nullable AABB drawn;
         long scanned;
+        int light;
 
         void set(Model model) {
             parts = model.parts();
@@ -186,10 +187,12 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
             ModelFrame frame = frame(box);
             model = new Built(box, frame, layout(level, vessel, box, frame), ports(level, box, frame));
             model.set(model(frame, model.key, model.ports));
+            model.light = exteriorLight(level, box);
             model.scanned = time;
             built.put(vessel, model);
         } else if (Math.abs(time - model.scanned) >= SCAN_INTERVAL) {
             model.scanned = time;
+            model.light = exteriorLight(level, box);
             Object key = layout(level, vessel, box, model.frame);
             List<ModelMesh.Port> ports = ports(level, box, model.frame);
             if (!Objects.equals(key, model.key) || !ports.equals(model.ports)) {
@@ -200,8 +203,7 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         }
         float[][] parts = model.parts;
         TextureAtlasSprite sheet = SteamBoilerArrayRenderer.sprite(DistillationArrayRenderer.SHEET);
-        // The light just above the box's top middle.
-        int light = LightCoordsUtil.getLightCoords(level, box.centre().atY(box.max().getY() + 1));
+        int light = model.light;
         VesselStructure.Box builtBox = model.box;
         java.util.function.BooleanSupplier stands = () -> vessel.isFormed() && builtBox.equals(vessel.getBox());
         MeshRendering.bake(vessel, MeshRendering.SOLID, min, ChunkSectionLayer.SOLID, parts[0], sheet, light, stands);
@@ -224,6 +226,41 @@ public abstract class VesselRenderer<B extends VesselControllerBlockEntity> impl
         state.cameraX = (float) (cameraPosition.x - min.getX());
         state.cameraY = (float) (cameraPosition.y - min.getY());
         state.cameraZ = (float) (cameraPosition.z - min.getZ());
+    }
+
+    // The model uses one light value. Sample just outside all six faces, so floor and wall lights count indoors too;
+    // a single sample above the roof can be dark (or inside the building's ceiling). Cache this with the layout scan
+    // instead of visiting the whole surface each frame. Keep block light and skylight independently.
+    private static int exteriorLight(Level level, VesselStructure.Box box) {
+        BlockPos min = box.min(), max = box.max();
+        int light = 0;
+        for (Direction face : Direction.values()) {
+            BlockPos from = min.relative(face), to = max.relative(face);
+            switch (face.getAxis()) {
+                case X -> {
+                    int x = face.getStepX() < 0 ? from.getX() : to.getX();
+                    from = new BlockPos(x, min.getY(), min.getZ());
+                    to = new BlockPos(x, max.getY(), max.getZ());
+                }
+                case Y -> {
+                    int y = face.getStepY() < 0 ? from.getY() : to.getY();
+                    from = from.atY(y);
+                    to = to.atY(y);
+                }
+                case Z -> {
+                    int z = face.getStepZ() < 0 ? from.getZ() : to.getZ();
+                    from = new BlockPos(min.getX(), min.getY(), z);
+                    to = new BlockPos(max.getX(), max.getY(), z);
+                }
+            }
+            for (BlockPos pos : BlockPos.betweenClosed(from, to)) {
+                light = LightCoordsUtil.max(light, LightCoordsUtil.getLightCoords(level, pos));
+                if (light == LightCoordsUtil.FULL_BRIGHT) {
+                    return light;
+                }
+            }
+        }
+        return light;
     }
 
     // The ports on the walls' outer faces, in the model's frame.

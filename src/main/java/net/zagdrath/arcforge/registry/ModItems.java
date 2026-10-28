@@ -56,6 +56,7 @@ import net.zagdrath.arcforge.item.tool.DieItem;
 import net.zagdrath.arcforge.item.tool.EngineersHandbookItem;
 import net.zagdrath.arcforge.item.tool.FoundrySuit;
 import net.zagdrath.arcforge.item.tool.JetpackItem;
+import net.zagdrath.arcforge.item.tool.LongFallBootsItem;
 import net.zagdrath.arcforge.item.tool.ModuleType;
 import net.zagdrath.arcforge.item.tool.SettingsCardItem;
 import net.zagdrath.arcforge.item.tool.SteelMaterials;
@@ -186,6 +187,14 @@ public final class ModItems {
     public static final DeferredItem<JetpackItem> TEMPERED_JETPACK = jetpack(ConduitTier.TEMPERED);
     public static final DeferredItem<JetpackItem> HARDENED_JETPACK = jetpack(ConduitTier.HARDENED);
     public static final DeferredItem<JetpackItem> ARCFORGED_JETPACK = jetpack(ConduitTier.ARCFORGED);
+    public static final DeferredItem<JetpackItem> TEMPERED_ARMORED_JETPACK = armoredJetpack(ConduitTier.TEMPERED);
+    public static final DeferredItem<JetpackItem> HARDENED_ARMORED_JETPACK = armoredJetpack(ConduitTier.HARDENED);
+    public static final DeferredItem<JetpackItem> ARCFORGED_ARMORED_JETPACK = armoredJetpack(ConduitTier.ARCFORGED);
+    public static final DeferredItem<LongFallBootsItem> LONG_FALL_BOOTS =
+            // Retain the original registry ID so existing boots keep their stored charge.
+            ITEMS.registerItem("shock_boots", LongFallBootsItem::new);
+    public static final DeferredItem<LongFallBootsItem> ARMORED_LONG_FALL_BOOTS =
+            ITEMS.registerItem("armored_long_fall_boots", p -> new LongFallBootsItem(true, p));
     public static final DeferredItem<ArcToolItem> TEMPERED_ARC_DRILL = arcTool(ConduitTier.TEMPERED, ArcToolItem.Kind.DRILL);
     public static final DeferredItem<ArcToolItem> HARDENED_ARC_DRILL = arcTool(ConduitTier.HARDENED, ArcToolItem.Kind.DRILL);
     public static final DeferredItem<ArcToolItem> ARCFORGED_ARC_DRILL = arcTool(ConduitTier.ARCFORGED, ArcToolItem.Kind.DRILL);
@@ -203,6 +212,10 @@ public final class ModItems {
         return ITEMS.registerItem(tier.getSerializedName() + "_jetpack", p -> new JetpackItem(tier, p));
     }
 
+    private static DeferredItem<JetpackItem> armoredJetpack(ConduitTier tier) {
+        return ITEMS.registerItem(tier.getSerializedName() + "_armored_jetpack", p -> new JetpackItem(tier, true, p));
+    }
+
     private static DeferredItem<ArcToolItem> arcTool(ConduitTier tier, ArcToolItem.Kind kind) {
         return ITEMS.registerItem(tier.getSerializedName() + (kind == ArcToolItem.Kind.DRILL ? "_arc_drill" : "_arc_saw"),
                 p -> new ArcToolItem(tier, kind, p), p -> ArcToolItem.properties(p, tier, kind));
@@ -213,7 +226,8 @@ public final class ModItems {
     }
 
     public static List<DeferredItem<JetpackItem>> jetpacks() {
-        return List.of(TEMPERED_JETPACK, HARDENED_JETPACK, ARCFORGED_JETPACK);
+        return List.of(TEMPERED_JETPACK, HARDENED_JETPACK, ARCFORGED_JETPACK,
+                TEMPERED_ARMORED_JETPACK, HARDENED_ARMORED_JETPACK, ARCFORGED_ARMORED_JETPACK);
     }
 
     public static List<DeferredItem<ArcToolItem>> arcTools() {

@@ -1,0 +1,16 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "BS"
+  ],
+  "key": {
+    "B": "arcforge:shock_boots",
+    "S": "arcforge:steel_boots"
+  },
+  "result": {
+    "id": "arcforge:armored_long_fall_boots",
+    "count": 1
+  },
+  "copy_components_from": "B"
+}

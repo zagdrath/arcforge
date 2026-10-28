@@ -3,6 +3,9 @@
   "values": [
     "arcforge:steel_chestplate",
     "arcforge:foundry_chestplate",
-    "arcforge:hazmat_chestplate"
+    "arcforge:hazmat_chestplate",
+    "arcforge:tempered_armored_jetpack",
+    "arcforge:hardened_armored_jetpack",
+    "arcforge:arcforged_armored_jetpack"
   ]
 }

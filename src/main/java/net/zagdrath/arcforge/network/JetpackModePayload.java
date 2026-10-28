@@ -21,7 +21,7 @@ import net.zagdrath.arcforge.item.tool.JetpackItem;
 import net.zagdrath.arcforge.item.tool.JetpackMode;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 
-// Client to server: the Jetpack Mode key was pressed. Cycles the worn jetpack Normal, Hover, Off.
+// Client to server: the Jetpack Mode key was pressed. Cycles the worn jetpack Normal, Hover, Distance, Off.
 public record JetpackModePayload() implements CustomPacketPayload {
     public static final Type<JetpackModePayload> TYPE = new Type<>(Identifier.fromNamespaceAndPath(Arcforge.MODID, "jetpack_mode"));
     public static final StreamCodec<ByteBuf, JetpackModePayload> STREAM_CODEC = StreamCodec.unit(new JetpackModePayload());

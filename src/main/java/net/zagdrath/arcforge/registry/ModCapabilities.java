@@ -81,6 +81,7 @@ import net.zagdrath.arcforge.item.storage.PortableStorageItem;
 import net.zagdrath.arcforge.item.tool.ArcToolItem;
 import net.zagdrath.arcforge.item.tool.JetpackFluidHandler;
 import net.zagdrath.arcforge.item.tool.JetpackItem;
+import net.zagdrath.arcforge.item.tool.LongFallBootsItem;
 import net.zagdrath.arcforge.multiblock.ArcforgeFurnaceStructure;
 import net.zagdrath.arcforge.multiblock.DistillationStructure;
 import net.zagdrath.arcforge.multiblock.GreenhouseStructure;
@@ -517,6 +518,10 @@ public final class ModCapabilities {
         }
 
         // Jetpacks hold a jetpack fuel gas; Arc Drills and Saws charge like a battery but can't be drained.
+        event.registerItem(Capabilities.Energy.ITEM,
+                (stack, access) -> new ItemAccessEnergyHandler(access, ModDataComponents.ENERGY.get(),
+                        LongFallBootsItem.CAPACITY, LongFallBootsItem.RECEIVE_RATE, 0),
+                ModItems.LONG_FALL_BOOTS.get(), ModItems.ARMORED_LONG_FALL_BOOTS.get());
         for (DeferredItem<JetpackItem> holder : ModItems.jetpacks()) {
             JetpackItem item = holder.get();
             event.registerItem(Capabilities.Fluid.ITEM, (stack, access) -> new JetpackFluidHandler(access, item), item);

@@ -4,7 +4,12 @@
   "items": [
     "arcforge:tempered_jetpack",
     "arcforge:hardened_jetpack",
-    "arcforge:arcforged_jetpack"
+    "arcforge:arcforged_jetpack",
+    "arcforge:tempered_armored_jetpack",
+    "arcforge:hardened_armored_jetpack",
+    "arcforge:arcforged_armored_jetpack",
+    "arcforge:shock_boots",
+    "arcforge:armored_long_fall_boots"
   ],
   "pages": [
     {
@@ -17,11 +22,11 @@
     },
     {
       "type": "text",
-      "text": "# Modes\nPress the Jetpack Mode key (H by default) to cycle:\n- **Normal**: hold jump to rise.\n- **Hover**: holds your altitude and uses 50% more fuel. Jump to rise, sneak to sink. No fall damage.\n- **Off**: the Jetpack does nothing.\nThe gauge beside your hotbar shows fuel and mode. You take no fall damage while the Jetpack is firing."
+      "text": "# Modes\nPress the Jetpack Mode key (H by default) to cycle:\n- **Normal**: hold jump to rise.\n- **Hover**: holds your altitude and uses 50% more fuel. Jump to rise, sneak to sink. No fall damage.\n- **Distance**: hold jump to thrust forward where you face, holding altitude in the air. Sneak while thrusting to descend. Higher tiers travel faster. Uses the normal fuel rate; release jump to coast and fall.\n- **Off**: the Jetpack does nothing.\nThe gauge beside your hotbar shows fuel and mode. You take no fall damage while the Jetpack is firing."
     },
     {
       "type": "text",
-      "text": "# Armored Jetpack\nIn a Smithing Table, put a Steel Plate as the template, the Jetpack, then a Steel Chestplate. The Jetpack gains the chestplate's armor (7 armor, 1 toughness) and keeps it through tier upgrades."
+      "text": "# Armored Jetpack\nCraft a Jetpack beside a Steel Chestplate to make the matching Armored Jetpack (7 armor, 1 toughness). Fuel, mode and custom components carry over. Armored packs have their own items and tier upgrade recipes, using the same materials as normal pack upgrades. Existing plated packs still work.\n# Long Fall Boots\nSteel Boots, a Tempered Battery, 2 Rubber Gaskets and 2 Copper Ingots make Long Fall Boots. They hold 100,000 FE and negate all fall damage for 1,000 FE per damaging landing. With less than 1,000 FE they give no fall protection. Recharge in a charging slot or on a Chargepad.\nCraft Long Fall Boots beside Steel Boots for Armored Long Fall Boots, keeping stored FE and the custom name. The armored variant adds 2 armor and 1 toughness, even while empty. The base variant supplies fall protection without armor."
     }
   ]
 }

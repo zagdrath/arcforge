@@ -28,6 +28,16 @@ machines and Settings Cards carry over).
 
 ### Added
 
+- **Armored Jetpack items.** Craft any tier's Jetpack beside a Steel Chestplate to make its Armored Jetpack, preserving
+  fuel and settings. Each armored tier has its own item and upgrade recipe; existing plated jetpacks still work.
+- **Long Fall Boots.** Steel Boots, a Tempered Battery, two Rubber Gaskets and two Copper Ingots make boots that store
+  100,000 FE and cancel all fall damage for 1,000 FE per damaging landing. Recharge them in a charging slot or on a
+  Chargepad. Below 1,000 FE they provide no fall protection. Craft them beside Steel Boots for Armored Long Fall Boots,
+  preserving charge and the custom name. The armored variant adds 2 armor and 1 toughness; the base variant has no armor.
+- **Jetpack Distance mode.** Cycle Normal, Hover, Distance and Off with the mode key. Hold jump to thrust forward at
+  up to 0.8/1.1/1.4 blocks per tick by tier, holding altitude in the air; sneak to descend. Uses the normal fuel rate.
+- **Vanilla sulfur crushing.** The Arc Crusher and Arc Crushing Array turn Sulfur into 2 Sulfur Dust and Potent Sulfur
+  into 4, taking 200 ticks per operation without an ore multiplier.
 - **Chemical Reactor Array.** A 3x3x3 cube of Chemical Reactor Array Casings (Hardened Alloy, nickel plates, glass and a
   Chemical Reactor make four), formed and given ports with the Wrench like the other arrays. It runs every
   `arcforge:chemical_reacting` recipe in three lanes at once, each twice as fast as a Chemical Reactor for 80% of the FE an
@@ -166,6 +176,9 @@ machines and Settings Cards carry over).
 
 ### Fixed
 
+- The Fission Reactor, Steam Generator and Heavy Water Tower models now sample light around all six exterior faces,
+  so floor and wall lighting illuminates them indoors even when the space above the vessel is dark.
+- Greenhouse Frames now require a Glass Pane in the center, resolving their recipe conflict with Derrick Casings.
 - The Chemical Reactor Array's formed casings drew as the missing model: the shape their port collars stop at
   (`chemical_reactor_array/shape`) had boxes with no faces, which Minecraft 26.3 won't load.
 - Holding Shift while the creative inventory's search was being built threw an error ("Rendersystem called from wrong

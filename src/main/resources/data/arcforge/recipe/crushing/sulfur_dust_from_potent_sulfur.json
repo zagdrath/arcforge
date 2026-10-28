@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "minecraft:potent_sulfur",
+  "result": {
+    "count": 4,
+    "id": "arcforge:sulfur_dust"
+  },
+  "time": 200,
+  "ore": false
+}

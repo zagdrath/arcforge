@@ -254,7 +254,7 @@ public final class ModRecipes {
     public static final Supplier<RecipeSerializer<ConduitDyeingRecipe>> CONDUIT_DYEING_SERIALIZER = RECIPE_SERIALIZERS.register("conduit_dyeing",
             () -> new RecipeSerializer<>(ConduitDyeingRecipe.MAP_CODEC, ConduitDyeingRecipe.STREAM_CODEC));
 
-    // Smithing a Steel Chestplate onto a Jetpack (a smithing recipe, so it has no type of its own).
+    // Legacy serializer retained for existing data packs. Built-in armored jetpacks use crafting recipes.
     public static final Supplier<RecipeSerializer<JetpackPlatingRecipe>> JETPACK_PLATING_SERIALIZER = RECIPE_SERIALIZERS.register("jetpack_plating",
             () -> new RecipeSerializer<>(JetpackPlatingRecipe.MAP_CODEC, JetpackPlatingRecipe.STREAM_CODEC));
 

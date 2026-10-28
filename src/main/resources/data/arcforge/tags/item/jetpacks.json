@@ -3,6 +3,9 @@
   "values": [
     "arcforge:tempered_jetpack",
     "arcforge:hardened_jetpack",
-    "arcforge:arcforged_jetpack"
+    "arcforge:arcforged_jetpack",
+    "arcforge:tempered_armored_jetpack",
+    "arcforge:hardened_armored_jetpack",
+    "arcforge:arcforged_armored_jetpack"
   ]
 }

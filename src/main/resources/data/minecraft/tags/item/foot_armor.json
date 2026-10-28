@@ -3,6 +3,8 @@
   "values": [
     "arcforge:steel_boots",
     "arcforge:foundry_boots",
-    "arcforge:hazmat_boots"
+    "arcforge:hazmat_boots",
+    "arcforge:shock_boots",
+    "arcforge:armored_long_fall_boots"
   ]
 }

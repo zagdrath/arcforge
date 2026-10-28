@@ -1,0 +1,16 @@
+{
+  "type": "arcforge:tier_upgrade",
+  "category": "equipment",
+  "pattern": [
+    "JC"
+  ],
+  "key": {
+    "J": "arcforge:hardened_jetpack",
+    "C": "arcforge:steel_chestplate"
+  },
+  "result": {
+    "id": "arcforge:hardened_armored_jetpack",
+    "count": 1
+  },
+  "copy_components_from": "J"
+}

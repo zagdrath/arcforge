@@ -34,8 +34,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.component.ItemAttributeModifiers;
 import net.minecraft.world.item.crafting.RecipeHolder;
-import net.minecraft.world.item.crafting.SmithingRecipe;
-import net.minecraft.world.item.crafting.SmithingRecipeInput;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -275,21 +273,15 @@ public final class ArcToolGameTests {
     static void tierUpgradeKeepsContents(GameTestHelper helper) {
         ItemStack tempered = jetpack(ModItems.TEMPERED_JETPACK.get(), ModFluids.HYDROGEN.get(), 10_000);
         tempered.set(ModDataComponents.JETPACK_MODE.get(), JetpackMode.HOVER);
-        RecipeHolder<?> plating = helper.getLevel().recipeAccess().recipeMap()
-                .byKey(ResourceKey.create(Registries.RECIPE, Identifier.fromNamespaceAndPath(Arcforge.MODID, "smithing/jetpack_plating")));
-        helper.assertTrue(plating != null && plating.value() instanceof SmithingRecipe, "No jetpack plating smithing recipe");
-        SmithingRecipeInput smithing = new SmithingRecipeInput(new ItemStack(ModItems.STEEL_PLATE.get()), tempered, new ItemStack(ModItems.STEEL_CHESTPLATE.get()));
-        SmithingRecipe recipe = (SmithingRecipe) plating.value();
-        helper.assertTrue(recipe.matches(smithing, helper.getLevel()), "Plating doesn't match a Tempered Jetpack and a Steel Chestplate");
-        ItemStack plated = recipe.assemble(smithing);
-        helper.assertFalse(recipe.matches(new SmithingRecipeInput(new ItemStack(ModItems.STEEL_PLATE.get()), plated,
-                new ItemStack(ModItems.STEEL_CHESTPLATE.get())), helper.getLevel()), "A plated jetpack can be plated again");
+        ItemStack plated = AlloyGameTests.craft(helper, "crafting/tempered_armored_jetpack", new String[] { "JC ", "   ", "   " }, Map.of(
+                'J', tempered, 'C', new ItemStack(ModItems.STEEL_CHESTPLATE.get())));
+        helper.assertTrue(plated.is(ModItems.TEMPERED_ARMORED_JETPACK.get()), "Crafting did not create the armored item");
 
-        ItemStack hardened = AlloyGameTests.craft(helper, "crafting/hardened_jetpack", new String[] { "PGP", "AXA", "PEP" }, Map.of(
+        ItemStack hardened = AlloyGameTests.craft(helper, "crafting/hardened_armored_jetpack_upgrade", new String[] { "PGP", "AXA", "PEP" }, Map.of(
                 'P', new ItemStack(ModItems.PLASTIC_SHEET.get()), 'G', new ItemStack(ModItems.RUBBER_GASKET.get()),
                 'A', new ItemStack(ModItems.HARDENED_ALLOY.get()), 'X', plated,
                 'E', new ItemStack(ModItems.portable(PortableStorageItem.Kind.GAS_CARTRIDGE, ConduitTier.HARDENED))));
-        helper.assertTrue(hardened.is(ModItems.HARDENED_JETPACK.get()), "Didn't make a Hardened Jetpack");
+        helper.assertTrue(hardened.is(ModItems.HARDENED_ARMORED_JETPACK.get()), "Didn't make a Hardened Jetpack");
         FluidStack gas = JetpackItem.fluid(hardened);
         helper.assertTrue(gas.is(ModFluids.HYDROGEN.get()) && gas.getAmount() == 10_000, "Gas lost: " + gas.getAmount());
         helper.assertTrue(JetpackItem.isPlated(hardened), "Plating lost");
@@ -309,6 +301,112 @@ public final class ArcToolGameTests {
         helper.assertTrue(ArcToolItem.energy(upgradedDrill) == 55_555, "FE lost: " + ArcToolItem.energy(upgradedDrill));
         helper.assertTrue(ArcToolItem.modules(upgradedDrill).equals(before), "Modules changed: " + ArcToolItem.modules(upgradedDrill));
         helper.assertTrue(((ArcToolItem) upgradedDrill.getItem()).moduleSlots() == 3, "A Hardened drill has " + ((ArcToolItem) upgradedDrill.getItem()).moduleSlots() + " slots");
+        helper.succeed();
+    }
+
+    // Each tier crafts a distinct armored item and keeps its fuel, name and mode.
+    static void armoredJetpackItems(GameTestHelper helper) {
+        for (var holder : ModItems.jetpacks()) {
+            JetpackItem pack = holder.get();
+            if (pack.armored()) {
+                ItemStack defaults = pack.getDefaultInstance();
+                helper.assertTrue(JetpackItem.isPlated(defaults), "Creative armored pack has no plating");
+                ServerPlayer wearer = wearer(helper, defaults);
+                wearer.doTick();
+                helper.assertTrue(wearer.getAttributeValue(Attributes.ARMOR) == 7, "Armored pack has no chest armor");
+                helper.assertTrue(wearer.getAttributeValue(Attributes.ARMOR_TOUGHNESS) == 1, "Armored pack has no toughness");
+                continue;
+            }
+            ItemStack base = jetpack(pack, ModFluids.HYDROGEN.get(), 1_000);
+            base.set(ModDataComponents.JETPACK_MODE.get(), JetpackMode.DISTANCE);
+            base.set(DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("My pack"));
+            String tier = pack.tier().getSerializedName();
+            ItemStack result = AlloyGameTests.craft(helper, "crafting/" + tier + "_armored_jetpack",
+                    new String[] { "JC ", "   ", "   " }, Map.of('J', base, 'C', new ItemStack(ModItems.STEEL_CHESTPLATE.get())));
+            helper.assertTrue(result.getItem() instanceof JetpackItem armored && armored.armored() && armored.tier() == pack.tier(), "Wrong armored tier");
+            helper.assertTrue(JetpackItem.fluid(result).getAmount() == 1_000 && JetpackItem.mode(result) == JetpackMode.DISTANCE, "Lost fuel or mode");
+            helper.assertTrue(result.getHoverName().getString().equals("My pack"), "Lost custom name");
+        }
+        helper.succeed();
+    }
+
+    static void jetpackDistanceMode(GameTestHelper helper) {
+        helper.assertTrue(JetpackMode.NORMAL.next() == JetpackMode.HOVER && JetpackMode.HOVER.next() == JetpackMode.DISTANCE
+                && JetpackMode.DISTANCE.next() == JetpackMode.OFF && JetpackMode.OFF.next() == JetpackMode.NORMAL, "Mode cycle is wrong");
+        for (var holder : ModItems.jetpacks()) {
+            JetpackItem pack = holder.get();
+            ItemStack stack = jetpack(pack, ModFluids.HYDROGEN.get(), 1_000);
+            stack.set(ModDataComponents.JETPACK_MODE.get(), JetpackMode.DISTANCE);
+            ServerPlayer player = wearer(helper, stack);
+            player.setYRot(90.0F);
+            player.setDeltaMovement(0, -0.4, 0);
+            player.fallDistance = 20;
+            JetpackFlight.setInput(player, true, false);
+            for (int tick = 0; tick < 40; tick++) {
+                JetpackFlight.serverTick(player);
+            }
+            var motion = player.getDeltaMovement();
+            double limit = ArcforgeConfig.perTierDouble(ArcforgeConfig.JETPACK_DISTANCE_SPEED, JetpackItem.tierIndex(pack.tier()));
+            helper.assertTrue(motion.x < 0 && Math.abs(motion.z) < 0.001 && Math.abs(motion.y) < 0.001, "Distance mode did not fly level toward yaw");
+            helper.assertTrue(Math.abs(motion.horizontalDistance() - limit) < 0.001, "Distance speed is not capped at " + limit);
+            helper.assertTrue(player.fallDistance == 0, "Distance mode did not clear fall distance");
+            int remaining = JetpackItem.fluid(stack).getAmount();
+            helper.assertTrue(remaining == 1_000 - 40 * JetpackFuel.of(ModFluids.HYDROGEN.get()).mbPerTick(), "Wrong distance fuel cost");
+            JetpackFlight.setInput(player, false, false);
+            JetpackFlight.serverTick(player);
+            helper.assertTrue(JetpackItem.fluid(stack).getAmount() == remaining, "Distance mode burned fuel with jump released");
+            JetpackFlight.setInput(player, true, true);
+            JetpackFlight.serverTick(player);
+            helper.assertTrue(player.getDeltaMovement().y < 0, "Sneak did not descend in Distance mode");
+            JetpackItem.setFluid(stack, FluidStack.EMPTY);
+            var before = player.getDeltaMovement();
+            JetpackFlight.serverTick(player);
+            helper.assertTrue(player.getDeltaMovement().equals(before), "An empty Distance pack thrust");
+            JetpackFlight.forget(player);
+        }
+        helper.succeed();
+    }
+
+    static void longFallBootsLandingAndCharging(GameTestHelper helper) {
+        for (var item : List.of(ModItems.LONG_FALL_BOOTS, ModItems.ARMORED_LONG_FALL_BOOTS)) {
+            ItemStack boots = new ItemStack(item.get());
+            var handler = net.neoforged.neoforge.transfer.access.ItemAccess.forStack(boots)
+                    .getCapability(net.neoforged.neoforge.capabilities.Capabilities.Energy.ITEM);
+            helper.assertTrue(handler != null, "Boots have no FE charging capability");
+            try (Transaction transaction = Transaction.openRoot()) {
+                int inserted = handler.insert(2_000, transaction);
+                helper.assertTrue(inserted == 2_000, "Boots did not charge");
+                transaction.commit();
+            }
+            helper.assertTrue(ArcToolItem.energy(boots) == 2_000, "Charge did not reach the item");
+            ServerPlayer player = player(helper, new BlockPos(1, 3, 1));
+            player.setItemSlot(EquipmentSlot.FEET, boots);
+            player.connection.markClientLoaded();
+            player.doTick();
+            helper.assertTrue(player.getAttributeValue(Attributes.ARMOR) == (item.get().armored() ? 2 : 0), "Wrong boots armor");
+            helper.assertTrue(player.getAttributeValue(Attributes.ARMOR_TOUGHNESS) == (item.get().armored() ? 1 : 0), "Wrong boots toughness");
+            float health = player.getHealth();
+            player.hurtServer(helper.getLevel(), player.damageSources().fall(), 100.0F);
+            helper.assertTrue(player.getHealth() == health && ArcToolItem.energy(boots) == 1_000, "Charged boots did not cancel a lethal fall for 1,000 FE");
+            player.hurtServer(helper.getLevel(), player.damageSources().fall(), 100.0F);
+            helper.assertTrue(player.getHealth() == health && ArcToolItem.energy(boots) == 0, "The last full charge did not cancel a fall");
+            ArcToolItem.setEnergy(boots, 999);
+            player.hurtServer(helper.getLevel(), player.damageSources().fall(), 4.0F);
+            helper.assertTrue(player.getHealth() < health && ArcToolItem.energy(boots) == 999, "Undercharged boots canceled damage or spent partial charge");
+            ArcToolItem.setEnergy(boots, 2_000);
+            helper.assertFalse(net.zagdrath.arcforge.item.tool.LongFallBootsItem.absorb(player, player.damageSources().generic(), 4), "Boots canceled non-fall damage");
+            helper.assertTrue(ArcToolItem.energy(boots) == 2_000, "Non-fall damage cost FE");
+            player.setItemSlot(EquipmentSlot.FEET, ItemStack.EMPTY);
+            helper.assertFalse(net.zagdrath.arcforge.item.tool.LongFallBootsItem.absorb(player, player.damageSources().fall(), 100), "Unequipped boots protected the player");
+        }
+        ItemStack base = new ItemStack(ModItems.LONG_FALL_BOOTS.get());
+        ArcToolItem.setEnergy(base, 42_000);
+        base.set(DataComponents.CUSTOM_NAME, net.minecraft.network.chat.Component.literal("Long way down"));
+        ItemStack upgraded = AlloyGameTests.craft(helper, "crafting/armored_long_fall_boots",
+                new String[] { "BS ", "   ", "   " }, Map.of('B', base, 'S', new ItemStack(ModItems.STEEL_BOOTS.get())));
+        helper.assertTrue(upgraded.is(ModItems.ARMORED_LONG_FALL_BOOTS.get()), "Wrong armored boots result");
+        helper.assertTrue(ArcToolItem.energy(upgraded) == 42_000, "Armoring lost stored FE");
+        helper.assertTrue(upgraded.getHoverName().getString().equals("Long way down"), "Armoring lost custom name");
         helper.succeed();
     }
 

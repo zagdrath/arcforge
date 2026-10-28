@@ -40,6 +40,7 @@ import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.client.sound.JetpackSound;
 import net.zagdrath.arcforge.item.tool.JetpackFlight;
 import net.zagdrath.arcforge.item.tool.JetpackItem;
+import net.zagdrath.arcforge.item.tool.JetpackMode;
 import net.zagdrath.arcforge.network.JetpackInputPayload;
 import net.zagdrath.arcforge.network.JetpackModePayload;
 import net.zagdrath.arcforge.network.JetpackStatePayload;
@@ -214,8 +215,12 @@ public final class JetpackClient {
             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("fill_" + fillName(fluid.getFluid())), FILL_W, FILL_H, 0, FILL_H - fill,
                     x + 2, y + 2 + FILL_H - fill, FILL_W, fill);
         }
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("mode_" + JetpackItem.mode(stack).getSerializedName()),
-                x + (GAUGE_W - MODE_SIZE) / 2, y - 9, MODE_SIZE, MODE_SIZE);
+        if (JetpackItem.mode(stack) == JetpackMode.DISTANCE) {
+            graphics.text(Minecraft.getInstance().font, ">>", x + (GAUGE_W - 12) / 2, y - 9, 0xFF5FD4C4, true);
+        } else {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, sprite("mode_" + JetpackItem.mode(stack).getSerializedName()),
+                    x + (GAUGE_W - MODE_SIZE) / 2, y - 9, MODE_SIZE, MODE_SIZE);
+        }
     }
 
     private static String fillName(Fluid fluid) {
