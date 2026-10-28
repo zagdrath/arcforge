@@ -102,9 +102,9 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
     protected void drawText(GuiGraphicsExtractor graphics) {
         Component ratio = ratio();
         if (ratio != null) {
-            graphics.text(font, ratio, TEXT_X, RATIO_Y, ArcforgeGui.LABEL, false);
-            graphics.text(font, Component.translatable("gui.arcforge.electrolyzer.cost",
-                    ArcforgeGui.grouped(perPrimary(menu.getCost()))), TEXT_X, COST_Y, ArcforgeGui.LABEL, false);
+            graphics.text(font, clipped(ratio, TEXT_W), TEXT_X, RATIO_Y, ArcforgeGui.LABEL, false);
+            graphics.text(font, clipped(Component.literal(ArcforgeGui.grouped(perPrimary(menu.getCost()))), TEXT_W), TEXT_X, COST_Y, ArcforgeGui.LABEL, false);
+            graphics.text(font, Component.literal("FE/mB"), TEXT_X, COST_Y + 10, ArcforgeGui.LABEL, false);
         }
         graphics.text(font, clipped(menu.getStatus().getDescription(), STATUS_W), STATUS_X, STATUS_Y, ArcforgeGui.TEXT, false);
     }
@@ -173,7 +173,12 @@ public class ElectrolyzerScreen extends MachineScreen<ElectrolyzerMenu> {
                     menu.getLiquidCapacity());
             return;
         }
-        if (menu.getRecipePrimary() > 0 && isHovering(TEXT_X, COST_Y - 1, TEXT_W, font.lineHeight + 1, mouseX, mouseY)) {
+        if (ratio() != null && isHovering(TEXT_X, RATIO_Y - 1, TEXT_W, font.lineHeight + 1, mouseX, mouseY)) {
+            lines.add(ratio());
+            return;
+        }
+        if (menu.getRecipePrimary() > 0 && isHovering(TEXT_X, COST_Y - 1, TEXT_W, 2 * font.lineHeight + 2, mouseX, mouseY)) {
+            lines.add(Component.translatable("gui.arcforge.electrolyzer.cost", ArcforgeGui.grouped(perPrimary(menu.getCost()))));
             lines.add(Component.translatable("gui.arcforge.electrolyzer.cost.hint", ArcforgeGui.grouped(perPrimary(menu.getFloor())))
                     .withStyle(ChatFormatting.GRAY));
             return;

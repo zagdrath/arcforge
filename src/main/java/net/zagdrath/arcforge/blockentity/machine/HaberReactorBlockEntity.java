@@ -104,6 +104,7 @@ public class HaberReactorBlockEntity extends MachineBlockEntity implements Fluid
         this.inputA = new FilteredFluidTank(capacity, resource -> Gases.isGas(resource) && MachineRecipes.isSynthesizingInput(level, resource), this::setChanged);
         this.inputB = new FilteredFluidTank(capacity, resource -> Gases.isGas(resource) && MachineRecipes.isSynthesizingInput(level, resource), this::setChanged);
         this.output = new FilteredFluidTank(capacity, Gases::isGas, this::setChanged);
+        gasVents.add(output, net.zagdrath.arcforge.registry.ModFluids.AMMONIA.get());
         this.router = new InputTankRouter(inputA, inputB);
         this.gasInput = new AutomationResourceHandler<>(router, index -> true, index -> false);
         this.gasOutput = new AutomationResourceHandler<>(output, index -> false, index -> true);

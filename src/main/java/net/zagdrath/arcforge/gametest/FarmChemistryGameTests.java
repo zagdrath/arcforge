@@ -85,6 +85,8 @@ public final class FarmChemistryGameTests {
                 .thenExecute(() -> {
                     helper.assertTrue(separator.getNitrogen().getAmount() == separator.getNitrogen().getCapacity(), "The Nitrogen overflowed its tank");
                     SteamGameTests.fill(separator.getOxygen(), fluid(ModFluids.OXYGEN.get()), separator.getOxygen().getCapacity());
+                    separator.gasVents.toggle(0);
+                    separator.gasVents.toggle(1);
                 })
                 .thenIdle(2)
                 .thenExecute(() -> helper.assertTrue(separator.getStatus() == MachineStatus.OUTPUT_FULL, "Both full, it's " + separator.getStatus()))

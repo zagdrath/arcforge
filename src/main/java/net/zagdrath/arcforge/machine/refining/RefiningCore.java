@@ -139,6 +139,13 @@ public final class RefiningCore {
                 : new CombinedResourceHandler<>(allOutputs, feedInput);
     }
 
+    public void registerVents(net.zagdrath.arcforge.machine.GasVents vents) {
+        for (int i = 0; i < products.length; i++) {
+            Fluid fluid = process.products().get(i);
+            if (Gases.isGas(FluidResource.of(fluid))) vents.add(products[i], fluid);
+        }
+    }
+
     public RefiningProcess process() {
         return process;
     }
@@ -243,7 +250,7 @@ public final class RefiningCore {
                 return false;
             }
             FilteredFluidTank tank = products[i];
-            if (tank.getAmount() > 0 && tank.getResource(0).getFluid() != out.fluid().value() || tank.getSpace() < out.amount()) {
+            if (!tank.canVent(FluidResource.of(out.fluid().value())) && (tank.getAmount() > 0 && tank.getResource(0).getFluid() != out.fluid().value() || tank.getSpace() < out.amount())) {
                 return false;
             }
         }

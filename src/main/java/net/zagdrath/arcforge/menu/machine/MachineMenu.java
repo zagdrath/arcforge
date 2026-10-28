@@ -61,6 +61,7 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
     private int machineSlots;
     // The "Limited by connections" warning of producers (OutputLimited); zeros for every other machine.
     private ContainerData outputLimit = OutputLimit.emptyData();
+    private ContainerData gasVents = WideIntContainerData.client(net.zagdrath.arcforge.machine.GasVents.VALUES);
 
     protected MachineMenu(MenuType<?> type, int containerId, Inventory inventory, BlockPos pos, MachineItemHandler items,
             ContainerData data, int dataValues, Block block) {
@@ -141,6 +142,18 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
             outputLimit = limited.getOutputLimit().data(inventory.player.level()::getGameTime);
         }
         addDataSlots(outputLimit);
+        if (!inventory.player.level().isClientSide() && inventory.player.level().getBlockEntity(pos) instanceof MachineBlockEntity machine) {
+            gasVents = machine.gasVents.data();
+        }
+        addDataSlots(gasVents);
+    }
+
+    public int ventCount() { return WideIntContainerData.read(gasVents, 0); }
+
+    public boolean ventEnabled(int index) { return (WideIntContainerData.read(gasVents, 1) & (1 << index)) != 0; }
+
+    public net.minecraft.world.level.material.Fluid ventFluid(int index) {
+        return net.minecraft.core.registries.BuiltInRegistries.FLUID.byId(WideIntContainerData.read(gasVents, 2 + index));
     }
 
     // The warning to show, or null when the machine isn't held back (or doesn't give anything out).

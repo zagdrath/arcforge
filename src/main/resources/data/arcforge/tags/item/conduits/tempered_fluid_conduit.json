@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:tempered_fluid_conduit",
+    "arcforge:white_tempered_fluid_conduit",
+    "arcforge:orange_tempered_fluid_conduit",
+    "arcforge:magenta_tempered_fluid_conduit",
+    "arcforge:light_blue_tempered_fluid_conduit",
+    "arcforge:yellow_tempered_fluid_conduit",
+    "arcforge:lime_tempered_fluid_conduit",
+    "arcforge:pink_tempered_fluid_conduit",
+    "arcforge:gray_tempered_fluid_conduit",
+    "arcforge:light_gray_tempered_fluid_conduit",
+    "arcforge:cyan_tempered_fluid_conduit",
+    "arcforge:purple_tempered_fluid_conduit",
+    "arcforge:blue_tempered_fluid_conduit",
+    "arcforge:brown_tempered_fluid_conduit",
+    "arcforge:green_tempered_fluid_conduit",
+    "arcforge:red_tempered_fluid_conduit",
+    "arcforge:black_tempered_fluid_conduit"
+  ]
+}

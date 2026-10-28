@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:wrought_energy_conduit",
+    "arcforge:white_wrought_energy_conduit",
+    "arcforge:orange_wrought_energy_conduit",
+    "arcforge:magenta_wrought_energy_conduit",
+    "arcforge:light_blue_wrought_energy_conduit",
+    "arcforge:yellow_wrought_energy_conduit",
+    "arcforge:lime_wrought_energy_conduit",
+    "arcforge:pink_wrought_energy_conduit",
+    "arcforge:gray_wrought_energy_conduit",
+    "arcforge:light_gray_wrought_energy_conduit",
+    "arcforge:cyan_wrought_energy_conduit",
+    "arcforge:purple_wrought_energy_conduit",
+    "arcforge:blue_wrought_energy_conduit",
+    "arcforge:brown_wrought_energy_conduit",
+    "arcforge:green_wrought_energy_conduit",
+    "arcforge:red_wrought_energy_conduit",
+    "arcforge:black_wrought_energy_conduit"
+  ]
+}

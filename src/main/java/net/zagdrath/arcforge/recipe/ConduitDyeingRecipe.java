@@ -47,7 +47,7 @@ public class ConduitDyeingRecipe extends CustomRecipe {
                 continue;
             }
             if (stack.getItem() instanceof ConduitBlockItem) {
-                if (!conduit.isEmpty() && !stack.is(conduit.getItem())) {
+                if (!conduit.isEmpty() && ((ConduitBlockItem) stack.getItem()).getBlock() != ((ConduitBlockItem) conduit.getItem()).getBlock()) {
                     return null;
                 }
                 conduit = stack;
@@ -81,7 +81,7 @@ public class ConduitDyeingRecipe extends CustomRecipe {
     // Stripping needs every conduit in the grid to be sheathed.
     private static boolean sheathed(CraftingInput input) {
         for (ItemStack stack : input.items()) {
-            if (stack.getItem() instanceof ConduitBlockItem && !stack.has(ModDataComponents.CONDUIT_COLOR.get())) {
+            if (stack.getItem() instanceof ConduitBlockItem && ConduitBlockItem.color(stack) == null) {
                 return false;
             }
         }
@@ -94,13 +94,7 @@ public class ConduitDyeingRecipe extends CustomRecipe {
         if (parts == null) {
             return ItemStack.EMPTY;
         }
-        ItemStack result = parts.conduit().copyWithCount(parts.count());
-        if (parts.dye() != null) {
-            result.set(ModDataComponents.CONDUIT_COLOR.get(), parts.dye());
-        } else {
-            result.remove(ModDataComponents.CONDUIT_COLOR.get());
-        }
-        return result;
+        return ConduitBlockItem.recolor(parts.conduit().copyWithCount(parts.count()), parts.dye());
     }
 
     @Override

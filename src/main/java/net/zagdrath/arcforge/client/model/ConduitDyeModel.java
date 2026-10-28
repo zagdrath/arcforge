@@ -156,7 +156,7 @@ public final class ConduitDyeModel {
 
         @Override
         public int calculate(ItemStack stack, @Nullable ClientLevel level, @Nullable LivingEntity owner) {
-            DyeColor color = stack.get(ModDataComponents.CONDUIT_COLOR.get());
+            DyeColor color = net.zagdrath.arcforge.item.conduit.ConduitBlockItem.color(stack);
             return color != null ? color.getTextureDiffuseColor() | 0xFF000000 : defaultColor;
         }
 

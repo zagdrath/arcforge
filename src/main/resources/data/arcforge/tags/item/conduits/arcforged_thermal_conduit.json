@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:arcforged_thermal_conduit",
+    "arcforge:white_arcforged_thermal_conduit",
+    "arcforge:orange_arcforged_thermal_conduit",
+    "arcforge:magenta_arcforged_thermal_conduit",
+    "arcforge:light_blue_arcforged_thermal_conduit",
+    "arcforge:yellow_arcforged_thermal_conduit",
+    "arcforge:lime_arcforged_thermal_conduit",
+    "arcforge:pink_arcforged_thermal_conduit",
+    "arcforge:gray_arcforged_thermal_conduit",
+    "arcforge:light_gray_arcforged_thermal_conduit",
+    "arcforge:cyan_arcforged_thermal_conduit",
+    "arcforge:purple_arcforged_thermal_conduit",
+    "arcforge:blue_arcforged_thermal_conduit",
+    "arcforge:brown_arcforged_thermal_conduit",
+    "arcforge:green_arcforged_thermal_conduit",
+    "arcforge:red_arcforged_thermal_conduit",
+    "arcforge:black_arcforged_thermal_conduit"
+  ]
+}

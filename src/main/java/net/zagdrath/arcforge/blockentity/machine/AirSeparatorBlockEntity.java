@@ -95,6 +95,8 @@ public class AirSeparatorBlockEntity extends MachineBlockEntity implements Fluid
         int capacity = ArcforgeConfig.AIR_SEPARATOR_GAS_CAPACITY.getAsInt();
         this.nitrogen = new FilteredFluidTank(capacity, Gases::isGas, this::setChanged);
         this.oxygen = new FilteredFluidTank(capacity, Gases::isGas, this::setChanged);
+        gasVents.add(nitrogen, net.zagdrath.arcforge.registry.ModFluids.NITROGEN.get(), true);
+        gasVents.add(oxygen, net.zagdrath.arcforge.registry.ModFluids.OXYGEN.get(), true);
         this.nitrogenOutput = new AutomationResourceHandler<>(nitrogen, index -> false, index -> true);
         this.oxygenOutput = new AutomationResourceHandler<>(oxygen, index -> false, index -> true);
         this.fluidAll = new CombinedResourceHandler<>(nitrogenOutput, oxygenOutput);
@@ -195,10 +197,9 @@ public class AirSeparatorBlockEntity extends MachineBlockEntity implements Fluid
 
     // Whether any of an operation's gas has somewhere to go: it only stops when neither tank can take any.
     private boolean hasRoom(AirSeparatingRecipe recipe) {
-        if (room(nitrogen, recipe.primary().create()) > 0) {
-            return true;
-        }
-        return recipe.secondary().isPresent() && room(oxygen, recipe.secondary().get().create()) > 0;
+        FluidStack primary = recipe.primary().create();
+        if (room(nitrogen, primary) < primary.getAmount()) return false;
+        return recipe.secondary().isEmpty() || room(oxygen, recipe.secondary().get().create()) >= recipe.secondary().get().amount();
     }
 
     private static int room(FilteredFluidTank tank, FluidStack fluid) {
@@ -213,12 +214,16 @@ public class AirSeparatorBlockEntity extends MachineBlockEntity implements Fluid
         List<FluidStack> kept = new ArrayList<>();
         try (Transaction tx = Transaction.openRoot()) {
             FluidStack primary = recipe.primary().create();
-            int primaryKept = nitrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx);
+            int before = nitrogen.getAmount();
+            nitrogen.insert(0, FluidResource.of(primary), primary.getAmount(), tx);
+            int primaryKept = nitrogen.getAmount() - before;
             vented += primary.getAmount() - primaryKept;
             kept.add(primary.copyWithAmount(primaryKept));
             if (recipe.secondary().isPresent()) {
                 FluidStack secondary = recipe.secondary().get().create();
-                int secondaryKept = oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
+                int secondaryBefore = oxygen.getAmount();
+                oxygen.insert(0, FluidResource.of(secondary), secondary.getAmount(), tx);
+                int secondaryKept = oxygen.getAmount() - secondaryBefore;
                 vented += secondary.getAmount() - secondaryKept;
                 kept.add(secondary.copyWithAmount(secondaryKept));
             }

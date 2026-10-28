@@ -28,6 +28,13 @@ machines and Settings Cards carry over).
 
 ### Added
 
+- **Gas output vent controls.** A Vents tab provides individual overflow toggles for refinery units, the Steam Cracker,
+  chemical reactors and arrays, the Gasifier, Haber Reactor, Distillation Array, Biogas Digester, Air Separator and
+  Fermenter. Vents discard excess gas while keeping the stored buffer; liquid outputs still require room. Settings
+  persist with the machine and copy through Settings Cards. Air Separator and Fermenter vents start enabled.
+- **Separate dyed conduit items.** All sixteen colors have registered items for every conduit type and tier. Dyeing,
+  washing, placement, mining, pick block and tier upgrades preserve the appropriate item. Older component-colored
+  stacks remain usable; tier upgrades require matching colors.
 - **Included Curios API and Jetpack slot.** Jetpacks work in a dedicated accessory slot alongside chest armor, with
   their existing modes, controls, HUD, sound and worn model. Curios is embedded in the release jar; this requires
   NeoForge 26.3.0.37-beta or newer. The development JEI dependency is updated for that NeoForge version.
@@ -185,6 +192,8 @@ machines and Settings Cards carry over).
 
 ### Fixed
 
+- **Crowded machine labels.** Removed the Chemical Reactor's inventory label from its status row and split the
+  Electrolyzer's energy cost into a value and units, bounded to the available space, with complete values in tooltips.
 - Hazmat chestplates cover the full arm with sleeves and black gloves; Hazmat Boots have black rubber lower boots.
   These model additions reuse the existing suit palette and follow the wearer's limbs.
 - Arc Quarry scans clamp saved areas to the current dimension and skip out-of-height positions before indexing chunk

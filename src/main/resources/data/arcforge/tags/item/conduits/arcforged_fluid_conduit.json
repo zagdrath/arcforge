@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:arcforged_fluid_conduit",
+    "arcforge:white_arcforged_fluid_conduit",
+    "arcforge:orange_arcforged_fluid_conduit",
+    "arcforge:magenta_arcforged_fluid_conduit",
+    "arcforge:light_blue_arcforged_fluid_conduit",
+    "arcforge:yellow_arcforged_fluid_conduit",
+    "arcforge:lime_arcforged_fluid_conduit",
+    "arcforge:pink_arcforged_fluid_conduit",
+    "arcforge:gray_arcforged_fluid_conduit",
+    "arcforge:light_gray_arcforged_fluid_conduit",
+    "arcforge:cyan_arcforged_fluid_conduit",
+    "arcforge:purple_arcforged_fluid_conduit",
+    "arcforge:blue_arcforged_fluid_conduit",
+    "arcforge:brown_arcforged_fluid_conduit",
+    "arcforge:green_arcforged_fluid_conduit",
+    "arcforge:red_arcforged_fluid_conduit",
+    "arcforge:black_arcforged_fluid_conduit"
+  ]
+}

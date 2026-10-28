@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:tempered_item_conduit",
+    "arcforge:white_tempered_item_conduit",
+    "arcforge:orange_tempered_item_conduit",
+    "arcforge:magenta_tempered_item_conduit",
+    "arcforge:light_blue_tempered_item_conduit",
+    "arcforge:yellow_tempered_item_conduit",
+    "arcforge:lime_tempered_item_conduit",
+    "arcforge:pink_tempered_item_conduit",
+    "arcforge:gray_tempered_item_conduit",
+    "arcforge:light_gray_tempered_item_conduit",
+    "arcforge:cyan_tempered_item_conduit",
+    "arcforge:purple_tempered_item_conduit",
+    "arcforge:blue_tempered_item_conduit",
+    "arcforge:brown_tempered_item_conduit",
+    "arcforge:green_tempered_item_conduit",
+    "arcforge:red_tempered_item_conduit",
+    "arcforge:black_tempered_item_conduit"
+  ]
+}

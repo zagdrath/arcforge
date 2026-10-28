@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:arcforged_pressurized_conduit",
+    "arcforge:white_arcforged_pressurized_conduit",
+    "arcforge:orange_arcforged_pressurized_conduit",
+    "arcforge:magenta_arcforged_pressurized_conduit",
+    "arcforge:light_blue_arcforged_pressurized_conduit",
+    "arcforge:yellow_arcforged_pressurized_conduit",
+    "arcforge:lime_arcforged_pressurized_conduit",
+    "arcforge:pink_arcforged_pressurized_conduit",
+    "arcforge:gray_arcforged_pressurized_conduit",
+    "arcforge:light_gray_arcforged_pressurized_conduit",
+    "arcforge:cyan_arcforged_pressurized_conduit",
+    "arcforge:purple_arcforged_pressurized_conduit",
+    "arcforge:blue_arcforged_pressurized_conduit",
+    "arcforge:brown_arcforged_pressurized_conduit",
+    "arcforge:green_arcforged_pressurized_conduit",
+    "arcforge:red_arcforged_pressurized_conduit",
+    "arcforge:black_arcforged_pressurized_conduit"
+  ]
+}

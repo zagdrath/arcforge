@@ -100,6 +100,7 @@ public class GasifierBlockEntity extends MachineBlockEntity implements FluidInte
         this.heatInput = heat.input(Integer.MAX_VALUE);
         this.steam = new FilteredFluidTank(ArcforgeConfig.GASIFIER_STEAM_CAPACITY.getAsInt(), GasifierBlockEntity::isSteam, this::setChanged);
         this.syngas = new FilteredFluidTank(ArcforgeConfig.GASIFIER_SYNGAS_CAPACITY.getAsInt(), resource -> !resource.isEmpty(), this::setChanged);
+        gasVents.add(syngas, net.zagdrath.arcforge.registry.ModFluids.SYNGAS.get());
         this.steamInput = new AutomationResourceHandler<>(steam, index -> true, index -> false);
         this.syngasOutput = new AutomationResourceHandler<>(syngas, index -> false, index -> true);
         this.fluidAutomation = new CombinedResourceHandler<>(steamInput, syngasOutput);

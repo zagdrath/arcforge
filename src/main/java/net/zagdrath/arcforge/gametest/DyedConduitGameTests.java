@@ -90,8 +90,7 @@ public final class DyedConduitGameTests {
         ConduitType[] types = ConduitType.values();
         for (int t = 0; t < types.length; t++) {
             for (int x = 0; x < row.length; x++) {
-                ItemStack stack = new ItemStack(ModBlocks.conduit(types[t], ConduitTier.WROUGHT).get().asItem());
-                stack.set(ModDataComponents.CONDUIT_COLOR.get(), row[x]);
+                ItemStack stack = new ItemStack(ModItems.coloredConduit(types[t], ConduitTier.WROUGHT, row[x]));
                 BlockPos pos = new BlockPos(x, 1, 1 + 2 * t);
                 // Clicking the top of a stone block under the (cleared) spot, as a player would.
                 helper.setBlock(pos.below(), Blocks.STONE);
@@ -165,16 +164,57 @@ public final class DyedConduitGameTests {
         withDye.add(new ItemStack(ModItems.PLASTIC_SHEET.get()));
         withDye.add(redDye());
         ItemStack red = craft(helper, withDye);
-        helper.assertTrue(red.getCount() == 7 && red.get(ModDataComponents.CONDUIT_COLOR.get()) == DyeColor.RED, "Dyeing made " + red);
+        helper.assertTrue(red.getCount() == 7 && red.is(ModItems.coloredConduit(ConduitType.ITEM, ConduitTier.WROUGHT, DyeColor.RED))
+                && !red.has(ModDataComponents.CONDUIT_COLOR.get()), "Dyeing made " + red);
 
         ItemStack oneRed = conduit.copy();
         oneRed.set(ModDataComponents.CONDUIT_COLOR.get(), DyeColor.RED);
         ItemStack stripped = craft(helper, List.of(oneRed));
         helper.assertTrue(stripped.getCount() == 1 && !stripped.has(ModDataComponents.CONDUIT_COLOR.get()), "Stripping made " + stripped);
+        ItemStack newStripped = craft(helper, List.of(new ItemStack(ModItems.coloredConduit(ConduitType.ITEM, ConduitTier.WROUGHT, DyeColor.RED))));
+        helper.assertTrue(newStripped.is(conduit.getItem()), "Registered colored item did not strip to plain");
+
+        var upgradeHolder = helper.getLevel().recipeAccess().recipeMap().byKey(ResourceKey.create(Registries.RECIPE,
+                Identifier.fromNamespaceAndPath(Arcforge.MODID, "crafting/tempered_fluid_conduit")));
+        CraftingRecipe upgrade = (CraftingRecipe) upgradeHolder.value();
+        List<ItemStack> upgrades = new ArrayList<>();
+        for (int i = 0; i < 9; i++) upgrades.add(i == 4 ? new ItemStack(ModItems.TEMPERED_ALLOY.get())
+                : new ItemStack(ModItems.coloredConduit(ConduitType.FLUID, ConduitTier.WROUGHT, DyeColor.RED)));
+        CraftingInput input = CraftingInput.of(3, 3, upgrades);
+        helper.assertTrue(upgrade.matches(input, helper.getLevel()), "Dyed conduits cannot upgrade");
+        ItemStack upgraded = upgrade.assemble(input);
+        helper.assertTrue(upgraded.getCount() == 8 && upgraded.is(ModItems.coloredConduit(ConduitType.FLUID, ConduitTier.TEMPERED, DyeColor.RED)),
+                "Tier upgrade lost color: " + upgraded);
+        upgrades.set(0, new ItemStack(ModItems.coloredConduit(ConduitType.FLUID, ConduitTier.WROUGHT, DyeColor.BLUE)));
+        helper.assertFalse(upgrade.matches(CraftingInput.of(3, 3, upgrades), helper.getLevel()), "Mixed colors can duplicate a dye in tier upgrades");
 
         ItemStack energy = new ItemStack(ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.WROUGHT).get().asItem());
         ItemStack mixed = craft(helper, List.of(conduit.copy(), energy, new ItemStack(ModItems.PLASTIC_SHEET.get()), redDye()));
         helper.assertTrue(mixed.isEmpty(), "Mixed conduits dyed: " + mixed);
+        helper.succeed();
+    }
+
+    // Every registered color/type/tier must mine back to its own item and retain the tint when placed again.
+    static void coloredDrops(GameTestHelper helper) {
+        BlockPos pos = new BlockPos(1, 1, 1);
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+        for (var entry : ModItems.coloredConduits()) {
+            ItemStack stack = new ItemStack(entry.get());
+            var item = (net.zagdrath.arcforge.item.conduit.ConduitBlockItem) stack.getItem();
+            DyeColor expected = net.zagdrath.arcforge.item.conduit.ConduitBlockItem.color(stack);
+            helper.setBlock(pos, Blocks.AIR);
+            helper.setBlock(pos.below(), Blocks.STONE);
+            player.setItemInHand(InteractionHand.MAIN_HAND, stack);
+            BlockPos floor = helper.absolutePos(pos.below());
+            stack.useOn(new UseOnContext(player, InteractionHand.MAIN_HAND,
+                    new BlockHitResult(Vec3.atCenterOf(floor).add(0, 0.5, 0), Direction.UP, floor, false)));
+            var entity = helper.getBlockEntity(pos, ConduitBlockEntity.class);
+            helper.assertTrue(entity.getColor() == expected, "Lost placed color: " + entry.getId());
+            var drops = net.minecraft.world.level.block.Block.getDrops(helper.getBlockState(pos), helper.getLevel(), helper.absolutePos(pos), entity);
+            helper.assertTrue(drops.size() == 1 && drops.getFirst().is(item) && !drops.getFirst().has(ModDataComponents.CONDUIT_COLOR.get()),
+                    "Wrong colored drop for " + entry.getId() + ": " + drops);
+            helper.assertTrue(item.getBlock().asItem() != item, "Colored item replaced plain block item");
+        }
         helper.succeed();
     }
 }

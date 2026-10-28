@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
     "XXX",
@@ -7,11 +7,12 @@
     "XXX"
   ],
   "key": {
-    "X": "arcforge:wrought_item_conduit",
+    "X": "#arcforge:conduits/wrought_item_conduit",
     "T": "arcforge:tempered_alloy"
   },
   "result": {
     "id": "arcforge:tempered_item_conduit",
     "count": 8
-  }
+  },
+  "copy_components_from": "X"
 }

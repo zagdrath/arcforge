@@ -79,6 +79,7 @@ public class CrackingUnitBlockEntity extends PlantControllerBlockEntity {
                 ArcforgeConfig.CRACKING_HEAT_CAPACITY.getAsInt(), ArcforgeConfig.CRACKING_MAX_TEMPERATURE.getAsInt(),
                 ArcforgeConfig.CRACKING_FEED_CAPACITY.getAsInt(), ArcforgeConfig.CRACKING_PRODUCT_CAPACITY.getAsInt(),
                 ArcforgeConfig.CRACKING_SECOND_FEED_CAPACITY.getAsInt()), items, () -> level, this::setChanged);
+        core.registerVents(gasVents);
         this.catalystInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_CATALYST, slot -> false);
         ResourceHandler<FluidResource> hydrogen = core.secondFeedInput();
         this.inputs = hydrogen != null ? new CombinedResourceHandler<>(core.feedInput(), hydrogen) : core.feedInput();

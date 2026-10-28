@@ -254,6 +254,7 @@ public final class ModCreativeTabs {
             .icon(() -> ModBlocks.conduit(ConduitType.ENERGY, ConduitTier.ARCFORGED).get().asItem().getDefaultInstance())
             .displayItems((parameters, output) -> {
                 ModItems.allConduits().forEach(item -> output.accept(item.get()));
+                ModItems.coloredConduits().forEach(item -> output.accept(item.get()));
                 output.accept(ModItems.CONDUIT_FILTER.get());
                 output.accept(ModItems.CONDUIT_FACADE.get());
                 output.accept(ModItems.BATTERY_ARRAY_CONTROLLER.get());

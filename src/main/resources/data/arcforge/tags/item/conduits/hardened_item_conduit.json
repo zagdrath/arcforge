@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:hardened_item_conduit",
+    "arcforge:white_hardened_item_conduit",
+    "arcforge:orange_hardened_item_conduit",
+    "arcforge:magenta_hardened_item_conduit",
+    "arcforge:light_blue_hardened_item_conduit",
+    "arcforge:yellow_hardened_item_conduit",
+    "arcforge:lime_hardened_item_conduit",
+    "arcforge:pink_hardened_item_conduit",
+    "arcforge:gray_hardened_item_conduit",
+    "arcforge:light_gray_hardened_item_conduit",
+    "arcforge:cyan_hardened_item_conduit",
+    "arcforge:purple_hardened_item_conduit",
+    "arcforge:blue_hardened_item_conduit",
+    "arcforge:brown_hardened_item_conduit",
+    "arcforge:green_hardened_item_conduit",
+    "arcforge:red_hardened_item_conduit",
+    "arcforge:black_hardened_item_conduit"
+  ]
+}

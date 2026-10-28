@@ -70,6 +70,12 @@ public final class ItemInfoTooltips {
 
     // The item's description key, or the shared one for its tier, or null if it has none.
     public static @Nullable String descriptionKey(String path) {
+        if (path.endsWith("_conduit")) {
+            for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
+                String prefix = color.getSerializedName() + "_";
+                if (path.startsWith(prefix)) { path = path.substring(prefix.length()); break; }
+            }
+        }
         Language language = Language.getInstance();
         if (language.has(PREFIX + path)) {
             return PREFIX + path;

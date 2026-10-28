@@ -75,6 +75,7 @@ public class SteamCrackerBlockEntity extends PlantControllerBlockEntity {
                 ArcforgeConfig.STEAM_CRACKER_HEAT_CAPACITY.getAsInt(), ArcforgeConfig.STEAM_CRACKER_MAX_TEMPERATURE.getAsInt(),
                 ArcforgeConfig.STEAM_CRACKER_FEED_CAPACITY.getAsInt(), ArcforgeConfig.STEAM_CRACKER_PRODUCT_CAPACITY.getAsInt(),
                 ArcforgeConfig.STEAM_CRACKER_SECOND_FEED_CAPACITY.getAsInt()), items, () -> level, this::setChanged);
+        core.registerVents(gasVents);
         ResourceHandler<FluidResource> steam = core.secondFeedInput();
         this.inputs = steam != null ? new CombinedResourceHandler<>(core.feedInput(), steam) : core.feedInput();
         this.data = RefiningMachineBlockEntity.menuData(core, new RefiningMachineBlockEntity.MachineBlockEntityAccess() {

@@ -70,6 +70,7 @@ public class RefiningMachineBlockEntity extends MachineBlockEntity implements Fl
                 sideModes(process));
         this.process = process;
         this.core = new RefiningCore(process, layout(process), items, () -> level, this::setChanged);
+        core.registerVents(gasVents);
         int itemSlot = layout(process).itemSlot();
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == itemSlot);
         ResourceHandler<FluidResource> second = core.secondFeedInput();

@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:superconducting_energy_conduit",
+    "arcforge:white_superconducting_energy_conduit",
+    "arcforge:orange_superconducting_energy_conduit",
+    "arcforge:magenta_superconducting_energy_conduit",
+    "arcforge:light_blue_superconducting_energy_conduit",
+    "arcforge:yellow_superconducting_energy_conduit",
+    "arcforge:lime_superconducting_energy_conduit",
+    "arcforge:pink_superconducting_energy_conduit",
+    "arcforge:gray_superconducting_energy_conduit",
+    "arcforge:light_gray_superconducting_energy_conduit",
+    "arcforge:cyan_superconducting_energy_conduit",
+    "arcforge:purple_superconducting_energy_conduit",
+    "arcforge:blue_superconducting_energy_conduit",
+    "arcforge:brown_superconducting_energy_conduit",
+    "arcforge:green_superconducting_energy_conduit",
+    "arcforge:red_superconducting_energy_conduit",
+    "arcforge:black_superconducting_energy_conduit"
+  ]
+}

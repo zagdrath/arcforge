@@ -895,12 +895,27 @@ public final class ModItems {
 
     // Conduit items, ordered by type then tier.
     private static final List<DeferredItem<ConduitBlockItem>> CONDUITS = new ArrayList<>();
+    private static final Map<String, DeferredItem<ConduitBlockItem>> COLORED_CONDUITS = new java.util.LinkedHashMap<>();
 
     static {
         for (DeferredBlock<ConduitBlock> block : ModBlocks.allConduits()) {
             CONDUITS.add(ITEMS.registerItem(block.getId().getPath(),
                     p -> new ConduitBlockItem(block.get(), p), p -> p.useBlockDescriptionPrefix()));
+            for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
+                String id = color.getSerializedName() + "_" + block.getId().getPath();
+                COLORED_CONDUITS.put(id, ITEMS.registerItem(id, p -> new ConduitBlockItem(block.get(), color, p)));
+            }
         }
+    }
+
+    public static ConduitBlockItem coloredConduit(net.zagdrath.arcforge.conduit.ConduitType type, ConduitTier tier, net.minecraft.world.item.@org.jspecify.annotations.Nullable DyeColor color) {
+        var block = ModBlocks.conduit(type, tier);
+        return color == null ? (ConduitBlockItem) block.get().asItem()
+                : COLORED_CONDUITS.get(color.getSerializedName() + "_" + block.getId().getPath()).get();
+    }
+
+    public static java.util.Collection<DeferredItem<ConduitBlockItem>> coloredConduits() {
+        return COLORED_CONDUITS.values();
     }
 
     // Fluid tank and energy cell items, in the same order as ModBlocks.allStorage().

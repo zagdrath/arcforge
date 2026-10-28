@@ -262,6 +262,8 @@ public final class ArcforgeGameTests {
         TESTS.put("dyed_conduits_placed_by_colour", DyedConduitGameTests::placedByColour);
         TESTS.put("dyed_conduit_placing_knows_colour", DyedConduitGameTests::placingKnowsColour);
         TESTS.put("dyed_conduit_recipe", DyedConduitGameTests::recipe);
+        TESTS.put("dyed_conduit_colored_drops", DyedConduitGameTests::coloredDrops);
+        TESTS.put("gas_vents_overflow_and_settings", GasVentGameTests::overflowAndSettings);
         TESTS.put("gas_turbine_fuel_acceptance", GasTurbineGameTests::fuelAcceptance);
         TESTS.put("gas_turbine_throttle", GasTurbineGameTests::throttle);
         TESTS.put("gas_turbine_flameout_restart", GasTurbineGameTests::flameoutRestart);

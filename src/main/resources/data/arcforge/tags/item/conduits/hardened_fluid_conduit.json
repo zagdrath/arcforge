@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:hardened_fluid_conduit",
+    "arcforge:white_hardened_fluid_conduit",
+    "arcforge:orange_hardened_fluid_conduit",
+    "arcforge:magenta_hardened_fluid_conduit",
+    "arcforge:light_blue_hardened_fluid_conduit",
+    "arcforge:yellow_hardened_fluid_conduit",
+    "arcforge:lime_hardened_fluid_conduit",
+    "arcforge:pink_hardened_fluid_conduit",
+    "arcforge:gray_hardened_fluid_conduit",
+    "arcforge:light_gray_hardened_fluid_conduit",
+    "arcforge:cyan_hardened_fluid_conduit",
+    "arcforge:purple_hardened_fluid_conduit",
+    "arcforge:blue_hardened_fluid_conduit",
+    "arcforge:brown_hardened_fluid_conduit",
+    "arcforge:green_hardened_fluid_conduit",
+    "arcforge:red_hardened_fluid_conduit",
+    "arcforge:black_hardened_fluid_conduit"
+  ]
+}

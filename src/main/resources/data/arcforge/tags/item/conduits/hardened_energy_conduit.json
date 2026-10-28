@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:hardened_energy_conduit",
+    "arcforge:white_hardened_energy_conduit",
+    "arcforge:orange_hardened_energy_conduit",
+    "arcforge:magenta_hardened_energy_conduit",
+    "arcforge:light_blue_hardened_energy_conduit",
+    "arcforge:yellow_hardened_energy_conduit",
+    "arcforge:lime_hardened_energy_conduit",
+    "arcforge:pink_hardened_energy_conduit",
+    "arcforge:gray_hardened_energy_conduit",
+    "arcforge:light_gray_hardened_energy_conduit",
+    "arcforge:cyan_hardened_energy_conduit",
+    "arcforge:purple_hardened_energy_conduit",
+    "arcforge:blue_hardened_energy_conduit",
+    "arcforge:brown_hardened_energy_conduit",
+    "arcforge:green_hardened_energy_conduit",
+    "arcforge:red_hardened_energy_conduit",
+    "arcforge:black_hardened_energy_conduit"
+  ]
+}

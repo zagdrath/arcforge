@@ -1822,7 +1822,7 @@
   "gui.arcforge.side_mode.digestate": "Digestate",
   "gui.arcforge.air_separator.nitrogen": "Nitrogen: %s mB",
   "gui.arcforge.air_separator.oxygen": "Oxygen: %s mB",
-  "gui.arcforge.air_separator.vent_hint": "Made each operation. When one tank is full, that gas goes back into the air.",
+  "gui.arcforge.air_separator.vent_hint": "Made each operation. Configure excess gas disposal in the Vents tab.",
   "gui.arcforge.haber_reactor.needs": "needs %s°C",
   "gui.arcforge.biogas_digester.lanes": "Lanes",
   "gui.arcforge.biogas_digester.lanes_hint": "%s of %s lanes digesting. Each digests one item.",
@@ -3734,5 +3734,10 @@
   "tooltip.arcforge.info.armored_long_fall_boots": "Long Fall Boots reinforced with Steel Boots: 2 armor and 1 toughness. Negates all fall damage for 1,000 FE per damaging landing. Holds 100,000 FE; recharge in a charging slot or on a Chargepad. Below 1,000 FE, fall protection stops; armor still works.",
   "curios.identifier.jetpack": "Jetpack",
   "arcforge.configuration.energyOutputPerFace": "Quantum Tunnel FE output per face",
-  "arcforge.configuration.radiationParticles": "Radiation warning particles"
+  "arcforge.configuration.radiationParticles": "Radiation warning particles",
+  "gui.arcforge.tab.vents": "Vents",
+  "gui.arcforge.vent.output": "Output %s",
+  "gui.arcforge.vent.on": "Vent excess gas: On",
+  "gui.arcforge.vent.off": "Vent excess gas: Off",
+  "gui.arcforge.vent.hint": "Discards gas that cannot fit. Keeps stored gas; never vents liquids."
 }

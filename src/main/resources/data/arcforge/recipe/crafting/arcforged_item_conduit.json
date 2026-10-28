@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
     "XCX",
@@ -7,12 +7,13 @@
     "XCX"
   ],
   "key": {
-    "X": "arcforge:hardened_item_conduit",
+    "X": "#arcforge:conduits/hardened_item_conduit",
     "A": "arcforge:arcforged_alloy",
     "C": "#c:gems/arcite"
   },
   "result": {
     "id": "arcforge:arcforged_item_conduit",
     "count": 6
-  }
+  },
+  "copy_components_from": "X"
 }

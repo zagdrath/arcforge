@@ -72,6 +72,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected final MachineItemHandler items;
     protected final SideConfig sideConfig;
     protected final MachineOutputs outputs = new MachineOutputs();
+    public final net.zagdrath.arcforge.machine.GasVents gasVents = new net.zagdrath.arcforge.machine.GasVents(this::setChanged);
     private final List<SideMode> allowedSideModes;
 
     // Its Wired Machine Link, if a Link Conduit links it to one (see machine.link.MachineLinks), and the mode a Wired Machine
@@ -310,6 +311,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
 
     @Override
     public void writeSettings(ValueOutput output) {
+        gasVents.save(output);
         MachineSettings.writeRedstone(output, redstoneMode);
         if (this instanceof MultiblockController controller) {
             if (level != null && controller.isFormed()) {
@@ -325,6 +327,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
 
     @Override
     public int readSettings(ValueInput input) {
+        gasVents.readSettings(input);
         int skipped = MachineSettings.readRedstone(input, this);
         if (this instanceof MultiblockController controller) {
             if (level != null && controller.isFormed()) {
@@ -418,6 +421,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         ownership.load(input);
+        gasVents.load(input);
         controlState.load(input);
         items.deserialize(input.childOrEmpty("items"));
         sideConfig.deserialize(input);
@@ -431,6 +435,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         ownership.save(output);
+        gasVents.save(output);
         controlState.save(output);
         items.serialize(output.child("items"));
         sideConfig.serialize(output);

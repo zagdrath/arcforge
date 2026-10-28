@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:wrought_item_conduit",
+    "arcforge:white_wrought_item_conduit",
+    "arcforge:orange_wrought_item_conduit",
+    "arcforge:magenta_wrought_item_conduit",
+    "arcforge:light_blue_wrought_item_conduit",
+    "arcforge:yellow_wrought_item_conduit",
+    "arcforge:lime_wrought_item_conduit",
+    "arcforge:pink_wrought_item_conduit",
+    "arcforge:gray_wrought_item_conduit",
+    "arcforge:light_gray_wrought_item_conduit",
+    "arcforge:cyan_wrought_item_conduit",
+    "arcforge:purple_wrought_item_conduit",
+    "arcforge:blue_wrought_item_conduit",
+    "arcforge:brown_wrought_item_conduit",
+    "arcforge:green_wrought_item_conduit",
+    "arcforge:red_wrought_item_conduit",
+    "arcforge:black_wrought_item_conduit"
+  ]
+}

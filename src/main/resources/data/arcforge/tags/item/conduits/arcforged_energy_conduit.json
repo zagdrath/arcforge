@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:arcforged_energy_conduit",
+    "arcforge:white_arcforged_energy_conduit",
+    "arcforge:orange_arcforged_energy_conduit",
+    "arcforge:magenta_arcforged_energy_conduit",
+    "arcforge:light_blue_arcforged_energy_conduit",
+    "arcforge:yellow_arcforged_energy_conduit",
+    "arcforge:lime_arcforged_energy_conduit",
+    "arcforge:pink_arcforged_energy_conduit",
+    "arcforge:gray_arcforged_energy_conduit",
+    "arcforge:light_gray_arcforged_energy_conduit",
+    "arcforge:cyan_arcforged_energy_conduit",
+    "arcforge:purple_arcforged_energy_conduit",
+    "arcforge:blue_arcforged_energy_conduit",
+    "arcforge:brown_arcforged_energy_conduit",
+    "arcforge:green_arcforged_energy_conduit",
+    "arcforge:red_arcforged_energy_conduit",
+    "arcforge:black_arcforged_energy_conduit"
+  ]
+}

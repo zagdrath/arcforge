@@ -297,12 +297,24 @@ public class ConduitBlock extends BaseEntityBlock {
     @Override
     public void setPlacedBy(Level level, BlockPos pos, BlockState state, net.minecraft.world.entity.@Nullable LivingEntity placer, net.minecraft.world.item.ItemStack stack) {
         super.setPlacedBy(level, pos, state, placer, stack);
+        if (level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit) {
+            conduit.setColor(net.zagdrath.arcforge.item.conduit.ConduitBlockItem.color(stack));
+        }
         if (!level.isClientSide()) {
             refreshConnections(level, pos);
             for (Direction side : Direction.values()) {
                 refreshConnections(level, pos.relative(side));
             }
         }
+    }
+
+    @Override
+    protected java.util.List<ItemStack> getDrops(BlockState state, net.minecraft.world.level.storage.loot.LootParams.Builder params) {
+        var drops = super.getDrops(state, params);
+        var entity = params.getOptionalParameter(net.minecraft.world.level.storage.loot.parameters.LootContextParams.BLOCK_ENTITY);
+        DyeColor color = entity instanceof ConduitBlockEntity conduit ? conduit.getColor() : null;
+        return drops.stream().map(stack -> stack.getItem() instanceof net.zagdrath.arcforge.item.conduit.ConduitBlockItem
+                ? net.zagdrath.arcforge.item.conduit.ConduitBlockItem.recolor(stack, color) : stack).toList();
     }
 
     // Re-evaluates the conduits touching a machine, e.g. after its side configuration or facing changed.
@@ -535,7 +547,12 @@ public class ConduitBlock extends BaseEntityBlock {
     public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         Direction side = facadeLookedAt(level, pos, player);
         ConduitFacades.Facade facade = side != null ? facades(level, pos).get(side) : null;
-        return facade != null ? facade.toItem() : super.getCloneItemStack(level, pos, state, includeData, player);
+        if (facade != null) {
+            return facade.toItem();
+        }
+        ItemStack result = super.getCloneItemStack(level, pos, state, includeData, player);
+        return net.zagdrath.arcforge.item.conduit.ConduitBlockItem.recolor(result,
+                level.getBlockEntity(pos) instanceof ConduitBlockEntity conduit ? conduit.getColor() : null);
     }
 
     private static @Nullable Direction facadeLookedAt(BlockGetter level, BlockPos pos, Player player) {

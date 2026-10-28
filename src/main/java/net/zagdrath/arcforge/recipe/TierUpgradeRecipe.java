@@ -81,6 +81,28 @@ public class TierUpgradeRecipe extends ShapedRecipe {
     }
 
     @Override
+    public boolean matches(CraftingInput input, net.minecraft.world.level.Level level) {
+        if (!super.matches(input, level)) {
+            return false;
+        }
+        if (result.create().getItem() instanceof net.zagdrath.arcforge.item.conduit.ConduitBlockItem) {
+            boolean found = false;
+            net.minecraft.world.item.DyeColor color = null;
+            for (ItemStack stack : input.items()) {
+                if (stack.getItem() instanceof net.zagdrath.arcforge.item.conduit.ConduitBlockItem) {
+                    var next = net.zagdrath.arcforge.item.conduit.ConduitBlockItem.color(stack);
+                    if (found && color != next) {
+                        return false;
+                    }
+                    color = next;
+                    found = true;
+                }
+            }
+        }
+        return true;
+    }
+
+    @Override
     public ItemStack assemble(CraftingInput input) {
         ItemStack upgraded = super.assemble(input);
         for (ItemStack stack : input.items()) {
@@ -88,6 +110,10 @@ public class TierUpgradeRecipe extends ShapedRecipe {
                 upgraded.applyComponents(stack.getComponentsPatch());
                 JetpackItem.restoreArmor(upgraded);
                 LongFallBootsItem.restoreArmor(upgraded);
+                if (upgraded.getItem() instanceof net.zagdrath.arcforge.item.conduit.ConduitBlockItem) {
+                    upgraded = net.zagdrath.arcforge.item.conduit.ConduitBlockItem.recolor(upgraded,
+                            net.zagdrath.arcforge.item.conduit.ConduitBlockItem.color(stack));
+                }
                 break;
             }
         }

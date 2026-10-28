@@ -219,6 +219,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
         for (Product product : Product.values()) {
             FilteredFluidTank tank = new FilteredFluidTank(output, resource -> !resource.isEmpty() && product.accepts(resource.getFluid()), this::setChanged);
             products.put(product, tank);
+            if (product.isGas()) gasVents.add(tank, product.fluid());
             ResourceHandler<FluidResource> out = new AutomationResourceHandler<>(tank, index -> false, index -> true);
             productOutputs.put(product, out);
             all.add(out);
@@ -636,7 +637,7 @@ public class DistillationArrayBlockEntity extends MachineBlockEntity implements 
     private boolean hasRoom(Map<Fluid, Integer> fluids, ItemStack item, int items) {
         for (Map.Entry<Fluid, Integer> entry : fluids.entrySet()) {
             FilteredFluidTank tank = tankFor(entry.getKey());
-            if (tank == null || tank.getAmount() > 0 && !tank.contains(entry.getKey()) || tank.getSpace() < entry.getValue()) {
+            if (tank == null || !tank.canVent(FluidResource.of(entry.getKey())) && (tank.getAmount() > 0 && !tank.contains(entry.getKey()) || tank.getSpace() < entry.getValue())) {
                 return false;
             }
         }

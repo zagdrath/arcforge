@@ -133,7 +133,9 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
         this.inputB = new FilteredFluidTank(capacity, resource -> MachineRecipes.isReactorFluid(level, resource), this::setChanged);
         this.inputC = new FilteredFluidTank(capacity, resource -> MachineRecipes.isReactorFluid(level, resource), this::setChanged);
         this.output = new FilteredFluidTank(capacity, resource -> true, this::setChanged);
+        gasVents.add(output, null);
         this.byproductTank = new FilteredFluidTank(capacity, resource -> true, this::setChanged);
+        gasVents.add(byproductTank, null);
         this.router = new InputTankRouter(inputA, inputB, inputC);
         this.fluidInput = new AutomationResourceHandler<>(router, index -> true, index -> false);
         this.fluidOutput = new AutomationResourceHandler<>(output, index -> false, index -> true);

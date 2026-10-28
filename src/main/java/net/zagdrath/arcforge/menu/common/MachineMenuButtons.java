@@ -67,6 +67,15 @@ public final class MachineMenuButtons {
     }
 
     public static boolean handle(ContainerLevelAccess access, int buttonId) {
+        int vent = buttonId - net.zagdrath.arcforge.machine.GasVents.BUTTON_FIRST;
+        if (vent >= 0 && vent < net.zagdrath.arcforge.machine.GasVents.MAX_OUTPUTS) {
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof net.zagdrath.arcforge.blockentity.machine.MachineBlockEntity machine) {
+                    machine.gasVents.toggle(vent);
+                }
+            });
+            return true;
+        }
         if (buttonId >= REDSTONE_FIRST && buttonId < REDSTONE_FIRST + RedstoneMode.values().length) {
             RedstoneMode mode = RedstoneMode.byId(buttonId - REDSTONE_FIRST);
             apply(access, machine -> {

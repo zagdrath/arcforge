@@ -115,6 +115,7 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         } else {
             menu.getUpgradeSlots().forEach(slot -> slot.setActive(false));
         }
+        tabs.add(new net.zagdrath.arcforge.client.gui.tab.GasVentsTab(menu, this::sendButton));
     }
 
     // For machines with item outputs: shows the auto-eject button on the Sides (or Ports) tab.
@@ -208,11 +209,13 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         OutputLimit.Shown limit = menu.getOutputLimit();
         if (limit != null) {
             drawOutputLimit(graphics, limit);
-        } else {
+        } else if (showInventoryLabel()) {
             graphics.text(font, playerInventoryTitle, inventoryLabelX, inventoryLabelY, ArcforgeGui.LABEL, false);
         }
         drawText(graphics);
     }
+
+    protected boolean showInventoryLabel() { return true; }
 
     // The "Limited by connections" line, in warning yellow where the inventory label sits. A line too wide for the panel
     // is scaled down to fit, down to 2/3; past that the short form ("Limited: ...") is used, scaled if it must be. The

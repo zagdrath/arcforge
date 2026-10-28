@@ -121,6 +121,7 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         this.carbonDioxide = new FilteredFluidTank(ArcforgeConfig.FERMENTER_CO2_TANK.getAsInt(), resource -> resource.is(ModFluids.CARBON_DIOXIDE.get()),
                 this::setChanged);
         this.carbonDioxideOutput = new AutomationResourceHandler<>(carbonDioxide, index -> false, index -> true);
+        gasVents.add(carbonDioxide, ModFluids.CARBON_DIOXIDE.get(), true);
         this.fluidAutomation = new CombinedResourceHandler<>(ethanolOutput, waterInput, carbonDioxideOutput);
         this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT || slot == SLOT_INPUT_2 || slot == SLOT_ADDITIVE,
                 slot -> false);
@@ -332,6 +333,10 @@ public class FermenterBlockEntity extends MachineBlockEntity implements FluidInt
         int amount = ethanolFor(recipe);
         try (Transaction tx = Transaction.openRoot()) {
             if (ethanol.insert(0, FluidResource.of(result), amount, tx) != amount) {
+                return false;
+            }
+            int gas = carbonDioxideFor(amount);
+            if (gas > 0 && carbonDioxide.insert(0, FluidResource.of(ModFluids.CARBON_DIOXIDE.get()), gas, tx) != gas) {
                 return false;
             }
         }

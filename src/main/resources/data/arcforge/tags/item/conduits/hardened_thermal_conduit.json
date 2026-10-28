@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:hardened_thermal_conduit",
+    "arcforge:white_hardened_thermal_conduit",
+    "arcforge:orange_hardened_thermal_conduit",
+    "arcforge:magenta_hardened_thermal_conduit",
+    "arcforge:light_blue_hardened_thermal_conduit",
+    "arcforge:yellow_hardened_thermal_conduit",
+    "arcforge:lime_hardened_thermal_conduit",
+    "arcforge:pink_hardened_thermal_conduit",
+    "arcforge:gray_hardened_thermal_conduit",
+    "arcforge:light_gray_hardened_thermal_conduit",
+    "arcforge:cyan_hardened_thermal_conduit",
+    "arcforge:purple_hardened_thermal_conduit",
+    "arcforge:blue_hardened_thermal_conduit",
+    "arcforge:brown_hardened_thermal_conduit",
+    "arcforge:green_hardened_thermal_conduit",
+    "arcforge:red_hardened_thermal_conduit",
+    "arcforge:black_hardened_thermal_conduit"
+  ]
+}

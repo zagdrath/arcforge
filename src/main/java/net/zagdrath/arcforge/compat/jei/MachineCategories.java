@@ -1511,7 +1511,7 @@ final class MachineCategories {
             for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
                 dyes.add(new ItemStack(net.minecraft.core.registries.BuiltInRegistries.ITEM.getValue(net.minecraft.resources.Identifier.withDefaultNamespace(color.getSerializedName() + "_dye"))));
                 ItemStack result = new ItemStack(recipe.conduit(), 8);
-                result.set(net.zagdrath.arcforge.registry.ModDataComponents.CONDUIT_COLOR.get(), color);
+                result = net.zagdrath.arcforge.item.conduit.ConduitBlockItem.recolor(result, color);
                 results.add(result);
             }
             var dye = builder.addInputSlot(37, 3).setStandardSlotBackground().addItemStacks(dyes);

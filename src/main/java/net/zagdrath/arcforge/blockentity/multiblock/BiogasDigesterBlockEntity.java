@@ -131,6 +131,7 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
         this.water = new FilteredFluidTank(ArcforgeConfig.DIGESTER_WATER_CAPACITY.getAsInt(),
                 resource -> resource.getFluid().defaultFluidState().is(FluidTags.WATER), this::setChanged);
         this.biogas = new FilteredFluidTank(ArcforgeConfig.DIGESTER_GAS_CAPACITY.getAsInt(), Gases::isGas, this::setChanged);
+        gasVents.add(biogas, net.zagdrath.arcforge.registry.ModFluids.BIOGAS.get());
         this.waterInput = new AutomationResourceHandler<>(water, index -> true, index -> false);
         this.gasOutput = new AutomationResourceHandler<>(biogas, index -> false, index -> true);
         this.fluidAutomation = new CombinedResourceHandler<>(waterInput, gasOutput);
@@ -384,7 +385,7 @@ public class BiogasDigesterBlockEntity extends MachineBlockEntity implements Mul
             pending += made.getAmount();
             byproducts += busy.byproduct().isPresent() ? 1 : 0;
         }
-        if (biogas.getAmount() > 0 && !biogas.getResource(0).equals(FluidResource.of(gas)) || biogas.getAmount() + pending > biogas.getCapacity()) {
+        if (!biogas.canVent(FluidResource.of(gas)) && (biogas.getAmount() > 0 && !biogas.getResource(0).equals(FluidResource.of(gas)) || biogas.getAmount() + pending > biogas.getCapacity())) {
             return false;
         }
         if (next.byproduct().isPresent()) {

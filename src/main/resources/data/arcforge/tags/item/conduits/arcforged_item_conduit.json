@@ -1,0 +1,22 @@
+{
+  "replace": false,
+  "values": [
+    "arcforge:arcforged_item_conduit",
+    "arcforge:white_arcforged_item_conduit",
+    "arcforge:orange_arcforged_item_conduit",
+    "arcforge:magenta_arcforged_item_conduit",
+    "arcforge:light_blue_arcforged_item_conduit",
+    "arcforge:yellow_arcforged_item_conduit",
+    "arcforge:lime_arcforged_item_conduit",
+    "arcforge:pink_arcforged_item_conduit",
+    "arcforge:gray_arcforged_item_conduit",
+    "arcforge:light_gray_arcforged_item_conduit",
+    "arcforge:cyan_arcforged_item_conduit",
+    "arcforge:purple_arcforged_item_conduit",
+    "arcforge:blue_arcforged_item_conduit",
+    "arcforge:brown_arcforged_item_conduit",
+    "arcforge:green_arcforged_item_conduit",
+    "arcforge:red_arcforged_item_conduit",
+    "arcforge:black_arcforged_item_conduit"
+  ]
+}

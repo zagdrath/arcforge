@@ -130,6 +130,8 @@ public class ChemicalReactorArrayBlockEntity extends CubeMultiblockBlockEntity {
         }
         tanks[3] = new FilteredFluidTank(capacity, resource -> true, this::setChanged);
         tanks[4] = new FilteredFluidTank(capacity, resource -> true, this::setChanged);
+        gasVents.add(tanks[3], null);
+        gasVents.add(tanks[4], null);
         this.router = new InputTankRouter(tanks[0], tanks[1], tanks[2]);
         this.fluidInput = new AutomationResourceHandler<>(router, index -> true, index -> false);
         this.fluidOutput = new AutomationResourceHandler<>(tanks[3], index -> false, index -> true);

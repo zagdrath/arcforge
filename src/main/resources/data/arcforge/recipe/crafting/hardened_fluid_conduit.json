@@ -1,5 +1,5 @@
 {
-  "type": "minecraft:crafting_shaped",
+  "type": "arcforge:tier_upgrade",
   "category": "misc",
   "pattern": [
     "XVX",
@@ -7,12 +7,13 @@
     "XXX"
   ],
   "key": {
-    "X": "arcforge:tempered_fluid_conduit",
+    "X": "#arcforge:conduits/tempered_fluid_conduit",
     "H": "arcforge:hardened_alloy",
     "V": "arcforge:pvc_sheet"
   },
   "result": {
     "id": "arcforge:hardened_fluid_conduit",
     "count": 7
-  }
+  },
+  "copy_components_from": "X"
 }

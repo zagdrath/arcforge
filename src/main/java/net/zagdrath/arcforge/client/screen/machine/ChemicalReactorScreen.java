@@ -44,6 +44,9 @@ public class ChemicalReactorScreen extends MachineScreen<ChemicalReactorMenu> {
     }
 
     @Override
+    protected boolean showInventoryLabel() { return false; }
+
+    @Override
     protected Component sideModeName(SideMode mode) {
         return mode == SideMode.ENERGY ? sideModeName("energy_input") : super.sideModeName(mode);
     }

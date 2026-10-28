@@ -83,15 +83,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
 
     @Override
     public void registerExtraIngredients(mezz.jei.api.registration.IExtraIngredientRegistration registration) {
-        List<ItemStack> sheathed = new ArrayList<>();
-        for (var conduit : ModItems.allConduits()) {
-            for (net.minecraft.world.item.DyeColor color : net.minecraft.world.item.DyeColor.values()) {
-                ItemStack stack = new ItemStack(conduit.get());
-                stack.set(ModDataComponents.CONDUIT_COLOR.get(), color);
-                sheathed.add(stack);
-            }
-        }
-        registration.addExtraItemStacks(sheathed);
+        // Colored conduits are registered items in the creative tab and are indexed by JEI directly.
     }
 
     @Override
