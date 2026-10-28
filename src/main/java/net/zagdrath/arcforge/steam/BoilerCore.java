@@ -63,7 +63,8 @@ public class BoilerCore {
     private int boilingGrace;
     private int ventGrace;
     // The heat it held after its last tick, to tell what came in since (-1 until its first tick), the HU/t that has
-    // been coming in (smoothed over the ticks heat came in), and the share of it it climbs on. None of these are saved.
+    // been coming in (smoothed over the ticks heat came in), and the share of it it climbs on. The rate and share
+    // survive reloads; lastStored starts fresh because it is only a baseline for measuring the next tick's input.
     private int lastStored = -1;
     private double heatIn;
     private double climbShare = CLIMB_SHARE;
@@ -134,6 +135,12 @@ public class BoilerCore {
     // One tick. costMultiplier scales the heat per mB (the array's big drum loses less), and hotSaving is the share of
     // that a boiler at the top of its grade's band saves.
     public State tick(int maxHeatPerTick, double costMultiplier, double hotSaving) {
+        // Old saves (and a rebuilt hot drum) have no heat-input history. At equilibrium with their source they
+        // cannot receive heat until boiling lowers their temperature. Start by drawing from their own stored
+        // heat, still subject to the pressure floor, so they can resume without a pressure-setting change.
+        if (lastStored < 0 && heatIn <= 0 && heat.getTemperature() >= SteamGrade.STEAM.minCelsius()) {
+            heatIn = maxHeatPerTick;
+        }
         int incoming = lastStored < 0 ? 0 : Math.max(0, heat.getStored() - lastStored);
         if (incoming > 0) {
             heatIn += (incoming - heatIn) * HEAT_IN_SMOOTHING;
@@ -266,6 +273,8 @@ public class BoilerCore {
         output.putDouble("pending_heat", pendingHeat);
         output.putDouble("lifted", lifted);
         output.putInt("pressure", pressure.ordinal());
+        output.putDouble("heat_in", heatIn);
+        output.putDouble("climb_share", climbShare);
     }
 
     public void deserialize(ValueInput input) {
@@ -273,5 +282,8 @@ public class BoilerCore {
         pendingHeat = input.getDoubleOr("pending_heat", 0.0);
         lifted = input.getDoubleOr("lifted", 0.0);
         pressure = BoilerPressure.byId(input.getIntOr("pressure", 0));
+        heatIn = Math.max(0, input.getDoubleOr("heat_in", 0.0));
+        climbShare = Mth.clamp(input.getDoubleOr("climb_share", CLIMB_SHARE), 0.0, CLIMB_SHARE);
+        lastStored = -1;
     }
 }

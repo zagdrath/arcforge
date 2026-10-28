@@ -20,7 +20,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.Identifier;
 import net.zagdrath.arcforge.item.tool.LongFallBootsItem;
 
-/** Open calf harnesses, side dampers and stepped heel springs, on a native 64x32 unwrap. */
+/** Solid boot uppers, reinforced toes, side dampers and stepped heel springs on a 64x64 unwrap. */
 public class LongFallBootsLayer<S extends HumanoidRenderState, M extends HumanoidModel<S>> extends RenderLayer<S, M> {
     private final ModelPart standard = model(false);
     private final ModelPart armored = model(true);
@@ -30,20 +30,19 @@ public class LongFallBootsLayer<S extends HumanoidRenderState, M extends Humanoi
     private static ModelPart model(boolean armor) {
         var mesh = new MeshDefinition();
         var root = mesh.getRoot();
-        root.addOrReplaceChild("sole", CubeListBuilder.create().texOffs(0, 0).addBox(-3, 11, -4, 6, 2, 8), PartPose.ZERO);
-        root.addOrReplaceChild("toe", CubeListBuilder.create().texOffs(0, 10).addBox(-3, 8, -4, 6, 3, 3), PartPose.ZERO);
-        root.addOrReplaceChild("ankle", CubeListBuilder.create().texOffs(0, 16).addBox(-3, 6, -3, 6, 2, 6), PartPose.ZERO);
-        root.addOrReplaceChild("rails", CubeListBuilder.create().texOffs(28, 0)
-                .addBox(-3, 1, 1, 1, 5, 2).addBox(2, 1, 1, 1, 5, 2), PartPose.ZERO);
-        root.addOrReplaceChild("dampers", CubeListBuilder.create().texOffs(34, 0)
+        root.addOrReplaceChild("sole", CubeListBuilder.create().texOffs(0, 0).addBox(-3, 10, -5, 6, 2, 8), PartPose.ZERO);
+        root.addOrReplaceChild("toe", CubeListBuilder.create().texOffs(0, 12).addBox(-3, 8, -5, 6, 2, 4), PartPose.ZERO);
+        root.addOrReplaceChild("upper", CubeListBuilder.create().texOffs(0, 20).addBox(-2.5F, 4, -2.5F, 5, 6, 5), PartPose.ZERO);
+        root.addOrReplaceChild("cuff", CubeListBuilder.create().texOffs(0, 32).addBox(-3, 2, -3, 6, 2, 6), PartPose.ZERO);
+        root.addOrReplaceChild("dampers", CubeListBuilder.create().texOffs(30, 0)
                 .addBox(-4, 4, 1, 1, 6, 1).addBox(3, 4, 1, 1, 6, 1), PartPose.ZERO);
-        root.addOrReplaceChild("spring_upper", CubeListBuilder.create().texOffs(40, 0).addBox(-1, 1, 3, 2, 3, 1), PartPose.ZERO);
-        root.addOrReplaceChild("spring_mid", CubeListBuilder.create().texOffs(46, 0).addBox(-1, 4, 4, 2, 4, 1), PartPose.ZERO);
-        root.addOrReplaceChild("spring_lower", CubeListBuilder.create().texOffs(40, 0).addBox(-1, 8, 5, 2, 3, 1), PartPose.ZERO);
-        root.addOrReplaceChild("spring_heel", CubeListBuilder.create().texOffs(52, 0).addBox(-1, 11, 4, 2, 2, 2), PartPose.ZERO);
-        root.addOrReplaceChild("spring_foot", CubeListBuilder.create().texOffs(40, 8).addBox(-1, 12, 1, 2, 1, 4), PartPose.ZERO);
-        if (armor) root.addOrReplaceChild("shin_guard", CubeListBuilder.create().texOffs(0, 24).addBox(-3, 2, -3, 6, 4, 1), PartPose.ZERO);
-        return LayerDefinition.create(mesh, 64, 32).bakeRoot();
+        root.addOrReplaceChild("spring_upper", CubeListBuilder.create().texOffs(36, 0).addBox(-1, 2, 3, 2, 3, 1), PartPose.ZERO);
+        root.addOrReplaceChild("spring_mid", CubeListBuilder.create().texOffs(42, 0).addBox(-1, 5, 4, 2, 3, 1), PartPose.ZERO);
+        root.addOrReplaceChild("spring_lower", CubeListBuilder.create().texOffs(36, 0).addBox(-1, 8, 5, 2, 3, 1), PartPose.ZERO);
+        root.addOrReplaceChild("spring_heel", CubeListBuilder.create().texOffs(48, 0).addBox(-1, 10, 3, 2, 2, 2), PartPose.ZERO);
+        root.addOrReplaceChild("spring_foot", CubeListBuilder.create().texOffs(36, 8).addBox(-1, 11, 1, 2, 1, 4), PartPose.ZERO);
+        if (armor) root.addOrReplaceChild("shin_guard", CubeListBuilder.create().texOffs(0, 42).addBox(-3, 4, -3.5F, 6, 4, 1), PartPose.ZERO);
+        return LayerDefinition.create(mesh, 64, 64).bakeRoot();
     }
 
     @Override

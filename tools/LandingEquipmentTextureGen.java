@@ -13,12 +13,17 @@ public class LandingEquipmentTextureGen {
             SPRING = 0xE8913A, CYAN = 0x5FD4C4;
 
     public static void main(String[] args) throws Exception {
+        // A valid equipment asset keeps the boots in humanoid render states; geometry is drawn
+        // by LongFallBootsLayer, so the vanilla armor texture must remain transparent.
+        save(new BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB),
+                "textures/entity/equipment/humanoid/long_fall_boots.png");
         for (boolean armored : new boolean[] {false, true}) {
             String name = armored ? "armored_long_fall_boots" : "shock_boots";
             sprite(name, armored);
             atlas(armored);
         }
-        hazmat();
+        // Other equipment is regenerated only when explicitly requested.
+        if (java.util.Arrays.asList(args).contains("--hazmat")) hazmat();
     }
 
     static void pixel(BufferedImage im, int x, int y, int rgb) { im.setRGB(x, y, 0xFF000000 | rgb); }
@@ -30,10 +35,11 @@ public class LandingEquipmentTextureGen {
     }
 
     static void sprite(String name, boolean armored) throws Exception {
-        // Two open ankle harnesses, pale toe guards, cyan batteries and offset orange heel blades.
+        // Filled calf uppers and broad forward toes give each boot a clear footwear silhouette.
+        // The orange heel damper and cyan battery retain the landing-equipment identity.
         String[] boot = {
-            "  OOOO ", "  OH.SO", "  O.CO ", "  O. SO", "  OH SO", "  OH SO",
-            "  OH SO", " OHH SO", "OFFFFSO", "OFFF.SO", "OHHH.SO", "OOOOOO "
+            "  OOOO ", "  OHFO ", "  OFCO ", "  OF.SO", "  OH.SO", "  O..SO",
+            "  OF.SO", " OHHFSO", "OHFFFSO", "OFFFF.O", "O....OO", "OOOOOO "
         };
         BufferedImage im = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
         for (int side = 0; side < 2; side++) {
@@ -72,20 +78,26 @@ public class LandingEquipmentTextureGen {
     }
 
     static void atlas(boolean armored) throws Exception {
-        BufferedImage im = new BufferedImage(64, 32, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage im = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
         int shell = armored ? 0x575D65 : IVORY;
-        cube(im, 0, 0, 6, 2, 8, DARK, false);       // sole
-        cube(im, 0, 10, 6, 3, 3, shell, true);     // toe guard
-        cube(im, 0, 16, 6, 2, 6, DARK, true);      // ankle harness
-        cube(im, 28, 0, 1, 5, 2, DARK, false);    // calf rails
-        cube(im, 34, 0, 1, 6, 1, STEEL, false);  // shock piston
-        cube(im, 40, 0, 2, 3, 1, SPRING, false);
-        cube(im, 46, 0, 2, 4, 1, SPRING, false);
-        cube(im, 52, 0, 2, 2, 2, SPRING, false);
-        cube(im, 40, 8, 2, 1, 4, SPRING, false);
-        cube(im, 0, 24, 6, 4, 1, shell, true);   // shin guard
-        rect(im, 3, 27, 1, 2, CYAN);
-        rect(im, 7, 23, 1, 1, CYAN);
+        cube(im, 0, 0, 6, 2, 8, DARK, false);    // sole
+        cube(im, 0, 12, 6, 2, 4, shell, true);   // broad toe cap
+        cube(im, 0, 20, 5, 6, 5, shell, true);   // closed boot upper
+        cube(im, 0, 32, 6, 2, 6, DARK, true);    // calf cuff
+        cube(im, 30, 0, 1, 6, 1, STEEL, false); // shock pistons
+        cube(im, 36, 0, 2, 3, 1, SPRING, false);
+        cube(im, 42, 0, 2, 3, 1, SPRING, false);
+        cube(im, 48, 0, 2, 2, 2, SPRING, false);
+        cube(im, 36, 8, 2, 1, 4, SPRING, false);
+        cube(im, 0, 42, 6, 4, 1, shell, true);   // armored shin guard
+        // Two front fastening straps and a side-mounted charge indicator.
+        rect(im, 5, 26, 5, 1, DARK);
+        rect(im, 5, 28, 5, 1, DARK);
+        rect(im, 6, 26, 1, 1, STEEL);
+        rect(im, 6, 28, 1, 1, STEEL);
+        rect(im, 2, 26, 1, 2, CYAN);
+        rect(im, 11, 26, 1, 2, CYAN);
+        rect(im, 3, 44, 1, 2, CYAN);
         save(im, "textures/entity/equipment/long_fall/" + (armored ? "armored" : "standard") + ".png");
     }
 

@@ -10,6 +10,8 @@ import java.util.function.Consumer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -19,12 +21,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.equipment.ArmorType;
+import net.minecraft.world.item.equipment.EquipmentAsset;
+import net.minecraft.world.item.equipment.EquipmentAssets;
 import net.minecraft.world.item.equipment.Equippable;
 
 // Electrically powered landing protection. One damaging landing costs a fixed amount regardless of height;
 // ordinary steps cost nothing. The FE component charges through the same capability as Arc Tools.
 public class LongFallBootsItem extends Item {
-    public static final int CAPACITY = 100_000;
+    // Humanoid render states only retain equipped stacks with an equipment asset. Its transparent
+    // armor layer opts in without drawing vanilla armor over our custom boot model.
+    public static final ResourceKey<EquipmentAsset> EQUIPMENT = ResourceKey.create(EquipmentAssets.ROOT_ID,
+            Identifier.fromNamespaceAndPath("arcforge", "long_fall_boots"));
+    public static final int CAPACITY = 256_000;
     public static final int RECEIVE_RATE = 2_000;
     public static final int LANDING_COST = 1_000;
     private final boolean armored;
@@ -44,6 +52,7 @@ public class LongFallBootsItem extends Item {
         }
         return properties.stacksTo(1)
                 .component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.FEET)
+                        .setAsset(EQUIPMENT)
                         .setEquipSound(SteelMaterials.STEEL_ARMOR.equipSound()).build());
     }
 

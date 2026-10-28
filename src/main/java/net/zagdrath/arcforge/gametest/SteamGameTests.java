@@ -8,6 +8,8 @@ package net.zagdrath.arcforge.gametest;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +19,7 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.transfer.ResourceHandler;
@@ -38,6 +41,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.common.MenuReach;
+import net.zagdrath.arcforge.menu.machine.SteamBoilerMenu;
 import net.zagdrath.arcforge.multiblock.MultiblockPorts;
 import net.zagdrath.arcforge.block.multiblock.SteamBoilerArrayCasingBlock;
 import net.zagdrath.arcforge.multiblock.ShellStructure;
@@ -181,6 +185,80 @@ public final class SteamGameTests {
 
     static SteamBoilerArrayBlockEntity boilerAt(GameTestHelper helper, BlockPos min) {
         return helper.getBlockEntity(min, SteamBoilerArrayBlockEntity.class);
+    }
+
+    // Reload a new block entity without breaking/reforming the shell, as happens on a server restart.
+    private static SteamBoilerArrayBlockEntity reloadBoiler(GameTestHelper helper, SteamBoilerArrayBlockEntity boiler, CompoundTag saved) {
+        var restored = new SteamBoilerArrayBlockEntity(boiler.getBlockPos(), boiler.getBlockState());
+        restored.setLevel(helper.getLevel());
+        restored.loadWithComponents(TagValueInput.create(ProblemReporter.DISCARDING, helper.getLevel().registryAccess(), saved));
+        return restored;
+    }
+
+    // A hot boiler must draw on its stored heat immediately after loading, even when its heat source is at the
+    // same temperature and cannot supply any new heat. Neither pressure changes nor shell rebuilds are needed.
+    static void boilerResumesAfterReload(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 0);
+        boilerArray(helper, min);
+        helper.startSequence().thenIdle(3).thenExecute(() -> {
+            var boiler = boilerAt(helper, min);
+            fill(boiler.getWater(), WATER, 40_000);
+            FiberGameTests.heatTo(boiler.getHeat(), 1_126);
+            boiler.setPressure(BoilerPressure.SUPERHEATED);
+            for (int tick = 0; tick < 30; tick++) {
+                boiler.getHeat().add(400);
+                boiler.getCore().tick(boiler.maxHeatPerTick(), SteamBoilerArrayBlockEntity.heatCostMultiplier(boiler.getSections()),
+                        ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble());
+            }
+            var saved = boiler.saveWithFullMetadata(helper.getLevel().registryAccess());
+            helper.assertTrue(saved.getDoubleOr("heat_in", 0) > 0, "Boiler did not save its heat-input history");
+            var restored = reloadBoiler(helper, boiler, saved);
+            helper.assertTrue(restored.isMaster() && restored.getShell().equals(boiler.getShell()), "Reload lost the formed shell");
+            helper.assertTrue(restored.getHeat().getStored() == boiler.getHeat().getStored(), "Reload changed stored heat");
+            helper.assertTrue(restored.getWater().getCapacity() == boiler.getWater().getCapacity(), "Reload changed tank capacity");
+            var player = TestFixtures.player(helper);
+            var menu = (SteamBoilerMenu) restored.createMenu(1, player.getInventory(), player);
+            helper.assertTrue(menu.getPressure() == BoilerPressure.SUPERHEATED, "Reload lost the menu pressure setting");
+            int waterBefore = restored.getWater().getAmount(), steamBefore = restored.getSteam().getAmount();
+            for (int tick = 0; tick < 5; tick++) {
+                restored.getCore().tick(restored.maxHeatPerTick(), SteamBoilerArrayBlockEntity.heatCostMultiplier(restored.getSections()),
+                        ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble());
+            }
+            helper.assertTrue(restored.getWater().getAmount() < waterBefore && restored.getSteam().getAmount() > steamBefore,
+                    "Hot reloaded boiler stopped making steam without new heat input");
+            helper.assertTrue(SteamGrade.of(restored.getSteam().getResource(0)) == SteamGrade.SUPERHEATED, "Reload changed steam grade");
+        }).thenSucceed();
+    }
+
+    // Existing worlds have no heat-input history. They must also recover at heat equilibrium, while respecting
+    // the Superheated setting's 900 C floor and consuming only heat actually stored in the drum.
+    static void boilerLegacyReloadRestarts(GameTestHelper helper) {
+        BlockPos min = new BlockPos(0, 1, 0);
+        boilerArray(helper, min);
+        helper.startSequence().thenIdle(3).thenExecute(() -> {
+            var boiler = boilerAt(helper, min);
+            fill(boiler.getWater(), WATER, 40_000);
+            FiberGameTests.heatTo(boiler.getHeat(), 1_126);
+            boiler.setPressure(BoilerPressure.SUPERHEATED);
+            var saved = boiler.saveWithFullMetadata(helper.getLevel().registryAccess());
+            saved.remove("heat_in");
+            saved.remove("climb_share");
+            var restored = reloadBoiler(helper, boiler, saved);
+            int waterBefore = restored.getWater().getAmount(), heatBefore = restored.getHeat().getStored();
+            restored.getCore().tick(restored.maxHeatPerTick(), SteamBoilerArrayBlockEntity.heatCostMultiplier(restored.getSections()),
+                    ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble());
+            helper.assertTrue(restored.getSteam().getAmount() > 0 && restored.getWater().getAmount() < waterBefore,
+                    "A legacy boiler needs a pressure toggle to restart");
+            helper.assertTrue(restored.getHeat().getStored() < heatBefore, "Restart made steam without consuming heat");
+            helper.assertTrue(restored.getCore().getPressure() == BoilerPressure.SUPERHEATED, "Restart changed pressure");
+            FiberGameTests.heatTo(restored.getHeat(), SteamGrade.SUPERHEATED.minCelsius());
+            int atFloor = restored.getWater().getAmount();
+            for (int tick = 0; tick < 10; tick++) {
+                restored.getCore().tick(restored.maxHeatPerTick(), SteamBoilerArrayBlockEntity.heatCostMultiplier(restored.getSections()),
+                        ArcforgeConfig.BOILER_ARRAY_HOT_SAVING.getAsDouble());
+            }
+            helper.assertTrue(restored.getWater().getAmount() == atFloor, "Restart boiled below the selected pressure floor");
+        }).thenSucceed();
     }
 
     // Heated past 900°C a boiler array makes Superheated Steam; at 150°C plain Steam; below 100°C nothing.

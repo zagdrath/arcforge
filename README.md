@@ -206,7 +206,7 @@ in your inventory.
   for it.
 - **Armored Jetpack:** craft a jetpack beside a Steel Chestplate to make the matching armored item, preserving fuel
   and settings. It provides 7 armor and 1 toughness when worn in the chest slot, and has its own tier-upgrade recipes.
-- **Long Fall Boots:** cancel all fall damage for 1,000 FE per damaging landing, storing 100,000 FE. Craft beside
+- **Long Fall Boots:** cancel all fall damage for 1,000 FE per damaging landing, storing 256,000 FE. Craft beside
   Steel Boots to make Armored Long Fall Boots (2 armor, 1 toughness), preserving stored charge and the custom name.
 - Fuels are the data map `arcforge:jetpack_fuels`; tank sizes, climb speed and hover cost are in the config.
 
