@@ -44,6 +44,9 @@ public class FermenterScreen extends MachineScreen<FermenterMenu> {
     }
 
     @Override
+    protected List<GasVent> gasVents() { return List.of(new GasVent(0, CO2_X - 1, 71)); }
+
+    @Override
     protected Component sideModeName(SideMode mode) {
         return mode == SideMode.ENERGY ? sideModeName("energy_input") : super.sideModeName(mode);
     }

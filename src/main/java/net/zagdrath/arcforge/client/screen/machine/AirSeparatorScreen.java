@@ -38,6 +38,9 @@ public class AirSeparatorScreen extends MachineScreen<AirSeparatorMenu> {
 
     // Nitrogen leaves through this machine's Gas Output faces.
     @Override
+    protected List<GasVent> gasVents() { return List.of(new GasVent(0, NITROGEN_X - 1, 71), new GasVent(1, OXYGEN_X - 1, 71)); }
+
+    @Override
     protected Component sideModeName(SideMode mode) {
         return switch (mode) {
             case ENERGY -> sideModeName("energy_input");

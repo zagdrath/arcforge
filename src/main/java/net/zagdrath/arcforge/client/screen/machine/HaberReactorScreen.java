@@ -52,6 +52,9 @@ public class HaberReactorScreen extends MachineScreen<HaberReactorMenu> {
 
     // Ammonia leaves through this machine's Gas Output faces.
     @Override
+    protected List<GasVent> gasVents() { return List.of(new GasVent(0, TANK_X[2] - 1, 71)); }
+
+    @Override
     protected Component sideModeName(SideMode mode) {
         return switch (mode) {
             case ENERGY -> sideModeName("energy_input");

@@ -580,12 +580,12 @@ public class ArcforgeClient {
             AvatarRenderer<?> renderer = event.getPlayerRenderer(skin);
             if (renderer != null) {
                 renderer.addLayer(new JetpackLayer(renderer, event.getEntityModels()));
-                renderer.addLayer(new net.zagdrath.arcforge.client.renderer.HazmatLayer(renderer));
+                renderer.addLayer(new net.zagdrath.arcforge.client.renderer.LongFallBootsLayer(renderer));
             }
         }
         if (event.getRenderer(EntityTypes.ARMOR_STAND) instanceof LivingEntityRenderer renderer) {
             renderer.addLayer(new JetpackLayer(renderer, event.getEntityModels()));
-            renderer.addLayer(new net.zagdrath.arcforge.client.renderer.HazmatLayer(renderer));
+            renderer.addLayer(new net.zagdrath.arcforge.client.renderer.LongFallBootsLayer(renderer));
         }
     }
 

@@ -115,7 +115,6 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         } else {
             menu.getUpgradeSlots().forEach(slot -> slot.setActive(false));
         }
-        tabs.add(new net.zagdrath.arcforge.client.gui.tab.GasVentsTab(menu, this::sendButton));
     }
 
     // For machines with item outputs: shows the auto-eject button on the Sides (or Ports) tab.
@@ -194,11 +193,33 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
 
     protected abstract void addTooltip(List<Component> lines, int mouseX, int mouseY);
 
+    // Insert plain panel rows when controls need extra room, keeping existing background art at native pixel size.
+    protected int panelGapY() { return -1; }
+    protected int panelGapHeight() { return 0; }
+
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTick) {
         super.extractBackground(graphics, mouseX, mouseY, partialTick);
-        graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos, 0.0F, 0.0F, imageWidth, imageHeight, textureWidth(), textureHeight());
+        int gapY = panelGapY(), gap = panelGapHeight();
+        if (gapY < 0 || gap <= 0) {
+            graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos, 0.0F, 0.0F, imageWidth, imageHeight, textureWidth(), textureHeight());
+        } else {
+            graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos, 0.0F, 0.0F, imageWidth, gapY, textureWidth(), textureHeight());
+            for (int row = 0; row < gap; row++) {
+                graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos + gapY + row, 0.0F, gapY, imageWidth, 1, textureWidth(), textureHeight());
+            }
+            graphics.blit(RenderPipelines.GUI_TEXTURED, background, leftPos, topPos + gapY + gap, 0.0F, gapY,
+                    imageWidth, imageHeight - gapY - gap, textureWidth(), textureHeight());
+        }
         drawContents(graphics, leftPos, topPos);
+        for (GasVent vent : gasVents()) {
+            if (!showVent(vent)) continue;
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.sprite("container/electrolyzer/vent_" + (menu.ventEnabled(vent.output()) ? "on" : "off")),
+                    leftPos + vent.x(), topPos + vent.y(), 14, 12);
+            if (isHovering(vent.x(), vent.y(), 14, 12, mouseX, mouseY)) {
+                graphics.fill(leftPos + vent.x(), topPos + vent.y(), leftPos + vent.x() + 14, topPos + vent.y() + 12, 0x30FFFFFF);
+            }
+        }
         // Tabs overlap the panel edge, so they are drawn after the background.
         tabs.render(graphics, font, leftPos, topPos, mouseX, mouseY);
     }
@@ -216,6 +237,19 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     }
 
     protected boolean showInventoryLabel() { return true; }
+
+    protected record GasVent(int output, int x, int y) {
+        public GasVent {}
+    }
+
+    // Each screen places these directly below its gas gauges, using the Electrolyzer's controls.
+    protected List<GasVent> gasVents() { return List.of(); }
+
+    private boolean showVent(GasVent vent) {
+        if (vent.output() >= menu.ventCount()) return false;
+        Fluid fluid = menu.ventFluid(vent.output());
+        return fluid == null || fluid == Fluids.EMPTY || net.zagdrath.arcforge.steam.Gases.isGas(fluid);
+    }
 
     // The "Limited by connections" line, in warning yellow where the inventory label sits. A line too wide for the panel
     // is scaled down to fit, down to 2/3; past that the short form ("Limited: ...") is used, scaled if it must be. The
@@ -245,7 +279,17 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
     protected void extractTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         super.extractTooltip(graphics, mouseX, mouseY);
         List<Component> lines = new ArrayList<>();
-        addTooltip(lines, mouseX, mouseY);
+        for (GasVent vent : gasVents()) {
+            if (showVent(vent) && isHovering(vent.x(), vent.y(), 14, 12, mouseX, mouseY)) {
+                Fluid fluid = menu.ventFluid(vent.output());
+                Component name = fluid == null || fluid == Fluids.EMPTY ? Component.translatable("gui.arcforge.vent.output", vent.output() + 1)
+                        : fluid.getFluidType().getDescription();
+                lines.add(Component.translatable("gui.arcforge.vent.title", name));
+                lines.add(Component.translatable(menu.ventEnabled(vent.output()) ? "gui.arcforge.vent.on" : "gui.arcforge.vent.off").withStyle(ChatFormatting.GRAY));
+                break;
+            }
+        }
+        if (lines.isEmpty()) addTooltip(lines, mouseX, mouseY);
         if (lines.isEmpty()) {
             tabs.addTooltip(lines, mouseX, mouseY);
         }
@@ -389,6 +433,15 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
 
     @Override
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
+        if (event.button() == 0 && menu.getCarried().isEmpty()) {
+            for (GasVent vent : gasVents()) {
+                if (showVent(vent) && isHovering(vent.x(), vent.y(), 14, 12, event.x(), event.y())) {
+                    sendButton(net.zagdrath.arcforge.machine.GasVents.BUTTON_FIRST + vent.output());
+                    ArcforgeGui.playClickSound();
+                    return true;
+                }
+            }
+        }
         if (menu.getCarried().isEmpty() && tabs.mouseClicked(event)) {
             return true;
         }

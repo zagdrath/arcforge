@@ -51,6 +51,9 @@ public class BiogasDigesterScreen extends MachineScreen<BiogasDigesterMenu> {
     }
 
     @Override
+    protected List<GasVent> gasVents() { return List.of(new GasVent(0, GAS_X - 1, 71)); }
+
+    @Override
     protected Component sideModeName(SideMode mode) {
         return switch (mode) {
             case HEAT -> sideModeName("heat_input");

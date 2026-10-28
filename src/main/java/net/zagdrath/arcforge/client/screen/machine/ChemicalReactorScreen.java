@@ -28,7 +28,7 @@ public class ChemicalReactorScreen extends MachineScreen<ChemicalReactorMenu> {
     private static final int TANK_Y = 19, TANK_W = 12, TANK_H = 50;
     private static final int PROGRESS_X = 90, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
     private static final int LED_X = 25, LED_Y = 73;
-    private static final int STATUS_X = 33, STATUS_Y = 73, STATUS_W = 135;
+    private static final int STATUS_X = 33, STATUS_Y = 73, STATUS_W = 98;
 
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier progress = sprite("progress");
@@ -45,6 +45,9 @@ public class ChemicalReactorScreen extends MachineScreen<ChemicalReactorMenu> {
 
     @Override
     protected boolean showInventoryLabel() { return false; }
+
+    @Override
+    protected List<GasVent> gasVents() { return List.of(new GasVent(0, TANK_X[3] - 1, 71), new GasVent(1, TANK_X[4] - 1, 71)); }
 
     @Override
     protected Component sideModeName(SideMode mode) {

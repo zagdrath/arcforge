@@ -53,6 +53,9 @@ public class DistillationArrayScreen extends MachineScreen<DistillationArrayMenu
     }
 
     @Override
+    protected List<GasVent> gasVents() { return List.of(new GasVent(0, PRODUCT_X - 3, 71)); }
+
+    @Override
     protected Component sideModeName(SideMode mode) {
         return switch (mode) {
             case INPUT -> sideModeName("feed_input");

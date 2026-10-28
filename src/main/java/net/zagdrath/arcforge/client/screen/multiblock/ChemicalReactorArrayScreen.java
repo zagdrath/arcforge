@@ -51,6 +51,12 @@ public class ChemicalReactorArrayScreen extends MachineScreen<ChemicalReactorArr
     }
 
     @Override
+    protected List<GasVent> gasVents() { return List.of(new GasVent(0, TANK_X[3] - 1, 71), new GasVent(1, TANK_X[4] - 1, 71)); }
+
+    @Override protected int panelGapY() { return 71; }
+    @Override protected int panelGapHeight() { return 12; }
+
+    @Override
     protected Component sideModeName(SideMode mode) {
         return mode == SideMode.ENERGY ? sideModeName("energy_input") : super.sideModeName(mode);
     }

@@ -50,7 +50,8 @@ public final class SteamCrackerMesh extends ModelMesh {
     private void furnace() {
         float[] f = SteamCrackerLayout.FURNACE;
         float x0 = f[0], y0 = f[1], u0 = f[2], x1 = f[3], y1 = f[4], u1 = f[5];
-        box(x0, y0, u0, x1, y1, u1, Paint.PLAIN, Paint.PLAIN, null, SKIP_DOWN);
+        // The cornice supplies the roof surface; a second top at y1 would z-fight with it.
+        box(x0, y0, u0, x1, y1, u1, Paint.PLAIN, Paint.PLAIN, null, SKIP_DOWN | SKIP_UP);
         solidBoxes.add(f);
         // The plinth lip and the cornice.
         box(x0 - 1.0F, y0, u0 - 1.0F, x1 + 1.0F, y0 + 2.0F, u1 + 1.0F, Paint.FACE_SHADE, Paint.MID, null, SKIP_DOWN);
@@ -127,7 +128,7 @@ public final class SteamCrackerMesh extends ModelMesh {
         tube(new float[] { xa - r, y, cu }, new float[] { xb + r, y, cu }, r + 0.4F, PIPE_SIDES, Paint.BANDED);
         // The convection hood and the stack.
         float[] h = SteamCrackerLayout.HOOD;
-        box(h[0], h[1], h[2], h[3], h[4], h[5], Paint.PLATE, Paint.PLAIN, null, SKIP_DOWN);
+        box(h[0], h[1], h[2], h[3], h[4], h[5], Paint.PLATE, Paint.PLAIN, null, SKIP_DOWN | SKIP_UP);
         box(h[0] - 0.6F, h[4] - 1.0F, h[2] - 0.6F, h[3] + 0.6F, h[4], h[5] + 0.6F, Paint.MID, Paint.LIT, Paint.DARK, 0);
         solidBoxes.add(h);
         float sx = SteamCrackerLayout.STACK_X, su = SteamCrackerLayout.STACK_U, sr = SteamCrackerLayout.STACK_R, top = SteamCrackerLayout.STACK_TOP;

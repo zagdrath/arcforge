@@ -44,7 +44,7 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
     private static final int CATALYST_TEXT_X = 41, CATALYST_TEXT_Y = 57, CATALYST_TEXT_W = 44;
     private static final int LED_X = 9, LED_Y = 75;
     private static final int STATUS_X = 17, STATUS_Y = 75, STATUS_W = 100;
-    private static final int TEMP_RIGHT = 167, TEMP_Y = 75;
+    private static final int TEMP_RIGHT = 167, TEMP_Y = 93;
     private static final int HEAT_X = 9, HEAT_Y = 88, HEAT_W = 158;
     private static final int TICK_Y = 85, TICK_W = 3, TICK_H = 7;
 
@@ -79,6 +79,19 @@ public class RefiningScreen extends MachineScreen<RefiningMenu> {
             }));
         }
         return tabs;
+    }
+
+    @Override
+    protected List<GasVent> gasVents() {
+        List<GasVent> vents = new ArrayList<>();
+        int output = 0;
+        for (int i = 0; i < process.tanks(); i++) {
+            if (net.zagdrath.arcforge.steam.Gases.isGas(process.products().get(i))) {
+                int index = output++;
+                if (net.zagdrath.arcforge.steam.Gases.isGas(productShown(i))) vents.add(new GasVent(index, PRODUCT_X[i] - 1, 71));
+            }
+        }
+        return vents;
     }
 
     private int feedX() {

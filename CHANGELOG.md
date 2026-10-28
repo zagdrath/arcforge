@@ -28,7 +28,7 @@ machines and Settings Cards carry over).
 
 ### Added
 
-- **Gas output vent controls.** A Vents tab provides individual overflow toggles for refinery units, the Steam Cracker,
+- **Gas output vent controls.** Buttons directly beneath the gas gauges provide individual overflow toggles for refinery units, the Steam Cracker,
   chemical reactors and arrays, the Gasifier, Haber Reactor, Distillation Array, Biogas Digester, Air Separator and
   Fermenter. Vents discard excess gas while keeping the stored buffer; liquid outputs still require room. Settings
   persist with the machine and copy through Settings Cards. Air Separator and Fermenter vents start enabled.
@@ -192,6 +192,11 @@ machines and Settings Cards carry over).
 
 ### Fixed
 
+- **Equipment and model visuals.** Hazmat sleeves now use the full armor unwrap, with black gloves and boots. Long
+  Fall Boots have native 16x16 item sprites and separate mechanical worn models with heel springs, side dampers and
+  armored shin guards. Removed duplicate Steam Cracker roof faces that caused clipping.
+- **Distance mode lift.** Holding jump in Distance mode now climbs at 30% of normal thrust and rise speed while
+  retaining forward thrust; sneak still descends.
 - **Crowded machine labels.** Removed the Chemical Reactor's inventory label from its status row and split the
   Electrolyzer's energy cost into a value and units, bounded to the available space, with complete values in tooltips.
 - Hazmat chestplates cover the full arm with sleeves and black gloves; Hazmat Boots have black rubber lower boots.

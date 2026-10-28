@@ -347,7 +347,8 @@ public final class ArcToolGameTests {
             }
             var motion = player.getDeltaMovement();
             double limit = ArcforgeConfig.perTierDouble(ArcforgeConfig.JETPACK_DISTANCE_SPEED, JetpackItem.tierIndex(pack.tier()));
-            helper.assertTrue(motion.x < 0 && Math.abs(motion.z) < 0.001 && Math.abs(motion.y) < 0.001, "Distance mode did not fly level toward yaw");
+            helper.assertTrue(motion.x < 0 && Math.abs(motion.z) < 0.001 && motion.y > 0 && motion.y <= pack.maxRise() * 0.3 + 0.001,
+                    "Distance mode did not climb gently toward yaw");
             helper.assertTrue(Math.abs(motion.horizontalDistance() - limit) < 0.001, "Distance speed is not capped at " + limit);
             helper.assertTrue(player.fallDistance == 0, "Distance mode did not clear fall distance");
             int remaining = JetpackItem.fluid(stack).getAmount();

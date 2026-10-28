@@ -44,9 +44,9 @@ public class ChemicalReactorArrayMenu extends MachineMenu {
     public static final int BYPRODUCT_TANK = 4;
 
     // Each lane's row: its three inputs, then (past the arrow) the output and the by-product.
-    public static final int WIDTH = 220, HEIGHT = 222;
-    public static final int INPUT_X = 30, OUTPUT_X = 118, BYPRODUCT_X = 136, FIRST_LANE_Y = 74, LANE_PITCH = 18;
-    public static final int INVENTORY_X = (WIDTH - 176) / 2 + 8, INVENTORY_Y = 140;
+    public static final int WIDTH = 220, HEIGHT = 234;
+    public static final int INPUT_X = 30, OUTPUT_X = 118, BYPRODUCT_X = 136, FIRST_LANE_Y = 86, LANE_PITCH = 18;
+    public static final int INVENTORY_X = (WIDTH - 176) / 2 + 8, INVENTORY_Y = 152;
 
     public ChemicalReactorArrayMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
         this(containerId, inventory, extraData.readBlockPos(), ChemicalReactorArrayBlockEntity.clientItems(),

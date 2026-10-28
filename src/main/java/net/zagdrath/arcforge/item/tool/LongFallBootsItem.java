@@ -44,7 +44,7 @@ public class LongFallBootsItem extends Item {
         }
         return properties.stacksTo(1)
                 .component(DataComponents.EQUIPPABLE, Equippable.builder(EquipmentSlot.FEET)
-                        .setAsset(SteelMaterials.STEEL_ARMOR.assetId()).setEquipSound(SteelMaterials.STEEL_ARMOR.equipSound()).build());
+                        .setEquipSound(SteelMaterials.STEEL_ARMOR.equipSound()).build());
     }
 
     public boolean armored() {

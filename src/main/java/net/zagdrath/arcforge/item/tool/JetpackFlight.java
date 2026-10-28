@@ -26,7 +26,7 @@ import net.zagdrath.arcforge.network.JetpackStatePayload;
 // exhaust). The local client runs the same motion from its own keys so flying doesn't rubber-band.
 // Normal: jump thrusts (up to the tier's climb speed) and steers with the movement keys.
 // Hover: while airborne it holds altitude; jump climbs, sneak sinks; it burns hoverFuelMultiplier times as much.
-// Distance: jump thrusts horizontally in the facing direction and holds altitude; sneak descends.
+// Distance: jump thrusts forward with a gentle climb; sneak descends.
 public final class JetpackFlight {
     public record Input(boolean jump, boolean sneak) {
         public static final Input NONE = new Input(false, false);
@@ -135,8 +135,8 @@ public final class JetpackFlight {
 
         Vec3 motion = player.getDeltaMovement();
         double vy = motion.y;
-        if (distance && !player.onGround()) {
-            vy = sneak ? SINK_SPEED : 0.0;
+        if (distance) {
+            vy = sneak ? SINK_SPEED : Math.min(Math.max(0.0, vy) + fuel.thrust() * 0.3, jetpack.maxRise() * 0.3);
         } else if (!hover || jump) {
             vy = Math.min(vy + fuel.thrust(), jetpack.maxRise());
         } else if (sneak) {
