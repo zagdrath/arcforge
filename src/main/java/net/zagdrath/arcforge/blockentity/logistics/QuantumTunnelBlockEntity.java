@@ -260,7 +260,7 @@ public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, Menu
             if (mode(face, QuantumResource.ENERGY) == QuantumFaces.OUTPUT) {
                 EnergyHandler target = target(level, pos, face, QuantumResource.ENERGY, Capabilities.Energy.BLOCK);
                 if (target != null) {
-                    EnergyHandlerUtil.move(frequency.energy(), target, ConduitTier.ARCFORGED.energyPerTick(), null);
+                    EnergyHandlerUtil.move(frequency.energy(), target, net.zagdrath.arcforge.config.ArcforgeConfig.QUANTUM_ENERGY_OUTPUT.getAsInt(), null);
                 }
             }
             if (mode(face, QuantumResource.HEAT) == QuantumFaces.OUTPUT) {

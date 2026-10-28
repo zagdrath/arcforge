@@ -127,9 +127,10 @@ public abstract class MachineMenu extends AbstractContainerMenu implements Secur
 
     // For wider GUIs too: the player inventory's left edge at inventoryX (8 on a 176-wide GUI).
     protected void finish(Inventory inventory, int inventoryX, int inventoryY) {
-        for (int i = 0; i < MachineBlockEntity.UPGRADE_SLOTS; i++) {
+        items.normalizeUpgrades();
+        for (int i = 0; i < items.getUpgradeTypes().size(); i++) {
             ToggleableSlot slot = new ToggleableSlot(items, items::set, items.getFirstUpgradeSlot() + i, upgradeSlotX() + i * UPGRADE_SLOT_PITCH,
-                    UPGRADE_SLOT_Y);
+                    UPGRADE_SLOT_Y).forUpgrade(items.getUpgradeTypes().get(i));
             upgradeSlots.add(slot);
             addSlot(slot);
         }

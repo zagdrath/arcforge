@@ -433,7 +433,7 @@ public final class ArcQuarryGameTests {
         clear(helper);
         helper.assertTrue(place(helper).consumesAction(), "The quarry wasn't placed");
         ArcQuarryBlockEntity quarry = helper.getBlockEntity(MAIN, ArcQuarryBlockEntity.class);
-        net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        net.minecraft.server.level.ServerPlayer player = TestFixtures.player(helper);
         BlockPos absolute = helper.absolutePos(MAIN);
         player.snapTo(absolute.getX() + 0.5, absolute.getY() + 1, absolute.getZ() + 0.5);
         ArcQuarryConfigMenu menu = new ArcQuarryConfigMenu(7, player.getInventory(), absolute);

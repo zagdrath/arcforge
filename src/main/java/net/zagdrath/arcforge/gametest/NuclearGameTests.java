@@ -407,6 +407,47 @@ public final class NuclearGameTests {
         helper.succeed();
     }
 
+    // A weak machine source must accumulate dose, eventually cause sickness, and allow recovery only once clear.
+    static void lowRadiationDose(GameTestHelper helper) {
+        ServerLevel level = helper.getLevel();
+        BlockPos source = new BlockPos(3, 2, 3);
+        helper.setBlock(source, ModBlocks.pressurizedCylinder(ConduitTier.WROUGHT).get());
+        PressurizedCylinderBlockEntity cylinder = helper.getBlockEntity(source, PressurizedCylinderBlockEntity.class);
+        cylinder.line();
+        helper.assertTrue(fill(cylinder.getTank(), uf6(Enrichment.NATURAL_PCM), 100) == 100, "Failed to fill radioactive machine");
+        var player = helper.makeMockPlayer(net.minecraft.world.level.GameType.SURVIVAL);
+        Vec3 at = centre(helper, source.south(2));
+        player.snapTo(at.x, at.y, at.z);
+        RadiationField.forget(level);
+        RadiationDose.reset(player);
+        try {
+            double rate = RadiationField.doseRate(level, player);
+            helper.assertTrue(rate > 0 && rate < ArcforgeConfig.RADIATION_RECOVERY.getAsDouble(), "Expected weak machine exposure, got " + rate);
+            int interval = ArcforgeConfig.RADIATION_CHECK_INTERVAL.getAsInt();
+            RadiationDose.tick(level, player, interval);
+            double expected = rate * interval / ArcforgeConfig.RADIATION_TICKS_PER_HOUR.getAsInt();
+            helper.assertTrue(Math.abs(RadiationDose.exposure(player).dose() - expected) < 1.0E-8,
+                    "Weak exposure dose " + RadiationDose.exposure(player).dose() + ", expected " + expected + "; rate " + rate
+                            + "; enabled " + ArcforgeConfig.RADIATION_ENABLED.getAsBoolean() + "; creative " + player.isCreative());
+            // Start just below the threshold, then simulate enough exposure time to gain one mSv.
+            RadiationDose.reset(player);
+            player.setData(RadiationDose.EXPOSURE, new RadiationDose.Exposure(ArcforgeConfig.RADIATION_POISONING_1.getAsDouble() - 0.5, 0));
+            int elapsed = (int) Math.ceil(ArcforgeConfig.RADIATION_TICKS_PER_HOUR.getAsInt() / rate);
+            RadiationDose.tick(level, player, elapsed);
+            helper.assertTrue(player.hasEffect(net.zagdrath.arcforge.registry.ModMobEffects.RADIATION_POISONING), "Prolonged weak exposure caused no sickness");
+            double before = RadiationDose.exposure(player).dose();
+            helper.setBlock(source, Blocks.AIR);
+            RadiationField.forget(level);
+            helper.assertTrue(RadiationField.doseRate(level, player) == 0, "The removed machine still irradiates the player");
+            RadiationDose.tick(level, player, ArcforgeConfig.RADIATION_TICKS_PER_HOUR.getAsInt());
+            double recovered = Math.max(0, before - ArcforgeConfig.RADIATION_RECOVERY.getAsDouble());
+            helper.assertTrue(Math.abs(RadiationDose.exposure(player).dose() - recovered) < 1.0E-8, "Dose did not recover outside radiation");
+        } finally {
+            RadiationDose.reset(player);
+        }
+        helper.succeed();
+    }
+
     // A full Hazmat Suit lets the configured 5% through, part of one some; and the dose thresholds.
     static void hazmatAndDose(GameTestHelper helper) {
         ServerLevel level = helper.getLevel();

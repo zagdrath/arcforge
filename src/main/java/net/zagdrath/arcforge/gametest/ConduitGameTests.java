@@ -956,7 +956,7 @@ final class ConduitGameTests {
     // would: an item filter takes items, a fluid filter fluids (or an item holding one), a pressurized filter gases, and
     // each refuses the other kinds, as only the matching entries light up while dragging.
     static void filterGhostSlotDrag(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         BlockPos near = helper.absolutePos(new BlockPos(2, 1, 0));
         player.snapTo(near.getX() + 0.5, near.getY() + 1, near.getZ() + 0.5);
         int id = 40;

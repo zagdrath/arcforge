@@ -286,8 +286,9 @@ public final class OreGameTests {
         }
         var items = plants[1].getItems();
         ItemResource card = ItemResource.of(ModItems.THERMOELECTRIC_UPGRADE.get());
-        helper.assertTrue(items.isValid(items.getFirstUpgradeSlot(), card), "The plant refuses the card");
-        items.setStack(items.getFirstUpgradeSlot(), new ItemStack(ModItems.THERMOELECTRIC_UPGRADE.get(), 8));
+        int efficiencySlot = items.slotFor(net.zagdrath.arcforge.upgrade.UpgradeType.THERMOELECTRIC);
+        helper.assertTrue(items.isValid(efficiencySlot, card), "The plant refuses the card");
+        items.setStack(efficiencySlot, new ItemStack(ModItems.THERMOELECTRIC_UPGRADE.get(), 8));
         helper.setBlock(new BlockPos(4, 1, 0), ModBlocks.ARC_CRUSHER.get());
         var crusher = helper.getBlockEntity(new BlockPos(4, 1, 0), ArcCrusherBlockEntity.class).getItems();
         helper.assertTrue(!crusher.isValid(crusher.getFirstUpgradeSlot(), card), "The Arc Crusher takes the card");

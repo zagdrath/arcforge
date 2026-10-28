@@ -40,6 +40,27 @@ public class UpgradesTab extends SideTab {
     }
 
     @Override
+    public boolean isVisible() {
+        return !slots.isEmpty();
+    }
+
+    @Override
+    protected int expandedWidth() {
+        return Math.max(100, 16 + slots.size() * SLOT_PITCH + (info != null ? 80 : 0));
+    }
+
+    @Override
+    protected void addTooltip(List<Component> lines, int localX, int localY) {
+        int index = (localX - SLOTS_X) / SLOT_PITCH;
+        if (localX >= SLOTS_X && localY >= SLOTS_Y && localY < SLOTS_Y + 18 && index < slots.size()
+                && slots.get(index).upgradeType() != null && !slots.get(index).hasItem()) {
+            var type = slots.get(index).upgradeType();
+            lines.add(Component.translatable("item.arcforge." + (type == net.zagdrath.arcforge.upgrade.UpgradeType.AUTOPILOT
+                    ? "reactor_autopilot" : type.getSerializedName() + "_upgrade")));
+        }
+    }
+
+    @Override
     protected void onFullyOpenChanged(boolean fullyOpen) {
         slots.forEach(slot -> slot.setActive(fullyOpen));
     }

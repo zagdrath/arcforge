@@ -62,7 +62,9 @@ public final class JetpackFlight {
 
     public static ItemStack worn(Player player) {
         ItemStack chest = player.getItemBySlot(EquipmentSlot.CHEST);
-        return chest.getItem() instanceof JetpackItem ? chest : ItemStack.EMPTY;
+        return chest.getItem() instanceof JetpackItem ? chest : top.theillusivec4.curios.api.CuriosApi.getCuriosInventory(player)
+                .flatMap(inventory -> inventory.findFirstCurio(stack -> stack.getItem() instanceof JetpackItem))
+                .map(top.theillusivec4.curios.api.SlotResult::stack).orElse(ItemStack.EMPTY);
     }
 
     // One server tick: fly on the player's last sent keys and tell trackers when the output changes.

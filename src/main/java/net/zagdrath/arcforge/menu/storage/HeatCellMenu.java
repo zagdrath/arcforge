@@ -57,7 +57,8 @@ public class HeatCellMenu extends StorageMenu {
         super(ModMenuTypes.HEAT_CELL.get(), containerId, inventory, pos, items, data, DATA_VALUES, DATA_SIDE_CONFIG,
                 block -> block instanceof HeatCellBlock, SLOT_X_LEFT);
         this.upgradeSlotIndex = slots.size();
-        this.upgradeSlot = new ToggleableSlot(upgrades, upgrades::set, upgrades.getFirstUpgradeSlot(), UPGRADE_SLOT_X, UPGRADE_SLOT_Y);
+        this.upgradeSlot = new ToggleableSlot(upgrades, upgrades::set, upgrades.getFirstUpgradeSlot(), UPGRADE_SLOT_X, UPGRADE_SLOT_Y)
+                .forUpgrade(net.zagdrath.arcforge.upgrade.UpgradeType.INSULATION);
         addSlot(upgradeSlot);
     }
 

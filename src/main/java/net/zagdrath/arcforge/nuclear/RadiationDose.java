@@ -38,7 +38,8 @@ import net.zagdrath.arcforge.registry.ModMobEffects;
 // A living entity's radiation exposure (EXPOSURE, saved on it, not kept through death, synced to its own player for the
 // Geiger Counter's clicks): the dose rate it last took (mSv/h, see RadiationField) and the dose it has built up (mSv).
 //  - Every radiation.doseCheckInterval ticks the dose grows by the rate for that time (an hour is radiation.ticksPerHour
-//    ticks, an in-game hour by default) and falls by radiation.recoveryPerHour. Creative and spectator players take none.
+//    ticks, an in-game hour by default). Outside exposure it falls by radiation.recoveryPerHour. Creative and spectator
+//    players take none.
 //  - Radiation Poisoning (RadiationPoisoningEffect) from the dose: I from poisoningDose1 (50 mSv; half a heart every 30
 //    seconds), II from poisoningDose2 (500; every 10 seconds, Hunger), III from poisoningDose3 (2,000; every 4 seconds,
 //    Hunger and Weakness), IV from poisoningDose4 (4,000; a heart every 2 seconds, Hunger, Weakness and Nausea), all
@@ -120,10 +121,13 @@ public final class RadiationDose {
         double rate = RadiationField.doseRate(level, entity);
         double hours = interval / (double) ArcforgeConfig.RADIATION_TICKS_PER_HOUR.getAsInt();
         double dose = before.dose();
-        if (ArcforgeConfig.RADIATION_ENABLED.getAsBoolean() && !immune) {
+        if (ArcforgeConfig.RADIATION_ENABLED.getAsBoolean() && !immune && rate > 0.0) {
             dose += rate * hours;
+        } else {
+            // Recover once clear of radiation. Subtracting recovery during exposure made every field below
+            // recoveryPerHour harmless indefinitely, despite the Geiger Counter reporting it.
+            dose = Math.max(0.0, dose - ArcforgeConfig.RADIATION_RECOVERY.getAsDouble() * hours);
         }
-        dose = Math.max(0.0, dose - ArcforgeConfig.RADIATION_RECOVERY.getAsDouble() * hours);
         Exposure after = new Exposure(dose, (float) rate);
         if (entity instanceof Player) {
             LIVE.put(entity.getUUID(), after);

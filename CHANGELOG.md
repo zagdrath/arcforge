@@ -28,6 +28,15 @@ machines and Settings Cards carry over).
 
 ### Added
 
+- **Included Curios API and Jetpack slot.** Jetpacks work in a dedicated accessory slot alongside chest armor, with
+  their existing modes, controls, HUD, sound and worn model. Curios is embedded in the release jar; this requires
+  NeoForge 26.3.0.37-beta or newer. The development JEI dependency is updated for that NeoForge version.
+- **Radiation warning particles.** Green particles surround radioactive sources and radioactive contents in machines,
+  conduits, inventories and dropped items. Uses the exposure source cache, loaded chunks near players and a bounded
+  particle budget; `nuclear.radiation.radiationParticles` can disable the visual warning.
+- **Typed machine upgrade slots.** Machines show only the upgrade types they support, with a faded matching icon in
+  each empty slot. Each slot accepts only its designated upgrade, including shift-clicks and automation. Installed
+  upgrades from older saves move into their matching slots without losing the machine's inventory.
 - **Armored Jetpack items.** Craft any tier's Jetpack beside a Steel Chestplate to make its Armored Jetpack, preserving
   fuel and settings. Each armored tier has its own item and upgrade recipe; existing plated jetpacks still work.
 - **Long Fall Boots.** Steel Boots, a Tempered Battery, two Rubber Gaskets and two Copper Ingots make boots that store
@@ -176,6 +185,16 @@ machines and Settings Cards carry over).
 
 ### Fixed
 
+- Hazmat chestplates cover the full arm with sleeves and black gloves; Hazmat Boots have black rubber lower boots.
+  These model additions reuse the existing suit palette and follow the wearer's limbs.
+- Arc Quarry scans clamp saved areas to the current dimension and skip out-of-height positions before indexing chunk
+  sections, preventing the Nether crash from an Overworld Y range.
+- Quantum Tunnel output no longer has the older Arcforged energy cap. Each face pushes up to 4,194,304 FE/t by default
+  (configurable with `logistics.quantumTunnel.energyOutputPerFace`), allowing high-power consumers to use the shared buffer.
+- Low radiation readings now build up dose instead of being canceled by passive recovery. Recovery applies after
+  exposure stops, so prolonged exposure near radioactive machines and conduits can cause Radiation Poisoning.
+- Uranium Dioxide, Green Fuel Pellets and Fuel Pellets now show their U-235 enrichment in the tooltip, including
+  the natural 0.711% value when no custom assay is set.
 - The Fission Reactor, Steam Generator and Heavy Water Tower models now sample light around all six exterior faces,
   so floor and wall lighting illuminates them indoors even when the space above the vessel is dark.
 - Greenhouse Frames now require a Glass Pane in the center, resolving their recipe conflict with Derrick Casings.

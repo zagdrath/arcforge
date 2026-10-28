@@ -201,7 +201,7 @@ public final class QuestPackGameTests {
 
     @SuppressWarnings("removal")
     private static ServerPlayer player(GameTestHelper helper, BlockPos standRelative) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         player.setGameMode(GameType.SURVIVAL);
         BlockPos stand = helper.absolutePos(standRelative);
         player.snapTo(stand.getX() + 0.5, stand.getY(), stand.getZ() + 0.5);

@@ -353,7 +353,7 @@ final class CavernGameTests {
         SurveyRecord survey = SeismicSurveyToolItem.survey(level, here);
         helper.assertTrue(survey.kind().orElse(null) == DepositKind.FIELD && survey.sour() && survey.gasCap() && survey.buckets() == 18_000,
                 "The survey read " + survey + " (before: " + legacy + ")");
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         player.getInventory().add(new ItemStack(Items.PAPER, 2));
         SeismicSurveyToolItem.recordOnPaper(player, survey);
         int paper = player.getInventory().countItem(Items.PAPER);

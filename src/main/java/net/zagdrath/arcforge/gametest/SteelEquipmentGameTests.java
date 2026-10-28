@@ -47,7 +47,7 @@ public final class SteelEquipmentGameTests {
     // A survival player two blocks west of the centre, facing it, holding `tool`; breaks the centre.
     @SuppressWarnings("removal")
     private static ServerPlayer mine(GameTestHelper helper, ItemStack tool, boolean sneaking) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         player.setGameMode(GameType.SURVIVAL);
         BlockPos stand = helper.absolutePos(CENTRE.west(2).below());
         // Face the centre in world terms (in case the test structure is rotated). A player looks where their head

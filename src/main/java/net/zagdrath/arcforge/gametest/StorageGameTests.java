@@ -152,7 +152,7 @@ final class StorageGameTests {
         helper.getBlockEntity(tankPos, FluidTankBlockEntity.class).getItems().setStack(StorageBlockEntity.SLOT_OUT, new ItemStack(Items.BUCKET, 3));
         helper.getBlockEntity(cellPos, EnergyCellBlockEntity.class).getItems().setStack(StorageBlockEntity.SLOT_IN, new ItemStack(Items.DIAMOND, 2));
 
-        var player = helper.makeMockServerPlayerInLevel();
+        var player = TestFixtures.player(helper);
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.DIAMOND_PICKAXE));
         // Keep the mock player out of pickup range of the drops.
         BlockPos away = helper.absolutePos(new BlockPos(2, 1, 12));

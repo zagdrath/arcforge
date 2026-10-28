@@ -23,7 +23,7 @@ public final class FoundryGameTests {
 
     @SuppressWarnings("removal")
     private static ServerPlayer wearing(GameTestHelper helper, int pieces) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         player.setGameMode(GameType.SURVIVAL);
         ItemStack[] suit = { new ItemStack(ModItems.FOUNDRY_HELMET.get()), new ItemStack(ModItems.FOUNDRY_CHESTPLATE.get()),
                 new ItemStack(ModItems.FOUNDRY_LEGGINGS.get()), new ItemStack(ModItems.FOUNDRY_BOOTS.get()) };

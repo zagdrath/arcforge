@@ -18,6 +18,7 @@ import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.zagdrath.arcforge.Arcforge;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.nuclear.RadiationDose;
@@ -34,6 +35,13 @@ public final class RadiationEvents {
     private static final int MOB_SLOWDOWN = 8;
 
     private RadiationEvents() {}
+
+    @SubscribeEvent
+    static void onLevelTick(LevelTickEvent.Post event) {
+        if (event.getLevel() instanceof ServerLevel level) {
+            net.zagdrath.arcforge.nuclear.RadiationParticles.tick(level);
+        }
+    }
 
     @SubscribeEvent
     static void onPlayerTick(PlayerTickEvent.Post event) {

@@ -329,6 +329,10 @@ public final class ArcforgeGameTests {
         TESTS.put("xp_shower", ExtendedLogisticsGameTests::xpShower);
         TESTS.put("vacuum_experience", ExtendedLogisticsGameTests::vacuumExperience);
         TESTS.put("quantum_tunnel", ExtendedLogisticsGameTests::quantumTunnel);
+        TESTS.put("typed_machine_upgrade_slots", EquipmentLogisticsFixGameTests::typedUpgrades);
+        TESTS.put("quantum_tunnel_high_power", EquipmentLogisticsFixGameTests::quantumPower);
+        TESTS.put("quarry_nether_height", EquipmentLogisticsFixGameTests::quarryNether);
+        TESTS.put("curios_jetpack_flight", EquipmentLogisticsFixGameTests::curioJetpack);
         TESTS.put("quantum_tunnel_item_counts", ExtendedLogisticsGameTests::quantumTunnelItemCounts);
         TESTS.put("chunk_loader", ExtendedLogisticsGameTests::chunkLoader);
         TESTS.put("firebox_array_forms", BigArrayGameTests::fireboxArrayForms);
@@ -637,6 +641,7 @@ public final class ArcforgeGameTests {
         LONG_TESTS.put("nuclear_containment_scan", NuclearSafetyGameTests::containmentScan);
         RADIATION_TESTS.put("nuclear_radiation_field", NuclearGameTests::radiationField);
         RADIATION_TESTS.put("nuclear_hazmat_and_dose", NuclearGameTests::hazmatAndDose);
+        RADIATION_TESTS.put("nuclear_low_radiation_dose", NuclearGameTests::lowRadiationDose);
         TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         RADIATION_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         SOLAR_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
@@ -694,7 +699,7 @@ public final class ArcforgeGameTests {
         helper.setBlock(pos, ModBlocks.GEOTHERMAL_PLANT.get());
         GeothermalPlantBlockEntity plant = helper.getBlockEntity(pos, GeothermalPlantBlockEntity.class);
 
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         BlockPos absolute = helper.absolutePos(pos);
         player.snapTo(absolute.getX() + 0.5, absolute.getY() + 1, absolute.getZ() + 0.5);
         // The mock connection can't receive NeoForge's open-screen payload, so attach the server menu directly.
@@ -725,7 +730,7 @@ public final class ArcforgeGameTests {
         BlockPos pos = new BlockPos(0, 1, 0);
         helper.setBlock(pos, ModBlocks.GEOTHERMAL_PLANT.get());
         GeothermalPlantBlockEntity plant = helper.getBlockEntity(pos, GeothermalPlantBlockEntity.class);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         BlockPos absolute = helper.absolutePos(pos);
         player.snapTo(absolute.getX() + 0.5, absolute.getY() + 1, absolute.getZ() + 0.5);
         GeothermalPlantMenu menu = (GeothermalPlantMenu) plant.createMenu(1, player.getInventory(), player);

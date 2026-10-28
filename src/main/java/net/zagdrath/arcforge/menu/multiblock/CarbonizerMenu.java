@@ -93,7 +93,7 @@ public class CarbonizerMenu extends AbstractContainerMenu implements SecuredMenu
         addSlot(new ResourceHandlerSlot(items, items::set, CarbonizerBlockEntity.SLOT_BUCKET_OUT, BUCKET_OUT_X, BUCKET_OUT_Y));
         // The Speed Upgrade slot, in the Upgrades tab (the third tab, as on every machine).
         ToggleableSlot upgrade = new ToggleableSlot(items, items::set, CarbonizerBlockEntity.SLOT_UPGRADE, MachineMenu.UPGRADE_SLOT_X,
-                MachineMenu.UPGRADE_SLOT_Y);
+                MachineMenu.UPGRADE_SLOT_Y).forUpgrade(net.zagdrath.arcforge.upgrade.UpgradeType.SPEED);
         upgradeSlots.add(upgrade);
         addSlot(upgrade);
         addStandardInventorySlots(inventory, 8, 84);

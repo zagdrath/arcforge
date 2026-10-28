@@ -333,6 +333,17 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
     // --- Ticking ---
 
     public void serverTick(ServerLevel level, BlockPos pos, BlockState state) {
+        if (settings.minY() < level.getMinY() || settings.maxY() > level.getMaxY()
+                || settings.minY() > settings.maxY() || settings.radius() < 0 || settings.radius() > ArcforgeConfig.QUARRY_MAX_RADIUS.getAsInt()) {
+            QuarrySettings bounded = settings.withArea(settings.radius(), settings.minY(), settings.maxY(), level);
+            boolean mining = quarryState == State.MINING || quarryState == State.SCANNING && mineAfterScan;
+            boolean scanning = quarryState == State.SCANNING || quarryState == State.MINING;
+            settings = bounded;
+            if (scanning) {
+                startScan(mining);
+            }
+            changed(true);
+        }
         usage = 0;
         switch (quarryState) {
             case SCANNING -> {
@@ -375,6 +386,10 @@ public class ArcQuarryBlockEntity extends MachineBlockEntity {
         long chunkKey = Long.MIN_VALUE;
         while (budget-- > 0 && scanCursor < volume) {
             BlockPos target = scanPos(scanCursor++);
+            // Saved Overworld ranges can extend below or above another dimension's chunk sections.
+            if (level.isOutsideBuildHeight(target)) {
+                continue;
+            }
             if (ArcQuarryBlock.isPart(worldPosition, target)) {
                 continue;
             }

@@ -12,7 +12,7 @@
     },
     {
       "type": "text",
-      "text": "# Radiation Poisoning\nWhile you're exposed your dose (mSv) builds up by the rate each in-game hour, and slowly falls again (10 mSv an hour). It brings Radiation Poisoning, which hurts through armour:\n- I from 50 mSv: half a heart every 30 seconds.\n- II from 500: every 10 seconds, and Hunger.\n- III from 2,000: every 4 seconds, Hunger and Weakness.\n- IV from 4,000: a heart every 2 seconds, with Nausea, until the dose falls or you die.\nStanding in a strong field (100 mSv/h or more) makes it a level worse at once, even with no dose yet. Dying resets it."
+      "text": "# Radiation Poisoning\nWhile you're exposed your dose (mSv) builds up by the rate each in-game hour, and falls again only once you are clear of radiation (10 mSv an hour). Radioactive blocks, items and machines or conduits containing radioactive contents emit green warning particles nearby (configurable). It brings Radiation Poisoning, which hurts through armour:\n- I from 50 mSv: half a heart every 30 seconds.\n- II from 500: every 10 seconds, and Hunger.\n- III from 2,000: every 4 seconds, Hunger and Weakness.\n- IV from 4,000: a heart every 2 seconds, with Nausea, until the dose falls or you die.\nStanding in a strong field (100 mSv/h or more) makes it a level worse at once, even with no dose yet. Dying resets it."
     },
     {
       "type": "text",

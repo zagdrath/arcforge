@@ -47,6 +47,16 @@ public class CarbonizerScreen extends MultiblockScreen<CarbonizerMenu> {
     }
 
     @Override
+    protected void extractSlot(GuiGraphicsExtractor graphics, net.minecraft.world.inventory.Slot slot, int mouseX, int mouseY) {
+        if (!isQuickCrafting && slot instanceof net.zagdrath.arcforge.menu.slot.ToggleableSlot typed
+                && typed.upgradeType() != null && slot.isActive() && !slot.hasItem()) {
+            graphics.blitSprite(RenderPipelines.GUI_TEXTURED, slot.getNoItemIcon(), slot.x, slot.y, 16, 16, 0.35F);
+            return;
+        }
+        super.extractSlot(graphics, slot, mouseX, mouseY);
+    }
+
+    @Override
     protected Component currentTitle() {
         int chambers = menu.getChambers();
         if (chambers <= 0) {

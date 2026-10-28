@@ -149,7 +149,7 @@ public final class ExtendedLogisticsGameTests {
                         "The orb didn't drain: " + reservoir(helper, tank).ownAmount()))
                 // Only then the player, so the orb can't fly to them instead.
                 .thenExecute(() -> {
-                    player[0] = helper.makeMockServerPlayerInLevel();
+                    player[0] = TestFixtures.player(helper);
                     player[0].setGameMode(GameType.SURVIVAL);
                     player[0].giveExperienceLevels(2);
                     player[0].setPos(helper.absoluteVec(new Vec3(1.5, 2.2, 1.5)));
@@ -168,7 +168,7 @@ public final class ExtendedLogisticsGameTests {
         helper.setBlock(tank, ModBlocks.FLUID_RESERVOIR.get());
         helper.setBlock(shower, ModBlocks.XP_SHOWER.get());
         insert(reservoir(helper, tank).getFluidHandler(), ModFluids.LIQUID_EXPERIENCE.get(), 10_000);
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         player.setGameMode(GameType.SURVIVAL);
         player.setPos(helper.absoluteVec(new Vec3(1.5, 1.0, 1.5)));
         player.setShiftKeyDown(true);

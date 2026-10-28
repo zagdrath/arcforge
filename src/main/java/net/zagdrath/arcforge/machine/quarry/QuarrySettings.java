@@ -91,12 +91,12 @@ public record QuarrySettings(int radius, int minY, int maxY, List<FilterSettings
 
     // The lowest layer, no lower than the level's floor and no higher than maxY.
     public QuarrySettings withMinY(int value, LevelHeightAccessor level) {
-        return new QuarrySettings(radius, Math.max(level.getMinY(), Math.min(maxY, value)), maxY, filter, deny, silkTouch, replace, showArea);
+        return new QuarrySettings(radius, Math.max(level.getMinY(), Math.min(Math.min(maxY, level.getMaxY()), value)), maxY, filter, deny, silkTouch, replace, showArea);
     }
 
     // The highest layer, no lower than minY and no higher than the level's top layer.
     public QuarrySettings withMaxY(int value, LevelHeightAccessor level) {
-        return new QuarrySettings(radius, minY, Math.max(minY, Math.min(level.getMaxY(), value)), filter, deny, silkTouch, replace, showArea);
+        return new QuarrySettings(radius, minY, Math.max(Math.max(minY, level.getMinY()), Math.min(level.getMaxY(), value)), filter, deny, silkTouch, replace, showArea);
     }
 
     // All three at once (from the settings screen): radius, then minY against the current maxY, then maxY against

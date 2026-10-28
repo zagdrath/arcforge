@@ -41,7 +41,7 @@ public final class AutomationGameTests {
 
     // A mock player standing on the machine with its menu attached (the mock connection can't open screens).
     private static ServerPlayer playerAt(GameTestHelper helper, BlockPos pos) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         BlockPos absolute = helper.absolutePos(pos);
         player.snapTo(absolute.getX() + 0.5, absolute.getY() + 1, absolute.getZ() + 0.5);
         return player;
@@ -490,7 +490,7 @@ public final class AutomationGameTests {
                 .setValue(net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACE, net.minecraft.world.level.block.state.properties.AttachFace.FLOOR)
                 .setValue(net.minecraft.world.level.block.FaceAttachedHorizontalDirectionalBlock.FACING, Direction.NORTH));
         var power = net.zagdrath.arcforge.block.redstone.ThrottleLeverBlock.POWER;
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
         BlockPos absolute = helper.absolutePos(lever);
         player.snapTo(absolute.getX() + 10.5, absolute.getY(), absolute.getZ() + 0.5);

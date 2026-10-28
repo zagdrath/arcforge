@@ -454,7 +454,7 @@ public final class FissionGameTests {
         BlockPos min = new BlockPos(1, 1, 1);
         BlockPos controller = vessel(helper, min, 5, 5, 5, ModBlocks.REACTOR_CASING.get(), ModBlocks.REACTOR_CONTROLLER.get(),
                 (x, z) -> x == 2 && z == 2 ? ModBlocks.CONTROL_ROD_CHANNEL.get() : ModBlocks.FUEL_CHANNEL.get());
-        net.minecraft.server.level.ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        net.minecraft.server.level.ServerPlayer player = TestFixtures.player(helper);
         BlockPos absolute = helper.absolutePos(controller.north());
         player.snapTo(absolute.getX() + 0.5, absolute.getY(), absolute.getZ() + 0.5);
         FissionReactorMenu[] menu = new FissionReactorMenu[1];

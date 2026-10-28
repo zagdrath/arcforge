@@ -1,6 +1,12 @@
 {
   "model": {
     "type": "minecraft:model",
-    "model": "arcforge:item/hazmat_boots"
+    "model": "arcforge:item/hazmat_boots",
+    "tints": [
+      {
+        "type": "minecraft:constant",
+        "value": 3159612
+      }
+    ]
   }
 }

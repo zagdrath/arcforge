@@ -568,6 +568,8 @@ public class ArcforgeClient {
     @SubscribeEvent
     static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(JetpackLayer.LAYER, JetpackLayer::createLayer);
+        net.zagdrath.arcforge.registry.ModItems.jetpacks().forEach(item -> top.theillusivec4.curios.api.client.ICurioRenderer.register(item.get(),
+                net.zagdrath.arcforge.client.renderer.CurioJetpackRenderer::new));
     }
 
     // The worn Jetpack's pack, on players (both skin models) and armor stands.
@@ -578,10 +580,12 @@ public class ArcforgeClient {
             AvatarRenderer<?> renderer = event.getPlayerRenderer(skin);
             if (renderer != null) {
                 renderer.addLayer(new JetpackLayer(renderer, event.getEntityModels()));
+                renderer.addLayer(new net.zagdrath.arcforge.client.renderer.HazmatLayer(renderer));
             }
         }
         if (event.getRenderer(EntityTypes.ARMOR_STAND) instanceof LivingEntityRenderer renderer) {
             renderer.addLayer(new JetpackLayer(renderer, event.getEntityModels()));
+            renderer.addLayer(new net.zagdrath.arcforge.client.renderer.HazmatLayer(renderer));
         }
     }
 

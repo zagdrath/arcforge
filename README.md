@@ -13,6 +13,10 @@ and items through NeoForge's standard capabilities, so they connect to cables, p
 from any other NeoForge mod that uses FE. Other mods can also monitor and control Arcforge machines, and
 store and move its gases, through its API; see [docs/API.md](docs/API.md).
 
+Requires NeoForge **26.3.0.37-beta or newer**. Curios API is included in the mod jar and supplies a dedicated Jetpack
+accessory slot, so a jetpack can be worn alongside a chestplate. Flight modes, controls and the fuel HUD work in either
+slot; an armored jetpack's armor attributes apply when worn in the chest slot.
+
 Every Arcforge machine, fluid tank and energy cell appears in the **Arcforge: Machines** creative tab, along with
 the creative-only [Creative Fluid Tank, Pressurized Cylinder and Energy Cell](#creative-storage). The Creative Vault is in
 **Arcforge: Logistics**.
@@ -184,7 +188,7 @@ hotbar) that refills a minute after you leave the lava.
 
 ### Jetpacks
 
-Worn in the chest slot, in Tempered, Hardened and Arcforged tiers (16,000 / 64,000 / 256,000 mB tanks). A
+Worn in the chest slot or the included Curios Jetpack slot, in Tempered, Hardened and Arcforged tiers (16,000 / 64,000 / 256,000 mB tanks). A
 jetpack holds one gas at a time, filled in a Pressurized Cylinder's slots or by clicking a Gas Cartridge onto it
 in your inventory.
 
@@ -196,11 +200,14 @@ in your inventory.
 | Hydrogen | 0.20 | 4 | blue flame |
 
 - **Modes** (the Jetpack Mode key, H by default): Normal thrusts while you hold jump and steers with the movement
-  keys; Hover holds your height in the air (jump climbs, sneak sinks) for 1.5x the fuel; Off doesn't fire.
+  keys; Hover holds your height in the air (jump climbs, sneak sinks) for 1.5x the fuel; Distance thrusts forward while
+  jump is held (sneak descends), with higher tiers travelling faster; Off doesn't fire.
 - A gauge left of the hotbar shows the fuel and mode. Flying clears fall damage, and the server won't kick you
   for it.
-- **Armored Jetpack:** smith a Steel Chestplate onto a jetpack (with a Steel Plate as the template) for the
-  chestplate's 7 armour and 1.0 toughness.
+- **Armored Jetpack:** craft a jetpack beside a Steel Chestplate to make the matching armored item, preserving fuel
+  and settings. It provides 7 armor and 1 toughness when worn in the chest slot, and has its own tier-upgrade recipes.
+- **Long Fall Boots:** cancel all fall damage for 1,000 FE per damaging landing, storing 100,000 FE. Craft beside
+  Steel Boots to make Armored Long Fall Boots (2 armor, 1 toughness), preserving stored charge and the custom name.
 - Fuels are the data map `arcforge:jetpack_fuels`; tank sizes, climb speed and hover cost are in the config.
 
 ### Arc Drill and Arc Saw
@@ -1406,7 +1413,8 @@ liquid, 64,000 mB of gas and 9 item slots (config `quantumTunnel`).
 - Name frequencies in its GUI: public (anyone) or private (you and the players you trust at a Security
   Terminal). Up to 32 per player; the maker may delete one (and its contents).
 - Each face is set per resource (FE, heat, liquid, gas, items) to none, input or output. Output faces push
-  into what they touch at an Arcforged conduit's rate. A face's port shows its mode's ring.
+  into what they touch: up to 4,194,304 FE/t per face (configurable), with Arcforged rates for the other resources.
+  A face's port shows its mode's ring.
 
 ### Chunk Loader
 
@@ -1547,8 +1555,8 @@ right. One tab can be open on each side.
   - Tanks and cells: none, input or output.
 - **Ports** (multiblocks, in place of Sides): the structure's ports, with where each one is, and the
   auto-eject toggle. Set ports with the wrench in Port mode.
-- **Upgrades**: four slots. Each holds up to 8 of one upgrade type, so a machine takes at most 8 of
-  each (see Upgrades below).
+- **Upgrades**: one slot per supported type, with a faded placeholder icon showing what belongs there. Each accepts
+  only its designated type, up to 8 (see Upgrades below). Machines with no supported types have no Upgrades tab.
 - **Security**: the machine's owner and mode (see Security below). The owner can override their default
   here.
 

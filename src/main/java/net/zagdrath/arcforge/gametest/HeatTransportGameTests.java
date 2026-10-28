@@ -219,7 +219,7 @@ public final class HeatTransportGameTests {
 
     @SuppressWarnings("removal")
     private static MachineMenu menuOf(GameTestHelper helper, FireboxBlockEntity firebox) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         return (MachineMenu) firebox.createMenu(1, player.getInventory(), player);
     }
 

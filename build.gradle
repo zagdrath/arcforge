@@ -44,6 +44,11 @@ sourceSets.main.resources {
 }
 
 repositories {
+    maven {
+        name = "Curios"
+        url = "https://maven.theillusivec4.top/"
+        content { includeGroup "top.theillusivec4.curios" }
+    }
     // JEI
     maven {
         name = "BlameJared"
@@ -123,6 +128,13 @@ configurations {
 }
 
 dependencies {
+    implementation "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+    jarJar("top.theillusivec4.curios:curios-neoforge:[${curios_version},18.0.0)") {
+        version {
+            strictly "[${curios_version},18.0.0)"
+            prefer curios_version
+        }
+    }
     implementation "net.neoforged:neoforge:${neo_version}"
     apiCompileOnly "net.neoforged:neoforge:${neo_version}"
 
@@ -188,6 +200,10 @@ def apiJavadocJar = tasks.register('apiJavadocJar', Jar) {
     from apiJavadoc
 }
 tasks.named('assemble') { dependsOn apiJar }
+// The release workflow ships the unclassified mod jar, so that artifact must contain Curios too.
+tasks.named('jar', Jar).configure { archiveClassifier = 'slim' }
+tasks.named('jarJar', Jar).configure { archiveClassifier = '' }
+tasks.named('assemble') { dependsOn tasks.named('jarJar') }
 tasks.named('check') { dependsOn apiJavadoc }
 
 publishing {

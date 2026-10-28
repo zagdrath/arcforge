@@ -54,10 +54,17 @@ public class JetpackLayer<S extends HumanoidRenderState, M extends HumanoidModel
         if (state.isInvisible || !(state.chestEquipment.getItem() instanceof JetpackItem jetpack)) {
             return;
         }
-        ModelPart body = getParentModel().body;
+        submitPack(root, getParentModel().body, state.chestEquipment, poseStack, collector, lightCoords);
+    }
+
+    public static void submitPack(ModelPart root, ModelPart body, net.minecraft.world.item.ItemStack stack,
+            PoseStack poseStack, SubmitNodeCollector collector, int lightCoords) {
+        if (!(stack.getItem() instanceof JetpackItem jetpack)) {
+            return;
+        }
         root.x = body.x;
         root.y = body.y;
-        root.z = body.z + (JetpackItem.isPlated(state.chestEquipment) ? 0.5F : 0.0F);
+        root.z = body.z + 0.5F;
         root.xRot = body.xRot;
         root.yRot = body.yRot;
         root.zRot = body.zRot;

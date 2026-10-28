@@ -37,7 +37,7 @@ public final class SettingsCardGameTests {
 
     @SuppressWarnings("removal")
     private static ServerPlayer player(GameTestHelper helper) {
-        ServerPlayer player = helper.makeMockServerPlayerInLevel();
+        ServerPlayer player = TestFixtures.player(helper);
         player.setGameMode(GameType.SURVIVAL);
         return player;
     }

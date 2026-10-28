@@ -553,7 +553,7 @@ public final class ModItems {
     // buckets.
     public static final DeferredItem<Item> AMMONIUM_DIURANATE = ITEMS.registerSimpleItem("ammonium_diuranate");
     public static final DeferredItem<Item> YELLOWCAKE = ITEMS.registerSimpleItem("yellowcake");
-    public static final DeferredItem<Item> URANIUM_DIOXIDE = ITEMS.registerSimpleItem("uranium_dioxide");
+    public static final DeferredItem<Item> URANIUM_DIOXIDE = ITEMS.registerItem("uranium_dioxide", net.zagdrath.arcforge.item.nuclear.EnrichedFuelItem::new);
     public static final DeferredItem<Item> URANIUM_TETRAFLUORIDE = ITEMS.registerSimpleItem("uranium_tetrafluoride");
     public static final DeferredItem<BucketItem> URANYL_SULFATE_SOLUTION_BUCKET = ITEMS.registerItem("uranyl_sulfate_solution_bucket",
             p -> new BucketItem(ModFluids.URANYL_SULFATE_SOLUTION.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
@@ -592,8 +592,8 @@ public final class ModItems {
     // Water.
     public static final DeferredItem<net.zagdrath.arcforge.item.tool.DieItem> PELLET_DIE = ITEMS.registerItem("pellet_die",
             net.zagdrath.arcforge.item.tool.DieItem::new, p -> p.stacksTo(1));
-    public static final DeferredItem<Item> GREEN_FUEL_PELLET = ITEMS.registerSimpleItem("green_fuel_pellet");
-    public static final DeferredItem<Item> FUEL_PELLET = ITEMS.registerSimpleItem("fuel_pellet");
+    public static final DeferredItem<Item> GREEN_FUEL_PELLET = ITEMS.registerItem("green_fuel_pellet", net.zagdrath.arcforge.item.nuclear.EnrichedFuelItem::new);
+    public static final DeferredItem<Item> FUEL_PELLET = ITEMS.registerItem("fuel_pellet", net.zagdrath.arcforge.item.nuclear.EnrichedFuelItem::new);
     public static final DeferredItem<Item> ZIRCONIUM_TETRACHLORIDE = ITEMS.registerSimpleItem("zirconium_tetrachloride");
     public static final DeferredItem<Item> ZIRCONIUM_DUST = ITEMS.registerSimpleItem("zirconium_dust");
     public static final DeferredItem<Item> ZIRCONIUM_INGOT = ITEMS.registerSimpleItem("zirconium_ingot");

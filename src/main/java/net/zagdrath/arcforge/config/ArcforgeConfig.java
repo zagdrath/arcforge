@@ -3669,6 +3669,10 @@ public class ArcforgeConfig {
             .comment("FE a frequency holds.")
             .defineInRange("energyBuffer", 4_000_000, 1_000, Integer.MAX_VALUE);
 
+    public static final ModConfigSpec.IntValue QUANTUM_ENERGY_OUTPUT = BUILDER
+            .comment("Most FE each output face pushes per tick. Defaults to a Superconducting Energy Conduit's rate.")
+            .defineInRange("energyOutputPerFace", 4_194_304, 1, Integer.MAX_VALUE);
+
     public static final ModConfigSpec.IntValue QUANTUM_HEAT_BUFFER = BUILDER
             .comment("HU a frequency holds.")
             .defineInRange("heatBuffer", 400_000, 1_000, Integer.MAX_VALUE);
@@ -4063,6 +4067,10 @@ public class ArcforgeConfig {
             .comment("Whether radiation is felt at all (off: no dose builds up; the Geiger Counter still reads).")
             .define("radiationEnabled", true);
 
+    public static final ModConfigSpec.BooleanValue RADIATION_PARTICLES = BUILDER
+            .comment("Green warning particles around radioactive blocks, machines, conduits, dropped items and carried sources.")
+            .define("radiationParticles", true);
+
     public static final ModConfigSpec.IntValue RADIATION_RADIUS = BUILDER
             .comment("How far away a source is felt, in blocks.")
             .defineInRange("sourceRadius", 16, 4, 32);
@@ -4092,7 +4100,7 @@ public class ArcforgeConfig {
             .defineInRange("ticksPerHour", 1_000, 20, 72_000);
 
     public static final ModConfigSpec.DoubleValue RADIATION_RECOVERY = BUILDER
-            .comment("mSv the accumulated dose falls by each hour (as ticksPerHour).")
+            .comment("mSv the accumulated dose falls by each hour (as ticksPerHour) while no longer exposed to radiation.")
             .defineInRange("recoveryPerHour", 10.0, 0.0, 10_000.0);
 
     public static final ModConfigSpec.DoubleValue RADIATION_POISONING_1 = BUILDER

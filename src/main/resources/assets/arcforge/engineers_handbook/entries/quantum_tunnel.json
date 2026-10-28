@@ -7,7 +7,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "Tunnels on the same frequency share one buffer of FE, heat, liquid, gas and items, wherever they are, in any dimension. A tunnel works while its chunk is loaded (a Chunk Loader helps); the buffer itself is kept with the world, not the block.\n- FE 4,000,000, heat 400,000 HU, liquid 64,000 mB, gas 64,000 mB, 9 item slots (config).\n- Each face moves up to an Arcforged conduit's rate per resource."
+      "text": "Tunnels on the same frequency share one buffer of FE, heat, liquid, gas and items, wherever they are, in any dimension. A tunnel works while its chunk is loaded (a Chunk Loader helps); the buffer itself is kept with the world, not the block.\n- FE 4,000,000, heat 400,000 HU, liquid 64,000 mB, gas 64,000 mB, 9 item slots (config).\n- Each output face pushes up to 4,194,304 FE/t (configurable), matching the default Superconducting Energy Conduit. Heat, fluid, gas and items keep their Arcforged rates. The shared FE buffer must be supplied fast enough for the connected load."
     },
     {
       "type": "text",

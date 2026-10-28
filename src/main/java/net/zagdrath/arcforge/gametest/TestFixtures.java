@@ -28,6 +28,20 @@ public final class TestFixtures {
 
     private TestFixtures() {}
 
+    // Negotiate registered mod payloads before login: embedded Curios synchronizes its slots there.
+    public static net.minecraft.server.level.ServerPlayer player(net.minecraft.gametest.framework.GameTestHelper helper) {
+        var cookie = net.minecraft.server.network.CommonListenerCookie.createInitial(
+                new com.mojang.authlib.GameProfile(java.util.UUID.randomUUID(), "test-mock-player"), false);
+        // NeoForge recognizes subclasses as GameTest players when skipping the real configuration handshake.
+        var player = new net.minecraft.server.level.ServerPlayer(helper.getLevel().getServer(), helper.getLevel(),
+                cookie.gameProfile(), cookie.clientInformation()) {};
+        var connection = new net.minecraft.network.Connection(net.minecraft.network.protocol.PacketFlow.SERVERBOUND);
+        new io.netty.channel.embedded.EmbeddedChannel(connection);
+        net.neoforged.neoforge.network.registration.NetworkRegistry.configureMockConnection(connection);
+        helper.getLevel().getServer().getPlayerList().placeNewPlayer(connection, player, cookie);
+        return player;
+    }
+
     public static boolean enabled() {
         return System.getProperty("neoforge.enabledGameTestNamespaces") != null;
     }

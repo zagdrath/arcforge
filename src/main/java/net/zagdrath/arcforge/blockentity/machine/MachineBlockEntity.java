@@ -398,6 +398,7 @@ public abstract class MachineBlockEntity extends BlockEntity implements MenuProv
     @Override
     public void onLoad() {
         super.onLoad();
+        items.normalizeUpgrades();
         MachineControlTracker.add(this);
     }
 
