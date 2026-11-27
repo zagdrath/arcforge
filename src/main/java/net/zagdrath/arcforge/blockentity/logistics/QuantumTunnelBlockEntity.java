@@ -5,12 +5,15 @@
 
 package net.zagdrath.arcforge.blockentity.logistics;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
@@ -20,6 +23,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -27,6 +31,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,12 +46,16 @@ import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandlerUtil;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.neoforged.neoforge.transfer.transaction.TransactionContext;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
+import net.zagdrath.arcforge.chunkloading.ChunkLoaderStatus;
+import net.zagdrath.arcforge.chunkloading.ChunkLoaders;
 import net.zagdrath.arcforge.conduit.ConduitConnectable;
 import net.zagdrath.arcforge.conduit.ConduitTier;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
+import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.heat.HeatBuffer;
 import net.zagdrath.arcforge.heat.HeatHandler;
 import net.zagdrath.arcforge.machine.MachineOutputs;
@@ -58,6 +67,8 @@ import net.zagdrath.arcforge.quantum.QuantumFrequencies;
 import net.zagdrath.arcforge.quantum.QuantumResource;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.registry.ModCapabilities;
+import net.zagdrath.arcforge.registry.ModChunkLoading;
+import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.security.Owned;
 import net.zagdrath.arcforge.security.Ownership;
 
@@ -66,6 +77,10 @@ import net.zagdrath.arcforge.security.Ownership;
 // into the frequency) or OUTPUT (the face gives them out, and pushes them into the block it touches every tick, at an
 // Arcforged conduit's rate). The tunnel acts for its owner: on a private frequency its owner must be the frequency's
 // owner or trusted by them, or the tunnel does nothing.
+// With a Chunk Loading Upgrade fitted (ChunkLoadingUpgradeItem) it keeps its own chunk loaded for its owner, as a Chunk
+// Loader at radius 0 does: listed in ChunkLoaders (so the chunk counts toward the owner's chunksPerPlayer and stays
+// loaded across restarts), stopping while its owner is offline (with requireOwnerOnline) and, when energyPerChunk is
+// above 0, paying that much FE a tick from its frequency's buffer (so it needs a frequency).
 public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, MenuProvider, ConduitConnectable {
     private static final int ITEMS_PER_TICK = 64;
 
@@ -83,6 +98,11 @@ public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, Menu
     private final ContainerData data;
     // Client side: whether the tunnel is on a frequency it may use (synced; the core glows brighter).
     private boolean linked;
+    // The Chunk Loading Upgrade: fitted, what it's doing, and whether it holds its chunk's ticket (null until it first
+    // ticks and reads ChunkLoaders, which keeps that across restarts).
+    private boolean chunkLoading;
+    private ChunkLoaderStatus loadStatus = ChunkLoaderStatus.NO_OWNER;
+    private @Nullable Boolean holding;
 
     public QuantumTunnelBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntityTypes.QUANTUM_TUNNEL.get(), pos, state);
@@ -235,12 +255,119 @@ public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, Menu
         };
     }
 
+    // --- The Chunk Loading Upgrade ---
+
+    public boolean hasChunkLoading() {
+        return chunkLoading;
+    }
+
+    // Fits or takes out the upgrade (the item is the caller's to take or give). Taken out, its ticket goes at once.
+    public void setChunkLoading(boolean chunkLoading) {
+        if (this.chunkLoading == chunkLoading) {
+            return;
+        }
+        this.chunkLoading = chunkLoading;
+        if (!chunkLoading && level instanceof ServerLevel serverLevel) {
+            releaseChunk(serverLevel);
+        }
+        setChanged();
+    }
+
+    // What the upgrade is doing (meaningful only with it fitted).
+    public ChunkLoaderStatus getLoadStatus() {
+        return loadStatus;
+    }
+
+    public boolean isLoadingChunk() {
+        return Boolean.TRUE.equals(holding);
+    }
+
+    private void tickChunkLoading(ServerLevel level, BlockPos pos, @Nullable Frequency frequency) {
+        ChunkLoaders loaders = ChunkLoaders.get(level.getServer());
+        GlobalPos here = GlobalPos.of(level.dimension(), pos);
+        if (holding == null) {
+            ChunkLoaders.Entry entry = loaders.get(here);
+            holding = entry != null && !entry.chunks().isEmpty();
+        }
+        UUID owner = owner();
+        boolean wanted = false;
+        if (owner == null) {
+            loadStatus = ChunkLoaderStatus.NO_OWNER;
+        } else if (ArcforgeConfig.CHUNK_LOADER_REQUIRE_ONLINE.getAsBoolean() && level.getServer().getPlayerList().getPlayer(owner) == null) {
+            loadStatus = ChunkLoaderStatus.OWNER_OFFLINE;
+        } else if (loaders.chunksOf(owner, here) + 1 > ArcforgeConfig.CHUNK_LOADER_PLAYER_LIMIT.getAsInt()) {
+            loadStatus = ChunkLoaderStatus.LIMIT;
+        } else if (!payForChunk(frequency)) {
+            loadStatus = ChunkLoaderStatus.NO_POWER;
+        } else {
+            loadStatus = ChunkLoaderStatus.ACTIVE;
+            wanted = true;
+        }
+        forceChunk(level, pos, wanted);
+        if (owner != null) {
+            loaders.put(here, owner, holding ? List.of(ChunkPos.pack(pos)) : List.of());
+        }
+    }
+
+    // energyPerChunk FE from the frequency's buffer, all of it or none (free when that's 0).
+    private static boolean payForChunk(@Nullable Frequency frequency) {
+        int cost = ArcforgeConfig.CHUNK_LOADER_ENERGY_PER_CHUNK.getAsInt();
+        if (cost <= 0) {
+            return true;
+        }
+        if (frequency == null) {
+            return false;
+        }
+        try (Transaction tx = Transaction.openRoot()) {
+            if (frequency.energy().extract(cost, tx) < cost) {
+                return false;
+            }
+            tx.commit();
+            return true;
+        }
+    }
+
+    private void forceChunk(ServerLevel level, BlockPos pos, boolean wanted) {
+        if (wanted != Boolean.TRUE.equals(holding)) {
+            ChunkPos chunk = ChunkPos.unpack(ChunkPos.pack(pos));
+            ModChunkLoading.LOADER.forceChunk(level, pos, chunk.x(), chunk.z(), wanted, true);
+        }
+        holding = wanted;
+    }
+
+    // Lets the chunk go and leaves ChunkLoaders (the upgrade came out, or the tunnel was broken).
+    private void releaseChunk(ServerLevel level) {
+        GlobalPos here = GlobalPos.of(level.dimension(), worldPosition);
+        ChunkLoaders loaders = ChunkLoaders.get(level.getServer());
+        if (holding == null) {
+            ChunkLoaders.Entry entry = loaders.get(here);
+            holding = entry != null && !entry.chunks().isEmpty();
+        }
+        forceChunk(level, worldPosition, false);
+        loaders.remove(here);
+    }
+
+    // Broken (not just unloaded): the chunk goes, and so does the upgrade, as an item.
+    @Override
+    public void preRemoveSideEffects(BlockPos pos, BlockState state) {
+        super.preRemoveSideEffects(pos, state);
+        if (chunkLoading && level instanceof ServerLevel serverLevel) {
+            releaseChunk(serverLevel);
+            Containers.dropItemStack(serverLevel, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5,
+                    new ItemStack(ModItems.CHUNK_LOADING_UPGRADE.get()));
+            chunkLoading = false;
+        }
+    }
+
     // --- Ticking: output faces push into what they touch ---
 
     private boolean wasLinked;
 
     public void serverTick(ServerLevel level, BlockPos pos) {
         Frequency frequency = frequency();
+        if (chunkLoading) {
+            tickChunkLoading(level, pos, frequency);
+        }
         boolean nowLinked = frequency != null;
         if (nowLinked != wasLinked) {
             wasLinked = nowLinked;
@@ -515,6 +642,7 @@ public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, Menu
         key = input.read("frequency", Frequency.Key.CODEC).orElse(null);
         faces = input.getLongOr("faces", 0L);
         linked = input.getBooleanOr("linked", false);
+        chunkLoading = input.getBooleanOr("chunk_loading", false);
     }
 
     @Override
@@ -525,6 +653,7 @@ public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, Menu
             output.store("frequency", Frequency.Key.CODEC, key);
         }
         output.putLong("faces", faces);
+        output.putBoolean("chunk_loading", chunkLoading);
     }
 
     // Clients get the faces (for the rings) and whether it's linked (for the core).

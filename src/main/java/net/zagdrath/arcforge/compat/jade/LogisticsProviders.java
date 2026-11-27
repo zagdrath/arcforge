@@ -316,10 +316,11 @@ public final class LogisticsProviders {
     public enum QuantumTunnel implements StreamServerDataProvider<BlockAccessor, QuantumTunnel.Data> {
         INSTANCE;
 
-        public record Data(String name, boolean isPrivate, boolean linked) {
+        // loadStatus: the Chunk Loading Upgrade's ChunkLoaderStatus, or -1 without one.
+        public record Data(String name, boolean isPrivate, boolean linked, int loadStatus) {
             public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
                     ByteBufCodecs.stringUtf8(Frequency.MAX_NAME_LENGTH * 4), Data::name, ByteBufCodecs.BOOL, Data::isPrivate,
-                    ByteBufCodecs.BOOL, Data::linked, Data::new);
+                    ByteBufCodecs.BOOL, Data::linked, ByteBufCodecs.VAR_INT.map(i -> i - 1, i -> i + 1), Data::loadStatus, Data::new);
         }
 
         @Override
@@ -327,7 +328,9 @@ public final class LogisticsProviders {
             if (!(accessor.getBlockEntity() instanceof QuantumTunnelBlockEntity tunnel)) {
                 return null;
             }
-            return tunnel.getKey().map(key -> new Data(key.name(), key.isPrivate(), tunnel.frequency() != null)).orElse(new Data("", false, false));
+            int loadStatus = tunnel.hasChunkLoading() ? tunnel.getLoadStatus().ordinal() : -1;
+            return tunnel.getKey().map(key -> new Data(key.name(), key.isPrivate(), tunnel.frequency() != null, loadStatus))
+                    .orElse(new Data("", false, false, loadStatus));
         }
 
         @Override
@@ -349,12 +352,17 @@ public final class LogisticsProviders {
                 QuantumTunnel.INSTANCE.decodeFromData(accessor).ifPresent(data -> {
                     if (data.name().isEmpty()) {
                         tooltip.add(Component.translatable("jade.arcforge.quantum_tunnel.none").withStyle(ChatFormatting.GRAY));
-                        return;
+                    } else {
+                        tooltip.add(Component.translatable(data.isPrivate() ? "jade.arcforge.quantum_tunnel.private" : "jade.arcforge.quantum_tunnel.public",
+                                data.name()).withStyle(data.linked() ? ChatFormatting.AQUA : ChatFormatting.RED));
+                        if (!data.linked()) {
+                            tooltip.add(Component.translatable("jade.arcforge.quantum_tunnel.not_linked").withStyle(ChatFormatting.RED));
+                        }
                     }
-                    tooltip.add(Component.translatable(data.isPrivate() ? "jade.arcforge.quantum_tunnel.private" : "jade.arcforge.quantum_tunnel.public",
-                            data.name()).withStyle(data.linked() ? ChatFormatting.AQUA : ChatFormatting.RED));
-                    if (!data.linked()) {
-                        tooltip.add(Component.translatable("jade.arcforge.quantum_tunnel.not_linked").withStyle(ChatFormatting.RED));
+                    if (data.loadStatus() >= 0) {
+                        net.zagdrath.arcforge.chunkloading.ChunkLoaderStatus status = net.zagdrath.arcforge.chunkloading.ChunkLoaderStatus.byId(data.loadStatus());
+                        tooltip.add(Component.translatable("jade.arcforge.quantum_tunnel.chunk_loading", status.description())
+                                .withStyle(status == net.zagdrath.arcforge.chunkloading.ChunkLoaderStatus.ACTIVE ? ChatFormatting.GREEN : ChatFormatting.GOLD));
                     }
                 });
             }

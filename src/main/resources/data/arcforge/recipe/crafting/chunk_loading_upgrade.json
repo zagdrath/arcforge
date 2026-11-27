@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "pattern": [
+    "PGP",
+    "ECE",
+    "PGP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:gems/arcite",
+    "E": "minecraft:ender_pearl",
+    "C": "arcforge:chunk_loader"
+  },
+  "result": {
+    "id": "arcforge:chunk_loading_upgrade",
+    "count": 1
+  }
+}

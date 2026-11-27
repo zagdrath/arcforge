@@ -19,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -328,6 +329,47 @@ public final class ExtendedLogisticsGameTests {
                     helper.setBlock(aPos, Blocks.AIR);
                     helper.setBlock(bPos, Blocks.AIR);
                     helper.assertTrue(ChunkLoaders.get(server).get(aGlobal) == null, "A broken loader is still registered");
+                    helper.assertTrue(ChunkLoaders.get(server).chunksOf(owner, null) == 0, "The owner still holds chunks");
+                })
+                .thenSucceed();
+    }
+
+    // A Quantum Tunnel with a Chunk Loading Upgrade holds its own chunk's ticket and lists it in the registry (where it
+    // counts toward the owner's limit); taken out, the ticket and entry go; broken with one fitted, the upgrade drops.
+    static void quantumTunnelChunkLoading(GameTestHelper helper) {
+        MinecraftServer server = helper.getLevel().getServer();
+        UUID owner = UUID.randomUUID();
+        BlockPos pos = new BlockPos(1, 1, 1);
+        helper.setBlock(pos, ModBlocks.QUANTUM_TUNNEL.get());
+        QuantumTunnelBlockEntity tunnel = helper.getBlockEntity(pos, QuantumTunnelBlockEntity.class);
+        tunnel.setOwner(owner, "owner");
+        GlobalPos global = GlobalPos.of(helper.getLevel().dimension(), helper.absolutePos(pos));
+        long chunk = ChunkPos.pack(helper.absolutePos(pos));
+        boolean free = ArcforgeConfig.CHUNK_LOADER_ENERGY_PER_CHUNK.getAsInt() <= 0 && !ArcforgeConfig.CHUNK_LOADER_REQUIRE_ONLINE.getAsBoolean();
+        helper.startSequence()
+                .thenIdle(2)
+                .thenExecute(() -> {
+                    helper.assertTrue(ChunkLoaders.get(server).get(global) == null, "A tunnel without the upgrade is registered");
+                    tunnel.setChunkLoading(true);
+                })
+                .thenWaitUntil(() -> helper.assertTrue(!free || tunnel.getLoadStatus() == ChunkLoaderStatus.ACTIVE && tunnel.isLoadingChunk(),
+                        "The tunnel is " + tunnel.getLoadStatus()))
+                .thenExecute(() -> {
+                    if (free) {
+                        ChunkLoaders.Entry entry = ChunkLoaders.get(server).get(global);
+                        helper.assertTrue(entry != null && entry.owner().equals(owner) && entry.chunks().equals(List.of(chunk)),
+                                "The registry doesn't list the tunnel's chunk: " + entry);
+                        helper.assertTrue(ChunkLoaders.get(server).chunksOf(owner, null) == 1, "It doesn't count one chunk toward its owner");
+                    }
+                    tunnel.setChunkLoading(false);
+                    helper.assertTrue(!tunnel.isLoadingChunk() && ChunkLoaders.get(server).get(global) == null, "Taking it out kept the chunk");
+                    tunnel.setChunkLoading(true);
+                })
+                .thenIdle(2)
+                .thenExecute(() -> helper.setBlock(pos, Blocks.AIR))
+                .thenExecute(() -> {
+                    helper.assertItemEntityPresent(ModItems.CHUNK_LOADING_UPGRADE.get(), pos, 2.0);
+                    helper.assertTrue(ChunkLoaders.get(server).get(global) == null, "A broken tunnel is still registered");
                     helper.assertTrue(ChunkLoaders.get(server).chunksOf(owner, null) == 0, "The owner still holds chunks");
                 })
                 .thenSucceed();

@@ -340,6 +340,7 @@ public final class ArcforgeGameTests {
         TESTS.put("curios_jetpack_flight", EquipmentLogisticsFixGameTests::curioJetpack);
         TESTS.put("quantum_tunnel_item_counts", ExtendedLogisticsGameTests::quantumTunnelItemCounts);
         TESTS.put("chunk_loader", ExtendedLogisticsGameTests::chunkLoader);
+        TESTS.put("quantum_tunnel_chunk_loading", ExtendedLogisticsGameTests::quantumTunnelChunkLoading);
         TESTS.put("firebox_array_forms", BigArrayGameTests::fireboxArrayForms);
         TESTS.put("firebox_array_burns_coal", BigArrayGameTests::fireboxArrayBurnsCoal);
         TESTS.put("firebox_array_burns_naphtha", BigArrayGameTests::fireboxArrayBurnsNaphtha);

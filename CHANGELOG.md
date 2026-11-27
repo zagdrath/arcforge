@@ -32,6 +32,12 @@ machines and Settings Cards carry over).
   chemical reactors and arrays, the Gasifier, Haber Reactor, Distillation Array, Biogas Digester, Air Separator and
   Fermenter. Vents discard excess gas while keeping the stored buffer; liquid outputs still require room. Settings
   persist with the machine and copy through Settings Cards. Air Separator and Fermenter vents start enabled.
+- **Chunk Loading Upgrade for the Quantum Tunnel.** Right-click a Quantum Tunnel with it to fit it (one per tunnel);
+  the tunnel then keeps its own chunk loaded for its owner, like a Chunk Loader at radius 0, across restarts. It counts
+  toward `chunksPerPlayer` and follows the other `logistics.chunkLoader` settings; when `energyPerChunk` is above 0 it
+  pays from the frequency's FE buffer. Sneak-right-click the tunnel with an empty hand to take it out; breaking the
+  tunnel drops it. Jade shows its status. Crafted from a Chunk Loader, two Ender Pearls, two Arcite and four Steel
+  Plates.
 - **Industrial Water Intake Seawater mode.** A button in its GUI (left of the river/ocean line, showing a swatch of
   what it pumps) switches it between Water and Seawater. On Seawater it pumps Seawater where its intake is in an ocean
   or beach biome (the Electric Pump's `seawaterBiomeTags`) at its usual rate, and Water anywhere else. Switching

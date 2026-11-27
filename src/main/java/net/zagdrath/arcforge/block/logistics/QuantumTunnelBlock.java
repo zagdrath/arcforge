@@ -10,6 +10,10 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -24,18 +28,45 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
+import net.zagdrath.arcforge.item.upgrade.ChunkLoadingUpgradeItem;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModItems;
 
 // The Quantum Tunnel: a steel frame cube with a socketed port on every face and a cyan core spinning in the middle
 // (QuantumTunnelRenderer). Tunnels on one frequency share its FE, heat, liquid, gas and items, across dimensions.
+// Right-click it with a Chunk Loading Upgrade to fit one; sneak-right-click with an empty hand to take it out.
 public class QuantumTunnelBlock extends BaseEntityBlock {
     public QuantumTunnelBlock(BlockBehaviour.Properties properties) {
         super(properties);
     }
 
     @Override
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand,
+            BlockHitResult hit) {
+        if (stack.getItem() instanceof ChunkLoadingUpgradeItem && level.getBlockEntity(pos) instanceof QuantumTunnelBlockEntity tunnel) {
+            return ChunkLoadingUpgradeItem.install(level, pos, tunnel, player, stack);
+        }
+        return super.useItemOn(stack, state, level, pos, player, hand, hit);
+    }
+
+    @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hit) {
-        if (player instanceof ServerPlayer serverPlayer && level.getBlockEntity(pos) instanceof QuantumTunnelBlockEntity tunnel) {
+        if (!(level.getBlockEntity(pos) instanceof QuantumTunnelBlockEntity tunnel)) {
+            return InteractionResult.PASS;
+        }
+        if (player.isSecondaryUseActive() && tunnel.hasChunkLoading()) {
+            if (!level.isClientSide()) {
+                tunnel.setChunkLoading(false);
+                ItemStack upgrade = new ItemStack(ModItems.CHUNK_LOADING_UPGRADE.get());
+                if (!player.getInventory().add(upgrade)) {
+                    popResourceFromFace(level, pos, hit.getDirection(), upgrade);
+                }
+                level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
+                player.sendOverlayMessage(Component.translatable("message.arcforge.chunk_loading_upgrade.removed"));
+            }
+            return InteractionResult.SUCCESS;
+        }
+        if (player instanceof ServerPlayer serverPlayer) {
             serverPlayer.openMenu(tunnel, buf -> buf.writeBlockPos(pos));
         }
         return InteractionResult.SUCCESS;

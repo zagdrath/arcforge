@@ -334,6 +334,9 @@ public final class ModItems {
     public static final DeferredItem<UpgradeItem> INSULATION_UPGRADE = ITEMS.registerItem("insulation_upgrade", p -> new UpgradeItem(UpgradeType.INSULATION, p));
     public static final DeferredItem<UpgradeItem> THERMOELECTRIC_UPGRADE = ITEMS.registerItem("thermoelectric_upgrade", p -> new UpgradeItem(UpgradeType.THERMOELECTRIC, p));
     public static final DeferredItem<UpgradeItem> RANGE_UPGRADE = ITEMS.registerItem("range_upgrade", p -> new UpgradeItem(UpgradeType.RANGE, p));
+    // Fitted into a Quantum Tunnel, not a machine's upgrade slot.
+    public static final DeferredItem<net.zagdrath.arcforge.item.upgrade.ChunkLoadingUpgradeItem> CHUNK_LOADING_UPGRADE = ITEMS.registerItem(
+            "chunk_loading_upgrade", p -> new net.zagdrath.arcforge.item.upgrade.ChunkLoadingUpgradeItem(p.stacksTo(16).rarity(Rarity.RARE)));
     // Creative only for now: no recipe.
     public static final DeferredItem<UpgradeItem> REACTOR_AUTOPILOT = ITEMS.registerItem("reactor_autopilot",
             p -> new UpgradeItem(UpgradeType.AUTOPILOT, p.stacksTo(1)));
