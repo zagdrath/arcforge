@@ -30,7 +30,7 @@ public class ChunkLoaderMenu extends AbstractContainerMenu implements SecuredMen
     public static final int DATA_RADIUS = 0, DATA_STATUS = 1, DATA_LOADED = 2, DATA_OWNER_TOTAL = 3, DATA_LIMIT = 4;
     public static final int DATA_ENERGY = 5, DATA_CAPACITY = 6, DATA_COST = 7;
     public static final int DATA_VALUES = 8;
-    public static final int BUTTON_RADIUS_MINUS = 0, BUTTON_RADIUS_PLUS = 1;
+    public static final int BUTTON_RADIUS_MINUS = 0, BUTTON_RADIUS_PLUS = 1, BUTTON_SHOW_AREA = 2;
 
     private final BlockPos pos;
     private final ContainerLevelAccess access;
@@ -74,6 +74,14 @@ public class ChunkLoaderMenu extends AbstractContainerMenu implements SecuredMen
             access.execute((level, at) -> {
                 if (level.getBlockEntity(at) instanceof ChunkLoaderBlockEntity loader) {
                     loader.setRadius(loader.getRadius() + (buttonId == BUTTON_RADIUS_PLUS ? 1 : -1));
+                }
+            });
+            return true;
+        }
+        if (buttonId == BUTTON_SHOW_AREA) {
+            access.execute((level, at) -> {
+                if (level.getBlockEntity(at) instanceof ChunkLoaderBlockEntity loader) {
+                    loader.toggleShowArea();
                 }
             });
             return true;

@@ -29,8 +29,9 @@ import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
 import net.zagdrath.arcforge.registry.ModItems;
 
 // The Vacuum Collector's range as a cyan box in the world: for every loaded collector within 32 blocks while the
-// player holds a Vacuum Collector, and for the one whose GUI is open while its show-range button is on. The Arc
-// Quarry's area likewise (see quarryAreas), and the chunks of a Chunk Loader whose screen is open (chunkLoaderArea).
+// player holds a Vacuum Collector, for the one whose GUI is open, and for any set to always show it (its Show area
+// button). The Arc Quarry's area likewise (see quarryAreas), and the chunks of a Chunk Loader whose screen is open or
+// that is set to always show them (chunkLoaderArea).
 // Drawn as per-tick gizmos, which the game renders until the next tick.
 @EventBusSubscriber(modid = Arcforge.MODID, value = Dist.CLIENT)
 public final class RangeOutlineRenderer {
@@ -39,18 +40,7 @@ public final class RangeOutlineRenderer {
     private static final double QUARRY_NEARBY = 64.0;
     private static final int MAX_QUARRY_RADIUS = 64;
     private static final int LAYER_COLOR = 0xFFA8FFF4;
-    // The GUI's show-range button; on by default, remembered for the session.
-    private static boolean guiOutline = true;
-
     private RangeOutlineRenderer() {}
-
-    public static boolean isGuiOutlineShown() {
-        return guiOutline;
-    }
-
-    public static void toggleGuiOutline() {
-        guiOutline = !guiOutline;
-    }
 
     @SubscribeEvent
     static void onClientTick(ClientTickEvent.Post event) {
@@ -68,8 +58,13 @@ public final class RangeOutlineRenderer {
                 }
             }
         }
-        if (guiOutline && player.containerMenu instanceof VacuumCollectorMenu menu) {
+        if (player.containerMenu instanceof VacuumCollectorMenu menu) {
             shown.add(menu.getPos());
+        }
+        for (BlockPos pos : VacuumCollectorBlockEntity.clientLoaded()) {
+            if (minecraft.level.getBlockEntity(pos) instanceof VacuumCollectorBlockEntity collector && collector.showArea()) {
+                shown.add(pos);
+            }
         }
         for (BlockPos pos : shown) {
             if (minecraft.level.getBlockEntity(pos) instanceof VacuumCollectorBlockEntity collector) {
@@ -80,15 +75,23 @@ public final class RangeOutlineRenderer {
         chunkLoaderArea(minecraft, player);
     }
 
-    // While a Chunk Loader's screen is open: each chunk it covers as a square at the loader's height, and the whole area
-    // as a box reaching a little above and below it.
+    // Chunk Loaders: the one whose screen is open (at the radius the screen shows) and any set to always show its area.
     private static void chunkLoaderArea(Minecraft minecraft, LocalPlayer player) {
-        if (!(player.containerMenu instanceof ChunkLoaderMenu menu)
-                || !(minecraft.level.getBlockEntity(menu.getPos()) instanceof ChunkLoaderBlockEntity loader)) {
-            return;
+        BlockPos open = null;
+        if (player.containerMenu instanceof ChunkLoaderMenu menu && minecraft.level.getBlockEntity(menu.getPos()) instanceof ChunkLoaderBlockEntity loader) {
+            open = menu.getPos();
+            chunkLoaderArea(open, loader, menu.getRadius());
         }
-        BlockPos pos = menu.getPos();
-        int radius = menu.getRadius();
+        for (BlockPos pos : ChunkLoaderBlockEntity.clientLoaded()) {
+            if (!pos.equals(open) && minecraft.level.getBlockEntity(pos) instanceof ChunkLoaderBlockEntity loader && loader.showArea()) {
+                chunkLoaderArea(pos, loader, loader.getRadius());
+            }
+        }
+    }
+
+    // Each chunk a loader covers as a square at its height, and the whole area as a box reaching a little above and
+    // below it.
+    private static void chunkLoaderArea(BlockPos pos, ChunkLoaderBlockEntity loader, int radius) {
         int chunkX = pos.getX() >> 4, chunkZ = pos.getZ() >> 4;
         double y = pos.getY();
         for (int dx = -radius; dx <= radius; dx++) {

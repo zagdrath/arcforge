@@ -23,6 +23,7 @@ import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
+import net.zagdrath.arcforge.registry.ModItems;
 
 // The Chunk Loading Upgrade: right-click a Quantum Tunnel with it to fit it (one per tunnel), and the tunnel keeps its
 // own chunk loaded as a Chunk Loader at radius 0 would (see QuantumTunnelBlockEntity). Sneak-right-click the tunnel with
@@ -62,6 +63,34 @@ public class ChunkLoadingUpgradeItem extends Item {
             player.sendOverlayMessage(Component.translatable("message.arcforge.chunk_loading_upgrade.installed"));
         }
         return InteractionResult.SUCCESS;
+    }
+
+    // Takes the upgrade out of the tunnel into the player's inventory (dropped on the tunnel if it's full).
+    public static void takeOut(Level level, BlockPos pos, QuantumTunnelBlockEntity tunnel, Player player) {
+        if (level.isClientSide() || !tunnel.hasChunkLoading()) {
+            return;
+        }
+        tunnel.setChunkLoading(false);
+        ItemStack upgrade = new ItemStack(ModItems.CHUNK_LOADING_UPGRADE.get());
+        if (!player.getInventory().add(upgrade)) {
+            net.minecraft.world.level.block.Block.popResource(level, pos.above(), upgrade);
+        }
+        level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
+        player.sendOverlayMessage(Component.translatable("message.arcforge.chunk_loading_upgrade.removed"));
+    }
+
+    // From the tunnel's Upgrades tab: fits one from the player's inventory (taken from the first stack found).
+    public static void installFromInventory(Level level, BlockPos pos, QuantumTunnelBlockEntity tunnel, Player player) {
+        var inventory = player.getInventory();
+        for (int slot = 0; slot < inventory.getContainerSize(); slot++) {
+            ItemStack stack = inventory.getItem(slot);
+            if (stack.getItem() instanceof ChunkLoadingUpgradeItem) {
+                install(level, pos, tunnel, player, stack);
+                inventory.setChanged();
+                return;
+            }
+        }
+        player.sendOverlayMessage(Component.translatable("message.arcforge.chunk_loading_upgrade.none"));
     }
 
     @Override

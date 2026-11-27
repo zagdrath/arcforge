@@ -1,7 +1,34 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/block",
   "textures": {
-    "all": "arcforge:block/pressure_glass"
+    "particle": "arcforge:block/pressure_glass",
+    "frame": "arcforge:block/pressure_glass_frame",
+    "pane": "arcforge:block/pressure_glass_pane"
   },
-  "render_type": "minecraft:translucent"
+  "elements": [
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {"texture": "#frame", "cullface": "down"},
+        "up": {"texture": "#frame", "cullface": "up"},
+        "north": {"texture": "#frame", "cullface": "north"},
+        "south": {"texture": "#frame", "cullface": "south"},
+        "west": {"texture": "#frame", "cullface": "west"},
+        "east": {"texture": "#frame", "cullface": "east"}
+      }
+    },
+    {
+      "from": [0, 0, 0],
+      "to": [16, 16, 16],
+      "faces": {
+        "down": {"texture": "#pane", "cullface": "down"},
+        "up": {"texture": "#pane", "cullface": "up"},
+        "north": {"texture": "#pane", "cullface": "north"},
+        "south": {"texture": "#pane", "cullface": "south"},
+        "west": {"texture": "#pane", "cullface": "west"},
+        "east": {"texture": "#pane", "cullface": "east"}
+      }
+    }
+  ]
 }

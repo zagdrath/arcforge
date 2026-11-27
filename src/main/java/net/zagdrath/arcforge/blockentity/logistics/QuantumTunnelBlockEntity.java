@@ -123,6 +123,12 @@ public class QuantumTunnelBlockEntity extends BlockEntity implements Owned, Menu
                 if (index == QuantumTunnelMenu.DATA_FACES_HIGH) {
                     return QuantumFaces.high(faces);
                 }
+                if (index == QuantumTunnelMenu.DATA_CHUNK_LOADING) {
+                    return chunkLoading ? 1 : 0;
+                }
+                if (index == QuantumTunnelMenu.DATA_LOAD_STATUS) {
+                    return loadStatus.ordinal();
+                }
                 if (frequency == null) {
                     return index == QuantumTunnelMenu.DATA_FLUID_ID || index == QuantumTunnelMenu.DATA_GAS_ID ? -1 : 0;
                 }

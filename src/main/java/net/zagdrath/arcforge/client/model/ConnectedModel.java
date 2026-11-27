@@ -10,6 +10,7 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Predicate;
 
 import org.joml.Vector3f;
@@ -264,7 +265,9 @@ public final class ConnectedModel {
             this.particle = material(baker, particleId, name);
             Material.Baked baseTexture = material(baker, unbaked.textures().get("base"), name);
             Material.Baked beamTexture = material(baker, unbaked.textures().get("beam"), name);
+            Material.Baked beamShadow = shadow(baker, unbaked.textures().get("beam"), name);
             Material.Baked lipTexture = material(baker, unbaked.textures().get("lip"), name);
+            Material.Baked lipShadow = shadow(baker, unbaked.textures().get("lip"), name);
             Material.Baked windowTexture = glass ? baseTexture : material(baker, unbaked.textures().get("window"), name);
             this.ports = new PortOverlays(baker, name);
             int flags = ports.materialFlags();
@@ -281,14 +284,14 @@ public final class ConnectedModel {
                     // 8px of the lip texture, its top edge turned onto that side.
                     Side acrossSide = quad.right ? Side.LEFT : Side.RIGHT;
                     Side upDownSide = quad.top ? Side.BOTTOM : Side.TOP;
-                    across[quad.ordinal()] = List.of(bake(baker, face, u0, v0, u0 + 8, v0 + 8, offset(LIP_OFFSET, acrossSide), lipTexture, 0, 0, 8, 8, acrossSide.rotation));
-                    upDown[quad.ordinal()] = List.of(bake(baker, face, u0, v0, u0 + 8, v0 + 8, LIP_OFFSET, lipTexture, 0, 0, 8, 8, upDownSide.rotation));
+                    across[quad.ordinal()] = bakeShadowed(baker, face, u0, v0, u0 + 8, v0 + 8, offset(LIP_OFFSET, acrossSide), lipTexture, lipShadow, 0, 0, 8, 8, acrossSide.rotation);
+                    upDown[quad.ordinal()] = bakeShadowed(baker, face, u0, v0, u0 + 8, v0 + 8, LIP_OFFSET, lipTexture, lipShadow, 0, 0, 8, 8, upDownSide.rotation);
                 }
                 List<BakedQuad>[] beams = new List[4];
                 List<BakedQuad>[] edges = new List[4];
                 for (Side side : Side.values()) {
-                    beams[side.ordinal()] = List.of(bake(baker, face, 0, 0, 16, 16, offset(BEAM_OFFSET, side), beamTexture, 0, 0, 16, 16, side.rotation));
-                    edges[side.ordinal()] = List.of(bake(baker, face, 0, 0, 16, 16, offset(LIP_OFFSET, side), lipTexture, 0, 0, 16, 16, side.rotation));
+                    beams[side.ordinal()] = bakeShadowed(baker, face, 0, 0, 16, 16, offset(BEAM_OFFSET, side), beamTexture, beamShadow, 0, 0, 16, 16, side.rotation);
+                    edges[side.ordinal()] = bakeShadowed(baker, face, 0, 0, 16, 16, offset(LIP_OFFSET, side), lipTexture, lipShadow, 0, 0, 16, 16, side.rotation);
                 }
                 base.put(face, baseQuads);
                 window.put(face, windowQuads);
@@ -309,6 +312,24 @@ public final class ConnectedModel {
 
         static Material.Baked material(ModelBaker baker, Identifier id, Identifier name) {
             return baker.materials().get(new Material(id), () -> name.toString());
+        }
+
+        // The beam and lip textures are solid rows with a 1px soft shadow cast onto the glass beside them. A quad goes in
+        // the translucent layer if any pixel it shows is part-transparent, and translucent blocks draw after the clear
+        // fluids block entities draw (which don't write depth, see ArcforgeRenderTypes), so a beam baked as one quad
+        // painted its solid rows over the fluid in a tank or Reservoir behind it. The shadow rows are their own texture
+        // ("<texture>_shadow"), drawn as a second quad over the same rectangle, so the solid rows stay cutout.
+        private static final Set<String> SHADOWED = Set.of("arcforge:block/ctm/column_beam", "arcforge:block/ctm/window_lip");
+
+        static Material.@Nullable Baked shadow(ModelBaker baker, @Nullable Identifier id, Identifier name) {
+            return id != null && SHADOWED.contains(id.toString()) ? material(baker, id.withSuffix("_shadow"), name) : null;
+        }
+
+        // bake, plus the same rectangle in shadow (if there is one).
+        static List<BakedQuad> bakeShadowed(ModelBaker baker, Direction face, float u0, float v0, float u1, float v1, float offset,
+                Material.Baked texture, Material.@Nullable Baked shadow, float tu0, float tv0, float tu1, float tv1, Quadrant rotation) {
+            BakedQuad solid = bake(baker, face, u0, v0, u1, v1, offset, texture, tu0, tv0, tu1, tv1, rotation);
+            return shadow == null ? List.of(solid) : List.of(solid, bake(baker, face, u0, v0, u1, v1, offset, shadow, tu0, tv0, tu1, tv1, rotation));
         }
 
         // A zero-thickness quad on one face: the face-local rectangle (u right, v down, in pixels) offset
@@ -531,6 +552,8 @@ public final class ConnectedModel {
             Material.Baked top = Baked.material(baker, textures.get("top"), name);
             Material.Baked bottom = Baked.material(baker, textures.getOrDefault("bottom", textures.get("top")), name);
             Material.Baked beam = Baked.material(baker, textures.get("beam"), name);
+            Material.Baked beamShadow = Baked.shadow(baker, textures.get("beam"), name);
+            Material.Baked lipShadow = skin ? Baked.shadow(baker, textures.get("lip"), name) : null;
             Material.Baked frontTexture = textures.containsKey("front") ? Baked.material(baker, textures.get("front"), name) : null;
             Material.Baked windowTexture = skin ? Baked.material(baker, textures.get("window"), name) : null;
             Material.Baked lipTexture = skin ? Baked.material(baker, textures.get("lip"), name) : null;
@@ -553,8 +576,8 @@ public final class ConnectedModel {
                         windows[quad.ordinal()] = List.of(Baked.bake(baker, face, u0, v0, u0 + 8, v0 + 8, WINDOW_OFFSET, windowTexture, u0, v0, u0 + 8, v0 + 8, Quadrant.R0));
                         Side acrossSide = quad.right ? Side.LEFT : Side.RIGHT;
                         Side upDownSide = quad.top ? Side.BOTTOM : Side.TOP;
-                        across[quad.ordinal()] = List.of(Baked.bake(baker, face, u0, v0, u0 + 8, v0 + 8, offset(LIP_OFFSET, acrossSide), lipTexture, 0, 0, 8, 8, acrossSide.rotation));
-                        upDown[quad.ordinal()] = List.of(Baked.bake(baker, face, u0, v0, u0 + 8, v0 + 8, LIP_OFFSET, lipTexture, 0, 0, 8, 8, upDownSide.rotation));
+                        across[quad.ordinal()] = Baked.bakeShadowed(baker, face, u0, v0, u0 + 8, v0 + 8, offset(LIP_OFFSET, acrossSide), lipTexture, lipShadow, 0, 0, 8, 8, acrossSide.rotation);
+                        upDown[quad.ordinal()] = Baked.bakeShadowed(baker, face, u0, v0, u0 + 8, v0 + 8, LIP_OFFSET, lipTexture, lipShadow, 0, 0, 8, 8, upDownSide.rotation);
                     }
                     baseQuads.put(face, bases);
                     windowQuads.put(face, windows);
@@ -563,7 +586,7 @@ public final class ConnectedModel {
                 }
                 List<BakedQuad>[] sides = new List[4];
                 for (Side edge : Side.values()) {
-                    sides[edge.ordinal()] = List.of(Baked.bake(baker, face, 0, 0, 16, 16, offset(BEAM_OFFSET, edge), beam, 0, 0, 16, 16, edge.rotation));
+                    sides[edge.ordinal()] = Baked.bakeShadowed(baker, face, 0, 0, 16, 16, offset(BEAM_OFFSET, edge), beam, beamShadow, 0, 0, 16, 16, edge.rotation);
                 }
                 beams.put(face, sides);
             }

@@ -156,6 +156,21 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
         }
     }
 
+    // Always outline its range in the world (RangeOutlineRenderer), not only while its screen is open. Saved and synced.
+    private boolean showArea;
+
+    public boolean showArea() {
+        return showArea;
+    }
+
+    public void toggleShowArea() {
+        showArea = !showArea;
+        setChanged();
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
     // The volume it collects from: a cube reaching `range` blocks out from the block on every axis.
     public static AABB area(BlockPos pos, int range) {
         return new AABB(pos).inflate(range);
@@ -404,6 +419,7 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
         energy.deserialize(input.childOrEmpty("energy"));
         xpTank.deserialize(input.childOrEmpty("xp_tank"));
         range = Math.max(1, Math.min(maxRange(), input.getIntOr("range", ArcforgeConfig.VACUUM_DEFAULT_RANGE.getAsInt())));
+        showArea = input.getBooleanOr("show_area", false);
     }
 
     @Override
@@ -412,6 +428,7 @@ public class VacuumCollectorBlockEntity extends MachineBlockEntity {
         energy.serialize(output.child("energy"));
         xpTank.serialize(output.child("xp_tank"));
         output.putInt("range", range);
+        output.putBoolean("show_area", showArea);
     }
 
     // Clients need the range for the outline.

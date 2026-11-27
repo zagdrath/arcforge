@@ -30,7 +30,7 @@ import net.zagdrath.arcforge.menu.logistics.ChunkLoaderMenu;
 // A Chunk Loader's screen (176x122, no inventory): a 5x5 map of the chunks round it (its own in the middle; the chunks
 // in its radius filled status cyan while it loads them, outlined while it doesn't), the radius with - and + buttons,
 // its status, how many chunks it and its owner load against the limit, and its FE when FE is required. While the screen
-// is open the area is outlined in the world too (RangeOutlineRenderer). A Security tab on the right.
+// is open the area is outlined in the world too, and its Show area button keeps it outlined after (RangeOutlineRenderer). A Security tab on the right.
 public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> {
     private static final Identifier BACKGROUND = Identifier.fromNamespaceAndPath(Arcforge.MODID, "textures/gui/container/chunk_loader.png");
     private static final Identifier BUTTON = ArcforgeGui.widget("button");
@@ -38,7 +38,7 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
     private static final Identifier BUTTON_DISABLED = ArcforgeGui.widget("button_disabled");
     private static final int WIDTH = 176, HEIGHT = 122;
     private static final int MAP_X = 9, MAP_Y = 20, CELL = 12, PITCH = 13, MAP_CELLS = 5;
-    private static final int TEXT_X = 80, RADIUS_Y = 21, BUTTONS_Y = 31, MINUS_X = 80, PLUS_X = 104, BUTTON_SIZE = 20;
+    private static final int TEXT_X = 80, RADIUS_Y = 21, BUTTONS_Y = 35, MINUS_X = 80, PLUS_X = 96, SHOW_X = 112, BUTTON_SIZE = 14;
     private static final int LED_X = 80, STATUS_Y = 58, LOADED_Y = 69, OWNER_Y = 79;
     private static final int ENERGY_LABEL_Y = 93, BAR_X = 10, BAR_Y = 103, BAR_W = 156, BAR_H = 4, ENERGY_TEXT_Y = 107;
     private static final int CELL_IDLE = 0xFF2F6E68, CELL_ACTIVE = 0xFF5FD4C4, CELL_HOME = 0xFFB8F2EA, CELL_OFF = 0xFF2A2A2A;
@@ -95,8 +95,9 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
                 }
             }
         }
-        button(graphics, mouseX, mouseY, MINUS_X, "minus", radius > 0);
-        button(graphics, mouseX, mouseY, PLUS_X, "plus", radius < ChunkLoaderBlockEntity.MAX_RADIUS);
+        button(graphics, mouseX, mouseY, MINUS_X, "small_minus", radius > 0);
+        button(graphics, mouseX, mouseY, PLUS_X, "small_plus", radius < ChunkLoaderBlockEntity.MAX_RADIUS);
+        button(graphics, mouseX, mouseY, SHOW_X, showArea() ? "show_area" : "hide_area", true);
         String led = switch (menu.getStatus()) {
             case ACTIVE -> "led_running";
             case DISABLED -> "led_off";
@@ -117,7 +118,13 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
         int x = leftPos + bx, y = topPos + BUTTONS_Y;
         boolean hovered = ArcforgeGui.isInside(mouseX, mouseY, x, y, BUTTON_SIZE, BUTTON_SIZE);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, !enabled ? BUTTON_DISABLED : hovered ? BUTTON_HOVER : BUTTON, x, y, BUTTON_SIZE, BUTTON_SIZE);
-        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.sprite("container/vacuum_collector/" + icon), x + 2, y + 2, 16, 16);
+        graphics.blitSprite(RenderPipelines.GUI_TEXTURED, ArcforgeGui.widget(icon), x + 2, y + 2, 10, 10);
+    }
+
+    // Whether the loader always shows its area in the world (its synced block entity says).
+    private boolean showArea() {
+        return minecraft != null && minecraft.level != null
+                && minecraft.level.getBlockEntity(menu.getPos()) instanceof ChunkLoaderBlockEntity loader && loader.showArea();
     }
 
     @Override
@@ -130,7 +137,11 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
         graphics.text(font, Component.translatable("gui.arcforge.chunk_loader.loaded", menu.value(ChunkLoaderMenu.DATA_LOADED)), TEXT_X, LOADED_Y,
                 ArcforgeGui.LABEL, false);
         int total = menu.value(ChunkLoaderMenu.DATA_OWNER_TOTAL), limit = menu.value(ChunkLoaderMenu.DATA_LIMIT);
-        graphics.text(font, Component.translatable("gui.arcforge.chunk_loader.owner_total", total, limit), TEXT_X, OWNER_Y,
+        // Over the limit this loader holds nothing, so the total is everything else; show what it asks for on top.
+        Component owner = menu.getStatus() == ChunkLoaderStatus.LIMIT
+                ? Component.translatable("gui.arcforge.chunk_loader.owner_total.over", total, side * side, limit)
+                : Component.translatable("gui.arcforge.chunk_loader.owner_total", total, limit);
+        graphics.text(font, owner, TEXT_X, OWNER_Y,
                 total > limit || menu.getStatus() == ChunkLoaderStatus.LIMIT ? 0xFFFF6A5A : ArcforgeGui.LABEL, false);
         if (energyRequired()) {
             graphics.text(font, Component.translatable("gui.arcforge.chunk_loader.energy", ArcforgeGui.grouped(menu.value(ChunkLoaderMenu.DATA_COST))),
@@ -158,6 +169,9 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
             lines.add(Component.translatable("gui.arcforge.chunk_loader.radius_minus"));
         } else if (ArcforgeGui.isInside(mouseX, mouseY, leftPos + PLUS_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
             lines.add(Component.translatable("gui.arcforge.chunk_loader.radius_plus"));
+        } else if (ArcforgeGui.isInside(mouseX, mouseY, leftPos + SHOW_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
+            lines.add(Component.translatable(showArea() ? "gui.arcforge.show_area.on" : "gui.arcforge.show_area.off"));
+            lines.add(Component.translatable("gui.arcforge.show_area.tooltip").withStyle(ChatFormatting.GRAY));
         } else if (ArcforgeGui.isInside(mouseX, mouseY, leftPos + MAP_X, topPos + MAP_Y, MAP_CELLS * PITCH, MAP_CELLS * PITCH)) {
             lines.add(Component.translatable("gui.arcforge.chunk_loader.map"));
             lines.add(Component.translatable("gui.arcforge.chunk_loader.map.tooltip").withStyle(ChatFormatting.GRAY));
@@ -186,6 +200,11 @@ public class ChunkLoaderScreen extends AbstractContainerScreen<ChunkLoaderMenu> 
             }
             if (radius < ChunkLoaderBlockEntity.MAX_RADIUS && ArcforgeGui.isInside(event.x(), event.y(), leftPos + PLUS_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
                 sendButton(ChunkLoaderMenu.BUTTON_RADIUS_PLUS);
+                ArcforgeGui.playClickSound();
+                return true;
+            }
+            if (ArcforgeGui.isInside(event.x(), event.y(), leftPos + SHOW_X, topPos + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE)) {
+                sendButton(ChunkLoaderMenu.BUTTON_SHOW_AREA);
                 ArcforgeGui.playClickSound();
                 return true;
             }

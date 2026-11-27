@@ -27,6 +27,15 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 - A **Long Fall Boots** Curios slot: boots there cushion landings like worn ones and still show on your legs, so your
   boots slot is free for armour (the Armored Long Fall Boots' armour only counts on your feet). The Chargepad now also
   charges a Jetpack or Long Fall Boots in their Curios slots.
+- An **Upgrades tab** on the Quantum Tunnel for its Chunk Loading Upgrade: it shows whether one is fitted and what it's
+  doing (loading, over your limit, no FE...), and a click fits one from your inventory or takes it out.
+- A **Show area** button on the Chunk Loader and the Vacuum Collector, like the Arc Quarry's: on, the block keeps its
+  area outlined in the world after its screen is closed (saved with the block). Their area always shows while the
+  screen is open.
+
+### Changed
+
+- The Chunk Loader's radius − and + buttons are smaller, with the Show area button beside them.
 
 ### Changed
 
@@ -37,6 +46,12 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Fixed
 
+- The beams, window lips and frames of formed multiblocks (and Pressure Glass and Reactor Glass) no longer show
+  through the fluid in tanks and Reservoirs in front of them. Their soft 1px shadow put their solid pixels in the
+  translucent layer, which draws after the fluid; the shadow is now a quad of its own.
+- A Chunk Loader over your limit now shows why: "Yours: 1 + 25 / 25" is what your other loaders and chunk-loading
+  Quantum Tunnels hold, plus what this one needs, against your limit. It used to show only the first number, so a
+  5×5 loader looked refused under the limit.
 - Held Arcforged gear no longer bobs in your hand, or restarts a block you're mining, each time it repairs itself or
   pays wear from its charge.
 - JEI now shows the Arcforged gear upgrades at the Smithing Table (template, netherite or steel piece, Arcforged Alloy;

@@ -10,9 +10,6 @@ import org.jspecify.annotations.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,7 +27,6 @@ import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.item.upgrade.ChunkLoadingUpgradeItem;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
-import net.zagdrath.arcforge.registry.ModItems;
 
 // The Quantum Tunnel: a steel frame cube with a socketed port on every face and a cyan core spinning in the middle
 // (QuantumTunnelRenderer). Tunnels on one frequency share its FE, heat, liquid, gas and items, across dimensions.
@@ -55,15 +51,7 @@ public class QuantumTunnelBlock extends BaseEntityBlock {
             return InteractionResult.PASS;
         }
         if (player.isSecondaryUseActive() && tunnel.hasChunkLoading()) {
-            if (!level.isClientSide()) {
-                tunnel.setChunkLoading(false);
-                ItemStack upgrade = new ItemStack(ModItems.CHUNK_LOADING_UPGRADE.get());
-                if (!player.getInventory().add(upgrade)) {
-                    popResourceFromFace(level, pos, hit.getDirection(), upgrade);
-                }
-                level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS, 1.0F, 1.0F);
-                player.sendOverlayMessage(Component.translatable("message.arcforge.chunk_loading_upgrade.removed"));
-            }
+            ChunkLoadingUpgradeItem.takeOut(level, pos, tunnel, player);
             return InteractionResult.SUCCESS;
         }
         if (player instanceof ServerPlayer serverPlayer) {

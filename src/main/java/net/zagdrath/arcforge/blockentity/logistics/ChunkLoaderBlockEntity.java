@@ -111,6 +111,52 @@ public class ChunkLoaderBlockEntity extends BlockEntity implements Owned, MenuPr
         return status;
     }
 
+    // Always outline its area in the world (RangeOutlineRenderer), not only while its screen is open. Saved and synced.
+    private boolean showArea;
+
+    public boolean showArea() {
+        return showArea;
+    }
+
+    public void toggleShowArea() {
+        showArea = !showArea;
+        setChanged();
+        if (level != null && !level.isClientSide()) {
+            level.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), Block.UPDATE_CLIENTS);
+        }
+    }
+
+    // Loaders on this client, for the outline. Client side only.
+    private static final Set<BlockPos> CLIENT_LOADED = java.util.concurrent.ConcurrentHashMap.newKeySet();
+
+    public static Set<BlockPos> clientLoaded() {
+        return CLIENT_LOADED;
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (level != null && level.isClientSide()) {
+            CLIENT_LOADED.add(worldPosition.immutable());
+        }
+    }
+
+    @Override
+    public void setRemoved() {
+        if (level != null && level.isClientSide()) {
+            CLIENT_LOADED.remove(worldPosition);
+        }
+        super.setRemoved();
+    }
+
+    @Override
+    public void onChunkUnloaded() {
+        if (level != null && level.isClientSide()) {
+            CLIENT_LOADED.remove(worldPosition);
+        }
+        super.onChunkUnloaded();
+    }
+
     public int chunkCount() {
         return (2 * radius + 1) * (2 * radius + 1);
     }
@@ -235,6 +281,7 @@ public class ChunkLoaderBlockEntity extends BlockEntity implements Owned, MenuPr
         ownership.load(input);
         energy.deserialize(input.childOrEmpty("energy"));
         radius = Mth.clamp(input.getIntOr("radius", 0), 0, MAX_RADIUS);
+        showArea = input.getBooleanOr("show_area", false);
     }
 
     @Override
@@ -243,13 +290,15 @@ public class ChunkLoaderBlockEntity extends BlockEntity implements Owned, MenuPr
         ownership.save(output);
         energy.serialize(output.child("energy"));
         output.putInt("radius", radius);
+        output.putBoolean("show_area", showArea);
     }
 
-    // Clients get the radius, for the area outline.
+    // Clients get the radius and whether to always show the area, for the outline.
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = new CompoundTag();
         tag.putInt("radius", radius);
+        tag.putBoolean("show_area", showArea);
         return tag;
     }
 

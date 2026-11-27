@@ -77,6 +77,9 @@ public class QuantumTunnelScreen extends AbstractContainerScreen<QuantumTunnelMe
     public QuantumTunnelScreen(QuantumTunnelMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, WIDTH, HEIGHT);
         tabs.add(new SecurityTab(() -> menu.containerId, this::sendButton));
+        tabs.add(new net.zagdrath.arcforge.client.gui.tab.ChunkLoadingUpgradeTab(() -> menu.value(QuantumTunnelMenu.DATA_CHUNK_LOADING) != 0,
+                () -> net.zagdrath.arcforge.chunkloading.ChunkLoaderStatus.byId(menu.value(QuantumTunnelMenu.DATA_LOAD_STATUS)),
+                this::sendButton, QuantumTunnelMenu.UPGRADE_BUTTON));
     }
 
     private QuantumStatePayload state() {

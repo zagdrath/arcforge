@@ -55,9 +55,13 @@ public class QuantumTunnelMenu extends AbstractContainerMenu implements SecuredM
     public static final int DATA_FACES_LOW = 14, DATA_FACES_HIGH = 15;
     // Items held across the slots, and what they could hold (each slot a stack of what's in it; 64 when empty).
     public static final int DATA_ITEM_COUNT = 16, DATA_ITEM_CAPACITY = 17;
-    public static final int DATA_VALUES = 18;
+    // The Chunk Loading Upgrade (Upgrades tab): fitted (0 or 1), and its ChunkLoaderStatus.
+    public static final int DATA_CHUNK_LOADING = 18, DATA_LOAD_STATUS = 19;
+    public static final int DATA_VALUES = 20;
 
     public static final int FACE_BUTTON = 0;
+    // Fits a Chunk Loading Upgrade from the player's inventory, or takes the fitted one out.
+    public static final int UPGRADE_BUTTON = 400;
     private static final int STATE_INTERVAL = 20;
 
     private final BlockPos pos;
@@ -119,6 +123,17 @@ public class QuantumTunnelMenu extends AbstractContainerMenu implements SecuredM
                 int index = buttonId - FACE_BUTTON;
                 tunnel.cycleMode(Direction.from3DDataValue(index / QuantumResource.values().length),
                         QuantumResource.values()[index % QuantumResource.values().length]);
+            }
+            return true;
+        }
+        if (buttonId == UPGRADE_BUTTON) {
+            QuantumTunnelBlockEntity tunnel = tunnel(player);
+            if (tunnel != null && SecurityRules.canAccess(player, tunnel)) {
+                if (tunnel.hasChunkLoading()) {
+                    net.zagdrath.arcforge.item.upgrade.ChunkLoadingUpgradeItem.takeOut(player.level(), pos, tunnel, player);
+                } else {
+                    net.zagdrath.arcforge.item.upgrade.ChunkLoadingUpgradeItem.installFromInventory(player.level(), pos, tunnel, player);
+                }
             }
             return true;
         }

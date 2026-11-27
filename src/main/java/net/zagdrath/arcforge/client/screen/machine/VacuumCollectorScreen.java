@@ -18,7 +18,6 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
-import net.zagdrath.arcforge.client.renderer.RangeOutlineRenderer;
 import net.zagdrath.arcforge.experience.LiquidExperience;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.VacuumCollectorMenu;
@@ -72,12 +71,19 @@ public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
         int hovered = buttonAt(mouseX, mouseY);
         button(graphics, x, y, MINUS_X, minus, hovered);
         button(graphics, x, y, PLUS_X, plus, hovered);
-        button(graphics, x, y, SHOW_X, RangeOutlineRenderer.isGuiOutlineShown() ? hideRange : showRange, hovered);
+        button(graphics, x, y, SHOW_X, showArea() ? showRange : hideRange, hovered);
     }
 
     private void button(GuiGraphicsExtractor graphics, int x, int y, int buttonX, Identifier icon, int hovered) {
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, hovered == buttonX ? BUTTON_HOVER : BUTTON, x + buttonX, y + BUTTONS_Y, BUTTON_SIZE, BUTTON_SIZE);
         graphics.blitSprite(RenderPipelines.GUI_TEXTURED, icon, x + buttonX + 2, y + BUTTONS_Y + 2, 16, 16);
+    }
+
+    // Whether the collector always shows its range in the world (its synced block entity says).
+    private boolean showArea() {
+        return minecraft != null && minecraft.level != null
+                && minecraft.level.getBlockEntity(menu.getPos()) instanceof net.zagdrath.arcforge.blockentity.machine.VacuumCollectorBlockEntity collector
+                && collector.showArea();
     }
 
     // The x of the button under the mouse, or -1.
@@ -102,8 +108,8 @@ public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
     public boolean mouseClicked(MouseButtonEvent event, boolean doubleClick) {
         if (ArcforgeGui.isPress(event)) {
             int buttonX = buttonAt(event.x(), event.y());
-            if (buttonX == SHOW_X) {
-                RangeOutlineRenderer.toggleGuiOutline();
+            if (buttonX == SHOW_X && minecraft.gameMode != null) {
+                minecraft.gameMode.handleInventoryButtonClick(menu.containerId, VacuumCollectorMenu.BUTTON_TOGGLE_OUTLINE);
                 ArcforgeGui.playClickSound();
                 return true;
             }
@@ -133,7 +139,10 @@ public class VacuumCollectorScreen extends MachineScreen<VacuumCollectorMenu> {
         switch (buttonAt(mouseX, mouseY)) {
             case MINUS_X -> lines.add(Component.translatable("gui.arcforge.vacuum.range_minus"));
             case PLUS_X -> lines.add(Component.translatable("gui.arcforge.vacuum.range_plus"));
-            case SHOW_X -> lines.add(Component.translatable(RangeOutlineRenderer.isGuiOutlineShown() ? "gui.arcforge.vacuum.hide_range" : "gui.arcforge.vacuum.show_range"));
+            case SHOW_X -> {
+                lines.add(Component.translatable(showArea() ? "gui.arcforge.show_area.on" : "gui.arcforge.show_area.off"));
+                lines.add(Component.translatable("gui.arcforge.show_area.tooltip").withStyle(ChatFormatting.GRAY));
+            }
             default -> {
                 if (!menu.getSlot(0).hasItem() && isHovering(VacuumCollectorMenu.FILTER_X - 1, VacuumCollectorMenu.FILTER_Y - 1, 18, 18, mouseX, mouseY)) {
                     lines.add(Component.translatable("gui.arcforge.vacuum.filter"));

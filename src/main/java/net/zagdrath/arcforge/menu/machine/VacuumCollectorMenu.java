@@ -62,6 +62,14 @@ public class VacuumCollectorMenu extends MachineMenu {
             });
             return true;
         }
+        if (buttonId == BUTTON_TOGGLE_OUTLINE) {
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof VacuumCollectorBlockEntity collector) {
+                    collector.toggleShowArea();
+                }
+            });
+            return true;
+        }
         return super.clickMenuButton(player, buttonId);
     }
 
