@@ -139,6 +139,7 @@ public final class ArcforgeGameTests {
         TESTS.put("energy_rates", MaxScaleGameTests::energyRates);
         TESTS.put("water_intake_pumps", MaxScaleGameTests::waterIntakePumps);
         TESTS.put("water_intake_needs_a_water_body", MaxScaleGameTests::waterIntakeNeedsAWaterBody);
+        TESTS.put("water_intake_seawater_mode", MaxScaleGameTests::waterIntakeSeawaterMode);
         TESTS.put("carbonizer_speed_upgrades", MaxScaleGameTests::carbonizerSpeedUpgrades);
         TESTS.put("distillation_upgrades", MaxScaleGameTests::distillationUpgrades);
         TESTS.put("heat_pipe_carries_heat", HeatTransportGameTests::heatPipeCarriesHeat);

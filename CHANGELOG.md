@@ -32,6 +32,11 @@ machines and Settings Cards carry over).
   chemical reactors and arrays, the Gasifier, Haber Reactor, Distillation Array, Biogas Digester, Air Separator and
   Fermenter. Vents discard excess gas while keeping the stored buffer; liquid outputs still require room. Settings
   persist with the machine and copy through Settings Cards. Air Separator and Fermenter vents start enabled.
+- **Industrial Water Intake Seawater mode.** A button in its GUI (left of the river/ocean line, showing a swatch of
+  what it pumps) switches it between Water and Seawater. On Seawater it pumps Seawater where its intake is in an ocean
+  or beach biome (the Electric Pump's `seawaterBiomeTags`) at its usual rate, and Water anywhere else. Switching
+  empties its tank. Intakes start on Water, so boilers fed from the sea keep running; Settings Cards copy the mode,
+  and Jade says when it's pumping Seawater.
 - **Separate dyed conduit items.** All sixteen colors have registered items for every conduit type and tier. Dyeing,
   washing, placement, mining, pick block and tier upgrades preserve the appropriate item. Older component-colored
   stacks remain usable; tier upgrades require matching colors.

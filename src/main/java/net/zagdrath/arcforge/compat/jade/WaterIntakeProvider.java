@@ -25,21 +25,23 @@ import snownee.jade.api.StreamServerDataProvider;
 import snownee.jade.api.config.IPluginConfig;
 
 // The Industrial Water Intake in Jade, from any casing: the water body it stands in ("Water body: 1,234 / 400 sources",
-// "River or ocean: ×1.25") and what it pumps ("Pumping 8,000 mB/t"), or why it doesn't.
+// "River or ocean: ×1.25") and what it pumps ("Pumping 8,000 mB/t", "Pumping 10,000 mB/t of Seawater"), or why it doesn't.
 public enum WaterIntakeProvider implements StreamServerDataProvider<BlockAccessor, WaterIntakeProvider.Data> {
     INSTANCE;
 
     public static final Identifier UID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "water_intake");
 
-    public record Data(int waterBlocks, boolean openWater, int pumped) {
+    public record Data(int waterBlocks, boolean openWater, int pumped, boolean seawater) {
         public static final StreamCodec<RegistryFriendlyByteBuf, Data> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.VAR_INT, Data::waterBlocks, ByteBufCodecs.BOOL, Data::openWater, ByteBufCodecs.VAR_INT, Data::pumped, Data::new);
+                ByteBufCodecs.VAR_INT, Data::waterBlocks, ByteBufCodecs.BOOL, Data::openWater, ByteBufCodecs.VAR_INT, Data::pumped,
+                ByteBufCodecs.BOOL, Data::seawater, Data::new);
     }
 
     @Override
     public @Nullable Data streamData(BlockAccessor accessor) {
         WaterIntakeBlockEntity intake = WaterIntakeCasingBlock.STRUCTURE.findController(accessor.getLevel(), accessor.getPosition());
-        return intake != null && intake.isFormed() ? new Data(intake.getWaterBlocks(), intake.isOpenWater(), intake.getPumped()) : null;
+        return intake != null && intake.isFormed() ? new Data(intake.getWaterBlocks(), intake.isOpenWater(), intake.getPumped(),
+                intake.pumpedFluid() != net.minecraft.world.level.material.Fluids.WATER) : null;
     }
 
     @Override
@@ -67,7 +69,8 @@ public enum WaterIntakeProvider implements StreamServerDataProvider<BlockAccesso
                                     .replaceAll("0+$", "").replaceAll("\\.$", "")).withColor(0xFF6FA8FF));
                 }
                 if (data.pumped() > 0) {
-                    tooltip.add(Component.translatable("jade.arcforge.water_intake.pumping", ArcforgeGui.grouped(data.pumped())));
+                    tooltip.add(Component.translatable(data.seawater() ? "jade.arcforge.water_intake.pumping_seawater" : "jade.arcforge.water_intake.pumping",
+                            ArcforgeGui.grouped(data.pumped())));
                 }
             });
         }

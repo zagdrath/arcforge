@@ -147,7 +147,7 @@ public abstract class MachineScreen<M extends MachineMenu> extends AbstractConta
         return ArcforgeGui.sprite("container/" + machine + "/" + name);
     }
 
-    private void sendButton(int buttonId) {
+    protected void sendButton(int buttonId) {
         if (minecraft.gameMode != null) {
             minecraft.gameMode.handleInventoryButtonClick(menu.containerId, buttonId);
         }

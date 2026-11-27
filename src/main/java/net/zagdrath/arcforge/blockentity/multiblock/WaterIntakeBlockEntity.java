@@ -13,8 +13,11 @@ import java.util.Set;
 
 import org.jspecify.annotations.Nullable;
 
+import com.mojang.serialization.Codec;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
@@ -23,6 +26,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -44,6 +48,7 @@ import net.zagdrath.arcforge.menu.multiblock.WaterIntakeMenu;
 import net.zagdrath.arcforge.multiblock.CubeMultiblockStructure;
 import net.zagdrath.arcforge.multiblock.MultiblockAutomation;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
+import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.steam.BoilerCore;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
@@ -56,6 +61,9 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // only). Then it pumps waterIntake.waterPerTick mB/t (x openWaterMultiplier in rivers and oceans) into its tank for
 // energyPerMb FE each, as far as its FE and tank room allow. Its Output ports push the water out on their own, each up to
 // what it pumps between pushes, and Fluid Conduits can pull it. The water isn't taken from the world.
+// Set to Seawater (a button in its GUI; off by default, so boilers fed from the sea keep their Water), it pumps Seawater
+// where its intake is in an ocean or beach biome (electricPump.seawaterBiomeTags, as the Electric Pump), and Water
+// elsewhere. Its tank holds one of the two: a change of what it pumps empties it (the water is free).
 public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
     public static final Set<UpgradeType> UPGRADES = EnumSet.noneOf(UpgradeType.class);
     private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.OUTPUT, SideMode.ENERGY);
@@ -66,6 +74,9 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
     // The last count of connected water sources (up to the scan's limit), and whether it's in a river or ocean.
     private int waterBlocks;
     private boolean openWater;
+    // Seawater mode (saved, copied by Settings Cards), and whether its intake is where water comes up as Seawater.
+    private boolean seawater;
+    private boolean seawaterHere;
     private long lastScan;
     private boolean scanDue = true;
     // mB pumped last tick.
@@ -76,7 +87,8 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
                 new SideConfig(SideMode.NONE, SideMode.NONE, SideMode.OUTPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.NONE),
                 SIDE_MODES, true, ArcforgeConfig.WATER_INTAKE_ENERGY_CAPACITY.getAsInt(), ArcforgeConfig.WATER_INTAKE_ENERGY_CAPACITY.getAsInt(),
                 new int[0], slot -> false);
-        this.water = new FilteredFluidTank(ArcforgeConfig.WATER_INTAKE_TANK.getAsInt(), BoilerCore::isWater, this::setChanged);
+        this.water = new FilteredFluidTank(ArcforgeConfig.WATER_INTAKE_TANK.getAsInt(),
+                resource -> BoilerCore.isWater(resource) || resource.getFluid() == ModFluids.SEAWATER.get(), this::setChanged);
         this.waterOutput = new AutomationResourceHandler<>(water, index -> false, index -> true);
         this.data = new WideIntContainerData(WaterIntakeMenu.DATA_VALUES) {
             @Override
@@ -94,6 +106,9 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
                     case WaterIntakeMenu.DATA_STATUS -> status.ordinal();
                     case WaterIntakeMenu.DATA_REDSTONE_MODE -> redstoneMode.ordinal();
                     case WaterIntakeMenu.DATA_SIDE_CONFIG -> packedSides();
+                    case WaterIntakeMenu.DATA_SEAWATER -> seawater ? 1 : 0;
+                    case WaterIntakeMenu.DATA_SEAWATER_HERE -> seawaterHere ? 1 : 0;
+                    case WaterIntakeMenu.DATA_FLUID -> BuiltInRegistries.FLUID.getId(water.getAmount() > 0 ? water.getResource(0).getFluid() : pumpedFluid());
                     default -> 0;
                 };
             }
@@ -151,6 +166,31 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
         int needed = ArcforgeConfig.WATER_INTAKE_MIN_WATER.getAsInt();
         waterBlocks = countWater(level, intakePos(), Math.max(needed, Math.min(needed * 4, 16_384)));
         openWater = isOpenWater(level, intakePos());
+        seawaterHere = isSeawaterBiome(level, intakePos());
+    }
+
+    public static boolean isSeawaterBiome(Level level, BlockPos pos) {
+        return ClimateHelper.inAny(level.getBiome(pos), ArcforgeConfig.PUMP_SEAWATER_BIOME_TAGS.get());
+    }
+
+    // What it pumps: Seawater when set to and its intake is in an ocean or beach biome, otherwise Water.
+    public Fluid pumpedFluid() {
+        return seawater && seawaterHere ? ModFluids.SEAWATER.get() : Fluids.WATER;
+    }
+
+    public boolean isSeawater() {
+        return seawater;
+    }
+
+    public boolean isSeawaterHere() {
+        return seawaterHere;
+    }
+
+    public void setSeawater(boolean seawater) {
+        if (this.seawater != seawater) {
+            this.seawater = seawater;
+            setChanged();
+        }
     }
 
     public boolean hasEnoughWater() {
@@ -193,7 +233,25 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
             status = stoppedStatus();
         } else if (rate <= 0) {
             status = MachineStatus.NO_WATER;
-        } else if (water.getSpace() <= 0) {
+        } else {
+            Fluid fluid = pumpedFluid();
+            if (water.getAmount() > 0 && water.getResource(0).getFluid() != fluid) {
+                // Switched between Water and Seawater: the rest of the other goes.
+                water.set(0, FluidResource.EMPTY, 0);
+            }
+            pump(fluid, rate);
+        }
+        setLit(pumped > 0);
+        if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
+            // Each port face up to what it pumps between pushes, so the ports keep up with it.
+            MultiblockAutomation.pushOutputs(level, this, true,
+                    Math.max(FluidType.BUCKET_VOLUME, rate * ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt()));
+        }
+    }
+
+    // Pumps fluid into its tank, as much as the rate, its room and its FE allow.
+    private void pump(Fluid fluid, int rate) {
+        if (water.getSpace() <= 0) {
             status = MachineStatus.OUTPUT_FULL;
         } else {
             double fePerMb = ArcforgeConfig.WATER_INTAKE_FE_PER_MB.getAsDouble();
@@ -204,7 +262,7 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
             int cost = (int) Math.ceil(n * fePerMb);
             if (n > 0 && energy.consume(cost)) {
                 try (Transaction tx = Transaction.openRoot()) {
-                    water.insert(0, FluidResource.of(Fluids.WATER), n, tx);
+                    water.insert(0, FluidResource.of(fluid), n, tx);
                     tx.commit();
                 }
                 pumped = n;
@@ -213,12 +271,6 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
                 setChanged();
             }
             status = pumped > 0 ? MachineStatus.PUMPING : MachineStatus.NO_POWER;
-        }
-        setLit(pumped > 0);
-        if (level.getGameTime() % ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt() == 0) {
-            // Each port face up to what it pumps between pushes, so the ports keep up with it.
-            MultiblockAutomation.pushOutputs(level, this, true,
-                    Math.max(FluidType.BUCKET_VOLUME, rate * ArcforgeConfig.MULTIBLOCK_PUSH_INTERVAL.getAsInt()));
         }
     }
 
@@ -260,12 +312,33 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
         };
     }
 
-    // --- Saving ---
+    // --- Saving and Settings Cards ---
+
+    @Override
+    public void writeSettings(ValueOutput output) {
+        super.writeSettings(output);
+        output.putBoolean("seawater", seawater);
+    }
+
+    @Override
+    public int readSettings(ValueInput input) {
+        input.read("seawater", Codec.BOOL).ifPresent(this::setSeawater);
+        return super.readSettings(input);
+    }
+
+    @Override
+    public List<Component> describe(ValueInput input) {
+        List<Component> lines = new java.util.ArrayList<>(super.describe(input));
+        input.read("seawater", Codec.BOOL).ifPresent(on -> lines.add(Component.translatable("settings.arcforge.water_intake.pumps",
+                Component.translatable(on ? "gui.arcforge.water_intake.mode.seawater" : "gui.arcforge.water_intake.mode.water"))));
+        return lines;
+    }
 
     @Override
     protected void loadAdditional(ValueInput input) {
         super.loadAdditional(input);
         water.deserialize(input.childOrEmpty("water"));
+        seawater = input.getBooleanOr("seawater", false);
         scanDue = true;
     }
 
@@ -273,6 +346,7 @@ public class WaterIntakeBlockEntity extends CubeMultiblockBlockEntity {
     protected void saveAdditional(ValueOutput output) {
         super.saveAdditional(output);
         water.serialize(output.child("water"));
+        output.putBoolean("seawater", seawater);
     }
 
     @Override

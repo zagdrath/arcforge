@@ -8,9 +8,12 @@ package net.zagdrath.arcforge.menu.multiblock;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.level.material.Fluid;
 import net.zagdrath.arcforge.blockentity.multiblock.WaterIntakeBlockEntity;
 import net.zagdrath.arcforge.menu.data.WideIntContainerData;
+import net.zagdrath.arcforge.menu.machine.ElectricPumpMenu;
 import net.zagdrath.arcforge.menu.machine.MachineMenu;
 import net.zagdrath.arcforge.registry.ModBlocks;
 import net.zagdrath.arcforge.registry.ModMenuTypes;
@@ -32,7 +35,13 @@ public class WaterIntakeMenu extends MachineMenu {
     public static final int DATA_STATUS = 9;
     public static final int DATA_REDSTONE_MODE = 10;
     public static final int DATA_SIDE_CONFIG = 11;
-    public static final int DATA_VALUES = 12;
+    // Seawater mode (1), whether its intake is in an ocean or beach biome (1), and the fluid in (or for) its tank.
+    public static final int DATA_SEAWATER = 12;
+    public static final int DATA_SEAWATER_HERE = 13;
+    public static final int DATA_FLUID = 14;
+    public static final int DATA_VALUES = 15;
+    // Switches between Water and Seawater.
+    public static final int BUTTON_SEAWATER = 300;
 
     // Client constructor, called with the centre's position written by the server.
     public WaterIntakeMenu(int containerId, Inventory inventory, RegistryFriendlyByteBuf extraData) {
@@ -57,6 +66,31 @@ public class WaterIntakeMenu extends MachineMenu {
     @Override
     protected int sidesIndex() {
         return DATA_SIDE_CONFIG;
+    }
+
+    @Override
+    public boolean clickMenuButton(Player player, int buttonId) {
+        if (buttonId == BUTTON_SEAWATER) {
+            access.execute((level, pos) -> {
+                if (level.getBlockEntity(pos) instanceof WaterIntakeBlockEntity intake) {
+                    intake.setSeawater(!intake.isSeawater());
+                }
+            });
+            return true;
+        }
+        return super.clickMenuButton(player, buttonId);
+    }
+
+    public boolean isSeawater() {
+        return value(DATA_SEAWATER) != 0;
+    }
+
+    public boolean isSeawaterHere() {
+        return value(DATA_SEAWATER_HERE) != 0;
+    }
+
+    public Fluid getFluid() {
+        return ElectricPumpMenu.fluid(value(DATA_FLUID));
     }
 
     public int getEnergy() {

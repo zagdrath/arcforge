@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.block.multiblock.CarbonizerBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayControllerBlock;
@@ -24,6 +26,7 @@ import net.zagdrath.arcforge.config.ArcforgeConfig;
 import net.zagdrath.arcforge.machine.MachineStatus;
 import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlocks;
+import net.zagdrath.arcforge.registry.ModFluids;
 import net.zagdrath.arcforge.registry.ModItems;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
@@ -103,6 +106,46 @@ public final class MaxScaleGameTests {
                     int used = 100_000 - intake.getEnergy().getAmountAsInt();
                     helper.assertTrue(water > 0 && Math.abs(used - water / 4) <= 5, "Pumped " + water + " mB for " + used + " FE");
                     helper.assertTrue(intake.getStatus() == MachineStatus.PUMPING, "Status " + intake.getStatus());
+                })
+                .thenSucceed();
+    }
+
+    // Set to Seawater, it pumps Seawater where its intake is in an ocean or beach biome and Water anywhere else (whichever
+    // the test biome is); Water it held from before is emptied rather than blocking it. Set back, it pumps Water again.
+    static void waterIntakeSeawaterMode(GameTestHelper helper) {
+        pool(helper, 12, 3);
+        BlockPos min = new BlockPos(4, 4, 4);
+        MultiblockTestHelpers.buildCube(helper, min, ModBlocks.WATER_INTAKE_CASING.get());
+        helper.startSequence()
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    WaterIntakeBlockEntity intake = MultiblockTestHelpers.centre(helper, min, WaterIntakeBlockEntity.class);
+                    helper.assertTrue(intake.isFormed() && !intake.isSeawater(), "A new intake isn't on Water");
+                    helper.assertTrue(intake.isSeawaterHere() == WaterIntakeBlockEntity.isSeawaterBiome(helper.getLevel(), intake.intakePos()),
+                            "Its biome check doesn't match");
+                    helper.assertTrue(intake.pumpedFluid() == Fluids.WATER, "On Water mode it pumps " + intake.pumpedFluid());
+                    try (Transaction tx = Transaction.openRoot()) {
+                        intake.getEnergy().insert(200_000, tx);
+                        intake.getWater().insert(0, FluidResource.of(Fluids.WATER), 1_000, tx);
+                        tx.commit();
+                    }
+                    intake.setSeawater(true);
+                })
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    WaterIntakeBlockEntity intake = MultiblockTestHelpers.centre(helper, min, WaterIntakeBlockEntity.class);
+                    var expected = intake.isSeawaterHere() ? ModFluids.SEAWATER.get() : Fluids.WATER;
+                    helper.assertTrue(intake.pumpedFluid() == expected, "On Seawater mode it pumps " + intake.pumpedFluid());
+                    helper.assertTrue(intake.getWater().getAmount() > 0 && intake.getWater().getResource(0).getFluid() == expected,
+                            "Its tank holds " + intake.getWater().getResource(0) + ", expected " + expected);
+                    helper.assertTrue(intake.getStatus() == MachineStatus.PUMPING, "Status " + intake.getStatus());
+                    intake.setSeawater(false);
+                })
+                .thenIdle(3)
+                .thenExecute(() -> {
+                    WaterIntakeBlockEntity intake = MultiblockTestHelpers.centre(helper, min, WaterIntakeBlockEntity.class);
+                    helper.assertTrue(intake.getWater().getResource(0).getFluid() == Fluids.WATER, "Back on Water it holds "
+                            + intake.getWater().getResource(0));
                 })
                 .thenSucceed();
     }
