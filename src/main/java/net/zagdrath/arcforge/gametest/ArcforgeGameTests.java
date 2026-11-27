@@ -42,6 +42,8 @@ public final class ArcforgeGameTests {
     // Every test, by name. All run in the same batch on an empty structure with room around it.
     private static final java.util.Map<String, Consumer<GameTestHelper>> TESTS = new java.util.LinkedHashMap<>();
     // Tests that wait on full machine cycles (a Carbonizer chamber, heating the Arcforge Furnace) get longer to finish.
+    // Builds every multiblock in turn, so it gets the room of the large tests and the time for all of them.
+    private static final String JADE_PARITY = "jade_multiblock_parity";
     private static final java.util.Map<String, Consumer<GameTestHelper>> LONG_TESTS = new java.util.LinkedHashMap<>();
     // Solar Thermal Array tests set the time of day and the weather, which are the whole level's: each runs
     // in its own batch (its own environment), one after another, under open sky.
@@ -655,6 +657,7 @@ public final class ArcforgeGameTests {
         LONG_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         FLAKY_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
         LARGE_TESTS.forEach((name, test) -> FUNCTIONS.register(name, () -> test));
+        FUNCTIONS.register(JADE_PARITY, () -> JadeParityGameTests::multiblocks);
     }
 
     private ArcforgeGameTests() {}
@@ -682,6 +685,9 @@ public final class ArcforgeGameTests {
         });
         // Each oil test builds across three chunks (deposits are per chunk), so it gets room enough that no other test's
         // area or barrier walls reach into it; each radiation test gets the same, so no other test's sources are in range.
+        Holder<TestEnvironmentDefinition<?>> parity = event.registerEnvironment(id(JADE_PARITY));
+        event.registerTest(id(JADE_PARITY), new FunctionGameTestInstance(function(JADE_PARITY), new TestData<>(parity, Level.OVERWORLD,
+                Identifier.withDefaultNamespace("empty"), 6_000, 0, true, Rotation.NONE, false, 1, 1, false, 48)));
         java.util.stream.Stream.of(OIL_TESTS, RADIATION_TESTS, LARGE_TESTS).flatMap(tests -> tests.keySet().stream()).forEach(name -> {
             Holder<TestEnvironmentDefinition<?>> own = event.registerEnvironment(id(name));
             event.registerTest(id(name), new FunctionGameTestInstance(function(name), new TestData<>(own, Level.OVERWORLD,

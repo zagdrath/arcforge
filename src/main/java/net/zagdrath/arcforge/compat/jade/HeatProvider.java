@@ -36,8 +36,8 @@ import snownee.jade.api.ui.IDisplayHelper;
 import snownee.jade.api.ui.JadeUI;
 import snownee.jade.api.view.ProgressView;
 
-// Heat (HU) in anything that holds it: heat machines, Heat Cells, formed arrays and Thermodynamic Conduits
-// (whose whole network is shown). A bar filled by how much is stored, coloured by how hot it is, with the
+// Heat (HU) in anything that holds it: heat machines, Heat Cells, formed multiblocks (from any of their blocks, read at
+// the controller: see WindowProviders.partOf) and Thermodynamic Conduits (whose whole network is shown). A bar filled by how much is stored, coloured by how hot it is, with the
 // temperature and the amount on it; a Firebox or Fuel Burner also shows its oxygen and when it's on oxy-fuel.
 // This half gathers the data on the server; Client draws it.
 public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, HeatProvider.Data> {
@@ -75,8 +75,7 @@ public enum HeatProvider implements StreamServerDataProvider<BlockAccessor, Heat
             }
             return new Data(network.getStored(), network.getCapacity(), network.getTemperature());
         }
-        // A pane of Pressure Glass shows its array's heat, a column casing its column's, and a solar casing or
-        // collector its array's.
+        // Any block of a formed multiblock shows its controller's heat.
         BlockPos machine = WindowProviders.machinePos(level, accessor.getPosition());
         BlockPos pos = machine != null ? machine : accessor.getPosition();
         HeatHandler heat = level.getCapability(ModCapabilities.HEAT, pos, null);

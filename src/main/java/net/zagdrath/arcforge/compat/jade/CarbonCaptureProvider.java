@@ -61,9 +61,15 @@ public enum CarbonCaptureProvider implements StreamServerDataProvider<BlockAcces
         if (be instanceof GasTurbineArrayBlockEntity casing) {
             return casing.getMaster() instanceof GasTurbineArrayBlockEntity turbine ? turbine.getFlue() : null;
         }
-        FireboxArrayBlockEntity array = be instanceof FireboxArrayBlockEntity own ? own
-                : FireboxArrayStructure.findController(accessor.getLevel(), accessor.getPosition());
-        return array != null ? array.getFlue() : null;
+        if (be instanceof FireboxArrayBlockEntity own) {
+            return own.getFlue();
+        }
+        // A Firebox Array casing, or a pane of either array's Pressure Glass.
+        return switch (net.zagdrath.arcforge.multiblock.Multiblocks.controllerAt(accessor.getLevel(), accessor.getPosition())) {
+            case FireboxArrayBlockEntity array -> array.getFlue();
+            case GasTurbineArrayBlockEntity turbine -> turbine.getFlue();
+            case null, default -> null;
+        };
     }
 
     @Override

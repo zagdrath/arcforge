@@ -187,8 +187,8 @@ final class AlloyGameTests {
         // Tray, Reactor Casing, Glass and Controller, Heavy Water Tower Casing and Controller, Steam Generator Casing, Tubes
         // and Controller), and the silica drop's four (Chemical Reactor Array Casing, Electric Enchanter, Silicon Carbide
         // Blend and Silicon Carbide Mesh), the Nuclear Turbine Casing, and seven equipment recipes (three armored
-        // jetpacks, two armored tier upgrades and both Long Fall Boots variants).
-        helper.assertTrue(crafting == 366, crafting + " crafting/ recipes, not 366");
+        // jetpacks, two armored tier upgrades and both Long Fall Boots variants), and the Chunk Loading Upgrade.
+        helper.assertTrue(crafting == 367, crafting + " crafting/ recipes, not 367");
         // Plus the fluorite-fluxed steel, Graphite from Coal Coke and from Carbon Dust, Zircaloy, Lead-Bismuth, Ferrosilicon
         // and Metallurgical Silicon.
         helper.assertTrue(smelting == 12, smelting + " arcforge_smelting/ recipes, not 12");

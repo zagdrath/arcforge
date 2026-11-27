@@ -40,7 +40,11 @@ public enum ArcforgeFurnaceProvider implements StreamServerDataProvider<BlockAcc
 
     @Override
     public @Nullable Data streamData(BlockAccessor accessor) {
-        if (!(accessor.getBlockEntity() instanceof ArcforgeFurnaceBlockEntity furnace) || furnace.getOxygen().getAmount() <= 0 && !furnace.isBoosted()) {
+        // From the port or any brick or wall of it.
+        ArcforgeFurnaceBlockEntity furnace = accessor.getBlockEntity() instanceof ArcforgeFurnaceBlockEntity own ? own
+                : net.zagdrath.arcforge.multiblock.Multiblocks.controllerAt(accessor.getLevel(), accessor.getPosition()) instanceof ArcforgeFurnaceBlockEntity part
+                        ? part : null;
+        if (furnace == null || furnace.getOxygen().getAmount() <= 0 && !furnace.isBoosted()) {
             return null;
         }
         return new Data(furnace.getOxygen().getAmount(), (int) Math.round(ArcforgeConfig.FURNACE_OXYGEN_SPEED.getAsDouble() * 100.0));

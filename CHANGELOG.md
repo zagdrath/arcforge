@@ -207,6 +207,14 @@ machines and Settings Cards carry over).
 
 ### Fixed
 
+- **Jade shows the same for every block of a multiblock.** Casings, Pressure Glass, bricks, cells and the blocks inside a
+  vessel now show what the controller shows. Before, most casings lost the heat bar (the Firebox Array's, the Cracking
+  Unit's, the Steam Cracker's, the Greenhouse's frame and lamps, and every array's glass) and the FE and fluid bars, and
+  never showed the controller's items. The Arcforge Furnace's bricks now show its oxygen, and Pressure Glass the Firebox
+  Array's and Gas Turbine Array's flue gas. A planting bed still adds its crop, and a control rod channel its bank. A new
+  game test builds every multiblock and checks each kind of block against its controller.
+- **Metal Pressing Array crash.** Inserting items into one slot by slot (as some pipes and other mods' automation do)
+  crashed the server: its lane check read the slot before the die slot. Now only lane input slots are checked.
 - **Tank and Reservoir items show their contents.** A Fluid Reservoir or Gas Reservoir item now draws the share it
   carries inside its frame, like the placed block: a liquid to its level, a gas as a tint that deepens as it fills. The
   fluid in a Fluid Tank item was hidden behind the tank's glass and shows again.

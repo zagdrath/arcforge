@@ -114,14 +114,19 @@ public abstract class CubeMultiblockBlockEntity extends MachineBlockEntity imple
             this.inputSlots = inputSlots;
         }
 
+        private boolean isInputSlot(int index) {
+            return Arrays.stream(inputSlots).anyMatch(input -> input == index);
+        }
+
         @Override
         public boolean isValid(int index, ItemResource resource) {
             return super.isValid(index, resource) && acceptsLaneInput(index, resource);
         }
 
+        // Only a lane input slot is asked whether it takes the item (a lane's check may read the slots beside it).
         @Override
         public int insert(int index, ItemResource resource, int amount, TransactionContext transaction) {
-            return acceptsLaneInput(index, resource) ? super.insert(index, resource, amount, transaction) : 0;
+            return isInputSlot(index) && acceptsLaneInput(index, resource) ? super.insert(index, resource, amount, transaction) : 0;
         }
 
         @Override

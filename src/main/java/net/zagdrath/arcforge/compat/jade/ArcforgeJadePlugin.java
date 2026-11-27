@@ -8,7 +8,6 @@ package net.zagdrath.arcforge.compat.jade;
 import java.util.List;
 
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.zagdrath.arcforge.block.conduit.ConduitBlock;
 import net.zagdrath.arcforge.block.machine.ArcMelterBlock;
 import net.zagdrath.arcforge.block.machine.ChemicalReactorBlock;
@@ -23,7 +22,6 @@ import net.zagdrath.arcforge.block.machine.BlockBreakerBlock;
 import net.zagdrath.arcforge.block.machine.AssemblerBlock;
 import net.zagdrath.arcforge.block.multiblock.DistillationArrayCasingBlock;
 import net.zagdrath.arcforge.block.multiblock.PressureGlassBlock;
-import net.zagdrath.arcforge.block.multiblock.SolarBlock;
 import net.zagdrath.arcforge.block.storage.VaultBlock;
 import net.zagdrath.arcforge.blockentity.conduit.ConduitBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcMelterBlockEntity;
@@ -49,8 +47,9 @@ import snownee.jade.api.IWailaCommonRegistration;
 import snownee.jade.api.IWailaPlugin;
 import snownee.jade.api.WailaPlugin;
 
-// Jade support (only loaded when Jade is installed): formed multiblocks are named as the machine, heat is
-// shown for everything that holds it, conduits show what their network carries, and an Arc Melter or
+// Jade support (only loaded when Jade is installed): formed multiblocks are named as the machine, and every block of one
+// shows what its controller shows (JadeMultiblockParity checks this for every blueprint); heat is shown for everything
+// that holds it, conduits show what their network carries, and an Arc Melter or
 // Chemical Reactor what it is making. Loam Farmland shows its nutrients and a Compost Bin how full it is. Looking
 // through a Pressure Glass window shows the same as looking at its array's casings. Conduits are named after their
 // pick-block item (the Conduit Facade looked at), which Jade only does for blocks marked to pick.
@@ -65,7 +64,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 }
             }
         }
-        registration.registerBlockDataProvider(HeatProvider.INSTANCE, BlockEntity.class);
+        // Any block: anything holding heat, and every block of a formed multiblock (its controller's).
+        registration.registerBlockDataProvider(HeatProvider.INSTANCE, Block.class);
         registration.registerBlockDataProvider(OutputLimitProvider.INSTANCE, Block.class);
         // Owner and security of any owned block, or any part of an owned structure (glass included).
         registration.registerBlockDataProvider(SecurityProvider.INSTANCE, Block.class);
@@ -85,6 +85,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(ArcQuarryProvider.INSTANCE, ArcQuarryBlockEntity.class);
         registration.registerBlockDataProvider(ArcQuarryProvider.INSTANCE, ArcQuarryBoundingBlockEntity.class);
         registration.registerBlockDataProvider(ArcforgeFurnaceProvider.INSTANCE, ArcforgeFurnaceBlockEntity.class);
+        registration.registerBlockDataProvider(ArcforgeFurnaceProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock.class);
+        registration.registerBlockDataProvider(ArcforgeFurnaceProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock.class);
         // Any casing: the cube arrays' casings each have a block entity; a turbine's glass doesn't.
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, SuperheaterArrayBlockEntity.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, CondenserArrayBlockEntity.class);
@@ -140,7 +142,6 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.ThermalEvaporatorBlockEntity.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);
         registration.registerBlockDataProvider(ThermalEvaporatorProvider.INSTANCE, PressureGlassBlock.class);
-        registration.registerBlockDataProvider(HeatProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.ThermalEvaporatorCasingBlock.class);
         // The Firebox Array: its fire, fuel and heat from any part.
         registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, net.zagdrath.arcforge.blockentity.multiblock.FireboxArrayBlockEntity.class);
         registration.registerBlockDataProvider(FireboxArrayProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class);
@@ -183,6 +184,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
             registration.registerBlockDataProvider(CarbonCaptureProvider.INSTANCE, type);
         }
         registration.registerBlockDataProvider(CarbonCaptureProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class);
+        registration.registerBlockDataProvider(CarbonCaptureProvider.INSTANCE, PressureGlassBlock.class);
         // Renewable coal: the Tree Cutter and the Hydrothermal Carbonizer.
         registration.registerBlockDataProvider(RenewableCoalProvider.INSTANCE, net.zagdrath.arcforge.blockentity.machine.TreeCutterBlockEntity.class);
         registration.registerBlockDataProvider(RenewableCoalProvider.INSTANCE,
@@ -190,18 +192,13 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GlassClocheBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.GrowChamberBlockEntity.class);
         registration.registerBlockDataProvider(ClocheProvider.INSTANCE, net.zagdrath.arcforge.blockentity.farming.HydroponicCellBlockEntity.class);
-        registration.registerBlockDataProvider(HeatProvider.INSTANCE, net.zagdrath.arcforge.block.multiblock.DigesterCasingBlock.class);
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockDataProvider(SteamCycleProvider.INSTANCE, PressureGlassBlock.class);
-        // Pressure Glass has no block entity: these read the array it belongs to.
-        registration.registerBlockDataProvider(HeatProvider.INSTANCE, PressureGlassBlock.class);
-        registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, PressureGlassBlock.class);
-        registration.registerEnergyStorage(WindowProviders.Energy.INSTANCE, PressureGlassBlock.class);
-        // Nor do the Distillation Array's casings and trays: these read its controller.
-        registration.registerBlockDataProvider(HeatProvider.INSTANCE, DistillationArrayCasingBlock.class);
-        // The Solar Thermal Array's casings and collectors show its heat.
-        registration.registerBlockDataProvider(HeatProvider.INSTANCE, SolarBlock.class);
-        registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, DistillationArrayCasingBlock.class);
+        // Every block of a formed multiblock (casings, glass, bricks, cells, what's inside a vessel) shows its controller's
+        // fluids, FE and items; anything else falls through to Jade's own.
+        registration.registerFluidStorage(WindowProviders.Fluid.INSTANCE, Block.class);
+        registration.registerEnergyStorage(WindowProviders.Energy.INSTANCE, Block.class);
+        registration.registerItemStorage(WindowProviders.Items.INSTANCE, Block.class);
         // Reservoirs, Liquid Experience, the Quantum Tunnel and the Chunk Loader.
         registration.registerBlockDataProvider(LogisticsProviders.Reservoir.INSTANCE, net.zagdrath.arcforge.blockentity.storage.ReservoirBlockEntity.class);
         registration.registerBlockDataProvider(LogisticsProviders.ItemReservoir.INSTANCE, net.zagdrath.arcforge.blockentity.storage.ItemReservoirBlockEntity.class);
@@ -236,6 +233,8 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(ArcQuarryProvider.Client.INSTANCE, ArcQuarryBlock.class);
         registration.registerBlockComponent(ArcQuarryProvider.Client.INSTANCE, ArcQuarryBoundingBlock.class);
         registration.registerBlockComponent(ArcforgeFurnaceProvider.Client.INSTANCE, ArcforgeFurnacePortBlock.class);
+        registration.registerBlockComponent(ArcforgeFurnaceProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBricksBlock.class);
+        registration.registerBlockComponent(ArcforgeFurnaceProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.ArcforgeFurnaceBrickWallBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, SuperheaterArrayCasingBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, CondenserArrayCasingBlock.class);
         registration.registerBlockComponent(WaterIntakeProvider.Client.INSTANCE, net.zagdrath.arcforge.block.multiblock.WaterIntakeCasingBlock.class);
@@ -282,7 +281,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
                 net.zagdrath.arcforge.block.machine.GasifierBlock.class, net.zagdrath.arcforge.block.machine.FischerTropschReactorBlock.class,
                 net.zagdrath.arcforge.block.machine.CombustionPlantBlock.class, net.zagdrath.arcforge.block.machine.FireboxBlock.class,
                 net.zagdrath.arcforge.block.machine.FuelBurnerBlock.class, net.zagdrath.arcforge.block.multiblock.FireboxArrayControllerBlock.class,
-                net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class, GasTurbineArrayCasingBlock.class)) {
+                net.zagdrath.arcforge.block.multiblock.FireboxArrayCasingBlock.class, GasTurbineArrayCasingBlock.class, PressureGlassBlock.class)) {
             registration.registerBlockComponent(CarbonCaptureProvider.Client.INSTANCE, type);
         }
         registration.registerBlockComponent(RenewableCoalProvider.Client.INSTANCE, net.zagdrath.arcforge.block.machine.TreeCutterBlock.class);
@@ -350,5 +349,6 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerItemStorageClient(VaultProviders.HideItems.INSTANCE);
         registration.registerFluidStorageClient(WindowProviders.Fluid.INSTANCE);
         registration.registerEnergyStorageClient(WindowProviders.Energy.INSTANCE);
+        registration.registerItemStorageClient(WindowProviders.Items.INSTANCE);
     }
 }

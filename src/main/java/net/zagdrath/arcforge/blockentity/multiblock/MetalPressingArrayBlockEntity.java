@@ -115,7 +115,7 @@ public class MetalPressingArrayBlockEntity extends CubeMultiblockBlockEntity {
     // Automation only feeds a lane whose die presses the item.
     @Override
     protected boolean acceptsLaneInput(int slot, ItemResource resource) {
-        return MachineRecipes.isPressingInput(level, items.getStack(slot - 1), resource.toStack(1));
+        return slot < MACHINE_SLOTS && slot % 3 == 1 && MachineRecipes.isPressingInput(level, items.getStack(slot - 1), resource.toStack(1));
     }
 
     // --- Running ---
