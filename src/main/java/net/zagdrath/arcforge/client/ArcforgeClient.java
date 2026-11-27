@@ -570,6 +570,9 @@ public class ArcforgeClient {
         event.registerLayerDefinition(JetpackLayer.LAYER, JetpackLayer::createLayer);
         net.zagdrath.arcforge.registry.ModItems.jetpacks().forEach(item -> top.theillusivec4.curios.api.client.ICurioRenderer.register(item.get(),
                 net.zagdrath.arcforge.client.renderer.CurioJetpackRenderer::new));
+        java.util.List.of(net.zagdrath.arcforge.registry.ModItems.LONG_FALL_BOOTS, net.zagdrath.arcforge.registry.ModItems.ARMORED_LONG_FALL_BOOTS)
+                .forEach(item -> top.theillusivec4.curios.api.client.ICurioRenderer.register(item.get(),
+                        net.zagdrath.arcforge.client.renderer.CurioLongFallBootsRenderer::new));
     }
 
     // The worn Jetpack's pack, on players (both skin models) and armor stands.

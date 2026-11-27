@@ -3,6 +3,7 @@
     "minecraft:player"
   ],
   "slots": [
-    "jetpack"
+    "jetpack",
+    "long_fall_boots"
   ]
 }

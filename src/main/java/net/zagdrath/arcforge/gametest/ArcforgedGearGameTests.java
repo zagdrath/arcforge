@@ -112,12 +112,14 @@ public final class ArcforgedGearGameTests {
                 "With 7 points of charge, 9 wear left " + pickaxe.getDamageValue() + " damage and " + ArcToolItem.energy(pickaxe) + " FE");
         pickaxe.hurtAndBreak(4, helper.getLevel(), null, broken -> {});
         helper.assertTrue(pickaxe.getDamageValue() == 6, "Empty, 4 wear left " + pickaxe.getDamageValue() + " damage");
+        // Two points of charge repair two of the six points of damage (the rate allows more).
         ArcToolItem.setEnergy(pickaxe, per * 2);
         ArcforgedGear.selfRepair(pickaxe, 20);
-        helper.assertTrue(pickaxe.getDamageValue() == 5 && ArcToolItem.energy(pickaxe) == per,
+        helper.assertTrue(pickaxe.getDamageValue() == 4 && ArcToolItem.energy(pickaxe) == 0,
                 "Self-repair left " + pickaxe.getDamageValue() + " damage and " + ArcToolItem.energy(pickaxe) + " FE");
+        ArcToolItem.setEnergy(pickaxe, per * 2);
         ArcforgedGear.selfRepair(pickaxe, 21);
-        helper.assertTrue(pickaxe.getDamageValue() == 5, "Self-repair ran off the second");
+        helper.assertTrue(pickaxe.getDamageValue() == 4, "Self-repair ran off the second");
         helper.succeed();
     }
 

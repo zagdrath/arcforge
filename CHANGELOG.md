@@ -22,8 +22,23 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Added
+
+- A **Long Fall Boots** Curios slot: boots there cushion landings like worn ones and still show on your legs, so your
+  boots slot is free for armour (the Armored Long Fall Boots' armour only counts on your feet). The Chargepad now also
+  charges a Jetpack or Long Fall Boots in their Curios slots.
+
+### Changed
+
+- The Curios Jetpack slot shows a jetpack outline when empty.
+
+- Arcforged gear repairs itself 10 points a second from its charge, up from 1. The config key is now `selfRepairPerSecond`
+  (was `repairPerSecond`), so existing configs take the new default.
+
 ### Fixed
 
+- Held Arcforged gear no longer bobs in your hand, or restarts a block you're mining, each time it repairs itself or
+  pays wear from its charge.
 - JEI now shows the Arcforged gear upgrades at the Smithing Table (template, netherite or steel piece, Arcforged Alloy;
   two for the Hammer and Excavator).
 

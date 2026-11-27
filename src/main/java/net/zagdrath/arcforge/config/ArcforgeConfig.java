@@ -4032,7 +4032,8 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.IntValue ARCFORGED_REPAIR_PER_SECOND = BUILDER
             .comment("Durability a damaged piece restores each second from its charge, at fePerDurability each (0: never).")
-            .defineInRange("repairPerSecond", 1, 0, 10_000);
+            // Was "repairPerSecond" (default 1) in 2.9.0; renamed so saved configs pick up the new default.
+            .defineInRange("selfRepairPerSecond", 10, 0, 10_000);
 
     static {
         BUILDER.pop();

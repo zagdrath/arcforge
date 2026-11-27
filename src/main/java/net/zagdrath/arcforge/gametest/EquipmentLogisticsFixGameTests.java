@@ -20,6 +20,7 @@ import net.zagdrath.arcforge.blockentity.logistics.QuantumTunnelBlockEntity;
 import net.zagdrath.arcforge.blockentity.machine.ArcQuarryBlockEntity;
 import net.zagdrath.arcforge.item.tool.JetpackFlight;
 import net.zagdrath.arcforge.item.tool.JetpackItem;
+import net.zagdrath.arcforge.item.tool.LongFallBootsItem;
 import net.zagdrath.arcforge.machine.quarry.QuarrySettings;
 import net.zagdrath.arcforge.quantum.Frequency;
 import net.zagdrath.arcforge.quantum.QuantumFaces;
@@ -117,6 +118,22 @@ public final class EquipmentLogisticsFixGameTests {
         player.setOnGround(false);
         helper.assertTrue(JetpackFlight.tick(player, true, false, false) > 0 && player.getDeltaMovement().y > 0, "Curios jetpack does not fly");
         helper.assertTrue(player.getItemBySlot(EquipmentSlot.CHEST).is(ModItems.STEEL_CHESTPLATE.get()), "Flight replaced chest armor");
+        helper.succeed();
+    }
+
+    // Long Fall Boots in their Curios slot cushion a landing as worn ones do, with other boots on the feet.
+    static void curioLongFallBoots(GameTestHelper helper) {
+        var player = TestFixtures.player(helper);
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        var inventory = top.theillusivec4.curios.api.CuriosApi.getCuriosInventory(player).orElseThrow();
+        helper.assertTrue(inventory.getCurios().containsKey("long_fall_boots"), "Dedicated Long Fall Boots slot is missing");
+        ItemStack boots = new ItemStack(ModItems.LONG_FALL_BOOTS.get());
+        net.zagdrath.arcforge.item.tool.ArcToolItem.setEnergy(boots, LongFallBootsItem.LANDING_COST * 2);
+        inventory.setEquippedCurio("long_fall_boots", 0, boots);
+        player.setItemSlot(EquipmentSlot.FEET, new ItemStack(ModItems.STEEL_BOOTS.get()));
+        helper.assertTrue(LongFallBootsItem.absorb(player, player.damageSources().fall(), 10), "Curios Long Fall Boots did not cushion the landing");
+        helper.assertTrue(net.zagdrath.arcforge.item.tool.ArcToolItem.energy(inventory.getStacksHandler("long_fall_boots").orElseThrow()
+                .getStacks().getStackInSlot(0)) == LongFallBootsItem.LANDING_COST, "The landing didn't take its FE from the Curios boots");
         helper.succeed();
     }
 }

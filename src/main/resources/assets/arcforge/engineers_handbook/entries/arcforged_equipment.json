@@ -26,7 +26,7 @@
     },
     {
       "type": "text",
-      "text": "# FE self-repair\nEach piece holds 512,000 FE. Charge it in an Energy Cell's slots, on a Chargepad or from a Battery, like an Arc Drill.\n- While it has charge, wear costs 100 FE a point instead of durability, and a damaged piece repairs a point a second from its charge.\n- With no charge it wears and repairs (anvil, Mending) like any other gear, so it never stops working.\n- The cyan bar above the durability bar is the charge. The inlay, and worn armor's visor, chest and shoulder seams, glow while charged.\nAll of this is in the arcforgedGear config section, with a switch to turn the FE buffer off."
+      "text": "# FE self-repair\nEach piece holds 512,000 FE. Charge it in an Energy Cell's slots, on a Chargepad or from a Battery, like an Arc Drill.\n- While it has charge, wear costs 100 FE a point instead of durability, and a damaged piece repairs 10 points a second from its charge.\n- With no charge it wears and repairs (anvil, Mending) like any other gear, so it never stops working.\n- The cyan bar above the durability bar is the charge. The inlay, and worn armor's visor, chest and shoulder seams, glow while charged.\nAll of this is in the arcforgedGear config section, with a switch to turn the FE buffer off."
     }
   ]
 }

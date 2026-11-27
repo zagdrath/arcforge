@@ -39,12 +39,14 @@ import net.zagdrath.arcforge.transfer.energy.SidedEnergyHandler;
 import net.zagdrath.arcforge.transfer.energy.TrackingEnergyHandler;
 
 // The Chargepad: FE goes in through the port on its back (and only there), and every tick it charges the FE items of
-// players standing on it, the held item first, then the offhand, the hotbar and the armour, each up to
+// players standing on it, the held item first, then the offhand, the hotbar, the armour and the Jetpack and Long Fall
+// Boots Curios slots, each up to
 // chargeRatePerItem and all together up to maxTransferPerTick. Its FE stays with the item when it's broken.
 public class ChargepadBlockEntity extends BlockEntity implements ConduitConnectable, Dismantleable {
     // How long after its last charge it still shows as charging.
     private static final int CHARGING_TICKS = 10;
     private static final int[] ARMOUR_SLOTS = { 36, 37, 38, 39 };
+    private static final String[] CURIO_SLOTS = { "jetpack", "long_fall_boots" };
 
     private final TrackingEnergyHandler energy;
     private final EnergyHandler input;
@@ -96,14 +98,18 @@ public class ChargepadBlockEntity extends BlockEntity implements ConduitConnecta
         int charged = 0;
         if (budget > 0) {
             for (Player player : level.getEntitiesOfClass(Player.class, standingArea(), player -> !player.isSpectator())) {
+                List<ItemAccess> items = new ArrayList<>();
                 for (int slot : slotsInOrder(player)) {
+                    if (!player.getInventory().getItem(slot).isEmpty()) {
+                        items.add(ItemAccess.forPlayerSlot(player, slot));
+                    }
+                }
+                curioSlots(player, items);
+                for (ItemAccess access : items) {
                     if (budget <= 0) {
                         break;
                     }
-                    if (player.getInventory().getItem(slot).isEmpty()) {
-                        continue;
-                    }
-                    EnergyHandler item = ItemAccess.forPlayerSlot(player, slot).getCapability(Capabilities.Energy.ITEM);
+                    EnergyHandler item = access.getCapability(Capabilities.Energy.ITEM);
                     if (item == null) {
                         continue;
                     }
@@ -143,6 +149,22 @@ public class ChargepadBlockEntity extends BlockEntity implements ConduitConnecta
             slots.add(slot);
         }
         return slots;
+    }
+
+    // After the armour: a Jetpack or Long Fall Boots worn in their Curios slots.
+    private static void curioSlots(Player player, List<ItemAccess> items) {
+        top.theillusivec4.curios.api.CuriosApi.getCuriosInventory(player).ifPresent(inventory -> {
+            for (String id : CURIO_SLOTS) {
+                inventory.getStacksHandler(id).ifPresent(handler -> {
+                    var stacks = handler.getStacks();
+                    for (int i = 0; i < stacks.size(); i++) {
+                        if (!stacks.getStackInSlot(i).isEmpty()) {
+                            items.add(ItemAccess.forHandlerIndex(stacks, i));
+                        }
+                    }
+                });
+            }
+        });
     }
 
     // --- Capabilities: FE in through the back only, capped at maxInput a call ---

@@ -67,10 +67,20 @@ public class LongFallBootsItem extends Item {
         }
     }
 
+    // The boots worn on the feet, or else in the Curios "long_fall_boots" slot (EMPTY with neither).
+    public static ItemStack worn(LivingEntity wearer) {
+        ItemStack feet = wearer.getItemBySlot(EquipmentSlot.FEET);
+        return feet.getItem() instanceof LongFallBootsItem ? feet : top.theillusivec4.curios.api.CuriosApi.getCuriosInventory(wearer)
+                .flatMap(inventory -> inventory.findFirstCurio(stack -> stack.getItem() instanceof LongFallBootsItem))
+                .map(top.theillusivec4.curios.api.SlotResult::stack).orElse(ItemStack.EMPTY);
+    }
+
     public static boolean absorb(LivingEntity wearer, DamageSource source, float amount) {
-        ItemStack boots = wearer.getItemBySlot(EquipmentSlot.FEET);
-        if (wearer.level().isClientSide() || amount <= 0 || !source.is(DamageTypeTags.IS_FALL)
-                || !(boots.getItem() instanceof LongFallBootsItem) || ArcToolItem.energy(boots) < LANDING_COST) {
+        if (wearer.level().isClientSide() || amount <= 0 || !source.is(DamageTypeTags.IS_FALL)) {
+            return false;
+        }
+        ItemStack boots = worn(wearer);
+        if (!(boots.getItem() instanceof LongFallBootsItem) || ArcToolItem.energy(boots) < LANDING_COST) {
             return false;
         }
         ArcToolItem.spend(boots, LANDING_COST);

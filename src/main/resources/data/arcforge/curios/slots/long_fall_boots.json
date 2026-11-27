@@ -1,0 +1,8 @@
+{
+  "size": 1,
+  "order": 82,
+  "icon": "arcforge:slot/long_fall_boots",
+  "validators": [
+    "curios:tag"
+  ]
+}

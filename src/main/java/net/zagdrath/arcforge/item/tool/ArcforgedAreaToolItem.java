@@ -39,6 +39,16 @@ public class ArcforgedAreaToolItem extends AreaToolItem {
     }
 
     @Override
+    public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
+        return slotChanged ? oldStack != newStack : !ArcforgedGear.onlyWearOrChargeChanged(oldStack, newStack);
+    }
+
+    @Override
+    public boolean shouldCauseBlockBreakReset(ItemStack oldStack, ItemStack newStack) {
+        return !ArcforgedGear.onlyWearOrChargeChanged(oldStack, newStack);
+    }
+
+    @Override
     public boolean canBeHurtBy(ItemStack stack, DamageSource source) {
         return ArcforgedGear.canBeHurtBy(source);
     }

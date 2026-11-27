@@ -22,9 +22,6 @@ import net.zagdrath.arcforge.item.tool.LongFallBootsItem;
 
 /** Solid boot uppers, reinforced toes, side dampers and stepped heel springs on a 64x64 unwrap. */
 public class LongFallBootsLayer<S extends HumanoidRenderState, M extends HumanoidModel<S>> extends RenderLayer<S, M> {
-    private final ModelPart standard = model(false);
-    private final ModelPart armored = model(true);
-
     public LongFallBootsLayer(RenderLayerParent<S, M> parent) { super(parent); }
 
     private static ModelPart model(boolean armor) {
@@ -48,9 +45,20 @@ public class LongFallBootsLayer<S extends HumanoidRenderState, M extends Humanoi
     @Override
     public void submit(PoseStack poses, SubmitNodeCollector collector, int light, S state, float yaw, float pitch) {
         if (state.isInvisible || !(state.feetEquipment.getItem() instanceof LongFallBootsItem boots)) return;
-        ModelPart root = boots.armored() ? armored : standard;
+        submitBoots(boots, getParentModel(), poses, collector, light);
+    }
+
+    private static ModelPart standardModel, armoredModel;
+
+    // The boots on both legs of `model`; also used for boots in their Curios slot (CurioLongFallBootsRenderer).
+    public static void submitBoots(LongFallBootsItem boots, HumanoidModel<?> model, PoseStack poses, SubmitNodeCollector collector, int light) {
+        if (standardModel == null) {
+            standardModel = model(false);
+            armoredModel = model(true);
+        }
+        ModelPart root = boots.armored() ? armoredModel : standardModel;
         var texture = Identifier.fromNamespaceAndPath("arcforge", "textures/entity/equipment/long_fall/" + (boots.armored() ? "armored" : "standard") + ".png");
-        for (ModelPart leg : new ModelPart[] {getParentModel().rightLeg, getParentModel().leftLeg}) {
+        for (ModelPart leg : new ModelPart[] {model.rightLeg, model.leftLeg}) {
             poses.pushPose();
             leg.translateAndRotate(poses);
             collector.submitModelPart(root, poses, RenderTypes.entityCutout(texture), light, OverlayTexture.NO_OVERLAY, null);
