@@ -76,7 +76,8 @@ import net.zagdrath.arcforge.upgrade.UpgradeType;
 // The Thermal Evaporator Array (see ThermalEvaporatorStructure), run by its controller. It boils its input down with heat
 // (arcforge:evaporating recipes): Seawater into Brine, Brine into Salt, each returning most of the steam as Water.
 //  - It works only at thermalEvaporator.minTemperature (100°C) or hotter, and faster the hotter it is: minSpeed of its
-//    throughput at minTemperature, rising in a straight line to the full throughput at fullSpeedTemperature.
+//    throughput at minTemperature, rising in a straight line to its throughput at fullSpeedTemperature (400°C), then on
+//    to maxSpeed times it (x2.5) at maxTemperature (1,000°C), a full heat buffer.
 //  - Each mB evaporated takes the recipe's heat per mB from its heat buffer; with less heat than that, it does what the
 //    heat it has allows.
 //  - Every recipe input.amount mB evaporated gives the recipe's fluid result (into the output tank) and item result
@@ -202,15 +203,24 @@ public class ThermalEvaporatorBlockEntity extends MachineBlockEntity implements 
         return ArcforgeConfig.EVAPORATOR_MIN_TEMPERATURE.getAsInt();
     }
 
-    // Share of the throughput at this temperature: 0 below minTemperature, minSpeed at it, 1 at fullSpeedTemperature.
+    // Multiple of the throughput at this temperature: 0 below minTemperature, minSpeed at it, 1 at fullSpeedTemperature,
+    // maxSpeed at maxTemperature (and no more past it).
     public static double speedAt(int celsius) {
         int min = minTemperature();
         if (celsius < min) {
             return 0.0;
         }
         int full = Math.max(min + 1, ArcforgeConfig.EVAPORATOR_FULL_SPEED_TEMPERATURE.getAsInt());
-        double minSpeed = ArcforgeConfig.EVAPORATOR_MIN_SPEED.getAsDouble();
-        return minSpeed + (1.0 - minSpeed) * Mth.clamp((celsius - min) / (double) (full - min), 0.0, 1.0);
+        if (celsius <= full) {
+            double minSpeed = ArcforgeConfig.EVAPORATOR_MIN_SPEED.getAsDouble();
+            return minSpeed + (1.0 - minSpeed) * (celsius - min) / (double) (full - min);
+        }
+        int max = ArcforgeConfig.EVAPORATOR_MAX_TEMPERATURE.getAsInt();
+        if (max <= full) {
+            return 1.0;
+        }
+        double maxSpeed = ArcforgeConfig.EVAPORATOR_MAX_SPEED.getAsDouble();
+        return 1.0 + (maxSpeed - 1.0) * Mth.clamp((celsius - full) / (double) (max - full), 0.0, 1.0);
     }
 
     private static int fluidId(FilteredFluidTank tank) {

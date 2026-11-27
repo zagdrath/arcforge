@@ -2494,7 +2494,7 @@ public class ArcforgeConfig {
     }
 
     public static final ModConfigSpec.IntValue EVAPORATOR_THROUGHPUT = BUILDER
-            .comment("mB of input evaporated per tick at fullSpeedTemperature or hotter.")
+            .comment("mB of input evaporated per tick at fullSpeedTemperature (more when hotter, see maxSpeed).")
             .defineInRange("throughput", 25, 1, 100_000);
 
     public static final ModConfigSpec.IntValue EVAPORATOR_MIN_TEMPERATURE = BUILDER
@@ -2502,12 +2502,17 @@ public class ArcforgeConfig {
             .defineInRange("minTemperature", 100, 20, 10_000);
 
     public static final ModConfigSpec.IntValue EVAPORATOR_FULL_SPEED_TEMPERATURE = BUILDER
-            .comment("At this temperature (°C) or hotter it runs at its full throughput.")
+            .comment("At this temperature (°C) it runs at its throughput; hotter, it goes faster still (see maxSpeed).")
             .defineInRange("fullSpeedTemperature", 400, 21, 10_000);
 
     public static final ModConfigSpec.DoubleValue EVAPORATOR_MIN_SPEED = BUILDER
             .comment("Share of its throughput at minTemperature; it rises in a straight line to 1 at fullSpeedTemperature.")
             .defineInRange("minSpeed", 0.2, 0.01, 1.0);
+
+    public static final ModConfigSpec.DoubleValue EVAPORATOR_MAX_SPEED = BUILDER
+            .comment("Multiple of its throughput at maxTemperature; it rises in a straight line from 1 at fullSpeedTemperature.",
+                    "1 keeps it at its throughput above fullSpeedTemperature. Heat per mB doesn't change, so faster uses heat faster.")
+            .defineInRange("maxSpeed", 2.5, 1.0, 100.0);
 
     public static final ModConfigSpec.IntValue EVAPORATOR_HEAT_CAPACITY = BUILDER
             .comment("Heat buffer size in HU.")

@@ -148,6 +148,10 @@ machines and Settings Cards carry over).
 
 ### Changed
 
+- **Hotter heat speeds up the Thermal Evaporator Array past 400°C.** It used to stop gaining at 400°C (25 mB/t); it now
+  keeps speeding up, to 2.5× (62.5 mB/t) at 1,000°C, a full heat buffer. Heat per mB is unchanged, so it draws heat
+  2.5 times as fast when that hot. New config key `multiblocks.thermalEvaporator.maxSpeed` (2.5; set it to 1 for the old cap).
+  The GUI hint, JEI line, handbook and Jade's speed percentage follow the new curve.
 - The Battery Array builds up to 7×7×7 (it was 5×5×5): up to 125 Lithium Cells and Power Regulators inside.
 - Crushing Quartz gives 4 Silica Dust instead of Nether Quartz Dust, which still comes from quartz ore.
 - Machines with a recipe XP store bank it as Liquid Experience first; the old held-for-the-player store only takes what a

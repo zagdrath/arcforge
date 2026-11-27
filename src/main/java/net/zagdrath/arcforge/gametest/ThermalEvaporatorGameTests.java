@@ -165,7 +165,8 @@ public final class ThermalEvaporatorGameTests {
                 .thenSucceed();
     }
 
-    // Hot (full speed), Seawater boils down into Brine at the configured throughput, using heat and returning water.
+    // Hot (a full heat buffer), Seawater boils down into Brine faster than its throughput, at the speed the curve gives
+    // for its temperature, using heat and returning water.
     static void seawaterToBrine(GameTestHelper helper) {
         BlockPos controller = buildTower(helper, new BlockPos(0, 1, 1), true);
         helper.startSequence()
@@ -180,8 +181,10 @@ public final class ThermalEvaporatorGameTests {
                 .thenExecute(() -> {
                     ThermalEvaporatorBlockEntity tower = tower(helper, controller);
                     helper.assertTrue(tower.getStatus() == MachineStatus.EVAPORATING, "Hot with Seawater it's " + tower.getStatus());
-                    helper.assertTrue(Math.abs(tower.getRate() - ArcforgeConfig.EVAPORATOR_THROUGHPUT.getAsInt()) < 0.01,
-                            "It evaporates " + tower.getRate() + " mB/t at " + tower.getHeat().getTemperature() + "°C");
+                    double expected = ArcforgeConfig.EVAPORATOR_THROUGHPUT.getAsInt() * ThermalEvaporatorBlockEntity.speedAt(tower.getHeat().getTemperature());
+                    helper.assertTrue(Math.abs(tower.getRate() - expected) < 0.5 && (ArcforgeConfig.EVAPORATOR_MAX_SPEED.getAsDouble() <= 1.0
+                            || tower.getRate() > ArcforgeConfig.EVAPORATOR_THROUGHPUT.getAsInt()),
+                            "It evaporates " + tower.getRate() + " mB/t at " + tower.getHeat().getTemperature() + "°C, expected " + expected);
                     helper.assertTrue(tower.getHeatUsage() > 0, "It used no heat");
                 })
                 .thenWaitUntil(() -> helper.assertTrue(tower(helper, controller).getOutput().contains(ModFluids.BRINE.get()), "No Brine yet"))
@@ -213,12 +216,19 @@ public final class ThermalEvaporatorGameTests {
                 .thenSucceed();
     }
 
-    // Cold, it holds its input; the speed curve runs from minSpeed at 100°C to 1 at fullSpeedTemperature.
+    // Cold, it holds its input; the speed curve runs from minSpeed at 100°C to 1 at fullSpeedTemperature, then on to
+    // maxSpeed at maxTemperature, and no further.
     static void needsHeat(GameTestHelper helper) {
         int min = ArcforgeConfig.EVAPORATOR_MIN_TEMPERATURE.getAsInt(), full = ArcforgeConfig.EVAPORATOR_FULL_SPEED_TEMPERATURE.getAsInt();
         helper.assertTrue(ThermalEvaporatorBlockEntity.speedAt(min - 1) == 0, "It works below " + min + "°C");
         helper.assertTrue(Math.abs(ThermalEvaporatorBlockEntity.speedAt(min) - ArcforgeConfig.EVAPORATOR_MIN_SPEED.getAsDouble()) < 1e-9, "Wrong speed at " + min);
-        helper.assertTrue(ThermalEvaporatorBlockEntity.speedAt(full) == 1.0 && ThermalEvaporatorBlockEntity.speedAt(full + 500) == 1.0, "Not full speed when hot");
+        int max = ArcforgeConfig.EVAPORATOR_MAX_TEMPERATURE.getAsInt();
+        double maxSpeed = ArcforgeConfig.EVAPORATOR_MAX_SPEED.getAsDouble();
+        helper.assertTrue(Math.abs(ThermalEvaporatorBlockEntity.speedAt(full) - 1.0) < 1e-9, "Not its throughput at " + full);
+        helper.assertTrue(Math.abs(ThermalEvaporatorBlockEntity.speedAt(max) - maxSpeed) < 1e-9
+                && Math.abs(ThermalEvaporatorBlockEntity.speedAt(max + 500) - maxSpeed) < 1e-9, "Not x" + maxSpeed + " at " + max + "°C and past it");
+        helper.assertTrue(maxSpeed <= 1.0 || ThermalEvaporatorBlockEntity.speedAt((full + max) / 2) > 1.0
+                && ThermalEvaporatorBlockEntity.speedAt((full + max) / 2) < maxSpeed, "Hotter than " + full + "°C isn't faster");
         helper.assertTrue(ThermalEvaporatorBlockEntity.speedAt((min + full) / 2) < 1.0, "No slower half way");
         BlockPos controller = buildTower(helper, new BlockPos(0, 1, 1), false);
         helper.startSequence()

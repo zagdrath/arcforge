@@ -1606,13 +1606,14 @@ final class MachineCategories {
             builder.addRecipeArrowWidget().setPosition(26, 5);
         }
 
-        // The heat an operation takes, and the temperature it needs (full speed from fullSpeedTemperature).
+        // The heat an operation takes, the temperature it needs, and how much faster it gets at maxTemperature.
         @Override
         public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.EvaporatingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
                 double mouseX, double mouseY) {
             text(graphics, Component.translatable("jei.arcforge.evaporating.heat", String.format(Locale.ROOT, "%,d", holder.value().heat())), 0, 30);
             text(graphics, Component.translatable("jei.arcforge.evaporating.temperature", ArcforgeConfig.EVAPORATOR_MIN_TEMPERATURE.getAsInt(),
-                    ArcforgeConfig.EVAPORATOR_FULL_SPEED_TEMPERATURE.getAsInt()), 0, 40);
+                    String.format(Locale.ROOT, "%.2f", ArcforgeConfig.EVAPORATOR_MAX_SPEED.getAsDouble()).replaceAll("0+$", "").replaceAll("\\.$", ""),
+                    ArcforgeConfig.EVAPORATOR_MAX_TEMPERATURE.getAsInt()), 0, 40);
         }
     }
 
