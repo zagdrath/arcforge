@@ -53,6 +53,12 @@ Vapour Lamp, plus the Long Fall Boots slot, carried Battery charging and the Qua
 
 ### Changed
 
+- Every fluid has its own texture in the style of vanilla's water and lava: soft swells in close tones, slowly
+  changing, each liquid its own pattern and movement (thin acids ripple, oils roll with a sheen, crude and bitumen barely
+  stir, molten salts and metals crust like lava), keeping its colours and translucency. Gases are wispy, curling
+  vapour. Corium is unchanged.
+- Every dust's shadow side is softer: the dark bottom-right of the heap steps down from its colour instead of dropping
+  to near-black.
 - The Chemical Reactor's By-product faces now connect to Pressurized Conduits, so a gas by-product (Hydrogen from
   Trichlorosilane, Sulfur Dioxide from roasting) can be piped away as well as pushed out.
 - The Chunk Loader's radius − and + buttons are smaller, with the Show area button beside them.

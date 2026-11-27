@@ -216,8 +216,11 @@ Creative ramp (`tools/creative_storage_gen.py`).
 
 ### Fluids
 
-- Use a few flat tones, with sheen streaks drawn as shapes rather than noise.
-- Animation strips are 16 frames.
+- Fluids follow vanilla's fluid language, not the flat machine style: soft, irregular swells in many close tones and a
+  seamless looping animation, like vanilla water and lava. See "Fluid textures" at the end for how they're made; it
+  replaces the older notes below that describe a fluid as another fluid's frames re-toned (the colours they give are
+  still each fluid's colours).
+- Animation strips are 32 frames, interpolated.
 
 ### GUIs
 
@@ -476,6 +479,9 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
   - New dusts use their ore ramp.
   - Existing dusts (iron, copper, gold, carbon, ancient debris, nether quartz) use their current tones,
     so their colours stay the same.
+  - **Softer shadow side** (`tools/dust_shading_gen.py`, every item on the dust heap): the darkest tone inside the
+    heap moves 65% of the way to the dust's next tone up, and on the bottom and right outline 30%, so the heap's
+    shading steps into its shadow instead of dropping to near-black there. Each dust keeps its own colours.
 - **Palettes are brighter and more saturated than the machine steel.**
   - Silver `#5E6C7C → #FFFFFF`; nickel `#6E6236 → #FFF9DC`; tungsten metal `#2E3338 → #B4BBC2`.
   - Wolframite (ore/raw) `#16100C → #A09080`.
@@ -1947,3 +1953,32 @@ Made by `tools/mercury_line_gen.py` (textures, and the lamp's models and blockst
   turned as the End Rod is for walls and ceilings.
 - **Induction Furnace GUI:** the Grain Dryer's tank frame copied to x 154 for the retorted Mercury (tank at 155,19,
   12×50), with its gauge marks (`tank_gauge`) and a `mercury_fill` fallback in 2 px diagonal mercury bands.
+
+## Fluid textures
+
+Every liquid and the shared gas texture are drawn by `tools/fluid_texture_gen.py` (Corium, Cody's own lava texture
+recoloured, and the vanilla-water fluids are left alone). It replaces the earlier re-tones of a few shared frame sets,
+which made many fluids the same pattern in different colours.
+
+- **One pattern per liquid.** A seeded value noise (the seed from the fluid's name) that tiles in x and y and loops in
+  time (its lattice wraps on all three axes), two octaves, softened with a wrapping 3×3 blur so the lattice never shows.
+  Each frame is normalised between its 2nd and 99th percentiles (no frame flashes brighter), raised to the kind's gamma,
+  and read along the fluid's own colours (`PALETTES`: its old tones, darkest to lightest, kept as they were) in 12 close
+  steps. Its alpha is kept too (translucent fluids stay translucent, at their old median).
+- **Still** 16×16 and **flowing** 32×32, 32 frames each, interpolated. Flowing swells are stretched four to one along the
+  flow and carried down a whole tile per loop.
+- **Kinds** set how a liquid moves (octave cells per tile, the fine octave's weight, time-lattice turns per loop, gamma,
+  frametimes still/flowing):
+  - *thin* (acids, brines, solutions, Heavy Water, Ethanol, Naphtha): 6 / 12 cells, 0.5, 6 turns, gamma 1.3, 2 / 2;
+  - *hot* (Hot Coolant, Hot Heavy Water): 8 / 16, 0.55, 10 turns, 1.3, 2 / 1: smaller, livelier;
+  - *milky* (Latex, Sodium Silicate, Lye): 4 / 8, 0.35, 4 turns, gamma 0.9, 3 / 2: soft and flat;
+  - *oil* (light fuels and oils): 4 / 10, 0.4, 4 turns, gamma 1.6, 3 / 2: broad swells, sheen on the crests;
+  - *thick* (Heavy Oil, crudes, Bitumen, Creosote, High-Level Waste): 3 / 6, 0.3, 3 turns, gamma 1.8, 6 / 4: big, lazy;
+  - *molten* (Lead-Bismuth, Fuel Salt and their hot forms): 4 / 8 ridged (lava's crusted veins), 4 turns, 1.1, 4 / 3;
+  - *slurry* (the shared, tinted slurry texture): 5 / 16, 0.6: swells with a fine grain of ground ore through them;
+  - *glow* (Liquid Experience): 5 / 10, 0.5, 8 turns, 1.4, 2 / 1.
+- **Gases** share one greyscale texture the game tints per gas (`block/fluid/steam_*`): near-white vapour (`#D8D8D8` to
+  `#FAFAFA` in 12 steps) whose opacity carries the shape, 25 to 70% opaque, a broad slow octave domain-warped by a second
+  so the wisps curl rather than blob, plus a fine one. Still 16×16 frametime 3; flowing 32×32 frametime 2, drifting up.
+- New fluids get an entry in `LIQUIDS` (and `PALETTES`) and a kind, and the script is re-run. Mercury (the mercury
+  line) is drawn the same way by its own generator, and is the reference for the look.
