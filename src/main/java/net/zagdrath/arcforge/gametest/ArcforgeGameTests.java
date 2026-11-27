@@ -171,6 +171,13 @@ public final class ArcforgeGameTests {
         TESTS.put("melter_upgrades", MeltingGameTests::upgrades);
         TESTS.put("melter_redstone", MeltingGameTests::redstone);
         TESTS.put("reactor_sulfuric_acid", ChemicalGameTests::sulfuricAcid);
+        TESTS.put("mercury_crush_cinnabar", MercuryGameTests::crushCinnabar);
+        TESTS.put("mercury_roast_cinnabar", MercuryGameTests::roastCinnabar);
+        TESTS.put("mercury_contact_process", MercuryGameTests::contactProcess);
+        TESTS.put("mercury_amalgam_and_retort", MercuryGameTests::amalgamAndRetort);
+        TESTS.put("mercury_containment", MercuryGameTests::containment);
+        TESTS.put("mercury_poisons", MercuryGameTests::mercuryPoisons);
+        TESTS.put("mercury_vapour_lamp", MercuryGameTests::vapourLamp);
         TESTS.put("crush_gunpowder_to_sulfur", ChemicalGameTests::crushGunpowder);
         TESTS.put("crush_netherrack_no_main_output", ChemicalGameTests::crushNetherrack);
         TESTS.put("reactor_tank_routing", ChemicalGameTests::tankRouting);

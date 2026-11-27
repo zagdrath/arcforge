@@ -381,6 +381,7 @@ public class ArcforgeClient {
         event.register(liquidModel("fuel_salt"), ModFluids.FUEL_SALT, ModFluids.FLOWING_FUEL_SALT);
         event.register(liquidModel("hot_fuel_salt"), ModFluids.HOT_FUEL_SALT, ModFluids.FLOWING_HOT_FUEL_SALT);
         event.register(liquidModel("corium"), ModFluids.CORIUM, ModFluids.FLOWING_CORIUM);
+        event.register(liquidModel("mercury"), ModFluids.MERCURY, ModFluids.FLOWING_MERCURY);
         // The slurries share one greyscale texture, tinted per metal.
         for (OreSlurry slurry : OreSlurry.values()) {
             ModFluids.Slurry fluids = ModFluids.slurry(slurry);
@@ -415,6 +416,7 @@ public class ArcforgeClient {
         event.register(gasModel(CONTAMINATED_STEAM_TINT), ModFluids.CONTAMINATED_STEAM, ModFluids.FLOWING_CONTAMINATED_STEAM);
         event.register(gasModel(HYDROGEN_SULFIDE_TINT), ModFluids.HYDROGEN_SULFIDE, ModFluids.FLOWING_HYDROGEN_SULFIDE);
         event.register(gasModel(GasTints.NITROGEN_DIOXIDE), ModFluids.NITROGEN_DIOXIDE, ModFluids.FLOWING_NITROGEN_DIOXIDE);
+        event.register(gasModel(GasTints.SULFUR_DIOXIDE), ModFluids.SULFUR_DIOXIDE, ModFluids.FLOWING_SULFUR_DIOXIDE);
     }
 
     private static FluidModel.Unbaked liquidModel(String name) {
@@ -491,6 +493,8 @@ public class ArcforgeClient {
         event.registerFluidType(liquidFog(0xC88A28, 5.0F), ModFluids.LUBRICANT_TYPE.get());
         event.registerFluidType(liquidFog(0xC8961E, 4.0F), ModFluids.SEED_OIL_TYPE.get());
         event.registerFluidType(liquidFog(0xC2D066, 6.0F), ModFluids.SULFURIC_ACID_TYPE.get());
+        event.registerFluidType(liquidFog(0x9CA4AC, 0.75F), ModFluids.MERCURY_TYPE.get());
+        event.registerFluidType(liquidFog(GasTints.SULFUR_DIOXIDE & 0xFFFFFF, 6.0F), ModFluids.SULFUR_DIOXIDE_TYPE.get());
         event.registerFluidType(liquidFog(EXHAUST_STEAM_TINT & 0xFFFFFF, 6.0F), ModFluids.EXHAUST_STEAM_TYPE.get());
         event.registerFluidType(liquidFog(HYDROGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.HYDROGEN_TYPE.get());
         event.registerFluidType(liquidFog(OXYGEN_TINT & 0xFFFFFF, 6.0F), ModFluids.OXYGEN_TYPE.get());

@@ -440,6 +440,36 @@ public final class ModFluids {
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CONTAMINATED_STEAM = FLUIDS.register("flowing_contaminated_steam",
             () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.CONTAMINATED_STEAM_TYPE, ModFluids.CONTAMINATED_STEAM, ModFluids.FLOWING_CONTAMINATED_STEAM)));
 
+    // --- The mercury line (vanilla Cinnabar roasted in the Chemical Reactor) ---
+    // Mercury: a heavy liquid metal (13,534 kg/m3), with its own bucket. It flows slowly and stops a block or two from
+    // where it's poured; anything stepping in floats on it (MercuryType) and is poisoned unless it wears a full Hazmat Suit
+    // (MercuryBlock). It doesn't burn. Only Tempered tanks, Canisters and Fluid Conduits and up hold it (Containment).
+    // Sulfur Dioxide: the gas roasting gives off, made into Sulfuric Acid by the contact process.
+    public static final DeferredHolder<FluidType, FluidType> MERCURY_TYPE = FLUID_TYPES.register("mercury", () -> new MercuryType(FluidType.Properties.create()
+            .descriptionId("fluid_type.arcforge.mercury")
+            .density(13_534)
+            .viscosity(1_500)
+            .temperature(300)
+            .motionScale(0.007)
+            .canSwim(false)
+            .canDrown(false)
+            .canPushEntity(true)
+            .canExtinguish(false)
+            .canConvertToSource(false)
+            .supportsBoating(false)
+            .fallDistanceModifier(0.0F)
+            .sound(SoundActions.BUCKET_FILL, SoundEvents.BUCKET_FILL_LAVA)
+            .sound(SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY_LAVA)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> MERCURY = FLUIDS.register("mercury",
+            () -> new BaseFlowingFluid.Source(mercuryProperties()));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_MERCURY = FLUIDS.register("flowing_mercury",
+            () -> new BaseFlowingFluid.Flowing(mercuryProperties()));
+    public static final DeferredHolder<FluidType, FluidType> SULFUR_DIOXIDE_TYPE = gasType("sulfur_dioxide", 293);
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Source> SULFUR_DIOXIDE = FLUIDS.register("sulfur_dioxide",
+            () -> new BaseFlowingFluid.Source(gasProperties(ModFluids.SULFUR_DIOXIDE_TYPE, ModFluids.SULFUR_DIOXIDE, ModFluids.FLOWING_SULFUR_DIOXIDE)));
+    public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_SULFUR_DIOXIDE = FLUIDS.register("flowing_sulfur_dioxide",
+            () -> new BaseFlowingFluid.Flowing(gasProperties(ModFluids.SULFUR_DIOXIDE_TYPE, ModFluids.SULFUR_DIOXIDE, ModFluids.FLOWING_SULFUR_DIOXIDE)));
+
     // --- Nuclear: failures, waste, reprocessing and the advanced reactors (the Nuclear chapter of the Handbook) ---
     // Nitrogen Dioxide (a brown gas: ammonia burned over a catalyst, the Ostwald process) and Nitric Acid (it in water;
     // what dissolves spent fuel in the PUREX Plant, caustic in the world like the other acids). High-Level Liquid Waste:
@@ -506,6 +536,17 @@ public final class ModFluids {
             () -> new BaseFlowingFluid.Source(coriumProperties()));
     public static final DeferredHolder<Fluid, BaseFlowingFluid.Flowing> FLOWING_CORIUM = FLUIDS.register("flowing_corium",
             () -> new BaseFlowingFluid.Flowing(coriumProperties()));
+
+    // Heavy and slow: a block or two from where it pours, every 20 ticks.
+    private static BaseFlowingFluid.Properties mercuryProperties() {
+        return new BaseFlowingFluid.Properties(MERCURY_TYPE, MERCURY, FLOWING_MERCURY)
+                .bucket(ModItems.MERCURY_BUCKET)
+                .block(ModBlocks.MERCURY)
+                .slopeFindDistance(1)
+                .levelDecreasePerBlock(3)
+                .tickRate(20)
+                .explosionResistance(100.0F);
+    }
 
     // Spreads 3 blocks, every 10 ticks, like the acids.
     private static BaseFlowingFluid.Properties nitricAcidProperties() {
@@ -985,6 +1026,29 @@ public final class ModFluids {
             Vec3 after = entity.getDeltaMovement();
             if (entity.horizontalCollision && entity.isFree(after.x, after.y + 0.6 - entity.getY() + oldY, after.z)) {
                 entity.setDeltaMovement(after.x, 0.3, after.z);
+            }
+            return true;
+        }
+    }
+
+    // Mercury: far denser than anything that wades in, so it holds them up. Movement is a thick liquid's (LiquidType's
+    // drags); on top, anything more than a fifth of a block deep is pushed back up, so mobs and players ride on the
+    // surface instead of sinking, and can walk out at an edge. Dropped items float on it as on any modded fluid.
+    private static class MercuryType extends LiquidType {
+        private static final double FLOAT_DEPTH = 0.2;
+        private static final double LIFT = 0.08;
+        private static final double MAX_RISE = 0.25;
+
+        MercuryType(Properties properties) {
+            super(properties, 0.015F, 0.55, 0.55);
+        }
+
+        @Override
+        public boolean move(LivingEntity entity, Vec3 input, double gravity) {
+            super.move(entity, input, gravity);
+            if (entity.getFluidTypeHeight(this) > FLOAT_DEPTH) {
+                Vec3 movement = entity.getDeltaMovement();
+                entity.setDeltaMovement(movement.x, Math.min(movement.y + LIFT, MAX_RISE), movement.z);
             }
             return true;
         }

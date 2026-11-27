@@ -95,6 +95,7 @@ public final class ModItems {
     public static final DeferredItem<BlockItem> FLUID_METER = ITEMS.registerSimpleBlockItem(ModBlocks.FLUID_METER);
     public static final DeferredItem<BlockItem> GAS_METER = ITEMS.registerSimpleBlockItem(ModBlocks.GAS_METER);
     public static final DeferredItem<BlockItem> CHARGEPAD = ITEMS.registerSimpleBlockItem(ModBlocks.CHARGEPAD);
+    public static final DeferredItem<BlockItem> MERCURY_VAPOUR_LAMP = ITEMS.registerSimpleBlockItem(ModBlocks.MERCURY_VAPOUR_LAMP);
     public static final DeferredItem<BlockItem> ARC_MELTER = ITEMS.registerSimpleBlockItem(ModBlocks.ARC_MELTER);
     public static final DeferredItem<BlockItem> FERMENTER = ITEMS.registerSimpleBlockItem(ModBlocks.FERMENTER);
     public static final DeferredItem<BlockItem> CHEMICAL_REACTOR = ITEMS.registerSimpleBlockItem(ModBlocks.CHEMICAL_REACTOR);
@@ -323,6 +324,13 @@ public final class ModItems {
     public static final DeferredItem<Item> METALLURGICAL_SILICON = ITEMS.registerSimpleItem("metallurgical_silicon");
     public static final DeferredItem<Item> POLYSILICON = ITEMS.registerSimpleItem("polysilicon");
     public static final DeferredItem<Item> SULFUR_DUST = ITEMS.registerSimpleItem("sulfur_dust");
+    // The mercury line: vanilla Cinnabar crushed to Cinnabar Dust (roasted to Mercury, or crafted into red dye), Mercury
+    // in a bucket, and the gold and silver amalgams the Induction Furnace retorts back to dust and Mercury.
+    public static final DeferredItem<Item> CINNABAR_DUST = ITEMS.registerSimpleItem("cinnabar_dust");
+    public static final DeferredItem<Item> GOLD_AMALGAM = ITEMS.registerSimpleItem("gold_amalgam");
+    public static final DeferredItem<Item> SILVER_AMALGAM = ITEMS.registerSimpleItem("silver_amalgam");
+    public static final DeferredItem<BucketItem> MERCURY_BUCKET = ITEMS.registerItem("mercury_bucket",
+            p -> new BucketItem(ModFluids.MERCURY.get(), p), p -> p.craftRemainder(Items.BUCKET).stacksTo(1));
 
     // --- Components ---
 
@@ -771,6 +779,7 @@ public final class ModItems {
     public static List<DeferredItem<BucketItem>> chemicalBuckets() {
         List<DeferredItem<BucketItem>> buckets = new ArrayList<>();
         buckets.add(SULFURIC_ACID_BUCKET);
+        buckets.add(MERCURY_BUCKET);
         buckets.add(HYDROCHLORIC_ACID_BUCKET);
         buckets.add(SEAWATER_BUCKET);
         buckets.add(BRINE_BUCKET);

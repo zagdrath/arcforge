@@ -126,6 +126,31 @@ ch.q("polysilicon", "Polysilicon", "polysilicon",
      rewards=[item("hydrochloric_acid_bucket", 2), xp(10)], frame="goal",
      items=["metallurgical_silicon", "trichlorosilane_bucket", "polysilicon"])
 
+ch.q("cinnabar", "Cinnabar", "cinnabar_dust",
+     "Vanilla Cinnabar finally has a use. The Arc Crusher makes 2 Cinnabar Dust from a block of it, 1 from its polished, "
+     "brick and chiseled blocks. One dust also crafts into 2 Red Dye: vermilion.",
+     [have("cinnabar_dust")], deps=["chemical_reactor"], rewards=[item("minecraft:cinnabar", 16), xp(3)], items=["cinnabar_dust"])
+
+ch.q("mercury", "Quicksilver", "mercury_bucket",
+     "Roast Cinnabar Dust with Oxygen in the Chemical Reactor at 600°C or more (heat through a Heat face): Mercury, and "
+     "Sulfur Dioxide into the by-product tank. That gas, Oxygen and Water make Sulfuric Acid (the contact process). Mercury "
+     "is heavy: only Tempered tanks, Canisters and Fluid Conduits and up hold it, things float on it, and wading in it "
+     "poisons anyone without a full Hazmat Suit.",
+     [produced(fluid="mercury", icon="mercury_bucket", label="Roast Mercury"),
+      produced(fluid="sulfur_dioxide", icon="chemical_reactor", label="Collect Sulfur Dioxide")], deps=["cinnabar", "electrolyzer"],
+     rewards=[item("tempered_fluid_tank", 1), xp(8)], frame="goal", items=["mercury_bucket"])
+
+ch.q("amalgamation", "Amalgamation", "gold_amalgam",
+     "Raw Gold or Raw Silver dissolved in 100 mB of Mercury gives an amalgam. The Induction Furnace retorts it into 4 Dust, "
+     "one more than leaching, and gives 90 mB of the Mercury back through a By-product face.",
+     [have("gold_amalgam", "silver_amalgam", label="Make an amalgam")], deps=["mercury", "leaching"],
+     rewards=[item("minecraft:raw_gold", 8), xp(10)], frame="goal", items=["gold_amalgam", "silver_amalgam"])
+
+ch.q("mercury_vapour_lamp", "Mercury Vapour Lamp", "mercury_vapour_lamp",
+     "A Mercury Bucket, four Glass and four Steel Plates make four lamps: light level 15 on a floor, wall or ceiling for a "
+     "few FE/t, off with a redstone signal.",
+     [placed("mercury_vapour_lamp")], deps=["mercury"], rewards=[item("steel_plate", 4), xp(4)], items=["mercury_vapour_lamp"])
+
 ch.q("chemical_reactor_array", "Chemical Reactor Array", "chemical_reactor_array_casing",
      "Hardened Alloy, nickel plates, glass and a Chemical Reactor make four casings; a 3×3×3 of them runs every reactor "
      "recipe in three lanes, each twice as fast, with 32,000 mB tanks and Heat ports. Set its ports with the Wrench.",

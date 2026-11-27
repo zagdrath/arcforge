@@ -12,11 +12,14 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.zagdrath.arcforge.client.gui.ArcforgeGui;
 import net.zagdrath.arcforge.client.gui.tab.EnergyTab;
 import net.zagdrath.arcforge.client.gui.tab.ExperienceTab;
 import net.zagdrath.arcforge.machine.config.SideMode;
 import net.zagdrath.arcforge.menu.machine.InductionFurnaceMenu;
+import net.zagdrath.arcforge.registry.ModFluids;
 
 // Layout follows induction_furnace_gui_layout.json. All positions are relative to leftPos/topPos.
 public class InductionFurnaceScreen extends MachineScreen<InductionFurnaceMenu> {
@@ -24,9 +27,13 @@ public class InductionFurnaceScreen extends MachineScreen<InductionFurnaceMenu> 
     private static final int PROGRESS_X = 78, PROGRESS_Y = 35, PROGRESS_W = 21, PROGRESS_H = 15;
     private static final int LED_X = 52, LED_Y = 58;
     private static final int STATUS_X = 60, STATUS_Y = 58;
+    // The by-product tank: the Mercury retorting gives back (the Grain Dryer's tank frame).
+    private static final int TANK_X = 155, TANK_Y = 19, TANK_W = 12, TANK_H = 50;
 
     private final Identifier energyBar = sprite("energy_bar");
     private final Identifier progress = sprite("progress");
+    private final Identifier tankGauge = sprite("tank_gauge");
+    private final Identifier mercuryFill = sprite("mercury_fill");
 
     public InductionFurnaceScreen(InductionFurnaceMenu menu, Inventory inventory, Component title) {
         super(menu, inventory, title, "induction_furnace", List.of(EnergyTab.usage(menu::getEnergy, menu::getUsage), new ExperienceTab(menu::getXp, menu::getXpCapacity)));
@@ -35,7 +42,8 @@ public class InductionFurnaceScreen extends MachineScreen<InductionFurnaceMenu> 
 
     @Override
     protected Component sideModeName(SideMode mode) {
-        return mode == SideMode.ENERGY ? sideModeName("energy_input") : super.sideModeName(mode);
+        return mode == SideMode.ENERGY ? sideModeName("energy_input") : mode == SideMode.BYPRODUCT ? sideModeName("mercury")
+                : super.sideModeName(mode);
     }
 
     @Override
@@ -43,6 +51,9 @@ public class InductionFurnaceScreen extends MachineScreen<InductionFurnaceMenu> 
         drawGauge(graphics, energyBar, x, y, ENERGY_X, ENERGY_Y, menu.getEnergy(), menu.getCapacity());
         ArcCrusherScreen.drawProgress(graphics, progress, x + PROGRESS_X, y + PROGRESS_Y, menu.getProgress(), menu.getTotal());
         drawLed(graphics, x, y, LED_X, LED_Y);
+        Fluid fluid = menu.getMercuryFluid();
+        drawFluidTank(graphics, fluid == Fluids.EMPTY ? ModFluids.MERCURY.get() : fluid, menu.getMercuryAmount(), menu.getMercuryCapacity(), mercuryFill,
+                tankGauge, x, y, TANK_X, TANK_Y, TANK_W, TANK_H);
     }
 
     @Override
@@ -55,6 +66,9 @@ public class InductionFurnaceScreen extends MachineScreen<InductionFurnaceMenu> 
         if (isHovering(ENERGY_X - 1, ENERGY_Y - 1, GAUGE_W + 2, GAUGE_H + 2, mouseX, mouseY)) {
             lines.add(Component.translatable("gui.arcforge.fe_stored", ArcforgeGui.grouped(menu.getEnergy()), ArcforgeGui.grouped(menu.getCapacity())).withStyle(ChatFormatting.GRAY));
             lines.add(Component.translatable("gui.arcforge.fe_per_tick_loss", menu.getUsage()).withStyle(ChatFormatting.RED));
+        } else if (isHovering(TANK_X - 1, TANK_Y - 1, TANK_W + 2, TANK_H + 2, mouseX, mouseY)) {
+            addFluidTooltip(lines, menu.getMercuryFluid(), ModFluids.MERCURY_TYPE.get().getDescription(), menu.getMercuryAmount(), menu.getMercuryCapacity());
+            lines.add(Component.translatable("gui.arcforge.induction_furnace.mercury_tank").withStyle(ChatFormatting.DARK_GRAY));
         } else if (isHovering(PROGRESS_X, PROGRESS_Y, PROGRESS_W, PROGRESS_H, mouseX, mouseY) && menu.getTotal() > 0) {
             lines.add(Component.translatable("gui.arcforge.progress_ticks", menu.getProgress(), menu.getTotal()));
         }

@@ -42,6 +42,8 @@ public final class GasTints {
     public static final int CONTAMINATED_STEAM = 0xFFDCF0EC;
     // Nitrogen Dioxide: the Ostwald process's reddish-brown gas.
     public static final int NITROGEN_DIOXIDE = 0xFFC8743C;
+    // Sulfur Dioxide: colourless in fact, so a clear pale yellow, paler and warmer than Fluorine.
+    public static final int SULFUR_DIOXIDE = 0xFFF2ECB8;
 
     private GasTints() {}
 }

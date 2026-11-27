@@ -85,6 +85,7 @@
         "electric_pump",
         "arc_melter",
         "chemical_processing",
+        "mercury",
         "silica",
         "electrolyzer",
         "carbon_capture",

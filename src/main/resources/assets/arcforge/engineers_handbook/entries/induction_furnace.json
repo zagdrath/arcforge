@@ -2,12 +2,13 @@
   "title": "Induction Furnace",
   "icon": "arcforge:induction_furnace",
   "items": [
-    "arcforge:induction_furnace"
+    "arcforge:induction_furnace",
+    "arcforge:gold_amalgam"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "Smelts anything a furnace can, twice as fast, with FE instead of fuel."
+      "text": "Smelts anything a furnace can, twice as fast, with FE instead of fuel.\nIt also retorts Gold and Silver Amalgam into 4 Dust each, giving the Mercury back into a by-product tank: set a By-product face to drain it."
     }
   ]
 }

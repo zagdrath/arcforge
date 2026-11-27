@@ -17,7 +17,7 @@
                 "**Covers:** {item:arcforge:electrolyzer}"
             ],
             x: 0d,
-            y: 1.25d,
+            y: 2.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["arcforge_steelmaking/hardened_alloy"],
@@ -67,7 +67,7 @@
                 "**Covers:** {item:arcforge:chemical_reactor}"
             ],
             x: 0d,
-            y: 2.5d,
+            y: 3.75d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["arcforge_steelmaking/hardened_alloy"],
@@ -112,7 +112,7 @@
                 "**Covers:** {item:arcforge:sulfuric_acid_bucket}"
             ],
             x: 1.5d,
-            y: 3.75d,
+            y: 5d,
             dependencies: ["chemical_reactor"],
             tasks: [
                 {
@@ -149,7 +149,7 @@
                 "**Covers:** {item:arcforge:iron_slurry_bucket}, {item:arcforge:copper_slurry_bucket}, {item:arcforge:gold_slurry_bucket}, {item:arcforge:silver_slurry_bucket}, {item:arcforge:nickel_slurry_bucket}, {item:arcforge:tungsten_slurry_bucket}, {item:arcforge:bismuth_slurry_bucket}, {item:arcforge:lead_slurry_bucket}"
             ],
             x: 3d,
-            y: 7.5d,
+            y: 8.75d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["sulfuric_acid"],
@@ -199,7 +199,7 @@
                 "**Covers:** {item:arcforge:plastic_sheet}"
             ],
             x: 1.5d,
-            y: 2.5d,
+            y: 3.75d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["chemical_reactor", "electrolyzer"],
@@ -231,7 +231,7 @@
                 "**Covers:** {item:arcforge:settings_card}, {item:arcforge:security_terminal}"
             ],
             x: 3d,
-            y: 5d,
+            y: 6.25d,
             dependencies: ["plastic"],
             tasks: [
                 {
@@ -272,7 +272,7 @@
                 "**Covers:** {item:arcforge:steam_cracker_casing}, {item:arcforge:steam_cracker_controller}"
             ],
             x: 3d,
-            y: 6.25d,
+            y: 7.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["plastic"],
@@ -309,7 +309,7 @@
                 "Ethylene also comes from Ethanol over Sulfuric Acid. 120 mB is two Plastic Sheets, and with Chlorine it's PVC."
             ],
             x: 4.5d,
-            y: 6.25d,
+            y: 7.5d,
             dependencies: ["steam_cracker"],
             tasks: [
                 {
@@ -346,7 +346,7 @@
                 "**Covers:** {item:arcforge:pvc_sheet}"
             ],
             x: 6d,
-            y: 6.25d,
+            y: 7.5d,
             dependencies: ["ethylene"],
             tasks: [
                 {
@@ -376,7 +376,7 @@
                 "**Covers:** {item:arcforge:polypropylene_sheet}"
             ],
             x: 4.5d,
-            y: 7.5d,
+            y: 8.75d,
             dependencies: ["steam_cracker"],
             tasks: [
                 {
@@ -415,7 +415,7 @@
                 "**Covers:** {item:arcforge:synthetic_rubber}"
             ],
             x: 6d,
-            y: 7.5d,
+            y: 8.75d,
             dependencies: ["polypropylene"],
             tasks: [
                 {
@@ -454,7 +454,7 @@
                 "**Covers:** {item:arcforge:carbon_reclaimer}"
             ],
             x: 1.5d,
-            y: 1.25d,
+            y: 2.5d,
             dependencies: ["electrolyzer"],
             tasks: [
                 {
@@ -491,7 +491,7 @@
                 "**Covers:** {item:arcforge:gasifier}"
             ],
             x: 1.5d,
-            y: 5d,
+            y: 6.25d,
             dependencies: ["chemical_reactor"],
             tasks: [
                 {
@@ -529,7 +529,7 @@
                 "**Covers:** {item:arcforge:fischer_tropsch_reactor}"
             ],
             x: 3d,
-            y: 8.75d,
+            y: 11.25d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["gasifier"],
@@ -568,7 +568,7 @@
                 "**Covers:** {item:arcforge:silica_dust}"
             ],
             x: 1.5d,
-            y: 0d,
+            y: 1.25d,
             dependencies: ["chemical_reactor"],
             tasks: [
                 {
@@ -598,7 +598,7 @@
                 "**Covers:** {item:arcforge:ferrosilicon}"
             ],
             x: 3d,
-            y: 0d,
+            y: 1.25d,
             dependencies: ["silica"],
             tasks: [
                 {
@@ -628,7 +628,7 @@
                 "**Covers:** {item:arcforge:sodium_silicate_bucket}, {item:arcforge:silica_gel}"
             ],
             x: 3d,
-            y: 3.75d,
+            y: 5d,
             dependencies: ["silica", "sulfuric_acid"],
             tasks: [
                 {
@@ -678,7 +678,7 @@
                 "**Covers:** {item:arcforge:silicon_carbide_blend}, {item:arcforge:silicon_carbide}, {item:arcforge:silicon_carbide_mesh}"
             ],
             x: 3d,
-            y: 1.25d,
+            y: 2.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["silica"],
@@ -710,7 +710,7 @@
                 "**Covers:** {item:arcforge:metallurgical_silicon}, {item:arcforge:trichlorosilane_bucket}, {item:arcforge:polysilicon}"
             ],
             x: 3d,
-            y: 2.5d,
+            y: 3.75d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["silica", "electrolyzer"],
@@ -746,6 +746,172 @@
             ]
         },
         {
+            id: "cinnabar",
+            title: "Cinnabar",
+            icon: "arcforge:cinnabar_dust",
+            description: [
+                "Vanilla Cinnabar finally has a use. The Arc Crusher makes 2 Cinnabar Dust from a block of it, 1 from its polished, brick and chiseled blocks. One dust also crafts into 2 Red Dye: vermilion.",
+                "",
+                "**Covers:** {item:arcforge:cinnabar_dust}"
+            ],
+            x: 1.5d,
+            y: 7.5d,
+            dependencies: ["chemical_reactor"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:cinnabar_dust"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:cinnabar",
+                    count: 16
+                },
+                {
+                    type: "xp_levels",
+                    levels: 3
+                }
+            ]
+        },
+        {
+            id: "mercury",
+            title: "Quicksilver",
+            icon: "arcforge:mercury_bucket",
+            description: [
+                "Roast Cinnabar Dust with Oxygen in the Chemical Reactor at 600°C or more (heat through a Heat face): Mercury, and Sulfur Dioxide into the by-product tank. That gas, Oxygen and Water make Sulfuric Acid (the contact process). Mercury is heavy: only Tempered tanks, Canisters and Fluid Conduits and up hold it, things float on it, and wading in it poisons anyone without a full Hazmat Suit.",
+                "",
+                "**Covers:** {item:arcforge:mercury_bucket}"
+            ],
+            x: 3d,
+            y: 10d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["cinnabar", "electrolyzer"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:mercury"
+                        }
+                    },
+                    title: "Roast Mercury",
+                    icon: "arcforge:mercury_bucket"
+                },
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "arcforge:machine_produced",
+                        conditions: {
+                            fluid: "arcforge:sulfur_dioxide"
+                        }
+                    },
+                    title: "Collect Sulfur Dioxide",
+                    icon: "arcforge:chemical_reactor"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:tempered_fluid_tank"
+                },
+                {
+                    type: "xp_levels",
+                    levels: 8
+                }
+            ]
+        },
+        {
+            id: "amalgamation",
+            title: "Amalgamation",
+            icon: "arcforge:gold_amalgam",
+            description: [
+                "Raw Gold or Raw Silver dissolved in 100 mB of Mercury gives an amalgam. The Induction Furnace retorts it into 4 Dust, one more than leaching, and gives 90 mB of the Mercury back through a By-product face.",
+                "",
+                "**Covers:** {item:arcforge:gold_amalgam}, {item:arcforge:silver_amalgam}"
+            ],
+            x: 4.5d,
+            y: 10d,
+            shape: "hexagon",
+            size: 1.5d,
+            dependencies: ["mercury", "leaching"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:inventory_changed",
+                        conditions: {
+                            items: [
+                                {
+                                    items: ["arcforge:gold_amalgam", "arcforge:silver_amalgam"]
+                                }
+                            ]
+                        }
+                    },
+                    title: "Make an amalgam",
+                    icon: "arcforge:gold_amalgam"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:raw_gold",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 10
+                }
+            ]
+        },
+        {
+            id: "mercury_vapour_lamp",
+            title: "Mercury Vapour Lamp",
+            icon: "arcforge:mercury_vapour_lamp",
+            description: [
+                "A Mercury Bucket, four Glass and four Steel Plates make four lamps: light level 15 on a floor, wall or ceiling for a few FE/t, off with a redstone signal.",
+                "",
+                "**Covers:** {item:arcforge:mercury_vapour_lamp}"
+            ],
+            x: 4.5d,
+            y: 11.25d,
+            dependencies: ["mercury"],
+            tasks: [
+                {
+                    type: "criterion",
+                    criterion: {
+                        trigger: "minecraft:placed_block",
+                        conditions: {
+                            location: {
+                                type: "minecraft:location_check",
+                                predicate: {
+                                    block: {
+                                        blocks: "arcforge:mercury_vapour_lamp"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    title: "Place Mercury Vapour Lamp",
+                    icon: "arcforge:mercury_vapour_lamp"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "arcforge:steel_plate",
+                    count: 4
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
             id: "chemical_reactor_array",
             title: "Chemical Reactor Array",
             icon: "arcforge:chemical_reactor_array_casing",
@@ -755,7 +921,7 @@
                 "**Covers:** {item:arcforge:chemical_reactor_array_casing}"
             ],
             x: 1.5d,
-            y: 6.25d,
+            y: 0d,
             shape: "gear",
             size: 1.5d,
             dependencies: ["chemical_reactor"],
@@ -792,7 +958,7 @@
                 "Plastic, PVC, Polypropylene and Synthetic Rubber from your own olefins, and carbon that goes round in a circle."
             ],
             x: 7.5d,
-            y: 6.25d,
+            y: 7.5d,
             shape: "gear",
             size: 1.5d,
             dependencies: ["pvc", "synthetic_rubber", "carbon_capture", "fischer_tropsch", "leaching"],

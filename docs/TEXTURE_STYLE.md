@@ -1912,3 +1912,38 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - **Arcforged Upgrade Template:** a smithing template's plaque (16x16) in the dark Arcforged steel, a 1 px bevel lit
   top/left and dark bottom/right, an inset panel and a cyan zigzag glyph, `#2E96B6` with its top-left pixels `#40B6D8`.
 - **Charge bar:** a 1 px bar in the tier's bevel tone `#40B6D8`, one row above the durability bar, its empty part black.
+
+## Mercury line
+
+Made by `tools/mercury_line_gen.py` (textures, and the lamp's models and blockstate).
+
+- **Cinnabar Dust** (natural material, the dust method): Cody's dust (the Iron Dust heap), every pixel kept, its five
+  tones moved by brightness rank onto a muted vermilion, `#5E2420 #8C3A30 #A4483A #BC5C48 #D48670` (saturation about
+  0.5): a brick-red outline to a soft orange-red top, an earthy mineral powder rather than a dye, so it sits with the
+  mod's other dusts.
+- **Gold and Silver Amalgam** are Cody's lump (the Pine Resin lump) re-shaped: each has a silhouette of its own (Gold a
+  wide, low lump with two knobs on top; Silver a tall, narrower lump with one knob), filled with the lump's own facets
+  (its brightness ranks read off at the same place across the lump, scaled to the new outline) on the lump's outline
+  rule (its lighter outline tone on the top and left edges, its darkest on the bottom and right), moved by rank onto a
+  dull grey silver in close steps (`#26292D #363B40 #474D53 #575D63 #666C72 #747A7F #82878C #8F9499`), darker and
+  flatter than any ingot, so the flecks are its only bright pixels. Five flecks each on lit grains, spread across the
+  lump, each with its shadow pixel down-right: gold `#E8C04A` / `#B8892A`, silver `#F6F9FC` / `#D8DFE6`.
+- **Mercury** (fluid, in the vanilla fluid language, drawn by the generator rather than re-toned from another fluid):
+  soft, irregular swells like vanilla water's and lava's, many close tones, a seamless loop. A seeded value noise that
+  tiles in x and y and loops in time (its lattice wraps on all three axes), two octaves (6 and 12 cells a tile), softened
+  with a wrapping 3×3 blur so the lattice never shows. Still: 16×16, 32 frames, frametime 3, interpolated, the swells
+  slowly changing shape. Flowing: 32×32, 32 frames, frametime 2, interpolated, the swells stretched four to one along the
+  flow and carried down a whole tile per loop. Height is read along a mirror-steel gradient in 12 close steps,
+  `#66707A #87919A #A5AFB8 #C2CAD1 #DCE2E7 #F4F7F9` (each frame normalised between its 2nd and 99th percentiles, then
+  t^1.4 so near-white catches only the highest crests). Low contrast, as vanilla water; fog `#9CA4AC`, very short. The
+  bucket is the fluid-container bucket.
+- **Sulfur Dioxide** (gas): the steam texture tinted `#F2ECB8`, a clear pale yellow, paler and warmer than Fluorine.
+- **Mercury Vapour Lamp** (a small UV-unwrapped model, 32×32 sheet `block/mercury_vapour_lamp`, every face painted to
+  its size): a 10×10 mounting plate 2 px thick (bevelled, rivets under the holder), a 6×6 lamp holder a step darker, the
+  bulb (4×4, 7 tall) in a cage of four 1 px corner bars on the machine steel ramp, 1 px rails round its foot (closing it
+  onto the holder) and its middle, and an 8×8 cap with a vent ring. The bulb has its own 16×16 texture: shaded across its side (lit just left of centre) with a
+  brighter arc-tube line down the middle and a rounded top; off `#3E4852 #56626E #6E7C89 #8896A2` (cool dull glass), on
+  `#8EB8E0 #B8D6F2 #DCEEFF #F6FBFF` (blue-white) with `light_emission` 15 on the bulb element only. Modelled pointing up,
+  turned as the End Rod is for walls and ceilings.
+- **Induction Furnace GUI:** the Grain Dryer's tank frame copied to x 154 for the retorted Mercury (tank at 155,19,
+  12×50), with its gauge marks (`tank_gauge`) and a `mercury_fill` fallback in 2 px diagonal mercury bands.

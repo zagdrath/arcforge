@@ -551,8 +551,10 @@ public class ChemicalReactorBlockEntity extends MachineBlockEntity implements Fl
             case FLUID -> mode == SideMode.INPUT ? ConnectionMode.INPUT
                     : mode == SideMode.OUTPUT || mode == SideMode.BYPRODUCT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            // Gases too (Ammonia, Hydrogen), through Pressurized Conduits.
-            case GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            // Gases too (Ammonia, Hydrogen), through Pressurized Conduits, and a gas by-product (Hydrogen, Sulfur Dioxide)
+            // out of By-product faces.
+            case GAS -> mode == SideMode.INPUT ? ConnectionMode.INPUT
+                    : mode == SideMode.OUTPUT || mode == SideMode.BYPRODUCT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case THERMAL -> mode == SideMode.HEAT ? ConnectionMode.INPUT : ConnectionMode.NONE;
         };
     }

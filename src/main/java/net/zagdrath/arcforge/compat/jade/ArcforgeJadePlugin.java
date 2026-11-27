@@ -97,6 +97,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(GasTurbineProvider.INSTANCE, GasTurbineArrayBlockEntity.class);
         registration.registerBlockDataProvider(MeterProviders.Meter.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity.class);
         registration.registerBlockDataProvider(MeterProviders.Chargepad.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.ChargepadBlockEntity.class);
+        registration.registerBlockDataProvider(MeterProviders.MercuryLamp.INSTANCE, net.zagdrath.arcforge.blockentity.logistics.MercuryVapourLampBlockEntity.class);
         registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.FarmMachineBlockEntity.class);
         registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.FertilizerSpreaderBlockEntity.class);
         registration.registerBlockDataProvider(FarmingProviders.RusticMachine.INSTANCE, net.zagdrath.arcforge.blockentity.farming.CopperSprinklerBlockEntity.class);
@@ -244,6 +245,7 @@ public class ArcforgeJadePlugin implements IWailaPlugin {
         registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, GasTurbineArrayCasingBlock.class);
         registration.registerBlockComponent(MeterProviders.Meter.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.MeterBlock.class);
         registration.registerBlockComponent(MeterProviders.Chargepad.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.ChargepadBlock.class);
+        registration.registerBlockComponent(MeterProviders.MercuryLamp.Client.INSTANCE, net.zagdrath.arcforge.block.logistics.MercuryVapourLampBlock.class);
         registration.registerBlockComponent(GasTurbineProvider.Client.INSTANCE, PressureGlassBlock.class);
         registration.registerBlockComponent(SteamCycleProvider.Client.INSTANCE, PressureGlassBlock.class);
         // Farming: read from the block state on the client.

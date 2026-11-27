@@ -1,0 +1,25 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "#c:dusts/cinnabar",
+    "count": 1
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:oxygen",
+      "amount": 100
+    }
+  ],
+  "fluid_output": {
+    "id": "arcforge:mercury",
+    "amount": 100
+  },
+  "fluid_byproduct": {
+    "id": "arcforge:sulfur_dioxide",
+    "amount": 100
+  },
+  "time": 120,
+  "energy_per_tick": 60,
+  "heat_per_tick": 20,
+  "min_temperature": 600
+}

@@ -31,7 +31,11 @@ public class InductionFurnaceMenu extends MachineMenu {
     // The Liquid Experience banked, and its tank.
     public static final int DATA_XP = 8;
     public static final int DATA_XP_CAPACITY = 9;
-    public static final int DATA_VALUES = 10;
+    // The Mercury retorting gave back: its fluid id (-1 empty), amount and the tank's size.
+    public static final int DATA_MERCURY_FLUID = 10;
+    public static final int DATA_MERCURY_AMOUNT = 11;
+    public static final int DATA_MERCURY_CAPACITY = 12;
+    public static final int DATA_VALUES = 13;
 
     // Slot positions from induction_furnace_gui_layout.json.
     public static final int INPUT_X = 53, INPUT_Y = 35;
@@ -97,5 +101,18 @@ public class InductionFurnaceMenu extends MachineMenu {
 
     public int getXpCapacity() {
         return value(DATA_XP_CAPACITY);
+    }
+
+    public net.minecraft.world.level.material.Fluid getMercuryFluid() {
+        int id = value(DATA_MERCURY_FLUID);
+        return id < 0 ? net.minecraft.world.level.material.Fluids.EMPTY : net.minecraft.core.registries.BuiltInRegistries.FLUID.byId(id);
+    }
+
+    public int getMercuryAmount() {
+        return value(DATA_MERCURY_AMOUNT);
+    }
+
+    public int getMercuryCapacity() {
+        return value(DATA_MERCURY_CAPACITY);
     }
 }

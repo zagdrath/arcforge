@@ -295,6 +295,10 @@ public final class ModBlockEntityTypes {
 
     public static final Supplier<BlockEntityType<ChargepadBlockEntity>> CHARGEPAD = BLOCK_ENTITY_TYPES.register("chargepad",
             () -> new BlockEntityType<>(ChargepadBlockEntity::new, ModBlocks.CHARGEPAD.get()));
+    // The Mercury Vapour Lamp: FE in, light out.
+    public static final Supplier<BlockEntityType<net.zagdrath.arcforge.blockentity.logistics.MercuryVapourLampBlockEntity>> MERCURY_VAPOUR_LAMP =
+            BLOCK_ENTITY_TYPES.register("mercury_vapour_lamp", () -> new BlockEntityType<>(
+                    net.zagdrath.arcforge.blockentity.logistics.MercuryVapourLampBlockEntity::new, ModBlocks.MERCURY_VAPOUR_LAMP.get()));
 
     public static final Supplier<BlockEntityType<ElectricPumpBlockEntity>> ELECTRIC_PUMP = BLOCK_ENTITY_TYPES.register("electric_pump",
             () -> new BlockEntityType<>(ElectricPumpBlockEntity::new, ModBlocks.ELECTRIC_PUMP.get()));

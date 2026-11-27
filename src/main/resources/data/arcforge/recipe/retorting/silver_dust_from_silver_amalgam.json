@@ -1,0 +1,14 @@
+{
+  "type": "arcforge:retorting",
+  "ingredient": "arcforge:silver_amalgam",
+  "result": {
+    "id": "arcforge:silver_dust",
+    "count": 4
+  },
+  "fluid_output": {
+    "id": "arcforge:mercury",
+    "amount": 90
+  },
+  "time": 200,
+  "experience": 0.3
+}

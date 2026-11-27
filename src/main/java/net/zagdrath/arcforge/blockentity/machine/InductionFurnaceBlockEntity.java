@@ -13,6 +13,7 @@ import org.jspecify.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Inventory;
@@ -24,10 +25,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.transfer.CombinedResourceHandler;
 import net.neoforged.neoforge.transfer.ResourceHandler;
 import net.neoforged.neoforge.transfer.energy.EnergyHandler;
 import net.neoforged.neoforge.transfer.fluid.FluidResource;
 import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.transaction.Transaction;
 import net.zagdrath.arcforge.conduit.ConduitType;
 import net.zagdrath.arcforge.conduit.ConnectionMode;
 import net.zagdrath.arcforge.config.ArcforgeConfig;
@@ -43,11 +47,13 @@ import net.zagdrath.arcforge.recipe.MachineRecipes;
 import net.zagdrath.arcforge.registry.ModBlockEntityTypes;
 import net.zagdrath.arcforge.transfer.AutomationResourceHandler;
 import net.zagdrath.arcforge.transfer.energy.ConsumerEnergyHandler;
+import net.zagdrath.arcforge.transfer.fluid.FilteredFluidTank;
 import net.zagdrath.arcforge.transfer.item.MachineItemHandler;
 import net.zagdrath.arcforge.upgrade.UpgradeType;
 
 // Smelts anything with a furnace recipe (vanilla or modded) using FE: half the recipe's cooking time
-// (100 ticks for a normal recipe) at 20 FE/t, so 2,000 FE an item. Banks the recipes' XP as Liquid Experience (see
+// (100 ticks for a normal recipe) at 20 FE/t, so 2,000 FE an item. It also retorts amalgams (arcforge:retorting): the
+// metal comes out as dust and the Mercury boils off into its by-product tank, drained through By-product faces. Banks the recipes' XP as Liquid Experience (see
 // ExperienceBank), drained through Experience faces; once that tank is full it holds the XP until a player takes the
 // output, like a vanilla furnace. Speed upgrades make it faster (drawing FE just as much faster), Energy upgrades cut the
 // FE per item.
@@ -56,7 +62,8 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
     public static final int SLOT_OUTPUT = 1;
     public static final int MACHINE_SLOTS = 2;
     public static final Set<UpgradeType> UPGRADES = EnumSet.of(UpgradeType.SPEED, UpgradeType.ENERGY);
-    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.ENERGY, SideMode.EXPERIENCE);
+    private static final List<SideMode> SIDE_MODES = List.of(SideMode.NONE, SideMode.INPUT, SideMode.OUTPUT, SideMode.BYPRODUCT, SideMode.ENERGY,
+            SideMode.EXPERIENCE);
 
     private final ConsumerEnergyHandler energy;
     private final ResourceHandler<ItemResource> itemInput;
@@ -65,6 +72,11 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
     private final SmeltingLane lane = new SmeltingLane(SLOT_INPUT, SLOT_OUTPUT);
     private final ExperienceBank bank = new ExperienceBank(ArcforgeConfig.INDUCTION_EXPERIENCE_TANK.getAsInt(), this::setChanged);
     private final StoredExperience experience = new StoredExperience(this::setChanged, bank);
+    // The Mercury retorting gives back, out through By-product faces.
+    private final FilteredFluidTank mercury;
+    private final ResourceHandler<FluidResource> mercuryOutput;
+    private final ResourceHandler<FluidResource> fluidAll;
+    private final SmeltingLane.FluidOutput mercurySink;
     private final ContainerData data;
     private int usage;
 
@@ -79,6 +91,25 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         this.itemInput = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> false);
         this.itemOutput = new AutomationResourceHandler<>(items, slot -> false, slot -> slot == SLOT_OUTPUT);
         this.itemAutomation = new AutomationResourceHandler<>(items, slot -> slot == SLOT_INPUT, slot -> slot == SLOT_OUTPUT);
+        this.mercury = new FilteredFluidTank(ArcforgeConfig.INDUCTION_MERCURY_TANK.getAsInt(), resource -> true, this::setChanged);
+        this.mercuryOutput = new AutomationResourceHandler<>(mercury, index -> false, index -> true);
+        this.fluidAll = new CombinedResourceHandler<>(bank.getOutput(), mercuryOutput);
+        this.mercurySink = new SmeltingLane.FluidOutput() {
+            @Override
+            public boolean fits(FluidStack fluid) {
+                try (Transaction tx = Transaction.openRoot()) {
+                    return mercury.insert(0, FluidResource.of(fluid), fluid.getAmount(), tx) == fluid.getAmount();
+                }
+            }
+
+            @Override
+            public void add(FluidStack fluid) {
+                try (Transaction tx = Transaction.openRoot()) {
+                    mercury.insert(0, FluidResource.of(fluid), fluid.getAmount(), tx);
+                    tx.commit();
+                }
+            }
+        };
         this.data = new WideIntContainerData(InductionFurnaceMenu.DATA_VALUES) {
             @Override
             protected int getValue(int index) {
@@ -93,16 +124,19 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
                     case InductionFurnaceMenu.DATA_SIDE_CONFIG -> packedSides();
                     case InductionFurnaceMenu.DATA_XP -> bank.getAmount();
                     case InductionFurnaceMenu.DATA_XP_CAPACITY -> bank.getCapacity();
+                    case InductionFurnaceMenu.DATA_MERCURY_FLUID -> mercury.getAmount() > 0 ? BuiltInRegistries.FLUID.getId(mercury.getResource(0).getFluid()) : -1;
+                    case InductionFurnaceMenu.DATA_MERCURY_AMOUNT -> mercury.getAmount();
+                    case InductionFurnaceMenu.DATA_MERCURY_CAPACITY -> mercury.getCapacity();
                     default -> 0;
                 };
             }
         };
     }
 
-    // The input slot takes anything with a smelting recipe. The client passes a null level and checks
-    // against the recipes the server synced.
+    // The input slot takes anything with a smelting recipe, or an amalgam to retort. The client passes a null level and
+    // checks against the recipes the server synced.
     public static boolean isItemValid(@Nullable Level level, int slot, ItemResource resource) {
-        return slot == SLOT_INPUT && MachineRecipes.isSmeltingInput(level, resource.toStack(1));
+        return slot == SLOT_INPUT && MachineRecipes.isInductionFurnaceInput(level, resource.toStack(1));
     }
 
     // A client-side copy of the slots, for the menu.
@@ -123,7 +157,7 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         } else {
             SmeltingLane.Settings settings = new SmeltingLane.Settings(
                     ArcforgeConfig.INDUCTION_TIME_MULTIPLIER.getAsDouble() / speedMultiplier(), energyPerTick());
-            SmeltingLane.State laneState = lane.tick(level, items, energy, experience, settings,
+            SmeltingLane.State laneState = lane.tick(level, items, energy, experience, settings, mercurySink,
                     (produced, used) -> controlState.completed(produced, List.of(), used, 0));
             status = switch (laneState) {
                 case WORKING -> MachineStatus.SMELTING;
@@ -140,6 +174,9 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         autoEject(level, itemOutput);
         if (isAutoEject() && bank.getAmount() > 0) {
             outputs.pushFluid(level, pos, getFacing(), sideConfig, SideMode.EXPERIENCE, bank.getOutput(), ArcforgeConfig.EXPERIENCE_OUTPUT_RATE.getAsInt());
+        }
+        if (isAutoEject() && mercury.getAmount() > 0) {
+            outputs.pushFluid(level, pos, getFacing(), sideConfig, SideMode.BYPRODUCT, mercuryOutput, ArcforgeConfig.INDUCTION_MERCURY_OUTPUT_RATE.getAsInt());
         }
     }
 
@@ -161,6 +198,11 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
     // The Liquid Experience it has banked.
     public ExperienceBank getBank() {
         return bank;
+    }
+
+    // The Mercury retorting has given back.
+    public FilteredFluidTank getMercuryTank() {
+        return mercury;
     }
 
     public int getUsage() {
@@ -194,10 +236,18 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         };
     }
 
-    // Experience faces give the banked Liquid Experience; unsided, it's there too (for Jade).
+    // Experience faces give the banked Liquid Experience, By-product faces the retorted Mercury; unsided, both are there
+    // (for Jade).
     public @Nullable ResourceHandler<FluidResource> getFluidHandler(@Nullable Direction side) {
         SideMode mode = modeFor(side);
-        return mode == null || mode == SideMode.EXPERIENCE ? bank.getOutput() : null;
+        if (mode == null) {
+            return fluidAll;
+        }
+        return switch (mode) {
+            case EXPERIENCE -> bank.getOutput();
+            case BYPRODUCT -> mercuryOutput;
+            default -> null;
+        };
     }
 
     // FE goes in on energy faces.
@@ -212,7 +262,7 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         return switch (type) {
             case ITEM -> mode == SideMode.INPUT ? ConnectionMode.INPUT : mode == SideMode.OUTPUT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case ENERGY -> mode == SideMode.ENERGY ? ConnectionMode.INPUT : ConnectionMode.NONE;
-            case FLUID -> mode == SideMode.EXPERIENCE ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
+            case FLUID -> mode == SideMode.EXPERIENCE || mode == SideMode.BYPRODUCT ? ConnectionMode.OUTPUT : ConnectionMode.NONE;
             case GAS, THERMAL -> ConnectionMode.NONE;
         };
     }
@@ -224,6 +274,7 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         lane.deserialize(input.childOrEmpty("lane"));
         experience.deserialize(input);
         bank.deserialize(input);
+        mercury.deserialize(input.childOrEmpty("mercury_tank"));
     }
 
     @Override
@@ -233,6 +284,7 @@ public class InductionFurnaceBlockEntity extends MachineBlockEntity {
         lane.serialize(output.child("lane"));
         experience.serialize(output);
         bank.serialize(output);
+        mercury.serialize(output.child("mercury_tank"));
     }
 
     @Override

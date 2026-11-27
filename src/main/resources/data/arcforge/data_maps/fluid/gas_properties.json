@@ -65,6 +65,9 @@
     },
     "arcforge:nitrogen_dioxide": {
       "color": "#C8743C"
+    },
+    "arcforge:sulfur_dioxide": {
+      "color": "#F2ECB8"
     }
   }
 }

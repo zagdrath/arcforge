@@ -22,8 +22,22 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+Suggested version: **2.10.0** (minor: the mercury line, from vanilla Cinnabar to Mercury, amalgams and the Mercury
+Vapour Lamp, plus the Long Fall Boots slot, carried Battery charging and the Quantum Tunnel Upgrades tab).
+
 ### Added
 
+- **The mercury line: a use for vanilla Cinnabar.** The Arc Crusher (and its Array) crushes Cinnabar into 2 Cinnabar Dust
+  and its other blocks into 1; one dust crafts into 2 Red Dye. Roasted with Oxygen in the Chemical Reactor at 600°C or
+  more, Cinnabar Dust gives **Mercury** and **Sulfur Dioxide**, and Sulfur Dioxide, Oxygen and Water make Sulfuric Acid
+  (the contact process), a second route beside Sulfur Dust. Mercury is a heavy liquid metal with its own bucket: it
+  creeps a block or two and stops, entities float on it, wading in it poisons anyone without a full Hazmat Suit, and it
+  doesn't burn. Only Tempered Fluid Tanks, Canisters and Fluid Conduits and up hold it. Raw Gold or Raw Silver in Mercury
+  makes **Gold** or **Silver Amalgam**, which the Induction Furnace retorts into 4 Dust (one more than leaching), giving
+  90% of the Mercury back through a new By-product face and tank. The **Mercury Vapour Lamp** is an industrial light for
+  floors, walls and ceilings: light 15 in a cool blue-white for 4 FE/t, off with a redstone signal. Values are in the
+  `mercury`, `inductionFurnace` and `mercuryVapourLamp` config sections. Includes a Handbook
+  entry, JEI info and a Retorting category, Jade for the lamp, four Chemistry quests and GameTests.
 - A **Long Fall Boots** Curios slot: boots there cushion landings like worn ones and still show on your legs, so your
   boots slot is free for armour (the Armored Long Fall Boots' armour only counts on your feet). The Chargepad now also
   charges a Jetpack or Long Fall Boots in their Curios slots.
@@ -39,6 +53,8 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ### Changed
 
+- The Chemical Reactor's By-product faces now connect to Pressurized Conduits, so a gas by-product (Hydrogen from
+  Trichlorosilane, Sulfur Dioxide from roasting) can be piped away as well as pushed out.
 - The Chunk Loader's radius − and + buttons are smaller, with the Show area button beside them.
 - Long Fall Boots' charge bar is the Arcforged gear's cyan.
 

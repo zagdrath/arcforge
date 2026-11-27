@@ -47,7 +47,8 @@ public class FluidConduitNetwork extends ConduitNetwork<ResourceHandler<FluidRes
     private long lastFlowTick;
 
     public FluidConduitNetwork(ServerLevel level, List<BlockPos> members, Set<BlockPos> memberSet, ConduitTier tier) {
-        this(level, members, memberSet, tier, tier.fluidBuffer(), tier.fluidPerTick(), resource -> !Gases.isGas(resource));
+        this(level, members, memberSet, tier, tier.fluidBuffer(), tier.fluidPerTick(),
+                resource -> !Gases.isGas(resource) && net.zagdrath.arcforge.chemistry.Containment.holds(tier, resource));
     }
 
     // perConduit: mB each conduit holds (at least a tick of rate, see ConduitTier.fluidBuffer). rate: mB/t pulled and

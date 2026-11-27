@@ -1078,6 +1078,15 @@ public class ArcforgeConfig {
                     "Experience faces. A full tank stops banking: the rest is held for the player taking the output, as before.")
             .defineInRange("experienceTankCapacity", 8_000, 0, 1_000_000);
 
+    public static final ModConfigSpec.IntValue INDUCTION_MERCURY_TANK = BUILDER
+            .comment("Size in mB of the by-product tank retorting an amalgam gives its Mercury back into, drained through By-product",
+                    "faces. While it's full the furnace retorts nothing.")
+            .defineInRange("mercuryTankCapacity", 4_000, 100, 1_000_000);
+
+    public static final ModConfigSpec.IntValue INDUCTION_MERCURY_OUTPUT_RATE = BUILDER
+            .comment("Most mB/t of Mercury it pushes out of its By-product faces with auto-eject on.")
+            .defineInRange("mercuryOutputRate", 200, 1, 1_000_000);
+
     static {
         BUILDER.pop();
     }
@@ -1386,6 +1395,23 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue FERMENTER_GAS_OUTPUT_RATE = BUILDER
             .comment("Most mB/t of Carbon Dioxide it pushes out of its Gas Output faces (shared across them).")
             .defineInRange("gasOutputRate", 100, 1, 1_000_000);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Mercury, from roasting Cinnabar Dust in the Chemical Reactor: what it does to anything wading in it without a",
+                "full Hazmat Suit.").push("mercury");
+    }
+
+    public static final ModConfigSpec.IntValue MERCURY_POISON_SECONDS = BUILDER
+            .comment("Seconds of Poison it gives, renewed each second something stays in it.")
+            .defineInRange("poisonSeconds", 5, 1, 600);
+
+    public static final ModConfigSpec.IntValue MERCURY_POISON_LEVEL = BUILDER
+            .comment("The Poison's level (1 is Poison I).")
+            .defineInRange("poisonLevel", 1, 1, 5);
 
     static {
         BUILDER.pop();
@@ -3580,6 +3606,27 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue CHARGEPAD_MAX_TRANSFER = BUILDER
             .comment("Most FE it gives out per tick in all.")
             .defineInRange("maxTransferPerTick", 8_192, 1, Integer.MAX_VALUE);
+
+    static {
+        BUILDER.pop();
+    }
+
+    static {
+        BUILDER.comment("Mercury Vapour Lamp: an industrial light (level 15) while it has FE; a redstone signal turns it off.")
+                .push("mercuryVapourLamp");
+    }
+
+    public static final ModConfigSpec.IntValue MERCURY_LAMP_ENERGY_PER_TICK = BUILDER
+            .comment("FE/t it draws while lit.")
+            .defineInRange("energyPerTick", 4, 0, 1_000_000);
+
+    public static final ModConfigSpec.IntValue MERCURY_LAMP_ENERGY_CAPACITY = BUILDER
+            .comment("FE buffer size.")
+            .defineInRange("energyCapacity", 2_000, 1, Integer.MAX_VALUE);
+
+    public static final ModConfigSpec.IntValue MERCURY_LAMP_MAX_INPUT = BUILDER
+            .comment("Most FE it takes in per tick.")
+            .defineInRange("maxInput", 64, 1, Integer.MAX_VALUE);
 
     static {
         BUILDER.pop();

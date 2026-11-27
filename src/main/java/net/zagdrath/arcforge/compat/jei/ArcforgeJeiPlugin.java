@@ -174,6 +174,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
                 new MachineCategories.EngineFuels(gui),
                 new MachineCategories.Enriching(gui),
                 new MachineCategories.Sintering(gui),
+                new MachineCategories.Retorting(gui),
                 new MachineCategories.IsotopeExchanging(gui),
                 new MachineCategories.Fission(gui),
                 new MachineCategories.SteamGenerating(gui),
@@ -264,6 +265,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addRecipes(MachineCategories.EngineFuels.TYPE, engineFuels);
         // The Gas Centrifuge Cascade's enrichment at a few common targets (3%, 5% and 20%, low-enriched fuel).
         registration.addRecipes(MachineCategories.Sintering.TYPE, recipes(ModRecipes.SINTERING.get()));
+        registration.addRecipes(MachineCategories.Retorting.TYPE, recipes(ModRecipes.RETORTING.get()));
         registration.addRecipes(MachineCategories.IsotopeExchanging.TYPE, recipes(ModRecipes.ISOTOPE_EXCHANGING.get()));
         // Fuel Rods at a few common enrichments (natural, 3%, 5% and 20%), and the Steam Generator's two coolants.
         registration.addRecipes(MachineCategories.Fission.TYPE, List.of(new MachineCategories.FissionRecipe(net.zagdrath.arcforge.nuclear.Enrichment.NATURAL_PCM),
@@ -454,6 +456,7 @@ public class ArcforgeJeiPlugin implements IModPlugin {
         registration.addCraftingStation(MachineCategories.Enriching.TYPE, ModBlocks.CENTRIFUGE_CASCADE_CONTROLLER.get(), ModBlocks.CENTRIFUGE_CASCADE_CASING.get(),
                 ModBlocks.GAS_CENTRIFUGE.get());
         registration.addCraftingStation(MachineCategories.Sintering.TYPE, ModBlocks.INDUCTION_FURNACE.get(), ModBlocks.INDUCTION_FURNACE_ARRAY_CASING.get());
+        registration.addCraftingStation(MachineCategories.Retorting.TYPE, ModBlocks.INDUCTION_FURNACE.get());
         registration.addCraftingStation(MachineCategories.IsotopeExchanging.TYPE, ModBlocks.HEAVY_WATER_TOWER_CONTROLLER.get(),
                 ModBlocks.HEAVY_WATER_TOWER_CASING.get(), ModBlocks.EXCHANGE_TRAY.get());
         registration.addCraftingStation(MachineCategories.Fission.TYPE, ModBlocks.REACTOR_CONTROLLER.get(), ModBlocks.REACTOR_CASING.get(),

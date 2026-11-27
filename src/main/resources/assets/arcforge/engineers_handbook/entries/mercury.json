@@ -1,0 +1,34 @@
+{
+  "title": "Cinnabar and Mercury",
+  "icon": "arcforge:mercury_bucket",
+  "items": [
+    "minecraft:cinnabar",
+    "arcforge:cinnabar_dust",
+    "arcforge:mercury_bucket",
+    "arcforge:gold_amalgam",
+    "arcforge:silver_amalgam",
+    "arcforge:mercury_vapour_lamp"
+  ],
+  "pages": [
+    {
+      "type": "text",
+      "text": "# Cinnabar Dust\nThe Arc Crusher (and its Array) crushes a block of Cinnabar into 2 Cinnabar Dust, and its other blocks (polished, bricks, chiseled, stairs, slabs and walls) into 1.\n# Vermilion\nOne Cinnabar Dust crafts into 2 Red Dye."
+    },
+    {
+      "type": "text",
+      "text": "# Roasting\nCinnabar Dust and Oxygen in the Chemical Reactor, heated to 600°C or more through its Heat faces: Mercury, and Sulfur Dioxide into the by-product tank.\n# The contact process\nSulfur Dioxide, Oxygen and Water in the Chemical Reactor make Sulfuric Acid: a second route beside Sulfur Dust. By-product faces push the gas into Pressurized Conduits."
+    },
+    {
+      "type": "text",
+      "text": "# Mercury\nA heavy, bright liquid metal. Poured, it creeps a block or two and stops. Anything that steps in floats on it, and is poisoned unless it wears a full Hazmat Suit. It doesn't burn.\nIt's heavy and searching: only Tempered Fluid Tanks, Canisters and Fluid Conduits and up hold it. A network with a Wrought conduit in it won't carry it."
+    },
+    {
+      "type": "text",
+      "text": "# Amalgamation\nRaw Gold or Raw Silver dissolved in 100 mB of Mercury in the Chemical Reactor gives Gold or Silver Amalgam.\nThe Induction Furnace (not its Array) retorts an amalgam into 4 of that metal's Dust, one more than leaching, and gives 90 mB of the Mercury back into its by-product tank. Drain it through By-product faces."
+    },
+    {
+      "type": "text",
+      "text": "# Mercury Vapour Lamp\nAn industrial light for floors, walls and ceilings: light level 15 in a cool blue-white while it has FE, dark without. It draws 4 FE/t from a conduit on any side but the bulb's. A redstone signal turns it off.\nFour from a Mercury Bucket, four Glass and four Steel Plates."
+    }
+  ]
+}

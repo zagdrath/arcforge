@@ -125,6 +125,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.FLUID_METER.get());
                 output.accept(ModItems.GAS_METER.get());
                 output.accept(ModItems.CHARGEPAD.get());
+                output.accept(ModItems.MERCURY_VAPOUR_LAMP.get());
             }).build());
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MATERIALS = CREATIVE_MODE_TABS.register("materials", () -> CreativeModeTab.builder()
@@ -158,6 +159,9 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.METALLURGICAL_SILICON.get());
                 output.accept(ModItems.POLYSILICON.get());
                 output.accept(ModItems.SULFUR_DUST.get());
+                output.accept(ModItems.CINNABAR_DUST.get());
+                output.accept(ModItems.GOLD_AMALGAM.get());
+                output.accept(ModItems.SILVER_AMALGAM.get());
                 output.accept(ModItems.HALITE_ORE.get());
                 output.accept(ModItems.DEEPSLATE_HALITE_ORE.get());
                 output.accept(ModItems.ROCK_SALT.get());

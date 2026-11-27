@@ -17,17 +17,20 @@ import net.zagdrath.arcforge.steam.Gases;
 public class PortableFluidHandler extends ItemAccessFluidHandler {
     private final boolean gas;
     private final int rate;
+    private final net.zagdrath.arcforge.conduit.ConduitTier tier;
 
     public PortableFluidHandler(ItemAccess itemAccess, PortableStorageItem item) {
         super(itemAccess, ModDataComponents.FLUID_CONTENTS.get(), item.capacity());
         this.gas = item.kind() == PortableStorageItem.Kind.GAS_CARTRIDGE;
         this.rate = item.rate();
+        this.tier = item.tier();
     }
 
     @Override
     public boolean isValid(int index, FluidResource resource) {
-        // Never a corrosive gas (UF6): a cartridge isn't lined for it.
-        return super.isValid(index, resource) && (resource.isEmpty() || Gases.isGas(resource) == gas && !net.zagdrath.arcforge.nuclear.Corrosion.isCorrosive(resource));
+        // Never a corrosive gas (UF6): a cartridge isn't lined for it. Mercury only in a Tempered Canister and up.
+        return super.isValid(index, resource) && (resource.isEmpty() || Gases.isGas(resource) == gas && !net.zagdrath.arcforge.nuclear.Corrosion.isCorrosive(resource)
+                && net.zagdrath.arcforge.chemistry.Containment.holds(tier, resource));
     }
 
     @Override

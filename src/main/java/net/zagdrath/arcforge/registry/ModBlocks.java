@@ -972,6 +972,16 @@ public final class ModBlocks {
             p -> new SulfuricAcidBlock(ModFluids.NITRIC_ACID.get(), ModDamageTypes.NITRIC_ACID, p),
             p -> liquidProperties(p, MapColor.COLOR_YELLOW));
 
+    // The mercury line: Mercury in the world (poisons anything wading in without a full Hazmat Suit), and the Mercury Vapour
+    // Lamp, a powered industrial light for floors, walls and ceilings.
+    public static final DeferredBlock<net.zagdrath.arcforge.block.fluid.MercuryBlock> MERCURY = BLOCKS.registerBlock("mercury",
+            p -> new net.zagdrath.arcforge.block.fluid.MercuryBlock(ModFluids.MERCURY.get(), p),
+            p -> liquidProperties(p, MapColor.METAL));
+    public static final DeferredBlock<net.zagdrath.arcforge.block.logistics.MercuryVapourLampBlock> MERCURY_VAPOUR_LAMP = BLOCKS.registerBlock(
+            "mercury_vapour_lamp", net.zagdrath.arcforge.block.logistics.MercuryVapourLampBlock::new,
+            p -> p.mapColor(MapColor.METAL).strength(2.0F, 6.0F).requiresCorrectToolForDrops().sound(SoundType.LANTERN).noOcclusion()
+                    .lightLevel(state -> state.getValue(net.zagdrath.arcforge.block.logistics.MercuryVapourLampBlock.LIT) ? 15 : 0));
+
     // The Thermal Evaporator Array: a 3x3x9 steel tower (see ThermalEvaporatorStructure), like the other arrays'
     // casings.
     public static final DeferredBlock<ThermalEvaporatorCasingBlock> THERMAL_EVAPORATOR_CASING = BLOCKS.registerBlock("thermal_evaporator_casing",

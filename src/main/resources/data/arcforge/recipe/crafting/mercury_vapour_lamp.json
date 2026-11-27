@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "redstone",
+  "pattern": [
+    "PGP",
+    "GMG",
+    "PGP"
+  ],
+  "key": {
+    "P": "#c:plates/steel",
+    "G": "#c:glass_blocks",
+    "M": "#c:buckets/mercury"
+  },
+  "result": {
+    "id": "arcforge:mercury_vapour_lamp",
+    "count": 4
+  }
+}

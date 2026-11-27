@@ -82,8 +82,10 @@ public class FluidTankBlockEntity extends StorageBlockEntity implements FluidInt
         // Defaults: fill from every side, drain from the bottom.
         super(ModBlockEntityTypes.FLUID_TANK.get(), pos, state, ((FluidTankBlock) state.getBlock()).getTier(),
                 new SideConfig(SideMode.INPUT, SideMode.OUTPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT, SideMode.INPUT));
+        // No gases; Mercury only from Tempered up (see Containment).
         this.tank = creative ? new CreativeFluidTank(tier.tankCapacity(), resource -> !Gases.isGas(resource), this::onTankChanged)
-                : new FilteredFluidTank(tier.tankCapacity(), resource -> !Gases.isGas(resource), this::onTankChanged);
+                : new FilteredFluidTank(tier.tankCapacity(), resource -> !Gases.isGas(resource)
+                        && net.zagdrath.arcforge.chemistry.Containment.holds(tier, resource), this::onTankChanged);
         this.inputView = new SidedResourceHandler<>(tank, true, false, rate(tier.tankRate()));
         this.outputView = new SidedResourceHandler<>(tank, false, true, rate(tier.tankRate()));
         this.automationView = new SidedResourceHandler<>(tank, true, true, rate(tier.tankRate()));

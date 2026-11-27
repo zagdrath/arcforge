@@ -133,6 +133,8 @@ public final class ModCapabilities {
                 net.zagdrath.arcforge.blockentity.logistics.MeterBlockEntity::getFluidHandler);
         event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.CHARGEPAD.get(),
                 net.zagdrath.arcforge.blockentity.logistics.ChargepadBlockEntity::getEnergyHandler);
+        event.registerBlockEntity(Capabilities.Energy.BLOCK, ModBlockEntityTypes.MERCURY_VAPOUR_LAMP.get(),
+                net.zagdrath.arcforge.blockentity.logistics.MercuryVapourLampBlockEntity::getEnergyHandler);
         // The Compost Bin: plant matter in, Compost out (hoppers and conduits).
         event.registerBlockEntity(Capabilities.Item.BLOCK, ModBlockEntityTypes.COMPOST_BIN.get(),
                 net.zagdrath.arcforge.blockentity.farming.CompostBinBlockEntity::getItemHandler);

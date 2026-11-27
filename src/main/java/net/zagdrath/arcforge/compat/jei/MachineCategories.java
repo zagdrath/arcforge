@@ -924,6 +924,33 @@ final class MachineCategories {
         }
     }
 
+    // An amalgam retorted in the Induction Furnace: the metal's dust out, the Mercury back into its by-product tank.
+    static final class Retorting extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.RetortingRecipe>> {
+        static final IRecipeHolderType<net.zagdrath.arcforge.recipe.RetortingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.RETORTING.get());
+
+        Retorting(IGuiHelper gui) {
+            super(TYPE, "retorting", ModBlocks.INDUCTION_FURNACE.get(), gui, 116, 40);
+        }
+
+        @Override
+        public void setRecipe(IRecipeLayoutBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.RetortingRecipe> holder, IFocusGroup focuses) {
+            builder.addInputSlot(1, 5).setStandardSlotBackground().add(holder.value().ingredient());
+            builder.addOutputSlot(61, 5).setStandardSlotBackground().add(holder.value().result());
+            fluid(builder, false, 83, 5, holder.value().fluidOutput());
+        }
+
+        @Override
+        public void createRecipeExtras(IRecipeExtrasBuilder builder, RecipeHolder<net.zagdrath.arcforge.recipe.RetortingRecipe> holder, IFocusGroup focuses) {
+            builder.addAnimatedRecipeArrowWidget(holder.value().time()).setPosition(26, 5);
+        }
+
+        @Override
+        public void draw(RecipeHolder<net.zagdrath.arcforge.recipe.RetortingRecipe> holder, IRecipeSlotsView slots, GuiGraphicsExtractor graphics,
+                double mouseX, double mouseY) {
+            text(graphics, Component.translatable("jei.arcforge.retorting.time", seconds(holder.value().time())), 0, 30);
+        }
+    }
+
     // The Girdler sulfide exchange: the fluids each Exchange Tray takes and the Heavy Water it makes, per operation.
     static final class IsotopeExchanging extends ArcforgeCategory<RecipeHolder<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe>> {
         static final IRecipeHolderType<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe> TYPE = IRecipeHolderType.create(ModRecipes.ISOTOPE_EXCHANGING.get());

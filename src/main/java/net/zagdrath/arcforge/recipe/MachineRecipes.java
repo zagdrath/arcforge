@@ -108,6 +108,17 @@ public final class MachineRecipes {
         return recipes(level).byType(ModRecipes.SINTERING.get()).stream().filter(holder -> holder.value().ingredient().test(input)).findFirst();
     }
 
+    // The retorting recipe for this item (the Induction Furnace's own), if any.
+    public static Optional<RecipeHolder<RetortingRecipe>> retorting(@Nullable Level level, ItemStack input) {
+        return recipes(level).byType(ModRecipes.RETORTING.get()).stream().filter(holder -> holder.value().ingredient().test(input)).findFirst();
+    }
+
+    // What the single Induction Furnace takes: what both Induction Furnaces take, or an amalgam to retort (it needs the
+    // by-product tank the array doesn't have).
+    public static boolean isInductionFurnaceInput(@Nullable Level level, ItemStack stack) {
+        return isSmeltingInput(level, stack) || retorting(level, stack).isPresent();
+    }
+
     // The isotope exchange recipe for what the Heavy Water Tower holds, if any.
     public static Optional<RecipeHolder<IsotopeExchangingRecipe>> isotopeExchanging(@Nullable Level level, IsotopeExchangingRecipe.Input input) {
         return recipes(level).byType(ModRecipes.ISOTOPE_EXCHANGING.get()).stream().filter(holder -> holder.value().matches(input, level)).findFirst();

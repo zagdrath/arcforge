@@ -252,6 +252,10 @@ The Electrolyzer and the Chemical Reactor: hydrogen and oxygen, acids and leachi
 - **Silica Gel** `silica_gel`: Make Sodium Silicate; Set Silica Gel. After: silica, sulfuric_acid. Rewards: 16× Silica Dust, 5 lvl
 - ★ **Silicon Carbide** `silicon_carbide`: Obtain Silicon Carbide Mesh. After: silica. Rewards: 4× Silicon Carbide, 8 lvl
 - ★ **Polysilicon** `polysilicon`: Obtain Metallurgical Silicon; Deposit Polysilicon. After: silica, electrolyzer. Rewards: 2× Hydrochloric Acid Bucket, 10 lvl
+- **Cinnabar** `cinnabar`: Obtain Cinnabar Dust. After: chemical_reactor. Rewards: 16× Cinnabar, 3 lvl
+- ★ **Quicksilver** `mercury`: Roast Mercury; Collect Sulfur Dioxide. After: cinnabar, electrolyzer. Rewards: 1× Tempered Fluid Tank, 8 lvl
+- ★ **Amalgamation** `amalgamation`: Make an amalgam. After: mercury, leaching. Rewards: 8× Raw Gold, 10 lvl
+- **Mercury Vapour Lamp** `mercury_vapour_lamp`: Place Mercury Vapour Lamp. After: mercury. Rewards: 4× Steel Plate, 4 lvl
 - ◆ **Chemical Reactor Array** `chemical_reactor_array`: Form the Chemical Reactor Array. After: chemical_reactor. Rewards: 4× Hardened Alloy, 15 lvl
 - ◆ **Petrochemist** `petrochemist`: Obtain Plastic Sheet; Obtain PVC Sheet; Obtain Polypropylene Sheet; Obtain Synthetic Rubber. After: pvc, synthetic_rubber, carbon_capture, fischer_tropsch, leaching. Rewards: 4× Arcforged Alloy, 20 lvl
 

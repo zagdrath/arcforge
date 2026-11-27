@@ -63,11 +63,16 @@ public final class ProcessingMachineSpecs {
                 .slot(InductionFurnaceBlockEntity.SLOT_OUTPUT, SlotRole.OUTPUT)
                 .items(InductionFurnaceBlockEntity::getItems, be -> be.getItemHandler(null))
                 .tank(SlotRole.OUTPUT, be -> be.getBank().getTank())
+                .tank(SlotRole.OUTPUT, InductionFurnaceBlockEntity::getMercuryTank)
                 .progress(be -> be.getLane().getProgress(), be -> be.getLane().getTotal())
                 .outputs(be -> current(be, be.getLane().getProgress(), level -> {
                     ItemStack input = be.getItems().getStack(InductionFurnaceBlockEntity.SLOT_INPUT);
-                    return MachineRecipes.smelting(level, input).map(holder -> holder.value().assemble(new SingleRecipeInput(input)));
+                    Optional<ItemStack> retorted = MachineRecipes.retorting(level, input).map(holder -> holder.value().assemble(new SingleRecipeInput(input)));
+                    return retorted.isPresent() ? retorted
+                            : MachineRecipes.smelting(level, input).map(holder -> holder.value().assemble(new SingleRecipeInput(input)));
                 }))
+                .fluidOutputs(be -> currentFluid(be, be.getLane().getProgress(), level -> MachineRecipes
+                        .retorting(level, be.getItems().getStack(InductionFurnaceBlockEntity.SLOT_INPUT)).map(holder -> holder.value().fluidOutput().create())))
                 .build());
 
         MachineControls.register(ModBlockEntityTypes.METAL_PRESS.get(), MachineControlSpec.builder(MetalPressBlockEntity.class)

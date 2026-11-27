@@ -69,6 +69,9 @@ public final class ModRecipes {
     // The nuclear tier: sintering in the Induction Furnace, and the Heavy Water Tower's isotope exchange.
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.SinteringRecipe>> SINTERING = RECIPE_TYPES.register("sintering",
             () -> RecipeType.simple(id("sintering")));
+    // The mercury line: retorting amalgams in the Induction Furnace.
+    public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.RetortingRecipe>> RETORTING = RECIPE_TYPES.register("retorting",
+            () -> RecipeType.simple(id("retorting")));
     public static final Supplier<RecipeType<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe>> ISOTOPE_EXCHANGING = RECIPE_TYPES.register(
             "isotope_exchanging", () -> RecipeType.simple(id("isotope_exchanging")));
     // Waste and reprocessing: the Waste Compactor, the Vitrification Plant and the PUREX Plant.
@@ -237,6 +240,9 @@ public final class ModRecipes {
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.SinteringRecipe>> SINTERING_SERIALIZER = RECIPE_SERIALIZERS.register(
             "sintering", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.SinteringRecipe.MAP_CODEC,
                     net.zagdrath.arcforge.recipe.SinteringRecipe.STREAM_CODEC));
+    public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.RetortingRecipe>> RETORTING_SERIALIZER = RECIPE_SERIALIZERS.register(
+            "retorting", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.RetortingRecipe.MAP_CODEC,
+                    net.zagdrath.arcforge.recipe.RetortingRecipe.STREAM_CODEC));
     public static final Supplier<RecipeSerializer<net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe>> ISOTOPE_EXCHANGING_SERIALIZER =
             RECIPE_SERIALIZERS.register("isotope_exchanging", () -> new RecipeSerializer<>(net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe.MAP_CODEC,
                     net.zagdrath.arcforge.recipe.IsotopeExchangingRecipe.STREAM_CODEC));
@@ -289,7 +295,7 @@ public final class ModRecipes {
                 MILLING.get(), OIL_PRESSING.get(), SEED_EXTRACTING.get(), DRYING.get(), AIR_SEPARATING.get(), SYNTHESIZING.get(), DIGESTING.get(), CLOCHE.get(), EVAPORATING.get(), VULCANIZING.get(),
                 HYDROTHERMAL_CARBONIZING.get(), CARBON_RECLAIMING.get(), GASIFYING.get(), FISCHER_TROPSCH.get(),
                 SIFTING.get(), DIAMOND_PRESSING.get(), CRACKING.get(), REFORMING.get(), COKING.get(), LUBRICANT_BLENDING.get(),
-                HYDROTREATING.get(), SULFUR_RECOVERY.get(), STEAM_REFORMING.get(), STEAM_CRACKING.get(), SINTERING.get(), ISOTOPE_EXCHANGING.get(),
+                HYDROTREATING.get(), SULFUR_RECOVERY.get(), STEAM_REFORMING.get(), STEAM_CRACKING.get(), SINTERING.get(), RETORTING.get(), ISOTOPE_EXCHANGING.get(),
                 COMPACTING.get(), VITRIFYING.get(), REPROCESSING.get(), RecipeType.SMELTING);
     }
 }
