@@ -1,6 +1,18 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "arcforge:block/fluid_reservoir"
+    "type": "minecraft:composite",
+    "models": [
+      {
+        "type": "minecraft:model",
+        "model": "arcforge:block/fluid_reservoir"
+      },
+      {
+        "type": "minecraft:special",
+        "base": "arcforge:block/fluid_reservoir",
+        "model": {
+          "type": "arcforge:reservoir_contents"
+        }
+      }
+    ]
   }
 }

@@ -90,6 +90,7 @@ import net.zagdrath.arcforge.client.renderer.blockentity.VaultRenderer;
 import net.zagdrath.arcforge.client.renderer.item.CellChargeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FilterModeProperty;
 import net.zagdrath.arcforge.client.renderer.item.FluidTankContentsRenderer;
+import net.zagdrath.arcforge.client.renderer.item.ReservoirContentsRenderer;
 import net.zagdrath.arcforge.client.screen.conduit.ConduitFilterScreen;
 import net.zagdrath.arcforge.client.screen.logistics.ChunkLoaderScreen;
 import net.zagdrath.arcforge.client.screen.logistics.QuantumTunnelScreen;
@@ -564,7 +565,6 @@ public class ArcforgeClient {
         MachineRecipes.setClientRecipes(RecipeMap.EMPTY);
     }
 
-    // Fluid tank items draw the fluid they carry (see items/<tier>_fluid_tank.json).
     @SubscribeEvent
     static void registerLayerDefinitions(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(JetpackLayer.LAYER, JetpackLayer::createLayer);
@@ -589,9 +589,12 @@ public class ArcforgeClient {
         }
     }
 
+    // Fluid tank and Fluid / Gas Reservoir items draw the fluid they carry (see items/<tier>_fluid_tank.json and
+    // items/fluid_reservoir.json).
     @SubscribeEvent
     static void registerSpecialRenderers(RegisterSpecialModelRendererEvent event) {
         event.register(FluidTankContentsRenderer.ID, FluidTankContentsRenderer.Unbaked.MAP_CODEC);
+        event.register(ReservoirContentsRenderer.ID, ReservoirContentsRenderer.Unbaked.MAP_CODEC);
     }
 
     // Energy cell items light up to match their charge (see items/<tier>_energy_cell.json).

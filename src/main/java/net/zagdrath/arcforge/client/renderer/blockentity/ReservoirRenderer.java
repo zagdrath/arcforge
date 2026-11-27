@@ -43,7 +43,7 @@ import net.zagdrath.arcforge.blockentity.storage.ReservoirKind;
 // them (see ArcforgeRenderTypes.fluid).
 public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEntity, ReservoirRenderer.State> {
     // Just inside the glass and frame, so no fluid face lies on a model face.
-    private static final float INSET = 0.01F;
+    public static final float INSET = 0.01F;
     private static final float SAME_LEVEL = 0.001F;
     public static final Identifier GAS_FILL = Identifier.fromNamespaceAndPath(Arcforge.MODID, "block/gas_reservoir/fill");
     private static final float GAS_ALPHA_EMPTY = 0.12F, GAS_ALPHA_FULL = 0.72F;
@@ -129,10 +129,8 @@ public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEnti
     // The whole block filled, toward a neighbouring Gas Reservoir with the same gas to its edge with the face between left
     // out; as opaque as the block is full.
     private static void extractGas(ReservoirBlockEntity reservoir, State state, Level level, FluidStack gas, int tint) {
-        state.sprite = SteamBoilerArrayRenderer.sprite(GAS_FILL);
-        float share = Math.min(1.0F, gas.getAmount() / (float) reservoir.capacity());
-        int alpha = Math.round(255 * (GAS_ALPHA_EMPTY + (GAS_ALPHA_FULL - GAS_ALPHA_EMPTY) * share));
-        state.color = (tint & 0x00FFFFFF) | alpha << 24;
+        state.sprite = gasSprite();
+        state.color = gasColor(tint, Math.min(1.0F, gas.getAmount() / (float) reservoir.capacity()));
         BlockPos pos = reservoir.getBlockPos();
         float[] min = new float[3], max = new float[3];
         int skip = 0;
@@ -158,8 +156,19 @@ public class ReservoirRenderer implements BlockEntityRenderer<ReservoirBlockEnti
         state.skip = skip;
     }
 
+    // The flat tile a gas is drawn with. Shared with the Reservoir item renderer, like gasColor and surface below.
+    public static TextureAtlasSprite gasSprite() {
+        return SteamBoilerArrayRenderer.sprite(GAS_FILL);
+    }
+
+    // A gas's tint, as opaque as the block is full (share, 0..1).
+    public static int gasColor(int tint, float share) {
+        int alpha = Math.round(255 * (GAS_ALPHA_EMPTY + (GAS_ALPHA_FULL - GAS_ALPHA_EMPTY) * share));
+        return (tint & 0x00FFFFFF) | alpha << 24;
+    }
+
     // The fluid's surface in a block holding amount of capacity (every block of a tank's surface layer holds the same).
-    private static float surface(int amount, int capacity) {
+    public static float surface(int amount, int capacity) {
         return INSET + (1.0F - 2.0F * INSET) * Math.min(1.0F, amount / (float) capacity);
     }
 

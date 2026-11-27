@@ -32,7 +32,9 @@ import net.zagdrath.arcforge.client.renderer.blockentity.FluidTankRenderer;
 import net.zagdrath.arcforge.registry.ModDataComponents;
 
 // Draws the fluid a tank item carries inside its glass, matching the placed block (see FluidTankRenderer).
-// Used as part of a composite item model, after the tank's own block model.
+// Used as part of a composite item model, with the tank's own block model. Drawn as cutout, not translucent: an item's
+// translucent quads (the tank's glass) are drawn before any translucent custom geometry and write depth, which would
+// hide the fluid behind them; cutout geometry is drawn with the solids, before the glass.
 public class FluidTankContentsRenderer implements SpecialModelRenderer<FluidStack> {
     public static final Identifier ID = Identifier.fromNamespaceAndPath(Arcforge.MODID, "fluid_tank_contents");
 
@@ -59,7 +61,7 @@ public class FluidTankContentsRenderer implements SpecialModelRenderer<FluidStac
         int color = (model.fluidTintSource() != null ? model.fluidTintSource().colorAsStack(fluid) : -1) | 0xFF000000;
         int light = LightCoordsUtil.lightCoordsWithEmission(lightCoords, fluid.getFluidType().getLightLevel(fluid));
         float[] box = FluidTankRenderer.fluidBox(Math.min(1.0F, fluid.getAmount() / (float) capacity), fluid.getFluidType().isLighterThanAir());
-        collector.submitCustomGeometry(poseStack, RenderTypes.entityTranslucent(sprite.atlasLocation()),
+        collector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(sprite.atlasLocation()),
                 (pose, buffer) -> FluidBoxes.box(pose, buffer, sprite, color, light, box[0], box[1], box[2], box[3], box[4], box[5]));
     }
 

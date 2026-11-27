@@ -192,6 +192,9 @@ machines and Settings Cards carry over).
 
 ### Fixed
 
+- **Tank and Reservoir items show their contents.** A Fluid Reservoir or Gas Reservoir item now draws the share it
+  carries inside its frame, like the placed block: a liquid to its level, a gas as a tint that deepens as it fills. The
+  fluid in a Fluid Tank item was hidden behind the tank's glass and shows again.
 - **Equipment and model visuals.** Hazmat sleeves now use the full armor unwrap, with black gloves and boots. Long
   Fall Boots have native 16x16 item sprites and separate mechanical worn models with heel springs, side dampers and
   armored shin guards. Removed duplicate Steam Cracker roof faces that caused clipping.
