@@ -62,6 +62,10 @@ import net.zagdrath.arcforge.client.screen.machine.ArcMelterScreen;
 import net.zagdrath.arcforge.client.screen.machine.ArcCrusherScreen;
 import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
+import mezz.jei.api.registration.IVanillaCategoryExtensionRegistration;
+import mezz.jei.api.gui.builder.IIngredientAcceptor;
+import mezz.jei.api.recipe.category.extensions.vanilla.smithing.ISmithingCategoryExtension;
+import net.zagdrath.arcforge.recipe.ArcforgedUpgradeRecipe;
 
 // JEI support (only loaded when JEI is installed): a category for each Arcforge machine's recipes, steam
 // grades and burner fuels, a step-by-step build viewer for every multiblock, and each item's description
@@ -84,6 +88,34 @@ public class ArcforgeJeiPlugin implements IModPlugin {
     @Override
     public void registerExtraIngredients(mezz.jei.api.registration.IExtraIngredientRegistration registration) {
         // Colored conduits are registered items in the creative tab and are indexed by JEI directly.
+    }
+
+    // The Arcforged gear upgrades are their own smithing recipe class (they take two Arcforged Alloy for the Hammer and
+    // Excavator), which JEI's smithing category only shows with an extension.
+    @Override
+    public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
+        registration.getSmithingCategory().addExtension(ArcforgedUpgradeRecipe.class, new ISmithingCategoryExtension<ArcforgedUpgradeRecipe>() {
+            @Override
+            public <T extends IIngredientAcceptor<T>> void setTemplate(ArcforgedUpgradeRecipe recipe, T acceptor) {
+                recipe.templateIngredient().ifPresent(acceptor::add);
+            }
+
+            @Override
+            public <T extends IIngredientAcceptor<T>> void setBase(ArcforgedUpgradeRecipe recipe, T acceptor) {
+                acceptor.add(recipe.baseIngredient());
+            }
+
+            @Override
+            public <T extends IIngredientAcceptor<T>> void setAddition(ArcforgedUpgradeRecipe recipe, T acceptor) {
+                recipe.additionIngredient().ifPresent(addition -> acceptor.addItemStacks(
+                        addition.items().map(item -> new ItemStack(item, recipe.additionCount())).toList()));
+            }
+
+            @Override
+            public <T extends IIngredientAcceptor<T>> void setOutput(ArcforgedUpgradeRecipe recipe, T acceptor) {
+                acceptor.add(recipe.result());
+            }
+        });
     }
 
     @Override

@@ -83,6 +83,10 @@ public class ArcforgedUpgradeRecipe extends SimpleSmithingRecipe {
         return additionCount;
     }
 
+    public ItemStackTemplate result() {
+        return result;
+    }
+
     @Override
     public boolean matches(SmithingRecipeInput input, Level level) {
         return template.test(input.template()) && base.test(input.base()) && addition.test(input.addition())

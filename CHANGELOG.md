@@ -22,6 +22,11 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 ## [Unreleased]
 
+### Fixed
+
+- JEI now shows the Arcforged gear upgrades at the Smithing Table (template, netherite or steel piece, Arcforged Alloy;
+  two for the Hammer and Excavator).
+
 ## [2.9.0] - 2026-11-27
 
 ### Added
