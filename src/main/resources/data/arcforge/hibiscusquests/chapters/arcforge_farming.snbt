@@ -17,7 +17,7 @@
                 "**Covers:** {item:arcforge:infuser}"
             ],
             x: 0d,
-            y: 1.25d,
+            y: 2.5d,
             tasks: [
                 {
                     type: "criterion",
@@ -60,7 +60,7 @@
                 "**Covers:** {item:arcforge:treated_planks}, {item:arcforge:treated_log}, {item:arcforge:stripped_treated_log}, {item:arcforge:treated_wood}, {item:arcforge:stripped_treated_wood}"
             ],
             x: 1.5d,
-            y: 1.25d,
+            y: 2.5d,
             dependencies: ["infuser"],
             tasks: [
                 {
@@ -110,7 +110,7 @@
                 "**Covers:** {item:arcforge:treated_stairs}, {item:arcforge:treated_slab}, {item:arcforge:treated_fence}, {item:arcforge:treated_fence_gate}, {item:arcforge:treated_door}, {item:arcforge:treated_trapdoor}, {item:arcforge:treated_pressure_plate}, {item:arcforge:treated_button}"
             ],
             x: 3d,
-            y: 1.25d,
+            y: 2.5d,
             dependencies: ["treated_wood"],
             tasks: [
                 {
@@ -163,7 +163,7 @@
                 "**Covers:** {item:arcforge:compost_bin}, {item:arcforge:compost}"
             ],
             x: 4.5d,
-            y: 1.25d,
+            y: 2.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["treated_set"],
@@ -213,7 +213,7 @@
                 "**Covers:** {item:arcforge:loam}, {item:arcforge:irrigated_loam_farmland}"
             ],
             x: 6d,
-            y: 1.25d,
+            y: 2.5d,
             dependencies: ["compost_bin"],
             tasks: [
                 {
@@ -268,7 +268,7 @@
                 "**Covers:** {item:arcforge:mixed_fertilizer}, {item:arcforge:wood_ash}, {item:arcforge:basic_slag}, {item:arcforge:compost}, {item:arcforge:seed_meal}"
             ],
             x: 7.5d,
-            y: 1.25d,
+            y: 2.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["loam"],
@@ -320,6 +320,36 @@
             ]
         },
         {
+            id: "potash",
+            title: "Potash",
+            icon: "arcforge:potash",
+            description: [
+                "Blast a Dried Kelp Block for four Potash, or crush Wood Ash into one. It's a +3 fertilizer, and with Wood Ash it is the potassium for NPK Fertilizer, so a kelp farm keeps the NPK coming.",
+                "",
+                "**Covers:** {item:arcforge:potash}"
+            ],
+            x: 9d,
+            y: 2.5d,
+            dependencies: ["fertilizers"],
+            tasks: [
+                {
+                    type: "item",
+                    item: "arcforge:potash"
+                }
+            ],
+            rewards: [
+                {
+                    type: "item",
+                    item: "minecraft:dried_kelp_block",
+                    count: 8
+                },
+                {
+                    type: "xp_levels",
+                    levels: 4
+                }
+            ]
+        },
+        {
             id: "irrigation",
             title: "Irrigation",
             icon: "arcforge:copper_sprinkler",
@@ -329,7 +359,7 @@
                 "**Covers:** {item:arcforge:copper_sprinkler}, {item:arcforge:fertilizer_spreader}, {item:arcforge:scarecrow}"
             ],
             x: 9d,
-            y: 1.25d,
+            y: 3.75d,
             dependencies: ["fertilizers"],
             tasks: [
                 {
@@ -373,7 +403,7 @@
                 "**Covers:** {item:arcforge:flax_seeds}, {item:arcforge:wild_flax}, {item:arcforge:rapeseeds}, {item:arcforge:wild_rapeseed}, {item:arcforge:sorghum_seeds}, {item:arcforge:wild_sorghum}, {item:arcforge:hop_seeds}, {item:arcforge:wild_hops}"
             ],
             x: 7.5d,
-            y: 2.5d,
+            y: 3.75d,
             dependencies: ["loam"],
             tasks: [
                 {
@@ -430,7 +460,7 @@
                 "**Covers:** {item:arcforge:flax_fibre}, {item:arcforge:linen}"
             ],
             x: 9d,
-            y: 2.5d,
+            y: 5d,
             dependencies: ["new_crops"],
             tasks: [
                 {
@@ -464,7 +494,7 @@
                 "**Covers:** {item:arcforge:sorghum_stalks}"
             ],
             x: 9d,
-            y: 3.75d,
+            y: 6.25d,
             dependencies: ["new_crops"],
             tasks: [
                 {
@@ -494,7 +524,7 @@
                 "**Covers:** {item:arcforge:trellis}, {item:arcforge:hop_cones}"
             ],
             x: 9d,
-            y: 5d,
+            y: 1.25d,
             dependencies: ["new_crops"],
             tasks: [
                 {
@@ -542,7 +572,7 @@
                 "**Covers:** {item:arcforge:soybeans}, {item:arcforge:wild_soybeans}"
             ],
             x: 9d,
-            y: 0d,
+            y: 7.5d,
             dependencies: ["new_crops"],
             tasks: [
                 {
@@ -568,7 +598,7 @@
             icon: "arcforge:soybeans",
             description: ["Harvest a non-legume from Loam that just grew Soybeans and take the rotation bonus."],
             x: 10.5d,
-            y: 0d,
+            y: 7.5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["soybeans"],
@@ -603,7 +633,7 @@
             icon: "arcforge:rapeseeds",
             description: ["Flax Fibre, Rapeseeds, Sorghum Stalks, Hop Cones and Soybeans, all from your own fields."],
             x: 10.5d,
-            y: 2.5d,
+            y: 5d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["flax", "sorghum", "hops", "soybeans"],
@@ -651,7 +681,7 @@
                 "**Covers:** {item:arcforge:iron_sickle}, {item:arcforge:steel_sickle}, {item:arcforge:steel_scythe}"
             ],
             x: 9d,
-            y: 6.25d,
+            y: 0d,
             dependencies: ["new_crops"],
             tasks: [
                 {
@@ -691,7 +721,7 @@
                 "**Covers:** {item:arcforge:planter}, {item:arcforge:harvester}"
             ],
             x: 10.5d,
-            y: 6.25d,
+            y: 0d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["sickles"],
@@ -755,7 +785,7 @@
                 "**Covers:** {item:arcforge:millstone}, {item:arcforge:mill}, {item:arcforge:flour}, {item:arcforge:seed_meal}"
             ],
             x: 12d,
-            y: 2.5d,
+            y: 5d,
             dependencies: ["every_crop"],
             tasks: [
                 {
@@ -799,7 +829,7 @@
                 "**Covers:** {item:arcforge:seed_extractor}"
             ],
             x: 12d,
-            y: 3.75d,
+            y: 6.25d,
             dependencies: ["every_crop"],
             tasks: [
                 {
@@ -843,7 +873,7 @@
                 "**Covers:** {item:arcforge:oil_press}, {item:arcforge:seed_oil_bucket}, {item:arcforge:press_cake}"
             ],
             x: 12d,
-            y: 1.25d,
+            y: 3.75d,
             shape: "hexagon",
             size: 1.5d,
             dependencies: ["every_crop"],

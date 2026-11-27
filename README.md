@@ -727,7 +727,7 @@ from quartz ore.
 ```
 burner + Flue Gas face --> 4 mB Carbon Dioxide per 1,000 HU from carbon fuels (none from Hydrogen)
 250 mB Carbon Dioxide + 500 mB Hydrogen --[Carbon Reclaimer, 800,000 FE or more]--> Carbon Dust + 250 mB Water
-coal / charcoal / Bio-Coal + 500 mB Steam --[Gasifier, 800°C+, 16,000 HU]--> 1,000 mB Syngas (+ Wood Ash 25%)
+coal / charcoal / Bio-Coal + 500 mB Steam --[Gasifier, 800°C+, 16,000 HU]--> 1,000 mB Syngas (+ Wood Ash 50%)
 Coal Coke --> 1,500 mB Syngas; 4 biomass --> 250 mB Syngas
 1,000 mB Syngas --[Fischer-Tropsch Reactor, 200-350°C, iron/nickel catalyst]--> 30 Naphtha + 50 Light Oil + 50 Heavy Oil + 200 Water (mB)
 ```
@@ -1160,10 +1160,11 @@ full, that gas goes back into the air.
 **Haber Reactor** (FE and heat). 60 mB of Hydrogen and 20 mB of Nitrogen make 40 mB of **Ammonia** every second at
 60 FE/t and 10 HU/t, only at 450°C or hotter (heat through its heat face, e.g. from a Fuel Burner).
 
-The **Chemical Reactor** (now with three item slots) makes **NPK Fertilizer** (Basic Slag, Wood Ash and 100 mB of Ammonia
-make two; +15 nutrients, and crops on the enriched Loam Farmland grow twice as fast until those run out), **Nutrient
-Solution** (NPK Fertilizer in water, for the Hydroponic Cell) and **Biodiesel** (Seed Oil and Ethanol; a Fuel Burner
-fuel, 320 HU per mB up to 1,000°C).
+The **Chemical Reactor** (now with three item slots) makes **NPK Fertilizer** (Basic Slag, Wood Ash or Potash and 100 mB
+of Ammonia make two; so do 3 Bone Meal, Wood Ash or Potash and 100 mB of Ammonia; 4 Digestate and 50 mB of Ammonia make
+one; +15 nutrients, and crops on the enriched Loam Farmland grow twice as fast until those run out), **Nutrient
+Solution** (one NPK Fertilizer in 4,000 mB of water makes 4,000 mB, for the Hydroponic Cell and Greenhouse) and
+**Biodiesel** (Seed Oil and Ethanol; a Fuel Burner fuel, 320 HU per mB up to 1,000°C).
 
 **Biogas Digester.** A solid 3×3×3 of Biogas Digester Casings with a controller in the middle of one side. Plant matter (crops,
 seeds, leaves, Press Cake, Compost) and water go in through ports, four items digesting at once, and come out as

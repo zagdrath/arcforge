@@ -1,0 +1,10 @@
+{
+  "type": "arcforge:crushing",
+  "ingredient": "arcforge:wood_ash",
+  "result": {
+    "count": 1,
+    "id": "arcforge:potash"
+  },
+  "time": 100,
+  "ore": false
+}

@@ -293,6 +293,7 @@ Treated wood, living soil, five new crops and the hand tools and unpowered machi
 - ★ **Compost Bin** `compost_bin`: Place Compost Bin; Obtain Compost. After: treated_set. Rewards: 8× Compost, 3 lvl
 - **Loam** `loam`: Till Loam into Loam Farmland. After: compost_bin. Rewards: 16× Loam, 3 lvl
 - ★ **Feed the Soil** `fertilizers`: Fertilize Loam Farmland; Obtain Mixed Fertilizer. After: loam. Rewards: 8× Mixed Fertilizer, 4 lvl
+- **Potash** `potash`: Obtain Potash. After: fertilizers. Rewards: 8× Dried Kelp Block, 4 lvl
 - **Irrigation** `irrigation`: Place Copper Sprinkler or Fertilizer Spreader or Scarecrow. After: fertilizers. Rewards: 2× Copper Sprinkler, 4 lvl
 - **Wild Harvest** `new_crops`: Obtain Flax Seeds; Obtain Rapeseeds; Obtain Sorghum Seeds; Obtain Hop Seeds. After: loam. Rewards: 4× Flax Seeds, 4× Rapeseeds, 4× Sorghum Seeds, 4× Hop Seeds, 4 lvl
 - **Flax and Linen** `flax`: Obtain Flax Fibre; Obtain Linen. After: new_crops. Rewards: 16× String, 3 lvl

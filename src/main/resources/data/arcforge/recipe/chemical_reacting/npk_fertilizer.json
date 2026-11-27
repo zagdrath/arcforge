@@ -5,7 +5,7 @@
     "count": 1
   },
   "second_item_input": {
-    "ingredient": "arcforge:wood_ash",
+    "ingredient": "#arcforge:potassium_sources",
     "count": 1
   },
   "fluid_inputs": [

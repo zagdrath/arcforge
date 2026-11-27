@@ -24,7 +24,7 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 
 Suggested version: **2.10.0** (minor: the fusion tier with its cryogenics, tritium and helium loop, and the mercury
 line, from vanilla Cinnabar to Mercury, amalgams and the Mercury Vapour Lamp, plus the Long Fall Boots slot, carried
-Battery charging and the Quantum Tunnel Upgrades tab).
+Battery charging, the Quantum Tunnel Upgrades tab and the NPK and Nutrient Solution rebalance with Potash).
 
 ### Added
 
@@ -108,6 +108,11 @@ Battery charging and the Quantum Tunnel Upgrades tab).
 - A **Show area** button on the Chunk Loader and the Vacuum Collector, like the Arc Quarry's: on, the block keeps its
   area outlined in the world after its screen is closed (saved with the block). Their area always shows while the
   screen is open.
+- **Potash**, a fertilizer (+3, `farming.growing.fertilizers.potash`) and NPK Fertilizer's potassium: blast a Dried Kelp
+  Block for four, or crush Wood Ash into one. New item tags `#arcforge:phosphorus_sources` (Basic Slag, Bone Meal) and
+  `#arcforge:potassium_sources` (Wood Ash, Potash).
+- Two more NPK Fertilizer recipes in the Chemical Reactor: 3 Bone Meal, a Wood Ash or Potash and 100 mB of Ammonia make
+  two; 4 Digestate and 50 mB of Ammonia make one.
 
 ### Changed
 
@@ -124,6 +129,10 @@ Battery charging and the Quantum Tunnel Upgrades tab).
 - `arcforge:radiation_shielding` entries take an optional `neutron_transmission`. Lead, concrete, water, steel and
   the reactor blocks have neutron figures.
 - Seismic surveys report helium-rich gas caps.
+- **Nutrient Solution and NPK no longer wait on byproducts.** One NPK Fertilizer now makes 4,000 mB of Nutrient
+  Solution (from 4,000 mB of water; was 1,000), so one fertilizer feeds 80 Hydroponic Cell harvests. The Basic Slag NPK
+  recipe takes Wood Ash or Potash. The Gasifier leaves Wood Ash half the time (`ashChance` 0.5, was 0.25), and an Arc
+  Crusher makes 6 Bone Meal from a bone (was 5).
 
 ### Changed
 

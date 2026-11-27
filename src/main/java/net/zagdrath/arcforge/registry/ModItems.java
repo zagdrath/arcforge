@@ -892,6 +892,9 @@ public final class ModItems {
             p -> new FertilizerItem(ArcforgeConfig.COMPOST_NUTRIENTS::getAsInt, p));
     public static final DeferredItem<FertilizerItem> WOOD_ASH = ITEMS.registerItem("wood_ash",
             p -> new FertilizerItem(ArcforgeConfig.WOOD_ASH_NUTRIENTS::getAsInt, p));
+    // Potash: blasted kelp or crushed Wood Ash, the NPK's potassium without waiting on ash.
+    public static final DeferredItem<FertilizerItem> POTASH = ITEMS.registerItem("potash",
+            p -> new FertilizerItem(ArcforgeConfig.POTASH_NUTRIENTS::getAsInt, p));
     public static final DeferredItem<FertilizerItem> BASIC_SLAG = ITEMS.registerItem("basic_slag",
             p -> new FertilizerItem(ArcforgeConfig.BASIC_SLAG_NUTRIENTS::getAsInt, p));
     public static final DeferredItem<FertilizerItem> MIXED_FERTILIZER = ITEMS.registerItem("mixed_fertilizer",

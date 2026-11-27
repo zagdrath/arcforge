@@ -4,16 +4,17 @@
   "items": [
     "arcforge:npk_fertilizer",
     "arcforge:nutrient_solution_bucket",
-    "arcforge:biodiesel_bucket"
+    "arcforge:biodiesel_bucket",
+    "arcforge:potash"
   ],
   "pages": [
     {
       "type": "text",
-      "text": "The Chemical Reactor turns farm chemistry into three products.\n# NPK Fertilizer\n- 1 Basic Slag + 1 Wood Ash + 100 mB Ammonia make 2 NPK Fertilizer. The reactor has two item slots, one for each.\n- It adds 15 nutrients to Loam Farmland (filling it), and enriches it: until those nutrients run out, the crop on it grows twice as fast instead of 1.5 times. Jade shows \"Enriched\".\n- It works in the Fertilizer Spreader too."
+      "text": "The Chemical Reactor turns farm chemistry into three products.\n# NPK Fertilizer\nThree recipes, so it never waits on one byproduct:\n- 1 Basic Slag + 1 Wood Ash or Potash + 100 mB Ammonia make 2.\n- 3 Bone Meal + 1 Wood Ash or Potash + 100 mB Ammonia make 2.\n- 4 Digestate + 50 mB Ammonia make 1.\nPotash comes from blasting a Dried Kelp Block (4) or crushing Wood Ash. An Arc Crusher makes 6 Bone Meal from a bone.\n- It adds 15 nutrients to Loam Farmland (filling it), and enriches it: until those nutrients run out, the crop on it grows twice as fast instead of 1.5 times. Jade shows \"Enriched\".\n- It works in the Fertilizer Spreader too."
     },
     {
       "type": "text",
-      "text": "# Nutrient Solution\n- 1 NPK Fertilizer + 1,000 mB Water make 1,000 mB Nutrient Solution.\n- It feeds the Hydroponic Cell (50 mB a harvest) and the Greenhouse Array (25 mB).\n# Biodiesel\n- 100 mB Seed Oil + 25 mB Ethanol make 100 mB Biodiesel.\n- A Fuel Burner fuel: 160 HU/t, up to 1,000°C. It doesn't burn in the Gas Turbine Array."
+      "text": "# Nutrient Solution\n- 1 NPK Fertilizer + 4,000 mB Water make 4,000 mB Nutrient Solution: 80 Hydroponic Cell harvests.\n- It feeds the Hydroponic Cell (50 mB a harvest) and the Greenhouse Array (25 mB).\n# Biodiesel\n- 100 mB Seed Oil + 25 mB Ethanol make 100 mB Biodiesel.\n- A Fuel Burner fuel: 160 HU/t, up to 1,000°C. It doesn't burn in the Gas Turbine Array."
     }
   ]
 }

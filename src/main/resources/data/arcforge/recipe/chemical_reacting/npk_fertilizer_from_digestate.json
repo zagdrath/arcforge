@@ -1,0 +1,18 @@
+{
+  "type": "arcforge:chemical_reacting",
+  "item_input": {
+    "ingredient": "arcforge:digestate",
+    "count": 4
+  },
+  "fluid_inputs": [
+    {
+      "fluid": "arcforge:ammonia",
+      "amount": 50
+    }
+  ],
+  "item_output": {
+    "id": "arcforge:npk_fertilizer",
+    "count": 1
+  },
+  "time": 100
+}

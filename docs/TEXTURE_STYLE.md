@@ -615,6 +615,9 @@ rules above are for machines, casings and GUIs. Natural materials follow vanilla
 - Fertilizer items:
   - Wood Ash and Basic Slag are the dust texture recoloured by brightness: ash grey `#242322 → #B3AEA7`, slag slate
     blue `#1A1E24 → #A2ABB5`.
+  - Potash is Wood Ash's heap recoloured tone for tone onto a pale lilac-white `#8A8492 #A19AA8 #B4AEBB #C6C1CC #DCD8E1
+    #F2F0F5` (`tools/potash_texture_gen.py`): the same pile and softened shadow, but brighter than the ash and cooler
+    than it, and lighter and pinker than the slag, so the three read apart. The lilac is potassium's flame colour.
   - Compost is Cody's lump texture, recoloured by rank onto humus `#1C130D → #8A6A4C` (his own tonal outline, no black).
   - Mixed Fertilizer is a tied paper sack (`#6E5634 … #CCAE74`) with a `#0C0D0F` outline. It has a green label
     carrying three 2×2 chips in the compost, ash and slag colours.

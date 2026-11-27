@@ -319,6 +319,7 @@ public final class ModCreativeTabs {
                 output.accept(ModItems.IRRIGATED_LOAM_FARMLAND.get());
                 output.accept(ModItems.COMPOST.get());
                 output.accept(ModItems.WOOD_ASH.get());
+                output.accept(ModItems.POTASH.get());
                 output.accept(ModItems.BASIC_SLAG.get());
                 output.accept(ModItems.MIXED_FERTILIZER.get());
                 output.accept(ModItems.TRELLIS.get());

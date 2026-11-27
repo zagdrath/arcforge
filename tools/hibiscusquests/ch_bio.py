@@ -24,9 +24,9 @@ ch.q("haber", "Haber Reactor", "haber_reactor",
      rewards=[item("invar_plate", 4), xp(6)], frame="goal", items=["haber_reactor"])
 
 ch.q("npk", "NPK Fertilizer", "npk_fertilizer",
-     "Basic Slag, Wood Ash and 100 mB of Ammonia in the Chemical Reactor give two NPK Fertilizer: +15 nutrients, and it "
-     "enriches Loam to grow at 2×. One NPK and 1,000 mB of water make 1,000 mB of Nutrient Solution for the Hydroponic Cell "
-     "and Greenhouse.",
+     "Three ways in the Chemical Reactor, with Ammonia: Basic Slag and Wood Ash or Potash (two NPK), three Bone Meal and Wood "
+     "Ash or Potash (two), or four Digestate (one). NPK is +15 nutrients and enriches Loam to grow at 2×. One NPK and "
+     "4,000 mB of water make 4,000 mB of Nutrient Solution for the Hydroponic Cell and Greenhouse.",
      [have("npk_fertilizer"), have("nutrient_solution_bucket")], deps=["haber"], rewards=[item("npk_fertilizer", 8), xp(6)],
      frame="goal", items=["npk_fertilizer", "nutrient_solution_bucket"])
 

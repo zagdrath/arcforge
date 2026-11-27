@@ -7,12 +7,12 @@
   "fluid_inputs": [
     {
       "tag": "minecraft:water",
-      "amount": 1000
+      "amount": 4000
     }
   ],
   "fluid_output": {
     "id": "arcforge:nutrient_solution",
-    "amount": 1000
+    "amount": 4000
   },
   "time": 60
 }

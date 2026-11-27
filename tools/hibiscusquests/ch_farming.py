@@ -48,6 +48,12 @@ ch.q("fertilizers", "Feed the Soil", "mixed_fertilizer",
      deps=["loam"], rewards=[item("mixed_fertilizer", 8), xp(4)], frame="goal",
      items=["mixed_fertilizer", "wood_ash", "basic_slag", "compost", "seed_meal"])
 
+ch.q("potash", "Potash", "potash",
+     "Blast a Dried Kelp Block for four Potash, or crush Wood Ash into one. It's a +3 fertilizer, and with Wood Ash it is "
+     "the potassium for NPK Fertilizer, so a kelp farm keeps the NPK coming.",
+     [have("potash")], deps=["fertilizers"], rewards=[item("minecraft:dried_kelp_block", 8), xp(4)],
+     items=["potash"])
+
 ch.q("irrigation", "Irrigation", "copper_sprinkler",
      "A Copper Sprinkler (four copper round a bucket) keeps a 9×9 moist and adds growth ticks for 1 mB/t of water. A "
      "Scarecrow (hay, Linen, wooden rods on a Stripped Treated Log) stops mobs trampling within 9 blocks. The Fertilizer "

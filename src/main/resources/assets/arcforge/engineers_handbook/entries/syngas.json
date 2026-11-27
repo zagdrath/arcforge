@@ -8,7 +8,7 @@
   "pages": [
     {
       "type": "text",
-      "text": "The Gasifier turns solid carbon and Steam into Syngas, with heat (HU, no FE), and only at 800°C or hotter.\n- A coal, charcoal or Bio-Coal + 500 mB Steam make 1,000 mB Syngas; Coal Coke 1,500 mB; 4 biomass 250 mB. Each takes 16,000 HU over 10 seconds and leaves Wood Ash a quarter of the time.\n- Fuel and Steam in on top, ash out underneath, Syngas out of the right, heat at the back.\n- Syngas burns in the Fuel Burner, Firebox Array and Gas Turbine Array (50 HU per mB, up to 1,150°C)."
+      "text": "The Gasifier turns solid carbon and Steam into Syngas, with heat (HU, no FE), and only at 800°C or hotter.\n- A coal, charcoal or Bio-Coal + 500 mB Steam make 1,000 mB Syngas; Coal Coke 1,500 mB; 4 biomass 250 mB. Each takes 16,000 HU over 10 seconds and leaves Wood Ash half the time.\n- Fuel and Steam in on top, ash out underneath, Syngas out of the right, heat at the back.\n- Syngas burns in the Fuel Burner, Firebox Array and Gas Turbine Array (50 HU per mB, up to 1,150°C)."
     },
     {
       "type": "text",

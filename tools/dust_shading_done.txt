@@ -24,6 +24,7 @@ mox_blend.png
 nether_quartz_dust.png
 nickel_dust.png
 plutonium_oxide.png
+potash.png
 rare_earth_dust.png
 recovered_uranium.png
 salt.png

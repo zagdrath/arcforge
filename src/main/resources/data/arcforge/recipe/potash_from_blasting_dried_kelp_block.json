@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:blasting",
+  "category": "misc",
+  "cookingtime": 100,
+  "experience": 0.1,
+  "ingredient": "minecraft:dried_kelp_block",
+  "result": {
+    "id": "arcforge:potash",
+    "count": 4
+  }
+}

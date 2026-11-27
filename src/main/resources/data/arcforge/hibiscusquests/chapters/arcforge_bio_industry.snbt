@@ -127,7 +127,7 @@
             title: "NPK Fertilizer",
             icon: "arcforge:npk_fertilizer",
             description: [
-                "Basic Slag, Wood Ash and 100 mB of Ammonia in the Chemical Reactor give two NPK Fertilizer: +15 nutrients, and it enriches Loam to grow at 2×. One NPK and 1,000 mB of water make 1,000 mB of Nutrient Solution for the Hydroponic Cell and Greenhouse.",
+                "Three ways in the Chemical Reactor, with Ammonia: Basic Slag and Wood Ash or Potash (two NPK), three Bone Meal and Wood Ash or Potash (two), or four Digestate (one). NPK is +15 nutrients and enriches Loam to grow at 2×. One NPK and 4,000 mB of water make 4,000 mB of Nutrient Solution for the Hydroponic Cell and Greenhouse.",
                 "",
                 "**Covers:** {item:arcforge:npk_fertilizer}, {item:arcforge:nutrient_solution_bucket}"
             ],

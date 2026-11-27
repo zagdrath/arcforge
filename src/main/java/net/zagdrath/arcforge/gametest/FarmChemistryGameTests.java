@@ -41,7 +41,8 @@ import net.zagdrath.arcforge.steam.Gases;
 
 // Farm chemistry: the Air Separator makes Nitrogen and Oxygen 4:1 (none in the End) and vents what doesn't fit; the
 // Haber Reactor waits for 450°C, then makes Ammonia from Hydrogen and Nitrogen; the Chemical Reactor sorts two items
-// into its two slots and makes NPK Fertilizer from Basic Slag, Wood Ash and Ammonia; NPK Fertilizer fills and enriches
+// into its two slots and makes NPK Fertilizer from Basic Slag, Wood Ash and Ammonia (and loads the Bone Meal and
+// Digestate routes, Potash and the 4,000 mB Nutrient Solution); NPK Fertilizer fills and enriches
 // Loam Farmland, doubling growth until the nutrients run out, and Digestate adds 4; the Biogas Digester forms (turning
 // its controller outward), breaks, and digests wheat into Biogas while warm; the new fuels and gases; and the recipes.
 public final class FarmChemistryGameTests {
@@ -124,8 +125,8 @@ public final class FarmChemistryGameTests {
     static void reactorMakesNpk(GameTestHelper helper) {
         var level = helper.getLevel();
         ChemicalReactingRecipe npk = level.recipeAccess().recipeMap().byType(ModRecipes.CHEMICAL_REACTING.get()).stream()
+                .filter(holder -> holder.id().identifier().getPath().equals("chemical_reacting/npk_fertilizer"))
                 .map(holder -> holder.value())
-                .filter(recipe -> recipe.itemOutput().isPresent() && recipe.itemOutput().get().create().is(ModItems.NPK_FERTILIZER.get()))
                 .findFirst().orElse(null);
         helper.assertTrue(npk != null, "No NPK Fertilizer recipe");
         FluidResource ammonia = fluid(ModFluids.AMMONIA.get());
@@ -293,11 +294,40 @@ public final class FarmChemistryGameTests {
         var biodiesel = MachineRecipes.chemicalReacting(level, diesel);
         helper.assertTrue(biodiesel.isPresent() && biodiesel.get().value().fluidOutput().get().create().getFluid() == ModFluids.BIODIESEL.get(),
                 "No Biodiesel recipe");
-        ChemicalReactorInput solution = new ChemicalReactorInput(new ItemStack(ModItems.NPK_FERTILIZER.get()), FluidResource.of(Fluids.WATER), 1_000,
+        ChemicalReactorInput solution = new ChemicalReactorInput(new ItemStack(ModItems.NPK_FERTILIZER.get()), FluidResource.of(Fluids.WATER), 4_000,
                 FluidResource.EMPTY, 0);
         var nutrient = MachineRecipes.chemicalReacting(level, solution);
-        helper.assertTrue(nutrient.isPresent() && nutrient.get().value().fluidOutput().get().create().getFluid() == ModFluids.NUTRIENT_SOLUTION.get(),
-                "No Nutrient Solution recipe");
+        helper.assertTrue(nutrient.isPresent() && nutrient.get().value().fluidOutput().get().create().getFluid() == ModFluids.NUTRIENT_SOLUTION.get()
+                && nutrient.get().value().fluidOutput().get().amount() == 4_000, "No 4,000 mB Nutrient Solution recipe");
+        helper.assertTrue(MachineRecipes.chemicalReacting(level, new ChemicalReactorInput(new ItemStack(ModItems.NPK_FERTILIZER.get()),
+                FluidResource.of(Fluids.WATER), 1_000, FluidResource.EMPTY, 0)).isEmpty(), "Nutrient Solution made from 1,000 mB of water");
+        // The other two NPK routes: Bone Meal (three of them) with Wood Ash or Potash, and Digestate on its own.
+        FluidResource ammoniaFluid = fluid(ModFluids.AMMONIA.get());
+        for (var potassium : List.of(ModItems.WOOD_ASH.get(), ModItems.POTASH.get())) {
+            var bone = MachineRecipes.chemicalReacting(level, new ChemicalReactorInput(new ItemStack(Items.BONE_MEAL, 3), new ItemStack(potassium),
+                    ammoniaFluid, 100, FluidResource.EMPTY, 0));
+            helper.assertTrue(bone.isPresent() && bone.get().value().itemOutput().get().create().is(ModItems.NPK_FERTILIZER.get()),
+                    "No NPK from Bone Meal and " + potassium);
+            var slag = MachineRecipes.chemicalReacting(level, new ChemicalReactorInput(new ItemStack(ModItems.BASIC_SLAG.get()), new ItemStack(potassium),
+                    ammoniaFluid, 100, FluidResource.EMPTY, 0));
+            helper.assertTrue(slag.isPresent() && slag.get().value().itemOutput().get().create().is(ModItems.NPK_FERTILIZER.get()),
+                    "No NPK from Basic Slag and " + potassium);
+        }
+        helper.assertTrue(MachineRecipes.chemicalReacting(level, new ChemicalReactorInput(new ItemStack(Items.BONE_MEAL, 2), new ItemStack(ModItems.POTASH.get()),
+                ammoniaFluid, 100, FluidResource.EMPTY, 0)).isEmpty(), "NPK from two Bone Meal");
+        var digestate = MachineRecipes.chemicalReacting(level, new ChemicalReactorInput(new ItemStack(ModItems.DIGESTATE.get(), 4), ammoniaFluid, 50,
+                FluidResource.EMPTY, 0));
+        helper.assertTrue(digestate.isPresent() && digestate.get().value().itemOutput().get().create().is(ModItems.NPK_FERTILIZER.get()),
+                "No NPK from Digestate");
+        // Potash from crushed Wood Ash and blasted kelp, and six Bone Meal from a bone.
+        var potash = MachineRecipes.crushing(level, new ItemStack(ModItems.WOOD_ASH.get()));
+        helper.assertTrue(potash.isPresent() && potash.get().value().result().get().create().is(ModItems.POTASH.get()), "Wood Ash doesn't crush to Potash");
+        var meal = MachineRecipes.crushing(level, new ItemStack(Items.BONE));
+        helper.assertTrue(meal.isPresent() && meal.get().value().result().get().create().getCount() == 6, "A bone doesn't crush to six Bone Meal");
+        var kelpInput = new net.minecraft.world.item.crafting.SingleRecipeInput(new ItemStack(Items.DRIED_KELP_BLOCK));
+        ItemStack kelp = level.recipeAccess().getRecipeFor(net.minecraft.world.item.crafting.RecipeType.BLASTING, kelpInput, level)
+                .map(holder -> holder.value().assemble(kelpInput)).orElse(ItemStack.EMPTY);
+        helper.assertTrue(kelp.is(ModItems.POTASH.get()) && kelp.getCount() == 4, "Blasting a Dried Kelp Block gave " + kelp);
         for (ItemStack stack : List.of(new ItemStack(Items.WHEAT), new ItemStack(Items.WHEAT_SEEDS), new ItemStack(Items.OAK_LEAVES),
                 new ItemStack(ModItems.PRESS_CAKE.get()), new ItemStack(ModItems.COMPOST.get()))) {
             helper.assertTrue(MachineRecipes.isDigesterInput(level, stack), stack + " doesn't digest");

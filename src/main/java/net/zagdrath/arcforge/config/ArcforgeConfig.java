@@ -1649,7 +1649,7 @@ public class ArcforgeConfig {
 
     public static final ModConfigSpec.DoubleValue GASIFIER_ASH_CHANCE = BUILDER
             .comment("Chance of a Wood Ash per operation.")
-            .defineInRange("ashChance", 0.25, 0.0, 1.0);
+            .defineInRange("ashChance", 0.5, 0.0, 1.0);
 
     public static final ModConfigSpec.IntValue GASIFIER_STEAM_CAPACITY = BUILDER
             .comment("Steam tank size in mB.")
@@ -2839,6 +2839,10 @@ public class ArcforgeConfig {
     public static final ModConfigSpec.IntValue WOOD_ASH_NUTRIENTS = BUILDER
             .comment("Nutrients from one Wood Ash.")
             .defineInRange("woodAsh", 3, 0, 15);
+
+    public static final ModConfigSpec.IntValue POTASH_NUTRIENTS = BUILDER
+            .comment("Nutrients from one Potash.")
+            .defineInRange("potash", 3, 0, 15);
 
     public static final ModConfigSpec.IntValue BASIC_SLAG_NUTRIENTS = BUILDER
             .comment("Nutrients from one Basic Slag.")
