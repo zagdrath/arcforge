@@ -100,7 +100,7 @@ public class LongFallBootsItem extends Item {
 
     @Override
     public int getBarColor(ItemStack stack) {
-        return ArcToolItem.BAR_COLOR;
+        return ArcforgedGear.BAR_COLOR;
     }
 
     @Override

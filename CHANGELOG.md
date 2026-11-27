@@ -29,6 +29,10 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
   charges a Jetpack or Long Fall Boots in their Curios slots.
 - An **Upgrades tab** on the Quantum Tunnel for its Chunk Loading Upgrade: it shows whether one is fitted and what it's
   doing (loading, over your limit, no FE...), and a click fits one from your inventory or takes it out.
+- **Carried Batteries charge your gear.** A Battery in your inventory, offhand or a Curios slot charges the FE items
+  you carry, up to its own rate a tick: the held item first, then the offhand, armour, Curios slots, hotbar and the
+  rest of the inventory. Anything with FE takes it (Arcforged gear, Arc tools, Long Fall Boots, other mods' tools),
+  except other Batteries.
 - A **Show area** button on the Chunk Loader and the Vacuum Collector, like the Arc Quarry's: on, the block keeps its
   area outlined in the world after its screen is closed (saved with the block). Their area always shows while the
   screen is open.
@@ -36,6 +40,7 @@ number and date. How to cut a release is in [docs/RELEASING.md](docs/RELEASING.m
 ### Changed
 
 - The Chunk Loader's radius − and + buttons are smaller, with the Show area button beside them.
+- Long Fall Boots' charge bar is the Arcforged gear's cyan.
 
 ### Changed
 

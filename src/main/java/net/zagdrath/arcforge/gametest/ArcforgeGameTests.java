@@ -235,6 +235,7 @@ public final class ArcforgeGameTests {
         TESTS.put("arcforged_tool_levels", ArcforgedGearGameTests::toolLevels);
         TESTS.put("arcforged_armor_values", ArcforgedGearGameTests::armorValues);
         TESTS.put("arcforged_fe_wear", ArcforgedGearGameTests::feWear);
+        TESTS.put("battery_charges_carried_gear", ArcforgedGearGameTests::batteryChargesCarriedGear);
         TESTS.put("arcforged_charges_in_energy_cell", ArcforgedGearGameTests::chargesInEnergyCell);
         TESTS.put("arcforged_smithing_upgrade", ArcforgedGearGameTests::smithingUpgrade);
         TESTS.put("arcforged_template_duplicates", ArcforgedGearGameTests::templateDuplicates);

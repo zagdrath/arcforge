@@ -918,7 +918,7 @@
   "gui.arcforge.smelts_above": "Smelts above %s °C",
   "container.arcforge.cylinder_short": "%s Cylinder",
   "tooltip.arcforge.info.alloy": "A tier material, made in the Arcforge Furnace. Every tiered block and item of this tier is made from it.",
-  "tooltip.arcforge.info.battery": "Carries FE. Charge and drain it in an Energy Cell's slots.",
+  "tooltip.arcforge.info.battery": "Carries FE. Charge and drain it in an Energy Cell's slots. Carried, it charges the FE items you hold, wear or carry (not other Batteries).",
   "tooltip.arcforge.info.canister": "Carries one liquid. Fill and empty it in a Fluid Tank's slots. Won't take gases.",
   "tooltip.arcforge.info.gas_cartridge": "Carries one gas, like steam. Fill and empty it in a Pressurized Cylinder's slots.",
   "tooltip.arcforge.info.thermal_capsule": "Carries heat (HU). Fill and empty it in a Heat Cell's slots; heat only flows hot to cold. Leaks while carried.",

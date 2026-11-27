@@ -215,4 +215,30 @@ public final class ArcforgedGearGameTests {
         }
         helper.succeed();
     }
+
+    // A Battery in the inventory charges worn armour and a tool in the inventory, but not another Battery.
+    static void batteryChargesCarriedGear(GameTestHelper helper) {
+        var player = TestFixtures.player(helper);
+        player.setGameMode(net.minecraft.world.level.GameType.SURVIVAL);
+        var kind = net.zagdrath.arcforge.item.storage.PortableStorageItem.Kind.BATTERY;
+        var batteryItem = ModItems.portable(kind, ConduitTier.ARCFORGED);
+        ItemStack battery = new ItemStack(batteryItem);
+        ArcToolItem.setEnergy(battery, batteryItem.capacity());
+        ItemStack emptyBattery = new ItemStack(ModItems.portable(kind, ConduitTier.TEMPERED));
+        ItemStack chestplate = new ItemStack(ModItems.ARCFORGED_CHESTPLATE.get());
+        ItemStack pickaxe = new ItemStack(ModItems.ARCFORGED_PICKAXE.get());
+        player.getInventory().setItem(20, battery);
+        player.getInventory().setItem(21, emptyBattery);
+        player.getInventory().setItem(22, pickaxe);
+        player.setItemSlot(net.minecraft.world.entity.EquipmentSlot.CHEST, chestplate);
+        net.zagdrath.arcforge.event.BatteryCharging.charge(player);
+        int chest = ArcToolItem.energy(player.getItemBySlot(net.minecraft.world.entity.EquipmentSlot.CHEST));
+        int pick = ArcToolItem.energy(player.getInventory().getItem(22));
+        helper.assertTrue(chest > 0, "The worn chestplate took no FE from the Battery");
+        helper.assertTrue(pick > 0, "The pickaxe in the inventory took no FE from the Battery");
+        helper.assertTrue(ArcToolItem.energy(player.getInventory().getItem(21)) == 0, "One Battery charged another");
+        helper.assertTrue(chest + pick <= batteryItem.rate(), "The Battery gave " + (chest + pick) + " FE in a tick, over its rate " + batteryItem.rate());
+        helper.assertTrue(ArcToolItem.energy(player.getInventory().getItem(20)) == batteryItem.capacity() - chest - pick, "FE was made or lost");
+        helper.succeed();
+    }
 }
